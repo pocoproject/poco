@@ -12,6 +12,7 @@
 //
 
 
+#include "Poco/ProcessOptions.h"
 #include "Poco/Process_UNIX.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
@@ -112,7 +113,16 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 }
 
 
-ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
+void ProcessImpl::timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kernelTime)
+{
+	struct rusage usage;
+	getrusage(RUSAGE_SELF, &usage);
+	userTime   = static_cast<Poco::Int64>(usage.ru_utime.tv_sec)*1000000 + usage.ru_utime.tv_usec;
+	kernelTime = static_cast<Poco::Int64>(usage.ru_stime.tv_sec)*1000000 + usage.ru_stime.tv_usec;
+}
+
+
+ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env, int options)
 {
 #if defined(__QNX__)
 	if (initialDirectory.empty())
@@ -123,7 +133,7 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		argv[i++] = const_cast<char*>(command.c_str());
 		for (const auto& a: args)
 			argv[i++] = const_cast<char*>(a.c_str());
-		argv[i] = NULL;
+		argv[i] = nullptr;
 		struct inheritance inherit;
 		std::memset(&inherit, 0, sizeof(inherit));
 		inherit.flags = SPAWN_ALIGN_DEFAULT | SPAWN_CHECK_SCRIPT | SPAWN_SEARCH_PATH;
@@ -156,21 +166,24 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 			throw SystemException("cannot spawn", command);
 
 		if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
+		if (options & PROCESS_CLOSE_STDIN) close(STDIN_FILENO);
 		if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
+		if (options & PROCESS_CLOSE_STDOUT) close(STDOUT_FILENO);
 		if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
+		if (options & PROCESS_CLOSE_STDERR) close(STDERR_FILENO);
 		return new ProcessHandleImpl(pid);
 	}
 	else
 	{
-		return launchByForkExecImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env);
+		return launchByForkExecImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env, options);
 	}
 #else
-	return launchByForkExecImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env);
+	return launchByForkExecImpl(command, args, initialDirectory, inPipe, outPipe, errPipe, env, options);
 #endif
 }
 
 
-ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env)
+ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command, const ArgsImpl& args, const std::string& initialDirectory, Pipe* inPipe, Pipe* outPipe, Pipe* errPipe, const EnvImpl& env, int options)
 {
 #if !defined(POCO_NO_FORK_EXEC)
 	// On some systems, sysconf(_SC_OPEN_MAX) returns a ridiculously high number,
@@ -178,72 +191,83 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 	// We therefore limit the maximum number of file descriptors we close.
 	const long CLOSE_FD_MAX = 100000;
 
-	// We must not allocated memory after fork(),
-	// therefore allocate all required buffers first.
-	std::vector<char> envChars = getEnvironmentVariablesBuffer(env);
-	std::vector<char*> argv(args.size() + 2);
-	int i = 0;
-	argv[i++] = const_cast<char*>(command.c_str());
-	for (const auto& a: args)
+	do
 	{
-		argv[i++] = const_cast<char*>(a.c_str());
-	}
-	argv[i] = NULL;
+		// We must not allocate memory after fork(),
+		// therefore allocate all required buffers first.
 
-	const char* pInitialDirectory = initialDirectory.empty() ? 0 : initialDirectory.c_str();
-
-	int pid = fork();
-	if (pid < 0)
-	{
-		throw SystemException("Cannot fork process for", command);
-	}
-	else if (pid == 0)
-	{
-		if (pInitialDirectory)
+		std::vector<char> envChars = getEnvironmentVariablesBuffer(env);
+		std::vector<char*> argv(args.size() + 2);
+		int i = 0;
+		argv[i++] = const_cast<char*>(command.c_str());
+		for (const auto& a: args)
 		{
-			if (chdir(pInitialDirectory) != 0)
+			argv[i++] = const_cast<char*>(a.c_str());
+		}
+		argv[i] = nullptr;
+
+		const char* pInitialDirectory = initialDirectory.empty() ? nullptr : initialDirectory.c_str();
+
+		int pid = fork();
+		if (pid < 0)
+		{
+			throw SystemException("Cannot fork process for", command);
+		}
+		else if (pid == 0)
+		{
+			if (pInitialDirectory)
 			{
-				_exit(72);
+				if (chdir(pInitialDirectory) != 0)
+				{
+					break;
+				}
 			}
+
+			// set environment variables
+			char* p = &envChars[0];
+			while (*p)
+			{
+				putenv(p);
+				while (*p) ++p;
+				++p;
+			}
+
+			// setup redirection
+			if (inPipe)
+			{
+				dup2(inPipe->readHandle(), STDIN_FILENO);
+				inPipe->close(Pipe::CLOSE_BOTH);
+			}
+			if (options & PROCESS_CLOSE_STDIN) close(STDIN_FILENO);
+
+			// outPipe and errPipe may be the same, so we dup first and close later
+			if (outPipe) dup2(outPipe->writeHandle(), STDOUT_FILENO);
+			if (errPipe) dup2(errPipe->writeHandle(), STDERR_FILENO);
+			if (outPipe) outPipe->close(Pipe::CLOSE_BOTH);
+			if (options & PROCESS_CLOSE_STDOUT) close(STDOUT_FILENO);
+			if (errPipe) errPipe->close(Pipe::CLOSE_BOTH);
+			if (options & PROCESS_CLOSE_STDERR) close(STDERR_FILENO);
+			// close all open file descriptors other than stdin, stdout, stderr
+			long fdMax = sysconf(_SC_OPEN_MAX);
+			// on some systems, sysconf(_SC_OPEN_MAX) returns a ridiculously high number
+			if (fdMax > CLOSE_FD_MAX) fdMax = CLOSE_FD_MAX;
+			for (long j = 3; j < fdMax; ++j)
+			{
+				close(j);
+			}
+
+			execvp(argv[0], &argv[0]);
+			break;
 		}
 
-		// set environment variables
-		char* p = &envChars[0];
-		while (*p)
-		{
-			putenv(p);
-			while (*p) ++p;
-			++p;
-		}
-
-		// setup redirection
-		if (inPipe)
-		{
-			dup2(inPipe->readHandle(), STDIN_FILENO);
-			inPipe->close(Pipe::CLOSE_BOTH);
-		}
-		// outPipe and errPipe may be the same, so we dup first and close later
-		if (outPipe) dup2(outPipe->writeHandle(), STDOUT_FILENO);
-		if (errPipe) dup2(errPipe->writeHandle(), STDERR_FILENO);
-		if (outPipe) outPipe->close(Pipe::CLOSE_BOTH);
-		if (errPipe) errPipe->close(Pipe::CLOSE_BOTH);
-		// close all open file descriptors other than stdin, stdout, stderr
-		long fdMax = sysconf(_SC_OPEN_MAX);
-		// on some systems, sysconf(_SC_OPEN_MAX) returns a ridiculously high number
-		if (fdMax > CLOSE_FD_MAX) fdMax = CLOSE_FD_MAX;
-		for (long i = 3; i < fdMax; ++i)
-		{
-			close(i);
-		}
-
-		execvp(argv[0], &argv[0]);
-		_exit(72);
+		if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
+		if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
+		if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
+		return new ProcessHandleImpl(pid);
 	}
+	while (false);
 
-	if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
-	if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
-	if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
-	return new ProcessHandleImpl(pid);
+	_exit(72);
 #else
 	throw Poco::NotImplementedException("platform does not allow fork/exec");
 #endif

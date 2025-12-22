@@ -24,28 +24,34 @@
 namespace Poco {
 
 
-//@ deprecated
-template <class TArgs, class TDelegate> 
-class FIFOStrategy: public DefaultStrategy<TArgs, TDelegate>
-	/// Note: As of release 1.4.2, DefaultStrategy already 
+template <class TArgs, class TDelegate>
+class POCO_DEPRECATED("As of release 1.4.2, DefaultStrategy already implements FIFO behavior, so this class is provided for backwards compatibility only") FIFOStrategy: public DefaultStrategy<TArgs, TDelegate>
+	/// Note: As of release 1.4.2, DefaultStrategy already
 	/// implements FIFO behavior, so this class is provided
 	/// for backwards compatibility only.
 {
 public:
-	FIFOStrategy()
-	{
-	}
+	FIFOStrategy() = default;
 
 	FIFOStrategy(const FIFOStrategy& s):
 		DefaultStrategy<TArgs, TDelegate>(s)
 	{
 	}
 
-	~FIFOStrategy()
+	FIFOStrategy(FIFOStrategy&& s):
+		DefaultStrategy<TArgs, TDelegate>(std::move(s))
 	{
 	}
 
+	~FIFOStrategy() = default;
+
 	FIFOStrategy& operator = (const FIFOStrategy& s)
+	{
+		DefaultStrategy<TArgs, TDelegate>::operator = (s);
+		return *this;
+	}
+	
+	FIFOStrategy& operator = (FIFOStrategy&& s)
 	{
 		DefaultStrategy<TArgs, TDelegate>::operator = (s);
 		return *this;

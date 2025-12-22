@@ -36,10 +36,10 @@ public:
 	Poco::UInt16 port() const;
 		/// Returns the port the echo server is
 		/// listening on.
-		
+
 	void run();
 		/// Does the work.
-		
+
 	const std::string& lastCommand() const;
 		/// Returns the last command received by the server.
 
@@ -52,29 +52,29 @@ public:
 
 	const std::vector<std::string>& lastCommands() const;
 		/// Returns the last command received by the server.
-		
+
 	void addResponse(const std::string& response);
 		/// Sets the next response returned by the server.
-	
+
 	void clearCommands();
 		/// Clears all commands.
-		
+
 	void clearResponses();
 		/// Clears all responses.
-		
+
 	void log(bool flag);
 		/// Enables or disables logging to stdout.
-	
+
 private:
 	Poco::Net::ServerSocket  _socket;
 	Poco::Thread             _thread;
 	Poco::Event              _ready;
 	mutable Poco::FastMutex  _mutex;
-	bool                     _stop;
+	std::atomic<bool>        _stop;
 	std::vector<std::string> _nextResponses;
 	std::vector<std::string> _lastCommands;
-	bool                     _acceptCommands;
-	bool                     _log;
+	std::atomic<bool>        _acceptCommands;
+	std::atomic<bool>        _log;
 };
 
 

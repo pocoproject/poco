@@ -194,6 +194,8 @@ private:
 		return getValue<T>(pResult, val);
 	}
 
+	void setName();
+
 	std::string           _connector;
 	mutable SessionHandle _handle;
 	bool                  _reset;

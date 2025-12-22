@@ -27,6 +27,11 @@
 
 
 namespace Poco {
+
+
+class FileInputStream;
+
+
 namespace Net {
 
 
@@ -39,6 +44,13 @@ class Net_API SocketImpl: public Poco::RefCountedObject
 	/// You should not create any instances of this class.
 {
 public:
+	enum Type
+	{
+		SOCKET_TYPE_STREAM = SOCK_STREAM,
+		SOCKET_TYPE_DATAGRAM = SOCK_DGRAM,
+		SOCKET_TYPE_RAW = SOCK_RAW
+	};
+
 	enum SelectMode
 	{
 		SELECT_READ  = 1,
@@ -135,6 +147,13 @@ public:
 		/// If the library has not been built with IPv6 support,
 		/// a Poco::NotImplementedException will be thrown.
 
+	void useFileDescriptor(poco_socket_t fd);
+		/// Use a external file descriptor for the socket. Required to be careful
+		/// about what kind of file descriptor you're passing to make sure it's compatible
+		/// with how you plan on using it. These specifics are platform-specific.
+		/// Not valid to call this if the internal socket is already initialized.
+		/// Poco takes ownership of the file descriptor, closing it when this socket is closed.
+
 	virtual void listen(int backlog = 64);
 		/// Puts the socket into listening state.
 		///
@@ -151,12 +170,22 @@ public:
 	virtual void shutdownReceive();
 		/// Shuts down the receiving part of the socket connection.
 
-	virtual void shutdownSend();
+	virtual int shutdownSend();
 		/// Shuts down the sending part of the socket connection.
+		///
+		/// Returns 0 for a non-blocking socket. May return
+		/// a negative value for a non-blocking socket in case
+		/// of a TLS connection. In that case, the operation should
+		/// be retried once the underlying socket becomes writable.
 
-	virtual void shutdown();
+	virtual int shutdown();
 		/// Shuts down both the receiving and the sending part
 		/// of the socket connection.
+		///
+		/// Returns 0 for a non-blocking socket. May return
+		/// a negative value for a non-blocking socket in case
+		/// of a TLS connection. In that case, the operation should
+		/// be retried once the underlying socket becomes writable.
 
 	virtual int sendBytes(const void* buffer, int length, int flags = 0);
 		/// Sends the contents of the given buffer through
@@ -169,7 +198,8 @@ public:
 		/// value denoting a certain condition.
 
 	virtual int sendBytes(const SocketBufVec& buffers, int flags = 0);
-		/// Receives data from the socket and stores it in buffers.
+		/// Sends the contents of the given buffers through
+		/// the socket.
 		///
 		/// Returns the number of bytes received.
 		///
@@ -257,6 +287,29 @@ public:
 		/// The preferred way for a socket to receive urgent data
 		/// is by enabling the SO_OOBINLINE option.
 
+	virtual std::streamsize sendFile(Poco::FileInputStream& FileInputStream, std::streamoff offset = 0, std::streamsize count = 0);
+		/// Sends the contents of a file over the socket, using operating
+		/// system-specific APIs, if available. The socket must not have
+		/// been set to non-blocking.
+		///
+		/// If count is != 0, sends the given number of bytes, otherwise
+		/// sends all bytes, starting from the given offset.
+		///
+		/// On Linux, macOS and FreeBSD systems, the implementation
+		/// uses sendfile() or sendfile64().
+		/// On Windows, the implementation uses TransmitFile().
+		///
+		/// If neither sendfile() nor TransmitFile() is available,
+		/// or the socket is a secure one (secure() returne true),
+		/// falls back to reading the file block by block and calling sendBytes().
+		///
+		/// Returns the number of bytes sent, which should be the same
+		/// as count, unless count is 0.
+		///
+		/// Throws NetException (or a subclass) in case of any errors.
+		/// Also throws a NetException if the socket has been set to
+		/// non-blocking.
+
 	virtual int available();
 		/// Returns the number of bytes available that can be read
 		/// without causing the socket to block.
@@ -270,6 +323,12 @@ public:
 		///
 		/// Returns true if the next operation corresponding to
 		/// mode will not block, false otherwise.
+
+	Type type();
+		/// Returns the socket type.
+
+	virtual int getError();
+		/// Returns the socket error.
 
 	virtual void setSendBufferSize(int size);
 		/// Sets the size of the send buffer.
@@ -492,6 +551,14 @@ protected:
 
 	void checkBrokenTimeout(SelectMode mode);
 
+	std::streamsize sendFileNative(Poco::FileInputStream& FileInputStream, std::streamoff offset, std::streamsize count);
+		/// Implements sendFile() using an OS-specific API like
+		/// sendfile() or TransmitFile().
+
+	std::streamsize sendFileBlockwise(Poco::FileInputStream& FileInputStream, std::streamoff offset, std::streamsize count);
+		/// Implements sendFile() by reading the file blockwise and
+		/// calling sendBytes() for each block.
+
 	static int lastError();
 		/// Returns the last error code.
 
@@ -526,6 +593,17 @@ private:
 //
 // inlines
 //
+inline SocketImpl::Type SocketImpl::type()
+{
+	int type;
+	getOption(SOL_SOCKET, SO_TYPE, type);
+	poco_assert_dbg(type == SOCK_STREAM ||
+					type == SOCK_DGRAM ||
+					type == SOCK_RAW);
+	return static_cast<Type>(type);
+}
+
+
 inline poco_socket_t SocketImpl::sockfd() const
 {
 	return _sockfd;
@@ -556,5 +634,9 @@ inline bool SocketImpl::getBlocking() const
 
 } } // namespace Poco::Net
 
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	#pragma comment(lib, "mswsock.lib")
+#endif
 
 #endif // Net_SocketImpl_INCLUDED

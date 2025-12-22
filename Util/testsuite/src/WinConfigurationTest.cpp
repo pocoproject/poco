@@ -15,7 +15,7 @@
 #include "Poco/Util/WinRegistryKey.h"
 #include "Poco/Environment.h"
 #include "Poco/AutoPtr.h"
-#include "Poco/types.h"
+#include "Poco/Types.h"
 #undef min
 #undef max
 #include <limits>
@@ -55,7 +55,7 @@ void WinConfigurationTest::testConfiguration()
 #if defined(POCO_HAVE_INT64)
 	pReg->setUInt64("name2", std::numeric_limits<UInt64>::max()); // overwrite should also change type
 	assertTrue (pReg->getUInt64("name2") == std::numeric_limits<UInt64>::max());
-	pReg->setInt64("name2", std::numeric_limits<Int64>::min()); 
+	pReg->setInt64("name2", std::numeric_limits<Int64>::min());
 	assertTrue (pReg->getInt64("name2") == std::numeric_limits<Int64>::min());
 
 	/// write real int64 value type
@@ -75,14 +75,14 @@ void WinConfigurationTest::testConfiguration()
 
 	assertTrue (pReg->hasProperty("name1"));
 	assertTrue (pReg->hasProperty("name2"));
-	
+
 	std::string dfl = pReg->getString("nonexistent", "default");
 	assertTrue (dfl == "default");
-	
+
 	AutoPtr<Poco::Util::AbstractConfiguration> pView = pReg->createView("config");
 	dfl = pView->getString("sub.foo", "default");
 	assertTrue (dfl == "default");
-	
+
 	pView->setString("sub.foo", "bar");
 	assertTrue (pView->getString("sub.foo", "default") == "bar");
 
@@ -108,13 +108,7 @@ void WinConfigurationTest::testConfiguration()
 	assertTrue (pRootReg->getInt("HKEY_CURRENT_USER.Software.Applied Informatics.Test.name1") == 1);
 
 	pRootReg->keys(keys);
-#if defined(_WIN32_WCE)
-	assertTrue (keys.size() == 4);
-	assertTrue (std::find(keys.begin(), keys.end(), "HKEY_CLASSES_ROOT") != keys.end());
-	assertTrue (std::find(keys.begin(), keys.end(), "HKEY_CURRENT_USER") != keys.end());
-	assertTrue (std::find(keys.begin(), keys.end(), "HKEY_LOCAL_MACHINE") != keys.end());
-	assertTrue (std::find(keys.begin(), keys.end(), "HKEY_USERS") != keys.end());
-#else
+
 	assertTrue (keys.size() == 6);
 	assertTrue (std::find(keys.begin(), keys.end(), "HKEY_CLASSES_ROOT") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "HKEY_CURRENT_CONFIG") != keys.end());
@@ -122,7 +116,6 @@ void WinConfigurationTest::testConfiguration()
 	assertTrue (std::find(keys.begin(), keys.end(), "HKEY_LOCAL_MACHINE") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "HKEY_PERFORMANCE_DATA") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "HKEY_USERS") != keys.end());
-#endif
 
 	pRootReg->keys("HKEY_CURRENT_USER.Software.Applied Informatics.Test", keys);
 	assertTrue (keys.size() == 5);

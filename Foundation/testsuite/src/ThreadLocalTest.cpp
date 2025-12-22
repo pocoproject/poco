@@ -35,12 +35,12 @@ public:
 			++(*_count);
 		_result = *_count;
 	}
-	
+
 	int result()
 	{
 		return _result;
 	}
-	
+
 private:
 	int _n;
 	int _result;
@@ -82,7 +82,7 @@ void ThreadLocalTest::testLocality()
 	t1.join();
 	t2.join();
 	t3.join();
-	
+
 	assertTrue (r1.result() == 5000);
 	assertTrue (r2.result() == 7500);
 	assertTrue (r3.result() == 6000);

@@ -27,18 +27,14 @@
 namespace Poco {
 
 
-template <class TKey, class TValue> 
+template <class TKey, class TValue>
 class AbstractStrategy
-	/// An AbstractStrategy is the interface for all strategies. 
+	/// An AbstractStrategy is the interface for all strategies.
 {
 public:
-	AbstractStrategy()
-	{
-	}
+	AbstractStrategy() = default;
 
-	virtual ~AbstractStrategy()
-	{
-	}
+	virtual ~AbstractStrategy() = default;
 
 	virtual void onUpdate(const void* pSender, const KeyValueArgs <TKey, TValue>& args)
 		/// Updates an existing entry.
@@ -46,7 +42,7 @@ public:
 		onRemove(pSender,args.key());
 		onAdd(pSender, args);
 	}
-	
+
 	virtual void onAdd(const void* pSender, const KeyValueArgs <TKey, TValue>& key) = 0;
 		/// Adds the key to the strategy.
 		/// If for the key already an entry exists, an exception will be thrown.

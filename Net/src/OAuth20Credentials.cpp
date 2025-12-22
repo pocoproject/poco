@@ -75,7 +75,7 @@ void OAuth20Credentials::setScheme(const std::string& scheme)
 	_scheme = scheme;
 }
 
-	
+
 void OAuth20Credentials::authenticate(HTTPRequest& request)
 {
 	std::string auth(_scheme);

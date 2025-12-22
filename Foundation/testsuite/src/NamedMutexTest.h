@@ -26,7 +26,7 @@ public:
 
 	void testLock();
 	void testTryLock();
-	
+
 	void setUp();
 	void tearDown();
 

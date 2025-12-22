@@ -29,7 +29,7 @@ public:
 	void testDistribution1();
 	void testDistribution2();
 	void testDistribution3();
-	
+
 	void setUp();
 	void tearDown();
 

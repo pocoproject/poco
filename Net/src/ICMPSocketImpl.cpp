@@ -66,7 +66,7 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 {
 	int maxPacketSize = _icmpPacket.maxPacketSize();
 	Poco::Buffer<unsigned char> buffer(maxPacketSize);
-	int expected = _icmpPacket.packetSize();
+	int leftover = _icmpPacket.packetSize();
 	int type = 0, code = 0;
 
 	try
@@ -83,8 +83,8 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 			if (rc == 0) break;
 			if (respAddr == address)
 			{
-				expected -= rc;
-				if (expected <= 0)
+				leftover -= rc;
+				if (leftover <= 0)
 				{
 					if (_icmpPacket.validReplyID(buffer.begin(), maxPacketSize)) break;
 					std::string err = _icmpPacket.errorDescription(buffer.begin(), maxPacketSize, type, code);
@@ -95,7 +95,7 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 			}
 			else continue;
 		}
-		while (expected > 0 && !_icmpPacket.validReplyID(buffer.begin(), maxPacketSize));
+		while (leftover > 0 && !_icmpPacket.validReplyID(buffer.begin(), maxPacketSize));
 	}
 	catch (ICMPException&)
 	{
@@ -113,10 +113,11 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 		else throw;
 	}
 
-	if (expected > 0)
+	if (leftover > 0)
 	{
-		throw ICMPException(Poco::format("No response: expected %d, received: %d", _icmpPacket.packetSize(),
-				_icmpPacket.packetSize() - expected));
+		std::string err = leftover < _icmpPacket.packetSize() ? "Incomplete" : "No";
+		throw ICMPException(Poco::format("%s response: expected %d, received: %d", err, _icmpPacket.packetSize(),
+				_icmpPacket.packetSize() - leftover));
 	}
 
 	struct timeval then = _icmpPacket.time(buffer.begin(), maxPacketSize);

@@ -27,7 +27,7 @@ namespace Net {
 #else
 #pragma pack(1)
 #endif
-struct NTPPacketData 
+struct NTPPacketData
 {
 	Poco::Int8 mode:3;
 	Poco::Int8 vn:3;
@@ -149,9 +149,10 @@ Poco::Timestamp NTPPacket::transmitTime() const
 Poco::Timestamp NTPPacket::convertTime(Poco::Int64 tm) const
 {
 	const unsigned long seventyYears = 2208988800UL;
-	Poco::UInt32 secsSince1900 = UInt32(Poco::ByteOrder::toLittleEndian(tm) >> 32);
-	unsigned long epoch = secsSince1900 - seventyYears;
-	return Poco::Timestamp::fromEpochTime(epoch);
+	Poco::UInt64 ntpTime = Poco::ByteOrder::toLittleEndian(tm);
+	Poco::UInt64 secs = ((ntpTime >> 32) - seventyYears) * 1000000;
+	Poco::UInt64 frac = ((ntpTime & 0xFFFFFFFF) * 1000000) >> 32;
+	return Poco::Timestamp(secs+frac);
 }
 
 

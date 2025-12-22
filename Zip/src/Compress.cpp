@@ -83,6 +83,12 @@ void Compress::addEntry(std::istream& in, const Poco::DateTime& lastModifiedAt, 
 
 	std::streamoff localHeaderOffset = _offset;
 	ZipLocalFileHeader hdr(fileName, lastModifiedAt, cm, cl, _forceZip64);
+	std::streampos pos = in.tellg();
+	in.seekg(0, in.end);
+	std::streampos length = in.tellg();
+	in.seekg(pos);
+	if (length >= ZipCommon::ZIP64_MAGIC)
+		hdr.setZip64Data();
 	hdr.setStartPos(localHeaderOffset);
 
 	ZipOutputStream zipOut(_out, hdr, _seekableOut);
@@ -321,11 +327,11 @@ ZipArchive Compress::close()
 	ZipArchive::FileInfos::const_iterator it = _infos.begin();
 	ZipArchive::FileInfos::const_iterator itEnd = _infos.end();
 	bool needZip64 = _forceZip64;
-	needZip64 = needZip64  || _files.size() >= ZipCommon::ZIP64_MAGIC_SHORT || centralDirStart64 >= ZipCommon::ZIP64_MAGIC;
+	needZip64 = needZip64 || _files.size() >= ZipCommon::ZIP64_MAGIC_SHORT || centralDirStart64 >= ZipCommon::ZIP64_MAGIC;
 	for (; it != itEnd; ++it)
 	{
 		const ZipFileInfo& nfo = it->second;
-		needZip64 = needZip64  || nfo.needsZip64();
+		needZip64 = needZip64 || nfo.needsZip64();
 
 		std::string info(nfo.createHeader());
 		_out.write(info.c_str(), static_cast<std::streamsize>(info.size()));
@@ -334,9 +340,9 @@ ZipArchive Compress::close()
 		_offset += entrySize;
 	}
 	if (!_out) throw Poco::IOException("Bad output stream");
-	
+
 	Poco::UInt64 numEntries64 = _infos.size();
-	needZip64 = needZip64  || _offset >= ZipCommon::ZIP64_MAGIC;
+	needZip64 = needZip64 || _offset >= ZipCommon::ZIP64_MAGIC;
 	if (needZip64)
 	{
 		ZipArchiveInfo64 central;

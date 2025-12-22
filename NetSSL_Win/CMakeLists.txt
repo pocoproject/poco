@@ -25,16 +25,19 @@ target_link_libraries(NetSSLWin PUBLIC Poco::Net Poco::Util Crypt32.lib)
 target_include_directories(NetSSLWin
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-		$<INSTALL_INTERFACE:include>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 POCO_INSTALL(NetSSLWin)
 POCO_GENERATE_PACKAGE(NetSSLWin)
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	#TODO: Looks like the samples use crypto somehow?
 	#add_subdirectory(samples)
+endif()
+
+if(ENABLE_TESTS)
 	#add_subdirectory(testsuite)
 endif()
 

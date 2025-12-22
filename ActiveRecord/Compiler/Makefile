@@ -8,7 +8,7 @@ include $(POCO_BASE)/build/rules/global
 
 objects = Parser CodeGenerator HeaderGenerator ImplGenerator Compiler
 
-target         = arc
+target         = poco-arc
 target_libs    = PocoUtil PocoJSON PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec

@@ -47,26 +47,26 @@ void TimestampTest::testTimestamp()
 	assertTrue (t2 <= t3);
 	Timestamp::TimeDiff d = (t2 - t1);
 	assertTrue (d >= 180000 && d <= 300000);
-	
+
 	t1.swap(t2);
 	assertTrue (t1 > t2);
 	t2.swap(t1);
-	
+
 	Timestamp::UtcTimeVal tv = t1.utcTime();
 	Timestamp t4 = Timestamp::fromUtcTime(tv);
 	assertTrue (t1 == t4);
-	
+
 	Timestamp epoch(0);
 	tv = epoch.utcTime();
 	assertTrue (tv >> 32 == 0x01B21DD2);
 	assertTrue ((tv & 0xFFFFFFFF) == 0x13814000);
-	
+
 	Timestamp now;
 	Thread::sleep(201);
 	assertTrue (now.elapsed() >= 200000);
 	assertTrue (now.isElapsed(200000));
 	assertTrue (!now.isElapsed(2000000));
-	
+
 #if defined(_WIN32)
 	{
 		Timestamp now;

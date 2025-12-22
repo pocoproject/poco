@@ -31,24 +31,44 @@ class Foundation_API FileStreamBuf: public BufferedBidirectionalStreamBuf
 	/// This stream buffer handles Fileio
 {
 public:
+	using NativeHandle = int;
+	
 	FileStreamBuf();
 		/// Creates a FileStreamBuf.
-		
-	~FileStreamBuf();
+
+	~FileStreamBuf() override;
 		/// Destroys the FileStream.
 
 	void open(const std::string& path, std::ios::openmode mode);
 		/// Opens the given file in the given mode.
 
+	void openHandle(NativeHandle fd, std::ios::openmode mode);
+		/// Take ownership of the given file descriptor.
+
 	bool close();
 		/// Closes the File stream buffer. Returns true if successful,
 		/// false otherwise.
 
-	std::streampos seekoff(std::streamoff off, std::ios::seekdir dir, std::ios::openmode mode = std::ios::in | std::ios::out);
+	bool resizeBuffer(std::streamsize bufferSize) override;
+		/// Resizes internal buffer. Minimum size is BUFFER_SIZE.
+		/// Minimum is used when requested size is smaller.
+		/// Buffer can be resized only when the file is not open.
+		/// Returns true if resize succeeded.
+
+	std::streampos seekoff(std::streamoff off, std::ios::seekdir dir, std::ios::openmode mode = std::ios::in | std::ios::out) override;
 		/// Change position by offset, according to way and mode.
 
-	std::streampos seekpos(std::streampos pos, std::ios::openmode mode = std::ios::in | std::ios::out);
+	std::streampos seekpos(std::streampos pos, std::ios::openmode mode = std::ios::in | std::ios::out) override;
 		/// Change to specified position, according to mode.
+
+	void flushToDisk();
+		/// Forces buffered data to be written to the disk
+
+	NativeHandle nativeHandle() const;
+		/// Returns native file descriptor handle
+	
+	UInt64 size() const;
+		/// Returns file size
 
 protected:
 	enum
@@ -56,13 +76,13 @@ protected:
 		BUFFER_SIZE = 4096
 	};
 
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	std::streamsize readFromDevice(char* buffer, std::streamsize length) override;
+	std::streamsize writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
 	std::string _path;
-	int _fd;
-	std::streamoff _pos;
+	NativeHandle _fd;
+	std::streamoff _pos {0};
 };
 
 

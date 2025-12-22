@@ -28,7 +28,7 @@
 namespace Poco {
 
 
-template <class TKey, class TValue> 
+template <class TKey, class TValue>
 class StrategyCollection: public AbstractStrategy<TKey, TValue>
 	/// An StrategyCollection is a decorator masking n collections as a single one.
 {
@@ -38,13 +38,9 @@ public:
 	using ConstIterator = typename Strategies::const_iterator;
 
 public:
-	StrategyCollection()
-	{
-	}
+	StrategyCollection() = default;
 
-	~StrategyCollection()
-	{
-	}
+	~StrategyCollection() = default;
 
 	void pushBack(AbstractStrategy<TKey, TValue>* pStrat)
 		/// Adds an AbstractStrategy to the collection. Class takes ownership of pointer

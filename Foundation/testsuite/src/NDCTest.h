@@ -26,6 +26,7 @@ public:
 
 	void testNDC();
 	void testNDCScope();
+	void testNDCMultiThread();
 
 	void setUp();
 	void tearDown();
@@ -33,6 +34,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	void runInThread();
 };
 
 

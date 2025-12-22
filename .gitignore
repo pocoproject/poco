@@ -43,8 +43,12 @@ config.build
 config.make
 
 # CLion #
-########
+#########
 .idea/
+
+# Qt Creator #
+#########
+build/Qt_*
 
 # CMake #
 ########
@@ -56,6 +60,7 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 cmake_*
 cmake-build-*
+*Targets_installed.cmake
 
 # Packages #
 ############
@@ -131,6 +136,9 @@ lib/
 lib64/
 pocomsg.h
 **/UpgradeLog*.XML
+/out/build/x64-Debug
+.vs/
+vcpkg_installed/
 
 # Eclipse generated files #
 ###########################
@@ -144,3 +152,82 @@ cmake-build/
 *.bak
 stage/
 releases/
+poco_build_stderr.out
+
+# vim #
+#######
+*.orig
+*.swp
+*.vim
+tags
+
+# Javascript #
+##############
+package-lock.json
+node_modules
+
+# Old Visual Studio files #
+###########################
+*_vs1[45]0.sln
+*_vs1[45]0.vcxproj
+*_vs1[45]0.vcxproj.filters
+
+# Debug files #
+##############
+*.core
+
+# Build-time symlinks to bundled libraries #
+############################################
+Foundation/src/adler32.c
+Foundation/src/config.h
+Foundation/src/pcre2posix.c
+Foundation/src/pcre2posix.h
+Foundation/src/compress.c
+Foundation/src/crc32.c
+Foundation/src/crc32.h
+Foundation/src/deflate.c
+Foundation/src/deflate.h
+Foundation/src/gzguts.h
+Foundation/src/infback.c
+Foundation/src/inffast.c
+Foundation/src/inffast.h
+Foundation/src/inffixed.h
+Foundation/src/inflate.c
+Foundation/src/inflate.h
+Foundation/src/inftrees.c
+Foundation/src/inftrees.h
+Foundation/src/pcre2.h
+Foundation/src/pcre2_*.c
+Foundation/src/pcre2_*.h
+Foundation/src/trees.c
+Foundation/src/trees.h
+Foundation/src/utf8proc.c
+Foundation/src/utf8proc.h
+Foundation/src/utf8proc_data.c
+Foundation/src/zconf.h
+Foundation/src/zlib.h
+Foundation/src/zutil.c
+Foundation/src/zutil.h
+JSON/src/pdjson.c
+JSON/src/pdjson.h
+Data/SQLite/src/sqlite3.c
+Data/SQLite/src/sqlite3.h
+XML/src/ascii.h
+XML/src/asciitab.h
+XML/src/expat.h
+XML/src/expat_config.h
+XML/src/expat_external.h
+XML/src/iasciitab.h
+XML/src/internal.h
+XML/src/latin1tab.h
+XML/src/nametab.h
+XML/src/siphash.h
+XML/src/utf8tab.h
+XML/src/xmlparse.cpp
+XML/src/xmlrole.c
+XML/src/xmlrole.h
+XML/src/xmltok.c
+XML/src/xmltok.h
+XML/src/xmltok_impl.c
+XML/src/xmltok_impl.h
+XML/src/xmltok_ns.c

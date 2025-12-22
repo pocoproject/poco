@@ -48,15 +48,15 @@ void ClockTest::testClock()
 	assertTrue (t2 <= t3);
 	Clock::ClockDiff d = (t2 - t1);
 	assertTrue (d >= 180000 && d <= 300000);
-	
+
 	Clock::ClockDiff acc = Clock::accuracy();
 	assertTrue (acc > 0 && acc < Clock::resolution());
 	std::cout << "Clock accuracy: " << acc << std::endl;
-	
+
 	t1.swap(t2);
 	assertTrue (t1 > t2);
 	t2.swap(t1);
-	
+
 	Clock now;
 	Thread::sleep(201);
 	assertTrue (now.elapsed() >= 200000);

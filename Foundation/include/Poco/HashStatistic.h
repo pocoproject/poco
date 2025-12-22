@@ -24,17 +24,17 @@
 
 namespace Poco {
 
+class POCO_DEPRECATED("Not supported since 2006, use Hash.") HashStatistic;
 
-//@ deprecated
 class Foundation_API HashStatistic
 	/// HashStatistic class bundles statistical information on the current state of a HashTable
 {
 public:
 	HashStatistic(
-		UInt32 tableSize, 
-		UInt32 numEntries, 
-		UInt32 numZeroEntries, 
-		UInt32 maxEntry, 
+		UInt32 tableSize,
+		UInt32 numEntries,
+		UInt32 numZeroEntries,
+		UInt32 maxEntry,
 		std::vector<UInt32> details = std::vector<UInt32>());
 		/// Creates the HashStatistic.
 

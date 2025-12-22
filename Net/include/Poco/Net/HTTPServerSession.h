@@ -41,19 +41,19 @@ public:
 
 	virtual ~HTTPServerSession();
 		/// Destroys the HTTPServerSession.
-				
+
 	bool hasMoreRequests();
 		/// Returns true if there are requests available.
-	
+
 	bool canKeepAlive() const;
 		/// Returns true if the session can be kept alive.
-	
+
 	SocketAddress clientAddress();
 		/// Returns the client's address.
-		
+
 	SocketAddress serverAddress();
 		/// Returns the server's address.
-		
+
 private:
 	bool           _firstRequest;
 	Poco::Timespan _keepAliveTimeout;

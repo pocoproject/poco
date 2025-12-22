@@ -14,7 +14,6 @@
 #define MongoDBTest_INCLUDED
 
 
-#include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Connection.h"
 #include "CppUnit/TestCase.h"
 
@@ -25,28 +24,36 @@ public:
 	MongoDBTest(const std::string& name);
 
 	virtual ~MongoDBTest();
-
-	void testInsertRequest();
-	void testQueryRequest();
-	void testDBQueryRequest();
-	void testCountCommand();
-	void testDBCountCommand();
-	void testDBCount2Command();
-	void testDeleteRequest();
-	void testBuildInfo();
-	void testConnectionPool();
-	void testCursorRequest();
-	void testObjectID();
-	void testCommand();
-	void testUUID();
-	void testConnectURI();
+	
 	void setUp();
 	void tearDown();
+
+	void testObjectID();
+	void testBuildInfo();
+	void testHello();
+	void testConnectURI();
+
+	// OP_MSG wire protocol
+	void testOpCmdHello();
+	void testOpCmdWriteRead();
+	void testOpCmdInsert();
+	void testOpCmdFind();
+	void testOpCmdCursor();
+	void testOpCmdCursorAggregate();
+	void testOpCmdCursorEmptyFirstBatch();
+	void testOpCmdKillCursor();
+	void testOpCmdCount();
+	void testOpCmdDelete();
+	void testOpCmdUnaknowledgedInsert();
+	void testOpCmdConnectionPool();
+	void testOpCmdDropDatabase();
+	void testDBCount();
 
 	static CppUnit::Test* suite();
 
 private:
-	static Poco::MongoDB::Connection::Ptr _mongo;
+	static Poco::MongoDB::Connection::Ptr	_mongo;
+	static Poco::Int64						_wireVersion;
 };
 
 

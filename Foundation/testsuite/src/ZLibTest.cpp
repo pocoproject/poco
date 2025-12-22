@@ -18,7 +18,6 @@
 #include "Poco/Buffer.h"
 #include <sstream>
 
-
 using Poco::InflatingInputStream;
 using Poco::InflatingOutputStream;
 using Poco::DeflatingOutputStream;
@@ -97,7 +96,7 @@ void ZLibTest::testDeflate4()
 {
 	Poco::Buffer<char> buffer(1024);
 	Poco::MemoryOutputStream ostr(buffer.begin(), static_cast<std::streamsize>(buffer.size()));
-	DeflatingOutputStream deflater(ostr, -10, Z_BEST_SPEED);
+	DeflatingOutputStream deflater(ostr, -10, DeflatingStreamBuf::BEST_SPEED);
 	std::string data(36828, 'x');
 	deflater << data;
 	deflater.close();
@@ -128,13 +127,13 @@ void ZLibTest::testGzip1()
 void ZLibTest::testGzip2()
 {
 	// created with gzip ("Hello, world!"):
-	const unsigned char gzdata[] = 
+	const unsigned char gzdata[] =
 	{
-		0x1f, 0x8b, 0x08, 0x08, 0xb0, 0x73, 0xd0, 0x41, 0x00, 0x03, 0x68, 0x77, 0x00, 0xf3, 0x48, 0xcd, 
-		0xc9, 0xc9, 0xd7, 0x51, 0x28, 0xcf, 0x2f, 0xca, 0x49, 0x51, 0xe4, 0x02, 0x00, 0x18, 0xa7, 0x55, 
+		0x1f, 0x8b, 0x08, 0x08, 0xb0, 0x73, 0xd0, 0x41, 0x00, 0x03, 0x68, 0x77, 0x00, 0xf3, 0x48, 0xcd,
+		0xc9, 0xc9, 0xd7, 0x51, 0x28, 0xcf, 0x2f, 0xca, 0x49, 0x51, 0xe4, 0x02, 0x00, 0x18, 0xa7, 0x55,
 		0x7b, 0x0e, 0x00, 0x00, 0x00, 0x00
 	};
-	
+
 	std::string gzstr((char*) gzdata, sizeof(gzdata));
 	std::istringstream istr(gzstr);
 	InflatingInputStream inflater(istr, InflatingStreamBuf::STREAM_GZIP);
@@ -142,7 +141,7 @@ void ZLibTest::testGzip2()
 	inflater >> data;
 	assertTrue (data == "Hello,");
 	inflater >> data;
-	assertTrue (data == "world!");	
+	assertTrue (data == "world!");
 }
 
 
@@ -171,7 +170,7 @@ void ZLibTest::testGzip3()
 	inflater >> data;
 	assertTrue (data == "bcdefabcdefabcdefabcdefabcdefabcdefa");
 	inflater >> data;
-	assertTrue (data == "bcdefabcdefabcdefabcdefabcdefabcdefa");	
+	assertTrue (data == "bcdefabcdefabcdefabcdefabcdefabcdefa");
 }
 
 

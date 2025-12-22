@@ -45,10 +45,10 @@ AutoDetectStreamBuf::~AutoDetectStreamBuf()
 }
 
 
-int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	poco_assert_dbg(length >= 8);
-	if (_pIstr == 0 || length == 0) return -1;
+	if (_pIstr == nullptr || length == 0) return -1;
 
 	if (_reposition)
 	{
@@ -59,20 +59,20 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 
 	if (!_prefix.empty())
 	{
-		std::streamsize n = (_prefix.size() > length) ? length : static_cast<std::streamsize>(_prefix.size());
+		std::streamsize n = std::min(static_cast<std::streamsize>(_prefix.size()), length);
 		std::memcpy(buffer, _prefix.data(), n);
-		_prefix.erase(0, n);
-		return static_cast<int>(n);
+		_prefix.erase(0, static_cast<std::size_t>(n));
+		return n;
 	}
 
 	if (_eofDetected)
 	{
 		if (!_postfix.empty())
 		{
-			std::streamsize n = (_postfix.size() > length) ? length : static_cast<std::streamsize>(_postfix.size());
+			std::streamsize n = std::min(static_cast<std::streamsize>(_postfix.size()), length);
 			std::memcpy(buffer, _postfix.data(), n);
-			_postfix.erase(0, n);
-			return static_cast<int>(n);
+			_postfix.erase(0, static_cast<std::size_t>(n));
+			return n;
 		}
 		else return -1;
 	}
@@ -120,22 +120,22 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 						if (!_pIstr->good()) throw Poco::IOException("Failed to read data descriptor");
 
 						dataInfoSize = dataInfo.getFullHeaderSize();
-						if (dataInfo.getCompressedSize() == _length + offset)
+						if (dataInfo.getCompressedSize() == static_cast<Poco::UInt64>(_length + offset))
 						{
-							_pIstr->seekg(-static_cast<int>(dataInfoSize), std::ios::cur);
+							_pIstr->seekg(-static_cast<std::streamoff>(dataInfoSize), std::ios::cur);
 							if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
 
 							_eofDetected = true;
 							_length += offset;
-						
+
 							if (offset == 0 && !_postfix.empty())
 							{
-								offset = (_postfix.size() > length) ? length : static_cast<std::streamsize>(_postfix.size());
-								std::memcpy(buffer, _postfix.data(), offset);
-								_postfix.erase(0, offset);
+								offset = std::min(static_cast<std::streamsize>(_postfix.size()), length);
+								std::memcpy(buffer, _postfix.data(), static_cast<std::size_t>(offset));
+								_postfix.erase(0, static_cast<std::size_t>(offset));
 							}
-						
-							return static_cast<int>(offset);
+
+							return offset;
 						}
 					}
 					else
@@ -144,26 +144,26 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 						if (!_pIstr->good()) throw Poco::IOException("Failed to read data descriptor");
 
 						dataInfoSize = dataInfo.getFullHeaderSize();
-						if (dataInfo.getCompressedSize() == _length + offset)
+						if (dataInfo.getCompressedSize() == static_cast<Poco::UInt64>(_length + offset))
 						{
-							_pIstr->seekg(-static_cast<int>(dataInfoSize), std::ios::cur);
+							_pIstr->seekg(-static_cast<std::streamoff>(dataInfoSize), std::ios::cur);
 							if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
 
 							_eofDetected = true;
 							_length += offset;
-						
+
 							if (offset == 0 && !_postfix.empty())
 							{
-								offset = (_postfix.size() > length) ? length : static_cast<std::streamsize>(_postfix.size());
-								std::memcpy(buffer, _postfix.data(), offset);
-								_postfix.erase(0, offset);
+								offset = std::min(static_cast<std::streamsize>(_postfix.size()), length);
+								std::memcpy(buffer, _postfix.data(), static_cast<std::size_t>(offset));
+								_postfix.erase(0, static_cast<std::size_t>(offset));
 							}
-						
-							return static_cast<int>(offset);
+
+							return offset;
 						}
 					}
 
-					_pIstr->seekg(-static_cast<int>(dataInfoSize - 4), std::ios::cur);
+					_pIstr->seekg(-static_cast<std::streamoff>(dataInfoSize - 4), std::ios::cur);
 					if (!_pIstr->good()) throw Poco::IOException("Failed to seek on input stream");
 
 					buffer[offset++] = ZipDataInfo::HEADER[0];
@@ -177,7 +177,7 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 					buffer[offset++] = ZipDataInfo::HEADER[0];
 					buffer[offset++] = ZipDataInfo::HEADER[1];
 					buffer[offset++] = ZipDataInfo::HEADER[2];
-					buffer[offset++] = c;
+					buffer[offset++] = static_cast<char>(c);
 					_matchCnt = 0;
 				}
 			}
@@ -185,12 +185,12 @@ int AutoDetectStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	}
 
 	_length += offset;
-	return static_cast<int>(offset);
+	return offset;
 
 }
 
 
-int AutoDetectStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize AutoDetectStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	return -1; // not supported
 }

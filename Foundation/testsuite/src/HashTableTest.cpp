@@ -7,6 +7,8 @@
 // SPDX-License-Identifier:	BSL-1.0
 //
 
+#if defined(POCO_TEST_DEPRECATED)
+
 
 #include "HashTableTest.h"
 #include "CppUnit/TestCaller.h"
@@ -200,3 +202,5 @@ CppUnit::Test* HashTableTest::suite()
 
 	return pSuite;
 }
+
+#endif

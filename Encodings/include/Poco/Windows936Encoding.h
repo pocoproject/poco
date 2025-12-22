@@ -33,7 +33,7 @@ class Encodings_API Windows936Encoding: public DoubleByteEncoding
 public:
 	Windows936Encoding();
 	~Windows936Encoding();
-	
+
 private:
 	static const char* _names[];
 	static const CharacterMap _charMap;

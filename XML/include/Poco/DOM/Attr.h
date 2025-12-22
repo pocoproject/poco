@@ -31,7 +31,7 @@ namespace XML {
 class XML_API Attr: public AbstractNode
 	/// The Attr interface represents an attribute in an Element object. Typically
 	/// the allowable values for the attribute are defined in a document type definition.
-	/// 
+	///
 	/// Attr objects inherit the Node interface, but since they are not actually
 	/// child nodes of the element they describe, the DOM does not consider them
 	/// part of the document tree. Thus, the Node attributes parentNode, previousSibling,
@@ -44,7 +44,7 @@ class XML_API Attr: public AbstractNode
 	/// nodes contained within a DocumentFragment. In short, users and implementors
 	/// of the DOM need to be aware that Attr nodes have some things in common with
 	/// other objects inheriting the Node interface, but they also are quite distinct.
-	/// 
+	///
 	/// The attribute's effective value is determined as follows: if this attribute
 	/// has been explicitly assigned any value, that value is the attribute's effective
 	/// value; otherwise, if there is a declaration for this attribute, and that
@@ -53,7 +53,7 @@ class XML_API Attr: public AbstractNode
 	/// in the structure model until it has been explicitly added. Note that the
 	/// nodeValue attribute on the Attr instance can also be used to retrieve the
 	/// string version of the attribute's value(s).
-	/// 
+	///
 	/// In XML, where the value of an attribute can contain entity references, the
 	/// child nodes of the Attr node provide a representation in which entity references
 	/// are not expanded. These child nodes may be either Text or EntityReference
@@ -74,7 +74,7 @@ public:
 		/// attribute. The implementation will then make a new attribute available with
 		/// specified set to false and the default value (if one exists).
 		/// In summary:
-		/// 
+		///
 		///     * If the attribute has an assigned value in the document then specified
 		///       is true, and the value is the assigned value.
 		///     * If the attribute has no assigned value in the document and has a default
@@ -106,7 +106,7 @@ public:
 
 	// DOM Level 2
 	Element* ownerElement() const;
-		/// The Element node this attribute is attached to or null 
+		/// The Element node this attribute is attached to or null
 		/// if this attribute is not in use.
 
 	// Node
@@ -127,7 +127,7 @@ protected:
 	Attr(Document* pOwnerDocument, Element* pOwnerElement, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname, const XMLString& value, bool specified = true);
 	Attr(Document* pOwnerDocument, const Attr& attr);
 	~Attr();
-	
+
 	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:

@@ -18,7 +18,7 @@
 namespace Poco {
 
 
-const int Ascii::CHARACTER_PROPERTIES[128] = 
+const int Ascii::CHARACTER_PROPERTIES[128] =
 {
 	/* 00 . */ ACP_CONTROL,
 	/* 01 . */ ACP_CONTROL,

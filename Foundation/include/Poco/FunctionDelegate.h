@@ -7,7 +7,7 @@
 //
 // Implementation of the FunctionDelegate template.
 //
-// Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -21,18 +21,64 @@
 #include "Poco/Foundation.h"
 #include "Poco/AbstractDelegate.h"
 #include "Poco/Mutex.h"
+#include <type_traits>
 
 
 namespace Poco {
 
 
-template <class TArgs, bool hasSender = true, bool senderIsConst = true> 
+namespace Detail {
+
+/// Helper to select the correct function pointer type based on template parameters.
+template <class TArgs, bool hasSender, bool senderIsConst>
+struct FunctionDelegateNotifyType;
+
+template <class TArgs>
+struct FunctionDelegateNotifyType<TArgs, true, true>
+{
+	using Type = void (*)(const void*, TArgs&);
+};
+
+template <class TArgs>
+struct FunctionDelegateNotifyType<TArgs, true, false>
+{
+	using Type = void (*)(void*, TArgs&);
+};
+
+template <class TArgs, bool senderIsConst>
+struct FunctionDelegateNotifyType<TArgs, false, senderIsConst>
+{
+	using Type = void (*)(TArgs&);
+};
+
+template <>
+struct FunctionDelegateNotifyType<void, true, true>
+{
+	using Type = void (*)(const void*);
+};
+
+template <>
+struct FunctionDelegateNotifyType<void, true, false>
+{
+	using Type = void (*)(void*);
+};
+
+template <bool senderIsConst>
+struct FunctionDelegateNotifyType<void, false, senderIsConst>
+{
+	using Type = void (*)();
+};
+
+} // namespace Detail
+
+
+template <class TArgs, bool hasSender = true, bool senderIsConst = true>
 class FunctionDelegate: public AbstractDelegate<TArgs>
-	/// Wraps a freestanding function or static member function 
+	/// Wraps a freestanding function or static member function
 	/// for use as a Delegate.
 {
 public:
-	typedef void (*NotifyFunction)(const void*, TArgs&);
+	using NotifyFunction = typename Detail::FunctionDelegateNotifyType<TArgs, hasSender, senderIsConst>::Type;
 
 	FunctionDelegate(NotifyFunction function):
 		_function(function)
@@ -45,10 +91,10 @@ public:
 	{
 	}
 
-	~FunctionDelegate()
-	{
-	}
-	
+	~FunctionDelegate() = default;
+
+	FunctionDelegate() = delete;
+
 	FunctionDelegate& operator = (const FunctionDelegate& delegate)
 	{
 		if (&delegate != this)
@@ -63,74 +109,21 @@ public:
 		Mutex::ScopedLock lock(_mutex);
 		if (_function)
 		{
-			(*_function)(sender, arguments);
-			return true;
-		}
-		else return false;
-	}
-
-	bool equals(const AbstractDelegate<TArgs>& other) const
-	{
-		const FunctionDelegate* pOtherDelegate = dynamic_cast<const FunctionDelegate*>(other.unwrap());
-		return pOtherDelegate && _function == pOtherDelegate->_function;
-	}
-
-	AbstractDelegate<TArgs>* clone() const
-	{
-		return new FunctionDelegate(*this);
-	}
-	
-	void disable()
-	{
-		Mutex::ScopedLock lock(_mutex);
-		_function = 0;
-	}
-
-protected:
-	NotifyFunction _function;
-	Mutex _mutex;
-
-private:
-	FunctionDelegate();
-};
-
-
-template <class TArgs> 
-class FunctionDelegate<TArgs, true, false>: public AbstractDelegate<TArgs>
-{
-public:
-	typedef void (*NotifyFunction)(void*, TArgs&);
-
-	FunctionDelegate(NotifyFunction function):
-		_function(function)
-	{
-	}
-
-	FunctionDelegate(const FunctionDelegate& delegate):
-		AbstractDelegate<TArgs>(delegate),
-		_function(delegate._function)
-	{
-	}
-
-	~FunctionDelegate()
-	{
-	}
-	
-	FunctionDelegate& operator = (const FunctionDelegate& delegate)
-	{
-		if (&delegate != this)
-		{
-			this->_function = delegate._function;
-		}
-		return *this;
-	}
-
-	bool notify(const void* sender, TArgs& arguments)
-	{
-		Mutex::ScopedLock lock(_mutex);
-		if (_function)
-		{
-			(*_function)(const_cast<void*>(sender), arguments);
+			if constexpr (hasSender)
+			{
+				if constexpr (senderIsConst)
+				{
+					(*_function)(sender, arguments);
+				}
+				else
+				{
+					(*_function)(const_cast<void*>(sender), arguments);
+				}
+			}
+			else
+			{
+				(*_function)(arguments);
+			}
 			return true;
 		}
 		else return false;
@@ -150,92 +143,21 @@ public:
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_function = 0;
+		_function = nullptr;
 	}
 
 protected:
 	NotifyFunction _function;
 	Mutex _mutex;
-
-private:
-	FunctionDelegate();
 };
 
 
-template <class TArgs, bool senderIsConst> 
-class FunctionDelegate<TArgs, false, senderIsConst>: public AbstractDelegate<TArgs>
+template <bool hasSender, bool senderIsConst>
+class FunctionDelegate<void, hasSender, senderIsConst>: public AbstractDelegate<void>
+	/// Specialization for void arguments (no TArgs parameter).
 {
 public:
-	typedef void (*NotifyFunction)(TArgs&);
-
-	FunctionDelegate(NotifyFunction function):
-		_function(function)
-	{
-	}
-
-	FunctionDelegate(const FunctionDelegate& delegate):
-		AbstractDelegate<TArgs>(delegate),
-		_function(delegate._function)
-	{
-	}
-
-	~FunctionDelegate()
-	{
-	}
-	
-	FunctionDelegate& operator = (const FunctionDelegate& delegate)
-	{
-		if (&delegate != this)
-		{
-			this->_function = delegate._function;
-		}
-		return *this;
-	}
-
-	bool notify(const void* /*sender*/, TArgs& arguments)
-	{
-		Mutex::ScopedLock lock(_mutex);
-		if (_function)
-		{
-			(*_function)(arguments);
-			return true; 
-		}
-		else return false;
-	}
-
-	bool equals(const AbstractDelegate<TArgs>& other) const
-	{
-		const FunctionDelegate* pOtherDelegate = dynamic_cast<const FunctionDelegate*>(other.unwrap());
-		return pOtherDelegate && _function == pOtherDelegate->_function;
-	}
-
-	AbstractDelegate<TArgs>* clone() const
-	{
-		return new FunctionDelegate(*this);
-	}
-
-	void disable()
-	{
-		Mutex::ScopedLock lock(_mutex);
-		_function = 0;
-	}
-
-protected:
-	NotifyFunction _function;
-	Mutex _mutex;
-
-private:
-	FunctionDelegate();
-};
-
-
-template <> 
-class FunctionDelegate<void, true, true>: public AbstractDelegate<void>
-	/// Wraps a freestanding function or static member function 
-	/// for use as a Delegate.
-{
-public:
-	typedef void (*NotifyFunction)(const void*);
+	using NotifyFunction = typename Detail::FunctionDelegateNotifyType<void, hasSender, senderIsConst>::Type;
 
 	FunctionDelegate(NotifyFunction function):
 		_function(function)
@@ -248,10 +170,10 @@ public:
 	{
 	}
 
-	~FunctionDelegate()
-	{
-	}
-	
+	~FunctionDelegate() override = default;
+
+	FunctionDelegate() = delete;
+
 	FunctionDelegate& operator = (const FunctionDelegate& delegate)
 	{
 		if (&delegate != this)
@@ -261,174 +183,51 @@ public:
 		return *this;
 	}
 
-	bool notify(const void* sender)
+	bool notify(const void* sender) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_function)
 		{
-			(*_function)(sender);
+			if constexpr (hasSender)
+			{
+				if constexpr (senderIsConst)
+				{
+					(*_function)(sender);
+				}
+				else
+				{
+					(*_function)(const_cast<void*>(sender));
+				}
+			}
+			else
+			{
+				(*_function)();
+			}
 			return true;
 		}
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void>& other) const override
 	{
 		const FunctionDelegate* pOtherDelegate = dynamic_cast<const FunctionDelegate*>(other.unwrap());
 		return pOtherDelegate && _function == pOtherDelegate->_function;
 	}
 
-	AbstractDelegate<void>* clone() const
+	AbstractDelegate<void>* clone() const override
 	{
 		return new FunctionDelegate(*this);
 	}
-	
-	void disable()
+
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_function = 0;
+		_function = nullptr;
 	}
 
 protected:
 	NotifyFunction _function;
 	Mutex _mutex;
-
-private:
-	FunctionDelegate();
-};
-
-
-template <> 
-class FunctionDelegate<void, true, false>: public AbstractDelegate<void>
-{
-public:
-	typedef void (*NotifyFunction)(void*);
-
-	FunctionDelegate(NotifyFunction function):
-		_function(function)
-	{
-	}
-
-	FunctionDelegate(const FunctionDelegate& delegate):
-		AbstractDelegate<void>(delegate),
-		_function(delegate._function)
-	{
-	}
-
-	~FunctionDelegate()
-	{
-	}
-	
-	FunctionDelegate& operator = (const FunctionDelegate& delegate)
-	{
-		if (&delegate != this)
-		{
-			this->_function = delegate._function;
-		}
-		return *this;
-	}
-
-	bool notify(const void* sender)
-	{
-		Mutex::ScopedLock lock(_mutex);
-		if (_function)
-		{
-			(*_function)(const_cast<void*>(sender));
-			return true;
-		}
-		else return false;
-	}
-
-	bool equals(const AbstractDelegate<void>& other) const
-	{
-		const FunctionDelegate* pOtherDelegate = dynamic_cast<const FunctionDelegate*>(other.unwrap());
-		return pOtherDelegate && _function == pOtherDelegate->_function;
-	}
-
-	AbstractDelegate<void>* clone() const
-	{
-		return new FunctionDelegate(*this);
-	}
-
-	void disable()
-	{
-		Mutex::ScopedLock lock(_mutex);
-		_function = 0;
-	}
-
-protected:
-	NotifyFunction _function;
-	Mutex _mutex;
-
-private:
-	FunctionDelegate();
-};
-
-
-template <bool senderIsConst> 
-class FunctionDelegate<void, false, senderIsConst>: public AbstractDelegate<void>
-{
-public:
-	typedef void (*NotifyFunction)();
-
-	FunctionDelegate(NotifyFunction function):
-		_function(function)
-	{
-	}
-
-	FunctionDelegate(const FunctionDelegate& delegate):
-		AbstractDelegate<void>(delegate),
-		_function(delegate._function)
-	{
-	}
-
-	~FunctionDelegate()
-	{
-	}
-	
-	FunctionDelegate& operator = (const FunctionDelegate& delegate)
-	{
-		if (&delegate != this)
-		{
-			this->_function = delegate._function;
-		}
-		return *this;
-	}
-
-	bool notify(const void* /*sender*/)
-	{
-		Mutex::ScopedLock lock(_mutex);
-		if (_function)
-		{
-			(*_function)();
-			return true; 
-		}
-		else return false;
-	}
-
-	bool equals(const AbstractDelegate<void>& other) const
-	{
-		const FunctionDelegate* pOtherDelegate = dynamic_cast<const FunctionDelegate*>(other.unwrap());
-		return pOtherDelegate && _function == pOtherDelegate->_function;
-	}
-
-	AbstractDelegate<void>* clone() const
-	{
-		return new FunctionDelegate(*this);
-	}
-
-	void disable()
-	{
-		Mutex::ScopedLock lock(_mutex);
-		_function = 0;
-	}
-
-protected:
-	NotifyFunction _function;
-	Mutex _mutex;
-
-private:
-	FunctionDelegate();
 };
 
 

@@ -47,7 +47,7 @@ Token::Class Token::tokenClass() const
 	return INVALID_TOKEN;
 }
 
-		
+
 std::string Token::asString() const
 {
 	return _value;

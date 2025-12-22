@@ -17,6 +17,7 @@
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Data/RowFormatter.h"
+#include "Poco/Data/JSONRowFormatter.h"
 #include "Poco/Data/SQLite/Connector.h"
 #include <iostream>
 
@@ -27,6 +28,7 @@ using Poco::Data::Session;
 using Poco::Data::Statement;
 using Poco::Data::RecordSet;
 using Poco::Data::RowFormatter;
+using Poco::Data::JSONRowFormatter;
 
 
 class HTMLTableFormatter : public RowFormatter
@@ -37,7 +39,7 @@ public:
 		std::ostringstream os;
 		os << "<TABLE border=\"1\" cellspacing=\"0\">" << std::endl;
 		setPrefix(os.str());
-		
+
 		os.str("");
 		os << "</TABLE>" << std::endl;
 		setPostfix(os.str());
@@ -65,9 +67,9 @@ public:
 		ValueVec::const_iterator end = vals.end();
 		for (; it != end; ++it)
 		{
-			if (it->isNumeric()) 
+			if (it->isNumeric())
 				str << "\t\t<TD align=\"right\">";
-			else 
+			else
 				str << "\t\t<TD align=\"left\">";
 
 			str << it->convert<std::string>() << "</TD>" << std::endl;
@@ -83,16 +85,16 @@ int main(int argc, char** argv)
 {
 	// register SQLite connector
 	Poco::Data::SQLite::Connector::registerConnector();
-	
+
 	// create a session
 	Session session("SQLite", "sample.db");
 
 	// drop sample table, if it exists
 	session << "DROP TABLE IF EXISTS Simpsons", now;
-	
+
 	// (re)create table
 	session << "CREATE TABLE Simpsons (Name VARCHAR(30), Address VARCHAR, Age INTEGER(3), Birthday DATE)", now;
-	
+
 	// insert some rows
 	DateTime hd(1956, 3, 1);
 	session << "INSERT INTO Simpsons VALUES('Homer Simpson', 'Springfield', 42, ?)", use(hd), now;
@@ -102,7 +104,7 @@ int main(int argc, char** argv)
 	session << "INSERT INTO Simpsons VALUES('Bart Simpson', 'Springfield', 12, ?)", use(hd), now;
 	hd.assign(1982, 5, 9);
 	session << "INSERT INTO Simpsons VALUES('Lisa Simpson', 'Springfield', 10, ?)", use(hd), now;
-		
+
 	// create a statement and print the column names and data as HTML table
 	HTMLTableFormatter tf;
 	Statement stmt = (session << "SELECT * FROM Simpsons", format(tf), now);
@@ -116,6 +118,12 @@ int main(int argc, char** argv)
 	// simple formatting example (uses the default SimpleRowFormatter provided by framework)
 	std::cout << std::endl << "Simple formatting:" << std::endl << std::endl;
 	std::cout << RecordSet(session, "SELECT * FROM Simpsons");
+
+	// JSON formatting example (uses the JSONRowFormatter provided by framework)
+	std::cout << std::endl << "JSON formatting:" << std::endl << std::endl;
+	JSONRowFormatter jsonRowFormatter;
+	jsonRowFormatter.setJSONMode((RowFormatter::Mode)(JSONRowFormatter::JSON_FMT_MODE_ROW_COUNT | JSONRowFormatter::JSON_FMT_MODE_COLUMN_NAMES));
+	std::cout << RecordSet(session, "SELECT * FROM Simpsons", jsonRowFormatter);
 
 	return 0;
 }

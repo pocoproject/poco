@@ -14,6 +14,7 @@
 
 #include "Poco/Data/MySQL/SessionImpl.h"
 #include "Poco/Data/MySQL/MySQLStatementImpl.h"
+#include "Poco/Data/MySQL/Utility.h"
 #include "Poco/Data/Session.h"
 #include "Poco/NumberParser.h"
 #include "Poco/String.h"
@@ -47,7 +48,7 @@ const std::string SessionImpl::MYSQL_SERIALIZABLE = "SERIALIZABLE";
 SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginTimeout) :
 	Poco::Data::AbstractSessionImpl<SessionImpl>(connectionString, loginTimeout),
 	_connector("MySQL"),
-	_handle(0),
+	_handle(nullptr),
 	_reset(false),
 	_connected(false),
 	_inTransaction(false),
@@ -58,6 +59,12 @@ SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginT
 	setProperty("handle", static_cast<MYSQL*>(_handle));
 	addFeature("failIfInnoReadOnly", &SessionImpl::setFailIfInnoReadOnly, &SessionImpl::getFailIfInnoReadOnly);
 	open();
+}
+
+
+void SessionImpl::setName()
+{
+	setDBMSName("MySQL"s);
 }
 
 
@@ -113,7 +120,7 @@ void SessionImpl::open(const std::string& connect)
 	if (options["user"].empty())
 		throw MySQLException("create session: specify user name");
 
-	const char * db = NULL;
+	const char * db = nullptr;
 	if (!options["db"].empty())
 		db = options["db"].c_str();
 
@@ -172,6 +179,9 @@ void SessionImpl::open(const std::string& connect)
 		&SessionImpl::autoCommit,
 		&SessionImpl::isAutoCommit);
 
+	// autocommit is initially on when a session is opened
+	AbstractSessionImpl::setAutoCommit("", true);
+	setName();
 	_connected = true;
 }
 
@@ -214,18 +224,18 @@ void SessionImpl::rollback()
 }
 
 
-void SessionImpl::autoCommit(const std::string&, bool val)
+void SessionImpl::autoCommit(const std::string& s, bool val)
 {
-	StatementExecutor ex(_handle);
-	ex.prepare(Poco::format("SET autocommit=%d", val ? 1 : 0));
-	ex.execute();
+	if (val != getAutoCommit(s)) {
+		_handle.autoCommit(val);
+		AbstractSessionImpl::setAutoCommit(s, val);
+	}
 }
 
 
-bool SessionImpl::isAutoCommit(const std::string&) const
+bool SessionImpl::isAutoCommit(const std::string& s) const
 {
-	int ac = 0;
-	return 1 == getSetting("autocommit", ac);
+	return AbstractSessionImpl::getAutoCommit(s);
 }
 
 
@@ -254,8 +264,29 @@ void SessionImpl::setTransactionIsolation(Poco::UInt32 ti)
 
 Poco::UInt32 SessionImpl::getTransactionIsolation() const
 {
+	const std::string MARIADB_SERVERINFO = "MariaDB";
+
 	std::string isolation;
-	getSetting("tx_isolation", isolation);
+	std::string serverInfo = Utility::serverInfo(_handle);
+	unsigned long version = Utility::serverVersion(_handle);
+
+	if (serverInfo.find(MARIADB_SERVERINFO) != std::string::npos) //MariaDB
+	{
+		getSetting("tx_isolation", isolation);
+		isolation = isolation.c_str();
+	}
+	else //MySQL
+	{
+		if (version >= 80000)
+		{
+			getSetting("transaction_isolation", isolation);
+			isolation = isolation.c_str();
+		}
+		else
+		{
+			getSetting("tx_isolation", isolation);
+		}
+	}
 	Poco::replaceInPlace(isolation, "-", " ");
 	if (MYSQL_READ_UNCOMMITTED == isolation)
 		return Session::TRANSACTION_READ_UNCOMMITTED;
@@ -284,6 +315,7 @@ void SessionImpl::reset()
 	if (_connected && _reset)
 	{
 		_handle.reset();
+		AbstractSessionImpl::setAutoCommit("", true);
 	}
 }
 

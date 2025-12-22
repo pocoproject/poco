@@ -7,7 +7,7 @@
 //
 // Definition of the Array class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -36,11 +36,34 @@ public:
 	Array();
 		/// Creates an empty Array.
 
-	virtual ~Array();
+	~Array() override;
 		/// Destroys the Array.
 
+	// Document template functions available for backward compatibility
+	using Document::add;
+	using Document::get;
+
 	template<typename T>
-	T get(int pos) const
+	Document& add(T value)
+		/// Creates an element with the name from the current pos and value and
+		/// adds it to the array document.
+		///
+		/// The active document is returned to allow chaining of the add methods.
+	{
+		return Document::add<T>(Poco::NumberFormatter::format(size()), value);
+	}
+
+	Document& add(const char* value)
+		/// Creates an element with a name from the current pos and value and
+		/// adds it to the array document.
+		///
+		/// The active document is returned to allow chaining of the add methods.
+	{
+		return Document::add(Poco::NumberFormatter::format(size()), value);
+	}
+
+	template<typename T>
+	T get(std::size_t pos) const
 		/// Returns the element at the given index and tries to convert
 		/// it to the template type. If the element is not found, a
 		/// Poco::NotFoundException will be thrown. If the element cannot be
@@ -50,7 +73,7 @@ public:
 	}
 
 	template<typename T>
-	T get(int pos, const T& deflt) const
+	T get(std::size_t pos, const T& deflt) const
 		/// Returns the element at the given index and tries to convert
 		/// it to the template type. If the element is not found, or
 		/// has the wrong type, the deflt argument will be returned.
@@ -58,20 +81,23 @@ public:
 		return Document::get<T>(Poco::NumberFormatter::format(pos), deflt);
 	}
 
-	Element::Ptr get(int pos) const;
+	[[nodiscard]] Element::Ptr get(std::size_t pos) const;
 		/// Returns the element at the given index.
 		/// An empty element will be returned if the element is not found.
 
 	template<typename T>
-	bool isType(int pos) const
+	[[nodiscard]] bool isType(std::size_t pos) const
 		/// Returns true if the type of the element equals the TypeId of ElementTrait,
 		/// otherwise false.
 	{
 		return Document::isType<T>(Poco::NumberFormatter::format(pos));
 	}
 
-	std::string toString(int indent = 0) const;
+	[[nodiscard]] std::string toString(int indent = 0) const override;
 		/// Returns a string representation of the Array.
+
+private:
+	friend void BSONReader::read<Array::Ptr>(Array::Ptr& to);
 };
 
 
@@ -84,7 +110,6 @@ struct ElementTraits<Array::Ptr>
 
 	static std::string toString(const Array::Ptr& value, int indent = 0)
 	{
-		//TODO:
 		return value.isNull() ? "null" : value->toString(indent);
 	}
 };
@@ -98,7 +123,7 @@ inline void BSONReader::read<Array::Ptr>(Array::Ptr& to)
 
 
 template<>
-inline void BSONWriter::write<Array::Ptr>(Array::Ptr& from)
+inline void BSONWriter::write<Array::Ptr>(const Array::Ptr& from)
 {
 	from->write(_writer);
 }

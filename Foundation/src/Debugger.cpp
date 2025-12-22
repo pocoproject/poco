@@ -37,20 +37,7 @@ bool Debugger::isAvailable()
 {
 #if defined(_DEBUG)
 	#if defined(POCO_OS_FAMILY_WINDOWS)
-		#if defined(_WIN32_WCE)
-			#if (_WIN32_WCE >= 0x600)
-				BOOL isDebuggerPresent;
-				if (CheckRemoteDebuggerPresent(GetCurrentProcess(), &isDebuggerPresent))
-				{
-					return isDebuggerPresent ? true : false;
-				}
-				return false;
-			#else
-				return false;
-			#endif
-		#else
-			return IsDebuggerPresent() ? true : false;
-		#endif
+		return IsDebuggerPresent() ? true : false;
 	#elif defined(POCO_VXWORKS)
 		return false;
 	#elif defined(POCO_OS_FAMILY_UNIX)
@@ -81,7 +68,7 @@ void Debugger::message(const std::string& msg)
 }
 
 
-void Debugger::message(const std::string& msg, const char* file, int line)
+void Debugger::message(const std::string& msg, const char* file, LineNumber line)
 {
 #if defined(_DEBUG)
 	std::ostringstream str;
@@ -122,7 +109,7 @@ void Debugger::enter(const std::string& msg)
 }
 
 
-void Debugger::enter(const std::string& msg, const char* file, int line)
+void Debugger::enter(const std::string& msg, const char* file, LineNumber line)
 {
 #if defined(_DEBUG)
 	message(msg, file, line);
@@ -131,7 +118,7 @@ void Debugger::enter(const std::string& msg, const char* file, int line)
 }
 
 
-void Debugger::enter(const char* file, int line)
+void Debugger::enter(const char* file, LineNumber line)
 {
 #if defined(_DEBUG)
 	message("BREAK", file, line);

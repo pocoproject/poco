@@ -45,7 +45,7 @@ public:
 	void testDownloadEPSV();
 	void testUpload();
 	void testList();
-	
+
 	void setUp();
 	void tearDown();
 

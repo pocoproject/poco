@@ -33,13 +33,13 @@ class Zip_API PartialStreamBuf: public Poco::BufferedStreamBuf
 	/// A PartialStreamBuf is a class that limits one view on an inputstream to a selected view range
 {
 public:
-	PartialStreamBuf(std::istream& in, std::ios::pos_type start, std::ios::pos_type end, const std::string& prefix, const std::string& postfix, bool initStream);
-		/// Creates the PartialStream. 
+	PartialStreamBuf(std::istream& in, std::ios::pos_type start, std::ios::pos_type endPos, const std::string& prefix, const std::string& postfix, bool initStream);
+		/// Creates the PartialStream.
 		/// If initStream is true the status of the stream will be cleared on the first access, and the stream will be repositioned
 		/// to position start
 
-	PartialStreamBuf(std::ostream& out, std::size_t start, std::size_t end, bool initStream);
-		/// Creates the PartialStream. 
+	PartialStreamBuf(std::ostream& out, std::size_t start, std::size_t endPos, bool initStream);
+		/// Creates the PartialStream.
 		/// If initStream is true the status of the stream will be cleared on the first access.
 		/// start and end acts as offset values for the written content. A start value greater than zero,
 		/// means that the first bytes are not written but discarded instead,
@@ -57,12 +57,12 @@ public:
 	Poco::UInt64 bytesWritten() const;
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
+	std::streamsize readFromDevice(char* buffer, std::streamsize length);
 
-	int writeToDevice(const char* buffer, std::streamsize length);
+	std::streamsize writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE  = 1024
 	};
@@ -94,13 +94,13 @@ class Zip_API PartialIOS: public virtual std::ios
 	/// order of the stream buffer and base classes.
 {
 public:
-	PartialIOS(std::istream& istr, std::ios::pos_type start, std::ios::pos_type end, const std::string& prefix, const std::string& postfix, bool initStream);
+	PartialIOS(std::istream& istr, std::ios::pos_type start, std::ios::pos_type endPos, const std::string& prefix, const std::string& postfix, bool initStream);
 		/// Creates the basic stream and connects it
 		/// to the given input stream.
 		/// If initStream is true the status of the stream will be cleared on the first access, and the stream will be repositioned
 		/// to position start
 
-	PartialIOS(std::ostream& ostr, std::size_t start, std::size_t end, bool initStream);
+	PartialIOS(std::ostream& ostr, std::size_t start, std::size_t endPos, bool initStream);
 		/// Creates the basic stream and connects it
 		/// to the given output stream.
 		/// If initStream is true the status of the stream will be cleared on the first access.
@@ -127,7 +127,7 @@ class Zip_API PartialInputStream: public PartialIOS, public std::istream
 	/// to one or multiple output streams.
 {
 public:
-	PartialInputStream(std::istream& istr, std::ios::pos_type start, std::ios::pos_type end, bool initStream = true, const std::string& prefix = std::string(), const std::string& postfix = std::string());
+	PartialInputStream(std::istream& istr, std::ios::pos_type start, std::ios::pos_type endPos, bool initStream = true, const std::string& prefix = std::string(), const std::string& postfix = std::string());
 		/// Creates the PartialInputStream and connects it
 		/// to the given input stream. Bytes read are guaranteed to be in the range [start, end-1]
 		/// If initStream is true the status of the stream will be cleared on the first access, and the stream will be repositioned
@@ -143,7 +143,7 @@ class Zip_API PartialOutputStream: public PartialIOS, public std::ostream
 	/// to one or multiple output streams.
 {
 public:
-	PartialOutputStream(std::ostream& ostr, std::size_t start, std::size_t end, bool initStream = true);
+	PartialOutputStream(std::ostream& ostr, std::size_t start, std::size_t endPos, bool initStream = true);
 		/// Creates the PartialOutputStream and connects it
 		/// to the given output stream. Bytes written are guaranteed to be in the range [start, realEnd - end].
 		/// If initStream is true the status of the stream will be cleared on the first access.
@@ -153,7 +153,7 @@ public:
 		/// Examples:
 		///     start = 3; end = 1
 		///     write("hello", 5) -> "l"
-		///     
+		///
 		///     start = 3; end = 0
 		///     write("hello", 5) -> "lo"
 

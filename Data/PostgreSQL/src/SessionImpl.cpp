@@ -60,6 +60,7 @@ SessionImpl::SessionImpl(const std::string& aConnectionString, std::size_t aLogi
 	Poco::Data::AbstractSessionImpl<SessionImpl>(aConnectionString, aLoginTimeout),
 	_connectorName("postgresql")
 {
+	setFeature("sqlParse", false); // the parse currently cannot handle the PostgreSQL placeholders $1, $2, etc.
 	setProperty("handle", static_cast<SessionHandle*>(&_sessionHandle));
 	setConnectionTimeout(CONNECTION_TIMEOUT_DEFAULT);
 	open();
@@ -75,6 +76,12 @@ SessionImpl::~SessionImpl()
 	catch (...)
 	{
 	}
+}
+
+
+void SessionImpl::setName()
+{
+	setDBMSName("PostgreSQL"s);
 }
 
 
@@ -99,7 +106,7 @@ void SessionImpl::open(const std::string& aConnectionString)
 		}
 	}
 
-	poco_assert_dbg (! connectionString().empty());
+	poco_assert_dbg (!connectionString().empty());
 
 	unsigned int timeout = static_cast<unsigned int>(getLoginTimeout());
 
@@ -134,12 +141,18 @@ void SessionImpl::open(const std::string& aConnectionString)
 	_sessionHandle.connect(createConnectionStringFromOptionsMap(optionsMap));
 
 	addFeature("autoCommit",
-		&SessionImpl::setAutoCommit,
+		&SessionImpl::autoCommit,
 		&SessionImpl::isAutoCommit);
 
 	addFeature("asynchronousCommit",
 		&SessionImpl::setAutoCommit,
 		&SessionImpl::isAutoCommit);
+
+	addFeature("binaryExtraction",
+		&SessionImpl::setBinaryExtraction,
+		&SessionImpl::isBinaryExtraction);
+
+	setName();
 }
 
 
@@ -202,15 +215,18 @@ void SessionImpl::rollback()
 }
 
 
-void SessionImpl::setAutoCommit(const std::string&, bool aValue)
+void SessionImpl::autoCommit(const std::string& s, bool val)
 {
-	_sessionHandle.setAutoCommit(aValue);
+	if (val != getAutoCommit(s)) {
+		_sessionHandle.autoCommit(val);
+		AbstractSessionImpl::setAutoCommit(s, val);
+	}
 }
 
 
-bool SessionImpl::isAutoCommit(const std::string&) const
+bool SessionImpl::isAutoCommit(const std::string& s) const
 {
-	return _sessionHandle.isAutoCommit();
+	return AbstractSessionImpl::getAutoCommit(s);
 }
 
 
@@ -241,6 +257,15 @@ Poco::UInt32 SessionImpl::getTransactionIsolation() const
 bool SessionImpl::hasTransactionIsolation(Poco::UInt32 aTI) const
 {
 	return _sessionHandle.hasTransactionIsolation(aTI);
+}
+
+
+void SessionImpl::setBinaryExtraction(const std::string& feature, bool enabled)
+{
+	if (enabled && _sessionHandle.parameterStatus("integer_datetimes") != "on")
+		throw PostgreSQLException("binary extraction is not supported with this server (ingeger_datetimes must be enabled on the server)");
+
+	_binaryExtraction = enabled;
 }
 
 

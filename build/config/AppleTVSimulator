@@ -2,7 +2,7 @@
 # AppleTVSimulator
 #
 # Build settings for tvOS 9.0 Simulator
-# 
+#
 
 TVOS_SDK           = AppleTVSimulator
 POCO_TARGET_OSARCH = x86_64

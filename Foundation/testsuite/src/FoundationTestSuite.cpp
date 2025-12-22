@@ -19,6 +19,7 @@
 #include "LoggingTestSuite.h"
 #include "FilesystemTestSuite.h"
 #include "UUIDTestSuite.h"
+#include "ULIDTestSuite.h"
 #include "TextTestSuite.h"
 #include "URITestSuite.h"
 #if !defined(POCO_VXWORKS)
@@ -44,6 +45,7 @@ CppUnit::Test* FoundationTestSuite::suite()
 	pSuite->addTest(LoggingTestSuite::suite());
 	pSuite->addTest(FilesystemTestSuite::suite());
 	pSuite->addTest(UUIDTestSuite::suite());
+	pSuite->addTest(ULIDTestSuite::suite());
 	pSuite->addTest(TextTestSuite::suite());
 	pSuite->addTest(URITestSuite::suite());
 #if !defined(POCO_VXWORKS)

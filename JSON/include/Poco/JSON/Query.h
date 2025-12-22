@@ -32,10 +32,10 @@ class JSON_API Query
 {
 public:
 	Query(const Dynamic::Var& source);
-		/// Creates a Query/
+		/// Creates a Query.
 		///
 		/// Source must be JSON Object, Array, Object::Ptr,
-		/// Array::Ptr or empty Var. Any other type will trigger throwing of 
+		/// Array::Ptr or empty Var. Any other type will trigger throwing of
 		/// InvalidArgumentException.
 		///
 		/// Creating Query holding Ptr will typically result in faster
@@ -45,9 +45,9 @@ public:
 		/// Destroys the Query.
 
 	Object::Ptr findObject(const std::string& path) const;
-		/// Search for an object. 
+		/// Search for an object.
 		///
-		/// When the object can't be found, a zero Ptr is returned; 
+		/// When the object can't be found, a zero Ptr is returned;
 		/// otherwise, a shared pointer to internally held object
 		/// is returned.
 		/// If object (as opposed to a pointer to object) is held
@@ -55,16 +55,16 @@ public:
 		/// returned; this may be expensive operation.
 
 	Object& findObject(const std::string& path, Object& obj) const;
-		/// Search for an object. 
+		/// Search for an object.
 		///
 		/// If object is found, it is assigned to the
-		/// Object through the reference passed in. When the object can't be 
+		/// Object through the reference passed in. When the object can't be
 		/// found, the provided Object is emptied and returned.
 
 	Array::Ptr findArray(const std::string& path) const;
-		/// Search for an array. 
+		/// Search for an array.
 		///
-		/// When the array can't be found, a zero Ptr is returned; 
+		/// When the array can't be found, a zero Ptr is returned;
 		/// otherwise, a shared pointer to internally held array
 		/// is returned.
 		/// If array (as opposed to a pointer to array) is held
@@ -72,10 +72,10 @@ public:
 		/// returned; this may be expensive operation.
 
 	Array& findArray(const std::string& path, Array& obj) const;
-		/// Search for an array. 
+		/// Search for an array.
 		///
 		/// If array is found, it is assigned to the
-		/// Object through the reference passed in. When the array can't be 
+		/// Object through the reference passed in. When the array can't be
 		/// found, the provided Object is emptied and returned.
 
 	Dynamic::Var find(const std::string& path) const;
@@ -99,8 +99,8 @@ public:
 			{
 				result = value.convert<T>();
 			}
-			catch (...) 
-			{ 
+			catch (...)
+			{
 			}
 		}
 		return result;

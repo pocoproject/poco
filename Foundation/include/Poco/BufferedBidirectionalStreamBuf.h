@@ -29,9 +29,9 @@
 namespace Poco {
 
 
-template <typename ch, typename tr, typename ba = BufferAllocator<ch>> 
+template <typename ch, typename tr, typename ba = BufferAllocator<ch>>
 class BasicBufferedBidirectionalStreamBuf: public std::basic_streambuf<ch, tr>
-	/// This is an implementation of a buffered bidirectional 
+	/// This is an implementation of a buffered bidirectional
 	/// streambuf that greatly simplifies the implementation of
 	/// custom streambufs of various kinds.
 	/// Derived classes only have to override the methods
@@ -43,15 +43,15 @@ class BasicBufferedBidirectionalStreamBuf: public std::basic_streambuf<ch, tr>
 	/// for implementing an iostream.
 {
 protected:
-	typedef std::basic_streambuf<ch, tr> Base;
-	typedef std::basic_ios<ch, tr> IOS;
-	typedef ch char_type;
-	typedef tr char_traits;
-	typedef ba Allocator;
-	typedef typename Base::int_type int_type;
-	typedef typename Base::pos_type pos_type;
-	typedef typename Base::off_type off_type;
-	typedef typename IOS::openmode openmode;
+	using Base = std::basic_streambuf<ch, tr>;
+	using IOS = std::basic_ios<ch, tr>;
+	using char_type = ch;
+	using char_traits = tr;
+	using Allocator = ba;
+	using int_type = typename Base::int_type;
+	using pos_type = typename Base::pos_type;
+	using off_type = typename Base::off_type;
+	using openmode = typename IOS::openmode;
 
 public:
 	BasicBufferedBidirectionalStreamBuf(std::streamsize bufferSize, openmode mode):
@@ -63,18 +63,21 @@ public:
 		resetBuffers();
 	}
 
-	~BasicBufferedBidirectionalStreamBuf()
+	~BasicBufferedBidirectionalStreamBuf() override
 	{
 		Allocator::deallocate(_pReadBuffer, _bufsize);
 		Allocator::deallocate(_pWriteBuffer, _bufsize);
 	}
-	
-	virtual int_type overflow(int_type c)
+
+	BasicBufferedBidirectionalStreamBuf(const BasicBufferedBidirectionalStreamBuf&) = delete;
+	BasicBufferedBidirectionalStreamBuf& operator = (const BasicBufferedBidirectionalStreamBuf&) = delete;
+
+	int_type overflow(int_type c) override
 	{
 		if (!(_mode & IOS::out)) return char_traits::eof();
 
 		if (flushBuffer() == std::streamsize(-1)) return char_traits::eof();
-		if (c != char_traits::eof()) 
+		if (c != char_traits::eof())
 		{
 			*this->pptr() = char_traits::to_char_type(c);
 			this->pbump(1);
@@ -83,7 +86,7 @@ public:
 		return c;
 	}
 
-	virtual int_type underflow()
+	int_type underflow() override
 	{
 		if (!(_mode & IOS::in)) return char_traits::eof();
 
@@ -95,18 +98,18 @@ public:
 
 		char_traits::move(_pReadBuffer + (4 - putback), this->gptr() - putback, putback);
 
-		int n = readFromDevice(_pReadBuffer + 4, _bufsize - 4);
+		std::streamsize n = readFromDevice(_pReadBuffer + 4, _bufsize - 4);
 		if (n <= 0) return char_traits::eof();
 
 		this->setg(_pReadBuffer + (4 - putback), _pReadBuffer + 4, _pReadBuffer + 4 + n);
 
 		// return next character
-		return char_traits::to_int_type(*this->gptr());    
+		return char_traits::to_int_type(*this->gptr());
 	}
 
-	virtual int sync()
+	int sync() override
 	{
-		if (this->pptr() && this->pptr() > this->pbase()) 
+		if (this->pptr() && this->pptr() > this->pbase())
 		{
 			if (flushBuffer() == -1) return -1;
 		}
@@ -123,57 +126,69 @@ protected:
 	{
 		return _mode;
 	}
-	
+
 	void resetBuffers()
 	{
 		this->setg(_pReadBuffer + 4, _pReadBuffer + 4, _pReadBuffer + 4);
 		this->setp(_pWriteBuffer, _pWriteBuffer + _bufsize);
 	}
 
-private:
-	virtual int readFromDevice(char_type* /*buffer*/, std::streamsize /*length*/)
+	virtual bool resizeBuffer(std::streamsize bufferSize)
 	{
-		return 0;
-	}
-
-	virtual int writeToDevice(const char_type* /*buffer*/, std::streamsize /*length*/)
-	{
-		return 0;
-	}
-
-	int flushBuffer()
-	{
-		int n = int(this->pptr() - this->pbase());
-		if (writeToDevice(this->pbase(), n) == n) 
+		if (_bufsize != bufferSize)
 		{
-			this->pbump(-n);
+			Allocator::deallocate(_pReadBuffer, _bufsize);
+			Allocator::deallocate(_pWriteBuffer, _bufsize);
+
+			_bufsize = bufferSize;
+			_pReadBuffer = Allocator::allocate(_bufsize);
+			_pWriteBuffer = Allocator::allocate(_bufsize);
+		}
+		resetBuffers();
+
+		return true;
+	}
+
+private:
+	virtual std::streamsize readFromDevice(char_type* /*buffer*/, std::streamsize /*length*/)
+	{
+		return 0;
+	}
+
+	virtual std::streamsize writeToDevice(const char_type* /*buffer*/, std::streamsize /*length*/)
+	{
+		return 0;
+	}
+
+	std::streamsize flushBuffer()
+	{
+		std::streamsize n = this->pptr() - this->pbase();
+		if (writeToDevice(this->pbase(), n) == n)
+		{
+			this->pbump(static_cast<int>(-n));
 			return n;
 		}
 		return -1;
 	}
 
-	std::streamsize _bufsize;
-	char_type*      _pReadBuffer;
-	char_type*      _pWriteBuffer;
-	openmode        _mode;
-
-	BasicBufferedBidirectionalStreamBuf(const BasicBufferedBidirectionalStreamBuf&);
-	BasicBufferedBidirectionalStreamBuf& operator = (const BasicBufferedBidirectionalStreamBuf&);
+	std::streamsize _bufsize {0};
+	char_type*      _pReadBuffer {nullptr};
+	char_type*      _pWriteBuffer {nullptr};
+	openmode        _mode {0};
 };
 
 
 //
 // We provide an instantiation for char.
 //
-// Visual C++ needs a workaround - explicitly importing the template
-// instantiation - to avoid duplicate symbols due to multiple
-// instantiations in different libraries.
-//
-#if defined(_MSC_VER) && defined(POCO_DLL) && !defined(Foundation_EXPORTS) 
-template class Foundation_API BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>>;
-#endif
-typedef BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>> BufferedBidirectionalStreamBuf;
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+extern template class BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>>;
+#else
+extern template class Foundation_API BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>>;
+#endif
+
+using BufferedBidirectionalStreamBuf = BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>>;
 
 } // namespace Poco
 

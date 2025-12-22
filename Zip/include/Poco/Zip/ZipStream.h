@@ -41,7 +41,7 @@ class Zip_API ZipStreamBuf: public Poco::BufferedStreamBuf
 public:
 	ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEntry, bool reposition);
 		/// Creates the ZipStreamBuf. Set reposition to false, if you do on-the-fly decompression.
-	
+
 	ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bool reposition);
 		/// Creates the ZipStreamBuf. Set reposition to false, if you do on-the-fly compression.
 
@@ -55,9 +55,9 @@ public:
 		/// Call this method once all bytes were read from the input stream to determine if the CRC is valid
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
+	std::streamsize readFromDevice(char* buffer, std::streamsize length);
 
-	int writeToDevice(const char* buffer, std::streamsize length);
+	std::streamsize writeToDevice(const char* buffer, std::streamsize length);
 
 private:
 	enum

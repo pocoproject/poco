@@ -28,8 +28,11 @@ public:
 	void testFloatFix();
 	void testFloatSci();
 	void testString();
+	void testStringView();
+	void testShortestRepr();
 	void testMultiple();
 	void testIndex();
+	void testAny();
 
 	void setUp();
 	void tearDown();

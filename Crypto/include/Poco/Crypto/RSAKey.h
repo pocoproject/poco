@@ -30,6 +30,7 @@ namespace Crypto {
 class X509Certificate;
 class PKCS12Container;
 
+//class [[deprecated]] RSAKey;
 
 class Crypto_API RSAKey: public KeyPair
 	/// This class stores an RSA key pair, consisting
@@ -56,7 +57,7 @@ public:
 	};
 
 	RSAKey(const EVPPKey& key);
-		/// Constructs ECKeyImpl by extracting the EC key.
+		/// Constructs RSAKey by extracting the RSA key.
 
 	RSAKey(const X509Certificate& cert);
 		/// Extracts the RSA public key from the given certificate.
@@ -80,7 +81,7 @@ public:
 		/// OpenSSL will auto-create the public key from the private key.
 
 	RSAKey(std::istream* pPublicKeyStream,
-		std::istream* pPrivateKeyStream = 0,
+		std::istream* pPrivateKeyStream = nullptr,
 		const std::string& privateKeyPassphrase = "");
 		/// Creates the RSAKey, by reading public and private key from the given streams and
 		/// using the given passphrase for the private key.

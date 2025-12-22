@@ -18,13 +18,14 @@
 #include "CppUnit/TestCase.h"
 
 
-class ChannelTest: public CppUnit::TestCase
+class ChannelTest : public CppUnit::TestCase
 {
 public:
 	ChannelTest(const std::string& name);
 	~ChannelTest();
 
 	void testSplitter();
+	void testSplitterAddSameChannelTwice();
 	void testAsync();
 	void testFormatting();
 	void testConsole();

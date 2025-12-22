@@ -33,7 +33,7 @@ Before writing any code, please read the
 
 6. Send [pull request](https://help.github.com/articles/using-pull-requests/) with a descriptive and clear commit message
 
-Important: Please don't send pull requests against the `master` branch. Pull requests should either target a specific release branch (if in ongoing development), or the `devel` branch.
+Important: Pull requests should either target a specific release branch (if in ongoing development), or the `main` branch.
 
 At this point, it's our turn; if you've done everything well, we may just thank you and merge your request. Otherwise, we may provide some comments or suggestions to steer the contribution in the right direction.
 

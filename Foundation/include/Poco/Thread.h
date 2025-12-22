@@ -21,14 +21,12 @@
 #include "Poco/Foundation.h"
 #include "Poco/Event.h"
 #include "Poco/Mutex.h"
+#include <thread>
+#include <chrono>
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Poco/Thread_WINCE.h"
-#else
 #include "Poco/Thread_WIN32.h"
-#endif
 #elif defined(POCO_VXWORKS)
 #include "Poco/Thread_VX.h"
 #else
@@ -53,7 +51,7 @@ class Foundation_API Thread: private ThreadImpl
 	/// The name of a thread can be changed at any time.
 {
 public:
-	typedef ThreadImpl::TIDImpl TID;
+	using TID = ThreadImpl::TIDImpl;
 
 	using ThreadImpl::Callable;
 
@@ -72,11 +70,23 @@ public:
 		POLICY_DEFAULT = POLICY_DEFAULT_IMPL
 	};
 
-	Thread();
+	Thread(uint32_t sigMask = 0);
 		/// Creates a thread. Call start() to start it.
+		///
+		/// The optional sigMask parameter specifies which signals should be blocked.
+		/// To block a specific signal, set the corresponding bit in the sigMask.
+		/// Multiple bits can be set in the mask to block multiple signals if needed.
+		///
+		/// Available on POSIX platforms only
 
-	Thread(const std::string& name);
+	Thread(const std::string& name, uint32_t sigMask = 0);
 		/// Creates a named thread. Call start() to start it.
+		///
+		/// The optional sigMask parameter specifies which signals should be blocked.
+		/// To block a specific signal, set the corresponding bit in the sigMask.
+		/// Multiple bits can be set in the mask to block multiple signals if needed.
+		///
+		/// Available on POSIX platforms only
 
 	~Thread();
 		/// Destroys the thread.
@@ -95,6 +105,7 @@ public:
 
 	void setName(const std::string& name);
 		/// Sets the name of the thread.
+		/// Note that it only take effect before start method invoked.
 
 	void setPriority(Priority prio);
 		/// Sets the thread's priority.
@@ -150,7 +161,7 @@ public:
 		/// The Thread ensures that the given target stays
 		/// alive while the thread is running.
 
-	void start(Callable target, void* pData = 0);
+	void start(Callable target, void* pData = nullptr);
 		/// Starts the thread with the given target and parameter.
 
 	template <class Functor>
@@ -206,6 +217,9 @@ public:
 		/// wakeUp() before calling trySleep() will prevent the next
 		/// trySleep() call to actually suspend the thread (which, in
 		/// some scenarios, may be desirable behavior).
+		///
+		/// Note that, unlike Thread::sleep(), this function can only
+		/// be succesfully called from a thread started as Poco::Thread.
 
 	void wakeUp();
 		/// Wakes up the thread which is in the state of interruptible
@@ -224,8 +238,52 @@ public:
 		/// Returns the Thread object for the currently active thread.
 		/// If the current thread is the main thread, 0 is returned.
 
- 	static TID currentTid();
- 		/// Returns the native thread ID for the current thread.
+	static TID currentTid();
+		/// Returns the native thread ID for the current thread.
+
+	static long currentOsTid();
+		/// Returns the operating system specific thread ID for the current thread.
+		/// On error, or if the platform does not support this functionality, it returns zero.
+
+	bool setAffinity(int coreId);
+		/// Sets the thread affinity to the coreID.
+		/// Returns true if succesful.
+		/// Returns false if not succesful or not
+		/// implemented.
+
+	int getAffinity() const;
+		/// Returns the thread affinity.
+		/// Negative value means the thread has
+		/// no CPU core affinity.
+
+	bool isInterrupted();
+		/// Tests whether current thread has been interrupted.
+		/// Return true if the task running on this thread should be stopped.
+		/// An interruption can be requested by interrupt().
+		///
+		/// This function can be used to make long running tasks cleanly interruptible.
+		/// Never checking or acting on the value returned by this function is safe,
+		/// however it is advisable do so regularly in long running functions.
+		/// Take care not to call it too often, to keep the overhead low.
+		/// 
+		/// See also checkInterrupted().
+
+	void checkInterrupted();
+		/// Tests whether current thread has been interrupted.
+		/// Throws Poco::ThreadInterruptedException if isInterrupted() return true.
+		///
+		/// Note: The interrupted status of the thread is cleared by this method.
+
+	void interrupt();
+		/// Interrupts this thread.
+		///
+		/// This function does not stop any event loop running on the thread and
+		/// does not terminate it in any way.
+		///
+		/// See also isInterrupted().
+
+	void clearInterrupt();
+		/// Clear the the interrupted status.
 
 protected:
 	ThreadLocalStorage& tls();
@@ -254,11 +312,9 @@ protected:
 		{
 		}
 
-		~FunctorRunnable()
-		{
-		}
+		~FunctorRunnable() override = default;
 
-		void run()
+		void run() override
 		{
 			_functor();
 		}
@@ -272,10 +328,9 @@ private:
 	Thread& operator = (const Thread&);
 
 	int                 _id;
-	std::string         _name;
 	ThreadLocalStorage* _pTLS;
 	Event               _event;
-	mutable FastMutex   _mutex;
+	std::atomic_bool    _interruptionRequested;
 
 	friend class ThreadLocalStorage;
 	friend class PooledThread;
@@ -299,17 +354,13 @@ inline int Thread::id() const
 
 inline std::string Thread::name() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	return _name;
+	return getNameImpl();
 }
 
 
 inline std::string Thread::getName() const
 {
-	FastMutex::ScopedLock lock(_mutex);
-
-	return _name;
+	return getNameImpl();
 }
 
 
@@ -319,15 +370,15 @@ inline bool Thread::isRunning() const
 }
 
 
-inline void Thread::sleep(long milliseconds)
-{
-	sleepImpl(milliseconds);
-}
-
-
 inline void Thread::yield()
 {
 	yieldImpl();
+}
+
+
+inline void Thread::sleep(long milliseconds)
+{
+	std::this_thread::sleep_for(std::chrono::milliseconds(milliseconds));
 }
 
 
@@ -376,6 +427,22 @@ inline int Thread::getStackSize() const
 inline Thread::TID Thread::currentTid()
 {
 	return currentTidImpl();
+}
+
+inline long Thread::currentOsTid()
+{
+	return currentOsTidImpl();
+}
+
+inline bool Thread::setAffinity(int coreId)
+{
+	return setAffinityImpl(coreId);
+}
+
+
+inline int Thread::getAffinity() const
+{
+	return getAffinityImpl();
 }
 
 

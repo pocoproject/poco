@@ -29,12 +29,12 @@ namespace Poco {
 class Foundation_API SemaphoreImpl
 {
 protected:
-	SemaphoreImpl(int n, int max);		
+	SemaphoreImpl(int n, int max);
 	~SemaphoreImpl();
 	void setImpl();
 	void waitImpl();
 	bool waitImpl(long milliseconds);
-	
+
 private:
 	HANDLE _sema;
 };
@@ -45,7 +45,7 @@ private:
 //
 inline void SemaphoreImpl::setImpl()
 {
-	if (!ReleaseSemaphore(_sema, 1, NULL))
+	if (!ReleaseSemaphore(_sema, 1, nullptr))
 	{
 		throw SystemException("cannot signal semaphore");
 	}

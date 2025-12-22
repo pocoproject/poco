@@ -33,7 +33,7 @@ class Encodings_API MacCentralEurRomanEncoding: public DoubleByteEncoding
 public:
 	MacCentralEurRomanEncoding();
 	~MacCentralEurRomanEncoding();
-	
+
 private:
 	static const char* _names[];
 	static const CharacterMap _charMap;

@@ -54,7 +54,7 @@ MD4Engine::~MD4Engine()
 	reset();
 }
 
-	
+
 void MD4Engine::updateImpl(const void* input_, std::size_t inputLen)
 {
 	const unsigned char* input = (const unsigned char*) input_;
@@ -71,7 +71,7 @@ void MD4Engine::updateImpl(const void* input_, std::size_t inputLen)
 	partLen = 64 - index;
 
 	/* Transform as many times as possible. */
-	if (inputLen >= partLen) 
+	if (inputLen >= partLen)
 	{
 		std::memcpy(&_context.buffer[index], input, partLen);
 		transform(_context.state, _context.buffer);
@@ -107,7 +107,7 @@ void MD4Engine::reset()
 
 const DigestEngine::Digest& MD4Engine::digest()
 {
-	static const unsigned char PADDING[64] = 
+	static const unsigned char PADDING[64] =
 	{
 		0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -129,10 +129,18 @@ const DigestEngine::Digest& MD4Engine::digest()
 
 	/* Store state in digest */
 	unsigned char digest[16];
-	encode(digest, _context.state, 16);
+	encode(digest, _context.state, sizeof(digest));
 	_digest.clear();
+#if defined(POCO_COMPILER_GCC)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wstringop-overflow"
+	#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
 	_digest.insert(_digest.begin(), digest, digest + sizeof(digest));
-
+	poco_assert_dbg (_digest.size() == sizeof(digest));
+#if defined(POCO_COMPILER_GCC)
+	#pragma GCC diagnostic pop
+#endif
 	/* Zeroize sensitive information. */
 	std::memset(&_context, 0, sizeof (_context));
 	reset();
@@ -168,16 +176,16 @@ const DigestEngine::Digest& MD4Engine::digest()
 /* FF, GG and HH are transformations for rounds 1, 2 and 3 */
 /* Rotation is separate from addition to prevent recomputation */
 #define FF(a, b, c, d, x, s) { \
-    (a) += F ((b), (c), (d)) + (x); \
-    (a) = ROTATE_LEFT ((a), (s)); \
+	(a) += F ((b), (c), (d)) + (x); \
+	(a) = ROTATE_LEFT ((a), (s)); \
   }
 #define GG(a, b, c, d, x, s) { \
-    (a) += G ((b), (c), (d)) + (x) + (UInt32)0x5a827999; \
-    (a) = ROTATE_LEFT ((a), (s)); \
+	(a) += G ((b), (c), (d)) + (x) + (UInt32)0x5a827999; \
+	(a) = ROTATE_LEFT ((a), (s)); \
   }
 #define HH(a, b, c, d, x, s) { \
-    (a) += H ((b), (c), (d)) + (x) + (UInt32)0x6ed9eba1; \
-    (a) = ROTATE_LEFT ((a), (s)); \
+	(a) += H ((b), (c), (d)) + (x) + (UInt32)0x6ed9eba1; \
+	(a) = ROTATE_LEFT ((a), (s)); \
   }
 
 
@@ -271,7 +279,7 @@ void MD4Engine::decode(UInt32* output, const unsigned char* input, std::size_t l
 
 	for (i = 0, j = 0; j < len; i++, j += 4)
 		output[i] = ((UInt32)input[j]) | (((UInt32)input[j+1]) << 8) |
-		            (((UInt32)input[j+2]) << 16) | (((UInt32)input[j+3]) << 24);
+					(((UInt32)input[j+2]) << 16) | (((UInt32)input[j+3]) << 24);
 }
 
 

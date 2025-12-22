@@ -37,9 +37,7 @@ Query::Query(const Var& source): _source(source)
 }
 
 
-Query::~Query()
-{
-}
+Query::~Query() = default;
 
 
 Object::Ptr Query::findObject(const std::string& path) const
@@ -51,7 +49,7 @@ Object::Ptr Query::findObject(const std::string& path) const
 	else if (result.type() == typeid(Object))
 		return new Object(result.extract<Object>());
 
-	return 0;
+	return nullptr;
 }
 
 
@@ -65,7 +63,7 @@ Object& Query::findObject(const std::string& path, Object& obj) const
 		obj = *result.extract<Object::Ptr>();
 	else if (result.type() == typeid(Object))
 		obj = result.extract<Object>();
-	
+
 	return obj;
 }
 
@@ -79,7 +77,7 @@ Array::Ptr Query::findArray(const std::string& path) const
 	else if (result.type() == typeid(Array))
 		return new Array(result.extract<Array>());
 
-	return 0;
+	return nullptr;
 }
 
 
@@ -93,7 +91,7 @@ Array& Query::findArray(const std::string& path, Array& arr) const
 		arr = *result.extract<Array::Ptr>();
 	else if (result.type() == typeid(Array))
 		arr = result.extract<Array>();
-	
+
 	return arr;
 }
 
@@ -101,6 +99,8 @@ Array& Query::findArray(const std::string& path, Array& arr) const
 Var Query::find(const std::string& path) const
 {
 	Var result = _source;
+	if (path.empty()) return result;
+	bool found = false;
 	StringTokenizer tokenizer(path, ".");
 	for (const auto& token: tokenizer)
 	{
@@ -134,20 +134,21 @@ Var Query::find(const std::string& path) const
 				{
 					Object::Ptr o = result.extract<Object::Ptr>();
 					result = o->get(name);
+					found = true;
 				}
 				else if (result.type() == typeid(Object))
 				{
 					Object o = result.extract<Object>();
 					result = o.get(name);
+					found = true;
 				}
-				else
-					result.empty();
+				else result.clear();
 
 			}
 
 			if (!result.isEmpty() && !indexes.empty())
 			{
-				for (auto i: indexes)
+				for (const auto& i: indexes)
 				{
 					if (result.type() == typeid(Array::Ptr))
 					{
@@ -165,6 +166,7 @@ Var Query::find(const std::string& path) const
 			}
 		}
 	}
+	if (!found) result.clear();
 	return result;
 }
 

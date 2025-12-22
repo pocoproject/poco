@@ -29,12 +29,12 @@ public:
 	void testSortedDirectoryIterator();
 	void testSimpleRecursiveDirectoryIterator();
 	void testSiblingsFirstRecursiveDirectoryIterator();
-	
+
 	void setUp();
 	void tearDown();
 
 	static CppUnit::Test* suite();
-	
+
 protected:
 	Poco::Path path() const;
 	void createSubdir(Poco::Path& p);

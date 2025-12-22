@@ -46,6 +46,8 @@ public:
 	{
 		OP_OPENBRACKET = 1, // [
 		OP_CLOSBRACKET,     // ]
+		OP_DBL_OPENBRACKET, // [[
+		OP_DBL_CLOSBRACKET, // ]]
 		OP_OPENPARENT,      // (
 		OP_CLOSPARENT,      // )
 		OP_OPENBRACE,       // {
@@ -58,6 +60,7 @@ public:
 		OP_GE,              // >=
 		OP_SHR,             // >>
 		OP_SHR_ASSIGN,      // >>=
+		OP_SPACESHIP,       // <=>
 		OP_ASSIGN,          // =
 		OP_EQ,              // ==
 		OP_NOT,             // !
@@ -101,7 +104,7 @@ public:
 	int asInteger() const;
 
 private:
-	typedef std::map<std::string, int> OpMap;
+	using OpMap = std::map<std::string, int>;
 
 	OpMap _opMap;
 };
@@ -112,7 +115,7 @@ class CppParser_API IdentifierToken: public CppToken
 public:
 	enum Keywords
 	{
-		KW_ALIGNAS = 1,
+		KW_ALIGNAS = 100, // Note: start with 100 to avoid overlapping definitions with operators
 		KW_ALIGNOF,
 		KW_AND,
 		KW_AND_EQ,
@@ -206,7 +209,7 @@ public:
 	int asInteger() const;
 
 private:
-	typedef std::map<std::string, int> KWMap;
+	using KWMap = std::map<std::string, int>;
 
 	KWMap _kwMap;
 };

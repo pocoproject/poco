@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 	// build a DOM document and write it to standard output.
 
 	AutoPtr<Document> pDoc = new Document;
-	
+
 	AutoPtr<Element> pRoot = pDoc->createElement("root");
 	pDoc->appendChild(pRoot);
 
@@ -46,11 +46,11 @@ int main(int argc, char** argv)
 	AutoPtr<Text> pText2 = pDoc->createTextNode("text2");
 	pChild2->appendChild(pText2);
 	pRoot->appendChild(pChild2);
-	
+
 	DOMWriter writer;
 	writer.setNewLine("\n");
 	writer.setOptions(XMLWriter::PRETTY_PRINT);
 	writer.writeNode(std::cout, pDoc);
-	
+
 	return 0;
 }

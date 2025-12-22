@@ -34,8 +34,8 @@ class Foundation_API Glob
 	/// as known from Unix shells.
 	///
 	/// In the pattern string, '*' matches any sequence of characters,
-	/// '?' matches any single character, [SET] matches any single character 
-	/// in the specified set, [!SET] matches any character not in the  
+	/// '?' matches any single character, [SET] matches any single character
+	/// in the specified set, [!SET] matches any character not in the
 	/// specified set.
 	///
 	/// A set is composed of characters or ranges; a range looks like
@@ -58,23 +58,23 @@ public:
 		GLOB_CASELESS        = 0x04, /// ignore case when comparing characters
 		GLOB_DIRS_ONLY       = 0x80  /// only glob for directories (for internal use only)
 	};
-	
+
 	Glob(const std::string& pattern, int options = 0);
 		/// Creates the Glob, using the given pattern. The pattern
 		/// must not be an empty string.
 		///
-		/// If the GLOB_DOT_SPECIAL option is specified, '*' and '?' do 
+		/// If the GLOB_DOT_SPECIAL option is specified, '*' and '?' do
 		/// not match '.' at the beginning of a matched subject. This is useful for
 		/// making dot-files invisible in good old Unix-style.
 
 	~Glob();
 		/// Destroys the Glob.
-		
+
 	bool match(const std::string& subject);
 		/// Matches the given subject against the glob pattern.
 		/// Returns true if the subject matches the pattern, false
 		/// otherwise.
-		
+
 	static void glob(const std::string& pathPattern, std::set<std::string>& files, int options = 0);
 		/// Creates a set of files that match the given pathPattern.
 		///
@@ -135,7 +135,7 @@ protected:
 	bool matchSet(TextIterator& itp, const TextIterator& endp, int c);
 	static void collect(const Path& pathPattern, const Path& base, const Path& current, const std::string& pattern, std::set<std::string>& files, int options);
 	static bool isDirectory(const Path& path, bool followSymlink);
-	
+
 private:
 	std::string _pattern;
 	int         _options;

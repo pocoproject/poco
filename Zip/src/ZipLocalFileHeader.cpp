@@ -45,7 +45,7 @@ ZipLocalFileHeader::ZipLocalFileHeader(const Poco::Path& fileName,
     _uncompressedSize(0)
 {
     std::memcpy(_rawHeader, HEADER, ZipCommon::HEADER_SIZE);
-    std::memset(_rawHeader+ZipCommon::HEADER_SIZE, 0, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
+    std::memset(_rawHeader+ZipCommon::HEADER_SIZE, 0, static_cast<std::size_t>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
     setHostSystem(ZipCommon::HS_FAT);
     setEncryption(false);
     setExtraFieldSize(0);
@@ -127,10 +127,11 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
     }
 
     // read the rest of the header
-    inp.read(_rawHeader + ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
+    inp.read(_rawHeader + ZipCommon::HEADER_SIZE, static_cast<std::streamsize>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
     poco_assert (_rawHeader[VERSION_POS + 1]>= ZipCommon::HS_FAT && _rawHeader[VERSION_POS + 1] < ZipCommon::HS_UNUSED);
     poco_assert (getMajorVersionNumber() <= 4); // Allow for Zip64 version 4.5
-    poco_assert (ZipUtil::get16BitValue(_rawHeader, COMPR_METHOD_POS) < ZipCommon::CM_UNUSED);
+    // Note: compression method is not validated here to allow parsing archives with
+    // unsupported methods (BZIP2, LZMA, etc.). Validation happens at decompression time.
     parseDateTime();
     Poco::UInt16 len = getFileNameLength();
     if (len > 0)
@@ -190,12 +191,10 @@ void ZipLocalFileHeader::parse(std::istream& inp, bool assumeHeaderRead)
 
 bool ZipLocalFileHeader::searchCRCAndSizesAfterData() const
 {
-	if (getCompressionMethod() == ZipCommon::CM_STORE || getCompressionMethod() == ZipCommon::CM_DEFLATE)
-	{
-		// check bit 3
-		return ((ZipUtil::get16BitValue(_rawHeader, GENERAL_PURPOSE_POS) & 0x0008) != 0);
-	}
-	return false;
+	// Check bit 3 of general purpose flags for all compression methods.
+	// This flag indicates that CRC-32 and sizes are in a data descriptor
+	// after the compressed data, not in the local file header.
+	return ((ZipUtil::get16BitValue(_rawHeader, GENERAL_PURPOSE_POS) & 0x0008) != 0);
 }
 
 
@@ -243,7 +242,8 @@ void ZipLocalFileHeader::init(const Poco::Path& fName, ZipCommon::CompressionMet
     }
     else
         setCompressionMethod(ZipCommon::CM_STORE);
-    if (_forceZip64)
+
+    if (needsZip64())
         setZip64Data();
 
     _rawHeader[GENERAL_PURPOSE_POS+1] |= 0x08; // Set "language encoding flag" to indicate that filenames and paths are in UTF-8.

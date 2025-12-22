@@ -36,7 +36,7 @@ public:
 	QuotedPrintableEncoderBuf(std::ostream& ostr);
 	~QuotedPrintableEncoderBuf();
 	int close();
-	
+
 private:
 	int writeToDevice(char c);
 	void writeEncoded(char c);

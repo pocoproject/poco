@@ -17,7 +17,6 @@
 #include "Poco/Exception.h"
 
 
-using Poco::SingletonHolder;
 using Poco::FastMutex;
 using Poco::NotFoundException;
 using Poco::ExistsException;
@@ -137,15 +136,10 @@ void HTTPSessionFactory::setProxyConfig(const HTTPClientSession::ProxyConfig& pr
 }
 
 
-namespace
-{
-	static SingletonHolder<HTTPSessionFactory> singleton;
-}
-
-
 HTTPSessionFactory& HTTPSessionFactory::defaultFactory()
 {
-	return *singleton.get();
+	static HTTPSessionFactory f;
+	return f;
 }
 
 

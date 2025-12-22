@@ -21,7 +21,7 @@
 class ODBCOracleTest: public ODBCTest
 	/// Oracle ODBC test class
 	/// Tested:
-	/// 
+	///
 	/// Driver		|	DB							| OS
 	/// ------------+-------------------------------+------------------------------------------
 	///	10.02.00.01	| Oracle9i Release 9.2.0.4.0	| MS Windows XP Professional x64 v.2003/SP1
@@ -30,49 +30,51 @@ class ODBCOracleTest: public ODBCTest
 {
 public:
 	ODBCOracleTest(const std::string& name);
-	~ODBCOracleTest();
+	~ODBCOracleTest() override;
 
-	void testBareboneODBC();
+	void testBareboneODBC() override;
 
-	void testBLOB();
+	void testBLOB() override;
 
-	void testMultipleResults();
+	void testMultipleResults() override;
 
-	void testStoredProcedure();
+	void testTransaction() override;
+
+	void testStoredProcedure() override;
 	void testCursorStoredProcedure();
-	void testStoredFunction();
+	void testStoredFunction() override;
 	void testCursorStoredFunction();
-	void testStoredProcedureAny();
-	void testStoredProcedureDynamicAny();
+	void testStoredProcedureAny() override;
+	void testStoredProcedureDynamicVar() override;
 	void testAutoTransaction();
 
-	void testNull();
+	void testNull() override;
 	static CppUnit::Test* suite();
 
 private:
 	static void testBarebone();
-	
-	void dropObject(const std::string& type, const std::string& name);
-	void recreateNullableTable();
-	void recreatePersonTable();
-	void recreatePersonTupleTable();
-	void recreatePersonBLOBTable();
-	void recreatePersonDateTable();
-	void recreatePersonDateTimeTable();
-	void recreateStringsTable();
-	void recreateIntsTable();
-	void recreateFloatsTable();
-	void recreateTuplesTable();
-	void recreateVectorsTable();
-	void recreateAnysTable();
-	void recreateNullsTable(const std::string& notNull = "");
-	void recreateMiscTable();
-	void recreateLogTable();
-	void recreateUnicodeTable();
+
+	void dropObject(const std::string& type, const std::string& name) override;
+	void recreateNullableTable() override;
+	void recreatePersonTable() override;
+	void recreatePersonTupleTable() override;
+	void recreatePersonBLOBTable() override;
+	void recreatePersonDateTable() override;
+	void recreatePersonDateTimeTable() override;
+	void recreateStringsTable() override;
+	void recreateIntsTable() override;
+	void recreateFloatsTable() override;
+	void recreateTuplesTable() override;
+	void recreateVectorsTable() override;
+	void recreateAnysTable() override;
+	void recreateNullsTable(const std::string& notNull = "") override;
+	void recreateMiscTable() override;
+	void recreateLogTable() override;
+	void recreateUnicodeTable() override;
 
 	static ODBCTest::SessionPtr _pSession;
 	static ODBCTest::ExecPtr    _pExecutor;
-	
+
 	static std::string _driver;
 	static std::string _dsn;
 	static std::string _uid;

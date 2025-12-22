@@ -28,7 +28,7 @@ class CachingChannel: public Poco::Channel
 {
 public:
 	typedef std::list<Poco::Message> Messages;
-	
+
 	CachingChannel(std::size_t n = 100);
 		/// Creates the CachingChannel. Caches n messages in memory
 
@@ -63,6 +63,7 @@ std::size_t CachingChannel::getMaxSize() const
 
 std::size_t CachingChannel::getCurrentSize() const
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
 	return _size;
 }
 
@@ -144,6 +145,44 @@ void SyslogTest::testListener()
 	assertTrue (msgs[0].getPriority() == Poco::Message::PRIO_CRITICAL);
 }
 
+void SyslogTest::testChannelFacility()
+{
+	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
+	channel->setProperty("loghost", "127.0.0.1:51400");
+	channel->setProperty("facility", "KERN");
+	channel->open();
+	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
+	listener->open();
+	auto pCL = Poco::makeAuto<CachingChannel>();
+	listener->addChannel(pCL);
+	assertTrue (pCL->getCurrentSize() == 0);
+	Poco::Message msg("asource", "amessage", Poco::Message::PRIO_CRITICAL);
+	channel->log(msg);
+	channel->setProperty("facility", "USER");
+	msg.setText("asecondmessage");
+	channel->log(msg);
+	assertFalse (msg.has("facility"));
+	Poco::Thread::sleep(1000);
+	listener->close();
+	channel->close();
+	assertTrue (pCL->getCurrentSize() == 2);
+	std::vector<Poco::Message> msgs;
+	pCL->getMessages(msgs, 0, 10);
+
+	assertTrue (msgs.size() == 2);
+
+	assertTrue (msgs[1].getSource() == "asource");
+	assertTrue (msgs[1].getText() == "amessage");
+	assertTrue (msgs[1].getPriority() == Poco::Message::PRIO_CRITICAL);
+	assertTrue (msgs[1].has("facility"));
+	assertTrue (msgs[1].get("facility") == "KERN");
+
+	assertTrue (msgs[0].getSource() == "asource");
+	assertTrue (msgs[0].getText() == "asecondmessage");
+	assertTrue (msgs[0].getPriority() == Poco::Message::PRIO_CRITICAL);
+	assertTrue (msgs[0].has("facility"));
+	assertTrue (msgs[0].get("facility") == "USER");
+}
 
 void SyslogTest::testChannelOpenClose()
 {
@@ -262,6 +301,7 @@ CppUnit::Test* SyslogTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SyslogTest");
 
 	CppUnit_addTest(pSuite, SyslogTest, testListener);
+	CppUnit_addTest(pSuite, SyslogTest, testChannelFacility);
 	CppUnit_addTest(pSuite, SyslogTest, testChannelOpenClose);
 	CppUnit_addTest(pSuite, SyslogTest, testOldBSD);
 	CppUnit_addTest(pSuite, SyslogTest, testStructuredData);

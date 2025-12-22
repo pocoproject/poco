@@ -34,6 +34,7 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	static std::string getFullName(const std::string& libName);
 };
 
 

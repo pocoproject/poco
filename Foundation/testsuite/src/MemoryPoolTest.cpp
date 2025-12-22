@@ -36,11 +36,11 @@ MemoryPoolTest::~MemoryPoolTest()
 void MemoryPoolTest::testMemoryPool()
 {
 	MemoryPool pool1(100, 0, 10);
-	
+
 	assertTrue (pool1.blockSize() == 100);
 	assertTrue (pool1.allocated() == 0);
 	assertTrue (pool1.available() == 0);
-	
+
 	std::vector<void*> ptrs;
 	for (int i = 0; i < 10; ++i)
 	{
@@ -48,7 +48,7 @@ void MemoryPoolTest::testMemoryPool()
 		assertTrue (pool1.allocated() == i + 1);
 		assertTrue (pool1.available() == 0);
 	}
-	
+
 	try
 	{
 		pool1.get();
@@ -57,7 +57,7 @@ void MemoryPoolTest::testMemoryPool()
 	catch (Poco::OutOfMemoryException&)
 	{
 	}
-	
+
 	int av = 0;
 	for (std::vector<void*>::iterator it = ptrs.begin(); it != ptrs.end(); ++it)
 	{
@@ -65,7 +65,7 @@ void MemoryPoolTest::testMemoryPool()
 		++av;
 		assertTrue (pool1.available() == av);
 	}
-	
+
 	MemoryPool pool2(32, 5, 10);
 	assertTrue (pool2.available() == 5);
 	assertTrue (pool2.blockSize() == 32);
@@ -80,7 +80,7 @@ template<typename T>
 bool fastMemPoolTest(int n)
 {
 	bool ret = true;
-	std::vector<T*> vec(n, (T*)0);
+	std::vector<T*> vec(n, (T*)nullptr);
 	Poco::FastMemoryPool<T> pool(sizeof(T*), vec.size()/2);
 	for (int i = 0; i < vec.size(); ++i)
 	{
@@ -104,7 +104,7 @@ template <typename T>
 bool fastMemPoolTestCustom(int n, const T& val)
 {
 	bool ret = true;
-	std::vector<T*> vec(n, (T*)0);
+	std::vector<T*> vec(n, (T*)nullptr);
 	Poco::FastMemoryPool<T> pool(sizeof(T*), vec.size()/2);
 	for (int i = 0; i < vec.size(); ++i)
 	{
@@ -177,7 +177,7 @@ void MemoryPoolTest::testFastMemoryPool()
 	Poco::FastMemoryPool<int> fastIntPool(blocks);
 	Poco::FastMemoryPool<std::string> fastStringPool(blocks);
 
-	std::vector<int*> intVec(blocks, (int*)0);
+	std::vector<int*> intVec(blocks, (int*)nullptr);
 	std::vector<std::string*> strVec(blocks);
 
 	for (int i = 0; i < blocks; ++i)
@@ -240,7 +240,7 @@ void MemoryPoolTest::memoryPoolBenchmark()
 	Poco::Stopwatch sw;
 
 	int reps = 1000000;
-	std::vector<int*> iVec(reps, (int*)0);
+	std::vector<int*> iVec(reps, (int*)nullptr);
 	Poco::FastMemoryPool<int> fastPool(reps);
 	sw.restart();
 	for (int i = 0; i < reps; ++i)

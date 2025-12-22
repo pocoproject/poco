@@ -26,18 +26,18 @@ const std::string SyslogChannel::PROP_FACILITY = "facility";
 const std::string SyslogChannel::PROP_OPTIONS  = "options";
 
 
-SyslogChannel::SyslogChannel(): 
-	_options(SYSLOG_CONS), 
-	_facility(SYSLOG_USER), 
+SyslogChannel::SyslogChannel():
+	_options(SYSLOG_CONS),
+	_facility(SYSLOG_USER),
 	_open(false)
 {
 }
 
 
-SyslogChannel::SyslogChannel(const std::string& name, int options, int facility): 
-	_name(name), 
-	_options(options), 
-	_facility(facility), 
+SyslogChannel::SyslogChannel(const std::string& name, int options, int facility):
+	_name(name),
+	_options(options),
+	_facility(facility),
 	_open(false)
 {
 }
@@ -69,7 +69,8 @@ void SyslogChannel::close()
 void SyslogChannel::log(const Message& msg)
 {
 	if (!_open) open();
-	syslog(getPrio(msg), "%s", msg.getText().c_str());
+	const int pri = getPrio(msg) + _facility;
+	syslog(pri, "%s", msg.getText().c_str());
 }
 
 

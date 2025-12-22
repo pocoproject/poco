@@ -162,7 +162,7 @@ template <typename IDType>
 const IDType ActiveRecord<IDType>::INVALID_ID = IDTraits<IDType>::INVALID_ID;
 
 
-class KeylessActiveRecord: public ActiveRecordBase
+class ActiveRecordLib_API KeylessActiveRecord: public ActiveRecordBase
 	/// The base class for all database objects that
 	/// implement the ActiveRecord pattern, without
 	/// a key column.
@@ -240,23 +240,24 @@ template <typename IDType>
 IDType ActiveRecord<IDType>::lastInsertID(Poco::Data::Session& session)
 {
 	using namespace Poco::Data::Keywords;
+	using namespace std::string_literals;
 
 	IDType id;
-	if (session.connector() == "sqlite")
+	if (Poco::icompare(session.connector(), "sqlite"s) == 0)
 	{
 		session
 			<< "SELECT last_insert_rowid()",
 			into(id),
 			now;
 	}
-	else if (session.connector() == "PostgreSQL")
+	else if (Poco::icompare(session.connector(), "postgresql"s) == 0)
 	{
 		session
-			<< "SELECT currval('id_seq')",
+			<< "SELECT lastval()",
 			into(id),
 			now;
 	}
-	else if (session.connector() == "MySQL")
+	else if (Poco::icompare(session.connector(), "mysql"s) == 0)
 	{
 		session
 			<< "SELECT LAST_INSERT_ID()",

@@ -25,7 +25,7 @@ namespace CppParser {
 
 
 Tokenizer::Tokenizer(std::istream& istr):
-	StreamTokenizer(istr)	
+	StreamTokenizer(istr)
 {
 	addToken(new OperatorToken);
 	addToken(new IdentifierToken);

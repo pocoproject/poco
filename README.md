@@ -1,6 +1,5 @@
 ![alt text][logo]
 
-
 [![poco-ci](https://github.com/pocoproject/poco/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/pocoproject/poco/actions/workflows/ci.yml)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/370/badge)](https://bestpractices.coreinfrastructure.org/projects/370)
 
@@ -25,13 +24,14 @@ and [Getting Started](https://pocoproject.org/docs/00200-GettingStarted.html) do
 
 ### Prerequisites
 
-- CMake 3.5 or newer
-- A C++14 compiler (Visual C++ 2015, GCC 5.0, Clang 3.4, or newer)
+- CMake 3.15 or newer
+- A C++17 compiler (Visual C++ 2017, GCC 8.0, Clang 5, or newer)
 - OpenSSL headers and libraries (optional, but recommended)
 - MySQL, PostgreSQL and ODBC client libraries (optional)
+- C++20 and CMake 3.28 or later (for C++ modules)
 
 Most Unix/Linux systems already have OpenSSL preinstalled. If your system
-does not have OpenSSL, please get it from <http://www.openssl.org> or
+does not have OpenSSL, please get it from <https://www.openssl.org> or
 another source. You do not have to build OpenSSL yourself - a binary
 distribution is fine. For example, via Debian APT:
 
@@ -49,6 +49,7 @@ The easiest way to install OpenSSL on Windows is to use a binary
 (prebuild) release, for example the one from Shining Light
 Productions that comes with a
 [Windows installer](https://www.slproweb.com/products/Win32OpenSSL.html).
+OpenSSL can also be installed via the `vcpkg` package manager.
 
 On Windows, POCO can also use the native Windows TLS APIs (SChannel).
 
@@ -59,28 +60,28 @@ All dependencies can be installed with the following commands:
 #### Debian Linux (including Ubuntu and Raspbian)
 
 ```
-$ sudo apt-get -y update && sudo apt-get -y install git g++ make cmake libssl-dev
+$ sudo apt-get -y update && sudo apt-get -y install git g++ make cmake libssl-dev libmysqlclient-dev libpq-dev
 ```
 
 #### RedHat Linux
 
 ```
-$ sudo yum install -y git gcc-c++ make cmake3 openssl-devel
+$ sudo yum install -y git gcc-c++ make cmake3 openssl-devel mysql-devel postgresql-devel 
 ```
 
 #### macOS (with Homebrew)
 
 ```
-$ brew install cmake openssl
+$ brew install cmake openssl mysql-client libpq
 ```
 
 ### Building with CMake (Linux, macOS, Windows)
 
-[CMake](https://cmake.org) (version 3.5 or newer) is the recommended build system for
+[CMake](https://cmake.org) (version 3.15 or newer) is the recommended build system for
 building the POCO C++ Libraries.
 
 ```
-$ git clone -b master https://github.com/pocoproject/poco.git
+$ git clone -b main https://github.com/pocoproject/poco.git
 $ cd poco
 $ mkdir cmake-build
 $ cd cmake-build
@@ -94,7 +95,13 @@ For example, if OpenSSL has been installed with Homebrew,
 the `cmake` invocation becomes:
 
 ```
-$ cmake .. -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl
+$ cmake .. -DOPENSSL_ROOT_DIR=/opt/homebrew/opt/openssl@3
+```
+
+Similarly, the locations of other external libraries can be specified:
+
+```
+$ cmake .. -DOPENSSL_ROOT_DIR=/opt/homebrew/opt/openssl@3 -DMYSQL_ROOT_DIR=/opt/homebrew/opt/mysql-client -DPostgreSQL_ROOT_DIR=/opt/homebrew/opt/libpq
 ```
 
 Other common ways of building with CMake (e.g., `cmake-gui`) will also work.
@@ -123,6 +130,40 @@ $ sudo cmake --build . --target install
 The default install location is `/usr/local/` on Linux and macOS and
 `C:\Program Files (x64)\` on Windows and can be overridden by setting
 the `CMAKE_INSTALL_PREFIX` CMake variable.
+
+
+#### Building and Installing - Using vcpkg
+
+You can download and install poco using the [vcpkg](https://github.com/Microsoft/vcpkg) dependency manager:
+
+```
+$ git clone https://github.com/Microsoft/vcpkg.git
+$ cd vcpkg
+$ ./bootstrap-vcpkg.sh
+$ ./vcpkg integrate install
+$ ./vcpkg install poco
+```
+The poco port in vcpkg is kept up to date by Microsoft team members and community contributors.
+If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg)
+on the vcpkg repository.
+
+
+#### Building and Installing - Using Conan
+
+You can download and install poco using the Conan(https://github.com/conan-io/conan)
+package manager. It needed to be installed first(https://conan.io/downloads.html):
+
+You can install Poco libraries from Conan Center(https://conan.io/center.html):
+
+    $ conan install -r conancenter poco/1.12.0@
+
+Or, you can download Poco recipe and build locally:
+
+    $ conan install -r conancenter poco/1.12.0@ --build=poco
+
+The Poco recipe and packages in Conan Center are kept up to date by Conan team members and community contributors.
+If the version is out of date, or you detect any wrong behavior, please create an issue or pull request(https://github.com/conan-io/conan-center-index)
+on the Conan Center Index repository.
 
 
 ### Building Without CMake

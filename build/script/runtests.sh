@@ -2,7 +2,7 @@
 #
 # A script for running the POCO testsuites.
 #
-# usage: runtests [component [test] ]
+# usage: runtests [component [test] [d]]
 #
 # If the environment variable EXCLUDE_TESTS is set, containing
 # a space-separated list of project names (as found in the
@@ -21,7 +21,7 @@
 #
 
 if [ "$POCO_BASE" = "" ] ; then
-	POCO_BASE=`pwd`
+	POCO_BASE=$(pwd)
 fi
 
 if [ "$POCO_BUILD" = "" ] ; then
@@ -31,7 +31,7 @@ fi
 TESTRUNNER=./testrunner
 
 if [ "$1" = "" ] ; then
-   components=`cat $POCO_BASE/components`
+   components=$(cat "$POCO_BASE"/components)
 else
    components=$1
 fi
@@ -43,11 +43,11 @@ else
 fi
 
 if [ "$OSARCH" = "" ] ; then
-	OSARCH=`uname -m | tr ' /' _-`
+	OSARCH=$(uname -m | tr ' /' _-)
 fi
 
 if [ "$OSNAME" = "" ] ; then
-	OSNAME=`uname`
+	OSNAME=$(uname)
         case $OSNAME in
         CYGWIN*)
                 OSNAME=CYGWIN
@@ -86,10 +86,10 @@ do
 				echo "****************************************"
 				echo ""
 
-				runs=`expr $runs + 1`
-				sh -c "cd $POCO_BUILD/$comp/testsuite/$BINDIR && PATH=.:$PATH && LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH $TESTRUNNER $IGNORE $TESTRUNNERARGS"
-				if [ $? -ne 0 ] ; then
-					failures=`expr $failures + 1`
+				runs=$((runs + 1))
+				if ! sh -c "export POCO_BASE='$POCO_BASE'; export OSNAME='$OSNAME'; export OSARCH='$OSARCH'; cd $POCO_BUILD/$comp/testsuite/$BINDIR && PATH=.:$PATH && LD_LIBRARY_PATH=.:$LD_LIBRARY_PATH $TESTRUNNER$2 $IGNORE $TESTRUNNERARGS";
+				then
+					failures=$((failures + 1))
 					failedTests="$failedTests $comp"
 					status=1
 				fi

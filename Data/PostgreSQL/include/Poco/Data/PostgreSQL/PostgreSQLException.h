@@ -36,6 +36,11 @@ public:
 	explicit PostgreSQLException(const std::string& aMessage);
 		/// Creates PostgreSQLException.
 
+
+	explicit PostgreSQLException(const std::string& aMessage,const char * pAnSqlState);
+		/// Creates PostgreSQLException.
+
+
 	PostgreSQLException(const PostgreSQLException& exc);
 		/// Creates PostgreSQLException.
 
@@ -63,6 +68,13 @@ public:
 		/// This is useful for temporarily storing a
 		/// copy of an exception (see clone()), then
 		/// throwing it again.
+
+	const char* sqlState() const noexcept;
+		/// Returns the SqlState
+
+
+private:
+	char _sqlState[6];
 };
 
 
@@ -90,6 +102,10 @@ class StatementException: public PostgreSQLException
 public:
 	StatementException(const std::string& aMessage);
 		/// Creates StatementException from string.
+
+	StatementException(const std::string& aMessage,const char* pAnSqlState);
+		/// Creates StatementException from string with support for sqlState.
+
 };
 
 
@@ -127,6 +143,13 @@ inline void PostgreSQLException::rethrow() const
 {
 	throw *this;
 }
+
+
+inline const char* PostgreSQLException::sqlState() const noexcept
+{
+	return _sqlState;
+}
+
 
 
 } } } // namespace Poco::Data::PostgreSQL

@@ -31,36 +31,32 @@
 namespace Poco {
 
 
-template < 
+template <
 	class TKey,
 	class TValue
 >
 class UniqueExpireStrategy: public AbstractStrategy<TKey, TValue>
 	/// An UniqueExpireStrategy implements time based expiration of cache entries. In contrast
-	/// to ExpireStrategy which only allows to set a per cache expiration value, it allows to define 
+	/// to ExpireStrategy which only allows to set a per cache expiration value, it allows to define
 	/// expiration per CacheEntry.
 	/// Each TValue object must thus offer the following method:
-	///    
+	///
 	///    const Poco::Timestamp& getExpiration() const;
-	///    
+	///
 	/// which returns the absolute timepoint when the entry will be invalidated.
 {
 public:
-	typedef std::multimap<Timestamp, TKey>     TimeIndex;
-	typedef typename TimeIndex::iterator       IndexIterator;
-	typedef typename TimeIndex::const_iterator ConstIndexIterator;
-	typedef std::map<TKey, IndexIterator>      Keys;
-	typedef typename Keys::iterator            Iterator;
+	using TimeIndex = std::multimap<Timestamp, TKey>;
+	using IndexIterator = typename TimeIndex::iterator;
+	using ConstIndexIterator = typename TimeIndex::const_iterator;
+	using Keys = std::map<TKey, IndexIterator>;
+	using Iterator = typename Keys::iterator;
 
 public:
-	UniqueExpireStrategy()
+	UniqueExpireStrategy() = default;
 		/// Create an unique expire strategy.
-	{
-	}
 
-	~UniqueExpireStrategy()
-	{
-	}
+	~UniqueExpireStrategy() = default;
 
 	void onAdd(const void*, const KeyValueArgs <TKey, TValue>& args)
 	{

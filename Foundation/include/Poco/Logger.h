@@ -116,21 +116,21 @@ public:
 		///   - debug
 		///   - trace
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string &name, const std::string &value) override;
 		/// Sets or changes a configuration property.
 		///
 		/// Only the "channel" and "level" properties are supported, which allow
 		/// setting the target channel and log level, respectively, via the LoggingRegistry.
 		/// The "channel" and "level" properties are set-only.
 
-	void log(const Message& msg);
+	void log(const Message& msg) override;
 		/// Logs the given message if its priority is
 		/// greater than or equal to the Logger's log level.
 
 	void log(const Exception& exc);
 		/// Logs the given exception with priority PRIO_ERROR.
 
-	void log(const Exception& exc, const char* file, int line);
+	void log(const Exception& exc, const char* file, LineNumber line);
 		/// Logs the given exception with priority PRIO_ERROR.
 		///
 		/// File must be a static string, such as the value of
@@ -142,8 +142,8 @@ public:
 		/// creates a Message with priority PRIO_FATAL
 		/// and the given message text and sends it
 		/// to the attached channel.
-
-	void fatal(const std::string& msg, const char* file, int line);
+	
+	void fatal(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_FATAL,
 		/// creates a Message with priority PRIO_FATAL
 		/// and the given message text and sends it
@@ -156,7 +156,8 @@ public:
 	template <typename T, typename... Args>
 	void fatal(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_FATAL);
+		if (fatal())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_FATAL);
 	}
 
 	void critical(const std::string& msg);
@@ -165,7 +166,7 @@ public:
 		/// and the given message text and sends it
 		/// to the attached channel.
 
-	void critical(const std::string& msg, const char* file, int line);
+	void critical(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_CRITICAL,
 		/// creates a Message with priority PRIO_CRITICAL
 		/// and the given message text and sends it
@@ -178,7 +179,8 @@ public:
 	template <typename T, typename... Args>
 	void critical(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_CRITICAL);
+		if (critical())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_CRITICAL);
 	}
 
 	void error(const std::string& msg);
@@ -187,7 +189,7 @@ public:
 		/// and the given message text and sends it
 		/// to the attached channel.
 
-	void error(const std::string& msg, const char* file, int line);
+	void error(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_ERROR,
 		/// creates a Message with priority PRIO_ERROR
 		/// and the given message text and sends it
@@ -200,7 +202,8 @@ public:
 	template <typename T, typename... Args>
 	void error(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_ERROR);
+		if (error())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_ERROR);
 	}
 
 	void warning(const std::string& msg);
@@ -209,7 +212,7 @@ public:
 		/// and the given message text and sends it
 		/// to the attached channel.
 
-	void warning(const std::string& msg, const char* file, int line);
+	void warning(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_WARNING,
 		/// creates a Message with priority PRIO_WARNING
 		/// and the given message text and sends it
@@ -222,7 +225,8 @@ public:
 	template <typename T, typename... Args>
 	void warning(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_WARNING);
+		if (warning())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_WARNING);
 	}
 
 	void notice(const std::string& msg);
@@ -231,7 +235,7 @@ public:
 		/// and the given message text and sends it
 		/// to the attached channel.
 
-	void notice(const std::string& msg, const char* file, int line);
+	void notice(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_NOTICE,
 		/// creates a Message with priority PRIO_NOTICE
 		/// and the given message text and sends it
@@ -244,7 +248,8 @@ public:
 	template <typename T, typename... Args>
 	void notice(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_NOTICE);
+		if (notice())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_NOTICE);
 	}
 
 	void information(const std::string& msg);
@@ -253,7 +258,7 @@ public:
 		/// and the given message text and sends it
 		/// to the attached channel.
 
-	void information(const std::string& msg, const char* file, int line);
+	void information(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_INFORMATION,
 		/// creates a Message with priority PRIO_INFORMATION
 		/// and the given message text and sends it
@@ -266,7 +271,8 @@ public:
 	template <typename T, typename... Args>
 	void information(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_INFORMATION);
+		if (information())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_INFORMATION);
 	}
 
 	void debug(const std::string& msg);
@@ -275,7 +281,7 @@ public:
 		/// and the given message text and sends it
 		/// to the attached channel.
 
-	void debug(const std::string& msg, const char* file, int line);
+	void debug(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_DEBUG,
 		/// creates a Message with priority PRIO_DEBUG
 		/// and the given message text and sends it
@@ -288,7 +294,8 @@ public:
 	template <typename T, typename... Args>
 	void debug(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_DEBUG);
+		if (debug())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_DEBUG);
 	}
 
 	void trace(const std::string& msg);
@@ -297,7 +304,7 @@ public:
 		/// and the given message text and sends it
 		/// to the attached channel.
 
-	void trace(const std::string& msg, const char* file, int line);
+	void trace(const std::string& msg, const char* file, LineNumber line);
 		/// If the Logger's log level is at least PRIO_TRACE,
 		/// creates a Message with priority PRIO_TRACE
 		/// and the given message text and sends it
@@ -310,7 +317,8 @@ public:
 	template <typename T, typename... Args>
 	void trace(const std::string& fmt, T arg1, Args&&... args)
 	{
-		log(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_TRACE);
+		if (trace())
+			logAlways(Poco::format(fmt, arg1, std::forward<Args>(args)...), Message::PRIO_TRACE);
 	}
 
 	void dump(const std::string& msg, const void* buffer, std::size_t length, Message::Priority prio = Message::PRIO_DEBUG);
@@ -448,13 +456,14 @@ public:
 	static const std::string ROOT; /// The name of the root logger ("").
 
 protected:
-	typedef std::map<std::string, Ptr> LoggerMap;
+	using LoggerMap = std::map<std::string, Ptr>;
 
 	Logger(const std::string& name, Channel::Ptr pChannel, int level);
-	~Logger();
+	~Logger() override;
 
 	void log(const std::string& text, Message::Priority prio);
-	void log(const std::string& text, Message::Priority prio, const char* file, int line);
+	void logNPC(const std::string& text, Message::Priority prio);
+	void log(const std::string& text, Message::Priority prio, const char* file, LineNumber line);
 
 	static std::string format(const std::string& fmt, int argc, std::string argv[]);
 	static Logger& parent(const std::string& name);
@@ -462,11 +471,13 @@ protected:
 	static Ptr find(const std::string& name);
 
 private:
-	typedef std::unique_ptr<LoggerMap> LoggerMapPtr;
+	using LoggerMapPtr = std::unique_ptr<LoggerMap>;
 
 	Logger();
 	Logger(const Logger&);
 	Logger& operator = (const Logger&);
+
+	void logAlways(const std::string& text, Message::Priority prio);
 
 	std::string _name;
 	Channel::Ptr _pChannel;
@@ -481,163 +492,199 @@ private:
 //
 // convenience macros
 //
+
+// The GNU compiler emits a warning if nested "if" statements are followed by
+// an "else" statement and braces are not used to explicitly disambiguate the
+// "else" binding.	This leads to problems with code like:
+//
+//	 if (gate)
+//		 poco_log(loglevel, msg);
+//
+#ifdef __INTEL_COMPILER
+#define POCO_AMBIGUOUS_ELSE_BLOCKER_BEG
+#define POCO_AMBIGUOUS_ELSE_BLOCKER_END
+#else
+#define POCO_AMBIGUOUS_ELSE_BLOCKER_BEG do {
+
+#define POCO_AMBIGUOUS_ELSE_BLOCKER_END \
+	} while(0)
+#endif
+
 #define poco_fatal(logger, msg) \
-	if ((logger).fatal()) (logger).fatal(msg, __FILE__, __LINE__); else (void) 0
-
-#define poco_fatal_f1(logger, fmt, arg1) \
-	if ((logger).fatal()) (logger).fatal(Poco::format((fmt), arg1), __FILE__, __LINE__); else (void) 0
-
-#define poco_fatal_f2(logger, fmt, arg1, arg2) \
-	if ((logger).fatal()) (logger).fatal(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); else (void) 0
-
-#define poco_fatal_f3(logger, fmt, arg1, arg2, arg3) \
-	if ((logger).fatal()) (logger).fatal(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); else (void) 0
-
-#define poco_fatal_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-	if ((logger).fatal()) (logger).fatal(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
+	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+	if ((logger).fatal()) (logger).fatal(msg, __FILE__, __LINE__); \
+	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
 #define poco_fatal_f(logger, fmt, ...) \
-	if ((logger).fatal()) (logger).fatal(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
+	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+	if ((logger).fatal()) (logger).fatal(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
+	POCO_AMBIGUOUS_ELSE_BLOCKER_END
+
+// Deprecated: use poco_fatal_f instead
+#define poco_fatal_f1(logger, fmt, arg1) \
+	poco_fatal_f(logger, fmt, arg1)
+#define poco_fatal_f2(logger, fmt, arg1, arg2) \
+	poco_fatal_f(logger, fmt, arg1, arg2)
+#define poco_fatal_f3(logger, fmt, arg1, arg2, arg3) \
+	poco_fatal_f(logger, fmt, arg1, arg2, arg3)
+#define poco_fatal_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+	poco_fatal_f(logger, fmt, arg1, arg2, arg3, arg4)
 
 #define poco_critical(logger, msg) \
-	if ((logger).critical()) (logger).critical(msg, __FILE__, __LINE__); else (void) 0
-
-#define poco_critical_f1(logger, fmt, arg1) \
-	if ((logger).critical()) (logger).critical(Poco::format((fmt), (arg1)), __FILE__, __LINE__); else (void) 0
-
-#define poco_critical_f2(logger, fmt, arg1, arg2) \
-	if ((logger).critical()) (logger).critical(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); else (void) 0
-
-#define poco_critical_f3(logger, fmt, arg1, arg2, arg3) \
-	if ((logger).critical()) (logger).critical(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); else (void) 0
-
-#define poco_critical_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-	if ((logger).critical()) (logger).critical(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
+	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+	if ((logger).critical()) (logger).critical(msg, __FILE__, __LINE__); \
+	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
 #define poco_critical_f(logger, fmt, ...) \
-	if ((logger).critical()) (logger).critical(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
+	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+	if ((logger).critical()) (logger).critical(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
+	POCO_AMBIGUOUS_ELSE_BLOCKER_END
+
+// Deprecated: use poco_critical_f instead
+#define poco_critical_f1(logger, fmt, arg1) \
+	poco_critical_f(logger, fmt, arg1)
+#define poco_critical_f2(logger, fmt, arg1, arg2) \
+	poco_critical_f(logger, fmt, arg1, arg2)
+#define poco_critical_f3(logger, fmt, arg1, arg2, arg3) \
+	poco_critical_f(logger, fmt, arg1, arg2, arg3)
+#define poco_critical_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+	poco_critical_f(logger, fmt, arg1, arg2, arg3, arg4)
 
 #define poco_error(logger, msg) \
-	if ((logger).error()) (logger).error(msg, __FILE__, __LINE__); else (void) 0
-
-#define poco_error_f1(logger, fmt, arg1) \
-	if ((logger).error()) (logger).error(Poco::format((fmt), (arg1)), __FILE__, __LINE__); else (void) 0
-
-#define poco_error_f2(logger, fmt, arg1, arg2) \
-	if ((logger).error()) (logger).error(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); else (void) 0
-
-#define poco_error_f3(logger, fmt, arg1, arg2, arg3) \
-	if ((logger).error()) (logger).error(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); else (void) 0
-
-#define poco_error_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-	if ((logger).error()) (logger).error(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
+	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+	if ((logger).error()) (logger).error(msg, __FILE__, __LINE__); \
+	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
 #define poco_error_f(logger, fmt, ...) \
-	if ((logger).error()) (logger).error(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
+	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+	if ((logger).error()) (logger).error(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
+	POCO_AMBIGUOUS_ELSE_BLOCKER_END
+
+// Deprecated: use poco_error_f instead
+#define poco_error_f1(logger, fmt, arg1) \
+	poco_error_f(logger, fmt, arg1)
+#define poco_error_f2(logger, fmt, arg1, arg2) \
+	poco_error_f(logger, fmt, arg1, arg2)
+#define poco_error_f3(logger, fmt, arg1, arg2, arg3) \
+	poco_error_f(logger, fmt, arg1, arg2, arg3)
+#define poco_error_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+	poco_error_f(logger, fmt, arg1, arg2, arg3, arg4)
 
 #define poco_warning(logger, msg) \
-	if ((logger).warning()) (logger).warning(msg, __FILE__, __LINE__); else (void) 0
-
-#define poco_warning_f1(logger, fmt, arg1) \
-	if ((logger).warning()) (logger).warning(Poco::format((fmt), (arg1)), __FILE__, __LINE__); else (void) 0
-
-#define poco_warning_f2(logger, fmt, arg1, arg2) \
-	if ((logger).warning()) (logger).warning(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); else (void) 0
-
-#define poco_warning_f3(logger, fmt, arg1, arg2, arg3) \
-	if ((logger).warning()) (logger).warning(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); else (void) 0
-
-#define poco_warning_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-	if ((logger).warning()) (logger).warning(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
+	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+	if ((logger).warning()) (logger).warning(msg, __FILE__, __LINE__); \
+	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
 #define poco_warning_f(logger, fmt, ...) \
-	if ((logger).warning()) (logger).warning(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
+	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+	if ((logger).warning()) (logger).warning(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
+	POCO_AMBIGUOUS_ELSE_BLOCKER_END
+
+// Deprecated: use poco_warning_f instead
+#define poco_warning_f1(logger, fmt, arg1) \
+	poco_warning_f(logger, fmt, arg1)
+#define poco_warning_f2(logger, fmt, arg1, arg2) \
+	poco_warning_f(logger, fmt, arg1, arg2)
+#define poco_warning_f3(logger, fmt, arg1, arg2, arg3) \
+	poco_warning_f(logger, fmt, arg1, arg2, arg3)
+#define poco_warning_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+	poco_warning_f(logger, fmt, arg1, arg2, arg3, arg4)
 
 #define poco_notice(logger, msg) \
-	if ((logger).notice()) (logger).notice(msg, __FILE__, __LINE__); else (void) 0
-
-#define poco_notice_f1(logger, fmt, arg1) \
-	if ((logger).notice()) (logger).notice(Poco::format((fmt), (arg1)), __FILE__, __LINE__); else (void) 0
-
-#define poco_notice_f2(logger, fmt, arg1, arg2) \
-	if ((logger).notice()) (logger).notice(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); else (void) 0
-
-#define poco_notice_f3(logger, fmt, arg1, arg2, arg3) \
-	if ((logger).notice()) (logger).notice(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); else (void) 0
-
-#define poco_notice_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-	if ((logger).notice()) (logger).notice(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
+	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+	if ((logger).notice()) (logger).notice(msg, __FILE__, __LINE__); \
+	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
 #define poco_notice_f(logger, fmt, ...) \
-	if ((logger).notice()) (logger).notice(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
+	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+	if ((logger).notice()) (logger).notice(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
+	POCO_AMBIGUOUS_ELSE_BLOCKER_END
+
+// Deprecated: use poco_notice_f instead
+#define poco_notice_f1(logger, fmt, arg1) \
+	poco_notice_f(logger, fmt, arg1)
+#define poco_notice_f2(logger, fmt, arg1, arg2) \
+	poco_notice_f(logger, fmt, arg1, arg2)
+#define poco_notice_f3(logger, fmt, arg1, arg2, arg3) \
+	poco_notice_f(logger, fmt, arg1, arg2, arg3)
+#define poco_notice_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+	poco_notice_f(logger, fmt, arg1, arg2, arg3, arg4)
 
 #define poco_information(logger, msg) \
-	if ((logger).information()) (logger).information(msg, __FILE__, __LINE__); else (void) 0
-
-#define poco_information_f1(logger, fmt, arg1) \
-	if ((logger).information()) (logger).information(Poco::format((fmt), (arg1)), __FILE__, __LINE__); else (void) 0
-
-#define poco_information_f2(logger, fmt, arg1, arg2) \
-	if ((logger).information()) (logger).information(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); else (void) 0
-
-#define poco_information_f3(logger, fmt, arg1, arg2, arg3) \
-	if ((logger).information()) (logger).information(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); else (void) 0
-
-#define poco_information_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-	if ((logger).information()) (logger).information(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
+	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+	if ((logger).information()) (logger).information(msg, __FILE__, __LINE__); \
+	POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
 #define poco_information_f(logger, fmt, ...) \
-	if ((logger).information()) (logger).information(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
+	POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+	if ((logger).information()) (logger).information(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
+	POCO_AMBIGUOUS_ELSE_BLOCKER_END
+
+// Deprecated: use poco_information_f instead
+#define poco_information_f1(logger, fmt, arg1) \
+	poco_information_f(logger, fmt, arg1)
+#define poco_information_f2(logger, fmt, arg1, arg2) \
+	poco_information_f(logger, fmt, arg1, arg2)
+#define poco_information_f3(logger, fmt, arg1, arg2, arg3) \
+	poco_information_f(logger, fmt, arg1, arg2, arg3)
+#define poco_information_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+	poco_information_f(logger, fmt, arg1, arg2, arg3, arg4)
 
 #if defined(_DEBUG) || defined(POCO_LOG_DEBUG)
-	#define poco_debug(logger, msg) \
-		if ((logger).debug()) (logger).debug(msg, __FILE__, __LINE__); else (void) 0
+#define poco_debug(logger, msg) \
+		POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+		if ((logger).debug()) (logger).debug(msg, __FILE__, __LINE__); \
+		POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
-	#define poco_debug_f1(logger, fmt, arg1) \
-		if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1)), __FILE__, __LINE__); else (void) 0
+#define poco_debug_f(logger, fmt, ...) \
+		POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+		if ((logger).debug()) (logger).debug(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
+		POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
-	#define poco_debug_f2(logger, fmt, arg1, arg2) \
-		if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); else (void) 0
+// Deprecated: use poco_debug_f instead
+#define poco_debug_f1(logger, fmt, arg1) \
+		poco_debug_f(logger, fmt, arg1)
+#define poco_debug_f2(logger, fmt, arg1, arg2) \
+		poco_debug_f(logger, fmt, arg1, arg2)
+#define poco_debug_f3(logger, fmt, arg1, arg2, arg3) \
+		poco_debug_f(logger, fmt, arg1, arg2, arg3)
+#define poco_debug_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+		poco_debug_f(logger, fmt, arg1, arg2, arg3, arg4)
 
-	#define poco_debug_f3(logger, fmt, arg1, arg2, arg3) \
-		if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); else (void) 0
+#define poco_trace(logger, msg) \
+		POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+		if ((logger).trace()) (logger).trace(msg, __FILE__, __LINE__); \
+		POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
-	#define poco_debug_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-		if ((logger).debug()) (logger).debug(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
+#define poco_trace_f(logger, fmt, ...) \
+		POCO_AMBIGUOUS_ELSE_BLOCKER_BEG \
+		if ((logger).trace()) (logger).trace(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); \
+		POCO_AMBIGUOUS_ELSE_BLOCKER_END
 
-	#define poco_debug_f(logger, fmt, ...) \
-		if ((logger).debug()) (logger).debug(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
-
-	#define poco_trace(logger, msg) \
-		if ((logger).trace()) (logger).trace(msg, __FILE__, __LINE__); else (void) 0
-
-	#define poco_trace_f1(logger, fmt, arg1) \
-		if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1)), __FILE__, __LINE__); else (void) 0
-
-	#define poco_trace_f2(logger, fmt, arg1, arg2) \
-		if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1), (arg2)), __FILE__, __LINE__); else (void) 0
-
-	#define poco_trace_f3(logger, fmt, arg1, arg2, arg3) \
-		if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1), (arg2), (arg3)), __FILE__, __LINE__); else (void) 0
-
-	#define poco_trace_f4(logger, fmt, arg1, arg2, arg3, arg4) \
-		if ((logger).trace()) (logger).trace(Poco::format((fmt), (arg1), (arg2), (arg3), (arg4)), __FILE__, __LINE__); else (void) 0
-
-	#define poco_trace_f(logger, fmt, ...) \
-		if ((logger).trace()) (logger).trace(Poco::format((fmt), __VA_ARGS__), __FILE__, __LINE__); else (void) 0
+// Deprecated: use poco_trace_f instead
+#define poco_trace_f1(logger, fmt, arg1) \
+		poco_trace_f(logger, fmt, arg1)
+#define poco_trace_f2(logger, fmt, arg1, arg2) \
+		poco_trace_f(logger, fmt, arg1, arg2)
+#define poco_trace_f3(logger, fmt, arg1, arg2, arg3) \
+		poco_trace_f(logger, fmt, arg1, arg2, arg3)
+#define poco_trace_f4(logger, fmt, arg1, arg2, arg3, arg4) \
+		poco_trace_f(logger, fmt, arg1, arg2, arg3, arg4)
 #else
 	#define poco_debug(logger, msg)
+	#define poco_debug_f(logger, fmt, ...)
+	// Deprecated: use poco_debug_f instead
 	#define poco_debug_f1(logger, fmt, arg1)
 	#define poco_debug_f2(logger, fmt, arg1, arg2)
 	#define poco_debug_f3(logger, fmt, arg1, arg2, arg3)
 	#define poco_debug_f4(logger, fmt, arg1, arg2, arg3, arg4)
-	#define poco_debug_f(logger, fmt, ...)
 	#define poco_trace(logger, msg)
+	#define poco_trace_f(logger, fmt, ...)
+	// Deprecated: use poco_trace_f instead
 	#define poco_trace_f1(logger, fmt, arg1)
 	#define poco_trace_f2(logger, fmt, arg1, arg2)
 	#define poco_trace_f3(logger, fmt, arg1, arg2, arg3)
 	#define poco_trace_f4(logger, fmt, arg1, arg2, arg3, arg4)
-	#define poco_trace_f(logger, fmt, ...)
 #endif
 
 
@@ -665,11 +712,29 @@ inline void Logger::log(const std::string& text, Message::Priority prio)
 }
 
 
-inline void Logger::log(const std::string& text, Message::Priority prio, const char* file, int line)
+inline void Logger::logNPC(const std::string& text, Message::Priority prio)
+{
+	if (_pChannel)
+	{
+		_pChannel->log(Message(_name, text, prio));
+	}
+}
+
+
+inline void Logger::log(const std::string& text, Message::Priority prio, const char* file, LineNumber line)
 {
 	if (_level >= prio && _pChannel)
 	{
 		_pChannel->log(Message(_name, text, prio, file, line));
+	}
+}
+
+
+inline void Logger::logAlways(const std::string& text, Message::Priority prio)
+{
+	if (_pChannel)
+	{
+		_pChannel->log(Message(_name, text, prio));
 	}
 }
 
@@ -680,7 +745,7 @@ inline void Logger::fatal(const std::string& msg)
 }
 
 
-inline void Logger::fatal(const std::string& msg, const char* file, int line)
+inline void Logger::fatal(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_FATAL, file, line);
 }
@@ -693,7 +758,7 @@ inline void Logger::critical(const std::string& msg)
 }
 
 
-inline void Logger::critical(const std::string& msg, const char* file, int line)
+inline void Logger::critical(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_CRITICAL, file, line);
 }
@@ -705,7 +770,7 @@ inline void Logger::error(const std::string& msg)
 }
 
 
-inline void Logger::error(const std::string& msg, const char* file, int line)
+inline void Logger::error(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_ERROR, file, line);
 }
@@ -717,7 +782,7 @@ inline void Logger::warning(const std::string& msg)
 }
 
 
-inline void Logger::warning(const std::string& msg, const char* file, int line)
+inline void Logger::warning(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_WARNING, file, line);
 }
@@ -729,7 +794,7 @@ inline void Logger::notice(const std::string& msg)
 }
 
 
-inline void Logger::notice(const std::string& msg, const char* file, int line)
+inline void Logger::notice(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_NOTICE, file, line);
 }
@@ -741,7 +806,7 @@ inline void Logger::information(const std::string& msg)
 }
 
 
-inline void Logger::information(const std::string& msg, const char* file, int line)
+inline void Logger::information(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_INFORMATION, file, line);
 }
@@ -753,7 +818,7 @@ inline void Logger::debug(const std::string& msg)
 }
 
 
-inline void Logger::debug(const std::string& msg, const char* file, int line)
+inline void Logger::debug(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_DEBUG, file, line);
 }
@@ -765,7 +830,7 @@ inline void Logger::trace(const std::string& msg)
 }
 
 
-inline void Logger::trace(const std::string& msg, const char* file, int line)
+inline void Logger::trace(const std::string& msg, const char* file, LineNumber line)
 {
 	log(msg, Message::PRIO_TRACE, file, line);
 }

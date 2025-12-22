@@ -27,7 +27,7 @@
 namespace Poco {
 
 
-Event::Event(EventType type): EventImpl(type == EVENT_AUTORESET)
+Event::Event(EventType type) : EventImpl(type == EVENT_AUTORESET)
 {
 }
 
@@ -37,9 +37,7 @@ Event::Event(bool autoReset): EventImpl(autoReset)
 }
 
 
-Event::~Event()
-{
-}
+Event::~Event() = default;
 
 
 } // namespace Poco

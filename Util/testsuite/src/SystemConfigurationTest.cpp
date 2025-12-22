@@ -45,7 +45,7 @@ SystemConfigurationTest::~SystemConfigurationTest()
 void SystemConfigurationTest::testProperties()
 {
 	AutoPtr<SystemConfiguration> pConf = new SystemConfiguration;
-	
+
 	assertTrue (pConf->getString("system.osName") == Environment::osName());
 	assertTrue (pConf->getString("system.osVersion") == Environment::osVersion());
 	assertTrue (pConf->getString("system.osArchitecture") == Environment::osArchitecture());
@@ -53,15 +53,15 @@ void SystemConfigurationTest::testProperties()
 	assertTrue (pConf->getString("system.currentDir") == Path::current());
 	assertTrue (pConf->getString("system.homeDir") == Path::home());
 	assertTrue (pConf->getString("system.tempDir") == Path::temp());
-	
+
 	std::string dateTime = pConf->getString("system.dateTime");
 	assertTrue (dateTime.size() == 20);
-	
+
 #if !defined(POCO_VXWORKS)
 	std::string pid = pConf->getString("system.pid");
 	assertTrue (Poco::NumberParser::parse64(pid) == Poco::Process::id());
 #endif
-	
+
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	std::string home = pConf->getString("system.env.HOMEPATH");
 #else

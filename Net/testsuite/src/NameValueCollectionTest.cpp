@@ -32,21 +32,21 @@ NameValueCollectionTest::~NameValueCollectionTest()
 void NameValueCollectionTest::testNameValueCollection()
 {
 	NameValueCollection nvc;
-	
+
 	assertTrue (nvc.empty());
 	assertTrue (nvc.size() == 0);
-	
+
 	nvc.set("name", "value");
 	assertTrue (!nvc.empty());
 	assertTrue (nvc["name"] == "value");
 	assertTrue (nvc["Name"] == "value");
-	
+
 	nvc.set("name2", "value2");
 	assertTrue (nvc.get("name2") == "value2");
 	assertTrue (nvc.get("NAME2") == "value2");
-	
+
 	assertTrue (nvc.size() == 2);
-	
+
 	try
 	{
 		std::string value = nvc.get("name3");
@@ -64,19 +64,19 @@ void NameValueCollectionTest::testNameValueCollection()
 	catch (NotFoundException&)
 	{
 	}
-	
+
 	assertTrue (nvc.get("name", "default") == "value");
 	assertTrue (nvc.get("name3", "default") == "default");
 
 	assertTrue (nvc.has("name"));
 	assertTrue (nvc.has("name2"));
-	assertTrue (!nvc.has("name3"));	
-	
+	assertTrue (!nvc.has("name3"));
+
 	nvc.add("name3", "value3");
 	assertTrue (nvc.get("name3") == "value3");
-	
+
 	nvc.add("name3", "value31");
-	
+
 	NameValueCollection::ConstIterator it = nvc.find("Name3");
 	assertTrue (it != nvc.end());
 	std::string v1 = it->second;
@@ -85,23 +85,23 @@ void NameValueCollectionTest::testNameValueCollection()
 	assertTrue (it != nvc.end());
 	std::string v2 = it->second;
 	assertTrue (it->first == "name3");
-	
+
 	assertTrue ((v1 == "value3" && v2 == "value31") || (v1 == "value31" && v2 == "value3"));
-	
+
 	nvc.erase("name3");
 	assertTrue (!nvc.has("name3"));
 	assertTrue (nvc.find("name3") == nvc.end());
-	
+
 	it = nvc.begin();
 	assertTrue (it != nvc.end());
 	++it;
 	assertTrue (it != nvc.end());
 	++it;
 	assertTrue (it == nvc.end());
-	
+
 	nvc.clear();
 	assertTrue (nvc.empty());
-	
+
 	assertTrue (nvc.size() == 0);
 }
 

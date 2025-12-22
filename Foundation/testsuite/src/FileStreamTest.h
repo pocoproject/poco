@@ -25,6 +25,7 @@ public:
 	~FileStreamTest();
 
 	void testRead();
+	void testWriteReadNativeHandle();
 	void testWrite();
 	void testReadWrite();
 	void testOpen();
@@ -35,6 +36,8 @@ public:
 	void testOpenModeApp();
 	void testSeek();
 	void testMultiOpen();
+	void testBufferSize();
+	void testBufferSizePerformance();
 
 	void setUp();
 	void tearDown();

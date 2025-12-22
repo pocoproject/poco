@@ -23,7 +23,7 @@ namespace XML {
 
 NodeAppender::NodeAppender(Element* parent):
 	_pParent(parent),
-	_pLast(0)
+	_pLast(nullptr)
 {
 	poco_check_ptr (parent);
 
@@ -39,11 +39,11 @@ NodeAppender::~NodeAppender()
 void NodeAppender::appendChild(Node* newChild)
 {
 	poco_check_ptr (newChild);
-	poco_assert (_pLast == 0 || _pLast->_pNext == 0);
+	poco_assert (_pLast == nullptr || _pLast->_pNext == nullptr);
 
 	if (static_cast<AbstractNode*>(newChild)->_pOwner != _pParent->_pOwner)
 		throw DOMException(DOMException::WRONG_DOCUMENT_ERR);
-		
+
 	if (newChild->nodeType() == Node::DOCUMENT_FRAGMENT_NODE)
 	{
 		AbstractContainerNode* pFrag = static_cast<AbstractContainerNode*>(newChild);
@@ -60,14 +60,14 @@ void NodeAppender::appendChild(Node* newChild)
 				pChild->_pParent = _pParent;
 				pChild = pChild->_pNext;
 			}
-			pFrag->_pFirstChild = 0;
+			pFrag->_pFirstChild = nullptr;
 		}
 	}
 	else
 	{
 		AbstractNode* pAN = static_cast<AbstractNode*>(newChild);
 		pAN->duplicate();
-		if (pAN->_pParent) 
+		if (pAN->_pParent)
 			pAN->_pParent->removeChild(pAN);
 		pAN->_pParent = _pParent;
 		if (_pLast)

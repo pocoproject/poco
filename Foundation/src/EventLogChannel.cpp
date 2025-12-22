@@ -28,13 +28,13 @@ const std::string EventLogChannel::PROP_LOGHOST = "loghost";
 const std::string EventLogChannel::PROP_LOGFILE = "logfile";
 
 
-EventLogChannel::EventLogChannel(): 
+EventLogChannel::EventLogChannel():
 	_logFile("Application"),
-	_h(0)
+	_h(nullptr)
 {
 	const DWORD maxPathLen = MAX_PATH + 1;
 	wchar_t name[maxPathLen];
-	int n = GetModuleFileNameW(NULL, name, maxPathLen);
+	int n = GetModuleFileNameW(nullptr, name, maxPathLen);
 	if (n > 0)
 	{
 		wchar_t* end = name + n - 1;
@@ -46,19 +46,19 @@ EventLogChannel::EventLogChannel():
 }
 
 
-EventLogChannel::EventLogChannel(const std::string& name): 
-	_name(name), 
+EventLogChannel::EventLogChannel(const std::string& name):
+	_name(name),
 	_logFile("Application"),
-	_h(0)
+	_h(nullptr)
 {
 }
 
 
-EventLogChannel::EventLogChannel(const std::string& name, const std::string& host): 
-	_name(name), 
+EventLogChannel::EventLogChannel(const std::string& name, const std::string& host):
+	_name(name),
 	_host(host),
 	_logFile("Application"),
-	_h(0)
+	_h(nullptr)
 {
 }
 
@@ -83,7 +83,7 @@ void EventLogChannel::open()
 	UnicodeConverter::toUTF16(_host, uhost);
 	std::wstring uname;
 	UnicodeConverter::toUTF16(_name, uname);
-	_h = RegisterEventSourceW(uhost.empty() ? NULL : uhost.c_str(), uname.c_str());
+	_h = RegisterEventSourceW(uhost.empty() ? nullptr : uhost.c_str(), uname.c_str());
 	if (!_h) throw SystemException("cannot register event source");
 }
 
@@ -91,7 +91,7 @@ void EventLogChannel::open()
 void EventLogChannel::close()
 {
 	if (_h) DeregisterEventSource(_h);
-	_h = 0;
+	_h = nullptr;
 }
 
 
@@ -101,7 +101,7 @@ void EventLogChannel::log(const Message& msg)
 	std::wstring utext;
 	UnicodeConverter::toUTF16(msg.getText(), utext);
 	const wchar_t* pMsg = utext.c_str();
-	ReportEventW(_h, getType(msg), getCategory(msg), POCO_MSG_LOG, NULL, 1, 0, &pMsg, NULL); 
+	ReportEventW(_h, getType(msg), getCategory(msg), POCO_MSG_LOG, nullptr, 1, 0, &pMsg, nullptr);
 }
 
 
@@ -188,31 +188,31 @@ void EventLogChannel::setUpRegistry() const
 	DWORD disp;
 	std::wstring ukey;
 	UnicodeConverter::toUTF16(key, ukey);
-	DWORD rc = RegCreateKeyExW(HKEY_LOCAL_MACHINE, ukey.c_str(), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hKey, &disp);
+	DWORD rc = RegCreateKeyExW(HKEY_LOCAL_MACHINE, ukey.c_str(), 0, nullptr, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, nullptr, &hKey, &disp);
 	if (rc != ERROR_SUCCESS) return;
-	
+
 	if (disp == REG_CREATED_NEW_KEY)
 	{
 		std::wstring path;
 		#if defined(POCO_DLL)
 			#if defined(_DEBUG)
-				#if defined(_WIN64)
+				#if defined(_WIN64) && !defined(POCO_CMAKE)
 					path = findLibrary(L"PocoFoundation64d.dll");
 				#else
 					path = findLibrary(L"PocoFoundationd.dll");
 				#endif
 			#else
-				#if defined(_WIN64)
+				#if defined(_WIN64) && !defined(POCO_CMAKE)
 					path = findLibrary(L"PocoFoundation64.dll");
 				#else
 					path = findLibrary(L"PocoFoundation.dll");
 				#endif
 			#endif
 		#endif
-		
+
 		if (path.empty())
 			path = findLibrary(L"PocoMsg.dll");
-		
+
 		if (!path.empty())
 		{
 			DWORD count = 8;
@@ -234,9 +234,9 @@ std::wstring EventLogChannel::findLibrary(const wchar_t* name)
 	if (dll)
 	{
 		const DWORD maxPathLen = MAX_PATH + 1;
-		wchar_t name[maxPathLen];
-		int n = GetModuleFileNameW(dll, name, maxPathLen);
-		if (n > 0) path = name;
+		wchar_t moduleName[maxPathLen];
+		int n = GetModuleFileNameW(dll, moduleName, maxPathLen);
+		if (n > 0) path = moduleName;
 		FreeLibrary(dll);
 	}
 	return path;

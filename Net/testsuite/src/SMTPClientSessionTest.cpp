@@ -300,7 +300,7 @@ void SMTPClientSessionTest::testSendFailed()
 	catch (SMTPException&)
 	{
 	}
-	
+
 	session.close();
 }
 

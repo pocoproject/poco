@@ -18,20 +18,20 @@
 namespace Poco {
 
 
-TeeStreamBuf::TeeStreamBuf(): 
-	_pIstr(0)
+TeeStreamBuf::TeeStreamBuf():
+	_pIstr(nullptr)
 {
 }
 
 
-TeeStreamBuf::TeeStreamBuf(std::istream& istr): 
+TeeStreamBuf::TeeStreamBuf(std::istream& istr):
 	_pIstr(&istr)
 {
 }
 
 
-TeeStreamBuf::TeeStreamBuf(std::ostream& ostr): 
-	_pIstr(0)
+TeeStreamBuf::TeeStreamBuf(std::ostream& ostr):
+	_pIstr(nullptr)
 {
 	_streams.push_back(&ostr);
 }

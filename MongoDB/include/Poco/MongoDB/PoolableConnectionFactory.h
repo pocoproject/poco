@@ -7,7 +7,7 @@
 //
 // Definition of the PoolableConnectionFactory class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -36,13 +36,13 @@ class PoolableObjectFactory<MongoDB::Connection, MongoDB::Connection::Ptr>
 public:
 	PoolableObjectFactory(Net::SocketAddress& address):
 		_address(address),
-		_pSocketFactory(0)
+		_pSocketFactory(nullptr)
 	{
 	}
 
 	PoolableObjectFactory(const std::string& address):
 		_address(address),
-		_pSocketFactory(0)
+		_pSocketFactory(nullptr)
 	{
 	}
 
@@ -89,11 +89,13 @@ namespace MongoDB {
 
 class PooledConnection
 	/// Helper class for borrowing and returning a connection automatically from a pool.
+	/// Note that the connection pool is not expected to be deleted during the lifetime
+	/// of an instance of PooledConnection.
 {
 public:
-	PooledConnection(Poco::ObjectPool<Connection, Connection::Ptr>& pool) : _pool(pool)
+	PooledConnection(Poco::ObjectPool<Connection, Connection::Ptr>& pool) : _pool(&pool)
 	{
-		_connection = _pool.borrowObject();
+		_connection = _pool->borrowObject();
 	}
 
 	virtual ~PooledConnection()
@@ -102,7 +104,7 @@ public:
 		{
 			if (_connection)
 			{
-				_pool.returnObject(_connection);
+				_pool->returnObject(_connection);
 			}
 		}
 		catch (...)
@@ -116,8 +118,16 @@ public:
 		return _connection;
 	}
 
+	// Disable copy to prevent unwanted release of resources: C++11 way
+	PooledConnection(const PooledConnection&) = delete;
+	PooledConnection& operator=(const PooledConnection&) = delete;
+
+	// Enable move semantics
+	PooledConnection(PooledConnection&& other) = default;
+	PooledConnection& operator=(PooledConnection&&) = default;
+
 private:
-	Poco::ObjectPool<Connection, Connection::Ptr>& _pool;
+	Poco::ObjectPool<Connection, Connection::Ptr>* _pool;
 	Connection::Ptr _connection;
 };
 

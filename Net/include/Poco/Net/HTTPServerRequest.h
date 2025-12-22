@@ -46,26 +46,26 @@ public:
 
 	~HTTPServerRequest();
 		/// Destroys the HTTPServerRequest.
-		
+
 	virtual std::istream& stream() = 0;
 		/// Returns the input stream for reading
 		/// the request body.
 		///
 		/// The stream must be valid until the HTTPServerRequest
 		/// object is destroyed.
-		
+
 	virtual const SocketAddress& clientAddress() const = 0;
 		/// Returns the client's address.
 
 	virtual const SocketAddress& serverAddress() const = 0;
 		/// Returns the server's address.
-		
+
 	virtual const HTTPServerParams& serverParams() const = 0;
 		/// Returns a reference to the server parameters.
 
 	virtual HTTPServerResponse& response() const = 0;
 		/// Returns a reference to the associated response.
-		
+
 	virtual bool secure() const = 0;
 		/// Returns true if the request is using a secure
 		/// connection. Returns false if no secure connection

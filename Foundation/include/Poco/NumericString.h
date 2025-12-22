@@ -7,7 +7,7 @@
 //
 // Numeric string utility functions.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -33,7 +33,7 @@
 #if !defined(POCO_NO_LOCALE)
 	#include <locale>
 #endif
-
+#include <type_traits>
 #if defined(POCO_NOINTMAX)
 typedef Poco::UInt64 uintmax_t;
 typedef Poco::Int64 intmax_t;
@@ -46,9 +46,8 @@ typedef Poco::Int64 intmax_t;
 #pragma warning(disable : 4146)
 #endif // POCO_COMPILER_MSVC
 
-
-// binary numbers are supported, thus 64 (bits) + 1 (string terminating zero)
-#define POCO_MAX_INT_STRING_LEN 65
+// binary numbers are supported, thus 64 (bits) + 1 (string terminating zero) + 2 (hex prefix)
+#define POCO_MAX_INT_STRING_LEN (67)
 // value from strtod.cc (double_conversion::kMaxSignificantDecimalDigits)
 #define POCO_MAX_FLT_STRING_LEN 780
 
@@ -60,33 +59,13 @@ typedef Poco::Int64 intmax_t;
 namespace Poco {
 
 
-namespace Impl {
-
-	template<bool SIGNED, typename T>
-	class IsNegativeImpl;
-
-	template<typename T>
-	class IsNegativeImpl<true, T>
-	{
-	public:
-		bool operator()(T x) { return x < 0; }
-	};
-
-	template<typename T>
-	class IsNegativeImpl<false, T>
-	{
-	public:
-		bool operator()(T) { return false; }
-	};
-
-}
-
-
 template<typename T>
 inline bool isNegative(T x)
 {
-	using namespace Impl;
-	return IsNegativeImpl<std::numeric_limits<T>::is_signed, T>()(x);
+	if constexpr (std::is_signed_v<T>)
+		return x < 0;
+	else
+		return false;
 }
 
 
@@ -112,6 +91,46 @@ inline bool isIntOverflow(From val)
 }
 
 
+template<typename R, typename F, typename S>
+bool safeMultiply(R& result, F f, S s)
+{
+	if ((f == 0) || (s==0))
+	{
+		result = 0;
+		return true;
+	}
+
+	if (f > 0)
+	{
+		if (s > 0)
+		{
+			if (f > (std::numeric_limits<R>::max() / s))
+				return false;
+		}
+		else
+		{
+			if (s < (std::numeric_limits<R>::min() / f))
+				return false;
+		}
+	}
+	else
+	{
+		if (s > 0)
+		{
+			if (f < (std::numeric_limits<R>::min() / s))
+				return false;
+		}
+		else
+		{
+			if (s < (std::numeric_limits<R>::max() / f))
+				return false;
+		}
+	}
+	result = f * s;
+	return true;
+}
+
+
 template <typename F, typename T>
 inline T& isSafeIntCast(F from)
 	/// Returns true if it is safe to cast
@@ -124,7 +143,7 @@ inline T& isSafeIntCast(F from)
 
 template <typename F, typename T>
 inline T& safeIntCast(F from, T& to)
-	/// Returns csted value if it is safe
+	/// Returns cast value if it is safe
 	/// to cast integer from F to T,
 	/// otherwise throws BadCastException.
 {
@@ -169,7 +188,9 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 	/// Converts zero-terminated character array to integer number;
 	/// Thousand separators are recognized for base10 and current locale;
 	/// they are silently skipped and not verified for correct positioning.
-	/// It is not allowed to convert a negative number to unsigned integer.
+	/// It is not allowed to convert a negative number to anything except
+	/// 10-base signed integer.
+	/// For hexadecimal numbers, the case of the digits is not relevant.
 	///
 	/// Function returns true if successful. If parsing was unsuccessful,
 	/// the return value is false with the result value undetermined.
@@ -178,7 +199,9 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 
 	if (!pStr) return false;
 	while (std::isspace(*pStr)) ++pStr;
-	if (*pStr == '\0') return false;
+	if ((*pStr == '\0') || ((*pStr == '-') && ((base != 10) || (std::is_unsigned<I>::value))))
+		return false;
+
 	bool negative = false;
 	if ((base == 10) && (*pStr == '-'))
 	{
@@ -188,101 +211,55 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 	}
 	else if (*pStr == '+') ++pStr;
 
-	// all numbers are parsed as positive; the sign
-	// for negative numbers is adjusted after parsing
+	// numbers are parsed as unsigned, for negative numbers the sign is applied after parsing
+	// overflow is checked in every parse step
 	uintmax_t limitCheck = std::numeric_limits<I>::max();
-	if (negative)
-	{
-		poco_assert_dbg(std::numeric_limits<I>::is_signed);
-		// to cover the entire range, (-min > max) has to be
-		// taken into account;
-		// to avoid overflow for the largest int size,
-		// we resort to FPEnvironment::copySign() (ie. floating-point)
-		if (sizeof(I) == sizeof(intmax_t))
-			limitCheck = static_cast<uintmax_t>(FPEnvironment::copySign(static_cast<double>(std::numeric_limits<I>::min()), 1));
-		else
-		{
-			intmax_t i = std::numeric_limits<I>::min();
-			limitCheck = -i;
-		}
-	}
-
+	if (negative) ++limitCheck;
 	uintmax_t result = 0;
+	unsigned char add = 0;
 	for (; *pStr != '\0'; ++pStr)
 	{
-		if  (result > (limitCheck / base)) return false;
+		if (*pStr == thSep)
+		{
+			if (base == 10) continue;
+			// thousand separators only allowed for base 10
+			return false;
+		}
+		if (result > (limitCheck / base)) return false;
+		if (!safeMultiply(result, result, base)) return false;
 		switch (*pStr)
 		{
 		case '0': case '1': case '2': case '3':
 		case '4': case '5': case '6': case '7':
-			{
-				char add = (*pStr - '0');
-				if ((limitCheck - result) < add) return false;
-				result = result * base + add;
-			}
+			add = (*pStr - '0');
 			break;
 
 		case '8': case '9':
-			if ((base == 10) || (base == 0x10))
-			{
-				char  add = (*pStr - '0');
-				if ((limitCheck - result) < add) return false;
-				result = result * base + add;
-			}
+			if ((base == 10) || (base == 0x10)) add = (*pStr - '0');
 			else return false;
-
 			break;
 
 		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-			{
-				if (base != 0x10) return false;
-				char  add = (*pStr - 'a');
-				if ((limitCheck - result) < add) return false;
-				result = result * base + (10 + add);
-			}
+			if (base != 0x10) return false;
+			add = (*pStr - 'a') + 10;
 			break;
 
 		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-			{
-				if (base != 0x10) return false;
-				char add = (*pStr - 'A');
-				if ((limitCheck - result) < add) return false;
-				result = result * base + (10 + add);
-			}
+			if (base != 0x10) return false;
+			add = (*pStr - 'A') + 10;
 			break;
-
-		case '.':
-			if ((base == 10) && (thSep == '.')) break;
-			else return false;
-
-		case ',':
-			if ((base == 10) && (thSep == ',')) break;
-			else return false;
-
-		case ' ':
-			if ((base == 10) && (thSep == ' ')) break;
 
 		default:
 			return false;
 		}
+		if ((limitCheck - static_cast<uintmax_t>(result)) < add) return false;
+		result += add;
 	}
 
 	if (negative && (base == 10))
-	{
-		poco_assert_dbg(std::numeric_limits<I>::is_signed);
-		intmax_t i;
-		if (sizeof(I) == sizeof(intmax_t))
-			i = static_cast<intmax_t>(FPEnvironment::copySign(static_cast<double>(result), -1));
-		else
-			i = static_cast<intmax_t>(-result);
-		if (isIntOverflow<I>(i)) return false;
-		outResult = static_cast<I>(i);
-	}
+		outResult = static_cast<I>(-result);
 	else
-	{
-		if (isIntOverflow<I>(result)) return false;
 		outResult = static_cast<I>(result);
-	}
 
 	return true;
 }
@@ -383,8 +360,10 @@ bool intToStr(T value,
 	bool prefix = false,
 	int width = -1,
 	char fill = ' ',
-	char thSep = 0)
-	/// Converts integer to string. Numeric bases from binary to hexadecimal are supported.
+	char thSep = 0,
+	bool lowercase = false)
+	/// Converts integer to string. Standard numeric bases from binary to hexadecimal
+	/// are supported.
 	/// If width is non-zero, it pads the return value with fill character to the specified width.
 	/// When padding is zero character ('0'), it is prepended to the number itself; all other
 	/// paddings are prepended to the formatted result with minus sign or base prefix included
@@ -392,6 +371,11 @@ bool intToStr(T value,
 	/// "0x" for hexadecimal) is prepended. For all other bases, prefix argument is ignored.
 	/// Formatted string has at least [width] total length.
 {
+	if constexpr (std::is_signed_v<T>)
+	{
+		poco_assert_dbg (((value < 0) && (base == 10)) || (value >= 0));
+	}
+
 	if (base < 2 || base > 0x10)
 	{
 		*result = '\0';
@@ -405,7 +389,7 @@ bool intToStr(T value,
 	{
 		tmpVal = value;
 		value /= base;
-		*ptr++ = "FEDCBA9876543210123456789ABCDEF"[15 + (tmpVal - value * base)];
+		*ptr++ = (lowercase ? "fedcba9876543210123456789abcdef" : "FEDCBA9876543210123456789ABCDEF")[15 + (tmpVal - value * base)];
 		if (thSep && (base == 10) && (++thCount == 3))
 		{
 			*ptr++ = thSep;
@@ -415,7 +399,10 @@ bool intToStr(T value,
 
 	if ('0' == fill)
 	{
-		if (tmpVal < 0) --width;
+		if constexpr (std::is_signed_v<T>)
+		{
+			if (tmpVal < 0) --width;
+		}
 		if (prefix && base == 010) --width;
 		if (prefix && base == 0x10) width -= 2;
 		while ((ptr - result) < width) *ptr++ = fill;
@@ -428,81 +415,9 @@ bool intToStr(T value,
 		*ptr++ = '0';
 	}
 
-	if (tmpVal < 0) *ptr++ = '-';
-
-	if ('0' != fill)
+	if constexpr (std::is_signed_v<T>)
 	{
-		while ((ptr - result) < width) *ptr++ = fill;
-	}
-
-	size = ptr - result;
-	poco_assert_dbg (size <= ptr.span());
-	poco_assert_dbg ((-1 == width) || (size >= size_t(width)));
-	*ptr-- = '\0';
-
-	char* ptrr = result;
-	char tmp;
-	while(ptrr < ptr)
-	{
-		 tmp    = *ptr;
-		*ptr--  = *ptrr;
-		*ptrr++ = tmp;
-	}
-
-	return true;
-}
-
-
-template <typename T>
-bool uIntToStr(T value,
-	unsigned short base,
-	char* result,
-	std::size_t& size,
-	bool prefix = false,
-	int width = -1,
-	char fill = ' ',
-	char thSep = 0)
-	/// Converts unsigned integer to string. Numeric bases from binary to hexadecimal are supported.
-	/// If width is non-zero, it pads the return value with fill character to the specified width.
-	/// When padding is zero character ('0'), it is prepended to the number itself; all other
-	/// paddings are prepended to the formatted result with minus sign or base prefix included
-	/// If prefix is true and base is octal or hexadecimal, respective prefix ('0' for octal,
-	/// "0x" for hexadecimal) is prepended. For all other bases, prefix argument is ignored.
-	/// Formatted string has at least [width] total length.
-{
-	if (base < 2 || base > 0x10)
-	{
-		*result = '\0';
-		return false;
-	}
-
-	Impl::Ptr ptr(result, size);
-	int thCount = 0;
-	T tmpVal;
-	do
-	{
-		tmpVal = value;
-		value /= base;
-		*ptr++ = "FEDCBA9876543210123456789ABCDEF"[15 + (tmpVal - value * base)];
-		if (thSep && (base == 10) && (++thCount == 3))
-		{
-			*ptr++ = thSep;
-			thCount = 0;
-		}
-	} while (value);
-
-	if ('0' == fill)
-	{
-		if (prefix && base == 010) --width;
-		if (prefix && base == 0x10) width -= 2;
-		while ((ptr - result) < width) *ptr++ = fill;
-	}
-
-	if (prefix && base == 010) *ptr++ = '0';
-	else if (prefix && base == 0x10)
-	{
-		*ptr++ = 'x';
-		*ptr++ = '0';
+		if (tmpVal < 0) *ptr++ = '-';
 	}
 
 	if ('0' != fill)
@@ -529,28 +444,66 @@ bool uIntToStr(T value,
 
 
 template <typename T>
-bool intToStr (T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
-	/// Converts integer to string; This is a wrapper function, for details see see the
+POCO_DEPRECATED("use intToStr instead")
+bool uIntToStr(T value,
+	unsigned short base,
+	char* result,
+	std::size_t& size,
+	bool prefix = false,
+	int width = -1,
+	char fill = ' ',
+	char thSep = 0,
+	bool lowercase = false)
+	/// Converts unsigned integer to string. Numeric bases from binary to hexadecimal are supported.
+	/// If width is non-zero, it pads the return value with fill character to the specified width.
+	/// When padding is zero character ('0'), it is prepended to the number itself; all other
+	/// paddings are prepended to the formatted result with minus sign or base prefix included
+	/// If prefix is true and base is octal or hexadecimal, respective prefix ('0' for octal,
+	/// "0x" for hexadecimal) is prepended. For all other bases, prefix argument is ignored.
+	/// Formatted string has at least [width] total length.
+	///
+	/// This function is deprecated; use intToStr instead.
+{
+	return intToStr(value, base, result, size, prefix, width, fill, thSep, lowercase);
+}
+
+
+template <typename T>
+bool intToStr (T number,
+	unsigned short base,
+	std::string& result,
+	bool prefix = false,
+	int width = -1,
+	char fill = ' ',
+	char thSep = 0,
+	bool lowercase = false)
+	/// Converts integer to string; This is a wrapper function, for details see the
 	/// bool intToStr(T, unsigned short, char*, int, int, char, char) implementation.
 {
 	char res[POCO_MAX_INT_STRING_LEN] = {0};
 	std::size_t size = POCO_MAX_INT_STRING_LEN;
-	bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep);
+	bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep, lowercase);
 	result.assign(res, size);
 	return ret;
 }
 
 
 template <typename T>
-bool uIntToStr (T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
-	/// Converts unsigned integer to string; This is a wrapper function, for details see see the
+POCO_DEPRECATED("use intToStr instead")
+bool uIntToStr (T number,
+	unsigned short base,
+	std::string& result,
+	bool prefix = false,
+	int width = -1,
+	char fill = ' ',
+	char thSep = 0,
+	bool lowercase = false)
+	/// Converts unsigned integer to string; This is a wrapper function, for details see the
 	/// bool uIntToStr(T, unsigned short, char*, int, int, char, char) implementation.
+	///
+	/// This function is deprecated; use intToStr instead.
 {
-	char res[POCO_MAX_INT_STRING_LEN] = {0};
-	std::size_t size = POCO_MAX_INT_STRING_LEN;
-	bool ret = uIntToStr(number, base, res, size, prefix, width, fill, thSep);
-	result.assign(res, size);
-	return ret;
+	return intToStr(number, base, result, prefix, width, fill, thSep, lowercase);
 }
 
 
@@ -578,7 +531,7 @@ Foundation_API void floatToFixedStr(char* buffer,
 	int precision);
 	/// Converts a float value to string. Converted string must be shorter than bufferSize.
 	/// Computes a decimal representation with a fixed number of digits after the
-  	/// decimal point.
+	/// decimal point.
 
 
 Foundation_API std::string& floatToStr(std::string& str,
@@ -621,7 +574,7 @@ Foundation_API void doubleToFixedStr(char* buffer,
 	int precision);
 	/// Converts a double value to string. Converted string must be shorter than bufferSize.
 	/// Computes a decimal representation with a fixed number of digits after the
-  	/// decimal point.
+	/// decimal point.
 
 
 Foundation_API std::string& doubleToStr(std::string& str,

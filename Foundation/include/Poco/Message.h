@@ -43,6 +43,8 @@ class Foundation_API Message
 	/// caused the message.
 {
 public:
+	using StringMap = std::map<std::string, std::string>;
+
 	enum Priority
 	{
 		PRIO_FATAL = 1,   /// A fatal error. The application will most likely terminate. This is the highest priority.
@@ -63,7 +65,7 @@ public:
 		/// Creates a Message with the given source, text and priority.
 		/// The thread and process ids are set.
 
-	Message(const std::string& source, const std::string& text, Priority prio, const char* file, int line);
+	Message(const std::string& source, const std::string& text, Priority prio, const char* file, LineNumber line);
 		/// Creates a Message with the given source, text, priority,
 		/// source file path and line.
 		///
@@ -132,6 +134,9 @@ public:
 	long getTid() const;
 		/// Returns the numeric thread identifier for the message.
 
+	long getOsTid() const;
+		/// Returns the numeric thread identifier for the message.
+
 	void setPid(long pid);
 		/// Sets the process identifier for the message.
 
@@ -150,14 +155,14 @@ public:
 		/// Returns the source file path of the code creating
 		/// the message. May be 0 if not set.
 
-	void setSourceLine(int line);
+	void setSourceLine(LineNumber line);
 		/// Sets the source file line of the statement
 		/// generating the log message.
 		///
 		/// This is usually the result of the __LINE__
 		/// macro.
 
-	int getSourceLine() const;
+	LineNumber getSourceLine() const;
 		/// Returns the source file line of the statement
 		/// generating the log message. May be 0
 		/// if not set.
@@ -174,6 +179,9 @@ public:
 		/// Returns a const reference to the value of the parameter
 		/// with the given name. If the parameter with the given name
 		/// does not exist, then defaultValue is returned.
+
+	const StringMap& getAll() const;
+		/// Returns a const reference to all the values
 
 	void set(const std::string& param, const std::string& value);
 		/// Sets the value for a parameter. If the parameter does
@@ -192,7 +200,6 @@ public:
 
 protected:
 	void init();
-	typedef std::map<std::string, std::string> StringMap;
 
 private:
 	std::string _source;
@@ -200,10 +207,11 @@ private:
 	Priority    _prio;
 	Timestamp   _time;
 	long        _tid;
+	long        _ostid;
 	std::string _thread;
 	long        _pid;
 	const char* _file;
-	int         _line;
+	LineNumber _line;
 	StringMap*  _pMap;
 };
 
@@ -246,6 +254,10 @@ inline long Message::getTid() const
 	return _tid;
 }
 
+inline long Message::getOsTid() const
+{
+	return _ostid;
+}
 
 inline long Message::getPid() const
 {
@@ -259,13 +271,13 @@ inline const char* Message::getSourceFile() const
 }
 
 
-inline int Message::getSourceLine() const
+inline LineNumber Message::getSourceLine() const
 {
 	return _line;
 }
 
 
-inline void swap(Message& m1, Message& m2)
+inline void swap(Message& m1, Message& m2) noexcept
 {
 	m1.swap(m2);
 }

@@ -19,14 +19,27 @@
 #include "Poco/Exception.h"
 #include "Poco/UnWindows.h"
 
-
 namespace Poco {
 
+std::string PathImpl::selfImpl()
+{
+	std::string path;
+	Buffer<wchar_t> buf(MAX_PATH_LEN);
+	DWORD n = GetModuleFileNameW(nullptr, buf.begin(), MAX_PATH_LEN);
+
+	if (n > 0  && n < MAX_PATH_LEN)
+	{
+		UnicodeConverter::toUTF8(buf.begin(), path);
+		return path;
+	}
+
+	throw SystemException("Cannot get path of the current process.");
+}
 
 std::string PathImpl::currentImpl()
 {
 	std::string result;
-	DWORD len = GetCurrentDirectoryW(0, NULL);
+	DWORD len = GetCurrentDirectoryW(0, nullptr);
 	if (len > 0)
 	{
 		Buffer<wchar_t> buffer(len);

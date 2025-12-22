@@ -29,16 +29,16 @@ namespace
 			_pRunnable(pRunnable)
 		{
 		}
-		
+
 		ActiveRunnableBase::Ptr runnable() const
 		{
 			return _pRunnable;
 		}
-		
+
 	private:
 		ActiveRunnableBase::Ptr _pRunnable;
 	};
-	
+
 	class StopNotification: public Notification
 	{
 	};
@@ -94,8 +94,8 @@ void ActiveDispatcher::run()
 		ActiveRunnableBase::Ptr pRunnable = pMethodNf->runnable();
 		pRunnable->duplicate(); // run will release
 		pRunnable->run();
-		pRunnable = 0;
-		pNf = 0;
+		pRunnable = nullptr;
+		pNf = nullptr;
 		pNf = _queue.waitDequeueNotification();
 	}
 }

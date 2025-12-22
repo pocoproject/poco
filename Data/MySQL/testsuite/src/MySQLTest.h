@@ -79,6 +79,11 @@ public:
 	void testDateTime();
 	void testBLOB();
 	void testBLOBStmt();
+	void testLongBLOB();
+	void testLongTEXT();
+#ifdef POCO_MYSQL_JSON
+	void testJSON();
+#endif
 
 	void testUnsignedInts();
 	void testFloat();
@@ -102,6 +107,7 @@ public:
 	void testTransaction();
 
 	void testReconnect();
+	void testSessionPoolAndUnicode();
 
 	void setUp();
 	void tearDown();
@@ -117,6 +123,11 @@ private:
 	void recreatePersonDateTimeTable();
 	void recreatePersonDateTable();
 	void recreatePersonTimeTable();
+	void recreatePersonTimestampTable();
+	void recreatePersonLongBLOBTable();
+#ifdef POCO_MYSQL_JSON
+	void recreatePersonJSONTable();
+#endif
 	void recreateStringsTable();
 	void recreateIntsTable();
 	void recreateUnsignedIntsTable();

@@ -33,7 +33,7 @@ class Encodings_API MacKoreanEncoding: public DoubleByteEncoding
 public:
 	MacKoreanEncoding();
 	~MacKoreanEncoding();
-	
+
 private:
 	static const char* _names[];
 	static const CharacterMap _charMap;

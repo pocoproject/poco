@@ -23,7 +23,7 @@ namespace Poco {
 //
 
 
-PipeStreamBuf::PipeStreamBuf(const Pipe& pipe, openmode mode): 
+PipeStreamBuf::PipeStreamBuf(const Pipe& pipe, openmode mode):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, mode),
 	_pipe(pipe)
 {
@@ -35,15 +35,15 @@ PipeStreamBuf::~PipeStreamBuf()
 }
 
 
-int PipeStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize PipeStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
-	return _pipe.readBytes(buffer, (int) length);
+	return _pipe.readBytes(buffer, static_cast<int>(length));
 }
 
 
-int PipeStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize PipeStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
-	return _pipe.writeBytes(buffer, (int) length);
+	return _pipe.writeBytes(buffer, static_cast<int>(length));
 }
 
 

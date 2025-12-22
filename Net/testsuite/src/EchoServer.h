@@ -18,6 +18,7 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Thread.h"
 #include "Poco/Event.h"
+#include <atomic>
 
 
 class EchoServer: public Poco::Runnable
@@ -29,6 +30,9 @@ public:
 
 	EchoServer(const Poco::Net::SocketAddress& address);
 		/// Creates the EchoServer using the given address.
+
+	EchoServer(const Poco::Net::ServerSocket& sock);
+		/// Creates the EchoServer using the already created socket
 
 	~EchoServer();
 		/// Destroys the EchoServer.
@@ -50,8 +54,8 @@ private:
 	Poco::Net::ServerSocket _socket;
 	Poco::Thread _thread;
 	Poco::Event  _ready;
-	bool         _stop;
-	bool         _done;
+	std::atomic<bool> _stop;
+	std::atomic<bool> _done;
 };
 
 

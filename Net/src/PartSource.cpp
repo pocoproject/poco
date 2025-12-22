@@ -27,7 +27,7 @@ PartSource::PartSource():
 {
 }
 
-	
+
 PartSource::PartSource(const std::string& mediaType):
 	_mediaType(mediaType)
 {

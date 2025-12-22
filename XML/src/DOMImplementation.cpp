@@ -17,7 +17,6 @@
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/Element.h"
 #include "Poco/String.h"
-#include "Poco/SingletonHolder.h"
 
 
 namespace Poco {
@@ -53,10 +52,10 @@ bool DOMImplementation::hasFeature(const XMLString& feature, const XMLString& ve
 	       (lcFeature == FEATURE_TRAVERSAL && version == VERSION_2_0);
 }
 
-		
+
 DocumentType* DOMImplementation::createDocumentType(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const
 {
-	return new DocumentType(0, name, publicId, systemId);
+	return new DocumentType(nullptr, name, publicId, systemId);
 }
 
 
@@ -71,15 +70,10 @@ Document* DOMImplementation::createDocument(const XMLString& namespaceURI, const
 }
 
 
-namespace
-{
-	static Poco::SingletonHolder<DOMImplementation> sh;
-}
-
-
 const DOMImplementation& DOMImplementation::instance()
 {
-	return *sh.get();
+	static DOMImplementation di;
+	return di;
 }
 
 

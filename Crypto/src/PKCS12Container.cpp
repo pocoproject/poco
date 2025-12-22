@@ -19,7 +19,6 @@
 
 
 #include "Poco/Crypto/PKCS12Container.h"
-#include "Poco/NumberFormatter.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>
 #include <openssl/err.h>
@@ -29,7 +28,7 @@ namespace Poco {
 namespace Crypto {
 
 
-PKCS12Container::PKCS12Container(std::istream& istr, const std::string& password): _pKey(0)
+PKCS12Container::PKCS12Container(std::istream& istr, const std::string& password) : _pKey(nullptr)
 {
 	std::ostringstream ostr;
 	Poco::StreamCopier::copyStream(istr, ostr);
@@ -38,7 +37,7 @@ PKCS12Container::PKCS12Container(std::istream& istr, const std::string& password
 	BIO *pBIO = BIO_new_mem_buf(const_cast<char*>(cont.data()), static_cast<int>(cont.size()));
 	if (pBIO)
 	{
-		PKCS12* pPKCS12 = 0;
+		PKCS12* pPKCS12 = nullptr;
 		d2i_PKCS12_bio(pBIO, &pPKCS12);
 		BIO_free(pBIO);
 		if (!pPKCS12) throw OpenSSLException("PKCS12Container(istream&, const string&)");
@@ -51,12 +50,12 @@ PKCS12Container::PKCS12Container(std::istream& istr, const std::string& password
 }
 
 
-PKCS12Container::PKCS12Container(const std::string& path, const std::string& password): _pKey(0)
+PKCS12Container::PKCS12Container(const std::string& path, const std::string& password) : _pKey(nullptr)
 {
 	FILE* pFile = fopen(path.c_str(), "rb");
 	if (pFile)
 	{
-		PKCS12* pPKCS12 = d2i_PKCS12_fp(pFile, NULL);
+		PKCS12* pPKCS12 = d2i_PKCS12_fp(pFile, nullptr);
 		fclose (pFile);
 		if (!pPKCS12) throw OpenSSLException("PKCS12Container(const string&, const string&)");
 		load(pPKCS12, password);
@@ -128,19 +127,12 @@ std::string PKCS12Container::extractFriendlyName(X509* pCert)
 	std::string friendlyName;
 	if(pCert)
 	{
-		STACK_OF(PKCS12_SAFEBAG)*pBags = 0;
-		PKCS12_SAFEBAG*pBag = PKCS12_add_cert(&pBags, pCert);
-		if(pBag)
+		int length = 0;
+		char* pBuffer = reinterpret_cast<char*>(X509_alias_get0(pCert, &length));
+		if (pBuffer)
 		{
-			char* pBuffer = PKCS12_get_friendlyname(pBag);
-			if(pBuffer)
-			{
-				friendlyName = pBuffer;
-				OPENSSL_free(pBuffer);
-			}
-			if(pBags) sk_PKCS12_SAFEBAG_pop_free(pBags, PKCS12_SAFEBAG_free);
+			friendlyName.append(pBuffer, length);
 		}
-		else throw OpenSSLException("PKCS12Container::extractFriendlyName()");
 	}
 	else throw NullPointerException("PKCS12Container::extractFriendlyName()");
 
@@ -152,8 +144,8 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 {
 	if (pPKCS12)
 	{
-		X509* pCert = 0;
-		STACK_OF(X509)* pCA = 0;
+		X509* pCert = nullptr;
+		STACK_OF(X509)* pCA = nullptr;
 		if (PKCS12_parse(pPKCS12, password.c_str(), &_pKey, &pCert, &pCA))
 		{
 			if (pCert)
@@ -171,7 +163,15 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 				int certCount = sk_X509_num(pCA);
 				for (int i = 0; i < certCount; ++i)
 				{
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
 					X509* pX509 = sk_X509_value(pCA, i);
+#else
+					// Cert order is reversed on OpenSSL < 3.
+					// https://github.com/openssl/openssl/issues/16421
+					// https://github.com/openssl/openssl/pull/12641
+					// https://github.com/jeroen/openssl/commit/f5eb85eb0fd432406a24abda6511c449eaee6162
+					X509* pX509 = sk_X509_value(pCA, (certCount - i - 1));
+#endif
 					if (pX509)
 					{
 						_caCertList.push_back(X509Certificate(pX509, true));

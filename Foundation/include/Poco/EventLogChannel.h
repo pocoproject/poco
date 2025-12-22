@@ -41,30 +41,30 @@ public:
 		/// Creates the EventLogChannel.
 		/// The name of the current application (or more correctly,
 		/// the name of its executable) is taken as event source name.
-		
+
 	EventLogChannel(const std::string& name);
 		/// Creates the EventLogChannel with the given event source name.
-		
+
 	EventLogChannel(const std::string& name, const std::string& host);
 		/// Creates an EventLogChannel with the given event source
 		/// name that routes messages to the given host.
-		
+
 	void open();
 		/// Opens the EventLogChannel. If necessary, the
 		/// required registry entries to register a
 		/// message resource DLL are made.
-		
+
 	void close();
 		/// Closes the EventLogChannel.
-	
+
 	void log(const Message& msg);
 		/// Logs the given message to the Windows Event Log.
 		///
 		/// The message type and priority are mapped to
 		/// appropriate values for Event Log type and category.
-		
+
 	void setProperty(const std::string& name, const std::string& value);
-		/// Sets or changes a configuration property. 
+		/// Sets or changes a configuration property.
 		///
 		/// The following properties are supported:
 		///
@@ -73,7 +73,7 @@ public:
 		///              The default is "localhost".
 		///   * host:    same as host.
 		///   * logfile: The name of the log file. The default is "Application".
-		
+
 	std::string getProperty(const std::string& name) const;
 		/// Returns the value of the given property.
 

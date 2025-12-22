@@ -37,7 +37,7 @@ class Net_API TCPServerParams: public Poco::RefCountedObject
 {
 public:
 	using Ptr = Poco::AutoPtr<TCPServerParams>;
-	
+
 	TCPServerParams();
 		/// Creates the TCPServerParams.
 		///
@@ -51,7 +51,7 @@ public:
 		/// it is terminated.
 		///
 		/// The default idle time is 10 seconds;
-		
+
 	const Poco::Timespan& getThreadIdleTime() const;
 		/// Returns the maximum thread idle time.
 
@@ -63,7 +63,7 @@ public:
 		/// in the queue, new connections will be silently discarded.
 		///
 		/// The default number is 64.
-		
+
 	int getMaxQueued() const;
 		/// Returns the maximum number of queued connections.
 
@@ -79,18 +79,43 @@ public:
 		/// The thread pool used by the TCPServerDispatcher
 		/// must at least have the capacity for the given
 		/// number of threads.
-		
+
 	int getMaxThreads() const;
 		/// Returns the maximum number of simultaneous threads
-		/// available for this TCPServerDispatcher.	
-		
+		/// available for this TCPServerDispatcher.
+
 	void setThreadPriority(Poco::Thread::Priority prio);
-		/// Sets the priority of TCP server threads 
+		/// Sets the priority of TCP server threads
 		/// created by TCPServer.
-		
+
 	Poco::Thread::Priority getThreadPriority() const;
 		/// Returns the priority of TCP server threads
-		/// created by TCPServer. 
+		/// created by TCPServer.
+	//reactor
+	bool getReactorMode() const;
+		/// Returns the reactor mode.
+		///
+		/// If true, use reactor mode, else use thread pool mode.
+	void setReactorMode(bool reactorMode);
+		/// Sets the reactor mode.
+		///
+		/// If true, use reactor mode, else use thread pool mode.
+	int getAcceptorNum() const;
+		/// Returns the number of acceptors.
+
+	void setAcceptorNum(int acceptorNum);
+		/// Sets the number of acceptors.
+		///
+		/// The number of acceptors must be greater than 0.
+		/// The default is 1.
+
+	bool getUseSelfReactor() const;
+		/// Returns true if acceptor's self reactor is used.
+		
+	void setUseSelfReactor(bool useSelfReactor);
+		/// Sets the acceptor's self reactor.
+		///
+		/// If true, use acceptor's self reactor, else create {_maxThreads} threads to use
 
 protected:
 	virtual ~TCPServerParams();
@@ -101,6 +126,10 @@ private:
 	int _maxThreads;
 	int _maxQueued;
 	Poco::Thread::Priority _threadPriority;
+
+	bool _reactorMode;
+	int _acceptorNum;
+	bool _useSelfReactor;
 };
 
 

@@ -14,33 +14,62 @@
 
 #include "Poco/Exception.h"
 #include <typeinfo>
+#ifdef POCO_ENABLE_TRACE
+#include <sstream>
+#include "cpptrace/cpptrace.hpp"
+#include "Poco/Trace/Trace.h"
+#endif
 
 
 namespace Poco {
 
 
-Exception::Exception(int code): _pNested(0), _code(code)
+Exception::Exception(int code): _pNested(nullptr), _code(code)
 {
+#ifdef POCO_ENABLE_TRACE
+	std::ostringstream ostr;
+	ostr << '\n';
+	cpptrace::generate_trace(0,100).print(ostr);
+	_msg = ostr.str();
+#endif
 }
 
 
-Exception::Exception(const std::string& msg, int code): _msg(msg), _pNested(0), _code(code)
+Exception::Exception(const std::string& msg, int code): _msg(msg), _pNested(nullptr), _code(code)
 {
+#ifdef POCO_ENABLE_TRACE
+	std::ostringstream ostr;
+	ostr << '\n';
+	cpptrace::generate_trace(0,100).print(ostr);
+	_msg += ostr.str();
+#endif
 }
 
 
-Exception::Exception(const std::string& msg, const std::string& arg, int code): _msg(msg), _pNested(0), _code(code)
+Exception::Exception(const std::string& msg, const std::string& arg, int code): _msg(msg), _pNested(nullptr), _code(code)
 {
 	if (!arg.empty())
 	{
 		_msg.append(": ");
 		_msg.append(arg);
 	}
+#ifdef POCO_ENABLE_TRACE
+	std::ostringstream ostr;
+	ostr << '\n';
+	cpptrace::generate_trace(0,100).print(ostr);
+	_msg += ostr.str();
+#endif
 }
 
 
 Exception::Exception(const std::string& msg, const Exception& nested, int code): _msg(msg), _pNested(nested.clone()), _code(code)
 {
+#ifdef POCO_ENABLE_TRACE
+	std::ostringstream ostr;
+	ostr << '\n';
+	cpptrace::generate_trace(0,100).print(ostr);
+	_msg += ostr.str();
+#endif
 }
 
 
@@ -49,10 +78,10 @@ Exception::Exception(const Exception& exc):
 	_msg(exc._msg),
 	_code(exc._code)
 {
-	_pNested = exc._pNested ? exc._pNested->clone() : 0;
+	_pNested = exc._pNested ? exc._pNested->clone() : nullptr;
 }
 
-	
+
 Exception::~Exception() noexcept
 {
 	delete _pNested;
@@ -63,7 +92,7 @@ Exception& Exception::operator = (const Exception& exc)
 {
 	if (&exc != this)
 	{
-		Exception* newPNested = exc._pNested ? exc._pNested->clone() : 0;
+		Exception* newPNested = exc._pNested ? exc._pNested->clone() : nullptr;
 		delete _pNested;
 		_msg     = exc._msg;
 		_pNested = newPNested;
@@ -84,13 +113,13 @@ const char* Exception::className() const noexcept
 	return typeid(*this).name();
 }
 
-	
+
 const char* Exception::what() const noexcept
 {
 	return name();
 }
 
-	
+
 std::string Exception::displayText() const
 {
 	std::string txt = name();
@@ -147,10 +176,12 @@ POCO_IMPLEMENT_EXCEPTION(RegularExpressionException, RuntimeException, "Error in
 POCO_IMPLEMENT_EXCEPTION(LibraryLoadException, RuntimeException, "Cannot load library")
 POCO_IMPLEMENT_EXCEPTION(LibraryAlreadyLoadedException, RuntimeException, "Library already loaded")
 POCO_IMPLEMENT_EXCEPTION(NoThreadAvailableException, RuntimeException, "No thread available")
+POCO_IMPLEMENT_EXCEPTION(ThreadInterruptedException, RuntimeException, "Thread interrupted")
 POCO_IMPLEMENT_EXCEPTION(PropertyNotSupportedException, RuntimeException, "Property not supported")
 POCO_IMPLEMENT_EXCEPTION(PoolOverflowException, RuntimeException, "Pool overflow")
 POCO_IMPLEMENT_EXCEPTION(NoPermissionException, RuntimeException, "No permission")
 POCO_IMPLEMENT_EXCEPTION(OutOfMemoryException, RuntimeException, "Out of memory")
+POCO_IMPLEMENT_EXCEPTION(ResourceLimitException, RuntimeException, "Resource limit")
 POCO_IMPLEMENT_EXCEPTION(DataException, RuntimeException, "Data error")
 
 POCO_IMPLEMENT_EXCEPTION(DataFormatException, DataException, "Bad data format")
@@ -169,6 +200,8 @@ POCO_IMPLEMENT_EXCEPTION(CreateFileException, FileException, "Cannot create file
 POCO_IMPLEMENT_EXCEPTION(OpenFileException, FileException, "Cannot open file")
 POCO_IMPLEMENT_EXCEPTION(WriteFileException, FileException, "Cannot write file")
 POCO_IMPLEMENT_EXCEPTION(ReadFileException, FileException, "Cannot read file")
+POCO_IMPLEMENT_EXCEPTION(ExecuteFileException, FileException, "Cannot execute file")
+POCO_IMPLEMENT_EXCEPTION(FileNotReadyException, FileException, "File not ready")
 POCO_IMPLEMENT_EXCEPTION(DirectoryNotEmptyException, FileException, "Directory not empty")
 POCO_IMPLEMENT_EXCEPTION(UnknownURISchemeException, RuntimeException, "Unknown URI scheme")
 POCO_IMPLEMENT_EXCEPTION(TooManyURIRedirectsException, RuntimeException, "Too many URI redirects")

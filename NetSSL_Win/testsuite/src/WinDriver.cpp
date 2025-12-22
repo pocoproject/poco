@@ -39,14 +39,14 @@ public:
 		runner.run();
 		return 0;
 	}
-	
+
 protected:
 	void initialize(Poco::Util::Application& self)
 	{
 		loadConfiguration(); // load default configuration files, if present
 		Poco::Util::Application::initialize(self);
 	}
-	
+
 private:
 	std::vector<std::string> _targs;
 };

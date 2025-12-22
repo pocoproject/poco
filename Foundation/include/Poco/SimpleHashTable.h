@@ -31,9 +31,8 @@
 namespace Poco {
 
 
-//@ deprecated
 template <class Key, class Value, class KeyHashFunction = HashFunction<Key>>
-class SimpleHashTable
+class POCO_DEPRECATED("use LinearHashTable") SimpleHashTable
 	/// A SimpleHashTable stores a key value pair that can be looked up via a hashed key.
 	///
 	/// In comparison to a HashTable, this class handles collisions by sequentially searching the next
@@ -54,7 +53,7 @@ public:
 		}
 	};
 
-	typedef std::vector<HashEntry*> HashTableVector;
+	using HashTableVector = std::vector<HashEntry *>;
 
 	SimpleHashTable(UInt32 capacity = 251): _entries(capacity, 0), _size(0), _capacity(capacity)
 		/// Creates the SimpleHashTable.
@@ -68,7 +67,7 @@ public:
 		_entries.reserve(ht._capacity);
 		for (auto p: ht._entries.end())
 		{
-			if (p) 
+			if (p)
 				_entries.push_back(new HashEntry(p));
 			else
 				_entries.push_back(0);
@@ -90,8 +89,8 @@ public:
 		}
 		return *this;
 	}
-	
-	void swap(SimpleHashTable& ht)
+
+	void swap(SimpleHashTable& ht) noexcept
 	{
 		using std::swap;
 		swap(_entries, ht._entries);
@@ -216,12 +215,12 @@ public:
 		UInt32 hsh = hash(key);
 		return const_cast<Value&>(getRaw(key, hsh));
 	}
-	
+
 	const Value& operator [] (const Key& key) const
 	{
 		return get(key);
 	}
-	
+
 	Value& operator [] (const Key& key)
 	{
 		UInt32 hsh = hash(key);
@@ -326,7 +325,7 @@ public:
 	{
 		return _size;
 	}
-	
+
 	UInt32 capacity() const
 	{
 		return _capacity;

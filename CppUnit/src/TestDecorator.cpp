@@ -15,9 +15,7 @@ TestDecorator::TestDecorator(Test* test)
 }
 
 
-TestDecorator::~TestDecorator()
-{
-}
+TestDecorator::~TestDecorator() = default;
 
 
 int TestDecorator::countTestCases() const
@@ -26,7 +24,7 @@ int TestDecorator::countTestCases() const
 }
 
 
-void TestDecorator::run(TestResult* result)
+void TestDecorator::run(TestResult* result, const Test::Callback& callback)
 {
 	_test->run(result);
 }

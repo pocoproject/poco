@@ -57,6 +57,8 @@ class ODBC_API Binder: public Poco::Data::AbstractBinder
 	/// Binds placeholders in the sql query to the provided values. Performs data types mapping.
 {
 public:
+	using AbstractBinder::bind;
+
 	typedef AbstractBinder::Direction Direction;
 	typedef std::map<SQLPOINTER, SQLLEN> ParamMap;
 
@@ -71,7 +73,9 @@ public:
 	Binder(const StatementHandle& rStmt,
 		std::size_t maxFieldSize,
 		ParameterBinding dataBinding = PB_IMMEDIATE,
-		const TypeInfo* pDataTypes = 0);
+		const TypeInfo* pDataTypes = nullptr,
+		Poco::TextEncoding::Ptr pFromEncoding = nullptr,
+		Poco::TextEncoding::Ptr pDBEncoding = nullptr);
 		/// Creates the Binder.
 
 	~Binder();
@@ -325,6 +329,15 @@ public:
 	void bind(std::size_t pos, const UUID& val, Direction dir);
 		/// Binds a UUID.
 
+	void bind(std::size_t pos, const std::vector<Poco::UUID>& val, Direction dir);
+		/// Binds a UUID vector.
+
+	void bind(std::size_t pos, const std::deque<Poco::UUID>& val, Direction dir);
+		/// Binds a UUID deque.
+
+	void bind(std::size_t pos, const std::list<Poco::UUID>& val, Direction dir);
+		/// Binds a UUID list.
+
 	void bind(std::size_t pos, const NullData& val, Direction dir);
 		/// Binds a null. In-bound only.
 
@@ -336,6 +349,27 @@ public:
 
 	void bind(std::size_t pos, const std::list<NullData>& val, Direction dir);
 		/// Binds a null list.
+
+	template <typename T>
+	void bind(std::size_t pos, const std::vector<Nullable<T>>& val, Direction dir)
+		/// Binds a nullable vector.
+	{
+		bindImplNullableContainer(pos, val, dir);
+	}
+
+	template <typename T>
+	void bind(std::size_t pos, const std::deque<Nullable<T>>& val, Direction dir)
+		/// Binds a nullable deque.
+	{
+		bindImplNullableContainer(pos, val, dir);
+	}
+
+	template <typename T>
+	void bind(std::size_t pos, const std::list<Nullable<T>>& val, Direction dir)
+		/// Binds a nullable list.
+	{
+		bindImplNullableContainer(pos, val, dir);
+	}
 
 	void setDataBinding(ParameterBinding binding);
 		/// Set data binding type.
@@ -392,9 +426,10 @@ private:
 	{
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
+
 		getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
 
-		_lengthIndicator.push_back(0);
+		_lengthIndicator.push_back(nullptr);
 
 		if (Utility::isError(SQLBindParameter(_rStmt,
 			(SQLUSMALLINT) pos + 1,
@@ -403,9 +438,9 @@ private:
 			Utility::sqlDataType(cDataType),
 			colSize,
 			decDigits,
-			(SQLPOINTER) &val, 0, 0)))
+			(SQLPOINTER) &val, 0, nullptr)))
 		{
-			throw StatementException(_rStmt, "SQLBindParameter()");
+			throw StatementException(_rStmt, "ODBC::Binder::SQLBindParameter()");
 		}
 	}
 
@@ -422,6 +457,8 @@ private:
 
 		SQLLEN* pLenIn = new SQLLEN;
 		*pLenIn  = size;
+		// prevent SQLSTATE = HY104 "Invalid precision value"
+		SQLULEN columnSize = size ? size : 1;
 
 		if (PB_AT_EXEC == _paramBinding)
 			*pLenIn  = SQL_LEN_DATA_AT_EXEC(size);
@@ -432,14 +469,14 @@ private:
 			(SQLUSMALLINT) pos + 1,
 			SQL_PARAM_INPUT,
 			SQL_C_BINARY,
-			SQL_LONGVARBINARY,
-			(SQLUINTEGER) size,
+			TypeInfo::sqlDataType<SQL_C_BINARY>(),
+			columnSize,
 			0,
 			pVal,
 			(SQLINTEGER) size,
 			_lengthIndicator.back())))
 		{
-			throw StatementException(_rStmt, "SQLBindParameter(LOB)");
+			throw StatementException(_rStmt, "ODBC::Binder::SQLBindParameter(LOB)");
 		}
 	}
 
@@ -457,7 +494,7 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length);
 		}
 
@@ -472,7 +509,7 @@ private:
 			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
-			throw StatementException(_rStmt, "SQLBindParameter()");
+			throw StatementException(_rStmt, "ODBC::Binder::SQLBindParameter()");
 		}
 	}
 
@@ -509,7 +546,7 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length);
 		}
 
@@ -533,12 +570,12 @@ private:
 			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
-			throw StatementException(_rStmt, "SQLBindParameter()");
+			throw StatementException(_rStmt, "ODBC::Binder::SQLBindParameter()");
 		}
 	}
 
 	template <typename C>
-	void bindImplContainerString(std::size_t pos, const C& val, Direction dir)
+	void bindImplContainerString(std::size_t pos, const C& valC, Direction dir)
 		/// Utility function to bind containers of strings.
 	{
 		if (isOutBound(dir) || !isInBound(dir))
@@ -547,7 +584,19 @@ private:
 		if (PB_IMMEDIATE != _paramBinding)
 			throw InvalidAccessException("Containers can only be bound immediately.");
 
-		std::size_t length = val.size();
+		const C* pVal = nullptr;
+		if (!transcodeRequired()) pVal = &valC;
+		else
+		{
+			pVal = new C(valC.size());
+			typename C::const_iterator valIt = valC.begin();
+			typename C::const_iterator valEnd = valC.end();
+			typename C::iterator tcIt = const_cast<C*>(pVal)->begin();
+			for (; valIt != valEnd; ++valIt, ++tcIt)
+				transcode(*valIt, *tcIt);
+		}
+
+		std::size_t length = pVal->size();
 
 		if (0 == length)
 			throw InvalidArgumentException("Empty container not allowed.");
@@ -558,43 +607,48 @@ private:
 		getColumnOrParameterSize(pos, size);
 		poco_assert (size > 0);
 
-		if (size == _maxFieldSize)
+		if (static_cast<std::size_t>(size) == _maxFieldSize)
 		{
-			getMinValueSize(val, size);
-			// accomodate for terminating zero
-			if (size != _maxFieldSize) ++size;
+			getMinValueSize(*pVal, size);
+			// accommodate for terminating zero
+			if (static_cast<std::size_t>(size) != _maxFieldSize) ++size;
 		}
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, SQL_NTS);
 		}
 
 		if (_charPtrs.size() <= pos)
-			_charPtrs.resize(pos + 1, 0);
+			_charPtrs.resize(pos + 1, nullptr);
 
-		_charPtrs[pos] = (char*) std::calloc(val.size() * size, sizeof(char));
+		_charPtrs[pos] = (char*) std::calloc(pVal->size() * size, sizeof(char));
 
+		std::string typeID = typeid(*pVal).name();
 		std::size_t strSize;
 		std::size_t offset = 0;
-		typename C::const_iterator it = val.begin();
-		typename C::const_iterator end = val.end();
+		typename C::const_iterator it = pVal->begin();
+		typename C::const_iterator end = pVal->end();
 		for (; it != end; ++it)
 		{
 			strSize = it->size();
-			if (strSize > size)
-				throw LengthExceededException("SQLBindParameter(std::vector<std::string>)");
+			if (strSize > static_cast<std::size_t>(size))
+			{
+				if (transcodeRequired()) delete pVal;
+				throw LengthExceededException(Poco::format("SQLBindParameter(%s)", typeID));
+			}
 			std::memcpy(_charPtrs[pos] + offset, it->c_str(), strSize);
 			offset += size;
 		}
+		if (transcodeRequired()) delete pVal;
 
 		if (Utility::isError(SQLBindParameter(_rStmt,
 			(SQLUSMALLINT) pos + 1,
 			toODBCDirection(dir),
 			SQL_C_CHAR,
-			SQL_LONGVARCHAR,
-			(SQLUINTEGER) size - 1,
+			TypeInfo::sqlDataType<SQL_C_CHAR>(),
+			getStringColSize(size),
 			0,
 			_charPtrs[pos],
 			(SQLINTEGER) size,
@@ -624,21 +678,21 @@ private:
 		getColumnOrParameterSize(pos, size);
 		poco_assert(size > 0);
 
-		if (size == _maxFieldSize)
+		if (static_cast<std::size_t>(size) == _maxFieldSize)
 		{
 			getMinValueSize(val, size);
 			// accomodate for terminating zero
-			if (size != _maxFieldSize) size += sizeof(UTF16Char);
+			if (static_cast<std::size_t>(size) != _maxFieldSize) size += sizeof(UTF16Char);
 		}
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, SQL_NTS);
 		}
 
 		if (_utf16CharPtrs.size() <= pos)
-			_utf16CharPtrs.resize(pos + 1, 0);
+			_utf16CharPtrs.resize(pos + 1, nullptr);
 
 		_utf16CharPtrs[pos] = (UTF16Char*)std::calloc(val.size() * size, sizeof(UTF16Char));
 
@@ -650,8 +704,8 @@ private:
 		for (; it != end; ++it)
 		{
 			strSize = it->size() * sizeof(UTF16Char);
-			if (strSize > size)
-				throw LengthExceededException("SQLBindParameter(std::vector<UTF16String>)");
+			if (strSize > static_cast<std::size_t>(size))
+				throw LengthExceededException("ODBC::Binder::bindImplContainerUTF16String:SQLBindParameter(std::vector<UTF16String>)");
 			std::memcpy(pBuf + offset, it->data(), strSize);
 			offset += size;
 		}
@@ -660,14 +714,14 @@ private:
 			(SQLUSMALLINT)pos + 1,
 			toODBCDirection(dir),
 			SQL_C_WCHAR,
-			SQL_WLONGVARCHAR,
-			(SQLUINTEGER)size - 1,
+			TypeInfo::sqlDataType<SQL_C_WCHAR>(),
+			getStringColSize(size),
 			0,
 			_utf16CharPtrs[pos],
 			(SQLINTEGER)size,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
-			throw StatementException(_rStmt, "SQLBindParameter(std::vector<UTF16String>)");
+			throw StatementException(_rStmt, "ODBC::Binder::bindImplContainerUTF16String:SQLBindParameter(std::vector<UTF16String>)");
 		}
 	}
 
@@ -678,14 +732,14 @@ private:
 		typedef typename LOBType::ValueType CharType;
 
 		if (isOutBound(dir) || !isInBound(dir))
-			throw NotImplementedException("BLOB container parameter type can only be inbound.");
+			throw NotImplementedException("ODBC::Binder::bindImplContainerLOB():BLOB container parameter type can only be inbound.");
 
 		if (PB_IMMEDIATE != _paramBinding)
-			throw InvalidAccessException("Containers can only be bound immediately.");
+			throw InvalidAccessException("ODBC::Binder::bindImplContainerLOB():Containers can only be bound immediately.");
 
 		std::size_t length = val.size();
 		if (0 == length)
-			throw InvalidArgumentException("Empty container not allowed.");
+			throw InvalidArgumentException("ODBC::Binder::bindImplContainerLOB():Empty container not allowed.");
 
 		setParamSetSize(length);
 
@@ -693,7 +747,7 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
@@ -708,7 +762,7 @@ private:
 		}
 
 		if (_charPtrs.size() <= pos)
-			_charPtrs.resize(pos + 1, 0);
+			_charPtrs.resize(pos + 1, nullptr);
 
 		_charPtrs[pos] = (char*) std::calloc(val.size() * size, sizeof(CharType));
 		poco_check_ptr (_charPtrs[pos]);
@@ -720,8 +774,8 @@ private:
 		for (; cIt != cEnd; ++cIt)
 		{
 			blobSize = cIt->size();
-			if (blobSize > size)
-				throw LengthExceededException("SQLBindParameter(std::vector<BLOB>)");
+			if (blobSize > static_cast<std::size_t>(size))
+				throw LengthExceededException("ODBC::Binder::bindImplContainerLOB():SQLBindParameter(std::vector<BLOB>)");
 			std::memcpy(_charPtrs[pos] + offset, cIt->rawContent(), blobSize * sizeof(CharType));
 			offset += size;
 		}
@@ -730,14 +784,14 @@ private:
 			(SQLUSMALLINT) pos + 1,
 			SQL_PARAM_INPUT,
 			SQL_C_BINARY,
-			SQL_LONGVARBINARY,
+			TypeInfo::sqlDataType<SQL_C_BINARY>(),
 			(SQLUINTEGER) size,
 			0,
 			_charPtrs[pos],
 			(SQLINTEGER) size,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
-			throw StatementException(_rStmt, "SQLBindParameter(std::vector<BLOB>)");
+			throw StatementException(_rStmt, "ODBC::Binder::bindImplContainerLOB():SQLBindParameter(std::vector<BLOB>)");
 		}
 	}
 
@@ -745,27 +799,27 @@ private:
 	void bindImplContainerDate(std::size_t pos, const C& val, Direction dir)
 	{
 		if (isOutBound(dir) || !isInBound(dir))
-			throw NotImplementedException("Date vector parameter type can only be inbound.");
+			throw NotImplementedException("ODBC::Binder::bindImplContainerDate():Date vector parameter type can only be inbound.");
 
 		if (PB_IMMEDIATE != _paramBinding)
-			throw InvalidAccessException("std::vector can only be bound immediately.");
+			throw InvalidAccessException("ODBC::Binder::bindImplContainerDate():std::vector can only be bound immediately.");
 
 		std::size_t length = val.size();
 
 		if (0 == length)
-			throw InvalidArgumentException("Empty vector not allowed.");
+			throw InvalidArgumentException("ODBC::Binder::bindImplContainerDate():Empty vector not allowed.");
 
 		setParamSetSize(length);
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
 		if (_dateVecVec.size() <= pos)
 		{
-			_dateVecVec.resize(pos + 1, 0);
+			_dateVecVec.resize(pos + 1, nullptr);
 			_dateVecVec[pos] = new DateVec(length ? length : 1);
 		}
 
@@ -779,14 +833,14 @@ private:
 			(SQLUSMALLINT) pos + 1,
 			toODBCDirection(dir),
 			SQL_C_TYPE_DATE,
-			SQL_TYPE_DATE,
+			TypeInfo::sqlDataType<SQL_C_TYPE_DATE>(),
 			colSize,
 			decDigits,
 			(SQLPOINTER) &(*_dateVecVec[pos])[0],
 			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
-			throw StatementException(_rStmt, "SQLBindParameter(Date[])");
+			throw StatementException(_rStmt, "ODBC::Binder::bindImplContainerDate():SQLBindParameter(Date[])");
 		}
 	}
 
@@ -794,26 +848,26 @@ private:
 	void bindImplContainerTime(std::size_t pos, const C& val, Direction dir)
 	{
 		if (isOutBound(dir) || !isInBound(dir))
-			throw NotImplementedException("Time container parameter type can only be inbound.");
+			throw NotImplementedException("ODBC::Binder::bindImplContainerTime():Time container parameter type can only be inbound.");
 
 		if (PB_IMMEDIATE != _paramBinding)
-			throw InvalidAccessException("Containers can only be bound immediately.");
+			throw InvalidAccessException("ODBC::Binder::bindImplContainerTime():Containers can only be bound immediately.");
 
 		std::size_t length = val.size();
 		if (0 == length)
-			throw InvalidArgumentException("Empty container not allowed.");
+			throw InvalidArgumentException("ODBC::Binder::bindImplContainerTime():Empty container not allowed.");
 
 		setParamSetSize(val.size());
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
 		if (_timeVecVec.size() <= pos)
 		{
-			_timeVecVec.resize(pos + 1, 0);
+			_timeVecVec.resize(pos + 1, nullptr);
 			_timeVecVec[pos] = new TimeVec(length ? length : 1);
 		}
 
@@ -827,14 +881,14 @@ private:
 			(SQLUSMALLINT) pos + 1,
 			toODBCDirection(dir),
 			SQL_C_TYPE_TIME,
-			SQL_TYPE_TIME,
+			TypeInfo::sqlDataType<SQL_C_TYPE_TIME>(),
 			colSize,
 			decDigits,
 			(SQLPOINTER) &(*_timeVecVec[pos])[0],
 			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
-			throw StatementException(_rStmt, "SQLBindParameter(Time[])");
+			throw StatementException(_rStmt, "ODBC::Binder::bindImplContainerTime():SQLBindParameter(Time[])");
 		}
 	}
 
@@ -842,27 +896,27 @@ private:
 	void bindImplContainerDateTime(std::size_t pos, const C& val, Direction dir)
 	{
 		if (isOutBound(dir) || !isInBound(dir))
-			throw NotImplementedException("DateTime container parameter type can only be inbound.");
+			throw NotImplementedException("ODBC::Binder::bindImplContainerDateTime():DateTime container parameter type can only be inbound.");
 
 		if (PB_IMMEDIATE != _paramBinding)
-			throw InvalidAccessException("Containers can only be bound immediately.");
+			throw InvalidAccessException("ODBC::Binder::bindImplContainerDateTime():Containers can only be bound immediately.");
 
 		std::size_t length = val.size();
 
 		if (0 == length)
-			throw InvalidArgumentException("Empty Containers not allowed.");
+			throw InvalidArgumentException("ODBC::Binder::bindImplContainerDateTime():Empty Containers not allowed.");
 
 		setParamSetSize(length);
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
 		if (_dateTimeVecVec.size() <= pos)
 		{
-			_dateTimeVecVec.resize(pos + 1, 0);
+			_dateTimeVecVec.resize(pos + 1, nullptr);
 			_dateTimeVecVec[pos] = new DateTimeVec(length ? length : 1);
 		}
 
@@ -876,14 +930,71 @@ private:
 			(SQLUSMALLINT) pos + 1,
 			toODBCDirection(dir),
 			SQL_C_TYPE_TIMESTAMP,
-			SQL_TYPE_TIMESTAMP,
+			TypeInfo::sqlDataType<SQL_C_TYPE_TIMESTAMP>(),
 			colSize,
 			decDigits,
 			(SQLPOINTER) &(*_dateTimeVecVec[pos])[0],
 			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
-			throw StatementException(_rStmt, "SQLBindParameter(Time[])");
+			throw StatementException(_rStmt, "ODBC::Binder::bindImplContainerDateTime():SQLBindParameter(Time[])");
+		}
+	}
+
+	template<typename C>
+	void bindImplContainerUUID(std::size_t pos, const C& val, Direction dir)
+	{
+		if (isOutBound(dir) || !isInBound(dir))
+			throw NotImplementedException("ODBC::Binder::bindImplContainerUUID():UUID container parameter type can only be inbound.");
+
+		if (PB_IMMEDIATE != _paramBinding)
+			throw InvalidAccessException("ODBC::Binder::bindImplContainerUUID():Containers can only be bound immediately.");
+
+		std::size_t length = val.size();
+
+		if (0 == length)
+			throw InvalidArgumentException("ODBC::Binder::bindImplContainerUUID():Empty Containers not allowed.");
+
+		setParamSetSize(length);
+
+		SQLINTEGER size = 16; // UUID is fixed 16 bytes
+		if (_vecLengthIndicator.size() <= pos)
+		{
+			_vecLengthIndicator.resize(pos + 1, nullptr);
+			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, size);
+		}
+
+		if (_charPtrs.size() <= pos)
+			_charPtrs.resize(pos + 1, nullptr);
+
+		_charPtrs[pos] = (char*)std::calloc(val.size() * size, sizeof(char));
+		std::size_t offset = 0;
+		for (typename C::const_iterator it = val.begin(); it != val.end(); ++it)
+		{
+			std::vector<char> bytes(16);
+			it->copyTo(bytes.data()); // Extract 16-byte binary data
+			if (bytes.size() != static_cast<std::size_t>(size))
+				throw LengthExceededException("Invalid UUID size");
+			std::memcpy(_charPtrs[pos] + offset, bytes.data(), size);
+			offset += size;
+		}
+
+		SQLINTEGER colSize = 0;
+		SQLSMALLINT decDigits = 0;
+		getColSizeAndPrecision(pos, SQL_C_BINARY, colSize, decDigits);
+
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT)pos + 1,
+			toODBCDirection(dir),
+			SQL_C_BINARY,
+			SQL_GUID,
+			colSize,
+			decDigits,
+			_charPtrs[pos],
+			(SQLINTEGER)size,
+			&(*_vecLengthIndicator[pos])[0])))
+		{
+			throw StatementException(_rStmt, "ODBC::Binder::bindImplContainerUUID():SQLBindParameter(UUID[])");
 		}
 	}
 
@@ -891,42 +1002,98 @@ private:
 	void bindImplNullContainer(std::size_t pos, const C& val, Direction dir)
 	{
 		if (isOutBound(dir) || !isInBound(dir))
-			throw NotImplementedException("Null container parameter type can only be inbound.");
+			throw NotImplementedException("ODBC::Binder::bindImplNullContainer():Null container parameter type can only be inbound.");
 
 		if (PB_IMMEDIATE != _paramBinding)
-			throw InvalidAccessException("Container can only be bound immediately.");
+			throw InvalidAccessException("ODBC::Binder::bindImplNullContainer():Container can only be bound immediately.");
 
 		std::size_t length = val.size();
+		poco_assert (length);
 
 		if (0 == length)
-			throw InvalidArgumentException("Empty container not allowed.");
+			throw InvalidArgumentException("ODBC::Binder::bindImplNullContainer():Empty container not allowed.");
 
 		setParamSetSize(length);
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
-			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
+			_vecLengthIndicator[pos] = new LengthVec(length, SQL_NULL_DATA);
 		}
 
 		SQLINTEGER colSize = 0;
 		SQLSMALLINT decDigits = 0;
-		getColSizeAndPrecision(pos, SQL_C_STINYINT, colSize, decDigits);
+		getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits);
 
 		if (Utility::isError(SQLBindParameter(_rStmt,
 			(SQLUSMALLINT) pos + 1,
 			SQL_PARAM_INPUT,
-			SQL_C_STINYINT,
-			Utility::sqlDataType(SQL_C_STINYINT),
+			SQL_C_CHAR,
+			TypeInfo::sqlDataType<SQL_C_CHAR>(),
 			colSize,
 			decDigits,
-			0,
+			nullptr,
 			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
-			throw StatementException(_rStmt, "SQLBindParameter()");
+			throw StatementException(_rStmt, "ODBC::Binder::bindImplNullContainer():SQLBindParameter()");
 		}
 	}
+
+	template<typename C>
+	void bindImplNullableContainer(std::size_t pos, const C& val, Direction dir)
+	{
+		if (isOutBound(dir) || !isInBound(dir))
+			throw NotImplementedException("ODBC::Binder::bindImplNullContainer():Null container parameter type can only be inbound.");
+
+		if (PB_IMMEDIATE != _paramBinding)
+			throw InvalidAccessException("ODBC::Binder::bindImplNullContainer():Container can only be bound immediately.");
+
+		std::size_t length = val.size();
+		poco_assert (length);
+
+		if (0 == length)
+			throw InvalidArgumentException("ODBC::Binder::bindImplNullContainer():Empty container not allowed.");
+
+		setParamSetSize(length);
+
+		if (_vecLengthIndicator.size() <= pos)
+		{
+			_vecLengthIndicator.resize(pos + 1, nullptr);
+			_vecLengthIndicator[pos] = new LengthVec(length, SQL_NULL_DATA);
+			auto valIt = val.begin(), valEnd = val.end();
+			auto lenIt = _vecLengthIndicator[pos]->begin(), lenEnd = _vecLengthIndicator[pos]->end();
+			for (; valIt != valEnd && lenIt != lenEnd; ++valIt, ++lenIt)
+			{
+				if (valIt->isNull()) *lenIt = SQL_NULL_DATA;
+				else *lenIt = Utility::sizeOf<C>();
+			}
+
+		}
+
+		SQLINTEGER colSize = 0;
+		SQLSMALLINT decDigits = 0;
+		getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits);
+
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT) pos + 1,
+			SQL_PARAM_INPUT,
+			SQL_C_CHAR,
+			TypeInfo::sqlDataType<SQL_C_CHAR>(),
+			colSize,
+			decDigits,
+			nullptr,
+			0,
+			&(*_vecLengthIndicator[pos])[0])))
+		{
+			throw StatementException(_rStmt, "ODBC::Binder::bindImplNullContainer():SQLBindParameter()");
+		}
+	}
+
+	SQLUINTEGER getStringColSize(SQLUINTEGER columnSize);
+		/// Returns the string column size.
+		/// If the back end is not SQL Server, it returns
+		/// the `columnSize` passed in.
 
 	void getColSizeAndPrecision(std::size_t pos,
 		SQLSMALLINT cDataType,
@@ -952,6 +1119,9 @@ private:
 		/// size should be set to some default value prior to calling this
 		/// function in order to avoid undefined size value.
 
+	std::size_t getParamSizeDirect(std::size_t pos, SQLINTEGER& size);
+		/// A "last ditch" attempt" to obtain parameter size directly from the driver.
+
 	void freeMemory();
 		/// Frees all dynamically allocated memory resources.
 
@@ -974,7 +1144,7 @@ private:
 		{
 			std::size_t sz = it->size() * typeSize;
 			if (sz > _maxFieldSize)
-				throw LengthExceededException();
+				throw LengthExceededException("ODBC::Binder::getMinValueSize(%s, %d)", std::string(typeid(T).name()), static_cast<int>(size));
 
 			if (sz == _maxFieldSize)
 			{
@@ -1474,6 +1644,24 @@ inline void Binder::bind(std::size_t pos, const std::deque<DateTime>& val, Direc
 inline void Binder::bind(std::size_t pos, const std::list<DateTime>& val, Direction dir)
 {
 	bindImplContainerDateTime(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Poco::UUID>& val, Direction dir)
+{
+	bindImplContainerUUID(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Poco::UUID>& val, Direction dir)
+{
+	bindImplContainerUUID(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Poco::UUID>& val, Direction dir)
+{
+	bindImplContainerUUID(pos, val, dir);
 }
 
 

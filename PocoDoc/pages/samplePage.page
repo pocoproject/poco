@@ -22,7 +22,7 @@ Here is some sample code:
     	std::cout << "Hello, world!" << std::endl;
     	return 0;
     }
-    
+
 !Another Paragraph
 Here we're -- showing <*italic text*>, <!bold text!> and <[teletype text]>.
 We can even do <*<!bold italic text!>*>!

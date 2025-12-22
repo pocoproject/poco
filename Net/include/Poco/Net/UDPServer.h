@@ -90,9 +90,9 @@ public:
 	}
 
 private:
-	P            _poller;
+	P _poller;
 	Poco::Thread _thread;
-	bool         _stop;
+	std::atomic<bool> _stop;
 };
 
 

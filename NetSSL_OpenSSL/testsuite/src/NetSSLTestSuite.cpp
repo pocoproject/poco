@@ -9,7 +9,7 @@
 
 
 #include "NetSSLTestSuite.h"
-
+#include "SecureStreamSocketTestSuite.h"
 #include "HTTPSClientTestSuite.h"
 #include "TCPServerTestSuite.h"
 #include "HTTPSServerTestSuite.h"
@@ -21,6 +21,7 @@ CppUnit::Test* NetSSLTestSuite::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("OpenSSLTestSuite");
 
+	pSuite->addTest(SecureStreamSocketTestSuite::suite());
 	pSuite->addTest(HTTPSClientTestSuite::suite());
 	pSuite->addTest(TCPServerTestSuite::suite());
 	pSuite->addTest(HTTPSServerTestSuite::suite());

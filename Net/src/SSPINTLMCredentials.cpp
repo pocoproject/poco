@@ -19,7 +19,6 @@
 
 
 #include "Poco/SharedLibrary.h"
-#include "Poco/SingletonHolder.h"
 #include "Poco/UnicodeConverter.h"
 #include <vector>
 #define WIN32_LEAN_AND_MEAN
@@ -53,7 +52,7 @@ class SSPINTLMProvider
 public:
 	SSPINTLMProvider():
 		_securityLib("security.dll"),
-		_pSecFunTable(0)
+		_pSecFunTable(nullptr)
 	{
 		InitSecurityInterfaceW pInitSecurityInterface = reinterpret_cast<InitSecurityInterfaceW>(_securityLib.getSymbol("InitSecurityInterfaceW"));
 		if (pInitSecurityInterface)
@@ -70,7 +69,8 @@ public:
 	bool available()
 	{
 		PSecPkgInfoW pSecPkgInfo;
-		SECURITY_STATUS status = _pSecFunTable->QuerySecurityPackageInfoW(L"NTLM", &pSecPkgInfo);
+		::SEC_WCHAR package[] = L"NTLM";
+		SECURITY_STATUS status = _pSecFunTable->QuerySecurityPackageInfoW(package, &pSecPkgInfo);
 		if (status == SEC_E_OK)
 		{
 			_pSecFunTable->FreeContextBuffer(pSecPkgInfo);
@@ -82,7 +82,8 @@ public:
 	Poco::SharedPtr<NTLMContext> createNTLMContext(const std::string& host, const std::string& service)
 	{
 		PSecPkgInfoW pSecPkgInfo;
-		SECURITY_STATUS status = _pSecFunTable->QuerySecurityPackageInfoW(L"NTLM", &pSecPkgInfo);
+		::SEC_WCHAR package[] = L"NTLM";
+		SECURITY_STATUS status = _pSecFunTable->QuerySecurityPackageInfoW(package, &pSecPkgInfo);
 		if (status != SEC_E_OK) throw Poco::SystemException("NTLM SSPI not available", status);
 
 		std::size_t maxTokenSize = pSecPkgInfo->cbMaxToken;
@@ -93,13 +94,13 @@ public:
 
 		TimeStamp expiry;
 		status = _pSecFunTable->AcquireCredentialsHandleW(
-			NULL,
-			L"NTLM",
+			nullptr,
+			package,
 			SECPKG_CRED_OUTBOUND,
-			NULL,
-			NULL,
-			NULL,
-			NULL,
+			nullptr,
+			nullptr,
+			nullptr,
+			nullptr,
 			&pContext->_pImpl->credentials,
 			&expiry);
 
@@ -131,12 +132,12 @@ public:
 		TimeStamp expiry;
 		SECURITY_STATUS status = _pSecFunTable->InitializeSecurityContextW(
 			&context._pImpl->credentials,
-			NULL,
+			nullptr,
 			const_cast<SEC_WCHAR*>(context._pImpl->spn.c_str()),
 			0,
 			0,
 			SECURITY_NETWORK_DREP,
-			NULL,
+			nullptr,
 			0,
 			&context._pImpl->context,
 			&msgBufferDesc,
@@ -227,15 +228,10 @@ private:
 };
 
 
-namespace
-{
-	static Poco::SingletonHolder<SSPINTLMProvider> sspintlmProviderHolder;
-}
-
-
 SSPINTLMProvider& SSPINTLMProvider::instance()
 {
-	return *sspintlmProviderHolder.get();
+	static SSPINTLMProvider p;
+	return p;
 }
 
 

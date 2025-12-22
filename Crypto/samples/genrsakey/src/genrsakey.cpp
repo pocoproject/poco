@@ -52,29 +52,29 @@ public:
 	{
 		Poco::Crypto::initializeCrypto();
 	}
-	
+
 	~RSAApp()
 	{
 		Poco::Crypto::uninitializeCrypto();
 	}
 
-protected:	
+protected:
 	void initialize(Application& self)
 	{
 		loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
 	}
-	
+
 	void uninitialize()
 	{
 		Application::uninitialize();
 	}
-	
+
 	void reinitialize(Application& self)
 	{
 		Application::reinitialize(self);
 	}
-	
+
 	void defineOptions(OptionSet& options)
 	{
 		Application::defineOptions(options);
@@ -97,7 +97,7 @@ protected:
 				.repeatable(false)
 				.argument("512|1024|2048|4096")
 				.callback(OptionCallback<RSAApp>(this, &RSAApp::handleKeyLength)));
-				
+
 		options.addOption(
 			Option("exponent", "e", "defines the exponent of the key")
 				.required(false)
@@ -119,14 +119,14 @@ protected:
 				.argument("pwd")
 				.callback(OptionCallback<RSAApp>(this, &RSAApp::handlePassword)));
 	}
-	
+
 	void handleHelp(const std::string& name, const std::string& value)
 	{
 		_helpRequested = true;
 		displayHelp();
 		stopOptionsProcessing();
 	}
-	
+
 	void handleKeyLength(const std::string& name, const std::string& value)
 	{
 		int keyLen = Poco::NumberParser::parse(value);
@@ -150,12 +150,12 @@ protected:
 			throw Poco::Util::IncompatibleOptionsException("Empty file prefix forbidden");
 		_name = value;
 	}
-	
+
 	void handlePassword(const std::string& name, const std::string& value)
 	{
 		_pwd = value;
 	}
-		
+
 	void displayHelp()
 	{
 		HelpFormatter helpFormatter(options());
@@ -176,14 +176,14 @@ protected:
 			logger().information("Generating key: DONE");
 			std::string pubFile(_name + ".pub");
 			std::string privFile(_name + ".priv");
-			
+
 			logger().information("Saving key to " + pubFile + " and " + privFile);
 			key.save(pubFile, privFile, _pwd);
 			logger().information("Key saved");
 		}
 		return Application::EXIT_OK;
 	}
-	
+
 private:
 	bool _helpRequested;
 	RSAKey::KeyLength _length;

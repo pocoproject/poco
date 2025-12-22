@@ -18,6 +18,7 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Thread.h"
+#include "Poco/Mutex.h"
 #include <iostream>
 
 
@@ -35,13 +36,15 @@ using Poco::Thread;
 
 namespace
 {
+	static Poco::FastMutex cerrMutex;
+
 	class EchoConnection: public TCPServerConnection
 	{
 	public:
 		EchoConnection(const StreamSocket& s): TCPServerConnection(s)
 		{
 		}
-		
+
 		void run()
 		{
 			StreamSocket& ss = socket();
@@ -55,13 +58,15 @@ namespace
 					n = ss.receiveBytes(buffer, sizeof(buffer));
 				}
 			}
-			catch (Poco::Exception& exc)
+			catch (const Poco::Exception& exc)
 			{
+				Poco::FastMutex::ScopedLock l(cerrMutex);
+
 				std::cerr << "EchoConnection: " << exc.displayText() << std::endl;
 			}
 		}
 	};
-	
+
 	class RejectFilter: public TCPServerConnectionFilter
 	{
 	public:
@@ -91,7 +96,7 @@ void TCPServerTest::testOneConnection()
 	assertTrue (srv.currentThreads() == 0);
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 0);
-	
+
 	SocketAddress sa("127.0.0.1", srv.socket().address().port());
 	StreamSocket ss1(sa);
 	std::string data("hello, world");
@@ -118,7 +123,7 @@ void TCPServerTest::testTwoConnections()
 	assertTrue (srv.currentThreads() == 0);
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 0);
-	
+
 	SocketAddress sa("127.0.0.1", srv.socket().address().port());
 	StreamSocket ss1(sa);
 	StreamSocket ss2(sa);
@@ -134,7 +139,7 @@ void TCPServerTest::testTwoConnections()
 	n = ss2.receiveBytes(buffer, sizeof(buffer));
 	assertTrue (n > 0);
 	assertTrue (std::string(buffer, n) == data);
-	
+
 	assertTrue (srv.currentConnections() == 2);
 	assertTrue (srv.currentThreads() == 2);
 	assertTrue (srv.queuedConnections() == 0);
@@ -166,7 +171,7 @@ void TCPServerTest::testMultiConnections()
 	assertTrue (srv.maxThreads() >= 4);
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 0);
-	
+
 	SocketAddress sa("127.0.0.1", svs.address().port());
 	StreamSocket ss1(sa);
 	StreamSocket ss2(sa);
@@ -194,19 +199,19 @@ void TCPServerTest::testMultiConnections()
 	n = ss4.receiveBytes(buffer, sizeof(buffer));
 	assertTrue (n > 0);
 	assertTrue (std::string(buffer, n) == data);
-	
+
 	assertTrue (srv.currentConnections() == 4);
 	assertTrue (srv.currentThreads() == 4);
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 4);
-	
+
 	StreamSocket ss5(sa);
 	Thread::sleep(200);
 	assertTrue (srv.queuedConnections() == 1);
 	StreamSocket ss6(sa);
 	Thread::sleep(200);
 	assertTrue (srv.queuedConnections() == 2);
-	
+
 	ss1.close();
 	Thread::sleep(2000);
 	assertTrue (srv.currentConnections() == 4);
@@ -220,7 +225,7 @@ void TCPServerTest::testMultiConnections()
 	assertTrue (srv.currentThreads() == 4);
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 6);
-	
+
 	ss3.close();
 	Thread::sleep(2000);
 	assertTrue (srv.currentConnections() == 3);
@@ -262,7 +267,7 @@ void TCPServerTest::testFilter()
 	assertTrue (srv.currentThreads() == 0);
 	assertTrue (srv.queuedConnections() == 0);
 	assertTrue (srv.totalConnections() == 0);
-	
+
 	SocketAddress sa("127.0.0.1", srv.socket().address().port());
 	StreamSocket ss(sa);
 

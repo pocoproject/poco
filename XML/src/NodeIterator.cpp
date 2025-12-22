@@ -26,11 +26,11 @@ NodeIterator::NodeIterator(Node* root, unsigned long whatToShow, NodeFilter* pFi
 	_pRoot(root),
 	_whatToShow(whatToShow),
 	_pFilter(pFilter),
-	_pCurrent(0)
+	_pCurrent(nullptr)
 {
 }
 
-	
+
 NodeIterator::NodeIterator(const NodeIterator& iterator):
 	_pRoot(iterator._pRoot),
 	_whatToShow(iterator._whatToShow),
@@ -39,7 +39,7 @@ NodeIterator::NodeIterator(const NodeIterator& iterator):
 {
 }
 
-	
+
 NodeIterator& NodeIterator::operator = (const NodeIterator& iterator)
 {
 	if (&iterator != this)
@@ -52,7 +52,7 @@ NodeIterator& NodeIterator::operator = (const NodeIterator& iterator)
 	return *this;
 }
 
-	
+
 NodeIterator::~NodeIterator()
 {
 }
@@ -61,7 +61,7 @@ NodeIterator::~NodeIterator()
 Node* NodeIterator::nextNode()
 {
 	if (!_pRoot) throw DOMException(DOMException::INVALID_STATE_ERR);
-	
+
 	if (_pCurrent)
 		_pCurrent = next();
 	else
@@ -88,8 +88,8 @@ Node* NodeIterator::previousNode()
 
 void NodeIterator::detach()
 {
-	_pRoot    = 0;
-	_pCurrent = 0;
+	_pRoot    = nullptr;
+	_pCurrent = nullptr;
 }
 
 
@@ -98,30 +98,30 @@ bool NodeIterator::accept(Node* pNode) const
 	bool accept = false;
 	switch (pNode->nodeType())
 	{
-	case Node::ELEMENT_NODE: 
+	case Node::ELEMENT_NODE:
 		accept = (_whatToShow & NodeFilter::SHOW_ELEMENT) != 0; break;
 	case Node::ATTRIBUTE_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_ATTRIBUTE) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_ATTRIBUTE) != 0; break;
 	case Node::TEXT_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_TEXT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_TEXT) != 0; break;
 	case Node::CDATA_SECTION_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_CDATA_SECTION) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_CDATA_SECTION) != 0; break;
 	case Node::ENTITY_REFERENCE_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_ENTITY_REFERENCE) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_ENTITY_REFERENCE) != 0; break;
 	case Node::ENTITY_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_ENTITY) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_ENTITY) != 0; break;
 	case Node::PROCESSING_INSTRUCTION_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_PROCESSING_INSTRUCTION) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_PROCESSING_INSTRUCTION) != 0; break;
 	case Node::COMMENT_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_COMMENT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_COMMENT) != 0; break;
 	case Node::DOCUMENT_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT) != 0; break;
 	case Node::DOCUMENT_TYPE_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT_TYPE) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT_TYPE) != 0; break;
 	case Node::DOCUMENT_FRAGMENT_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT_FRAGMENT) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_DOCUMENT_FRAGMENT) != 0; break;
 	case Node::NOTATION_NODE:
-		accept = (_whatToShow & NodeFilter::SHOW_NOTATION) != 0; break; 
+		accept = (_whatToShow & NodeFilter::SHOW_NOTATION) != 0; break;
 	}
 	if (accept && _pFilter)
 		accept = _pFilter->acceptNode(pNode) == NodeFilter::FILTER_ACCEPT;
@@ -140,13 +140,13 @@ Node* NodeIterator::next() const
 		if (pSibling) return pSibling;
 		pNext = pNext->parentNode();
 	}
-	return 0;
+	return nullptr;
 }
 
 
 Node* NodeIterator::previous() const
 {
-	if (_pCurrent == _pRoot) return 0;
+	if (_pCurrent == _pRoot) return nullptr;
 	Node* pPrev = _pCurrent->previousSibling();
 	while (pPrev)
 	{
@@ -163,7 +163,7 @@ Node* NodeIterator::previous() const
 Node* NodeIterator::last()
 {
 	_pCurrent = _pRoot;
-	Node* pLast = 0;
+	Node* pLast = nullptr;
 	while (_pCurrent)
 	{
 		pLast = _pCurrent;

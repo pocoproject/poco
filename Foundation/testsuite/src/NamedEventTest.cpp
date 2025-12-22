@@ -15,13 +15,20 @@
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Exception.h"
 
+#include <iostream>
+
+#if POCO_NAMED_EVENT_USE_POSIX_SEMAPHORES
+	#include <semaphore.h>
+#endif
 
 using Poco::NamedEvent;
 using Poco::Thread;
 using Poco::Runnable;
 using Poco::Timestamp;
 
+using namespace std::string_literals;
 
 static NamedEvent testEvent("TestEvent");
 
@@ -101,6 +108,49 @@ void NamedEventTest::testNamedEvent()
 }
 
 
+void NamedEventTest::testCreateManyNamedEvents()
+{
+
+	std::string name;
+#if (POCO_OS == POCO_OS_MAC_OS_X)
+	constexpr int testEventCount = 5000;
+#else
+	constexpr int testEventCount = 20000;
+#endif
+
+#if POCO_NAMED_EVENT_USE_POSIX_SEMAPHORES
+	// Attempt to remove existing semaphores from previous run of the test suite.
+	for (int i = 0; i < testEventCount; i++)
+	{
+		name = std::string("TestEvent ") + std::to_string(i);
+		if (::sem_unlink(name.c_str()) != 0)
+		{
+			if (errno != ENOENT)
+			{
+				std::cout << "NamedEvent: Cleanup sem_unlink failed: " << errno << std::endl;
+			}
+		}
+	}
+#endif
+
+	try
+	{
+		int i = 0;
+		for (; i < testEventCount; i++)
+		{
+			name = std::string("TestEvent_") + std::to_string(i);
+			auto* ne = new NamedEvent(name);
+			delete ne;
+		}
+		assertEqual(i, testEventCount);
+	}
+	catch (const Poco::Exception& e)
+	{
+		fail ("Failed creating named event: "s  + name + " " + e.displayText());
+	}
+}
+
+
 void NamedEventTest::setUp()
 {
 }
@@ -116,6 +166,7 @@ CppUnit::Test* NamedEventTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NamedEventTest");
 
 	CppUnit_addTest(pSuite, NamedEventTest, testNamedEvent);
+	CppUnit_addTest(pSuite, NamedEventTest, testCreateManyNamedEvents);
 
 	return pSuite;
 }

@@ -39,10 +39,10 @@ Variable::Variable(const std::string& decl, NameSpace* pNameSpace):
 	std::size_t pos = decl.rfind(name());
 	std::string tmp = decl.substr(0, pos);
 	tmp = Poco::trim(tmp);
-	
+
 	pos = tmp.rfind("*");
 	_isPointer = (pos == (tmp.size()-1));
-	
+
 	Poco::replaceInPlace(tmp, "static ", "");
 	Poco::replaceInPlace(tmp, "mutable ", "");
 	Poco::replaceInPlace(tmp, "volatile ", "");
@@ -53,7 +53,7 @@ Variable::Variable(const std::string& decl, NameSpace* pNameSpace):
 		tmp = tmp.substr(6);
 	if (tmp.find("const\t") == 0)
 		tmp = tmp.substr(6);
-	
+
 	std::size_t rightCut = tmp.size();
 	while (rightCut > 0 && (tmp[rightCut-1] == '&' || tmp[rightCut-1] == '*' || tmp[rightCut-1] == '\t' || tmp[rightCut-1] == ' '))
 		--rightCut;

@@ -48,7 +48,7 @@ public:
 		MAX_SEQUENCE_LENGTH = 4 /// The maximum character byte sequence length supported.
 	};
 
-	typedef int CharacterMap[256];
+	using CharacterMap = int[256];
 		/// The map[b] member gives information about byte sequences
 		/// whose first byte is b.
 		/// If map[b] is c where c is >= 0, then b by itself encodes the Unicode scalar value c.
@@ -141,7 +141,7 @@ public:
 
 	static TextEncoding::Ptr find(const std::string& encodingName);
 		/// Returns a pointer to the TextEncoding object for the given encodingName,
-		/// or NULL if no such TextEncoding object exists.
+		/// or nullptr if no such TextEncoding object exists.
 
 	static void add(TextEncoding::Ptr encoding);
 		/// Adds the given TextEncoding to the table of text encodings,

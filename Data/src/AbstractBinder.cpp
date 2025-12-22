@@ -16,6 +16,7 @@
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
 #include "Poco/Data/LOB.h"
+#include "Poco/Data/Transcoder.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/DateTime.h"
 #include "Poco/Any.h"
@@ -26,13 +27,42 @@ namespace Poco {
 namespace Data {
 
 
-AbstractBinder::AbstractBinder()
+AbstractBinder::AbstractBinder(Poco::TextEncoding::Ptr pFromEncoding,
+	Poco::TextEncoding::Ptr pDBEncoding) :
+		_pTranscoder(Transcoder::create(pFromEncoding, pDBEncoding))
 {
 }
 
 
 AbstractBinder::~AbstractBinder()
 {
+	if (_pStrings)
+	{
+		for (auto& s : *_pStrings)
+			delete s;
+	}
+}
+
+
+void AbstractBinder::transcode(const std::string& from, std::string& to)
+{
+	if (_pTranscoder)
+		_pTranscoder->transcode(from, to);
+}
+
+
+void AbstractBinder::reverseTranscode(const std::string& from, std::string& to)
+{
+	if (_pTranscoder)
+		_pTranscoder->reverseTranscode(from, to);
+}
+
+
+const std::string& AbstractBinder::toString(const UUID& uuid)
+{
+	if (!_pStrings) _pStrings.reset(new StringList);
+	_pStrings->push_back(new std::string(uuid.toString()));
+	return *_pStrings->back();
 }
 
 

@@ -167,7 +167,7 @@ private:
 	RecordSet& recordSet() const;
 
 	Comparison getComparison(const std::string& comp) const;
-	
+
 	void rewindRecordSet();
 
 	Comparisons        _comparisons;

@@ -18,7 +18,7 @@ AttributedString::AttributedString():
 }
 
 
-AttributedString::AttributedString(const char* content): 
+AttributedString::AttributedString(const char* content):
 	_content(content),
 	_align(ALIGN_LEFT),
 	_style(STYLE_PLAIN),
@@ -29,17 +29,33 @@ AttributedString::AttributedString(const char* content):
 
 
 AttributedString::AttributedString(const std::string& content, Alignment align, int style):
-	_content(content), 
-	_align(align), 
+	_content(content),
+	_align(align),
 	_style(static_cast<Style>(style)),
 	_fontName("Helvetica"),
 	_fontSize(10)
 {
 }
 
+AttributedString::~AttributedString() = default;
 
-AttributedString::~AttributedString()
+AttributedString& AttributedString::operator=(const std::string& content)
 {
+	_content = content;
+	return *this;
+}
+
+
+AttributedString& AttributedString::operator=(const char* content)
+{
+	_content = content;
+	return *this;
+}
+
+
+AttributedString::operator const std::string&()
+{
+	return _content;
 }
 
 

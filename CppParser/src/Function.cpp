@@ -111,13 +111,13 @@ void Function::makeFinal()
 	_flags |= FN_FINAL;
 }
 
-	
+
 void Function::makeOverride()
 {
 	_flags |= FN_OVERRIDE;
 }
 
-	
+
 void Function::makeNoexcept()
 {
 	_flags |= FN_NOEXCEPT;
@@ -141,7 +141,7 @@ bool Function::isConstructor() const
 	return name() == nameSpace()->name();
 }
 
-	
+
 bool Function::isDestructor() const
 {
 	return name()[0] == '~';
@@ -201,7 +201,7 @@ std::string Function::signature() const
 	return signature;
 }
 
-	
+
 bool Function::isVirtual() const
 {
 	if (_flags & FN_VIRTUAL)
@@ -213,7 +213,7 @@ bool Function::isVirtual() const
 		Struct* pClass = dynamic_cast<Struct*>(nameSpace());
 		return pClass && pClass->hasVirtualDestructor();
 	}
-	else return getOverridden() != 0;
+	else return getOverridden() != nullptr;
 }
 
 
@@ -235,7 +235,7 @@ Function* Function::getOverridden() const
 			}
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 

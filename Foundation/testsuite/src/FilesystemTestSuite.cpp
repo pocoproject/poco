@@ -27,6 +27,6 @@ CppUnit::Test* FilesystemTestSuite::suite()
 	pSuite->addTest(DirectoryWatcherTest::suite());
 #endif // POCO_NO_INOTIFY
 	pSuite->addTest(DirectoryIteratorsTest::suite());
-	
+
 	return pSuite;
 }

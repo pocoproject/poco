@@ -7,7 +7,7 @@
 //
 // Implementation of the PriorityDelegate template.
 //
-// Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -23,16 +23,21 @@
 #include "Poco/PriorityExpire.h"
 #include "Poco/FunctionPriorityDelegate.h"
 #include "Poco/Mutex.h"
+#include <type_traits>
 
 
 namespace Poco {
 
 
-template <class TObj, class TArgs, bool useSender = true> 
+template <class TObj, class TArgs, bool useSender = true>
 class PriorityDelegate: public AbstractPriorityDelegate<TArgs>
+	/// Wraps a member function for use as a PriorityDelegate.
+	/// Use useSender=true for callbacks that take sender as first parameter.
 {
 public:
-	typedef void (TObj::*NotifyMethod)(const void*, TArgs&);
+	using NotifyMethod = std::conditional_t<useSender,
+		void (TObj::*)(const void*, TArgs&),
+		void (TObj::*)(TArgs&)>;
 
 	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
 		AbstractPriorityDelegate<TArgs>(prio),
@@ -40,19 +45,18 @@ public:
 		_receiverMethod(method)
 	{
 	}
-	
+
 	PriorityDelegate(const PriorityDelegate& delegate):
 		AbstractPriorityDelegate<TArgs>(delegate),
 		_receiverObject(delegate._receiverObject),
 		_receiverMethod(delegate._receiverMethod)
 	{
 	}
-	
+
 	PriorityDelegate& operator = (const PriorityDelegate& delegate)
 	{
 		if (&delegate != this)
 		{
-			this->_pTarget        = delegate._pTarget;
 			this->_receiverObject = delegate._receiverObject;
 			this->_receiverMethod = delegate._receiverMethod;
 			this->_priority       = delegate._priority;
@@ -60,17 +64,24 @@ public:
 		return *this;
 	}
 
-	~PriorityDelegate()
-	{
-	}
+	~PriorityDelegate() = default;
+
+	PriorityDelegate() = delete;
 
 	bool notify(const void* sender, TArgs& arguments)
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverObject)
 		{
-			(_receiverObject->*_receiverMethod)(sender, arguments);
-			return true; 
+			if constexpr (useSender)
+			{
+				(_receiverObject->*_receiverMethod)(sender, arguments);
+			}
+			else
+			{
+				(_receiverObject->*_receiverMethod)(arguments);
+			}
+			return true;
 		}
 		else return false;
 	}
@@ -89,98 +100,24 @@ public:
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_receiverObject = 0;
-	}
-	
-protected:
-	TObj*        _receiverObject;
-	NotifyMethod _receiverMethod;
-	Mutex _mutex;
-
-private:
-	PriorityDelegate();
-};
-
-
-template <class TObj, class TArgs> 
-class PriorityDelegate<TObj, TArgs, false>: public AbstractPriorityDelegate<TArgs>
-{
-public:
-	typedef void (TObj::*NotifyMethod)(TArgs&);
-
-	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
-		AbstractPriorityDelegate<TArgs>(prio),
-		_receiverObject(obj),
-		_receiverMethod(method)
-	{
-	}
-	
-	PriorityDelegate(const PriorityDelegate& delegate):
-		AbstractPriorityDelegate<TArgs>(delegate),
-		_receiverObject(delegate._receiverObject),
-		_receiverMethod(delegate._receiverMethod)
-	{
-	}
-	
-	PriorityDelegate& operator = (const PriorityDelegate& delegate)
-	{
-		if (&delegate != this)
-		{
-			this->_pTarget        = delegate._pTarget;
-			this->_receiverObject = delegate._receiverObject;
-			this->_receiverMethod = delegate._receiverMethod;
-			this->_priority       = delegate._priority;
-		}
-		return *this;
-	}
-
-	~PriorityDelegate()
-	{
-	}
-
-	bool notify(const void* sender, TArgs& arguments)
-	{
-		Mutex::ScopedLock lock(_mutex);
-		if (_receiverObject)
-		{
-			(_receiverObject->*_receiverMethod)(arguments);
-			return true;
-		}
-		return false;
-	}
-
-	bool equals(const AbstractDelegate<TArgs>& other) const
-	{
-		const PriorityDelegate* pOtherDelegate = dynamic_cast<const PriorityDelegate*>(other.unwrap());
-		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
-	}
-
-	AbstractDelegate<TArgs>* clone() const
-	{
-		return new PriorityDelegate(*this);
-	}
-
-	void disable()
-	{
-		Mutex::ScopedLock lock(_mutex);
-		_receiverObject = 0;
+		_receiverObject = nullptr;
 	}
 
 protected:
 	TObj*        _receiverObject;
 	NotifyMethod _receiverMethod;
 	Mutex _mutex;
-
-private:
-	PriorityDelegate();
 };
 
 
-template <class TObj>
-class PriorityDelegate<TObj, void, true>: public AbstractPriorityDelegate<void>
+template <class TObj, bool useSender>
+class PriorityDelegate<TObj, void, useSender>: public AbstractPriorityDelegate<void>
+	/// Specialization for void arguments (no TArgs parameter).
 {
 public:
-	typedef void (TObj::*NotifyMethod)(const void*);
+	using NotifyMethod = std::conditional_t<useSender,
+		void (TObj::*)(const void*),
+		void (TObj::*)()>;
 
 	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
 		AbstractPriorityDelegate<void>(prio),
@@ -200,7 +137,6 @@ public:
 	{
 		if (&delegate != this)
 		{
-			this->_pTarget        = delegate._pTarget;
 			this->_receiverObject = delegate._receiverObject;
 			this->_receiverMethod = delegate._receiverMethod;
 			this->_priority       = delegate._priority;
@@ -208,119 +144,49 @@ public:
 		return *this;
 	}
 
-	~PriorityDelegate()
-	{
-	}
+	~PriorityDelegate() override = default;
 
-	bool notify(const void* sender)
+	PriorityDelegate() = delete;
+
+	bool notify(const void* sender) override
 	{
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverObject)
 		{
-			(_receiverObject->*_receiverMethod)(sender);
+			if constexpr (useSender)
+			{
+				(_receiverObject->*_receiverMethod)(sender);
+			}
+			else
+			{
+				(_receiverObject->*_receiverMethod)();
+			}
 			return true;
 		}
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const
+	bool equals(const AbstractDelegate<void>& other) const override
 	{
 		const PriorityDelegate* pOtherDelegate = dynamic_cast<const PriorityDelegate*>(other.unwrap());
 		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
-	AbstractDelegate<void>* clone() const
+	AbstractDelegate<void>* clone() const override
 	{
 		return new PriorityDelegate(*this);
 	}
 
-	void disable()
+	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_receiverObject = 0;
+		_receiverObject = nullptr;
 	}
 
 protected:
 	TObj*        _receiverObject;
 	NotifyMethod _receiverMethod;
 	Mutex _mutex;
-
-private:
-	PriorityDelegate();
-};
-
-
-template <class TObj>
-class PriorityDelegate<TObj, void, false>: public AbstractPriorityDelegate<void>
-{
-public:
-	typedef void (TObj::*NotifyMethod)();
-
-	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
-		AbstractPriorityDelegate<void>(prio),
-		_receiverObject(obj),
-		_receiverMethod(method)
-	{
-	}
-
-	PriorityDelegate(const PriorityDelegate& delegate):
-		AbstractPriorityDelegate<void>(delegate),
-		_receiverObject(delegate._receiverObject),
-		_receiverMethod(delegate._receiverMethod)
-	{
-	}
-
-	PriorityDelegate& operator = (const PriorityDelegate& delegate)
-	{
-		if (&delegate != this)
-		{
-			this->_pTarget        = delegate._pTarget;
-			this->_receiverObject = delegate._receiverObject;
-			this->_receiverMethod = delegate._receiverMethod;
-			this->_priority       = delegate._priority;
-		}
-		return *this;
-	}
-
-	~PriorityDelegate()
-	{
-	}
-
-	bool notify(const void* sender)
-	{
-		Mutex::ScopedLock lock(_mutex);
-		if (_receiverObject)
-		{
-			(_receiverObject->*_receiverMethod)();
-			return true;
-		}
-		return false;
-	}
-
-	bool equals(const AbstractDelegate<void>& other) const
-	{
-		const PriorityDelegate* pOtherDelegate = dynamic_cast<const PriorityDelegate*>(other.unwrap());
-		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
-	}
-
-	AbstractDelegate<void>* clone() const
-	{
-		return new PriorityDelegate(*this);
-	}
-
-	void disable()
-	{
-		Mutex::ScopedLock lock(_mutex);
-		_receiverObject = 0;
-	}
-
-protected:
-	TObj*        _receiverObject;
-	NotifyMethod _receiverMethod;
-	Mutex _mutex;
-
-private:
-	PriorityDelegate();
 };
 
 

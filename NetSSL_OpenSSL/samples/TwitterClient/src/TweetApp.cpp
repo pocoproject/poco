@@ -33,8 +33,8 @@ public:
 	TweetApp()
 	{
 	}
-	
-protected:	
+
+protected:
 	void defineOptions(OptionSet& options)
 	{
 		Application::defineOptions(options);
@@ -51,14 +51,14 @@ protected:
 				.repeatable(false)
 				.argument("message")
 				.callback(OptionCallback<TweetApp>(this, &TweetApp::handleMessage)));
-				
+
 		options.addOption(
 			Option("ckey", "c", "Specify the Twitter consumer key.")
 				.required(true)
 				.repeatable(false)
 				.argument("consumer key")
 				.callback(OptionCallback<TweetApp>(this, &TweetApp::handleConsumerKey)));
-				
+
 		options.addOption(
 			Option("csecret", "s", "Specify the Twitter consumer secret.")
 				.required(true)
@@ -80,18 +80,18 @@ protected:
 				.argument("access token secret")
 				.callback(OptionCallback<TweetApp>(this, &TweetApp::handleAccessTokenSecret)));
 	}
-	
+
 	void handleHelp(const std::string& name, const std::string& value)
 	{
 		displayHelp();
 		stopOptionsProcessing();
 	}
-	
+
 	void handleConsumerKey(const std::string& name, const std::string& value)
 	{
 		_consumerKey = value;
 	}
-	
+
 	void handleConsumerSecret(const std::string& name, const std::string& value)
 	{
 		_consumerSecret = value;
@@ -106,12 +106,12 @@ protected:
 	{
 		_accessTokenSecret = value;
 	}
-	
+
 	void handleMessage(const std::string& name, const std::string& value)
 	{
 		_message = value;
 	}
-		
+
 	void displayHelp()
 	{
 		HelpFormatter helpFormatter(options());
@@ -120,7 +120,7 @@ protected:
 		helpFormatter.setHeader("A simple Twitter command line client for posting status updates.");
 		helpFormatter.format(std::cout);
 	}
-	
+
 	int main(const std::vector<std::string>& args)
 	{
 		try

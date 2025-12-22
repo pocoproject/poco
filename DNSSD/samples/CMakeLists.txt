@@ -1,0 +1,2 @@
+add_subdirectory(DNSSDBrowser)
+add_subdirectory(HTTPTimeServer)

@@ -39,14 +39,14 @@ class Handle
 /// ODBC handle class template
 {
 public:
-	Handle(const ConnectionHandle& rConnection): 
+	Handle(const ConnectionHandle& rConnection):
 		_rConnection(rConnection),
-		_handle(0)
+		_handle(nullptr)
 			/// Creates the Handle.
 	{
-		if (Utility::isError(SQLAllocHandle(handleType, 
-			_rConnection, 
-			&_handle))) 
+		if (Utility::isError(SQLAllocHandle(handleType,
+			_rConnection,
+			&_handle)))
 		{
 			throw ODBCException("Could not allocate statement handle.");
 		}
@@ -58,11 +58,9 @@ public:
 		try
 		{
 #if defined(_DEBUG)
-			SQLRETURN rc = 
+			SQLRETURN rc =
 #endif
 			SQLFreeHandle(handleType, _handle);
-			// N.B. Destructors should not throw, but neither do we want to
-			// leak resources. So, we throw here in debug mode if things go bad.
 			poco_assert_dbg (!Utility::isError(rc));
 		}
 		catch (...)
@@ -81,6 +79,12 @@ public:
 		/// Returns const reference to native type.
 	{
 		return _handle;
+	}
+
+	const ConnectionHandle& connection() const
+		/// Returns the connection handle.
+	{
+		return _rConnection;
 	}
 
 private:

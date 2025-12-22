@@ -16,7 +16,6 @@
 #include "Poco/Notification.h"
 #include "Poco/Observer.h"
 #include "Poco/AutoPtr.h"
-#include "Poco/SingletonHolder.h"
 
 
 namespace Poco {
@@ -29,6 +28,20 @@ NotificationCenter::NotificationCenter()
 
 NotificationCenter::~NotificationCenter()
 {
+	try
+	{
+		ObserverList observersToDisable;
+		{
+			Mutex::ScopedLock lock(_mutex);
+			observersToDisable = std::move(_observers);
+		}
+		for (auto& o: observersToDisable)
+			o->disable();
+	}
+	catch(...)
+	{
+		poco_unexpected();
+	}
 }
 
 
@@ -36,21 +49,27 @@ void NotificationCenter::addObserver(const AbstractObserver& observer)
 {
 	Mutex::ScopedLock lock(_mutex);
 	_observers.push_back(observer.clone());
+	_observers.back()->start();
 }
 
 
 void NotificationCenter::removeObserver(const AbstractObserver& observer)
 {
-	Mutex::ScopedLock lock(_mutex);
-	for (ObserverList::iterator it = _observers.begin(); it != _observers.end(); ++it)
+	AbstractObserverPtr pObserver;
 	{
-		if (observer.equals(**it))
+		Mutex::ScopedLock lock(_mutex);
+		for (auto it = _observers.begin(); it != _observers.end(); ++it)
 		{
-			(*it)->disable();
-			_observers.erase(it);
-			return;
+			if (observer.equals(**it))
+			{
+				pObserver = *it;
+				_observers.erase(it);
+				break;
+			}
 		}
 	}
+	if (pObserver)
+		pObserver->disable();
 }
 
 
@@ -64,17 +83,34 @@ bool NotificationCenter::hasObserver(const AbstractObserver& observer) const
 }
 
 
+NotificationCenter::ObserverList NotificationCenter::observersToNotify(const Notification::Ptr& pNotification) const
+{
+	ObserverList ret;
+	ScopedLock<Mutex> lock(_mutex);
+	for (auto& o : _observers)
+	{
+		if (o->accepts(pNotification))
+			ret.push_back(o);
+	}
+	return ret;
+}
+
+
 void NotificationCenter::postNotification(Notification::Ptr pNotification)
 {
 	poco_check_ptr (pNotification);
 
-	ScopedLockWithUnlock<Mutex> lock(_mutex);
-	ObserverList observersToNotify(_observers);
-	lock.unlock();
-	for (auto& p: observersToNotify)
-	{
+	notifyObservers(pNotification);
+}
+
+
+void NotificationCenter::notifyObservers(Notification::Ptr& pNotification)
+{
+	poco_check_ptr (pNotification);
+
+	ObserverList observers = observersToNotify(pNotification);
+	for (auto& p: observers)
 		p->notify(pNotification);
-	}
 }
 
 
@@ -94,15 +130,24 @@ std::size_t NotificationCenter::countObservers() const
 }
 
 
-namespace
+int NotificationCenter::backlog() const
 {
-	static SingletonHolder<NotificationCenter> sh;
+	int cnt = 0;
+
+	ScopedLockWithUnlock<Mutex> lock(_mutex);
+	ObserverList observersToCount(_observers);
+	lock.unlock();
+	for (auto& p : observersToCount)
+		cnt += p->backlog();
+
+	return cnt;
 }
 
 
 NotificationCenter& NotificationCenter::defaultCenter()
 {
-	return *sh.get();
+	static NotificationCenter nc;
+	return nc;
 }
 
 

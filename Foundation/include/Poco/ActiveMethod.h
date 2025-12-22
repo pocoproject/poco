@@ -72,9 +72,9 @@ class ActiveMethod
 	/// class can be used.
 {
 public:
-	typedef ResultType (OwnerType::*Callback)(const ArgType&);
-	typedef ActiveResult<ResultType> ActiveResultType;
-	typedef ActiveRunnable<ResultType, ArgType, OwnerType> ActiveRunnableType;
+	using Callback = ResultType (OwnerType::*)(const ArgType &);
+	using ActiveResultType = ActiveResult<ResultType>;
+	using ActiveRunnableType = ActiveRunnable<ResultType, ArgType, OwnerType>;
 
 	ActiveMethod(OwnerType* pOwner, Callback method):
 		_pOwner(pOwner),
@@ -83,7 +83,9 @@ public:
 	{
 		poco_check_ptr (pOwner);
 	}
-	
+
+	ActiveMethod() = delete;
+
 	ActiveResultType operator () (const ArgType& arg)
 		/// Invokes the ActiveMethod.
 	{
@@ -92,7 +94,7 @@ public:
 		StarterType::start(_pOwner, pRunnable);
 		return result;
 	}
-		
+
 	ActiveMethod(const ActiveMethod& other):
 		_pOwner(other._pOwner),
 		_method(other._method)
@@ -106,15 +108,13 @@ public:
 		return *this;
 	}
 
-	void swap(ActiveMethod& other)
+	void swap(ActiveMethod& other) noexcept
 	{
 		std::swap(_pOwner, other._pOwner);
 		std::swap(_method, other._method);
 	}
 
 private:
-	ActiveMethod();
-
 	OwnerType* _pOwner;
 	Callback   _method;
 };
@@ -164,9 +164,9 @@ class ActiveMethod <ResultType, void, OwnerType, StarterType>
 	/// For methods that do not require an argument or a return value, simply use void.
 {
 public:
-	typedef ResultType (OwnerType::*Callback)(void);
-	typedef ActiveResult<ResultType> ActiveResultType;
-	typedef ActiveRunnable<ResultType, void, OwnerType> ActiveRunnableType;
+	using Callback = ResultType (OwnerType::*)();
+	using ActiveResultType = ActiveResult<ResultType>;
+	using ActiveRunnableType = ActiveRunnable<ResultType, void, OwnerType>;
 
 	ActiveMethod(OwnerType* pOwner, Callback method):
 		_pOwner(pOwner),
@@ -175,7 +175,9 @@ public:
 	{
 		poco_check_ptr (pOwner);
 	}
-	
+
+	ActiveMethod() = delete;
+
 	ActiveResultType operator () (void)
 		/// Invokes the ActiveMethod.
 	{
@@ -184,7 +186,7 @@ public:
 		StarterType::start(_pOwner, pRunnable);
 		return result;
 	}
-		
+
 	ActiveMethod(const ActiveMethod& other):
 		_pOwner(other._pOwner),
 		_method(other._method)
@@ -198,15 +200,13 @@ public:
 		return *this;
 	}
 
-	void swap(ActiveMethod& other)
+	void swap(ActiveMethod& other) noexcept
 	{
 		std::swap(_pOwner, other._pOwner);
 		std::swap(_method, other._method);
 	}
 
 private:
-	ActiveMethod();
-
 	OwnerType* _pOwner;
 	Callback   _method;
 };

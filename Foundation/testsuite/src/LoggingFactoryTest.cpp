@@ -80,7 +80,7 @@ void LoggingFactoryTest::testBuiltins()
 	LoggingFactory& fact = LoggingFactory::defaultFactory();
 
 	Channel::Ptr pConsoleChannel = fact.createChannel("ConsoleChannel");
-#if defined(_WIN32) && !defined(_WIN32_WCE)
+#if defined(_WIN32)
 	assertTrue (!pConsoleChannel.cast<Poco::WindowsConsoleChannel>().isNull());
 #else
 	assertTrue (!pConsoleChannel.cast<ConsoleChannel>().isNull());
@@ -128,7 +128,7 @@ void LoggingFactoryTest::testCustom()
 	fact->registerFormatterClass("CustomFormatter", new Instantiator<CustomFormatter, Formatter>);
 
 	Channel::Ptr pCustomChannel = fact->createChannel("CustomChannel");
-	assertTrue (dynamic_cast<CustomChannel*>(pCustomChannel.get()) != 0);
+	assertTrue (dynamic_cast<CustomChannel*>(pCustomChannel.get()) != nullptr);
 
 	Formatter::Ptr pCustomFormatter = fact->createFormatter("CustomFormatter");
 	assertTrue (!pCustomFormatter.isNull());

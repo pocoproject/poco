@@ -30,6 +30,9 @@
 #include <set>
 
 
+using namespace std::string_literals;
+
+
 namespace Poco {
 namespace Util {
 
@@ -37,14 +40,14 @@ namespace Util {
 XMLConfiguration::XMLConfiguration():
 	_delim('.')
 {
-	loadEmpty("config");
+	loadEmpty("config"s);
 }
 
 
 XMLConfiguration::XMLConfiguration(char delim):
 	_delim(delim)
 {
-	loadEmpty("config");
+	loadEmpty("config"s);
 }
 
 
@@ -103,7 +106,7 @@ XMLConfiguration::XMLConfiguration(const Poco::XML::Document* pDocument, char de
 	load(pDocument);
 }
 
-	
+
 XMLConfiguration::XMLConfiguration(const Poco::XML::Node* pNode):
 	_delim('.')
 {
@@ -126,7 +129,7 @@ XMLConfiguration::~XMLConfiguration()
 void XMLConfiguration::load(Poco::XML::InputSource* pInputSource, unsigned long namePoolSize)
 {
 	poco_check_ptr (pInputSource);
-	
+
 	Poco::XML::DOMParser parser(namePoolSize);
 	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, false);
 	parser.setFeature(Poco::XML::DOMParser::FEATURE_FILTER_WHITESPACE, true);
@@ -144,21 +147,23 @@ void XMLConfiguration::load(Poco::XML::InputSource* pInputSource)
 void XMLConfiguration::load(std::istream& istr)
 {
 	Poco::XML::InputSource src(istr);
-	load(&src);	
+	load(&src);
 }
 
 
 void XMLConfiguration::load(const std::string& path)
 {
 	Poco::XML::InputSource src(path);
-	load(&src);	
+	load(&src);
 }
 
-	
+
 void XMLConfiguration::load(const Poco::XML::Document* pDocument)
 {
 	poco_check_ptr (pDocument);
-	
+
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	_pDocument = Poco::XML::AutoPtr<Poco::XML::Document>(const_cast<Poco::XML::Document*>(pDocument), true);
 	_pRoot     = Poco::XML::AutoPtr<Poco::XML::Node>(pDocument->documentElement(), true);
 }
@@ -174,6 +179,8 @@ void XMLConfiguration::load(const Poco::XML::Node* pNode)
 	}
 	else
 	{
+		AbstractConfiguration::ScopedLock lock(*this);
+
 		_pDocument = Poco::XML::AutoPtr<Poco::XML::Document>(pNode->ownerDocument(), true);
 		_pRoot     = Poco::XML::AutoPtr<Poco::XML::Node>(const_cast<Poco::XML::Node*>(pNode), true);
 	}
@@ -182,6 +189,8 @@ void XMLConfiguration::load(const Poco::XML::Node* pNode)
 
 void XMLConfiguration::loadEmpty(const std::string& rootElementName)
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	_pDocument = new Poco::XML::Document;
 	_pRoot     = _pDocument->createElement(rootElementName);
 	_pDocument->appendChild(_pRoot);
@@ -190,8 +199,10 @@ void XMLConfiguration::loadEmpty(const std::string& rootElementName)
 
 void XMLConfiguration::save(const std::string& path) const
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	Poco::XML::DOMWriter writer;
-	writer.setNewLine("\n");
+	writer.setNewLine("\n"s);
 	writer.setOptions(Poco::XML::XMLWriter::PRETTY_PRINT);
 	writer.writeNode(path, _pDocument);
 }
@@ -199,8 +210,10 @@ void XMLConfiguration::save(const std::string& path) const
 
 void XMLConfiguration::save(std::ostream& ostr) const
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	Poco::XML::DOMWriter writer;
-	writer.setNewLine("\n");
+	writer.setNewLine("\n"s);
 	writer.setOptions(Poco::XML::XMLWriter::PRETTY_PRINT);
 	writer.writeNode(ostr, _pDocument);
 }
@@ -208,12 +221,16 @@ void XMLConfiguration::save(std::ostream& ostr) const
 
 void XMLConfiguration::save(Poco::XML::DOMWriter& writer, const std::string& path) const
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	writer.writeNode(path, _pDocument);
 }
 
 
 void XMLConfiguration::save(Poco::XML::DOMWriter& writer, std::ostream& ostr) const
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	writer.writeNode(ostr, _pDocument);
 }
 
@@ -236,37 +253,37 @@ void XMLConfiguration::setRaw(const std::string& key, const std::string& value)
 	Poco::XML::Node* pNode = findNode(it, key.end(), _pRoot, true);
 	if (pNode)
 	{
-        unsigned short nodeType = pNode->nodeType();
-        if (Poco::XML::Node::ATTRIBUTE_NODE == nodeType)
-        {
-            pNode->setNodeValue(value);
-        }
-        else if (Poco::XML::Node::ELEMENT_NODE == nodeType)
-        {
-            Poco::XML::Node* pChildNode = pNode->firstChild();
-            if (pChildNode)
-            {
-                if (Poco::XML::Node::TEXT_NODE == pChildNode->nodeType())
-                {
-                    pChildNode->setNodeValue(value);
-                }
-            }
-            else
-            {
+		unsigned short nodeType = pNode->nodeType();
+		if (Poco::XML::Node::ATTRIBUTE_NODE == nodeType)
+		{
+			pNode->setNodeValue(value);
+		}
+		else if (Poco::XML::Node::ELEMENT_NODE == nodeType)
+		{
+			Poco::XML::Node* pChildNode = pNode->firstChild();
+			if (pChildNode)
+			{
+				if (Poco::XML::Node::TEXT_NODE == pChildNode->nodeType())
+				{
+					pChildNode->setNodeValue(value);
+				}
+			}
+			else
+			{
 				Poco::AutoPtr<Poco::XML::Node> pText = _pDocument->createTextNode(value);
 				pNode->appendChild(pText);
-            }
-        }
+			}
+		}
 	}
-    else throw NotFoundException("Node not found in XMLConfiguration", key);
+	else throw NotFoundException("Node not found in XMLConfiguration", key);
 }
 
 
 void XMLConfiguration::enumerate(const std::string& key, Keys& range) const
 {
 	using Poco::NumberFormatter;
-	
-	std::multiset<std::string> keys;
+
+	std::map<std::string, size_t> keys;
 	const Poco::XML::Node* pNode = findNode(key);
 	if (pNode)
 	{
@@ -276,12 +293,12 @@ void XMLConfiguration::enumerate(const std::string& key, Keys& range) const
 			if (pChild->nodeType() == Poco::XML::Node::ELEMENT_NODE)
 			{
 				const std::string& nodeName = pChild->nodeName();
-				int n = (int) keys.count(nodeName);
-				if (n)
-					range.push_back(nodeName + "[" + NumberFormatter::format(n) + "]");
+				size_t& count = keys[nodeName];
+				if (count)
+					range.push_back(nodeName + "[" + NumberFormatter::format(count) + "]");
 				else
 					range.push_back(nodeName);
-				keys.insert(nodeName);
+				++count;
 			}
 			pChild = pChild->nextSibling();
 		}
@@ -402,7 +419,7 @@ Poco::XML::Node* XMLConfiguration::findElement(const std::string& name, Poco::XM
 		pNode->appendChild(pElem);
 		return pElem;
 	}
-	else return 0;
+	else return nullptr;
 }
 
 
@@ -458,7 +475,7 @@ Poco::XML::Node* XMLConfiguration::findElement(const std::string& attr, const st
 
 Poco::XML::Node* XMLConfiguration::findAttribute(const std::string& name, Poco::XML::Node* pNode, bool create)
 {
-	Poco::XML::Node* pResult(0);
+	Poco::XML::Node* pResult(nullptr);
 	Poco::XML::Element* pElem = dynamic_cast<Poco::XML::Element*>(pNode);
 	if (pElem)
 	{
@@ -475,5 +492,6 @@ Poco::XML::Node* XMLConfiguration::findAttribute(const std::string& name, Poco::
 
 
 } } // namespace Poco::Util
+
 
 #endif // POCO_UTIL_NO_XMLCONFIGURATION

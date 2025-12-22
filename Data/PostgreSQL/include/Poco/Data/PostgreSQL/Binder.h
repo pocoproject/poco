@@ -38,6 +38,8 @@ class PostgreSQL_API Binder: public Poco::Data::AbstractBinder
 	/// Allows data type mapping at statement execution time.
 {
 public:
+	using AbstractBinder::bind;
+
 	using Ptr = SharedPtr<Binder>;
 
 	Binder();

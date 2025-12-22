@@ -32,17 +32,17 @@ class XML_API CDATASection: public Text
 	/// in a CDATA section is the "]]>" string that ends the CDATA section. CDATA
 	/// sections cannot be nested. Their primary purpose is for including material
 	/// such as XML fragments, without needing to escape all the delimiters.
-	/// 
+	///
 	/// The DOMString attribute of the Text node holds the text that is contained
 	/// by the CDATA section. Note that this may contain characters that need to
 	/// be escaped outside of CDATA sections and that, depending on the character
 	/// encoding ("charset") chosen for serialization, it may be impossible to write
 	/// out some characters as part of a CDATA section.
-	/// 
+	///
 	/// The CDATASection interface inherits from the CharacterData interface through
 	/// the Text interface. Adjacent CDATASection nodes are not merged by use of
 	/// the normalize method on the Element interface.
-	/// 
+	///
 	/// Note: Because no markup is recognized within a CDATASection, character numeric
 	/// references cannot be used as an escape mechanism when serializing. Therefore,
 	/// action needs to be taken when serializing a CDATASection with a character
@@ -73,7 +73,7 @@ protected:
 
 private:
 	static const XMLString NODE_NAME;
-	
+
 	friend class Document;
 };
 

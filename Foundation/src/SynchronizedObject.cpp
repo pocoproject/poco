@@ -22,7 +22,7 @@ SynchronizedObject::SynchronizedObject()
 {
 }
 
-	
+
 SynchronizedObject::~SynchronizedObject()
 {
 }

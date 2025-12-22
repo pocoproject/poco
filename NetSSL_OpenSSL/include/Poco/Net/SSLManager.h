@@ -287,6 +287,10 @@ protected:
 		/// Returns the index for SSL_CTX_set_ex_data() and SSL_CTX_get_ex_data() to
 		/// store the Context* in the underlying SSL_CTX.
 
+	int socketIndex() const;
+		/// Returns the index for SSL_set_ex_data() and SSL_get_ex_data() to
+		/// store the SecureSocketImpl* in the underlying SSL.
+
 private:
 	SSLManager();
 		/// Creates the SSLManager.
@@ -320,6 +324,7 @@ private:
 	PrivateKeyPassphraseHandlerPtr   _ptrClientPassphraseHandler;
 	InvalidCertificateHandlerPtr     _ptrClientCertificateHandler;
 	int                              _contextIndex;
+	int                              _socketIndex;
 	Poco::FastMutex                  _mutex;
 
 	static const std::string CFG_PRIV_KEY_FILE;
@@ -359,6 +364,7 @@ private:
 
 	friend class Poco::SingletonHolder<SSLManager>;
 	friend class Context;
+	friend class SecureSocketImpl;
 };
 
 
@@ -402,6 +408,12 @@ inline int SSLManager::verifyClientCallback(int ok, X509_STORE_CTX* pStore)
 inline int SSLManager::contextIndex() const
 {
 	return _contextIndex;
+}
+
+
+inline int SSLManager::socketIndex() const
+{
+	return _socketIndex;
 }
 
 

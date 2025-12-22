@@ -21,10 +21,10 @@ namespace PDF {
 class PDF_API Table
 {
 public:
-	typedef SharedPtr<Table> Ptr;
-	typedef std::vector<TableRow> Cells;
+	using Ptr = SharedPtr<Table>;
+	using Cells = std::vector<TableRow>;
 
-	Table(int columnCount, int rowCount, const std::string& name, Cell::FontMapPtr pFontMap = 0);
+	Table(int columnCount, int rowCount, const std::string& name, Cell::FontMapPtr pFontMap = nullptr);
 	~Table();
 
 	void setCell(int col, int row, const Cell& cell);
@@ -49,34 +49,6 @@ private:
 	Cells            _cells;
 	Cell::FontMapPtr _pFontMap;
 };
-
-
-//
-// inlines
-//
-
-inline const std::string Table::name() const
-{
-	return _name;
-}
-
-
-inline const Table::Cells& Table::cells() const
-{
-	return _cells;
-}
-
-
-inline std::size_t Table::rows() const
-{
-	return _cells.size();
-}
-
-
-inline std::size_t Table::columns() const
-{
-	return _cells[0].size();
-}
 
 
 } } // namespace Poco::PDF

@@ -42,11 +42,11 @@ void ChildNodesTest::testChildNodes()
 	assertTrue (!pRoot->hasChildNodes());
 	AutoPtr<NodeList> pNL = pRoot->childNodes();
 	assertTrue (pNL->length() == 0);
-	
+
 	AutoPtr<Element> pChild1 = pDoc->createElement("child1");
 	pRoot->appendChild(pChild1);
 	assertTrue (pRoot->hasChildNodes());
-	
+
 	assertTrue (pNL->length() == 1);
 	assertTrue (pNL->item(0) == pChild1);
 
@@ -56,7 +56,7 @@ void ChildNodesTest::testChildNodes()
 	assertTrue (pNL->length() == 2);
 	assertTrue (pNL->item(0) == pChild1);
 	assertTrue (pNL->item(1) == pChild2);
-	
+
 	AutoPtr<Element> pChild0 = pDoc->createElement("child0");
 	pRoot->insertBefore(pChild0, pChild1);
 
@@ -65,18 +65,33 @@ void ChildNodesTest::testChildNodes()
 	assertTrue (pNL->item(1) == pChild1);
 	assertTrue (pNL->item(2) == pChild2);
 
+	AutoPtr<Element> pChild3 = pDoc->createElement("child3");
+	pRoot->insertAfterNP(pChild3, pChild1);
+
+	assertTrue(pNL->length() == 4);
+	assertTrue(pNL->item(0) == pChild0);
+	assertTrue(pNL->item(1) == pChild1);
+	assertTrue(pNL->item(2) == pChild3);
+	assertTrue(pNL->item(3) == pChild2);
+
 	pRoot->removeChild(pChild1);
-	assertTrue (pNL->length() == 2);
-	assertTrue (pNL->item(0) == pChild0);
-	assertTrue (pNL->item(1) == pChild2);
+	assertTrue(pNL->length() == 3);
+	assertTrue(pNL->item(0) == pChild0);
+	assertTrue(pNL->item(1) == pChild3);
+	assertTrue(pNL->item(2) == pChild2);
 
 	pRoot->removeChild(pChild0);
-	assertTrue (pNL->length() == 1);
-	assertTrue (pNL->item(0) == pChild2);
+	assertTrue(pNL->length() == 2);
+	assertTrue(pNL->item(0) == pChild3);
+	assertTrue(pNL->item(1) == pChild2);
 
 	pRoot->removeChild(pChild2);
-	assertTrue (pNL->length() == 0);
-	assertTrue (pNL->item(0) == 0);
+	assertTrue(pNL->length() == 1);
+	assertTrue(pNL->item(0) == pChild3);
+
+	pRoot->removeChild(pChild3);
+	assertTrue(pNL->length() == 0);
+	assertTrue(pNL->item(0) == nullptr);
 
 	assertTrue (!pRoot->hasChildNodes());
 }

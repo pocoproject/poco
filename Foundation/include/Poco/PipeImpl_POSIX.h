@@ -30,17 +30,17 @@ class Foundation_API PipeImpl: public RefCountedObject
 	/// that do not support pipes.
 {
 public:
-	typedef int Handle;
+	using Handle = int;
 
 	PipeImpl();
-	~PipeImpl();
+	~PipeImpl() override;
 	int writeBytes(const void* buffer, int length);
 	int readBytes(void* buffer, int length);
 	Handle readHandle() const;
 	Handle writeHandle() const;
 	void closeRead();
 	void closeWrite();
-	
+
 private:
 	int _readfd;
 	int _writefd;

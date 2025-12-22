@@ -1,0 +1,208 @@
+DNS Service Discovery and Zero Configuration Networking Overview
+DNS-SD
+
+!!!Introduction
+
+A growing number of embedded devices are connected to TCP/IP networks.
+And many of these devices are no longer passive network nodes, waiting
+for someone else to control them. They are full-blown network citizens,
+actively communicating with their peers and often relying on the network
+services provided by other devices to do their job. For this to work,
+all these devices must be configured properly. Configuring the network
+parameters (e.g., IP address, netmask, etc.) of a device is a tedious task,
+as many devices do not have an appropriate user interface to do this comfortably.
+This is especially an issue with consumer devices, where the user might not even have the
+necessary technical knowledge to configure such a device. And as the
+number of devices in a network grows, configuring each device separately
+is no longer practical. There from comes the need for the automatic
+configuration of network devices and the automatic discovery of network
+services. In recent years, the industry has come up with a variety of
+different technologies and specifications to address this.
+
+
+!!!Fundamental Issues
+
+Generally, there are three fundamental issues that must be dealt with
+for the automatic discovery of network devices and services, and three
+more issues that must be dealt with for the actual invocation or use of
+the discovered services.
+
+
+!!Address Assignment
+
+Every device must be assigned a unique network address. In case of
+TCP/IP networks this can be done with the help of a DHCP (Dynamic Host
+Configuration Protocol) server. Should, however, no DHCP server be
+available (for example, in typical home user networks), another way of
+assigning an IP addresses must be found. Apart from manual
+configuration, which is often undesirable, a method called APIPA
+(Automatic Private IP Addressing, or AutoIP for short) is used. In this
+case, a device's TCP/IP stack randomly chooses an IP address in the
+private (link-local) IP address range 169.254.0.0 to 169.254.255.255. To
+prevent two or more devices from accidentally selecting the same address,
+each device must probe, using the ARP (Address Resolution Protocol),
+whether the chosen address is available.
+
+
+!!Name Resolution
+
+Whenever a user (or device) wants to access another device over the
+network, he usually wants to refer to the device by its name, not by its
+IP address. In a typical TCP/IP network, a DNS (Domain Name System)
+server is used to map domain names to IP addresses. Again, if no DNS
+server is available, such as in a typical home network, another way of
+resolving names to IP addresses is required. Multicast DNS (mDNS), as
+used by Zeroconf, is such an alternative technology.
+
+
+!!Service Discovery
+
+A user or device must be able to find a service provided by one or more
+devices in the network. The important part here is that the user (or
+device) usually does not care which device implements the service, as
+long as the service with specific properties is available and
+accessible. A typical example for service discovery is: <*I need to print
+a document in color. Give me an IP address and port number where I can
+send the print job to, using the Internet Printing Protocol (IPP), so
+that the document will be printed in color.*>
+
+What all technologies for service discovery have in common is, that they
+make use of IP multicasting. IP multicasting uses addresses in a special
+address range (224.0.0.0 to 239.255.255.255). A packet (typically, a UDP
+packet) sent to a multicast address is received by all hosts listening
+to that specific address.
+
+Service discovery is implemented in the following way:
+
+  - An application or device that needs a certain service sends a request
+    describing the required properties of the service to a specific multicast
+    address (and port number).
+  - Other applications or devices on the same network receive the request,
+    and if they provide the requested service themselves (or know another device
+    that implements the service), respond with a message describing where the
+    service can be found.
+  - The application or device searching for the service collects all responses,
+    and from the responses chooses the one service provider it is going to use.
+
+In addition, devices that join or leave a network can send announcements to other
+devices describing the availability of the services they provide.
+
+
+!!Service Description
+
+Once a certain service has been discovered, it may be necessary to
+obtain more information about the service. For example, if a service
+consists of multiple operations, it is necessary to find out exactly
+what operations are supported, and what arguments must be passed to
+them. This is the purpose of service description.
+
+In case only well-defined service protocols are used (e.g., HTTP,
+Internet Printing, or media streaming), service description is not
+necessary, because the only information needed to access the service is
+the network address (IP address and port number, or URI), and this
+information can be obtained by service discovery. In other cases, the
+information obtained via service discovery is insufficient to
+successfully access the service. In such a case, service discovery only
+returns the address of a network resource that provides detailed
+information about the capabilities of the service, and how to access
+them.
+
+
+!!Service Invocation
+
+After an application has obtained enough information about the services
+it wants to access -- either via service discovery alone, or together
+with service description, the application will access or invoke them.
+This is usually beyond the scope of most service discovery technologies,
+and the domain of specialized technologies and protocols. Examples for
+such technologies are HTTP (HyperText Transfer Protocol), SOAP,
+Java RMI (Remote Method Invocation), CORBA (Common Object Request Broker
+Architecture), or media streaming protocols such as RTSP
+(Real Time Streaming Protocol).
+
+
+!!Service Presentation
+
+Some technologies (UPnP and Jini) provide facilities to present a device
+specific user interface to the user, via another device (e.g., a central
+management workstation, the user's PC or TV set). Such a user interface
+can be used to allow the user to directly interact with a device, in
+order to configure it, or to use some of its functions not available
+otherwise.
+
+This requires that the user interface is implemented in a device
+independent way. One way to do this is to implement the user interface
+in HTML (HyperText Markup Language), served by an embedded web server
+built into the device. Another way is to implement the user interface in
+Java, so that it can be run everywhere a Java Virtual Machine is
+available. The user interface code than talks to the device over a
+network connection, using a possibly proprietary protocol.
+
+
+!!!Zero Configuration Networking (Zeroconf)
+
+Zero Configuration Networking (Zeroconf) is a technology originally developed
+by Apple and promoted under the trademark name Bonjour. Zeroconf is
+built upon technologies known as multicast DNS (mDNS) and DNS
+Service Discovery (DNS-SD), which themselves are based on the proven
+DNS protocol. Its most popular uses are in network printers, network
+cameras and for sharing music using Apple's iTunes music jukebox
+software. Open source implementations are available from Apple and
+others for all important platforms.
+
+Zeroconf uses DHCP and AutoIP for address assignment if no DHCP server
+is available. A special variant of the well-known DNS protocol,
+multicast DNS, is used for name resolution in case no DNS server is
+available. In mDNS, a name resolution query is sent not directly to a
+DNS server, as with traditional DNS, but to a multicast address. All
+network devices supporting Zeroconf and listening to this multicast
+address respond to name resolution queries, if they have the requested
+information.
+
+Finally, for service discovery, an extension of the DNS protocol called
+DNS Service Discovery is used. DNS-SD can be used both with multicast
+DNS (the usual way), or with traditional unicast queries to a DNS
+server. With the additional support for DNS Update and DNS Long Lived
+Queries, two extensions of the DNS protocol, Zeroconf can be used to
+announce services across the global internet. In this case, an ordinary
+DNS server is used to make the service information available. Periodic
+automatic updates of the DNS server's database ensure that its service
+information is up to date.
+
+A major advantage of Zeroconf is that it is based on proven technology.
+Also, it can be implemented in a very resource efficient way, making it
+a good choice for resource constrained embedded devices.
+
+Beside heavy use by Apple in many of its applications for Mac OS X and
+Windows (iTunes), Zeroconf is popular among manufacturers of printers
+and network cameras.
+
+
+!!Zeroconf Implementations
+
+Two implementations of Zeroconf are currently in widespread use.
+
+Apple's Bonjour was the first implementation of Zeroconf. The
+implementation is available under an open source license and
+can be used on different platforms like Mac OS X, Windows, Linux or
+VxWorks. Bonjour is an integrated part of Mac OS X and iOS.
+A Windows installer (and SDK) is available as well.
+
+Avahi is another open source implementation of Zeroconf, targeted
+mostly at Linux, although it can also be used on other POSIX platforms
+like FreeBSD or Solaris. Avahi has been integrated into many
+Linux distributions such as Debian, Ubuntu, SuSE and others.
+
+
+!!The POCO DNS-SD Library
+
+The POCO DNS-SD library provides an easy-to-use
+and unified programming interface for integrating Zeroconf features
+(service discovery and host name resolution) into a C++ application.
+The library does not implement its own mDNS and DNS-SD protocol stacks,
+but rather uses an existing Zeroconf implementation for that purpose.
+Apple's Bonjour and Avahi can be used as backend for the DNS-SD library.
+
+A great advantage of the library is that it provides a unified
+programming interface. For the programmer, it's completely
+transparent whether Avahi or Bonjour is used as backend.

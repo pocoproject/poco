@@ -26,6 +26,7 @@
 #include "Poco/NotificationQueue.h"
 #include "Poco/ThreadPool.h"
 #include "Poco/Mutex.h"
+#include <atomic>
 
 
 namespace Poco {
@@ -50,35 +51,35 @@ public:
 	void release();
 		/// Decrements the object's reference count
 		/// and deletes the object if the count
-		/// reaches zero.	
+		/// reaches zero.
 
 	void run();
 		/// Runs the dispatcher.
-		
+
 	void enqueue(const StreamSocket& socket);
 		/// Queues the given socket connection.
 
 	void stop();
 		/// Stops the dispatcher.
-			
+
 	int currentThreads() const;
 		/// Returns the number of currently used threads.
 
 	int maxThreads() const;
 		/// Returns the maximum number of threads available.
-		
-	int totalConnections() const;
+
+	Int64 totalConnections() const;
 		/// Returns the total number of handled connections.
-		
+
 	int currentConnections() const;
-		/// Returns the number of currently handled connections.	
+		/// Returns the number of currently handled connections.
 
 	int maxConcurrentConnections() const;
-		/// Returns the maximum number of concurrently handled connections.	
-		
+		/// Returns the maximum number of concurrently handled connections.
+
 	int queuedConnections() const;
-		/// Returns the number of queued connections.	
-	
+		/// Returns the number of queued connections.
+
 	int refusedConnections() const;
 		/// Returns the number of refused connections.
 
@@ -91,7 +92,7 @@ protected:
 
 	void beginConnection();
 		/// Updates the performance counters.
-		
+
 	void endConnection();
 		/// Updates the performance counters.
 
@@ -100,14 +101,14 @@ private:
 	TCPServerDispatcher(const TCPServerDispatcher&);
 	TCPServerDispatcher& operator = (const TCPServerDispatcher&);
 
-	int _rc;
+	std::atomic<int> _rc;
 	TCPServerParams::Ptr _pParams;
-	int  _currentThreads;
-	int  _totalConnections;
-	int  _currentConnections;
-	int  _maxConcurrentConnections;
-	int  _refusedConnections;
-	bool _stopped;
+	std::atomic<int>   _currentThreads;
+	std::atomic<Int64> _totalConnections;
+	std::atomic<int>   _currentConnections;
+	std::atomic<int>   _maxConcurrentConnections;
+	std::atomic<int>   _refusedConnections;
+	std::atomic<bool>  _stopped;
 	Poco::NotificationQueue         _queue;
 	TCPServerConnectionFactory::Ptr _pConnectionFactory;
 	Poco::ThreadPool&               _threadPool;

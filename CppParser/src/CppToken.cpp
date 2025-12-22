@@ -49,9 +49,11 @@ void CppToken::syntaxError(const std::string& expected, const std::string& actua
 
 OperatorToken::OperatorToken()
 {
-	int i = 1;
+	int i = OP_OPENBRACKET;
 	_opMap["["] = i++;
 	_opMap["]"] = i++;
+	_opMap["[["] = i++;
+	_opMap["]]"] = i++;
 	_opMap["("] = i++;
 	_opMap[")"] = i++;
 	_opMap["{"] = i++;
@@ -64,6 +66,7 @@ OperatorToken::OperatorToken()
 	_opMap[">="] = i++;
 	_opMap[">>"] = i++;
 	_opMap[">>="] = i++;
+	_opMap["<=>"] = i++;
 	_opMap["="] = i++;
 	_opMap["=="] = i++;
 	_opMap["!"] = i++;
@@ -159,13 +162,23 @@ void OperatorToken::finish(std::istream& istr)
 	case ')':
 	case '{':
 	case '}':
-	case '[':
-	case ']':
 	case ';':
 	case '?':
 	case '~':
 	case ',':
 		break;
+	case '[':
+		if (next == '[')
+		{
+			_value += (char) istr.get();
+		}
+		break;
+	case ']':
+		if (next == ']')
+		{
+			_value += (char) istr.get();
+		}
+		break;	
 	case '.':
 		if (next == '.')
 		{
@@ -182,8 +195,14 @@ void OperatorToken::finish(std::istream& istr)
 		{
 			_value += (char) istr.get();
 			next = (char) istr.peek();
+			if (next == '=') _value += (char) istr.get();
 		}
-		if (next == '=') _value += (char) istr.get();
+		else if (next == '=')
+		{
+			_value += (char) istr.get();
+			next = (char) istr.peek();
+			if (next == '>') _value += (char) istr.get();
+		}
 		break;
 	case '>':
 		if (next == '>')
@@ -231,7 +250,7 @@ int OperatorToken::asInteger() const
 
 IdentifierToken::IdentifierToken()
 {
-	int i = 1;
+	int i = KW_ALIGNAS;
 	_kwMap["alignas"] = i++;
 	_kwMap["alignof"] = i++;
 	_kwMap["and"] = i++;
@@ -334,8 +353,8 @@ bool IdentifierToken::start(char c, std::istream& /*istr*/)
 {
 	_value = c;
 	return (c >= 'A' && c <= 'Z') ||
-	       (c >= 'a' && c <= 'z') ||
-	       (c == '_' || c == '$');
+		   (c >= 'a' && c <= 'z') ||
+		   (c == '_' || c == '$');
 }
 
 
@@ -503,7 +522,7 @@ bool NumberLiteralToken::start(char c, std::istream& istr)
 	_value = c;
 	int next = istr.peek();
 	return (c >= '0' && c <= '9') ||
-	       (c == '.' && next >= '0' && next <= '9');
+		   (c == '.' && next >= '0' && next <= '9');
 }
 
 
@@ -651,13 +670,13 @@ void NumberLiteralToken::finishSuffix(std::istream& istr, int next)
 
 int NumberLiteralToken::asInteger() const
 {
-	return static_cast<int>(std::strtol(_value.c_str(), 0, 0));
+	return static_cast<int>(std::strtol(_value.c_str(), nullptr, 0));
 }
 
 
 double NumberLiteralToken::asFloat() const
 {
-	return std::strtod(_value.c_str(), 0);
+	return std::strtod(_value.c_str(), nullptr);
 }
 
 

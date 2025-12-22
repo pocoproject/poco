@@ -32,7 +32,7 @@ StreamChannel::~StreamChannel()
 void StreamChannel::log(const Message& msg)
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	_str << msg.getText() << std::endl;
 }
 

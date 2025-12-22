@@ -61,7 +61,7 @@ void Date::assign(int year, int month, int day)
 		throw InvalidArgumentException("Month must be between 1 and 12");
 
 	if (day < 1 || day > DateTime::daysOfMonth(year, month))
-		throw InvalidArgumentException("Month must be between 1 and " + 
+		throw InvalidArgumentException("Month must be between 1 and " +
 			NumberFormatter::format(DateTime::daysOfMonth(year, month)));
 
 	_year = year;
@@ -80,7 +80,7 @@ bool Date::operator < (const Date& date) const
 	{
 		int month = date.month();
 		if (_month < month) return true;
-		else 
+		else
 		if (_month > month) return false;
 		else // months equal
 		if (_day < date.day()) return true;

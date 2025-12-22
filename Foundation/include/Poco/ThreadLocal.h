@@ -47,20 +47,18 @@ public:
 		_value()
 	{
 	}
-	
-	~TLSSlot()
-	{
-	}
-	
+
+	~TLSSlot() override = default;
+
+	TLSSlot(const TLSSlot&) = delete;
+	TLSSlot& operator=(const TLSSlot&) = delete;
+
 	C& value()
 	{
 		return _value;
 	}
-	
-private:
-	TLSSlot(const TLSSlot&);
-	TLSSlot& operator = (const TLSSlot&);
 
+private:
 	C _value;
 };
 
@@ -73,24 +71,24 @@ class Foundation_API ThreadLocalStorage
 public:
 	ThreadLocalStorage();
 		/// Creates the TLS.
-		
+
 	~ThreadLocalStorage();
 		/// Deletes the TLS.
 
 	TLSAbstractSlot*& get(const void* key);
 		/// Returns the slot for the given key.
-		
+
 	static ThreadLocalStorage& current();
 		/// Returns the TLS object for the current thread
 		/// (which may also be the main thread).
-		
+
 	static void clear();
 		/// Clears the current thread's TLS object.
 		/// Does nothing in the main thread.
-	
+
 private:
-	typedef std::map<const void*, TLSAbstractSlot*> TLSMap;
-	
+	using TLSMap = std::map<const void *, TLSAbstractSlot *>;
+
 	TLSMap _map;
 
 	friend class Thread;
@@ -112,22 +110,21 @@ class ThreadLocal
 	/// thread local data. There is no way for a thread
 	/// to access another thread's local data.
 {
-	typedef TLSSlot<C> Slot;
+	using Slot = TLSSlot<C>;
 
 public:
-	ThreadLocal()
-	{
-	}
-	
-	~ThreadLocal()
-	{
-	}
-	
+	ThreadLocal() = default;
+
+	~ThreadLocal() = default;
+
+	ThreadLocal(const ThreadLocal&) = delete;
+	ThreadLocal& operator=(const ThreadLocal&) = delete;
+
 	C* operator -> ()
 	{
 		return &get();
 	}
-	
+
 	C& operator * ()
 		/// "Dereferences" the smart pointer and returns a reference
 		/// to the underlying data object. The reference can be used
@@ -144,10 +141,6 @@ public:
 		if (!p) p = new Slot;
 		return static_cast<Slot*>(p)->value();
 	}
-	
-private:
-	ThreadLocal(const ThreadLocal&);
-	ThreadLocal& operator = (const ThreadLocal&);
 };
 
 

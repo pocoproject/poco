@@ -35,7 +35,7 @@ Preparator::Preparator(const StatementHandle& rStmt,
 {
 	SQLCHAR* pStr = (SQLCHAR*) statement.c_str();
 	if (Utility::isError(Poco::Data::ODBC::SQLPrepare(_rStmt, pStr, (SQLINTEGER) statement.length())))
-		throw StatementException(_rStmt);
+		throw StatementException(_rStmt, "ODBC::Preparator():SQLPrepare()");
 }
 
 
@@ -158,7 +158,8 @@ std::size_t Preparator::maxDataSize(std::size_t pos) const
 
 		// accomodate for terminating zero (non-bulk only!)
 		MetaColumn::ColumnDataType type = mc.type();
-		if (sz && !isBulk() && ((ODBCMetaColumn::FDT_WSTRING == type) || (ODBCMetaColumn::FDT_STRING == type))) ++sz;
+		if (sz && !isBulk() && ((ODBCMetaColumn::FDT_WSTRING == type) || (ODBCMetaColumn::FDT_STRING == type)))
+			++sz;
 	}
 	catch (StatementException&) { }
 
@@ -201,7 +202,7 @@ void Preparator::prepareBoolArray(std::size_t pos, SQLSMALLINT valueType, std::s
 		(SQLINTEGER) sizeof(bool),
 		&_lenLengths[pos][0])))
 	{
-		throw StatementException(_rStmt, "SQLBindCol()");
+		throw StatementException(_rStmt, "ODBC::Preparator::prepareBoolArray():SQLBindCol()");
 	}
 }
 

@@ -34,7 +34,7 @@ class Foundation_API EventArgs
 {
 public:
 	EventArgs();
-	
+
 	virtual ~EventArgs();
 };
 

@@ -64,6 +64,9 @@ public:
 	bool isSecure() const;
 		/// Returns true if the session is FTPS.
 
+	void forceSessionReuse(bool force = true);
+		/// Enable or disable session reusing
+
 protected:
 	virtual StreamSocket establishDataConnection(const std::string& command, const std::string& arg);
 		/// Create secure data connection
@@ -80,6 +83,7 @@ private:
 
 	bool _enableFTPS = true;
 	bool _secureDataConnection = false;
+	bool _forceSessionReuse = false;
 	Context::Ptr _pContext;
 };
 
@@ -92,6 +96,12 @@ inline bool FTPSClientSession::isSecure() const
 	if (_pControlSocket != nullptr)
 		return _pControlSocket->secure();
 	return false;
+}
+
+
+inline void FTPSClientSession::forceSessionReuse(bool force)
+{
+	_forceSessionReuse = force;
 }
 
 

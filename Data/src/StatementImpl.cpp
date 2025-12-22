@@ -69,36 +69,54 @@ StatementImpl::~StatementImpl()
 
 std::size_t StatementImpl::execute(const bool& reset)
 {
-	if (reset) resetExtraction();
+	std::size_t lim = 0;
 
+	try
+	{
+		if (reset) resetExtraction();
+
+		if (!_rSession.isConnected())
+			throw NotConnectedException(_rSession.connectionString());
+
+		if (_lowerLimit > _extrLimit.value())
+			throw LimitException("Illegal Statement state. Upper limit must not be smaller than the lower limit.");
+
+		do
+		{
+			compile();
+			if (_extrLimit.value() == Limit::LIMIT_UNLIMITED)
+				lim += executeWithoutLimit();
+			else
+				lim += executeWithLimit();
+		} while (canCompile());
+
+		if (_extrLimit.value() == Limit::LIMIT_UNLIMITED)
+			_state = ST_DONE;
+
+		if (lim < _lowerLimit)
+			throw LimitException("Did not receive enough data.");
+
+		assignSubTotal(reset);
+	}
+	catch(...)
+	{
+		_state = ST_DONE;
+		throw;
+	}
+
+	return lim;
+}
+
+void StatementImpl::executeDirect(const std::string &query)
+{
 	if (!_rSession.isConnected())
 	{
 		_state = ST_DONE;
 		throw NotConnectedException(_rSession.connectionString());
 	}
-
-	std::size_t lim = 0;
-	if (_lowerLimit > _extrLimit.value())
-		throw LimitException("Illegal Statement state. Upper limit must not be smaller than the lower limit.");
-
-	do
-	{
-		compile();
-		if (_extrLimit.value() == Limit::LIMIT_UNLIMITED)
-			lim += executeWithoutLimit();
-		else
-			lim += executeWithLimit();
-	} while (canCompile());
-
-	if (_extrLimit.value() == Limit::LIMIT_UNLIMITED)
-		_state = ST_DONE;
-
-	if (lim < _lowerLimit)
-		throw LimitException("Did not receive enough data.");
-
-	assignSubTotal(reset);
-
-	return lim;
+	_ostr.str("");
+	_ostr << query;
+	execDirectImpl(_ostr.str());
 }
 
 
@@ -353,6 +371,8 @@ void StatementImpl::makeExtractors(std::size_t count)
 				addInternalExtract<DateTime>(mc); break;
 			case MetaColumn::FDT_UUID:
 				addInternalExtract<UUID>(mc); break;
+			case MetaColumn::FDT_JSON:
+				addInternalExtract<std::string>(mc); break;
 			default:
 				throw Poco::InvalidArgumentException("Data type not supported.");
 		}
@@ -370,6 +390,11 @@ const MetaColumn& StatementImpl::metaColumn(const std::string& name) const
 	}
 
 	throw NotFoundException(format("Invalid column name: %s", name));
+}
+
+void StatementImpl::execDirectImpl(const std::string& query)
+{
+	poco_assert("Not implemented");
 }
 
 

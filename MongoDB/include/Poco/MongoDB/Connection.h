@@ -7,7 +7,7 @@
 //
 // Definition of the Connection class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -20,9 +20,7 @@
 
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/StreamSocket.h"
-#include "Poco/Mutex.h"
-#include "Poco/MongoDB/RequestMessage.h"
-#include "Poco/MongoDB/ResponseMessage.h"
+#include "Poco/MongoDB/OpMsgMessage.h"
 
 
 namespace Poco {
@@ -35,6 +33,17 @@ class MongoDB_API Connection
 	///
 	/// See https://docs.mongodb.com/manual/reference/mongodb-wire-protocol/
 	/// for more information on the wire protocol.
+	///
+	/// THREAD SAFETY:
+	/// This class is NOT thread-safe. A single Connection instance must not be
+	/// used concurrently from multiple threads without external synchronization.
+	/// Concurrent calls to sendRequest() will result in interleaved data on the
+	/// socket and corrupted responses.
+	///
+	/// For multi-threaded applications, use one of these patterns:
+	/// - Each thread has its own Connection instance
+	/// - Use ObjectPool<Connection> with PooledConnection for connection pooling
+	/// - Protect shared Connection with external mutex
 {
 public:
 	using Ptr = Poco::SharedPtr<Connection>;
@@ -86,7 +95,7 @@ public:
 	virtual ~Connection();
 		/// Destroys the Connection.
 
-	Poco::Net::SocketAddress address() const;
+	[[nodiscard]] Poco::Net::SocketAddress address() const;
 		/// Returns the address of the MongoDB server.
 
 	void connect(const std::string& hostAndPort);
@@ -107,8 +116,7 @@ public:
 		///     a SecureStreamSocket must be supplied.
 		///   - connectTimeoutMS: Socket connection timeout in milliseconds.
 		///   - socketTimeoutMS: Socket send/receive timeout in milliseconds.
-		///   - authMechanism: Authentication mechanism. Only "SCRAM-SHA-1" (default)
-		///     and "MONGODB-CR" are supported.
+		///   - authMechanism: Authentication mechanism. Only "SCRAM-SHA-1" is supported.
 		///
 		/// Unknown options are silently ignored.
 		///
@@ -129,16 +137,20 @@ public:
 	void disconnect();
 		/// Disconnects from the MongoDB server.
 
-	void sendRequest(RequestMessage& request);
-		/// Sends a request to the MongoDB server.
-		///
-		/// Used for one-way requests without a response.
+	void sendRequest(OpMsgMessage& request, OpMsgMessage& response);
+		/// Sends a request to the MongoDB server and receives the response
+		/// using OP_MSG wire protocol.
 
-	void sendRequest(RequestMessage& request, ResponseMessage& response);
-		/// Sends a request to the MongoDB server and receives the response.
-		///
-		/// Use this when a response is expected: only a "query" or "getmore"
-		/// request will return a response.
+	void sendRequest(OpMsgMessage& request);
+		/// Sends an unacknowledged request to the MongoDB server using
+		/// OP_MSG wire protocol.
+		/// No response is sent by the server.
+
+	void readResponse(OpMsgMessage& response);
+		/// Reads additional response data when previous message's flag moreToCome
+		/// indicates that server will send more data.
+		/// NOTE: See comments in OpMsgCursor code.
+
 
 protected:
 	void connect();

@@ -34,9 +34,8 @@ const std::string SessionHandle::POSTGRESQL_SERIALIZABLE	= "SERIALIZABLE";
 
 
 SessionHandle::SessionHandle():
-	_pConnection(0),
+	_pConnection(nullptr),
 	_inTransaction(false),
-	_isAutoCommit(true),
 	_isAsynchronousCommit(false),
 	_tranactionIsolationLevel(Session::TRANSACTION_READ_COMMITTED)
 {
@@ -79,16 +78,31 @@ void SessionHandle::connect(const std::string& aConnectionString)
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
+	_inTransaction = false;
+	_preparedStatementsToBeDeallocated.clear();
+
 	if (isConnectedNoLock())
 	{
 		throw ConnectionFailedException("Already Connected");
+	}
+	else if (_pConnection)
+	{
+		// free bad connection
+		PQfinish(_pConnection);
+		_pConnection = nullptr;
 	}
 
 	_pConnection = PQconnectdb(aConnectionString.c_str());
 
 	if (!isConnectedNoLock())
 	{
-		throw ConnectionFailedException(std::string("Connection Error: ") + lastErrorNoLock());
+		std::string msg = std::string("Connection Error: ") + lastErrorNoLock();
+		if (_pConnection)
+		{
+			PQfinish(_pConnection);
+			_pConnection = nullptr;
+		}
+		throw ConnectionFailedException(msg);
 	}
 
 	_connectionString = aConnectionString;
@@ -137,15 +151,14 @@ void SessionHandle::disconnect()
 {
 	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 
-	if (isConnectedNoLock())
+	if (_pConnection)
 	{
 		PQfinish(_pConnection);
 
-		_pConnection = 0;
+		_pConnection = nullptr;
 
 		_connectionString = std::string();
 		_inTransaction= false;
-		_isAutoCommit = true;
 		_isAsynchronousCommit = false;
 		_tranactionIsolationLevel = Session::TRANSACTION_READ_COMMITTED;
 	}
@@ -187,7 +200,7 @@ std::string SessionHandle::lastError() const
 std::string SessionHandle::lastErrorNoLock() const
 {
 	// DO NOT ACQUIRE THE MUTEX IN PRIVATE METHODS
-	std::string lastErrorString (0 != _pConnection ? PQerrorMessage(_pConnection) : "not connected");
+	std::string lastErrorString (nullptr != _pConnection ? PQerrorMessage(_pConnection) : "not connected");
 
 	return lastErrorString;
 }
@@ -268,23 +281,13 @@ void SessionHandle::rollback()
 }
 
 
-void SessionHandle::setAutoCommit(bool aShouldAutoCommit)
+void SessionHandle::autoCommit(bool val)
 {
-	if (aShouldAutoCommit == _isAutoCommit)
+	// There is no PostgreSQL API call to switch autocommit (unchained) mode off.
+	if (isTransaction())
 	{
-		return;
+		throw Poco::InvalidAccessException();
 	}
-
-	if (aShouldAutoCommit)
-	{
-		commit();  // end any in process transaction
-	}
-	else
-	{
-		startTransaction();  // start a new transaction
-	}
-
-	_isAutoCommit = aShouldAutoCommit;
 }
 
 
@@ -328,7 +331,7 @@ void SessionHandle::cancel()
 
 	PGCancelFree cancelFreer(ptrPGCancel);
 
-	PQcancel(ptrPGCancel, 0, 0); // no error buffer
+	PQcancel(ptrPGCancel, nullptr, 0); // no error buffer
 }
 
 
@@ -376,7 +379,7 @@ void SessionHandle::setTransactionIsolation(Poco::UInt32 aTI)
 }
 
 
-Poco::UInt32 SessionHandle::transactionIsolation()
+Poco::UInt32 SessionHandle::transactionIsolation() const
 {
 	return _tranactionIsolationLevel;
 }
@@ -493,6 +496,23 @@ std::string SessionHandle::clientEncoding() const
 }
 
 
+std::string SessionHandle::parameterStatus(const std::string& param) const
+{
+	Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
+
+	if (!isConnectedNoLock())
+	{
+		throw NotConnectedException();
+	}
+
+	const char* pValue = PQparameterStatus(_pConnection, param.c_str());
+	if (pValue)
+		return std::string(pValue);
+	else
+		return std::string();
+}
+
+
 int SessionHandle::libpqVersion() const
 {
 	return PQlibVersion();
@@ -548,7 +568,7 @@ SessionParametersMap SessionHandle::connectionParameters() const
 		throw NotConnectedException();
 	}
 
-	PQconninfoOption* ptrConnInfoOptions = 0;
+	PQconninfoOption* ptrConnInfoOptions = nullptr;
 	{
 		Poco::FastMutex::ScopedLock mutexLocker(_sessionMutex);
 

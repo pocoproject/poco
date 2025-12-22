@@ -41,8 +41,8 @@ RawSocketImpl::RawSocketImpl(SocketAddress::Family family, int proto)
 
 }
 
-	
-RawSocketImpl::RawSocketImpl(poco_socket_t sockfd): 
+
+RawSocketImpl::RawSocketImpl(poco_socket_t sockfd):
 	SocketImpl(sockfd)
 {
 }

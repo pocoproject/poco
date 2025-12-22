@@ -33,7 +33,7 @@ class Net_API ICMPv4PacketImpl : public ICMPPacketImpl
 	/// Parts are based on the original ICMP code by
 	/// Mike Muuss
 	/// U. S. Army Ballistic Research Laboratory
- 	/// December, 1983
+	/// December, 1983
 {
 public:
 	// ICMPv4 header
@@ -54,6 +54,13 @@ public:
 	poco_static_assert (offsetof(Header, seq) == 0x06);
 #endif
 
+#if defined(MINGW) || defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(TIMESTAMP_REQUEST) && defined(POCO_COMPILER_MINGW)
+	#pragma push_macro("TIMESTAMP_REQUEST")
+	#define POCO_RESTORE_TIMESTAMP_REQUEST
+	#undef TIMESTAMP_REQUEST
+#endif
+#endif
 	enum MessageType
 	{
 		ECHO_REPLY,
@@ -77,6 +84,10 @@ public:
 		MESSAGE_TYPE_LENGTH    // length indicator, must remain last
 	};
 
+#if defined(POCO_RESTORE_TIMESTAMP_REQUEST)
+	#pragma pop_macro("TIMESTAMP_REQUEST")
+	#undef POCO_RESTORE_TIMESTAMP_REQUEST
+#endif
 	enum DestinationUnreachableCode
 	{
 		NET_UNREACHABLE,
@@ -123,7 +134,7 @@ public:
 	int packetSize() const;
 		/// Returns the total length of packet (header + data);
 
-	struct timeval time(Poco::UInt8* buffer = 0, int length = 0) const;
+	struct timeval time(Poco::UInt8* buffer = nullptr, int length = 0) const;
 		/// Returns current epoch time if either buffer or length are equal to zero.
 		/// Otherwise, it extracts the time value from the supplied buffer.
 		///

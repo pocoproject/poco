@@ -44,8 +44,8 @@ class Foundation_API Formatter: public Configurable, public RefCountedObject
 	/// The Formatter class supports the Configurable interface,
 	/// so the behaviour of certain formatters is configurable.
 	/// It also supports reference counting based garbage collection.
-	/// 
-	/// Trivial implementations of of getProperty() and 
+	///
+	/// Trivial implementations of of getProperty() and
 	/// setProperty() are provided.
 	///
 	/// Subclasses must at least provide a format() method.
@@ -55,19 +55,19 @@ public:
 
 	Formatter();
 		/// Creates the formatter.
-		
-	virtual ~Formatter();
-		/// Destroys the formatter.
+
+	~Formatter() override;
+	/// Destroys the formatter.
 
 	virtual void format(const Message& msg, std::string& text) = 0;
-		/// Formats the message and places the result in text. 
+		/// Formats the message and places the result in text.
 		/// Subclasses must override this method.
-		
-	void setProperty(const std::string& name, const std::string& value);
-		/// Throws a PropertyNotSupportedException.
 
-	std::string getProperty(const std::string& name) const;
-		/// Throws a PropertyNotSupportedException.
+	void setProperty(const std::string& name, const std::string& value) override;
+	/// Throws a PropertyNotSupportedException.
+
+	std::string getProperty(const std::string& name) const override;
+	/// Throws a PropertyNotSupportedException.
 };
 
 

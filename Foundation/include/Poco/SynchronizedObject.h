@@ -34,10 +34,10 @@ class Foundation_API SynchronizedObject
 {
 public:
 	using ScopedLock = Poco::ScopedLock<SynchronizedObject>;
-	
+
 	SynchronizedObject();
 		/// Creates the object.
-		
+
 	virtual ~SynchronizedObject();
 		/// Destroys the object.
 
@@ -49,14 +49,14 @@ public:
 		/// Tries to lock the object. Returns false immediately
 		/// if the object is already locked by another thread
 		/// Returns true if the object was successfully locked.
-	
+
 	void unlock() const;
 		/// Unlocks the object so that it can be locked by
 		/// other threads.
-		
+
 	void notify() const;
-		/// Signals the object. 
-		/// Exactly only one thread waiting for the object 
+		/// Signals the object.
+		/// Exactly only one thread waiting for the object
 		/// can resume execution.
 
 	void wait() const;

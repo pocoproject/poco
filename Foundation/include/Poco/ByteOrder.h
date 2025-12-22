@@ -32,6 +32,8 @@ class Foundation_API ByteOrder
 	/// integers of various sizes.
 {
 public:
+	static Int8 flipBytes(Int8 value);
+	static UInt8 flipBytes(UInt8 value);
 	static Int16 flipBytes(Int16 value);
 	static UInt16 flipBytes(UInt16 value);
 	static Int32 flipBytes(Int32 value);
@@ -43,6 +45,8 @@ public:
 	static UInt64 flipBytes(UInt64 value);
 #endif
 
+	static Int8 toBigEndian(Int8 value);
+	static UInt8 toBigEndian(UInt8 value);
 	static Int16 toBigEndian(Int16 value);
 	static UInt16 toBigEndian (UInt16 value);
 	static Int32 toBigEndian(Int32 value);
@@ -52,6 +56,8 @@ public:
 	static UInt64 toBigEndian (UInt64 value);
 #endif
 
+	static Int8 fromBigEndian(Int8 value);
+	static UInt8 fromBigEndian(UInt8 value);
 	static Int16 fromBigEndian(Int16 value);
 	static UInt16 fromBigEndian (UInt16 value);
 	static Int32 fromBigEndian(Int32 value);
@@ -61,6 +67,8 @@ public:
 	static UInt64 fromBigEndian (UInt64 value);
 #endif
 
+	static Int8 toLittleEndian(Int8 value);
+	static UInt8 toLittleEndian(UInt8 value);
 	static Int16 toLittleEndian(Int16 value);
 	static UInt16 toLittleEndian (UInt16 value);
 	static Int32 toLittleEndian(Int32 value);
@@ -70,6 +78,8 @@ public:
 	static UInt64 toLittleEndian (UInt64 value);
 #endif
 
+	static Int8 fromLittleEndian(Int8 value);
+	static UInt8 fromLittleEndian(UInt8 value);
 	static Int16 fromLittleEndian(Int16 value);
 	static UInt16 fromLittleEndian (UInt16 value);
 	static Int32 fromLittleEndian(Int32 value);
@@ -79,6 +89,8 @@ public:
 	static UInt64 fromLittleEndian (UInt64 value);
 #endif
 
+	static Int8 toNetwork(Int8 value);
+	static UInt8 toNetwork(UInt8 value);
 	static Int16 toNetwork(Int16 value);
 	static UInt16 toNetwork (UInt16 value);
 	static Int32 toNetwork(Int32 value);
@@ -88,6 +100,8 @@ public:
 	static UInt64 toNetwork (UInt64 value);
 #endif
 
+	static Int8 fromNetwork(Int8 value);
+	static UInt8 fromNetwork(UInt8 value);
 	static Int16 fromNetwork(Int16 value);
 	static UInt16 fromNetwork (UInt16 value);
 	static Int32 fromNetwork(Int32 value);
@@ -119,7 +133,7 @@ private:
 		#if (POCO_MSVC_VERSION > 71)
 			#define POCO_HAVE_MSC_BYTESWAP 1
 		#endif
-	#elif defined(__clang__) 
+	#elif defined(__clang__)
 		#if __has_builtin(__builtin_bswap32)
 			#define POCO_HAVE_GCC_BYTESWAP 1
 		#endif
@@ -132,6 +146,18 @@ private:
 //
 // inlines
 //
+inline UInt8 ByteOrder::flipBytes(UInt8 value)
+{
+	return value;
+}
+
+
+inline Int8 ByteOrder::flipBytes(Int8 value)
+{
+	return value;
+}
+
+
 inline UInt16 ByteOrder::flipBytes(UInt16 value)
 {
 #if defined(POCO_HAVE_MSC_BYTESWAP)
@@ -156,7 +182,7 @@ inline UInt32 ByteOrder::flipBytes(UInt32 value)
 	return __builtin_bswap32(value);
 #else
 	return ((value >> 24) & 0x000000FF) | ((value >> 8) & 0x0000FF00)
-	     | ((value << 8) & 0x00FF0000) | ((value << 24) & 0xFF000000);
+		 | ((value << 8) & 0x00FF0000) | ((value << 24) & 0xFF000000);
 #endif
 }
 
@@ -218,6 +244,8 @@ inline Int64 ByteOrder::flipBytes(Int64 value)
 
 #if defined(POCO_HAVE_INT64)
 	#define POCO_IMPLEMENT_BYTEORDER_NOOP(op) \
+		POCO_IMPLEMENT_BYTEORDER_NOOP_(op, Int8)    \
+		POCO_IMPLEMENT_BYTEORDER_NOOP_(op, UInt8)   \
 		POCO_IMPLEMENT_BYTEORDER_NOOP_(op, Int16)	\
 		POCO_IMPLEMENT_BYTEORDER_NOOP_(op, UInt16)	\
 		POCO_IMPLEMENT_BYTEORDER_NOOP_(op, Int32)	\
@@ -225,6 +253,8 @@ inline Int64 ByteOrder::flipBytes(Int64 value)
 		POCO_IMPLEMENT_BYTEORDER_NOOP_(op, Int64)	\
 		POCO_IMPLEMENT_BYTEORDER_NOOP_(op, UInt64)
 	#define POCO_IMPLEMENT_BYTEORDER_FLIP(op) \
+		POCO_IMPLEMENT_BYTEORDER_FLIP_(op, Int8)    \
+		POCO_IMPLEMENT_BYTEORDER_FLIP_(op, UInt8)   \
 		POCO_IMPLEMENT_BYTEORDER_FLIP_(op, Int16)	\
 		POCO_IMPLEMENT_BYTEORDER_FLIP_(op, UInt16)	\
 		POCO_IMPLEMENT_BYTEORDER_FLIP_(op, Int32)	\
@@ -233,11 +263,15 @@ inline Int64 ByteOrder::flipBytes(Int64 value)
 		POCO_IMPLEMENT_BYTEORDER_FLIP_(op, UInt64)
 #else
 	#define POCO_IMPLEMENT_BYTEORDER_NOOP(op) \
+		POCO_IMPLEMENT_BYTEORDER_NOOP_(op, Int8)    \
+		POCO_IMPLEMENT_BYTEORDER_NOOP_(op, UInt8)   \
 		POCO_IMPLEMENT_BYTEORDER_NOOP_(op, Int16)	\
 		POCO_IMPLEMENT_BYTEORDER_NOOP_(op, UInt16)	\
 		POCO_IMPLEMENT_BYTEORDER_NOOP_(op, Int32)	\
 		POCO_IMPLEMENT_BYTEORDER_NOOP_(op, UInt32)
 	#define POCO_IMPLEMENT_BYTEORDER_FLIP(op) \
+		POCO_IMPLEMENT_BYTEORDER_FLIP_(op, Int8)    \
+		POCO_IMPLEMENT_BYTEORDER_FLIP_(op, UInt8)   \
 		POCO_IMPLEMENT_BYTEORDER_FLIP_(op, Int16)	\
 		POCO_IMPLEMENT_BYTEORDER_FLIP_(op, UInt16)	\
 		POCO_IMPLEMENT_BYTEORDER_FLIP_(op, Int32)	\

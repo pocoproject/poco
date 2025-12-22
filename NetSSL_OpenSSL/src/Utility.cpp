@@ -15,6 +15,7 @@
 #include "Poco/Net/Utility.h"
 #include "Poco/String.h"
 #include "Poco/Util/OptionException.h"
+#include "Poco/Crypto/Crypto.h"
 #include <openssl/err.h>
 
 
@@ -51,14 +52,9 @@ std::string Utility::convertCertificateError(long errCode)
 
 std::string Utility::getLastError()
 {
-	unsigned long errCode = ERR_get_error();
-	if (errCode != 0)
-	{
-		char buffer[256];
-		ERR_error_string_n(errCode, buffer, sizeof(buffer));
-		return std::string(buffer);
-	}
-	else return "No error";
+	std::string msg;
+	Poco::Crypto::getError(msg);
+	return msg;
 }
 
 

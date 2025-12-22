@@ -26,12 +26,12 @@ public:
 		_activity(this, &ActivityExample::runActivity)
 	{
 	}
-	
+
 	void start()
 	{
 		_activity.start();
 	}
-	
+
 	void stop()
 	{
 		_activity.stop();
@@ -48,7 +48,7 @@ protected:
 		}
 		std::cout << "Activity stopped." << std::endl;
 	}
-	
+
 private:
 	Activity<ActivityExample> _activity;
 };

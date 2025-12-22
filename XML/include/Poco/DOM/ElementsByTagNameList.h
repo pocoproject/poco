@@ -46,7 +46,7 @@ protected:
 	const Node* _pParent;
 	XMLString   _name;
 	mutable unsigned long _count;
-	
+
 	friend class AbstractContainerNode;
 	friend class Element;
 	friend class Document;
@@ -73,7 +73,7 @@ protected:
 	XMLString   _localName;
 	XMLString   _namespaceURI;
 	mutable unsigned long _count;
-	
+
 	friend class AbstractContainerNode;
 	friend class Element;
 	friend class Document;

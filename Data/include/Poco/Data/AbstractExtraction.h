@@ -151,6 +151,25 @@ public:
 		/// - string is empty
 		/// - getEmptyStringIsNull() returns true
 
+	std::string getHeldType() const
+		/// Returns the held type name, if set.
+		/// If held type name is not set, returns empty string.
+		/// Held type is optionally set by calling setHeldType<T>()
+		/// in child classes.
+		/// Useful for dynamic_cast failure diagnostics.
+	{
+		std::string held;
+		if (_pHeldType) held = *_pHeldType;
+		return held;
+	}
+
+protected:
+	template<typename T>
+	void setHeldType()
+	{
+		_pHeldType.reset(new std::string(Poco::demangle<T>()));
+	}
+
 private:
 	template <typename S>
 	bool isStringNull(const S& str, bool deflt)
@@ -169,6 +188,7 @@ private:
 	bool         _bulk;
 	bool         _emptyStringIsNull;
 	bool         _forceEmptyString;
+	std::unique_ptr<std::string> _pHeldType;
 };
 
 

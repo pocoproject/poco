@@ -33,6 +33,8 @@ public:
 	void testUTF8Supplementary();
 	void testUTF16Supplementary();
 	void testSwap();
+	void testUTF32Invalid1();
+	void testUTF32Invalid2();
 
 	void setUp();
 	void tearDown();

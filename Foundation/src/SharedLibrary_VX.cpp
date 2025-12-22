@@ -99,6 +99,7 @@ void SharedLibraryImpl::unloadImpl()
 
 bool SharedLibraryImpl::isLoadedImpl() const
 {
+	FastMutex::ScopedLock lock(_mutex);
 	return _moduleId != 0;
 }
 
@@ -135,6 +136,13 @@ std::string SharedLibraryImpl::suffixImpl()
 bool SharedLibraryImpl::setSearchPathImpl(const std::string&)
 {
 	return false;
+}
+
+
+std::vector<std::string> SharedLibraryImpl::findMissingDependenciesImpl(const std::string&)
+{
+	// not implemented
+	return std::vector<std::string>();
 }
 
 

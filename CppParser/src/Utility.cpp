@@ -195,14 +195,14 @@ std::string Utility::preprocessFile(const std::string& file, const std::string& 
 		newPath += path;
 		Environment::set("PATH", path);
 	}
-	
-	ProcessHandle proc = Process::launch(exec, args);		
+
+	ProcessHandle proc = Process::launch(exec, args);
 	int rc = Process::wait(proc);
 	if (rc != 0)
 	{
 		throw Poco::RuntimeException("Failed to process file");
 	}
-	
+
 	return pp.getFileName();
 }
 
@@ -293,7 +293,7 @@ std::string replace(const std::string& input, const std::string& oldToken, const
 		start = pos + oldToken.length();
 	}
 	while (pos != std::string::npos);
-	
+
 	return result;
 }
 

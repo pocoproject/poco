@@ -1013,7 +1013,6 @@
                                 <File Id="DYNAMICSTRUCT.H" Name="DynamicStruct.h" Source="$(var.POCO)\Foundation\include\Poco\DynamicStruct.h" />
                                 <File Id="ENVIRONMENT.H" Name="Environment.h" Source="$(var.POCO)\Foundation\include\Poco\Environment.h" />
                                 <File Id="ENVIRONMENT_WIN32.H" Name="Environment_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\Environment_WIN32.h" />
-                                <File Id="ENVIRONMENT_WINCE.H" Name="Environment_WINCE.h" Source="$(var.POCO)\Foundation\include\Poco\Environment_WINCE.h" />
                                 <File Id="ERROR.H" Name="Error.h" Source="$(var.POCO)\Foundation\include\Poco\Error.h" />
                                 <File Id="ERRORHANDLER.H" Name="ErrorHandler.h" Source="$(var.POCO)\Foundation\include\Poco\ErrorHandler.h" />
                                 <File Id="EVENT.H" Name="Event.h" Source="$(var.POCO)\Foundation\include\Poco\Event.h" />
@@ -1036,7 +1035,6 @@
                                 <File Id="FILESTREAMFACTORY.H" Name="FileStreamFactory.h" Source="$(var.POCO)\Foundation\include\Poco\FileStreamFactory.h" />
                                 <File Id="FILESTREAM_WIN32.H" Name="FileStream_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\FileStream_WIN32.h" />
                                 <File Id="FILE_WIN32.H" Name="File_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\File_WIN32.h" />
-                                <File Id="FILE_WINCE.H" Name="File_WINCE.h" Source="$(var.POCO)\Foundation\include\Poco\File_WINCE.h" />
                                 <File Id="FORMAT.H" Name="Format.h" Source="$(var.POCO)\Foundation\include\Poco\Format.h" />
                                 <File Id="FORMATTER.H" Name="Formatter.h" Source="$(var.POCO)\Foundation\include\Poco\Formatter.h" />
                                 <File Id="FORMATTINGCHANNEL.H" Name="FormattingChannel.h" Source="$(var.POCO)\Foundation\include\Poco\FormattingChannel.h" />
@@ -1109,7 +1107,6 @@
                                 <File Id="OPTIONAL.H" Name="Optional.h" Source="$(var.POCO)\Foundation\include\Poco\Optional.h" />
                                 <File Id="PATH.H" Name="Path.h" Source="$(var.POCO)\Foundation\include\Poco\Path.h" />
                                 <File Id="PATH_WIN32.H" Name="Path_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\Path_WIN32.h" />
-                                <File Id="PATH_WINCE.H" Name="Path_WINCE.h" Source="$(var.POCO)\Foundation\include\Poco\Path_WINCE.h" />
                                 <File Id="PATTERNFORMATTER.H" Name="PatternFormatter.h" Source="$(var.POCO)\Foundation\include\Poco\PatternFormatter.h" />
                                 <File Id="PBKDF2ENGINE.H" Name="PBKDF2Engine.h" Source="$(var.POCO)\Foundation\include\Poco\PBKDF2Engine.h" />
                                 <File Id="PIPE.H" Name="Pipe.h" Source="$(var.POCO)\Foundation\include\Poco\Pipe.h" />
@@ -1126,7 +1123,6 @@
                                 <File Id="PRIORITYSTRATEGY.H" Name="PriorityStrategy.h" Source="$(var.POCO)\Foundation\include\Poco\PriorityStrategy.h" />
                                 <File Id="PROCESS.H" Name="Process.h" Source="$(var.POCO)\Foundation\include\Poco\Process.h" />
                                 <File Id="PROCESS_WIN32.H" Name="Process_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\Process_WIN32.h" />
-                                <File Id="PROCESS_WINCE.H" Name="Process_WINCE.h" Source="$(var.POCO)\Foundation\include\Poco\Process_WINCE.h" />
                                 <File Id="PURGESTRATEGY.H" Name="PurgeStrategy.h" Source="$(var.POCO)\Foundation\include\Poco\PurgeStrategy.h" />
                                 <File Id="RANDOM.H" Name="Random.h" Source="$(var.POCO)\Foundation\include\Poco\Random.h" />
                                 <File Id="RANDOMSTREAM.H" Name="RandomStream.h" Source="$(var.POCO)\Foundation\include\Poco\RandomStream.h" />
@@ -1140,7 +1136,6 @@
                                 <File Id="RWLOCK.H" Name="RWLock.h" Source="$(var.POCO)\Foundation\include\Poco\RWLock.h" />
                                 <File Id="RWLOCK_ANDROID.H" Name="RWLock_Android.h" Source="$(var.POCO)\Foundation\include\Poco\RWLock_Android.h" />
                                 <File Id="RWLOCK_WIN32.H" Name="RWLock_WIN32.h" Source="$(var.POCO)\Foundation\include\Poco\RWLock_WIN32.h" />
-                                <File Id="RWLOCK_WINCE.H" Name="RWLock_WINCE.h" Source="$(var.POCO)\Foundation\include\Poco\RWLock_WINCE.h" />
                                 <File Id="SCOPEDLOCK.H" Name="ScopedLock.h" Source="$(var.POCO)\Foundation\include\Poco\ScopedLock.h" />
                                 <File Id="SCOPEDUNLOCK.H" Name="ScopedUnlock.h" Source="$(var.POCO)\Foundation\include\Poco\ScopedUnlock.h" />
                                 <File Id="SEMAPHORE.H" Name="Semaphore.h" Source="$(var.POCO)\Foundation\include\Poco\Semaphore.h" />

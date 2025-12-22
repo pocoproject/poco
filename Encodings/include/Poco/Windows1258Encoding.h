@@ -33,7 +33,7 @@ class Encodings_API Windows1258Encoding: public DoubleByteEncoding
 public:
 	Windows1258Encoding();
 	~Windows1258Encoding();
-	
+
 private:
 	static const char* _names[];
 	static const CharacterMap _charMap;

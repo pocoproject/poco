@@ -25,19 +25,22 @@ target_link_libraries(NetSSL PUBLIC Poco::Crypto Poco::Util Poco::Net)
 target_include_directories(NetSSL
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-		$<INSTALL_INTERFACE:include>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-if(MSVC AND POCO_DISABLE_INTERNAL_OPENSSL AND OPENSSL_USE_STATIC_LIBS)
+if(MSVC AND OPENSSL_USE_STATIC_LIBS)
 	target_link_libraries(NetSSL PUBLIC ws2_32.lib Crypt32.lib)
 endif()
 
 POCO_INSTALL(NetSSL)
 POCO_GENERATE_PACKAGE(NetSSL)
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
+endif()
+
+if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
 endif()
 

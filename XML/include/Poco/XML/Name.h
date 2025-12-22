@@ -33,33 +33,33 @@ class XML_API Name
 public:
 	Name();
 		/// Creates an empty Name.
-		
+
 	Name(const XMLString& qname);
 		/// Creates a Name from a qualified name only.
 
 	Name(const XMLString& qname, const XMLString& namespaceURI);
 		/// Creates a Name from a qualified name and a namespace URI.
 		/// The local name is extracted from the qualified name.
-		
+
 	Name(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName);
 		/// Creates a Name from a qualified name, a namespace URI and a local name.
-		
+
 	Name(const Name& name);
 		/// Copy constructor.
 
 	Name(Name&& name) noexcept;
 		/// Move constructor.
-		
+
 	~Name();
 		/// Destroys the name.
-		
+
 	Name& operator = (const Name& name);
 		/// Assignment operator.
 
 	Name& operator = (Name&& name) noexcept;
 		/// Move assignment.
-		
-	void swap(Name& name);
+
+	void swap(Name& name) noexcept;
 		/// Swaps the name with another one.	
 		
 	void assign(const XMLString& qname);
@@ -71,31 +71,31 @@ public:
 
 	void assign(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName);
 		/// Assigns new values to the name.
-	
+
 	bool equals(const Name& name) const;
 		/// Returns true if both names are equal.
-		
+
 	bool equals(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Returns true if all the name's components are equal to the given ones.
 
 	bool equalsWeakly(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Returns true if either the qnames are identical or the namespaceURIs and the localNames are identical.
-	
+
 	const XMLString& qname() const;
 		/// Returns the qualified name.
-		
+
 	const XMLString& namespaceURI() const;
 		/// Returns the namespace URI.
-		
+
 	const XMLString& localName() const;
 		/// Returns the local name.
-		
+
 	XMLString prefix() const;
 		/// Returns the namespace prefix.
-		
+
 	static void split(const XMLString& qname, XMLString& prefix, XMLString& localName);
 		/// Splits the given qualified name into its prefix and localName parts.
-	
+
 	static XMLString localName(const XMLString& qname);
 		/// Returns the local name part of the given qualified name.
 
@@ -132,7 +132,7 @@ inline const XMLString& Name::localName() const
 }
 
 
-inline void swap(Name& n1, Name& n2)
+inline void swap(Name& n1, Name& n2) noexcept
 {
 	n1.swap(n2);
 }

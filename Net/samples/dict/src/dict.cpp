@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 {
 	const std::string HOST("dict.org");
 	const unsigned short PORT = 2628;
-	
+
 	if (argc != 2)
 	{
 		Path p(argv[0]);
@@ -40,13 +40,13 @@ int main(int argc, char** argv)
 		return 1;
 	}
 	std::string term(argv[1]);
-	
+
 	try
 	{
 		SocketAddress sa(HOST, PORT);
 		StreamSocket sock(sa);
 		SocketStream str(sock);
-		
+
 		str << "DEFINE ! " << term << "\r\n" << std::flush;
 		str << "QUIT\r\n" << std::flush;
 
@@ -58,6 +58,6 @@ int main(int argc, char** argv)
 		std::cerr << exc.displayText() << std::endl;
 		return 1;
 	}
-	
+
 	return 0;
 }

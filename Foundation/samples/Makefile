@@ -5,7 +5,7 @@
 #
 
 .PHONY: projects
-clean all: projects
+clean distclean all: projects
 projects:
 	$(MAKE) -C ActiveMethod $(MAKECMDGOALS)
 	$(MAKE) -C Activity $(MAKECMDGOALS)
@@ -26,3 +26,4 @@ projects:
 	$(MAKE) -C StringTokenizer $(MAKECMDGOALS)
 	$(MAKE) -C URI $(MAKECMDGOALS)
 	$(MAKE) -C uuidgen $(MAKECMDGOALS)
+	$(MAKE) -C trace $(MAKECMDGOALS)

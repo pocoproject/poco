@@ -31,6 +31,8 @@ public:
 	void testVariant();
 	void testSwap();
 	void testTryParse();
+	void testV6();
+	void testV7();
 
 	void setUp();
 	void tearDown();

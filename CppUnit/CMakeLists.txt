@@ -18,18 +18,33 @@ target_link_libraries(CppUnit PUBLIC Poco::Foundation)
 target_include_directories(CppUnit
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-		$<INSTALL_INTERFACE:include>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
+if(WIN32)
+	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+		target_compile_definitions(CppUnit PUBLIC POCO_NO_AUTOMATIC_LIBS)
+	endif()
+endif()
 
 if(NOT BUILD_SHARED_LIBS)
-	target_compile_definitions(CppUnit
-		PUBLIC
-			POCO_STATIC
-	)
-elseif(MINGW)
-	target_compile_definitions(CppUnit
-		PUBLIC
-			_DLL)
+	target_compile_definitions(CppUnit PUBLIC POCO_STATIC)
+elseif (MINGW)
+	target_compile_definitions(CppUnit PUBLIC _DLL)
 endif()
+
+install(
+	DIRECTORY include/CppUnit
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+	COMPONENT Devel
+)
+
+install(
+	TARGETS CppUnit
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+	BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR}
+	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)

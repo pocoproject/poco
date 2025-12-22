@@ -14,6 +14,7 @@
 
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Handle.h"
+#include "Poco/Data/ODBC/ConnectionHandle.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/DateTime.h"
@@ -41,7 +42,7 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 	SQLSMALLINT len2 = length;
 	RETCODE rc = 0;
 
-	if (!Utility::isError(rc = SQLDrivers(henv, 
+	if (!Utility::isError(rc = SQLDrivers(henv,
 		SQL_FETCH_FIRST,
 		desc,
 		length,
@@ -52,12 +53,12 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 	{
 		do
 		{
-			driverMap.insert(DSNMap::value_type(std::string((char *) desc), 
+			driverMap.insert(DSNMap::value_type(std::string((char *) desc),
 				std::string((char *) attr)));
 			std::memset(desc, 0, length);
 			std::memset(attr, 0, length);
 			len2 = length;
-		}while (!Utility::isError(rc = SQLDrivers(henv, 
+		}while (!Utility::isError(rc = SQLDrivers(henv,
 			SQL_FETCH_NEXT,
 			desc,
 			length,
@@ -67,7 +68,7 @@ Utility::DriverMap& Utility::drivers(Utility::DriverMap& driverMap)
 			&len2)));
 	}
 
-	if (SQL_NO_DATA != rc) 
+	if (SQL_NO_DATA != rc)
 		throw EnvironmentException(henv);
 
 	return driverMap;
@@ -88,7 +89,7 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 	SQLSMALLINT len2 = length;
 	RETCODE rc = 0;
 
-	while (!Utility::isError(rc = Poco::Data::ODBC::SQLDataSources(henv, 
+	while (!Utility::isError(rc = Poco::Data::ODBC::SQLDataSources(henv,
 		SQL_FETCH_NEXT,
 		dsn,
 		SQL_MAX_DSN_LENGTH,
@@ -103,7 +104,7 @@ Utility::DSNMap& Utility::dataSources(Utility::DSNMap& dsnMap)
 		len2 = length;
 	}
 
-	if (SQL_NO_DATA != rc) 
+	if (SQL_NO_DATA != rc)
 		throw EnvironmentException(henv);
 
 	return dsnMap;
@@ -152,7 +153,54 @@ void Utility::dateTimeSync(SQL_TIMESTAMP_STRUCT& ts, const Poco::DateTime& dt)
 	ts.second = dt.second();
 	// Fraction support is limited to milliseconds due to MS SQL Server limitation
 	// see http://support.microsoft.com/kb/263872
-	ts.fraction = (dt.millisecond() * 1000000);// + (dt.microsecond() * 1000);
+	ts.fraction = (dt.millisecond() * 1000000);
+}
+
+
+std::string Utility::sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type)
+{
+	std::string ret = "unknown"s;
+	const SQLSMALLINT bufSize = 1024;
+	SQLCHAR dbmsName[bufSize] = {0};
+	SQLSMALLINT retSize = 0;
+	SQLRETURN rc = Poco::Data::ODBC::SQLGetInfo(const_cast<SQLHDBC>(db.handle()), type, dbmsName, bufSize, &retSize);
+	if (!isError(rc))
+	{
+		ret.assign(reinterpret_cast<char*>(dbmsName), retSize);
+		// API may return string longer than effective length
+		ret.erase(ret.find_last_not_of('\0') + 1, std::string::npos);
+	}
+	return ret;
+}
+
+
+std::string Utility::dbmsName(const ConnectionHandle& db)
+{
+	return sqlGetInfo(db, SQL_DBMS_NAME);
+}
+
+
+std::string Utility::dbmsVersion(const ConnectionHandle& db)
+{
+	return sqlGetInfo(db, SQL_DBMS_VER);
+}
+
+
+std::string Utility::driverName(const ConnectionHandle& db)
+{
+	return sqlGetInfo(db, SQL_DRIVER_NAME);
+}
+
+
+std::string Utility::driverVersion(const ConnectionHandle& db)
+{
+	return sqlGetInfo(db, SQL_DRIVER_VER);
+}
+
+
+std::string Utility::driverODBCVersion(const ConnectionHandle& db)
+{
+	return sqlGetInfo(db, SQL_DRIVER_ODBC_VER);
 }
 
 

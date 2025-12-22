@@ -18,8 +18,8 @@
     <repository type='git' url='git@github.com:pocoproject/poco.git' branch='poco-$version$' />
     <dependencies>
       <dependency id='Poco.$id$.vs$vs$.noarch' version='$version$' />
-<dependency id='Poco.Foundation.vs$vs$.shared' version='$version$' /> 
-<dependency id='Poco.Net.vs$vs$.shared' version='$version$' /> 
+<dependency id='Poco.Foundation.vs$vs$.shared' version='$version$' />
+<dependency id='Poco.Net.vs$vs$.shared' version='$version$' />
      </dependencies>
   </metadata>
   <files>

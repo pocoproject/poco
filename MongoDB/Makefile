@@ -12,7 +12,7 @@ objects = Array Binary Connection Cursor DeleteRequest  Database \
 	Document Element GetMoreRequest InsertRequest JavaScriptCode \
 	KillCursorsRequest Message MessageHeader ObjectId QueryRequest \
 	RegularExpression ReplicaSet RequestMessage ResponseMessage \
-	UpdateRequest
+	UpdateRequest OpMsgMessage OpMsgCursor
 
 target         = PocoMongoDB
 target_version = $(LIBVERSION)

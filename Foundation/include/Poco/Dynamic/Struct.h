@@ -32,19 +32,50 @@ namespace Poco {
 namespace Dynamic {
 
 
+template <typename S, typename I = typename S::ConstIterator>
+std::string structToString(const S& data, bool wrap = true)
+	/// Utility function for converting DynamicStruct to std::string.
+	/// Set wrap to false in order to prevent string values wrapping
+	/// (useful to prevent JSON fragments from being treated as strings).
+{
+	std::string val;
+	val.append("{ ");
+	I it = data.begin();
+	I itEnd = data.end();
+	if (!data.empty())
+	{
+		const Var key(it->first);
+		Impl::appendJSONKey(val, key);
+		val.append(": ");
+		Impl::appendJSONValue(val, it->second, wrap);
+		++it;
+	}
+	for (; it != itEnd; ++it)
+	{
+		val.append(", ");
+		const Var key(it->first);
+		Impl::appendJSONKey(val, key);
+		val.append(": ");
+		Impl::appendJSONValue(val, it->second, wrap);
+	}
+	val.append(" }");
+	return val;
+}
+
+
 template <typename K, typename M = std::map<K, Var>, typename S = std::set<K>>
 class Struct
 	/// Struct allows to define a named collection of Var objects.
 {
 public:
-	typedef M Data;
-	typedef S NameSet;
-	typedef typename Data::iterator Iterator;
-	typedef typename Data::const_iterator ConstIterator;
-	typedef typename Struct<K>::Data::value_type ValueType;
-	typedef typename Struct<K>::Data::size_type SizeType;
-	typedef typename std::pair<typename Struct<K, M, S>::Iterator, bool> InsRetVal;
-	typedef typename Poco::SharedPtr<Struct<K, M, S>> Ptr;
+	using Data = M;
+	using NameSet = S;
+	using Iterator = typename Data::iterator;
+	using ConstIterator = typename Data::const_iterator;
+	using ValueType = typename Struct<K>::Data::value_type;
+	using SizeType = typename Struct<K>::Data::size_type;
+	using InsRetVal = typename std::pair<typename Struct<K, M, S>::Iterator, bool>;
+	using Ptr = typename Poco::SharedPtr<Struct<K, M, S>>;
 
 	Struct(): _data()
 		/// Creates an empty Struct
@@ -68,10 +99,8 @@ public:
 		assignMap(val);
 	}
 
-	virtual ~Struct()
+	virtual ~Struct() = default;
 		/// Destroys the Struct.
-	{
-	}
 
 	inline Var& operator [] (const K& name)
 		/// Returns the Var with the given name, creates an entry if not found.
@@ -83,7 +112,7 @@ public:
 		/// Returns the Var with the given name, throws a
 		/// NotFoundException if the data member is not found.
 	{
-		ConstIterator it = find(name);
+		const auto it = find(name);
 		if (it == end()) throw NotFoundException(name);
 		return it->second;
 	}
@@ -173,7 +202,7 @@ public:
 		_data.clear();
 	}
 
-	inline void swap(Struct& other)
+	inline void swap(Struct& other) noexcept
 		/// Swap content of Struct with another Struct
 	{
 		_data.swap(other._data);
@@ -226,18 +255,27 @@ public:
 		return it->second;
 	}
 
-	std::string toString() const
+	std::string toString(bool wrap = true) const
+		/// Returns the DynamicStruct as string.
+		///
+		/// To prevent unwanted string wrapping
+		/// (eg. when a value is JSON string),
+		/// `wrap` should be false. Note, however,
+		/// that wrap argument is of a limited utility
+		/// because it applies to the entire Struct,
+		/// so it should not be relied on when mixed content
+		/// (ie. plain string, which should be wrapped,
+		/// and JSON-as-string entries, which shouldn't)
+		/// is held.
 	{
-		std::string str;
-		Var(*this).template convert<std::string>(str);
-		return str;
+		return structToString<Data, ConstIterator>(_data, wrap);
 	}
 
 private:
 	template <typename T>
 	void assignMap(const T& map)
 	{
-		typedef typename T::const_iterator MapConstIterator;
+		using MapConstIterator = typename T::const_iterator;
 
 		MapConstIterator it = map.begin();
 		MapConstIterator end = map.end();
@@ -248,128 +286,126 @@ private:
 };
 
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+
+extern template class Struct<std::string>;
+extern template class Struct<int>;
+
+extern template class Struct<std::string, Poco::OrderedMap<std::string, Var>, Poco::OrderedSet<std::string>>;
+extern template class Struct<int, OrderedMap<int, Var>, OrderedSet<int>>;
+
+#else
+
+extern template class Foundation_API Struct<std::string>;
+extern template class Foundation_API Struct<int>;
+
+extern template class Foundation_API Struct<std::string, Poco::OrderedMap<std::string, Var>, Poco::OrderedSet<std::string>>;
+extern template class Foundation_API Struct<int, OrderedMap<int, Var>, OrderedSet<int>>;
+
+#endif
+
+
 template <>
 class VarHolderImpl<Struct<std::string, std::map<std::string, Var>, std::set<std::string>>>: public VarHolder
 {
 public:
-	typedef std::string KeyType;
-	typedef std::map<KeyType, Var> MapType;
-	typedef std::set<KeyType> SetType;
-	typedef Struct<KeyType, MapType, SetType> ValueType;
+	using KeyType = std::string;
+	using MapType = std::map<KeyType, Var>;
+	using SetType = std::set<KeyType>;
+	using ValueType = Struct<KeyType, MapType, SetType>;
 
 	VarHolderImpl(const ValueType& val): _val(val)
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(ValueType);
 	}
 
-	void convert(Int8&) const
+	void convert(Int8&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int8");
 	}
 
-	void convert(Int16&) const
+	void convert(Int16&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int16");
 	}
 
-	void convert(Int32&) const
+	void convert(Int32&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int32");
 	}
 
-	void convert(Int64&) const
+	void convert(Int64&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int64");
 	}
 
-	void convert(UInt8&) const
+	void convert(UInt8&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt8");
 	}
 
-	void convert(UInt16&) const
+	void convert(UInt16&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt16");
 	}
 
-	void convert(UInt32&) const
+	void convert(UInt32&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt32");
 	}
 
-	void convert(UInt64&) const
+	void convert(UInt64&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt64");
 	}
 
-	void convert(bool&) const
+	void convert(bool&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to bool");
 	}
 
-	void convert(float&) const
+	void convert(float&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to float");
 	}
 
-	void convert(double&) const
+	void convert(double&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to double");
 	}
 
-	void convert(char&) const
+	void convert(char&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to char");
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
-		val.append("{ ");
-		ValueType::ConstIterator it = _val.begin();
-		ValueType::ConstIterator itEnd = _val.end();
-		if (!_val.empty())
-		{
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-			++it;
-		}
-		for (; it != itEnd; ++it)
-		{
-			val.append(", ");
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-		}
-		val.append(" }");
+		val = structToString(_val);
 	}
 
-	void convert(Poco::DateTime&) const
+	void convert(Poco::DateTime&) const override
 	{
 		throw BadCastException("Struct -> Poco::DateTime");
 	}
 
-	void convert(Poco::LocalDateTime&) const
+	void convert(Poco::LocalDateTime&) const override
 	{
 		throw BadCastException("Struct -> Poco::LocalDateTime");
 	}
 
-	void convert(Poco::Timestamp&) const
+	void convert(Poco::Timestamp&) const override
 	{
 		throw BadCastException("Struct -> Poco::Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -379,42 +415,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return true;
 	}
 
-	bool isOrdered() const
+	bool isOrdered() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
-	std::size_t size() const
+	std::size_t size() const override
 	{
 		return _val.size();
 	}
@@ -438,124 +474,103 @@ template <>
 class VarHolderImpl<Struct<int, std::map<int, Var>, std::set<int>>> : public VarHolder
 {
 public:
-	typedef int KeyType;
-	typedef std::map<KeyType, Var> MapType;
-	typedef std::set<KeyType> SetType;
-	typedef Struct<KeyType, MapType, SetType> ValueType;
+	using KeyType = int;
+	using MapType = std::map<KeyType, Var>;
+	using SetType = std::set<KeyType>;
+	using ValueType = Struct<KeyType, MapType, SetType>;
 
 	VarHolderImpl(const ValueType& val) : _val(val)
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(ValueType);
 	}
 
-	void convert(Int8&) const
+	void convert(Int8&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int8");
 	}
 
-	void convert(Int16&) const
+	void convert(Int16&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int16");
 	}
 
-	void convert(Int32&) const
+	void convert(Int32&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int32");
 	}
 
-	void convert(Int64&) const
+	void convert(Int64&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int64");
 	}
 
-	void convert(UInt8&) const
+	void convert(UInt8&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt8");
 	}
 
-	void convert(UInt16&) const
+	void convert(UInt16&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt16");
 	}
 
-	void convert(UInt32&) const
+	void convert(UInt32&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt32");
 	}
 
-	void convert(UInt64&) const
+	void convert(UInt64&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt64");
 	}
 
-	void convert(bool&) const
+	void convert(bool&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to bool");
 	}
 
-	void convert(float&) const
+	void convert(float&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to float");
 	}
 
-	void convert(double&) const
+	void convert(double&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to double");
 	}
 
-	void convert(char&) const
+	void convert(char&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to char");
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
-		val.append("{ ");
-		ValueType::ConstIterator it = _val.begin();
-		ValueType::ConstIterator itEnd = _val.end();
-		if (!_val.empty())
-		{
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-			++it;
-		}
-		for (; it != itEnd; ++it)
-		{
-			val.append(", ");
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-		}
-		val.append(" }");
+		val = structToString(_val);
 	}
 
-	void convert(Poco::DateTime&) const
+	void convert(Poco::DateTime&) const override
 	{
 		throw BadCastException("Struct -> Poco::DateTime");
 	}
 
-	void convert(Poco::LocalDateTime&) const
+	void convert(Poco::LocalDateTime&) const override
 	{
 		throw BadCastException("Struct -> Poco::LocalDateTime");
 	}
 
-	void convert(Poco::Timestamp&) const
+	void convert(Poco::Timestamp&) const override
 	{
 		throw BadCastException("Struct -> Poco::Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -565,42 +580,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return true;
 	}
 
-	bool isOrdered() const
+	bool isOrdered() const override
 	{
 		return false;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
-	std::size_t size() const
+	std::size_t size() const override
 	{
 		return _val.size();
 	}
@@ -624,124 +639,103 @@ template <>
 class VarHolderImpl<Struct<std::string, Poco::OrderedMap<std::string, Var>, Poco::OrderedSet<std::string>>> : public VarHolder
 {
 public:
-	typedef std::string KeyType;
-	typedef Poco::OrderedMap<KeyType, Var> MapType;
-	typedef Poco::OrderedSet<KeyType> SetType;
-	typedef Struct<KeyType, MapType, SetType> ValueType;
+	using KeyType = std::string;
+	using MapType = Poco::OrderedMap<KeyType, Var>;
+	using SetType = Poco::OrderedSet<KeyType>;
+	using ValueType = Struct<KeyType, MapType, SetType>;
 
 	VarHolderImpl(const ValueType& val) : _val(val)
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(ValueType);
 	}
 
-	void convert(Int8&) const
+	void convert(Int8&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int8");
 	}
 
-	void convert(Int16&) const
+	void convert(Int16&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int16");
 	}
 
-	void convert(Int32&) const
+	void convert(Int32&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int32");
 	}
 
-	void convert(Int64&) const
+	void convert(Int64&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int64");
 	}
 
-	void convert(UInt8&) const
+	void convert(UInt8&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt8");
 	}
 
-	void convert(UInt16&) const
+	void convert(UInt16&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt16");
 	}
 
-	void convert(UInt32&) const
+	void convert(UInt32&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt32");
 	}
 
-	void convert(UInt64&) const
+	void convert(UInt64&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt64");
 	}
 
-	void convert(bool&) const
+	void convert(bool&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to bool");
 	}
 
-	void convert(float&) const
+	void convert(float&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to float");
 	}
 
-	void convert(double&) const
+	void convert(double&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to double");
 	}
 
-	void convert(char&) const
+	void convert(char&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to char");
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string&val) const override
 	{
-		val.append("{ ");
-		ValueType::ConstIterator it = _val.begin();
-		ValueType::ConstIterator itEnd = _val.end();
-		if (!_val.empty())
-		{
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-			++it;
-		}
-		for (; it != itEnd; ++it)
-		{
-			val.append(", ");
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-		}
-		val.append(" }");
+		val = structToString(_val);
 	}
 
-	void convert(Poco::DateTime&) const
+	void convert(Poco::DateTime&) const override
 	{
 		throw BadCastException("Struct -> Poco::DateTime");
 	}
 
-	void convert(Poco::LocalDateTime&) const
+	void convert(Poco::LocalDateTime&) const override
 	{
 		throw BadCastException("Struct -> Poco::LocalDateTime");
 	}
 
-	void convert(Poco::Timestamp&) const
+	void convert(Poco::Timestamp&) const override
 	{
 		throw BadCastException("Struct -> Poco::Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -751,42 +745,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return true;
 	}
 
-	bool isOrdered() const
+	bool isOrdered() const override
 	{
 		return true;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
-	std::size_t size() const
+	std::size_t size() const override
 	{
 		return _val.size();
 	}
@@ -810,124 +804,103 @@ template <>
 class VarHolderImpl<Struct<int, Poco::OrderedMap<int, Var>, Poco::OrderedSet<int>>> : public VarHolder
 {
 public:
-	typedef int KeyType;
-	typedef Poco::OrderedMap<KeyType, Var> MapType;
-	typedef Poco::OrderedSet<KeyType> SetType;
-	typedef Struct<KeyType, MapType, SetType> ValueType;
+	using KeyType = int;
+	using MapType = Poco::OrderedMap<KeyType, Var>;
+	using SetType = Poco::OrderedSet<KeyType>;
+	using ValueType = Struct<KeyType, MapType, SetType>;
 
 	VarHolderImpl(const ValueType& val) : _val(val)
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	const std::type_info&type() const override
 	{
 		return typeid(ValueType);
 	}
 
-	void convert(Int8&) const
+	void convert(Int8&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int8");
 	}
 
-	void convert(Int16&) const
+	void convert(Int16&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int16");
 	}
 
-	void convert(Int32&) const
+	void convert(Int32&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int32");
 	}
 
-	void convert(Int64&) const
+	void convert(Int64&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to Int64");
 	}
 
-	void convert(UInt8&) const
+	void convert(UInt8&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt8");
 	}
 
-	void convert(UInt16&) const
+	void convert(UInt16&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt16");
 	}
 
-	void convert(UInt32&) const
+	void convert(UInt32&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt32");
 	}
 
-	void convert(UInt64&) const
+	void convert(UInt64&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to UInt64");
 	}
 
-	void convert(bool&) const
+	void convert(bool&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to bool");
 	}
 
-	void convert(float&) const
+	void convert(float&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to float");
 	}
 
-	void convert(double&) const
+	void convert(double&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to double");
 	}
 
-	void convert(char&) const
+	void convert(char&) const override
 	{
 		throw BadCastException("Cannot cast Struct type to char");
 	}
 
-	void convert(std::string& val) const
+	void convert(std::string& val) const override
 	{
-		val.append("{ ");
-		ValueType::ConstIterator it = _val.begin();
-		ValueType::ConstIterator itEnd = _val.end();
-		if (!_val.empty())
-		{
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-			++it;
-		}
-		for (; it != itEnd; ++it)
-		{
-			val.append(", ");
-			Var key(it->first);
-			Impl::appendJSONKey(val, key);
-			val.append(": ");
-			Impl::appendJSONValue(val, it->second);
-		}
-		val.append(" }");
+		val = structToString(_val);
 	}
 
-	void convert(Poco::DateTime&) const
+	void convert(Poco::DateTime&) const override
 	{
 		throw BadCastException("Struct -> Poco::DateTime");
 	}
 
-	void convert(Poco::LocalDateTime&) const
+	void convert(Poco::LocalDateTime&) const override
 	{
 		throw BadCastException("Struct -> Poco::LocalDateTime");
 	}
 
-	void convert(Poco::Timestamp&) const
+	void convert(Poco::Timestamp&) const override
 	{
 		throw BadCastException("Struct -> Poco::Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder *clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -937,42 +910,42 @@ public:
 		return _val;
 	}
 
-	bool isArray() const
+	bool isArray() const override
 	{
 		return false;
 	}
 
-	bool isStruct() const
+	bool isStruct() const override
 	{
 		return true;
 	}
 
-	bool isOrdered() const
+	bool isOrdered() const override
 	{
 		return true;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
 
-	std::size_t size() const
+	std::size_t size() const override
 	{
 		return _val.size();
 	}
@@ -995,8 +968,8 @@ private:
 } // namespace Dynamic
 
 
-typedef Dynamic::Struct<std::string> DynamicStruct;
-typedef Dynamic::Struct<std::string, Poco::OrderedMap<std::string, Dynamic::Var>, Poco::OrderedSet<std::string>> OrderedDynamicStruct;
+using DynamicStruct = Dynamic::Struct<std::string>;
+using OrderedDynamicStruct = Dynamic::Struct<std::string, Poco::OrderedMap<std::string, Dynamic::Var>, Poco::OrderedSet<std::string>>;
 
 
 } // namespace Poco

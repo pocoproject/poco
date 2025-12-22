@@ -53,7 +53,7 @@ protected:
 	iterator begin() const;
 	iterator end() const;
 
-private:	
+private:
 	StringMap _map;
 };
 

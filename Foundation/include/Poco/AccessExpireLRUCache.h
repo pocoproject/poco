@@ -27,10 +27,10 @@
 namespace Poco {
 
 
-template < 
+template <
 	class TKey,
 	class TValue,
-	class TMutex = FastMutex, 
+	class TMutex = FastMutex,
 	class TEventMutex = FastMutex
 >
 class AccessExpireLRUCache: public AbstractCache<TKey, TValue, StrategyCollection<TKey, TValue>, TMutex, TEventMutex>
@@ -46,13 +46,10 @@ public:
 		this->_strategy.pushBack(new AccessExpireStrategy<TKey, TValue>(expire));
 	}
 
-	~AccessExpireLRUCache()
-	{
-	}
+	~AccessExpireLRUCache() = default;
 
-private:
-	AccessExpireLRUCache(const AccessExpireLRUCache& aCache);
-	AccessExpireLRUCache& operator = (const AccessExpireLRUCache& aCache);
+	AccessExpireLRUCache(const AccessExpireLRUCache& aCache) = delete;
+	AccessExpireLRUCache& operator=(const AccessExpireLRUCache& aCache) = delete;
 };
 
 

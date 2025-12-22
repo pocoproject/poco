@@ -317,6 +317,7 @@ void CodeWriter::writeResponse(std::ostream& ostr)
 	std::string contentType(_page.get("page.contentType", "text/html"));
 	std::string contentLang(_page.get("page.contentLanguage", ""));
 	std::string contentSecurityPolicy(_page.get("page.contentSecurityPolicy", ""));
+	std::string referrerPolicy(_page.get("page.referrerPolicy", ""));
 	std::string cacheControl(_page.get("page.cacheControl", ""));
 	bool buffered(_page.getBool("page.buffered", false));
 	bool chunked(_page.getBool("page.chunked", !buffered));
@@ -338,6 +339,10 @@ void CodeWriter::writeResponse(std::ostream& ostr)
 	if (!contentSecurityPolicy.empty())
 	{
 		ostr << "\tresponse.set(\"Content-Security-Policy\"s, \"" << contentSecurityPolicy << "\"s);\n";
+	}
+	if (!referrerPolicy.empty())
+	{
+		ostr << "\tresponse.set(\"Referrer-Policy\"s, \"" << referrerPolicy << "\"s);\n";
 	}
 	if (compressed)
 	{

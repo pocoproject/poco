@@ -23,7 +23,7 @@ DOMObject::DOMObject(): _rc(1)
 {
 }
 
-	
+
 DOMObject::~DOMObject()
 {
 }

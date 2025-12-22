@@ -5,7 +5,7 @@
 #
 
 .PHONY: projects
-clean all: projects
+clean distclean all: projects
 projects:
 	$(MAKE) -C Binding $(MAKECMDGOALS)
 	$(MAKE) -C TypeHandler $(MAKECMDGOALS)
@@ -13,3 +13,4 @@ projects:
 	$(MAKE) -C RowFormatter $(MAKECMDGOALS)
 	$(MAKE) -C Tuple $(MAKECMDGOALS)
 	$(MAKE) -C WebNotifier $(MAKECMDGOALS)
+	$(MAKE) -C DBLogger $(MAKECMDGOALS)

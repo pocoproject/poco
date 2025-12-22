@@ -31,6 +31,7 @@ public:
 	void testMatch4();
 	void testMatch5();
 	void testMatch6();
+	void testMatchDateTime();
 	void testExtract();
 	void testSplit1();
 	void testSplit2();
@@ -38,7 +39,9 @@ public:
 	void testSubst2();
 	void testSubst3();
 	void testSubst4();
+	void testSubst5();
 	void testError();
+	void testGroup();
 
 	void setUp();
 	void tearDown();

@@ -33,7 +33,7 @@ template <typename T>
 class LOBStreamBuf: public BasicUnbufferedStreamBuf<T, std::char_traits<T>>
 	/// This is the streambuf class used for reading from and writing to a LOB.
 {
-public:	
+public:
 	LOBStreamBuf(LOB<T>& lob): _lob(lob), _it(_lob.begin())
 		/// Creates LOBStreamBuf.
 	{

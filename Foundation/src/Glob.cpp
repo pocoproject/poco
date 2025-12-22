@@ -42,7 +42,7 @@ bool Glob::match(const std::string& subject)
 	TextIterator endp(_pattern);
 	TextIterator its(subject, utf8);
 	TextIterator ends(subject);
-	
+
 	if ((_options & GLOB_DOT_SPECIAL) && its != ends && *its == '.' && (*itp == '?' || *itp == '*'))
 		return false;
 	else
@@ -118,7 +118,7 @@ bool Glob::match(TextIterator& itp, const TextIterator& endp, TextIterator& its,
 			}
 			return true;
 		case '[':
-			if (++itp != endp) 
+			if (++itp != endp)
 			{
 				bool invert = *itp == '!';
 				if (invert) ++itp;
@@ -165,7 +165,7 @@ bool Glob::matchSet(TextIterator& itp, const TextIterator& endp, int c)
 		switch (*itp)
 		{
 		case ']':
-			++itp; 
+			++itp;
 			return false;
 		case '\\':
 			if (++itp == endp) throw SyntaxException("backslash must be followed by character in glob pattern");

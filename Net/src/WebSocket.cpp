@@ -30,6 +30,9 @@
 #include <sstream>
 
 
+using namespace std::string_literals;
+
+
 namespace Poco {
 namespace Net {
 
@@ -65,6 +68,30 @@ WebSocket::WebSocket(const Socket& socket):
 }
 
 
+#ifdef POCO_NEW_STATE_ON_MOVE
+
+WebSocket::WebSocket(Socket&& socket):
+	StreamSocket(std::move(socket))
+{
+	if (!dynamic_cast<WebSocketImpl*>(impl()))
+		throw InvalidArgumentException("Cannot assign incompatible socket");
+}
+
+
+WebSocket::WebSocket(WebSocket&& socket):
+	StreamSocket(std::move(socket))
+{
+}
+
+#endif // POCO_NEW_STATE_ON_MOVE
+
+
+WebSocket::WebSocket(const WebSocket& socket):
+	StreamSocket(socket)
+{
+}
+
+
 WebSocket::~WebSocket()
 {
 }
@@ -80,20 +107,48 @@ WebSocket& WebSocket::operator = (const Socket& socket)
 }
 
 
-void WebSocket::shutdown()
+#ifdef POCO_NEW_STATE_ON_MOVE
+
+WebSocket& WebSocket::operator = (Socket&& socket)
 {
-	shutdown(WS_NORMAL_CLOSE);
+	if (dynamic_cast<WebSocketImpl*>(socket.impl()))
+		Socket::operator = (std::move(socket));
+	else
+		throw InvalidArgumentException("Cannot assign incompatible socket");
+	return *this;
 }
 
 
-void WebSocket::shutdown(Poco::UInt16 statusCode, const std::string& statusMessage)
+WebSocket& WebSocket::operator = (WebSocket&& socket)
+{
+	Socket::operator = (std::move(socket));
+	return *this;
+}
+
+#endif // POCO_NEW_STATE_ON_MOVE
+
+
+WebSocket& WebSocket::operator = (const WebSocket& socket)
+{
+	Socket::operator = (socket);
+	return *this;
+}
+
+
+int WebSocket::shutdown()
+{
+	return shutdown(WS_NORMAL_CLOSE);
+}
+
+
+int WebSocket::shutdown(Poco::UInt16 statusCode, const std::string& statusMessage)
 {
 	Poco::Buffer<char> buffer(statusMessage.size() + 2);
 	Poco::MemoryOutputStream ostr(buffer.begin(), buffer.size());
 	Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::NETWORK_BYTE_ORDER);
 	writer << statusCode;
 	writer.writeRaw(statusMessage);
-	sendFrame(buffer.begin(), static_cast<int>(ostr.charsWritten()), FRAME_FLAG_FIN | FRAME_OP_CLOSE);
+	return sendFrame(buffer.begin(), static_cast<int>(ostr.charsWritten()), static_cast<int>(FRAME_FLAG_FIN) | static_cast<int>(FRAME_OP_CLOSE));
 }
 
 
@@ -140,19 +195,19 @@ int WebSocket::getMaxPayloadSize() const
 
 WebSocketImpl* WebSocket::accept(HTTPServerRequest& request, HTTPServerResponse& response)
 {
-	if (request.hasToken("Connection", "upgrade") && icompare(request.get("Upgrade", ""), "websocket") == 0)
+	if (request.hasToken("Connection"s, "upgrade"s) && icompare(request.get("Upgrade"s, ""s), "websocket"s) == 0)
 	{
-		std::string version = request.get("Sec-WebSocket-Version", "");
+		std::string version = request.get("Sec-WebSocket-Version"s, ""s);
 		if (version.empty()) throw WebSocketException("Missing Sec-WebSocket-Version in handshake request", WS_ERR_HANDSHAKE_NO_VERSION);
 		if (version != WEBSOCKET_VERSION) throw WebSocketException("Unsupported WebSocket version requested", version, WS_ERR_HANDSHAKE_UNSUPPORTED_VERSION);
-		std::string key = request.get("Sec-WebSocket-Key", "");
+		std::string key = request.get("Sec-WebSocket-Key"s, ""s);
 		Poco::trimInPlace(key);
 		if (key.empty()) throw WebSocketException("Missing Sec-WebSocket-Key in handshake request", WS_ERR_HANDSHAKE_NO_KEY);
 
 		response.setStatusAndReason(HTTPResponse::HTTP_SWITCHING_PROTOCOLS);
-		response.set("Upgrade", "websocket");
-		response.set("Connection", "Upgrade");
-		response.set("Sec-WebSocket-Accept", computeAccept(key));
+		response.set("Upgrade"s, "websocket"s);
+		response.set("Connection"s, "Upgrade"s);
+		response.set("Sec-WebSocket-Accept"s, computeAccept(key));
 		response.setContentLength(HTTPResponse::UNKNOWN_CONTENT_LENGTH);
 		response.send().flush();
 
@@ -170,10 +225,10 @@ WebSocketImpl* WebSocket::connect(HTTPClientSession& cs, HTTPRequest& request, H
 		cs.proxyTunnel();
 	}
 	std::string key = createKey();
-	request.set("Connection", "Upgrade");
-	request.set("Upgrade", "websocket");
-	request.set("Sec-WebSocket-Version", WEBSOCKET_VERSION);
-	request.set("Sec-WebSocket-Key", key);
+	request.set("Connection"s, "Upgrade"s);
+	request.set("Upgrade"s, "websocket"s);
+	request.set("Sec-WebSocket-Version"s, WEBSOCKET_VERSION);
+	request.set("Sec-WebSocket-Key"s, key);
 	request.setChunkedTransferEncoding(false);
 	cs.setKeepAlive(true);
 	cs.sendRequest(request);
@@ -220,13 +275,13 @@ WebSocketImpl* WebSocket::connect(HTTPClientSession& cs, HTTPRequest& request, H
 
 WebSocketImpl* WebSocket::completeHandshake(HTTPClientSession& cs, HTTPResponse& response, const std::string& key)
 {
-	std::string connection = response.get("Connection", "");
-	if (Poco::icompare(connection, "Upgrade") != 0)
+	std::string connection = response.get("Connection"s, ""s);
+	if (Poco::icompare(connection, "Upgrade"s) != 0)
 		throw WebSocketException("No Connection: Upgrade header in handshake response", WS_ERR_NO_HANDSHAKE);
-	std::string upgrade = response.get("Upgrade", "");
-	if (Poco::icompare(upgrade, "websocket") != 0)
+	std::string upgrade = response.get("Upgrade"s, ""s);
+	if (Poco::icompare(upgrade, "websocket"s) != 0)
 		throw WebSocketException("No Upgrade: websocket header in handshake response", WS_ERR_NO_HANDSHAKE);
-	std::string accept = response.get("Sec-WebSocket-Accept", "");
+	std::string accept = response.get("Sec-WebSocket-Accept"s, ""s);
 	if (accept != computeAccept(key))
 		throw WebSocketException("Invalid or missing Sec-WebSocket-Accept header in handshake response", WS_ERR_HANDSHAKE_ACCEPT);
 	return new WebSocketImpl(static_cast<StreamSocketImpl*>(cs.detachSocket().impl()), cs, true);

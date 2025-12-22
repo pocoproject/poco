@@ -32,7 +32,7 @@ RowFilter::RowFilter(RecordSet* pRecordSet): _pRecordSet(pRecordSet), _not(false
 }
 
 
-RowFilter::RowFilter(Ptr pParent, LogicOperator op): _pRecordSet(0),
+RowFilter::RowFilter(Ptr pParent, LogicOperator op): _pRecordSet(nullptr),
 	_pParent(pParent),
 	_not(false)
 {
@@ -61,7 +61,7 @@ RowFilter::~RowFilter()
 {
 	try
 	{
-		if (_pRecordSet) _pRecordSet->filter(0);
+		if (_pRecordSet) _pRecordSet->filter(nullptr);
 		if (_pParent && _pParent->has(this))
 			_pParent->removeFilter(this);
 		release();
@@ -77,7 +77,7 @@ bool RowFilter::isAllowed(std::size_t row) const
 {
 	Poco::Dynamic::Var retVal;
 	const RecordSet& rs = recordSet();
-	
+
 	std::size_t columns = rs.columnCount();
 	ComparisonMap::const_iterator it = _comparisonMap.begin();
 	ComparisonMap::const_iterator end = _comparisonMap.end();
@@ -89,7 +89,7 @@ bool RowFilter::isAllowed(std::size_t row) const
 			if (_comparisonMap.find(name) == _comparisonMap.end()) continue;
 
 			Poco::Dynamic::Var ret;
-			CompT compOp = 0;
+			CompT compOp = nullptr;
 			Poco::Dynamic::Var val = rs.value(col, row, false);
 
 			switch (it->second.get<1>())
@@ -111,7 +111,7 @@ bool RowFilter::isAllowed(std::size_t row) const
 			default:
 				throw IllegalStateException("Unsupported comparison criteria.");
 			}
-			
+
 			doCompare(ret, val, compOp, it->second);
 			if (retVal.isEmpty()) retVal = ret;
 			else retVal = retVal || ret;
@@ -180,8 +180,8 @@ void RowFilter::removeFilter(Ptr pFilter)
 
 	_pRecordSet->moveFirst();
 	_filterMap.erase(pFilter);
-	pFilter->_pRecordSet = 0;
-	pFilter->_pParent = 0;
+	pFilter->_pRecordSet = nullptr;
+	pFilter->_pParent = nullptr;
 }
 
 
@@ -212,7 +212,7 @@ RecordSet& RowFilter::recordSet() const
 			_pRecordSet = pParent->_pRecordSet;
 	}
 	poco_check_ptr (_pRecordSet);
-	return *_pRecordSet; 
+	return *_pRecordSet;
 }
 
 

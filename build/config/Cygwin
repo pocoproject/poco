@@ -21,7 +21,7 @@ RANLIB  = ranlib
 SHLIB   = $(CXX) -shared -o $@
 SHLIBLN = $(POCO_BASE)/build/script/shlibln
 STRIP   =
-DEP     = $(POCO_BASE)/build/script/makedepend.gcc 
+DEP     = $(POCO_BASE)/build/script/makedepend.gcc
 SHELL   = sh
 RM      = rm -rf
 CP      = cp
@@ -41,30 +41,30 @@ IMPLIBLINKEXT    = .dll.a
 #
 # Compiler and Linker Flags
 #
-CFLAGS          = 
-CFLAGS32        = 
-CFLAGS64        = 
+CFLAGS          =
+CFLAGS32        =
+CFLAGS64        =
 CXXFLAGS        = -Wa,-mbig-obj -DPOCO_NO_FPENVIRONMENT -DPOCO_NO_WSTRING
 CXXFLAGS32      =
 CXXFLAGS64      = -Wa,-mbig-obj
 SHLIBFLAGS      = -Wl,--out-implib=$(dir $@)$(subst cyg,lib,$(notdir $@)).a -Wl,--export-all-symbols -Wl,--enable-auto-import
-SHLIBFLAGS32    = 
-SHLIBFLAGS64    = 
-LINKFLAGS       = 
-LINKFLAGS32     = 
-LINKFLAGS64     = 
-STATICOPT_CC    = 
-STATICOPT_CXX   = 
+SHLIBFLAGS32    =
+SHLIBFLAGS64    =
+LINKFLAGS       =
+LINKFLAGS32     =
+LINKFLAGS64     =
+STATICOPT_CC    =
+STATICOPT_CXX   =
 STATICOPT_LINK  = -static
-SHAREDOPT_CC    = 
-SHAREDOPT_CXX   = 
-SHAREDOPT_LINK  = 
+SHAREDOPT_CC    =
+SHAREDOPT_CXX   =
+SHAREDOPT_LINK  =
 DEBUGOPT_CC     = -g -D_DEBUG
 DEBUGOPT_CXX    = -g -D_DEBUG
 DEBUGOPT_LINK   = -g
 RELEASEOPT_CC   = -DNDEBUG
 RELEASEOPT_CXX  = -DNDEBUG
-RELEASEOPT_LINK = 
+RELEASEOPT_LINK =
 
 #
 # System Specific Flags
@@ -75,9 +75,9 @@ SYSFLAGS = -D_GNU_SOURCE
 #
 # System Specific Libraries
 #
-SYSLIBS  = 
+SYSLIBS  =
 
-# commented out until OSARCH_POSTFIX be fixed 
+# commented out until OSARCH_POSTFIX be fixed
 #ifeq ($(findstring x86_64,$(shell uname -m)),x86_64)
 #    OSARCH_64BITS = 1
 #else

@@ -27,11 +27,11 @@ namespace Dynamic {
 const std::size_t VarIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
 
 
-VarIterator::VarIterator(Var* pVar, bool positionEnd): 
+VarIterator::VarIterator(Var* pVar, bool positionEnd):
 	_pVar(pVar),
 	_position(positionEnd ? POSITION_END : 0)
 {
-    if (!_pVar || _pVar->isEmpty()) throw InvalidAccessException("Cannot create iterator on empty Var");
+	if (!_pVar || _pVar->isEmpty()) throw InvalidAccessException("Cannot create iterator on empty Var");
 }
 
 
@@ -73,7 +73,7 @@ VarIterator& VarIterator::operator = (VarIterator&& other) noexcept
 void VarIterator::swap(VarIterator& other)
 {
 	using std::swap;
-	
+
 	swap(_pVar, other._pVar);
 	swap(_position, other._position);
 }
@@ -83,8 +83,7 @@ void VarIterator::increment() const
 {
 	if (POSITION_END == _position)
 		throw RangeException("End of iterator reached.");
-
-	if (_position < _pVar->size() - 1)
+	else if (_position < _pVar->size() - 1)
 		++_position;
 	else
 		_position = POSITION_END;

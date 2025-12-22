@@ -61,6 +61,7 @@ public:
 
 	static PIDImpl idImpl();
 	static void timesImpl(long& userTime, long& kernelTime);
+	static void timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kernelTime);
 	static ProcessHandleImpl* launchImpl(
 		const std::string& command,
 		const ArgsImpl& args,
@@ -68,7 +69,8 @@ public:
 		Pipe* inPipe,
 		Pipe* outPipe,
 		Pipe* errPipe,
-		const EnvImpl& env);
+		const EnvImpl& env,
+		int options = 0);
 	static void killImpl(ProcessHandleImpl& handle);
 	static void killImpl(PIDImpl pid);
 	static bool isRunningImpl(const ProcessHandleImpl& handle);

@@ -14,7 +14,6 @@
 
 #include "Poco/Data/MySQL/SessionHandle.h"
 #include "Poco/Data/DataException.h"
-#include "Poco/SingletonHolder.h"
 #ifdef POCO_OS_FAMILY_UNIX
 #include <pthread.h>
 #endif
@@ -51,7 +50,8 @@ public:
 
 	static ThreadCleanupHelper& instance()
 	{
-		return *_sh.get();
+		static ThreadCleanupHelper tch;
+		return tch;
 	}
 
 	static void cleanup(void* data)
@@ -61,15 +61,13 @@ public:
 
 private:
 	pthread_key_t _key;
-	static Poco::SingletonHolder<ThreadCleanupHelper> _sh;
 };
 
 
-Poco::SingletonHolder<ThreadCleanupHelper> ThreadCleanupHelper::_sh;
 #endif
 
 
-SessionHandle::SessionHandle(MYSQL* mysql): _pHandle(0)
+SessionHandle::SessionHandle(MYSQL* mysql): _pHandle(nullptr)
 {
 	init(mysql);
 #ifdef POCO_OS_FAMILY_UNIX
@@ -97,7 +95,7 @@ SessionHandle::~SessionHandle()
 
 void SessionHandle::options(mysql_option opt)
 {
-	if (mysql_options(_pHandle, opt, 0) != 0)
+	if (mysql_options(_pHandle, opt, nullptr) != 0)
 		throw ConnectionException("mysql_options error", _pHandle);
 }
 
@@ -132,7 +130,7 @@ void SessionHandle::options(mysql_option opt, unsigned int i)
 void SessionHandle::connect(const char* host, const char* user, const char* password, const char* db, unsigned int port)
 {
 #ifdef HAVE_MYSQL_REAL_CONNECT
-	if (!mysql_real_connect(_pHandle, host, user, password, db, port, 0, 0))
+	if (!mysql_real_connect(_pHandle, host, user, password, db, port, nullptr, 0))
 		throw ConnectionFailedException(mysql_error(_pHandle));
 #else
 	if (!mysql_connect(_pHandle, host, user, password))
@@ -146,21 +144,21 @@ void SessionHandle::close()
 	if (_pHandle)
 	{
 		mysql_close(_pHandle);
-		_pHandle = 0;
+		_pHandle = nullptr;
 	}
 }
 
 
 void SessionHandle::startTransaction()
 {
-	int rc = mysql_autocommit(_pHandle, false);
+	int rc = mysql_query(_pHandle, "BEGIN");
 	if (rc != 0)
 	{
 		// retry if connection lost
 		int err = mysql_errno(_pHandle);
 		if (err == 2006 /* CR_SERVER_GONE_ERROR */ || err == 2013 /* CR_SERVER_LOST */)
 		{
-			rc = mysql_autocommit(_pHandle, false);
+			rc = mysql_query(_pHandle, "BEGIN");
 		}
 	}
 	if (rc != 0) throw TransactionException("Start transaction failed.", _pHandle);
@@ -178,6 +176,13 @@ void SessionHandle::rollback()
 {
 	if (mysql_rollback(_pHandle) != 0)
 		throw TransactionException("Rollback failed.", _pHandle);
+}
+
+
+void SessionHandle::autoCommit(bool val)
+{
+	if (mysql_autocommit(_pHandle, val) != 0)
+		throw TransactionException("Setting autocommit mode failed.", _pHandle);
 }
 
 

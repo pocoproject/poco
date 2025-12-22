@@ -56,7 +56,7 @@ class Util_API OptionProcessor
 	/// In Unix mode, the option prefix is a dash '-'. A dash must be followed
 	/// by a short option name, or another dash, followed by a (partial)
 	/// long option name.
-	/// In default mode, the option prefix is a slash '/', followed by 
+	/// In default mode, the option prefix is a slash '/', followed by
 	/// a (partial) long option name.
 	/// If the special option '--' is encountered in Unix mode, all following
 	/// options are ignored.
@@ -64,7 +64,7 @@ class Util_API OptionProcessor
 	/// Option arguments can be specified in three ways. If a Unix short option
 	/// ("-o") is given, the argument directly follows the option name, without
 	/// any delimiting character or space ("-ovalue"). In default option mode, or if a
-	/// Unix long option ("--option") is given, the option argument is 
+	/// Unix long option ("--option") is given, the option argument is
 	/// delimited from the option name with either an equal sign ('=') or
 	/// a colon (':'), as in "--option=value" or "/option:value". Finally,
 	/// a required option argument can be specified on the command line after the
@@ -97,7 +97,7 @@ public:
 		/// Examines and processes the given command line argument.
 		///
 		/// If the argument begins with an option prefix, the option is processed
-		/// and true is returned. The full option name is stored in optionName and the 
+		/// and true is returned. The full option name is stored in optionName and the
 		/// option argument, if present, is stored in optionArg.
 		///
 		/// If the option does not begin with an option prefix, false is returned.
@@ -112,7 +112,7 @@ private:
 	bool processUnix(const std::string& argument, std::string& optionName, std::string& optionArg);
 	bool processDefault(const std::string& argument, std::string& optionName, std::string& optionArg);
 	bool processCommon(const std::string& option, bool isShort, std::string& optionName, std::string& optionArg);
-	
+
 	const OptionSet& _options;
 	bool _unixStyle;
 	bool _ignore;

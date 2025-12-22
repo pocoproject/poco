@@ -84,6 +84,8 @@ HTTPRequest::HTTPRequest(const HTTPRequest& other):
 
 HTTPRequest::~HTTPRequest()
 {
+	secureErase(AUTHORIZATION);
+	secureErase(PROXY_AUTHORIZATION);
 }
 
 
@@ -194,7 +196,7 @@ void HTTPRequest::setCredentials(const std::string& scheme, const std::string& a
 
 void HTTPRequest::removeCredentials()
 {
-	erase(AUTHORIZATION);
+	secureErase(AUTHORIZATION);
 }
 
 
@@ -218,7 +220,7 @@ void HTTPRequest::setProxyCredentials(const std::string& scheme, const std::stri
 
 void HTTPRequest::removeProxyCredentials()
 {
-	erase(PROXY_AUTHORIZATION);
+	secureErase(PROXY_AUTHORIZATION);
 }
 
 

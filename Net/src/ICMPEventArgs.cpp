@@ -31,11 +31,11 @@ namespace Net {
 
 
 ICMPEventArgs::ICMPEventArgs(const SocketAddress& address, int repetitions, int dataSize, int ttl):
-	_address(address), 
+	_address(address),
 	_sent(0),
-	_dataSize(dataSize), 
-	_ttl(ttl), 
-	_rtt(repetitions, 0), 
+	_dataSize(dataSize),
+	_ttl(ttl),
+	_rtt(repetitions, -1),
 	_errors(repetitions)
 {
 }
@@ -52,10 +52,10 @@ std::string ICMPEventArgs::hostName() const
 	{
 		return DNS::resolve(_address.host().toString()).name();
 	}
-	catch (HostNotFoundException&) 
+	catch (HostNotFoundException&)
 	{
 	}
-	catch (NoAddressFoundException&) 
+	catch (NoAddressFoundException&)
 	{
 	}
 	catch (DNSException&)
@@ -77,7 +77,7 @@ std::string ICMPEventArgs::hostAddress() const
 void ICMPEventArgs::setRepetitions(int repetitions)
 {
 	_rtt.clear();
-	_rtt.resize(repetitions, 0);
+	_rtt.resize(repetitions, -1);
 	_errors.assign(repetitions, "");
 }
 
@@ -101,9 +101,9 @@ int ICMPEventArgs::received() const
 {
 	int received = 0;
 
-	for (int i = 0; i < _rtt.size(); ++i) 
+	for (const auto& r : _rtt)
 	{
-		if (_rtt[i]) ++received;
+		if (r != -1) ++received;
 	}
 	return received;
 }
@@ -111,7 +111,7 @@ int ICMPEventArgs::received() const
 
 void ICMPEventArgs::setError(int index, const std::string& text)
 {
-	if (index >= _errors.size()) 
+	if (index >= _errors.size())
 		throw InvalidArgumentException("Supplied index exceeds vector capacity.");
 
 	_errors[index] = text;
@@ -120,7 +120,7 @@ void ICMPEventArgs::setError(int index, const std::string& text)
 
 const std::string& ICMPEventArgs::error(int index) const
 {
-	if (0 == _errors.size()) 
+	if (0 == _errors.size())
 		throw InvalidArgumentException("Supplied index exceeds vector capacity.");
 
 	if (-1 == index) index = _sent - 1;
@@ -131,29 +131,38 @@ const std::string& ICMPEventArgs::error(int index) const
 
 void ICMPEventArgs::setReplyTime(int index, int time)
 {
-	if (index >= _rtt.size()) 
+	if (index >= _rtt.size())
 		throw InvalidArgumentException("Supplied index exceeds array capacity.");
-	if (0 == time) time = 1;
 	_rtt[index] = time;
 }
 
 
 int ICMPEventArgs::replyTime(int index) const
 {
-	if (0 == _rtt.size()) 
+	if (0 == _rtt.size())
 		throw InvalidArgumentException("Supplied index exceeds array capacity.");
 
 	if (-1 == index) index = _sent - 1;
-
-	return _rtt[index];
+	poco_assert (index < _rtt.size());
+	int ret = _rtt[index];
+	return (ret < 0) ? 0 : ret;
 }
 
 
 int ICMPEventArgs::avgRTT() const
 {
 	if (0 == _rtt.size()) return 0;
-	
-	return (int) (std::accumulate(_rtt.begin(), _rtt.end(), 0) / _rtt.size());
+
+	int avg = 0, cnt = 0;
+	for (const auto& r : _rtt)
+	{
+		if (r != -1)
+		{
+			avg += r;
+			++cnt;
+		}
+	}
+	return cnt ? static_cast<int>(avg/cnt) : 0;
 }
 
 
@@ -162,6 +171,30 @@ float ICMPEventArgs::percent() const
 	if (0 == _rtt.size()) return 0;
 
 	return ((float) received() / (float) _rtt.size()) * (float) 100.0;
+}
+
+
+int ICMPEventArgs::minRTT() const
+{
+	int min = 0;
+	for (const auto& r : _rtt)
+	{
+		if (r != -1 && (r < min || min == 0))
+			min = r;
+	}
+	return min;
+}
+
+
+int ICMPEventArgs::maxRTT() const
+{
+	int max = 0;
+	for (const auto& r : _rtt)
+	{
+		if (r != -1 && r > max)
+			max = r;
+	}
+	return max;
 }
 
 

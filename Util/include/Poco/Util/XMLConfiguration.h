@@ -41,9 +41,9 @@ class Util_API XMLConfiguration: public AbstractConfiguration
 	/// from an XML document. An XPath-like syntax for property
 	/// names is supported to allow full access to the XML document.
 	/// XML namespaces are not supported. The name of the root element
-	/// of the XML document is not significant and ignored. 
+	/// of the XML document is not significant and ignored.
 	/// Periods in tag names are not supported.
-	/// 
+	///
 	/// Given the following XML document as an example:
 	///
 	///     <config>
@@ -120,7 +120,7 @@ public:
 	XMLConfiguration(const Poco::XML::Document* pDocument, char delim);
 		/// Creates the XMLConfiguration using the given XML document.
 		/// Uses the given delimiter char instead of the default '.'.
-		
+
 	XMLConfiguration(const Poco::XML::Node* pNode);
 		/// Creates the XMLConfiguration using the given XML node.
 
@@ -134,18 +134,18 @@ public:
 
 	void load(Poco::XML::InputSource* pInputSource, unsigned long namePoolSize);
 		/// Loads the XML document containing the configuration data
-		/// from the given InputSource. Uses the give namePoolSize (which 
+		/// from the given InputSource. Uses the give namePoolSize (which
 		/// should be a suitable prime like 251, 509, 1021, 4093) for the
 		/// internal DOM Document's name pool.
 
 	void load(std::istream& istr);
 		/// Loads the XML document containing the configuration data
 		/// from the given stream.
-		
+
 	void load(const std::string& path);
 		/// Loads the XML document containing the configuration data
 		/// from the given file.
-		
+
 	void load(const Poco::XML::Document* pDocument);
 		/// Loads the XML document containing the configuration data
 		/// from the given XML document.
@@ -153,11 +153,11 @@ public:
 	void load(const Poco::XML::Node* pNode);
 		/// Loads the XML document containing the configuration data
 		/// from the given XML node.
-	
+
 	void loadEmpty(const std::string& rootElementName);
 		/// Loads an empty XML document containing only the
 		/// root element with the given name.
-		
+
 	void save(const std::string& path) const;
 		/// Writes the XML document containing the configuration data
 		/// to the file given by path.

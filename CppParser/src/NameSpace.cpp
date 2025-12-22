@@ -50,6 +50,7 @@ void NameSpace::addSymbol(Symbol* pSymbol)
 {
 	poco_check_ptr (pSymbol);
 	
+	pSymbol->setOrder(_symbols.size());
 	_symbols.insert(SymbolTable::value_type(pSymbol->name(), pSymbol));
 }
 
@@ -93,13 +94,14 @@ Symbol* NameSpace::lookup(const std::string& name) const
 
 Symbol* NameSpace::lookup(const std::string& name, std::set<const NameSpace*>& alreadyVisited) const
 {
-	Symbol* pSymbol = 0;
+	Symbol* pSymbol = nullptr;
 	
 	if (name.empty())
 		return pSymbol;
 
 	if (alreadyVisited.find(this) != alreadyVisited.end())
-			return pSymbol;
+		return pSymbol;
+	
 	std::string head;
 	std::string tail;
 	splitName(name, head, tail);
@@ -107,7 +109,6 @@ Symbol* NameSpace::lookup(const std::string& name, std::set<const NameSpace*>& a
 	alreadyVisited.insert(this);
 	bool currentNSInserted = true;
 
-	
 	if (head.empty()) 
 	{
 		alreadyVisited.insert(this);
@@ -124,7 +125,7 @@ Symbol* NameSpace::lookup(const std::string& name, std::set<const NameSpace*>& a
 			if (pNS)
 				pSymbol = static_cast<NameSpace*>(pSymbol)->lookup(tail, alreadyVisited);
 			else
-				pSymbol = 0;
+				pSymbol = nullptr;
 		}
 	}
 	else if (tail.empty())

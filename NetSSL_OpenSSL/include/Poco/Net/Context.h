@@ -126,9 +126,34 @@ public:
 		PROTO_TLSV1_3 = 0x20
 	};
 
+	enum SecurityLevel
+	{
+		SECURITY_LEVEL_NONE     = 0,
+		SECURITY_LEVEL_80_BITS  = 1,
+		SECURITY_LEVEL_112_BITS = 2,
+		SECURITY_LEVEL_128_BITS = 3,
+		SECURITY_LEVEL_192_BITS = 4,
+		SECURITY_LEVEL_256_BITS = 5
+	};
+
+	enum KeyDHGroup
+	{
+		// MODP
+		//KEY_DH_GROUP_768  = 1,  // (768-bit)
+		KEY_DH_GROUP_1024 = 2,  // (1024-bit)
+		//KEY_DH_GROUP_1536 = 5,  // (1536-bit)
+		KEY_DH_GROUP_2048 = 14, // (2048-bit)
+		//KEY_DH_GROUP_3072 = 15, // (3072-bit)
+
+		// ECP
+		//KEY_DH_GROUP_256 = 19, // (256-bit random)
+		//KEY_DH_GROUP_384 = 20, // (384-bit random)
+		//KEY_DH_GROUP_521 = 21  // (521-bit random)
+	};
+
 	struct NetSSL_API Params
 	{
-		Params();
+		Params(KeyDHGroup dhBits = KEY_DH_GROUP_2048);
 			/// Initializes the struct with default values.
 
 		std::string privateKeyFile;
@@ -166,12 +191,21 @@ public:
 		std::string cipherList;
 			/// Specifies the supported ciphers in OpenSSL notation.
 			/// Defaults to "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH".
+			/// Note: The cipher list only applies for TLS 1.2 and 
+			/// earlier versions. To configure TLS 1.3 cipher suites, 
+			/// please use the cipherSuites member variable.
+
+		std::string cipherSuites;
+			/// Specifies the supported TLS 1.3 cipher suites.
+			/// If left empty, the OpenSSL default cipher suites
+			/// are used. Please refer to the OpenSSL documentation
+			/// for available cipher suite names.
 
 		std::string dhParamsFile;
 			/// Specifies a file containing Diffie-Hellman parameters.
 			/// If empty, the default parameters are used.
 
-		bool dhUse2048Bits;
+		KeyDHGroup dhGroup;
 			/// If set to true, will use 2048-bit MODP Group with 256-bit
 			/// prime order subgroup (RFC5114) instead of 1024-bit for DH.
 
@@ -193,6 +227,11 @@ public:
 			///   and other TLSv1.3 ephemeral key negotiation, based
 			///   on the group names defined by OpenSSL. Defaults to
 			///   "X448:X25519:ffdhe4096:ffdhe3072:ffdhe2048:ffdhe6144:ffdhe8192:P-521:P-384:P-256"
+
+		SecurityLevel securityLevel;
+			/// Defines minimal number of security bits allowed.
+			/// Requires OpenSSL >= 1.1 to be effective.
+
 	};
 
 	using InvalidCertificateHandlerPtr = Poco::SharedPtr<InvalidCertificateHandler>;
@@ -274,6 +313,7 @@ public:
 	void addCertificateAuthority(const Poco::Crypto::X509Certificate& certificate);
 		/// Add one trusted certification authority to be used by the Context.
 
+	//POCO_DEPRECATED("")
 	void usePrivateKey(const Poco::Crypto::RSAKey& key);
 		/// Sets the private key to be used by the Context.
 		///
@@ -420,11 +460,29 @@ public:
 		/// Returns the InvalidCertificateHandler set for this Context,
 		/// or a null pointer if none has been set.
 
+	void setSecurityLevel(SecurityLevel level);
+		/// Sets the security level.
+
+	void ignoreUnexpectedEof(bool flag = true);
+		/// Enable or disable SSL/TLS SSL_OP_IGNORE_UNEXPECTED_EOF
+		///
+		/// Some TLS implementations do not send the mandatory close_notify alert on shutdown.
+		/// If the application tries to wait for the close_notify alert
+		/// but the peer closes the connection without sending it, an error is generated.
+		/// When this option is enabled the peer does not need to send the close_notify alert
+		/// and a closed connection will be treated as if the close_notify alert was received.
+
+	void setQuietShutdown(bool flag = true);
+		/// Normally, when an SSL connection is finished, the parties must send out close_notify alert messages for a clean shutdown.
+		/// When setting the "quiet shutdown" flag to true, the SecureSocketImpl::shutdown() will set the SSL shutdown flags,
+		/// but no close_notify alert is sent to the peer. This behaviour violates the TLS standard.
+		/// The default is a normal shutdown behaviour as described by the TLS standard.
+
 private:
 	void init(const Params& params);
 		/// Initializes the Context with the given parameters.
 
-	void initDH(bool use2048Bits, const std::string& dhFile);
+	void initDH(KeyDHGroup keyDHGroup, const std::string& dhFile);
 		/// Initializes the Context with Diffie-Hellman parameters.
 
 	void initECDH(const std::string& curve);

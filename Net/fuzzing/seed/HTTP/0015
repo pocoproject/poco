@@ -1,0 +1,4 @@
+GET http://example.com/ HTTP/1.1
+Host: example.com
+Proxy-Authorization: NTLM TlRMTVNTUAABAAAAB4IIogAAAAAAAAAAAAAAAAAAAAAGAbEdAAAADw==
+

@@ -32,6 +32,7 @@ ECTest::~ECTest()
 {
 }
 
+#if defined(POCO_TEST_DEPRECATED)
 
 void ECTest::testECNewKeys()
 {
@@ -176,6 +177,7 @@ void ECTest::testECDSASignManipulated()
 	}
 }
 
+#endif
 
 void ECTest::setUp()
 {
@@ -191,10 +193,13 @@ CppUnit::Test* ECTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ECTest");
 
+#if defined(POCO_TEST_DEPRECATED)
+
 	CppUnit_addTest(pSuite, ECTest, testECNewKeys);
 	CppUnit_addTest(pSuite, ECTest, testECNewKeysNoPassphrase);
 	CppUnit_addTest(pSuite, ECTest, testECDSASignSha256);
 	CppUnit_addTest(pSuite, ECTest, testECDSASignManipulated);
 
+#endif
 	return pSuite;
 }

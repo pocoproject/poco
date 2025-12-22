@@ -12,6 +12,7 @@
 #include "LoggerTest.h"
 #include "ChannelTest.h"
 #include "PatternFormatterTest.h"
+#include "JSONFormatterTest.h"
 #include "FileChannelTest.h"
 #include "SimpleFileChannelTest.h"
 #include "LoggingFactoryTest.h"
@@ -26,6 +27,7 @@ CppUnit::Test* LoggingTestSuite::suite()
 	pSuite->addTest(LoggerTest::suite());
 	pSuite->addTest(ChannelTest::suite());
 	pSuite->addTest(PatternFormatterTest::suite());
+	pSuite->addTest(JSONFormatterTest::suite());
 	pSuite->addTest(FileChannelTest::suite());
 	pSuite->addTest(SimpleFileChannelTest::suite());
 	pSuite->addTest(LoggingFactoryTest::suite());

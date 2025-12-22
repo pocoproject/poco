@@ -23,6 +23,7 @@
 #include <unistd.h>
 #include <vector>
 #include <map>
+#include <atomic>
 
 
 namespace Poco {
@@ -35,26 +36,27 @@ class Foundation_API ProcessHandleImpl: public RefCountedObject
 {
 public:
 	ProcessHandleImpl(pid_t pid);
-	~ProcessHandleImpl();
+	~ProcessHandleImpl() override;
 
 	pid_t id() const;
 	int wait() const;
 	int tryWait() const;
 
 private:
-	pid_t _pid;
+	std::atomic<pid_t> _pid;
 };
 
 
 class Foundation_API ProcessImpl
 {
 public:
-	typedef pid_t PIDImpl;
-	typedef std::vector<std::string> ArgsImpl;
-	typedef std::map<std::string, std::string> EnvImpl;
+	using PIDImpl = pid_t;
+	using ArgsImpl = std::vector<std::string>;
+	using EnvImpl = std::map<std::string, std::string>;
 
 	static PIDImpl idImpl();
 	static void timesImpl(long& userTime, long& kernelTime);
+	static void timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kernelTime);
 	static ProcessHandleImpl* launchImpl(
 		const std::string& command,
 		const ArgsImpl& args,
@@ -62,7 +64,8 @@ public:
 		Pipe* inPipe,
 		Pipe* outPipe,
 		Pipe* errPipe,
-		const EnvImpl& env);
+		const EnvImpl& env,
+		int options = 0);
 	static void killImpl(ProcessHandleImpl& handle);
 	static void killImpl(PIDImpl pid);
 	static bool isRunningImpl(const ProcessHandleImpl& handle);
@@ -77,7 +80,8 @@ private:
 		Pipe* inPipe,
 		Pipe* outPipe,
 		Pipe* errPipe,
-		const EnvImpl& env);
+		const EnvImpl& env,
+		int options = 0);
 };
 
 

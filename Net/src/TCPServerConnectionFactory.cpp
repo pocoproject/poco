@@ -19,7 +19,8 @@ namespace Poco {
 namespace Net {
 
 
-TCPServerConnectionFactory::TCPServerConnectionFactory()
+TCPServerConnectionFactory::TCPServerConnectionFactory():
+	_stopped(false)
 {
 }
 

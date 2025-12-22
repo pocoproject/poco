@@ -5,7 +5,7 @@
 #
 
 .PHONY: projects
-clean all: projects
+clean distclean all: projects
 projects:
 	$(MAKE) -C DOMParser $(MAKECMDGOALS)
 	$(MAKE) -C DOMWriter $(MAKECMDGOALS)

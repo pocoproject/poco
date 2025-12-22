@@ -37,7 +37,7 @@ public:
 	~SessionHandle();
 		/// Destroy handle, close connection
 
-	void init(MYSQL* mysql = 0);
+	void init(MYSQL* mysql = nullptr);
 		/// Initializes the handle iff not initialized.
 
 	void options(mysql_option opt);
@@ -66,6 +66,9 @@ public:
 
 	void rollback();
 		/// Rollback transaction
+
+	void autoCommit(bool val);
+		/// Set autocommit mode
 
 	void reset();
 		/// Reset connection with dababase and clears session state, but without disconnecting

@@ -44,15 +44,15 @@ const std::string& Connector::name() const
 
 
 Poco::AutoPtr<Poco::Data::SessionImpl> Connector::createSession(const std::string& connectionString,
-	std::size_t timeout)
+	std::size_t loginTimeout)
 {
-	return Poco::AutoPtr<Poco::Data::SessionImpl>(new SessionImpl(connectionString, timeout));
+	return Poco::AutoPtr<Poco::Data::SessionImpl>(new SessionImpl(connectionString, loginTimeout));
 }
 
 
 void Connector::registerConnector()
 {
-	if (mysql_library_init(0, 0, 0) != 0)
+	if (mysql_library_init(0, nullptr, nullptr) != 0)
 	{
 		throw Exception("mysql_library_init error");
 	}

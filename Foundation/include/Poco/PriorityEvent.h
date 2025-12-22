@@ -26,14 +26,14 @@
 namespace Poco {
 
 
-template <class TArgs, class TMutex = FastMutex> 
-class PriorityEvent: public AbstractEvent < 
+template <class TArgs, class TMutex = FastMutex>
+class PriorityEvent: public AbstractEvent <
 	TArgs,
 	PriorityStrategy<TArgs, AbstractPriorityDelegate<TArgs> >,
 	AbstractPriorityDelegate<TArgs>,
 	TMutex
 >
-	/// A PriorityEvent uses internally a PriorityStrategy which 
+	/// A PriorityEvent uses internally a PriorityStrategy which
 	/// invokes delegates in order of priority (lower priorities first).
 	/// PriorityEvent's can only be used together with PriorityDelegate's.
 	/// PriorityDelegate's are sorted according to the priority value, when
@@ -41,17 +41,12 @@ class PriorityEvent: public AbstractEvent <
 	/// an arbitrary manner.
 {
 public:
-	PriorityEvent()
-	{
-	}
+	PriorityEvent() = default;
 
-	~PriorityEvent()
-	{
-	}
+	~PriorityEvent() = default;
 
-private:
-	PriorityEvent(const PriorityEvent&);
-	PriorityEvent& operator = (const PriorityEvent&);
+	PriorityEvent(const PriorityEvent&) = delete;
+	PriorityEvent& operator=(const PriorityEvent&) = delete;
 };
 
 

@@ -36,7 +36,7 @@ PropertyFileConfigurationTest::~PropertyFileConfigurationTest()
 
 void PropertyFileConfigurationTest::testLoad()
 {
-	static const std::string propFile = 
+	static const std::string propFile =
 		"! comment\n"
 		"! comment\n"
 		"prop1=value1\n"
@@ -50,10 +50,10 @@ void PropertyFileConfigurationTest::testLoad()
 		"prop4 = escaped[\\t\\r\\n\\f]\n"
 		"#prop4 = foo\n"
 		"prop5:foo";
-		
+
 	std::istringstream istr(propFile);
 	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(istr);
-	
+
 	assertTrue (pConf->getString("prop1") == "value1");
 	assertTrue (pConf->getString("prop2") == "value2");
 	assertTrue (pConf->getString("prop3.prop31") == "value3");
@@ -61,7 +61,7 @@ void PropertyFileConfigurationTest::testLoad()
 	assertTrue (pConf->getString("prop3.prop33") == "value5, value6, value7, value8, value9");
 	assertTrue (pConf->getString("prop4") == "escaped[\t\r\n\f]");
 	assertTrue (pConf->getString("prop5") == "foo");
-	
+
 	AbstractConfiguration::Keys keys;
 	pConf->keys(keys);
 	assertTrue (keys.size() == 5);
@@ -70,13 +70,13 @@ void PropertyFileConfigurationTest::testLoad()
 	assertTrue (std::find(keys.begin(), keys.end(), "prop3") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "prop4") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "prop5") != keys.end());
-	
+
 	pConf->keys("prop3", keys);
 	assertTrue (keys.size() == 3);
 	assertTrue (std::find(keys.begin(), keys.end(), "prop31") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "prop32") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "prop33") != keys.end());
-	
+
 	try
 	{
 		std::string s = pConf->getString("foo");
@@ -85,23 +85,37 @@ void PropertyFileConfigurationTest::testLoad()
 	catch (NotFoundException&)
 	{
 	}
+
+	std::istringstream istr_err(propFile);
+	istr_err.putback(std::ios_base::failbit);
+	try
+	{
+		AutoPtr<PropertyFileConfiguration> pConf_err = new PropertyFileConfiguration(istr_err);
+	}
+	catch (Poco::IOException& exc)
+	{
+#ifndef POCO_ENABLE_TRACE
+		std::string s(exc.message());
+		assertTrue (s == "Broken input stream");
+#endif
+	}
 }
 
 
 void PropertyFileConfigurationTest::testSave()
 {
 	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration;
-	
+
 	pConf->setString("prop1", "value1");
 	pConf->setInt("prop2", 42);
 	pConf->setString("prop3", "value\\1\txxx");
-	
+
 	std::ostringstream ostr;
 	pConf->save(ostr);
 	std::string propFile = ostr.str();
 	assertTrue (propFile == "prop1: value1\n"
-	                    "prop2: 42\n"
-	                    "prop3: value\\\\1\\txxx\n");
+						"prop2: 42\n"
+						"prop3: value\\\\1\\txxx\n");
 }
 
 

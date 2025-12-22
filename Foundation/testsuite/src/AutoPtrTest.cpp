@@ -13,6 +13,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
+#include <atomic>
 
 
 using Poco::AutoPtr;
@@ -66,7 +67,7 @@ namespace
 		}
 
 	private:
-		int _rc;
+		std::atomic<int> _rc;
 		static int _count;
 	};
 
@@ -177,7 +178,7 @@ void AutoPtrTest::testOps()
 	assertTrue (!(ptr4 != ptr2));
 
 	assertTrue (!(!ptr1));
-	ptr1 = 0;
+	ptr1 = nullptr;
 	assertTrue (!ptr1);
 
 	assertTrue (ptr1 == nullptr);

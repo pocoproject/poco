@@ -52,6 +52,7 @@ public:
 	NamedNodeMap* attributes() const;
 	Document* ownerDocument() const;
 	Node* insertBefore(Node* newChild, Node* refChild);
+	Node* insertAfterNP(Node* newChild, Node* refChild);
 	Node* replaceChild(Node* newChild, Node* oldChild);
 	Node* removeChild(Node* oldChild);
 	Node* appendChild(Node* newChild);

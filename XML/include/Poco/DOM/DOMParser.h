@@ -38,14 +38,14 @@ class XML_API DOMParser
 	/// support of a WhitespaceFilter.
 {
 public:
-	explicit DOMParser(NamePool* pNamePool = 0);
-		/// Creates a new DOMParser. 
+	explicit DOMParser(NamePool* pNamePool = nullptr);
+		/// Creates a new DOMParser.
 		/// If a NamePool is given, it becomes the Document's NamePool.
-		
+
 	explicit DOMParser(unsigned long namePoolSize);
 		/// Creates a new DOMParser, using the given NamePool size.
 		///
-		/// The given namePoolSize should be a suitable prime number, 
+		/// The given namePoolSize should be a suitable prime number,
 		/// e.g. 251, 509, 1021 or 4093, depending on the expected
 		/// size of the document.
 
@@ -55,7 +55,7 @@ public:
 	void setEncoding(const XMLString& encoding);
 		/// Sets the encoding used by the parser if no
 		/// encoding is specified in the XML document.
-		
+
 	const XMLString& getEncoding() const;
 		/// Returns the name of the encoding used by
 		/// the parser if no encoding is specified in
@@ -99,12 +99,30 @@ public:
 	void setEntityResolver(EntityResolver* pEntityResolver);
 		/// Sets the entity resolver on the underlying SAXParser.
 
+	void setMaxElementDepth(std::size_t limit);
+		/// Limits the maximum element depth of the XML document to be loaded.
+		/// Setting the limit to zero disables the limit.
+		///
+		/// This can be used to prevent excessive element depth, which
+		/// could lead to a stack overflow when destroying the document.
+		///
+		/// The default limit is 256.
+
+	std::size_t getMaxElementDepth() const;
+		/// Returns the maximum element depth.
+
 	static const XMLString FEATURE_FILTER_WHITESPACE;
-	
+
+	enum
+	{
+		DEFAULT_MAX_ELEMENT_DEPTH = 256
+	};
+
 private:
 	SAXParser _saxParser;
 	NamePool* _pNamePool;
-	bool      _filterWhitespace;
+	bool      _filterWhitespace = false;
+	std::size_t _maxElementDepth = DEFAULT_MAX_ELEMENT_DEPTH;
 };
 
 

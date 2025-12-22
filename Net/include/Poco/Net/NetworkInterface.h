@@ -40,18 +40,18 @@ class NetworkInterfaceImpl;
 
 class Net_API NetworkInterface
 	/// This class represents a network interface.
-	/// 
+	///
 	/// NetworkInterface is used with MulticastSocket to specify
 	/// multicast interfaces for sending and receiving multicast
 	/// messages.
-	/// 
+	///
 	/// The class also provides static member functions for
 	/// enumerating or searching network interfaces and their
 	/// respective configuration values.
 	///
 	/// On Windows, detection capabilities vary depending on the
 	/// OS version/service pack. Although the best effort is made
-	/// not to attempt access to non-existent features through a 
+	/// not to attempt access to non-existent features through a
 	/// combination of compile/runtime checks, when running binaries
 	/// compiled on a newer version of the OS on an older one
 	/// problems may occur; if possible, it is best to run
@@ -60,14 +60,14 @@ class Net_API NetworkInterface
 	/// and XP.
 {
 public:
-	typedef std::vector<NetworkInterface>                List;
-	typedef List                                         NetworkInterfaceList;//@deprecated
-	typedef std::map<unsigned, NetworkInterface>         Map;
-	typedef Poco::Tuple<IPAddress, IPAddress, IPAddress> AddressTuple;
-	typedef std::vector<AddressTuple>                    AddressList;
-	typedef AddressList::iterator                        AddressIterator;
-	typedef AddressList::const_iterator                  ConstAddressIterator;
-	typedef std::vector<unsigned char>                   MACAddress;
+	using List = std::vector<NetworkInterface>;
+	using NetworkInterfaceList  POCO_DEPRECATED("Use NetworkInterface::List") = List;
+	using Map = std::map<unsigned int, NetworkInterface>;
+	using AddressTuple = Poco::Tuple<IPAddress, IPAddress, IPAddress>;
+	using AddressList = std::vector<AddressTuple>;
+	using AddressIterator = AddressList::iterator;
+	using ConstAddressIterator = AddressList::const_iterator;
+	using MACAddress = std::vector<unsigned char>;
 
 	enum AddressType
 	{
@@ -110,7 +110,7 @@ public:
 		///
 		/// The name is empty, the IP address is the wildcard
 		/// address and the index is max value of unsigned integer.
-	
+
 	NetworkInterface(const NetworkInterface& interfc);
 		/// Creates the NetworkInterface by copying another one.
 
@@ -119,28 +119,28 @@ public:
 
 	NetworkInterface& operator = (const NetworkInterface& interfc);
 		/// Assigns another NetworkInterface.
-	
+
 	bool operator < (const NetworkInterface& other) const;
 		/// Operator less-than.
-	
+
 	bool operator == (const NetworkInterface& other) const;
 		/// Operator equal. Compares interface indices.
 
-	void swap(NetworkInterface& other);
-		/// Swaps the NetworkInterface with another one.	
-		
+	void swap(NetworkInterface& other) noexcept;
+		/// Swaps the NetworkInterface with another one.
+
 	unsigned index() const;
 		/// Returns the interface OS index.
-		
+
 	const std::string& name() const;
 		/// Returns the interface name.
-		
+
 	const std::string& displayName() const;
 		/// Returns the interface display name.
 		///
 		/// On Windows platforms, this is currently the network adapter
 		/// name. This may change to the "friendly name" of the network
-		/// connection in a future version, however. 
+		/// connection in a future version, however.
 		///
 		/// On other platforms this is the same as name().
 
@@ -148,7 +148,7 @@ public:
 		/// Returns the interface adapter name.
 		///
 		/// On Windows platforms, this is the network adapter LUID.
-		/// The adapter name is used by some Windows Net APIs like DHCP. 
+		/// The adapter name is used by some Windows Net APIs like DHCP.
 		///
 		/// On other platforms this is the same as name().
 
@@ -199,7 +199,7 @@ public:
 		/// Returns true if the interface supports IPv4.
 
 	bool supportsIPv6() const;
-		/// Returns true if the interface supports IPv6.	
+		/// Returns true if the interface supports IPv6.
 
 	bool supportsBroadcast() const;
 		/// Returns true if the interface supports broadcast.
@@ -221,7 +221,7 @@ public:
 
 	static NetworkInterface forName(const std::string& name, bool requireIPv6 = false);
 		/// Returns the NetworkInterface for the given name.
-		/// 
+		///
 		/// If requireIPv6 is false, an IPv4 interface is returned.
 		/// Otherwise, an IPv6 interface is returned.
 		///
@@ -230,14 +230,14 @@ public:
 
 	static NetworkInterface forName(const std::string& name, IPVersion ipVersion);
 		/// Returns the NetworkInterface for the given name.
-		/// 
+		///
 		/// The ipVersion argument can be used to specify whether
-		/// an IPv4 (IPv4_ONLY) or IPv6 (IPv6_ONLY) interface is required, 
+		/// an IPv4 (IPv4_ONLY) or IPv6 (IPv6_ONLY) interface is required,
 		/// or whether the caller does not care (IPv4_OR_IPv6).
 		///
 		/// Throws an InterfaceNotFoundException if an interface
 		/// with the give name does not exist.
-		
+
 	static NetworkInterface forAddress(const IPAddress& address);
 		/// Returns the NetworkInterface for the given IP address.
 		///
@@ -277,17 +277,17 @@ public:
 		/// Otherwise, both interfaces being up and down are returned.
 		///
 		/// If there are multiple addresses bound to one interface,
-		/// they are contained within the NetworkInterface (second) 
+		/// they are contained within the NetworkInterface (second)
 		/// member of the pair.
 
 protected:
-	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, MACAddress* pMACAddress = 0);
+	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
-	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index, MACAddress* pMACAddress = 0);
+	NetworkInterface(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index, MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
-	NetworkInterface(const std::string& name, const IPAddress& address, unsigned index, MACAddress* pMACAddress = 0);
+	NetworkInterface(const std::string& name, const IPAddress& address, unsigned index, MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
 	NetworkInterface(const std::string& name,
@@ -297,7 +297,7 @@ protected:
 		const IPAddress& subnetMask,
 		const IPAddress& broadcastAddress,
 		unsigned index,
-		MACAddress* pMACAddress = 0);
+		MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
 	NetworkInterface(const std::string& name,
@@ -305,7 +305,7 @@ protected:
 		const IPAddress& subnetMask,
 		const IPAddress& broadcastAddress,
 		unsigned index,
-		MACAddress* pMACAddress = 0);
+		MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
 	IPAddress interfaceNameToAddress(const std::string& interfaceName) const;

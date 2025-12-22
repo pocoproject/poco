@@ -36,15 +36,15 @@ public:
 	Poco::UInt16 port() const;
 		/// Returns the port the echo server is
 		/// listening on.
-		
+
 	void run();
 		/// Does the work.
-		
+
 	const std::string& lastRequest() const;
 		/// Returns the last request.
 
 	static const std::string SMALL_BODY;
-	static const std::string LARGE_BODY;	
+	static const std::string LARGE_BODY;
 
 protected:
 	bool requestComplete() const;

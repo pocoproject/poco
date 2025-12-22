@@ -26,8 +26,23 @@
 
 
 namespace Poco {
+
 namespace JSON {
 
+class JSON_API Array;
+
+}
+
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+// Explicitly instantiated shared pointer in JSON library
+extern template class Poco::SharedPtr<Poco::JSON::Array>;
+#else
+// Explicitly instantiated shared pointer in JSON library
+extern template class JSON_API Poco::SharedPtr<Poco::JSON::Array>;
+#endif
+
+namespace JSON {
 
 class Object;
 
@@ -46,7 +61,7 @@ class JSON_API Array
 	///    Array::Ptr arr = result.extract<Array::Ptr>();
 	///    Object::Ptr object = arr->getObject(0); // object == {\"test\" : 0}
 	///    int i = object->getElement<int>("test"); // i == 0;
-	///    Object::Ptr subObject = *arr->getObject(1); // subObject == {\"test\" : 0}
+	///    Object::Ptr subObject = arr->getObject(1); // subObject == {\"test\" : 0}
 	///    Array subArr::Ptr = subObject->getArray("test1"); // subArr == [1, 2, 3]
 	///    i = result = subArr->get(0); // i == 1;
 	///
@@ -90,6 +105,12 @@ public:
 
 	bool getEscapeUnicode() const;
 		/// Returns the flag for escaping unicode.
+	
+	void setLowercaseHex(bool lowercaseHex);
+		/// Sets the flag for using lowercase hex numbers
+
+	bool getLowercaseHex() const;
+		/// Returns the flag for using lowercase hex numbers
 
 	ValueVec::const_iterator begin() const;
 		/// Returns the begin iterator for values.
@@ -196,7 +217,7 @@ public:
 private:
 	void resetDynArray() const;
 
-	typedef SharedPtr<Poco::Dynamic::Array> ArrayPtr;
+	using ArrayPtr = SharedPtr<Poco::Dynamic::Array>;
 
 	ValueVec         _values;
 	mutable ArrayPtr _pArray;
@@ -206,6 +227,7 @@ private:
 	//  is because Array can be returned stringified from a Dynamic::Var:toString(),
 	//  so it must know whether to escape unicode or not.
 	bool             _escapeUnicode;
+	bool             _lowercaseHex;
 };
 
 
@@ -222,6 +244,17 @@ inline void Array::setEscapeUnicode(bool escape)
 inline bool Array::getEscapeUnicode() const
 {
 	return _escapeUnicode;
+}
+
+inline void Array::setLowercaseHex(bool lowercaseHex)
+{
+	_lowercaseHex = lowercaseHex;
+}
+
+
+inline bool Array::getLowercaseHex() const
+{
+	return _lowercaseHex;
 }
 
 
@@ -307,98 +340,96 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(JSON::Array::Ptr);
 	}
 
-	void convert(Int8&) const
+	void convert(Int8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int16&) const
+	void convert(Int16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int32&) const
+	void convert(Int32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int64&) const
+	void convert(Int64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt8&) const
+	void convert(UInt8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt16&) const
+	void convert(UInt16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt32&) const
+	void convert(UInt32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt64&) const
+	void convert(UInt64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(bool& value) const
+	void convert(bool& value) const override
 	{
 		value = !_val.isNull() && _val->size() > 0;
 	}
 
-	void convert(float&) const
+	void convert(float&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(double&) const
+	void convert(double&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(char&) const
+	void convert(char&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(std::string& s) const
+	void convert(std::string& s) const override
 	{
 		std::ostringstream oss;
-		_val->stringify(oss, 2);
+		_val->stringify(oss);
 		s = oss.str();
 	}
 
-	void convert(DateTime& /*val*/) const
+	void convert(DateTime& /*val*/) const override
 	{
 		throw BadCastException("Cannot convert Array to DateTime");
 	}
 
-	void convert(LocalDateTime& /*ldt*/) const
+	void convert(LocalDateTime& /*ldt*/) const override
 	{
 		throw BadCastException("Cannot convert Array to LocalDateTime");
 	}
 
-	void convert(Timestamp& /*ts*/) const
+	void convert(Timestamp& /*ts*/) const override
 	{
 		throw BadCastException("Cannot convert Array to Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -408,22 +439,22 @@ public:
 		return _val;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}
@@ -441,98 +472,96 @@ public:
 	{
 	}
 
-	~VarHolderImpl()
-	{
-	}
+	~VarHolderImpl() override = default;
 
-	const std::type_info& type() const
+	const std::type_info& type() const override
 	{
 		return typeid(JSON::Array);
 	}
 
-	void convert(Int8&) const
+	void convert(Int8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int16&) const
+	void convert(Int16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int32&) const
+	void convert(Int32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(Int64&) const
+	void convert(Int64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt8&) const
+	void convert(UInt8&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt16&) const
+	void convert(UInt16&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt32&) const
+	void convert(UInt32&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(UInt64&) const
+	void convert(UInt64&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(bool& value) const
+	void convert(bool& value) const override
 	{
 		value = _val.size() > 0;
 	}
 
-	void convert(float&) const
+	void convert(float&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(double&) const
+	void convert(double&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(char&) const
+	void convert(char&) const override
 	{
 		throw BadCastException();
 	}
 
-	void convert(std::string& s) const
+	void convert(std::string& s) const override
 	{
 		std::ostringstream oss;
-		_val.stringify(oss, 2);
+		_val.stringify(oss);
 		s = oss.str();
 	}
 
-	void convert(DateTime& /*val*/) const
+	void convert(DateTime& /*val*/) const override
 	{
 		throw BadCastException("Cannot convert Array to DateTime");
 	}
 
-	void convert(LocalDateTime& /*ldt*/) const
+	void convert(LocalDateTime& /*ldt*/) const override
 	{
 		throw BadCastException("Cannot convert Array to LocalDateTime");
 	}
 
-	void convert(Timestamp& /*ts*/) const
+	void convert(Timestamp& /*ts*/) const override
 	{
 		throw BadCastException("Cannot convert Array to Timestamp");
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -542,22 +571,22 @@ public:
 		return _val;
 	}
 
-	bool isInteger() const
+	bool isInteger() const override
 	{
 		return false;
 	}
 
-	bool isSigned() const
+	bool isSigned() const override
 	{
 		return false;
 	}
 
-	bool isNumeric() const
+	bool isNumeric() const override
 	{
 		return false;
 	}
 
-	bool isString() const
+	bool isString() const override
 	{
 		return false;
 	}

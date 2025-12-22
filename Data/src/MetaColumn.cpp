@@ -92,7 +92,7 @@ MetaColumn& MetaColumn::operator = (MetaColumn&& other) noexcept
 }
 
 
-void MetaColumn::swap(MetaColumn& other)
+void MetaColumn::swap(MetaColumn& other) noexcept
 {
 	std::swap(_name, other._name);
 	std::swap(_length, other._length);

@@ -41,26 +41,26 @@ public:
 	{
 	}
 
-protected:	
+protected:
 	void initialize(Application& self)
 	{
 		loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
 		// add your own initialization code here
 	}
-	
+
 	void uninitialize()
 	{
 		// add your own uninitialization code here
 		Application::uninitialize();
 	}
-	
+
 	void reinitialize(Application& self)
 	{
 		Application::reinitialize(self);
 		// add your own reinitialization code here
 	}
-	
+
 	void defineOptions(OptionSet& options)
 	{
 		Application::defineOptions(options);
@@ -84,7 +84,7 @@ protected:
 				.repeatable(false)
 				.argument("language")
 				.callback(OptionCallback<File2PageApp>(this, &File2PageApp::handleContentLang)));
-								
+
 		options.addOption(
 			Option("class", "c", "Specify the handler class name.")
 				.required(false)
@@ -98,7 +98,7 @@ protected:
 				.repeatable(false)
 				.argument("namespace-name")
 				.callback(OptionCallback<File2PageApp>(this, &File2PageApp::handleNamespace)));
-	
+
 		options.addOption(
 			Option("output", "o", "Specify the output file name.")
 				.required(false)
@@ -113,14 +113,14 @@ protected:
 				.argument("path")
 				.callback(OptionCallback<File2PageApp>(this, &File2PageApp::handlePath)));
 	}
-	
+
 	void handleHelp(const std::string& name, const std::string& value)
 	{
 		_helpRequested = true;
 		displayHelp();
 		stopOptionsProcessing();
 	}
-	
+
 	void handleContentType(const std::string& name, const std::string& value)
 	{
 		_contentType = value;
@@ -130,7 +130,7 @@ protected:
 	{
 		_contentLang = value;
 	}
-	
+
 	void handleClassName(const std::string& name, const std::string& value)
 	{
 		_clazz = value;
@@ -140,7 +140,7 @@ protected:
 	{
 		_namespace = value;
 	}
-				
+
 	void handleOutput(const std::string& name, const std::string& value)
 	{
 		_output = value;
@@ -160,7 +160,7 @@ protected:
 		helpFormatter.setIndent(8);
 		helpFormatter.format(std::cout);
 	}
-	
+
 	void convert(const std::string& path)
 	{
 		Poco::Path p(path);
@@ -243,7 +243,7 @@ protected:
 		     << "\tresponseStream.write(reinterpret_cast<const char*>(data), sizeof(data));\n"
 		     << "%>";
 	}
-	
+
 	std::string extToContentType(const std::string& ext)
 	{
 		if (ext == "jpg" || ext == "jpeg")
@@ -267,7 +267,7 @@ protected:
 		else
 			return "application/binary";
 	}
-	
+
 	int main(const std::vector<std::string>& args)
 	{
 		if (!_helpRequested)
@@ -279,7 +279,7 @@ protected:
 		}
 		return Application::EXIT_OK;
 	}
-		
+
 private:
 	bool _helpRequested;
 	std::string _contentType;

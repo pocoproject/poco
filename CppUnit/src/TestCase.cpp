@@ -4,7 +4,7 @@
 
 
 #include <stdexcept>
-#include <math.h>
+#include <cmath>
 #include "CppUnit/TestCase.h"
 #include "CppUnit/TestResult.h"
 #include "CppUnit/estring.h"
@@ -48,14 +48,6 @@ void TestCase::loop2assertImplementation(bool condition, const std::string& cond
 
 
 // Check for a failed equality assertion
-void TestCase::assertEquals(long expected, long actual, long lineNumber, const std::string& fileName)
-{
-	if (expected != actual)
-		assertImplementation(false, notEqualsMessage(expected, actual), lineNumber, fileName);
-}
-
-
-// Check for a failed equality assertion
 void TestCase::assertEquals(double expected, double actual, double delta, long lineNumber, const std::string& fileName)
 {
 	if (fabs(expected - actual) > delta)
@@ -79,16 +71,24 @@ void TestCase::assertEquals(const std::string& expected, const std::string& actu
 }
 
 
+// Check for a failed equality assertion
+void TestCase::assertEquals(const char* expected, const std::string& actual, long lineNumber, const std::string& fileName)
+{
+	if (std::string(expected) != actual)
+		assertImplementation(false, notEqualsMessage(std::string(expected), actual), lineNumber, fileName);
+}
+
+
 void TestCase::assertNotNull(const void* pointer, const std::string& pointerExpression, long lineNumber, const std::string& fileName)
 {
-	if (pointer == NULL)
+	if (pointer == nullptr)
 		throw CppUnitException(pointerExpression + " must not be NULL", lineNumber, fileName);
 }
 
 
 void TestCase::assertNull(const void* pointer, const std::string& pointerExpression, long lineNumber, const std::string& fileName)
 {
-	if (pointer != NULL)
+	if (pointer != nullptr)
 		throw CppUnitException(pointerExpression + " must be NULL", lineNumber, fileName);
 }
 
@@ -106,7 +106,7 @@ void TestCase::warn(const std::string& message, long lineNumber, const std::stri
 
 
 // Run the test and catch any exceptions that are triggered by it
-void TestCase::run(TestResult *result)
+void TestCase::run(TestResult *result, const Test::Callback& callback)
 {
 	result->startTest(this);
 
@@ -117,19 +117,21 @@ void TestCase::run(TestResult *result)
 	}
 	catch (CppUnitException& e)
 	{
-		CppUnitException* copy = new CppUnitException(e);
+		auto* copy = new CppUnitException(e);
 		result->addFailure(this, copy);
 	}
 	catch (std::exception& e)
 	{
-		std::string msg(typeid(e).name());
-		msg.append(": ");
-		msg.append(e.what());
+		std::string msg(TestResult::demangle(typeid(e).name()));
+		if (callback)
+		{
+			msg.append(": ").append(callback(e));
+		}
 		result->addError(this, new CppUnitException(msg));
 	}
 	catch (...)
 	{
-		CppUnitException *e = new CppUnitException ("unknown exception");
+		auto* e = new CppUnitException ("unknown exception");
 		result->addError (this, e);
 	}
 	tearDown ();
@@ -150,20 +152,6 @@ TestResult* TestCase::run()
 // All the work for runTest is deferred to subclasses
 void TestCase::runTest()
 {
-}
-
-
-// Build a message about a failed equality check
-std::string TestCase::notEqualsMessage(long expected, long actual)
-{
-	return "expected: " + estring(expected) + " but was: " + estring(actual);
-}
-
-
-// Build a message about a failed equality check
-std::string TestCase::notEqualsMessage(double expected, double actual)
-{
-	return "expected: " + estring(expected) + " but was: " + estring(actual);
 }
 
 

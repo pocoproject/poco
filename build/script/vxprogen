@@ -27,7 +27,7 @@ fi
 if [ ! -d "$POCO_BASE" ] ; then
 	echo "Fatal error: POCO_BASE does not contain a valid path to a directory. Exiting."
 	exit 1
-fi 
+fi
 
 pwd=`pwd`
 buildfile=`basename $pwd`.vxbuild
@@ -58,7 +58,7 @@ echo "Document file - DO NOT EDIT" >$out
 echo "" >>$out
 
 buildvars="
-	MACRO_AR 
+	MACRO_AR
 	MACRO_ARCHIVE
 	MACRO_AS
 	MACRO_CC
@@ -88,7 +88,7 @@ buildvars="
 
 for build in $builds ; do
 	source $POCO_BASE/build/vxconfig/$build
-	
+
 	echo "<BEGIN> BUILD_${BUILD}_BUILDRULE" >>$out
 	echo "${TARGET}.out" >>$out
 	echo "<END>" >>$out

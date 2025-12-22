@@ -11,18 +11,19 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 )
 
 add_executable(CppParser-testrunner ${TEST_SRCS})
+set_target_properties(CppParser-testrunner PROPERTIES DEBUG_POSTFIX "d")
 if(ANDROID)
 	add_test(
 		NAME CppParser
 		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-		COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/CppParser-testrunner -DTEST_PARAMETER=-all -P ${CMAKE_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake
+		COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/CppParser-testrunner -DTEST_PARAMETER=-all -P ${PROJECT_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake
 	)
 else()
 	add_test(
 		NAME CppParser
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		COMMAND CppParser-testrunner -ignore ${CMAKE_SOURCE_DIR}/cppignore.lnx -all
+		COMMAND CppParser-testrunner -ignore ${PROJECT_SOURCE_DIR}/cppignore.lnx -all
 	)
-	set_tests_properties(CppParser PROPERTIES ENVIRONMENT POCO_BASE=${CMAKE_SOURCE_DIR})
+	set_tests_properties(CppParser PROPERTIES ENVIRONMENT POCO_BASE=${PROJECT_SOURCE_DIR})
 endif()
 target_link_libraries(CppParser-testrunner PUBLIC Poco::CppParser CppUnit)

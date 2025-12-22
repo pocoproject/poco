@@ -29,6 +29,7 @@ public:
 	void testDecompressSingleFile();
 	void testDecompressSingleFileInDir();
 	void testDecompress();
+	void testDecompressConsistency();
 	void testDecompressFlat();
 	void testDecompressVuln();
 	void testDecompressFlatVuln();
@@ -51,7 +52,7 @@ public:
 
 private:
 	void onDecompressError(const void* pSender, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>& info);
-	
+
 	int _errCnt;
 };
 

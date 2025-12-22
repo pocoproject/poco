@@ -15,10 +15,21 @@
 #include "Poco/Thread_POSIX.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
+#include "Poco/Error.h"
 #include "Poco/ErrorHandler.h"
-#include "Poco/Timespan.h"
-#include "Poco/Timestamp.h"
+#include "Poco/Format.h"
+#include "Poco/Error.h"
 #include <signal.h>
+#include <limits.h>
+
+
+#if POCO_OS == POCO_OS_FREE_BSD
+#    include <sys/thr.h>
+#    include <pthread_np.h>
+#    include <osreldate.h>
+#endif
+
+
 #if defined(__sun) && defined(__SVR4)
 #	if !defined(__EXTENSIONS__)
 #		define __EXTENSIONS__
@@ -27,6 +38,25 @@
 #if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX
 #	include <time.h>
 #endif
+
+#if POCO_OS == POCO_OS_QNX
+#	include <sys/neutrino.h>
+#endif
+
+#ifndef POCO_NO_THREADNAME
+	#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
+	#	include <sys/prctl.h>
+	#endif
+#endif
+
+#if POCO_OS == POCO_OS_LINUX
+	#ifndef _GNU_SOURCE
+		#define _GNU_SOURCE         /* See feature_test_macros(7) */
+	#endif
+	#include <unistd.h>
+	#include <sys/syscall.h>   /* For SYS_xxx definitions */
+#endif
+
 
 //
 // Block SIGPIPE in main thread.
@@ -42,7 +72,7 @@ namespace
 			sigset_t sset;
 			sigemptyset(&sset);
 			sigaddset(&sset, SIGPIPE);
-			pthread_sigmask(SIG_BLOCK, &sset, 0);
+			pthread_sigmask(SIG_BLOCK, &sset, nullptr);
 		}
 		~SignalBlocker()
 		{
@@ -54,28 +84,61 @@ namespace
 #endif
 
 
-#if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
-
-
-namespace {
-void setThreadName(pthread_t thread, const std::string& threadName)
+namespace
 {
-#if (POCO_OS == POCO_OS_MAC_OS_X)
-	pthread_setname_np(threadName.c_str()); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
-#else
-	if (pthread_setname_np(thread, threadName.c_str()) == ERANGE && threadName.size() > 15)
+	std::string truncName(const std::string& name, int nameSize = POCO_MAX_THREAD_NAME_LEN)
 	{
-		std::string truncName(threadName, 0, 7);
-		truncName.append("~");
-		truncName.append(threadName, threadName.size() - 7, 7);
-		pthread_setname_np(thread, truncName.c_str());
+		if (name.size() > nameSize)
+			return name.substr(0, nameSize).append("~");
+		return name;
+	}
+
+#ifndef POCO_NO_THREADNAME
+	void setThreadName(const std::string& threadName)
+		/// Sets thread name. Support for this feature varies
+		/// on platforms. Any errors are ignored.
+	{
+#if (POCO_OS == POCO_OS_FREE_BSD)
+		pthread_setname_np(pthread_self(), truncName(threadName).c_str());
+#elif (POCO_OS == POCO_OS_MAC_OS_X)
+	#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+		#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
+			pthread_setname_np(truncName(threadName).c_str()); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
+		#endif
+	#endif // __MAC_OS_X_VERSION_MIN_REQUIRED
+#elif (POCO_OS == POCO_OS_QNX)
+		pthread_setname_np(pthread_self(), truncName(threadName, _NTO_THREAD_NAME_MAX).c_str());
+#else
+		prctl(PR_SET_NAME, truncName(threadName).c_str());
+#endif
+	}
+
+	std::string getThreadName()
+	{
+	constexpr size_t nameSize =
+#if (POCO_OS == POCO_OS_QNX)
+			_NTO_THREAD_NAME_MAX;
+#else
+			POCO_MAX_THREAD_NAME_LEN;
+#endif
+		char name[nameSize + 1]{'\0'};
+#if (POCO_OS == POCO_OS_FREE_BSD)
+		pthread_getname_np(pthread_self(), name, nameSize + 1);
+#elif (POCO_OS == POCO_OS_MAC_OS_X)
+	#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+		#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
+			pthread_getname_np(pthread_self(), name, nameSize + 1);
+		#endif
+	#endif // __MAC_OS_X_VERSION_MIN_REQUIRED
+#elif (POCO_OS == POCO_OS_QNX)
+		pthread_getname_np(pthread_self(), name, nameSize);
+#else
+		prctl(PR_GET_NAME, name);
+#endif
+		return name;
 	}
 #endif
 }
-}
-
-
-#endif
 
 
 namespace Poco {
@@ -99,6 +162,47 @@ ThreadImpl::~ThreadImpl()
 }
 
 
+void ThreadImpl::setNameImpl(const std::string& threadName)
+{
+	std::string realName = threadName;
+#if (POCO_OS == POCO_OS_MAC_OS_X)
+	if (threadName.size() > POCO_MAX_THREAD_NAME_LEN)
+	{
+		int half = (POCO_MAX_THREAD_NAME_LEN - 1) / 2;
+#else
+	if (threadName.size() > std::min(POCO_MAX_THREAD_NAME_LEN, 15))
+	{
+		int half = (std::min(POCO_MAX_THREAD_NAME_LEN, 15) - 1) / 2;
+#endif
+		std::string truncName(threadName, 0, half);
+		truncName.append("~");
+		truncName.append(threadName, threadName.size() - half);
+		realName = truncName;
+	}
+
+	ScopedLock<FastMutex> lock(_pData->mutex);
+	if (realName != _pData->name)
+	{
+		_pData->name = realName;
+	}
+}
+
+
+std::string ThreadImpl::getNameImpl() const
+{
+	ScopedLock<FastMutex> lock(_pData->mutex);
+	return _pData->name;
+}
+
+
+#ifndef POCO_NO_THREADNAME
+std::string ThreadImpl::getOSThreadNameImpl()
+{
+	return isRunningImpl() ? getThreadName() : "";
+}
+#endif
+
+
 void ThreadImpl::setPriorityImpl(int prio)
 {
 	if (prio != _pData->prio)
@@ -109,8 +213,10 @@ void ThreadImpl::setPriorityImpl(int prio)
 		{
 			struct sched_param par;
 			par.sched_priority = mapPrio(_pData->prio, SCHED_OTHER);
-			if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
-				throw SystemException("cannot set thread priority");
+			int errorCode;
+			if ((errorCode = pthread_setschedparam(_pData->thread, SCHED_OTHER, &par)))
+				throw SystemException(Poco::format("cannot set thread priority (%s)",
+					Error::getMessage(errorCode)));
 		}
 	}
 }
@@ -124,8 +230,10 @@ void ThreadImpl::setOSPriorityImpl(int prio, int policy)
 		{
 			struct sched_param par;
 			par.sched_priority = prio;
-			if (pthread_setschedparam(_pData->thread, policy, &par))
-				throw SystemException("cannot set thread priority");
+			int errorCode;
+			if ((errorCode = pthread_setschedparam(_pData->thread, policy, &par)))
+				throw SystemException(Poco::format("cannot set thread priority (%s)",
+					Error::getMessage(errorCode)));
 		}
 		_pData->prio   = reverseMapPrio(prio, policy);
 		_pData->osPrio = prio;
@@ -170,39 +278,66 @@ void ThreadImpl::setStackSizeImpl(int size)
 		const int STACK_PAGE_SIZE = 4096;
 		size = ((size + STACK_PAGE_SIZE - 1)/STACK_PAGE_SIZE)*STACK_PAGE_SIZE;
 #endif
- 		if (size < PTHREAD_STACK_MIN)
- 			size = PTHREAD_STACK_MIN;
+		if (size < PTHREAD_STACK_MIN)
+			size = PTHREAD_STACK_MIN;
 	}
- 	_pData->stackSize = size;
+	_pData->stackSize = size;
 #endif
+}
+
+
+void ThreadImpl::setSignalMaskImpl(uint32_t sigMask)
+{
+	sigset_t sset;
+	sigemptyset(&sset);
+
+	for (int sig = 0; sig < sizeof(uint32_t) * 8; ++sig)
+	{
+		if ((sigMask & (1 << sig)) != 0)
+			sigaddset(&sset, sig);
+	}
+
+	pthread_sigmask(SIG_BLOCK, &sset, nullptr);
 }
 
 
 void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 {
-	if (_pData->pRunnableTarget)
-		throw SystemException("thread already running");
+	{
+		FastMutex::ScopedLock l(_pData->mutex);
+		if (_pData->pRunnableTarget)
+			throw SystemException("thread already running");
+	}
 
 	pthread_attr_t attributes;
 	pthread_attr_init(&attributes);
 
 	if (_pData->stackSize != 0)
 	{
-		if (0 != pthread_attr_setstacksize(&attributes, _pData->stackSize))
+		int errorCode;
+		if ((errorCode = pthread_attr_setstacksize(&attributes, _pData->stackSize)))
 		{
 			pthread_attr_destroy(&attributes);
-			throw SystemException("cannot set thread stack size");
+			throw SystemException(Poco::format("cannot set thread stack size: (%s)",
+				Error::getMessage(errorCode)));
 		}
 	}
 
-	_pData->pRunnableTarget = pTarget;
-	if (pthread_create(&_pData->thread, &attributes, runnableEntry, this))
 	{
-		_pData->pRunnableTarget = 0;
-		pthread_attr_destroy(&attributes);
-		throw SystemException("cannot start thread");
+		FastMutex::ScopedLock l(_pData->mutex);
+		_pData->pRunnableTarget = pTarget;
+		_pData->done.reset();
+		int errorCode;
+		if ((errorCode = pthread_create(&_pData->thread, &attributes, runnableEntry, this)))
+		{
+			_pData->pRunnableTarget = nullptr;
+			pthread_attr_destroy(&attributes);
+			throw SystemException(Poco::format("cannot start thread (%s)",
+				Error::getMessage(errorCode)));
+		}
 	}
 	_pData->started = true;
+	_pData->joined = false;
 	pthread_attr_destroy(&attributes);
 
 	if (_pData->policy == SCHED_OTHER)
@@ -211,16 +346,20 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 		{
 			struct sched_param par;
 			par.sched_priority = mapPrio(_pData->prio, SCHED_OTHER);
-			if (pthread_setschedparam(_pData->thread, SCHED_OTHER, &par))
-				throw SystemException("cannot set thread priority");
+			int errorCode;
+			if ((errorCode = pthread_setschedparam(_pData->thread, SCHED_OTHER, &par)))
+				throw SystemException(Poco::format("cannot set thread priority (%s)",
+					Error::getMessage(errorCode)));
 		}
 	}
 	else
 	{
 		struct sched_param par;
 		par.sched_priority = _pData->osPrio;
-		if (pthread_setschedparam(_pData->thread, _pData->policy, &par))
-			throw SystemException("cannot set thread priority");
+		int errorCode;
+		if ((errorCode = pthread_setschedparam(_pData->thread, _pData->policy, &par)))
+			throw SystemException(Poco::format("cannot set thread priority (%s)",
+				Error::getMessage(errorCode)));
 	}
 }
 
@@ -229,20 +368,27 @@ void ThreadImpl::joinImpl()
 {
 	if (!_pData->started) return;
 	_pData->done.wait();
-	void* result;
-	if (pthread_join(_pData->thread, &result))
-		throw SystemException("cannot join thread");
-	_pData->joined = true;
+	if (!_pData->joined)
+	{
+		int errorCode;
+		if ((errorCode = pthread_join(_pData->thread, nullptr)))
+		{
+			throw SystemException(Poco::format("cannot join thread (%s)",
+				Error::getMessage(errorCode)));
+		}
+		_pData->joined = true;
+	}
 }
 
 
 bool ThreadImpl::joinImpl(long milliseconds)
 {
-	if (_pData->started && _pData->done.tryWait(milliseconds))
+	if (_pData->started && _pData->done.tryWait(milliseconds) && !_pData->joined)
 	{
-		void* result;
-		if (pthread_join(_pData->thread, &result))
-			throw SystemException("cannot join thread");
+		int errorCode;
+		if ((errorCode = pthread_join(_pData->thread, nullptr)))
+			throw SystemException(Poco::format("cannot join thread (%s)",
+				Error::getMessage(errorCode)));
 		_pData->joined = true;
 		return true;
 	}
@@ -263,59 +409,17 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 }
 
 
-void ThreadImpl::sleepImpl(long milliseconds)
+long ThreadImpl::currentOsTidImpl()
 {
-#if defined(__digital__)
-		// This is specific to DECThreads
-		struct timespec interval;
-		interval.tv_sec  = milliseconds / 1000;
-		interval.tv_nsec = (milliseconds % 1000)*1000000;
-		pthread_delay_np(&interval);
-#elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID || POCO_OS == POCO_OS_MAC_OS_X || POCO_OS == POCO_OS_QNX || POCO_OS == POCO_OS_VXWORKS
-	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
-	int rc;
-	do
-	{
-		struct timespec ts;
-		ts.tv_sec  = (long) remainingTime.totalSeconds();
-		ts.tv_nsec = (long) remainingTime.useconds()*1000;
-		Poco::Timestamp start;
-		rc = ::nanosleep(&ts, 0);
-		if (rc < 0 && errno == EINTR)
-		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = start.elapsed();
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (remainingTime > 0 && rc < 0 && errno == EINTR);
-	if (rc < 0 && remainingTime > 0) throw Poco::SystemException("Thread::sleep(): nanosleep() failed");
-#else
-	Poco::Timespan remainingTime(1000*Poco::Timespan::TimeDiff(milliseconds));
-	int rc;
-	do
-	{
-		struct timeval tv;
-		tv.tv_sec  = (long) remainingTime.totalSeconds();
-		tv.tv_usec = (long) remainingTime.useconds();
-		Poco::Timestamp start;
-		rc = ::select(0, NULL, NULL, NULL, &tv);
-		if (rc < 0 && errno == EINTR)
-		{
-			Poco::Timestamp end;
-			Poco::Timespan waited = start.elapsed();
-			if (waited < remainingTime)
-				remainingTime -= waited;
-			else
-				remainingTime = 0;
-		}
-	}
-	while (remainingTime > 0 && rc < 0 && errno == EINTR);
-	if (rc < 0 && remainingTime > 0) throw Poco::SystemException("Thread::sleep(): select() failed");
+	long id = 0;
+#if (POCO_OS == POCO_OS_LINUX) && !defined(POCO_EMSCRIPTEN)
+	id = ::syscall(SYS_gettid);
+#elif POCO_OS == POCO_OS_MAC_OS_X
+	id = ::pthread_mach_thread_np(::pthread_self());
+#elif POCO_OS == POCO_OS_FREE_BSD
+	if (0 != thr_self(&id)) id = 0;
 #endif
+	return id;
 }
 
 
@@ -329,14 +433,22 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	sigaddset(&sset, SIGQUIT);
 	sigaddset(&sset, SIGTERM);
 	sigaddset(&sset, SIGPIPE);
-	pthread_sigmask(SIG_BLOCK, &sset, 0);
+	pthread_sigmask(SIG_BLOCK, &sset, nullptr);
 #endif
 
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
-#if defined(POCO_POSIX_DEBUGGER_THREAD_NAMES)
-	setThreadName(pThreadImpl->_pData->thread, reinterpret_cast<Thread*>(pThread)->getName());
+#ifndef POCO_NO_THREADNAME
+	setThreadName(reinterpret_cast<Thread*>(pThread)->getName());
 #endif
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
+
+#ifndef POCO_NO_THREADNAME
+	{
+		FastMutex::ScopedLock lock(pData->mutex);
+		setThreadName(pData->name);
+	}
+#endif
+
 	try
 	{
 		pData->pRunnableTarget->run();
@@ -354,9 +466,10 @@ void* ThreadImpl::runnableEntry(void* pThread)
 		ErrorHandler::handle();
 	}
 
-	pData->pRunnableTarget = 0;
+	FastMutex::ScopedLock l(pData->mutex);
+	pData->pRunnableTarget = nullptr;
 	pData->done.set();
-	return 0;
+	return nullptr;
 }
 
 
@@ -403,6 +516,41 @@ int ThreadImpl::reverseMapPrio(int prio, int policy)
 			return PRIO_LOWEST_IMPL;
 	}
 	else return PRIO_HIGHEST_IMPL;
+}
+
+
+bool ThreadImpl::setAffinityImpl(int coreID)
+{
+#if POCO_OS == POCO_OS_LINUX
+	int numCores = sysconf(_SC_NPROCESSORS_ONLN);
+	if (coreID < 0 || coreID >= numCores)
+		return false;
+
+	cpu_set_t cpuset;
+	CPU_ZERO(&cpuset);
+	CPU_SET(coreID, &cpuset);
+
+	return 0 == pthread_setaffinity_np(_pData->thread, sizeof(cpu_set_t), &cpuset);
+#else
+	return false;
+#endif
+}
+
+
+int ThreadImpl::getAffinityImpl() const
+{
+#if POCO_OS == POCO_OS_LINUX
+	cpu_set_t cpuset;
+	CPU_ZERO(&cpuset);
+	if (0 == pthread_getaffinity_np(_pData->thread, sizeof(cpu_set_t), &cpuset))
+	{
+		for (int i = 0; i < CPU_SETSIZE; ++i)
+		{
+			if (CPU_ISSET(i, &cpuset)) return i;
+		}
+	}
+#endif
+	return -1;
 }
 
 

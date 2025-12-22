@@ -19,7 +19,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "Poco/ThreadPool.h"
+#include "Poco/ActiveThreadPool.h"
 #include "Poco/ActiveRunnable.h"
 
 
@@ -28,7 +28,7 @@ namespace Poco {
 
 template <class OwnerType>
 class ActiveStarter
-	/// The default implementation of the StarterType 
+	/// The default implementation of the StarterType
 	/// policy for ActiveMethod. It starts the method
 	/// in its own thread, obtained from the default
 	/// thread pool.
@@ -36,7 +36,7 @@ class ActiveStarter
 public:
 	static void start(OwnerType* /*pOwner*/, ActiveRunnableBase::Ptr pRunnable)
 	{
-		ThreadPool::defaultPool().start(*pRunnable);
+		ActiveThreadPool::defaultPool().start(*pRunnable);
 		pRunnable->duplicate(); // The runnable will release itself.
 	}
 };

@@ -40,15 +40,15 @@ public:
 
 	void addChannel(Channel::Ptr pChannel);
 		/// Attaches a channel, which may not be null.
-		
+
 	void removeChannel(Channel::Ptr pChannel);
 		/// Removes a channel.
 
-	void log(const Message& msg);
+	void log(const Message& msg) override;
 		/// Sends the given Message to all
-		/// attaches channels. 
+		/// attaches channels.
 
-	void setProperty(const std::string& name, const std::string& value);
+	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets or changes a configuration property.
 		///
 		/// Only the "channel" property is supported, which allows
@@ -57,18 +57,18 @@ public:
 		/// To simplify file-based configuration, all property
 		/// names starting with "channel" are treated as "channel".
 
-	void close();
+	void close() override;
 		/// Removes all channels.
-		
+
 	int count() const;
 		/// Returns the number of channels in the SplitterChannel.
 
 protected:
-	~SplitterChannel();
+	~SplitterChannel() override;
 
 private:
-	typedef std::vector<Channel::Ptr> ChannelVec;
-	
+	using ChannelVec = std::vector<Channel::Ptr>;
+
 	ChannelVec        _channels;
 	mutable FastMutex _mutex;
 };

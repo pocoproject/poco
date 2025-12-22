@@ -13,6 +13,8 @@
 #ifndef HashTableTest_INCLUDED
 #define HashTableTest_INCLUDED
 
+#if defined(POCO_TEST_DEPRECATED)
+
 
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
@@ -39,5 +41,6 @@ public:
 private:
 };
 
+#endif
 
 #endif // HashTableTest_INCLUDED

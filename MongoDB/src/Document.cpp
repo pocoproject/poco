@@ -5,7 +5,7 @@
 // Package: MongoDB
 // Module:  Document
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -18,6 +18,7 @@
 #include "Poco/MongoDB/Array.h"
 #include "Poco/MongoDB/RegularExpression.h"
 #include "Poco/MongoDB/JavaScriptCode.h"
+#include <algorithm>
 #include <sstream>
 
 
@@ -35,17 +36,24 @@ Document::~Document()
 }
 
 
+Array& Document::addNewArray(const std::string& name)
+{
+	Array::Ptr newArray = new Array();
+	add(name, newArray);
+	return *newArray;
+}
+
+
 Element::Ptr Document::get(const std::string& name) const
 {
-	Element::Ptr element;
-
-	ElementSet::const_iterator it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
-	if (it != _elements.end())
+	// O(1) hash map lookup instead of O(n) linear search
+	auto it = _elementMap.find(name);
+	if (it != _elementMap.end())
 	{
-		return *it;
+		return it->second;
 	}
 
-	return element;
+	return Element::Ptr();  // Return empty pointer if not found
 }
 
 
@@ -56,18 +64,19 @@ Int64 Document::getInteger(const std::string& name) const
 
 	if (ElementTraits<double>::TypeId == element->type())
 	{
-		ConcreteElement<double>* concrete = dynamic_cast<ConcreteElement<double>*>(element.get());
-		if (concrete) return static_cast<Int64>(concrete->value());
+		// Type is already verified, static_cast is safe and ~10x faster than dynamic_cast
+		auto* concrete = static_cast<ConcreteElement<double>*>(element.get());
+		return static_cast<Int64>(concrete->value());
 	}
 	else if (ElementTraits<Int32>::TypeId == element->type())
 	{
-		ConcreteElement<Int32>* concrete = dynamic_cast<ConcreteElement<Int32>*>(element.get());
-		if (concrete) return concrete->value();
+		auto* concrete = static_cast<ConcreteElement<Int32>*>(element.get());
+		return concrete->value();
 	}
 	else if (ElementTraits<Int64>::TypeId == element->type())
 	{
-		ConcreteElement<Int64>* concrete = dynamic_cast<ConcreteElement<Int64>*>(element.get());
-		if (concrete) return concrete->value();
+		auto* concrete = static_cast<ConcreteElement<Int64>*>(element.get());
+		return concrete->value();
 	}
 	throw Poco::BadCastException("Invalid type mismatch!");
 }
@@ -134,7 +143,7 @@ void Document::read(BinaryReader& reader)
 		default:
 			{
 				std::stringstream ss;
-				ss << "Element " << name << " contains an unsupported type 0x" << std::hex << (int) type;
+				ss << "Element " << name << " contains an unsupported type 0x" << std::hex << static_cast<int>(type);
 				throw Poco::NotImplementedException(ss.str());
 			}
 		//TODO: x0F -> JavaScript code with scope
@@ -143,7 +152,8 @@ void Document::read(BinaryReader& reader)
 		}
 
 		element->read(reader);
-		_elements.push_back(element);
+		_elementNames.push_back(element->name());
+		_elementMap[element->name()] = element;  // Populate hash map for O(1) lookups
 
 		reader >> type;
 	}
@@ -153,26 +163,32 @@ void Document::read(BinaryReader& reader)
 std::string Document::toString(int indent) const
 {
 	std::ostringstream oss;
+	// Pre-reserve reasonable capacity for small-medium documents to reduce reallocations
+	oss.str().reserve(256);
 
 	oss << '{';
 
 	if (indent > 0) oss << std::endl;
 
-
-	for (ElementSet::const_iterator it = _elements.begin(); it != _elements.end(); ++it)
+	for (auto it = _elementNames.begin(), total = _elementNames.end(); it != total; ++it)
 	{
-		if (it != _elements.begin())
+		if (it != _elementNames.begin())
 		{
 			oss << ',';
 			if (indent > 0) oss << std::endl;
 		}
 
-		for (int i = 0; i < indent; ++i) oss << ' ';
+		if (indent > 0)
+		{
+			const std::string indentStr(indent, ' ');
+			oss << indentStr;
+		}
 
-		oss << '"' << (*it)->name() << '"';
+		const auto& element = _elementMap.at(*it);
+		oss << '"' << *it << '"';
 		oss << (indent > 0  ? " : " : ":");
 
-		oss << (*it)->toString(indent > 0 ? indent + 2 : 0);
+		oss << element->toString(indent > 0 ? indent + 2 : 0);
 	}
 
 	if (indent > 0)
@@ -180,7 +196,8 @@ std::string Document::toString(int indent) const
 		oss << std::endl;
 		if (indent >= 2) indent -= 2;
 
-		for (int i = 0; i < indent; ++i) oss << ' ';
+		const std::string indentStr(indent, ' ');
+		oss << indentStr;
 	}
 
 	oss << '}';
@@ -189,9 +206,9 @@ std::string Document::toString(int indent) const
 }
 
 
-void Document::write(BinaryWriter& writer)
+void Document::write(BinaryWriter& writer) const
 {
-	if (_elements.empty())
+	if (_elementNames.empty())
 	{
 		writer << 5;
 	}
@@ -199,11 +216,11 @@ void Document::write(BinaryWriter& writer)
 	{
 		std::stringstream sstream;
 		Poco::BinaryWriter tempWriter(sstream, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
-		for (ElementSet::iterator it = _elements.begin(); it != _elements.end(); ++it)
+		for (const auto& name : _elementNames)
 		{
-			tempWriter << static_cast<unsigned char>((*it)->type());
-			BSONWriter(tempWriter).writeCString((*it)->name());
-			Element::Ptr element = *it;
+			const auto& element = _elementMap.at(name);
+			tempWriter << static_cast<unsigned char>(element->type());
+			BSONWriter(tempWriter).writeCString(element->name());
 			element->write(tempWriter);
 		}
 		tempWriter.flush();
@@ -213,6 +230,50 @@ void Document::write(BinaryWriter& writer)
 		writer.writeRaw(sstream.str());
 	}
 	writer << '\0';
+}
+
+
+void Document::reserve(std::size_t size)
+{
+	_elementNames.reserve(size);
+	_elementMap.reserve(size);
+}
+
+
+Document& Document::addElement(Element::Ptr element)
+{
+	// Check if element with this name already exists
+	auto it = _elementMap.find(element->name());
+	if (it == _elementMap.end())
+	{
+		// New element - add name to vector and element to map
+		_elementNames.push_back(element->name());
+		_elementMap[element->name()] = element;
+	}
+	else
+	{
+		// Element exists - only update the map (replace existing)
+		_elementMap[element->name()] = element;
+	}
+	return *this;
+}
+
+
+bool Document::remove(const std::string& name)
+{
+	// Remove from hash map first (O(1))
+	auto mapIt = _elementMap.find(name);
+	if (mapIt == _elementMap.end())
+		return false;
+
+	_elementMap.erase(mapIt);
+
+	// Then remove from vector (O(n) but unavoidable for order preservation)
+	auto it = std::find(_elementNames.begin(), _elementNames.end(), name);
+	if (it != _elementNames.end())
+		_elementNames.erase(it);
+
+	return true;
 }
 
 

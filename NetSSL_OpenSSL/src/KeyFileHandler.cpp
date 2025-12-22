@@ -45,7 +45,7 @@ void KeyFileHandler::onPrivateKeyRequested(const void* pSender, std::string& pri
 		std::string prefix = serverSide() ? SSLManager::CFG_SERVER_PREFIX : SSLManager::CFG_CLIENT_PREFIX;
 		if (!config.hasProperty(prefix + CFG_PRIV_KEY_FILE))
 			throw Poco::Util::EmptyOptionException(std::string("Missing Configuration Entry: ") + prefix + CFG_PRIV_KEY_FILE);
-		
+
 		privateKey = config.getString(prefix + CFG_PRIV_KEY_FILE);
 	}
 	catch (Poco::NullPointerException&)

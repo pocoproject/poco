@@ -81,7 +81,7 @@ void SortedDirectoryIterator::scan()
 		{
 			isDir = (*this)->isDirectory();
 		}
-		catch (...) 
+		catch (...)
 		{
 		}
 		if (isDir)

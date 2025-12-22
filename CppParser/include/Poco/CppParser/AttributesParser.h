@@ -34,13 +34,13 @@ class CppParser_API AttributesParser
 	/// structs/classes, functions, types, etc. can be annotated
 	/// with attributes.
 	///
-	/// Attributes always come immediately before the symbol that 
+	/// Attributes always come immediately before the symbol that
 	/// is being annotated, and are written inside special comments
 	/// with the syntax:
 	///     //@ <attrDecl>[,<attrDec>...]
 	/// where <attrDecl> is
 	///     <name>[=<value>]
-	/// <name> is a valid C++ identifier, or two identifiers separated by 
+	/// <name> is a valid C++ identifier, or two identifiers separated by
 	/// a period (struct accessor notation).
 	/// <value> is a string, integer, identifier, bool literal, or a complex value
 	/// in the form
@@ -67,7 +67,7 @@ protected:
 	static bool isOperator(const Poco::Token* pToken, int kind);
 	static bool isLiteral(const Poco::Token* pToken);
 	static bool isEOF(const Poco::Token* pToken);
-	
+
 private:
 	Attributes& _attrs;
 	Tokenizer   _tokenizer;

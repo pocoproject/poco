@@ -45,15 +45,15 @@ public:
 		/// Creates the StreamConverterBuf and connects it
 		/// to the given output stream.
 
-	~StreamConverterBuf();
-		/// Destroys the StreamConverterBuf.
+	~StreamConverterBuf() override;
+	/// Destroys the StreamConverterBuf.
 
 	int errors() const;
 		/// Returns the number of encoding errors encountered.
 
 protected:
-	int readFromDevice();
-	int writeToDevice(char c);
+	int readFromDevice() override;
+	int writeToDevice(char c) override;
 
 private:
 	std::istream*       _pIstr;
@@ -77,7 +77,7 @@ class Foundation_API StreamConverterIOS: public virtual std::ios
 public:
 	StreamConverterIOS(std::istream& istr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
 	StreamConverterIOS(std::ostream& ostr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
-	~StreamConverterIOS();
+	~StreamConverterIOS() override;
 	StreamConverterBuf* rdbuf();
 	int errors() const;
 
@@ -91,7 +91,7 @@ class Foundation_API InputStreamConverter: public StreamConverterIOS, public std
 	/// underlying istream from one character encoding into another.
 	/// If a character cannot be represented in outEncoding, defaultChar
 	/// is used instead.
-	/// If a byte sequence read from the underlying stream is not valid in inEncoding, 
+	/// If a byte sequence read from the underlying stream is not valid in inEncoding,
 	/// defaultChar is used instead and the encoding error count is incremented.
 {
 public:
@@ -99,8 +99,8 @@ public:
 		/// Creates the InputStreamConverter and connects it
 		/// to the given input stream.
 
-	~InputStreamConverter();
-		/// Destroys the stream.
+	~InputStreamConverter() override;
+	/// Destroys the stream.
 };
 
 
@@ -109,7 +109,7 @@ class Foundation_API OutputStreamConverter: public StreamConverterIOS, public st
 	/// underlying ostream from one character encoding into another.
 	/// If a character cannot be represented in outEncoding, defaultChar
 	/// is used instead.
-	/// If a byte sequence written to the stream is not valid in inEncoding, 
+	/// If a byte sequence written to the stream is not valid in inEncoding,
 	/// defaultChar is used instead and the encoding error count is incremented.
 {
 public:
@@ -117,8 +117,8 @@ public:
 		/// Creates the OutputStreamConverter and connects it
 		/// to the given input stream.
 
-	~OutputStreamConverter();
-		/// Destroys the CountingOutputStream.
+	~OutputStreamConverter() override;
+	/// Destroys the CountingOutputStream.
 };
 
 

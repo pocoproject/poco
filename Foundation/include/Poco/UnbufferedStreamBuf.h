@@ -1,5 +1,5 @@
 //
-// UnufferedStreamBuf.h
+// UnbufferedStreamBuf.h
 //
 // Library: Foundation
 // Package: Streams
@@ -28,7 +28,7 @@
 namespace Poco {
 
 
-template <typename ch, typename tr> 
+template <typename ch, typename tr>
 class BasicUnbufferedStreamBuf: public std::basic_streambuf<ch, tr>
 	/// This is an implementation of an unbuffered streambuf
 	/// that greatly simplifies the implementation of
@@ -37,37 +37,38 @@ class BasicUnbufferedStreamBuf: public std::basic_streambuf<ch, tr>
 	/// readFromDevice() or writeToDevice().
 {
 protected:
-	typedef std::basic_streambuf<ch, tr> Base;
-	typedef std::basic_ios<ch, tr> IOS;
-	typedef ch char_type;
-	typedef tr char_traits;
-	typedef typename Base::int_type int_type;
-	typedef typename Base::pos_type pos_type;
-	typedef typename Base::off_type off_type;
-	typedef typename IOS::openmode openmode;
+	using Base = std::basic_streambuf<ch, tr>;
+	using IOS = std::basic_ios<ch, tr>;
+	using char_type = ch;
+	using char_traits = tr;
+	using int_type = typename Base::int_type;
+	using pos_type = typename Base::pos_type;
+	using off_type = typename Base::off_type;
+	using openmode = typename IOS::openmode;
 
 public:
 	BasicUnbufferedStreamBuf():
 		_pb(char_traits::eof()),
 		_ispb(false)
 	{
-		this->setg(0, 0, 0);
-		this->setp(0, 0);
+		this->setg(nullptr, nullptr, nullptr);
+		this->setp(nullptr, nullptr);
 	}
 
-	~BasicUnbufferedStreamBuf()
-	{
-	}
+	~BasicUnbufferedStreamBuf() override = default;
 
-	virtual int_type overflow(int_type c)
+	BasicUnbufferedStreamBuf(const BasicUnbufferedStreamBuf&) = delete;
+	BasicUnbufferedStreamBuf& operator=(const BasicUnbufferedStreamBuf&) = delete;
+
+	int_type overflow(int_type c) override
 	{
-		if (c != char_traits::eof()) 
+		if (c != char_traits::eof())
 			return writeToDevice(char_traits::to_char_type(c));
 		else
 			return c;
 	}
 
-	virtual int_type underflow()
+	int_type underflow() override
 	{
 		if (_ispb)
 		{
@@ -85,7 +86,7 @@ public:
 		}
 	}
 
-	virtual int_type uflow()
+	int_type uflow() override
 	{
 		if (_ispb)
 		{
@@ -103,7 +104,7 @@ public:
 		}
 	}
 
-	virtual int_type pbackfail(int_type c)
+	int_type pbackfail(int_type c) override
 	{
 		if (_ispb)
 		{
@@ -116,9 +117,9 @@ public:
 			return c;
 		}
 	}
-	
-	virtual std::streamsize xsgetn(char_type* p, std::streamsize count)
-		/// Some platforms (for example, Compaq C++) have buggy implementations of 
+
+	std::streamsize xsgetn(char_type* p, std::streamsize count) override
+		/// Some platforms (for example, Compaq C++) have buggy implementations of
 		/// xsgetn that handle null buffers incorrectly.
 		/// Anyway, it does not hurt to provide an optimized implementation
 		/// of xsgetn for this streambuf implementation.
@@ -146,7 +147,7 @@ private:
 	{
 		return char_traits::eof();
 	}
-	
+
 	virtual int_type writeToDevice(char_type)
 	{
 		return char_traits::eof();
@@ -154,24 +155,20 @@ private:
 
 	int_type _pb;
 	bool     _ispb;
-	
-	BasicUnbufferedStreamBuf(const BasicUnbufferedStreamBuf&);
-	BasicUnbufferedStreamBuf& operator = (const BasicUnbufferedStreamBuf&);
 };
 
 
 //
 // We provide an instantiation for char.
 //
-// Visual C++ needs a workaround - explicitly importing the template
-// instantiation - to avoid duplicate symbols due to multiple
-// instantiations in different libraries.
-//
-#if defined(_MSC_VER) && defined(POCO_DLL) && !defined(Foundation_EXPORTS)
-template class Foundation_API BasicUnbufferedStreamBuf<char, std::char_traits<char>>;
-#endif
-typedef BasicUnbufferedStreamBuf<char, std::char_traits<char>> UnbufferedStreamBuf;
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+extern template class BasicUnbufferedStreamBuf<char, std::char_traits<char>>;
+#else
+extern template class Foundation_API BasicUnbufferedStreamBuf<char, std::char_traits<char>>;
+#endif
+
+using UnbufferedStreamBuf = BasicUnbufferedStreamBuf<char, std::char_traits<char>>;
 
 } // namespace Poco
 

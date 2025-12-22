@@ -52,6 +52,9 @@ public:
 	~ZipArchive();
 		/// Destroys the ZipArchive.
 
+	void checkConsistency();
+		/// Check archive's consistency
+
 	FileInfos::const_iterator fileInfoBegin() const;
 
 	FileInfos::const_iterator fileInfoEnd() const;
@@ -78,7 +81,7 @@ private:
 		/// Stores directory info for all found disks
 	DirectoryInfos64 _disks64;
 		/// Stores directory info for all found disks
-		
+
 	static const std::string EMPTY_COMMENT;
 
 	friend class Compress;

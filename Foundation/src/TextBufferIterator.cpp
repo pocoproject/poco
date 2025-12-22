@@ -22,9 +22,9 @@ namespace Poco {
 
 
 TextBufferIterator::TextBufferIterator():
-	_pEncoding(0),
-	_it(0),
-	_end(0)
+	_pEncoding(nullptr),
+	_it(nullptr),
+	_end(nullptr)
 {
 }
 
@@ -54,7 +54,7 @@ TextBufferIterator::TextBufferIterator(const char* begin, const char* end, const
 
 
 TextBufferIterator::TextBufferIterator(const char* end):
-	_pEncoding(0),
+	_pEncoding(nullptr),
 	_it(end),
 	_end(end)
 {
@@ -86,7 +86,7 @@ TextBufferIterator& TextBufferIterator::operator = (const TextBufferIterator& it
 }
 
 
-void TextBufferIterator::swap(TextBufferIterator& it)
+void TextBufferIterator::swap(TextBufferIterator& it) noexcept
 {
 	std::swap(_pEncoding, it._pEncoding);
 	std::swap(_it, it._it);
@@ -99,9 +99,10 @@ int TextBufferIterator::operator * () const
 	poco_check_ptr (_pEncoding);
 	poco_assert (_it != _end);
 	const char* it = _it;
-	
+
 	unsigned char buffer[TextEncoding::MAX_SEQUENCE_LENGTH];
 	unsigned char* p = buffer;
+	unsigned char* pend = p + TextEncoding::MAX_SEQUENCE_LENGTH;
 
 	if (it != _end)
 		*p++ = *it++;
@@ -114,9 +115,10 @@ int TextBufferIterator::operator * () const
 	while (-1 > n && (_end - it) >= -n - read)
 	{
 		while (read < -n && it != _end)
-		{ 
-			*p++ = *it++; 
-			read++; 
+		{
+			poco_assert(p != pend);
+			*p++ = *it++;
+			read++;
 		}
 		n = _pEncoding->queryConvert(buffer, read);
 	}
@@ -131,12 +133,12 @@ int TextBufferIterator::operator * () const
 	}
 }
 
-	
+
 TextBufferIterator& TextBufferIterator::operator ++ ()
 {
 	poco_check_ptr (_pEncoding);
 	poco_assert (_it != _end);
-	
+
 	unsigned char buffer[TextEncoding::MAX_SEQUENCE_LENGTH];
 	unsigned char* p = buffer;
 
@@ -151,16 +153,16 @@ TextBufferIterator& TextBufferIterator::operator ++ ()
 	while (-1 > n && (_end - _it) >= -n - read)
 	{
 		while (read < -n && _it != _end)
-		{ 
-			*p++ = *_it++; 
-			read++; 
+		{
+			*p++ = *_it++;
+			read++;
 		}
 		n = _pEncoding->sequenceLength(buffer, read);
 	}
 	while (read < n && _it != _end)
-	{ 
-		_it++; 
-		read++; 
+	{
+		_it++;
+		read++;
 	}
 
 	return *this;

@@ -20,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include <stdexcept>
+#include <typeinfo>
 
 
 namespace Poco {
@@ -42,8 +43,8 @@ public:
 
 	Exception(const Exception& exc);
 		/// Copy constructor.
-		
-	~Exception() noexcept;
+
+	~Exception() noexcept override;
 		/// Destroys the exception and deletes the nested exception.
 
 	Exception& operator = (const Exception& exc);
@@ -51,25 +52,25 @@ public:
 
 	virtual const char* name() const noexcept;
 		/// Returns a static string describing the exception.
-		
+
 	virtual const char* className() const noexcept;
 		/// Returns the name of the exception class.
-		
-	virtual const char* what() const noexcept;
+
+	const char* what() const noexcept override;
 		/// Returns a static string describing the exception.
 		///
 		/// Same as name(), but for compatibility with std::exception.
-		
+
 	const Exception* nested() const;
 		/// Returns a pointer to the nested exception, or
 		/// null if no nested exception exists.
-			
+
 	const std::string& message() const;
 		/// Returns the message text.
-			
+
 	int code() const;
 		/// Returns the exception code if defined.
-		
+
 	std::string displayText() const;
 		/// Returns a string consisting of the
 		/// message name and the message text.
@@ -79,7 +80,7 @@ public:
 		///
 		/// The copy can later be thrown again by
 		/// invoking rethrow() on it.
-		
+
 	virtual void rethrow() const;
 		/// (Re)Throws the exception.
 		///
@@ -96,13 +97,19 @@ protected:
 
 	void extendedMessage(const std::string& arg);
 		/// Sets the extended message for the exception.
-		
+
 private:
 	std::string _msg;
 	Exception*  _pNested;
 	int			_code;
 };
 
+#if defined(_HAS_EXCEPTIONS)
+	// Size of Poco::Exception depends on the exception settings (like _HAS_EXCEPTIONS)
+	// that might influence size of std::exception from which Poco::Exception is derived from.
+	// It is expected that Poco libraries and application using Poco have the same settings.
+	static_assert(_HAS_EXCEPTIONS != 0);
+#endif
 
 //
 // inlines
@@ -224,10 +231,12 @@ POCO_DECLARE_EXCEPTION(Foundation_API, RegularExpressionException, RuntimeExcept
 POCO_DECLARE_EXCEPTION(Foundation_API, LibraryLoadException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, LibraryAlreadyLoadedException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, NoThreadAvailableException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, ThreadInterruptedException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, PropertyNotSupportedException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, PoolOverflowException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, NoPermissionException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, OutOfMemoryException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, ResourceLimitException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, DataException, RuntimeException)
 
 POCO_DECLARE_EXCEPTION(Foundation_API, DataFormatException, DataException)
@@ -246,6 +255,8 @@ POCO_DECLARE_EXCEPTION(Foundation_API, CreateFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, OpenFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, WriteFileException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, ReadFileException, FileException)
+POCO_DECLARE_EXCEPTION(Foundation_API, ExecuteFileException, FileException)
+POCO_DECLARE_EXCEPTION(Foundation_API, FileNotReadyException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, DirectoryNotEmptyException, FileException)
 POCO_DECLARE_EXCEPTION(Foundation_API, UnknownURISchemeException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, TooManyURIRedirectsException, RuntimeException)

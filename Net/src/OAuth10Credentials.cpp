@@ -128,7 +128,7 @@ void OAuth10Credentials::authenticate(HTTPRequest& request, const Poco::URI& uri
 	authenticate(request, uri, emptyParams, method);
 }
 
-	
+
 void OAuth10Credentials::authenticate(HTTPRequest& request, const Poco::URI& uri, const Poco::Net::HTMLForm& params, SignatureMethod method)
 {
 	if (method == SIGN_PLAINTEXT)
@@ -165,27 +165,27 @@ bool OAuth10Credentials::verify(const HTTPRequest& request, const Poco::URI& uri
 
 			std::string version = oauthParams.get("oauth_version", "1.0");
 			if (version != "1.0") throw NotAuthenticatedException("Unsupported OAuth version", version);
-			
+
 			_consumerKey.clear();
 			std::string consumerKey = oauthParams.get("oauth_consumer_key", "");
 			URI::decode(consumerKey, _consumerKey);
-			
+
 			_token.clear();
 			std::string token = oauthParams.get("oauth_token", "");
 			URI::decode(token, _token);
-			
+
 			_callback.clear();
 			std::string callback = oauthParams.get("oauth_callback", "");
 			URI::decode(callback, _callback);
-			
+
 			std::string nonceEnc = oauthParams.get("oauth_nonce", "");
 			std::string nonce;
 			URI::decode(nonceEnc, nonce);
-			
+
 			std::string timestamp = oauthParams.get("oauth_timestamp", "");
-			
+
 			std::string method = oauthParams.get("oauth_signature_method", "");
-			
+
 			std::string signatureEnc = oauthParams.get("oauth_signature", "");
 			std::string signature;
 			URI::decode(signatureEnc, signature);
@@ -205,8 +205,8 @@ bool OAuth10Credentials::verify(const HTTPRequest& request, const Poco::URI& uri
 				refSignature = createSignature(request, uriWithoutQuery.toString(), params, nonce, timestamp);
 			}
 			else throw NotAuthenticatedException("Unsupported OAuth signature method", method);
-			
-			return refSignature == signature;			
+
+			return refSignature == signature;
 		}
 		else throw NotAuthenticatedException("No OAuth credentials found in Authorization header");
 	}
@@ -226,7 +226,7 @@ void OAuth10Credentials::signPlaintext(Poco::Net::HTTPRequest& request) const
 	std::string signature(percentEncode(_consumerSecret));
 	signature += '&';
 	signature += percentEncode(_tokenSecret);
-	
+
 	std::string authorization(SCHEME);
 	if (!_realm.empty())
 	{
@@ -322,7 +322,7 @@ std::string OAuth10Credentials::createSignature(const Poco::Net::HTTPRequest& re
 	{
 		paramsMap[percentEncode(p.first)] = percentEncode(p.second);
 	}
-	
+
 	std::string paramsString;
 	for (auto it = paramsMap.begin(); it != paramsMap.end(); ++it)
 	{
@@ -331,18 +331,18 @@ std::string OAuth10Credentials::createSignature(const Poco::Net::HTTPRequest& re
 		paramsString += "=";
 		paramsString += it->second;
 	}
-	
+
 	std::string signatureBase = request.getMethod();
 	signatureBase += '&';
 	signatureBase += percentEncode(uri);
 	signatureBase += '&';
 	signatureBase += percentEncode(paramsString);
-	
+
 	std::string signingKey;
 	signingKey += percentEncode(_consumerSecret);
 	signingKey += '&';
 	signingKey += percentEncode(_tokenSecret);
-	
+
 	Poco::HMACEngine<Poco::SHA1Engine> hmacEngine(signingKey);
 	hmacEngine.update(signatureBase);
 	Poco::DigestEngine::Digest digest = hmacEngine.digest();

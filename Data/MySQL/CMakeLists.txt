@@ -25,8 +25,7 @@ target_link_libraries(DataMySQL PUBLIC Poco::Data MySQL::client)
 target_include_directories(DataMySQL
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-		$<INSTALL_INTERFACE:include>
-	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 target_compile_definitions(DataMySQL PUBLIC THREADSAFE NO_TCL)
 

@@ -62,7 +62,10 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	///   * e signed floating-point value in the form [-]d.dddde[<sign>]dd[d]
 	///   * E signed floating-point value in the form [-]d.ddddE[<sign>]dd[d]
 	///   * f signed floating-point value in the form [-]dddd.dddd
+	///   * g use the shortest representation: %e or %f
+	///   * G use the shortest representation: %E or %F
 	///   * s std::string
+	///   * v std::string_view
 	///   * z std::size_t
 	///
 	/// The following flags are supported:
@@ -106,17 +109,26 @@ std::string Foundation_API format(const std::string& fmt, const Any& value);
 	///     std::string s2 = format("second: %[1]d, first: %[0]d", 1, 2);
 
 void Foundation_API format(std::string& result, const char *fmt, const std::vector<Any>& values);
-	/// Supports a variable number of arguments and is used by
-	/// all other variants of format().
+	/// Supports a variable number of arguments.
 
 void Foundation_API format(std::string& result, const std::string& fmt, const std::vector<Any>& values);
+	/// Supports a variable number of arguments.
+
+inline void formatAny(std::string& result, const std::string& fmt, const std::vector<Any>& values)
 	/// Supports a variable number of arguments and is used by
 	/// all other variants of format().
+{
+	Poco::format(result, fmt, values);
+}
 
+inline void formatAny(std::string& result, const char *fmt, const std::vector<Any>& values)
+	/// Supports a variable number of arguments and is used by
+	/// all other variants of format().
+{
+	Poco::format(result, fmt, values);
+}
 
-template <
-	typename T,
-	typename... Args>
+template <typename T, typename... Args>
 void format(std::string& result, const std::string& fmt, T arg1, Args... args)
 	/// Appends the formatted string to result.
 {
@@ -124,13 +136,11 @@ void format(std::string& result, const std::string& fmt, T arg1, Args... args)
 	values.reserve(sizeof...(Args) + 1);
 	values.emplace_back(arg1);
 	values.insert(values.end(), { args... });
-	format(result, fmt, values);
+	formatAny(result, fmt, values);
 }
 
 
-template <
-	typename T,
-	typename... Args>
+template <typename T, typename... Args>
 void format(std::string& result, const char* fmt, T arg1, Args... args)
 	/// Appends the formatted string to result.
 {
@@ -138,13 +148,11 @@ void format(std::string& result, const char* fmt, T arg1, Args... args)
 	values.reserve(sizeof...(Args) + 1);
 	values.emplace_back(arg1);
 	values.insert(values.end(), { args... });
-	format(result, fmt, values);
+	formatAny(result, fmt, values);
 }
 
 
-template <
-	typename T,
-	typename... Args>
+template <typename T, typename... Args>
 std::string format(const std::string& fmt, T arg1, Args... args)
 	/// Returns the formatted string.
 {
@@ -153,14 +161,12 @@ std::string format(const std::string& fmt, T arg1, Args... args)
 	values.emplace_back(arg1);
 	values.insert(values.end(), { args... });
 	std::string result;
-	format(result, fmt, values);
+	formatAny(result, fmt, values);
 	return result;
 }
 
 
-template <
-	typename T,
-	typename... Args>
+template <typename T, typename... Args>
 std::string format(const char* fmt, T arg1, Args... args)
 	/// Returns the formatted string.
 {
@@ -169,7 +175,7 @@ std::string format(const char* fmt, T arg1, Args... args)
 	values.emplace_back(arg1);
 	values.insert(values.end(), { args... });
 	std::string result;
-	format(result, fmt, values);
+	formatAny(result, fmt, values);
 	return result;
 }
 

@@ -43,7 +43,7 @@ class SocketConnector
 	/// The Acceptor-Connector design pattern decouples connection
 	/// establishment and service initialization in a distributed system
 	/// from the processing performed once a service is initialized.
-	/// This decoupling is achieved with three components: Acceptors, 
+	/// This decoupling is achieved with three components: Acceptors,
 	/// Connectors and Service Handlers.
 	/// The Connector actively establishes a connection with a remote
 	/// server socket (usually managed by an Acceptor) and initializes
@@ -51,10 +51,10 @@ class SocketConnector
 	///
 	/// The SocketConnector sets up a StreamSocket, initiates a non-blocking
 	/// connect operation and registers itself for ReadableNotification, WritableNotification
-	/// and ErrorNotification. ReadableNotification or WritableNotification denote the successful 
+	/// and ErrorNotification. ReadableNotification or WritableNotification denote the successful
 	/// establishment of the connection.
 	///
-	/// When the StreamSocket becomes readable or writeable, the SocketConnector 
+	/// When the StreamSocket becomes readable or writeable, the SocketConnector
 	/// creates a ServiceHandler to service the connection and unregisters
 	/// itself.
 	///
@@ -73,16 +73,16 @@ class SocketConnector
 	/// if special steps are necessary to create a ServiceHandler object.
 {
 public:
-	explicit SocketConnector(SocketAddress& address):
-		_pReactor(0)
+	explicit SocketConnector(const SocketAddress& address):
+		_pReactor(nullptr)
 		/// Creates a SocketConnector, using the given Socket.
 	{
 		_socket.connectNB(address);
 	}
 
-	SocketConnector(SocketAddress& address, SocketReactor& reactor, bool doRegister = true) :
-		_pReactor(0)
-		/// Creates an acceptor, using the given ServerSocket.
+	SocketConnector(const SocketAddress& address, SocketReactor& reactor, bool doRegister = true) :
+		_pReactor(nullptr)
+		/// Creates an connector, using the given ServerSocket.
 		/// The SocketConnector registers itself with the given SocketReactor.
 	{
 		_socket.connectNB(address);
@@ -102,6 +102,10 @@ public:
 		}
 	}
 
+	SocketConnector() = delete;
+	SocketConnector(const SocketConnector&) = delete;
+	SocketConnector& operator = (const SocketConnector&) = delete;
+
 	virtual void registerConnector(SocketReactor& reactor)
 		/// Registers the SocketConnector with a SocketReactor.
 		///
@@ -111,9 +115,9 @@ public:
 		/// The overriding method must call the baseclass implementation first.
 	{
 		_pReactor = &reactor;
-		_pReactor->addEventHandler(_socket, Poco::Observer<SocketConnector, ReadableNotification>(*this, &SocketConnector::onReadable));
-		_pReactor->addEventHandler(_socket, Poco::Observer<SocketConnector, WritableNotification>(*this, &SocketConnector::onWritable));
-		_pReactor->addEventHandler(_socket, Poco::Observer<SocketConnector, ErrorNotification>(*this, &SocketConnector::onError));
+		_pReactor->addEventHandler(_socket, Poco::NObserver<SocketConnector, ReadableNotification>(*this, &SocketConnector::onReadable));
+		_pReactor->addEventHandler(_socket, Poco::NObserver<SocketConnector, WritableNotification>(*this, &SocketConnector::onWritable));
+		_pReactor->addEventHandler(_socket, Poco::NObserver<SocketConnector, ErrorNotification>(*this, &SocketConnector::onError));
 	}
 
 	virtual void unregisterConnector()
@@ -126,47 +130,38 @@ public:
 	{
 		if (_pReactor)
 		{
-			_pReactor->removeEventHandler(_socket, Poco::Observer<SocketConnector, ReadableNotification>(*this, &SocketConnector::onReadable));
-			_pReactor->removeEventHandler(_socket, Poco::Observer<SocketConnector, WritableNotification>(*this, &SocketConnector::onWritable));
-			_pReactor->removeEventHandler(_socket, Poco::Observer<SocketConnector, ErrorNotification>(*this, &SocketConnector::onError));
+			_pReactor->removeEventHandler(_socket, Poco::NObserver<SocketConnector, ReadableNotification>(*this, &SocketConnector::onReadable));
+			_pReactor->removeEventHandler(_socket, Poco::NObserver<SocketConnector, WritableNotification>(*this, &SocketConnector::onWritable));
+			_pReactor->removeEventHandler(_socket, Poco::NObserver<SocketConnector, ErrorNotification>(*this, &SocketConnector::onError));
 		}
 	}
 
-	void onReadable(ReadableNotification* pNotification)
+	void onReadable(const AutoPtr<ReadableNotification>& pNotification)
 	{
-		pNotification->release();
+		unregisterConnector();
 		int err = _socket.impl()->socketError(); 
-		if (err)
-		{
-			onError(err);
-			unregisterConnector();
-		}
-		else
-		{
-			onConnect();
-		}
+		if (err) onError(err);
+		else onConnect();
 	}
-	
-	void onWritable(WritableNotification* pNotification)
+
+	void onWritable(const AutoPtr<WritableNotification>& pNotification)
 	{
-		pNotification->release();
+		unregisterConnector();
 		onConnect();
 	}
-	
+
+	void onError(const AutoPtr<ErrorNotification>& pNotification)
+	{
+		unregisterConnector();
+		onError(_socket.impl()->socketError());
+	}
+
 	void onConnect()
 	{
 		_socket.setBlocking(true);
 		createServiceHandler();
-		unregisterConnector();
 	}
-	
-	void onError(ErrorNotification* pNotification)
-	{
-		pNotification->release();
-		onError(_socket.impl()->socketError());
-		unregisterConnector();
-	}
-	
+
 protected:
 	virtual ServiceHandler* createServiceHandler()
 		/// Create and initialize a new ServiceHandler instance.
@@ -182,7 +177,7 @@ protected:
 		/// Subclasses can override this method.
 	{
 	}
-	
+
 	SocketReactor* reactor()
 		/// Returns a pointer to the SocketReactor where
 		/// this SocketConnector is registered.
@@ -191,7 +186,7 @@ protected:
 	{
 		return _pReactor;
 	}
-	
+
 	StreamSocket& socket()
 		/// Returns a reference to the SocketConnector's socket.
 	{
@@ -199,9 +194,6 @@ protected:
 	}
 
 private:
-	SocketConnector();
-	SocketConnector(const SocketConnector&);
-	SocketConnector& operator = (const SocketConnector&);
 
 	StreamSocket   _socket;
 	SocketReactor* _pReactor;

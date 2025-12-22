@@ -30,7 +30,7 @@ Attr::Attr(Document* pOwnerDocument, Element* pOwnerElement, const XMLString& na
 }
 
 
-Attr::Attr(Document* pOwnerDocument, const Attr& attr): 
+Attr::Attr(Document* pOwnerDocument, const Attr& attr):
 	AbstractNode(pOwnerDocument, attr),
 	_name(pOwnerDocument->namePool().insert(attr._name)),
 	_value(attr._value),
@@ -56,7 +56,7 @@ void Attr::setValue(const XMLString& value)
 
 Node* Attr::parentNode() const
 {
-	return 0;
+	return nullptr;
 }
 
 
@@ -72,7 +72,7 @@ Node* Attr::previousSibling() const
 		}
 		return pSibling;
 	}
-	return 0;
+	return nullptr;
 }
 
 

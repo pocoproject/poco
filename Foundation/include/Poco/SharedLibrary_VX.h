@@ -21,6 +21,8 @@
 #include "Poco/Foundation.h"
 #include "Poco/Mutex.h"
 #include <moduleLib.h>
+#include <vector>
+#include <string>
 
 
 namespace Poco {
@@ -38,6 +40,7 @@ protected:
 	const std::string& getPathImpl() const;
 	static std::string suffixImpl();
 	static bool setSearchPathImpl(const std::string& path);
+	static std::vector<std::string> findMissingDependenciesImpl(const std::string& path);
 
 private:
 	std::string _path;

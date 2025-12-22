@@ -31,7 +31,7 @@ public:
 	void testSendMultiRecipient();
 	void testMultiSeparateRecipient();
 	void testSendFailed();
-	
+
 	void setUp();
 	void tearDown();
 

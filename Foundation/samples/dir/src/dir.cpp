@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 		dir = argv[1];
 	else
 		dir = Path::current();
-		
+
 	try
 	{
 		DirectoryIterator it(dir);
@@ -57,6 +57,6 @@ int main(int argc, char** argv)
 		std::cerr << exc.displayText() << std::endl;
 		return 1;
 	}
-		
+
 	return 0;
 }

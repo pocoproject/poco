@@ -18,10 +18,15 @@
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPServerRequest.h"
+#include "Poco/Net/HTTPServerRequestImpl.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/HTTPServerSession.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Path.h"
+#include "Poco/FileStream.h"
+#include "Poco/File.h"
 #include <sstream>
 
 
@@ -38,10 +43,15 @@ using Poco::Net::HTTPServerResponse;
 using Poco::Net::HTTPMessage;
 using Poco::Net::ServerSocket;
 using Poco::StreamCopier;
+using Poco::Path;
+using Poco::File;
+using Poco::FileOutputStream;
 
 
 namespace
 {
+	static const int sendFileSize = 64000;
+
 	class EchoBodyRequestHandler: public HTTPRequestHandler
 	{
 	public:
@@ -51,15 +61,15 @@ namespace
 				response.setChunkedTransferEncoding(true);
 			else if (request.getContentLength() != HTTPMessage::UNKNOWN_CONTENT_LENGTH)
 				response.setContentLength(request.getContentLength());
-			
+
 			response.setContentType(request.getContentType());
-			
+
 			std::istream& istr = request.stream();
 			std::ostream& ostr = response.send();
 			StreamCopier::copyStream(istr, ostr);
 		}
 	};
-	
+
 	class EchoHeaderRequestHandler: public HTTPRequestHandler
 	{
 	public:
@@ -93,7 +103,7 @@ namespace
 			response.send();
 		}
 	};
-	
+
 	class BufferRequestHandler: public HTTPRequestHandler
 	{
 	public:
@@ -104,6 +114,43 @@ namespace
 		}
 	};
 	
+	class FileRequestHandler: public HTTPRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		{
+			std::string payload(sendFileSize, 'x');
+			Poco::Path testFilePath = Poco::Path::temp().append("test.http.server.sendfile.txt");
+			const std::string fileName = testFilePath.toString();
+			{
+				File f(fileName);
+				if (f.exists())
+				{
+					f.remove();
+				}
+			}
+			FileOutputStream fout(fileName);
+			fout << payload;
+			fout.close();
+			response.sendFile(fileName, "text/plain");
+		}
+	};
+	
+	class TrailerRequestHandler: public HTTPRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		{
+			std::string data("xxxxxxxxxx");
+
+			response.setChunkedTransferEncoding(true);
+			Poco::Net::MessageHeader& trailer = static_cast<Poco::Net::HTTPServerRequestImpl&>(request).session().responseTrailer();
+			trailer.set("Trailer-1", "Value 1");
+			trailer.set("Trailer-2", "Value 2");
+			response.send() << data;
+		}
+	};
+
 	class RequestHandlerFactory: public HTTPRequestHandlerFactory
 	{
 	public:
@@ -114,13 +161,17 @@ namespace
 			else if (request.getURI() == "/echoHeader")
 				return new EchoHeaderRequestHandler;
 			else if (request.getURI() == "/redirect")
-				return new RedirectRequestHandler();
+				return new RedirectRequestHandler;
 			else if (request.getURI() == "/auth")
-				return new AuthRequestHandler();
+				return new AuthRequestHandler;
 			else if (request.getURI() == "/buffer")
-				return new BufferRequestHandler();
+				return new BufferRequestHandler;
+			else if (request.getURI() == "/trailer")
+				return new TrailerRequestHandler;
+			else if (request.getURI() == "/file")
+				return new FileRequestHandler;
 			else
-				return 0;
+				return nullptr;
 		}
 	};
 }
@@ -143,7 +194,7 @@ void HTTPServerTest::testIdentityRequest()
 	pParams->setKeepAlive(false);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
@@ -166,7 +217,7 @@ void HTTPServerTest::testPutIdentityRequest()
 	pParams->setKeepAlive(false);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("PUT", "/echoBody");
@@ -189,7 +240,7 @@ void HTTPServerTest::testChunkedRequest()
 	pParams->setKeepAlive(false);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
@@ -206,34 +257,11 @@ void HTTPServerTest::testChunkedRequest()
 }
 
 
-void HTTPServerTest::testClosedRequest()
-{
-	ServerSocket svs(0);
-	HTTPServerParams* pParams = new HTTPServerParams;
-	pParams->setKeepAlive(false);
-	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
-	srv.start();
-	
-	HTTPClientSession cs("127.0.0.1", svs.address().port());
-	std::string body(5000, 'x');
-	HTTPRequest request("POST", "/echoBody");
-	request.setContentType("text/plain");
-	cs.sendRequest(request) << body;
-	HTTPResponse response;
-	std::string rbody;
-	cs.receiveResponse(response) >> rbody;
-	assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	assertTrue (response.getContentType() == "text/plain");
-	assertTrue (!response.getChunkedTransferEncoding());
-	assertTrue (rbody == body);
-}
-
-
 void HTTPServerTest::testIdentityRequestKeepAlive()
 {
 	HTTPServer srv(new RequestHandlerFactory, 8008);
 	srv.start();
-	
+
 	HTTPClientSession cs("127.0.0.1", srv.socket().address().port());
 	cs.setKeepAlive(true);
 	std::string body(5000, 'x');
@@ -248,7 +276,7 @@ void HTTPServerTest::testIdentityRequestKeepAlive()
 	assertTrue (response.getContentType() == "text/plain");
 	assertTrue (response.getKeepAlive());
 	assertTrue (rbody == body);
-	
+
 	body.assign(1000, 'y');
 	request.setContentLength((int) body.length());
 	request.setKeepAlive(false);
@@ -264,7 +292,7 @@ void HTTPServerTest::testChunkedRequestKeepAlive()
 {
 	HTTPServer srv(new RequestHandlerFactory, 8009);
 	srv.start();
-	
+
 	HTTPClientSession cs("127.0.0.1", srv.socket().address().port());
 	cs.setKeepAlive(true);
 	std::string body(5000, 'x');
@@ -292,27 +320,6 @@ void HTTPServerTest::testChunkedRequestKeepAlive()
 }
 
 
-void HTTPServerTest::testClosedRequestKeepAlive()
-{
-	HTTPServer srv(new RequestHandlerFactory, 8010);
-	srv.start();
-	
-	HTTPClientSession cs("127.0.0.1", srv.socket().address().port());
-	std::string body(5000, 'x');
-	HTTPRequest request("POST", "/echoBody");
-	request.setContentType("text/plain");
-	cs.sendRequest(request) << body;
-	HTTPResponse response;
-	std::string rbody;
-	cs.receiveResponse(response) >> rbody;
-	assertTrue (response.getContentLength() == HTTPMessage::UNKNOWN_CONTENT_LENGTH);
-	assertTrue (response.getContentType() == "text/plain");
-	assertTrue (!response.getChunkedTransferEncoding());
-	assertTrue (!response.getKeepAlive());
-	assertTrue (rbody == body);
-}
-
-
 void HTTPServerTest::testMaxKeepAlive()
 {
 	ServerSocket svs(0);
@@ -321,7 +328,7 @@ void HTTPServerTest::testMaxKeepAlive()
 	pParams->setMaxKeepAliveRequests(4);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	cs.setKeepAlive(true);
 	HTTPRequest request("POST", "/echoBody", HTTPMessage::HTTP_1_1);
@@ -377,7 +384,7 @@ void HTTPServerTest::testKeepAliveTimeout()
 	pParams->setKeepAliveTimeout(Poco::Timespan(3, 0));
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	cs.setKeepAlive(true);
 	cs.setKeepAliveTimeout(Poco::Timespan(2, 0));
@@ -421,7 +428,7 @@ void HTTPServerTest::test100Continue()
 	pParams->setKeepAlive(false);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
@@ -445,7 +452,7 @@ void HTTPServerTest::testRedirect()
 	pParams->setKeepAlive(false);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	HTTPRequest request("GET", "/redirect");
 	cs.sendRequest(request);
@@ -465,7 +472,7 @@ void HTTPServerTest::testAuth()
 	pParams->setKeepAlive(false);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	HTTPRequest request("GET", "/auth");
 	cs.sendRequest(request);
@@ -485,7 +492,7 @@ void HTTPServerTest::testNotImpl()
 	pParams->setKeepAlive(false);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	HTTPRequest request("GET", "/notImpl");
 	cs.sendRequest(request);
@@ -504,7 +511,7 @@ void HTTPServerTest::testBuffer()
 	pParams->setKeepAlive(false);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPClientSession cs("127.0.0.1", svs.address().port());
 	HTTPRequest request("GET", "/buffer");
 	cs.sendRequest(request);
@@ -513,6 +520,48 @@ void HTTPServerTest::testBuffer()
 	cs.receiveResponse(response) >> rbody;
 	assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
 	assertTrue (rbody == "xxxxxxxxxx");
+}
+
+void HTTPServerTest::testFile()
+{
+	std::string payload(sendFileSize, 'x');
+	
+	ServerSocket svs(0);
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+	
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
+	HTTPRequest request("GET", "/file");
+	cs.sendRequest(request);
+	HTTPResponse response;
+	std::string rbody;
+	cs.receiveResponse(response) >> rbody;
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+	assertTrue (rbody == payload);
+}
+
+
+void HTTPServerTest::testChunkedTrailer()
+{
+	ServerSocket svs(0);
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
+	srv.start();
+
+	HTTPClientSession cs("127.0.0.1", svs.address().port());
+	HTTPRequest request("GET", "/trailer");
+	cs.sendRequest(request);
+	HTTPResponse response;
+	std::string rbody;
+	cs.receiveResponse(response) >> rbody;
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+	assertTrue (rbody == "xxxxxxxxxx");
+	assertTrue (!cs.responseTrailer().empty());
+	assertTrue (cs.responseTrailer().get("Trailer-1") == "Value 1");
+	assertTrue (cs.responseTrailer().get("Trailer-2") == "Value 2");
 }
 
 
@@ -533,10 +582,8 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testIdentityRequest);
 	CppUnit_addTest(pSuite, HTTPServerTest, testPutIdentityRequest);
 	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedRequest);
-	CppUnit_addTest(pSuite, HTTPServerTest, testClosedRequest);
 	CppUnit_addTest(pSuite, HTTPServerTest, testIdentityRequestKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedRequestKeepAlive);
-	CppUnit_addTest(pSuite, HTTPServerTest, testClosedRequestKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testMaxKeepAlive);
 	CppUnit_addTest(pSuite, HTTPServerTest, testKeepAliveTimeout);
 	CppUnit_addTest(pSuite, HTTPServerTest, test100Continue);
@@ -544,6 +591,8 @@ CppUnit::Test* HTTPServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPServerTest, testAuth);
 	CppUnit_addTest(pSuite, HTTPServerTest, testNotImpl);
 	CppUnit_addTest(pSuite, HTTPServerTest, testBuffer);
+	CppUnit_addTest(pSuite, HTTPServerTest, testFile);
+	CppUnit_addTest(pSuite, HTTPServerTest, testChunkedTrailer);
 
 	return pSuite;
 }

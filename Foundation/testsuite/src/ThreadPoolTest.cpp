@@ -14,6 +14,7 @@
 #include "Poco/ThreadPool.h"
 #include "Poco/RunnableAdapter.h"
 #include "Poco/Exception.h"
+#include "Poco/Timestamp.h"
 #include "Poco/Thread.h"
 
 
@@ -22,7 +23,7 @@ using Poco::RunnableAdapter;
 using Poco::Thread;
 
 
-ThreadPoolTest::ThreadPoolTest(const std::string& name): CppUnit::TestCase(name), _event(false)
+ThreadPoolTest::ThreadPoolTest(const std::string& name): CppUnit::TestCase(name), _event(Poco::Event::EVENT_MANUALRESET)
 {
 }
 
@@ -35,7 +36,6 @@ ThreadPoolTest::~ThreadPoolTest()
 void ThreadPoolTest::testThreadPool()
 {
 	ThreadPool pool(2, 3, 3);
-	pool.setStackSize(1);
 
 	assertTrue (pool.allocated() == 2);
 	assertTrue (pool.used() == 0);
@@ -76,7 +76,7 @@ void ThreadPoolTest::testThreadPool()
 	{
 		pool.start(ra);
 		failmsg("thread pool exhausted - must throw exception");
-	}	
+	}
 	catch (Poco::NoThreadAvailableException&)
 	{
 	}
@@ -84,17 +84,17 @@ void ThreadPoolTest::testThreadPool()
 	{
 		failmsg("wrong exception thrown");
 	}
-	
+
 	_event.set(); // go!!!
 	pool.joinAll();
-	
+
 	assertTrue (_count == 40000);
-	
+
 	assertTrue (pool.allocated() == 4);
 	assertTrue (pool.used() == 0);
 	assertTrue (pool.capacity() == 4);
 	assertTrue (pool.available() == 4);
-	
+
 	Thread::sleep(4000);
 
 	pool.collect();
@@ -102,7 +102,7 @@ void ThreadPoolTest::testThreadPool()
 	assertTrue (pool.used() == 0);
 	assertTrue (pool.capacity() == 4);
 	assertTrue (pool.available() == 4);
-	
+
 	_count = 0;
 	_event.reset();
 	pool.start(ra);
@@ -120,13 +120,57 @@ void ThreadPoolTest::testThreadPool()
 	pool.joinAll();
 
 	assertTrue (_count == 20000);
-	
+
 	assertTrue (pool.allocated() == 2);
 	assertTrue (pool.used() == 0);
 	assertTrue (pool.capacity() == 4);
 	assertTrue (pool.available() == 4);
 }
 
+class Worker : public Poco::Runnable
+{
+	static bool _shutDown;
+public:
+	Worker()
+	{
+	}
+	void run()
+	{
+		while (!_shutDown)
+		{
+			Poco::Thread::sleep(200);
+		}
+	}
+	static void Initialize() {
+		_shutDown = false;
+	}
+	static void Shutdown() {
+		_shutDown = true;
+	}
+};
+
+bool Worker::_shutDown = false;
+
+void ThreadPoolTest::testThreadPoolImmediateShutdown()
+{
+	Worker::Initialize();
+
+	Worker worker1; // create worker threads
+	Worker worker2;
+	Worker::Shutdown();  // workers will come up, and then immediatly be told to go away
+
+	Poco::Timestamp stime;
+
+	Poco::ThreadPool::defaultPool().start(worker1);
+	Poco::ThreadPool::defaultPool().start(worker2);
+
+	Poco::ThreadPool::defaultPool().joinAll();
+	Poco::Timestamp etime;
+
+	Poco::Timestamp::TimeDiff d = etime - stime;
+	assertTrue (d <= 100000);
+
+}
 
 void ThreadPoolTest::setUp()
 {
@@ -157,6 +201,7 @@ CppUnit::Test* ThreadPoolTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ThreadPoolTest");
 
 	CppUnit_addTest(pSuite, ThreadPoolTest, testThreadPool);
+	CppUnit_addTest(pSuite, ThreadPoolTest, testThreadPoolImmediateShutdown);
 
 	return pSuite;
 }

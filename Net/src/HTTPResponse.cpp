@@ -81,6 +81,7 @@ const std::string HTTPResponse::HTTP_REASON_MISDIRECTED_REQUEST             = "M
 const std::string HTTPResponse::HTTP_REASON_UNPROCESSABLE_ENTITY            = "Unprocessable Entity";
 const std::string HTTPResponse::HTTP_REASON_LOCKED                          = "Locked";
 const std::string HTTPResponse::HTTP_REASON_FAILED_DEPENDENCY               = "Failed Dependency";
+const std::string HTTPResponse::HTTP_REASON_TOO_EARLY                       = "Too Early";
 const std::string HTTPResponse::HTTP_REASON_UPGRADE_REQUIRED                = "Upgrade Required";
 const std::string HTTPResponse::HTTP_REASON_PRECONDITION_REQUIRED           = "Precondition Required";
 const std::string HTTPResponse::HTTP_REASON_TOO_MANY_REQUESTS               = "Too Many Requests";
@@ -212,6 +213,40 @@ Poco::Timestamp HTTPResponse::getDate() const
 
 void HTTPResponse::addCookie(const HTTPCookie& cookie)
 {
+	add(SET_COOKIE, cookie.toString());
+}
+
+
+void HTTPResponse::removeCookie(const std::string& cookieName)
+{
+	NameValueCollection::Iterator it = find(SET_COOKIE);
+	while (it != end() && Poco::icompare(it->first, SET_COOKIE) == 0)
+	{
+		const std::string& hv = it->second;
+		if (hv.size() > cookieName.size() && hv[cookieName.size()] == '=' && hv.compare(0, cookieName.size(), cookieName) == 0)
+		{
+			erase(it);
+			break;
+		}
+		++it;
+	}
+}
+
+
+void HTTPResponse::replaceCookie(const HTTPCookie& cookie)
+{
+	const std::string& cookieName = cookie.getName();
+	NameValueCollection::Iterator it = find(SET_COOKIE);
+	while (it != end() && Poco::icompare(it->first, SET_COOKIE) == 0)
+	{
+		const std::string& hv = it->second;
+		if (hv.size() > cookieName.size() && hv[cookieName.size()] == '=' && hv.compare(0, cookieName.size(), cookieName) == 0)
+		{
+			it->second = cookie.toString();
+			return;
+		}
+		++it;
+	}
 	add(SET_COOKIE, cookie.toString());
 }
 
@@ -363,6 +398,8 @@ const std::string& HTTPResponse::getReasonForStatus(HTTPStatus status)
 		return HTTP_REASON_LOCKED;
 	case HTTP_FAILED_DEPENDENCY:
 		return HTTP_REASON_FAILED_DEPENDENCY;
+	case HTTP_TOO_EARLY:
+		return HTTP_REASON_TOO_EARLY;
 	case HTTP_UPGRADE_REQUIRED:
 		return HTTP_REASON_UPGRADE_REQUIRED;
 	case HTTP_PRECONDITION_REQUIRED:

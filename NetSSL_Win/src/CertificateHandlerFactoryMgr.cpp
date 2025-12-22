@@ -42,21 +42,21 @@ void CertificateHandlerFactoryMgr::setFactory(const std::string& name, Certifica
 		delete pFactory;
 	poco_assert(success);
 }
-		
+
 
 bool CertificateHandlerFactoryMgr::hasFactory(const std::string& name) const
 {
 	return _factories.find(name) != _factories.end();
 }
-		
-	
+
+
 const CertificateHandlerFactory* CertificateHandlerFactoryMgr::getFactory(const std::string& name) const
 {
 	FactoriesMap::const_iterator it = _factories.find(name);
 	if (it != _factories.end())
 		return it->second;
 	else
-		return 0;
+		return nullptr;
 }
 
 

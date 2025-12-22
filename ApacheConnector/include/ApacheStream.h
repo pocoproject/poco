@@ -33,7 +33,7 @@ protected:
 	int writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE = 1024
 	};
@@ -53,15 +53,15 @@ class ApacheIOS: public virtual std::ios
 public:
 	ApacheIOS(ApacheRequestRec* pApacheRequest, bool haveData = false);
 		/// Creates the ApacheIOS with the given socket.
-		
+
 	~ApacheIOS();
 		/// Destroys the ApacheIOS.
 		///
 		/// Flushes the buffer, but does not close the socket.
-		
+
 	ApacheStreamBuf* rdbuf();
 		/// Returns a pointer to the internal ApacheStreamBuf.
-		
+
 	void close();
 		/// Flushes the stream.
 

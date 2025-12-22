@@ -13,8 +13,7 @@
 
 
 #include "Poco/NestedDiagnosticContext.h"
-#include "Poco/SingletonHolder.h"
-#include "Poco/ThreadLocal.h"
+#include "Poco/Path.h"
 
 
 namespace Poco {
@@ -43,18 +42,18 @@ NestedDiagnosticContext& NestedDiagnosticContext::operator = (const NestedDiagno
 	return *this;
 }
 
-	
+
 void NestedDiagnosticContext::push(const std::string& info)
 {
 	Context ctx;
 	ctx.info = info;
 	ctx.line = -1;
-	ctx.file = 0;
+	ctx.file = nullptr;
 	_stack.push_back(ctx);
 }
 
-	
-void NestedDiagnosticContext::push(const std::string& info, int line, const char* filename)
+
+void NestedDiagnosticContext::push(const std::string& info, LineNumber line, const char* filename)
 {
 	Context ctx;
 	ctx.info = info;
@@ -70,7 +69,7 @@ void NestedDiagnosticContext::pop()
 		_stack.pop_back();
 }
 
-	
+
 int NestedDiagnosticContext::depth() const
 {
 	return int(_stack.size());
@@ -89,21 +88,33 @@ std::string NestedDiagnosticContext::toString() const
 	return result;
 }
 
-	
+
 void NestedDiagnosticContext::dump(std::ostream& ostr) const
 {
 	dump(ostr, "\n");
 }
 
 
-void NestedDiagnosticContext::dump(std::ostream& ostr, const std::string& delimiter) const
+void NestedDiagnosticContext::dump(std::ostream& ostr, const std::string& delimiter, bool nameOnly) const
 {
-	for (const auto& i: _stack)
+	for (auto it = _stack.begin(); it != _stack.end(); ++it)
 	{
-		ostr << i.info;
-		if (i.file)
-			ostr << " (in \"" << i.file << "\", line " << i.line << ")";
-		ostr << delimiter;
+		if (it != _stack.begin())
+		{
+			ostr << delimiter;
+		}
+
+		std::string file = it->file ? it->file : "";
+		if (nameOnly && !file.empty())
+		{
+			file = Path(file).getFileName();
+		}
+
+		ostr << it->info;
+		if (!file.empty())
+		{
+			ostr << " (in \"" << file << "\", line " << it->line << ")";
+		}
 	}
 }
 
@@ -114,15 +125,10 @@ void NestedDiagnosticContext::clear()
 }
 
 
-namespace
-{
-	static ThreadLocal<NestedDiagnosticContext> ndc;
-}
-
-
 NestedDiagnosticContext& NestedDiagnosticContext::current()
 {
-	return ndc.get();
+	static thread_local NestedDiagnosticContext ndc;
+	return ndc;
 }
 
 

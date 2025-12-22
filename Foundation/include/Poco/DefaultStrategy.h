@@ -26,7 +26,7 @@
 namespace Poco {
 
 
-template <class TArgs, class TDelegate> 
+template <class TArgs, class TDelegate>
 class DefaultStrategy: public NotificationStrategy<TArgs, TDelegate>
 	/// Default notification strategy.
 	///
@@ -41,18 +41,14 @@ public:
 	using Iterator = typename Delegates::iterator;
 
 public:
-	DefaultStrategy()
-	{
-	}
+	DefaultStrategy() = default;
 
 	DefaultStrategy(const DefaultStrategy& s):
 		_delegates(s._delegates)
 	{
 	}
 
-	~DefaultStrategy()
-	{
-	}
+	~DefaultStrategy() = default;
 
 	void notify(const void* sender, TArgs& arguments)
 	{
@@ -81,7 +77,7 @@ public:
 			}
 		}
 	}
-	
+
 	void remove(DelegateHandle delegateHandle)
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
@@ -138,18 +134,19 @@ public:
 	using Iterator = typename Delegates::iterator;
 
 public:
-	DefaultStrategy()
-	{
-	}
+	DefaultStrategy() = default;
 
 	DefaultStrategy(const DefaultStrategy& s):
 		_delegates(s._delegates)
 	{
 	}
 
-	~DefaultStrategy()
+	DefaultStrategy(DefaultStrategy&& s):
+		_delegates(std::move(s._delegates))
 	{
 	}
+
+	~DefaultStrategy() = default;
 
 	void notify(const void* sender)
 	{
@@ -197,6 +194,15 @@ public:
 		if (this != &s)
 		{
 			_delegates = s._delegates;
+		}
+		return *this;
+	}
+
+	DefaultStrategy& operator = (DefaultStrategy&& s)
+	{
+		if (this != &s)
+		{
+			_delegates = std::move(s._delegates);
 		}
 		return *this;
 	}

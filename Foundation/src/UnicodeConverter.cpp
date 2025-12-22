@@ -69,7 +69,7 @@ void UnicodeConverter::convert(const std::string& utf8String, UTF16String& utf16
 	UTF8Encoding utf8Encoding;
 	TextIterator it(utf8String, utf8Encoding);
 	TextIterator end(utf8String);
-	while (it != end) 
+	while (it != end)
 	{
 		int cc = *it++;
 		if (cc <= 0xffff)

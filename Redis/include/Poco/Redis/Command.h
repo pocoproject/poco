@@ -57,8 +57,11 @@ public:
 	Command(const Command& copy);
 		/// Creates a command by copying another one.
 
-	virtual ~Command();
+	~Command() override;
 		/// Destroys the command.
+
+	Command& operator=(const Command&) = default;
+	Command& operator=(Command&&) = default;
 
 	static Command append(const std::string& key, const std::string& value);
 		/// Creates and returns an APPEND command.
@@ -131,6 +134,9 @@ public:
 
 	static Command incr(const std::string& key, Int64 by = 0);
 		/// Creates and returns an INCR or INCRBY command. Calls INCR when by is omitted or zero.
+
+	static Command keys(const std::string& pattern);
+		/// Creates and returns a KEYS command.
 
 	static Command lindex(const std::string& list, Int64 index = 0);
 		/// Creates and returns a LINDEX command.
@@ -270,10 +276,17 @@ public:
 
 	static Command discard();
 		/// Creates and returns a DISCARD command.
+
+	static Command auth(const std::string& password);
+		/// Creates and returns an AUTH command with the given password.
+
+	static Command auth(const std::string& username, const std::string& password);
+		/// Creates and returns an AUTH command with the given password.
 };
 
 
-} } // namespace Poco::Redis
+} // namespace Redis
+} // namespace Poco
 
 
 #endif // Redis_Command_INCLUDED

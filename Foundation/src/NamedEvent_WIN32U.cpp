@@ -26,10 +26,10 @@ NamedEventImpl::NamedEventImpl(const std::string& name):
 	_name(name)
 {
 	UnicodeConverter::toUTF16(_name, _uname);
-	_event = CreateEventW(NULL, FALSE, FALSE, _uname.c_str());
+	_event = CreateEventW(nullptr, FALSE, FALSE, _uname.c_str());
 	if (!_event)
 	{
-		DWORD dwRetVal = GetLastError(); 
+		DWORD dwRetVal = GetLastError();
 		throw SystemException(format("cannot create named event %s [Error %d: %s]", _name, (int)dwRetVal, Error::getMessage(dwRetVal)));
 	}
 }

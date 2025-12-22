@@ -77,7 +77,7 @@ public:
 		/// persistent connections.
 
 	bool getKeepAlive() const;
-		/// Returns true iff persistent connections are enabled.
+		/// Returns true if persistent connections are enabled.
 
 	void setKeepAliveTimeout(const Poco::Timespan& timeout);
 		/// Sets the keep-alive timeout for persistent HTTP connections.
@@ -95,6 +95,15 @@ public:
 		/// during a persistent connection, or 0 if
 		/// unlimited connections are allowed.
 
+	void setAutoDecodeHeaders(bool autoDecode);
+		/// Enables or disables automatic HTTP header value conversions, for example
+		/// RFC2047.
+		/// Default is true: convert header values when reading HTTP header.
+
+	bool getAutoDecodeHeaders() const;
+		/// Returns true if automatic conversion of HTTP header values
+		/// when reading HTTP header.
+
 protected:
 	virtual ~HTTPServerParams();
 		/// Destroys the HTTPServerParams.
@@ -106,6 +115,7 @@ private:
 	bool           _keepAlive;
 	int            _maxKeepAliveRequests;
 	Poco::Timespan _keepAliveTimeout;
+	bool           _autoDecodeHeaders;
 };
 
 
@@ -145,6 +155,12 @@ inline int HTTPServerParams::getMaxKeepAliveRequests() const
 inline const Poco::Timespan& HTTPServerParams::getKeepAliveTimeout() const
 {
 	return _keepAliveTimeout;
+}
+
+
+inline bool HTTPServerParams::getAutoDecodeHeaders() const
+{
+	return _autoDecodeHeaders;
 }
 
 

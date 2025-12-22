@@ -207,6 +207,10 @@ void WebSocketTest::testWebSocketLarge()
 
 	assertTrue (n == payload.size());
 	assertTrue (payload.compare(0, payload.size(), buffer, 0, n) == 0);
+
+	ws.shutdown();
+	ws.close();
+	server.stop();
 }
 
 

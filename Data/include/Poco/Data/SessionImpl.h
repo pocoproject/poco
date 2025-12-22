@@ -53,12 +53,22 @@ public:
 	static const std::size_t CONNECTION_TIMEOUT_DEFAULT = CONNECTION_TIMEOUT_INFINITE;
 		/// Default connection/login timeout in seconds.
 
+	// ODBC only, otherwise no-op
+	static const int CURSOR_USE_ALWAYS = 0;
+	static const int CURSOR_USE_IF_NEEDED = 1;
+	static const int CURSOR_USE_NEVER = 2;
+
 	SessionImpl(const std::string& connectionString,
-		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT);
+		std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl.
 
 	virtual ~SessionImpl();
 		/// Destroys the SessionImpl.
+
+	const std::string& dbmsName() const;
+		/// Returns the DBMS name. The name must be set by the
+		/// implementation.
+		/// Defaults to "unknown".
 
 	virtual Poco::SharedPtr<StatementImpl> createStatementImpl() = 0;
 		/// Creates a StatementImpl.
@@ -113,7 +123,7 @@ public:
 		/// Returns true if session has transaction capabilities.
 
 	virtual bool isTransaction() const = 0;
-		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
+		/// Returns true iff a transaction is in progress, false otherwise.
 
 	virtual void setTransactionIsolation(Poco::UInt32) = 0;
 		/// Sets the transaction isolation level.
@@ -141,6 +151,15 @@ public:
 	std::string uri() const;
 		/// Returns the URI for this session.
 
+	bool isAutocommit() const;
+		/// Returns true if autocommit is on, false otherwise.
+
+	bool shouldParse() const;
+		/// Returns true if SQL parser is enabled, false otherwise.
+
+	virtual bool hasFeature(const std::string& name) const = 0;
+		/// Returns true if session has the named feature.
+
 	virtual void setFeature(const std::string& name, bool state) = 0;
 		/// Set the state of a feature.
 		///
@@ -150,7 +169,7 @@ public:
 		/// Throws a NotSupportedException if the requested feature is
 		/// not supported by the underlying implementation.
 
-	virtual bool getFeature(const std::string& name) = 0;
+	virtual bool getFeature(const std::string& name) const = 0;
 		/// Look up the state of a feature.
 		///
 		/// Features are a generic extension mechanism for session implementations.
@@ -158,6 +177,9 @@ public:
 		///
 		/// Throws a NotSupportedException if the requested feature is
 		/// not supported by the underlying implementation.
+
+	virtual bool hasProperty(const std::string& name) const = 0;
+		/// Returns true if session has the named feature.
 
 	virtual void setProperty(const std::string& name, const Poco::Any& value) = 0;
 		/// Set the value of a property.
@@ -168,7 +190,7 @@ public:
 		/// Throws a NotSupportedException if the requested property is
 		/// not supported by the underlying implementation.
 
-	virtual Poco::Any getProperty(const std::string& name) = 0;
+	virtual Poco::Any getProperty(const std::string& name) const = 0;
 		/// Look up the value of a property.
 		///
 		/// Properties are a generic extension mechanism for session implementations.
@@ -178,6 +200,9 @@ public:
 		/// not supported by the underlying implementation.
 
 protected:
+	void setDBMSName(const std::string& name);
+		/// Sets the DBMS name.
+
 	void setConnectionString(const std::string& connectionString);
 		/// Sets the connection string. Should only be called on
 		/// disconnected sessions. Throws InvalidAccessException when called on
@@ -188,6 +213,7 @@ private:
 	SessionImpl(const SessionImpl&);
 	SessionImpl& operator = (const SessionImpl&);
 
+	std::string _dbmsName;
 	std::string _connectionString;
 	std::size_t _loginTimeout;
 };
@@ -196,6 +222,19 @@ private:
 //
 // inlines
 //
+
+inline void SessionImpl::setDBMSName(const std::string& name)
+{
+	_dbmsName = name;
+}
+
+
+inline const std::string& SessionImpl::dbmsName() const
+{
+	return _dbmsName;
+}
+
+
 inline const std::string& SessionImpl::connectionString() const
 {
 	return _connectionString;
@@ -224,6 +263,18 @@ inline std::string SessionImpl::uri(const std::string& connector,
 inline std::string SessionImpl::uri() const
 {
 	return uri(connectorName(), connectionString());
+}
+
+
+inline bool SessionImpl::isAutocommit() const
+{
+	return hasFeature("autoCommit") && getFeature("autoCommit");
+}
+
+
+inline bool SessionImpl::shouldParse() const
+{
+	return hasFeature("sqlParse") && getFeature("sqlParse");
 }
 
 

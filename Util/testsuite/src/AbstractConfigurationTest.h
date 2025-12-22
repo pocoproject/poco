@@ -29,6 +29,7 @@ public:
 	void testHasProperty();
 	void testGetString();
 	void testGetInt();
+	void testGetInt16();
 	void testGetInt64();
 	void testGetDouble();
 	void testGetBool();
@@ -44,10 +45,10 @@ public:
 	void testRemove();
 	void testChangeEvents();
 	void testRemoveEvents();
-	
+
 	void setUp();
 	void tearDown();
-	
+
 	void onPropertyChanging(const void*, Poco::Util::AbstractConfiguration::KeyValue& kv);
 	void onPropertyChanged(const void*, const Poco::Util::AbstractConfiguration::KeyValue& kv);
 	void onPropertyRemoving(const void*, const std::string& key);

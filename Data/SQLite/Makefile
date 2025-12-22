@@ -9,18 +9,28 @@ include $(POCO_BASE)/build/rules/global
 COMMONFLAGS += -I$(POCO_BASE)/Data/SQLite/src
 
 SYSFLAGS += -DSQLITE_THREADSAFE=1 -DSQLITE_DISABLE_LFS \
-        -DSQLITE_OMIT_UTF16 -DSQLITE_OMIT_PROGRESS_CALLBACK -DSQLITE_OMIT_COMPLETE \
-        -DSQLITE_OMIT_TCL_VARIABLE -DSQLITE_OMIT_DEPRECATED
+	-DSQLITE_OMIT_UTF16 -DSQLITE_OMIT_PROGRESS_CALLBACK -DSQLITE_OMIT_COMPLETE \
+	-DSQLITE_OMIT_TCL_VARIABLE -DSQLITE_OMIT_DEPRECATED
 
 objects = Binder Extractor Notifier SessionImpl Connector \
-        SQLiteException SQLiteStatementImpl Utility
+	SQLiteException SQLiteStatementImpl Utility
 
-sqlite_objects = sqlite3
+ifdef POCO_ENABLE_SQLITE_FTS5
+		SYSFLAGS += -DSQLITE_ENABLE_FTS5
+endif
 
-ifdef POCO_UNBUNDLED
-        SYSLIBS += -lsqlite3
+ifdef POCO_SQLITE_UNBUNDLED
+	SYSLIBS += -lsqlite3
 else
-        objects += $(sqlite_objects)
+	objects += sqlite3
+	prebuild = $(shell \
+		ln -sf $(POCO_BASE)/dependencies/sqlite3/src/*.c     src/ \
+		ln -sf $(POCO_BASE)/dependencies/sqlite3/src/*.h     src/ \
+	)
+endif
+
+ifndef POCO_DATA_NO_SQL_PARSER
+	target_includes += $(POCO_BASE)/Data/SQLParser $(POCO_BASE)/Data/SQLParser/src
 endif
 
 target         = PocoDataSQLite

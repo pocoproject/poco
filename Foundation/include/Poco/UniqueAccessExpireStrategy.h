@@ -33,37 +33,33 @@
 namespace Poco {
 
 
-template < 
+template <
 	class TKey,
 	class TValue
 >
 class UniqueAccessExpireStrategy: public AbstractStrategy<TKey, TValue>
 	/// An UniqueExpireStrategy implements time based expiration of cache entries. In contrast
-	/// to ExpireStrategy which only allows to set a per cache expiration value, it allows to define 
+	/// to ExpireStrategy which only allows to set a per cache expiration value, it allows to define
 	/// expiration per CacheEntry.
 	/// Each TValue object must thus offer the following method:
-	///    
+	///
 	///    const Poco::Timestamp& getTimeout() const;
-	///    
+	///
 	/// which returns the timespan for how long an object will be valid without being accessed.
 {
 public:
-	typedef std::pair<TKey, Timespan>           KeyExpire;
-	typedef std::multimap<Timestamp, KeyExpire> TimeIndex;
-	typedef typename TimeIndex::iterator        IndexIterator;
-	typedef typename TimeIndex::const_iterator  ConstIndexIterator;
-	typedef std::map<TKey, IndexIterator>       Keys;
-	typedef typename Keys::iterator             Iterator;
+	using KeyExpire = std::pair<TKey, Timespan>;
+	using TimeIndex = std::multimap<Timestamp, KeyExpire>;
+	using IndexIterator = typename TimeIndex::iterator;
+	using ConstIndexIterator = typename TimeIndex::const_iterator;
+	using Keys = std::map<TKey, IndexIterator>;
+	using Iterator = typename Keys::iterator;
 
 public:
-	UniqueAccessExpireStrategy()
+	UniqueAccessExpireStrategy() = default;
 		/// Create an unique expire strategy.
-	{
-	}
 
-	~UniqueAccessExpireStrategy()
-	{
-	}
+	~UniqueAccessExpireStrategy() = default;
 
 	void onAdd(const void*, const KeyValueArgs <TKey, TValue>& args)
 	{
@@ -71,7 +67,7 @@ public:
 		// value will expire, even insert negative values!
 		Timestamp expire;
 		expire += args.value().getTimeout().totalMicroseconds();
-		
+
 		IndexIterator it = _keyIndex.insert(std::make_pair(expire, std::make_pair(args.key(), args.value().getTimeout())));
 		std::pair<Iterator, bool> stat = _keys.insert(std::make_pair(args.key(), it));
 		if (!stat.second)

@@ -27,6 +27,7 @@ public:
 
 	void testCreate();
 	void testCreateFromFile();
+	void testCreateLarge();
 
 	void setUp();
 	void tearDown();

@@ -23,7 +23,7 @@ AtomicCounter::AtomicCounter():
 {
 }
 
-	
+
 AtomicCounter::AtomicCounter(AtomicCounter::ValueType initialValue):
 	_counter(initialValue)
 {
@@ -47,7 +47,7 @@ AtomicCounter& AtomicCounter::operator = (const AtomicCounter& counter)
 	return *this;
 }
 
-	
+
 AtomicCounter& AtomicCounter::operator = (AtomicCounter::ValueType value)
 {
 	_counter.store(value);

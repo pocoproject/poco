@@ -35,10 +35,10 @@ class XML_API NodeFilter
 	/// the next node. If the filter says to accept the node, the traversal logic
 	/// returns it; otherwise, traversal looks for the next node and pretends that
 	/// the node that was rejected was not there.
-	/// 
+	///
 	/// The DOM does not provide any filters. NodeFilter is just an interface that
 	/// users can implement to provide their own filters.
-	/// 
+	///
 	/// NodeFilters do not need to know how to traverse from node to node, nor do
 	/// they need to know anything about the data structure that is being traversed.
 	/// This makes it very easy to write filters, since the only thing they have
@@ -61,7 +61,7 @@ public:
 			/// will not return this node. For both NodeIterator and TreeWalker, the children
 			/// of this node will still be considered.
 	};
-	
+
 	enum WhatToShow
 		/// These are the available values for the whatToShow parameter used in TreeWalkers
 		/// and NodeIterators. They are the same as the set of possible types for Node,
@@ -69,18 +69,18 @@ public:
 		/// value of nodeType for the equivalent node type. If a bit in whatToShow is
 		/// set false, that will be taken as a request to skip over this type of node;
 		/// the behavior in that case is similar to that of FILTER_SKIP.
-		/// 
+		///
 		/// Note that if node types greater than 32 are ever introduced, they may not
 		/// be individually testable via whatToShow. If that need should arise, it can
 		/// be handled by selecting SHOW_ALL together with an appropriate NodeFilter.
 	{
 		SHOW_ALL                    = 0xFFFFFFFF,
 			/// Show all Nodes.
-	
+
 		SHOW_ELEMENT                = 0x00000001,
 			/// Show Element nodes.
 
-		SHOW_ATTRIBUTE              = 0x00000002, 
+		SHOW_ATTRIBUTE              = 0x00000002,
 			/// Show Attr nodes. This is meaningful only when creating an iterator or tree-walker
 			/// with an attribute node as its root; in this case, it means that the attribute
 			/// node will appear in the first position of the iteration or traversal. Since
@@ -125,7 +125,7 @@ public:
 			/// notations are not part of the document tree, they do not appear when traversing
 			/// over the document tree.
 	};
-	
+
 	virtual short acceptNode(Node* node) = 0;
 		/// Test whether a specified node is visible in the logical view of a TreeWalker
 		/// or NodeIterator. This function will be called by the implementation of TreeWalker
@@ -134,7 +134,7 @@ public:
 		/// logic.)
 		///
 		/// Returns FILTER_ACCEPT, FILTER_REJECT or FILTER_SKIP.
-		
+
 protected:
 	virtual ~NodeFilter();
 };

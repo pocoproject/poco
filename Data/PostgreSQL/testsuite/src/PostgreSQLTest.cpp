@@ -26,6 +26,7 @@
 #include "Poco/Data/DataException.h"
 #include <iostream>
 
+#include "Poco/Data/Transaction.h"
 
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
@@ -41,8 +42,8 @@ using Poco::NamedTuple;
 using Poco::Environment;
 
 
-Poco::SharedPtr<Poco::Data::Session> PostgreSQLTest::_pSession = 0;
-Poco::SharedPtr<SQLExecutor> PostgreSQLTest::_pExecutor = 0;
+Poco::SharedPtr<Poco::Data::Session> PostgreSQLTest::_pSession = nullptr;
+Poco::SharedPtr<SQLExecutor> PostgreSQLTest::_pExecutor = nullptr;
 
 
 //
@@ -140,80 +141,99 @@ void PostgreSQLTest::testConnectNoDB()
 	}
 }
 
+
+void PostgreSQLTest::testFailedConnect()
+{
+	std::string dbConnString;
+	dbConnString +=  "host=" + getHost();
+	dbConnString += " user=invalid";
+	dbConnString +=	" password=invalid";
+	dbConnString += " port=" + getPort();
+
+	try
+	{
+		Session session(PostgreSQL::Connector::KEY, dbConnString);
+		failmsg ("must fail");
+	}
+	catch (ConnectionFailedException& ex) {}
+	catch (ConnectionException& ex) {}
+}
+
+
 void PostgreSQLTest::testPostgreSQLOIDs()
 {
 	if (!_pSession) fail ("Test not available.");
 
 	std::string tableCreateString = "CREATE TABLE Test ("
-		"charcol			char,"
-		"bigintcol          bigint,"
-		"int8col            int8,"
-		"bigserialcol       bigserial,"
-		"serial8col         serial8,"
-		"bit1col			bit(1),"
-		"bit4col			bit(4),"
-		"bit6col			bit(6),"
-		"bit8col			bit(8),"
-		"bit9col			bit(9),"
-		"bitv1col			bit varying(1),"
-		"bitv4col			bit varying(4),"
-		"bitv6col			bit varying(6),"
-		"bitv8col			bit varying(8),"
-		"bitv9col			bit varying(9),"
-		"booleancol			boolean,"
-		"boolcol			bool,"
-		"boxcol				box,"
-		"byteacol			bytea,"
-		"char1col			char(1),"
-		"char4col			char(4),"
-		"char6col			char(6),"
-		"char8col			char(8),"
-		"char9col			char(9),"
-		"char12col			char(12),"
-		"char256col			char(256),"
-		"charv1col			char varying(1),"
-		"charv4col			char varying(4),"
-		"charv6col			char varying(6),"
-		"charv8col			char varying(8),"
-		"charv9col			char varying(9),"
-		"charv12col			char varying(12),"
-		"charv256col		char varying(256),"
-		"cidrcol			cidr,"
-		"circlecol			circle,"
-		"datecol			date,"
-		"doubleprecol		double precision,"
-		"float8col			float8,"
-		"inetcol			inet,"
-		"integercol			integer,"
-		"intcol				int,"
-		"int4col			int4,"
-		"jsoncol			json,"
-//		"jsonbcol			jsonb,"  // requires 9.4
-		"linecol			line,"
-		"lsegcol			lseg,"
-		"macaddrcol			macaddr,"
-		"moneycol			money,"
-		"numericcol			numeric(12,3),"
-		"decimalcol			decimal(12,4),"
-		"pathcol			path,"
-//		"pglencol			pg_lsn,"  // requires 9.4
-		"pointcol			point,"
-		"polygoncol			polygon,"
-		"realcol			real,"
-		"float4col			float4,"
-		"smallintcol		smallint,"
-		"int2col			int2,"
-		"smallserialcol		smallserial,"
-		"serial2col			serial2,"
-		"serialcol			serial,"
-		"serial4col			serial4,"
-		"textcol			text,"
-		"timewtzcol			time(6) without time zone,"
-		"tsquerycol			tsquery,"
-		"tsvectorcol		tsvector,"
-		"txidsnapshotcol	txid_snapshot,"
-		"uuidcol			uuid,"
-		"xmlcol				xml"
+		"charcol         char,"
+		"bigintcol       bigint,"
+		"int8col         int8,"
+		"bigserialcol    bigserial,"
+		"serial8col      serial8,"
+		"bit1col         bit(1),"
+		"bit4col         bit(4),"
+		"bit6col         bit(6),"
+		"bit8col         bit(8),"
+		"bit9col         bit(9),"
+		"bitv1col        bit varying(1),"
+		"bitv4col        bit varying(4),"
+		"bitv6col        bit varying(6),"
+		"bitv8col        bit varying(8),"
+		"bitv9col        bit varying(9),"
+		"booleancol      boolean,"
+		"boolcol         bool,"
+		"boxcol          box,"
+		"byteacol        bytea,"
+		"char1col        char(1),"
+		"char4col        char(4),"
+		"char6col        char(6),"
+		"char8col        char(8),"
+		"char9col        char(9),"
+		"char12col       char(12),"
+		"char256col      char(256),"
+		"charv1col       char varying(1),"
+		"charv4col       char varying(4),"
+		"charv6col       char varying(6),"
+		"charv8col       char varying(8),"
+		"charv9col       char varying(9),"
+		"charv12col      char varying(12),"
+		"charv256col     char varying(256),"
+		"cidrcol         cidr,"
+		"circlecol       circle,"
+		"datecol         date,"
+		"doubleprecol    double precision,"
+		"float8col       float8,"
+		"inetcol         inet,"
+		"integercol      integer,"
+		"intcol          int,"
+		"int4col         int4,"
+		"jsoncol         json,"
+//		"jsonbcol        jsonb,"  // requires 9.4
+		"linecol         line,"
+		"lsegcol         lseg,"
+		"macaddrcol      macaddr,"
+		"moneycol        money,"
+		"numericcol      numeric(12,3),"
+		"decimalcol      decimal(12,4),"
+		"pathcol         path,"
+//		"pglencol        pg_lsn,"  // requires 9.4
+		"pointcol        point,"
+		"polygoncol      polygon,"
+		"realcol         real,"
+		"float4col       float4,"
+		"smallintcol     smallint,"
+		"int2col         int2,"
+		"smallserialcol  smallserial,"
+		"serial2col      serial2,"
+		"serialcol       serial,"
+		"serial4col      serial4,"
+		"textcol         text,"
+		"timewtzcol      time(6) without time zone,"
+		"tsquerycol      tsquery,"
+		"tsvectorcol     tsvector,"
+		"txidsnapshotcol txid_snapshot,"
+		"uuidcol         uuid,"
+		"xmlcol          xml"
 		")";
 
 	Oid OIDArray[] = {
@@ -307,6 +327,7 @@ void PostgreSQLTest::testBarebonePostgreSQL()
 	_pExecutor->barebonePostgreSQLTest(POSTGRESQL_HOST, POSTGRESQL_USER, POSTGRESQL_PWD, POSTGRESQL_DB, POSTGRESQL_PORT, tableCreateString.c_str());
 */
 }
+
 
 
 void PostgreSQLTest::testSimpleAccess()
@@ -647,6 +668,7 @@ void PostgreSQLTest::testBLOB()
 	catch (DataException&) { }
 }
 
+
 void PostgreSQLTest::testCLOBStmt()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -655,6 +677,7 @@ void PostgreSQLTest::testCLOBStmt()
 	_pExecutor->clobStmt();
 }
 
+
 void PostgreSQLTest::testBLOBStmt()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -662,6 +685,7 @@ void PostgreSQLTest::testBLOBStmt()
 	recreatePersonBLOBTable();
 	_pExecutor->blobStmt();
 }
+
 
 void PostgreSQLTest::testUnsignedInts()
 {
@@ -697,6 +721,7 @@ void PostgreSQLTest::testUUID()
 	recreateUUIDsTable();
 	_pExecutor->uuids();
 }
+
 
 void PostgreSQLTest::testTuple()
 {
@@ -743,6 +768,15 @@ void PostgreSQLTest::testSessionTransaction()
 }
 
 
+void PostgreSQLTest::testSessionTransactionNoAutoCommit()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreatePersonTable();
+	_pExecutor->sessionTransactionNoAutoCommit(_dbConnString);
+}
+
+
 void PostgreSQLTest::testTransaction()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -760,6 +794,51 @@ void PostgreSQLTest::testReconnect()
 	_pExecutor->reconnect();
 }
 
+
+void PostgreSQLTest::testTransactionWithReconnect()
+{
+    if (!_pSession) fail ("Test not available.");
+
+    try
+    {
+        _pSession->begin();
+        *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now;
+        _pSession->reconnect();
+        _pSession->commit();
+    }
+    catch (Poco::Exception& e)
+    {
+        _pSession->rollback();
+        std::cout << e.displayText() << std::endl;
+    }
+
+    try
+    {
+        _pSession->begin();
+        *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now;
+        _pSession->commit();
+    }
+    catch (Poco::Exception& e)
+    {
+        _pSession->rollback();
+        std::cout << e.displayText() << std::endl;
+    }
+}
+
+
+void PostgreSQLTest::testSqlState()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	try
+	{
+		*_pSession << "syntax error", now;
+	}
+	catch (const Poco::Data::PostgreSQL::PostgreSQLException & exception)
+	{
+		assertTrue(exception.sqlState() == std::string("42601"));
+	}
+}
 
 void PostgreSQLTest::testNullableInt()
 {
@@ -888,9 +967,132 @@ void PostgreSQLTest::testTupleWithNullable()
 
 	assertTrue (result[5].get<1>() == std::string("B"));
 	assertTrue (result[5].get<2>() == null);
-
 }
 
+
+void PostgreSQLTest::testBinarySimpleAccess()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreatePersonTable();
+	_pExecutor->simpleAccess();
+}
+
+
+void PostgreSQLTest::testBinaryComplexType()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreatePersonTable();
+	_pExecutor->complexType();
+}
+
+
+void PostgreSQLTest::testBinarySimpleAccessVector()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreatePersonTable();
+	_pExecutor->simpleAccessVector();
+}
+
+
+void PostgreSQLTest::testBinaryComplexTypeVector()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreatePersonTable();
+	_pExecutor->complexTypeVector();
+}
+
+
+void PostgreSQLTest::testBinaryInts()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreateUnsignedIntsTable();
+	_pExecutor->unsignedInts();
+}
+
+
+void PostgreSQLTest::testBinaryFloat()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreateFloatsTable();
+	_pExecutor->floats();
+}
+
+
+void PostgreSQLTest::testBinaryDouble()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreateFloatsTable();
+	_pExecutor->doubles();
+}
+
+
+void PostgreSQLTest::testBinaryUUID()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreateUUIDsTable();
+	_pExecutor->uuids();
+}
+
+
+void PostgreSQLTest::testBinaryDateTime()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreatePersonDateTimeTable();
+	_pExecutor->dateTime();
+	recreatePersonDateTable();
+	_pExecutor->date();
+	recreatePersonTimeTable();
+	_pExecutor->time();
+}
+
+
+void PostgreSQLTest::testBinaryCLOBStmt()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreatePersonCLOBTable();
+	_pExecutor->clobStmt();
+}
+
+
+void PostgreSQLTest::testBinaryBLOBStmt()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pSession->setFeature("binaryExtraction", true);
+
+	recreatePersonBLOBTable();
+	_pExecutor->blobStmt();
+}
 
 void PostgreSQLTest::dropTable(const std::string& tableName)
 {
@@ -994,6 +1196,14 @@ void PostgreSQLTest::recreateFloatsTable()
 }
 
 
+void PostgreSQLTest::recreateDoublesTable()
+{
+	dropTable("Strings");
+	try { *_pSession << "CREATE TABLE Strings (str DOUBLE)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail ("recreateDoublesTable()"); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail ("recreateDoublesTable()"); }
+}
+
 void PostgreSQLTest::recreateUUIDsTable()
 {
 	dropTable("Strings");
@@ -1055,6 +1265,7 @@ void PostgreSQLTest::tearDown()
 {
 	dropTable("Person");
 	dropTable("Strings");
+	_pSession->setFeature("binaryExtraction", false);
 }
 
 
@@ -1075,7 +1286,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	catch (ConnectionFailedException& ex)
 	{
 		std::cout << ex.displayText() << std::endl;
-		return 0;
+		return nullptr;
 	}
 
 	std::cout << "*** Connected to [" << "PostgreSQL" << "] test database." << std::endl;
@@ -1086,6 +1297,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("PostgreSQLTest");
 
 	CppUnit_addTest(pSuite, PostgreSQLTest, testConnectNoDB);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testFailedConnect);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testPostgreSQLOIDs);
 	//CppUnit_addTest(pSuite, PostgreSQLTest, testBarebonePostgreSQL);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testSimpleAccess);
@@ -1135,9 +1347,25 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, PostgreSQLTest, testNullableInt);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testNullableString);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testTupleWithNullable);
+		CppUnit_addTest(pSuite, PostgreSQLTest, testSqlState);
+
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinarySimpleAccess);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryComplexType);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinarySimpleAccessVector);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryComplexTypeVector);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryInts);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryFloat);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryDouble);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryUUID);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryDateTime);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryCLOBStmt);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryBLOBStmt);
+
 	CppUnit_addTest(pSuite, PostgreSQLTest, testSessionTransaction);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testSessionTransactionNoAutoCommit);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testTransaction);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testReconnect);
+    CppUnit_addTest(pSuite, PostgreSQLTest, testTransactionWithReconnect);
 
 	return pSuite;
 }

@@ -66,13 +66,14 @@ HTTPBasicCredentials::HTTPBasicCredentials(const std::string& authInfo)
 
 HTTPBasicCredentials::~HTTPBasicCredentials()
 {
+	clear();
 }
 
 
 void HTTPBasicCredentials::clear()
 {
-	_username.clear();
-	_password.clear();
+	Poco::secureClear(_username);
+	Poco::secureClear(_password);
 }
 
 

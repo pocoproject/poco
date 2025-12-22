@@ -18,7 +18,9 @@
 #include "Poco/Thread.h"
 #include <fstream>
 #include <set>
-
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#include <Windows.h>
+#endif
 
 using Poco::File;
 using Poco::TemporaryFile;
@@ -192,6 +194,61 @@ void FileTest::testCreateFile()
 }
 
 
+void FileTest::testExists()
+{
+	assertFalse (File("").exists());
+	{
+		File f("testfile.dat");
+		f.createFile();
+		assertTrue (f.exists());
+		assertTrue (f.existsAnywhere());
+		assertFalse (f.canExecute());
+	}
+
+	{
+		File f("/testfile.dat");
+		assertFalse (f.exists());
+		assertFalse (f.existsAnywhere());
+		assertFalse (f.canExecute());
+	}
+
+	{
+#if defined(POCO_OS_FAMILY_UNIX)
+		File f("echo");
+		File f2("/dev/null");
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+		std::string buffer(MAX_PATH, 0);
+		UINT r = GetSystemDirectoryA(buffer.data(), static_cast<UINT>(buffer.size()));
+		if (r)
+		{
+			Path p(buffer);
+			p.makeDirectory().makeAbsolute().makeParent();
+			buffer = p.toString();
+			buffer.append("win.ini");
+		}
+		else
+		{
+			buffer = R"(c:\windows\win.ini)";
+		}
+		File f("cmd.exe");
+		File f2(buffer);
+
+		File f3("cmd");
+		assertTrue (f3.canExecute());
+		File f4("cmd-nonexistent");
+		assertFalse (f4.canExecute());
+#endif
+		assertFalse (f.exists());
+		assertTrue (f.existsAnywhere());
+		assertTrue (f.canExecute());
+
+		assertTrue (f2.exists());
+		assertTrue (f2.existsAnywhere());
+		assertFalse (f2.canExecute());
+	}
+}
+
+
 void FileTest::testFileAttributes2()
 {
 	TemporaryFile f;
@@ -229,17 +286,15 @@ void FileTest::testFileAttributes3()
 #if POCO_OS==POCO_OS_CYGWIN
 	File f("/dev/tty");
 #else
- 	File f("/dev/console");
+	File f("/dev/null");
 #endif
-#elif defined(POCO_OS_FAMILY_WINDOWS) && !defined(_WIN32_WCE)
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 	File f("CON");
 #endif
 
-#if !defined(_WIN32_WCE)
 	assertTrue (f.isDevice());
 	assertTrue (!f.isFile());
 	assertTrue (!f.isDirectory());
-#endif
 }
 
 
@@ -271,21 +326,21 @@ void FileTest::testCompare()
 void FileTest::testRootDir()
 {
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-	File f1("\\");
-	File f2("/");
-	assertTrue (f1.exists());
-	assertTrue (f2.exists());
-#else
 	File f1("/");
 	File f2("c:/");
 	File f3("c:\\");
 	File f4("\\");
+	File f5("c:");
+	File f6("\\\\?\\c:");
+	File f7("\\\\?\\c:\\");
+
 	assertTrue (f1.exists());
 	assertTrue (f2.exists());
 	assertTrue (f3.exists());
 	assertTrue (f4.exists());
-#endif
+	assertTrue (f5.exists());
+	assertTrue (f6.exists());
+	assertTrue (f7.exists());
 #else
 	File f1("/");
 	assertTrue (f1.exists());
@@ -380,6 +435,7 @@ void FileTest::testCopy()
 	f1.setWriteable().remove();
 }
 
+
 void FileTest::testCopyFailIfDestinationFileExists()
 {
 	std::ofstream ostr("testfile.dat");
@@ -414,6 +470,7 @@ void FileTest::testMove()
 	assertTrue (f1 == f2);
 }
 
+
 void FileTest::testMoveFailIfDestinationFileExists() {
 	std::ofstream ostr("testfile.dat");
 	ostr << "Hello, world!" << std::endl;
@@ -429,6 +486,7 @@ void FileTest::testMoveFailIfDestinationFileExists() {
 	}
 	f1.setWriteable().remove();
 }
+
 
 void FileTest::testCopyDirectory()
 {
@@ -499,6 +557,7 @@ void FileTest::testCopyDirectory()
 	fd3.remove(true);
 }
 
+
 void FileTest::testCopyDirectoryFailIfExists()
 {
 	Path pd1("testdir");
@@ -538,6 +597,7 @@ void FileTest::testCopyDirectoryFailIfExists()
 	fd2.remove(true);
 }
 
+
 void FileTest::testRename()
 {
 	std::ofstream ostr("testfile.dat");
@@ -554,6 +614,7 @@ void FileTest::testRename()
 
 	f2.remove();
 }
+
 
 void FileTest::testRenameFailIfExists() {
 	std::ofstream ostr("testfile.dat");
@@ -580,11 +641,9 @@ void FileTest::testRenameFailIfExists() {
 }
 
 
-
-
 void FileTest::testLongPath()
 {
-#if defined(_WIN32) && !defined(_WIN32_WCE)
+#if defined(_WIN32)
 	Poco::Path p("longpathtest");
 	p.makeAbsolute();
 	std::string longpath(p.toString());
@@ -603,6 +662,34 @@ void FileTest::testLongPath()
 	Poco::File f(p.toString());
 	f.remove(true);
 #endif
+}
+
+void FileTest::testUnixFileExtension()
+{
+	std::string filePath1 = "/a/b/c/.notextension";
+	Poco::Path path1(filePath1, Poco::Path::Style::PATH_UNIX);
+
+	assertEqual(".notextension", path1.getBaseName());
+	assertEqual("", path1.getExtension());
+
+	std::string filePath2 = "/a/b/c/emptyextension.";
+	Poco::Path path2(filePath2, Poco::Path::Style::PATH_UNIX);
+
+	assertEqual("emptyextension", path2.getBaseName());
+	assertEqual("", path2.getExtension());
+}
+
+
+void FileTest::testTemporaryFile()
+{
+	const int COUNT = 10000;
+	std::set<std::string> paths;
+	for (int i = 0; i < COUNT; i++)
+	{
+		Poco::TemporaryFile f;
+		paths.insert(f.path());
+	}
+	assertTrue (paths.size() == COUNT);
 }
 
 
@@ -637,6 +724,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FileTest");
 
 	CppUnit_addTest(pSuite, FileTest, testCreateFile);
+	CppUnit_addTest(pSuite, FileTest, testExists);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes1);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes2);
 	CppUnit_addTest(pSuite, FileTest, testFileAttributes3);
@@ -654,6 +742,8 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testRenameFailIfExists);
 	CppUnit_addTest(pSuite, FileTest, testRootDir);
 	CppUnit_addTest(pSuite, FileTest, testLongPath);
+	CppUnit_addTest(pSuite, FileTest, testUnixFileExtension);
+	CppUnit_addTest(pSuite, FileTest, testTemporaryFile);
 
 	return pSuite;
 }

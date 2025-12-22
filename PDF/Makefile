@@ -21,7 +21,7 @@ objects = AttributedString Cell Destination Document Encoder Font Image Outline 
 	hpdf_image_png hpdf_info hpdf_list hpdf_mmgr hpdf_name hpdf_namedict hpdf_null \
 	hpdf_number hpdf_objects hpdf_outline hpdf_page_label hpdf_page_operator \
 	hpdf_pages hpdf_pdfa hpdf_real hpdf_streams hpdf_string hpdf_u3d hpdf_utils hpdf_xref \
-	adler32 compress crc32 deflate gzio \
+	adler32 compress crc32 deflate \
 	infback inffast inflate inftrees trees zutil \
 	png pngerror pnggccrd pngget pngmem pngpread \
 	pngread pngrio pngrtran pngrutil pngset pngtest \
@@ -30,5 +30,22 @@ objects = AttributedString Cell Destination Document Encoder Font Image Outline 
 target         = PocoPDF
 target_version = $(LIBVERSION)
 target_libs    = PocoXML PocoJSON PocoUtil PocoFoundation
+
+# poco build system looks for sources in src/
+ifndef POCO_UNBUNDLED
+	prebuild = $(shell \
+		ln -sf $(POCO_BASE)/dependencies/zlib/src/*.c      src/ && \
+		ln -sf $(POCO_BASE)/dependencies/zlib/src/*.h      src/ && \
+		ln -sf $(POCO_BASE)/dependencies/png/src/*.c       src/ && \
+		ln -sf $(POCO_BASE)/dependencies/png/src/*.h       src/ && \
+		ln -sf $(POCO_BASE)/dependencies/hpdf/src/*.c      src/ && \
+		ln -sf $(POCO_BASE)/dependencies/hpdf/src/*.h      src/ \
+	)
+
+	INCLUDE += -I$(POCO_BASE)/dependencies/zlib/src
+	INCLUDE += -I$(POCO_BASE)/dependencies/png/src
+	INCLUDE += -I$(POCO_BASE)/dependencies/hpdf/src
+	INCLUDE += -I$(POCO_BASE)/PDF/src
+endif
 
 include $(POCO_BASE)/build/rules/lib

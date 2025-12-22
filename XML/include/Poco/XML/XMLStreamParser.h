@@ -30,16 +30,15 @@
 #include "Poco/XML/QName.h"
 #include "Poco/XML/ValueTraits.h"
 #include "Poco/XML/Content.h"
-#if defined(POCO_UNBUNDLED)
-#include <expat.h>
-#else
-#include "Poco/XML/expat.h"
-#endif
+#include "Poco/XML/XMLString.h"
 #include <map>
 #include <vector>
 #include <string>
 #include <iosfwd>
 #include <cstddef>
+
+
+struct XML_ParserStruct;
 
 
 namespace Poco {
@@ -131,7 +130,7 @@ public:
 	{
 		using value_type = EventType;
 
-		Iterator(XMLStreamParser* p = 0, EventType e = EV_EOF):
+		Iterator(XMLStreamParser* p = nullptr, EventType e = EV_EOF):
 			_parser(p),
 			_e(e)
 		{
@@ -269,17 +268,18 @@ private:
 	XMLStreamParser(const XMLStreamParser&);
 	XMLStreamParser& operator = (const XMLStreamParser&);
 
-	static void XMLCALL handleStartElement(void*, const XML_Char*, const XML_Char**);
-	static void XMLCALL handleEndElement(void*, const XML_Char*);
-	static void XMLCALL handleCharacters(void*, const XML_Char*, int);
-	static void XMLCALL handleStartNamespaceDecl(void*, const XML_Char*, const XML_Char*);
-	static void XMLCALL handleEndNamespaceDecl(void*, const XML_Char*);
+	static void handleStartElement(void*, const XMLChar*, const XMLChar**);
+	static void handleEndElement(void*, const XMLChar*);
+	static void handleCharacters(void*, const XMLChar*, int);
+	static void handleStartNamespaceDecl(void*, const XMLChar*, const XMLChar*);
+	static void handleEndNamespaceDecl(void*, const XMLChar*);
 
 	void init();
 	EventType nextImpl(bool peek);
 	EventType nextBody();
 	void handleError();
 
+#ifndef POCO_DOC
 	// If _size is 0, then data is std::istream. Otherwise, it is a buffer.
 	union
 	{
@@ -287,14 +287,21 @@ private:
 		const void* buf;
 	}
 	_data;
+#endif
+
+	enum ParserState
+	{
+		state_next, 
+		state_peek 
+	};
 
 	std::size_t _size;
 	const std::string _inputName;
 	FeatureType _feature;
-	XML_Parser _parser;
+	XML_ParserStruct* _parser;
 	std::size_t _depth;
 	bool _accumulateContent; // Whether we are accumulating character content.
-	enum { state_next, state_peek } _parserState;
+	ParserState _parserState;
 	EventType _currentEvent;
 	EventType _queue;
 	QName _qname;
@@ -589,7 +596,7 @@ inline Content XMLStreamParser::content() const
 
 inline const XMLStreamParser::ElementEntry* XMLStreamParser::getElement() const
 {
-	return _elementState.empty() ? 0 : getElementImpl();
+	return _elementState.empty() ? nullptr : getElementImpl();
 }
 
 

@@ -104,15 +104,12 @@ void TextTestResult::ignoring(const std::string ignore)
 
 void TextTestResult::setup()
 {
-#if !defined(_WIN32_WCE)
 	const char* env = std::getenv("CPPUNIT_IGNORE");
 	if (env)
 	{
 		std::string ignored = env;
 		ignoring(ignored);
 	}
-
-#endif
 }
 
 
@@ -165,19 +162,18 @@ void TextTestResult::printErrors(std::ostream& stream)
 			stream << "There were " << testErrors() << " errors: " << std::endl;
 
 		int i = 1;
-		for (std::vector<TestFailure*>::iterator it = errors().begin(); it != errors().end(); ++it)
+		for (const auto& failure : errors())
 		{
-			TestFailure* failure = *it;
 			CppUnitException* e = failure->thrownException();
 
 			stream << std::setw(2) << i
-			       << ": "
-			       << failure->failedTest()->toString() << "\n"
-			       << "    \"" << (e ? e->what() : "") << "\"\n"
-			       << "    in \""
-			       << (e ? e->fileName() : std::string())
-			       << "\", line ";
-			if (e == 0)
+				   << ": "
+				   << failure->failedTest()->toString() << "\n"
+				   << "    \"" << (e ? e->what() : "") << "\"\n"
+				   << "    in \""
+				   << (e ? e->fileName() : std::string())
+				   << "\", line ";
+			if (e == nullptr)
 			{
 				stream << "0";
 			}
@@ -187,7 +183,7 @@ void TextTestResult::printErrors(std::ostream& stream)
 				if (e->data2LineNumber() != CppUnitException::CPPUNIT_UNKNOWNLINENUMBER)
 				{
 					stream << " data lines " << e->data1LineNumber()
-                                               << ", " << e->data2LineNumber();
+											   << ", " << e->data2LineNumber();
 				}
 				else if (e->data1LineNumber() != CppUnitException::CPPUNIT_UNKNOWNLINENUMBER)
 				{
@@ -213,19 +209,18 @@ void TextTestResult::printFailures(std::ostream& stream)
 
 		int i = 1;
 
-		for (std::vector<TestFailure*>::iterator it = failures().begin(); it != failures().end(); ++it)
+		for (const auto& failure : failures())
 		{
-			TestFailure* failure = *it;
-			CppUnitException* e = failure->thrownException();
+				CppUnitException* e = failure->thrownException();
 
 			stream << std::setw(2) << i
-			       << ": "
-			       << failure->failedTest()->toString() << "\n"
-			       << "    \"" << (e ? e->what() : "") << "\"\n"
-			       << "    in \""
-			       << (e ? e->fileName() : std::string())
-			       << "\", line ";
-			if (e == 0)
+				   << ": "
+				   << failure->failedTest()->toString() << "\n"
+				   << "    \"" << (e ? e->what() : "") << "\"\n"
+				   << "    in \""
+				   << (e ? e->fileName() : std::string())
+				   << "\", line ";
+			if (e == nullptr)
 			{
 				stream << "0";
 			}
@@ -235,8 +230,8 @@ void TextTestResult::printFailures(std::ostream& stream)
 				if (e->data2LineNumber() != CppUnitException::CPPUNIT_UNKNOWNLINENUMBER)
 				{
 					stream << " data lines "
-					       << e->data1LineNumber()
-                           << ", " << e->data2LineNumber();
+						   << e->data1LineNumber()
+						   << ", " << e->data2LineNumber();
 				}
 				else if (e->data1LineNumber() != CppUnitException::CPPUNIT_UNKNOWNLINENUMBER)
 				{
@@ -263,17 +258,17 @@ void TextTestResult::printHeader(std::ostream& stream)
 	stream << "\n\n";
 	if (wasSuccessful())
 		stream << "OK ("
-		          << runTests() << " tests)"
-		          << std::endl;
+				  << runTests() << " tests)"
+				  << std::endl;
 	else
 		stream << "!!!FAILURES!!!" << "\n"
-		          << "Runs: "
-		          << runTests ()
-		          << "   Failures: "
-		          << testFailures ()
-		          << "   Errors: "
-		          << testErrors ()
-		          << std::endl;
+				  << "Runs: "
+				  << runTests ()
+				  << "   Failures: "
+				  << testFailures ()
+				  << "   Errors: "
+				  << testErrors ()
+				  << std::endl;
 }
 
 

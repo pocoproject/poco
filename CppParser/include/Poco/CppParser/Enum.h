@@ -37,8 +37,8 @@ class CppParser_API Enum: public Symbol
 	/// a collection of EnumValues.
 {
 public:
-	typedef std::vector<EnumValue*> Values;
-	typedef Values::const_iterator Iterator;
+	using Values = std::vector<EnumValue*>;
+	using Iterator = Values::const_iterator;
 
 	enum Flags
 	{

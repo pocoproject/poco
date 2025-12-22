@@ -23,6 +23,7 @@
 #include "Poco/Net/Context.h"
 #include "Poco/Net/X509Certificate.h"
 #include "Poco/Net/Session.h"
+#include "Poco/Mutex.h"
 #include <openssl/bio.h>
 #include <openssl/ssl.h>
 
@@ -148,10 +149,11 @@ public:
 		/// number of connections that can be queued
 		/// for this socket.
 
-	void shutdown();
+	int shutdown();
 		/// Shuts down the connection by attempting
 		/// an orderly SSL shutdown, then actually
-		/// shutting down the TCP connection.
+		/// shutting down the TCP connection in the
+		/// send direction.
 
 	void close();
 		/// Close the socket.
@@ -230,6 +232,12 @@ public:
 		/// Returns true iff a reused session was negotiated during
 		/// the handshake.
 
+	SocketImpl* socket();
+		/// Returns the underlying SocketImpl.
+		
+	const SocketImpl* socket() const;
+		/// Returns the underlying SocketImpl.
+
 protected:
 	void acceptSSL();
 		/// Performs a server-side SSL handshake and certificate verification.
@@ -271,24 +279,45 @@ protected:
 		/// Note that simply closing a socket is not sufficient
 		/// to be able to re-use it again.
 
+	static int onSessionCreated(SSL* pSSL, SSL_SESSION* pSession);
+		/// Callback to handle new session data sent by server.
+
 private:
+	using MutexT = Poco::FastMutex;
+	using LockT = MutexT::ScopedLock;
+	using UnLockT = Poco::ScopedLockWithUnlock<MutexT>;
+
 	SecureSocketImpl(const SecureSocketImpl&);
 	SecureSocketImpl& operator = (const SecureSocketImpl&);
 
-	SSL* _pSSL;
+	std::atomic<SSL*> _pSSL;
 	Poco::AutoPtr<SocketImpl> _pSocket;
 	Context::Ptr _pContext;
 	bool _needHandshake;
 	std::string _peerHostName;
 	Session::Ptr _pSession;
+	mutable MutexT _mutex;
 
 	friend class SecureStreamSocketImpl;
+	friend class Context;
 };
 
 
 //
 // inlines
 //
+inline SocketImpl* SecureSocketImpl::socket()
+{
+	return _pSocket.get();
+}
+
+
+inline const SocketImpl* SecureSocketImpl::socket() const
+{
+	return _pSocket.get();
+}
+
+
 inline poco_socket_t SecureSocketImpl::sockfd()
 {
 	return _pSocket->sockfd();

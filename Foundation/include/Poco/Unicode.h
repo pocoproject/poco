@@ -36,7 +36,7 @@ class Foundation_API Unicode
 {
 public:
 	// Implementation note: the following definitions must be kept
-	// in sync with those from ucp.h (PCRE).
+	// in sync with those from pcre2_ucp.h (PCRE).
 	enum CharacterCategory
 		/// Unicode character categories.
 	{
@@ -83,7 +83,7 @@ public:
 		UCP_PARAGRAPH_SEPARATOR,
 		UCP_SPACE_SEPARATOR
 	};
-	
+
 	enum Script
 		/// Unicode 7.0 script identifiers.
 	{
@@ -219,12 +219,12 @@ public:
 		UCP_TIRHUTA,
 		UCP_WARANG_CITI
 	};
-	
+
 	enum
 	{
 		UCP_MAX_CODEPOINT = 0x10FFFF
 	};
-	
+
 	struct CharacterProperties
 		/// This structure holds the character properties
 		/// of an Unicode character.
@@ -237,27 +237,27 @@ public:
 	static void properties(int ch, CharacterProperties& props);
 		/// Return the Unicode character properties for the
 		/// character with the given Unicode value.
-		
+
 	static bool isSpace(int ch);
 		/// Returns true iff the given character is a separator.
-		
+
 	static bool isDigit(int ch);
 		/// Returns true iff the given character is a numeric character.
-		
+
 	static bool isPunct(int ch);
 		/// Returns true iff the given character is a punctuation character.
-		
+
 	static bool isAlpha(int ch);
-		/// Returns true iff the given character is a letter.	
-		
+		/// Returns true iff the given character is a letter.
+
 	static bool isLower(int ch);
 		/// Returns true iff the given character is a lowercase
 		/// character.
-		
+
 	static bool isUpper(int ch);
 		/// Returns true iff the given character is an uppercase
 		/// character.
-		
+
 	static int toLower(int ch);
 		/// If the given character is an uppercase character,
 		/// return its lowercase counterpart, otherwise return
@@ -312,7 +312,7 @@ inline bool Unicode::isLower(int ch)
 	return props.category == UCP_LETTER && props.type == UCP_LOWER_CASE_LETTER;
 }
 
-	
+
 inline bool Unicode::isUpper(int ch)
 {
 	CharacterProperties props;

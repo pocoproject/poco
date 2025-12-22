@@ -76,12 +76,17 @@ void StatementExecutor::bindParams(MYSQL_BIND* params, std::size_t count)
 		throw StatementException("Statement is not compiled yet");
 
 	if (count != mysql_stmt_param_count(_pHandle))
-		throw StatementException("wrong bind parameters count", 0, _query);
+		throw StatementException("wrong bind parameters count", nullptr, _query);
 
 	if (count == 0) return;
 
+#if LIBMYSQL_VERSION_ID >= 80300
+	if (mysql_stmt_bind_named_param(_pHandle, params, count, nullptr) != 0)
+		throw StatementException("mysql_stmt_bind_named_param() error ", _pHandle, _query);
+#else
 	if (mysql_stmt_bind_param(_pHandle, params) != 0)
 		throw StatementException("mysql_stmt_bind_param() error ", _pHandle, _query);
+#endif
 }
 
 

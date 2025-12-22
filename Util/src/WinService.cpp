@@ -12,9 +12,6 @@
 //
 
 
-#if !defined(_WIN32_WCE)
-
-
 #include "Poco/Util/WinService.h"
 #include "Poco/Util/WinRegistryKey.h"
 #include "Poco/Thread.h"
@@ -39,9 +36,9 @@ const std::string WinService::REGISTRY_DESCRIPTION("Description");
 
 WinService::WinService(const std::string& name):
 	_name(name),
-	_svcHandle(0)
+	_svcHandle(nullptr)
 {
-	_scmHandle = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+	_scmHandle = OpenSCManager(nullptr, nullptr, SC_MANAGER_ALL_ACCESS);
 	if (!_scmHandle) throw SystemException("cannot open Service Control Manager");
 }
 
@@ -49,7 +46,7 @@ WinService::WinService(const std::string& name):
 WinService::WinService(SC_HANDLE scmHandle, const std::string& name):
 	_scmHandle(scmHandle),
 	_name(name),
-	_svcHandle(0)
+	_svcHandle(nullptr)
 {
 	if (!_scmHandle) throw SystemException("Service Control Manager not connected");
 }
@@ -102,18 +99,18 @@ void WinService::registerService(const std::string& path, const std::string& dis
 	_svcHandle = CreateServiceW(
 		_scmHandle,
 		uname.c_str(),
-		udisplayName.c_str(), 
+		udisplayName.c_str(),
 		SERVICE_ALL_ACCESS,
 		SERVICE_WIN32_OWN_PROCESS,
 		SERVICE_DEMAND_START,
 		SERVICE_ERROR_NORMAL,
 		upath.c_str(),
-		NULL, NULL, NULL, NULL, NULL);
+		nullptr, nullptr, nullptr, nullptr, nullptr);
 	if (!_svcHandle)
 		throw SystemException("cannot register service", _name);
 }
 
-	
+
 void WinService::registerService(const std::string& path)
 {
 	registerService(path, _name);
@@ -144,7 +141,7 @@ bool WinService::isRunning() const
 	return ss.dwCurrentState == SERVICE_RUNNING;
 }
 
-bool WinService::isStopped() const 
+bool WinService::isStopped() const
 {
 	open();
 	SERVICE_STATUS ss;
@@ -153,11 +150,11 @@ bool WinService::isStopped() const
 	return ss.dwCurrentState == SERVICE_STOPPED;
 }
 
-	
+
 void WinService::start()
 {
 	open();
-	if (!StartService(_svcHandle, 0, NULL))
+	if (!StartService(_svcHandle, 0, nullptr))
 		throw SystemException("cannot start service", _name);
 
 	SERVICE_STATUS svcStatus;
@@ -203,13 +200,13 @@ void WinService::setStartup(WinService::Startup startup)
 	default:
 		startType = SERVICE_NO_CHANGE;
 	}
-	if (!ChangeServiceConfig(_svcHandle, SERVICE_NO_CHANGE, startType, SERVICE_NO_CHANGE, NULL, NULL, NULL, NULL, NULL, NULL, NULL))
+	if (!ChangeServiceConfig(_svcHandle, SERVICE_NO_CHANGE, startType, SERVICE_NO_CHANGE, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr))
 	{
 		throw SystemException("cannot change service startup mode");
 	}
 }
 
-	
+
 WinService::Startup WinService::getStartup() const
 {
 	POCO_LPQUERY_SERVICE_CONFIG pSvcConfig = config();
@@ -245,22 +242,22 @@ void WinService::setFailureActions(FailureActionVector failureActions, const std
 	open();
 	auto actions = new SC_ACTION[failureActions.size()];
 	SERVICE_FAILURE_ACTIONSW ac;
-	ac.lpCommand = NULL;
-	ac.lpRebootMsg = NULL;
+	ac.lpCommand = nullptr;
+	ac.lpRebootMsg = nullptr;
 
 	std::wstring urebootMessage;
 	Poco::UnicodeConverter::toUTF16(rebootMessage, urebootMessage);
 	std::vector<wchar_t> rebootMessageVector{ urebootMessage.begin(), urebootMessage.end() };
 	rebootMessageVector.push_back('\0');
-	
+
 	std::wstring uComamnd;
 	Poco::UnicodeConverter::toUTF16(command, uComamnd);
 	std::vector<wchar_t> commandVector{ uComamnd.begin(), uComamnd.end() };
 	commandVector.push_back('\0');
 
-	for (auto i = 0; i < failureActions.size(); i++) 		
+	for (auto i = 0; i < failureActions.size(); i++)
 	{
-		switch (failureActions[i].type) 
+		switch (failureActions[i].type)
 		{
 		case SVC_REBOOT:
 			actions[i].Type = SC_ACTION_REBOOT;
@@ -311,15 +308,15 @@ WinService::FailureActionTypeVector WinService::getFailureActions() const {
 			} else throw SystemException("cannot query service configuration", _name);
 		}
 	}
-	catch (...) 
+	catch (...)
 	{
 		LocalFree(pSvcFailureAction);
 		throw;
 	}
 	FailureActionTypeVector result(3, SVC_NONE);
-	for (auto i = 0; i < pSvcFailureAction->cActions; i++) 
+	for (auto i = 0; i < pSvcFailureAction->cActions; i++)
 	{
-		switch (pSvcFailureAction->lpsaActions->Type) 
+		switch (pSvcFailureAction->lpsaActions->Type)
 		{
 		case SC_ACTION_NONE:
 			result[i] = SVC_NONE;
@@ -377,7 +374,7 @@ bool WinService::tryOpen() const
 		Poco::UnicodeConverter::toUTF16(_name, uname);
 		_svcHandle = OpenServiceW(_scmHandle, uname.c_str(), SERVICE_ALL_ACCESS);
 	}
-	return _svcHandle != 0;
+	return _svcHandle != nullptr;
 }
 
 
@@ -386,7 +383,7 @@ void WinService::close() const
 	if (_svcHandle)
 	{
 		CloseServiceHandle(_svcHandle);
-		_svcHandle = 0;
+		_svcHandle = nullptr;
 	}
 }
 
@@ -421,6 +418,3 @@ POCO_LPQUERY_SERVICE_CONFIG WinService::config() const
 
 
 } } // namespace Poco::Util
-
-
-#endif // !defined(_WIN32_WCE)

@@ -14,6 +14,7 @@
 
 #include "Poco/Net/NameValueCollection.h"
 #include "Poco/Exception.h"
+#include "Poco/String.h"
 #include <algorithm>
 
 
@@ -63,12 +64,12 @@ NameValueCollection& NameValueCollection::operator = (NameValueCollection&& nvc)
 }
 
 
-void NameValueCollection::swap(NameValueCollection& nvc)
+void NameValueCollection::swap(NameValueCollection& nvc) noexcept
 {
 	std::swap(_map, nvc._map);
 }
 
-	
+
 const std::string& NameValueCollection::operator [] (const std::string& name) const
 {
 	ConstIterator it = _map.find(name);
@@ -78,8 +79,8 @@ const std::string& NameValueCollection::operator [] (const std::string& name) co
 		throw NotFoundException(name);
 }
 
-	
-void NameValueCollection::set(const std::string& name, const std::string& value)	
+
+void NameValueCollection::set(const std::string& name, const std::string& value)
 {
 	Iterator it = _map.find(name);
 	if (it != _map.end())
@@ -88,13 +89,13 @@ void NameValueCollection::set(const std::string& name, const std::string& value)
 		_map.insert(HeaderMap::ValueType(name, value));
 }
 
-	
+
 void NameValueCollection::add(const std::string& name, const std::string& value)
 {
 	_map.insert(HeaderMap::ValueType(name, value));
 }
 
-	
+
 const std::string& NameValueCollection::get(const std::string& name) const
 {
 	ConstIterator it = _map.find(name);
@@ -121,44 +122,51 @@ bool NameValueCollection::has(const std::string& name) const
 }
 
 
-NameValueCollection::ConstIterator NameValueCollection::find(const std::string& name) const
-{
-	return _map.find(name);
-}
-
-	
-NameValueCollection::ConstIterator NameValueCollection::begin() const
-{
-	return _map.begin();
-}
-
-	
-NameValueCollection::ConstIterator NameValueCollection::end() const
-{
-	return _map.end();
-}
-
-	
-bool NameValueCollection::empty() const
-{
-	return _map.empty();
-}
-
-
-std::size_t NameValueCollection::size() const
-{
-	return _map.size();
-}
-
-
 void NameValueCollection::erase(const std::string& name)
 {
 	_map.erase(name);
 }
 
 
+void NameValueCollection::erase(Iterator it)
+{
+	_map.erase(it);
+}
+
+
+void NameValueCollection::secureErase(const std::string& name)
+{
+	Iterator it = _map.find(name);
+	while (it != _map.end())
+	{
+		Poco::secureClear(it->second);
+		_map.erase(it);
+		it = _map.find(name);
+	}
+}
+
+
+void NameValueCollection::secureErase(Iterator it)
+{
+	Poco::secureClear(it->second);
+	_map.erase(it);
+}
+
+
 void NameValueCollection::clear()
 {
+	_map.clear();
+}
+
+
+void NameValueCollection::secureClear()
+{
+	Iterator it = _map.begin();
+	while (it != _map.end())
+	{
+		Poco::secureClear(it->second);
+		++it;
+	}
 	_map.clear();
 }
 

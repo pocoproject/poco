@@ -43,12 +43,12 @@ void TokenTest::testParse()
 	std::string jwt("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
 
 	Token token(jwt);
-	assert (token.getAlgorithm() == "HS256");
-	assert (token.getType() == "JWT");
-	assert (token.getSubject() == "1234567890");
-	assert (token.getIssuedAt().epochTime() == 1516239022);
-	assert (token.payload().getValue<std::string>("name") == "John Doe");
-	assert (token.signature() == "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
+	assertTrue(token.getAlgorithm() == "HS256");
+	assertTrue(token.getType() == "JWT");
+	assertTrue(token.getSubject() == "1234567890");
+	assertTrue(token.getIssuedAt().epochTime() == 1516239022);
+	assertTrue(token.payload().getValue<std::string>("name") == "John Doe");
+	assertTrue(token.signature() == "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
 }
 
 
@@ -57,12 +57,12 @@ void TokenTest::testParseNoSig()
 	std::string jwt("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.");
 
 	Token token(jwt);
-	assert (token.getAlgorithm() == "HS256");
-	assert (token.getType() == "JWT");
-	assert (token.getSubject() == "1234567890");
-	assert (token.getIssuedAt().epochTime() == 1516239022);
-	assert (token.payload().getValue<std::string>("name") == "John Doe");
-	assert (token.signature() == "");
+	assertTrue(token.getAlgorithm() == "HS256");
+	assertTrue(token.getType() == "JWT");
+	assertTrue(token.getSubject() == "1234567890");
+	assertTrue(token.getIssuedAt().epochTime() == 1516239022);
+	assertTrue(token.payload().getValue<std::string>("name") == "John Doe");
+	assertTrue(token.signature() == "");
 }
 
 
@@ -76,7 +76,7 @@ void TokenTest::testSerialize()
 	token.setIssuedAt(Poco::Timestamp::fromEpochTime(1516239022));
 
 	std::string jwt = token.toString();
-	assert (jwt == "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.");
+	assertTrue(jwt == "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsIm5hbWUiOiJKb2huIERvZSIsInN1YiI6IjEyMzQ1Njc4OTAifQ.");
 }
 
 
@@ -87,7 +87,7 @@ void TokenTest::testAssign()
 	Token token(jwt);
 	Token token2(token);
 
-	assert (token.toString() == token2.toString());
+	assertTrue(token.toString() == token2.toString());
 }
 
 
@@ -96,20 +96,20 @@ void TokenTest::testAudience()
 	Token token;
 
 	token.setAudience("11111");
-	assert (token.payload().getValue<std::string>(Token::CLAIM_AUDIENCE) == "11111");
+	assertTrue(token.payload().getValue<std::string>(Token::CLAIM_AUDIENCE) == "11111");
 
 	std::vector<std::string> audience = token.getAudience();
-	assert (audience.size() == 1);
-	assert (audience[0] == "11111");
+	assertTrue(audience.size() == 1);
+	assertTrue(audience[0] == "11111");
 
 	audience.push_back("22222");
 	token.setAudience(audience);
 
-	assert (token.payload().isArray(Token::CLAIM_AUDIENCE));
+	assertTrue(token.payload().isArray(Token::CLAIM_AUDIENCE));
 	audience = token.getAudience();
-	assert (audience.size() == 2);
-	assert (audience[0] == "11111");
-	assert (audience[1] == "22222");
+	assertTrue(audience.size() == 2);
+	assertTrue(audience[0] == "11111");
+	assertTrue(audience[1] == "22222");
 }
 
 

@@ -30,7 +30,7 @@ ZipDataInfo::ZipDataInfo():
 	_valid(true)
 {
 	std::memcpy(_rawInfo, HEADER, ZipCommon::HEADER_SIZE);
-	std::memset(_rawInfo+ZipCommon::HEADER_SIZE, 0, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
+	std::memset(_rawInfo+ZipCommon::HEADER_SIZE, 0, static_cast<std::size_t>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
 	_valid = true;
 }
 
@@ -52,7 +52,7 @@ ZipDataInfo::ZipDataInfo(std::istream& in, bool assumeHeaderRead):
 			throw Poco::DataFormatException("Bad data info header");
 	}
 	// now copy the rest of the header
-	in.read(_rawInfo+ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
+	in.read(_rawInfo+ZipCommon::HEADER_SIZE, static_cast<std::streamsize>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
 	_valid = (!in.eof() && in.good());
 }
 
@@ -70,7 +70,7 @@ ZipDataInfo64::ZipDataInfo64():
 	_valid(true)
 {
 	std::memcpy(_rawInfo, HEADER, ZipCommon::HEADER_SIZE);
-	std::memset(_rawInfo+ZipCommon::HEADER_SIZE, 0, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
+	std::memset(_rawInfo+ZipCommon::HEADER_SIZE, 0, static_cast<std::size_t>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
 	_valid = true;
 }
 
@@ -93,7 +93,7 @@ ZipDataInfo64::ZipDataInfo64(std::istream& in, bool assumeHeaderRead):
 	}
 
 	// now copy the rest of the header
-	in.read(_rawInfo+ZipCommon::HEADER_SIZE, FULLHEADER_SIZE - ZipCommon::HEADER_SIZE);
+	in.read(_rawInfo+ZipCommon::HEADER_SIZE, static_cast<std::streamsize>(FULLHEADER_SIZE) - ZipCommon::HEADER_SIZE);
 	_valid = (!in.eof() && in.good());
 }
 

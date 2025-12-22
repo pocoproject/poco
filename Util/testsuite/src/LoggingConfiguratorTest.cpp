@@ -84,19 +84,19 @@ void LoggingConfiguratorTest::testConfigurator()
 
 	LoggingConfigurator configurator;
 	configurator.configure(pConfig);
-	
+
 	Logger& root = Logger::get("");
 	assertTrue (root.getLevel() == Message::PRIO_WARNING);
 	FormattingChannel::Ptr pFC = root.getChannel().cast<FormattingChannel>();
 	assertNotNull (pFC);
-#if defined(_WIN32) && !defined(_WIN32_WCE)
+#if defined(_WIN32)
 	assertTrue (!pFC->getChannel().cast<Poco::WindowsConsoleChannel>().isNull());
 #else
 	assertTrue (!pFC->getChannel().cast<Poco::ConsoleChannel>().isNull());
 #endif
 	assertTrue (!pFC->getFormatter().cast<Poco::PatternFormatter>().isNull());
 	assertTrue ((pFC->getFormatter().cast<PatternFormatter>())->getProperty("pattern") == "%s-[%p] %t");
-	
+
 	Logger& logger1 = Logger::get("logger1");
 	assertTrue (logger1.getLevel() == Message::PRIO_INFORMATION);
 	pFC = logger1.getChannel().cast<FormattingChannel>();
@@ -113,9 +113,9 @@ void LoggingConfiguratorTest::testConfigurator()
 
 void LoggingConfiguratorTest::testBadConfiguration1()
 {
-	// this is mainly testing for memory leaks in case of 
+	// this is mainly testing for memory leaks in case of
 	// a bad configuration.
-	
+
 	static const std::string config =
 		"logging.loggers.root.channel = c1\n"
 		"logging.loggers.root.level = warning\n"
@@ -156,9 +156,9 @@ void LoggingConfiguratorTest::testBadConfiguration1()
 
 void LoggingConfiguratorTest::testBadConfiguration2()
 {
-	// this is mainly testing for memory leaks in case of 
+	// this is mainly testing for memory leaks in case of
 	// a bad configuration.
-	
+
 	static const std::string config =
 		"logging.loggers.root.channel = c1\n"
 		"logging.loggers.root.level = unknown\n"
@@ -199,9 +199,9 @@ void LoggingConfiguratorTest::testBadConfiguration2()
 
 void LoggingConfiguratorTest::testBadConfiguration3()
 {
-	// this is mainly testing for memory leaks in case of 
+	// this is mainly testing for memory leaks in case of
 	// a bad configuration.
-	
+
 	static const std::string config =
 		"logging.loggers.root.channel = c1\n"
 		"logging.loggers.root.level = warning\n"
@@ -242,9 +242,9 @@ void LoggingConfiguratorTest::testBadConfiguration3()
 
 void LoggingConfiguratorTest::testBadConfiguration4()
 {
-	// this is mainly testing for memory leaks in case of 
+	// this is mainly testing for memory leaks in case of
 	// a bad configuration.
-	
+
 	static const std::string config =
 		"logging.loggers.root.channel = c1\n"
 		"logging.loggers.root.level = warning\n"

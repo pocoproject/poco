@@ -19,6 +19,7 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Runnable.h"
@@ -30,42 +31,41 @@
 #include "Poco/StringTokenizer.h"
 #include <deque>
 #include <cstring>
+#include <atomic>
+#include <map>
 
 
 namespace Poco {
 namespace Net {
 
 
-typedef int UDPMsgSizeT;
-#define POCO_UDP_BUF_SIZE 1472 + sizeof(UDPMsgSizeT) + SocketAddress::MAX_ADDRESS_LENGTH
+using UDPMsgSizeT = int;
+#define POCO_UDP_BUF_SIZE (1472 + sizeof(UDPMsgSizeT) + SocketAddress::MAX_ADDRESS_LENGTH)
 
 
-template <std::size_t S = POCO_UDP_BUF_SIZE>
+template <std::size_t S = POCO_UDP_BUF_SIZE, class TMutex = Poco::FastMutex>
 class UDPHandlerImpl: public Runnable, public RefCountedObject
-	/// UDP handler handles the data that arives to the UDP server.
+	/// UDP handler handles the data that arrives to the UDP server.
 	/// The class is thread-safe and runs in its own thread, so many handlers
-	/// can be used in parallel.Handler manages and provides the storage
+	/// can be used in parallel. Handler manages and provides the storage
 	/// (fixed-size memory blocks of S size) to the reader, which signals back
 	/// to the handler when there is data or error ready for processing.
 	/// Typically, user will inherit from this class and override processData()
-	/// and processError() members to do the actual work.
+	/// and processError() members to do the actual work. To auto-start the handler,
+	/// the inheriting class can call start() in the constructor.
 {
 public:
-	typedef UDPMsgSizeT             MsgSizeT;
-	typedef AutoPtr<UDPHandlerImpl> Ptr;
-	typedef std::vector<Ptr>        List;
-	typedef typename List::iterator Iterator;
-#ifdef POCO_HAVE_STD_ATOMICS
-	typedef Poco::SpinlockMutex     DFMutex;
-#else
-	typedef Poco::FastMutex         DFMutex;
-#endif
+	using MsgSizeT = UDPMsgSizeT;
+	using Ptr = AutoPtr<UDPHandlerImpl>;
+	using List = std::vector<Ptr>;
+	using Iterator = typename List::iterator;
+	using DFMutex = TMutex;
 
 	static const MsgSizeT BUF_STATUS_IDLE  = 0;
 	static const MsgSizeT BUF_STATUS_BUSY  = -1;
 	static const MsgSizeT BUF_STATUS_ERROR = -2;
 
-	UDPHandlerImpl(std::size_t bufListSize = 1000, std::ostream* pErr = 0):
+	UDPHandlerImpl(std::size_t bufListSize = 1000, std::ostream* pErr = nullptr):
 		_thread("UDPHandlerImpl"),
 		_stop(false),
 		_done(false),
@@ -76,7 +76,6 @@ public:
 		_pErr(pErr)
 		/// Creates the UDPHandlerImpl.
 	{
-		_thread.start(*this);
 	}
 
 	~UDPHandlerImpl()
@@ -97,7 +96,7 @@ public:
 		/// the pointers to the newly created guard/buffer.
 		/// If mutex lock times out, returns null pointer.
 	{
-		char* ret = 0;
+		char* ret = nullptr;
 		if (_mutex.tryLock(10))
 		{
 			if (_buffers[sock].size() < _bufListSize) // building buffer list
@@ -119,8 +118,8 @@ public:
 			}
 			else // last resort, full scan
 			{
-				BufList::iterator it = _buffers[sock].begin();
-				BufList::iterator end = _buffers[sock].end();
+				auto it = _buffers[sock].begin();
+				const auto end = _buffers[sock].end();
 				for (; it != end; ++it)
 				{
 					if (*reinterpret_cast<MsgSizeT*>(*_bufIt[sock]) == 0) // available
@@ -143,38 +142,41 @@ public:
 	}
 
 	void notify()
-		/// Sets the ready event.
+		/// Sets the data ready event.
 	{
-		_ready.set();
+		_dataReady.set();
 	}
 
-	void run()
+	void run() override
 		/// Does the work.
 	{
 		while (!_stop)
 		{
-			_ready.wait();
+			_dataReady.wait();
 			if (_stop) break;
 			if (_mutex.tryLock(10))
 			{
-				BufMap::iterator it = _buffers.begin();
-				BufMap::iterator end = _buffers.end();
-				for (; it != end; ++it)
+				if (!_stop)
 				{
-					BufList::iterator lIt = it->second.begin();
-					BufList::iterator lEnd = it->second.end();
-					for (; lIt != lEnd; ++lIt)
+					auto it = _buffers.begin();
+					const auto end = _buffers.end();
+					for (; it != end; ++it)
 					{
-						if (hasData(*lIt))
+						auto lIt = it->second.begin();
+						const auto lEnd = it->second.end();
+						for (; lIt != lEnd; ++lIt)
 						{
-							processData(*lIt);
-							--_dataBacklog;
-							setIdle(*lIt);
-						}
-						else if (isError(*lIt))
-						{
-							processError(*lIt);
-							++_errorBacklog;
+							if (hasData(*lIt))
+							{
+								processData(*lIt);
+								--_dataBacklog;
+								setIdle(*lIt);
+							}
+							else if (isError(*lIt))
+							{
+								processError(*lIt);
+								++_errorBacklog;
+							}
 						}
 					}
 				}
@@ -188,7 +190,7 @@ public:
 		/// Signals the handler to stop.
 	{
 		_stop = true;
-		_ready.set();
+		_dataReady.set();
 	}
 
 	bool stopped() const
@@ -244,14 +246,14 @@ public:
 	bool hasData(char*& pBuf)
 		/// Returns true if buffer contains data.
 	{
-		DFMutex::ScopedLock l(_dfMutex);
+		typename DFMutex::ScopedLock l(_dfMutex);
 		return *reinterpret_cast<MsgSizeT*>(pBuf) > 0;
 	}
 
 	bool isError(char*& pBuf)
 		/// Returns true if buffer contains error.
 	{
-		DFMutex::ScopedLock l(_dfMutex);
+		typename DFMutex::ScopedLock l(_dfMutex);
 		return *reinterpret_cast<MsgSizeT*>(pBuf) == BUF_STATUS_ERROR;
 	}
 
@@ -268,9 +270,9 @@ public:
 
 	static SocketAddress address(char* buf)
 	{
-		poco_socklen_t* len = reinterpret_cast<poco_socklen_t*>(buf + sizeof(MsgSizeT));
-		struct sockaddr* pSA = reinterpret_cast<struct sockaddr*>(buf + sizeof(MsgSizeT) + sizeof(poco_socklen_t));
-		return SocketAddress(pSA, *len);
+		auto* len = reinterpret_cast<poco_socklen_t*>(buf + sizeof(MsgSizeT));
+		auto* pSA = reinterpret_cast<struct sockaddr*>(buf + sizeof(MsgSizeT) + sizeof(poco_socklen_t));
+		return {pSA, *len};
 	}
 
 	static char* payload(char* buf)
@@ -311,7 +313,7 @@ public:
 	}
 
 	virtual void processData(char*)
-		/// Caled when data is received by reader.
+		/// Called when data is received by reader.
 		///
 		/// No-op here, must be overridden by inheriting
 		/// class in order to do useful work.
@@ -319,7 +321,7 @@ public:
 	};
 
 	virtual void processError(char* buf)
-		/// Caled when error is detected by reader.
+		/// Called when error is detected by reader.
 		///
 		/// Only functional if stream pointer is provided
 		/// to the handler, otherwise it must be overridden
@@ -329,12 +331,18 @@ public:
 		setIdle(buf);
 	}
 
+	void start()
+		/// Starts the handler run in thread.
+	{
+		_thread.start(*this);
+	}
+
 private:
-	typedef std::deque<char*>                BufList;
-	typedef std::map<poco_socket_t, BufList> BufMap;
-	typedef typename BufList::iterator       BLIt;
-	typedef std::map<poco_socket_t, BLIt>    BufIt;
-	typedef Poco::FastMemoryPool<char[S]>    MemPool;
+	using BufList = std::deque<char*>;
+	using BufMap = std::map<poco_socket_t, BufList>;
+	using BLIt = typename BufList::iterator;
+	using BufIt = std::map<poco_socket_t, BLIt>;
+	using MemPool = Poco::FastMemoryPool<char[S]>;
 
 	void setStatusImpl(char*& pBuf, MsgSizeT status)
 	{
@@ -343,7 +351,7 @@ private:
 
 	void setStatus(char*& pBuf, MsgSizeT status)
 	{
-		DFMutex::ScopedLock l(_dfMutex);
+		typename DFMutex::ScopedLock l(_dfMutex);
 		setStatusImpl(pBuf, status);
 	}
 
@@ -355,10 +363,10 @@ private:
 		*ret = _buffers[sock].back();
 	}
 
-	Poco::Event       _ready;
+	Poco::Event       _dataReady;
 	Poco::Thread      _thread;
-	bool              _stop;
-	bool              _done;
+	std::atomic<bool> _stop;
+	std::atomic<bool> _done;
 	BufMap            _buffers;
 	BufIt             _bufIt;
 	std::size_t       _bufListSize;
@@ -372,7 +380,7 @@ private:
 };
 
 
-typedef UDPHandlerImpl<POCO_UDP_BUF_SIZE> UDPHandler;
+using UDPHandler = UDPHandlerImpl<POCO_UDP_BUF_SIZE>;
 
 
 } } // namespace Poco::Net

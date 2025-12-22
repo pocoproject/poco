@@ -43,10 +43,10 @@ public:
 
 	MailRecipient();
 		/// Creates an empty MailRecipient.
-		
+
 	MailRecipient(const MailRecipient& recipient);
 		/// Creates a MailRecipient by copying another one.
-		
+
 	MailRecipient(RecipientType type, const std::string& address);
 		/// Creates a MailRecipient of the given type.
 
@@ -55,28 +55,28 @@ public:
 
 	~MailRecipient();
 		/// Destroys the MailRecipient.
-		
+
 	MailRecipient& operator = (const MailRecipient& recipient);
 		/// Assigns another recipient.
-		
-	void swap(MailRecipient& recipient);
+
+	void swap(MailRecipient& recipient) noexcept;
 		/// Exchanges the content of two recipients.
 
 	RecipientType getType() const;
 		/// Returns the type of the recipient.
-		
+
 	void setType(RecipientType type);
 		/// Sets the type of the recipient.
-		
+
 	const std::string& getAddress() const;
 		/// Returns the address of the recipient.
-		
+
 	void setAddress(const std::string& address);
 		/// Sets the address of the recipient.
-		
+
 	const std::string& getRealName() const;
 		/// Returns the real name of the recipient.
-		
+
 	void setRealName(const std::string& realName);
 		/// Sets the real name of the recipient.
 
@@ -108,7 +108,7 @@ inline const std::string& MailRecipient::getRealName() const
 }
 
 
-inline void swap(MailRecipient& r1, MailRecipient& r2)
+inline void swap(MailRecipient& r1, MailRecipient& r2) noexcept
 {
 	r1.swap(r2);
 }

@@ -20,7 +20,7 @@
 
 #include "Poco/Zip/Zip.h"
 #include "Poco/Zip/ZipArchive.h"
-#include "Poco/FIFOEvent.h"
+#include "Poco/BasicEvent.h"
 #include <istream>
 #include <ostream>
 #include <set>
@@ -34,7 +34,7 @@ class Zip_API Compress
 	/// Compresses a directory or files as zip.
 {
 public:
-	Poco::FIFOEvent<const ZipLocalFileHeader> EDone;
+	Poco::BasicEvent<const ZipLocalFileHeader> EDone;
 
 	Compress(std::ostream& out, bool seekableOut, bool forceZip64 = false);
 		/// seekableOut determines how we write the zip, setting it to true is recommended for local files (smaller zip file),
@@ -66,7 +66,7 @@ public:
 
 	const std::string& getZipComment() const;
 		/// Returns the Zip file comment.
-		
+
 	ZipArchive close();
 		/// Finalizes the ZipArchive, closes it.
 
@@ -82,7 +82,7 @@ public:
 		///   - jpg
 		///   - jpeg
 		///   - png
-		
+
 	const std::set<std::string>& getStoreExtensions() const;
 		/// Returns the file extensions for which the CM_STORE compression method
 		/// is used if CM_AUTO is specified in addFile() or addRecursive().

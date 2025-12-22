@@ -14,6 +14,7 @@
 
 #include "Poco/Zip/ZipArchive.h"
 #include "Poco/Zip/SkipCallback.h"
+#include "Poco/Zip/ZipException.h"
 #include "Poco/Exception.h"
 #include <cstring>
 
@@ -62,6 +63,32 @@ ZipArchive::~ZipArchive()
 }
 
 
+void ZipArchive::checkConsistency()
+{
+	for (const auto& [filename, dirHeader]: _infos)
+	{
+		Poco::UInt32 dirCRC = dirHeader.getCRC();
+		Poco::UInt64 dirUncompressedSize = dirHeader.getUncompressedSize();
+
+		const auto dataIt = _entries.find(filename);
+		if (dataIt != _entries.end())
+		{
+			const ZipLocalFileHeader &dataHeader = dataIt->second;
+
+			Poco::UInt32 dataCRC = dataHeader.getCRC();
+			Poco::UInt64 dataUncompressedSize = dataHeader.getUncompressedSize();
+
+			if (dataCRC != dirCRC)
+				throw ZipException("CRC-32 mismatch: ", filename);
+
+			if (dataUncompressedSize != dirUncompressedSize)
+				throw ZipException("Uncompressed size mismatch: ", filename);
+		}
+	}
+
+}
+
+
 void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 {
 	// read 4 bytes
@@ -75,18 +102,30 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 		if (std::memcmp(header, ZipLocalFileHeader::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipLocalFileHeader entry(in, true, pc);
-			poco_assert (_entries.insert(std::make_pair(entry.getFileName(), entry)).second);
+			std::string uniqueName = entry.getFileName();
+			int suffix = 1;
+			while (_entries.find(uniqueName) != _entries.end())
+			{
+				uniqueName = entry.getFileName() + ".duplicate-" + std::to_string(suffix++);
+			}
+			_entries.insert(std::make_pair(uniqueName, entry));
 			haveSynced = false;
 		}
 		else if (std::memcmp(header, ZipFileInfo::HEADER, ZipCommon::HEADER_SIZE) == 0)
 		{
 			ZipFileInfo info(in, true);
+			std::string uniqueName = info.getFileName();
+			int suffix = 1;
+			while (_infos.find(uniqueName) != _infos.end())
+			{
+				uniqueName = info.getFileName() + ".duplicate-" + std::to_string(suffix++);
+			}
 			FileHeaders::iterator it = _entries.find(info.getFileName());
 			if (it != _entries.end())
 			{
 				it->second.setStartPos(info.getOffset());
 			}
-			poco_assert (_infos.insert(std::make_pair(info.getFileName(), info)).second);
+			_infos.insert(std::make_pair(uniqueName, info));
 			haveSynced = false;
 		}
 		else if (std::memcmp(header, ZipArchiveInfo::HEADER, ZipCommon::HEADER_SIZE) == 0)

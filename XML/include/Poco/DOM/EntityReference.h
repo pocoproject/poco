@@ -39,10 +39,10 @@ class XML_API EntityReference: public AbstractNode
 	/// node, it may be that there is no Entity node representing the referenced
 	/// entity. If such an Entity exists, then the child list of the EntityReference
 	/// node is the same as that of the Entity node.
-	/// 
+	///
 	/// As for Entity nodes, EntityReference nodes and all their descendants are
 	/// readonly.
-	/// 
+	///
 	/// The resolution of the children of the EntityReference (the replacement value
 	/// of the referenced Entity) may be lazily evaluated; actions by the user (such
 	/// as calling the childNodes method on the EntityReference node) are assumed
@@ -62,7 +62,7 @@ protected:
 
 private:
 	XMLString _name;
-	
+
 	friend class Document;
 };
 

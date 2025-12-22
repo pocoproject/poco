@@ -55,7 +55,7 @@ protected:
 	int affectedRowCount() const;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
-		/// All changes are counted, even if they are later undone by a ROLLBACK or ABORT. 
+		/// All changes are counted, even if they are later undone by a ROLLBACK or ABORT.
 		/// Changes associated with creating and dropping tables are not counted.
 
 	const MetaColumn& metaColumn(std::size_t pos) const;

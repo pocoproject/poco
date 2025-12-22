@@ -18,6 +18,7 @@
 #define Net_SocketDefs_INCLUDED
 
 
+#include "Poco/Config.h"
 #include <vector>
 
 
@@ -26,9 +27,20 @@
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	#include "Poco/UnWindows.h"
+	#ifndef FD_SETSIZE
+		#define FD_SETSIZE 1024 // increase as needed
+	#endif
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
 	#include <ws2def.h>
+	#if !defined (POCO_NET_NO_UNIX_SOCKET)
+		#if POCO_HAVE_CPP17_COMPILER
+			#if __has_include(<afunix.h>)
+				#include <afunix.h>
+				#define POCO_HAS_UNIX_SOCKET
+			#endif
+		#endif
+	#endif
 	#define POCO_INVALID_SOCKET  INVALID_SOCKET
 	#define poco_socket_t        SOCKET
 	#define poco_socklen_t       int
@@ -147,7 +159,6 @@
 	#include <netinet/in.h>
 	#include <netinet/tcp.h>
 	#include <netdb.h>
-	#if defined(POCO_OS_FAMILY_UNIX)
 		#if (POCO_OS == POCO_OS_LINUX) || (POCO_OS == POCO_OS_ANDROID)
 			// Net/src/NetworkInterface.cpp changed #include <linux/if.h> to #include <net/if.h>
 			// no more conflict, can use #include <net/if.h> here
@@ -160,7 +171,6 @@
 		#else
 			#include <net/if.h>
 		#endif
-	#endif
 	#if (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_MAC_OS_X)
 		#include <sys/sockio.h>
 		#include <sys/filio.h>
@@ -227,6 +237,9 @@
 	#define POCO_TRY_AGAIN       TRY_AGAIN
 	#define POCO_NO_RECOVERY     NO_RECOVERY
 	#define POCO_NO_DATA         NO_DATA
+	#if !defined (POCO_NET_NO_UNIX_SOCKET)
+		#define POCO_HAS_UNIX_SOCKET
+	#endif
 #endif
 
 
@@ -240,7 +253,7 @@
 #endif
 
 
-#if (POCO_OS == POCO_OS_HPUX) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_WINDOWS_CE) || (POCO_OS == POCO_OS_CYGWIN)
+#if (POCO_OS == POCO_OS_HPUX) || (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_CYGWIN)
 	#define POCO_BROKEN_TIMEOUTS 1
 #endif
 
@@ -364,6 +377,21 @@ namespace Net {
 
 typedef std::vector<SocketBuf> SocketBufVec;
 
+inline int SocketBufVecSize(const SocketBufVec& sbv)
+	/// Returns total length of all SocketBufs in the vector.
+{
+	std::size_t sz = 0;
+	for (const auto& v : sbv)
+	{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		sz += v.len;
+#elif defined(POCO_OS_FAMILY_UNIX)
+		sz += v.iov_len;
+#endif
+	}
+	return static_cast<int>(sz);
+}
+
 struct AddressFamily
 	/// AddressFamily::Family replaces the previously used IPAddress::Family
 	/// enumeration and is now used for IPAddress::Family and SocketAddress::Family.
@@ -371,15 +399,17 @@ struct AddressFamily
 	enum Family
 		/// Possible address families for socket addresses.
 	{
-		IPv4,
+		UNKNOWN = AF_UNSPEC,
+			/// Unspecified family
+	#if defined(POCO_HAS_UNIX_SOCKET)
+		UNIX_LOCAL = AF_UNIX,
+			/// UNIX domain socket address family. Available on UNIX/POSIX platforms only.
+	#endif
+		IPv4 = AF_INET,
 			/// IPv4 address family.
 	#if defined(POCO_HAVE_IPv6)
-		IPv6,
+		IPv6 = AF_INET6
 			/// IPv6 address family.
-	#endif
-	#if defined(POCO_OS_FAMILY_UNIX)
-		UNIX_LOCAL
-			/// UNIX domain socket address family. Available on UNIX/POSIX platforms only.
 	#endif
 	};
 };

@@ -91,15 +91,9 @@ public:
 	template <typename T>
 	Var(const T& val)
 		/// Creates the Var from the given value.
-#ifdef POCO_NO_SOO
-		: _pHolder(new VarHolderImpl<T>(val))
-	{
-	}
-#else
 	{
 		construct(val);
 	}
-#endif
 
 	Var(const char* pVal);
 		// Convenience constructor for const char* which gets mapped to a std::string internally, i.e. pVal is deep-copied.
@@ -191,16 +185,14 @@ public:
 		VarHolder* pHolder = content();
 
 		if (!pHolder)
-				throw InvalidAccessException("Can not convert empty value.");
+			throw InvalidAccessException("Can not convert empty value.");
 
 		if (typeid(T) == pHolder->type())
 			return extract<T>();
-		else
-		{
-			T result;
-			pHolder->convert(result);
-			return result;
-		}
+
+		T result;
+		pHolder->convert(result);
+		return result;
 	}
 
 	template <typename T>
@@ -214,15 +206,16 @@ public:
 	{
 		VarHolder* pHolder = content();
 
-		if (pHolder && pHolder->type() == typeid(T))
+		if ( (pHolder != nullptr) && pHolder->type() == typeid(T))
 		{
-			VarHolderImpl<T>* pHolderImpl = static_cast<VarHolderImpl<T>*>(pHolder);
+			auto* pHolderImpl = static_cast<VarHolderImpl<T>*>(pHolder);
 			return pHolderImpl->value();
 		}
-		else if (!pHolder)
+
+		if (!pHolder)
 			throw InvalidAccessException("Can not extract empty value.");
 		else
-			throw BadCastException(format("Can not convert %s to %s.",
+			throw BadCastException(Poco::format("Can not convert %s to %s.",
 				std::string(pHolder->type().name()),
 				std::string(typeid(T).name())));
 	}
@@ -231,12 +224,8 @@ public:
 	Var& operator = (const T& other)
 		/// Assignment operator for assigning POD to Var
 	{
-#ifdef POCO_NO_SOO
-		Var tmp(other);
-		swap(tmp);
-#else
+		clear();
 		construct(other);
-#endif
 		return *this;
 	}
 
@@ -485,10 +474,14 @@ public:
 	const std::type_info& type() const;
 		/// Returns the type information of the stored content.
 
-	//@ deprecated
+	std::string typeName(bool demangle = true) const;
+		/// Returns the type name of the stored content.
+		/// If demangling is available and emangle is true,
+		/// the returnsed string will be demangled.
+
+	POCO_DEPRECATED("Use clear() instead")
 	void empty();
 		/// Empties Var.
-		/// This function is deprecated and will be removed.
 		/// Please use clear().
 
 	void clear();
@@ -531,23 +524,8 @@ public:
 		/// This function returns 0 when Var is empty, 1 for POD or the size (i.e. length)
 		/// for held container.
 
-	std::string toString() const
+	std::string toString() const;
 		/// Returns the stored value as string.
-	{
-		VarHolder* pHolder = content();
-
-		if (!pHolder)
-				throw InvalidAccessException("Can not convert empty value.");
-
-		if (typeid(std::string) == pHolder->type())
-			return extract<std::string>();
-		else
-		{
-			std::string result;
-			pHolder->convert(result);
-			return result;
-		}
-	}
 
 	static Var parse(const std::string& val);
 		/// Parses the string which must be in JSON format
@@ -600,7 +578,8 @@ private:
 
 		if (pHolder && pHolder->type() == typeid(T))
 			return static_cast<VarHolderImpl<T>*>(pHolder);
-		else if (!pHolder)
+
+		if (pHolder == nullptr)
 			throw InvalidAccessException("Can not access empty value.");
 		else
 			throw E(errorMessage);
@@ -612,79 +591,25 @@ private:
 		return pStr->operator[](n);
 	}
 
-#ifdef POCO_NO_SOO
-
-	VarHolder* content() const
-	{
-		return _pHolder;
-	}
-
-	void destruct()
-	{
-		if (!isEmpty()) delete content();
-	}
-
-	VarHolder* _pHolder;
-
-#else
-
 	VarHolder* content() const
 	{
 		return _placeholder.content();
 	}
 
+	void destruct()
+	{
+	}
+
 	template<typename ValueType>
 	void construct(const ValueType& value)
 	{
-		if (sizeof(VarHolderImpl<ValueType>) <= Placeholder<ValueType>::Size::value)
-		{
-			new (reinterpret_cast<VarHolder*>(_placeholder.holder)) VarHolderImpl<ValueType>(value);
-			_placeholder.setLocal(true);
-		}
-		else
-		{
-			_placeholder.pHolder = new VarHolderImpl<ValueType>(value);
-			_placeholder.setLocal(false);
-		}
+		_placeholder.assign<VarHolderImpl<ValueType>, ValueType>(value);
 	}
 
-	void construct(const char* value)
-	{
-		std::string val(value);
-		if (sizeof(VarHolderImpl<std::string>) <= Placeholder<std::string>::Size::value)
-		{
-			new (reinterpret_cast<VarHolder*>(_placeholder.holder)) VarHolderImpl<std::string>(val);
-			_placeholder.setLocal(true);
-		}
-		else
-		{
-			_placeholder.pHolder = new VarHolderImpl<std::string>(val);
-			_placeholder.setLocal(false);
-		}
-	}
-
-	void construct(const Var& other)
-	{
-		if (!other.isEmpty())
-			other.content()->clone(&_placeholder);
-		else
-			_placeholder.erase();
-	}
-
-	void destruct()
-	{
-		if (!isEmpty())
-		{
-			if (_placeholder.isLocal())
-				content()->~VarHolder();
-			else
-				delete content();
-		}
-	}
+	void construct(const char* value);
+	void construct(const Var& other);
 
 	Placeholder<VarHolder> _placeholder;
-
-#endif // POCO_NO_SOO
 };
 
 
@@ -697,26 +622,33 @@ private:
 /// Var members
 ///
 
+inline void Var::construct(const char* value)
+{
+	const std::string val(value);
+	_placeholder.assign<VarHolderImpl<std::string>, std::string>(val);
+}
+
+
+inline void Var::construct(const Var& other)
+{
+	if (!other.isEmpty())
+		(void) other.content()->clone(&_placeholder);
+}
+
+
 inline void Var::swap(Var& other)
 {
-#ifdef POCO_NO_SOO
-
-	std::swap(_pHolder, other._pHolder);
-
-#else
-
 	if (this == &other) return;
 
 	if (!_placeholder.isLocal() && !other._placeholder.isLocal())
 	{
-		std::swap(_placeholder.pHolder, other._placeholder.pHolder);
+		_placeholder.swap(other._placeholder);
 	}
 	else
 	{
-		Var tmp(*this);
+		const Var tmp(*this);
 		try
 		{
-			if (_placeholder.isLocal()) destruct();
 			construct(other);
 			other = tmp;
 		}
@@ -726,40 +658,45 @@ inline void Var::swap(Var& other)
 			throw;
 		}
 	}
-
-#endif
 }
 
 
 inline const std::type_info& Var::type() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->type() : typeid(void);
+	return (pHolder != nullptr) ? pHolder->type() : typeid(void);
+}
+
+
+inline std::string Var::typeName(bool demangle) const
+{
+	VarHolder* pHolder = content();
+	return (pHolder != nullptr) ? demangle ? Poco::demangle(pHolder->type().name()) : pHolder->type().name() : std::string();
 }
 
 
 inline Var::ConstIterator Var::begin() const
 {
-	if (size() == 0) return ConstIterator(const_cast<Var*>(this), true);
+	if (size() == 0) return {const_cast<Var*>(this), true};
 
-	return ConstIterator(const_cast<Var*>(this), false);
+	return {const_cast<Var*>(this), false};
 }
 
 inline Var::ConstIterator Var::end() const
 {
-	return ConstIterator(const_cast<Var*>(this), true);
+	return {const_cast<Var*>(this), true};
 }
 
 inline Var::Iterator Var::begin()
 {
-	if (size() == 0) return Iterator(const_cast<Var*>(this), true);
+	if (size() == 0) return {const_cast<Var*>(this), true};
 
-	return Iterator(const_cast<Var*>(this), false);
+	return {const_cast<Var*>(this), false};
 }
 
 inline Var::Iterator Var::end()
 {
-	return Iterator(this, true);
+	return {this, true};
 }
 
 
@@ -795,7 +732,7 @@ inline bool Var::operator ! () const
 
 inline bool Var::isEmpty() const
 {
-	return 0 == content();
+	return nullptr == content();
 }
 
 
@@ -804,112 +741,112 @@ inline bool Var::isArray() const
 	if (isEmpty() || isString()) return false;
 
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isArray() : false;
+	return (pHolder != nullptr) ? pHolder->isArray() : false;
 }
 
 
 inline bool Var::isVector() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isVector() : false;
+	return (pHolder != nullptr) ? pHolder->isVector() : false;
 }
 
 
 inline bool Var::isList() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isList() : false;
+	return (pHolder != nullptr) ? pHolder->isList() : false;
 }
 
 
 inline bool Var::isDeque() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isDeque() : false;
+	return (pHolder != nullptr) ? pHolder->isDeque() : false;
 }
 
 
 inline bool Var::isStruct() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isStruct() : false;
+	return (pHolder != nullptr) ? pHolder->isStruct() : false;
 }
 
 
 inline bool Var::isOrdered() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isOrdered() : false;
+	return (pHolder != nullptr) ? pHolder->isOrdered() : false;
 }
 
 
 inline bool Var::isInteger() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isInteger() : false;
+	return (pHolder != nullptr) ? pHolder->isInteger() : false;
 }
 
 
 inline bool Var::isSigned() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isSigned() : false;
+	return (pHolder != nullptr) ? pHolder->isSigned() : false;
 }
 
 
 inline bool Var::isNumeric() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isNumeric() : false;
+	return (pHolder != nullptr) ? pHolder->isNumeric() : false;
 }
 
 
 inline bool Var::isBoolean() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isBoolean() : false;
+	return (pHolder != nullptr) ? pHolder->isBoolean() : false;
 }
 
 
 inline bool Var::isString() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isString() : false;
+	return (pHolder != nullptr) ? pHolder->isString() : false;
 }
 
 
 inline bool Var::isDate() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isDate() : false;
+	return (pHolder != nullptr) ? pHolder->isDate() : false;
 }
 
 
 inline bool Var::isTime() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isTime() : false;
+	return (pHolder != nullptr) ? pHolder->isTime() : false;
 }
 
 
 inline bool Var::isDateTime() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isDateTime() : false;
+	return (pHolder != nullptr) ? pHolder->isDateTime() : false;
 }
 
 
 inline bool Var::isUUID() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->isUUID() : false;
+	return (pHolder != nullptr) ? pHolder->isUUID() : false;
 }
 
 
 inline std::size_t Var::size() const
 {
 	VarHolder* pHolder = content();
-	return pHolder ? pHolder->size() : 0;
+	return (pHolder != nullptr) ? pHolder->size() : 0;
 }
 
 
@@ -920,7 +857,7 @@ inline std::size_t Var::size() const
 inline const Var operator + (const char* other, const Var& da)
 	/// Addition operator for adding Var to const char*
 {
-	std::string tmp = other;
+	const std::string tmp = other;
 	return tmp + da.convert<std::string>();
 }
 
@@ -2350,8 +2287,7 @@ inline bool operator >= (const unsigned long& other, const Var& da)
 } // namespace Dynamic
 
 
-//@ deprecated
-typedef Dynamic::Var DynamicAny;
+using DynamicAny POCO_DEPRECATED("Replace with Poco::Dynamic::Var") = Dynamic::Var;
 
 
 } // namespace Poco

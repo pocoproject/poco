@@ -26,7 +26,7 @@ namespace Poco {
 namespace Net {
 
 
-SecureServerSocket::SecureServerSocket(): 
+SecureServerSocket::SecureServerSocket():
 	ServerSocket(new SecureServerSocketImpl(SSLManager::instance().defaultServerContext()), true)
 {
 }
@@ -38,7 +38,7 @@ SecureServerSocket::SecureServerSocket(Context::Ptr pContext):
 }
 
 
-SecureServerSocket::SecureServerSocket(const Socket& socket): 
+SecureServerSocket::SecureServerSocket(const Socket& socket):
 	ServerSocket(socket)
 {
 	if (!dynamic_cast<SecureServerSocketImpl*>(impl()))
@@ -46,7 +46,7 @@ SecureServerSocket::SecureServerSocket(const Socket& socket):
 }
 
 
-SecureServerSocket::SecureServerSocket(const SocketAddress& address, int backlog): 
+SecureServerSocket::SecureServerSocket(const SocketAddress& address, int backlog):
 	ServerSocket(new SecureServerSocketImpl(SSLManager::instance().defaultServerContext()), true)
 {
 	impl()->bind(address, true);
@@ -54,7 +54,7 @@ SecureServerSocket::SecureServerSocket(const SocketAddress& address, int backlog
 }
 
 
-SecureServerSocket::SecureServerSocket(const SocketAddress& address, int backlog, Context::Ptr pContext): 
+SecureServerSocket::SecureServerSocket(const SocketAddress& address, int backlog, Context::Ptr pContext):
 	ServerSocket(new SecureServerSocketImpl(pContext), true)
 {
 	impl()->bind(address, true);
@@ -62,7 +62,7 @@ SecureServerSocket::SecureServerSocket(const SocketAddress& address, int backlog
 }
 
 
-SecureServerSocket::SecureServerSocket(Poco::UInt16 port, int backlog): 
+SecureServerSocket::SecureServerSocket(Poco::UInt16 port, int backlog):
 	ServerSocket(new SecureServerSocketImpl(SSLManager::instance().defaultServerContext()), true)
 {
 	IPAddress wildcardAddr;
@@ -71,7 +71,7 @@ SecureServerSocket::SecureServerSocket(Poco::UInt16 port, int backlog):
 	impl()->listen(backlog);
 }
 
-SecureServerSocket::SecureServerSocket(Poco::UInt16 port, int backlog, Context::Ptr pContext): 
+SecureServerSocket::SecureServerSocket(Poco::UInt16 port, int backlog, Context::Ptr pContext):
 	ServerSocket(new SecureServerSocketImpl(pContext), true)
 {
 	IPAddress wildcardAddr;

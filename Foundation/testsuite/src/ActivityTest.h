@@ -25,6 +25,7 @@ public:
 	~ActivityTest();
 
 	void testActivity();
+	void testActivityFinishes();
 
 	void setUp();
 	void tearDown();

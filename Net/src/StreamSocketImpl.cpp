@@ -34,7 +34,7 @@ StreamSocketImpl::StreamSocketImpl(SocketAddress::Family family)
 	else if (family == SocketAddress::IPv6)
 		init(AF_INET6);
 #endif
-#if defined(POCO_OS_FAMILY_UNIX)
+#if defined(POCO_HAS_UNIX_SOCKET)
 	else if (family == SocketAddress::UNIX_LOCAL)
 		init(AF_UNIX);
 #endif
@@ -61,8 +61,8 @@ int StreamSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	while (remaining > 0)
 	{
 		int n = SocketImpl::sendBytes(p, remaining, flags);
-		poco_assert_dbg (n >= 0);
-		p += n; 
+		poco_assert_dbg (!blocking || n >= 0);
+		p += n;
 		sent += n;
 		remaining -= n;
 		if (blocking && remaining > 0)

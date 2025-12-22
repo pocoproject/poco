@@ -24,21 +24,21 @@ namespace
 	class ActiveObject
 	{
 	public:
-		ActiveObject(): 
+		ActiveObject():
 			_activity(this, &ActiveObject::run),
 			_count(0)
 		{
 		}
-		
+
 		~ActiveObject()
 		{
 		}
-		
+
 		Activity<ActiveObject>& activity()
 		{
 			return _activity;
 		}
-		
+
 		Poco::UInt64 count() const
 		{
 			return _count;
@@ -47,7 +47,7 @@ namespace
 	protected:
 		void run()
 		{
-			while (!_activity.isStopped()) 
+			while (!_activity.isStopped())
 				++_count;
 		}
 
@@ -55,8 +55,46 @@ namespace
 		Activity<ActiveObject> _activity;
 		Poco::UInt64           _count;
 	};
+
+	class BriefActiveObject
+	{
+	public:
+		BriefActiveObject():
+			_activity(this, &BriefActiveObject::run),
+			_count(0)
+		{
+		}
+
+		~BriefActiveObject()
+		{
+		}
+
+		Activity<BriefActiveObject>& activity()
+		{
+			return _activity;
+		}
+
+		Poco::UInt64 count() const
+		{
+			return _count;
+		}
+	protected:
+		void run()
+		{
+			while (!_activity.isStopped())
+			{
+				++_count;
+				if(_count > 2)
+					break;
+
+			}
+		}
+	private:
+		Activity<BriefActiveObject> _activity;
+		Poco::UInt64           _count;
+	};
 }
- 
+
 
 ActivityTest::ActivityTest(const std::string& name): CppUnit::TestCase(name)
 {
@@ -81,6 +119,17 @@ void ActivityTest::testActivity()
 	assertTrue (activeObj.count() > 0);
 }
 
+void ActivityTest::testActivityFinishes()
+{
+	BriefActiveObject briefActiveObj;
+	assertTrue (briefActiveObj.activity().isStopped());
+	briefActiveObj.activity().start();
+	assertTrue (!briefActiveObj.activity().isStopped());
+	Thread::sleep(100);
+	assertTrue (!briefActiveObj.activity().isRunning());
+	assertTrue (briefActiveObj.count() == 3);
+}
+
 
 void ActivityTest::setUp()
 {
@@ -97,6 +146,7 @@ CppUnit::Test* ActivityTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ActivityTest");
 
 	CppUnit_addTest(pSuite, ActivityTest, testActivity);
+	CppUnit_addTest(pSuite, ActivityTest, testActivityFinishes);
 
 	return pSuite;
 }

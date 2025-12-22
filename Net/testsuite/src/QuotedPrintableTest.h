@@ -26,7 +26,7 @@ public:
 
 	void testEncode();
 	void testDecode();
-	
+
 	void setUp();
 	void tearDown();
 

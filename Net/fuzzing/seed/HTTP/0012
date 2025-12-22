@@ -1,0 +1,29 @@
+POST /cgi-bin/qtest HTTP/1.1
+Host: aram
+User-Agent: Mozilla/5.0 Gecko/2009042316 Firefox/3.0.10
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Connection: keep-alive
+Referer: http://aram/~martind/banner.htm
+Content-Type: multipart/form-data; boundary=2a8ae6ad-f4ad-4d9a-a92c-6d217011fe0f
+Content-Length: 514
+
+--2a8ae6ad-f4ad-4d9a-a92c-6d217011fe0f
+Content-Disposition: form-data; name="datafile1"; filename="r.gif"
+Content-Type: image/gif
+
+GIF87a.............,...........D..;
+--2a8ae6ad-f4ad-4d9a-a92c-6d217011fe0f
+Content-Disposition: form-data; name="datafile2"; filename="g.gif"
+Content-Type: image/gif
+
+GIF87a.............,...........D..;
+--2a8ae6ad-f4ad-4d9a-a92c-6d217011fe0f
+Content-Disposition: form-data; name="datafile3"; filename="b.gif"
+Content-Type: image/gif
+
+GIF87a.............,...........D..;
+--2a8ae6ad-f4ad-4d9a-a92c-6d217011fe0f--

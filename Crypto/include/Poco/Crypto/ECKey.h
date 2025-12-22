@@ -31,6 +31,7 @@ namespace Crypto {
 class X509Certificate;
 class PKCS12Container;
 
+//class [[deprecated]] ECKey;
 
 class Crypto_API ECKey: public KeyPair
 	/// This class stores an EC key pair, consisting
@@ -64,7 +65,7 @@ public:
 		/// If a private key is specified, you don't need to specify a public key file.
 		/// OpenSSL will auto-create the public key from the private key.
 
-	ECKey(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream = 0, const std::string& privateKeyPassphrase = "");
+	ECKey(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream = nullptr, const std::string& privateKeyPassphrase = "");
 		/// Creates the ECKey, by reading public and private key from the given streams and
 		/// using the given passphrase for the private key.
 		///

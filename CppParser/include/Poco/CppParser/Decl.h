@@ -28,7 +28,7 @@ namespace CppParser {
 
 class CppParser_API Decl: public Symbol
 	/// This class represents a simple declaration in a C++ source file.
-	/// It is a base class for Function, TypeDef or Variable.
+	/// It is a base class for Function, TypeDef, Using or Variable.
 {
 public:
 	Decl(const std::string& decl, NameSpace* pNameSpace);

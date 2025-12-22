@@ -44,7 +44,7 @@
 // Foundation_API functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if (defined(_WIN32) || defined(_WIN32_WCE)) && defined(POCO_DLL)
+#if defined(_WIN32) && defined(POCO_DLL)
 	#if defined(Foundation_EXPORTS)
 		#define Foundation_API __declspec(dllexport)
 	#else
@@ -91,6 +91,14 @@
 	#endif
 #endif
 
+#include <string>
+
+namespace Poco {
+
+using namespace std::literals;
+
+} // namespace Poco
+
 
 //
 // Include platform-specific definitions
@@ -133,32 +141,22 @@
 #define POCO_DO_JOIN(X, Y) POCO_DO_JOIN2(X, Y)
 #define POCO_DO_JOIN2(X, Y) X##Y
 
+//
+// MS Visual Studio can use type long for __LINE__ macro
+// when /ZI compilation flag is used - https://learn.microsoft.com/en-us/cpp/build/reference/z7-zi-zi-debug-information-format?view=msvc-170#zi-1
+// This breaks some poco interfaces, for ex. logger
+// We should fix type for line number
+namespace Poco {
 
-//
-// POCO_DEPRECATED
-//
-// A macro expanding to a compiler-specific clause to
-// mark a class or function as deprecated.
-//
-#if defined(POCO_NO_DEPRECATED)
-#define POCO_DEPRECATED
-#elif defined(_GNUC_)
-#define POCO_DEPRECATED __attribute__((deprecated))
-#elif defined(__clang__)
-#define POCO_DEPRECATED __attribute__((deprecated))
-#elif defined(_MSC_VER)
-#define POCO_DEPRECATED __declspec(deprecated)
-#else
-#define POCO_DEPRECATED
-#endif
+using LineNumber = decltype(__LINE__);
 
+} // namespace Poco
 
 //
 // Pull in basic definitions
 //
 #include "Poco/Bugcheck.h"
 #include "Poco/Types.h"
-#include <string>
 
 
 #endif // Foundation_Foundation_INCLUDED

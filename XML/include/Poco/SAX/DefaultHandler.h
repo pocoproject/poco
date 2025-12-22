@@ -30,29 +30,29 @@ namespace XML {
 
 
 class XML_API DefaultHandler: public EntityResolver, public DTDHandler, public ContentHandler, public ErrorHandler
-	/// Default base class for SAX2 event handlers. 
-	/// This class is available as a convenience base class for SAX2 applications: 
+	/// Default base class for SAX2 event handlers.
+	/// This class is available as a convenience base class for SAX2 applications:
 	/// it provides default implementations for all of the
 	/// callbacks in the four core SAX2 handler classes:
-	///      * EntityResolver 
-	///      * DTDHandler 
-	///      * ContentHandler 
-	///      * ErrorHandler 
-	/// Application writers can extend this class when they need to implement only 
+	///      * EntityResolver
+	///      * DTDHandler
+	///      * ContentHandler
+	///      * ErrorHandler
+	/// Application writers can extend this class when they need to implement only
 	/// part of an interface; parser writers can instantiate this
 	/// class to provide default handlers when the application has not supplied its own.
 {
 public:
 	DefaultHandler();
 		/// Creates the DefaultHandler.
-		
+
 	~DefaultHandler();
 		/// Destroys the DefaultHandler.
-	
+
 	// EntityResolver
 	InputSource* resolveEntity(const XMLString* publicId, const XMLString& systemId);
 	void releaseInputSource(InputSource* pSource);
-	
+
 	// DTDHandler
 	void notationDecl(const XMLString& name, const XMLString* publicId, const XMLString* systemId);
 	void unparsedEntityDecl(const XMLString& name, const XMLString* publicId, const XMLString& systemId, const XMLString& notationName);
@@ -69,7 +69,7 @@ public:
 	void startPrefixMapping(const XMLString& prefix, const XMLString& uri);
 	void endPrefixMapping(const XMLString& prefix);
 	void skippedEntity(const XMLString& name);
-	
+
 	// ErrorHandler
 	void warning(const SAXException& exc);
 	void error(const SAXException& exc);

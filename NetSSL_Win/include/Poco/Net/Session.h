@@ -38,11 +38,11 @@ class NetSSL_Win_API Session: public Poco::RefCountedObject
 public:
 	using Ptr = Poco::AutoPtr<Session>;
 
-protected:	
+protected:
 	Session();
 		/// Creates a new Session object, using the given
-		/// SSL_SESSION object. 
-		/// 
+		/// SSL_SESSION object.
+		///
 		/// The SSL_SESSION's reference count is not changed.
 
 	~Session();

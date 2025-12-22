@@ -31,7 +31,7 @@ namespace Poco {
 namespace Crypto {
 
 
-class KeyPairImpl: public Poco::RefCountedObject
+class Crypto_API KeyPairImpl: public Poco::RefCountedObject
 	/// Class KeyPairImpl
 {
 public:
@@ -56,13 +56,13 @@ public:
 	virtual void save(const std::string& publicKeyFile,
 		const std::string& privateKeyFile = "",
 		const std::string& privateKeyPassphrase = "") const = 0;
-		/// Exports the public and private keys to the given files. 
+		/// Exports the public and private keys to the given files.
 		///
 		/// If an empty filename is specified, the corresponding key
 		/// is not exported.
 
 	virtual void save(std::ostream* pPublicKeyStream,
-		std::ostream* pPrivateKeyStream = 0,
+		std::ostream* pPrivateKeyStream = nullptr,
 		const std::string& privateKeyPassphrase = "") const = 0;
 		/// Exports the public and private key to the given streams.
 		///

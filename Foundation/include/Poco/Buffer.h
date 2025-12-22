@@ -34,12 +34,27 @@ class Buffer
 	///
 	/// This class is useful everywhere where a temporary buffer
 	/// is needed.
+	///
+	/// Note: A Buffer has both a size and a capacity, similar to
+	/// std::vector and std::string. However, upon creation of the
+	/// Buffer, the size always equals the capacity (provided via the
+	/// length argument of the constructor), as the Buffer is meant
+	/// to be filled by directly writing to its contents,
+	/// i.e., by passing the pointer to the first element
+	/// of the buffer obtained via begin() to a function expecting
+	/// a pointer to a buffer.
+	///
+	/// Therefore, calling append() on a newly created Buffer will
+	/// always expand the buffer size and capacity.
+	/// If you need to create a Buffer and want to write data to it
+	/// by calling append(), the correct steps are to first create
+	/// the Buffer, then call resize(0), and then call append().
 {
 public:
 	Buffer(std::size_t length):
 		_capacity(length),
 		_used(length),
-		_ptr(0),
+		_ptr(nullptr),
 		_ownMem(true)
 		/// Creates and allocates the Buffer.
 	{
@@ -66,7 +81,7 @@ public:
 	Buffer(const T* pMem, std::size_t length):
 		_capacity(length),
 		_used(length),
-		_ptr(0),
+		_ptr(nullptr),
 		_ownMem(true)
 		/// Creates and allocates the Buffer; copies the contents of
 		/// the supplied memory into the buffer. Length argument specifies
@@ -84,7 +99,7 @@ public:
 		/// Copy constructor.
 		_capacity(other._used),
 		_used(other._used),
-		_ptr(0),
+		_ptr(nullptr),
 		_ownMem(true)
 	{
 		if (_used)
@@ -143,6 +158,8 @@ public:
 		if (_ownMem) delete [] _ptr;
 	}
 
+	Buffer() = delete;
+
 	void resize(std::size_t newCapacity, bool preserveContent = true)
 		/// Resizes the buffer capacity and size. If preserveContent is true,
 		/// the content of the old buffer is copied over to the
@@ -187,7 +204,7 @@ public:
 
 		if (newCapacity != _capacity)
 		{
-			T* ptr = 0;
+			T* ptr = nullptr;
 			if (newCapacity > 0)
 			{
 				ptr = new T[newCapacity];
@@ -248,7 +265,7 @@ public:
 		return _capacity * sizeof(T);
 	}
 
-	void swap(Buffer& other)
+	void swap(Buffer& other) noexcept
 	/// Swaps the buffer with another one.
 	{
 		using std::swap;
@@ -347,8 +364,6 @@ public:
 	}
 
 private:
-	Buffer();
-
 	std::size_t _capacity;
 	std::size_t _used;
 	T*          _ptr;

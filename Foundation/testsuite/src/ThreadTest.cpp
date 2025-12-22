@@ -17,11 +17,11 @@
 #include "Poco/Event.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
-//#include <iostream>
 #if defined(__sun) && defined(__SVR4) && !defined(__EXTENSIONS__)
 #define __EXTENSIONS__
 #endif
 #include <climits>
+#include <iostream>
 
 
 using Poco::Thread;
@@ -41,7 +41,13 @@ public:
 	{
 		Thread* pThread = Thread::current();
 		if (pThread)
+		{
 			_threadName = pThread->name();
+#ifndef POCO_NO_THREADNAME
+			auto *pThreadImpl = reinterpret_cast<Poco::ThreadImpl *>(pThread);
+			_osThreadName = pThreadImpl->getOSThreadNameImpl();
+#endif
+		}
 		_ran = true;
 		_event.wait();
 	}
@@ -55,6 +61,13 @@ public:
 	{
 		return _threadName;
 	}
+
+#ifndef POCO_NO_THREADNAME
+	const std::string& osThreadName() const
+	{
+		return _osThreadName;
+	}
+#endif
 
 	void notify()
 	{
@@ -71,6 +84,9 @@ public:
 private:
 	bool _ran;
 	std::string _threadName;
+#ifndef POCO_NO_THREADNAME
+	std::string _osThreadName;
+#endif
 	Event _event;
 };
 
@@ -108,7 +124,38 @@ public:
 	}
 
 private:
-	bool _finished;
+	std::atomic<bool> _finished;
+};
+
+
+class JoinRunnable : public Runnable
+{
+public:
+	JoinRunnable() : _stop(false), _running(false)
+	{
+	}
+
+	void run()
+	{
+		_running = true;
+		while (!_stop)
+			Thread::sleep(100);
+		_running = false;
+	}
+
+	void stop()
+	{
+		_stop = true;
+	}
+
+	bool running() const
+	{
+		return _running;
+	}
+
+private:
+	std::atomic<bool> _stop;
+	std::atomic<bool> _running;
 };
 
 
@@ -140,8 +187,65 @@ public:
 	}
 
 private:
-	int _counter;
-	bool _sleepy;
+	std::atomic<int> _counter;
+	std::atomic<bool> _sleepy;
+};
+
+
+class InterruptionRunnable : public Runnable
+{
+public:
+	virtual void run() override
+	{
+		_sleep = !Thread::trySleep(300000);
+		_interrupted = Thread::current()->isInterrupted();
+
+		try
+		{
+			Thread::current()->checkInterrupted();
+		}
+		catch (const Poco::ThreadInterruptedException&)
+		{
+			_exception = true;
+		}
+
+		// interrupt state should be cleared
+		if (!Thread::current()->isInterrupted())
+		{
+			_interruptCleared = true;
+		}
+
+		// interrupt state should be cleared
+		try
+		{
+			Thread::current()->checkInterrupted();
+			_exceptionCleared = true;
+		}
+		catch (const Poco::ThreadInterruptedException&)
+		{
+			_exceptionCleared = false;
+		}
+	}
+
+	bool isTestOK() const
+	{
+		if (_sleep &&
+			_interrupted &&
+			_exception &&
+			_interruptCleared &&
+			_exceptionCleared)
+		{
+			return true;
+		}
+		return false;
+	}
+
+private:
+	bool _sleep = false;
+	bool _interrupted = false;
+	bool _exception = false;
+	bool _interruptCleared = false;
+	bool _exceptionCleared = false;
 };
 
 
@@ -168,6 +272,9 @@ void ThreadTest::testThread()
 	assertTrue (!thread.isRunning());
 	assertTrue (r.ran());
 	assertTrue (!r.threadName().empty());
+#ifndef POCO_NO_THREADNAME
+	assertTrue (!r.osThreadName().empty());
+#endif
 }
 
 
@@ -180,6 +287,23 @@ void ThreadTest::testNamedThread()
 	thread.join();
 	assertTrue (r.ran());
 	assertTrue (r.threadName() == "MyThread");
+#ifndef POCO_NO_THREADNAME
+	assertTrue (r.osThreadName() == r.threadName());
+#endif
+
+	// name len > POCO_MAX_THREAD_NAME_LEN
+	Thread thread2("0123456789aaaaaaaaaa9876543210");
+	MyRunnable r2;
+	thread2.start(r2);
+	r2.notify();
+	thread2.join();
+	assertTrue (r2.ran());
+#ifndef POCO_NO_THREADNAME
+	assertTrue (r2.osThreadName() == r2.threadName());
+#endif
+	assertTrue (r2.threadName().length() <= POCO_MAX_THREAD_NAME_LEN);
+	assertTrue (std::string(r2.threadName(), 0, 7) == "0123456");
+	assertTrue (std::string(r2.threadName(), r2.threadName().size() - 7) == "6543210");
 }
 
 
@@ -244,7 +368,7 @@ void ThreadTest::testThreads()
 }
 
 
-void ThreadTest::testJoin()
+void ThreadTest::testTryJoin()
 {
 	Thread thread;
 	MyRunnable r;
@@ -256,6 +380,22 @@ void ThreadTest::testJoin()
 	r.notify();
 	assertTrue (thread.tryJoin(500));
 	assertTrue (!thread.isRunning());
+}
+
+
+void ThreadTest::testJoin()
+{
+	Thread thread;
+	JoinRunnable r;
+	assertTrue(!thread.isRunning());
+	thread.start(r);
+	Thread::sleep(200);
+	assertTrue(thread.isRunning());
+	assertTrue(!thread.tryJoin(100));
+	r.stop();
+	thread.join();
+	assertTrue(!thread.isRunning());
+	assertTrue(!r.running());
 }
 
 
@@ -347,10 +487,11 @@ void ThreadTest::testThreadFunction()
 
 	assertTrue (!thread.isRunning());
 
-	int tmp = MyRunnable::_staticVar;
+	MyRunnable::_staticVar = 0;
+	int tmp = 1;
 	thread.start(freeFunc, &tmp);
 	thread.join();
-	assertTrue (tmp * 2 == MyRunnable::_staticVar);
+	assertTrue (tmp == MyRunnable::_staticVar);
 
 	assertTrue (!thread.isRunning());
 
@@ -408,15 +549,16 @@ void ThreadTest::testThreadStackSize()
 	assertTrue (0 == thread.getStackSize());
 	thread.setStackSize(stackSize);
 	assertTrue (stackSize <= thread.getStackSize());
-	int tmp = MyRunnable::_staticVar;
+	MyRunnable::_staticVar = 0;
+	int tmp = 1;
 	thread.start(freeFunc, &tmp);
 	thread.join();
-	assertTrue (tmp * 2 == MyRunnable::_staticVar);
+	assertTrue (1 == MyRunnable::_staticVar);
 
 	stackSize = 1;
 	thread.setStackSize(stackSize);
 
-#if !defined(POCO_OS_FAMILY_BSD) // on BSD family, stack size is rounded
+#if defined(POCO_OS_FAMILY_BSD) // on BSD family, stack size is rounded
 	#ifdef PTHREAD_STACK_MIN
 		assertTrue (PTHREAD_STACK_MIN == thread.getStackSize());
 	#else
@@ -424,17 +566,22 @@ void ThreadTest::testThreadStackSize()
 	#endif
 #endif
 
-	tmp = MyRunnable::_staticVar;
-	thread.start(freeFunc, &tmp);
-	thread.join();
-	assertTrue (tmp * 2 == MyRunnable::_staticVar);
-
-	thread.setStackSize(0);
-	assertTrue (0 == thread.getStackSize());
-	tmp = MyRunnable::_staticVar;
-	thread.start(freeFunc, &tmp);
-	thread.join();
-	assertTrue (tmp * 2 == MyRunnable::_staticVar);
+// disabled on FreeBSD; segfaults due to stack overflow,
+// possibly happens on other BSD OSes)
+#if (POCO_OS == POCO_OS_FREE_BSD)
+	{
+		int tmp = MyRunnable::_staticVar;
+		thread.start(freeFunc, &tmp);
+		thread.join();
+		assertTrue (tmp * 2 == MyRunnable::_staticVar);
+		thread.setStackSize(0);
+		assertTrue (0 == thread.getStackSize());
+		tmp = MyRunnable::_staticVar;
+		thread.start(freeFunc, &tmp);
+		thread.join();
+		assertTrue (tmp * 2 == MyRunnable::_staticVar);
+	}
+#endif
 }
 
 
@@ -444,6 +591,57 @@ void ThreadTest::testSleep()
 	Thread::sleep(200);
 	Poco::Timespan elapsed = start.elapsed();
 	assertTrue (elapsed.totalMilliseconds() >= 190 && elapsed.totalMilliseconds() < 250);
+}
+
+
+void ThreadTest::testAffinity()
+{
+#if POCO_OS == POCO_OS_LINUX
+	MyRunnable mr;
+	Thread t;
+	t.start(mr);
+	assertTrue (t.setAffinity(0));
+	assertEqual (t.getAffinity(), 0);
+	mr.notify();
+	t.join();
+#else
+	std::cout << "not implemented";
+#endif
+}
+
+
+void ThreadTest::testInterrupt()
+{
+	Thread thread;
+
+	for (int i = 0; i < 2; i++)
+	{
+		InterruptionRunnable r;
+
+		thread.start(r);
+		Thread::sleep(200);
+		assertTrue (thread.isRunning());
+		assertTrue (!thread.tryJoin(100));
+
+		// interrupt
+		thread.interrupt();
+		thread.join();
+
+		// clear the interrupt state to re-use the thread
+		thread.clearInterrupt();
+		assertTrue (!thread.isInterrupted());
+
+		try
+		{
+			thread.checkInterrupted();
+		}
+		catch (const std::exception&)
+		{
+			assertTrue (false);
+		}
+
+		assertTrue (r.isTestOK());
+	}
 }
 
 
@@ -465,6 +663,7 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testNamedThread);
 	CppUnit_addTest(pSuite, ThreadTest, testCurrent);
 	CppUnit_addTest(pSuite, ThreadTest, testThreads);
+	CppUnit_addTest(pSuite, ThreadTest, testTryJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testNotJoin);
 	CppUnit_addTest(pSuite, ThreadTest, testNotRun);
@@ -475,6 +674,8 @@ CppUnit::Test* ThreadTest::suite()
 	CppUnit_addTest(pSuite, ThreadTest, testThreadFunctor);
 	CppUnit_addTest(pSuite, ThreadTest, testThreadStackSize);
 	CppUnit_addTest(pSuite, ThreadTest, testSleep);
+	CppUnit_addTest(pSuite, ThreadTest, testAffinity);
+	CppUnit_addTest(pSuite, ThreadTest, testInterrupt);
 
 	return pSuite;
 }

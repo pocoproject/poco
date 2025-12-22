@@ -14,12 +14,14 @@
 #include "Poco/Any.h"
 #include "Poco/Format.h"
 #include "Poco/Exception.h"
+#include <string_view>
 
 
 using Poco::format;
 using Poco::BadCastException;
 using Poco::Int64;
 using Poco::UInt64;
+using Poco::Any;
 
 
 FormatTest::FormatTest(const std::string& name): CppUnit::TestCase(name)
@@ -27,9 +29,7 @@ FormatTest::FormatTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-FormatTest::~FormatTest()
-{
-}
+FormatTest::~FormatTest() = default;
 
 
 void FormatTest::testChar()
@@ -87,12 +87,12 @@ void FormatTest::testInt()
 	assertTrue (s == "  42");
 	s = format("%04hu", hu);
 	assertTrue (s == "0042");
-	
+
 	s = format("%*hu", 4, hu);
 	assertTrue (s == "  42");
 	s = format("%0*hu", 4, hu);
 	assertTrue (s == "0042");
-	
+
 	unsigned x = 0x42;
 	s = format("%x", x);
 	assertTrue (s == "42");
@@ -126,12 +126,12 @@ void FormatTest::testInt()
 	assertTrue (s == "  42");
 	s = format("%04u", u);
 	assertTrue (s == "0042");
-	
+
 	s = format("%*u", 4, u);
 	assertTrue (s == "  42");
 	s = format("%0*u", 4, u);
 	assertTrue (s == "0042");
-	
+
 	long l = 42;
 	s = format("%ld", l);
 	assertTrue (s == "42");
@@ -152,12 +152,12 @@ void FormatTest::testInt()
 	assertTrue (s == "  42");
 	s = format("%04lu", ul);
 	assertTrue (s == "0042");
-	
+
 	s = format("%*lu", 4, ul);
 	assertTrue (s == "  42");
 	s = format("%0*lu", 4, ul);
 	assertTrue (s == "0042");
-	
+
 	unsigned long xl = 0x42;
 	s = format("%lx", xl);
 	assertTrue (s == "42");
@@ -165,12 +165,12 @@ void FormatTest::testInt()
 	assertTrue (s == "  42");
 	s = format("%04lx", xl);
 	assertTrue (s == "0042");
-	
+
 	s = format("%*lx", 4, xl);
 	assertTrue (s == "  42");
 	s = format("%0*lx", 4, xl);
 	assertTrue (s == "0042");
-	
+
 	Int64 i64 = 42;
 	s = format("%Ld", i64);
 	assertTrue (s == "42");
@@ -178,12 +178,12 @@ void FormatTest::testInt()
 	assertTrue (s == "  42");
 	s = format("%04Ld", i64);
 	assertTrue (s == "0042");
-	
+
 	s = format("%*Ld", 4, i64);
 	assertTrue (s == "  42");
 	s = format("%0*Ld", 4, i64);
 	assertTrue (s == "0042");
-	
+
 	UInt64 ui64 = 42;
 	s = format("%Lu", ui64);
 	assertTrue (s == "42");
@@ -191,18 +191,18 @@ void FormatTest::testInt()
 	assertTrue (s == "  42");
 	s = format("%04Lu", ui64);
 	assertTrue (s == "0042");
-	
+
 	s = format("%*Lu", 4, ui64);
 	assertTrue (s == "  42");
 	s = format("%0*Lu", 4, ui64);
 	assertTrue (s == "0042");
-	
+
 	x = 0xaa;
 	s = format("%x", x);
 	assertTrue (s == "aa");
 	s = format("%X", x);
 	assertTrue (s == "AA");
-	
+
 	i = 42;
 	s = format("%+d", i);
 	assertTrue (s == "+42");
@@ -221,7 +221,7 @@ void FormatTest::testInt()
 
 	s = format("%d", i);
 	assertTrue (s == "-42");
-	
+
 	x = 0x42;
 	s = format("%#x", x);
 	assertTrue (s == "0x42");
@@ -254,7 +254,7 @@ void FormatTest::testBool()
 	bv.push_back(true);
 
 	s.clear();
-	format(s, "%b%b%b%b%b%b%b%b%b%b", bv);
+	Poco::format(s, "%b%b%b%b%b%b%b%b%b%b", bv);
 	assertTrue (s == "0101010101");
 }
 
@@ -264,7 +264,7 @@ void FormatTest::testAnyInt()
 	char c = 42;
 	std::string s(format("%?i", c));
 	assertTrue (s == "42");
-	
+
 	c = 43;
 	s.clear();
 	format(s, "%?i", c);
@@ -277,35 +277,35 @@ void FormatTest::testAnyInt()
 	signed char sc = -42;
 	s = format("%?i", sc);
 	assertTrue (s == "-42");
-	
+
 	unsigned char uc = 65;
 	s = format("%?i", uc);
 	assertTrue (s == "65");
-	
+
 	short ss = -134;
 	s = format("%?i", ss);
 	assertTrue (s == "-134");
-	
+
 	unsigned short us = 200;
 	s = format("%?i", us);
 	assertTrue (s == "200");
-	
+
 	int i = -12345;
 	s = format("%?i", i);
 	assertTrue (s == "-12345");
-	
+
 	unsigned ui = 12345;
 	s = format("%?i", ui);
 	assertTrue (s == "12345");
-	
+
 	long l = -54321;
 	s = format("%?i", l);
 	assertTrue (s == "-54321");
-	
+
 	unsigned long ul = 54321;
 	s = format("%?i", ul);
 	assertTrue (s == "54321");
-	
+
 	Int64 i64 = -12345678;
 	s = format("%?i", i64);
 	assertTrue (s == "-12345678");
@@ -313,7 +313,7 @@ void FormatTest::testAnyInt()
 	UInt64 ui64 = 12345678;
 	s = format("%?i", ui64);
 	assertTrue (s == "12345678");
-	
+
 	ss = 0x42;
 	s = format("%?x", ss);
 	assertTrue (s == "42");
@@ -323,6 +323,80 @@ void FormatTest::testAnyInt()
 	assertTrue (s == "42");
 }
 
+void FormatTest::testShortestRepr()
+{
+	std::string str;
+
+	//
+	// uppercase tests
+	//
+	{
+		str = format("%G", 123.456);
+		assertEquals("123.456", str);
+
+		str = format("%G", 12345.6789);
+		assertEquals("12345.7", str);
+
+		str = format("%G", 0.000123);
+		assertEquals("0.000123", str);
+
+		str = format("%G", 1234567890.123);
+		assertEquals("1.23457E+09", str);
+
+		str = format("%G", 0.0);
+		assertEquals("0", str);
+
+		str = format("%G", -9876.54321);
+		assertEquals("-9876.54", str);
+
+		str = format("%.2G", 123.456);
+		assertEquals("1.2E+02", str);
+
+		str = format("%G", 1.0);
+		assertEquals("1", str);
+
+		str = format("%G", 0.00000000123);
+		assertEquals("1.23E-09", str);
+
+		str = format("%G", 0.00000000000123);
+		assertEquals("1.23E-12", str);
+	}
+
+	//
+	// lowercase tests
+	//
+	{
+		str = format("%g", 123.456);
+		assertEquals("123.456", str);
+
+		str = format("%g", 12345.6789);
+		assertEquals("12345.7", str);
+
+		str = format("%g", 0.000123);
+		assertEquals("0.000123", str);
+
+		str = format("%g", 1234567890.123);
+		assertEquals("1.23457e+09", str);
+
+		str = format("%g", 0.0);
+		assertEquals("0", str);
+
+		str = format("%g", -9876.54321);
+		assertEquals("-9876.54", str);
+
+		str = format("%.2g", 123.456);
+		assertEquals("1.2e+02", str);
+
+		str = format("%g", 1.0);
+		assertEquals("1", str);
+
+		str = format("%g", 0.00000000123);
+		assertEquals("1.23e-09", str);
+
+		str = format("%g", 0.00000000000123);
+		assertEquals("1.23e-12", str);
+	}
+}
 
 void FormatTest::testFloatFix()
 {
@@ -340,12 +414,12 @@ void FormatTest::testFloatFix()
 	assertTrue (s == "  1.50");
 	s = format("%-6.2f", d);
 	assertTrue (s == "1.50  ");
-	
+
 	s = format("%*.*f", 6, 2, d);
 	assertTrue (s == "  1.50");
 	s = format("%-*.*f", 6,2, d);
 	assertTrue (s == "1.50  ");
-	
+
 	float f = 1.5;
 	s = format("%hf", f);
 	assertTrue (s.find("1.50") == 0);
@@ -415,6 +489,32 @@ void FormatTest::testString()
 }
 
 
+void FormatTest::testStringView()
+{
+	std::string_view foo("foo");
+	std::string s(format("%v", foo));
+	assertTrue (s == "foo");
+
+	s = format("%5v", foo);
+	assertTrue (s == "  foo");
+
+	s = format("%-5v", foo);
+	assertTrue (s == "foo  ");
+
+	s = format("%*v", 5, foo);
+	assertTrue (s == "  foo");
+
+	s = format("%-*v", 5, foo);
+	assertTrue (s == "foo  ");
+
+	s = format("%v%%a", foo);
+	assertTrue (s == "foo%a");
+
+	s = format("'%v%%''%v%%'", foo, foo);
+	assertTrue (s == "'foo%''foo%'");
+}
+
+
 void FormatTest::testMultiple()
 {
 	std::string s(format("aaa%dbbb%4dccc", 1, 2));
@@ -422,7 +522,7 @@ void FormatTest::testMultiple()
 
 	s = format("%%%d%%%d%%%d", 1, 2, 3);
 	assertTrue (s == "%1%2%3");
-	
+
 	s = format("%d%d%d%d", 1, 2, 3, 4);
 	assertTrue (s == "1234");
 
@@ -453,6 +553,27 @@ void FormatTest::testIndex()
 }
 
 
+void FormatTest::testAny()
+{
+	Any a = 42;
+	std::string s(format("%d", a));
+	assertTrue (s == "42");
+
+	a = std::string("42");
+	s = format("%s", a);
+	assertTrue (s == "42");
+
+	a = 42.;
+	s = format("%f", a);
+	assertTrue (s.find("42.0") == 0);
+
+	s.clear();
+	std::vector<Any> av{ 42, std::string("42"), 42. };
+	Poco::format(s, "%d '%s' %f", av);
+	assertTrue (s.find("42 '42' 42.0") == 0);
+}
+
+
 void FormatTest::setUp()
 {
 }
@@ -474,8 +595,11 @@ CppUnit::Test* FormatTest::suite()
 	CppUnit_addTest(pSuite, FormatTest, testFloatFix);
 	CppUnit_addTest(pSuite, FormatTest, testFloatSci);
 	CppUnit_addTest(pSuite, FormatTest, testString);
+	CppUnit_addTest(pSuite, FormatTest, testStringView);
 	CppUnit_addTest(pSuite, FormatTest, testMultiple);
 	CppUnit_addTest(pSuite, FormatTest, testIndex);
+	CppUnit_addTest(pSuite, FormatTest, testAny);
+	CppUnit_addTest(pSuite, FormatTest, testShortestRepr);
 
 	return pSuite;
 }

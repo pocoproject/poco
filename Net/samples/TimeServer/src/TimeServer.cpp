@@ -48,12 +48,12 @@ class TimeServerConnection: public TCPServerConnection
 	/// A string with the current date and time is sent back to the client.
 {
 public:
-	TimeServerConnection(const StreamSocket& s, const std::string& format): 
+	TimeServerConnection(const StreamSocket& s, const std::string& format):
 		TCPServerConnection(s),
 		_format(format)
 	{
 	}
-	
+
 	void run()
 	{
 		Application& app = Application::instance();
@@ -70,7 +70,7 @@ public:
 			app.logger().log(exc);
 		}
 	}
-	
+
 private:
 	std::string _format;
 };
@@ -84,7 +84,7 @@ public:
 		_format(format)
 	{
 	}
-	
+
 	TCPServerConnection* createConnection(const StreamSocket& socket)
 	{
 		return new TimeServerConnection(socket, _format);
@@ -118,7 +118,7 @@ public:
 	TimeServer(): _helpRequested(false)
 	{
 	}
-	
+
 	~TimeServer()
 	{
 	}
@@ -129,7 +129,7 @@ protected:
 		loadConfiguration(); // load default configuration files, if present
 		ServerApplication::initialize(self);
 	}
-		
+
 	void uninitialize()
 	{
 		ServerApplication::uninitialize();
@@ -138,7 +138,7 @@ protected:
 	void defineOptions(OptionSet& options)
 	{
 		ServerApplication::defineOptions(options);
-		
+
 		options.addOption(
 			Option("help", "h", "display help information on command line arguments")
 				.required(false)
@@ -173,7 +173,7 @@ protected:
 			// get parameters from configuration file
 			unsigned short port = (unsigned short) config().getInt("TimeServer.port", 9911);
 			std::string format(config().getString("TimeServer.format", DateTimeFormat::ISO8601_FORMAT));
-			
+
 			// set-up a server socket
 			ServerSocket svs(port);
 			// set-up a TCPServer instance
@@ -187,7 +187,7 @@ protected:
 		}
 		return Application::EXIT_OK;
 	}
-	
+
 private:
 	bool _helpRequested;
 };

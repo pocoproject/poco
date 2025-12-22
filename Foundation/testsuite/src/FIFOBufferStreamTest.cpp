@@ -42,17 +42,17 @@ void FIFOBufferStreamTest::testInput()
 	assertTrue (c == 'T');
 	c = str1.get();
 	assertTrue (c == 'h');
-	
+
 	std::string str;
 	str1 >> str;
 	assertTrue (str == "is");
-	
+
 	char buffer[32];
 	str1.read(buffer, sizeof(buffer));
 	assertTrue (str1.gcount() == 10);
 	buffer[str1.gcount()] = 0;
 	assertTrue (std::string(" is a test") == buffer);
-	
+
 	const char* data2 = "123";
 	FIFOBufferStream str2(data2, 3);
 
@@ -109,7 +109,7 @@ void FIFOBufferStreamTest::testNotify()
 	iostr >> input;
 	assertTrue (std::string("This") == input);
 	assertTrue (iostr.rdbuf()->fifoBuffer().isEmpty());
-	
+
 	assertTrue (1 == _readableToNot);
 	assertTrue (1 == _notToReadable);
 	assertTrue (1 == _writableToNot);

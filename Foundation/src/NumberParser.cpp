@@ -28,7 +28,7 @@
 	#define I64_FMT "l"
 #elif defined(_MSC_VER) || defined(__MINGW32__)
 	#define I64_FMT "I64"
-#elif defined(__APPLE__) 
+#elif defined(__APPLE__)
 	#define I64_FMT "q"
 #else
 	#define I64_FMT "ll"
@@ -201,7 +201,7 @@ bool NumberParser::parseBool(const std::string& s)
 		throw SyntaxException("Not a valid bool number", s);
 }
 
-	
+
 bool NumberParser::tryParseBool(const std::string& s, bool& value)
 {
 	int n;
@@ -226,7 +226,7 @@ bool NumberParser::tryParseBool(const std::string& s, bool& value)
 		value = true;
 		return true;
 	}
-	
+
 	if (icompare(s, "false") == 0)
 	{
 		value = false;
@@ -242,7 +242,7 @@ bool NumberParser::tryParseBool(const std::string& s, bool& value)
 		value = false;
 		return true;
 	}
-	
+
 	return false;
 }
 

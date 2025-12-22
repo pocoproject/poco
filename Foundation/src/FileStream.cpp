@@ -13,7 +13,6 @@
 
 
 #include "Poco/FileStream.h"
-#include "Poco/Exception.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "FileStream_WIN32.cpp"
 #else
@@ -24,8 +23,7 @@
 namespace Poco {
 
 
-FileIOS::FileIOS(std::ios::openmode defaultMode):
-	_defaultMode(defaultMode)
+FileIOS::FileIOS()
 {
 	poco_ios_init(&_buf);
 }
@@ -39,7 +37,14 @@ FileIOS::~FileIOS()
 void FileIOS::open(const std::string& path, std::ios::openmode mode)
 {
 	clear();
-	_buf.open(path, mode | _defaultMode);
+	_buf.open(path, mode);
+}
+
+
+void FileIOS::openHandle(NativeHandle handle, std::ios::openmode mode)
+{
+	clear();
+	_buf.openHandle(handle, mode);
 }
 
 
@@ -58,15 +63,31 @@ FileStreamBuf* FileIOS::rdbuf()
 }
 
 
+FileIOS::NativeHandle FileIOS::nativeHandle() const
+{
+	return _buf.nativeHandle();
+}
+
+
+Poco::UInt64 FileIOS::size() const
+{
+	return _buf.size();
+}
+
+
+void FileIOS::flushToDisk()
+{
+	_buf.flushToDisk();
+}
+
+
 FileInputStream::FileInputStream():
-	FileIOS(std::ios::in),
 	std::istream(&_buf)
 {
 }
 
 
 FileInputStream::FileInputStream(const std::string& path, std::ios::openmode mode):
-	FileIOS(std::ios::in),
 	std::istream(&_buf)
 {
 	open(path, mode);
@@ -78,15 +99,19 @@ FileInputStream::~FileInputStream()
 }
 
 
+void FileInputStream::open(const std::string& path, std::ios::openmode mode)
+{
+	FileIOS::open(path, mode | std::ios::in);
+}
+
+
 FileOutputStream::FileOutputStream():
-	FileIOS(std::ios::out),
 	std::ostream(&_buf)
 {
 }
 
 
 FileOutputStream::FileOutputStream(const std::string& path, std::ios::openmode mode):
-	FileIOS(std::ios::out),
 	std::ostream(&_buf)
 {
 	open(path, mode);
@@ -98,15 +123,19 @@ FileOutputStream::~FileOutputStream()
 }
 
 
+void FileOutputStream::open(const std::string& path, std::ios::openmode mode)
+{
+	FileIOS::open(path, mode | std::ios::out);
+}
+
+
 FileStream::FileStream():
-	FileIOS(std::ios::in | std::ios::out),
 	std::iostream(&_buf)
 {
 }
 
 
 FileStream::FileStream(const std::string& path, std::ios::openmode mode):
-	FileIOS(std::ios::in | std::ios::out),
 	std::iostream(&_buf)
 {
 	open(path, mode);
@@ -115,6 +144,12 @@ FileStream::FileStream(const std::string& path, std::ios::openmode mode):
 
 FileStream::~FileStream()
 {
+}
+
+
+void FileStream::open(const std::string& path, std::ios::openmode mode)
+{
+	FileIOS::open(path, mode);
 }
 
 

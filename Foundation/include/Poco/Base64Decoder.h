@@ -30,18 +30,18 @@ class Foundation_API Base64DecoderBuf: public UnbufferedStreamBuf
 	/// This streambuf base64-decodes all data read
 	/// from the istream connected to it.
 	///
-	/// Note: For performance reasons, the characters 
-	/// are read directly from the given istream's 
+	/// Note: For performance reasons, the characters
+	/// are read directly from the given istream's
 	/// underlying streambuf, so the state
 	/// of the istream will not reflect that of
 	/// its streambuf.
 {
 public:
 	Base64DecoderBuf(std::istream& istr, int options = 0);
-	~Base64DecoderBuf();
+	~Base64DecoderBuf() override;
 
 private:
-	int readFromDevice();
+	int readFromDevice() override;
 	int readOne();
 
 	int             _options;
@@ -70,7 +70,7 @@ class Foundation_API Base64DecoderIOS: public virtual std::ios
 {
 public:
 	Base64DecoderIOS(std::istream& istr, int options = 0);
-	~Base64DecoderIOS();
+	~Base64DecoderIOS() override;
 	Base64DecoderBuf* rdbuf();
 
 protected:
@@ -88,15 +88,15 @@ class Foundation_API Base64Decoder: public Base64DecoderIOS, public std::istream
 	///
 	/// The class implements RFC 4648 - https://tools.ietf.org/html/rfc4648
 	///
-	/// Note: For performance reasons, the characters 
-	/// are read directly from the given istream's 
+	/// Note: For performance reasons, the characters
+	/// are read directly from the given istream's
 	/// underlying streambuf, so the state
 	/// of the istream will not reflect that of
 	/// its streambuf.
 {
 public:
 	Base64Decoder(std::istream& istr, int options = 0);
-	~Base64Decoder();
+	~Base64Decoder() override;
 
 private:
 	Base64Decoder(const Base64Decoder&);

@@ -31,7 +31,7 @@ class Util_API AbstractOptionCallback
 public:
 	virtual void invoke(const std::string& name, const std::string& value) const = 0;
 		/// Invokes the callback member function.
-		
+
 	virtual AbstractOptionCallback* clone() const = 0;
 		/// Creates and returns a copy of the object.
 
@@ -61,7 +61,7 @@ public:
 	{
 		poco_check_ptr (pObject);
 	}
-	
+
 	OptionCallback(const OptionCallback& cb):
 		AbstractOptionCallback(cb),
 		_pObject(cb._pObject),
@@ -69,12 +69,12 @@ public:
 		/// Creates an OptionCallback from another one.
 	{
 	}
-	
+
 	~OptionCallback()
 		/// Destroys the OptionCallback.
 	{
 	}
-	
+
 	OptionCallback& operator = (const OptionCallback& cb)
 	{
 		if (&cb != this)
@@ -84,20 +84,20 @@ public:
 		}
 		return *this;
 	}
-	
+
 	void invoke(const std::string& name, const std::string& value) const
 	{
 		(_pObject->*_method)(name, value);
 	}
-	
+
 	AbstractOptionCallback* clone() const
 	{
 		return new OptionCallback(_pObject, _method);
 	}
-	
+
 private:
 	OptionCallback();
-	
+
 	C* _pObject;
 	Callback _method;
 };

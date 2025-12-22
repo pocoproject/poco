@@ -26,6 +26,7 @@ public:
 
 	void testFileAttributes1();
 	void testCreateFile();
+	void testExists();
 	void testFileAttributes2();
 	void testFileAttributes3();
 	void testCompare();
@@ -42,7 +43,9 @@ public:
 	void testRenameFailIfExists();
 	void testRootDir();
 	void testLongPath();
-	
+	void testUnixFileExtension();
+	void testTemporaryFile();
+
 	void setUp();
 	void tearDown();
 

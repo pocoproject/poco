@@ -34,7 +34,7 @@ SignalHandler::JumpBufferVec SignalHandler::_jumpBufferVec;
 SignalHandler::SignalHandler()
 {
 	JumpBufferVec& jbv = jumpBufferVec();
-	JumpBuffer buf;
+	JumpBuffer buf = {};
 	jbv.push_back(buf);
 }
 
@@ -76,10 +76,10 @@ void SignalHandler::install()
 	sa.sa_handler = handleSignal;
 	sa.sa_flags   = 0;
 	sigemptyset(&sa.sa_mask);
-	sigaction(SIGILL,  &sa, 0);
-	sigaction(SIGBUS,  &sa, 0);
-	sigaction(SIGSEGV, &sa, 0);
-	sigaction(SIGSYS,  &sa, 0);
+	sigaction(SIGILL,  &sa, nullptr);
+	sigaction(SIGBUS,  &sa, nullptr);
+	sigaction(SIGSEGV, &sa, nullptr);
+	sigaction(SIGSYS,  &sa, nullptr);
 #endif
 }
 
@@ -89,7 +89,7 @@ void SignalHandler::handleSignal(int sig)
 	JumpBufferVec& jb = jumpBufferVec();
 	if (!jb.empty())
 		siglongjmp(jb.back().buf, sig);
-		
+
 	// Abort if no jump buffer registered
 	std::abort();
 }

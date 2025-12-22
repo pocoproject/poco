@@ -32,7 +32,7 @@ class Net_API RawSocketImpl: public SocketImpl
 public:
 	RawSocketImpl();
 		/// Creates an unconnected IPv4 raw socket with IPPROTO_RAW.
-		
+
 	RawSocketImpl(SocketAddress::Family family, int proto = IPPROTO_RAW);
 		/// Creates an unconnected raw socket.
 		///
@@ -41,12 +41,12 @@ public:
 
 	RawSocketImpl(poco_socket_t sockfd);
 		/// Creates a RawSocketImpl using the given native socket.
-				
+
 protected:
-	void init(int af);
+	void init(int af) override;
 	void init2(int af, int proto);
-	
-	~RawSocketImpl();
+
+	~RawSocketImpl() override;
 };
 
 

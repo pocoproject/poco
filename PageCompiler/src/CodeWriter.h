@@ -21,7 +21,7 @@ class Page;
 
 class CodeWriter
 	/// This class implements the code generator for
-	/// generating C++ header and implementation files 
+	/// generating C++ header and implementation files
 	/// from C++ Server Pages.
 {
 public:
@@ -39,7 +39,7 @@ public:
 
 	const Page& page() const;
 		/// Returns a const reference to the Page.
-		
+
 	const std::string& clazz() const;
 		/// Returns the name of the handler class.
 
@@ -57,7 +57,7 @@ protected:
 	virtual void writeResponse(std::ostream& ostr);
 	virtual void writeContent(std::ostream& ostr);
 	virtual void writeManifest(std::ostream& ostr);
-	
+
 	void beginGuard(std::ostream& ostr, const std::string& headerFileName);
 	void endGuard(std::ostream& ostr, const std::string& headerFileName);
 	void beginNamespace(std::ostream& ostr);

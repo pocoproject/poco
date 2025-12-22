@@ -49,7 +49,9 @@ SQLRETURN SQLColAttribute(SQLHSTMT hstmt,
 			pcbCharAttr,
 			pNumAttr);
 
-		makeUTF8(buffer, *pcbCharAttr, pCharAttr, cbCharAttrMax);
+		if (!Utility::isError(rc))
+			makeUTF8(buffer, *pcbCharAttr, pCharAttr, cbCharAttrMax);
+
 		return rc;
 	}
 
@@ -97,7 +99,7 @@ SQLRETURN SQLConnect(SQLHDBC hdbc,
 
 	std::wstring sqlPWD;
 	makeUTF16(szAuthStr, cbAuthStr, sqlPWD);
-	
+
 	return SQLConnectW(hdbc,
 		(SQLWCHAR*) sqlDSN.c_str(),
 		(SQLSMALLINT) sqlDSN.size(),
@@ -129,7 +131,9 @@ SQLRETURN SQLDescribeCol(SQLHSTMT hstmt,
 		pibScale,
 		pfNullable);
 
-	makeUTF8(buffer, *pcbColName * sizeof(wchar_t), szColName, cbColNameMax);
+	if (!Utility::isError(rc))
+		makeUTF8(buffer, *pcbColName * sizeof(wchar_t), szColName, cbColNameMax);
+
 	return rc;
 }
 
@@ -155,8 +159,8 @@ SQLRETURN SQLExecDirect(SQLHSTMT hstmt,
 	std::wstring sqlStr;
 	makeUTF16(szSqlStr, cbSqlStr, sqlStr);
 
-	return SQLExecDirectW(hstmt, 
-		(SQLWCHAR*) sqlStr.c_str(), 
+	return SQLExecDirectW(hstmt,
+		(SQLWCHAR*) sqlStr.c_str(),
 		(SQLINTEGER) sqlStr.size());
 }
 
@@ -167,6 +171,9 @@ SQLRETURN SQLGetConnectAttr(SQLHDBC hdbc,
 	SQLINTEGER  cbValueMax,
 	SQLINTEGER* pcbValue)
 {
+	SQLINTEGER cbValue = 0;
+	if (!pcbValue) pcbValue = &cbValue;
+
 	if (isString(rgbValue, cbValueMax))
 	{
 		Buffer<wchar_t> buffer(stringLength(rgbValue, cbValueMax));
@@ -177,10 +184,12 @@ SQLRETURN SQLGetConnectAttr(SQLHDBC hdbc,
 				(SQLINTEGER) buffer.sizeBytes(),
 				pcbValue);
 
-		makeUTF8(buffer, *pcbValue, rgbValue, cbValueMax);
+		if (!Utility::isError(rc))
+			makeUTF8(buffer, *pcbValue, rgbValue, cbValueMax);
+
 		return rc;
 	}
-	
+
 
 	return SQLGetConnectAttrW(hdbc,
 		fAttribute,
@@ -200,9 +209,9 @@ SQLRETURN SQLGetCursorName(SQLHSTMT hstmt,
 
 
 SQLRETURN SQLSetDescField(SQLHDESC hdesc,
-	SQLSMALLINT iRecord, 
+	SQLSMALLINT iRecord,
 	SQLSMALLINT iField,
-	SQLPOINTER  rgbValue, 
+	SQLPOINTER  rgbValue,
 	SQLINTEGER  cbValueMax)
 {
 	if (isString(rgbValue, cbValueMax))
@@ -211,18 +220,18 @@ SQLRETURN SQLSetDescField(SQLHDESC hdesc,
 		makeUTF16((SQLCHAR*) rgbValue, cbValueMax, str);
 
 		SQLRETURN rc = SQLSetDescFieldW(hdesc,
-			iRecord, 
+			iRecord,
 			iField,
-			(SQLPOINTER) str.c_str(), 
+			(SQLPOINTER) str.c_str(),
 			(SQLINTEGER) str.size() * sizeof(std::wstring::value_type));
 
 		return rc;
 	}
 
 	return SQLSetDescFieldW(hdesc,
-		iRecord, 
+		iRecord,
 		iField,
-		rgbValue, 
+		rgbValue,
 		cbValueMax);
 }
 
@@ -234,6 +243,9 @@ SQLRETURN SQLGetDescField(SQLHDESC hdesc,
 	SQLINTEGER	cbValueMax,
 	SQLINTEGER* pcbValue)
 {
+	SQLINTEGER cbValue = 0;
+	if (!pcbValue) pcbValue = &cbValue;
+
 	if (isString(rgbValue, cbValueMax))
 	{
 		Buffer<wchar_t> buffer(stringLength(rgbValue, cbValueMax));
@@ -245,7 +257,9 @@ SQLRETURN SQLGetDescField(SQLHDESC hdesc,
 			(SQLINTEGER) buffer.sizeBytes(),
 			pcbValue);
 
-		makeUTF8(buffer, *pcbValue, rgbValue, cbValueMax);
+		if (!Utility::isError(rc))
+			makeUTF8(buffer, *pcbValue, rgbValue, cbValueMax);
+
 		return rc;
 	}
 
@@ -266,7 +280,7 @@ SQLRETURN SQLGetDescRec(SQLHDESC hdesc,
 	SQLSMALLINT* pfType,
 	SQLSMALLINT* pfSubType,
 	SQLLEN*      pLength,
-	SQLSMALLINT* pPrecision, 
+	SQLSMALLINT* pPrecision,
 	SQLSMALLINT* pScale,
 	SQLSMALLINT* pNullable)
 {
@@ -294,7 +308,8 @@ SQLRETURN SQLGetDiagField(SQLSMALLINT fHandleType,
 			(SQLSMALLINT) buffer.sizeBytes(),
 			pcbDiagInfo);
 
-		makeUTF8(buffer, *pcbDiagInfo, rgbDiagInfo, cbDiagInfoMax);
+		if (!Utility::isError(rc))
+			makeUTF8(buffer, *pcbDiagInfo, rgbDiagInfo, cbDiagInfoMax);
 		return rc;
 	}
 
@@ -317,6 +332,12 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT fHandleType,
 	SQLSMALLINT  cbErrorMsgMax,
 	SQLSMALLINT* pcbErrorMsg)
 {
+	SQLINTEGER nativeError = 0;
+	SQLSMALLINT cbErrorMsg = 0;
+
+	if (!pfNativeError) pfNativeError = &nativeError;
+	if (!pcbErrorMsg) pcbErrorMsg = &cbErrorMsg;
+
 	const SQLINTEGER stateLen = SQL_SQLSTATE_SIZE + 1;
 	Buffer<wchar_t> bufState(stateLen);
 	Buffer<wchar_t> bufErr(cbErrorMsgMax);
@@ -330,8 +351,11 @@ SQLRETURN SQLGetDiagRec(SQLSMALLINT fHandleType,
 		(SQLSMALLINT) bufErr.size(),
 		pcbErrorMsg);
 
-	makeUTF8(bufState, stateLen * sizeof(wchar_t), szSqlState, stateLen);
-	makeUTF8(bufErr, *pcbErrorMsg * sizeof(wchar_t), szErrorMsg, cbErrorMsgMax);
+	if (!Utility::isError(rc))
+	{
+		makeUTF8(bufState, stateLen * sizeof(wchar_t), szSqlState, stateLen);
+		makeUTF8(bufErr, *pcbErrorMsg * sizeof(wchar_t), szErrorMsg, cbErrorMsgMax);
+	}
 
 	return rc;
 }
@@ -344,8 +368,8 @@ SQLRETURN SQLPrepare(SQLHSTMT hstmt,
 	std::wstring sqlStr;
 	makeUTF16(szSqlStr, cbSqlStr, sqlStr);
 
-	return SQLPrepareW(hstmt, 
-		(SQLWCHAR*) sqlStr.c_str(), 
+	return SQLPrepareW(hstmt,
+		(SQLWCHAR*) sqlStr.c_str(),
 		(SQLINTEGER) sqlStr.size());
 }
 
@@ -362,13 +386,13 @@ SQLRETURN SQLSetConnectAttr(SQLHDBC hdbc,
 
 		return SQLSetConnectAttrW(hdbc,
 			fAttribute,
-			(SQLWCHAR*) str.c_str(), 
+			(SQLWCHAR*) str.c_str(),
 			(SQLINTEGER) str.size() * sizeof(std::wstring::value_type));
 	}
 
 	return SQLSetConnectAttrW(hdbc,
 		fAttribute,
-		rgbValue, 
+		rgbValue,
 		cbValue);
 }
 
@@ -410,6 +434,9 @@ SQLRETURN SQLGetStmtAttr(SQLHSTMT hstmt,
 	SQLINTEGER  cbValueMax,
 	SQLINTEGER* pcbValue)
 {
+	SQLINTEGER cbValue = 0;
+	if (!pcbValue) pcbValue = &cbValue;
+
 	if (isString(rgbValue, cbValueMax))
 	{
 		Buffer<wchar_t> buffer(stringLength(rgbValue, cbValueMax));
@@ -457,6 +484,9 @@ SQLRETURN SQLGetInfo(SQLHDBC hdbc,
 	SQLSMALLINT  cbInfoValueMax,
 	SQLSMALLINT* pcbInfoValue)
 {
+	SQLSMALLINT cbValue = 0;
+	if (!pcbInfoValue) pcbInfoValue = &cbValue;
+
 	if (cbInfoValueMax)
 	{
 		Buffer<wchar_t> buffer(cbInfoValueMax);
@@ -467,7 +497,8 @@ SQLRETURN SQLGetInfo(SQLHDBC hdbc,
 			(SQLSMALLINT) buffer.sizeBytes(),
 			pcbInfoValue);
 
-		makeUTF8(buffer, *pcbInfoValue, rgbInfoValue, cbInfoValueMax);
+		if (!Utility::isError(rc))
+			makeUTF8(buffer, *pcbInfoValue, rgbInfoValue, cbInfoValueMax);
 
 		return rc;
 	}
@@ -558,8 +589,11 @@ SQLRETURN SQLDataSources(SQLHENV henv,
 		(SQLSMALLINT) bufDesc.size(),
 		pcbDesc);
 
-	makeUTF8(bufDSN, *pcbDSN * sizeof(wchar_t), szDSN, cbDSNMax);
-	makeUTF8(bufDesc, *pcbDesc * sizeof(wchar_t), szDesc, cbDescMax);
+	if (!Utility::isError(rc))
+	{
+		makeUTF8(bufDSN, *pcbDSN * sizeof(wchar_t), szDSN, cbDSNMax);
+		makeUTF8(bufDesc, *pcbDesc * sizeof(wchar_t), szDesc, cbDescMax);
+	}
 
 	return rc;
 }
@@ -576,7 +610,7 @@ SQLRETURN SQLDriverConnect(SQLHDBC hdbc,
 {
 	std::wstring connStrIn;
 	int len = cbConnStrIn;
-	if (SQL_NTS == len) 
+	if (SQL_NTS == len)
 		len = (int) std::strlen((const char*) szConnStrIn);
 
 	Poco::UnicodeConverter::toUTF16((const char *) szConnStrIn, len, connStrIn);
@@ -617,7 +651,8 @@ SQLRETURN SQLBrowseConnect(SQLHDBC hdbc,
 		(SQLSMALLINT) bufConnStrOut.size(),
 		pcbConnStrOut);
 
-	makeUTF8(bufConnStrOut, *pcbConnStrOut * sizeof(wchar_t), szConnStrOut, cbConnStrOutMax);
+	if (!Utility::isError(rc))
+		makeUTF8(bufConnStrOut, *pcbConnStrOut * sizeof(wchar_t), szConnStrOut, cbConnStrOutMax);
 
 	return rc;
 }
@@ -674,7 +709,8 @@ SQLRETURN SQLNativeSql(SQLHDBC hdbc,
 		(SQLINTEGER) bufSQLOut.size(),
 		pcbSqlStr);
 
-	makeUTF8(bufSQLOut, *pcbSqlStr * sizeof(wchar_t), szSqlStr, cbSqlStrMax);
+	if (!Utility::isError(rc))
+		makeUTF8(bufSQLOut, *pcbSqlStr * sizeof(wchar_t), szSqlStr, cbSqlStrMax);
 
 	return rc;
 }
@@ -751,8 +787,11 @@ SQLRETURN SQLDrivers(SQLHENV henv,
 		(SQLSMALLINT) bufDriverAttr.size(),
 		pcbDrvrAttr);
 
-	makeUTF8(bufDriverDesc, *pcbDriverDesc * sizeof(wchar_t), szDriverDesc, cbDriverDescMax);
-	makeUTF8(bufDriverAttr, *pcbDrvrAttr * sizeof(wchar_t), szDriverAttributes, cbDrvrAttrMax);
+	if (!Utility::isError(rc))
+	{
+		makeUTF8(bufDriverDesc, *pcbDriverDesc * sizeof(wchar_t), szDriverDesc, cbDriverDescMax);
+		makeUTF8(bufDriverAttr, *pcbDrvrAttr * sizeof(wchar_t), szDriverAttributes, cbDrvrAttrMax);
+	}
 
 	return rc;
 }

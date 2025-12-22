@@ -36,7 +36,7 @@ TaskStartedNotification::TaskStartedNotification(Task* pTask):
 {
 }
 
-	
+
 TaskStartedNotification::~TaskStartedNotification()
 {
 }
@@ -47,7 +47,7 @@ TaskCancelledNotification::TaskCancelledNotification(Task* pTask):
 {
 }
 
-	
+
 TaskCancelledNotification::~TaskCancelledNotification()
 {
 }
@@ -58,7 +58,7 @@ TaskFinishedNotification::TaskFinishedNotification(Task* pTask):
 {
 }
 
-	
+
 TaskFinishedNotification::~TaskFinishedNotification()
 {
 }
@@ -70,7 +70,7 @@ TaskFailedNotification::TaskFailedNotification(Task* pTask, const Exception& exc
 {
 }
 
-	
+
 TaskFailedNotification::~TaskFailedNotification()
 {
 	delete _pException;
@@ -83,7 +83,7 @@ TaskProgressNotification::TaskProgressNotification(Task* pTask, float progress):
 {
 }
 
-	
+
 TaskProgressNotification::~TaskProgressNotification()
 {
 }

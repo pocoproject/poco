@@ -76,7 +76,7 @@ void NetSSL_Win_API initializeSSL();
 	/// Can be called multiple times; however, for every call to
 	/// initializeSSL(), a matching call to uninitializeSSL()
 	/// must be performed.
-	
+
 
 void NetSSL_Win_API uninitializeSSL();
 	/// Uninitializes the NetSSL library and

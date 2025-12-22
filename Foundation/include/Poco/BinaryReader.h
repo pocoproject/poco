@@ -117,6 +117,9 @@ public:
 	void readRaw(char* buffer, std::streamsize length);
 		/// Reads length bytes of raw data into buffer.
 
+	void readCString(std::string& value);
+		/// Reads zero-terminated C-string into value.
+
 	void readBOM();
 		/// Reads a byte-order mark from the stream and configures
 		/// the reader for the encountered byte order.
@@ -174,9 +177,7 @@ public:
 	{
 	}
 
-	~BasicMemoryBinaryReader()
-	{
-	}
+	~BasicMemoryBinaryReader() = default;
 
 	const Buffer<T>& data() const
 	{
@@ -198,9 +199,7 @@ private:
 	MemoryInputStream _istr;
 };
 
-
-typedef BasicMemoryBinaryReader<char> MemoryBinaryReader;
-
+using MemoryBinaryReader = BasicMemoryBinaryReader<char>;
 
 //
 // inlines

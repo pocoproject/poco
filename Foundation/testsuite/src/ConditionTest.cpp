@@ -36,7 +36,7 @@ namespace
 			_mutex(mutex)
 		{
 		}
-		
+
 		void run()
 		{
 			_mutex.lock();
@@ -44,18 +44,18 @@ namespace
 			_mutex.unlock();
 			_ran = true;
 		}
-		
+
 		bool ran() const
 		{
 			return _ran;
 		}
-			
+
 	private:
 		bool _ran;
 		Condition& _cond;
 		Mutex& _mutex;
 	};
-	
+
 	class TryWaitRunnable: public Runnable
 	{
 	public:
@@ -65,7 +65,7 @@ namespace
 			_mutex(mutex)
 		{
 		}
-		
+
 		void run()
 		{
 			_mutex.lock();
@@ -75,12 +75,12 @@ namespace
 			}
 			_mutex.unlock();
 		}
-		
+
 		bool ran() const
 		{
 			return _ran;
 		}
-			
+
 	private:
 		bool _ran;
 		Condition& _cond;
@@ -106,26 +106,26 @@ void ConditionTest::testSignal()
 	Mutex mtx;
 	WaitRunnable r1(cond, mtx);
 	WaitRunnable r2(cond, mtx);
-	
+
 	Thread t1;
 	Thread t2;
-	
+
 	t1.start(r1);
 	Thread::sleep(200);
 	t2.start(r2);
-	
+
 	assertTrue (!r1.ran());
 	assertTrue (!r2.ran());
-	
+
 	cond.signal();
-	
+
 	t1.join();
 	assertTrue (r1.ran());
-	
+
 	assertTrue (!t2.tryJoin(200));
-	
+
 	cond.signal();
-	
+
 	t2.join();
 
 	assertTrue (r2.ran());
@@ -139,33 +139,33 @@ void ConditionTest::testBroadcast()
 	WaitRunnable r1(cond, mtx);
 	WaitRunnable r2(cond, mtx);
 	TryWaitRunnable r3(cond, mtx);
-	
+
 	Thread t1;
 	Thread t2;
 	Thread t3;
-	
+
 	t1.start(r1);
 	Thread::sleep(200);
 	t2.start(r2);
 	Thread::sleep(200);
 	t3.start(r3);
-	
+
 	assertTrue (!r1.ran());
 	assertTrue (!r2.ran());
 	assertTrue (!r3.ran());
-	
+
 	cond.signal();
 	t1.join();
-	
+
 	assertTrue (r1.ran());
 	assertTrue (!t2.tryJoin(500));
 	assertTrue (!t3.tryJoin(500));
-	
+
 	cond.broadcast();
-	
+
 	t2.join();
 	t3.join();
-	
+
 	assertTrue (r2.ran());
 	assertTrue (r3.ran());
 }

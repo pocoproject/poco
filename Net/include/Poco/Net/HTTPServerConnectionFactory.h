@@ -42,7 +42,7 @@ public:
 	TCPServerConnection* createConnection(const StreamSocket& socket);
 		/// Creates an instance of HTTPServerConnection
 		/// using the given StreamSocket.
-	
+
 private:
 	HTTPServerParams::Ptr          _pParams;
 	HTTPRequestHandlerFactory::Ptr _pFactory;

@@ -37,9 +37,13 @@ class Foundation_API UUID
 	/// as specified in Appendix A of the DCE 1.1 Remote Procedure
 	/// Call Specification (http://www.opengroup.org/onlinepubs/9629399/),
 	/// RFC 2518 (WebDAV), section 6.4.1 and the UUIDs and GUIDs internet
-	/// draft by Leach/Salz from February, 1998 
+	/// draft by Leach/Salz from February, 1998
 	/// (http://www.ics.uci.edu/~ejw/authoring/uuid-guid/draft-leach-uuids-guids-01.txt)
 	/// and also http://tools.ietf.org/html/draft-mealling-uuid-urn-05
+	///
+	/// Version 6 and 7 UUIDs are based on RFC 9562.
+	///
+	/// To generate a UUID, see UUIDGenerator.
 {
 public:
 	enum Version
@@ -48,19 +52,20 @@ public:
 		UUID_DCE_UID         = 0x02,
 		UUID_NAME_BASED      = 0x03,
 		UUID_RANDOM          = 0x04,
-		UUID_NAME_BASED_SHA1 = 0x05
-		
+		UUID_NAME_BASED_SHA1 = 0x05,
+		UUID_TIME_BASED_V6   = 0x06,
+		UUID_TIME_BASED_V7   = 0x07
 	};
 
 	UUID();
 		/// Creates a nil (all zero) UUID.
-		
+
 	UUID(const UUID& uuid);
 		/// Copy constructor.
 
 	explicit UUID(const std::string& uuid);
 		/// Parses the UUID from a string.
-		
+
 	explicit UUID(const char* uuid);
 		/// Parses the UUID from a string.
 
@@ -69,17 +74,17 @@ public:
 
 	UUID& operator = (const UUID& uuid);
 		/// Assignment operator.
-		
-	void swap(UUID& uuid);
-		/// Swaps the UUID with another one.	
-		
+
+	void swap(UUID& uuid) noexcept;
+		/// Swaps the UUID with another one.
+
 	void parse(const std::string& uuid);
 		/// Parses the UUID from its string representation.
 
 	bool tryParse(const std::string& uuid);
 		/// Tries to interpret the given string as an UUID.
 		/// If the UUID is syntactically valid, assigns the
-		/// members and returns true. Otherwise leaves the 
+		/// members and returns true. Otherwise leaves the
 		/// object unchanged and returns false.
 
 	std::string toString() const;
@@ -100,7 +105,7 @@ public:
 
 	Version version() const;
 		/// Returns the version of the UUID.
-		
+
 	int variant() const;
 		/// Returns the variant number of the UUID:
 		///   - 0 reserved for NCS backward compatibility
@@ -114,7 +119,7 @@ public:
 	bool operator <= (const UUID& uuid) const;
 	bool operator >  (const UUID& uuid) const;
 	bool operator >= (const UUID& uuid) const;
-	
+
 	bool isNull() const;
 		/// Returns true iff the UUID is nil (in other words,
 		/// consists of all zeros).
@@ -124,7 +129,7 @@ public:
 
 	static const UUID& dns();
 		/// Returns the namespace identifier for the DNS namespace.
-		
+
 	static const UUID& uri();
 		/// Returns the namespace identifier for the URI (former URL) namespace.
 
@@ -135,7 +140,7 @@ public:
 		/// Returns the namespace identifier for the X500 namespace.
 
 protected:
-	UUID(UInt32 timeLow, UInt32 timeMid, UInt32 timeHiAndVersion, UInt16 clockSeq, UInt8 node[]);
+	UUID(UInt32 timeLow, UInt16 timeMid, UInt16 timeHiAndVersion, UInt16 clockSeq, UInt8 node[]);
 	UUID(const char* bytes, Version version);
 	int compare(const UUID& uuid) const;
 	static void appendHex(std::string& str, UInt8 n);
@@ -151,7 +156,7 @@ private:
 	UInt16 _timeHiAndVersion;
 	UInt16 _clockSeq;
 	UInt8  _node[6];
-	
+
 	friend class UUIDGenerator;
 };
 
@@ -207,7 +212,7 @@ inline bool UUID::isNull() const
 }
 
 
-inline void swap(UUID& u1, UUID& u2)
+inline void swap(UUID& u1, UUID& u2) noexcept
 {
 	u1.swap(u2);
 }

@@ -58,7 +58,7 @@ public:
 		///
 		/// This can cause issues with SQL Server, resulting in an error
 		/// ("The data types varchar and text are incompatible in the equal to operator")
-		/// when comparing against a VARCHAR. 
+		/// when comparing against a VARCHAR.
 		///
 		/// Set this to false to bind std::string to SQL_VARCHAR.
 		///

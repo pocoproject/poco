@@ -6,48 +6,19 @@
 
 include $(POCO_BASE)/build/rules/global
 
-ifeq (0, $(shell test -e /usr/include/postgresql; echo $$?))
-INCLUDE += -I/usr/include/postgresql
-endif
-ifeq (0, $(shell test -e /usr/local/include/postgresql; echo $$?))
-INCLUDE += -I/usr/local/include/postgresql
-endif
-ifeq (0, $(shell test -e /usr/local/postgresql/include; echo $$?))
-INCLUDE += -I/usr/local/postgresql/include
-endif
-ifeq (0, $(shell test -e /opt/postgresql/include; echo $$?))
-INCLUDE += -I/opt/postgresql/include
-endif
-ifeq (0, $(shell test -e /usr/local/opt/libpq/include; echo $$?))
-INCLUDE += -I/usr/local/opt/libpq/include
-endif
-
-ifeq (0, $(shell test -e /usr/lib$(LIB64SUFFIX)/postgresql; echo $$?))
-SYSLIBS += -L/usr/lib$(LIB64SUFFIX)/postgresql
-endif
-ifeq (0, $(shell test -e /usr/local/lib$(LIB64SUFFIX)/postgresql; echo $$?))
-SYSLIBS += -L/usr/local/lib$(LIB64SUFFIX)/postgresql
-endif
-ifeq (0, $(shell test -e /usr/local/postgresql/lib$(LIB64SUFFIX); echo $$?))
-SYSLIBS += -L/usr/local/postgresql/lib$(LIB64SUFFIX)
-endif
-ifeq (0, $(shell test -e /opt/postgresql/lib$(LIB64SUFFIX); echo $$?))
-SYSLIBS += -L/opt/postgresql/lib$(LIB64SUFFIX)
-endif
-ifeq (0, $(shell test -e /opt/postgresql/lib$(LIB64SUFFIX); echo $$?))
-SYSLIBS += -L/opt/postgresql/lib$(LIB64SUFFIX)
-endif
-ifeq (0, $(shell test -e /usr/local/opt/libpq/lib; echo $$?))
-SYSLIBS += -L/usr/local/opt/libpq/lib$(LIB64SUFFIX)
-endif
+include $(POCO_BASE)/Data/PostgreSQL/PostgreSQL.make
 
 # Note: linking order is important, do not change it.
 SYSLIBS += -lpq -lz -lpthread -ldl
 
 objects = PostgreSQLTestSuite Driver PostgreSQLTest SQLExecutor
 
+ifndef POCO_DATA_NO_SQL_PARSER
+	target_includes += $(POCO_BASE)/Data/SQLParser $(POCO_BASE)/Data/SQLParser/src
+endif
+
 target         = testrunner
 target_version = 1
-target_libs    = PocoDataPostgreSQL PocoData PocoFoundation CppUnit
+target_libs    = PocoDataPostgreSQL PocoDataTest PocoData PocoFoundation CppUnit
 
 include $(POCO_BASE)/build/rules/exec

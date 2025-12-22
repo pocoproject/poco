@@ -11,4 +11,4 @@
         <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)lib64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
-</Project> 
+</Project>

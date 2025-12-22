@@ -51,15 +51,15 @@ namespace
 				response.setChunkedTransferEncoding(true);
 			else if (request.getContentLength() != HTTPMessage::UNKNOWN_CONTENT_LENGTH)
 				response.setContentLength(request.getContentLength());
-			
+
 			response.setContentType(request.getContentType());
-			
+
 			std::istream& istr = request.stream();
 			std::ostream& ostr = response.send();
 			StreamCopier::copyStream(istr, ostr);
 		}
 	};
-	
+
 	class EchoHeaderRequestHandler: public HTTPRequestHandler
 	{
 	public:
@@ -93,7 +93,7 @@ namespace
 			response.send();
 		}
 	};
-	
+
 	class RequestHandlerFactory: public HTTPRequestHandlerFactory
 	{
 	public:
@@ -131,7 +131,7 @@ void HTTPSServerTest::testIdentityRequest()
 	pParams->setKeepAlive(false);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
@@ -154,7 +154,7 @@ void HTTPSServerTest::testChunkedRequest()
 	pParams->setKeepAlive(false);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
@@ -178,7 +178,7 @@ void HTTPSServerTest::testIdentityRequestKeepAlive()
 	pParams->setKeepAlive(true);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	cs.setKeepAlive(true);
 	std::string body(5000, 'x');
@@ -193,7 +193,7 @@ void HTTPSServerTest::testIdentityRequestKeepAlive()
 	assertTrue (response.getContentType() == "text/plain");
 	assertTrue (response.getKeepAlive());
 	assertTrue (rbody == body);
-	
+
 	body.assign(1000, 'y');
 	request.setContentLength((int) body.length());
 	request.setKeepAlive(false);
@@ -213,7 +213,7 @@ void HTTPSServerTest::testChunkedRequestKeepAlive()
 	pParams->setKeepAlive(true);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	cs.setKeepAlive(true);
 	std::string body(5000, 'x');
@@ -248,7 +248,7 @@ void HTTPSServerTest::test100Continue()
 	pParams->setKeepAlive(false);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	std::string body(5000, 'x');
 	HTTPRequest request("POST", "/echoBody");
@@ -272,7 +272,7 @@ void HTTPSServerTest::testRedirect()
 	pParams->setKeepAlive(false);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	HTTPRequest request("GET", "/redirect");
 	cs.sendRequest(request);
@@ -292,7 +292,7 @@ void HTTPSServerTest::testAuth()
 	pParams->setKeepAlive(false);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	HTTPRequest request("GET", "/auth");
 	cs.sendRequest(request);
@@ -312,7 +312,7 @@ void HTTPSServerTest::testNotImpl()
 	pParams->setKeepAlive(false);
 	HTTPServer srv(new RequestHandlerFactory, svs, pParams);
 	srv.start();
-	
+
 	HTTPSClientSession cs("127.0.0.1", svs.address().port());
 	HTTPRequest request("GET", "/notImpl");
 	cs.sendRequest(request);

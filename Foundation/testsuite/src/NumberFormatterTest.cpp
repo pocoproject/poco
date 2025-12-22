@@ -39,13 +39,13 @@ void NumberFormatterTest::testFormat()
 	assertTrue (NumberFormatter::format((unsigned) 123) == "123");
 	assertTrue (NumberFormatter::format((unsigned) 123, 5) == "  123");
 	assertTrue (NumberFormatter::format0((unsigned) 123, 5) == "00123");
-	
+
 	assertTrue (NumberFormatter::format((long) 123) == "123");
 	assertTrue (NumberFormatter::format((long) -123) == "-123");
 	assertTrue (NumberFormatter::format((long) -123, 5) == " -123");
 
 	assertTrue (NumberFormatter::format((unsigned long) 123) == "123");
-	assertTrue (NumberFormatter::format((unsigned long) 123, 5) == "  123");	
+	assertTrue (NumberFormatter::format((unsigned long) 123, 5) == "  123");
 
 	assertTrue (NumberFormatter::format(123) == "123");
 	assertTrue (NumberFormatter::format(-123) == "-123");
@@ -57,7 +57,7 @@ void NumberFormatterTest::testFormat()
 	assertTrue (NumberFormatter::format((Int64) -123, 5) == " -123");
 
 	assertTrue (NumberFormatter::format((UInt64) 123) == "123");
-	assertTrue (NumberFormatter::format((UInt64) 123, 5) == "  123");	
+	assertTrue (NumberFormatter::format((UInt64) 123, 5) == "  123");
 #if defined(POCO_LONG_IS_64_BIT)
 	assertTrue (NumberFormatter::format((long long) 123) == "123");
 	assertTrue (NumberFormatter::format((long long) -123) == "-123");
@@ -113,105 +113,158 @@ void NumberFormatterTest::testFormatBool()
 
 void NumberFormatterTest::testFormatHex()
 {
+	using Opt = NumberFormatter::Options;
+
 	assertTrue (NumberFormatter::formatHex(0x12) == "12");
 	assertTrue (NumberFormatter::formatHex(0xab) == "AB");
+	assertTrue (NumberFormatter::formatHex(0xab, Opt::HEX_LOWERCASE) == "ab");
 	assertTrue (NumberFormatter::formatHex(0x12, 4) == "0012");
 	assertTrue (NumberFormatter::formatHex(0xab, 4) == "00AB");
+	assertTrue (NumberFormatter::formatHex(0xab, 4, Opt::HEX_LOWERCASE) == "00ab");
 
 	assertTrue (NumberFormatter::formatHex((unsigned) 0x12) == "12");
 	assertTrue (NumberFormatter::formatHex((unsigned) 0xab) == "AB");
+	assertTrue (NumberFormatter::formatHex((unsigned) 0xab, Opt::HEX_LOWERCASE) == "ab");
 	assertTrue (NumberFormatter::formatHex((unsigned) 0x12, 4) == "0012");
 	assertTrue (NumberFormatter::formatHex((unsigned) 0xab, 4) == "00AB");
+	assertTrue (NumberFormatter::formatHex((unsigned) 0xab, 4, Opt::HEX_LOWERCASE) == "00ab");
 
 	assertTrue (NumberFormatter::formatHex((long) 0x12) == "12");
 	assertTrue (NumberFormatter::formatHex((long) 0xab) == "AB");
+	assertTrue (NumberFormatter::formatHex((long) 0xab, Opt::HEX_LOWERCASE) == "ab");
 	assertTrue (NumberFormatter::formatHex((long) 0x12, 4) == "0012");
 	assertTrue (NumberFormatter::formatHex((long) 0xab, 4) == "00AB");
 
 	assertTrue (NumberFormatter::formatHex((unsigned long) 0x12) == "12");
 	assertTrue (NumberFormatter::formatHex((unsigned long) 0xab) == "AB");
+	assertTrue (NumberFormatter::formatHex((unsigned long) 0xab, Opt::HEX_LOWERCASE) == "ab");
 	assertTrue (NumberFormatter::formatHex((unsigned long) 0x12, 4) == "0012");
 	assertTrue (NumberFormatter::formatHex((unsigned long) 0xab, 4) == "00AB");
+	assertTrue (NumberFormatter::formatHex((unsigned long) 0xab, 4, Opt::HEX_LOWERCASE) == "00ab");
 
 #if defined(POCO_HAVE_INT64)
 	assertTrue (NumberFormatter::formatHex((Int64) 0x12) == "12");
 	assertTrue (NumberFormatter::formatHex((Int64) 0xab) == "AB");
+	assertTrue (NumberFormatter::formatHex((Int64) 0xab, Opt::HEX_LOWERCASE) == "ab");
 	assertTrue (NumberFormatter::formatHex((Int64) 0x12, 4) == "0012");
 	assertTrue (NumberFormatter::formatHex((Int64) 0xab, 4) == "00AB");
+	assertTrue (NumberFormatter::formatHex((Int64) 0xab, 4, Opt::HEX_LOWERCASE) == "00ab");
 
 	assertTrue (NumberFormatter::formatHex((UInt64) 0x12) == "12");
 	assertTrue (NumberFormatter::formatHex((UInt64) 0xab) == "AB");
+	assertTrue (NumberFormatter::formatHex((UInt64) 0xab, Opt::HEX_LOWERCASE) == "ab");
 	assertTrue (NumberFormatter::formatHex((UInt64) 0x12, 4) == "0012");
 	assertTrue (NumberFormatter::formatHex((UInt64) 0xab, 4) == "00AB");
+	assertTrue (NumberFormatter::formatHex((UInt64) 0xab, 4, Opt::HEX_LOWERCASE) == "00ab");
 #if defined(POCO_LONG_IS_64_BIT)
 	assertTrue (NumberFormatter::formatHex((long long) 0x12) == "12");
 	assertTrue (NumberFormatter::formatHex((long long) 0xab) == "AB");
+	assertTrue (NumberFormatter::formatHex((long long) 0xab, Opt::HEX_LOWERCASE) == "ab");
 	assertTrue (NumberFormatter::formatHex((long long) 0x12, 4) == "0012");
 	assertTrue (NumberFormatter::formatHex((long long) 0xab, 4) == "00AB");
+	assertTrue (NumberFormatter::formatHex((long long) 0xab, 4, Opt::HEX_LOWERCASE) == "00ab");
 
 	assertTrue (NumberFormatter::formatHex((unsigned long long) 0x12) == "12");
 	assertTrue (NumberFormatter::formatHex((unsigned long long) 0xab) == "AB");
+	assertTrue (NumberFormatter::formatHex((unsigned long long) 0xab, Opt::HEX_LOWERCASE) == "ab");
 	assertTrue (NumberFormatter::formatHex((unsigned long long) 0x12, 4) == "0012");
 	assertTrue (NumberFormatter::formatHex((unsigned long long) 0xab, 4) == "00AB");
+	assertTrue (NumberFormatter::formatHex((unsigned long long) 0xab, 4, Opt::HEX_LOWERCASE) == "00ab");
 #endif
 #endif
 
+#if defined(POCO_TEST_DEPRECATED)
+	// Deprecated functions
 	assertTrue (NumberFormatter::formatHex(0x12, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex(0xab, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex(0x12, 4, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex(0xab, 4, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex(0x12, 6, true) == "0x0012");
-	assertTrue (NumberFormatter::formatHex(0xab, 6, true) == "0x00AB");
-
 	assertTrue (NumberFormatter::formatHex((unsigned) 0x12, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex((unsigned) 0xab, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex((unsigned) 0x12, 4, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex((unsigned) 0xab, 4, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex((unsigned) 0x12, 6, true) == "0x0012");
-	assertTrue (NumberFormatter::formatHex((unsigned) 0xab, 6, true) == "0x00AB");
-
 	assertTrue (NumberFormatter::formatHex((long) 0x12, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex((long) 0xab, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex((long) 0x12, 4, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex((long) 0xab, 4, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex((long) 0x12, 6, true) == "0x0012");
-	assertTrue (NumberFormatter::formatHex((long) 0xab, 6, true) == "0x00AB");
-
 	assertTrue (NumberFormatter::formatHex((unsigned long) 0x12, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex((unsigned long) 0xab, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex((unsigned long) 0x12, 4, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex((unsigned long) 0xab, 4, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex((unsigned long) 0x12, 6, true) == "0x0012");
-	assertTrue (NumberFormatter::formatHex((unsigned long) 0xab, 6, true) == "0x00AB");
+	assertTrue (NumberFormatter::formatHex((Int64) 0x12, true) == "0x12");
+	assertTrue (NumberFormatter::formatHex((UInt64) 0x12, true) == "0x12");
+	assertTrue (NumberFormatter::formatHex((long long) 0x12, true) == "0x12");
+	assertTrue (NumberFormatter::formatHex((unsigned long long) 0x12, true) == "0x12");
+#endif
+
+	assertTrue (NumberFormatter::formatHex(0x12, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex(0xab, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex(0xab, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex(0x12, 4, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex(0xab, 4, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex(0xab, 4, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex(0x12, 6, Opt::HEX_PREFIX) == "0x0012");
+	assertTrue (NumberFormatter::formatHex(0xab, 6, Opt::HEX_PREFIX) == "0x00AB");
+	assertTrue (NumberFormatter::formatHex(0xab, 6, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0x00ab");
+
+	assertTrue (NumberFormatter::formatHex((unsigned) 0x12, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex((unsigned) 0xab, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex((unsigned) 0xab, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex((unsigned) 0x12, 4, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex((unsigned) 0xab, 4, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex((unsigned) 0xab, 4, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex((unsigned) 0x12, 6, Opt::HEX_PREFIX) == "0x0012");
+	assertTrue (NumberFormatter::formatHex((unsigned) 0xab, 6, Opt::HEX_PREFIX) == "0x00AB");
+	assertTrue (NumberFormatter::formatHex((unsigned) 0xab, 6, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0x00ab");
+
+	assertTrue (NumberFormatter::formatHex((long) 0x12, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex((long) 0xab, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex((long) 0xab, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex((long) 0x12, 4, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex((long) 0xab, 4, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex((long) 0xab, 4, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex((long) 0x12, 6, Opt::HEX_PREFIX) == "0x0012");
+	assertTrue (NumberFormatter::formatHex((long) 0xab, 6, Opt::HEX_PREFIX) == "0x00AB");
+	assertTrue (NumberFormatter::formatHex((long) 0xab, 6, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0x00ab");
+
+	assertTrue (NumberFormatter::formatHex((unsigned long) 0x12, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex((unsigned long) 0xab, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex((unsigned long) 0xab, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex((unsigned long) 0x12, 4, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex((unsigned long) 0xab, 4, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex((unsigned long) 0xab, 4, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex((unsigned long) 0x12, 6, Opt::HEX_PREFIX) == "0x0012");
+	assertTrue (NumberFormatter::formatHex((unsigned long) 0xab, 6, Opt::HEX_PREFIX) == "0x00AB");
+	assertTrue (NumberFormatter::formatHex((unsigned long) 0xab, 6, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0x00ab");
 
 #if defined(POCO_HAVE_INT64)
-	assertTrue (NumberFormatter::formatHex((Int64) 0x12, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex((Int64) 0xab, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex((Int64) 0x12, 4, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex((Int64) 0xab, 4, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex((Int64) 0x12, 6, true) == "0x0012");
-	assertTrue (NumberFormatter::formatHex((Int64) 0xab, 6, true) == "0x00AB");
+	assertTrue (NumberFormatter::formatHex((Int64) 0x12, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex((Int64) 0xab, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex((Int64) 0xab, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex((Int64) 0x12, 4, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex((Int64) 0xab, 4, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex((Int64) 0xab, 4, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex((Int64) 0x12, 6, Opt::HEX_PREFIX) == "0x0012");
+	assertTrue (NumberFormatter::formatHex((Int64) 0xab, 6, Opt::HEX_PREFIX) == "0x00AB");
+	assertTrue (NumberFormatter::formatHex((Int64) 0xab, 6, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0x00ab");
 
-	assertTrue (NumberFormatter::formatHex((UInt64) 0x12, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex((UInt64) 0xab, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex((UInt64) 0x12, 4, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex((UInt64) 0xab, 4, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex((UInt64) 0x12, 6, true) == "0x0012");
-	assertTrue (NumberFormatter::formatHex((UInt64) 0xab, 6, true) == "0x00AB");
+	assertTrue (NumberFormatter::formatHex((UInt64) 0x12, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex((UInt64) 0xab, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex((UInt64) 0xab, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex((UInt64) 0x12, 4, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex((UInt64) 0xab, 4, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex((UInt64) 0xab, 4, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex((UInt64) 0x12, 6, Opt::HEX_PREFIX) == "0x0012");
+	assertTrue (NumberFormatter::formatHex((UInt64) 0xab, 6, Opt::HEX_PREFIX) == "0x00AB");
+	assertTrue (NumberFormatter::formatHex((UInt64) 0xab, 6, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0x00ab");
 #if defined(POCO_LONG_IS_64_BIT)
-	assertTrue (NumberFormatter::formatHex((long long) 0x12, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex((long long) 0xab, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex((long long) 0x12, 4, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex((long long) 0xab, 4, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex((long long) 0x12, 6, true) == "0x0012");
-	assertTrue (NumberFormatter::formatHex((long long) 0xab, 6, true) == "0x00AB");
+	assertTrue (NumberFormatter::formatHex((long long) 0x12, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex((long long) 0xab, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex((long long) 0xab, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex((long long) 0x12, 4, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex((long long) 0xab, 4, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex((long long) 0xab, 4, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex((long long) 0x12, 6, Opt::HEX_PREFIX) == "0x0012");
+	assertTrue (NumberFormatter::formatHex((long long) 0xab, 6, Opt::HEX_PREFIX) == "0x00AB");
+	assertTrue (NumberFormatter::formatHex((long long) 0xab, 6, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0x00ab");
 
-	assertTrue (NumberFormatter::formatHex((unsigned long long) 0x12, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex((unsigned long long) 0xab, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex((unsigned long long) 0x12, 4, true) == "0x12");
-	assertTrue (NumberFormatter::formatHex((unsigned long long) 0xab, 4, true) == "0xAB");
-	assertTrue (NumberFormatter::formatHex((unsigned long long) 0x12, 6, true) == "0x0012");
-	assertTrue (NumberFormatter::formatHex((unsigned long long) 0xab, 6, true) == "0x00AB");
+	assertTrue (NumberFormatter::formatHex((unsigned long long) 0x12, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex((unsigned long long) 0xab, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex((unsigned long long) 0xab, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex((unsigned long long) 0x12, 4, Opt::HEX_PREFIX) == "0x12");
+	assertTrue (NumberFormatter::formatHex((unsigned long long) 0xab, 4, Opt::HEX_PREFIX) == "0xAB");
+	assertTrue (NumberFormatter::formatHex((unsigned long long) 0xab, 4, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0xab");
+	assertTrue (NumberFormatter::formatHex((unsigned long long) 0x12, 6, Opt::HEX_PREFIX) == "0x0012");
+	assertTrue (NumberFormatter::formatHex((unsigned long long) 0xab, 6, Opt::HEX_PREFIX) == "0x00AB");
+	assertTrue (NumberFormatter::formatHex((unsigned long long) 0xab, 6, Opt::HEX_PREFIX | Opt::HEX_LOWERCASE) == "0x00ab");
 #endif
 #endif
 }
@@ -263,6 +316,20 @@ void NumberFormatterTest::testFormatFloat()
 	assertTrue (NumberFormatter::format(50.546, 0) == "51");
 	assertTrue (NumberFormatter::format(50.546f, 0) == "51");
 	assertTrue (NumberFormatter::format(50.546f, 2) == "50.55");
+
+	try
+	{
+		Poco::NumberFormatter::format(0.1, -1);
+		fail ("NumberFormatter::format() must throw on negative precision");
+	}
+	catch(Poco::InvalidArgumentException&){}
+
+	try
+	{
+		Poco::NumberFormatter::format(0.1, 2, -1);
+		fail ("NumberFormatter::format() must throw on negative precision");
+	}
+	catch(Poco::InvalidArgumentException&){}
 }
 
 
@@ -293,7 +360,7 @@ void NumberFormatterTest::testAppend()
 	NumberFormatter::append0(s, 123u, 5);
 	assertTrue (s == "00123");
 
-	
+
 	s.erase();
 	NumberFormatter::append(s, 123.4);
 	assertTrue (s == "123.4");

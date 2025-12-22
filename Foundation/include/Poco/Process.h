@@ -22,11 +22,7 @@
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#if defined(_WIN32_WCE)
-#include "Process_WINCE.h"
-#else
 #include "Poco/Process_WIN32U.h"
-#endif
 #elif defined(POCO_VXWORKS)
 #include "Poco/Process_VX.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -48,7 +44,7 @@ class Foundation_API ProcessHandle
 	/// the completion of a process.
 {
 public:
-	typedef ProcessImpl::PIDImpl PID;
+	using PID = ProcessImpl::PIDImpl;
 
 	ProcessHandle(const ProcessHandle& handle);
 		/// Creates a ProcessHandle by copying another one.
@@ -67,9 +63,9 @@ public:
 		/// and returns the exit code of the process.
 
 	int tryWait() const;
- 		/// Checks that process is terminated
- 		/// and returns the exit code of the process.
- 		/// If the process is still running, returns -1.
+		/// Checks that process is terminated
+		/// and returns the exit code of the process.
+		/// If the process is still running, returns -1.
 
 protected:
 	ProcessHandle(ProcessHandleImpl* pImpl);
@@ -87,9 +83,9 @@ class Foundation_API Process: public ProcessImpl
 	/// This class provides methods for working with processes.
 {
 public:
-	typedef PIDImpl  PID;
-	typedef ArgsImpl Args;
-	typedef EnvImpl  Env;
+	using PID = PIDImpl;
+	using Args = ArgsImpl;
+	using Env = EnvImpl;
 
 	static PID id();
 		/// Returns the process ID of the current process.
@@ -98,7 +94,11 @@ public:
 		/// Returns the number of seconds spent by the
 		/// current process in user and kernel mode.
 
-	static ProcessHandle launch(const std::string& command, const Args& args);
+	static void timesMicroseconds(Poco::Int64& userTime, Poco::Int64& kernelTime);
+		/// Returns the number of microseconds spent by the
+		/// current process in user and kernel mode.
+
+	static ProcessHandle launch(const std::string& command, const Args& args, int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -106,7 +106,8 @@ public:
 	static ProcessHandle launch(
 		const std::string& command,
 		const Args& args,
-		const std::string& initialDirectory);
+		const std::string& initialDirectory,
+		int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -117,7 +118,8 @@ public:
 		const Args& args,
 		Pipe* inPipe,
 		Pipe* outPipe,
-		Pipe* errPipe);
+		Pipe* errPipe,
+		int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -150,7 +152,8 @@ public:
 		const std::string& initialDirectory,
 		Pipe* inPipe,
 		Pipe* outPipe,
-		Pipe* errPipe);
+		Pipe* errPipe,
+		int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -184,7 +187,8 @@ public:
 		Pipe* inPipe,
 		Pipe* outPipe,
 		Pipe* errPipe,
-		const Env& env);
+		const Env& env,
+		int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -202,7 +206,8 @@ public:
 		Pipe* inPipe,
 		Pipe* outPipe,
 		Pipe* errPipe,
-		const Env& env);
+		const Env& env,
+		int options = 0);
 		/// Creates a new process for the given command and returns
 		/// a ProcessHandle of the new process. The given arguments are
 		/// passed to the command on the command line.
@@ -217,8 +222,8 @@ public:
 		/// and returns the exit code of the process.
 
 	static int tryWait(const ProcessHandle& handle);
- 		/// Checks that process is finished and returns the exit code of the
- 		/// process. If the process is still running, returns -1.
+		/// Checks that process is finished and returns the exit code of the
+		/// process. If the process is still running, returns -1.
 
 	static bool isRunning(const ProcessHandle& handle);
 		/// check if the process specified by handle is running or not
@@ -264,6 +269,12 @@ inline Process::PID Process::id()
 inline void Process::times(long& userTime, long& kernelTime)
 {
 	ProcessImpl::timesImpl(userTime, kernelTime);
+}
+
+
+inline void Process::timesMicroseconds(Poco::Int64& userTime, Poco::Int64& kernelTime)
+{
+	ProcessImpl::timesMicrosecondsImpl(userTime, kernelTime);
 }
 
 

@@ -16,10 +16,10 @@ b, u, i, center,
 dl, dt, dd, ol, ul, li,
 fieldset, form, label, legend,
 table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
 menu, nav, output, ruby, section, summary,
-time, mark, audio, video 
+time, mark, audio, video
 {
 	margin: 0;
 	padding: 0;
@@ -30,40 +30,40 @@ time, mark, audio, video
 }
 
 /* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure, 
-footer, header, hgroup, menu, nav, section 
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section
 {
 	display: block;
 }
 
-body 
+body
 {
 	line-height: 1;
 }
 
-ol, ul 
+ol, ul
 {
 	list-style: none;
 }
 
-blockquote, q 
+blockquote, q
 {
 	quotes: none;
 }
 
-blockquote:before, blockquote:after, q:before, q:after 
+blockquote:before, blockquote:after, q:before, q:after
 {
 	content: '';
 	content: none;
 }
 
-table 
+table
 {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
 
-body 
+body
 {
     margin: 0;
     color: #000000;
@@ -75,24 +75,24 @@ body
 
 p, h1, h2, h3, h4, h5, h6, ul, ol, li, td, th, address, blockquote, strong, b, emph, i
 {
-	font-family: "Trebuchet MS", Geneva, Arial, Helvetica, SunSans-Regular, sans-serif; 
+	font-family: "Trebuchet MS", Geneva, Arial, Helvetica, SunSans-Regular, sans-serif;
 }
 
 p, ul, ol, address, blockquote, h6
 {
-	color: black; 
-	font-size: 1em; 
-	line-height: 1.5em; 
-	margin-top: 1.0em; 
+	color: black;
+	font-size: 1em;
+	line-height: 1.5em;
+	margin-top: 1.0em;
 	margin-bottom: 1.0em;
 }
 
 h1
 {
-	color: black; 
-	font-size: 1.5em; 
+	color: black;
+	font-size: 1.5em;
 	line-height: 2em;
-	font-weight: 300; 
+	font-weight: 300;
 	margin-top: 12px;
 	margin-right: 0;
 	margin-bottom: 12px;
@@ -101,7 +101,7 @@ h1
 h1.category, h1.namespace
 {
 	font-size: 1.2em;
-	line-height: 1.2em; 
+	line-height: 1.2em;
 	font-weight: 300;
 	margin-top: 0px;
 	margin-bottom: 8px;
@@ -114,7 +114,7 @@ h1.category, h1.namespace
 h1.title, h1.symbol
 {
 	font-size: 1.5em;
-	line-height: 1.2em; 
+	line-height: 1.2em;
 	font-weight: 300;
 	margin-top: 0;
 	margin-bottom: 0;
@@ -127,7 +127,7 @@ h1.title, h1.symbol
 h1.template
 {
 	font-size: 1.2em;
-	line-height: 1.2em; 
+	line-height: 1.2em;
 	font-weight: 300;
 	margin-top: 0;
 	margin-bottom: 0;
@@ -172,9 +172,9 @@ div.body
 
 #navigation
 {
-	position: absolute; 
-	left: 0; 
-	width: 300px; 
+	position: absolute;
+	left: 0;
+	width: 300px;
 	padding-left: 16px;
 	padding-right: 16px;
 	overflow-y: visible;
@@ -183,17 +183,17 @@ div.body
 
 #navigation iframe
 {
-	width: 300px; 
-	margin: 0; 
-	padding: 0; 
+	width: 300px;
+	margin: 0;
+	padding: 0;
 	border: 0;
 	overflow-y: visible;
 }
 
 #content
 {
-	position: absolute; 
-	left: 332px; 
+	position: absolute;
+	left: 332px;
 	right: 0;
 	padding-left: 16px;
 	padding-right: 16px;
@@ -203,7 +203,7 @@ div.body
 
 pre
 {
-	color: #141414; 
+	color: #141414;
 	background: #F4F4F4;
 	font-size: 0.9em;
 	line-height: 1.5em;
@@ -225,26 +225,26 @@ pre
 
 tt
 {
-	color: #141414; 
+	color: #141414;
 	background: #F4F4F4;
 	font-size: 0.9em;
 	line-height: 1.5em;
 	font-family: "Lucida Console", "Monaco", Courier, "Courier New", monospace;
 }
 
-h2 
+h2
 {
-	color: black; 
-	font-size: 1.25em; 
+	color: black;
+	font-size: 1.25em;
 	font-weight: 600;
-	margin-top: 1.5em; 
-	margin-bottom: 0em; 
+	margin-top: 1.5em;
+	margin-bottom: 0em;
 }
 
 h3
 {
 	color: black;
-	font-size: 1.15em; 
+	font-size: 1.15em;
 	font-weight: 600;
 	margin-top: 1.0em;
 	margin-right: 0;
@@ -262,7 +262,7 @@ h3
 h3.overview
 {
 	color: black;
-	font-size: 1.25em; 
+	font-size: 1.25em;
 	margin-top: 1.5em;
 	margin-right: 0;
 	margin-bottom: 0;
@@ -276,11 +276,11 @@ h3.overview
 
 h4
 {
-	color: #444; 
+	color: #444;
 	font-size: 1.1em;
-	font-weight: 600; 
-	margin-top: 1.0em; 
-	margin-bottom: 0; 
+	font-weight: 600;
+	margin-top: 1.0em;
+	margin-bottom: 0;
 }
 
 p.decl
@@ -435,174 +435,174 @@ emph, i
 
 .address
 {
-	line-height: 11pt; 
+	line-height: 11pt;
 	margin-bottom: 4px;
 }
 
-.footer 
+.footer
 {
-	font-size: 0.8em; 
-	font-family: Verdana, Arial, Helvetica, sans-serif; 
-	text-align: left; 
-	line-height: 1.4em; 
+	font-size: 0.8em;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	text-align: left;
+	line-height: 1.4em;
 	margin-top: 32px;
 	margin-left: 0;
 	margin-right: 0;
 	margin-bottom: 10px;
 }
 
-a:link 
-{ 
+a:link
+{
     color: #138AC4;
     text-decoration: underline;
 }
 
-a:visited 
-{ 
-    color: #138AC4;
-    text-decoration: underline; 
-}
-
-a:active 
-{ 
+a:visited
+{
     color: #138AC4;
     text-decoration: underline;
 }
 
-a:hover 
-{ 
+a:active
+{
     color: #138AC4;
-    text-decoration: underline;  
+    text-decoration: underline;
 }
 
-a.namespace:link 
-{ 
+a:hover
+{
+    color: #138AC4;
+    text-decoration: underline;
+}
+
+a.namespace:link
+{
     color: white;
     text-decoration: none;
 }
 
-a.namespace:visited 
-{ 
+a.namespace:visited
+{
     color: white;
-    text-decoration: none; 
+    text-decoration: none;
 }
 
-a.namespace:active 
-{ 
+a.namespace:active
+{
     color: white;
     text-decoration: underline;
 }
 
-a.namespace:hover 
-{ 
+a.namespace:hover
+{
     color: white;
-    text-decoration: underline;  
+    text-decoration: underline;
 }
 
-a.class:link 
-{ 
+a.class:link
+{
     color: black;
     text-decoration: none;
 }
 
-a.class:visited 
-{ 
+a.class:visited
+{
     color: black;
-    text-decoration: none; 
+    text-decoration: none;
 }
 
-a.class:active 
-{ 
+a.class:active
+{
     color: #138AC4;
     text-decoration: underline;
 }
 
-a.class:hover 
-{ 
-    color: #138AC4;
-    text-decoration: underline;  
-}
-
-a.footer:link 
-{ 
+a.class:hover
+{
     color: #138AC4;
     text-decoration: underline;
 }
 
-a.footer:visited 
-{ 
-    color: #138AC4;
-    text-decoration: underline; 
-}
-
-a.footer:active 
-{ 
+a.footer:link
+{
     color: #138AC4;
     text-decoration: underline;
 }
 
-a.footer:hover 
-{ 
+a.footer:visited
+{
     color: #138AC4;
-    text-decoration: underline;  
+    text-decoration: underline;
+}
+
+a.footer:active
+{
+    color: #138AC4;
+    text-decoration: underline;
+}
+
+a.footer:hover
+{
+    color: #138AC4;
+    text-decoration: underline;
 }
 
 h3.overview a:link, h3.overview a:visited
-{ 
+{
     color: black;
     text-decoration: none;
 }
 
 h3.overview a:active, h3.overview a:hover
-{ 
+{
     color: #138AC4;
     text-decoration: none;
 }
 
 h2 a:link, h3 a:link, h4 a:link
-{ 
+{
     color: black;
     text-decoration: none;
 }
 
 h2 a:visited, h3 a:visited, h4 a:visited
-{ 
+{
     color: black;
-    text-decoration: none; 
+    text-decoration: none;
 }
 
 h2 a:active, h3 a:active, h4 a:active
-{ 
+{
     color: black;
     text-decoration: none;
 }
 
 h2 a:hover, h3 a:hover, h4 a:hover
-{ 
+{
     color: black;
     text-decoration: none;
 }
 
 li.level1 a:link, li.level2 a:link, li.level3 a:link
-{ 
+{
     color: #138AC4;
     text-decoration: underline;
 }
 
 li.level1 a:visited, li.level2 a:visited, li.level3 a:visited
-{ 
+{
     color: #138AC4;
     text-decoration: underline;
 }
 
 li.level1 a:active, li.level2 a:active, li.level3 a:active
-{ 
+{
     color: #138AC4;
     text-decoration: underline;
 }
 
 li.level1 a:hover, li.level2 a:hover, li.level3 a:hover
-{ 
+{
     color: #138AC4;
     text-decoration: underline;
 }
@@ -615,11 +615,11 @@ li.level1 a:hover, li.level2 a:hover, li.level3 a:hover
 
 .imagecaption
 {
-	font-family: "Trebuchet MS", Geneva, Arial, Helvetica, SunSans-Regular, sans-serif; 
-	color: black; 
-	font-size: 0.8em; 
-	line-height: 1.4em; 
+	font-family: "Trebuchet MS", Geneva, Arial, Helvetica, SunSans-Regular, sans-serif;
+	color: black;
+	font-size: 0.8em;
+	line-height: 1.4em;
 	font-style: italic;
-	margin-top: 4px; 
+	margin-top: 4px;
 	margin-bottom: 0px;
 }

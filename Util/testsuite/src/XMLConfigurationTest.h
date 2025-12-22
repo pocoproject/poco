@@ -31,6 +31,7 @@ public:
 	void testSaveEmpty();
 	void testFromScratch();
 	void testLoadEmpty();
+	void testManyKeys();
 
 	void setUp();
 	void tearDown();

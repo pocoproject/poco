@@ -1,0 +1,13 @@
+From: sender@example.com
+To: recipient@example.com
+Content-Type: multipart/mixed; boundary="boundary"
+
+--boundary
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+SGVsbG8gdGhlcmUsCgpUaGlzIGlzIGEgc2FtcGxlIGVtYWlsIHdpdGggYmFzZTY0IGVuY29kaW5n
+IGFuZCBhbiBhdHRhY2htZW50LgoKLS0gU2VuZGVy
+
+--boundary--
+

@@ -38,37 +38,18 @@ enum JSONOptions
 		/// unicode characters will be escaped in the resulting
 		/// string.
 
-	JSON_WRAP_STRINGS = 4
+	JSON_WRAP_STRINGS = 4,
 		/// If specified, the object will preserve the items
 		/// insertion order. Otherwise, items will be sorted
 		/// by keys.
+
+	JSON_LOWERCASE_HEX = 8
+		/// If specified, all encoding happens with lowercase
+		/// HEX characters instead of capitals
 };
 
 
-//@ deprecated
-void Foundation_API toJSON(const std::string& value, std::ostream& out, bool wrap = true);
-	/// Formats string value into the supplied output stream by
-	/// escaping control and ALL Unicode characters.
-	/// If wrap is true, the resulting string is enclosed in double quotes.
-	///
-	/// This function is deprecated, please use
-	///
-	/// void Poco::toJSON(const std::string&, std::ostream&, int)
-
-
-//@ deprecated
-std::string Foundation_API toJSON(const std::string& value, bool wrap = true);
-	/// Formats string value by escaping control and ALL Unicode characters.
-	/// If wrap is true, the resulting string is enclosed in double quotes
-	///
-	/// Returns formatted string.
-	///
-	/// This function is deprecated, please use
-	///
-	/// std::string Poco::toJSON(const std::string&, int)
-
-
-void Foundation_API toJSON(const std::string& value, std::ostream& out, int options);
+void Foundation_API toJSON(const std::string& value, std::ostream& out, int options = Poco::JSON_WRAP_STRINGS);
 	/// Formats string value into the supplied output stream by
 	/// escaping control characters.
 	/// If JSON_WRAP_STRINGS is in options, the resulting strings is enclosed in double quotes
@@ -76,7 +57,7 @@ void Foundation_API toJSON(const std::string& value, std::ostream& out, int opti
 	/// only the compulsory ones.
 
 
-std::string Foundation_API toJSON(const std::string& value, int options);
+std::string Foundation_API toJSON(const std::string& value, int options = Poco::JSON_WRAP_STRINGS);
 	/// Formats string value by escaping control characters.
 	/// If JSON_WRAP_STRINGS is in options, the resulting string is enclosed in double quotes
 	/// If JSON_ESCAPE_UNICODE is in options, all unicode characters will be escaped, otherwise

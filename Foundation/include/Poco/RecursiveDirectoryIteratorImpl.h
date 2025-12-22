@@ -47,9 +47,7 @@ public:
 		_current = _itStack.top()->path();
 	}
 
-	~RecursiveDirectoryIteratorImpl()
-	{
-	}
+	~RecursiveDirectoryIteratorImpl() = default;
 
 	inline void duplicate()
 	{
@@ -87,7 +85,7 @@ public:
 	}
 
 private:
-	typedef std::stack<DirectoryIterator> Stack;
+	using Stack = std::stack<DirectoryIterator>;
 
 	static UInt16 depthFun(const Stack& stack)
 		/// Function which implements the logic of determining

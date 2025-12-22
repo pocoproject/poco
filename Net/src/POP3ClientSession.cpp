@@ -39,17 +39,17 @@ public:
 		_socket(socket)
 	{
 	}
-	
+
 	~DialogStreamBuf()
 	{
 	}
-		
+
 private:
 	int readFromDevice()
 	{
 		return _socket.get();
 	}
-	
+
 	DialogSocket& _socket;
 };
 
@@ -62,11 +62,11 @@ public:
 	{
 		poco_ios_init(&_buf);
 	}
-	
+
 	~DialogIOS()
 	{
 	}
-	
+
 	DialogStreamBuf* rdbuf()
 	{
 		return &_buf;
@@ -85,7 +85,7 @@ public:
 		std::istream(&_buf)
 	{
 	}
-		
+
 	~DialogInputStream()
 	{
 	}
@@ -99,7 +99,7 @@ POP3ClientSession::POP3ClientSession(const StreamSocket& socket):
 }
 
 
-POP3ClientSession::POP3ClientSession(const std::string& host, Poco::UInt16 port):	
+POP3ClientSession::POP3ClientSession(const std::string& host, Poco::UInt16 port):
 	_socket(SocketAddress(host, port)),
 	_isOpen(true)
 {
@@ -123,7 +123,7 @@ void POP3ClientSession::setTimeout(const Poco::Timespan& timeout)
 	_socket.setReceiveTimeout(timeout);
 }
 
-	
+
 Poco::Timespan POP3ClientSession::getTimeout() const
 {
 	return _socket.getReceiveTimeout();

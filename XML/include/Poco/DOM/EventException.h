@@ -27,15 +27,15 @@ namespace XML {
 
 
 class XML_API EventException: public XMLException
-	/// Event operations may throw an EventException as 
+	/// Event operations may throw an EventException as
 	/// specified in their method descriptions.
 {
 public:
 	enum
 	{
-		UNSPECIFIED_EVENT_TYPE_ERR = 0  /// If the Event's type was not specified by initializing the 
+		UNSPECIFIED_EVENT_TYPE_ERR = 0  /// If the Event's type was not specified by initializing the
 		                                /// event before the method was called. Specification of the Event's
-                                        /// type as null or an empty string will also trigger this exception. 
+                                        /// type as null or an empty string will also trigger this exception.
 	};
 
 	EventException(int code);
@@ -60,7 +60,7 @@ public:
 
 protected:
 	Poco::Exception* clone() const;
-	
+
 private:
 	EventException();
 };

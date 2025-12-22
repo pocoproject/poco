@@ -52,17 +52,23 @@ public:
 		ODBC_TXN_CAPABILITY_TRUE = 1
 	};
 
+	enum CursorUse
+	{
+		ODBC_CURSOR_USE_ALWAYS = Poco::Data::SessionImpl::CURSOR_USE_ALWAYS,
+		ODBC_CURSOR_USE_IF_NEEDED = Poco::Data::SessionImpl::CURSOR_USE_IF_NEEDED,
+		ODBC_CURSOR_USE_NEVER = Poco::Data::SessionImpl::CURSOR_USE_NEVER
+	};
+
 	SessionImpl(const std::string& connect,
 		std::size_t loginTimeout,
-		std::size_t maxFieldSize = ODBC_MAX_FIELD_SIZE, 
+		std::size_t maxFieldSize = ODBC_MAX_FIELD_SIZE,
 		bool autoBind = true,
 		bool autoExtract = true);
 		/// Creates the SessionImpl. Opens a connection to the database.
 		/// Throws NotConnectedException if connection was not succesful.
 
-	//@ deprecated
-	SessionImpl(const std::string& connect, 
-		Poco::Any maxFieldSize = ODBC_MAX_FIELD_SIZE, 
+	POCO_DEPRECATED("Use other constructors.") SessionImpl(const std::string& connect,
+		Poco::Any maxFieldSize = ODBC_MAX_FIELD_SIZE,
 		bool enforceCapability=false,
 		bool autoBind = true,
 		bool autoExtract = true);
@@ -73,6 +79,9 @@ public:
 
 	Poco::SharedPtr<Poco::Data::StatementImpl> createStatementImpl();
 		/// Returns an ODBC StatementImpl
+
+	void addFeatures();
+		/// Adds the ODBC session features and properties.
 
 	void open(const std::string& connect = "");
 		/// Opens a connection to the Database
@@ -144,7 +153,7 @@ public:
 
 	void setMaxFieldSize(const std::string& rName, const Poco::Any& rValue);
 		/// Sets the max field size (the default used when column size is unknown).
-		
+
 	Poco::Any getMaxFieldSize(const std::string& rName="") const;
 		/// Returns the max field size (the default used when column size is unknown).
 
@@ -154,11 +163,20 @@ public:
 	void setQueryTimeout(const std::string&, const Poco::Any& value);
 		/// Sets the timeout (in seconds) for queries.
 		/// Value must be of type int.
-		
+
 	Poco::Any getQueryTimeout(const std::string&) const;
 		/// Returns the timeout (in seconds) for queries,
 		/// or -1 if no timeout has been set.
-		
+
+	void setCursorUse(const std::string&, const Poco::Any& value);
+		/// Sets the use of cursors:
+		///   - SQL_CUR_USE_ODBC - always
+		///   - SQL_CUR_USE_IF_NEEDED - if needed
+		///   - SQL_CUR_USE_DRIVER - never
+
+	Poco::Any getCursorUse(const std::string&) const;
+		/// Returns the use of cursors.
+
 	int queryTimeout() const;
 		/// Returns the timeout (in seconds) for queries,
 		/// or -1 if no timeout has been set.
@@ -172,6 +190,14 @@ public:
 
 	const std::string& dbEncoding() const;
 		/// Returns the database encoding.
+
+	void setMultiActiveResultset(const std::string&, bool value);
+		/// Sets the multiple active resultset capability, if available.
+		/// Does nothing, if feature is not available.
+
+	bool getMultiActiveResultset(const std::string&) const;
+		/// Returns the multiple active resultset capability, if available.
+		/// Returns false, if feature is not available.
 
 	const ConnectionHandle& dbc() const;
 		/// Returns the connection handle.
@@ -195,17 +221,20 @@ private:
 		/// Sets the transaction isolation level.
 		/// Called internally from getTransactionIsolation()
 
-	std::string            _connector;
-	mutable ConnectionHandle _db;
-	Poco::Any              _maxFieldSize;
-	bool                   _autoBind;
-	bool                   _autoExtract;
-	TypeInfo               _dataTypes;
-	mutable char           _canTransact;
-	bool                   _inTransaction;
-	int                    _queryTimeout;
-	std::string            _dbEncoding;
-	Poco::FastMutex        _mutex;
+	void setName();
+		/// Sets the back end DBMS name.
+
+	std::string                   _connector;
+	mutable ConnectionHandle      _db;
+	Poco::Any                     _maxFieldSize;
+	bool                          _autoBind;
+	bool                          _autoExtract;
+	TypeInfo                      _dataTypes;
+	mutable TransactionCapability _canTransact;
+	std::atomic<bool>             _inTransaction;
+	int                           _queryTimeout;
+	std::string                   _dbEncoding;
+	Poco::FastMutex               _mutex;
 };
 
 
@@ -230,7 +259,7 @@ inline void SessionImpl::setMaxFieldSize(const std::string& rName, const Poco::A
 	_maxFieldSize = rValue;
 }
 
-		
+
 inline Poco::Any SessionImpl::getMaxFieldSize(const std::string& rName) const
 {
 	return _maxFieldSize;
@@ -242,7 +271,7 @@ inline void SessionImpl::setDataTypeInfo(const std::string& rName, const Poco::A
 	throw InvalidAccessException();
 }
 
-		
+
 inline Poco::Any SessionImpl::dataTypeInfo(const std::string& rName) const
 {
 	return &_dataTypes;

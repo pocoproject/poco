@@ -60,8 +60,11 @@ public:
 		/// The returned reference is valid until the next
 		/// time digest() is called, or the engine object is destroyed.
 
-	static std::string digestToHex(const Digest& bytes);
+	static std::string digestToHex(const Digest& bytes, std::size_t length = 0);
 		/// Converts a message digest into a string of hexadecimal numbers.
+		/// If length is greater than zero, the output is truncated to length
+		/// bytes. If size is greater than the length of untruncated output,
+		/// InvalidArgumentException is thrown.
 
 	static Digest digestFromHex(const std::string& digest);
 		/// Converts a string created by digestToHex back to its Digest presentation

@@ -30,12 +30,12 @@ Transaction::Transaction(Poco::Data::Session& rSession, Poco::Logger* pLogger):
 
 Transaction::Transaction(Poco::Data::Session& rSession, bool start):
 	_rSession(rSession),
-	_pLogger(0)
+	_pLogger(nullptr)
 {
 	if (start) begin();
 }
 
-	
+
 Transaction::~Transaction()
 {
 	try
@@ -44,19 +44,19 @@ Transaction::~Transaction()
 		{
 			try
 			{
-				if (_pLogger) 
+				if (_pLogger)
 					_pLogger->debug("Rolling back transaction.");
 
 				_rSession.rollback();
 			}
 			catch (Poco::Exception& exc)
 			{
-				if (_pLogger) 
+				if (_pLogger)
 					_pLogger->error("Error while rolling back database transaction: %s", exc.displayText());
 			}
 			catch (...)
 			{
-				if (_pLogger) 
+				if (_pLogger)
 					_pLogger->error("Error while rolling back database transaction.");
 			}
 		}
@@ -85,36 +85,43 @@ void Transaction::execute(const std::string& sql, bool doCommit)
 }
 
 
-void Transaction::execute(const std::vector<std::string>& sql)
+bool Transaction::execute(const std::vector<std::string>& sql)
+{
+	return execute(sql, nullptr);
+}
+
+bool Transaction::execute(const std::vector<std::string>& sql, std::string* info)
 {
 	try
 	{
 		std::vector<std::string>::const_iterator it = sql.begin();
 		std::vector<std::string>::const_iterator end = sql.end();
 		for (; it != end; ++it)	execute(*it, it + 1 == end ? true : false);
-		return;
+		return true;
 	}
 	catch (Exception& ex)
 	{
 		if (_pLogger) _pLogger->log(ex);
+		if(info) *info = ex.displayText();
 	}
 
 	rollback();
+	return false;
 }
 
 
 void Transaction::commit()
 {
-	if (_pLogger) 
+	if (_pLogger)
 		_pLogger->debug("Committing transaction.");
 
 	_rSession.commit();
 }
 
-	
+
 void Transaction::rollback()
 {
-	if (_pLogger) 
+	if (_pLogger)
 		_pLogger->debug("Rolling back transaction.");
 
 	_rSession.rollback();

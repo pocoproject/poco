@@ -45,11 +45,11 @@ std::string          ODBCSQLiteTest::_driver = SQLITE_ODBC_DRIVER;
 std::string          ODBCSQLiteTest::_dsn = SQLITE_DSN;
 std::string          ODBCSQLiteTest::_uid = "";
 std::string          ODBCSQLiteTest::_pwd = "";
-std::string          ODBCSQLiteTest::_connectString = "Driver=" SQLITE_ODBC_DRIVER 
+std::string          ODBCSQLiteTest::_connectString = "Driver=" SQLITE_ODBC_DRIVER
 	";Database=" SQLITE_DB ";";
 
 
-ODBCSQLiteTest::ODBCSQLiteTest(const std::string& name): 
+ODBCSQLiteTest::ODBCSQLiteTest(const std::string& name):
 	ODBCTest(name, _pSession, _pExecutor, _dsn, _uid, _pwd, _connectString)
 {
 }
@@ -116,7 +116,7 @@ void ODBCSQLiteTest::testAffectedRows()
 		// why "WHERE 1" is necessary here
 		_pExecutor->affectedRows("WHERE 1");
 		i += 2;
-	}	
+	}
 }
 
 
@@ -130,7 +130,7 @@ void ODBCSQLiteTest::testNull()
 		recreateNullsTable("NOT NULL");
 		session().setFeature("autoBind", bindValue(i));
 		session().setFeature("autoExtract", bindValue(i+1));
-		_pExecutor->notNulls("HY000");
+		_pExecutor->notNulls({"HY000"});
 		i += 2;
 	}
 }
@@ -156,7 +156,7 @@ void ODBCSQLiteTest::dropObject(const std::string& type, const std::string& name
 			}
 		}
 
-		if (!ignoreError) 
+		if (!ignoreError)
 		{
 			std::cout << ex.toString() << std::endl;
 			throw;
@@ -168,7 +168,7 @@ void ODBCSQLiteTest::dropObject(const std::string& type, const std::string& name
 void ODBCSQLiteTest::recreateNullableTable()
 {
 	dropObject("TABLE", "NullableTest");
-	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat REAL NULL , EmptyDateTime TIMESTAMP NULL)", now; }
+	try { *_pSession << "CREATE TABLE NullableTest (EmptyString VARCHAR(30) NULL, EmptyInteger INTEGER NULL, EmptyFloat REAL NULL, EmptyDateTime TIMESTAMP NULL, EmptyDate DATE NULL)", now; }
 	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreatePersonTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreatePersonTable()"); }
 }
@@ -273,15 +273,15 @@ void ODBCSQLiteTest::recreateNullsTable(const std::string& notNull)
 void ODBCSQLiteTest::recreateMiscTable()
 {
 	dropObject("TABLE", "MiscTest");
-	try 
-	{ 
+	try
+	{
 		// SQLite fails with BLOB bulk operations
 		session() << "CREATE TABLE MiscTest "
 			"(First VARCHAR(30),"
 			//"Second BLOB,"
 			"Third INTEGER,"
 			"Fourth REAL,"
-			"Fifth DATETIME)", now; 
+			"Fifth DATETIME)", now;
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateMiscTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateMiscTable()"); }
 }
@@ -292,20 +292,20 @@ void ODBCSQLiteTest::recreateLogTable()
 	dropObject("TABLE", "T_POCO_LOG");
 	dropObject("TABLE", "T_POCO_LOG_ARCHIVE");
 
-	try 
-	{ 
+	try
+	{
 		std::string sql = "CREATE TABLE %s "
 			"(Source VARCHAR,"
 			"Name VARCHAR,"
 			"ProcessId INTEGER,"
 			"Thread VARCHAR, "
-			"ThreadId INTEGER," 
+			"ThreadId INTEGER,"
 			"Priority INTEGER,"
 			"Text VARCHAR,"
 			"DateTime DATETIME)";
 
-		session() << sql, "T_POCO_LOG", now; 
-		session() << sql, "T_POCO_LOG_ARCHIVE", now; 
+		session() << sql, "T_POCO_LOG", now;
+		session() << sql, "T_POCO_LOG_ARCHIVE", now;
 
 	} catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; fail ("recreateLogTable()"); }
 	catch(StatementException& se){ std::cout << se.toString() << std::endl; fail ("recreateLogTable()"); }
@@ -323,6 +323,9 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ODBCSQLiteTest");
 
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testBareboneODBC);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testConnection);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSession);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSessionPool);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testZeroRows);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSimpleAccess);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testComplexType);
@@ -385,6 +388,8 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testDynamicAny);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSQLChannel);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSQLLogger);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testAutoCommit);
+		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTransactionIsolation);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTransaction);
 		CppUnit_addTest(pSuite, ODBCSQLiteTest, testTransactor);
@@ -393,5 +398,5 @@ CppUnit::Test* ODBCSQLiteTest::suite()
 		return pSuite;
 	}
 
-	return 0;
+	return nullptr;
 }

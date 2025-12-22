@@ -22,12 +22,8 @@
 #include "Poco/InflatingStream.h"
 #include "Poco/DeflatingStream.h"
 #include "Poco/Format.h"
-#if defined(POCO_UNBUNDLED)
-#include <zlib.h>
-#else
-#include "Poco/zlib.h"
-#endif
 
+#include <zlib.h>
 
 namespace Poco {
 namespace Zip {
@@ -36,7 +32,7 @@ namespace Zip {
 ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEntry, bool reposition):
 	Poco::BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_ptrBuf(),
 	_ptrOBuf(),
 	_ptrHelper(),
@@ -45,7 +41,7 @@ ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEnt
 	_expectedCrc32(0),
 	_checkCRC(true),
 	_bytesWritten(0),
-	_pHeader(0)
+	_pHeader(nullptr)
 {
 	if (fileEntry.isDirectory())
 		return;
@@ -86,7 +82,7 @@ ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEnt
 
 ZipStreamBuf::ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bool reposition):
 	Poco::BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_ptrBuf(),
 	_ptrOBuf(),
@@ -144,21 +140,21 @@ ZipStreamBuf::ZipStreamBuf(std::ostream& ostr, ZipLocalFileHeader& fileEntry, bo
 ZipStreamBuf::~ZipStreamBuf()
 {
 	// make sure destruction of streams happens in correct order
-	_ptrOBuf = 0;
-	_ptrOHelper = 0;
-	_ptrBuf = 0;
-	_ptrHelper = 0;
+	_ptrOBuf = nullptr;
+	_ptrOHelper = nullptr;
+	_ptrBuf = nullptr;
+	_ptrHelper = nullptr;
 }
 
 
-int ZipStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize ZipStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (!_ptrBuf) return 0; // directory entry
 	_ptrBuf->read(buffer, length);
-	int cnt = static_cast<int>(_ptrBuf->gcount());
+	std::streamsize cnt = _ptrBuf->gcount();
 	if (cnt > 0)
 	{
-		_crc32.update(buffer, cnt);
+		_crc32.update(buffer, static_cast<unsigned int>(cnt));
 	}
 	else
 	{
@@ -185,7 +181,7 @@ int ZipStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 }
 
 
-int ZipStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize ZipStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	if (!_ptrOBuf) return 0; // directory entry
 	if (length == 0)
@@ -193,7 +189,7 @@ int ZipStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 	_bytesWritten += length;
 	_ptrOBuf->write(buffer, length);
 	_crc32.update(buffer, static_cast<unsigned int>(length));
-	return static_cast<int>(length);
+	return length;
 }
 
 
@@ -211,7 +207,7 @@ void ZipStreamBuf::close(Poco::UInt64& extraDataSize)
 			_ptrOHelper->flush();
 			_ptrOHelper->close();
 		}
-		_ptrOBuf = 0;
+		_ptrOBuf = nullptr;
 		if (!*_pOstr) throw Poco::IOException("Bad output stream");
 
 		// write an extra datablock if required
@@ -262,7 +258,7 @@ void ZipStreamBuf::close(Poco::UInt64& extraDataSize)
 			_pOstr->seekp(0, std::ios_base::end);
 			if (!*_pOstr) throw Poco::IOException("Bad output stream");
 		}
-		_pHeader = 0;
+		_pHeader = nullptr;
 	}
 }
 

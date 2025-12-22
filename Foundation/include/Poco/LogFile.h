@@ -17,21 +17,14 @@
 #ifndef Foundation_LogFile_INCLUDED
 #define Foundation_LogFile_INCLUDED
 
-
 #include "Poco/Foundation.h"
-
-
-#if defined(POCO_OS_FAMILY_WINDOWS)
-#include "Poco/LogFile_WIN32U.h"
-#else
-#include "Poco/LogFile_STD.h"
-#endif
-
+#include "Poco/Timestamp.h"
+#include "Poco/FileStream.h"
 
 namespace Poco {
 
 
-class Foundation_API LogFile: public LogFileImpl
+class Foundation_API LogFile
 	/// This class is used by FileChannel to work
 	/// with a log file.
 {
@@ -55,34 +48,13 @@ public:
 
 	const std::string& path() const;
 		/// Returns the path given in the constructor.
+
+private:
+	std::string _path;
+	mutable Poco::FileOutputStream _str;
+	Timestamp _creationDate;
+	UInt64 _size;
 };
-
-
-//
-// inlines
-//
-inline void LogFile::write(const std::string& text, bool flush)
-{
-	writeImpl(text, flush);
-}
-
-
-inline UInt64 LogFile::size() const
-{
-	return sizeImpl();
-}
-
-
-inline Timestamp LogFile::creationDate() const
-{
-	return creationDateImpl();
-}
-
-
-inline const std::string& LogFile::path() const
-{
-	return pathImpl();
-}
 
 
 } // namespace Poco

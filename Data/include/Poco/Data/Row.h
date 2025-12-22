@@ -41,12 +41,12 @@ class Data_API Row
 	/// Rows are sortable. The sortability is maintained at all times (i.e. there
 	/// is always at least one column specified as a sorting criteria) .
 	/// The default and minimal sorting criteria is the first field (position 0).
-	/// The default sorting criteria can be replaced with any other field by 
+	/// The default sorting criteria can be replaced with any other field by
 	/// calling replaceSortField() member function.
 	/// Additional fields can be added to sorting criteria, in which case the
 	/// field precedence corresponds to addition order (i.e. later added fields
 	/// have lower sorting precedence).
-	/// These features make Row suitable for use with standard sorted 
+	/// These features make Row suitable for use with standard sorted
 	/// containers and algorithms. The main constraint is that all the rows from
 	/// a set that is being sorted must have the same sorting criteria (i.e., the same
 	/// set of fields must be in sorting criteria in the same order). Since rows don't
@@ -73,7 +73,7 @@ public:
 	using SortMap = std::vector<SortTuple>;
 		/// The type for map holding fields used for sorting criteria.
 		/// Fields are added sequentially and have precedence that
-		/// corresponds to field adding sequence order (rather than field's 
+		/// corresponds to field adding sequence order (rather than field's
 		/// position in the row).
 		/// This requirement rules out use of std::map due to its sorted nature.
 	using SortMapPtr = SharedPtr<SortMap>;
@@ -82,12 +82,12 @@ public:
 		/// Creates the Row.
 
 	Row(NameVecPtr pNames,
-		const RowFormatter::Ptr& pFormatter = 0);
+		const RowFormatter::Ptr& pFormatter = nullptr);
 		/// Creates the Row.
 
 	Row(NameVecPtr pNames,
 		const SortMapPtr& pSortMap,
-		const RowFormatter::Ptr& pFormatter = 0);
+		const RowFormatter::Ptr& pFormatter = nullptr);
 		/// Creates the Row.
 
 	~Row();
@@ -111,7 +111,7 @@ public:
 		_pNames->push_back(name);
 		if (1 == _values.size()) addSortField(0);
 	}
-	
+
 	template <typename T>
 	void set(std::size_t pos, const T& val)
 		/// Assigns the value to the row.
@@ -200,14 +200,14 @@ public:
 	const ValueVec& values() const;
 		/// Returns the const reference to values vector.
 
-	void setFormatter(const RowFormatter::Ptr& pFormatter = 0);
+	void setFormatter(const RowFormatter::Ptr& pFormatter = nullptr);
 		/// Sets the formatter for this row and takes the
 		/// shared ownership of it.
 
 	const RowFormatter& getFormatter() const;
 		/// Returns the reference to the formatter.
 
-	void setSortMap(const SortMapPtr& pSortMap = 0);
+	void setSortMap(const SortMapPtr& pSortMap = nullptr);
 		/// Adds the sorting fields entry and takes the
 		/// shared ownership of it.
 

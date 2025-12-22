@@ -24,7 +24,7 @@ namespace Poco {
 
 BinaryReader::BinaryReader(std::istream& istr, StreamByteOrder byteOrder):
 	_istr(istr),
-	_pTextConverter(0)
+	_pTextConverter(nullptr)
 {
 #if defined(POCO_ARCH_BIG_ENDIAN)
 	_flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);
@@ -273,6 +273,31 @@ void BinaryReader::readRaw(std::streamsize length, std::string& value)
 void BinaryReader::readRaw(char* buffer, std::streamsize length)
 {
 	_istr.read(buffer, length);
+}
+
+
+void BinaryReader::readCString(std::string& value)
+{
+	value.clear();
+	if (!_istr.good())
+	{
+		return;
+	}
+	value.reserve(256);
+	while (true)
+	{
+		char c;
+		_istr.get(c);
+		if (!_istr.good())
+		{
+			break;
+		}
+		if (c == '\0')
+		{
+			break;
+		}
+		value += c;
+	}
 }
 
 

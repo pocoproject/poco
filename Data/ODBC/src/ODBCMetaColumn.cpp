@@ -53,7 +53,7 @@ void ODBCMetaColumn::getDescription()
 		&_columnDesc.decimalDigits,
 		&_columnDesc.isNullable)))
 	{
-		throw StatementException(_rStmt);
+		throw StatementException(_rStmt, "ODBCMetaColumn::getDescription()");
 	}
 }
 
@@ -64,12 +64,12 @@ bool ODBCMetaColumn::isUnsigned() const
 	if (Utility::isError(Poco::Data::ODBC::SQLColAttribute(_rStmt,
 		(SQLUSMALLINT)position() + 1, // ODBC columns are 1-based
 		SQL_DESC_UNSIGNED,
+		nullptr,
 		0,
-		0,
-		0,
+		nullptr,
 		&val)))
 	{
-		throw StatementException(_rStmt);
+		throw StatementException(_rStmt, "ODBCMetaColumn::isUnsigned()");
 	}
 	return (val == SQL_TRUE);
 }
@@ -82,12 +82,12 @@ void ODBCMetaColumn::init()
 	if (Utility::isError(Poco::Data::ODBC::SQLColAttribute(_rStmt,
 			(SQLUSMALLINT) position() + 1, // ODBC columns are 1-based
 			SQL_DESC_LENGTH,
+			nullptr,
 			0,
-			0,
-			0,
+			nullptr,
 			&_dataLength)))
 	{
-		throw StatementException(_rStmt);
+		throw StatementException(_rStmt, "ODBCMetaColumn::init()");
 	}
 
 	setName(std::string((char*) _columnDesc.name));
@@ -127,25 +127,9 @@ void ODBCMetaColumn::init()
 
 	case SQL_DOUBLE:
 	case SQL_FLOAT:
-		setType(MetaColumn::FDT_DOUBLE); break;
-
 	case SQL_NUMERIC:
 	case SQL_DECIMAL:
-		// Oracle has no INTEGER type - it's essentially NUMBER with 38 whole and
-		// 0 fractional digits. It also does not recognize SQL_BIGINT type,
-		// so the workaround here is to hardcode it to 32 or 64 bit integer
-		if (0 == _columnDesc.decimalDigits)
-		{
-			if (_columnDesc.size > 9)
-				setType(MetaColumn::FDT_INT64);
-			else
-				setType(MetaColumn::FDT_INT32);
-		}
-		else
-		{
-			setType(MetaColumn::FDT_DOUBLE);
-		}
-		break;
+		setType(MetaColumn::FDT_DOUBLE); break;
 
 	case SQL_REAL:
 		setType(MetaColumn::FDT_FLOAT); break;
@@ -160,6 +144,9 @@ void ODBCMetaColumn::init()
 		setType(MetaColumn::FDT_DATE); break;
 
 	case SQL_TYPE_TIME:
+#ifdef POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
+	case SQL_SS_TIME2: // MS SQL Server custom type
+#endif
 		setType(MetaColumn::FDT_TIME); break;
 
 	case SQL_TYPE_TIMESTAMP:

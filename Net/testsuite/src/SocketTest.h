@@ -22,9 +22,11 @@ class SocketTest: public CppUnit::TestCase
 {
 public:
 	SocketTest(const std::string& name);
-	~SocketTest();
+	~SocketTest() override;
 
 	void testEcho();
+	void testPeek();
+	void testMoveStreamSocket();
 	void testPoll();
 	void testAvailable();
 	void testFIFOBuffer();
@@ -37,13 +39,22 @@ public:
 	void testTimeout();
 	void testBufferSize();
 	void testOptions();
+
+#if defined(POCO_TEST_DEPRECATED)
 	void testSelect();
 	void testSelect2();
 	void testSelect3();
-	void testEchoUnixLocal();
+#endif
 
-	void setUp();
-	void tearDown();
+	void testEchoUnixLocal();
+	void testUnixLocalAbstract();
+	void testUseFd();
+	void testSendFile();
+	void testSendFileLarge();
+	void testSendFileRange();
+
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 
@@ -51,10 +62,10 @@ private:
 	void onReadable(bool& b);
 	void onWritable(bool& b);
 
-	int _readableToNot;
-	int _notToReadable;
-	int _writableToNot;
-	int _notToWritable;
+	int _readableToNot = 0;
+	int _notToReadable = 0;
+	int _writableToNot = 0;
+	int _notToWritable = 0;
 };
 
 

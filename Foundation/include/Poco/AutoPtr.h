@@ -110,34 +110,23 @@ public:
 	{
 		if (_ptr != ptr)
 		{
-			if (_ptr) _ptr->release();
-			_ptr = ptr;
-			if (shared && _ptr) _ptr->duplicate();
+			if (shared && ptr) ptr->duplicate();
+			std::swap(_ptr, ptr);
+			if (ptr) ptr->release();
 		}
 		return *this;
 	}
 
 	AutoPtr& assign(const AutoPtr& ptr)
 	{
-		if (&ptr != this)
-		{
-			if (_ptr) _ptr->release();
-			_ptr = ptr._ptr;
-			if (_ptr) _ptr->duplicate();
-		}
-		return *this;
+		return assign(ptr._ptr, true);
 	}
 
 	template <class Other>
 	AutoPtr& assign(const AutoPtr<Other>& ptr)
 	{
-		if (ptr.get() != _ptr)
-		{
-			if (_ptr) _ptr->release();
-			_ptr = const_cast<Other*>(ptr.get());
-			if (_ptr) _ptr->duplicate();
-		}
-		return *this;
+		C* nptr = const_cast<Other*>(ptr.get());
+		return assign(nptr, true);
 	}
 
 	void reset()
@@ -194,7 +183,7 @@ public:
 		return assign<Other>(ptr);
 	}
 
-	void swap(AutoPtr& ptr)
+	void swap(AutoPtr& ptr) noexcept
 	{
 		std::swap(_ptr, ptr._ptr);
 	}
@@ -202,7 +191,7 @@ public:
 	template <class Other>
 	AutoPtr<Other> cast() const
 		/// Casts the AutoPtr via a dynamic cast to the given type.
-		/// Returns an AutoPtr containing NULL if the cast fails.
+		/// Returns an AutoPtr containing nullptr if the cast fails.
 		/// Example: (assume class Sub: public Super)
 		///    AutoPtr<Super> super(new Sub());
 		///    AutoPtr<Sub> sub = super.cast<Sub>();
@@ -398,7 +387,7 @@ private:
 
 
 template <class C>
-inline void swap(AutoPtr<C>& p1, AutoPtr<C>& p2)
+inline void swap(AutoPtr<C>& p1, AutoPtr<C>& p2) noexcept
 {
 	p1.swap(p2);
 }
@@ -407,7 +396,7 @@ inline void swap(AutoPtr<C>& p1, AutoPtr<C>& p2)
 template<typename T, typename... Args>
 AutoPtr<T> makeAuto(Args&&... args)
 {
-    return AutoPtr<T>(new T(std::forward<Args>(args)...));
+	return AutoPtr<T>(new T(std::forward<Args>(args)...));
 }
 
 

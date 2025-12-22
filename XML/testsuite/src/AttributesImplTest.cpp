@@ -34,7 +34,7 @@ void AttributesImplTest::testNoNamespaces()
 	assertTrue (attrs.getLength() == 0);
 	assertTrue (attrs.getIndex("foo") == -1);
 	assertTrue (attrs.getValue("foo").empty());
-	
+
 	attrs.addAttribute("", "", "a1", "CDATA", "v1");
 	assertTrue (attrs.getLength() == 1);
 	assertTrue (attrs.getIndex("a1") == 0);
@@ -42,7 +42,7 @@ void AttributesImplTest::testNoNamespaces()
 	assertTrue (attrs.getType(0) == "CDATA");
 	assertTrue (attrs.getValue(0) == "v1");
 	assertTrue (attrs.isSpecified(0));
-	
+
 	assertTrue (attrs.getType("a1") == "CDATA");
 	assertTrue (attrs.getValue("a1") == "v1");
 
@@ -53,15 +53,15 @@ void AttributesImplTest::testNoNamespaces()
 	assertTrue (attrs.getType(1) == "CDATA");
 	assertTrue (attrs.getValue(1) == "v2");
 	assertTrue (attrs.isSpecified(1));
-	
+
 	assertTrue (attrs.getType("a2") == "CDATA");
 	assertTrue (attrs.getValue("a2") == "v2");
 
 	attrs.addAttribute("", "", "a3", "CDATA", "v3");
 	assertTrue (attrs.getLength() == 3);
-	assertTrue (attrs.getIndex("a3") == 2);	
+	assertTrue (attrs.getIndex("a3") == 2);
 	assertTrue (attrs.getValue("a3") == "v3");
-	
+
 	attrs.removeAttribute(0);
 	assertTrue (attrs.getLength() == 2);
 	assertTrue (attrs.getIndex("a1") == -1);
@@ -69,7 +69,7 @@ void AttributesImplTest::testNoNamespaces()
 	assertTrue (attrs.getIndex("a3") == 1);
 	assertTrue (attrs.getQName(0) == "a2");
 	assertTrue (attrs.getQName(1) == "a3");
-	
+
 	attrs.removeAttribute("a3");
 	assertTrue (attrs.getLength() == 1);
 	assertTrue (attrs.getIndex("a1") == -1);
@@ -86,7 +86,7 @@ void AttributesImplTest::testNamespaces()
 	assertTrue (attrs.getLength() == 0);
 	assertTrue (attrs.getIndex("urn:ns", "foo") == -1);
 	assertTrue (attrs.getValue("urn:ns", "foo").empty());
-	
+
 	attrs.addAttribute("urn:ns", "a1", "p:a1", "CDATA", "v1");
 	assertTrue (attrs.getLength() == 1);
 	assertTrue (attrs.getIndex("urn:ns", "a1") == 0);
@@ -96,7 +96,7 @@ void AttributesImplTest::testNamespaces()
 	assertTrue (attrs.getType(0) == "CDATA");
 	assertTrue (attrs.getValue(0) == "v1");
 	assertTrue (attrs.isSpecified(0));
-	
+
 	assertTrue (attrs.getType("urn:ns", "a1") == "CDATA");
 	assertTrue (attrs.getValue("urn:ns", "a1") == "v1");
 
@@ -109,7 +109,7 @@ void AttributesImplTest::testNamespaces()
 	assertTrue (attrs.getType(1) == "CDATA");
 	assertTrue (attrs.getValue(1) == "v2");
 	assertTrue (attrs.isSpecified(1));
-	
+
 	assertTrue (attrs.getType("urn:ns", "a2") == "CDATA");
 	assertTrue (attrs.getValue("urn:ns", "a2") == "v2");
 
@@ -117,9 +117,9 @@ void AttributesImplTest::testNamespaces()
 
 	attrs.addAttribute("urn:ns2", "a3", "q:a3", "CDATA", "v3");
 	assertTrue (attrs.getLength() == 3);
-	assertTrue (attrs.getIndex("urn:ns2", "a3") == 2);	
+	assertTrue (attrs.getIndex("urn:ns2", "a3") == 2);
 	assertTrue (attrs.getValue("urn:ns2", "a3") == "v3");
-	
+
 	attrs.removeAttribute(0);
 	assertTrue (attrs.getLength() == 2);
 	assertTrue (attrs.getIndex("urn:ns", "a1") == -1);
@@ -131,10 +131,10 @@ void AttributesImplTest::testNamespaces()
 	assertTrue (attrs.getQName(1) == "q:a3");
 	assertTrue (attrs.getLocalName(1) == "a3");
 	assertTrue (attrs.getURI(1) == "urn:ns2");
-	
+
 	attrs.removeAttribute("urn:ns", "a3");
 	assertTrue (attrs.getLength() == 2);
-	
+
 	attrs.removeAttribute("urn:ns2", "a3");
 	assertTrue (attrs.getLength() == 1);
 	assertTrue (attrs.getIndex("urn:ns", "a1") == -1);
@@ -174,19 +174,19 @@ void AttributesImplTest::testAccessors()
 	attrs.setType(0, "NMTOKEN");
 	assertTrue (attrs.getType(0) == "NMTOKEN");
 	assertTrue (attrs.getType("urn:ns1", "a1") == "NMTOKEN");
-	
+
 	attrs.setValue(1, "v2 v2");
 	assertTrue (attrs.getValue(1) == "v2 v2");
 	assertTrue (attrs.getValue("urn:ns1", "a2") == "v2 v2");
 	assertTrue (attrs.isSpecified(1));
-	
+
 	attrs.setLocalName(2, "A3");
 	assertTrue (attrs.getLocalName(2) == "A3");
 	attrs.setQName(2, "p:A3");
 	assertTrue (attrs.getQName(2) == "p:A3");
 	attrs.setURI(2, "urn:ns1");
 	assertTrue (attrs.getURI(2) == "urn:ns1");
-	
+
 	assertTrue (attrs.getValue("urn:ns1", "A3") == "v3");
 }
 
@@ -202,11 +202,11 @@ void AttributesImplTest::testCopy()
 	attrs2.setAttributes(attrs);
 
 	assertTrue (attrs2.getLength() == 3);
-	
+
 	assertTrue (attrs2.getQName(0) == "p:a1");
 	assertTrue (attrs2.getQName(1) == "p:a2");
 	assertTrue (attrs2.getQName(2) == "q:a3");
-	
+
 	assertTrue (attrs2.getLocalName(0) == "a1");
 	assertTrue (attrs2.getLocalName(1) == "a2");
 	assertTrue (attrs2.getLocalName(2) == "a3");

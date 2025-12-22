@@ -29,7 +29,7 @@
 namespace Poco {
 
 
-template <typename ch, typename tr, typename ba = BufferAllocator<ch>> 
+template <typename ch, typename tr, typename ba = BufferAllocator<ch>>
 class BasicBufferedStreamBuf: public std::basic_streambuf<ch, tr>
 	/// This is an implementation of a buffered streambuf
 	/// that greatly simplifies the implementation of
@@ -43,15 +43,15 @@ class BasicBufferedStreamBuf: public std::basic_streambuf<ch, tr>
 	/// ostream, but not for an iostream.
 {
 protected:
-	typedef std::basic_streambuf<ch, tr> Base;
-	typedef std::basic_ios<ch, tr> IOS;
-	typedef ch char_type;
-	typedef tr char_traits;
-	typedef ba Allocator;
-	typedef typename Base::int_type int_type;
-	typedef typename Base::pos_type pos_type;
-	typedef typename Base::off_type off_type;
-	typedef typename IOS::openmode openmode;
+	using Base = std::basic_streambuf<ch, tr>;
+	using IOS = std::basic_ios<ch, tr>;
+	using char_type = ch;
+	using char_traits = tr;
+	using Allocator = ba;
+	using int_type = typename Base::int_type;
+	using pos_type = typename Base::pos_type;
+	using off_type = typename Base::off_type;
+	using openmode = typename IOS::openmode;
 
 public:
 	BasicBufferedStreamBuf(std::streamsize bufferSize, openmode mode):
@@ -59,28 +59,31 @@ public:
 		_pBuffer(Allocator::allocate(_bufsize)),
 		_mode(mode)
 	{
-		this->setg(_pBuffer + 4, _pBuffer + 4, _pBuffer + 4);	
+		this->setg(_pBuffer + 4, _pBuffer + 4, _pBuffer + 4);
 		this->setp(_pBuffer, _pBuffer + _bufsize);
 	}
 
-	~BasicBufferedStreamBuf()
+	~BasicBufferedStreamBuf() override
 	{
 		try
 		{
 			Allocator::deallocate(_pBuffer, _bufsize);
-		} 
+		}
 		catch (...)
 		{
 			poco_unexpected();
 		}
 	}
 
-	virtual int_type overflow(int_type c)
+	BasicBufferedStreamBuf(const BasicBufferedStreamBuf&) = delete;
+	BasicBufferedStreamBuf& operator=(const BasicBufferedStreamBuf&) = delete;
+
+	int_type overflow(int_type c) override
 	{
 		if (!(_mode & IOS::out)) return char_traits::eof();
 
 		if (flushBuffer() == std::streamsize(-1)) return char_traits::eof();
-		if (c != char_traits::eof()) 
+		if (c != char_traits::eof())
 		{
 			*this->pptr() = char_traits::to_char_type(c);
 			this->pbump(1);
@@ -89,7 +92,7 @@ public:
 		return c;
 	}
 
-	virtual int_type underflow()
+	int_type underflow() override
 	{
 		if (!(_mode & IOS::in)) return char_traits::eof();
 
@@ -101,18 +104,18 @@ public:
 
 		char_traits::move(_pBuffer + (4 - putback), this->gptr() - putback, putback);
 
-		int n = readFromDevice(_pBuffer + 4, _bufsize - 4);
+		std::streamsize n = readFromDevice(_pBuffer + 4, _bufsize - 4);
 		if (n <= 0) return char_traits::eof();
 
 		this->setg(_pBuffer + (4 - putback), _pBuffer + 4, _pBuffer + 4 + n);
 
 		// return next character
-		return char_traits::to_int_type(*this->gptr());    
+		return char_traits::to_int_type(*this->gptr());
 	}
 
-	virtual int sync()
+	int sync() override
 	{
-		if (this->pptr() && this->pptr() > this->pbase()) 
+		if (this->pptr() && this->pptr() > this->pbase())
 		{
 			if (flushBuffer() == -1) return -1;
 		}
@@ -124,29 +127,29 @@ protected:
 	{
 		_mode = mode;
 	}
-	
+
 	openmode getMode() const
 	{
 		return _mode;
 	}
 
 private:
-	virtual int readFromDevice(char_type* /*buffer*/, std::streamsize /*length*/)
+	virtual std::streamsize readFromDevice(char_type* /*buffer*/, std::streamsize /*length*/)
 	{
 		return 0;
 	}
 
-	virtual int writeToDevice(const char_type* /*buffer*/, std::streamsize /*length*/)
+	virtual std::streamsize writeToDevice(const char_type* /*buffer*/, std::streamsize /*length*/)
 	{
 		return 0;
 	}
 
-	int flushBuffer()
+	std::streamsize flushBuffer()
 	{
-		int n = int(this->pptr() - this->pbase());
-		if (writeToDevice(this->pbase(), n) == n) 
+		std::streamsize n = this->pptr() - this->pbase();
+		if (writeToDevice(this->pbase(), n) == n)
 		{
-			this->pbump(-n);
+			this->pbump(static_cast<int>(-n));
 			return n;
 		}
 		return -1;
@@ -155,23 +158,19 @@ private:
 	std::streamsize _bufsize;
 	char_type*      _pBuffer;
 	openmode        _mode;
-
-	BasicBufferedStreamBuf(const BasicBufferedStreamBuf&);
-	BasicBufferedStreamBuf& operator = (const BasicBufferedStreamBuf&);
 };
-
 
 //
 // We provide an instantiation for char.
 //
-// Visual C++ needs a workaround - explicitly importing the template
-// instantiation - to avoid duplicate symbols due to multiple
-// instantiations in different libraries.
-//
-#if defined(_MSC_VER) && defined(POCO_DLL) && !defined(Foundation_EXPORTS)
-template class Foundation_API BasicBufferedStreamBuf<char, std::char_traits<char>>;
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+extern template class BasicBufferedStreamBuf<char, std::char_traits<char>>;
+#else
+extern template class Foundation_API BasicBufferedStreamBuf<char, std::char_traits<char>>;
 #endif
-typedef BasicBufferedStreamBuf<char, std::char_traits<char>> BufferedStreamBuf;
+
+using BufferedStreamBuf = BasicBufferedStreamBuf<char, std::char_traits<char>>;
 
 
 } // namespace Poco

@@ -27,6 +27,7 @@ public:
 	void testWebSocket();
 	void testWebSocketLarge();
 	void testWebSocketLargeInOneFrame();
+	void testWebSocketNB();
 
 	void setUp();
 	void tearDown();

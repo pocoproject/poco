@@ -24,22 +24,17 @@
 namespace Poco {
 
 
-template <class TArgs> 
+template <class TArgs>
 class AbstractDelegate
 	/// Base class for Delegate and Expire.
 {
 public:
-	AbstractDelegate()
-	{
-	}
+	AbstractDelegate() = default;
 
-	AbstractDelegate(const AbstractDelegate& /*del*/)
-	{
-	}
+	AbstractDelegate(const AbstractDelegate & /*del*/) = default;
+	AbstractDelegate& operator=(const AbstractDelegate &) = default;
 
-	virtual ~AbstractDelegate() 
-	{
-	}
+	virtual ~AbstractDelegate() = default;
 
 	virtual bool notify(const void* sender, TArgs& arguments) = 0;
 		/// Invokes the delegate's callback function.
@@ -54,7 +49,7 @@ public:
 
 	virtual void disable() = 0;
 		/// Disables the delegate, which is done prior to removal.
-		
+
 	virtual const AbstractDelegate* unwrap() const
 		/// Returns the unwrapped delegate. Must be overridden by decorators
 		/// like Expire.
@@ -64,22 +59,17 @@ public:
 };
 
 
-template <> 
+template <>
 class AbstractDelegate<void>
 	/// Base class for Delegate and Expire.
 {
 public:
-	AbstractDelegate()
-	{
-	}
+	AbstractDelegate() = default;
 
-	AbstractDelegate(const AbstractDelegate&)
-	{
-	}
+	AbstractDelegate(const AbstractDelegate &) = default;
+	AbstractDelegate& operator=(const AbstractDelegate &) = default;
 
-	virtual ~AbstractDelegate() 
-	{
-	}
+	virtual ~AbstractDelegate() = default;
 
 	virtual bool notify(const void* sender) = 0;
 		/// Invokes the delegate's callback function.
@@ -94,7 +84,7 @@ public:
 
 	virtual void disable() = 0;
 		/// Disables the delegate, which is done prior to removal.
-		
+
 	virtual const AbstractDelegate* unwrap() const
 		/// Returns the unwrapped delegate. Must be overridden by decorators
 		/// like Expire.

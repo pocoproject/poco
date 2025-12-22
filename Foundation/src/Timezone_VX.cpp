@@ -23,7 +23,7 @@ namespace Poco {
 
 int Timezone::utcOffset()
 {
-	std::time_t now = std::time(NULL);
+	std::time_t now = std::time(nullptr);
 	struct std::tm t;
 	gmtime_r(&now, &t);
 	std::time_t utc = std::mktime(&t);
@@ -33,7 +33,7 @@ int Timezone::utcOffset()
 
 int Timezone::dst()
 {
-	std::time_t now = std::time(NULL);
+	std::time_t now = std::time(nullptr);
 	struct std::tm t;
 #if defined(_VXWORKS_COMPATIBILITY_MODE) || (defined(_WRS_VXWORKS_MAJOR) && ((_WRS_VXWORKS_MAJOR < 6) || ((_WRS_VXWORKS_MAJOR == 6)  && (_WRS_VXWORKS_MINOR < 9))))
 	if (localtime_r(&now, &t) != OK)
@@ -42,6 +42,12 @@ int Timezone::dst()
 #endif
 		throw Poco::SystemException("cannot get local time DST offset");
 	return t.tm_isdst == 1 ? 3600 : 0;
+}
+
+
+int Timezone::dst(const Poco::Timestamp& timestamp)
+{
+	return isDst(timestamp) ? 3600 : 0;
 }
 
 

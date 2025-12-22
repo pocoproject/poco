@@ -492,10 +492,10 @@ private:
 
 template <class C>
 class InternalExtraction: public Extraction<C>
-	/// Container Data Type specialization extension for extraction of values from a query result set.
+	/// Container Data Type extension for extraction of values from a query result set.
 	///
 	/// This class is intended for PocoData internal use - it is used by StatementImpl
-	/// to automaticaly create internal Extraction in cases when statement returns data and no external storage
+	/// to automatically create internal Extraction in cases when statement returns data and no external storage
 	/// was supplied. It is later used by RecordSet to retrieve the fetched data after statement execution.
 	/// It takes ownership of the Column pointer supplied as constructor argument. Column object, in turn
 	/// owns the data container pointer.
@@ -503,17 +503,14 @@ class InternalExtraction: public Extraction<C>
 	/// InternalExtraction objects can not be copied or assigned.
 {
 public:
-	using ValType = typename C::value_type;
-	using ValPtr = SharedPtr<ValType>;
-	using Type = Extraction<ValType>;
-	using Ptr = SharedPtr<Type>;
-
+	using HeldValType = typename C::value_type;
 
 	InternalExtraction(C& result, Column<C>* pColumn, const Position& pos = Position(0)):
-		Extraction<C>(result, ValType(), pos),
+		Extraction<C>(result, HeldValType(), pos),
 		_pColumn(pColumn)
 		/// Creates InternalExtraction.
 	{
+		AbstractExtraction::setHeldType<C>();
 	}
 
 	~InternalExtraction()
@@ -528,7 +525,7 @@ public:
 		_pColumn->reset();
 	}
 
-	const ValType& value(int index) const
+	const HeldValType& value(int index) const
 	{
 		try
 		{

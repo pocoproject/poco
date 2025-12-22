@@ -32,23 +32,23 @@ class Foundation_API PipeStreamBuf: public BufferedStreamBuf
 	/// This is the streambuf class used for reading from and writing to a Pipe.
 {
 public:
-	typedef BufferedStreamBuf::openmode openmode;
-	
+	using openmode = BufferedStreamBuf::openmode;
+
 	PipeStreamBuf(const Pipe& pipe, openmode mode);
 		/// Creates a PipeStreamBuf with the given Pipe.
 
-	~PipeStreamBuf();
+	~PipeStreamBuf() override;
 		/// Destroys the PipeStreamBuf.
-		
+
 	void close();
 		/// Closes the pipe.
-		
+
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	std::streamsize readFromDevice(char* buffer, std::streamsize length) override;
+	std::streamsize writeToDevice(const char* buffer, std::streamsize length) override;
 
 private:
-	enum 
+	enum
 	{
 		STREAM_BUFFER_SIZE = 1024
 	};
@@ -67,15 +67,15 @@ class Foundation_API PipeIOS: public virtual std::ios
 public:
 	PipeIOS(const Pipe& pipe, openmode mode);
 		/// Creates the PipeIOS with the given Pipe.
-		
-	~PipeIOS();
+
+	~PipeIOS() override;
 		/// Destroys the PipeIOS.
 		///
 		/// Flushes the buffer, but does not close the pipe.
-		
+
 	PipeStreamBuf* rdbuf();
 		/// Returns a pointer to the internal PipeStreamBuf.
-		
+
 	void close();
 		/// Flushes the stream and closes the pipe.
 
@@ -91,7 +91,7 @@ public:
 	PipeOutputStream(const Pipe& pipe);
 		/// Creates the PipeOutputStream with the given Pipe.
 
-	~PipeOutputStream();
+	~PipeOutputStream() override;
 		/// Destroys the PipeOutputStream.
 		///
 		/// Flushes the buffer, but does not close the pipe.
@@ -109,7 +109,7 @@ public:
 	PipeInputStream(const Pipe& pipe);
 		/// Creates the PipeInputStream with the given Pipe.
 
-	~PipeInputStream();
+	~PipeInputStream() override;
 		/// Destroys the PipeInputStream.
 };
 

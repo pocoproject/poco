@@ -51,11 +51,11 @@ class ClassLoader
 	/// library.
 {
 public:
-	typedef AbstractMetaObject<Base> Meta;
-	typedef Manifest<Base> Manif;
-	typedef void (*InitializeLibraryFunc)();
-	typedef void (*UninitializeLibraryFunc)();
-	typedef bool (*BuildManifestFunc)(ManifestBase*);
+	using Meta = AbstractMetaObject<Base>;
+	using Manif = Manifest<Base>;
+	using InitializeLibraryFunc = void (*)();
+	using UninitializeLibraryFunc = void (*)();
+	using BuildManifestFunc = bool (*)(ManifestBase *);
 
 	struct LibraryInfo
 	{
@@ -63,13 +63,13 @@ public:
 		const Manif*   pManifest;
 		int            refCount;
 	};
-	typedef std::map<std::string, LibraryInfo> LibraryMap;
+	using LibraryMap = std::map<std::string, LibraryInfo>;
 
 	class Iterator
 		/// The ClassLoader's very own iterator class.
 	{
 	public:
-		typedef std::pair<std::string, const Manif*> Pair;
+		using Pair = std::pair<std::string, const Manif *>;
 
 		Iterator(const typename LibraryMap::const_iterator& it)
 		{
@@ -79,9 +79,7 @@ public:
 		{
 			_it = it._it;
 		}
-		~Iterator()
-		{
-		}
+		~Iterator() = default;
 		Iterator& operator = (const Iterator& it)
 		{
 			_it = it._it;
@@ -124,10 +122,8 @@ public:
 		mutable Pair _pair;
 	};
 
-	ClassLoader()
+	ClassLoader() = default;
 		/// Creates the ClassLoader.
-	{
-	}
 
 	virtual ~ClassLoader()
 		/// Destroys the ClassLoader.
@@ -139,8 +135,8 @@ public:
 		}
 	}
 
-	void loadLibrary(const std::string& path, const std::string& manifest)
-		/// Loads a library from the given path, using the given manifest. 
+	void loadLibrary(const std::string& path, const std::string& manifest, int flags = SharedLibrary::SHLIB_GLOBAL)
+		/// Loads a library from the given path, using the given manifest.
 		/// Does nothing if the library is already loaded.
 		/// Throws a LibraryLoadException if the library
 		/// cannot be loaded or does not have a Manifest.
@@ -149,6 +145,9 @@ public:
 		/// If called multiple times for the same library,
 		/// the number of calls to unloadLibrary() must be the same
 		/// for the library to become unloaded.
+		///
+		/// The flags parameter can be used to specify SharedLibrary loading
+		/// flags. See SharedLibrary::Flags for valid values.
 	{
 		FastMutex::ScopedLock lock(_mutex);
 
@@ -156,12 +155,12 @@ public:
 		if (it == _map.end())
 		{
 			LibraryInfo li;
-			li.pLibrary  = 0;
-			li.pManifest = 0;
+			li.pLibrary  = nullptr;
+			li.pManifest = nullptr;
 			li.refCount  = 1;
 			try
 			{
-				li.pLibrary  = new SharedLibrary(path);
+				li.pLibrary  = new SharedLibrary(path, flags);
 				li.pManifest = new Manif();
 				std::string pocoBuildManifestSymbol("pocoBuildManifest");
 				pocoBuildManifestSymbol.append(manifest);
@@ -193,7 +192,7 @@ public:
 		}
 	}
 
-	void loadLibrary(const std::string& path)
+	void loadLibrary(const std::string& path, int flags = SharedLibrary::SHLIB_GLOBAL)
 		/// Loads a library from the given path. Does nothing
 		/// if the library is already loaded.
 		/// Throws a LibraryLoadException if the library
@@ -204,13 +203,16 @@ public:
 		/// the number of calls to unloadLibrary() must be the same
 		/// for the library to become unloaded.
 		///
-		/// Equivalent to loadLibrary(path, "").
+		/// The flags parameter can be used to specify SharedLibrary loading
+		/// flags. See SharedLibrary::Flags for valid values.
+		///
+		/// Equivalent to loadLibrary(path, "", flags).
 	{
-		loadLibrary(path, "");
+		loadLibrary(path, "", flags);
 	}
-		
+
 	void unloadLibrary(const std::string& path)
-		/// Unloads the given library. 
+		/// Unloads the given library.
 		/// Be extremely cautious when unloading shared libraries.
 		/// If objects from the library are still referenced somewhere,
 		/// a total crash is very likely.
@@ -254,9 +256,9 @@ public:
 			if (itm != pManif->end())
 				return *itm;
 		}
-		return 0;
+		return nullptr;
 	}
-	
+
 	const Meta& classFor(const std::string& className) const
 		/// Returns a reference to the MetaObject for the given
 		/// class. Throws a NotFoundException if the class
@@ -268,7 +270,7 @@ public:
 		else
 			throw NotFoundException(className);
 	}
-	
+
 	Base* create(const std::string& className) const
 		/// Creates an instance of the given class.
 		/// Throws a NotFoundException if the class
@@ -276,7 +278,7 @@ public:
 	{
 		return classFor(className).create();
 	}
-	
+
 	Base& instance(const std::string& className) const
 		/// Returns a reference to the sole instance of
 		/// the given class. The class must be a singleton,
@@ -286,7 +288,7 @@ public:
 	{
 		return classFor(className).instance();
 	}
-	
+
 	bool canCreate(const std::string& className) const
 		/// Returns true if create() can create new instances
 		/// of the class.
@@ -307,7 +309,7 @@ public:
 	{
 		return classFor(className).isAutoDelete(pObject);
 	}
-	
+
 	const Manif* findManifest(const std::string& path) const
 		/// Returns a pointer to the Manifest for the given
 		/// library, or a null pointer if the library has not been loaded.
@@ -318,9 +320,9 @@ public:
 		if (it != _map.end())
 			return it->second.pManifest;
 		else
-			return 0;
+			return nullptr;
 	}
-	
+
 	const Manif& manifestFor(const std::string& path) const
 		/// Returns a reference to the Manifest for the given library
 		/// Throws a NotFoundException if the library has not been loaded.
@@ -336,7 +338,7 @@ public:
 		/// Returns true if the library with the given name
 		/// has already been loaded.
 	{
-		return findManifest(path) != 0;
+		return findManifest(path) != nullptr;
 	}
 
 	Iterator begin() const

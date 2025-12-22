@@ -28,7 +28,7 @@ ElementsByTagNameList::ElementsByTagNameList(const Node* pParent, const XMLStrin
 	_count(0)
 {
 	poco_check_ptr (pParent);
-	
+
 	_pParent->duplicate();
 }
 
@@ -62,7 +62,7 @@ namespace
 
 Node* ElementsByTagNameList::find(const Node* pParent, unsigned long index) const
 {
-	if (!pParent) return 0;
+	if (!pParent) return nullptr;
 
 	// preorder search
 	Node* pCur = pParent->firstChild();
@@ -94,7 +94,7 @@ ElementsByTagNameListNS::ElementsByTagNameListNS(const Node* pParent, const XMLS
 	_count(0)
 {
 	poco_check_ptr (pParent);
-	
+
 	_pParent->duplicate();
 }
 
@@ -123,7 +123,7 @@ unsigned long ElementsByTagNameListNS::length() const
 
 Node* ElementsByTagNameListNS::find(const Node* pParent, unsigned long index) const
 {
-	if (!pParent) return 0;
+	if (!pParent) return nullptr;
 
 	// preorder search
 	Node* pCur = pParent->firstChild();

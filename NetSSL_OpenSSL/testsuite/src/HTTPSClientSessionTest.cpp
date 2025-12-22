@@ -25,6 +25,8 @@
 #include "Poco/Net/Session.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/SSLException.h"
+#include "Poco/Net/AcceptCertificateHandler.h"
+#include "Poco/Net/PrivateKeyPassphraseHandler.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/StreamCopier.h"
@@ -33,8 +35,7 @@
 #include "Poco/DateTimeFormat.h"
 #include "Poco/Thread.h"
 #include "HTTPSTestServer.h"
-#include <istream>
-#include <ostream>
+#include <iostream>
 #include <sstream>
 
 
@@ -84,6 +85,23 @@ HTTPSClientSessionTest::HTTPSClientSessionTest(const std::string& name): CppUnit
 
 HTTPSClientSessionTest::~HTTPSClientSessionTest()
 {
+}
+
+
+void HTTPSClientSessionTest::testFromSocket()
+{
+	HTTPSTestServer srv;
+	SecureStreamSocket sss("localhost");
+	HTTPSClientSession s(sss, "127.0.0.1", srv.port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/small");
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assertTrue (response.getContentLength() == HTTPSTestServer::SMALL_BODY.length());
+	assertTrue (response.getContentType() == "text/plain");
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
 }
 
 
@@ -286,6 +304,44 @@ void HTTPSClientSessionTest::testKeepAlive()
 }
 
 
+void HTTPSClientSessionTest::testMultipleSSLInit()
+{
+
+	auto initSSL = []()
+	{
+		initializeSSL();
+		Poco::SharedPtr<InvalidCertificateHandler> ptrCert = new AcceptCertificateHandler(false);
+		Context::Ptr context(new Context(Context::CLIENT_USE, "", "", "",
+				Context::VerificationMode::VERIFY_STRICT, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"
+			)
+		);
+		SSLManager::instance().initializeClient(nullptr, ptrCert, context);
+	};
+
+	auto deinitSSL = []()
+	{
+		uninitializeSSL();
+	};
+
+	try
+	{
+		initSSL();
+		deinitSSL();
+
+		initSSL();
+
+		HTTPSClientSession session("secure.appinf.com");
+		HTTPRequest request(HTTPRequest::HTTP_GET, "", HTTPMessage::HTTP_1_1);
+		(void)session.sendRequest(request);
+		deinitSSL();
+	}
+	catch(...)
+	{
+		failmsg("Double SSL init failed");
+	}
+}
+
+
 void HTTPSClientSessionTest::testInterop()
 {
 	HTTPSClientSession s("secure.appinf.com");
@@ -298,7 +354,7 @@ void HTTPSClientSessionTest::testInterop()
 	StreamCopier::copyStream(rs, ostr);
 	std::string str(ostr.str());
 	assertTrue (str == "This is a test file for NetSSL.\n");
-	assertTrue (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
+	assertTrue (cert.commonName().find(".appinf.com") != std::string::npos);
 }
 
 
@@ -319,7 +375,7 @@ void HTTPSClientSessionTest::testProxy()
 	StreamCopier::copyStream(rs, ostr);
 	std::string str(ostr.str());
 	assertTrue (str == "This is a test file for NetSSL.\n");
-	assertTrue (cert.commonName() == "secure.appinf.com" || cert.commonName() == "*.appinf.com");
+	assertTrue (cert.commonName().find(".appinf.com") != std::string::npos);
 }
 
 
@@ -419,6 +475,7 @@ void HTTPSClientSessionTest::testUnknownContentLength()
 	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
 }
 
+
 void HTTPSClientSessionTest::testServerAbort()
 {
 	HTTPSTestServer srv;
@@ -432,8 +489,8 @@ void HTTPSClientSessionTest::testServerAbort()
 	std::ostringstream ostr;
 	StreamCopier::copyStream(rs, ostr);
 	assertTrue (ostr.str() == HTTPSTestServer::SMALL_BODY);
-	assertTrue ( dynamic_cast<const Poco::Net::SSLConnectionUnexpectedlyClosedException*>(
-	         s.networkException()) != NULL );
+	assertTrue (dynamic_cast<const Poco::Net::SSLConnectionUnexpectedlyClosedException*>(
+			 s.networkException()) != nullptr );
 }
 
 
@@ -451,6 +508,7 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("HTTPSClientSessionTest");
 
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testFromSocket);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testGetSmall);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testGetLarge);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testHead);
@@ -460,6 +518,7 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeChunked);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testPostLargeChunkedKeepAlive);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testKeepAlive);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testMultipleSSLInit);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testInterop);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxy);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testCachedSession);

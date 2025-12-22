@@ -7,7 +7,7 @@
 //
 // Definition of the Binary class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -20,12 +20,8 @@
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Element.h"
-#include "Poco/Base64Encoder.h"
 #include "Poco/Buffer.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/MemoryStream.h"
 #include "Poco/UUID.h"
-#include <sstream>
 
 
 namespace Poco {
@@ -40,6 +36,19 @@ class MongoDB_API Binary
 public:
 	using Ptr = SharedPtr<Binary>;
 
+	/// BSON Binary subtypes
+	enum Subtype
+	{
+		SUBTYPE_GENERIC      = 0x00,  /// Generic binary data
+		SUBTYPE_FUNCTION     = 0x01,  /// Function
+		SUBTYPE_BINARY_OLD   = 0x02,  /// Binary (Old)
+		SUBTYPE_UUID_OLD     = 0x03,  /// UUID (Old)
+		SUBTYPE_UUID         = 0x04,  /// UUID
+		SUBTYPE_MD5          = 0x05,  /// MD5
+		SUBTYPE_ENCRYPTED    = 0x06,  /// Encrypted BSON value
+		SUBTYPE_USER_DEFINED = 0x80   /// User defined (start of range)
+	};
+
 	Binary();
 		/// Creates an empty Binary with subtype 0.
 
@@ -49,31 +58,40 @@ public:
 	Binary(const UUID& uuid);
 		/// Creates a Binary containing an UUID.
 
+	Binary(const char* data, unsigned char subtype = 0);
+		/// Creates a Binary with the contents of the given C-string and the given subtype.
+
 	Binary(const std::string& data, unsigned char subtype = 0);
 		/// Creates a Binary with the contents of the given string and the given subtype.
 
-	Binary(const void* data, Poco::Int32 size, unsigned char subtype = 0);
+	Binary(const void* data, Poco::Int32 size, unsigned char subtype);
 		/// Creates a Binary with the contents of the given buffer and the given subtype.
 
 	virtual ~Binary();
 		/// Destroys the Binary.
 
+	const Buffer<unsigned char>& buffer() const;
+		/// Returns a reference to the internal buffer
+
 	Buffer<unsigned char>& buffer();
 		/// Returns a reference to the internal buffer
 
-	unsigned char subtype() const;
+	[[nodiscard]] unsigned char subtype() const;
 		/// Returns the subtype.
 
 	void subtype(unsigned char type);
 		/// Sets the subtype.
 
-	std::string toString(int indent = 0) const;
-		/// Returns the contents of the Binary as Base64-encoded string.
+	[[nodiscard]] std::string toString(int indent = 0) const;
+		/// Returns the contents of the Binary as a string.
+		/// For UUID subtype (SUBTYPE_UUID), returns a formatted UUID string
+		/// wrapped in UUID() (e.g., UUID("550e8400-e29b-41d4-a716-446655440000")).
+		/// For other subtypes, returns Base64-encoded data.
 
-	std::string toRawString() const;
+	[[nodiscard]] std::string toRawString() const;
 		/// Returns the raw content of the Binary as a string.
 
-	UUID uuid() const;
+	[[nodiscard]] UUID uuid() const;
 		/// Returns the UUID when the binary subtype is 0x04.
 		/// Otherwise, throws a Poco::BadCastException.
 
@@ -98,6 +116,12 @@ inline void Binary::subtype(unsigned char type)
 }
 
 
+inline const Buffer<unsigned char>& Binary::buffer() const
+{
+	return _buffer;
+}
+
+
 inline Buffer<unsigned char>& Binary::buffer()
 {
 	return _buffer;
@@ -106,7 +130,7 @@ inline Buffer<unsigned char>& Binary::buffer()
 
 inline std::string Binary::toRawString() const
 {
-	return std::string(reinterpret_cast<const char*>(_buffer.begin()), _buffer.size());
+	return {reinterpret_cast<const char*>(_buffer.begin()), _buffer.size()};
 }
 
 
@@ -136,16 +160,16 @@ inline void BSONReader::read<Binary::Ptr>(Binary::Ptr& to)
 	_reader >> subtype;
 	to->subtype(subtype);
 
-	_reader.readRaw((char*) to->buffer().begin(), size);
+	_reader.readRaw(reinterpret_cast<char*>(to->buffer().begin()), size);
 }
 
 
 template<>
-inline void BSONWriter::write<Binary::Ptr>(Binary::Ptr& from)
+inline void BSONWriter::write<Binary::Ptr>(const Binary::Ptr& from)
 {
-	_writer << (Poco::Int32) from->buffer().size();
+	_writer << static_cast<Poco::Int32>(from->buffer().size());
 	_writer << from->subtype();
-	_writer.writeRaw((char*) from->buffer().begin(), from->buffer().size());
+	_writer.writeRaw(reinterpret_cast<const char*>(from->buffer().begin()), from->buffer().size());
 }
 
 

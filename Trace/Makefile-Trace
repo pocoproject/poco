@@ -1,0 +1,36 @@
+#
+# Makefile
+#
+# Makefile for Poco Trace
+#
+
+
+include $(POCO_BASE)/build/rules/global
+
+INCLUDE += -I $(POCO_BASE)/Trace/src -I $(POCO_BASE)/Trace/src/symbols -I $(POCO_BASE)/Trace/include/Poco/Trace -I $(POCO_BASE)/Trace/include/Poco/Trace/backtrace
+LIBRARY += -L$(POCO_BASE)/lib/$(OSNAME)/$(OSARCH)/lib
+
+SYSFLAGS += -DCPPTRACE_DEMANGLE_WITH_CXXABI -DCPPTRACE_UNWIND_WITH_UNWIND
+
+ifeq ($(OSNAME), Linux)
+SYSFLAGS += -DCPPTRACE_GET_SYMBOLS_WITH_LIBBACKTRACE
+SYSLIBS += -lbacktrace
+else
+ifeq ($(OSNAME), Darwin)
+SYSFLAGS += -DCPPTRACE_GET_SYMBOLS_WITH_LIBDL
+endif
+endif
+
+objects = cpptrace ctrace from_current \
+	elf mach-o module_base object pe safe_dl \
+	demangle_with_cxxabi demangle_with_nothing demangle_with_winapi \
+	snippet symbols_core symbols_with_addr2line symbols_with_dbghelp \
+	symbols_with_dl symbols_with_libbacktrace symbols_with_libdwarf \
+	symbols_with_nothing debug_map_resolver dwarf_resolver \
+	unwind_with_dbghelp unwind_with_execinfo unwind_with_libunwind \
+	unwind_with_nothing unwind_with_unwind unwind_with_winapi
+
+target         = PocoTrace
+target_version = $(LIBVERSION)
+
+include $(POCO_BASE)/build/rules/lib

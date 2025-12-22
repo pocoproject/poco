@@ -58,11 +58,11 @@ void Struct::addBase(const std::string& name, Symbol::Access access, bool isVirt
 	base.name      = name;
 	base.access    = access;
 	base.isVirtual = isVirtual;
-	base.pClass = 0;
+	base.pClass = nullptr;
 	_bases.push_back(base);
 }
 
-	
+
 Struct::BaseIterator Struct::baseBegin() const
 {
 	return _bases.begin();
@@ -78,7 +78,7 @@ Struct::BaseIterator Struct::baseEnd() const
 void Struct::addDerived(Struct* pClass)
 {
 	poco_check_ptr (pClass);
-	
+
 	_derived.push_back(pClass);
 }
 
@@ -154,7 +154,7 @@ Function* Struct::destructor() const
 		if (pFunc && pFunc->isDestructor())
 			return pFunc;
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -220,7 +220,7 @@ Function* Struct::findFunction(const std::string& signature) const
 			if (pFunc) return pFunc;
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -249,6 +249,30 @@ std::string Struct::toString() const
 	}
 	ostr << "};\n";
 	return ostr.str();
+}
+
+
+Symbol* Struct::lookup(const std::string& name) const
+{
+	Symbol* pSymbol = NameSpace::lookup(name);
+	if (!pSymbol)
+	{
+		for (BaseIterator it = baseBegin(); it != baseEnd(); ++it)
+		{
+			if (it->access != Symbol::ACC_PRIVATE)
+			{
+				if (it->pClass)
+				{
+					pSymbol = it->pClass->lookup(name);
+					if (pSymbol)
+					{
+						return pSymbol;
+					}
+				}
+			}
+		}
+	}
+	return pSymbol;
 }
 
 

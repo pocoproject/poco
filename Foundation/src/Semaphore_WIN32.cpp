@@ -22,7 +22,7 @@ SemaphoreImpl::SemaphoreImpl(int n, int max)
 {
 	poco_assert (n >= 0 && max > 0 && n <= max);
 
-	_sema = CreateSemaphoreW(NULL, n, max, NULL);
+	_sema = CreateSemaphoreW(nullptr, n, max, nullptr);
 	if (!_sema)
 	{
 		throw SystemException("cannot create semaphore");
@@ -57,7 +57,7 @@ bool SemaphoreImpl::waitImpl(long milliseconds)
 	case WAIT_OBJECT_0:
 		return true;
 	default:
-		throw SystemException("wait for semaphore failed");		
+		throw SystemException("wait for semaphore failed");
 	}
 }
 

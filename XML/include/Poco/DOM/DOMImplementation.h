@@ -40,20 +40,20 @@ class XML_API DOMImplementation
 public:
 	DOMImplementation();
 		/// Creates the DOMImplementation.
-		
+
 	~DOMImplementation();
 		/// Destroys the DOMImplementation.
 
 	bool hasFeature(const XMLString& feature, const XMLString& version) const;
 		/// Tests if the DOM implementation implements a specific feature.
 		///
-		/// The only supported features are "XML", version "1.0" and "Core", 
+		/// The only supported features are "XML", version "1.0" and "Core",
 		/// "Events", "MutationEvents" and "Traversal", version "2.0".
-	
+
 	// DOM Level 2
 	DocumentType* createDocumentType(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const;
-		/// Creates an empty DocumentType node. Entity declarations and notations 
-		/// are not made available. Entity reference expansions and default attribute 
+		/// Creates an empty DocumentType node. Entity declarations and notations
+		/// are not made available. Entity reference expansions and default attribute
 		/// additions do not occur.
 
 	Document* createDocument(const XMLString& namespaceURI, const XMLString& qualifiedName, DocumentType* doctype) const;
@@ -64,7 +64,7 @@ public:
 	static const DOMImplementation& instance();
 		/// Returns a reference to the default DOMImplementation
 		/// object.
-		
+
 private:
 	static const XMLString FEATURE_XML;
 	static const XMLString FEATURE_CORE;
@@ -72,7 +72,7 @@ private:
 	static const XMLString FEATURE_MUTATIONEVENTS;
 	static const XMLString FEATURE_TRAVERSAL;
 	static const XMLString VERSION_1_0;
-	static const XMLString VERSION_2_0;	
+	static const XMLString VERSION_2_0;
 };
 
 

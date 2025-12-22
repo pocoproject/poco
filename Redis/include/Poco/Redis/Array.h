@@ -47,6 +47,9 @@ public:
 	virtual ~Array();
 		/// Destroys the Array.
 
+	Array& operator=(const Array&) = default;
+	Array& operator=(Array&&) = default;
+
 	template<typename T>
 	Array& operator<<(const T& arg)
 		/// Adds the argument to the array.
@@ -126,8 +129,8 @@ public:
 		RedisType::Ptr element = _elements.value().at(pos);
 		if ( RedisTypeTraits<T>::TypeId == element->type() )
 		{
-			Type<T>* concrete = dynamic_cast<Type<T>* >(element.get());
-			if ( concrete != NULL ) return concrete->value();
+			auto* concrete = dynamic_cast<Type<T>* >(element.get());
+			if ( concrete != nullptr ) return concrete->value();
 		}
 		throw BadCastException();
 	}
@@ -296,7 +299,7 @@ struct RedisTypeTraits<Array>
 	{
 		value.clear();
 
-		Int64 length = NumberParser::parse64(input.getline());
+		const Int64 length = NumberParser::parse64(input.getline());
 
 		if ( length != -1 )
 		{
@@ -316,7 +319,8 @@ struct RedisTypeTraits<Array>
 };
 
 
-} } // namespace Poco::Redis
+} // namespace Redis
+} // namespace Poco
 
 
 #endif // Redis_Array_INCLUDED

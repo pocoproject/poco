@@ -93,9 +93,9 @@ Poco::Net::NetworkInterface MulticastEchoServer::findInterface()
 	NetworkInterface::Map m = NetworkInterface::map();
 	for (NetworkInterface::Map::const_iterator it = m.begin(); it != m.end(); ++it)
 	{
-		if (it->second.supportsIPv4() && 
-			it->second.firstAddress(IPAddress::IPv4).isUnicast() && 
-			!it->second.isLoopback() && 
+		if (it->second.supportsIPv4() &&
+			it->second.firstAddress(IPAddress::IPv4).isUnicast() &&
+			!it->second.isLoopback() &&
 			!it->second.isPointToPoint())
 		{
 			return it->second;

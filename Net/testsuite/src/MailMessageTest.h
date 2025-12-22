@@ -37,6 +37,9 @@ public:
 	void testReadMultiPart();
 	void testReadMultiPartWithAttachmentNames();
 	void testReadMultiPartDefaultTransferEncoding();
+	void testReadMultiPartMixedCaseHeaders();
+	void testReadMultiPartInvalidContentDisposition();
+	void testReadMultiPartNoFinalBoundaryFromFile();
 	void testEncodeWord();
 
 	void setUp();

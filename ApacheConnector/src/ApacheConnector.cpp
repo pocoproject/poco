@@ -164,7 +164,7 @@ void ApacheConnector::log(const char* file, int line, int level, int status, con
 	// ap_log_error() has undergone significant changes in Apache 2.4.
 	// Validate Apache version for using a proper ap_log_error() version.
 #if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
-		ap_log_error(file, line, level, 0, NULL, "%s", text);
+		ap_log_error(file, line, level, 0, nullptr, "%s", text);
 #else
 	ap_log_error(file, line, level, 0, 0, 0, text);
 #endif
@@ -186,27 +186,27 @@ extern "C" int ApacheConnector_handler(request_rec *r)
 		if (!app.factory().mustHandle(r->uri))
 			return DECLINED;
 
-	    apr_status_t rv;
+		apr_status_t rv;
 		if ((rv = ap_setup_client_block(r, REQUEST_CHUNKED_DECHUNK)))
 			return rv;
 
-                // The properties conn_rec->remote_ip and conn_rec->remote_addr have undergone significant changes in Apache 2.4.
-                // Validate Apache version for using conn_rec->remote_ip and conn_rec->remote_addr proper versions.
+				// The properties conn_rec->remote_ip and conn_rec->remote_addr have undergone significant changes in Apache 2.4.
+				// Validate Apache version for using conn_rec->remote_ip and conn_rec->remote_addr proper versions.
 #if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
-                const char* clientIp = r->connection->remote_ip;
-                apr_port_t clientPort = r->connection->remote_addr->port;
+				const char* clientIp = r->connection->remote_ip;
+				apr_port_t clientPort = r->connection->remote_addr->port;
 #else
-                const char* clientIp = r->connection->client_ip;
-                apr_port_t clientPort = r->connection->client_addr->port;
+				const char* clientIp = r->connection->client_ip;
+				apr_port_t clientPort = r->connection->client_addr->port;
 #endif
-                std::unique_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
-                        &rec,
-                        r->connection->local_ip,
-                        r->connection->local_addr->port,
-                        clientIp,
-                        clientPort));
+				std::unique_ptr<ApacheServerRequest> pRequest(new ApacheServerRequest(
+						&rec,
+						r->connection->local_ip,
+						r->connection->local_addr->port,
+						clientIp,
+						clientPort));
 
-                std::unique_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
+				std::unique_ptr<ApacheServerResponse> pResponse(new ApacheServerResponse(pRequest.get()));
 
 		// add header information to request
 		rec.copyHeaders(*pRequest);
@@ -245,7 +245,7 @@ extern "C" int ApacheConnector_handler(request_rec *r)
 
 extern "C" void ApacheConnector_register_hooks(apr_pool_t *p)
 {
-	ap_hook_handler(ApacheConnector_handler, NULL, NULL, APR_HOOK_MIDDLE);
+	ap_hook_handler(ApacheConnector_handler, nullptr, nullptr, APR_HOOK_MIDDLE);
 }
 
 
@@ -263,7 +263,7 @@ extern "C" const char* ApacheConnector_uris(cmd_parms *cmd, void *in_dconf, cons
 	{
 		ApacheConnector::log(__FILE__, __LINE__, ApacheConnector::PRIO_ERROR, 0, "Unknown exception");
 	}
-    return 0;
+	return 0;
 }
 
 
@@ -281,35 +281,35 @@ extern "C" const char* ApacheConnector_config(cmd_parms *cmd, void *in_dconf, co
 	{
 		ApacheConnector::log(__FILE__, __LINE__, ApacheConnector::PRIO_ERROR, 0, "Unknown exception");
 	}
-    return 0;
+	return 0;
 }
 
 
 extern "C" const command_rec ApacheConnector_cmds[] =
 {
-    AP_INIT_RAW_ARGS(
+	AP_INIT_RAW_ARGS(
 		"AddPocoRequestHandler",
 		reinterpret_cast<cmd_func>(ApacheConnector_uris),
-		NULL,
+		nullptr,
 		RSRC_CONF,
 		"POCO RequestHandlerFactory class name followed by shared library path followed by a list of ' ' separated URIs that must be handled by this module."),
-    AP_INIT_RAW_ARGS(
+	AP_INIT_RAW_ARGS(
 		"AddPocoConfig",
 		reinterpret_cast<cmd_func>(ApacheConnector_config),
-		NULL,
+		nullptr,
 		RSRC_CONF,
 		"Path of the POCO configuration file."),
-    { NULL }
+	{ nullptr }
 };
 
 
 module AP_MODULE_DECLARE_DATA poco_module =
 {
 	STANDARD20_MODULE_STUFF,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
+	nullptr,
+	nullptr,
 	ApacheConnector_cmds,
 	ApacheConnector_register_hooks
 };

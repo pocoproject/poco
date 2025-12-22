@@ -35,8 +35,8 @@ class Util_API LayeredConfiguration: public AbstractConfiguration
 	/// all added configurations are searched, in order of their priority.
 	/// Configurations with lower priority values have precedence.
 	///
-	/// When setting a property, the property is always written to the first writeable 
-	/// configuration (see addWriteable()). 
+	/// When setting a property, the property is always written to the first writeable
+	/// configuration (see addWriteable()).
 	/// If no writeable configuration has been added to the LayeredConfiguration, and an
 	/// attempt is made to set a property, a RuntimeException is thrown.
 	///
@@ -51,7 +51,7 @@ public:
 
 	LayeredConfiguration();
 		/// Creates the LayeredConfiguration.
-		
+
 	void add(AbstractConfiguration::Ptr pConfig);
 		/// Adds a read-only configuration to the back of the LayeredConfiguration.
 		/// The LayeredConfiguration takes shared ownership of the given configuration.
@@ -92,8 +92,8 @@ public:
 		///
 		/// Does nothing if the given configuration is not part of the
 		/// LayeredConfiguration.
-		
-protected:	
+
+protected:
 	struct ConfigItem
 	{
 		typedef AbstractConfiguration::Ptr ACPtr;
@@ -107,11 +107,11 @@ protected:
 	void setRaw(const std::string& key, const std::string& value);
 	void enumerate(const std::string& key, Keys& range) const;
 	void removeRaw(const std::string& key);
-	
+
 	int lowest() const;
 	int highest() const;
 	void insert(const ConfigItem& item);
-	
+
 	~LayeredConfiguration();
 
 private:
@@ -119,7 +119,7 @@ private:
 	LayeredConfiguration& operator = (const LayeredConfiguration&);
 
 	typedef std::list<ConfigItem> ConfigList;
-	
+
 	ConfigList _configs;
 };
 

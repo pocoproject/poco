@@ -24,6 +24,10 @@
 #include "Poco/Redis/RedisStream.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Timespan.h"
+#include "Poco/AsyncNotificationCenter.h"
+#include <memory>
+#include <atomic>
+#include <mutex>
 
 
 namespace Poco {
@@ -69,9 +73,14 @@ class Redis_API Client
 	///
 	///     Command command("LLEN");
 	///     command << "list";
+	///
+	/// Redis client owns a lazily-created AsyncNotificationCenter that can be used to
+	/// register for connect, disconnect, and error notifications. Use this to monitor
+	/// the state of the client.
 {
 public:
 	using Ptr = SharedPtr<Client>;
+	using NotificationCenterPtr = std::shared_ptr<AsyncNotificationCenter>;
 
 	Client();
 		/// Creates an unconnected Client.
@@ -86,6 +95,11 @@ public:
 
 	Client(const Net::SocketAddress& addrs);
 		/// Constructor which connects to the given Redis host/port.
+
+	Client(const Net::StreamSocket& socket);
+		/// Constructor which connects using an existing TCP
+		/// connection. This can be used to connect via TLS, if the
+		/// given socket is a Poco::Net::SecureStreamSocket.
 
 	virtual ~Client();
 		/// Destroys the Client.
@@ -112,6 +126,11 @@ public:
 
 	void connect(const Net::SocketAddress& addrs, const Timespan& timeout);
 		/// Connects to the given Redis server.
+
+	void connect(const Net::StreamSocket& socket);
+		/// Connects to the given Redis server using an existing TCP
+		/// connection. This can be used to connect via TLS, if the
+		/// given socket is a Poco::Net::SecureStreamSocket.
 
 	void disconnect();
 		/// Disconnects from the Redis server.
@@ -167,7 +186,7 @@ public:
 		if (redisResult->type() == RedisTypeTraits<T>::TypeId)
 		{
 			Type<T>* type = dynamic_cast<Type<T>*>(redisResult.get());
-			if (type != NULL) result = type->value();
+			if (type != nullptr) result = type->value();
 		}
 		else throw BadCastException();
 	}
@@ -178,6 +197,9 @@ public:
 
 	void setReceiveTimeout(const Timespan& timeout);
 		/// Sets a receive timeout.
+
+	NotificationCenterPtr notificationCenter();
+		/// Returns the notification center for this client.
 
 private:
 	Client(const Client&);
@@ -197,8 +219,15 @@ private:
 
 	Net::SocketAddress _address;
 	Net::StreamSocket _socket;
-	RedisInputStream* _input;
-	RedisOutputStream* _output;
+	std::unique_ptr<RedisInputStream> _pInput{};
+	std::unique_ptr<RedisOutputStream> _pOutput{};
+
+#if POCO_HAVE_ATOMIC_SHARED_PTR
+	std::atomic<NotificationCenterPtr> _pNC{};
+#else
+	std::atomic<AsyncNotificationCenter*> _pNC{nullptr};
+#endif
+	mutable std::once_flag _ncInitFlag{};
 };
 
 
@@ -222,8 +251,8 @@ void Client::execute<void>(const Array& command)
 
 inline void Client::flush()
 {
-	poco_assert(_output);
-	_output->flush();
+	poco_assert(_pOutput);
+	_pOutput->flush();
 }
 
 

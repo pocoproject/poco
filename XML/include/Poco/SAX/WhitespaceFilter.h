@@ -35,7 +35,7 @@ class XML_API WhitespaceFilter: public XMLFilterImpl, public LexicalHandler
 public:
 	WhitespaceFilter();
 		/// Creates the WhitespaceFilter, with no parent.
-		
+
 	WhitespaceFilter(XMLReader* pReader);
 		/// Creates the WhitespaceFilter with the specified parent.
 

@@ -11,7 +11,6 @@
 #include "ApacheApplication.h"
 #include "ApacheChannel.h"
 #include "Poco/Logger.h"
-#include "Poco/SingletonHolder.h"
 #include <vector>
 
 
@@ -35,7 +34,7 @@ ApacheApplication::~ApacheApplication()
 void ApacheApplication::setup()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	if (!_ready)
 	{
 		std::vector<std::string> cmdLine;
@@ -48,6 +47,6 @@ void ApacheApplication::setup()
 
 ApacheApplication& ApacheApplication::instance()
 {
-	static Poco::SingletonHolder<ApacheApplication> sh;
-	return *sh.get();
+	static ApacheApplication aa;
+	return aa;
 }

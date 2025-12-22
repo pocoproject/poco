@@ -28,12 +28,12 @@ namespace Poco {
 class Foundation_API FileImpl
 {
 protected:
-	enum Options 
+	enum Options
 	{
 		OPT_FAIL_ON_OVERWRITE_IMPL = 0x01
 	};
 
-	typedef UInt64 FileSizeImpl;
+	using FileSizeImpl = UInt64;
 
 	FileImpl();
 	FileImpl(const std::string& path);
@@ -41,10 +41,11 @@ protected:
 	void swapImpl(FileImpl& file);
 	void setPathImpl(const std::string& path);
 	const std::string& getPathImpl() const;
+	std::string getExecutablePathImpl() const;
 	bool existsImpl() const;
 	bool canReadImpl() const;
 	bool canWriteImpl() const;
-	bool canExecuteImpl() const;
+	bool canExecuteImpl(const std::string& absolutePath) const;
 	bool isFileImpl() const;
 	bool isDirectoryImpl() const;
 	bool isLinkImpl() const;
@@ -61,7 +62,7 @@ protected:
 	void renameToImpl(const std::string& path, int options = 0);
 	void linkToImpl(const std::string& path, int type) const;
 	void removeImpl();
-	bool createFileImpl();
+	bool createFileImpl(bool createDirectories = false);
 	bool createDirectoryImpl();
 	FileSizeImpl totalSpaceImpl() const;
 	FileSizeImpl usableSpaceImpl() const;

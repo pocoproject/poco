@@ -23,12 +23,13 @@
 #include "Poco/Ascii.h"
 #include "Poco/BasicEvent.h"
 #include "Poco/Delegate.h"
-#include "Poco/Exception.h"
+#include "Poco/Debugger.h"
 #include <iostream>
 #include <sstream>
 #include <vector>
 #include <cstring>
 
+using namespace std::string_literals;
 
 using Poco::Bugcheck;
 using Poco::Exception;
@@ -181,11 +182,11 @@ void CoreTest::testBugcheck()
 
 void CoreTest::testEnvironment()
 {
-#if !defined(_WIN32_WCE)
+
 	Environment::set("FOO", "BAR");
 	assertTrue (Environment::has("FOO"));
 	assertTrue (Environment::get("FOO") == "BAR");
-#endif
+
 	try
 	{
 		std::string v = Environment::get("THISONEDOESNOTEXIST123");
@@ -195,50 +196,88 @@ void CoreTest::testEnvironment()
 	{
 	}
 
-	std::cout << "OS Name:         " << Environment::osName() << std::endl;
-	std::cout << "OS Display Name: " << Environment::osDisplayName() << std::endl;
-	std::cout << "OS Version:      " << Environment::osVersion() << std::endl;
-	std::cout << "OS Architecture: " << Environment::osArchitecture() << std::endl;
-	std::cout << "Node Name:       " << Environment::nodeName() << std::endl;
-	std::cout << "Node ID:         " << Environment::nodeId() << std::endl;
-	std::cout << "Number of CPUs:  " << Environment::processorCount() << std::endl;
+	std::string osName = Environment::osName();
+	std::string osDisplayName = Environment::osDisplayName();
+	std::string osVersion = Environment::osVersion();
+	std::string osArch = Environment::osArchitecture();
+	std::string nodeName = Environment::nodeName();
+	std::string nodeId = Environment::nodeId();
+	unsigned int cpuCount = Environment::processorCount();
+
+	std::cout << "OS Name:         " << osName << std::endl;
+	std::cout << "OS Display Name: " << osDisplayName << std::endl;
+	std::cout << "OS Version:      " << osVersion << std::endl;
+	std::cout << "OS Architecture: " << osArch << std::endl;
+	std::cout << "Node Name:       " << nodeName << std::endl;
+	std::cout << "Node ID:         " << nodeId << std::endl;
+	std::cout << "Number of CPUs:  " << cpuCount << std::endl;
+
+	// Basic validation
+	assertTrue (!osName.empty());
+	assertTrue (!osDisplayName.empty());
+	assertTrue (!osVersion.empty());
+	assertTrue (!osArch.empty());
+	assertTrue (!nodeName.empty());
+	assertTrue (cpuCount > 0);
+
+#if defined(_WIN32)
+	// Windows-specific validation
+	// osName returns "Windows NT" for all modern Windows versions
+	assertTrue (osName == "Windows NT" || osName == "Unknown");
+	// osDisplayName returns specific version like "Windows 10", "Windows 11", etc.
+	assertTrue (osDisplayName.find("Windows") != std::string::npos || osDisplayName == "Unknown");
+#elif defined(__linux__)
+	assertTrue (osName == "Linux");
+#elif defined(__APPLE__)
+	assertTrue (osName == "Darwin");
+#endif
 }
 
 
 void CoreTest::testBuffer()
 {
-	std::size_t s = 10;
+	std::size_t const s = 10;
 	Buffer<int> b(s);
 	assertTrue (b.size() == s);
 	assertTrue (b.sizeBytes() == s * sizeof(int));
 	assertTrue (b.capacity() == s);
 	assertTrue (b.capacityBytes() == s * sizeof(int));
 	std::vector<int> v;
-	for (int i = 0; i < s; ++i)
-		v.push_back(i);
+	for (std::size_t i = 0; i < s; ++i)
+	{
+		v.push_back(static_cast<int>(i));
+	}
 
-	std::memcpy(b.begin(), &v[0], sizeof(int) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(int) * v.size());
 
 	assertTrue (s == b.size());
-	for (int i = 0; i < s; ++i)
-		assertTrue (b[i] == i);
+	for (std::size_t i = 0; i < s; ++i)
+	{
+		assertTrue (b[i] == static_cast<int>(i));
+	}
 
 	b.resize(s/2);
-	for (int i = 0; i < s/2; ++i)
-		assertTrue (b[i] == i);
+	for (std::size_t i = 0; i < s/2; ++i)
+	{
+		assertTrue (b[i] == static_cast<int>(i));
+	}
 
 	assertTrue (b.size() == s/2);
 	assertTrue (b.capacity() == s);
 
 	b.resize(s*2);
 	v.clear();
-	for (int i = 0; i < s*2; ++i)
-		v.push_back(i);
+	for (std::size_t i = 0; i < s*2; ++i)
+	{
+		v.push_back(static_cast<int>(i));
+	}
 
-	std::memcpy(b.begin(), &v[0], sizeof(int) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(int) * v.size());
 
-	for (int i = 0; i < s*2; ++i)
-		assertTrue (b[i] == i);
+	for (std::size_t i = 0; i < s*2; ++i)
+	{
+		assertTrue (b[i] == static_cast<int>(i));
+	}
 
 	assertTrue (b.size() == s*2);
 	assertTrue (b.capacity() == s*2);
@@ -334,7 +373,7 @@ void CoreTest::testFIFOBufferEOFAndError()
 	for (T c = '0'; c < '0' +  10; ++c)
 		v.push_back(c);
 
-	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
 	assertTrue (0 == _notToReadable);
 	assertTrue (0 == _readableToNot);
 	assertTrue (10 == f.write(b));
@@ -440,7 +479,7 @@ void CoreTest::testFIFOBufferChar()
 	for (T c = '0'; c < '0' +  10; ++c)
 		v.push_back(c);
 
-	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
 	assertTrue (0 == _notToReadable);
 	assertTrue (0 == _readableToNot);
 	f.write(b);
@@ -478,7 +517,7 @@ void CoreTest::testFIFOBufferChar()
 		v.push_back(c);
 
 	b.resize(10);
-	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
 	f.write(b);
 	assertTrue (20 == f.size());
 	assertTrue (15 == f.used());
@@ -688,7 +727,7 @@ void CoreTest::testFIFOBufferChar()
 	assertTrue (1 == _notToWritable);
 	assertTrue (1 == _writableToNot);
 
-	const char arr[3] = {'4', '5', '6' };
+	const char arr[4] = {'4', '5', '6', '7' };
 	try
 	{
 		f.copy(&arr[0], 8);
@@ -771,7 +810,7 @@ void CoreTest::testFIFOBufferInt()
 	for (T c = 0; c < 10; ++c)
 		v.push_back(c);
 
-	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
 	f.write(b);
 	assertTrue (20 == f.size());
 	assertTrue (10 == f.used());
@@ -805,7 +844,7 @@ void CoreTest::testFIFOBufferInt()
 		v.push_back(c);
 
 	b.resize(10);
-	std::memcpy(b.begin(), &v[0], sizeof(T) * v.size());
+	std::memcpy(b.begin(), v.data(), sizeof(T) * v.size());
 	f.write(b);
 	assertTrue (20 == f.size());
 	assertTrue (15 == f.used());
@@ -965,7 +1004,7 @@ void CoreTest::testNullable()
 
 	assertTrue (i == 1);
 	assertTrue (f == 1.5);
-	assertTrue (s == "abc");
+	assertTrue (s == "abc"s);
 
 	i.clear();
 	f.clear();
@@ -1034,7 +1073,7 @@ void CoreTest::testNullable()
 	assertTrue (n2 != n1);
 	assertTrue (n1 > n2);
 
-	NullType nd{};
+	const auto nd {std::nullopt};
 	assertTrue (n1 != nd);
 	assertTrue (nd != n1);
 	n1.clear();
@@ -1118,6 +1157,13 @@ void CoreTest::testAscii()
 }
 
 
+void CoreTest::testSrcLoc()
+{
+	// must be all on a single line to succeed
+	assertTrue(poco_src_loc == Poco::format("CoreTest.cpp::testSrcLoc():%d", __LINE__));
+}
+
+
 void CoreTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -1161,6 +1207,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testAtomicCounter);
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
 	CppUnit_addTest(pSuite, CoreTest, testAscii);
+	CppUnit_addTest(pSuite, CoreTest, testSrcLoc);
 
 	return pSuite;
 }

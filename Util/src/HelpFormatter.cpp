@@ -25,7 +25,7 @@ const int HelpFormatter::TAB_WIDTH  = 4;
 const int HelpFormatter::LINE_WIDTH = 78;
 
 
-HelpFormatter::HelpFormatter(const OptionSet& options): 
+HelpFormatter::HelpFormatter(const OptionSet& options):
 	_options(options),
 	_width(LINE_WIDTH),
 	_indent(0),
@@ -94,7 +94,7 @@ void HelpFormatter::format(std::ostream& ostr) const
 void HelpFormatter::setWidth(int width)
 {
 	poco_assert (width > 0);
-	
+
 	_width = width;
 }
 
@@ -102,7 +102,7 @@ void HelpFormatter::setWidth(int width)
 void HelpFormatter::setIndent(int indent)
 {
 	poco_assert (indent >= 0 && indent < _width);
-	
+
 	_indent = indent;
 }
 
@@ -180,6 +180,7 @@ void HelpFormatter::formatOption(std::ostream& ostr, const Option& option, int w
 		n += (int) shortPrefix().length() + (int) option.shortName().length();
 		if (option.takesArgument())
 		{
+			ostr << ' ';
 			if (!option.argumentRequired()) { ostr << '['; ++n; }
 			ostr << option.argumentName();
 			n += (int) option.argumentName().length();
@@ -240,7 +241,7 @@ void HelpFormatter::formatText(std::ostream& ostr, const std::string& text, int 
 			clearWord(ostr, pos, word, indent);
 			if (pos < _width) { ostr << ' '; ++pos; }
 		}
-		else 
+		else
 		{
 			if (word.length() == maxWordLen)
 			{

@@ -147,7 +147,7 @@ public:
 	HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request)
 	{
 		Application& app = Application::instance();
-		app.logger().information("Request from " 
+		app.logger().information("Request from "
 			+ request.clientAddress().toString()
 			+ ": "
 			+ request.getMethod()
@@ -155,12 +155,12 @@ public:
 			+ request.getURI()
 			+ " "
 			+ request.getVersion());
-			
+
 		for (HTTPServerRequest::ConstIterator it = request.begin(); it != request.end(); ++it)
 		{
 			app.logger().information(it->first + ": " + it->second);
 		}
-		
+
 		if(request.find("Upgrade") != request.end() && Poco::icompare(request["Upgrade"], "websocket") == 0)
 			return new WebSocketRequestHandler;
 		else
@@ -192,7 +192,7 @@ public:
 	WebSocketServer(): _helpRequested(false)
 	{
 	}
-	
+
 	~WebSocketServer()
 	{
 	}
@@ -203,7 +203,7 @@ protected:
 		loadConfiguration(); // load default configuration files, if present
 		ServerApplication::initialize(self);
 	}
-		
+
 	void uninitialize()
 	{
 		ServerApplication::uninitialize();
@@ -212,7 +212,7 @@ protected:
 	void defineOptions(OptionSet& options)
 	{
 		ServerApplication::defineOptions(options);
-		
+
 		options.addOption(
 			Option("help", "h", "display help information on command line arguments")
 				.required(false)
@@ -246,7 +246,7 @@ protected:
 		{
 			// get parameters from configuration file
 			unsigned short port = (unsigned short) config().getInt("WebSocketServer.port", 9980);
-			
+
 			// set-up a server socket
 			ServerSocket svs(port);
 			// set-up a HTTPServer instance
@@ -260,7 +260,7 @@ protected:
 		}
 		return Application::EXIT_OK;
 	}
-	
+
 private:
 	bool _helpRequested;
 };

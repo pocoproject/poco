@@ -24,10 +24,10 @@
 namespace Poco {
 
 
-template <class TArgs, class TDelegate> 
+template <class TArgs, class TDelegate>
 class NotificationStrategy
 	/// The interface that all notification strategies must implement.
-	/// 
+	///
 	/// Note: Event is based on policy-driven design, so every strategy implementation
 	/// must provide all the methods from this interface (otherwise: compile errors)
 	/// but does not need to inherit from NotificationStrategy.
@@ -35,13 +35,9 @@ class NotificationStrategy
 public:
 	using DelegateHandle = TDelegate*;
 
-	NotificationStrategy()
-	{
-	}
+	NotificationStrategy() = default;
 
-	virtual ~NotificationStrategy()
-	{
-	}
+	virtual ~NotificationStrategy() = default;
 
 	virtual void notify(const void* sender, TArgs& arguments) = 0;
 		/// Sends a notification to all registered delegates.
@@ -65,10 +61,10 @@ public:
 };
 
 
-template <class TDelegate> 
+template <class TDelegate>
 class NotificationStrategy<void, TDelegate>
 	/// The interface that all notification strategies must implement.
-	/// 
+	///
 	/// Note: Event is based on policy-driven design, so every strategy implementation
 	/// must provide all the methods from this interface (otherwise: compile errors)
 	/// but does not need to inherit from NotificationStrategy.
@@ -76,13 +72,9 @@ class NotificationStrategy<void, TDelegate>
 public:
 	using DelegateHandle = TDelegate*;
 
-	NotificationStrategy()
-	{
-	}
+	NotificationStrategy() = default;
 
-	virtual ~NotificationStrategy()
-	{
-	}
+	virtual ~NotificationStrategy() = default;
 
 	virtual void notify(const void* sender) = 0;
 		/// Sends a notification to all registered delegates.

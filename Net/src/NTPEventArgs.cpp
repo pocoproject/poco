@@ -46,10 +46,10 @@ std::string NTPEventArgs::hostName() const
 	{
 		return DNS::resolve(_address.host().toString()).name();
 	}
-	catch (HostNotFoundException&) 
+	catch (HostNotFoundException&)
 	{
 	}
-	catch (NoAddressFoundException&) 
+	catch (NoAddressFoundException&)
 	{
 	}
 	catch (DNSException&)

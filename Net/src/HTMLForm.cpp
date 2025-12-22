@@ -18,6 +18,7 @@
 #include "Poco/Net/PartHandler.h"
 #include "Poco/Net/MultipartWriter.h"
 #include "Poco/Net/MultipartReader.h"
+#include "Poco/Net/MessageHeader.h"
 #include "Poco/Net/NullPartHandler.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/NullStream.h"
@@ -219,9 +220,8 @@ void HTMLForm::prepareSubmit(HTTPRequest& request, int options)
 		{
 			_boundary = MultipartWriter::createBoundary();
 			std::string ct(_encoding);
-			ct.append("; boundary=\"");
-			ct.append(_boundary);
-			ct.append("\"");
+			ct.append("; boundary=");
+			MessageHeader::quote(_boundary, ct);
 			request.setContentType(ct);
 		}
 		if (request.getVersion() == HTTPMessage::HTTP_1_0)
@@ -234,9 +234,9 @@ void HTMLForm::prepareSubmit(HTTPRequest& request, int options)
 			request.setChunkedTransferEncoding(true);
 		}
 		if (!request.getChunkedTransferEncoding() && !request.hasContentLength())
- 		{
- 			request.setContentLength(calculateContentLength());
- 		}
+		{
+			request.setContentLength(calculateContentLength());
+		}
 	}
 	else
 	{
@@ -368,15 +368,15 @@ void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 		{
 			std::string name = params["name"];
 			std::string value;
-			std::istream& istr = reader.stream();
-			int ch = istr.get();
+			std::istream& partStream = reader.stream();
+			int ch = partStream.get();
 			while (ch != eof)
 			{
 				if (value.size() < _valueLengthLimit)
 					value += (char) ch;
 				else
 					throw HTMLFormException("Field value too long");
-				ch = istr.get();
+				ch = partStream.get();
 			}
 			add(name, value);
 		}

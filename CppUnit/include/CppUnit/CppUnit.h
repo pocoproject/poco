@@ -41,9 +41,7 @@
 	#endif
 #endif
 
-//
-// Automatically link Data library.
-//
+
 #if defined(_MSC_VER)
 	#if defined(POCO_DLL)
 		#if defined(_DEBUG)
@@ -66,7 +64,9 @@
 	#endif
 #endif
 
-
+//
+// Automatically link CppUnit library.
+//
 #if defined(_MSC_VER) && !defined(POCO_NO_AUTOMATIC_LIBS)
 	#if !defined(CppUnit_EXPORTS)
 		#pragma comment(lib, "CppUnit" POCO_LIB_SUFFIX)

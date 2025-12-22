@@ -51,7 +51,7 @@ class Foundation_API TextIterator
 public:
 	TextIterator();
 		/// Creates an uninitialized TextIterator.
-		
+
 	TextIterator(const std::string& str, const TextEncoding& encoding);
 		/// Creates a TextIterator for the given string.
 		/// The encoding object must not be deleted as long as the iterator
@@ -70,37 +70,37 @@ public:
 
 	~TextIterator();
 		/// Destroys the TextIterator.
-	
+
 	TextIterator(const TextIterator& it);
 		/// Copy constructor.
-	
+
 	TextIterator& operator = (const TextIterator& it);
 		/// Assignment operator.
-		
-	void swap(TextIterator& it);
+
+	void swap(TextIterator& it) noexcept;
 		/// Swaps the iterator with another one.
-	
+
 	int operator * () const;
 		/// Returns the Unicode value of the current character.
 		/// If there is no valid character at the current position,
 		/// -1 is returned.
-		
-	TextIterator& operator ++ (); 
+
+	TextIterator& operator ++ ();
 		/// Prefix increment operator.
 
-	TextIterator operator ++ (int);		
+	TextIterator operator ++ (int);
 		/// Postfix increment operator.
 
 	bool operator == (const TextIterator& it) const;
 		/// Compares two iterators for equality.
-		
+
 	bool operator != (const TextIterator& it) const;
 		/// Compares two iterators for inequality.
-		
+
 	TextIterator end() const;
 		/// Returns the end iterator for the range handled
 		/// by the iterator.
-		
+
 private:
 	const TextEncoding*         _pEncoding;
 	std::string::const_iterator _it;
@@ -123,7 +123,7 @@ inline bool TextIterator::operator != (const TextIterator& it) const
 }
 
 
-inline void swap(TextIterator& it1, TextIterator& it2)
+inline void swap(TextIterator& it1, TextIterator& it2) noexcept
 {
 	it1.swap(it2);
 }

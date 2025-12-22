@@ -25,57 +25,74 @@
 class ODBCSQLServerTest: public ODBCTest
 	/// SQLServer ODBC test class
 	/// Tested:
-	/// 
-	/// Driver				|	DB								| OS
-	/// --------------------+-----------------------------------+------------------------------------------
-	/// 2000.86.1830.00		| SQL Server Express 9.0.2047		| MS Windows XP Professional x64 v.2003/SP1
-	/// 2005.90.2047.00		| SQL Server Express 9.0.2047		| MS Windows XP Professional x64 v.2003/SP1
-	/// 2009.100.1600.01	| SQL Server Express 10.50.1600.1	| MS Windows XP Professional x64 v.2003/SP1
 	///
-
+	///  Driver name                        | Driver version    | DB version            | OS
+	/// ------------------------------------+-------------------+-----------------------+------------------------------------------
+	///  SQL Server Express 9.0.2047        | 2000.86.1830.00   |                       | MS Windows XP Professional x64 v.2003/SP1
+	///  SQL Server Express 9.0.2047        | 2005.90.2047.00   |                       | MS Windows XP Professional x64 v.2003/SP1
+	///  SQL Server Express 10.50.1600.1    | 2009.100.1600.01  |                       | MS Windows XP Professional x64 v.2003/SP1
+	///  SQL Server                         | 10.00.22621.1992  | 16.0.1000.6 (64-bit)  | Windows 11
+	///  ODBC Driver 17 for SQL Server      | 2017.1710.03.01   | 16.0.1000.6 (64-bit)  | Windows 11
+	///  ODBC Driver 18 for SQL Server      | 2018.183.01.01    | 16.0.1000.6 (64-bit)  | Windows 11
+	///
+	/// Drivers download (x86, x64, ARM64):
+	/// https://learn.microsoft.com/en-us/sql/connect/odbc/download-odbc-driver-for-sql-server?view=sql-server-ver16
 {
 public:
 	ODBCSQLServerTest(const std::string& name);
-	~ODBCSQLServerTest();
+	~ODBCSQLServerTest() override;
 
-	void testBareboneODBC();
+	void testBareboneODBC() override;
 
-	void testBLOB();
-	void testNull();
-	void testBulk();
+	void testTempTable() override;
 
-	void testStoredProcedure();
+	void testBLOB() override;
+	void testBigString();
+	void testBigStringVector();
+	void testBigBatch();
+	void testNull() override;
+	void testNullBulk() override;
+	void testUUIDsBulk();
+	void testBulk() override;
+
+	void testStoredProcedure() override;
 	void testCursorStoredProcedure();
-	void testStoredProcedureAny();
-	void testStoredProcedureDynamicAny();
-	
-	void testStoredFunction();
+	void testStoredProcedureAny() override;
+	void testStoredProcedureDynamicVar() override;
+
+	void testStoredProcedureReturn();
+	void testStoredFunction() override;
+
+	void testSQLServerTime();
 
 	static CppUnit::Test* suite();
 
 private:
-	void dropObject(const std::string& type, const std::string& name);
-	void recreateNullableTable();
-	void recreatePersonTable();
-	void recreatePersonBLOBTable();
-	void recreatePersonDateTimeTable();
-	void recreatePersonDateTable() { /* no-op */ };
-	void recreatePersonTimeTable() { /* no-op */ };
-	void recreateStringsTable();
-	void recreateIntsTable();
-	void recreateFloatsTable();
-	void recreateUUIDsTable();
-	void recreateTuplesTable();
+	void dropObject(const std::string& type, const std::string& name) override;
+	void recreateNullableTable() override;
+	void recreatePersonTable() override;
+	void recreatePersonBLOBTable() override;
+	void recreatePersonBigStringTable();
+	void recreatePersonDateTimeTable() override;
+	void recreatePersonDateTable() override { /* no-op */ };
+	void recreatePersonTimeTable() override { /* no-op */ };
+	void recreateStringsTable() override;
+	void recreateIntsTable() override;
+	void recreateFloatsTable() override;
+	void recreateUUIDsTable() override;
+	void recreateTuplesTable() override;
 	void recreateVectorTable();
-	void recreateVectorsTable();
-	void recreateAnysTable();
-	void recreateNullsTable(const std::string& notNull = "");
-	void recreateBoolTable();
-	void recreateMiscTable();
-	void recreateLogTable();
-	void recreateUnicodeTable();
+	void recreateVectorsTable() override;
+	void recreateAnysTable() override;
+	void recreateNullsTable(const std::string& notNull = "") override;
+	void recreateBoolTable() override;
+	void recreateMiscTable() override;
+	void recreateLogTable() override;
+	void recreateUnicodeTable() override;
+	void recreateEncodingTables() override;
 
 	static SessionPtr  _pSession;
+	static SessionPtr  _pEncSession;
 	static ExecPtr     _pExecutor;
 	static std::string _driver;
 	static std::string _dsn;

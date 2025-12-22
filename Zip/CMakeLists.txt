@@ -13,6 +13,16 @@ if(MSVC AND BUILD_SHARED_LIBS)
 endif()
 
 add_library(Zip ${SRCS})
+if (POCO_UNBUNDLED)
+	target_link_libraries(Zip PRIVATE ZLIB::ZLIB)
+	target_compile_definitions(Zip PUBLIC POCO_UNBUNDLED)
+else()
+	# zlib is already linked with Foundation, we only needs headers.
+	target_include_directories(Zip
+		PRIVATE $<TARGET_PROPERTY:ZLIB::ZLIB,INCLUDE_DIRECTORIES>
+	)
+endif()
+
 add_library(Poco::Zip ALIAS Zip)
 set_target_properties(Zip
 	PROPERTIES
@@ -21,19 +31,22 @@ set_target_properties(Zip
 		DEFINE_SYMBOL Zip_EXPORTS
 )
 
-target_link_libraries(Zip PUBLIC Poco::Util Poco::XML)
+target_link_libraries(Zip PUBLIC Poco::Foundation)
 target_include_directories(Zip
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-		$<INSTALL_INTERFACE:include>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 POCO_INSTALL(Zip)
 POCO_GENERATE_PACKAGE(Zip)
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
+endif()
+
+if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
 endif()
 

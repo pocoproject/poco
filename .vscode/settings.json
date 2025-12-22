@@ -80,12 +80,34 @@
 		"unordered_map": "cpp",
 		"unordered_set": "cpp",
 		"utility": "cpp",
-		"vector": "cpp"
+		"vector": "cpp",
+		"*.tcc": "cpp",
+		"compare": "cpp",
+		"concepts": "cpp",
+		"memory_resource": "cpp",
+		"random": "cpp",
+		"ranges": "cpp",
+		"cfenv": "cpp",
+		"__bits": "cpp",
+		"variant": "cpp",
+		"condition_variable": "cpp",
+		"valarray": "cpp",
+		"strstream": "cpp",
+		"future": "cpp",
+		"shared_mutex": "cpp",
+		"stop_token": "cpp",
+		"codecvt": "cpp",
+		"numbers": "cpp",
+		"span": "cpp",
+		"semaphore": "cpp",
+		"__verbose_abort": "cpp",
+		"charconv": "cpp"
 	},
 	"files.exclude": {
         "**/.dep": true,
         "**/bin": true,
         "**/obj": true
 	},
-	"git.ignoreLimitWarning": true
+	"git.ignoreLimitWarning": true,
+	"cmake.configureOnOpen": false
 }

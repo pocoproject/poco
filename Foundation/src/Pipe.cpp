@@ -23,7 +23,7 @@ Pipe::Pipe():
 {
 }
 
-	
+
 Pipe::Pipe(const Pipe& pipe):
 	_pImpl(pipe._pImpl)
 {

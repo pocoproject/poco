@@ -26,8 +26,8 @@ public:
 
 	void testParseWriteXHTML();
 	void testParseWriteXHTML2();
-	void testParseWriteWSDL();
 	void testParseWriteSimple();
+	void testMaxElementDepth();
 
 	void setUp();
 	void tearDown();

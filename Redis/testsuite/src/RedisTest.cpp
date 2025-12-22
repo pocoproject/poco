@@ -287,7 +287,7 @@ void RedisTest::testDECR()
 
 	try
 	{
-		Poco::Int64 result = _redis.execute<Poco::Int64>(decr);
+		_redis.execute<Poco::Int64>(decr);
 		fail("This must fail");
 	}
 	catch (RedisException& e)
@@ -1588,7 +1588,7 @@ public:
 		if (!args.message().isNull())
 		{
 			Type<Array>* arrayType = dynamic_cast<Type<Array>*>(args.message().get());
-			if (arrayType != NULL)
+			if (arrayType != nullptr)
 			{
 				Array& array = arrayType->value();
 				if (array.size() == 3)

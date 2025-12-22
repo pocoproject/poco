@@ -19,15 +19,11 @@ extern "C" int POCO_LIBRARY_API gimmeFive();
 class PluginA: public TestPlugin
 {
 public:
-	PluginA()
-	{
-	}
-	
-	~PluginA()
-	{
-	}
-	
-	std::string name() const
+	PluginA() = default;
+
+	~PluginA() override = default;
+
+	std::string name() const override
 	{
 		return "PluginA";
 	}
@@ -37,15 +33,11 @@ public:
 class PluginB: public TestPlugin
 {
 public:
-	PluginB()
-	{
-	}
-	
-	~PluginB()
-	{
-	}
-	
-	std::string name() const
+	PluginB() = default;
+
+	~PluginB() override = default;
+
+	std::string name() const override
 	{
 		return "PluginB";
 	}
@@ -55,15 +47,11 @@ public:
 class PluginC: public TestPlugin
 {
 public:
-	PluginC()
-	{
-	}
-	
-	~PluginC()
-	{
-	}
-	
-	std::string name() const
+	PluginC() = default;
+
+	~PluginC() override = default;
+
+	std::string name() const override
 	{
 		return "PluginC";
 	}
@@ -85,7 +73,7 @@ void pocoInitializeLibrary()
 
 void pocoUninitializeLibrary()
 {
-	std::cout << "TestLibrary uninitialzing" << std::endl;
+	std::cout << "TestLibrary uninitializing" << std::endl;
 }
 
 

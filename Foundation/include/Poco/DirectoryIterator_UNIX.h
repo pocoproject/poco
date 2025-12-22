@@ -30,13 +30,13 @@ class Foundation_API DirectoryIteratorImpl
 public:
 	DirectoryIteratorImpl(const std::string& path);
 	~DirectoryIteratorImpl();
-	
+
 	void duplicate();
 	void release();
-	
+
 	const std::string& get() const;
 	const std::string& next();
-	
+
 private:
 	DIR*        _pDir;
 	std::string _current;
@@ -47,7 +47,7 @@ private:
 //
 // inlines
 //
-const std::string& DirectoryIteratorImpl::get() const
+inline const std::string& DirectoryIteratorImpl::get() const
 {
 	return _current;
 }

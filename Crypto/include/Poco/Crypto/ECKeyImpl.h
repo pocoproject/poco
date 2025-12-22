@@ -22,8 +22,6 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Crypto/KeyPairImpl.h"
-#include "Poco/Crypto/OpenSSLInitializer.h"
-#include "Poco/RefCountedObject.h"
 #include "Poco/AutoPtr.h"
 #include <istream>
 #include <ostream>
@@ -40,7 +38,7 @@ class X509Certificate;
 class PKCS12Container;
 
 
-class ECKeyImpl: public KeyPairImpl
+class Crypto_API ECKeyImpl: public KeyPairImpl
 	/// Elliptic Curve key clas implementation.
 {
 public:
@@ -62,8 +60,8 @@ public:
 
 	ECKeyImpl(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase);
 		/// Creates the ECKey, by reading public and private key from the given files and
-		/// using the given passphrase for the private key. Can only by used for signing if 
-		/// a private key is available. 
+		/// using the given passphrase for the private key. Can only by used for signing if
+		/// a private key is available.
 
 	ECKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKeyStream, const std::string& privateKeyPassphrase);
 		/// Creates the ECKey. Can only by used for signing if pPrivKey
@@ -91,13 +89,13 @@ public:
 	void save(const std::string& publicKeyFile,
 		const std::string& privateKeyFile = "",
 		const std::string& privateKeyPassphrase = "") const;
-		/// Exports the public and private keys to the given files. 
+		/// Exports the public and private keys to the given files.
 		///
 		/// If an empty filename is specified, the corresponding key
 		/// is not exported.
 
 	void save(std::ostream* pPublicKeyStream,
-		std::ostream* pPrivateKeyStream = 0,
+		std::ostream* pPrivateKeyStream = nullptr,
 		const std::string& privateKeyPassphrase = "") const;
 		/// Exports the public and private key to the given streams.
 		///

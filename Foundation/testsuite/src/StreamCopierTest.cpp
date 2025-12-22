@@ -93,6 +93,74 @@ void StreamCopierTest::testCopyToString()
 }
 
 
+void StreamCopierTest::testBufferedCopyRange()
+{
+	{
+		std::string src;
+		for (int i = 0; i < 512; ++i) src += char(i % 256);
+		std::istringstream istr(src);
+		std::ostringstream ostr;
+		std::streampos rangeStart = 100;
+		std::streamsize rangeLength = 20;
+		std::string subSrc = src.substr(100, 20);
+		std::streamsize n = StreamCopier::copyStreamRange(istr, ostr, rangeStart, rangeLength);
+		assertTrue (ostr.str() == subSrc);
+		assertTrue (n == subSrc.size());
+	}
+	{
+		std::string src;
+		for (int i = 0; i < 512; ++i) src += char(i % 256);
+		std::istringstream istr(src);
+		std::ostringstream ostr;
+		std::streampos rangeStart = 100;
+		std::streamsize rangeLength = 20;
+		std::string subSrc = src.substr(100, 20);
+		std::streamsize n = StreamCopier::copyStreamRange(istr, ostr, rangeStart, rangeLength, 100);
+		assertTrue (ostr.str() == subSrc);
+		assertTrue (n == subSrc.size());
+	}
+	{
+		std::string src;
+		for (int i = 0; i < 512; ++i) src += char(i % 256);
+		std::istringstream istr(src);
+		std::ostringstream ostr;
+		std::streampos rangeStart = 100;
+		std::streamsize rangeLength = 150;
+		std::string subSrc = src.substr(100, 150);
+		std::streamsize n = StreamCopier::copyStreamRange(istr, ostr, rangeStart, rangeLength, 100);
+		assertTrue (ostr.str() == subSrc);
+		assertTrue (n == subSrc.size());
+	}
+	{
+		std::string src;
+		for (int i = 0; i < 512; ++i) src += char(i % 256);
+		std::istringstream istr(src);
+		std::ostringstream ostr;
+		std::streampos rangeStart = 100;
+		std::streamsize rangeLength = 128;
+		std::string subSrc = src.substr(100, 128);
+		std::streamsize n = StreamCopier::copyStreamRange(istr, ostr, rangeStart, rangeLength, 128);
+		assertTrue (ostr.str() == subSrc);
+		assertTrue (n == subSrc.size());
+	}
+}
+
+
+void StreamCopierTest::testUnbufferedCopyRange()
+{
+	std::string src;
+	for (int i = 0; i < 255; ++i) src += char(i);
+	std::istringstream istr(src);
+	std::ostringstream ostr;
+	std::streampos rangeStart = 100;
+	std::streamsize rangeLength = 20;
+	std::string subSrc = src.substr(100, 20);
+	std::streamsize n = StreamCopier::copyStreamRangeUnbuffered(istr, ostr, rangeStart, rangeLength);
+	assertTrue (ostr.str() == subSrc);
+	assertTrue (n == subSrc.size());
+}
+
+
 #if defined(POCO_HAVE_INT64)
 void StreamCopierTest::testBufferedCopy64()
 {
@@ -157,6 +225,74 @@ void StreamCopierTest::testCopyToString64()
 	assertTrue (src == dest);
 	assertTrue (n == src.size());
 }
+
+
+void StreamCopierTest::testBufferedCopyRange64()
+{
+	{
+		std::string src;
+		for (int i = 0; i < 512; ++i) src += char(i % 256);
+		std::istringstream istr(src);
+		std::ostringstream ostr;
+		std::streampos rangeStart = 100;
+		std::streamsize rangeLength = 20;
+		std::string subSrc = src.substr(100, 20);
+		Poco::UInt64 n = StreamCopier::copyStreamRange64(istr, ostr, rangeStart, rangeLength);
+		assertTrue (ostr.str() == subSrc);
+		assertTrue (n == subSrc.size());
+	}
+	{
+		std::string src;
+		for (int i = 0; i < 512; ++i) src += char(i % 256);
+		std::istringstream istr(src);
+		std::ostringstream ostr;
+		std::streampos rangeStart = 100;
+		std::streamsize rangeLength = 20;
+		std::string subSrc = src.substr(100, 20);
+		Poco::UInt64 n = StreamCopier::copyStreamRange64(istr, ostr, rangeStart, rangeLength, 100);
+		assertTrue (ostr.str() == subSrc);
+		assertTrue (n == subSrc.size());
+	}
+	{
+		std::string src;
+		for (int i = 0; i < 512; ++i) src += char(i % 256);
+		std::istringstream istr(src);
+		std::ostringstream ostr;
+		std::streampos rangeStart = 100;
+		std::streamsize rangeLength = 150;
+		std::string subSrc = src.substr(100, 150);
+		Poco::UInt64 n = StreamCopier::copyStreamRange64(istr, ostr, rangeStart, rangeLength, 100);
+		assertTrue (ostr.str() == subSrc);
+		assertTrue (n == subSrc.size());
+	}
+	{
+		std::string src;
+		for (int i = 0; i < 512; ++i) src += char(i % 256);
+		std::istringstream istr(src);
+		std::ostringstream ostr;
+		std::streampos rangeStart = 100;
+		std::streamsize rangeLength = 128;
+		std::string subSrc = src.substr(100, 128);
+		Poco::UInt64 n = StreamCopier::copyStreamRange64(istr, ostr, rangeStart, rangeLength, 128);
+		assertTrue (ostr.str() == subSrc);
+		assertTrue (n == subSrc.size());
+	}
+}
+
+
+void StreamCopierTest::testUnbufferedCopyRange64()
+{
+	std::string src;
+	for (int i = 0; i < 255; ++i) src += char(i);
+	std::istringstream istr(src);
+	std::ostringstream ostr;
+	std::streampos rangeStart = 100;
+	std::streamsize rangeLength = 20;
+	std::string subSrc = src.substr(100, 20);
+	Poco::UInt64 n = StreamCopier::copyStreamRangeUnbuffered64(istr, ostr, rangeStart, rangeLength);
+	assertTrue (ostr.str() == subSrc);
+	assertTrue (n == subSrc.size());
+}
 #endif
 
 
@@ -177,11 +313,15 @@ CppUnit::Test* StreamCopierTest::suite()
 	CppUnit_addTest(pSuite, StreamCopierTest, testBufferedCopy);
 	CppUnit_addTest(pSuite, StreamCopierTest, testUnbufferedCopy);
 	CppUnit_addTest(pSuite, StreamCopierTest, testCopyToString);
+	CppUnit_addTest(pSuite, StreamCopierTest, testBufferedCopyRange);
+	CppUnit_addTest(pSuite, StreamCopierTest, testUnbufferedCopyRange);
 
 #if defined(POCO_HAVE_INT64)
 	CppUnit_addTest(pSuite, StreamCopierTest, testBufferedCopy64);
 	CppUnit_addTest(pSuite, StreamCopierTest, testUnbufferedCopy64);
 	CppUnit_addTest(pSuite, StreamCopierTest, testCopyToString64);
+	CppUnit_addTest(pSuite, StreamCopierTest, testBufferedCopyRange64);
+	CppUnit_addTest(pSuite, StreamCopierTest, testUnbufferedCopyRange64);
 #endif
 
 	return pSuite;

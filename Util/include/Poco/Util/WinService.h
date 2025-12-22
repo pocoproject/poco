@@ -46,8 +46,8 @@ public:
 		SVC_MANUAL_START,
 		SVC_DISABLED
 	};
-	
-	enum FailureActionType 
+
+	enum FailureActionType
 	{
 		SVC_NONE,
 		SVC_REBOOT,
@@ -55,7 +55,7 @@ public:
 		SVC_RUN_COMMAND
 	};
 
-	struct FailureAction 
+	struct FailureAction
 	{
 		FailureActionType type;
 		int delay;
@@ -83,7 +83,7 @@ public:
 		/// Returns the service's display name.
 
 	std::string path() const;
-		/// Returns the path to the service executable. 
+		/// Returns the path to the service executable.
 		///
 		/// Throws a NotFoundException if the service has not been registered.
 
@@ -92,7 +92,7 @@ public:
 		/// and the given displayName.
 		///
 		/// Throws a ExistsException if the service has already been registered.
-		
+
 	void registerService(const std::string& path);
 		/// Creates a Windows service with the executable specified by path
 		/// and the given displayName. The service name is used as display name.
@@ -100,7 +100,7 @@ public:
 		/// Throws a ExistsException if the service has already been registered.
 
 	void unregisterService();
-		/// Deletes the Windows service. 
+		/// Deletes the Windows service.
 		///
 		/// Throws a NotFoundException if the service has not been registered.
 
@@ -112,7 +112,7 @@ public:
 
 	bool isStopped() const;
 		/// Returns true if the service is currently stopped.
-		
+
 	void start();
 		/// Starts the service.
 		/// Does nothing if the service is already running.
@@ -127,7 +127,7 @@ public:
 
 	void setStartup(Startup startup);
 		/// Sets the startup mode for the service.
-		
+
 	Startup getStartup() const;
 		/// Returns the startup mode for the service.
 
@@ -138,10 +138,10 @@ public:
 
 	FailureActionTypeVector getFailureActions() const;
 		/// Returns the Failure Actions for the service.
-		
+
 	void setDescription(const std::string& description);
 		/// Sets the service description in the registry.
-		
+
 	std::string getDescription() const;
 		/// Returns the service description from the registry.
 

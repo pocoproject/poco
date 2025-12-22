@@ -14,13 +14,13 @@ set_target_properties(mod_poco
 target_include_directories(mod_poco
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-		$<INSTALL_INTERFACE:include>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE
 		${APACHE2_INCLUDE_DIRS}
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 target_link_libraries(mod_poco PUBLIC Poco::Util Poco::Net Apache::Apr Apache::Aprutil)
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
 endif()

@@ -20,12 +20,11 @@ shift
 dir4=$1
 shift
 
-cwd=`pwd`
+cwd=$(pwd)
 
-cd `dirname $target`
-$CXX -qmakedep -E -w $@ $cwd/$source >/dev/null
+cd "$(dirname "$target")" || exit
+$CXX -qmakedep -E -w "$@" "$cwd"/"$source" >/dev/null
 
-ufile=`basename $source`
-ufile=`echo $ufile | sed "s#\.cpp#\.u#"`
-cat $ufile | sort | uniq | grep -v '/usr/include' | grep -v '/usr/vacpp' | sed "s#\(.*\.o$\)#$dir1/\1 $dir2/\1 $dir3/\1 $dir4/\1#" >$target
-
+ufile=$(basename "$source")
+ufile=$(echo "$ufile" | sed "s#\.cpp#\.u#")
+sort "$ufile" | uniq | grep -v '/usr/include' | grep -v '/usr/vacpp' | sed "s#\(.*\.o$\)#$dir1/\1 $dir2/\1 $dir3/\1 $dir4/\1#" >"$target"

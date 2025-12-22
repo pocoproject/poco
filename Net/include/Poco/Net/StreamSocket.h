@@ -24,6 +24,11 @@
 
 
 namespace Poco {
+
+
+class FileInputStream;
+
+
 namespace Net {
 
 
@@ -60,7 +65,11 @@ public:
 		/// a StreamSocketImpl, otherwise an InvalidArgumentException
 		/// will be thrown.
 
-	virtual ~StreamSocket();
+	StreamSocket(const StreamSocket& socket);
+		/// Creates the StreamSocket with the SocketImpl
+		/// from another socket.
+
+	~StreamSocket() override;
 		/// Destroys the StreamSocket.
 
 	StreamSocket& operator = (const Socket& socket);
@@ -69,6 +78,43 @@ public:
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.
+
+	StreamSocket& operator = (const StreamSocket& socket);
+		/// Assignment operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// increments the reference count of the SocketImpl.
+
+#if POCO_NEW_STATE_ON_MOVE
+
+	StreamSocket(Socket&& socket);
+		/// Creates the StreamSocket with the SocketImpl
+		/// from another socket and zeroes the other socket's
+		/// SocketImpl.The SocketImpl must be
+		/// a StreamSocketImpl, otherwise an InvalidArgumentException
+		/// will be thrown.
+
+	StreamSocket(StreamSocket&& socket);
+		/// Creates the StreamSocket with the SocketImpl
+		/// from another socket and zeroes the other socket's
+		/// SocketImpl.
+
+	StreamSocket& operator = (Socket&& socket);
+		/// Assignment move operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// zeroes the other socket's SocketImpl.
+
+	StreamSocket& operator = (StreamSocket&& socket);
+		/// Assignment move operator.
+		///
+		/// Releases the socket's SocketImpl and
+		/// attaches the SocketImpl from the other socket and
+		/// zeroes the other socket's SocketImpl.
+
+#endif //POCO_NEW_STATE_ON_MOVE
 
 	void connect(const SocketAddress& address);
 		/// Initializes the socket and establishes a connection to
@@ -87,15 +133,46 @@ public:
 		/// the TCP server at the given address. Prior to opening the
 		/// connection the socket is set to nonblocking mode.
 
+	void bind(const SocketAddress& address, bool reuseAddress = false, bool ipV6Only = false);
+		/// Bind a local address to the socket.
+		///
+		/// This is usually only done when establishing a server
+		/// socket.
+		///
+		/// TCP clients normally do not bind to a local address,
+		/// but in some special advanced cases it may be useful to have
+		/// this type of functionality.  (e.g. in multihoming situations
+		/// where the traffic will be sent through a particular interface;
+		/// or in computer clustered environments with active/standby
+		/// servers and it is desired to make the traffic from either
+		/// active host present the same source IP address).
+		///
+		/// Note:  Practical use of client source IP address binding
+		///        may require OS networking setup outside the scope of
+		///        the Poco library.
+		///
+		/// If reuseAddress is true, sets the SO_REUSEADDR
+		/// socket option.
+
 	void shutdownReceive();
 		/// Shuts down the receiving part of the socket connection.
 
-	void shutdownSend();
+	int shutdownSend();
 		/// Shuts down the sending part of the socket connection.
+		///
+		/// Returns 0 for a non-blocking socket. May return
+		/// a negative value for a non-blocking socket in case
+		/// of a TLS connection. In that case, the operation should
+		/// be retried once the underlying socket becomes writable.
 
-	void shutdown();
+	int shutdown();
 		/// Shuts down both the receiving and the sending part
 		/// of the socket connection.
+		///
+		/// Returns 0 for a non-blocking socket. May return
+		/// a negative value for a non-blocking socket in case
+		/// of a TLS connection. In that case, the operation should
+		/// be retried once the underlying socket becomes writable.
 
 	int sendBytes(const void* buffer, int length, int flags = 0);
 		/// Sends the contents of the given buffer through
@@ -190,6 +267,29 @@ public:
 		///
 		/// The preferred way for a socket to receive urgent data
 		/// is by enabling the SO_OOBINLINE option.
+
+	std::streamsize sendFile(Poco::FileInputStream& FileInputStream, std::streamoff offset = 0, std::streamsize count = 0);
+		/// Sends the contents of a file over the socket, using operating
+		/// system-specific APIs, if available. The socket must not have
+		/// been set to non-blocking.
+		///
+		/// If count is != 0, sends the given number of bytes, otherwise
+		/// sends all bytes, starting from the given offset.
+		///
+		/// On Linux, macOS and FreeBSD systems, the implementation 
+		/// uses sendfile() or sendfile64().
+		/// On Windows, the implementation uses TransmitFile().
+		///
+		/// If neither sendfile() nor TransmitFile() is available, 
+		/// or the socket is a SecureStreamSocket (secure() returne true),
+		/// falls back to reading the file block by block and calling sendBytes().
+		///
+		/// Returns the number of bytes sent, which should be the same
+		/// as count, unless count is 0.
+		///
+		/// Throws NetException (or a subclass) in case of any errors.
+		/// Also throws a NetException if the socket has been set to 
+		/// non-blocking.
 
 	StreamSocket(SocketImpl* pImpl);
 		/// Creates the Socket and attaches the given SocketImpl.

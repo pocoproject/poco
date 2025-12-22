@@ -37,7 +37,7 @@ public:
 	MediaType(const std::string& mediaType);
 		/// Creates the MediaType from the given string, which
 		/// must have the format <type>/<subtype>{;<parameter>=<value>}.
-		
+
 	MediaType(const std::string& type, const std::string& subType);
 		/// Creates the MediaType, using the given type and subtype.
 
@@ -55,51 +55,51 @@ public:
 
 	MediaType& operator = (MediaType&& mediaType) noexcept;
 		/// Assigns another media type.
-		
+
 	MediaType& operator = (const std::string& mediaType);
 		/// Assigns another media type.
-		
-	void swap(MediaType& mediaType);
+
+	void swap(MediaType& mediaType) noexcept;
 		/// Swaps the MediaType with another one.
-		
+
 	void setType(const std::string& type);
 		/// Sets the top-level type.
-		
+
 	const std::string& getType() const;
 		/// Returns the top-level type.
-		
+
 	void setSubType(const std::string& subType);
 		/// Sets the sub type.
-		
+
 	const std::string& getSubType() const;
 		/// Returns the sub type.
-		
+
 	void setParameter(const std::string& name, const std::string& value);
 		/// Sets the parameter with the given name.
-		
+
 	const std::string& getParameter(const std::string& name) const;
 		/// Returns the parameter with the given name.
 		///
 		/// Throws a NotFoundException if the parameter does not exist.
-		
+
 	bool hasParameter(const std::string& name) const;
 		/// Returns true iff a parameter with the given name exists.
-		
+
 	void removeParameter(const std::string& name);
-		/// Removes the parameter with the given name.	
-		
+		/// Removes the parameter with the given name.
+
 	const NameValueCollection& parameters() const;
 		/// Returns the parameters.
-		
+
 	std::string toString() const;
 		/// Returns the string representation of the media type
 		/// which is <type>/<subtype>{;<parameter>=<value>}
-		
+
 	bool matches(const MediaType& mediaType) const;
 		/// Returns true iff the type and subtype match
 		/// the type and subtype of the given media type.
 		/// Matching is case insensitive.
-		
+
 	bool matches(const std::string& type, const std::string& subType) const;
 		/// Returns true iff the type and subtype match
 		/// the given type and subtype.
@@ -132,10 +132,10 @@ public:
 
 protected:
 	void parse(const std::string& mediaType);
-		
+
 private:
 	MediaType();
-	
+
 	std::string         _type;
 	std::string         _subType;
 	NameValueCollection _parameters;
@@ -163,7 +163,7 @@ inline const NameValueCollection& MediaType::parameters() const
 }
 
 
-inline void swap(MediaType& m1, MediaType& m2)
+inline void swap(MediaType& m1, MediaType& m2) noexcept
 {
 	m1.swap(m2);
 }

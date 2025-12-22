@@ -91,7 +91,7 @@ public:
 		///
 		/// Releases the socket's SocketImpl and
 		/// attaches the SocketImpl from the other socket and
-		/// increments the reference count of the SocketImpl.	
+		/// increments the reference count of the SocketImpl.
 
 	StreamSocket acceptConnection(SocketAddress& clientAddr);
 		/// Get the next completed connection from the

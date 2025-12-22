@@ -35,7 +35,7 @@ public:
 		/// Non-case sensitive conversion of a string to a VerificationMode enum.
 		/// If verMode is illegal an OptionException is thrown.
 
-	static const std::string& formatError(long errCode);
+	static std::string formatError(long errCode);
 		/// Converts an winerror.h code into human readable form.
 
 private:

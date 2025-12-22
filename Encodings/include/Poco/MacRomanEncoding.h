@@ -33,7 +33,7 @@ class Encodings_API MacRomanEncoding: public DoubleByteEncoding
 public:
 	MacRomanEncoding();
 	~MacRomanEncoding();
-	
+
 private:
 	static const char* _names[];
 	static const CharacterMap _charMap;

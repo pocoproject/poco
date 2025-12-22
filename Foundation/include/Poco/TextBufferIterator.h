@@ -53,7 +53,7 @@ class Foundation_API TextBufferIterator
 public:
 	TextBufferIterator();
 		/// Creates an uninitialized TextBufferIterator.
-		
+
 	TextBufferIterator(const char* begin, const TextEncoding& encoding);
 		/// Creates a TextBufferIterator for the given buffer, which must be 0-terminated.
 		/// The encoding object must not be deleted as long as the iterator
@@ -74,37 +74,37 @@ public:
 
 	~TextBufferIterator();
 		/// Destroys the TextBufferIterator.
-	
+
 	TextBufferIterator(const TextBufferIterator& it);
 		/// Copy constructor.
-	
+
 	TextBufferIterator& operator = (const TextBufferIterator& it);
 		/// Assignment operator.
-		
-	void swap(TextBufferIterator& it);
+
+	void swap(TextBufferIterator& it) noexcept;
 		/// Swaps the iterator with another one.
-	
+
 	int operator * () const;
 		/// Returns the Unicode value of the current character.
 		/// If there is no valid character at the current position,
 		/// -1 is returned.
-		
-	TextBufferIterator& operator ++ (); 
+
+	TextBufferIterator& operator ++ ();
 		/// Prefix increment operator.
 
-	TextBufferIterator operator ++ (int);		
+	TextBufferIterator operator ++ (int);
 		/// Postfix increment operator.
 
 	bool operator == (const TextBufferIterator& it) const;
 		/// Compares two iterators for equality.
-		
+
 	bool operator != (const TextBufferIterator& it) const;
 		/// Compares two iterators for inequality.
 
 	TextBufferIterator end() const;
 		/// Returns the end iterator for the range handled
 		/// by the iterator.
-		
+
 private:
 	const TextEncoding* _pEncoding;
 	const char* _it;
@@ -127,7 +127,7 @@ inline bool TextBufferIterator::operator != (const TextBufferIterator& it) const
 }
 
 
-inline void swap(TextBufferIterator& it1, TextBufferIterator& it2)
+inline void swap(TextBufferIterator& it1, TextBufferIterator& it2) noexcept
 {
 	it1.swap(it2);
 }

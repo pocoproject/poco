@@ -14,6 +14,7 @@
 
 #include "Poco/File_WIN32U.h"
 #include "Poco/Exception.h"
+#include "Poco/Path.h"
 #include "Poco/String.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/UnWindows.h"
@@ -88,6 +89,19 @@ void FileImpl::setPathImpl(const std::string& path)
 	convertPath(_path, _upath);
 }
 
+std::string FileImpl::getExecutablePathImpl() const
+{
+	// Windows specific: An executable can be invoked without
+	// the extension .exe, but the file has it nevertheless.
+	// This function appends extension "exe" if the file path does not have it.
+	Path p(_path);
+	if (!p.getExtension().empty())
+	{
+		return _path;
+	}
+	return p.setExtension("exe"s).toString();
+}
+
 
 bool FileImpl::existsImpl() const
 {
@@ -100,7 +114,6 @@ bool FileImpl::existsImpl() const
 		{
 		case ERROR_FILE_NOT_FOUND:
 		case ERROR_PATH_NOT_FOUND:
-		case ERROR_NOT_READY:
 		case ERROR_INVALID_DRIVE:
 			return false;
 		default:
@@ -141,9 +154,9 @@ bool FileImpl::canWriteImpl() const
 }
 
 
-bool FileImpl::canExecuteImpl() const
+bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 {
-	Path p(_path);
+	Path p(absolutePath);
 	return icompare(p.getExtension(), "exe") == 0;
 }
 
@@ -309,7 +322,7 @@ void FileImpl::renameToImpl(const std::string& path, int options)
 	std::wstring upath;
 	convertPath(path, upath);
 	if (options & OPT_FAIL_ON_OVERWRITE_IMPL) {
-		if (MoveFileExW(_upath.c_str(), upath.c_str(), NULL) == 0)
+		if (MoveFileExW(_upath.c_str(), upath.c_str(), 0) == 0)
 			handleLastErrorImpl(_path);
 	} else {
 		if (MoveFileExW(_upath.c_str(), upath.c_str(), MOVEFILE_REPLACE_EXISTING) == 0)
@@ -327,7 +340,7 @@ void FileImpl::linkToImpl(const std::string& path, int type) const
 
 	if (type == 0)
 	{
-		if (CreateHardLinkW(upath.c_str(), _upath.c_str(), NULL) == 0)
+		if (CreateHardLinkW(upath.c_str(), _upath.c_str(), nullptr) == 0)
 			handleLastErrorImpl(_path);
 	}
 	else
@@ -364,9 +377,14 @@ void FileImpl::removeImpl()
 }
 
 
-bool FileImpl::createFileImpl()
+bool FileImpl::createFileImpl(bool createDirectories)
 {
 	poco_assert (!_path.empty());
+
+	if(createDirectories) {
+		Path p(_path);
+		p.makeDirectory();
+	}
 
 	HANDLE hFile = CreateFileW(_upath.c_str(), GENERIC_WRITE, 0, 0, CREATE_NEW, 0, 0);
 	if (hFile != INVALID_HANDLE_VALUE)
@@ -399,7 +417,7 @@ FileImpl::FileSizeImpl FileImpl::totalSpaceImpl() const
 	poco_assert(!_path.empty());
 
 	ULARGE_INTEGER space;
-	if (!GetDiskFreeSpaceExW(_upath.c_str(), NULL, &space, NULL))
+	if (!GetDiskFreeSpaceExW(_upath.c_str(), nullptr, &space, nullptr))
 		handleLastErrorImpl(_path);
 	return space.QuadPart;
 }
@@ -410,7 +428,7 @@ FileImpl::FileSizeImpl FileImpl::usableSpaceImpl() const
 	poco_assert(!_path.empty());
 
 	ULARGE_INTEGER space;
-	if (!GetDiskFreeSpaceExW(_upath.c_str(), &space, NULL, NULL))
+	if (!GetDiskFreeSpaceExW(_upath.c_str(), &space, nullptr, nullptr))
 		handleLastErrorImpl(_path);
 	return space.QuadPart;
 }
@@ -421,7 +439,7 @@ FileImpl::FileSizeImpl FileImpl::freeSpaceImpl() const
 	poco_assert(!_path.empty());
 
 	ULARGE_INTEGER space;
-	if (!GetDiskFreeSpaceExW(_upath.c_str(), NULL, NULL, &space))
+	if (!GetDiskFreeSpaceExW(_upath.c_str(), nullptr, nullptr, &space))
 		handleLastErrorImpl(_path);
 	return space.QuadPart;
 }
@@ -439,6 +457,8 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 	case ERROR_CANT_RESOLVE_FILENAME:
 	case ERROR_INVALID_DRIVE:
 		throw PathNotFoundException(path, err);
+	case ERROR_NOT_READY:
+		throw FileNotReadyException(path, err);
 	case ERROR_ACCESS_DENIED:
 		throw FileAccessDeniedException(path, err);
 	case ERROR_ALREADY_EXISTS:
@@ -479,6 +499,14 @@ void FileImpl::handleLastErrorImpl(const std::string& path)
 void FileImpl::convertPath(const std::string& utf8Path, std::wstring& utf16Path)
 {
 	UnicodeConverter::toUTF16(utf8Path, utf16Path);
+	if (utf16Path.length() > 0 && utf16Path.back() == L':')
+	{
+		// If the path only has disk letter, we must make sure it ends with backslash!
+		// Or it will be failed to call Windows API GetFileAttributesW().
+		// For example:
+		//   DWORD dw = GetFileAttributesW(L"\\\\?\\C:"); // dw == -1
+		utf16Path.push_back(L'\\');
+	}
 	if (utf16Path.size() > MAX_PATH - 12) // Note: CreateDirectory has a limit of MAX_PATH - 12 (room for 8.3 file name)
 	{
 		if (utf16Path[0] == '\\' || utf16Path[1] == ':')

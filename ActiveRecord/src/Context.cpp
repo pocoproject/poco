@@ -15,6 +15,9 @@
 #include "Poco/ActiveRecord/Context.h"
 
 
+using namespace std::string_literals;
+
+
 namespace Poco {
 namespace ActiveRecord {
 
@@ -33,7 +36,7 @@ Context::Context(const std::string& connector, const std::string& connectionStri
 
 StatementPlaceholderProvider::Ptr Context::statementPlaceholderProvider() const
 {
-	if (_session.connector() == "postgresql")
+	if (Poco::icompare(_session.connector(), "postgresql"s) == 0)
 		return std::make_unique<PostgresStatementPlaceholderProvider>();
 	else
 		return std::make_unique<DefaultStatementPlaceholderProvider>();

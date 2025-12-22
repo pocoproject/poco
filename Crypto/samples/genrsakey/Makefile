@@ -13,7 +13,11 @@ else
 ifeq ($(POCO_CONFIG),QNX)
 SYSLIBS += -lssl -lcrypto -lz
 else
+ifeq ($(findstring AIX, $(POCO_CONFIG)), AIX)
+SYSLIBS += -lssl_a -lcrypto_a -lz -ldl
+else
 SYSLIBS += -lssl -lcrypto -lz -ldl
+endif
 endif
 endif
 objects = genrsakey

@@ -19,7 +19,7 @@ namespace Poco {
 namespace XML {
 
 
-Notation::Notation(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId): 
+Notation::Notation(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId):
 	AbstractNode(pOwnerDocument),
 	_name(name),
 	_publicId(publicId),
@@ -28,7 +28,7 @@ Notation::Notation(Document* pOwnerDocument, const XMLString& name, const XMLStr
 }
 
 
-Notation::Notation(Document* pOwnerDocument, const Notation& notation): 
+Notation::Notation(Document* pOwnerDocument, const Notation& notation):
 	AbstractNode(pOwnerDocument, notation),
 	_name(notation._name),
 	_publicId(notation._publicId),

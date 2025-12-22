@@ -37,7 +37,7 @@ public:
 		/// Returns the subject of the notification.
 
 protected:
-	virtual ~TaskNotification();
+	~TaskNotification() override;
 		/// Destroys the TaskNotification.
 
 private:
@@ -51,9 +51,9 @@ class Foundation_API TaskStartedNotification: public TaskNotification
 {
 public:
 	TaskStartedNotification(Task* pTask);
-	
+
 protected:
-	~TaskStartedNotification();
+	~TaskStartedNotification() override;
 };
 
 
@@ -65,7 +65,7 @@ public:
 	TaskCancelledNotification(Task* pTask);
 
 protected:
-	~TaskCancelledNotification();
+	~TaskCancelledNotification() override;
 };
 
 
@@ -77,7 +77,7 @@ public:
 	TaskFinishedNotification(Task* pTask);
 
 protected:
-	~TaskFinishedNotification();
+	~TaskFinishedNotification() override;
 };
 
 
@@ -91,8 +91,8 @@ public:
 	const Exception& reason() const;
 
 protected:
-	~TaskFailedNotification();
-	
+	~TaskFailedNotification() override;
+
 private:
 	Exception* _pException;
 };
@@ -108,8 +108,8 @@ public:
 	float progress() const;
 
 protected:
-	~TaskProgressNotification();
-	
+	~TaskProgressNotification() override;
+
 private:
 	float _progress;
 };
@@ -136,8 +136,8 @@ public:
 	}
 
 protected:
-	~TaskCustomNotification(){};
-	
+	~TaskCustomNotification() override = default;
+
 private:
 	C _custom;
 };

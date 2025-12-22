@@ -30,7 +30,7 @@ namespace Poco {
 class Foundation_API EventChannel: public Channel
 	/// The EventChannel fires the messageLogged event for every log message
 	/// received. This can be used to hook custom log message processing into
-	/// the logging framework. 
+	/// the logging framework.
 {
 public:
 	using Ptr = AutoPtr<EventChannel>;
@@ -41,11 +41,11 @@ public:
 	EventChannel();
 		/// Creates the EventChannel.
 
-	void log(const Message& msg);
+	void log(const Message& msg) override;
 		/// Fires the messageLogged event.
 
 protected:
-	~EventChannel();
+	~EventChannel() override;
 		/// Destroys the EventChannel.
 };
 

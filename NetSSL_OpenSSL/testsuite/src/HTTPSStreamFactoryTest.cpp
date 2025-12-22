@@ -103,7 +103,7 @@ void HTTPSStreamFactoryTest::testError()
 	uri.setPort(server.port());
 	try
 	{
-		std::istream* pStr = factory.open(uri);
+		factory.open(uri);
 		fail("not found - must throw");
 	}
 	catch (HTTPException& exc)

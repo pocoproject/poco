@@ -38,13 +38,13 @@ void TimespanTest::testConversions()
 	assertTrue (ts.totalMinutes() == 60*24);
 	assertTrue (ts.totalHours() == 24);
 	assertTrue (ts.days() == 1);
-	
+
 	assertTrue (ts.microseconds() == 0);
 	assertTrue (ts.milliseconds() == 0);
 	assertTrue (ts.seconds() == 0);
 	assertTrue (ts.minutes() == 0);
 	assertTrue (ts.hours() == 0);
-	
+
 	ts.assign(2, 12, 30, 10, 123456);
 	assertTrue (ts.microseconds() == 456);
 	assertTrue (ts.milliseconds() == 123);
@@ -70,6 +70,10 @@ void TimespanTest::testConversions()
 	assertTrue (ts.minutes() == 30);
 	assertTrue (ts.hours() == 12);
 	assertTrue (ts.days() == 1);
+
+	ts.assign(std::chrono::minutes(62));
+	assertTrue(ts.hours() == 1);
+	assertTrue(ts.minutes() == 2);
 }
 
 
@@ -78,21 +82,21 @@ void TimespanTest::testComparisons()
 	Timespan ts1(10000000);
 	Timespan ts2(20000000);
 	Timespan ts3(20000000);
-	
+
 	assertTrue (ts1 != ts2);
 	assertTrue (!(ts1 == ts2));
 	assertTrue (ts1 <= ts2);
 	assertTrue (ts1 < ts2);
 	assertTrue (ts2 > ts1);
 	assertTrue (ts2 >= ts1);
-	
+
 	assertTrue (ts2 == ts3);
 	assertTrue (!(ts2 != ts3));
 	assertTrue (ts2 >= ts3);
 	assertTrue (ts2 <= ts3);
 	assertTrue (!(ts2 > ts3));
 	assertTrue (!(ts2 < ts3));
-	
+
 	assertTrue (ts1 == 10000000);
 	assertTrue (ts1 != 20000000);
 	assertTrue (ts1 <= 10000000);
@@ -128,7 +132,7 @@ void TimespanTest::testSwap()
 {
 	Timespan ts1(10000000);
 	Timespan ts2(50000000);
-	
+
 	assertTrue (ts1 < ts2);
 	ts1.swap(ts2);
 	assertTrue (ts2 < ts1);

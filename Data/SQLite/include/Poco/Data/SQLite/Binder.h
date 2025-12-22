@@ -22,8 +22,8 @@
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Any.h"
-#include "Poco/DynamicAny.h"
-#include "sqlite3.h"
+#include "Poco/Dynamic/Var.h"
+#include <sqlite3.h>
 
 
 namespace Poco {
@@ -35,6 +35,8 @@ class SQLite_API Binder: public Poco::Data::AbstractBinder
 	/// Binds placeholders in the sql query to the provided values. Performs data types mapping.
 {
 public:
+	using AbstractBinder::bind;
+
 	Binder(sqlite3_stmt* pStmt);
 		/// Creates the Binder.
 

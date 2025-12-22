@@ -138,10 +138,28 @@ private:
 };
 
 
-typedef HandleException<SQLHENV, SQL_HANDLE_ENV>   EnvironmentException;
-typedef HandleException<SQLHDBC, SQL_HANDLE_DBC>   ConnectionException;
-typedef HandleException<SQLHSTMT, SQL_HANDLE_STMT> StatementException;
-typedef HandleException<SQLHDESC, SQL_HANDLE_DESC> DescriptorException;
+// explicit instantiation definition
+#ifndef POCO_DOC
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+extern template class HandleException<SQLHENV, SQL_HANDLE_ENV>;
+extern template class HandleException<SQLHDBC, SQL_HANDLE_DBC>;
+extern template class HandleException<SQLHSTMT, SQL_HANDLE_STMT>;
+extern template class HandleException<SQLHDESC, SQL_HANDLE_DESC>;
+#else
+extern template class ODBC_API HandleException<SQLHENV, SQL_HANDLE_ENV>;
+extern template class ODBC_API HandleException<SQLHDBC, SQL_HANDLE_DBC>;
+extern template class ODBC_API HandleException<SQLHSTMT, SQL_HANDLE_STMT>;
+extern template class ODBC_API HandleException<SQLHDESC, SQL_HANDLE_DESC>;
+#endif
+
+#endif
+
+
+using EnvironmentException = HandleException<SQLHENV, SQL_HANDLE_ENV>;
+using ConnectionException = HandleException<SQLHDBC, SQL_HANDLE_DBC>;
+using StatementException = HandleException<SQLHSTMT, SQL_HANDLE_STMT>;
+using DescriptorException = HandleException<SQLHDESC, SQL_HANDLE_DESC>;
 
 
 } } } // namespace Poco::Data::ODBC

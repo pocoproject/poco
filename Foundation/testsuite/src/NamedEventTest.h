@@ -25,6 +25,7 @@ public:
 	~NamedEventTest();
 
 	void testNamedEvent();
+	void testCreateManyNamedEvents();
 
 	void setUp();
 	void tearDown();

@@ -41,7 +41,7 @@ public:
 
 class Foundation_API LineEndingConverterStreamBuf: public UnbufferedStreamBuf
 	/// This stream buffer performs line ending conversion
-	/// on text streams. The converter can convert from and to 
+	/// on text streams. The converter can convert from and to
 	/// the Unix (LF), Mac (CR) and DOS/Windows/Network (CF-LF) endings.
 	///
 	/// Any newline sequence in the source will be replaced by the
@@ -56,9 +56,9 @@ public:
 		/// Creates the LineEndingConverterStreamBuf and connects it
 		/// to the given output stream.
 
-	~LineEndingConverterStreamBuf();
-		/// Destroys the LineEndingConverterStream.
-		
+	~LineEndingConverterStreamBuf() override;
+	/// Destroys the LineEndingConverterStream.
+
 	void setNewLine(const std::string& newLineCharacters);
 		/// Sets the target line ending for the converter.
 		///
@@ -75,8 +75,8 @@ public:
 		/// Returns the line ending currently in use.
 
 protected:
-	int readFromDevice();
-	int writeToDevice(char c);
+	int readFromDevice() override;
+	int writeToDevice(char c) override;
 
 private:
 	std::istream*               _pIstr;
@@ -90,7 +90,7 @@ private:
 class Foundation_API LineEndingConverterIOS: public virtual std::ios
 	/// The base class for InputLineEndingConverter and OutputLineEndingConverter.
 	///
-	/// This class provides common methods and is also needed to ensure 
+	/// This class provides common methods and is also needed to ensure
 	/// the correct initialization order of the stream buffer and base classes.
 {
 public:
@@ -102,8 +102,8 @@ public:
 		/// Creates the LineEndingConverterIOS and connects it
 		/// to the given output stream.
 
-	~LineEndingConverterIOS();
-		/// Destroys the stream.
+	~LineEndingConverterIOS() override;
+	/// Destroys the stream.
 
 	void setNewLine(const std::string& newLineCharacters);
 		/// Sets the target line ending for the converter.
@@ -133,7 +133,7 @@ protected:
 
 class Foundation_API InputLineEndingConverter: public LineEndingConverterIOS, public std::istream
 	/// InputLineEndingConverter performs line ending conversion
-	/// on text input streams. The converter can convert from and to 
+	/// on text input streams. The converter can convert from and to
 	/// the Unix (LF), Mac (CR) and DOS/Windows/Network (CF-LF) endings.
 	///
 	/// Any newline sequence in the source will be replaced by the
@@ -148,14 +148,14 @@ public:
 		/// Creates the LineEndingConverterInputStream and connects it
 		/// to the given input stream.
 
-	~InputLineEndingConverter();
-		/// Destroys the stream.
+	~InputLineEndingConverter() override;
+	/// Destroys the stream.
 };
 
 
 class Foundation_API OutputLineEndingConverter: public LineEndingConverterIOS, public std::ostream
 	/// OutputLineEndingConverter performs line ending conversion
-	/// on text output streams. The converter can convert from and to 
+	/// on text output streams. The converter can convert from and to
 	/// the Unix (LF), Mac (CR) and DOS/Windows/Network (CF-LF) endings.
 	///
 	/// Any newline sequence in the source will be replaced by the
@@ -170,8 +170,8 @@ public:
 		/// Creates the LineEndingConverterOutputStream and connects it
 		/// to the given input stream.
 
-	~OutputLineEndingConverter();
-		/// Destroys the LineEndingConverterOutputStream.
+	~OutputLineEndingConverter() override;
+	/// Destroys the LineEndingConverterOutputStream.
 };
 
 

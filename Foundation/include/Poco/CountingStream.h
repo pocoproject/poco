@@ -34,7 +34,7 @@ class Foundation_API CountingStreamBuf: public UnbufferedStreamBuf
 public:
 	CountingStreamBuf();
 		/// Creates an unconnected CountingStreamBuf.
-	
+
 	CountingStreamBuf(std::istream& istr);
 		/// Creates the CountingStreamBuf and connects it
 		/// to the given input stream.
@@ -43,42 +43,42 @@ public:
 		/// Creates the CountingStreamBuf and connects it
 		/// to the given output stream.
 
-	~CountingStreamBuf();
+	~CountingStreamBuf() override;
 		/// Destroys the CountingStream.
-		
+
 	std::streamsize chars() const;
 		/// Returns the total number of characters.
-		
+
 	std::streamsize lines() const;
 		/// Returns the total number of lines.
-		
+
 	std::streamsize pos() const;
 		/// Returns the number of characters on the current line.
-		
+
 	void reset();
 		/// Resets all counters.
-		
+
 	void setCurrentLineNumber(std::streamsize line);
 		/// Sets the current line number.
 		///
 		/// This is mainly useful when parsing C/C++
 		/// preprocessed source code containing #line directives.
-		
+
 	std::streamsize getCurrentLineNumber() const;
 		/// Returns the current line number (same as lines()).
 
 	void addChars(std::streamsize chars);
 		/// Add to the total number of characters.
-		
+
 	void addLines(std::streamsize lines);
 		/// Add to the total number of lines.
-		
+
 	void addPos(std::streamsize pos);
 		/// Add to the number of characters on the current line.
 
 protected:
-	int readFromDevice();
-	int writeToDevice(char c);
+	int readFromDevice() override;
+	int writeToDevice(char c) override;
 
 private:
 	std::istream* _pIstr;
@@ -107,7 +107,7 @@ public:
 		/// Creates the basic stream and connects it
 		/// to the given output stream.
 
-	~CountingIOS();
+	~CountingIOS() override;
 		/// Destroys the stream.
 
 	std::streamsize chars() const;
@@ -127,16 +127,16 @@ public:
 		///
 		/// This is mainly useful when parsing C/C++
 		/// preprocessed source code containing #line directives.
-		
+
 	std::streamsize getCurrentLineNumber() const;
 		/// Returns the current line number (same as lines()).
 
 	void addChars(std::streamsize chars);
 		/// Add to the total number of characters.
-		
+
 	void addLines(std::streamsize lines);
 		/// Add to the total number of lines.
-		
+
 	void addPos(std::streamsize pos);
 		/// Add to the number of characters on the current line.
 
@@ -158,7 +158,7 @@ public:
 		/// Creates the CountingInputStream and connects it
 		/// to the given input stream.
 
-	~CountingInputStream();
+	~CountingInputStream() override;
 		/// Destroys the stream.
 };
 
@@ -170,12 +170,12 @@ class Foundation_API CountingOutputStream: public CountingIOS, public std::ostre
 public:
 	CountingOutputStream();
 		/// Creates an unconnected CountingOutputStream.
-	
+
 	CountingOutputStream(std::ostream& ostr);
 		/// Creates the CountingOutputStream and connects it
 		/// to the given output stream.
 
-	~CountingOutputStream();
+	~CountingOutputStream() override;
 		/// Destroys the CountingOutputStream.
 };
 

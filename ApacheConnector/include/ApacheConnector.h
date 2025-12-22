@@ -25,7 +25,7 @@ class ApacheRequestRec
 public:
 	ApacheRequestRec(request_rec* _pRec);
 		/// Creates the ApacheRequestRec;
-	
+
 	bool haveRequestBody();
 		/// Returns true if the request contains a body.
 

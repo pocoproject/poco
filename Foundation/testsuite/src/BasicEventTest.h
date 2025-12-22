@@ -44,7 +44,7 @@ public:
 	void testOverwriteDelegate();
 	void testAsyncNotify();
 	void testNullMutex();
-	
+
 	void setUp();
 	void tearDown();
 	static CppUnit::Test* suite();
@@ -71,7 +71,7 @@ protected:
 
 	int getCount() const;
 private:
-	int		_count;
+	std::atomic<int> _count;
 };
 
 

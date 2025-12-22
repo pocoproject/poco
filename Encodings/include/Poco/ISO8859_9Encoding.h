@@ -33,7 +33,7 @@ class Encodings_API ISO8859_9Encoding: public DoubleByteEncoding
 public:
 	ISO8859_9Encoding();
 	~ISO8859_9Encoding();
-	
+
 private:
 	static const char* _names[];
 	static const CharacterMap _charMap;

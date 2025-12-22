@@ -19,4 +19,4 @@ shift
 dir4=$1
 shift
 
-$CC -MM $@ $source | sed "s#\(.*\.o\):#$dir1/\1 $dir2/\1 $dir3/\1 $dir4/\1:#" >$target
+$CC -MM "$@" "$source" | sed "s#\(.*\.o\):#$dir1/\1 $dir2/\1 $dir3/\1 $dir4/\1:#" >"$target"

@@ -23,12 +23,8 @@
 #include <vector>
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS) 
-#if defined(_WIN32_WCE)
-#include "File_WINCE.h"
-#else
+#if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/File_WIN32U.h"
-#endif
 #elif defined(POCO_VXWORKS)
 #include "Poco/File_VX.h"
 #elif defined(POCO_OS_FAMILY_UNIX)
@@ -58,7 +54,7 @@ class Foundation_API File: private FileImpl
 	/// use the forward slash ("/") as directory separator.
 {
 public:
-	typedef FileSizeImpl FileSize;
+	using FileSize = FileSizeImpl;
 
 	enum LinkType
 		/// Type of link for linkTo().
@@ -88,7 +84,7 @@ public:
 	File(const File& file);
 		/// Copy constructor.
 
-	virtual ~File();
+	~File() override;
 		/// Destroys the file.
 
 	File& operator = (const File& file);
@@ -103,14 +99,29 @@ public:
 	File& operator = (const Path& path);
 		/// Assignment operator.
 
-	void swap(File& file);
+	void swap(File& file) noexcept;
 		/// Swaps the file with another one.
 
 	const std::string& path() const;
 		/// Returns the path.
 
+	std::string absolutePath() const;
+		/// Returns absolute path.
+		/// Attempts to find the existing file
+		/// using curent work directory and the PATH
+		/// environment variable.
+		/// If the file doesn't exist, returns empty string.
+
 	bool exists() const;
 		/// Returns true iff the file exists.
+
+	bool existsAnywhere() const;
+		/// If the file path is relative, searches
+		/// for the file in the current working directory
+		/// and the environment paths.
+		/// If the file path is absolute, the
+		/// functionality is identical to the
+		/// exists() call.
 
 	bool canRead() const;
 		/// Returns true iff the file is readable.
@@ -312,7 +323,7 @@ inline bool File::operator >= (const File& file) const
 }
 
 
-inline void swap(File& f1, File& f2)
+inline void swap(File& f1, File& f2) noexcept
 {
 	f1.swap(f2);
 }

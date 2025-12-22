@@ -27,7 +27,7 @@ namespace Poco {
 namespace Data {
 
 
-static const std::size_t POCO_DATA_INVALID_ROW = std::numeric_limits<std::size_t>::max();
+inline const std::size_t POCO_DATA_INVALID_ROW = std::numeric_limits<std::size_t>::max();
 
 
 } } // namespace Poco::Data

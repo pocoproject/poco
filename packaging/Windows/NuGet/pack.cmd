@@ -1,7 +1,7 @@
 echo off
 rem echo Usage:
 rem echo ------
-rem echo pack (shared | static) [vsvers] [release]       // pack shared 150 1.10.1 
+rem echo pack (shared | static) [vsvers] [release]       // pack shared 150 1.10.1
 rem echo ------
 setlocal enableextensions enabledelayedexpansion
 if "%1"=="" goto usage
@@ -27,14 +27,14 @@ for %%G in (Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL Foundation Encoding
 	if [%%G] == [Data/MySQL] 		set module=DataMySQL		& set inc=Data\MySQL
 	if [%%G] == [Data/PostgreSQL] 	set module=DataPostgreSQL	& set inc=Data\PostgreSQL
 	call nuget pack Poco.noarch.nuspec 									-p vs=%2 -p version=%3 -p id=!module! -p inc=!inc!
-	call nuget pack Poco.%1.nuspec -symbols -symbolpackageformat snupkg	-p vs=%2 -p version=%3 -p id=!module! -p mode=%1 
+	call nuget pack Poco.%1.nuspec -symbols -symbolpackageformat snupkg	-p vs=%2 -p version=%3 -p id=!module! -p mode=%1
 )
 
 goto exit
 :usage
 echo Usage:
 echo ------
-echo "pack (shared | static) [vsvers] [release]"       // pack shared 150 1.10.1 
+echo "pack (shared | static) [vsvers] [release]"       // pack shared 150 1.10.1
 echo ------
 :exit
 endlocal

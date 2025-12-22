@@ -42,10 +42,17 @@ public:
 	virtual bool mustRotate(LogFile* pFile) = 0;
 		/// Returns true if the given log file must
 		/// be rotated, false otherwise.
-		
+
 private:
 	RotateStrategy(const RotateStrategy&);
 	RotateStrategy& operator = (const RotateStrategy&);
+};
+
+
+class Foundation_API NullRotateStrategy : public RotateStrategy
+{
+public:
+	bool mustRotate(LogFile *pFile) override;
 };
 
 
@@ -55,14 +62,14 @@ class RotateAtTimeStrategy: public RotateStrategy
 {
 public:
 	RotateAtTimeStrategy(const std::string& rtime):
-		_day(-1), 
-		_hour(-1), 
+		_day(-1),
+		_hour(-1),
 		_minute(0)
 	{
-		if (rtime.empty()) 
+		if (rtime.empty())
 			throw InvalidArgumentException("Rotation time must be specified.");
 
-		if ((rtime.find(',') != rtime.npos) && (rtime.find(':') == rtime.npos)) 
+		if ((rtime.find(',') != rtime.npos) && (rtime.find(':') == rtime.npos))
 			throw InvalidArgumentException("Invalid rotation time specified.");
 
 		StringTokenizer timestr(rtime, ",:", StringTokenizer::TOK_TRIM | StringTokenizer::TOK_IGNORE_EMPTY);
@@ -76,9 +83,11 @@ public:
 				_day = DateTimeParser::parseDayOfWeek(it, timestr[index].end());
 				++index;
 			}
+			[[fallthrough]];
 		case 2: // hh:mm
 			_hour = NumberParser::parse(timestr[index]);
 			++index;
+			[[fallthrough]];
 		case 1: // mm
 			_minute = NumberParser::parse(timestr[index]);
 			break;
@@ -87,12 +96,10 @@ public:
 		}
 		getNextRollover();
 	}
-	
-	~RotateAtTimeStrategy()
-	{
-	}
-	
-	bool mustRotate(LogFile* /*pFile*/)
+
+	~RotateAtTimeStrategy() override = default;
+
+	bool mustRotate(LogFile* /*pFile*/) override
 	{
 		if (DT() >= _threshold)
 		{
@@ -111,8 +118,8 @@ private:
 			_threshold += tsp;
 		}
 		while (!(_threshold.minute() == _minute &&
-		        (-1 == _hour || _threshold.hour() == _hour) && 
-		        (-1 == _day  || _threshold.dayOfWeek() == _day)));
+				 (-1 == _hour || _threshold.hour() == _hour) &&
+				 (-1 == _day  || _threshold.dayOfWeek() == _day)));
 		// round to :00.0 seconds
 		_threshold.assign(_threshold.year(), _threshold.month(), _threshold.day(), _threshold.hour(), _threshold.minute());
 	}
@@ -125,7 +132,7 @@ private:
 
 
 class Foundation_API RotateByIntervalStrategy: public RotateStrategy
-	/// The file is rotated when the log file 
+	/// The file is rotated when the log file
 	/// exceeds a given age.
 	///
 	/// For this to work reliably across all platforms and file systems
@@ -135,8 +142,8 @@ class Foundation_API RotateByIntervalStrategy: public RotateStrategy
 {
 public:
 	RotateByIntervalStrategy(const Timespan& span);
-	~RotateByIntervalStrategy();
-	bool mustRotate(LogFile* pFile);
+	~RotateByIntervalStrategy() override;
+	bool mustRotate(LogFile* pFile) override;
 
 private:
 	Timespan _span;
@@ -151,8 +158,8 @@ class Foundation_API RotateBySizeStrategy: public RotateStrategy
 {
 public:
 	RotateBySizeStrategy(UInt64 size);
-	~RotateBySizeStrategy();
-	bool mustRotate(LogFile* pFile);
+	~RotateBySizeStrategy() override;
+	bool mustRotate(LogFile* pFile) override;
 
 private:
 	UInt64 _size;

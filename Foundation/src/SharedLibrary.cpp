@@ -22,7 +22,7 @@
 #include "SharedLibrary_VX.cpp"
 #elif defined(POCO_OS_FAMILY_UNIX)
 #include "SharedLibrary_UNIX.cpp"
-#elif defined(POCO_OS_FAMILY_WINDOWS) 
+#elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "SharedLibrary_WIN32U.cpp"
 #endif
 
@@ -78,7 +78,7 @@ bool SharedLibrary::isLoaded() const
 
 bool SharedLibrary::hasSymbol(const std::string& name)
 {
-	return findSymbolImpl(name) != 0;
+	return findSymbolImpl(name) != nullptr;
 }
 
 
@@ -107,6 +107,12 @@ std::string SharedLibrary::suffix()
 bool SharedLibrary::setSearchPath(const std::string& path)
 {
 	return setSearchPathImpl(path);
+}
+
+
+std::vector<std::string> SharedLibrary::findMissingDependencies(const std::string& path)
+{
+	return findMissingDependenciesImpl(path);
 }
 
 

@@ -86,7 +86,7 @@ private:
 	DatagramSocket      _socket;
 	SocketAddress       _address;
 	Thread*             _pThread;
-	bool                _stop;
+	std::atomic<bool>   _stop;
 	Poco::AtomicCounter _dataBacklog;
 	Poco::AtomicCounter _errorBacklog;
 };

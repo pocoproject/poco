@@ -17,7 +17,6 @@
 #include "Poco/FileStreamFactory.h"
 #include "Poco/URI.h"
 #include "Poco/Path.h"
-#include "Poco/SingletonHolder.h"
 #include "Poco/Exception.h"
 
 
@@ -56,7 +55,7 @@ std::istream* URIStreamOpener::open(const std::string& pathOrURI) const
 	try
 	{
 		URI uri(pathOrURI);
-		std::string scheme(uri.getScheme());
+		const std::string& scheme(uri.getScheme());
 		FactoryMap::const_iterator it = _map.find(scheme);
 		if (it != _map.end())
 		{
@@ -77,7 +76,7 @@ std::istream* URIStreamOpener::open(const std::string& pathOrURI) const
 		Path path;
 		if (path.tryParse(pathOrURI, Path::PATH_GUESS))
 			return openFile(path);
-		else 
+		else
 			throw;
 	}
 }
@@ -123,7 +122,7 @@ std::istream* URIStreamOpener::open(const std::string& basePathOrURI, const std:
 	}
 }
 
-	
+
 void URIStreamOpener::registerStreamFactory(const std::string& scheme, URIStreamFactory* pFactory)
 {
 	poco_check_ptr (pFactory);
@@ -140,7 +139,7 @@ void URIStreamOpener::registerStreamFactory(const std::string& scheme, URIStream
 void URIStreamOpener::unregisterStreamFactory(const std::string& scheme)
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	FactoryMap::iterator it = _map.find(scheme);
 	if (it != _map.end())
 	{
@@ -159,15 +158,10 @@ bool URIStreamOpener::supportsScheme(const std::string& scheme)
 }
 
 
-namespace
-{
-	static SingletonHolder<URIStreamOpener> sh;
-}
-
-
 URIStreamOpener& URIStreamOpener::defaultOpener()
 {
-	return *sh.get();
+	static URIStreamOpener so;
+	return so;
 }
 
 
@@ -183,7 +177,7 @@ std::istream* URIStreamOpener::openURI(const std::string& scheme, const URI& uri
 	std::string actualScheme(scheme);
 	URI actualURI(uri);
 	int redirects = 0;
-	
+
 	while (redirects < MAX_REDIRECTS)
 	{
 		try

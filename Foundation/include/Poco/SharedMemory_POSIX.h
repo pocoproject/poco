@@ -56,7 +56,7 @@ public:
 		/// Returns the start address of the shared memory segment.
 
 	char* end() const;
-		/// Returns the one-past-end end address of the shared memory segment. 
+		/// Returns the one-past-end end address of the shared memory segment.
 
 protected:
 	void map(const void* addrHint);
@@ -68,7 +68,7 @@ protected:
 	void close();
 		/// Releases the handle for the shared memory segment.
 
-	~SharedMemoryImpl();
+	~SharedMemoryImpl() override;
 		/// Destroys the SharedMemoryImpl.
 
 private:

@@ -30,7 +30,7 @@ public:
 	void testName();
 	void testCompare();
 	void testSwap();
-	
+
 	void setUp();
 	void tearDown();
 

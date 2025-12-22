@@ -7,7 +7,7 @@
 //
 // Common definitions useful for Meta Template Programming
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include <type_traits>
 
 
 namespace Poco {
@@ -28,30 +29,7 @@ template <typename T>
 struct IsReference
 	/// Use this struct to determine if a template type is a reference.
 {
-	enum
-	{
-		VALUE = 0
-	};
-};
-
-
-template <typename T>
-struct IsReference<T&>
-{
-	enum 
-	{
-		VALUE = 1
-	};
-};
-
-
-template <typename T>
-struct IsReference<const T&>
-{
-	enum 
-	{
-		VALUE = 1
-	};
+	static constexpr int VALUE = std::is_reference_v<T> ? 1 : 0;
 };
 
 
@@ -59,41 +37,7 @@ template <typename T>
 struct IsConst
 	/// Use this struct to determine if a template type is a const type.
 {
-	enum
-	{
-		VALUE = 0
-	};
-};
-
-
-template <typename T>
-struct IsConst<const T&>
-{
-	enum 
-	{
-		VALUE = 1
-	};
-};
-
-
-template <typename T>
-struct IsConst<const T>
-{
-	enum 
-	{
-		VALUE = 1
-	};
-};
-
-
-template <typename T, int i>
-struct IsConst<const T[i]>
-	/// Specialization for const char arrays
-{
-	enum
-	{
-		VALUE = 1
-	};
+	static constexpr int VALUE = std::is_const_v<std::remove_reference_t<T>> ? 1 : 0;
 };
 
 
@@ -101,40 +45,13 @@ template <typename T>
 struct TypeWrapper
 	/// Use the type wrapper if you want to decouple constness and references from template types.
 {
-	typedef T TYPE;
-	typedef const T CONSTTYPE;
-	typedef T& REFTYPE;
-	typedef const T& CONSTREFTYPE;
-};
-
-
-template <typename T>
-struct TypeWrapper<const T>
-{
-	typedef T TYPE;
-	typedef const T CONSTTYPE;
-	typedef T& REFTYPE;
-	typedef const T& CONSTREFTYPE;
-};
-
-
-template <typename T>
-struct TypeWrapper<const T&>
-{
-	typedef T TYPE;
-	typedef const T CONSTTYPE;
-	typedef T& REFTYPE;
-	typedef const T& CONSTREFTYPE;
-};
-
-
-template <typename T>
-struct TypeWrapper<T&>
-{
-	typedef T TYPE;
-	typedef const T CONSTTYPE;
-	typedef T& REFTYPE;
-	typedef const T& CONSTREFTYPE;
+private:
+	using BaseType = std::remove_cv_t<std::remove_reference_t<T>>;
+public:
+	using TYPE = BaseType;
+	using CONSTTYPE = const BaseType;
+	using REFTYPE = BaseType&;
+	using CONSTREFTYPE = const BaseType&;
 };
 
 

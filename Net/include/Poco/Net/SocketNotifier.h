@@ -42,36 +42,36 @@ class Net_API SocketNotifier: public Poco::RefCountedObject
 public:
 	explicit SocketNotifier(const Socket& socket);
 		/// Creates the SocketNotifier for the given socket.
-		
+
 	void addObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer);
-		/// Adds the given observer. 
-		
+		/// Adds the given observer.
+
 	void removeObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer);
-		/// Removes the given observer. 
-		
+		/// Removes the given observer.
+
 	bool hasObserver(const Poco::AbstractObserver& observer) const;
 		/// Returns true if the given observer is registered.
-		
+
 	bool accepts(SocketNotification* pNotification);
 		/// Returns true if there is at least one observer for the given notification.
-		
+
 	void dispatch(SocketNotification* pNotification);
 		/// Dispatches the notification to all observers.
-		
+
 	bool hasObservers() const;
 		/// Returns true if there are subscribers.
-		
+
 	std::size_t countObservers() const;
 		/// Returns the number of subscribers;
 
 protected:
-	~SocketNotifier();
+	~SocketNotifier() override;
 		/// Destroys the SocketNotifier.
 
 private:
-	typedef std::multiset<SocketNotification*> EventSet;
-	typedef Poco::FastMutex                    MutexType;
-	typedef MutexType::ScopedLock              ScopedLock;
+	using EventSet = std::multiset<SocketNotification *>;
+	using MutexType = Poco::FastMutex;
+	using ScopedLock = MutexType::ScopedLock;
 
 	EventSet                 _events;
 	Poco::NotificationCenter _nc;

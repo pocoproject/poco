@@ -20,9 +20,10 @@ namespace Poco {
 namespace Data {
 
 
-SessionImpl::SessionImpl(const std::string& connectionString, std::size_t timeout):
+SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginTimeout):
+	_dbmsName("unknown"s),
 	_connectionString(connectionString),
-	_loginTimeout(timeout)
+	_loginTimeout(loginTimeout)
 {
 }
 

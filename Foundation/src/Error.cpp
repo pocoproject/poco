@@ -36,8 +36,8 @@ namespace Poco {
 	{
 		std::string errMsg;
 		DWORD dwFlg = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS;
-		LPWSTR lpMsgBuf = 0;
-		if (FormatMessageW(dwFlg, 0, errorCode, 0, (LPWSTR) & lpMsgBuf, 0, NULL))
+		LPWSTR lpMsgBuf = nullptr;
+		if (FormatMessageW(dwFlg, nullptr, errorCode, 0, (LPWSTR) & lpMsgBuf, 0, nullptr))
 			UnicodeConverter::toUTF8(lpMsgBuf, errMsg);
 		LocalFree(lpMsgBuf);
 		return errMsg;
@@ -62,37 +62,35 @@ namespace Poco {
 		{
 			_buffer[0] = 0;
 
-#if (_XOPEN_SOURCE >= 600) || POCO_OS == POCO_OS_ANDROID || __APPLE__
-			setMessage(strerror_r(err, _buffer, sizeof(_buffer)));
-#elif _GNU_SOURCE
+#if (_XOPEN_SOURCE >= 600) || POCO_OS == POCO_OS_ANDROID || __APPLE__ || _GNU_SOURCE
 			setMessage(strerror_r(err, _buffer, sizeof(_buffer)));
 #else
 			setMessage(strerror(err));
-#endif		
+#endif
 		}
-		
+
 		~StrErrorHelper()
 		{
 		}
-		
+
 		const std::string& message() const
 		{
 			return _message;
 		}
-		
+
 	protected:
 		void setMessage(int rc)
 			/// Handles POSIX variant
 		{
 			_message = _buffer;
 		}
-		
+
 		void setMessage(const char* msg)
 			/// Handles GLIBC variant
 		{
 			_message = msg;
 		}
-		
+
 	private:
 		char _buffer[256];
 		std::string _message;
@@ -104,8 +102,13 @@ namespace Poco {
 		return helper.message();
 	}
 
-
 #endif
+
+
+std::string Error::getLastMessage()
+{
+	return getMessage(last());
+}
 
 
 } // namespace Poco

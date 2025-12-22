@@ -37,7 +37,7 @@ protected:
 	bool tryLockImpl();
 	bool tryLockImpl(long milliseconds);
 	void unlockImpl();
-	
+
 private:
 	SEM_ID _sem;
 };

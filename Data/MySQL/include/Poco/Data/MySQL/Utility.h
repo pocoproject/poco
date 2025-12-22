@@ -50,9 +50,6 @@ public:
 	static std::string hostInfo(Poco::Data::Session& session);
 		/// Returns host info.
 
-	static bool hasMicrosecond();
-		/// Rturns true if microseconds are suported.
-
 	static MYSQL* handle(Poco::Data::Session& session);
 		/// Returns native MySQL handle for the session.
 };

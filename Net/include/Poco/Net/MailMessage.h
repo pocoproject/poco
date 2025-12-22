@@ -78,7 +78,7 @@ public:
 
 	using PartVec = std::vector<Part>;
 
-	MailMessage(PartStoreFactory* pStoreFactory = 0);
+	MailMessage(PartStoreFactory* pStoreFactory = nullptr);
 		/// Creates an empty MailMessage.
 		///
 		/// If pStoreFactory is not null, message attachments will be
@@ -297,7 +297,7 @@ class Net_API MultipartSource: public PartSource
 	/// mail messages consisting of multiple nested parts.
 {
 public:
-	explicit MultipartSource(const std::string contentType = "multipart/alternative");
+	explicit MultipartSource(const std::string& contentType = "multipart/alternative");
 		/// Creates an empty MultipartSource.
 		///
 		/// At least one part must be added with addPart().

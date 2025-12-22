@@ -49,11 +49,11 @@ namespace XML {
 	std::string fromXMLString(const XMLString& str);
 		/// Converts an XMLString into an UTF-8 encoded
 		/// string.
-		
+
 	XMLString toXMLString(const std::string& str);
 		/// Converts an UTF-8 encoded string into an
 		/// XMLString
-		
+
 	#define XML_LIT(lit) L##lit
 
 #elif defined(XML_UNICODE)
@@ -75,7 +75,7 @@ namespace XML {
 	{
 		return str;
 	}
-	
+
 	#define XML_LIT(lit) lit
 
 #endif

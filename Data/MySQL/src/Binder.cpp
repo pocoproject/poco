@@ -30,7 +30,7 @@ Binder::~Binder()
 	for (std::vector<MYSQL_TIME*>::iterator it = _dates.begin(); it != _dates.end(); ++it)
 	{
 		delete *it;
-		*it = 0;
+		*it = nullptr;
 	}
 }
 
@@ -159,7 +159,7 @@ void Binder::bind(std::size_t pos, const Poco::Data::CLOB& val, Direction dir)
 void Binder::bind(std::size_t pos, const DateTime& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	MYSQL_TIME mt = {0};
+	MYSQL_TIME mt = {};
 
 	mt.year = val.year();
 	mt.month = val.month();
@@ -180,7 +180,7 @@ void Binder::bind(std::size_t pos, const DateTime& val, Direction dir)
 void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	MYSQL_TIME mt = {0};
+	MYSQL_TIME mt = {};
 
 	mt.year  = val.year();
 	mt.month = val.month();
@@ -197,7 +197,7 @@ void Binder::bind(std::size_t pos, const Date& val, Direction dir)
 void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	MYSQL_TIME mt = {0};
+	MYSQL_TIME mt = {};
 
 	mt.hour   = val.hour();
 	mt.minute = val.minute();
@@ -213,15 +213,14 @@ void Binder::bind(std::size_t pos, const Time& val, Direction dir)
 
 void Binder::bind(std::size_t pos, const UUID& val, Direction dir)
 {
-	std::string str = val.toString();
-	bind(pos, str, dir);
+	bind(pos, toString(val), dir);
 }
 
 
 void Binder::bind(std::size_t pos, const NullData&, Direction dir)
 {
 	poco_assert(dir == PD_IN);
-	realBind(pos, MYSQL_TYPE_NULL, 0, 0);
+	realBind(pos, MYSQL_TYPE_NULL, nullptr, 0);
 }
 
 
@@ -235,7 +234,7 @@ MYSQL_BIND* Binder::getBindArray() const
 {
 	if (_bindArray.size() == 0)
 	{
-		return 0;
+		return nullptr;
 	}
 
 	return const_cast<MYSQL_BIND*>(&_bindArray[0]);
@@ -287,7 +286,7 @@ void Binder::realBind(std::size_t pos, enum_field_types type, const void* buffer
 		std::memset(&_bindArray[s], 0, sizeof(MYSQL_BIND) * (_bindArray.size() - s));
 	}
 
-	MYSQL_BIND b = {0};
+	MYSQL_BIND b = {};
 
 	b.buffer_type   = type;
 	b.buffer  = const_cast<void*>(buffer);

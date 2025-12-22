@@ -57,6 +57,14 @@ ServerSocket::ServerSocket(SocketImpl* pImpl, bool ignore): Socket(pImpl)
 }
 
 
+ServerSocket ServerSocket::fromFileDescriptor(poco_socket_t fd)
+{
+	ServerSocket s;
+	s.impl()->useFileDescriptor(fd);
+	return s;
+}
+
+
 ServerSocket::~ServerSocket()
 {
 }
@@ -123,7 +131,7 @@ void ServerSocket::bind6(Poco::UInt16 port, bool reuseAddress, bool ipV6Only)
 #endif // POCO_HAVE_IPv6
 }
 
-	
+
 void ServerSocket::bind6(Poco::UInt16 port, bool reuseAddress, bool reusePort, bool ipV6Only)
 {
 #if defined(POCO_HAVE_IPv6)
@@ -135,7 +143,7 @@ void ServerSocket::bind6(Poco::UInt16 port, bool reuseAddress, bool reusePort, b
 #endif // POCO_HAVE_IPv6
 }
 
-	
+
 void ServerSocket::listen(int backlog)
 {
 	impl()->listen(backlog);

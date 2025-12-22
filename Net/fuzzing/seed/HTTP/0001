@@ -1,0 +1,8 @@
+HTTP/1.0 401 Unauthorized
+Server: HTTPd/0.9
+Host: localhost
+Date: Sun, 10 Apr 2014 20:26:47 GMT
+WWW-Authenticate: Basic realm=<realm>, charset="UTF-8"
+Proxy-Authenticate: Basic realm=<realm>, charset="UTF-8"
+
+

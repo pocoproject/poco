@@ -27,11 +27,11 @@ namespace Poco {
 
 class Foundation_API LocalDateTime
 	/// This class represents an instant in local time
-	/// (as opposed to UTC), expressed in years, months, days, 
-	/// hours, minutes, seconds and milliseconds based on the 
+	/// (as opposed to UTC), expressed in years, months, days,
+	/// hours, minutes, seconds and milliseconds based on the
 	/// Gregorian calendar.
 	///
-	/// In addition to the date and time, the class also 
+	/// In addition to the date and time, the class also
 	/// maintains a time zone differential, which denotes
 	/// the difference in seconds from UTC to local time,
 	/// i.e. UTC = local time - time zone differential.
@@ -53,7 +53,7 @@ class Foundation_API LocalDateTime
 {
 public:
 	LocalDateTime();
-		/// Creates a LocalDateTime with the current date/time 
+		/// Creates a LocalDateTime with the current date/time
 		/// for the current time zone.
 
 	LocalDateTime(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int millisecond = 0, int microsecond = 0);
@@ -67,7 +67,6 @@ public:
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
 
-	//@ deprecated
 	LocalDateTime(int tzd, int year, int month, int day, int hour, int minute, int second, int millisecond, int microsecond);
 		/// Creates a LocalDateTime for the given Gregorian date and time in the
 		/// time zone denoted by the time zone differential in tzd.
@@ -85,41 +84,38 @@ public:
 		/// Creates a LocalDateTime from the UTC time given in dateTime,
 		/// using the time zone differential of the current time zone.
 
-	//@ deprecated
 	LocalDateTime(int tzd, const DateTime& dateTime);
 		/// Creates a LocalDateTime from the UTC time given in dateTime,
 		/// using the given time zone differential. Adjusts dateTime
 		/// for the given time zone differential.
 
-	//@ deprecated
 	LocalDateTime(int tzd, const DateTime& dateTime, bool adjust);
 		/// Creates a LocalDateTime from the UTC time given in dateTime,
-		/// using the given time zone differential. If adjust is true, 
+		/// using the given time zone differential. If adjust is true,
 		/// adjusts dateTime for the given time zone differential.
 
 	LocalDateTime(double julianDay);
 		/// Creates a LocalDateTime for the given Julian day in the local time zone.
 
-	//@ deprecated
 	LocalDateTime(int tzd, double julianDay);
 		/// Creates a LocalDateTime for the given Julian day in the time zone
 		/// denoted by the time zone differential in tzd.
 
 	LocalDateTime(const LocalDateTime& dateTime);
 		/// Copy constructor. Creates the LocalDateTime from another one.
-		
+
 	~LocalDateTime();
 		/// Destroys the LocalDateTime.
-		
+
 	LocalDateTime& operator = (const LocalDateTime& dateTime);
 		/// Assigns another LocalDateTime.
-	
+
 	LocalDateTime& operator = (const Timestamp& timestamp);
 		/// Assigns a timestamp
 
 	LocalDateTime& operator = (double julianDay);
 		/// Assigns a Julian day in the local time zone.
-	
+
 	LocalDateTime& assign(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int millisecond = 0, int microseconds = 0);
 		/// Assigns a Gregorian local date and time.
 		///   * year is from 0 to 9999.
@@ -131,7 +127,6 @@ public:
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
 
-	//@ deprecated
 	LocalDateTime& assign(int tzd, int year, int month, int day, int hour, int minute, int second, int millisecond, int microseconds);
 		/// Assigns a Gregorian local date and time in the time zone denoted by
 		/// the time zone differential in tzd.
@@ -145,7 +140,6 @@ public:
 		///   * millisecond is from 0 to 999.
 		///   * microsecond is from 0 to 999.
 
-	//@ deprecated
 	LocalDateTime& assign(int tzd, double julianDay);
 		/// Assigns a Julian day in the time zone denoted by the
 		/// time zone differential in tzd.
@@ -155,64 +149,64 @@ public:
 
 	int year() const;
 		/// Returns the year.
-		
+
 	int month() const;
 		/// Returns the month (1 to 12).
-	
+
 	int week(int firstDayOfWeek = DateTime::MONDAY) const;
 		/// Returns the week number within the year.
 		/// FirstDayOfWeek should be either SUNDAY (0) or MONDAY (1).
-		/// The returned week number will be from 0 to 53. Week number 1 is the week 
+		/// The returned week number will be from 0 to 53. Week number 1 is the week
 		/// containing January 4. This is in accordance to ISO 8601.
-		/// 
+		///
 		/// The following example assumes that firstDayOfWeek is MONDAY. For 2005, which started
 		/// on a Saturday, week 1 will be the week starting on Monday, January 3.
 		/// January 1 and 2 will fall within week 0 (or the last week of the previous year).
 		///
 		/// For 2007, which starts on a Monday, week 1 will be the week starting on Monday, January 1.
 		/// There will be no week 0 in 2007.
-	
+
 	int day() const;
 		/// Returns the day within the month (1 to 31).
-		
+
 	int dayOfWeek() const;
 		/// Returns the weekday (0 to 6, where
 		/// 0 = Sunday, 1 = Monday, ..., 6 = Saturday).
-	
+
 	int dayOfYear() const;
 		/// Returns the number of the day in the year.
 		/// January 1 is 1, February 1 is 32, etc.
-	
+
 	int hour() const;
 		/// Returns the hour (0 to 23).
-		
+
 	int hourAMPM() const;
 		/// Returns the hour (0 to 12).
-	
+
 	bool isAM() const;
 		/// Returns true if hour < 12;
 
 	bool isPM() const;
 		/// Returns true if hour >= 12.
-		
+
 	int minute() const;
 		/// Returns the minute (0 to 59).
-		
+
 	int second() const;
 		/// Returns the second (0 to 59).
-		
+
 	int millisecond() const;
 		/// Returns the millisecond (0 to 999)
-	
+
 	int microsecond() const;
 		/// Returns the microsecond (0 to 999)
-	
+
 	double julianDay() const;
 		/// Returns the Julian day for the date.
 
 	int tzd() const;
 		/// Returns the time zone differential.
-		
+
 	DateTime utc() const;
 		/// Returns the UTC equivalent for the local date and time.
 
@@ -222,12 +216,12 @@ public:
 	Timestamp::UtcTimeVal utcTime() const;
 		/// Returns the UTC equivalent for the local date and time.
 
-	bool operator == (const LocalDateTime& dateTime) const;	
-	bool operator != (const LocalDateTime& dateTime) const;	
-	bool operator <  (const LocalDateTime& dateTime) const;	
-	bool operator <= (const LocalDateTime& dateTime) const;	
-	bool operator >  (const LocalDateTime& dateTime) const;	
-	bool operator >= (const LocalDateTime& dateTime) const;	
+	bool operator == (const LocalDateTime& dateTime) const;
+	bool operator != (const LocalDateTime& dateTime) const;
+	bool operator <  (const LocalDateTime& dateTime) const;
+	bool operator <= (const LocalDateTime& dateTime) const;
+	bool operator >  (const LocalDateTime& dateTime) const;
+	bool operator >= (const LocalDateTime& dateTime) const;
 
 	LocalDateTime  operator +  (const Timespan& span) const;
 	LocalDateTime  operator -  (const Timespan& span) const;
@@ -237,23 +231,23 @@ public:
 
 protected:
 	LocalDateTime(Timestamp::UtcTimeVal utcTime, Timestamp::TimeDiff diff, int tzd);
-		
+
 	void determineTzd(bool adjust = false);
 		/// Recalculate the tzd based on the _dateTime member based
 		/// on the current timezone using the Standard C runtime functions.
 		/// If adjust is true, then adjustForTzd() is called after the
 		/// differential is calculated.
-		
+
 	void adjustForTzd();
 		/// Adjust the _dateTime member based on the _tzd member.
-		
+
 	std::time_t dstOffset(int& dstOffset) const;
 		/// Determine the DST offset for the current date/time.
-	
+
 private:
 	DateTime _dateTime;
 	int      _tzd;
-	
+
 	friend class DateTimeFormatter;
 	friend class DateTimeParser;
 };
@@ -285,7 +279,7 @@ inline int LocalDateTime::day() const
 	return _dateTime.day();
 }
 
-	
+
 inline int LocalDateTime::dayOfWeek() const
 {
 	return _dateTime.dayOfWeek();
@@ -303,7 +297,7 @@ inline int LocalDateTime::hour() const
 	return _dateTime.hour();
 }
 
-	
+
 inline int LocalDateTime::hourAMPM() const
 {
 	return _dateTime.hourAMPM();
@@ -321,19 +315,19 @@ inline bool LocalDateTime::isPM() const
 	return _dateTime.isPM();
 }
 
-	
+
 inline int LocalDateTime::minute() const
 {
 	return _dateTime.minute();
 }
 
-	
+
 inline int LocalDateTime::second() const
 {
 	return _dateTime.second();
 }
 
-	
+
 inline int LocalDateTime::millisecond() const
 {
 	return _dateTime.millisecond();
@@ -376,7 +370,7 @@ inline void LocalDateTime::adjustForTzd()
 }
 
 
-inline void swap(LocalDateTime& d1, LocalDateTime& d2)
+inline void swap(LocalDateTime& d1, LocalDateTime& d2) noexcept
 {
 	d1.swap(d2);
 }

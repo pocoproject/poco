@@ -50,7 +50,7 @@ using Poco::format;
 
 std::ostream& operator << (std::ostream& os, const Poco::Net::NetworkInterface::MACAddress& mac)
 {
-	std::ios state(0);
+	std::ios state(nullptr);
 	state.copyfmt(os);
 	for (unsigned i = 0; i < mac.size(); ++i)
 	{
@@ -78,8 +78,8 @@ public:
 	using Type = NetworkInterface::Type;
 
 	NetworkInterfaceImpl(unsigned index);
-	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress = 0);
-	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index = 0, NetworkInterface::MACAddress* pMACAddress = 0);
+	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, const IPAddress& address, unsigned index, NetworkInterface::MACAddress* pMACAddress = nullptr);
+	NetworkInterfaceImpl(const std::string& name, const std::string& displayName, const std::string& adapterName, unsigned index = 0, NetworkInterface::MACAddress* pMACAddress = nullptr);
 	NetworkInterfaceImpl(const std::string& name,
 		const std::string& displayName,
 		const std::string& adapterName,
@@ -87,7 +87,7 @@ public:
 		const IPAddress& subnetMask,
 		const IPAddress& broadcastAddress,
 		unsigned index,
-		NetworkInterface::MACAddress* pMACAddress = 0);
+		NetworkInterface::MACAddress* pMACAddress = nullptr);
 
 	unsigned index() const;
 	const std::string& name() const;
@@ -637,7 +637,7 @@ NetworkInterface& NetworkInterface::operator = (const NetworkInterface& interfc)
 }
 
 
-void NetworkInterface::swap(NetworkInterface& other)
+void NetworkInterface::swap(NetworkInterface& other) noexcept
 {
 	using std::swap;
 	swap(_pImpl, other._pImpl);
@@ -948,7 +948,7 @@ namespace Net {
 namespace {
 
 
-IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr, ULONG* pprefix = 0)
+IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr, ULONG* pprefix = nullptr)
 	/// This function relies on (1) subnet prefix being at the position
 	/// immediately preceding and (2) broadcast address being at the position
 	/// immediately succeeding the IPv4 unicast address.
@@ -959,7 +959,7 @@ IPAddress getBroadcastAddress(PIP_ADAPTER_PREFIX pPrefix, const IPAddress& addr,
 	/// not contain prefix length; for those platforms, this function
 	/// returns prefix through pprefix argument.
 {
-	PIP_ADAPTER_PREFIX pPrev = 0;
+	PIP_ADAPTER_PREFIX pPrev = nullptr;
 	for (int i = 0; pPrefix; pPrefix = pPrefix->Next, ++i)
 	{
 		ADDRESS_FAMILY family = pPrefix->Address.lpSockaddr->sa_family;
@@ -1009,7 +1009,6 @@ IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 	}
 	else
 	{
-#if !defined(_WIN32_WCE)
 		std::string subKey("SYSTEM\\CurrentControlSet\\services\\Tcpip\\Parameters\\Interfaces\\");
 		subKey += name;
 		std::string netmask;
@@ -1020,9 +1019,9 @@ IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 			return IPAddress();
 		wchar_t unetmask[16];
 		DWORD size = sizeof(unetmask);
-		if (RegQueryValueExW(hKey, L"DhcpSubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
+		if (RegQueryValueExW(hKey, L"DhcpSubnetMask", nullptr, nullptr, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
 		{
-			if (RegQueryValueExW(hKey, L"SubnetMask", NULL, NULL, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
+			if (RegQueryValueExW(hKey, L"SubnetMask", nullptr, nullptr, (LPBYTE)&unetmask, &size) != ERROR_SUCCESS)
 			{
 				RegCloseKey(hKey);
 				return IPAddress();
@@ -1031,9 +1030,6 @@ IPAddress subnetMaskForInterface(const std::string& name, bool isLoopback)
 		Poco::UnicodeConverter::toUTF8(unetmask, netmask);
 		RegCloseKey(hKey);
 		return IPAddress::parse(netmask);
-#else
-		return IPAddress();
-#endif // !defined(_WIN32_WCE)
 	}
 }
 
@@ -1063,12 +1059,12 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #endif
 	DWORD dwRetVal = 0;
 	ULONG iterations = 0;
-	PIP_ADAPTER_ADDRESSES pAddress = 0;
+	PIP_ADAPTER_ADDRESSES pAddress = nullptr;
 	do
 	{
 		pAddress = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(memory.begin()); // leave in the loop, begin may change after resize
 		poco_assert (memory.capacity() >= outBufLen);
-		if (ERROR_BUFFER_OVERFLOW == (dwRetVal = GetAdaptersAddresses(family, flags, 0, pAddress, &outBufLen)))
+		if (ERROR_BUFFER_OVERFLOW == (dwRetVal = GetAdaptersAddresses(family, flags, nullptr, pAddress, &outBufLen)))
 			memory.resize(outBufLen, false); // adjust size and try again
 		else if (ERROR_NO_DATA == dwRetVal) // no network interfaces found
 			return result;
@@ -1088,9 +1084,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		unsigned ifIndex = 0;
 
 #if defined(POCO_HAVE_IPv6)
-	#if defined(_WIN32_WCE)
-		ifIndex = pAddress->Ipv6IfIndex;
-	#elif (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
+	#if (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
 		#if defined (IP_ADAPTER_IPV6_ENABLED) // Vista
 			if(osvi.dwMajorVersion>=6)//vista
 			{
@@ -1146,7 +1140,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 		Poco::UnicodeConverter::toUTF8(pAddress->Description, displayName);
 
 		bool isUp = (pAddress->OperStatus == IfOperStatusUp);
-		bool isIP = (0 != pAddress->FirstUnicastAddress);
+		bool isIP = (nullptr != pAddress->FirstUnicastAddress);
 		if (((ipOnly && isIP) || !ipOnly) && ((upOnly && isUp) || !upOnly))
 		{
 			NetworkInterface ni(name, displayName, adapterName, ifIndex);
@@ -1190,24 +1184,8 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 						// OS, master address structure does not contain member for prefix length; we go an extra mile here in order to make sure
 						// we reflect the actual values held by system and protect against misconfiguration (e.g. bad DHCP config entry)
 						ULONG prefixLength = 0;
-#if defined(_WIN32_WCE)
-	#if _WIN32_WCE >= 0x0800
-						prefixLength = pUniAddr->OnLinkPrefixLength;
-						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address);
-	#else
-						broadcastAddress = getBroadcastAddress(pAddress->FirstPrefix, address, &prefixLength);
-	#endif
-						// if previous call did not do it, make last-ditch attempt for prefix and broadcast
-						if (prefixLength == 0 && pAddress->FirstPrefix)
-							prefixLength = pAddress->FirstPrefix->PrefixLength;
-						poco_assert (prefixLength <= 32);
-						if (broadcastAddress.isWildcard())
-						{
-							IPAddress mask(static_cast<unsigned>(prefixLength), IPAddress::IPv4);
-							IPAddress host(mask & address);
-							broadcastAddress = host | ~mask;
-						}
-#elif (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
+
+#if (_WIN32_WINNT >= 0x0501) && (NTDDI_VERSION >= 0x05010100) // Win XP SP1
 	#if (_WIN32_WINNT >= 0x0600) // Vista and newer
 						if (osvi.dwMajorVersion >= 6)
 						{
@@ -1391,13 +1369,13 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 	NetworkInterface intf;
 	Map::iterator ifIt;
 
-	struct ifaddrs* ifaces = 0;
-	struct ifaddrs* currIface = 0;
+	struct ifaddrs* ifaces = nullptr;
+	struct ifaddrs* currIface = nullptr;
 
 	if (getifaddrs(&ifaces) < 0)
 		throw NetException("cannot get network adapter list");
 
-	for (currIface = ifaces; currIface != 0; currIface = currIface->ifa_next)
+	for (currIface = ifaces; currIface != nullptr; currIface = currIface->ifa_next)
 	{
 		try
 		{
@@ -1508,11 +1486,11 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 
 
 #include <sys/types.h>
-#if POCO_OS != POCO_OS_ANDROID // Android doesn't have <ifaddrs.h>
+#if POCO_OS != POCO_OS_ANDROID || __ANDROID_API__ >= 24 // old Android doesn't have <ifaddrs.h>
 #include <ifaddrs.h>
 #endif
 #include <net/if.h>
-#ifndef POCO_NO_LINUX_IF_PACKET_H
+#if !defined(POCO_NO_LINUX_IF_PACKET_H) && !defined(POCO_EMSCRIPTEN)
 #include <linux/if_packet.h>
 #endif
 #include <net/if_arp.h>
@@ -1543,7 +1521,7 @@ static NetworkInterface::Type fromNative(unsigned arphrd)
 	}
 }
 
-#if POCO_OS != POCO_OS_ANDROID
+#if (POCO_OS != POCO_OS_ANDROID || __ANDROID_API__ >= 24) && !defined(POCO_EMSCRIPTEN)
 
 void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 {
@@ -1552,7 +1530,7 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 	impl.setAdapterName(iface->ifa_name);
 	impl.setPhyParams();
 
-#ifndef POCO_NO_LINUX_IF_PACKET_H
+#if !defined(POCO_NO_LINUX_IF_PACKET_H)
 	if (iface->ifa_addr->sa_family == AF_PACKET)
 	{
 		struct sockaddr_ll* sdl = (struct sockaddr_ll*) iface->ifa_addr;
@@ -1602,15 +1580,15 @@ void setInterfaceParams(struct ifaddrs* iface, NetworkInterfaceImpl& impl)
 
 NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 {
-#if POCO_OS != POCO_OS_ANDROID
+#if (POCO_OS != POCO_OS_ANDROID || __ANDROID_API__ >= 24) && !defined(POCO_EMSCRIPTEN)
 	FastMutex::ScopedLock lock(_mutex);
 	Map result;
 	unsigned ifIndex = 0;
 	NetworkInterface intf;
 	Map::iterator ifIt;
 
-	struct ifaddrs* ifaces = 0;
-	struct ifaddrs* iface = 0;
+	struct ifaddrs* ifaces = nullptr;
+	struct ifaddrs* iface = nullptr;
 
 	if (getifaddrs(&ifaces) < 0)
 		throw NetException("cannot get network adapter list");

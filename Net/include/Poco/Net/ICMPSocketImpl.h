@@ -41,7 +41,7 @@ public:
 		/// Sends an ICMP request through the socket to the given address.
 		///
 		/// Returns the number of bytes sent.
-	
+
 	int receiveFrom(void*, int, SocketAddress& address, int flags = 0);
 		/// Receives data from the socket.
 		/// Stores the address of the sender in address.

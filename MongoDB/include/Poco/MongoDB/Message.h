@@ -7,7 +7,7 @@
 //
 // Definition of the Message class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -32,15 +32,18 @@ namespace MongoDB {
 
 class MongoDB_API Message
 	/// Base class for all messages send or retrieved from MongoDB server.
+	///
+	/// INTERNAL: This is a base class for OpMsgMessage and not intended
+	/// for direct use. Use OpMsgMessage instead.
 {
 public:
 	explicit Message(MessageHeader::OpCode opcode);
 		/// Creates a Message using the given OpCode.
-	
+
 	virtual ~Message();
 		/// Destructor
 
-	MessageHeader& header();
+	[[nodiscard]] MessageHeader& header();
 		/// Returns the message header
 
 protected:

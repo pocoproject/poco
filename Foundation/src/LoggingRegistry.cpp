@@ -13,7 +13,6 @@
 
 
 #include "Poco/LoggingRegistry.h"
-#include "Poco/SingletonHolder.h"
 
 
 namespace Poco {
@@ -32,7 +31,7 @@ LoggingRegistry::~LoggingRegistry()
 Channel::Ptr LoggingRegistry::channelForName(const std::string& name) const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	ChannelMap::const_iterator it = _channelMap.find(name);
 	if (it != _channelMap.end())
 		return it->second;
@@ -60,7 +59,7 @@ void LoggingRegistry::registerChannel(const std::string& name, Channel::Ptr pCha
 	_channelMap[name] = ChannelPtr(pChannel, true);
 }
 
-	
+
 void LoggingRegistry::registerFormatter(const std::string& name, Formatter::Ptr pFormatter)
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -102,15 +101,10 @@ void LoggingRegistry::clear()
 }
 
 
-namespace
-{
-	static SingletonHolder<LoggingRegistry> sh;
-}
-
-
 LoggingRegistry& LoggingRegistry::defaultRegistry()
 {
-	return *sh.get();
+	static LoggingRegistry lr;
+	return lr;
 }
 
 

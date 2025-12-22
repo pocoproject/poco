@@ -42,7 +42,7 @@ void SerializerTest::testSerializeEmpty()
 {
 	Poco::JSON::Object::Ptr pObject = new Poco::JSON::Object;
 	std::string str = Serializer::serialize(*pObject);
-	assert (str == "e30");
+	assertTrue(str == "e30");
 }
 
 
@@ -51,7 +51,7 @@ void SerializerTest::testSerializeAlgNone()
 	Poco::JSON::Object::Ptr pObject = new Poco::JSON::Object;
 	pObject->set("alg", std::string("none"));
 	std::string str = Serializer::serialize(*pObject);
-	assert (str == "eyJhbGciOiJub25lIn0");
+	assertTrue(str == "eyJhbGciOiJub25lIn0");
 }
 
 
@@ -61,7 +61,7 @@ void SerializerTest::testSerializeAlgHS256()
 	pObject->set("alg", std::string("HS256"));
 	pObject->set("typ", std::string("JWT"));
 	std::string str = Serializer::serialize(*pObject);
-	assert (str == "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9");
+	assertTrue(str == "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9");
 }
 
 
@@ -69,7 +69,7 @@ void SerializerTest::testDeserializeEmpty()
 {
 	std::string serialized("e30");
 	Poco::JSON::Object::Ptr pObject = Serializer::deserialize(serialized);
-	assert (pObject->size() == 0);
+	assertTrue(pObject->size() == 0);
 }
 
 
@@ -77,8 +77,8 @@ void SerializerTest::testDeserializeAlgNone()
 {
 	std::string serialized("eyJhbGciOiJub25lIn0");
 	Poco::JSON::Object::Ptr pObject = Serializer::deserialize(serialized);
-	assert (pObject->size() == 1);
-	assert (pObject->getValue<std::string>("alg") == "none");
+	assertTrue(pObject->size() == 1);
+	assertTrue(pObject->getValue<std::string>("alg") == "none");
 }
 
 
@@ -86,9 +86,9 @@ void SerializerTest::testDeserializeAlgHS256()
 {
 	std::string serialized("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9");
 	Poco::JSON::Object::Ptr pObject = Serializer::deserialize(serialized);
-	assert (pObject->size() == 2);
-	assert (pObject->getValue<std::string>("alg") == "HS256");
-	assert (pObject->getValue<std::string>("typ") == "JWT");
+	assertTrue(pObject->size() == 2);
+	assertTrue(pObject->getValue<std::string>("alg") == "HS256");
+	assertTrue(pObject->getValue<std::string>("typ") == "JWT");
 }
 
 
@@ -96,10 +96,10 @@ void SerializerTest::testSplit()
 {
 	std::string jwt("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
 	std::vector<std::string> parts = Serializer::split(jwt);
-	assert (parts.size() == 3);
-	assert (parts[0] == "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9");
-	assert (parts[1] == "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ");
-	assert (parts[2] == "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
+	assertTrue(parts.size() == 3);
+	assertTrue(parts[0] == "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9");
+	assertTrue(parts[1] == "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ");
+	assertTrue(parts[2] == "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c");
 }
 
 
@@ -107,10 +107,10 @@ void SerializerTest::testSplitEmptySig()
 {
 	std::string jwt("eyJhbGciOiJub25lIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.");
 	std::vector<std::string> parts = Serializer::split(jwt);
-	assert (parts.size() == 3);
-	assert (parts[0] == "eyJhbGciOiJub25lIn0");
-	assert (parts[1] == "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ");
-	assert (parts[2] == "");
+	assertTrue(parts.size() == 3);
+	assertTrue(parts[0] == "eyJhbGciOiJub25lIn0");
+	assertTrue(parts[1] == "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ");
+	assertTrue(parts[2] == "");
 }
 
 

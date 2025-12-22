@@ -50,6 +50,9 @@ public:
 	~ODBCStatementImpl();
 		/// Destroys the ODBCStatementImpl.
 
+	std::string nativeSQL();
+		/// Returns the SQL string as modified by the driver.
+
 protected:
 	std::size_t columnsReturned() const;
 		/// Returns number of columns returned by query.
@@ -76,7 +79,7 @@ protected:
 		/// Returns true if another compile is possible.
 
 	void compileImpl();
-		/// Compiles the statement, doesn't bind yet. 
+		/// Compiles the statement, doesn't bind yet.
 		/// Does nothing if the statement has already been compiled.
 
 	void bindImpl();
@@ -88,8 +91,11 @@ protected:
 	AbstractBinding::BinderPtr binder();
 		/// Returns the concrete binder used by the statement.
 
-	std::string nativeSQL();
-		/// Returns the SQL string as modified by the driver.
+	void execDirectImpl(const std::string& query);
+		/// Execute query directly impl
+
+	void printErrors(std::ostream& os) const;
+		/// Print errors, if any.
 
 private:
 	typedef Poco::Data::AbstractBindingVec    Bindings;
@@ -101,12 +107,12 @@ private:
 	typedef std::vector<ExtractorPtr>         ExtractorVec;
 	typedef std::vector<ODBCMetaColumn*>      ColumnPtrVec;
 	typedef std::vector<ColumnPtrVec>         ColumnPtrVecVec;
-	
+
 	static const std::string INVALID_CURSOR_STATE;
 
 	void clear();
 		/// Closes the cursor and resets indicator variables.
-	
+
 	void doBind();
 		/// Binds parameters.
 
@@ -119,8 +125,8 @@ private:
 	void doPrepare();
 		/// Prepares placeholders for data returned by statement.
 		/// It is called during statement compilation for SQL statements
-		/// returning data. For stored procedures returning datasets, 
-		/// it is called upon the first check for data availability 
+		/// returning data. For stored procedures returning datasets,
+		/// it is called upon the first check for data availability
 		/// (see hasNext() function).
 
 	bool hasData() const;
@@ -133,24 +139,33 @@ private:
 		/// Returns true if there is a row fetched but not yet extracted.
 
 	void putData();
-		/// Called whenever SQLExecute returns SQL_NEED_DATA. This is expected 
-		/// behavior for PB_AT_EXEC binding mode. 
+		/// Called whenever SQLExecute returns SQL_NEED_DATA. This is expected
+		/// behavior for PB_AT_EXEC binding mode.
 
 	void addPreparator();
 	void fillColumns();
 	void checkError(SQLRETURN rc, const std::string& msg="");
 
-	const SQLHDBC&        _rConnection;
-	const StatementHandle _stmt;
-	PreparatorVec         _preparations;
-	BinderPtr             _pBinder;
-	ExtractorVec          _extractors;
-	bool                  _stepCalled;
-	int                   _nextResponse;
-	ColumnPtrVecVec       _columnPtrs;
-	bool                  _prepared;
-	mutable std::size_t   _affectedRowCount;
-	bool                  _canCompile;
+	struct ERROR_INFO
+	{
+		SQLCHAR state[8];
+		SQLINTEGER native;
+		SQLCHAR text[256];
+	};
+	void addErrors();
+
+	const SQLHDBC&          _rConnection;
+	const StatementHandle   _stmt;
+	PreparatorVec           _preparations;
+	BinderPtr               _pBinder;
+	ExtractorVec            _extractors;
+	bool                    _stepCalled;
+	int                     _nextResponse;
+	ColumnPtrVecVec         _columnPtrs;
+	bool                    _prepared;
+	mutable std::size_t     _affectedRowCount;
+	bool                    _canCompile;
+	std::vector<ERROR_INFO> _errorInfo;
 };
 
 

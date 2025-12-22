@@ -273,6 +273,10 @@ header in the request.
 
 Allows to specify the value of the HTTP Content-Security-Policy header.
 
+!referrerPolicy
+
+Allows to specify the value of the HTTP Referrer-Policy header.
+
 !chunked
 
 Allows you to specify whether the response is sent using chunked transfer encoding.

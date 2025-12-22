@@ -34,33 +34,33 @@ using Poco::Util::OptionCallback;
 class Un7zipApp: public Application
 {
 public:
-	Un7zipApp(): 
+	Un7zipApp():
 		_helpRequested(false),
 		_list(false),
 		_extract(false)
 	{
 	}
 
-protected:	
+protected:
 	void initialize(Application& self)
 	{
 		loadConfiguration(); // load default configuration files, if present
 		Application::initialize(self);
 		// add your own initialization code here
 	}
-	
+
 	void uninitialize()
 	{
 		// add your own uninitialization code here
 		Application::uninitialize();
 	}
-	
+
 	void reinitialize(Application& self)
 	{
 		Application::reinitialize(self);
 		// add your own reinitialization code here
 	}
-	
+
 	void defineOptions(OptionSet& options)
 	{
 		Application::defineOptions(options);
@@ -77,7 +77,7 @@ protected:
 				.repeatable(false)
 				.argument("path")
 				.callback(OptionCallback<Un7zipApp>(this, &Un7zipApp::handleOutput)));
-				
+
 		options.addOption(
 			Option("list", "l", "List files and directories in archive.")
 				.required(false)
@@ -91,7 +91,7 @@ protected:
 				.argument("file", false)
 				.callback(OptionCallback<Un7zipApp>(this, &Un7zipApp::handleExtract)));
 	}
-	
+
 	void handleHelp(const std::string& name, const std::string& value)
 	{
 		_helpRequested = true;
@@ -103,18 +103,18 @@ protected:
 	{
 		_outputPath = value;
 	}
-	
+
 	void handleList(const std::string& name, const std::string& value)
 	{
 		_list = true;
 	}
-	
+
 	void handleExtract(const std::string& name, const std::string& value)
 	{
 		_extract = true;
 		_extractFile = value;
 	}
-	
+
 	void displayHelp()
 	{
 		HelpFormatter helpFormatter(options());
@@ -123,12 +123,12 @@ protected:
 		helpFormatter.setHeader("A application that demonstrates usage of Poco::SevenZip::Archive.");
 		helpFormatter.format(std::cout);
 	}
-	
+
 	void onExtracted(const Poco::SevenZip::Archive::ExtractedEventArgs& args)
 	{
 		std::cout << "Extracted: " << args.entry.path() << " ===> " << args.extractedPath << std::endl;
 	}
-	
+
 	void onFailed(const Poco::SevenZip::Archive::FailedEventArgs& args)
 	{
 		std::cout << "Failed: " << args.entry.path() << ": " << args.pException->displayText() << std::endl;
@@ -139,28 +139,28 @@ protected:
 		if (!_helpRequested && !args.empty())
 		{
 			Poco::SevenZip::Archive archive(args[0]);
-			
+
 			if (_list)
 			{
 				for (Poco::SevenZip::Archive::ConstIterator it = archive.begin(); it != archive.end(); ++it)
 				{
-					std::cout 
-						<< (it->isFile() ? '-' : 'd') 
+					std::cout
+						<< (it->isFile() ? '-' : 'd')
 						<< " "
 						<< Poco::DateTimeFormatter::format(it->lastModified(), Poco::DateTimeFormat::SORTABLE_FORMAT)
-						<< " " 
+						<< " "
 						<< std::setw(12) << it->size()
-						<< " " 
+						<< " "
 						<< it->path()
 						<< std::endl;
 				}
 			}
-			
+
 			if (_extract)
-			{			
+			{
 				archive.extracted += Poco::delegate(this, &Un7zipApp::onExtracted);
 				archive.failed += Poco::delegate(this, &Un7zipApp::onFailed);
-			
+
 				if (_extractFile.empty())
 				{
 					archive.extract(_outputPath);
@@ -179,7 +179,7 @@ protected:
 		}
 		return Application::EXIT_OK;
 	}
-	
+
 private:
 	bool _helpRequested;
 	std::string _outputPath;

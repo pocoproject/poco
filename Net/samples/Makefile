@@ -5,12 +5,13 @@
 #
 
 .PHONY: projects
-clean all: projects
+clean distclean all: projects
 projects:
 	$(MAKE) -C dict $(MAKECMDGOALS)
 	$(MAKE) -C TimeServer $(MAKECMDGOALS)
 	$(MAKE) -C httpget $(MAKECMDGOALS)
 	$(MAKE) -C HTTPTimeServer $(MAKECMDGOALS)
+	$(MAKE) -C HTTPReactorTimeServer $(MAKECMDGOALS)
 	$(MAKE) -C HTTPFormServer $(MAKECMDGOALS)
 	$(MAKE) -C HTTPLoadTest $(MAKECMDGOALS)
 	$(MAKE) -C download $(MAKECMDGOALS)

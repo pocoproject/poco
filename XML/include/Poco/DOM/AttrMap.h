@@ -54,7 +54,7 @@ private:
 	AttrMap();
 
 	Element* _pElement;
-	
+
 	friend class Element;
 };
 

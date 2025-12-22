@@ -58,7 +58,7 @@ using Poco::strToInt;
 using Poco::strToFloat;
 using Poco::strToDouble;
 using Poco::intToStr;
-using Poco::uIntToStr;
+using Poco::intToStr;
 using Poco::floatToStr;
 using Poco::doubleToStr;
 using Poco::thousandSeparator;
@@ -70,6 +70,7 @@ using Poco::MemoryInputStream;
 using Poco::Stopwatch;
 using Poco::RangeException;
 using Poco::isIntOverflow;
+using Poco::safeMultiply;
 using Poco::isSafeIntCast;
 using Poco::safeIntCast;
 using Poco::FPEnvironment;
@@ -429,6 +430,10 @@ void StringTest::testReplaceInPlace()
 	std::string s("aabbccdd");
 
 	replaceInPlace(s, std::string("aa"), std::string("xx"));
+	assertTrue (s == "xxbbccdd");
+	
+	s = "aabbccdd";
+	replaceInPlace(s, "aa", "xx");
 	assertTrue (s == "xxbbccdd");
 
 	s = "aabbccdd";
@@ -915,121 +920,6 @@ void StringTest::testNumericLocale()
 }
 
 
-void StringTest::benchmarkStrToInt()
-{
-	Poco::Stopwatch sw;
-	std::string num = "123456789";
-	int res;
-	sw.start();
-	for (int i = 0; i < 1000000; ++i) parseStream(num, res);
-	sw.stop();
-	std::cout << "parseStream Number: " << res << std::endl;
-	double timeStream = sw.elapsed() / 1000.0;
-
-	char* pC = 0;
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) res = std::strtol(num.c_str(), &pC, 10);
-	sw.stop();
-	std::cout << "std::strtol Number: " << res << std::endl;
-	double timeStrtol = sw.elapsed() / 1000.0;
-
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) strToInt(num.c_str(), res, 10);
-	sw.stop();
-	std::cout << "strToInt Number: " << res << std::endl;
-	double timeStrToInt = sw.elapsed() / 1000.0;
-
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%d", &res);
-	sw.stop();
-	std::cout << "sscanf Number: " << res << std::endl;
-	double timeScanf = sw.elapsed() / 1000.0;
-
-	int graph;
-	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
-	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << timeStream << "[ms]" << std::endl;
-
-	std::cout << std::setw(14) << "std::strtol:\t" << std::setw(10) << std::setfill(' ') << timeStrtol << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrtol) << '\t' ;
-	graph = (int) (timeStream / timeStrtol); for (int i = 0; i < graph; ++i) std::cout << '|';
-
-	std::cout << std::endl << std::setw(14) << "strToInt:\t" << std::setw(10) << std::setfill(' ') << timeStrToInt << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrToInt) << '\t' ;
-	graph = (int) (timeStream / timeStrToInt); for (int i = 0; i < graph; ++i) std::cout << '|';
-
-	std::cout << std::endl << std::setw(14) << "std::sscanf:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeScanf) << '\t' ;
-	graph = (int) (timeStream / timeScanf); for (int i = 0; i < graph; ++i) std::cout << '|';
-	std::cout << std::endl;
-}
-
-
-void StringTest::benchmarkStrToFloat()
-{
-	Poco::Stopwatch sw;
-	std::string num = "1.0372157551632929e-112";
-	std::cout << "The Number: " << num << std::endl;
-	double res;
-	sw.start();
-	for (int i = 0; i < 1000000; ++i) parseStream(num, res);
-	sw.stop();
-	std::cout << "parseStream Number: " << std::setprecision(std::numeric_limits<double>::digits10) << res << std::endl;
-	double timeStream = sw.elapsed() / 1000.0;
-
-	// standard strtod
-	char* pC = 0;
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) res = std::strtod(num.c_str(), &pC);
-	sw.stop();
-	std::cout << "std::strtod Number: " << res << std::endl;
-	double timeStdStrtod = sw.elapsed() / 1000.0;
-
-	// POCO Way
-	sw.restart();
-	char ou = 0;
-	for (int i = 0; i < 1000000; ++i) strToDouble(num, res, ou);
-	sw.stop();
-	std::cout << "strToDouble Number: " << res << std::endl;
-	double timeStrToDouble = sw.elapsed() / 1000.0;
-
-	// standard sscanf
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%lf", &res);
-	sw.stop();
-	std::cout << "sscanf Number: " << res << std::endl;
-	double timeScanf = sw.elapsed() / 1000.0;
-
-	// double-conversion Strtod
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) strToDouble(num.c_str());
-	sw.stop();
-	std::cout << "Strtod Number: " << res << std::endl;
-	double timeStrtod = sw.elapsed() / 1000.0;
-
-	int graph;
-	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
-	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << std::setprecision(4) << timeStream << "[ms]" << std::endl;
-
-	std::cout << std::setw(14) << "std::strtod:\t" << std::setw(10) << std::setfill(' ') << timeStdStrtod << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStdStrtod) << '\t' ;
-	graph = (int) (timeStream / timeStdStrtod); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl << std::setw(14) << "strToDouble:\t" << std::setw(10) << std::setfill(' ') << timeStrToDouble << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrToDouble) << '\t' ;
-	graph = (int) (timeStream / timeStrToDouble); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl << std::setw(14) << "std::sscanf:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeScanf) << '\t' ;
-	graph = (int) (timeStream / timeScanf); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl << std::setw(14) << "StrtoD:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrtod) << '\t' ;
-	graph = (int) (timeStream / timeStrtod); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl;
-}
-
-
 void StringTest::testIntToString()
 {
 	//intToStr(T number, unsigned short base, std::string& result, bool prefix = false, int width = -1, char fill = ' ', char thSep = 0)
@@ -1058,65 +948,90 @@ void StringTest::testIntToString()
 	assertTrue (result == "1001001100101100000001011010010");
 	assertTrue (intToStr(1234567890, 2, result, true, 35, '0'));
 	assertTrue (result == "00001001001100101100000001011010010");
-	assertTrue (uIntToStr(0xFF, 2, result));
+	assertTrue (intToStr(0xFF, 2, result));
 	assertTrue (result == "11111111");
-	assertTrue (uIntToStr(0x0F, 2, result, false, 8, '0'));
+	assertTrue (intToStr(0x0F, 2, result, false, 8, '0'));
 	assertTrue (result == "00001111");
-	assertTrue (uIntToStr(0x0F, 2, result));
+	assertTrue (intToStr(0x0F, 2, result));
 	assertTrue (result == "1111");
-	assertTrue (uIntToStr(0xF0, 2, result));
+	assertTrue (intToStr(0xF0, 2, result));
 	assertTrue (result == "11110000");
-	assertTrue (uIntToStr(0xFFFF, 2, result));
+	assertTrue (intToStr(0xFFFF, 2, result));
 	assertTrue (result == "1111111111111111");
-	assertTrue (uIntToStr(0xFF00, 2, result));
+	assertTrue (intToStr(0xFF00, 2, result));
 	assertTrue (result == "1111111100000000");
-	assertTrue (uIntToStr(0xFFFFFFFF, 2, result));
+	assertTrue (intToStr(0xFFFFFFFF, 2, result));
 	assertTrue (result == "11111111111111111111111111111111");
-	assertTrue (uIntToStr(0xFF00FF00, 2, result));
+	assertTrue (intToStr(0xFF00FF00, 2, result));
 	assertTrue (result == "11111111000000001111111100000000");
-	assertTrue (uIntToStr(0xF0F0F0F0, 2, result));
+	assertTrue (intToStr(0xF0F0F0F0, 2, result));
 	assertTrue (result == "11110000111100001111000011110000");
 #if defined(POCO_HAVE_INT64)
-	assertTrue (uIntToStr(0xFFFFFFFFFFFFFFFF, 2, result));
+	assertTrue (intToStr(0xFFFFFFFFFFFFFFFF, 2, result));
 	assertTrue (result == "1111111111111111111111111111111111111111111111111111111111111111");
-	assertTrue (uIntToStr(0xFF00000FF00000FF, 2, result));
+	assertTrue (intToStr(0xFF00000FF00000FF, 2, result));
 	assertTrue (result == "1111111100000000000000000000111111110000000000000000000011111111");
 #endif
 
 	// octal
-	assertTrue (uIntToStr(1234567890, 010, result));
+	assertTrue (intToStr(1234567890, 010, result));
 	assertTrue (result == "11145401322");
-	assertTrue (uIntToStr(1234567890, 010, result, true));
+	assertTrue (intToStr(1234567890, 010, result, true));
 	assertTrue (result == "011145401322");
-	assertTrue (uIntToStr(1234567890, 010, result, true, 15, '0'));
+	assertTrue (intToStr(1234567890, 010, result, true, 15, '0'));
 	assertTrue (result == "000011145401322");
-	assertTrue (uIntToStr(012345670, 010, result, true));
+	assertTrue (intToStr(012345670, 010, result, true));
 	assertTrue (result == "012345670");
-	assertTrue (uIntToStr(012345670, 010, result));
+	assertTrue (intToStr(012345670, 010, result));
 	assertTrue (result == "12345670");
 
 	// hexadecimal
-	assertTrue (uIntToStr(0, 0x10, result, true));
+	// uppercase
+	assertTrue (intToStr(0, 0x10, result, true));
 	assertTrue (result == "0x0");
-	assertTrue (uIntToStr(0, 0x10, result, true, 4, '0'));
+	assertTrue (intToStr(0, 0x10, result, true, 4, '0'));
 	assertTrue (result == "0x00");
-	assertTrue (uIntToStr(0, 0x10, result, false, 4, '0'));
+	assertTrue (intToStr(0, 0x10, result, false, 4, '0'));
 	assertTrue (result == "0000");
-	assertTrue (uIntToStr(1234567890, 0x10, result));
+	assertTrue (intToStr(1234567890, 0x10, result));
 	assertTrue (result == "499602D2");
-	assertTrue (uIntToStr(1234567890, 0x10, result, true));
+	assertTrue (intToStr(1234567890, 0x10, result, true));
 	assertTrue (result == "0x499602D2");
-	assertTrue (uIntToStr(1234567890, 0x10, result, true, 15, '0'));
+	assertTrue (intToStr(1234567890, 0x10, result, true, 15, '0'));
 	assertTrue (result == "0x00000499602D2");
-	assertTrue (uIntToStr(0x1234567890ABCDEF, 0x10, result, true));
+	assertTrue (intToStr(0x1234567890ABCDEF, 0x10, result, true));
 	assertTrue (result == "0x1234567890ABCDEF");
-	assertTrue (uIntToStr(0xDEADBEEF, 0x10, result));
+	assertTrue (intToStr(0xDEADBEEF, 0x10, result));
 	assertTrue (result == "DEADBEEF");
 #if defined(POCO_HAVE_INT64)
-	assertTrue (uIntToStr(0xFFFFFFFFFFFFFFFF, 0x10, result));
+	assertTrue (intToStr(0xFFFFFFFFFFFFFFFF, 0x10, result));
 	assertTrue (result == "FFFFFFFFFFFFFFFF");
-	assertTrue (uIntToStr(0xFFFFFFFFFFFFFFFF, 0x10, result, true));
+	assertTrue (intToStr(0xFFFFFFFFFFFFFFFF, 0x10, result, true));
 	assertTrue (result == "0xFFFFFFFFFFFFFFFF");
+#endif
+
+	// lowercase
+	assertTrue (intToStr(0, 0x10, result, true, -1, (char)32, 0, true));
+	assertTrue (result == "0x0");
+	assertTrue (intToStr(0, 0x10, result, true, 4, '0', 0, true));
+	assertTrue (result == "0x00");
+	assertTrue (intToStr(0, 0x10, result, false, 4, '0', 0, true));
+	assertTrue (result == "0000");
+	assertTrue (intToStr(1234567890, 0x10, result, false, -1, (char)32, 0, true));
+	assertTrue (result == "499602d2");
+	assertTrue (intToStr(1234567890, 0x10, result, true, -1, (char)32, 0, true));
+	assertTrue (result == "0x499602d2");
+	assertTrue (intToStr(1234567890, 0x10, result, true, 15, '0', 0, true));
+	assertTrue (result == "0x00000499602d2");
+	assertTrue (intToStr(0x1234567890ABCDEF, 0x10, result, true, -1, (char)32, 0, true));
+	assertTrue (result == "0x1234567890abcdef");
+	assertTrue (intToStr(0xDEADBEEF, 0x10, result, false, -1, (char)32, 0, true));
+	assertTrue (result == "deadbeef");
+#if defined(POCO_HAVE_INT64)
+	assertTrue (intToStr(0xFFFFFFFFFFFFFFFF, 0x10, result, false, -1, (char)32, 0, true));
+	assertTrue (result == "ffffffffffffffff");
+	assertTrue (intToStr(0xFFFFFFFFFFFFFFFF, 0x10, result, true, -1, (char)32, 0, true));
+	assertTrue (result == "0xffffffffffffffff");
 #endif
 
 	try
@@ -1325,6 +1240,15 @@ void StringTest::testNumericStringLimit()
 	numericStringLowerLimit<int16_t, int8_t>();
 	numericStringLowerLimit<int32_t, int16_t>();
 	numericStringLowerLimit<int64_t, int32_t>();
+
+	multiplyOverflow<int8_t>();
+	multiplyOverflow<uint8_t>();
+	multiplyOverflow<int16_t>();
+	multiplyOverflow<uint16_t>();
+	multiplyOverflow<int32_t>();
+	multiplyOverflow<uint32_t>();
+	multiplyOverflow<int64_t>();
+	multiplyOverflow<uint64_t>();
 }
 
 
@@ -1343,8 +1267,112 @@ void formatStream(double value, std::string& str)
 void formatSprintf(double value, std::string& str)
 {
 	char buffer[128];
-	std::sprintf(buffer, "%.*g", 16, value);
+	std::snprintf(buffer, sizeof(buffer), "%.*g", 16, value);
 	str = buffer;
+}
+
+
+void StringTest::testJSONString()
+{
+	assertTrue (toJSON("\\", 0) == "\\\\");
+	assertTrue (toJSON("\"", 0) == "\\\"");
+	assertTrue (toJSON("\a", 0) == "\\u0007");
+	assertTrue (toJSON("\b", 0) == "\\b");
+	assertTrue (toJSON("\f", 0) == "\\f");
+	assertTrue (toJSON("\n", 0) == "\\n");
+	assertTrue (toJSON("\r", 0) == "\\r");
+	assertTrue (toJSON("\t", 0) == "\\t");
+	assertTrue (toJSON("\v", 0) == "\\u000B");
+	assertTrue (toJSON("\v", Poco::JSON_LOWERCASE_HEX) == "\\u000b");
+	assertTrue (toJSON("a", 0) == "a");
+	assertTrue (toJSON("\xD0\x82", 0) == "\xD0\x82");
+	assertTrue (toJSON("\xD0\x82", Poco::JSON_ESCAPE_UNICODE) == "\\u0402");
+
+	// ??? on MSVC, the assert macro expansion
+	// fails to compile when this string is inline ???
+	std::string str = "\"foo\\\\\"";
+	assertTrue (toJSON("foo\\") == str);
+
+	assertTrue (toJSON("bar/") == "\"bar/\"");
+	assertTrue (toJSON("baz") == "\"baz\"");
+	assertTrue (toJSON("q\"uote\"d") == "\"q\\\"uote\\\"d\"");
+	assertTrue (toJSON("bs\b") == "\"bs\\b\"");
+	assertTrue (toJSON("nl\n") == "\"nl\\n\"");
+	assertTrue (toJSON("tb\t") == "\"tb\\t\"");
+	assertTrue (toJSON("\xD0\x82") == "\"\xD0\x82\"");
+	assertTrue (toJSON("\xD0\x82", Poco::JSON_WRAP_STRINGS) == "\"\xD0\x82\"");
+	assertTrue (toJSON("\xD0\x82",
+			Poco::JSON_WRAP_STRINGS | Poco::JSON_ESCAPE_UNICODE) == "\"\\u0402\"");
+
+	std::ostringstream ostr;
+	toJSON("foo\\", ostr);
+	assertTrue (ostr.str() == str);
+	ostr.str("");
+
+	toJSON("foo\\", ostr);
+	assertTrue (toJSON("bar/") == "\"bar/\"");
+	ostr.str("");
+	toJSON("baz", ostr);
+	assertTrue (ostr.str() == "\"baz\"");
+	ostr.str("");
+	toJSON("q\"uote\"d", ostr);
+	assertTrue (ostr.str() == "\"q\\\"uote\\\"d\"");
+	ostr.str("");
+	toJSON("bs\b", ostr);
+	assertTrue (ostr.str() == "\"bs\\b\"");
+	ostr.str("");
+	toJSON("nl\n", ostr);
+	assertTrue (ostr.str() == "\"nl\\n\"");
+	ostr.str("");
+	toJSON("tb\t", ostr);
+	assertTrue (ostr.str() == "\"tb\\t\"");
+
+	ostr.str("");
+	toJSON("\xD0\x82", ostr);
+	assertTrue (ostr.str() == "\"\xD0\x82\"");
+	ostr.str("");
+	toJSON("\xD0\x82", ostr, Poco::JSON_WRAP_STRINGS);
+	assertTrue (ostr.str() == "\"\xD0\x82\"");
+
+	// wrap
+	// uppercase (default)
+	ostr.str("");
+	toJSON("\v", ostr);
+	assertTrue (ostr.str() == "\"\\u000B\"");
+	// lowercase
+	ostr.str("");
+	toJSON("\v", ostr, Poco::JSON_WRAP_STRINGS | Poco::JSON_LOWERCASE_HEX);
+	assertTrue (ostr.str() == "\"\\u000b\"");
+
+	// no wrap
+	// uppercase
+	ostr.str("");
+	toJSON("\v", ostr, 0);
+	assertTrue (ostr.str() == "\\u000B");
+	// lowercase
+	ostr.str("");
+	toJSON("\v", ostr, Poco::JSON_LOWERCASE_HEX);
+	assertTrue (ostr.str() == "\\u000b");
+
+	ostr.str("");
+	toJSON("\xD0\x82", ostr, Poco::JSON_WRAP_STRINGS | Poco::JSON_ESCAPE_UNICODE);
+	assertTrue (ostr.str() == "\"\\u0402\"");
+	ostr.str("");
+}
+
+
+
+void StringTest::conversionBenchmarks()
+{
+	std::cout << std::endl << "===================" << std::endl;
+	benchmarkFloatToStr();
+	std::cout << "===================" << std::endl << std::endl;
+	std::cout << "===================" << std::endl;
+	benchmarkStrToFloat();
+	std::cout << "===================" << std::endl << std::endl;
+	std::cout << "===================" << std::endl;
+	benchmarkStrToInt();
+	std::cout << "===================" << std::endl << std::endl;
 }
 
 
@@ -1405,69 +1433,126 @@ void StringTest::benchmarkFloatToStr()
 }
 
 
-void StringTest::testJSONString()
+void StringTest::benchmarkStrToInt()
 {
-	assertTrue (toJSON("\\", false) == "\\\\");
-	assertTrue (toJSON("\"", false) == "\\\"");
-	assertTrue (toJSON("\a", false) == "\\u0007");
-	assertTrue (toJSON("\b", false) == "\\b");
-	assertTrue (toJSON("\f", false) == "\\f");
-	assertTrue (toJSON("\n", false) == "\\n");
-	assertTrue (toJSON("\r", false) == "\\r");
-	assertTrue (toJSON("\t", false) == "\\t");
-	assertTrue (toJSON("\v", false) == "\\u000B");
-	assertTrue (toJSON("a", false) == "a");
-	assertTrue (toJSON("\xD0\x82", 0) == "\xD0\x82");
-	assertTrue (toJSON("\xD0\x82", Poco::JSON_ESCAPE_UNICODE) == "\\u0402");
+	Poco::Stopwatch sw;
+	std::string num = "123456789";
+	int res[4] = {};
+	sw.start();
+	for (int i = 0; i < 1000000; ++i) parseStream(num, res[0]);
+	sw.stop();
+	std::cout << "parseStream Number: " << res[0] << std::endl;
+	double timeStream = sw.elapsed() / 1000.0;
 
-	// ??? on MSVC, the assert macro expansion
-	// fails to compile when this string is inline ???
-	std::string str = "\"foo\\\\\"";
-	assertTrue (toJSON("foo\\") == str);
+	char* pC = nullptr;
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) res[1] = std::strtol(num.c_str(), &pC, 10);
+	sw.stop();
+	std::cout << "std::strtol Number: " << res[1] << std::endl;
+	double timeStrtol = sw.elapsed() / 1000.0;
 
-	assertTrue (toJSON("bar/") == "\"bar/\"");
-	assertTrue (toJSON("baz") == "\"baz\"");
-	assertTrue (toJSON("q\"uote\"d") == "\"q\\\"uote\\\"d\"");
-	assertTrue (toJSON("bs\b") == "\"bs\\b\"");
-	assertTrue (toJSON("nl\n") == "\"nl\\n\"");
-	assertTrue (toJSON("tb\t") == "\"tb\\t\"");
-	assertTrue (toJSON("\xD0\x82") == "\"\xD0\x82\"");
-	assertTrue (toJSON("\xD0\x82", Poco::JSON_WRAP_STRINGS) == "\"\xD0\x82\"");
-	assertTrue (toJSON("\xD0\x82",
-			Poco::JSON_WRAP_STRINGS | Poco::JSON_ESCAPE_UNICODE) == "\"\\u0402\"");
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) strToInt(num.c_str(), res[2], 10);
+	sw.stop();
+	std::cout << "strToInt Number: " << res[2] << std::endl;
+	double timeStrToInt = sw.elapsed() / 1000.0;
 
-	std::ostringstream ostr;
-	toJSON("foo\\", ostr);
-	assertTrue (ostr.str() == str);
-	ostr.str("");
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%d", &res[3]);
+	sw.stop();
+	std::cout << "sscanf Number: " << res[3] << std::endl;
+	double timeScanf = sw.elapsed() / 1000.0;
 
-	toJSON("foo\\", ostr);
-	assertTrue (toJSON("bar/") == "\"bar/\"");
-	ostr.str("");
-	toJSON("baz", ostr);
-	assertTrue (ostr.str() == "\"baz\"");
-	ostr.str("");
-	toJSON("q\"uote\"d", ostr);
-	assertTrue (ostr.str() == "\"q\\\"uote\\\"d\"");
-	ostr.str("");
-	toJSON("bs\b", ostr);
-	assertTrue (ostr.str() == "\"bs\\b\"");
-	ostr.str("");
-	toJSON("nl\n", ostr);
-	assertTrue (ostr.str() == "\"nl\\n\"");
-	ostr.str("");
-	toJSON("tb\t", ostr);
-	assertTrue (ostr.str() == "\"tb\\t\"");
-	ostr.str("");
-	toJSON("\xD0\x82", ostr);
-	assertTrue (ostr.str() == "\"\xD0\x82\"");
-	ostr.str("");
-	toJSON("\xD0\x82", ostr, Poco::JSON_WRAP_STRINGS);
-	assertTrue (ostr.str() == "\"\xD0\x82\"");
-	ostr.str("");
-	toJSON("\xD0\x82", ostr, Poco::JSON_WRAP_STRINGS | Poco::JSON_ESCAPE_UNICODE);
-	assertTrue (ostr.str() == "\"\\u0402\"");
-	ostr.str("");
+	assertEqual (res[0], res[1]);
+	assertEqual (res[1], res[2]);
+	assertEqual (res[2], res[3]);
+
+	int graph;
+	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
+	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << timeStream << "[ms]" << std::endl;
+
+	std::cout << std::setw(14) << "std::strtol:\t" << std::setw(10) << std::setfill(' ') << timeStrtol << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrtol) << '\t' ;
+	graph = (int) (timeStream / timeStrtol); for (int i = 0; i < graph; ++i) std::cout << '|';
+
+	std::cout << std::endl << std::setw(14) << "strToInt:\t" << std::setw(10) << std::setfill(' ') << timeStrToInt << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrToInt) << '\t' ;
+	graph = (int) (timeStream / timeStrToInt); for (int i = 0; i < graph; ++i) std::cout << '|';
+
+	std::cout << std::endl << std::setw(14) << "std::sscanf:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeScanf) << '\t' ;
+	graph = (int) (timeStream / timeScanf); for (int i = 0; i < graph; ++i) std::cout << '|';
+	std::cout << std::endl;
+}
+
+
+void StringTest::benchmarkStrToFloat()
+{
+	double res[5] = {};
+	Poco::Stopwatch sw;
+	std::string num = "1.0372157551632929e-112";
+	std::cout << "The Number: " << num << std::endl;
+	sw.start();
+	for (int i = 0; i < 1000000; ++i) parseStream(num, res[0]);
+	sw.stop();
+	std::cout << "parseStream Number: " << std::setprecision(std::numeric_limits<double>::digits10) << res[0] << std::endl;
+	double timeStream = sw.elapsed() / 1000.0;
+
+	// standard strtod
+	char* pC = nullptr;
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) res[1] = std::strtod(num.c_str(), &pC);
+	sw.stop();
+	std::cout << "std::strtod Number: " << res[1] << std::endl;
+	double timeStdStrtod = sw.elapsed() / 1000.0;
+
+	// POCO Way
+	sw.restart();
+	char ou = 0;
+	for (int i = 0; i < 1000000; ++i) strToDouble(num, res[2], ou);
+	sw.stop();
+	std::cout << "Poco::strToDouble(const string&, double&) Number: " << res[2] << std::endl;
+	double timeStrToDouble = sw.elapsed() / 1000.0;
+
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) res[3] = strToDouble(num.c_str());
+	sw.stop();
+	std::cout << "Poco::strToDouble(const char*) Number: " << res[3] << std::endl;
+	double timeStrtoD = sw.elapsed() / 1000.0;
+
+	// standard sscanf
+	sw.restart();
+	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%lf", &res[4]);
+	sw.stop();
+	std::cout << "sscanf Number: " << res[4] << std::endl;
+	double timeScanf = sw.elapsed() / 1000.0;
+
+	assertEqual (res[0], res[1]);
+	assertEqual (res[1], res[2]);
+	assertEqual (res[2], res[3]);
+	assertEqual (res[3], res[4]);
+
+	int graph;
+	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
+	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << std::setprecision(4) << timeStream << "[ms]" << std::endl;
+
+	std::cout << std::setw(14) << "std::strtod:\t" << std::setw(10) << std::setfill(' ') << timeStdStrtod << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStdStrtod) << '\t' ;
+	graph = (int) (timeStream / timeStdStrtod); for (int i = 0; i < graph; ++i) std::cout << '#';
+
+	std::cout << std::endl << std::setw(14) << "strToDouble:\t" << std::setw(10) << std::setfill(' ') << timeStrToDouble << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrToDouble) << '\t' ;
+	graph = (int) (timeStream / timeStrToDouble); for (int i = 0; i < graph; ++i) std::cout << '#';
+
+	std::cout << std::endl << std::setw(14) << "strToDouble:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrtoD) << '\t' ;
+	graph = (int) (timeStream / timeStrtoD); for (int i = 0; i < graph; ++i) std::cout << '#';
+
+	std::cout << std::endl << std::setw(14) << "std::sscanf:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
+	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeScanf) << '\t' ;
+	graph = (int) (timeStream / timeScanf); for (int i = 0; i < graph; ++i) std::cout << '#';
+
+	std::cout << std::endl;
 }
 
 
@@ -1510,12 +1595,10 @@ CppUnit::Test* StringTest::suite()
 	CppUnit_addTest(pSuite, StringTest, testNumericStringLimit);
 	CppUnit_addTest(pSuite, StringTest, testStringToFloatError);
 	CppUnit_addTest(pSuite, StringTest, testNumericLocale);
-	//CppUnit_addTest(pSuite, StringTest, benchmarkStrToFloat);
-	//CppUnit_addTest(pSuite, StringTest, benchmarkStrToInt);
 	CppUnit_addTest(pSuite, StringTest, testIntToString);
 	CppUnit_addTest(pSuite, StringTest, testFloatToString);
-	//CppUnit_addTest(pSuite, StringTest, benchmarkFloatToStr);
 	CppUnit_addTest(pSuite, StringTest, testJSONString);
+	CppUnit_addTest(pSuite, StringTest, conversionBenchmarks);
 
 	return pSuite;
 }

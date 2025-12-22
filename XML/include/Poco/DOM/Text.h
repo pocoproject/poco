@@ -34,7 +34,7 @@ class XML_API Text: public CharacterData
 	/// object implementing the Text interface that is the only child of the element.
 	/// If there is markup, it is parsed into the information items (elements, comments,
 	/// etc.) and Text nodes that form the list of children of the element.
-	/// 
+	///
 	/// When a document is first made available via the DOM, there is only one Text
 	/// node for each block of text. Users may create adjacent Text nodes that represent
 	/// the contents of a given element without any intervening markup, but should
@@ -68,7 +68,7 @@ protected:
 
 private:
 	static const XMLString NODE_NAME;
-	
+
 	friend class Document;
 };
 

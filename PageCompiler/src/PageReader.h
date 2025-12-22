@@ -35,7 +35,7 @@ public:
 	~PageReader();
 		/// Destroys the PageReader.
 
-	void parse(std::istream& pageStream);	
+	void parse(std::istream& pageStream);
 		/// Parses a HTML file containing server page directives,
 		/// converts the file into C++ code and adds the code
 		/// to the reader's Page object. Also parses page
@@ -74,7 +74,7 @@ protected:
 
 protected:
 	void generateLineDirective(std::ostream& ostr);
-	
+
 private:
 	PageReader();
 	PageReader(const PageReader&);

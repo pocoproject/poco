@@ -36,7 +36,7 @@ FilesystemConfigurationTest::~FilesystemConfigurationTest()
 void FilesystemConfigurationTest::testFilesystemConfiguration()
 {
 	AutoPtr<FilesystemConfiguration> config = new FilesystemConfiguration(_path.toString());
-	
+
 	config->setString("logging.loggers.root.channel.class", "ConsoleChannel");
 	config->setString("logging.loggers.app.name", "Application");
 	config->setString("logging.loggers.app.channel", "c1");
@@ -52,7 +52,7 @@ void FilesystemConfigurationTest::testFilesystemConfiguration()
 
 	config->setString("logging.loggers.app.channel", "c2");
 	assertTrue (config->getString("logging.loggers.app.channel") == "c2");
-	
+
 	AbstractConfiguration::Keys keys;
 	config->keys(keys);
 	assertTrue (keys.size() == 1);
@@ -72,7 +72,7 @@ void FilesystemConfigurationTest::testFilesystemConfiguration()
 	assertTrue (keys.size() == 2);
 	assertTrue (std::find(keys.begin(), keys.end(), "class") != keys.end());
 	assertTrue (std::find(keys.begin(), keys.end(), "pattern") != keys.end());
-	
+
 	assertTrue (config->hasProperty("logging.loggers.root.channel.class"));
 	config->clear();
 	assertTrue (!config->hasProperty("logging.loggers.root.channel.class"));

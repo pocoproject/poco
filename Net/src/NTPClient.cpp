@@ -26,7 +26,7 @@ namespace Poco {
 namespace Net {
 
 
-NTPClient::NTPClient(IPAddress::Family family, int timeout): 
+NTPClient::NTPClient(IPAddress::Family family, int timeout):
 	_family(family), _timeout(timeout)
 {
 }

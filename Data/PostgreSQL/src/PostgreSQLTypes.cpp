@@ -90,13 +90,13 @@ Poco::Data::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID)
 	case TIMESTAMPOID:
 		cdt = Poco::Data::MetaColumn::FDT_TIMESTAMP;
 		break;
-	case TIMESTAMPZOID:
+	case TIMESTAMPTZOID:
 		cdt = Poco::Data::MetaColumn::FDT_TIMESTAMP;
 		break;
 
 	//uuid
 	case UUIDOID:
-		cdt = Poco::Data::MetaColumn::FDT_BLOB;
+		cdt = Poco::Data::MetaColumn::FDT_UUID;
 		break;
 
 	// everything else is a string

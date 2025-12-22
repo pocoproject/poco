@@ -32,25 +32,25 @@ class RunnableAdapter: public Runnable
 	/// Usage:
 	///    RunnableAdapter<MyClass> ra(myObject, &MyObject::doSomething));
 	///    Thread thr;
-	///    thr.Start(ra);
+	///    thr.start(ra);
 	///
 	/// For using a freestanding or static member function as a thread
 	/// target, please see the ThreadTarget class.
 {
 public:
-	typedef void (C::*Callback)();
-	
+	using Callback = void (C::*)();
+
 	RunnableAdapter(C& object, Callback method): _pObject(&object), _method(method)
 	{
 	}
-	
+
 	RunnableAdapter(const RunnableAdapter& ra): _pObject(ra._pObject), _method(ra._method)
 	{
 	}
 
-	~RunnableAdapter()
-	{
-	}
+	~RunnableAdapter() override = default;
+
+	RunnableAdapter() = delete;
 
 	RunnableAdapter& operator = (const RunnableAdapter& ra)
 	{
@@ -59,14 +59,9 @@ public:
 		return *this;
 	}
 
-	void run()
-	{
-		(_pObject->*_method)();
-	}
-	
-private:
-	RunnableAdapter();
+	void run() override { (_pObject->*_method)(); }
 
+private:
 	C*       _pObject;
 	Callback _method;
 };

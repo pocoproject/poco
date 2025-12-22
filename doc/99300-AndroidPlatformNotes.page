@@ -5,7 +5,7 @@ AAAIntroduction
 
 Starting with release 1.4.2 the POCO C++ Libraries can be used on
 Android.
-In the past the android NDK used a gmake-based build system. They provided a 
+In the past the android NDK used a gmake-based build system. They provided a
 a standalone "customized" toolchain. Also they used gcc and the gnu-stl as
 build environment. But these are all obsolete.
 
@@ -15,17 +15,17 @@ standard library.
 
 !!!Requirements
 
-To build Poco for android you need as minimum the android NDK plus cmake executable. 
-You can download the newest NDK from: https://developer.android.com/ndk and 
-cmake from http://www.cmake.org or if you have already installed Android SDK, 
+To build Poco for android you need as minimum the android NDK plus cmake executable.
+You can download the newest NDK from: https://developer.android.com/ndk and
+cmake from http://www.cmake.org or if you have already installed Android SDK,
 then install the NDK and cmake executable via the <*Android SDK Manager*>.
 
 !!!Quick start
 
-<path_to_android_sdk>/cmake/<cmake_version>/bin/cmake 
--H<path_to_poco_sourcen> 
--B/tmp/poco-build 
--G'Ninja' 
+<path_to_android_sdk>/cmake/<cmake_version>/bin/cmake
+-H<path_to_poco_sourcen>
+-B/tmp/poco-build
+-G'Ninja'
 -DCMAKE_BUILD_TYPE=Release
 -DCMAKE_MAKE_PROGRAM=<path_to_android_sdk>/cmake/<cmake_version>/bin/ninja
 -DCMAKE_TOOLCHAIN_FILE=<path_to_android_sdk>/ndk-bundle/build/cmake/android.toolchain.cmake
@@ -48,7 +48,7 @@ also the ninja build tool:
 
 The easiest way is to set the PATH environment to <path_to_android_sdk>/cmake/<cmake_version>/bin
 then cmake and ninja is found via the environment.
-If you not set the PATH environment you should add -DCMAKE_MAKE_PROGRAM=<path_to_android_sdk>/cmake/<cmake_version>/bin/ninja 
+If you not set the PATH environment you should add -DCMAKE_MAKE_PROGRAM=<path_to_android_sdk>/cmake/<cmake_version>/bin/ninja
 as parameter for cmake.
 
 If you have didn't installed the Android SDK, it is also possible to use make as build tool:
@@ -56,8 +56,8 @@ If you have didn't installed the Android SDK, it is also possible to use make as
 or
 <path_to_android_sdk>/ndk/<ndk_version>/prebuilt/linux-x86_64/bin/make
 
-The easiest way is to set the PATH environment to <path_to_android_sdk>/ndk/<ndk_version>/prebuilt/linux-x86_64/bin. 
-If you not set the PATH environment you should add -DCMAKE_MAKE_PROGRAM=<path_to_android_sdk>/ndk/<ndk_version>/prebuilt/linux-x86_64/bin/make 
+The easiest way is to set the PATH environment to <path_to_android_sdk>/ndk/<ndk_version>/prebuilt/linux-x86_64/bin.
+If you not set the PATH environment you should add -DCMAKE_MAKE_PROGRAM=<path_to_android_sdk>/ndk/<ndk_version>/prebuilt/linux-x86_64/bin/make
 as parameter for cmake.
 
 The toolchain file can be found in the android NDK:
@@ -75,10 +75,10 @@ cmake -H<path_to_poco_sourcen> -B<path_to_build_dir>/poco_build -G'Ninja' -DCMAK
 
 To build with the tools from the Android SDK:
 
-<path_to_android_sdk>/cmake/<cmake_version>/bin/cmake 
--H<path_to_poco_sourcen> 
--B/tmp/poco-build 
--G'Ninja' 
+<path_to_android_sdk>/cmake/<cmake_version>/bin/cmake
+-H<path_to_poco_sourcen>
+-B/tmp/poco-build
+-G'Ninja'
 -DCMAKE_BUILD_TYPE=Release
 -DCMAKE_MAKE_PROGRAM=<path_to_android_sdk>/cmake/<cmake_version>/bin/ninja
 -DCMAKE_TOOLCHAIN_FILE=<path_to_android_sdk>/ndk-bundle/build/cmake/android.toolchain.cmake

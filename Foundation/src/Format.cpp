@@ -20,6 +20,7 @@
 #include <locale>
 #endif
 #include <cstddef>
+#include <string_view>
 
 
 namespace Poco {
@@ -62,8 +63,8 @@ namespace
 		}
 		if (width > 0) str.width(width);
 	}
-	
-	
+
+
 	void parsePrec(std::ostream& str, std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt, std::vector<Any>::const_iterator& itVal)
 	{
 		if (itFmt != endFmt && *itFmt == '.')
@@ -86,7 +87,7 @@ namespace
 			if (prec >= 0) str.precision(prec);
 		}
 	}
-	
+
 	char parseMod(std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt)
 	{
 		char mod = 0;
@@ -96,13 +97,13 @@ namespace
 			{
 			case 'l':
 			case 'h':
-			case 'L': 
+			case 'L':
 			case '?': mod = *itFmt++; break;
 			}
 		}
 		return mod;
 	}
-	
+
 	std::size_t parseIndex(std::string::const_iterator& itFmt, const std::string::const_iterator& endFmt)
 	{
 		int index = 0;
@@ -127,10 +128,12 @@ namespace
 		case 'e': str << std::scientific; break;
 		case 'E': str << std::scientific << std::uppercase; break;
 		case 'f': str << std::fixed; break;
+		case 'g': str << std::defaultfloat; break;
+		case 'G': str << std::defaultfloat << std::uppercase; break;
 		}
 	}
-	
-	
+
+
 	void writeAnyInt(std::ostream& str, const Any& any)
 	{
 		if (any.type() == typeid(char))
@@ -211,6 +214,8 @@ namespace
 				case 'e':
 				case 'E':
 				case 'f':
+				case 'g': 
+				case 'G': 
 					switch (mod)
 					{
 					case 'l': str << AnyCast<long double>(*itVal++); break;
@@ -222,8 +227,11 @@ namespace
 				case 's':
 					str << RefAnyCast<std::string>(*itVal++);
 					break;
+				case 'v':
+					str << RefAnyCast<std::string_view>(*itVal++);
+					break;
 				case 'z':
-					str << AnyCast<std::size_t>(*itVal++); 
+					str << AnyCast<std::size_t>(*itVal++);
 					break;
 				case 'I':
 				case 'D':
@@ -241,26 +249,26 @@ namespace
 }
 
 
-std::string format(const std::string& fmt, const Any& value) 
+std::string format(const std::string& fmt, const Any& value)
 {
 	std::string result;
-	format(result, fmt, value);
+	Poco::format(result, fmt, value);
 	return result;
 }
 
 
 void format(std::string& result, const char *fmt, const std::vector<Any>& values)
 {
-	format(result, std::string(fmt), values);
+	Poco::format(result, std::string(fmt), values);
 }
 
 
 void format(std::string& result, const std::string& fmt, const std::vector<Any>& values)
 {
-	std::string::const_iterator itFmt  = fmt.begin();
-	std::string::const_iterator endFmt = fmt.end();
-	std::vector<Any>::const_iterator itVal  = values.begin();
-	std::vector<Any>::const_iterator endVal = values.end(); 
+	auto itFmt  = fmt.begin();
+	const auto endFmt = fmt.end();
+	auto itVal  = values.begin();
+	const auto endVal = values.end();
 	while (itFmt != endFmt)
 	{
 		switch (*itFmt)
@@ -275,7 +283,7 @@ void format(std::string& result, const std::string& fmt, const std::vector<Any>&
 					std::size_t index = parseIndex(itFmt, endFmt);
 					if (index < values.size())
 					{
-						std::vector<Any>::const_iterator it = values.begin() + index;
+						auto it = values.begin() + index;
 						formatOne(result, itFmt, endFmt, it);
 					}
 					else throw InvalidArgumentException("format argument index out of range", fmt);

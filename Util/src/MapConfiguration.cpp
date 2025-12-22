@@ -32,6 +32,8 @@ MapConfiguration::~MapConfiguration()
 
 void MapConfiguration::copyTo(AbstractConfiguration& config)
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+
 	for (const auto& p: _map)
 	{
 		config.setString(p.first, p.second);
@@ -41,6 +43,8 @@ void MapConfiguration::copyTo(AbstractConfiguration& config)
 
 void MapConfiguration::clear()
 {
+	AbstractConfiguration::ScopedLock lock(*this);
+	
 	_map.clear();
 }
 

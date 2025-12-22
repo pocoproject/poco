@@ -30,10 +30,10 @@ const std::string SimpleFileChannel::PROP_ROTATION      = "rotation";
 const std::string SimpleFileChannel::PROP_FLUSH         = "flush";
 
 
-SimpleFileChannel::SimpleFileChannel(): 
+SimpleFileChannel::SimpleFileChannel():
 	_limit(0),
-	_flush(true),
-	_pFile(0)
+	_flush(false),
+	_pFile(nullptr)
 {
 }
 
@@ -42,8 +42,8 @@ SimpleFileChannel::SimpleFileChannel(const std::string& path):
 	_path(path),
 	_secondaryPath(path + ".0"),
 	_limit(0),
-	_flush(true),
-	_pFile(0)
+	_flush(false),
+	_pFile(nullptr)
 {
 }
 
@@ -64,7 +64,7 @@ SimpleFileChannel::~SimpleFileChannel()
 void SimpleFileChannel::open()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	if (!_pFile)
 	{
 		File primary(_path);
@@ -86,7 +86,7 @@ void SimpleFileChannel::close()
 	FastMutex::ScopedLock lock(_mutex);
 
 	delete _pFile;
-	_pFile = 0;
+	_pFile = nullptr;
 }
 
 
@@ -103,7 +103,7 @@ void SimpleFileChannel::log(const Message& msg)
 	_pFile->write(msg.getText(), _flush);
 }
 
-	
+
 void SimpleFileChannel::setProperty(const std::string& name, const std::string& value)
 {
 	FastMutex::ScopedLock lock(_mutex);
@@ -134,7 +134,7 @@ std::string SimpleFileChannel::getProperty(const std::string& name) const
 	else if (name == PROP_ROTATION)
 		return _rotation;
 	else if (name == PROP_FLUSH)
-		return std::string(_flush ? "true" : "false");
+		return (_flush ? "true"s : "false"s);
 	else
 		return Channel::getProperty(name);
 }
@@ -148,7 +148,7 @@ Timestamp SimpleFileChannel::creationDate() const
 		return 0;
 }
 
-	
+
 UInt64 SimpleFileChannel::size() const
 {
 	if (_pFile)
@@ -180,7 +180,7 @@ void SimpleFileChannel::setRotation(const std::string& rotation)
 	while (it != end && Ascii::isSpace(*it)) ++it;
 	std::string unit;
 	while (it != end && Ascii::isAlpha(*it)) unit += *it++;
-	
+
 	if (unit == "K")
 		_limit = n*1024;
 	else if (unit == "M")

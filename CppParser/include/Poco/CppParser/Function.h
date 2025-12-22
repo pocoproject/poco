@@ -48,9 +48,9 @@ public:
 		FN_DEFAULT      = 512, /// The function is default.
 		FN_DELETE       = 1024 /// The function has been deleted.
 	};
-	
-	typedef std::vector<Parameter*> Parameters;
-	typedef Parameters::const_iterator Iterator;
+
+	using Parameters = std::vector<Parameter*>;
+	using Iterator = Parameters::const_iterator;
 
 	Function(const std::string& decl, NameSpace* pNameSpace);
 		/// Creates the Function.
@@ -68,73 +68,76 @@ public:
 
 	Iterator end() const;
 		/// Returns an iterator for iterating over the Function's Parameter's.
-	
+
 	void makeInline();
 		/// Sets the FN_INLINE flag.
-	
+
 	void makeConst();
 		/// Sets the FN_CONST flag.
-		
+
 	void makePureVirtual();
 		/// Sets the FN_PURE_VIRTUAL flag.
-		
+
 	void makeFinal();
 		/// Sets the FN_FINAL flag.
-		
+
 	void makeOverride();
 		/// Sets the FN_OVERRIDE flag.
-		
+
 	void makeNoexcept();
 		/// Sets the FN_NOEXCEPT flag.
 
 	void makeDefault();
 		/// Sets the FN_DEFAULT flag.
-	
+
 	void makeDelete();
 		/// Sets the FN_DELETE flag.
-	
+
 	int flags() const;
 		/// Returns the function's flags.
-		
+
 	bool isConstructor() const;
 		/// Returns true iff the function is a constructor.
-		
+
 	bool isDestructor() const;
 		/// Returns true iff the function is a destructor.
 
 	bool isMethod() const;
 		/// Returns true iff the function is a method (it's part of
 		/// a Struct and it's neither a constructor nor a destructor).
-		
+
 	bool isFunction() const;
 		/// Returns true iff the function is not a member of a class
 		/// (a freestanding function).
 
 	bool isConst() const;
 		/// Returns true iff the method is const.
-		
+
 	bool isDefault() const;
 		/// Returns true iff the method has a default implementation.
 
 	bool isDeleted() const;
 		/// Returns true iff the method has been deleted.
 
-	int countParameters() const;
-		/// Returns the number of parameters.
-	
-	std::string signature() const;
-		/// Returns the signature of the function.
-		
 	bool isVirtual() const;
 		/// Returns true if the method is virtual. Also examines base
 		/// classes to check for a virtual function with the same
 		/// signature.
-		
+
+	bool isStatic() const;
+		/// Returns true iff the method is static.
+
+	int countParameters() const;
+		/// Returns the number of parameters.
+
+	std::string signature() const;
+		/// Returns the signature of the function.
+
 	Function* getOverridden() const;
 		/// If the function is virtual and overrides a function in a
 		/// base class, the base class function is returned.
 		/// Otherwise, null is returned.
-		
+
 	Symbol::Kind kind() const;
 	std::string toString() const;
 
@@ -175,6 +178,12 @@ inline bool Function::isDefault() const
 inline bool Function::isDeleted() const
 {
 	return (flags() & FN_DELETE) != 0;
+}
+
+
+inline bool Function::isStatic() const
+{
+	return (flags() & FN_STATIC) != 0;
 }
 
 

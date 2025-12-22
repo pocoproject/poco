@@ -22,9 +22,11 @@ objects = \
 	HTTPRequest HTTPSession HTTPSessionInstantiator HTTPSessionFactory NetworkInterface  \
 	HTTPRequestHandler HTTPStream HTTPIOStream ServerSocket TCPServerDispatcher TCPServerConnectionFactory \
 	HTTPRequestHandlerFactory HTTPStreamFactory ServerSocketImpl TCPServerParams \
+	HTTPReactorServer HTTPReactorServerSession \
+	TCPReactorAcceptor TCPReactorServer TCPReactorServerConnection \
 	QuotedPrintableEncoder QuotedPrintableDecoder StringPartSource \
 	FTPClientSession FTPStreamFactory PartHandler PartSource PartStore NullPartHandler \
-	SocketReactor SocketNotifier SocketNotification AbstractHTTPRequestHandler \
+	SocketReactor SocketProactor SocketNotifier SocketNotification AbstractHTTPRequestHandler \
 	MailRecipient MailMessage MailStream SMTPClientSession POP3ClientSession \
 	RawSocket RawSocketImpl ICMPClient ICMPEventArgs ICMPPacket ICMPPacketImpl \
 	ICMPSocket ICMPSocketImpl ICMPv4PacketImpl \
@@ -39,5 +41,14 @@ objects = \
 target         = PocoNet
 target_version = $(LIBVERSION)
 target_libs    = PocoFoundation
+
+# poco build system looks for sources in src/
+ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)
+prebuild = $(shell \
+	ln -sf $(POCO_BASE)/dependencies/wepoll/wepoll.c  src/wepoll.c \
+)
+INCLUDE += -I$(POCO_BASE)/dependencies/wepoll
+objects += wepoll
+endif
 
 include $(POCO_BASE)/build/rules/lib

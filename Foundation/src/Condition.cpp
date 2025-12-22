@@ -30,7 +30,7 @@ Condition::~Condition()
 void Condition::signal()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	if (!_waitQueue.empty())
 	{
 		_waitQueue.front()->set();
@@ -42,7 +42,7 @@ void Condition::signal()
 void Condition::broadcast()
 {
 	FastMutex::ScopedLock lock(_mutex);
-	
+
 	for (auto p: _waitQueue)
 	{
 		p->set();

@@ -7,7 +7,7 @@
 //
 // Definition of class Base32Decoder.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -30,28 +30,32 @@ class Foundation_API Base32DecoderBuf: public UnbufferedStreamBuf
 	/// This streambuf base32-decodes all data read
 	/// from the istream connected to it.
 	///
-	/// Note: For performance reasons, the characters 
-	/// are read directly from the given istream's 
+	/// Note: For performance reasons, the characters
+	/// are read directly from the given istream's
 	/// underlying streambuf, so the state
 	/// of the istream will not reflect that of
 	/// its streambuf.
 {
 public:
-	Base32DecoderBuf(std::istream& istr);
-	~Base32DecoderBuf();
-	
+	Base32DecoderBuf(std::istream& istr, int options = 0);
+	~Base32DecoderBuf() override;
+
 private:
-	int readFromDevice();
+	int readFromDevice() override;
 	int readOne();
+
+	static const unsigned char* encoding(int options);
 
 	unsigned char   _group[8];
 	int             _groupLength;
 	int             _groupIndex;
 	std::streambuf& _buf;
-	
-	static unsigned char IN_ENCODING[256];
-	static bool          IN_ENCODING_INIT;
-	
+	const unsigned char* _encoding;
+
+	static const unsigned char REVERSE_DEFAULT_ENCODING[256];
+	static const unsigned char REVERSE_HEX_ENCODING[256];
+	static const unsigned char REVERSE_CROCKFORD_ENCODING[256];
+
 private:
 	Base32DecoderBuf(const Base32DecoderBuf&);
 	Base32DecoderBuf& operator = (const Base32DecoderBuf&);
@@ -65,13 +69,13 @@ class Foundation_API Base32DecoderIOS: public virtual std::ios
 	/// order of the stream buffer and base classes.
 {
 public:
-	Base32DecoderIOS(std::istream& istr);
-	~Base32DecoderIOS();
+	Base32DecoderIOS(std::istream& istr, int options = 0);
+	~Base32DecoderIOS() override;
 	Base32DecoderBuf* rdbuf();
 
 protected:
 	Base32DecoderBuf _buf;
-	
+
 private:
 	Base32DecoderIOS(const Base32DecoderIOS&);
 	Base32DecoderIOS& operator = (const Base32DecoderIOS&);
@@ -83,16 +87,21 @@ class Foundation_API Base32Decoder: public Base32DecoderIOS, public std::istream
 	/// read from the istream connected to it.
 	///
 	/// The class implements RFC 4648 - https://tools.ietf.org/html/rfc4648
+	/// and additionally supports decoding of Crockford Base 32 encoded
+	/// data.
 	///
-	/// Note: For performance reasons, the characters 
-	/// are read directly from the given istream's 
+	/// Note: For performance reasons, the characters
+	/// are read directly from the given istream's
 	/// underlying streambuf, so the state
 	/// of the istream will not reflect that of
 	/// its streambuf.
 {
 public:
-	Base32Decoder(std::istream& istr);
-	~Base32Decoder();
+	Base32Decoder(std::istream& istr, int options = 0);
+		/// Creates the Base32Decoder with the given options.
+		/// See Base32EncodingOptions for valid options.
+
+	~Base32Decoder() override;
 
 private:
 	Base32Decoder(const Base32Decoder&);

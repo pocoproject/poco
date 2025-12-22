@@ -63,7 +63,15 @@ public:
 	{
 	}
 
-	LOB(const std::basic_string<T>& content):
+	template<typename U = T>
+	LOB(const std::enable_if_t<std::is_same_v<T, U> && std::is_same_v<U, char>, std::string>& content):
+		_pContent(new std::vector<T>(content.begin(), content.end()))
+		/// Creates a LOB from a string.
+	{
+	}
+
+	template<typename U = T>
+	LOB(const std::enable_if_t<std::is_same_v<T, U> && std::is_same_v<U, wchar_t>, std::wstring>& content):
 		_pContent(new std::vector<T>(content.begin(), content.end()))
 		/// Creates a LOB from a string.
 	{
@@ -109,7 +117,7 @@ public:
 		return *_pContent != *other._pContent;
 	}
 
-	void swap(LOB& other)
+	void swap(LOB& other) noexcept
 		/// Swaps the LOB with another one.
 	{
 		using std::swap;
@@ -128,7 +136,7 @@ public:
 		/// If the LOB is empty, returns NULL.
 	{
 		if (_pContent->empty())
-			return 0;
+			return nullptr;
 		else
 			return _pContent->data();
 	}
@@ -139,7 +147,7 @@ public:
 		/// If the LOB is empty, returns NULL.
 	{
 		if (_pContent->empty())
-			return 0;
+			return nullptr;
 		else
 			return _pContent->data();
 	}
@@ -221,14 +229,14 @@ private:
 
 using BLOB = LOB<unsigned char>;
 using CLOB = LOB<char>;
-
+using JSON = std::string;
 
 //
 // inlines
 //
 
 template <typename T>
-inline void swap(LOB<T>& b1, LOB<T>& b2)
+inline void swap(LOB<T>& b1, LOB<T>& b2) noexcept
 {
 	b1.swap(b2);
 }
@@ -286,7 +294,7 @@ public:
 		val.assign(_val.begin(), _val.end());
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
@@ -324,7 +332,7 @@ public:
 		val.assign(_val.begin(), _val.end());
 	}
 
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = 0) const
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
 	{
 		return cloneHolder(pVarHolder, _val);
 	}

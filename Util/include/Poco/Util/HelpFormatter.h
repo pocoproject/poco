@@ -36,7 +36,7 @@ class Util_API HelpFormatter
 public:
 	HelpFormatter(const OptionSet& options);
 		/// Creates the HelpFormatter, using the given
-		/// options. 
+		/// options.
 		///
 		/// The HelpFormatter just stores a reference
 		/// to the given OptionSet, so the OptionSet must not
@@ -47,34 +47,34 @@ public:
 
 	void setCommand(const std::string& command);
 		/// Sets the command name.
-		
+
 	const std::string& getCommand() const;
 		/// Returns the command name.
-		
+
 	void setUsage(const std::string& usage);
 		/// Sets the usage string.
-		
+
 	const std::string& getUsage() const;
 		/// Returns the usage string.
-		
+
 	void setHeader(const std::string& header);
 		/// Sets the header string.
-		
+
 	const std::string& getHeader() const;
 		/// Returns the header string.
-		
+
 	void setFooter(const std::string& footer);
 		/// Sets the footer string.
-		
+
 	const std::string& getFooter() const;
 		/// Returns the footer string.
 
 	void format(std::ostream& ostr) const;
 		/// Writes the formatted help text to the given stream.
-	
+
 	void setWidth(int width);
 		/// Sets the line width for the formatted help text.
-		
+
 	int getWidth() const;
 		/// Returns the line width for the formatted help text.
 		///
@@ -85,10 +85,10 @@ public:
 
 	int getIndent() const;
 		/// Returns the indentation for description continuation lines.
-		
+
 	void setAutoIndent();
 		/// Sets the indentation for description continuation lines so that
-		/// the description text is left-aligned. 
+		/// the description text is left-aligned.
 
 	void setUnixStyle(bool flag);
 		/// Enables Unix-style options. Both short and long option names
@@ -97,14 +97,14 @@ public:
 		///
 		/// After calling setUnixStyle(), setAutoIndent() should be called
 		/// as well to ensure proper help text formatting.
-		
+
 	bool isUnixStyle() const;
 		/// Returns if Unix-style options are set.
 
 	std::string shortPrefix() const;
 		/// Returns the platform-specific prefix for short options.
 		/// "-" on Unix, "/" on Windows and OpenVMS.
-	
+
 	std::string longPrefix() const;
 		/// Returns the platform-specific prefix for long options.
 		/// "--" on Unix, "/" on Windows and OpenVMS.
@@ -129,10 +129,10 @@ protected:
 
 	void formatWord(std::ostream& ostr, int& pos, const std::string& word, int indent) const;
 		/// Formats the given word.
-	
+
 	void clearWord(std::ostream& ostr, int& pos, std::string& word, int indent) const;
 		/// Formats and then clears the given word.
-	
+
 private:
 	HelpFormatter(const HelpFormatter&);
 	HelpFormatter& operator = (const HelpFormatter&);
@@ -145,7 +145,7 @@ private:
 	std::string _header;
 	std::string _footer;
 	bool _unixStyle;
-	
+
 	static const int TAB_WIDTH;
 	static const int LINE_WIDTH;
 };

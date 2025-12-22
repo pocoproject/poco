@@ -21,14 +21,14 @@ namespace Poco {
 namespace XML {
 
 
-CharacterData::CharacterData(Document* pOwnerDocument, const XMLString& data): 
+CharacterData::CharacterData(Document* pOwnerDocument, const XMLString& data):
 	AbstractNode(pOwnerDocument),
 	_data(data)
 {
 }
 
 
-CharacterData::CharacterData(Document* pOwnerDocument, const CharacterData& data): 
+CharacterData::CharacterData(Document* pOwnerDocument, const CharacterData& data):
 	AbstractNode(pOwnerDocument, data),
 	_data(data._data)
 {

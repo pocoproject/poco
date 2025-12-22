@@ -58,18 +58,21 @@ public:
 		TYPE_BINARY /// TYPE I (Image/binary data)
 	};
 
-	FTPClientSession();
+	FTPClientSession(Poco::UInt16 activeDataPort = 0);
 		/// Creates an FTPClientSession.
 		///
 		/// Passive mode will be used for data transfers.
 
-	FTPClientSession(const StreamSocket& socket, bool readWelcomeMessage = true);
+	FTPClientSession(const StreamSocket& socket, bool readWelcomeMessage = true,
+		Poco::UInt16 activeDataPort = 0);
 		/// Creates an FTPClientSession using the given
 		/// connected socket for the control connection.
 		///
 		/// Passive mode will be used for data transfers.
 
-	FTPClientSession(const std::string& host, Poco::UInt16 port = FTP_PORT, const std::string& username = "", const std::string& password = "");
+	FTPClientSession(const std::string& host, Poco::UInt16 port = FTP_PORT,
+		const std::string& username = "", const std::string& password = "",
+		Poco::UInt16 activeDataPort = 0);
 		/// Creates an FTPClientSession using a socket connected
 		/// to the given host and port. If username is supplied,
 		/// login is attempted.
@@ -322,6 +325,9 @@ protected:
 		DEFAULT_TIMEOUT = 30000000 // 30 seconds default timeout for socket operations
 	};
 
+	const std::string& getHost() const;
+		/// Returns the host name
+
 	static bool isPositivePreliminary(int status);
 	static bool isPositiveCompletion(int status);
 	static bool isPositiveIntermediate(int status);
@@ -350,6 +356,7 @@ private:
 
 	std::string _host;
 	Poco::UInt16 _port = FTP_PORT;
+	Poco::UInt16 _activeDataPort = 0;
 	bool _passiveMode = true;
 	FileType _fileType = TYPE_BINARY;
 	bool _supports1738 = true;
@@ -396,7 +403,7 @@ inline bool FTPClientSession::isPermanentNegative(int status)
 
 inline bool FTPClientSession::isOpen() const
 {
-	return _pControlSocket != 0;
+	return _pControlSocket != nullptr;
 }
 
 
@@ -418,6 +425,10 @@ inline const std::string& FTPClientSession::welcomeMessage()
 	return _welcomeMessage;
 }
 
+inline const std::string& FTPClientSession::getHost() const
+{
+	return _host;
+}
 
 } } // namespace Poco::Net
 

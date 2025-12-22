@@ -38,7 +38,7 @@ class Util_API LoggingSubsystem: public Subsystem
 public:
 	LoggingSubsystem();
 	const char* name() const;
-	
+
 protected:
 	void initialize(Application& self);
 	void uninitialize();

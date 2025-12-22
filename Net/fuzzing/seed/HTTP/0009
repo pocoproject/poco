@@ -1,0 +1,12 @@
+POST /oauth1/access HTTP/1.1
+Host: server.example.com
+Authorization: OAuth realm="Example",
+               oauth_consumer_key="jd83jd92dhsh93js",
+               oauth_token="hdk48Djdsa",
+               oauth_signature_method="HMAC-SHA1",
+               oauth_timestamp="123456789",
+               oauth_nonce="7d8f3e4a",
+               oauth_verifier="473f82d3",
+               oauth_signature="..."
+
+

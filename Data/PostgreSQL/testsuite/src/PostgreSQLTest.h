@@ -27,8 +27,8 @@ class PostgreSQLTest: public CppUnit::TestCase
 	///
 	/// Driver			|	DB						| OS
 	/// ----------------+---------------------------+------------------------------------------
-	/// 03.51.12.00		| PostgreSQL 9.3.1.0(18)   	| Mac OSX  10.9.1
-	///
+	/// 03.51.12.00		        | PostgreSQL 9.3.1.0(18)   	                        | Mac OSX  10.9.1
+	///                             | PostgreSQL 15.3          	                        | Ubuntu 16.04
 
 {
 public:
@@ -36,6 +36,7 @@ public:
 	~PostgreSQLTest();
 
 	void testConnectNoDB();
+	void testFailedConnect();
 	void testPostgreSQLOIDs();
 	void testBarebonePostgreSQL();
 
@@ -96,10 +97,24 @@ public:
 	void testNullableString();
 	void testTupleWithNullable();
 
-	void testSessionTransaction();
-	void testTransaction();
+	void testBinarySimpleAccess();
+	void testBinaryComplexType();
+	void testBinarySimpleAccessVector();
+	void testBinaryComplexTypeVector();
+	void testBinaryInts();
+	void testBinaryFloat();
+	void testBinaryDouble();
+	void testBinaryUUID();
+	void testBinaryDateTime();
+	void testBinaryBLOBStmt();
+	void testBinaryCLOBStmt();
 
+	void testSessionTransaction();
+	void testSessionTransactionNoAutoCommit();
+	void testTransaction();
 	void testReconnect();
+    void testTransactionWithReconnect();
+	void testSqlState();
 
 	void setUp();
 	void tearDown();
@@ -119,6 +134,7 @@ private:
 	void recreateIntsTable();
 	void recreateUnsignedIntsTable();
 	void recreateFloatsTable();
+	void recreateDoublesTable();
 	void recreateUUIDsTable();
 	void recreateTuplesTable();
 	void recreateVectorsTable();

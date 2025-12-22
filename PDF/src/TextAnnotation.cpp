@@ -13,8 +13,8 @@
 
 
 #include "Poco/PDF/TextAnnotation.h"
-#include "Poco/PDF/PDFException.h"
 
+#include <hpdf.h>
 
 namespace Poco {
 namespace PDF {
@@ -22,7 +22,7 @@ namespace PDF {
 
 TextAnnotation::TextAnnotation(HPDF_Doc* pPDF,
 	const HPDF_Annotation& annotation,
-	const std::string& name): 
+	const std::string& name):
 	Resource<HPDF_Annotation>(pPDF, annotation, name)
 {
 	open();
@@ -32,6 +32,24 @@ TextAnnotation::TextAnnotation(HPDF_Doc* pPDF,
 TextAnnotation::~TextAnnotation()
 {
 	close();
+}
+
+
+void TextAnnotation::open()
+{
+	HPDF_TextAnnot_SetOpened(handle(), HPDF_TRUE);
+}
+
+
+void TextAnnotation::close()
+{
+	HPDF_TextAnnot_SetOpened(handle(), HPDF_FALSE);
+}
+
+
+void TextAnnotation::icon(IconType iconType)
+{
+	HPDF_TextAnnot_SetIcon(handle(), static_cast<HPDF_AnnotIcon>(iconType));
 }
 
 

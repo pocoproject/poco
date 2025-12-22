@@ -17,6 +17,13 @@
 #include "Poco/Data/SessionFactory.h"
 
 
+#if POCO_DATA_SQL_SERVER_BIG_STRINGS
+	#pragma message ("MS SQLServer ODBC big string capability ENABLED")
+#else
+	#pragma message ("MS SQLServer ODBC big string capability DISABLED")
+#endif
+
+
 namespace Poco {
 namespace Data {
 namespace ODBC {

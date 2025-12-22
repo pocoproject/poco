@@ -38,7 +38,7 @@ public:
 		SYSLOG_NDELAY = 0x08, /// don't delay open
 		SYSLOG_PERROR = 0x20  /// log to stderr as well (not supported on all platforms)
 	};
-	
+
 	enum Facility
 	{
 		SYSLOG_KERN     = ( 0<<3), /// kernel messages
@@ -62,31 +62,31 @@ public:
 		SYSLOG_LOCAL6   = (22<<3), /// reserved for local use
 		SYSLOG_LOCAL7   = (23<<3)  /// reserved for local use
 	};
-	
+
 	SyslogChannel();
 		/// Creates a SyslogChannel.
-		
+
 	SyslogChannel(const std::string& name, int options = SYSLOG_CONS, int facility = SYSLOG_USER);
 		/// Creates a SyslogChannel with the given name, options and facility.
-	
-	void open();
+
+	void open() override;
 		/// Opens the SyslogChannel.
-		
-	void close();
+
+	void close() override;
 		/// Closes the SyslogChannel.
-		
-	void log(const Message& msg);
-		/// Sens the message's text to the syslog service.
-		
-	void setProperty(const std::string& name, const std::string& value);
+
+	void log(const Message& msg) override;
+		/// Sends the message's text to the syslog service.
+
+	void setProperty(const std::string &name, const std::string &value) override;
 		/// Sets the property with the given value.
 		///
 		/// The following properties are supported:
 		///     * name:     The name used to identify the source of log messages.
 		///     * facility: The facility added to each log message. See the Facility enumeration for a list of supported values.
 		///     * options:  The logging options. See the Option enumeration for a list of supported values.
-		
-	std::string getProperty(const std::string& name) const;
+
+	std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.
 
 	static const std::string PROP_NAME;
@@ -94,7 +94,7 @@ public:
 	static const std::string PROP_OPTIONS;
 
 protected:
-	~SyslogChannel();
+	~SyslogChannel() override;
 	static int getPrio(const Message& msg);
 
 private:
