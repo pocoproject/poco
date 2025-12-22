@@ -41,12 +41,8 @@ public:
 
 public:
 	PriorityStrategy() = default;
-
-	PriorityStrategy(const PriorityStrategy& s):
-		_delegates(s._delegates)
-	{
-	}
-
+	PriorityStrategy(const PriorityStrategy& s) = default;
+	PriorityStrategy(PriorityStrategy&& s) = default;
 	~PriorityStrategy() = default;
 
 	void notify(const void* sender, TArgs& arguments)
