@@ -15,10 +15,9 @@
 #include "Poco/Data/ODBC/SessionImpl.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCStatementImpl.h"
-#include "Poco/Data/ODBC/Error.h"
+#include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/Session.h"
-#include "Poco/String.h"
 #include <sqlext.h>
 
 
@@ -175,7 +174,7 @@ void SessionImpl::open(const std::string& connect)
 		if (!canTransact()) autoCommit("", true);
 	}
 	else
-		throw ConnectionException(ODBC_NULL_HDBC,
+		throw ConnectionException(POCO_ODBC_NULL_HDBC,
 			Poco::format("Connection to '%s' failed.", connectionString()));
 
 	setName();

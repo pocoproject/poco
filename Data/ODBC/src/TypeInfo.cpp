@@ -95,7 +95,7 @@ void TypeInfo::fillTypeInfo(const SQLHDBC* pHDBC)
 		TypeInfoVec().swap(_typeInfo);
 
 		SQLRETURN rc;
-		SQLHSTMT hstmt = ODBC_NULL_HSTMT;
+		SQLHSTMT hstmt = POCO_ODBC_NULL_HSTMT;
 
 		rc = SQLAllocHandle(SQL_HANDLE_STMT, *_pHDBC, &hstmt);
 		if (!SQL_SUCCEEDED(rc))

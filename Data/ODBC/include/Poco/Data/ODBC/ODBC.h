@@ -84,11 +84,11 @@
 // as literal 0, which triggers -Wzero-as-null-pointer-constant warnings in C++.
 // We define these as nullptr to use in place of the ODBC macros.
 //
-constexpr std::nullptr_t ODBC_NULL_HANDLE = nullptr;
-constexpr std::nullptr_t ODBC_NULL_HENV   = nullptr;
-constexpr std::nullptr_t ODBC_NULL_HDBC   = nullptr;
-constexpr std::nullptr_t ODBC_NULL_HSTMT  = nullptr;
-constexpr std::nullptr_t ODBC_NULL_HDESC  = nullptr;
+constexpr std::nullptr_t POCO_ODBC_NULL_HANDLE = nullptr;
+constexpr std::nullptr_t POCO_ODBC_NULL_HENV   = nullptr;
+constexpr std::nullptr_t POCO_ODBC_NULL_HDBC   = nullptr;
+constexpr std::nullptr_t POCO_ODBC_NULL_HSTMT  = nullptr;
+constexpr std::nullptr_t POCO_ODBC_NULL_HDESC  = nullptr;
 
 
 //

@@ -15,8 +15,6 @@
 #include "Poco/Data/ODBC/ConnectionHandle.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCException.h"
-#include "Poco/Error.h"
-#include "Poco/Debugger.h"
 
 
 namespace Poco {
@@ -30,8 +28,6 @@ const std::string ConnectionHandle::CANT_SET_ATTR_SQLSTATE = "HY011";
 
 
 ConnectionHandle::ConnectionHandle(const std::string& connectString, SQLULEN loginTimeout, SQLULEN timeout):
-	_pEnvironment(nullptr),
-	_hdbc(ODBC_NULL_HDBC),
 	_connectString(connectString)
 {
 	alloc();
@@ -60,7 +56,7 @@ void ConnectionHandle::alloc()
 	{
 		delete _pEnvironment;
 		_pEnvironment = nullptr;
-		_hdbc = ODBC_NULL_HDBC;
+		_hdbc = POCO_ODBC_NULL_HDBC;
 		throw ODBCException("ODBC: Could not allocate connection handle.");
 	}
 }
@@ -68,10 +64,10 @@ void ConnectionHandle::alloc()
 
 void ConnectionHandle::free()
 {
-	if (_hdbc != ODBC_NULL_HDBC)
+	if (_hdbc != POCO_ODBC_NULL_HDBC)
 	{
 		SQLFreeHandle(SQL_HANDLE_DBC, _hdbc);
-		_hdbc = ODBC_NULL_HDBC;
+		_hdbc = POCO_ODBC_NULL_HDBC;
 	}
 
 	if (_pEnvironment)
@@ -152,7 +148,7 @@ bool ConnectionHandle::connect(const std::string& connectString, SQLULEN loginTi
 	catch(NotSupportedException&){}
 	catch(InvalidAccessException&){}
 
-	return _hdbc != ODBC_NULL_HDBC;
+	return _hdbc != POCO_ODBC_NULL_HDBC;
 }
 
 

@@ -19,7 +19,6 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/ODBC/EnvironmentHandle.h"
 #include "Poco/Data/ODBC/ConnectionHandle.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/ODBC/Utility.h"

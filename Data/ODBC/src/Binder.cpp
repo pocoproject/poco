@@ -13,9 +13,9 @@
 
 
 #include "Poco/Data/ODBC/Binder.h"
+#include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Utility.h"
-#include "Poco/Data/ODBC/Connector.h"
-#include "Poco/Data/LOB.h"
+#include "Poco/Data/ODBC/Parameter.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"

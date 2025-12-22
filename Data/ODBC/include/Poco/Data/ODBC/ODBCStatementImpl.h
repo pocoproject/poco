@@ -25,13 +25,12 @@
 #include "Poco/Data/ODBC/Preparator.h"
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/StatementImpl.h"
-#include "Poco/Data/Column.h"
 #include "Poco/SharedPtr.h"
-#include "Poco/Format.h"
-#include <sstream>
+
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include <windows.h>
 #endif
+
 #include <sqltypes.h>
 
 
