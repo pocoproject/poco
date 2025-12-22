@@ -134,7 +134,8 @@ void Message::init()
 		_tid    = pThread->id();
 		_thread = pThread->name();
 	}
-	else {
+	else
+	{
 		NativeThreadInfo info;
 		_tid = info.id();
 		_thread = info.name();
