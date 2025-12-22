@@ -125,22 +125,21 @@ public:
 		{
 			throw NotFoundException(name);
 		}
-		else
+
+		if (ElementTraits<T>::TypeId == element->type())
 		{
-			if (ElementTraits<T>::TypeId == element->type())
+			auto* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
+			if (concrete != nullptr)
 			{
-				auto* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
-				if (concrete != nullptr)
-				{
-					return concrete->value();
-				}
+				return concrete->value();
 			}
-			throw BadCastException("Invalid type mismatch!");
 		}
+		throw BadCastException("Invalid type mismatch!");
+
 	}
 
 	template<typename T>
-	const T& get(const std::string& name, const T& def) const
+	T get(const std::string& name, const T& def) const
 		/// Returns the element with the given name and tries to convert
 		/// it to the template type. When the element is not found, or
 		/// has the wrong type, the def argument will be returned.
