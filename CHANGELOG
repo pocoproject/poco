@@ -72,6 +72,7 @@ Bundled Third-Party Library Upgrades:
 - libharu 2.3.0RC2 → 2.4.5 (first stable release since RC)
 - utf8proc 2.9.0 → 2.11.0 - adds Unicode 16 and 17 support
 - LZMA SDK 9.22 → 25.01 (major upgrade from 2011 version)
+- Quill 11.0.2 (new)
 
 Breaking Changes and Migration Notes:
 
@@ -119,6 +120,10 @@ Features:
 - GH #4851 Foundation: AsyncNotificationCenter should dispatch asynchronously
 - GH #4731 Foundation: Allow specifying SharedLibrary flags in ClassLoader
 - GH #4518 Net: Update HTTP cookies to RFC 6265
+- GH #5132 Make SpinlockMutex adaptive
+- GH #5133 Add Channel::log(message&&)
+- GH #5134 Lock-free queues
+- GH #5083 CppUnit: Improve test name display and selection
 
 Enhancements and Third-Party Updates:
 
@@ -159,6 +164,7 @@ Enhancements and Third-Party Updates:
 - GH #4348 0 (or NULL) for null pointer shall be replaced with nullptr
 - GH #4202 Foundation: LogFileImpl::createFile() fails if path does not exist
 - GH #2731 Poco::format() supports %g and %G format specifiers
+- GH #5080 Add benchmark infrastructure
 
 Bug Fixes:
 
