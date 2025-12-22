@@ -114,7 +114,7 @@ void AsyncChannel::close()
 void AsyncChannel::log(const Message& msg)
 {
 	if (_closed) return;
-	if (_queueSize != 0 && _queue.size() >= _queueSize)
+	if (_queueSize != 0 && static_cast<std::size_t>(_queue.size()) >= _queueSize)
 	{
 		++_dropCount;
 		return;

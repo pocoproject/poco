@@ -755,7 +755,7 @@ struct i_char_traits : public std::char_traits<charT>
 
 	static int compare(const charT* s1, const charT* s2, std::size_t n)
 	{
-		for (int i = 0; i < n && s1 && s2; ++i, ++s1, ++s2)
+		for (std::size_t i = 0; i < n && s1 && s2; ++i, ++s1, ++s2)
 		{
 			if (Ascii::toLower(*s1) == Ascii::toLower(*s2)) continue;
 			else if (Ascii::toLower(*s1) < Ascii::toLower(*s2)) return -1;

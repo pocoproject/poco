@@ -22,8 +22,6 @@
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/ODBC/Handle.h"
-#include "Poco/Data/ODBC/Parameter.h"
-#include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/TypeInfo.h"
 #include "Poco/Exception.h"

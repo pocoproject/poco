@@ -457,10 +457,8 @@ void HTMLForm::setFieldLimit(int limit)
 }
 
 
-void HTMLForm::setValueLengthLimit(int limit)
+void HTMLForm::setValueLengthLimit(std::size_t limit)
 {
-	poco_assert (limit >= 0);
-
 	_valueLengthLimit = limit;
 }
 

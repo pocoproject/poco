@@ -241,7 +241,7 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 	domainNames.clear();
 	cmnName = commonName();
 	PCERT_EXTENSION pExt = _pCert->pCertInfo->rgExtension;
-	for (int i = 0; i < _pCert->pCertInfo->cExtension; i++, pExt++)
+	for (DWORD i = 0; i < _pCert->pCertInfo->cExtension; i++, pExt++)
 	{
 		if (std::strcmp(pExt->pszObjId, szOID_SUBJECT_ALT_NAME2) == 0)
 		{
@@ -276,7 +276,7 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 			if (rc)
 			{
 				PCERT_ALT_NAME_INFO pNameInfo = reinterpret_cast<PCERT_ALT_NAME_INFO>(buffer.begin());
-				for (int i = 0; i < pNameInfo->cAltEntry; i++)
+				for (DWORD i = 0; i < pNameInfo->cAltEntry; i++)
 				{
 					// Some certificates have Subject Alternative Name entries that are not DNS Name. Skip them.
 					if (pNameInfo->rgAltEntry[i].dwAltNameChoice == CERT_ALT_NAME_DNS_NAME)
@@ -521,13 +521,14 @@ bool X509Certificate::verify(const Poco::Net::X509Certificate& certificate, cons
 					if (IPAddress::tryParse(hostName, ip))
 					{
 						// compare by IP
-						const HostEntry& heData = DNS::resolve(*it);
-						const HostEntry::AddressList& addr = heData.addresses();
-						HostEntry::AddressList::const_iterator it = addr.begin();
-						HostEntry::AddressList::const_iterator itEnd = addr.end();
-						for (; it != itEnd && !ok; ++it)
+						const auto& heData = DNS::resolve(*it);
+						for (const auto& address : heData.addresses())
 						{
-							ok = (*it == ip);
+							if (address == ip)
+							{
+								ok = true;
+								break;
+							}
 						}
 					}
 					else

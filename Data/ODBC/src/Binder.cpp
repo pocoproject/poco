@@ -13,9 +13,9 @@
 
 
 #include "Poco/Data/ODBC/Binder.h"
+#include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Utility.h"
-#include "Poco/Data/ODBC/Connector.h"
-#include "Poco/Data/LOB.h"
+#include "Poco/Data/ODBC/Parameter.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
@@ -597,7 +597,7 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 	}
 
 	// last check, just in case
-	if ((0 != colSize) && (actualSize > colSize))
+	if ((0 != colSize) && (actualSize > static_cast<std::size_t>(colSize)))
 	{
 		throw LengthExceededException(Poco::format("ODBC::Binder::getColSizeAndPrecision();%d: Error binding column %z size=%z, max size=%ld)",
 			__LINE__, pos, actualSize, static_cast<long>(colSize)));
@@ -656,7 +656,7 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 	else if (paramSize > 0)
 		size = static_cast<SQLINTEGER>(paramSize);
 
-	if (size > _maxFieldSize) size = static_cast<SQLINTEGER>(_maxFieldSize);
+	if (static_cast<std::size_t>(size) > _maxFieldSize) size = static_cast<SQLINTEGER>(_maxFieldSize);
 }
 
 
@@ -664,8 +664,8 @@ void Binder::setParamSetSize(std::size_t length)
 {
 	if (0 == _paramSetSize)
 	{
-		if (Utility::isError(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAM_BIND_TYPE, SQL_PARAM_BIND_BY_COLUMN, SQL_IS_UINTEGER)) ||
-			Utility::isError(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) length, SQL_IS_UINTEGER)))
+		if (Utility::isError(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAM_BIND_TYPE, reinterpret_cast<SQLPOINTER>(SQL_PARAM_BIND_BY_COLUMN), SQL_IS_UINTEGER)) ||
+			Utility::isError(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAMSET_SIZE, reinterpret_cast<SQLPOINTER>(length), SQL_IS_UINTEGER)))
 				throw StatementException(_rStmt, "ODBC::Binder::setParamSetSize():SQLSetStmtAttr()");
 
 		_paramSetSize = static_cast<SQLINTEGER>(length);

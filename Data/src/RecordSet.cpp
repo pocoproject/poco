@@ -515,7 +515,7 @@ std::size_t RecordSet::rowCount() const
 	if (!isFiltered()) return rc;
 
 	std::size_t counter = 0;
-	for (int row = 0; row < rc; ++row)
+	for (std::size_t row = 0; row < rc; ++row)
 	{
 		if (isAllowed(row)) ++counter;
 	}

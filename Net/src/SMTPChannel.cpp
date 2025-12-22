@@ -127,7 +127,7 @@ void SMTPChannel::log(const Message& msg)
 
 					std::streamoff size = fis.tellg();
 					poco_assert (std::numeric_limits<unsigned int>::max() >= size);
-					poco_assert (std::numeric_limits<SST>::max() >= size);
+					poco_assert (static_cast<std::streamoff>(std::numeric_limits<SST>::max()) >= size);
 					char* pMem = new char [static_cast<unsigned int>(size)];
 					fis.seekg(std::ios::beg);
 					fis.read(pMem, size);

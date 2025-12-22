@@ -204,7 +204,7 @@ void SessionImpl::open(const std::string& connect)
 	try
 	{
 		int rc = 0;
-		size_t tout = getLoginTimeout();
+		std::size_t tout = getLoginTimeout();
 		Stopwatch sw; sw.start();
 		while (true)
 		{
@@ -213,7 +213,7 @@ void SessionImpl::open(const std::string& connect)
 			if (rc == SQLITE_OK) break;
 			if (!_pDB)
 				throw ConnectionFailedException(std::string(sqlite3_errstr(rc)));
-			if (sw.elapsedSeconds() >= tout)
+			if (static_cast<std::size_t>(sw.elapsedSeconds()) >= tout)
 			{
 				Utility::throwException(_pDB, rc);
 			}

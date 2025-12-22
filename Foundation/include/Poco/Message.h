@@ -175,10 +175,10 @@ public:
 		/// with the given name. Throws a NotFoundException if the
 		/// parameter does not exist.
 
-	const std::string& get(const std::string& param, const std::string& defaultValue) const;
-		/// Returns a const reference to the value of the parameter
-		/// with the given name. If the parameter with the given name
-		/// does not exist, then defaultValue is returned.
+	std::string get(const std::string& param, const std::string& defaultValue) const;
+		/// Returns the value of the parameter with the given name.
+		/// If the parameter with the given name does not exist,
+		/// then defaultValue is returned.
 
 	const StringMap& getAll() const;
 		/// Returns a const reference to all the values
