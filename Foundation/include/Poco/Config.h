@@ -218,4 +218,12 @@
 // Uncomment to enable stack trace autogeneration in Exception
 //#define POCO_ENABLE_TRACE 1
 
+// Enable FastLogger (Quill-based high-performance logger) by default.
+// FastLogger provides ~9ns logging latency using the Quill library.
+// Uncomment to disable FastLogger:
+// #define POCO_NO_FASTLOGGER
+#if !defined(POCO_NO_FASTLOGGER) && !defined(POCO_ENABLE_FASTLOGGER)
+	#define POCO_ENABLE_FASTLOGGER
+#endif
+
 #endif // Foundation_Config_INCLUDED

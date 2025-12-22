@@ -1,0 +1,9 @@
+includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@
+
+Name: quill
+Description: Low Latency C++ Logging Library
+URL: https://github.com/odygrd/quill
+Version: @QUILL_VERSION@
+CFlags: -I${includedir}
+Libs: @QUILL_PTHREAD_LIBS@
+Requires: @PKG_CONFIG_REQUIRES@

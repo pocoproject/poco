@@ -63,6 +63,12 @@ public:
 
 	static std::string dstName();
 		/// Returns the timezone name if daylight saving time is in effect.
+
+	static void reloadCache();
+		/// Reloads the cached UTC offset from the system.
+		/// This is typically done internally when a change to the
+		/// TZ environment variable is detected, but can be called
+		/// explicitly if needed.
 };
 
 

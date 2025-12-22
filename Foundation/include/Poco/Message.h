@@ -65,9 +65,28 @@ public:
 		/// Creates a Message with the given source, text and priority.
 		/// The thread and process ids are set.
 
+	Message(const std::string& source, std::string&& text, Priority prio);
+		/// Creates a Message with the given source, text and priority.
+		/// The text is moved into the message.
+		/// The thread and process ids are set.
+
 	Message(const std::string& source, const std::string& text, Priority prio, const char* file, LineNumber line);
 		/// Creates a Message with the given source, text, priority,
 		/// source file path and line.
+		///
+		/// The source file path must be a
+		/// static string with a lifetime that's at least the lifetime
+		/// of the message object (the string is not copied internally).
+		/// Usually, this will be the path string obtained from the
+		/// __FILE__ macro.
+		///
+		/// The thread and process ids are set.
+
+	Message(const std::string& source, std::string&& text, Priority prio, const char* file, LineNumber line);
+		/// Creates a Message with the given source, text, priority,
+		/// source file path and line.
+		///
+		/// The text is moved into the message.
 		///
 		/// The source file path must be a
 		/// static string with a lifetime that's at least the lifetime

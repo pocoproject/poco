@@ -52,9 +52,39 @@ Message::Message(const std::string& source, const std::string& text, Priority pr
 }
 
 
+Message::Message(const std::string& source, std::string&& text, Priority prio):
+	_source(source),
+	_text(std::move(text)),
+	_prio(prio),
+	_tid(0),
+	_ostid(0),
+	_pid(0),
+	_file(nullptr),
+	_line(0),
+	_pMap(nullptr)
+{
+	init();
+}
+
+
 Message::Message(const std::string& source, const std::string& text, Priority prio, const char* file, LineNumber line):
 	_source(source),
 	_text(text),
+	_prio(prio),
+	_tid(0),
+	_ostid(0),
+	_pid(0),
+	_file(file),
+	_line(line),
+	_pMap(nullptr)
+{
+	init();
+}
+
+
+Message::Message(const std::string& source, std::string&& text, Priority prio, const char* file, LineNumber line):
+	_source(source),
+	_text(std::move(text)),
 	_prio(prio),
 	_tid(0),
 	_ostid(0),

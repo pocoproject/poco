@@ -17,6 +17,12 @@ objects = AbstractConfigurationTest ConfigurationTestSuite \
 	TimerTestSuite TimerTest \
 	JSONConfigurationTest
 
+# FastLogger - enabled by default
+# Set POCO_NO_FASTLOGGER=1 to disable
+ifdef POCO_NO_FASTLOGGER
+COMMONFLAGS += -DPOCO_NO_FASTLOGGER
+endif
+
 target         = testrunner
 target_version = 1
 target_libs    = PocoUtil PocoXML PocoJSON PocoFoundation CppUnit

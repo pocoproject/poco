@@ -25,6 +25,11 @@ public:
 	~LoggingConfiguratorTest();
 
 	void testConfigurator();
+	void testFastLoggerConfigurator();
+	void testFastLoggerRootConfigurator();
+	void testFastLoggerWithRegistry();
+	void testFastLoggerOptions();
+	void testFastLoggerOptionsWarnings();
 	void testBadConfiguration1();
 	void testBadConfiguration2();
 	void testBadConfiguration3();

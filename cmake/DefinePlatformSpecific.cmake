@@ -48,6 +48,12 @@ if(MSVC)
 else(MSVC)
 	# Other compilers then MSVC don't have a static STATIC_POSTFIX at the moment
 	set(STATIC_POSTFIX "" CACHE STRING "Set static library postfix" FORCE)
+
+	# Strip debug symbols from Release binaries (reduces binary size significantly)
+	# On Windows, debug symbols go to separate .pdb files, so this is not needed
+	# NOTE: CMAKE_BUILD_TYPE must be set to Release for this to take effect
+	#       e.g., cmake -B build -DCMAKE_BUILD_TYPE=Release
+	add_link_options($<$<CONFIG:Release>:-s>)
 endif(MSVC)
 
 if (DEFINED POCO_SANITIZEFLAGS AND NOT "${POCO_SANITIZEFLAGS}" STREQUAL "")

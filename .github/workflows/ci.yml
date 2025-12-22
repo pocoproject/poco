@@ -1108,3 +1108,41 @@ jobs:
             cd cmake-build &&
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
+
+  linux-gcc-cmake-no-fastlogger:
+    # Build and test without FastLogger to ensure it can be fully disabled
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DENABLE_FASTLOGGER=OFF -DENABLE_TESTS=ON
+          -DPOCO_MINIMAL_BUILD=ON -DENABLE_UTIL=ON -DENABLE_JSON=ON -DENABLE_XML=ON
+      - run: cmake --build cmake-build --target Foundation Util Foundation-testrunner Util-testrunner --parallel 4
+      - name: Run Foundation LoggingTestSuite
+        run: ./cmake-build/bin/Foundation-testrunner LoggingTestSuite
+      - name: Run Util LoggingConfiguratorTest
+        run: ./cmake-build/bin/Util-testrunner LoggingConfiguratorTest
+
+  linux-gcc-make-no-fastlogger:
+    # Build and test without FastLogger using Make build system
+    runs-on: ubuntu-24.04
+    env:
+      POCO_BASE: ${{ github.workspace }}
+      POCO_NO_FASTLOGGER: 1
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./configure --minimal --no-tests --no-samples
+      - run: make -s -j4 -C CppUnit
+      - run: make -s -j4 -C Foundation
+      - run: make -s -j4 -C Foundation/testsuite
+      - run: make -s -j4 -C XML
+      - run: make -s -j4 -C JSON
+      - run: make -s -j4 -C Util
+      - run: make -s -j4 -C Util/testsuite
+      - name: Run Foundation LoggingTestSuite
+        working-directory: Foundation/testsuite
+        run: . $POCO_BASE/poco_env.bash && ./bin/Linux/x86_64/testrunner LoggingTestSuite
+      - name: Run Util LoggingConfiguratorTest
+        working-directory: Util/testsuite
+        run: . $POCO_BASE/poco_env.bash && ./bin/Linux/x86_64/testrunner LoggingConfiguratorTest

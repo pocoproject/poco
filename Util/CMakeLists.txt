@@ -2,6 +2,11 @@
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO(SRCS ${SRCS_G})
 
+# FastLoggerConfigurator requires FastLogger - exclude if not enabled
+if(NOT ENABLE_FASTLOGGER)
+	list(FILTER SRCS EXCLUDE REGEX ".*FastLoggerConfigurator\\.cpp$")
+endif()
+
 # Headers
 file(GLOB_RECURSE HDRS_G "include/*.h")
 POCO_HEADERS_AUTO(SRCS ${HDRS_G})

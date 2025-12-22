@@ -16,17 +16,72 @@
 #include "Poco/UnicodeConverter.h"
 #include "Poco/Exception.h"
 #include "Poco/UnWindows.h"
+#include <mutex>
 #include <ctime>
+#include <cstdlib>
+#include <string>
 
 
 namespace Poco {
 
 
+class TZInfo
+{
+public:
+	TZInfo()
+	{
+		reload();
+	}
+
+	int utcOffset()
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+
+		if (tzChanged())
+			reloadNoLock();
+		return _tzOffset;
+	}
+
+	void reload()
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		reloadNoLock();
+	}
+
+private:
+	void reloadNoLock()
+	{
+		TIME_ZONE_INFORMATION info;
+		GetTimeZoneInformation(&info);
+		_tzOffset = -info.Bias*60;
+		cacheTZ();
+	}
+
+	void cacheTZ()
+	{
+		const char* tz = std::getenv("TZ");
+		_cachedTZ = tz ? tz : "";
+	}
+
+	bool tzChanged() const
+	{
+		const char* tz = std::getenv("TZ");
+		std::string currentTZ = tz ? tz : "";
+		return currentTZ != _cachedTZ;
+	}
+
+	std::mutex _mutex;
+	int _tzOffset;
+	std::string _cachedTZ;
+};
+
+
+static TZInfo tzInfo;
+
+
 int Timezone::utcOffset()
 {
-	TIME_ZONE_INFORMATION tzInfo;
-	(void) GetTimeZoneInformation(&tzInfo);
-	return -tzInfo.Bias*60;
+	return tzInfo.utcOffset();
 }
 
 
@@ -90,6 +145,12 @@ std::string Timezone::dstName()
 	WCHAR* ptr = tzInfo.DaylightName;
 	UnicodeConverter::toUTF8(ptr, result);
 	return result;
+}
+
+
+void Timezone::reloadCache()
+{
+	tzInfo.reload();
 }
 
 
