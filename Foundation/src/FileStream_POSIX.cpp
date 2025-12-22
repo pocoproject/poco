@@ -219,7 +219,7 @@ Poco::UInt64 FileStreamBuf::size() const
 	int rc = ::fstat(_fd, &stat_buf);
 	if (rc < 0)
 	{
-		Poco::SystemException(strerror(errno), errno);
+		throw Poco::SystemException(strerror(errno), errno);
 	}
 	return stat_buf.st_size;
 }

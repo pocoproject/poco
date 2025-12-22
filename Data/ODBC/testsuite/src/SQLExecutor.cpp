@@ -155,12 +155,12 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 	const std::string& blobPlaceholder)
 {
 	SQLRETURN rc;
-	SQLHENV henv = SQL_NULL_HENV;
-	SQLHDBC hdbc = SQL_NULL_HDBC;
-	SQLHSTMT hstmt = SQL_NULL_HSTMT;
+	SQLHENV henv = POCO_ODBC_NULL_HENV;
+	SQLHDBC hdbc = POCO_ODBC_NULL_HDBC;
+	SQLHSTMT hstmt = POCO_ODBC_NULL_HSTMT;
 
 	// Environment begin
-	rc = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
+	rc = SQLAllocHandle(SQL_HANDLE_ENV, POCO_ODBC_NULL_HANDLE, &henv);
 	poco_odbc_check_env (rc, henv);
 	rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, 0);
 	poco_odbc_check_env (rc, henv);
@@ -583,12 +583,12 @@ void SQLExecutor::bareboneODBCMultiResultTest(const std::string& dbConnString,
 	const std::string& procCreateString)
 {
 	SQLRETURN rc;
-	SQLHENV henv = SQL_NULL_HENV;
-	SQLHDBC hdbc = SQL_NULL_HDBC;
-	SQLHSTMT hstmt = SQL_NULL_HSTMT;
+	SQLHENV henv = POCO_ODBC_NULL_HENV;
+	SQLHDBC hdbc = POCO_ODBC_NULL_HDBC;
+	SQLHSTMT hstmt = POCO_ODBC_NULL_HSTMT;
 
 	// Environment begin
-	rc = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
+	rc = SQLAllocHandle(SQL_HANDLE_ENV, POCO_ODBC_NULL_HANDLE, &henv);
 	poco_odbc_check_stmt (rc, hstmt);
 	rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER) SQL_OV_ODBC3, 0);
 	poco_odbc_check_stmt (rc, hstmt);
@@ -805,12 +805,12 @@ void SQLExecutor::bareboneODBCStoredFuncTest(const std::string& dbConnString,
 	SQLExecutor::DataExtraction extractMode)
 {
 	SQLRETURN rc;
-	SQLHENV henv = SQL_NULL_HENV;
-	SQLHDBC hdbc = SQL_NULL_HDBC;
-	SQLHSTMT hstmt = SQL_NULL_HSTMT;
+	SQLHENV henv = POCO_ODBC_NULL_HENV;
+	SQLHDBC hdbc = POCO_ODBC_NULL_HDBC;
+	SQLHSTMT hstmt = POCO_ODBC_NULL_HSTMT;
 
 	// Environment begin
-	rc = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &henv);
+	rc = SQLAllocHandle(SQL_HANDLE_ENV, POCO_ODBC_NULL_HANDLE, &henv);
 	poco_odbc_check_env(rc, henv);
 	rc = SQLSetEnvAttr(henv, SQL_ATTR_ODBC_VERSION, (SQLPOINTER)SQL_OV_ODBC3, 0);
 	poco_odbc_check_env(rc, henv);
@@ -1020,7 +1020,7 @@ void SQLExecutor::session(const std::string& connectString, int timeout)
 	Poco::Any any = s.getProperty("handle");
 	assertTrue (typeid(SQLHDBC) == any.type());
 	SQLHDBC hdbc = Poco::AnyCast<SQLHDBC>(any);
-	assertTrue (SQL_NULL_HDBC != hdbc);
+	assertTrue (POCO_ODBC_NULL_HDBC != hdbc);
 	SQLRETURN rc = SQLDisconnect(hdbc);
 	assertTrue (!Utility::isError(rc));
 	assertTrue (!s.isConnected());

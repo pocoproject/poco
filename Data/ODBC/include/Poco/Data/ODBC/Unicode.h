@@ -17,9 +17,7 @@
 #ifndef Data_ODBC_Unicode_INCLUDED
 #define Data_ODBC_Unicode_INCLUDED
 
-
-#include "Poco/UnicodeConverter.h"
-#include "Poco/Buffer.h"
+#include "Poco/Data/ODBC/ODBC.h"
 #include "Poco/Exception.h"
 #include <cstring>
 #ifdef POCO_OS_FAMILY_WINDOWS

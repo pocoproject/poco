@@ -291,9 +291,9 @@ private:
 	std::string       _table;
 	std::atomic<bool> _tableChanged;
 	std::atomic<int>  _timeout;
-	std::atomic<int>  _minBatch;
-	std::atomic<int>  _maxBatch;
-	std::atomic<int>  _maxSQL;
+	std::atomic<std::size_t>  _minBatch;
+	std::atomic<std::size_t>  _maxBatch;
+	std::atomic<std::size_t>  _maxSQL;
 	std::atomic<bool> _bulk;
 	std::atomic<bool> _throw;
 	std::atomic<int>  _flush;

@@ -153,7 +153,7 @@ void SQLiteStatementImpl::bindImpl()
 
 	sqlite3_reset(_pStmt);
 
-	int paramCount = sqlite3_bind_parameter_count(_pStmt);
+	std::size_t paramCount = static_cast<std::size_t>(sqlite3_bind_parameter_count(_pStmt));
 	if (0 == paramCount)
 	{
 		_canBind = false;
@@ -256,7 +256,7 @@ std::size_t SQLiteStatementImpl::next()
 {
 	if (SQLITE_ROW == _nextResponse)
 	{
-		poco_assert (columnsReturned() == sqlite3_column_count(_pStmt));
+		poco_assert (columnsReturned() == static_cast<std::size_t>(sqlite3_column_count(_pStmt)));
 
 		Extractions& extracts = extractions();
 		Extractions::iterator it    = extracts.begin();
@@ -297,7 +297,7 @@ std::size_t SQLiteStatementImpl::columnsReturned() const
 const MetaColumn& SQLiteStatementImpl::metaColumn(std::size_t pos) const
 {
 	std::size_t curDataSet = currentDataSet();
-	poco_assert (pos >= 0 && pos <= _columns[curDataSet].size());
+	poco_assert (pos <= _columns[curDataSet].size());
 	return _columns[curDataSet][pos];
 }
 

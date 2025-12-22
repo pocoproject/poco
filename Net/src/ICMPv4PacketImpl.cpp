@@ -169,7 +169,7 @@ ICMPv4PacketImpl::Header* ICMPv4PacketImpl::header(Poco::UInt8* buffer, int leng
 	poco_check_ptr (buffer);
 
 	int offset = (buffer[0] & 0x0F) * 4;
-	if ((offset + sizeof(Header)) > length) return nullptr;
+	if (static_cast<std::size_t>(offset) + sizeof(Header) > static_cast<std::size_t>(length)) return nullptr;
 
 	buffer += offset;
 	return reinterpret_cast<Header*>(buffer);

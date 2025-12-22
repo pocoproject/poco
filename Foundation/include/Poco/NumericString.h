@@ -94,6 +94,9 @@ inline bool isIntOverflow(From val)
 template<typename R, typename F, typename S>
 bool safeMultiply(R& result, F f, S s)
 {
+	using CT = std::common_type_t<R, F, S>;
+	auto cast = [](auto v) { return static_cast<CT>(v); };
+
 	if ((f == 0) || (s==0))
 	{
 		result = 0;
@@ -104,12 +107,12 @@ bool safeMultiply(R& result, F f, S s)
 	{
 		if (s > 0)
 		{
-			if (f > (std::numeric_limits<R>::max() / s))
+			if (cast(f) > (cast(std::numeric_limits<R>::max()) / cast(s)))
 				return false;
 		}
 		else
 		{
-			if (s < (std::numeric_limits<R>::min() / f))
+			if (cast(s) < (cast(std::numeric_limits<R>::min()) / cast(f)))
 				return false;
 		}
 	}
@@ -117,12 +120,12 @@ bool safeMultiply(R& result, F f, S s)
 	{
 		if (s > 0)
 		{
-			if (f < (std::numeric_limits<R>::min() / s))
+			if (cast(f) < (cast(std::numeric_limits<R>::min()) / cast(s)))
 				return false;
 		}
 		else
 		{
-			if (s < (std::numeric_limits<R>::max() / f))
+			if (cast(s) < (cast(std::numeric_limits<R>::max()) / cast(f)))
 				return false;
 		}
 	}

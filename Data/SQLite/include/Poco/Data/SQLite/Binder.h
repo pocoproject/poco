@@ -126,7 +126,10 @@ private:
 		const T* pData = reinterpret_cast<const T*>(val.rawContent());
 		int valSize = static_cast<int>(val.size());
 
-		int rc = sqlite3_bind_blob(_pStmt, static_cast<int>(pos), pData, valSize, SQLITE_STATIC); // no deep copy, do not free memory
+		// nullptr is equivalent to SQLITE_STATIC ((sqlite3_destructor_type)0)
+		// It tells SQLite that the data is static/persistent and should not be freed.
+		// Using nullptr instead of SQLITE_STATIC avoids -Wzero-as-null-pointer-constant warning.
+		int rc = sqlite3_bind_blob(_pStmt, static_cast<int>(pos), pData, valSize, nullptr);
 		checkReturn(rc);
 	}
 

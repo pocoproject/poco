@@ -19,13 +19,10 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/TypeInfo.h"
-#include "Poco/Data/ODBC/Binder.h"
-#include "Poco/Data/ODBC/Handle.h"
+#include "Poco/Data/ODBC/ConnectionHandle.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/AbstractSessionImpl.h"
-#include "Poco/TextEncoding.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Mutex.h"
 #ifdef POCO_OS_FAMILY_WINDOWS

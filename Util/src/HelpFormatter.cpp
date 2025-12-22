@@ -141,7 +141,7 @@ int HelpFormatter::calcIndent() const
 				n += 1 + opt.argumentName().length() + (opt.argumentRequired() ? 0 : 2);
 		}
 		n += 2;
-		if (n > indent)
+		if (static_cast<int>(n) > indent)
 			indent = static_cast<int>(n);
 	}
 	return indent;
@@ -243,7 +243,7 @@ void HelpFormatter::formatText(std::ostream& ostr, const std::string& text, int 
 		}
 		else
 		{
-			if (word.length() == maxWordLen)
+			if (static_cast<int>(word.length()) == maxWordLen)
 			{
 				clearWord(ostr, pos, word, indent);
 			}
@@ -256,7 +256,7 @@ void HelpFormatter::formatText(std::ostream& ostr, const std::string& text, int 
 
 void HelpFormatter::formatWord(std::ostream& ostr, int& pos, const std::string& word, int indent) const
 {
-	if (pos + word.length() > _width)
+	if (pos + static_cast<int>(word.length()) > _width)
 	{
 		ostr << '\n';
 		pos = 0;

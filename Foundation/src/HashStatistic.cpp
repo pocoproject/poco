@@ -46,7 +46,7 @@ std::string HashStatistic::toString() const
 	str << "  MaxEntry: " << _maxEntriesPerHash << "\n";
 	str << "  AvgEntry: " << avgEntriesPerHash() << ", excl Zero slots: " << avgEntriesPerHashExclZeroEntries() << "\n";
 	str << "  DetailedStatistics: \n";
-	for (int i = 0; i < _detailedEntriesPerHash.size(); ++i)
+	for (std::size_t i = 0; i < _detailedEntriesPerHash.size(); ++i)
 	{
 		// 10 entries per line
 		if (i % 10 == 0)

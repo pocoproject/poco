@@ -138,7 +138,7 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 	StringTokenizer tokenizer(key, ".");
 	lastPart = tokenizer[tokenizer.count() - 1];
 
-	for (int i = 0; i < tokenizer.count() - 1; ++i)
+	for (std::size_t i = 0; i < tokenizer.count() - 1; ++i)
 	{
 		std::vector<int> indexes;
 		std::string name = tokenizer[i];

@@ -185,7 +185,7 @@ void SQLExecutor::bareboneMySQLTest(const char* host, const char* user, const ch
 	int fourth = 4;
 	float fifth = 1.5;
 
-	MYSQL_BIND bind_param[5] = {{nullptr}};
+	MYSQL_BIND bind_param[5] = {};
 
 	bind_param[0].buffer		= const_cast<char*>(str[0].c_str());
 	bind_param[0].buffer_length = static_cast<unsigned long>(str[0].length());
@@ -225,7 +225,7 @@ void SQLExecutor::bareboneMySQLTest(const char* host, const char* user, const ch
 	fourth = 0;
 	fifth = 0.0f;
 
-	MYSQL_BIND bind_result[5] = {{nullptr}};
+	MYSQL_BIND bind_result[5] = {};
 
 	bind_result[0].buffer		= chr[0];
 	bind_result[0].buffer_length = sizeof(chr[0]);

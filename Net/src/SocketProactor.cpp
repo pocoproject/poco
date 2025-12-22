@@ -59,7 +59,7 @@ public:
 	{
 		auto pch = SocketProactor::PERMANENT_COMPLETION_HANDLER;
 		Poco::Timestamp expires = (ms != pch) ? Timestamp() + (ms * 1000) : Timestamp(pch);
-		if (pos == -1 || (pos + 1) > _funcList.size())
+		if (pos == -1 || static_cast<std::size_t>(pos + 1) > _funcList.size())
 		{
 			ScopedLock lock(_mutex);
 			_funcList.push_back({std::move(ch), expires});

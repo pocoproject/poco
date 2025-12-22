@@ -79,7 +79,7 @@ public:
 		///
 		/// Throws a NotFoundException if the name-value pair does not exist.
 
-	const std::string& get(const std::string& name, const std::string& defaultValue) const;
+	std::string get(const std::string& name, const std::string& defaultValue) const;
 		/// Returns the value of the first name-value pair with the given name.
 		/// If no value with the given name has been found, the defaultValue is returned.
 

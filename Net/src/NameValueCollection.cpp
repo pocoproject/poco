@@ -106,7 +106,7 @@ const std::string& NameValueCollection::get(const std::string& name) const
 }
 
 
-const std::string& NameValueCollection::get(const std::string& name, const std::string& defaultValue) const
+std::string NameValueCollection::get(const std::string& name, const std::string& defaultValue) const
 {
 	ConstIterator it = _map.find(name);
 	if (it != _map.end())

@@ -102,7 +102,8 @@ IPv4AddressImpl::IPv4AddressImpl(unsigned prefix)
 }
 
 
-IPv4AddressImpl::IPv4AddressImpl(const IPv4AddressImpl& addr)
+IPv4AddressImpl::IPv4AddressImpl(const IPv4AddressImpl& addr):
+	IPAddressImpl()
 {
 	std::memcpy(&_addr, &addr._addr, sizeof(_addr));
 }
@@ -372,7 +373,9 @@ IPv6AddressImpl::IPv6AddressImpl(const void* addr, Poco::UInt32 scope): _scope(s
 }
 
 
-IPv6AddressImpl::IPv6AddressImpl(const IPv6AddressImpl& addr): _scope(addr._scope)
+IPv6AddressImpl::IPv6AddressImpl(const IPv6AddressImpl& addr):
+	IPAddressImpl(),
+	_scope(addr._scope)
 {
 	std::memcpy((void*) &_addr, (void*) &addr._addr, sizeof(_addr));
 }

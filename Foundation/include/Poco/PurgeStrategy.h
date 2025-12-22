@@ -91,13 +91,13 @@ class Foundation_API PurgeByCountStrategy: public PurgeStrategy
 	/// based on their age, with oldest files deleted first.
 {
 public:
-	PurgeByCountStrategy(int count);
+	PurgeByCountStrategy(std::size_t count);
 	~PurgeByCountStrategy() override;
 
 	void purge(const std::string& path) override;
 
 private:
-	int _count;
+	std::size_t _count;
 };
 
 
