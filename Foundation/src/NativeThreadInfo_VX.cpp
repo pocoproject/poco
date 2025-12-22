@@ -26,7 +26,7 @@ std::string NativeThreadInfoImpl::nameImpl() const
 	return taskName(_thread);
 }
 
-pid_t NativeThreadInfoImpl::idImpl() const
+NativeThreadInfoImpl::ThreadIdImpl NativeThreadInfoImpl::osTidImpl() const
 {
 	return _thread;
 }

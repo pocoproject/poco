@@ -31,10 +31,12 @@ namespace Poco {
 
 NativeThreadInfo::NativeThreadInfo(Handle handle):
 	NativeThreadInfoImpl{handle}
-{ }
+{
+}
 
 NativeThreadInfo::NativeThreadInfo():
 	NativeThreadInfo{ NativeThreadInfoImpl::currentThreadHandleImpl() }
-{ }
+{
+}
 
 } // namespace Poco

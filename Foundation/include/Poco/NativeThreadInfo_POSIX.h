@@ -38,7 +38,7 @@ public:
 	NativeThreadInfoImpl(HandleImpl handle);
 
 	std::string nameImpl() const;
-	ThreadIdImpl idImpl() const;
+	ThreadIdImpl osTidImpl() const;
 
 	static HandleImpl currentThreadHandleImpl();
 };

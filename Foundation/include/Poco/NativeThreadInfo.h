@@ -34,7 +34,17 @@
 namespace Poco {
 
 class Foundation_API NativeThreadInfo: private NativeThreadInfoImpl
-	/// This class implements a platform independent API to query information about a native thread.
+	/// This class provides a platform-independent API to query information about native threads.
+	///
+	/// NativeThreadInfo is used to get information (name and OS thread ID) about threads that
+	/// are not managed by Poco::Thread. This includes:
+	///   - std::thread instances
+	///   - The main thread
+	///   - Threads created by third-party libraries
+	///   - Any other native OS threads not created via Poco::Thread
+	///
+	/// The OS thread ID returned by osTid() is the same kernel-level thread identifier
+	/// returned by Thread::currentOsTid() and visible in system tools (debuggers, profilers, etc.).
 {
 public:
 	typedef NativeThreadInfoImpl::ThreadIdImpl ThreadId;
@@ -49,7 +59,8 @@ public:
 	std::string name() const;
 		/// Returns the name of the thread.
 
-	ThreadId id() const;
+	ThreadId osTid() const;
+		/// Returns the operating system specific thread ID.
 };
 
 //
@@ -60,9 +71,9 @@ inline std::string NativeThreadInfo::name() const
 	return nameImpl();
 }
 
-inline NativeThreadInfo::ThreadId NativeThreadInfo::id() const
+inline NativeThreadInfo::ThreadId NativeThreadInfo::osTid() const
 {
-	return idImpl();
+	return osTidImpl();
 }
 
 } // namespace Poco

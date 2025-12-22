@@ -143,8 +143,9 @@ void Message::init()
 	}
 	else
 	{
+		// Not a POCO thread, use native OS thread ID.
 		NativeThreadInfo info;
-		_tid = info.id();
+		_tid = info.osTid();
 		_thread = info.name();
 	}
 }

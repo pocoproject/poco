@@ -88,7 +88,7 @@ std::string NativeThreadInfoImpl::nameImpl() const
 }
 
 
-NativeThreadInfoImpl::ThreadIdImpl NativeThreadInfoImpl::idImpl() const
+NativeThreadInfoImpl::ThreadIdImpl NativeThreadInfoImpl::osTidImpl() const
 {
 	long id = 0;
 #if (POCO_OS == POCO_OS_LINUX) && !defined(POCO_EMSCRIPTEN)

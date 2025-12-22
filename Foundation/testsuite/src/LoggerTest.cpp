@@ -317,7 +317,7 @@ std::string LoggerTest::doTestFormatThreadName(ThreadFactory makeThread)
 
 	Event ev;
 	auto thr = makeThread(
-		ThreadNameTestStrings::threadName, 
+		ThreadNameTestStrings::threadName,
 		[&ev, &logger] {
 			logger.information(ThreadNameTestStrings::message);
 			ev.set();
@@ -328,7 +328,7 @@ std::string LoggerTest::doTestFormatThreadName(ThreadFactory makeThread)
 
 	const std::string logMsg = pChannel->getLastMessage().getText();
 	std::vector<std::string> parts;
-	std::size_t p = 0; 
+	std::size_t p = 0;
 	while (p != std::string::npos && p < logMsg.size()) {
 		auto q = logMsg.find(':', p);
 		if (q == logMsg.npos) {
@@ -345,24 +345,26 @@ std::string LoggerTest::doTestFormatThreadName(ThreadFactory makeThread)
 	return parts[1];
 }
 
+
 void LoggerTest::testFormatThreadName()
 {
 	auto tidStr = doTestFormatThreadName(
 		[](std::string name, auto body) {
 			auto thr = std::make_unique<Thread>(name);
 			thr->startFunc(std::move(body));
-			return std::move(thr);
+			return thr;
 		}
-	);	
+	);
 	assertEqual( "1", tidStr );
 }
+
 
 void LoggerTest::testFormatStdThreadName()
 {
 #ifdef POCO_OS_FAMILY_UNIX
 	doTestFormatThreadName(
 		[](std::string name, auto bodyIn) {
-			auto thr = std::make_unique<std::thread>( 
+			auto thr = std::make_unique<std::thread>(
 				[name, body = std::move(bodyIn)] {
 					pthread_setname_np(pthread_self(), name.c_str());
 					body();

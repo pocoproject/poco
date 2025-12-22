@@ -27,7 +27,7 @@ std::string NativeThreadInfoImpl::nameImpl() const
 	return {};
 }
 
-NativeThreadInfoImpl::ThreadIdImpl NativeThreadInfoImpl::idImpl() const
+NativeThreadInfoImpl::ThreadIdImpl NativeThreadInfoImpl::osTidImpl() const
 {
 	return _thread;
 }
