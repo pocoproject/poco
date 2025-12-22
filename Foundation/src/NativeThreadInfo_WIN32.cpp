@@ -25,6 +25,7 @@ NativeThreadInfoImpl::NativeThreadInfoImpl(NativeThreadInfoImpl::HandleImpl hand
 
 std::string NativeThreadInfoImpl::nameImpl() const
 {
+	PWSTR data = nullptr;
 	HRESULT hr = GetThreadDescription(_thread, &data);
 	if (SUCCEEDED(hr))
 	{   
