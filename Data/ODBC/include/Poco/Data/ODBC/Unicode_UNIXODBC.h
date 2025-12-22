@@ -17,6 +17,9 @@
 #ifndef Data_ODBC_Unicode_UNIX_INCLUDED
 #define Data_ODBC_Unicode_UNIX_INCLUDED
 
+#include "Poco/Buffer.h"
+#include <sqltypes.h>
+#include <string>
 
 namespace Poco {
 namespace Data {

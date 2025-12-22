@@ -212,7 +212,7 @@ int WebSocketImpl::peekHeader(ReceiveState& receiveState)
 		Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
 		Poco::UInt64 l;
 		reader >> l;
-		if (l > _maxPayloadSize) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
+		if (l > static_cast<Poco::UInt64>(_maxPayloadSize)) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 		receiveState.payloadLength = static_cast<int>(l);
 		maskOffset = 10;
 	}

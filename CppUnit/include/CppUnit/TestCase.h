@@ -133,7 +133,9 @@ protected:
 					  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 					  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME)
 	{
-		if (expected != actual)
+		// Use common_type to avoid sign-compare warnings when comparing mixed signed/unsigned types
+		using CommonType = std::common_type_t<T1, T2>;
+		if (static_cast<CommonType>(expected) != static_cast<CommonType>(actual))
 			assertImplementation(false, notEqualsMessage(expected, actual), lineNumber, fileName);
 	}
 

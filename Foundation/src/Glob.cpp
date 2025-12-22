@@ -195,6 +195,7 @@ bool Glob::matchSet(TextIterator& itp, const TextIterator& endp, int c)
 					return true;
 				case '\\':
 					if (++itp == endp) break;
+					[[fallthrough]];
 				default:
 					++itp;
 				}

@@ -133,7 +133,7 @@ private:
 		}
 
 		char key;
-		int length;
+		std::size_t length;
 		std::string property;
 		std::string prepend;
 	};

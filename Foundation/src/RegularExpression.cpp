@@ -83,7 +83,7 @@ RegularExpression::RegularExpression(const std::string& pattern, int options, bo
 	else // default RE_NEWLINE_CR
 		pcre2_set_newline(context, PCRE2_NEWLINE_CR);
 
-	_pcre = pcre2_compile(reinterpret_cast<const PCRE2_SPTR>(pattern.c_str()), pattern.length(), compileOptions(options), &errorCode, &errorOffset, context);
+	_pcre = pcre2_compile(reinterpret_cast<PCRE2_SPTR>(pattern.c_str()), pattern.length(), compileOptions(options), &errorCode, &errorOffset, context);
 	pcre2_compile_context_free(context);
 
 	if (!_pcre)
@@ -99,7 +99,7 @@ RegularExpression::RegularExpression(const std::string& pattern, int options, bo
 	pcre2_pattern_info(reinterpret_cast<pcre2_code*>(_pcre), PCRE2_INFO_NAMEENTRYSIZE, &nameEntrySize);
 	pcre2_pattern_info(reinterpret_cast<pcre2_code*>(_pcre), PCRE2_INFO_NAMETABLE, &nameTable);
 
-	for (int i = 0; i < nameCount; i++)
+	for (unsigned i = 0; i < nameCount; i++)
 	{
 		unsigned char* group = nameTable + 2 + (nameEntrySize * i);
 		int n = pcre2_substring_number_from_name(reinterpret_cast<pcre2_code*>(_pcre), group);
@@ -119,7 +119,7 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 	poco_assert (offset <= subject.length());
 
 	MatchData matchData(reinterpret_cast<pcre2_code*>(_pcre));
-	int rc = pcre2_match(reinterpret_cast<pcre2_code*>(_pcre), reinterpret_cast<const PCRE2_SPTR>(subject.c_str()), subject.size(), offset, matchOptions(options), matchData, nullptr);
+	int rc = pcre2_match(reinterpret_cast<pcre2_code*>(_pcre), reinterpret_cast<PCRE2_SPTR>(subject.c_str()), subject.size(), offset, matchOptions(options), matchData, nullptr);
 	if (rc == PCRE2_ERROR_NOMATCH)
 	{
 		mtch.offset = std::string::npos;
@@ -141,7 +141,7 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 		throw RegularExpressionException(std::string(reinterpret_cast<char*>(buffer)));
 	}
 	const PCRE2_SIZE* ovec = matchData.data();
-	mtch.offset = ovec[0] < 0 ? std::string::npos : ovec[0];
+	mtch.offset = (ovec[0] == PCRE2_UNSET) ? std::string::npos : ovec[0];
 	mtch.length = ovec[1] - mtch.offset;
 	return rc;
 }
@@ -154,7 +154,7 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 	matches.clear();
 
 	MatchData matchData(reinterpret_cast<pcre2_code*>(_pcre));
-	int rc = pcre2_match(reinterpret_cast<pcre2_code*>(_pcre), reinterpret_cast<const PCRE2_SPTR>(subject.c_str()), subject.size(), offset, options & 0xFFFF, matchData, nullptr);
+	int rc = pcre2_match(reinterpret_cast<pcre2_code*>(_pcre), reinterpret_cast<PCRE2_SPTR>(subject.c_str()), subject.size(), offset, options & 0xFFFF, matchData, nullptr);
 	if (rc == PCRE2_ERROR_NOMATCH)
 	{
 		return 0;
@@ -180,7 +180,7 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 		Match m;
 		GroupMap::const_iterator it;
 
-		m.offset = ovec[i*2] < 0 ? std::string::npos : ovec[i*2] ;
+		m.offset = (ovec[i*2] == PCRE2_UNSET) ? std::string::npos : ovec[i*2];
 		m.length = ovec[i*2 + 1] - m.offset;
 
 		it = _groups.find(i);
@@ -277,7 +277,7 @@ std::string::size_type RegularExpression::substOne(std::string& subject, std::st
 	if (offset >= subject.length()) return std::string::npos;
 
 	MatchData matchData(reinterpret_cast<pcre2_code*>(_pcre));
-	int rc = pcre2_match(reinterpret_cast<pcre2_code*>(_pcre), reinterpret_cast<const PCRE2_SPTR>(subject.c_str()), subject.size(), offset, matchOptions(options), matchData, nullptr);
+	int rc = pcre2_match(reinterpret_cast<pcre2_code*>(_pcre), reinterpret_cast<PCRE2_SPTR>(subject.c_str()), subject.size(), offset, matchOptions(options), matchData, nullptr);
 	if (rc == PCRE2_ERROR_NOMATCH)
 	{
 		return std::string::npos;

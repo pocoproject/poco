@@ -40,6 +40,7 @@ Preparator::Preparator(const StatementHandle& rStmt,
 
 
 Preparator::Preparator(const Preparator& other):
+	AbstractPreparator(other),
 	_rStmt(other._rStmt),
 	_maxFieldSize(other._maxFieldSize),
 	_dataExtraction(other._dataExtraction)

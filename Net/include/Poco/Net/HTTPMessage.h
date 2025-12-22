@@ -82,7 +82,7 @@ public:
 		/// The value should be either IDENTITY_TRANSFER_CODING
 		/// or CHUNKED_TRANSFER_CODING.
 
-	const std::string& getTransferEncoding() const;
+	std::string getTransferEncoding() const;
 		/// Returns the transfer encoding used for this
 		/// message.
 		///
@@ -108,7 +108,7 @@ public:
 	void setContentType(const MediaType& mediaType);
 		/// Sets the content type for this message.
 
-	const std::string& getContentType() const;
+	std::string getContentType() const;
 		/// Returns the content type for this message.
 		///
 		/// If no Content-Type header is present,

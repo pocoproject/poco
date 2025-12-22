@@ -60,7 +60,7 @@ void UDPClient::run()
 			{
 				char buffer[sizeof(Poco::UInt32)*2];
 				int n = _socket.receiveBytes(buffer, sizeof(buffer));
-				if (n >= sizeof(Poco::Int32)) handleResponse(buffer, n);
+				if (static_cast<std::size_t>(n) >= sizeof(Poco::Int32)) handleResponse(buffer, n);
 			}
 			catch (Exception& exc)
 			{

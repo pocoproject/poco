@@ -182,7 +182,7 @@ void PatternFormatter::parsePattern()
 						if (it == end) --it;
 						try
 						{
-							act.length = NumberParser::parse(number);
+							act.length = static_cast<std::size_t>(NumberParser::parse(number));
 						}
 						catch (...)
 						{

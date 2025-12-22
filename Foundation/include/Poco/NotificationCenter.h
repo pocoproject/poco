@@ -100,23 +100,35 @@ public:
 		/// Unregisters an observer with the NotificationCenter.
 
 	template <class C, class N>
+	POCO_DEPRECATED("use addNObserver() instead")
 	void addObserver(C& object, void (C::*method)(N*))
-		/// @deprecated This convenience method uses the deprecated Observer class.
-		/// Use addNObserver() or construct an NObserver explicitly instead.
+		/// @deprecated This convenience method instantiates the deprecated
+		/// Observer<C, N> class template, which triggers a compiler warning.
+		/// The Observer class requires manual memory management of notifications
+		/// (caller must call release()), while NObserver handles this automatically
+		/// via AutoPtr.
 		///
-		/// Convenience method for registering an Observer.
-		/// Creates an Observer<C, N> and registers it.
+		/// Use addNObserver() instead, which creates an NObserver that passes
+		/// notifications as `const AutoPtr<N>&`, providing automatic memory management.
+		///
+		/// Migration example:
+		///     // Old (deprecated):
+		///     nc.addObserver(*this, &MyClass::onEvent);
+		///     void MyClass::onEvent(MyNotification* pNf) { pNf->release(); }
+		///
+		///     // New (recommended):
+		///     nc.addNObserver(*this, &MyClass::onEvent);
+		///     void MyClass::onEvent(const AutoPtr<MyNotification>& pNf) { /* no release needed */ }
 	{
 		addObserver(Observer<C, N>(object, method));
 	}
 
 	template <class C, class N>
+	POCO_DEPRECATED("use removeNObserver() instead")
 	void removeObserver(C& object, void (C::*method)(N*))
-		/// @deprecated This convenience method uses the deprecated Observer class.
-		/// Use removeNObserver() or construct an NObserver explicitly instead.
-		///
-		/// Convenience method for unregistering an Observer.
-		/// Removes the Observer<C, N> with the given callback.
+		/// @deprecated This convenience method instantiates the deprecated
+		/// Observer<C, N> class template. See addObserver() deprecation note
+		/// for migration details.
 	{
 		removeObserver(Observer<C, N>(object, method));
 	}

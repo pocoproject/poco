@@ -484,7 +484,7 @@ void ODBCStatementImpl::fillColumns()
 	if (curDataSet >= _columnPtrs.size())
 		_columnPtrs.resize(curDataSet + 1);
 
-	for (int i = 0; i < colCount; ++i)
+	for (std::size_t i = 0; i < colCount; ++i)
 		_columnPtrs[curDataSet].push_back(new ODBCMetaColumn(_stmt, i));
 }
 

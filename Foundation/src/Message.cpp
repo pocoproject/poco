@@ -293,7 +293,7 @@ const std::string& Message::get(const std::string& param) const
 }
 
 
-const std::string& Message::get(const std::string& param, const std::string& defaultValue) const
+std::string Message::get(const std::string& param, const std::string& defaultValue) const
 {
 	if (_pMap)
 	{

@@ -511,7 +511,7 @@ int SocketImpl::receiveBytes(Poco::Buffer<char>& buffer, int flags, const Poco::
 			else
 				error(err);
 		}
-		if (rc < buffer.size()) buffer.resize(rc);
+		if (static_cast<std::size_t>(rc) < buffer.size()) buffer.resize(rc);
 	}
 	return rc;
 }
@@ -1559,7 +1559,7 @@ std::streamsize SocketImpl::sendFileBlockwise(FileInputStream& fileInputStream, 
 	fileInputStream.seekg(offset, std::ios_base::beg);
 	Poco::Buffer<char> buffer(8192);
 	std::size_t bufferSize = buffer.size();
-	if (count > 0 && bufferSize > count) bufferSize = count;
+	if (count > 0 && static_cast<std::streamsize>(bufferSize) > count) bufferSize = static_cast<std::size_t>(count);
 
 	std::streamsize len = 0;
 	fileInputStream.read(buffer.begin(), bufferSize);

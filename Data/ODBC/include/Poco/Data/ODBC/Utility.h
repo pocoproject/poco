@@ -23,9 +23,8 @@
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
 #include "Poco/DateTime.h"
-#include <sstream>
-#include <map>
 #include <sqltypes.h>
+#include <map>
 
 
 namespace Poco {

@@ -143,7 +143,7 @@ public:
 
 	const Diagnostics& diagnostics()
 	{
-		if (SQL_NULL_HANDLE == _handle) return *this;
+		if (POCO_ODBC_NULL_HANDLE == _handle) return *this;
 
 		DiagnosticFields df;
 		SQLSMALLINT count = 1;
