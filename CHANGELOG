@@ -34,6 +34,8 @@ Poco::Foundation:
   significant code reduction. Full backward API compatibility maintained.
 - New AsyncNotificationCenter for asynchronous notification dispatch with auto-configured
   worker threads.
+- FastLogger (Quill wrapper, fully compatible with Poco Logging system)
+- Single/Multiple Producer, Single Consumer lock-free notification queueues.
 - DataNotification class for carrying typed payloads in notifications.
 - Thread interrupt feature added for cooperative thread cancellation.
 - LogFileImpl::createFile() now creates parent directories if they don't exist.
