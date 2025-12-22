@@ -348,31 +348,37 @@ std::string LoggerTest::doTestFormatThreadName(ThreadFactory makeThread)
 
 void LoggerTest::testFormatThreadName()
 {
-	auto tidStr = doTestFormatThreadName(
-		[](std::string name, auto body) {
-			auto thr = std::make_unique<Thread>(name);
-			thr->startFunc(std::move(body));
-			return thr;
+	Thread thr(ThreadNameTestStrings::threadName);
+	std::string expectedTid = std::to_string(thr.id());
+
+	std::string actualTid = doTestFormatThreadName(
+		[&thr](std::string, auto body) {
+			thr.startFunc(std::move(body));
+			return &thr;
 		}
 	);
-	assertEqual( "1", tidStr );
+	assertEqual( expectedTid, actualTid );
 }
 
 
 void LoggerTest::testFormatStdThreadName()
 {
 #ifdef POCO_OS_FAMILY_UNIX
-	doTestFormatThreadName(
-		[](std::string name, auto bodyIn) {
-			auto thr = std::make_unique<std::thread>(
-				[name, body = std::move(bodyIn)] {
+	std::unique_ptr<std::thread> thrPtr;
+	std::string expectedTid;
+	std::string actualTid = doTestFormatThreadName(
+		[&thrPtr, &expectedTid](std::string name, auto bodyIn) {
+			thrPtr = std::make_unique<std::thread>(
+				[name, body = std::move(bodyIn), &expectedTid] {
+					expectedTid = std::to_string(Thread::currentOsTid());
 					pthread_setname_np(pthread_self(), name.c_str());
 					body();
 				}
 			);
-			return std::move(thr);
+			return thrPtr.get();
 		}
 	);
+	assertEqual( expectedTid, actualTid );
 #endif
 }
 
