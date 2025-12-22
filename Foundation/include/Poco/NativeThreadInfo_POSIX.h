@@ -41,9 +41,6 @@ public:
 	ThreadIdImpl idImpl() const;
 
 	static HandleImpl currentThreadHandleImpl();
-
-private:
-	HandleImpl _thread;
 };
 
 } // namespace Poco
