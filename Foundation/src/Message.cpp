@@ -18,7 +18,6 @@
 #include "Poco/Process.h"
 #endif
 #include "Poco/Thread.h"
-#include "Poco/NativeThreadInfo.h"
 #include <algorithm>
 
 
@@ -174,9 +173,8 @@ void Message::init()
 	else
 	{
 		// Not a POCO thread, use native OS thread ID.
-		NativeThreadInfo info;
-		_tid = info.osTid();
-		_thread = info.name();
+		_tid = Thread::currentOsTid();
+		_thread = Thread::getCurrentName();
 	}
 }
 
