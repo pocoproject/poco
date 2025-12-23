@@ -22,7 +22,6 @@
 #include "Poco/Data/SessionImpl.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/StatementCreator.h"
-#include "Poco/Data/Binding.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Any.h"

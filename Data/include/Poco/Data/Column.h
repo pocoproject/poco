@@ -21,7 +21,6 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/SharedPtr.h"
-#include "Poco/RefCountedObject.h"
 #include <vector>
 #include <list>
 #include <deque>
@@ -71,10 +70,8 @@ public:
 	{
 	}
 
-	~Column()
+	~Column() = default;
 		/// Destroys the Column.
-	{
-	}
 
 	Column& operator = (const Column& col)
 		/// Assignment operator.
@@ -224,10 +221,10 @@ public:
 		_deque.assign(_pData->begin(), _pData->end());
 	}
 
-	~Column()
+	Column() = delete;
+
+	~Column() = default;
 		/// Destroys the Column.
-	{
-	}
 
 	Column& operator = (const Column& col)
 		/// Assignment operator.
@@ -331,7 +328,6 @@ public:
 	}
 
 private:
-	Column();
 
 	MetaColumn               _metaColumn;
 	ContainerPtr             _pData;
@@ -365,10 +361,10 @@ public:
 	{
 	}
 
-	~Column()
+	Column() = delete;
+
+	~Column() = default;
 		/// Destroys the Column.
-	{
-	}
 
 	Column& operator = (const Column& col)
 		/// Assignment operator.
@@ -484,7 +480,6 @@ public:
 	}
 
 private:
-	Column();
 
 	MetaColumn   _metaColumn;
 	ContainerPtr _pData;

@@ -51,13 +51,9 @@ public:
 		/// The getter method for a property.
 
 	AbstractSessionImpl(const std::string& connectionString,
-		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT): SessionImpl(connectionString, timeout),
-			_storage(std::string("deque")),
-			_bulk(false),
-			_emptyStringIsNull(false),
-			_forceEmptyString(false),
-			_sqlParse(false),
-			_autoCommit(true)
+		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT):
+			SessionImpl(connectionString, timeout),
+			_storage(std::string("deque"))
 		/// Creates the AbstractSessionImpl.
 		///
 		/// Adds "storage" property and sets the default internal storage container
@@ -132,10 +128,8 @@ public:
 			&AbstractSessionImpl<C>::getAutoCommit);
 	}
 
-	~AbstractSessionImpl() override
+	~AbstractSessionImpl() override = default;
 		/// Destroys the AbstractSessionImpl.
-	{
-	}
 
 	bool hasFeature(const std::string& name) const override
 		/// Looks a feature up in the features map
@@ -389,11 +383,11 @@ private:
 	FeatureMap  _features;
 	PropertyMap _properties;
 	std::string _storage;
-	bool        _bulk;
-	bool        _emptyStringIsNull;
-	bool        _forceEmptyString;
-	bool        _sqlParse;
-	bool        _autoCommit;
+	bool        _bulk{false};
+	bool        _emptyStringIsNull{false};
+	bool        _forceEmptyString{false};
+	bool        _sqlParse{false};
+	bool        _autoCommit{true};
 	Poco::Any   _handle;
 };
 

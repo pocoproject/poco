@@ -73,7 +73,7 @@ namespace Keywords {
 inline Bulk bulk(const Limit& limit = Limit(Limit::LIMIT_UNLIMITED, false, false))
 	/// Convenience function for creation of bulk.
 {
-	return Bulk(limit);
+	return {limit};
 }
 
 
@@ -87,7 +87,7 @@ inline void bulk(Void)
 } // namespace Keywords
 
 
-typedef void (*BulkFnType)(Void);
+using BulkFnType = void (*)(Void);
 
 
 } } // namespace Poco::Data

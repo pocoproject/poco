@@ -27,6 +27,7 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/SharedPtr.h"
 #include <cstddef>
+#include <optional>
 
 #if defined(POCO_COMPILER_GCC) && (__GNUC__ >= 12)
 	#pragma GCC diagnostic push
@@ -42,7 +43,7 @@ class AbstractTypeHandler
 	/// The reason for this class is to prevent instantiations of type handlers.
 	/// For documentation on type handlers, see TypeHandler class.
 {
-protected:
+public:
 	AbstractTypeHandler() = delete;
 	~AbstractTypeHandler() = delete;
 	AbstractTypeHandler(const AbstractTypeHandler&) = delete;
@@ -50,7 +51,7 @@ protected:
 };
 
 
-template <class T>
+template <typename T>
 class TypeHandler: public AbstractTypeHandler
 	/// Converts Rows to a Type and the other way around. Provide template specializations to support your own complex types.
 	///
@@ -144,7 +145,7 @@ public:
 };
 
 
-template <class T>
+template <typename T>
 class TypeHandler<std::deque<T>>: public AbstractTypeHandler
 	/// Specialization of type handler for std::deque.
 {
@@ -175,7 +176,7 @@ public:
 };
 
 
-template <class T>
+template <typename T>
 class TypeHandler<std::vector<T>>: public AbstractTypeHandler
 	/// Specialization of type handler for std::vector.
 {
@@ -206,7 +207,7 @@ public:
 };
 
 
-template <class T>
+template <typename T>
 class TypeHandler<std::list<T>>: public AbstractTypeHandler
 	/// Specialization of type handler for std::list.
 {
@@ -240,7 +241,7 @@ public:
 #define POCO_TUPLE_TYPE_HANDLER_INLINE inline
 
 
-template <typename...T>
+template <typename... T>
 class TypeHandler<std::tuple<T...>>: public AbstractTypeHandler
 	/// Specialization of type handler for std::tuple.
 {
@@ -271,47 +272,47 @@ public:
 	}
 
 private:
-	template<size_t N>
+	template <std::size_t N>
 	static POCO_TUPLE_TYPE_HANDLER_INLINE void tupleBind(std::size_t& pos, const std::tuple<T...>& t, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
 	{
 		if constexpr (N < sizeof...(T))
 		{
-			using Type = typename std::tuple_element<N, std::tuple<T...>>::type;
+			using Type = std::tuple_element_t<N, std::tuple<T...>>;
 			TypeHandler<Type>::bind(pos, std::get<N>(t), pBinder, dir);
 			pos += TypeHandler<Type>::size();
 			tupleBind<N+1>(pos, t, pBinder, dir);
 		}
 	}
 
-	template<size_t N>
+	template <std::size_t N>
 	static POCO_TUPLE_TYPE_HANDLER_INLINE void tuplePrepare(std::size_t& pos, const std::tuple<T...>& t, AbstractPreparator::Ptr pPreparator)
 	{
 		if constexpr (N < sizeof...(T))
 		{
-			using Type = typename std::tuple_element<N, std::tuple<T...>>::type;
+			using Type = std::tuple_element_t<N, std::tuple<T...>>;
 			TypeHandler<Type>::prepare(pos, std::get<N>(t), pPreparator);
 			pos += TypeHandler<Type>::size();
 			tuplePrepare<N+1>(pos, t, pPreparator);
 		}
 	}
 
-	template<size_t N>
+	template <std::size_t N>
 	static POCO_TUPLE_TYPE_HANDLER_INLINE void tupleSize(std::size_t& sz)
 	{
 		if constexpr (N < sizeof...(T))
 		{
-			using Type = typename std::tuple_element<N, std::tuple<T...>>::type;
+			using Type = std::tuple_element_t<N, std::tuple<T...>>;
 			sz += TypeHandler<Type>::size();
 			tupleSize<N+1>(sz);
 		}
 	}
 
-	template<size_t N>
+	template <std::size_t N>
 	static POCO_TUPLE_TYPE_HANDLER_INLINE void tupleExtract(std::size_t& pos, std::tuple<T...>& t, const std::tuple<T...>& defVal, AbstractExtractor::Ptr pExt)
 	{
 		if constexpr (N < sizeof...(T))
 		{
-			using Type = typename std::tuple_element<N, std::tuple<T...>>::type;
+			using Type = std::tuple_element_t<N, std::tuple<T...>>;
 			auto dVal = std::get<N>(defVal);
 			TypeHandler<Type>::extract(pos, std::get<N>(t), dVal, pExt);
 			pos += TypeHandler<Type>::size();
@@ -323,7 +324,7 @@ private:
 
 template <typename T>
 class TypeHandler<std::optional<T>>: public AbstractTypeHandler
-	/// Specialization of type handler for std::tuple.
+	/// Specialization of type handler for std::optional.
 {
 public:
 	static void bind(std::size_t pos, const std::optional<T>& obj, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
@@ -333,7 +334,6 @@ public:
 			pBinder->bind(pos++, *obj, dir);
 		else
 			pBinder->bind(pos++, Poco::Data::Keywords::null, dir);
-
 	}
 
 	static void prepare(std::size_t pos, const std::optional<T>& obj, AbstractPreparator::Ptr pPreparator)
@@ -342,7 +342,7 @@ public:
 		if (obj)
 			pPreparator->prepare(pos++, *obj);
 		else
-		   pPreparator->prepare(pos++, T()); //Poco::Data::Keywords::null);
+			pPreparator->prepare(pos++, T()); //Poco::Data::Keywords::null);
 	}
 
 	static std::size_t size()
@@ -398,7 +398,7 @@ public:
 };
 
 
-template <typename...T>
+template <typename... T>
 class TypeHandler<Poco::Tuple<T...>>: public AbstractTypeHandler
 	/// Specialization of type handler for Tuple.
 {
@@ -429,7 +429,7 @@ public:
 };
 
 
-template <class K, class V>
+template <typename K, typename V>
 class TypeHandler<std::pair<K, V>>: public AbstractTypeHandler
 {
 public:
@@ -442,7 +442,7 @@ public:
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(TypeHandler<K>::size() + TypeHandler<V>::size());
+		return TypeHandler<K>::size() + TypeHandler<V>::size();
 	}
 
 	static void extract(std::size_t pos, std::pair<K, V>& obj, const std::pair<K, V>& defVal, AbstractExtractor::Ptr pExt)
@@ -461,7 +461,7 @@ public:
 };
 
 
-template <class T>
+template <typename T>
 class TypeHandler<Poco::AutoPtr<T>>: public AbstractTypeHandler
 	/// Specialization of type handler for Poco::AutoPtr
 {
@@ -474,7 +474,7 @@ public:
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(TypeHandler<T>::size());
+		return TypeHandler<T>::size();
 	}
 
 	static void extract(std::size_t pos, Poco::AutoPtr<T>& obj, const Poco::AutoPtr<T>& defVal, AbstractExtractor::Ptr pExt)
@@ -497,7 +497,7 @@ public:
 
 
 
-template <class T>
+template <typename T>
 class TypeHandler<Poco::SharedPtr<T>>: public AbstractTypeHandler
 	/// Specialization of type handler for Poco::SharedPtr
 {
@@ -510,7 +510,7 @@ public:
 
 	static std::size_t size()
 	{
-		return static_cast<std::size_t>(TypeHandler<T>::size());
+		return TypeHandler<T>::size();
 	}
 
 	static void extract(std::size_t pos, Poco::SharedPtr<T>& obj, const Poco::SharedPtr<T>& defVal, AbstractExtractor::Ptr pExt)

@@ -60,17 +60,14 @@ public:
 		const std::string& name = "",
 		Direction direction = PD_IN):
 		AbstractBinding(name, direction),
-		_val(val),
-		_bound(false)
+		_val(val)
 		/// Creates the Binding using the passed reference as bound value.
 		/// If copy is true, a copy of the value referred to is created.
 	{
 	}
 
-	~Binding() override
+	~Binding() override = default;
 		/// Destroys the Binding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -103,7 +100,7 @@ public:
 
 private:
 	const T& _val;
-	bool     _bound;
+	bool     _bound{false};
 };
 
 
@@ -129,17 +126,14 @@ public:
 		const std::string& name = "",
 		Direction direction = PD_IN):
 		AbstractBinding(name, direction),
-		_pVal(new T(val)),
-		_bound(false)
+		_pVal(new T(val))
 		/// Creates the Binding using the passed reference as bound value.
 		/// If copy is true, a copy of the value referred to is created.
 	{
 	}
 
-	~CopyBinding() override
+	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -172,7 +166,7 @@ public:
 
 private:
 	ValPtr _pVal;
-	bool   _bound;
+	bool   _bound{false};
 };
 
 
@@ -190,16 +184,13 @@ public:
 		const std::string& name = "",
 		Direction direction = PD_IN):
 		AbstractBinding(name, direction),
-		_val(pVal ? pVal : throw NullPointerException() ),
-		_bound(false)
+		_val(pVal ? pVal : throw NullPointerException() )
 		/// Creates the Binding by copying the passed string.
 	{
 	}
 
-	~Binding() override
+	~Binding() override = default;
 		/// Destroys the Binding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -232,7 +223,7 @@ public:
 
 private:
 	std::string _val;
-	bool        _bound;
+	bool        _bound{false};
 };
 
 
@@ -251,16 +242,13 @@ public:
 		const std::string& name = "",
 		Direction direction = PD_IN):
 		AbstractBinding(name, direction),
-		_val(pVal ? pVal : throw NullPointerException() ),
-		_bound(false)
+		_val(pVal ? pVal : throw NullPointerException() )
 		/// Creates the Binding by copying the passed string.
 	{
 	}
 
-	~CopyBinding() override
+	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -293,7 +281,7 @@ public:
 
 private:
 	std::string _val;
-	bool        _bound;
+	bool        _bound{false};
 };
 
 
@@ -321,10 +309,8 @@ public:
 		reset();
 	}
 
-	~Binding() override
+	~Binding() override = default;
 		/// Destroys the Binding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -388,10 +374,8 @@ public:
 		reset();
 	}
 
-	~CopyBinding() override
+	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -469,10 +453,8 @@ public:
 		reset();
 	}
 
-	~Binding() override
+	~Binding() override = default;
 		/// Destroys the Binding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -550,10 +532,8 @@ public:
 		reset();
 	}
 
-	~CopyBinding() override
+	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -615,10 +595,8 @@ public:
 		reset();
 	}
 
-	~Binding() override
+	~Binding() override = default;
 		/// Destroys the Binding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -680,10 +658,8 @@ public:
 		reset();
 	}
 
-	~CopyBinding() override
+	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -745,10 +721,8 @@ public:
 		reset();
 	}
 
-	~Binding() override
+	~Binding() override = default;
 		/// Destroys the Binding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -810,10 +784,8 @@ public:
 		reset();
 	}
 
-	~CopyBinding() override
+	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -875,10 +847,8 @@ public:
 		reset();
 	}
 
-	~Binding() override
+	~Binding() override = default;
 		/// Destroys the Binding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -940,10 +910,8 @@ public:
 		reset();
 	}
 
-	~CopyBinding() override
+	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -1005,10 +973,8 @@ public:
 		reset();
 	}
 
-	~Binding() override
+	~Binding() override = default;
 		/// Destroys the Binding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -1070,10 +1036,8 @@ public:
 		reset();
 	}
 
-	~CopyBinding() override
+	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -1135,10 +1099,8 @@ public:
 		reset();
 	}
 
-	~Binding() override
+	~Binding() override = default;
 		/// Destroys the Binding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -1200,10 +1162,8 @@ public:
 		reset();
 	}
 
-	~CopyBinding() override
+	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -1265,10 +1225,8 @@ public:
 		reset();
 	}
 
-	~Binding() override
+	~Binding() override = default;
 		/// Destroys the Binding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -1330,10 +1288,8 @@ public:
 		reset();
 	}
 
-	~CopyBinding() override
+	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{

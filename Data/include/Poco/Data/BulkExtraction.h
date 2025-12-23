@@ -19,8 +19,10 @@
 
 
 #include "Poco/Data/Data.h"
+#include "Poco/Data/Column.h"
 #include "Poco/Data/AbstractExtraction.h"
 #include "Poco/Data/Bulk.h"
+#include "Poco/Data/Position.h"
 #include "Poco/Data/Preparation.h"
 #include <vector>
 
@@ -195,10 +197,11 @@ public:
 		return *_pColumn;
 	}
 
-private:
 	InternalBulkExtraction() = delete;
 	InternalBulkExtraction(const InternalBulkExtraction&) = delete;
 	InternalBulkExtraction& operator = (const InternalBulkExtraction&) = delete;
+
+private:
 
 	Column<C>* _pColumn;
 };
@@ -221,7 +224,7 @@ AbstractExtraction::Ptr into(std::vector<T>& t, BulkFnType, const Position& pos 
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::vector bulk extraction support.
 {
-	Poco::UInt32 size = static_cast<Poco::UInt32>(t.size());
+	auto size = static_cast<Poco::UInt32>(t.size());
 	if (0 == size) throw InvalidArgumentException("Zero length not allowed.");
 	return new BulkExtraction<std::vector<T>>(t, size, pos);
 }
@@ -241,7 +244,7 @@ AbstractExtraction::Ptr into(std::deque<T>& t, BulkFnType, const Position& pos =
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::deque bulk extraction support.
 {
-	Poco::UInt32 size = static_cast<Poco::UInt32>(t.size());
+	auto size = static_cast<Poco::UInt32>(t.size());
 	if (0 == size) throw InvalidArgumentException("Zero length not allowed.");
 	return new BulkExtraction<std::deque<T>>(t, size, pos);
 }
@@ -261,7 +264,7 @@ AbstractExtraction::Ptr into(std::list<T>& t, BulkFnType, const Position& pos = 
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::list bulk extraction support.
 {
-	Poco::UInt32 size = static_cast<Poco::UInt32>(t.size());
+	auto size = static_cast<Poco::UInt32>(t.size());
 	if (0 == size) throw InvalidArgumentException("Zero length not allowed.");
 	return new BulkExtraction<std::list<T>>(t, size, pos);
 }

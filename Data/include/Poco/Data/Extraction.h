@@ -69,10 +69,8 @@ public:
 	{
 	}
 
-	~Extraction() override
+	~Extraction() override = default;
 		/// Destroys the Extraction object.
-	{
-	}
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -154,9 +152,7 @@ public:
 		_rResult.clear();
 	}
 
-	~Extraction() override
-	{
-	}
+	~Extraction() override = default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -244,9 +240,7 @@ public:
 		_rResult.clear();
 	}
 
-	~Extraction() override
-	{
-	}
+	~Extraction() override = default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -336,9 +330,7 @@ public:
 		_rResult.clear();
 	}
 
-	~Extraction() override
-	{
-	}
+	~Extraction() override = default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -426,9 +418,7 @@ public:
 		_rResult.clear();
 	}
 
-	~Extraction() override
-	{
-	}
+	~Extraction() override = default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -519,6 +509,10 @@ public:
 		delete _pColumn;
 	}
 
+	InternalExtraction() = delete;
+	InternalExtraction(const InternalExtraction&) = delete;
+	InternalExtraction& operator = (const InternalExtraction&) = delete;
+
 	void reset() override
 	{
 		Extraction<C>::reset();
@@ -548,10 +542,6 @@ public:
 	}
 
 private:
-	InternalExtraction();
-	InternalExtraction(const InternalExtraction&) = delete;
-	InternalExtraction& operator = (const InternalExtraction&) = delete;
-
 	Column<C>* _pColumn;
 };
 
@@ -583,9 +573,7 @@ public:
 		_rResult.clear();
 	}
 
-	~Extraction() override
-	{
-	}
+	~Extraction() override = default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -647,9 +635,7 @@ public:
 		_rResult.clear();
 	}
 
-	~Extraction() override
-	{
-	}
+	~Extraction() override = default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -711,9 +697,7 @@ public:
 		_rResult.clear();
 	}
 
-	~Extraction() override
-	{
-	}
+	~Extraction() override = default;
 
 	std::size_t numOfColumnsHandled() const override
 	{
@@ -775,9 +759,7 @@ public:
 		_rResult.clear();
 	}
 
-	~Extraction() override
-	{
-	}
+	~Extraction() override = default;
 
 	std::size_t numOfColumnsHandled() const override
 	{

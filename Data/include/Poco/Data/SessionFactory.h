@@ -50,6 +50,8 @@ class Data_API SessionFactory
 	///      Session ses("SQLite", "dummy.db");
 {
 public:
+	SessionFactory(const SessionFactory&) = delete;
+	SessionFactory& operator = (const SessionFactory&) = delete;
 
 	static SessionFactory& instance();
 		/// returns the static instance of the singleton.
@@ -77,8 +79,6 @@ public:
 private:
 	SessionFactory();
 	~SessionFactory();
-	SessionFactory(const SessionFactory&) = delete;
-	SessionFactory& operator = (const SessionFactory&) = delete;
 
 	struct SessionInfo
 	{
@@ -87,7 +87,7 @@ private:
 		SessionInfo(Connector* pSI);
 	};
 
-	typedef std::map<std::string, SessionInfo, Poco::CILess> Connectors;
+	using Connectors = std::map<std::string, SessionInfo, Poco::CILess>;
 	Connectors      _connectors;
 	Poco::FastMutex _mutex;
 };

@@ -20,17 +20,14 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/Data/Session.h"
-#include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RowIterator.h"
 #include "Poco/Data/RowFilter.h"
-#include "Poco/Data/LOB.h"
 #include "Poco/String.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Exception.h"
 #include "Poco/AutoPtr.h"
 #include <ostream>
-#include <limits>
 
 
 namespace Poco {
@@ -343,12 +340,12 @@ private:
 		bool typeFound = false;
 
 		const AbstractExtractionVec& rExtractions = extractions();
-		AbstractExtractionVec::const_iterator it = rExtractions.begin();
-		AbstractExtractionVec::const_iterator end = rExtractions.end();
+		auto it = rExtractions.begin();
+		auto end = rExtractions.end();
 
 		for (; it != end; ++it)
 		{
-			ExtractionVecPtr pExtraction = dynamic_cast<ExtractionVecPtr>(it->get());
+			auto pExtraction = dynamic_cast<ExtractionVecPtr>(it->get());
 
 			if (pExtraction)
 			{
