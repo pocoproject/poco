@@ -17,6 +17,8 @@
 #include "Poco/ErrorHandler.h"
 #include <process.h>
 #include <limits>
+#include <processthreadsapi.h>
+#include <stringapiset.h>
 
 
 namespace
@@ -220,6 +222,36 @@ ThreadImpl::TIDImpl ThreadImpl::currentTidImpl()
 long ThreadImpl::currentOsTidImpl()
 {
 	return GetCurrentThreadId();
+}
+
+
+void ThreadImpl::setCurrentNameImpl(const std::string& threadName)
+{
+	std::wstring wname(threadName.begin(), threadName.end());
+	SetThreadDescription(GetCurrentThread(), wname.c_str());
+}
+
+
+std::string ThreadImpl::getCurrentNameImpl()
+{
+	PWSTR data = nullptr;
+	HRESULT hr = GetThreadDescription(GetCurrentThread(), &data);
+	if (SUCCEEDED(hr) && data)
+	{
+		std::string result;
+		int convSize = WideCharToMultiByte(CP_UTF8, 0, data, -1, NULL, 0, NULL, NULL);
+		if (convSize > 0)
+		{
+			result.resize(convSize);
+			WideCharToMultiByte(CP_UTF8, 0, data, -1, &result[0], convSize, NULL, NULL);
+			// Remove null terminator from string
+			if (!result.empty() && result.back() == '\0')
+				result.pop_back();
+		}
+		LocalFree(data);
+		return result;
+	}
+	return std::string();
 }
 
 

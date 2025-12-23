@@ -363,7 +363,7 @@ void LoggerTest::testFormatThreadName()
 
 void LoggerTest::testFormatStdThreadName()
 {
-#ifdef POCO_OS_FAMILY_UNIX
+#ifndef POCO_NO_THREADNAME
 	std::unique_ptr<std::thread> thrPtr;
 	std::string expectedTid;
 	std::string actualTid = doTestFormatThreadName(
@@ -371,7 +371,7 @@ void LoggerTest::testFormatStdThreadName()
 			thrPtr = std::make_unique<std::thread>(
 				[name, body = std::move(bodyIn), &expectedTid] {
 					expectedTid = std::to_string(Thread::currentOsTid());
-					pthread_setname_np(pthread_self(), name.c_str());
+					Thread::setCurrentName(name);
 					body();
 				}
 			);
