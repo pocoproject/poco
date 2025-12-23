@@ -1,0 +1,4 @@
+# Build-time symlinks to bundled sqlite3 library
+# Created by prebuild step in Makefile when POCO_SQLITE_UNBUNDLED is not set
+src/sqlite3.c
+src/sqlite3.h
