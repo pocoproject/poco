@@ -62,24 +62,47 @@ if (DEFINED POCO_SANITIZEFLAGS AND NOT "${POCO_SANITIZEFLAGS}" STREQUAL "")
 	add_link_options(${POCO_SANITIZEFLAGS})
 endif()
 
-if (ENABLE_COMPILER_WARNINGS)
-	message(STATUS "Enabling additional compiler warning flags.")
-	# Additional compiler-specific warning flags
-	if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-		# using clang
-		add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter)
-		# Warn when using 0 or NULL instead of nullptr constant
-		add_compile_options(-Wzero-as-null-pointer-constant)
-	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-		# using GCC
-		add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter)
-		# Warn when using 0 or NULL instead of nullptr constant
-		add_compile_options(-Wzero-as-null-pointer-constant)
-	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-		# using Visual Studio C++
-		add_compile_options(/W4)
+#################################################################################
+# Compiler warnings for Poco code only
+#################################################################################
+# This function enables additional compiler warnings for Poco C++ code.
+# It should be called from the root CMakeLists.txt AFTER add_subdirectory(dependencies)
+# to ensure third-party code is not affected.
+#
+# The function uses $<COMPILE_LANGUAGE:CXX> generator expressions to apply
+# warnings only to C++ files, providing an extra layer of protection since
+# bundled dependencies are mostly C code.
+#
+function(poco_enable_detailed_compiler_warnings)
+	if (NOT ENABLE_COMPILER_WARNINGS)
+		return()
 	endif()
-endif()
+
+	message(STATUS "Enabling additional compiler warning flags for Poco C++ code only.")
+
+	if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+		# Clang and AppleClang
+		add_compile_options(
+			$<$<COMPILE_LANGUAGE:CXX>:-Wall>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wextra>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wpedantic>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wzero-as-null-pointer-constant>
+		)
+	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+		# GCC
+		add_compile_options(
+			$<$<COMPILE_LANGUAGE:CXX>:-Wall>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wextra>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wpedantic>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wno-unused-parameter>
+			$<$<COMPILE_LANGUAGE:CXX>:-Wzero-as-null-pointer-constant>
+		)
+	elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+		# Visual Studio
+		add_compile_options($<$<COMPILE_LANGUAGE:CXX>:/W4>)
+	endif()
+endfunction(poco_enable_detailed_compiler_warnings)
 
 # Add a d postfix to the debug libraries
 if(BUILD_SHARED_LIBS)

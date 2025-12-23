@@ -432,6 +432,9 @@ endif()
 
 add_subdirectory(dependencies)
 
+# Enable detailed compiler warnings for Poco code only (after dependencies to exclude them)
+poco_enable_detailed_compiler_warnings()
+
 if(ENABLE_FOUNDATION)
 	add_subdirectory(Foundation)
 	list(APPEND Poco_COMPONENTS "Foundation")
