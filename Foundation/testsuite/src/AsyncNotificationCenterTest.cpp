@@ -29,6 +29,7 @@ using Poco::AsyncObserver;
 using Poco::Notification;
 using Poco::AutoPtr;
 using AsyncMode = AsyncNotificationCenter::AsyncMode;
+using CppUnit::waitForCondition;
 
 
 class TestNotification: public Notification
@@ -162,8 +163,7 @@ void AsyncNotificationCenterTest::testAsyncObserver()
 	nc.postNotification(new TestNotification("anotherNotification"));
 	nc.postNotification(new Notification);
 
-	while (!_handleAsync1Done || !_handleAsync2Done)
-		Poco::Thread::sleep(100);
+	assertTrue(waitForCondition([&]{ return _handleAsync1Done.load() && _handleAsync2Done.load(); }, 5000));
 
 	nc.removeObserver(AObserver(*this, &AsyncNotificationCenterTest::handleAsync1, &AsyncNotificationCenterTest::matchAsync));
 	nc.removeObserver(AObserver(*this, &AsyncNotificationCenterTest::handleAsync2, &AsyncNotificationCenterTest::matchAsync));
@@ -186,8 +186,7 @@ void AsyncNotificationCenterTest::testAsyncNotificationCenter()
 	nc.postNotification(new TestNotification("anotherNotification"));
 	nc.postNotification(new Notification);
 
-	while (!_handleAsync1Done || !_handleAsync2Done)
-		Poco::Thread::sleep(100);
+	assertTrue(waitForCondition([&]{ return _handleAsync1Done.load() && _handleAsync2Done.load(); }, 5000));
 
 	nc.removeAsyncObserver(*this, &AsyncNotificationCenterTest::handleAsync1, &AsyncNotificationCenterTest::matchAsync);
 	nc.removeAsyncObserver(*this, &AsyncNotificationCenterTest::handleAsync2, &AsyncNotificationCenterTest::matchAsync);
@@ -207,8 +206,7 @@ void AsyncNotificationCenterTest::testAsyncNotificationCenterModes()
 		AsyncNotificationCenter nc(AsyncMode::ENQUEUE);
 		nc.addNObserver(*this, &AsyncNotificationCenterTest::handleAuto);
 		nc.postNotification(new Notification);
-		while (!_handleAuto1Done)
-			Poco::Thread::sleep(100);
+		assertTrue(waitForCondition([&]{ return _handleAuto1Done.load(); }, 5000));
 		assertTrue(_set.find("handleAuto") != _set.end());
 		nc.removeNObserver(*this, &AsyncNotificationCenterTest::handleAuto);
 	}
@@ -221,8 +219,7 @@ void AsyncNotificationCenterTest::testAsyncNotificationCenterModes()
 		AsyncNotificationCenter nc(AsyncMode::NOTIFY);
 		nc.addNObserver(*this, &AsyncNotificationCenterTest::handleAuto);
 		nc.postNotification(new Notification);
-		while (!_handleAuto1Done)
-			Poco::Thread::sleep(100);
+		assertTrue(waitForCondition([&]{ return _handleAuto1Done.load(); }, 5000));
 		assertTrue(_set.find("handleAuto") != _set.end());
 		nc.removeNObserver(*this, &AsyncNotificationCenterTest::handleAuto);
 	}
@@ -235,8 +232,7 @@ void AsyncNotificationCenterTest::testAsyncNotificationCenterModes()
 		AsyncNotificationCenter nc(AsyncMode::BOTH);
 		nc.addNObserver(*this, &AsyncNotificationCenterTest::handleAuto);
 		nc.postNotification(new Notification);
-		while (!_handleAuto1Done)
-			Poco::Thread::sleep(100);
+		assertTrue(waitForCondition([&]{ return _handleAuto1Done.load(); }, 5000));
 		assertTrue(_set.find("handleAuto") != _set.end());
 		nc.removeNObserver(*this, &AsyncNotificationCenterTest::handleAuto);
 	}
@@ -397,13 +393,8 @@ void AsyncNotificationCenterTest::testThreadSafety()
 	}
 
 	// Wait for all notifications to be processed
-	int timeout = 0;
 	int expected = numThreads * notificationsPerThread;
-	while (_threadSafeCount < expected && timeout < 250)
-	{
-		Poco::Thread::sleep(50);
-		++timeout;
-	}
+	assertTrue(waitForCondition([&]{ return _threadSafeCount >= expected; }, 15000));
 
 	// Verify all notifications were received
 	assertEqual(expected, _threadSafeCount.load());
@@ -516,12 +507,7 @@ void AsyncNotificationCenterTest::testEdgeCases()
 		}
 
 		// Wait for all to process (max 10 seconds)
-		int timeout = 0;
-		while (_notificationCount < stressCount && timeout < 100)
-		{
-			Poco::Thread::sleep(100);
-			++timeout;
-		}
+		assertTrue(waitForCondition([&]{ return _notificationCount >= stressCount; }, 10000));
 
 		// Verify we got most/all notifications
 		int received = _notificationCount.load();
@@ -545,8 +531,7 @@ void AsyncNotificationCenterTest::workerCount(AsyncMode mode)
 	AsyncNotificationCenter nc(mode, 8);
 	nc.addNObserver(*this, &AsyncNotificationCenterTest::handleAuto);
 	nc.postNotification(new Notification);
-	while (!_handleAuto1Done)
-		Poco::Thread::sleep(100);
+	assertTrue(waitForCondition([&]{ return _handleAuto1Done.load(); }, 5000));
 	assertTrue(_set.find("handleAuto") != _set.end());
 	nc.removeNObserver(*this, &AsyncNotificationCenterTest::handleAuto);
 }
@@ -586,12 +571,7 @@ void AsyncNotificationCenterTest::parallelDispatch(AsyncMode mode)
 	}
 
 	// Wait for all to be processed
-	int timeout = 0;
-	while (_notificationCount < numNotifications && timeout < 100)
-	{
-		Poco::Thread::sleep(50);
-		++timeout;
-	}
+	assertTrue(waitForCondition([&]{ return _notificationCount >= numNotifications; }, 5000));
 
 	assertEqual(numNotifications, _notificationCount.load());
 	nc.removeNObserver(*this, &AsyncNotificationCenterTest::handleCount);
@@ -609,8 +589,7 @@ void AsyncNotificationCenterTest::mixedNObserversAndAsyncObservers(AsyncMode mod
 	nc.postNotification(new Notification);
 	nc.postNotification(new TestNotification("asyncNotification"));
 
-	while (!_handleNObsDone || !_handleAuto1Done || !_handleAsync1Done)
-		Poco::Thread::sleep(100);
+	assertTrue(waitForCondition([&]{ return _handleNObsDone.load() && _handleAuto1Done.load() && _handleAsync1Done.load(); }, 5000));
 
 	nc.removeAsyncObserver<AsyncNotificationCenterTest, TestNotification>(*this, &AsyncNotificationCenterTest::handleAsync1, &AsyncNotificationCenterTest::matchAsync);
 	nc.removeNObserver<AsyncNotificationCenterTest, Notification>(*this, &AsyncNotificationCenterTest::handleAuto);
@@ -636,8 +615,7 @@ void AsyncNotificationCenterTest::mixedObservers(AsyncMode mode)
 	nc.postNotification(new Notification);
 	nc.postNotification(new TestNotification("asyncNotification"));
 
-	while (!_handle1Done || !_handleAuto1Done || !_handleAsync1Done)
-		Poco::Thread::sleep(100);
+	assertTrue(waitForCondition([&]{ return _handle1Done.load() && _handleAuto1Done.load() && _handleAsync1Done.load(); }, 5000));
 
 	nc.removeAsyncObserver<AsyncNotificationCenterTest, TestNotification>(*this, &AsyncNotificationCenterTest::handleAsync1, &AsyncNotificationCenterTest::matchAsync);
 	nc.removeNObserver<AsyncNotificationCenterTest, Notification>(*this, &AsyncNotificationCenterTest::handleAuto);

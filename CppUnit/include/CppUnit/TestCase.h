@@ -15,9 +15,39 @@
 #include <string>
 #include <vector>
 #include <typeinfo>
+#include <chrono>
+#include <thread>
 
 
 namespace CppUnit {
+
+
+template <typename Func>
+bool waitForCondition(Func condition, long timeoutMs, long pollIntervalMs = 100)
+	/// Waits for a condition to become true, with timeout.
+	///
+	/// This helper function is useful for testing asynchronous operations
+	/// or time-based expiration without using fixed Thread::sleep() calls.
+	///
+	/// The condition parameter is a callable that returns bool (e.g., a lambda).
+	/// The function polls the condition at regular intervals until it returns
+	/// true or the timeout expires.
+	///
+	/// Returns true if the condition was met within the timeout,
+	/// false if the timeout occurred.
+{
+	auto start = std::chrono::steady_clock::now();
+	auto timeout = std::chrono::milliseconds(timeoutMs);
+	auto pollInterval = std::chrono::milliseconds(pollIntervalMs);
+
+	while (std::chrono::steady_clock::now() - start < timeout)
+	{
+		if (condition())
+			return true;
+		std::this_thread::sleep_for(pollInterval);
+	}
+	return condition(); // Final check
+}
 
 
 class TestResult;
