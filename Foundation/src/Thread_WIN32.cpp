@@ -17,8 +17,6 @@
 #include "Poco/ErrorHandler.h"
 #include <process.h>
 #include <limits>
-#include <processthreadsapi.h>
-#include <stringapiset.h>
 
 
 namespace
@@ -225,22 +223,57 @@ long ThreadImpl::currentOsTidImpl()
 }
 
 
+namespace
+{
+	// SetThreadDescription/GetThreadDescription require Windows 10 version 1607+
+	// Use dynamic loading for compatibility with older Windows versions
+	using SetThreadDescriptionFunc = HRESULT (WINAPI *)(HANDLE, PCWSTR);
+	using GetThreadDescriptionFunc = HRESULT (WINAPI *)(HANDLE, PWSTR*);
+
+	SetThreadDescriptionFunc getSetThreadDescriptionFunc()
+	{
+		static SetThreadDescriptionFunc func = reinterpret_cast<SetThreadDescriptionFunc>(
+			GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "SetThreadDescription"));
+		return func;
+	}
+
+	GetThreadDescriptionFunc getGetThreadDescriptionFunc()
+	{
+		static GetThreadDescriptionFunc func = reinterpret_cast<GetThreadDescriptionFunc>(
+			GetProcAddress(GetModuleHandleW(L"kernel32.dll"), "GetThreadDescription"));
+		return func;
+	}
+}
+
+
 void ThreadImpl::setCurrentNameImpl(const std::string& threadName)
 {
-	int wideLen = MultiByteToWideChar(CP_UTF8, 0, threadName.c_str(), -1, NULL, 0);
-	if (wideLen > 0)
+	// Try modern API first (Windows 10 1607+)
+	auto setDesc = getSetThreadDescriptionFunc();
+	if (setDesc)
 	{
-		std::wstring wname(wideLen, L'\0');
-		MultiByteToWideChar(CP_UTF8, 0, threadName.c_str(), -1, &wname[0], wideLen);
-		SetThreadDescription(GetCurrentThread(), wname.c_str());
+		int wideLen = MultiByteToWideChar(CP_UTF8, 0, threadName.c_str(), -1, NULL, 0);
+		if (wideLen > 0)
+		{
+			std::wstring wname(wideLen, L'\0');
+			MultiByteToWideChar(CP_UTF8, 0, threadName.c_str(), -1, &wname[0], wideLen);
+			if (SUCCEEDED(setDesc(GetCurrentThread(), wname.c_str())))
+				return;
+		}
 	}
+
+	// Fall back to legacy exception method for older Windows/debuggers
+	setThreadName(static_cast<DWORD>(-1), threadName);
 }
 
 
 std::string ThreadImpl::getCurrentNameImpl()
 {
+	auto getDesc = getGetThreadDescriptionFunc();
+	if (!getDesc) return std::string();
+
 	PWSTR data = nullptr;
-	HRESULT hr = GetThreadDescription(GetCurrentThread(), &data);
+	HRESULT hr = getDesc(GetCurrentThread(), &data);
 	if (SUCCEEDED(hr) && data)
 	{
 		std::string result;

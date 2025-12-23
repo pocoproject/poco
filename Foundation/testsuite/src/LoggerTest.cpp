@@ -329,12 +329,14 @@ std::string LoggerTest::doTestFormatThreadName(ThreadFactory makeThread)
 	const std::string logMsg = pChannel->getLastMessage().getText();
 	std::vector<std::string> parts;
 	std::size_t p = 0;
-	while (p != std::string::npos && p < logMsg.size()) {
+	while (p < logMsg.size())
+	{
 		auto q = logMsg.find(':', p);
-		if (q == logMsg.npos) {
+		if (q == std::string::npos)
+		{
 			q = logMsg.size();
 		}
-		parts.push_back(logMsg.substr(p, q-p));
+		parts.push_back(logMsg.substr(p, q - p));
 		p = q + 1;
 	}
 	assertTrue (parts.size() >= 5);
