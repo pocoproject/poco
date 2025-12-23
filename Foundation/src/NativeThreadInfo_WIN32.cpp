@@ -27,39 +27,21 @@ std::string NativeThreadInfoImpl::nameImpl() const
 {
 	PWSTR data = nullptr;
 	HRESULT hr = GetThreadDescription(_thread, &data);
-	if (SUCCEEDED(hr))
-	{   
+	if (SUCCEEDED(hr) && data)
+	{
 		std::string result;
-		const UINT codePage = CP_THREAD_ACP;
-		const DWORD flags = 0;
-		int convSize = WideCharToMultiByte(
-				codePage,
-				flags,
-				data,
-				-1,
-				NULL /* LPSTR lpMultiByteStr*/,
-				0 /* int cbMultiByte */,
-				NULL /* LPCCH lpDefaultChar */,
-				NULL /* LPBOOL lpUsedDefaultChar */
-			);
-		if (convSize >= 0) {
+		int convSize = WideCharToMultiByte(CP_UTF8, 0, data, -1, NULL, 0, NULL, NULL);
+		if (convSize > 0)
+		{
 			result.resize(convSize);
-			WideCharToMultiByte(
-				codePage,
-				flags,
-				data,
-				-1,
-				&result[0],
-				convSize,
-				NULL /* LPCCH lpDefaultChar */,
-				NULL /* LPBOOL lpUsedDefaultChar */
-			);
-		}		
+			WideCharToMultiByte(CP_UTF8, 0, data, -1, &result[0], convSize, NULL, NULL);
+			if (!result.empty() && result.back() == '\0')
+				result.pop_back();
+		}
 		LocalFree(data);
 		return result;
 	}
-
-	return {};
+	return std::string();
 }
 
 NativeThreadInfoImpl::ThreadIdImpl NativeThreadInfoImpl::osTidImpl() const
