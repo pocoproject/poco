@@ -172,11 +172,11 @@ void Message::init()
 	}
 	else
 	{
-		// Not a POCO thread, use native OS thread ID.
+		// Not a POCO thread, use native OS thread ID and name.
+		// getCurrentName() returns empty string if no name has been set
+		// or not available on the platform.
 		_tid = Thread::currentOsTid();
-#ifndef POCO_NO_THREADNAME
 		_thread = Thread::getCurrentName();
-#endif
 	}
 }
 
