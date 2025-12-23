@@ -28,7 +28,7 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	StreamsTestSuite StringTest StringTokenizerTest TaskTestSuite TaskTest \
 	TaskManagerTest TestChannel TeeStreamTest UTF8StringTest \
 	TextConverterTest TextIteratorTest TextBufferIteratorTest TextTestSuite TextEncodingTest \
-	ThreadLocalTest ThreadPoolTest ActiveThreadPoolTest ThreadTest ThreadingTestSuite TimerTest \
+	ThreadLocalTest ThreadPoolTest ActiveThreadPoolTest ThreadTest ThreadingTestSuite TimerTest SpinlockMutexTest \
 	TimespanTest TimestampTest TimezoneTest URIStreamOpenerTest URITest \
 	URITestSuite UUIDGeneratorTest UUIDTest UUIDTestSuite \
 	ULIDTest ULIDGeneratorTest ULIDTestSuite ZLibTest \
@@ -39,7 +39,15 @@ objects = ActiveMethodTest ActivityTest ActiveDispatcherTest \
 	UniqueExpireCacheTest UniqueExpireLRUCacheTest UnicodeConverterTest \
 	TuplesTest NamedTuplesTest TypeListTest VarTest DynamicTestSuite FileStreamTest \
 	MemoryStreamTest ObjectPoolTest DirectoryWatcherTest DirectoryIteratorsTest \
-	DataURIStreamTest FileStreamRWLockTest
+	DataURIStreamTest FileStreamRWLockTest SPSCQueueTest MPSCQueueTest
+
+# FastLogger tests - enabled by default
+# Set POCO_NO_FASTLOGGER=1 to disable
+ifdef POCO_NO_FASTLOGGER
+COMMONFLAGS += -DPOCO_NO_FASTLOGGER
+else
+objects += FastLoggerTest FastLoggerChannelsTest
+endif
 
 target         = testrunner
 target_version = 1

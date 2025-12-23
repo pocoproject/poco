@@ -21,7 +21,7 @@ namespace Poco {
 
 Checksum::Checksum():
 	_type(TYPE_CRC32),
-	_value(crc32(0L, Z_NULL, 0))
+	_value(crc32(0L, nullptr, 0))
 {
 }
 
@@ -31,9 +31,9 @@ Checksum::Checksum(Type t):
 	_value(0)
 {
 	if (t == TYPE_CRC32)
-		_value = crc32(0L, Z_NULL, 0);
+		_value = crc32(0L, nullptr, 0);
 	else
-		_value = adler32(0L, Z_NULL, 0);
+		_value = adler32(0L, nullptr, 0);
 }
 
 

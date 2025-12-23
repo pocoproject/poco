@@ -206,7 +206,7 @@ int Socket::select(SocketList& readList, SocketList& writeList, SocketList& exce
 
 	SocketList::iterator begE = exceptList.begin();
 	SocketList::iterator endE = exceptList.end();
-	for (int idx = 0; idx < nfd; ++idx)
+	for (nfds_t idx = 0; idx < nfd; ++idx)
 	{
 		SocketList::iterator slIt = std::find_if(begR, endR, Socket::FDCompare(static_cast<int>(pPollArr[idx].fd)));
 		if (POLLIN & pPollArr[idx].revents && slIt != endR) readyReadList.push_back(*slIt);

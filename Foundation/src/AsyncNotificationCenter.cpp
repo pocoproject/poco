@@ -180,7 +180,7 @@ void AsyncNotificationCenter::start()
 
 	if (_mode == AsyncMode::NOTIFY || _mode == AsyncMode::BOTH)
 	{
-		auto dispatch = [this](std::stop_token stopToken, int id) {
+		auto dispatch = [this](std::stop_token stopToken, std::size_t id) {
 			this->dispatchNotifications(stopToken, id);
 		};
 
@@ -282,7 +282,7 @@ std::optional<AsyncNotificationCenter::NotificationTuple> AsyncNotificationCente
 	return {};
 }
 
-void AsyncNotificationCenter::dispatchNotifications(std::stop_token& stopToken, int workerId)
+void AsyncNotificationCenter::dispatchNotifications(std::stop_token& stopToken, std::size_t workerId)
 {
 	while (!stopToken.stop_requested())
 	{

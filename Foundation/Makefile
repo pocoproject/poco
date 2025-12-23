@@ -60,6 +60,21 @@ else
 	objects += $(zlib_objects) $(pcre_objects) $(pcre_utf8_objects) $(utf8proc_objects)
 endif
 
+# FastLogger support (requires Quill library) - enabled by default
+# Set POCO_NO_FASTLOGGER=1 to disable
+ifndef POCO_NO_FASTLOGGER
+	POCO_ENABLE_FASTLOGGER = 1
+endif
+ifdef POCO_ENABLE_FASTLOGGER
+	objects += FastLogger
+	COMMONFLAGS += -DPOCO_ENABLE_FASTLOGGER
+	ifdef POCO_UNBUNDLED
+		SYSLIBS += -lquill
+	else
+		INCLUDE += -I$(POCO_BASE)/dependencies/quill/include
+	endif
+endif
+
 ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)
 	objects += EventLogChannel WindowsConsoleChannel
 else
@@ -77,7 +92,7 @@ ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)
     $(shell cd src; $(WINDMC) pocomsg.mc)
 endif
 
-# poco build system looks for sources in src/
+# make build system looks for sources in src/
 ifndef POCO_UNBUNDLED
 	prebuild = $(shell \
 		ln -sf $(POCO_BASE)/dependencies/zlib/src/*.c        src/ && \

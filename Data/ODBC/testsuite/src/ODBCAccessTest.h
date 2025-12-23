@@ -51,7 +51,6 @@ private:
 	static Poco::Data::ODBC::Utility::DriverMap _drivers;
 	static std::string _dbConnString;
 	static Poco::Data::Session* _pSession;
-	bool _owner;
 };
 
 

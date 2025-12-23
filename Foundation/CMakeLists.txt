@@ -2,6 +2,11 @@
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO(SRCS ${SRCS_G})
 
+# FastLogger requires Quill - exclude if not enabled
+if(NOT ENABLE_FASTLOGGER)
+	list(FILTER SRCS EXCLUDE REGEX ".*FastLogger\\.cpp$")
+endif()
+
 # Headers
 file(GLOB_RECURSE HDRS_G "include/*.h")
 POCO_HEADERS_AUTO(SRCS ${HDRS_G})
@@ -66,6 +71,17 @@ else()
 endif()
 
 target_link_libraries(Foundation PRIVATE "$<BUILD_LOCAL_INTERFACE:V8::DoubleConversion>")
+
+# FastLogger support (requires Quill)
+if(ENABLE_FASTLOGGER)
+	# Quill is header-only, use BUILD_LOCAL_INTERFACE to avoid export issues
+	# The quill headers are needed at build time but don't need to be exported
+	target_link_libraries(Foundation PUBLIC "$<BUILD_LOCAL_INTERFACE:quill::quill>")
+	target_compile_definitions(Foundation PUBLIC POCO_ENABLE_FASTLOGGER)
+else()
+	# Prevent Config.h from auto-enabling FastLogger
+	target_compile_definitions(Foundation PUBLIC POCO_NO_FASTLOGGER)
+endif()
 
 add_library(Poco::Foundation ALIAS Foundation)
 set_target_properties(Foundation

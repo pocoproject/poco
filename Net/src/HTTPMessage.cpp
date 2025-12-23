@@ -139,7 +139,7 @@ void HTTPMessage::setTransferEncoding(const std::string& transferEncoding)
 }
 
 
-const std::string& HTTPMessage::getTransferEncoding() const
+std::string HTTPMessage::getTransferEncoding() const
 {
 	return get(TRANSFER_ENCODING, IDENTITY_TRANSFER_ENCODING);
 }
@@ -175,7 +175,7 @@ void HTTPMessage::setContentType(const MediaType& mediaType)
 }
 
 
-const std::string& HTTPMessage::getContentType() const
+std::string HTTPMessage::getContentType() const
 {
 	return get(CONTENT_TYPE, UNKNOWN_CONTENT_TYPE);
 }

@@ -43,28 +43,26 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 # Setup C/C++ compiler options
 #################################################################################
 
-# Detect if compiler supports at least C++17 standard
-include(CXX1x)
-check_for_cxx17_compiler(CXX17_COMPILER)
-
-if(NOT CXX17_COMPILER)
-	message(FATAL_ERROR "Compiler does not support C++17.")
-endif()
-
-# If a C++17 compiler is available, then set the appropriate flags
-
-option(POCO_ENABLE_CPP20 "Build Poco with C++20 standard" ON)
+# Detect if compiler supports C++20 standard (preferred)
+include(CXX2x)
+check_for_cxx20_compiler(CXX20_COMPILER)
 
 if (EMSCRIPTEN)
-	set(POCO_ENABLE_CPP20 OFF CACHE BOOL "Build Poco with C++20 standard" FORCE)
+	set(CXX20_COMPILER OFF)
 endif()
 
-if (POCO_ENABLE_CPP20)
+if(CXX20_COMPILER)
 	set(CMAKE_CXX_STANDARD 20)
 	message(STATUS "Building Poco with C++20 standard")
 else()
+	# Fall back to C++17
+	include(CXX1x)
+	check_for_cxx17_compiler(CXX17_COMPILER)
+	if(NOT CXX17_COMPILER)
+		message(FATAL_ERROR "Compiler does not support C++17 or later.")
+	endif()
 	set(CMAKE_CXX_STANDARD 17)
-	message(STATUS "Building Poco with C++17 standard")
+	message(STATUS "Building Poco with C++17 standard (C++20 not available)")
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -201,7 +199,12 @@ option(ENABLE_CPPPARSER "Enable C++ parser" OFF)
 option(ENABLE_POCODOC "Enable Poco Documentation Generator" OFF)
 option(ENABLE_PDF "Enable PDF" OFF)
 option(ENABLE_TRACE "Enable stack tracing" OFF)
+option(ENABLE_FASTLOGGER "Enable FastLogger (Quill-based high-performance logger)" ON)
 
+# FastLogger uses Quill which requires x86/ARM intrinsics not available in WebAssembly
+if(EMSCRIPTEN)
+	set(ENABLE_FASTLOGGER OFF CACHE BOOL "Enable FastLogger" FORCE)
+endif()
 
 if(POCO_ENABLE_CPP20)
 	option(ENABLE_MODULES "Build Poco.* C++ modules" OFF)
@@ -596,6 +599,23 @@ endif()
 if(ENABLE_MODULES AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.28)
 	add_subdirectory(modules)
 	list(APPEND Poco_COMPONENTS "C++ modules")
+endif()
+
+#############################################################
+# Benchmark application (optional, requires Google Benchmark)
+
+option(ENABLE_BENCHMARK
+	"Set to OFF|ON (default is OFF) to enable Benchmark application (requires Google Benchmark library)" OFF)
+
+if(ENABLE_BENCHMARK)
+	find_package(benchmark QUIET)
+	if(benchmark_FOUND)
+		message(STATUS "Google Benchmark found - building Benchmark application")
+		add_subdirectory(Benchmark)
+	else()
+		message(STATUS "Google Benchmark not found - skipping Benchmark application")
+		message(STATUS "Install with: brew install google-benchmark (macOS) or apt install libbenchmark-dev (Linux)")
+	endif()
 endif()
 
 

@@ -133,12 +133,13 @@ private:
 	}
 
 	template <typename T>
-	static T copyStreamRangeImpl(std::istream& istr, std::ostream& ostr, std::streampos rangeStart, std::streamsize rangeLength, std::size_t bufferSize)
+	static T copyStreamRangeImpl(std::istream& istr, std::ostream& ostr, std::streampos rangeStart, std::streamsize rangeLen, std::size_t bufferSize)
 	{
 		poco_assert (bufferSize > 0);
 
+		const T rangeLength = static_cast<T>(rangeLen);
 		if (bufferSize > static_cast<std::size_t>(rangeLength))
-			bufferSize = rangeLength;
+			bufferSize = static_cast<std::size_t>(rangeLength);
 
 		Buffer<char> buffer(bufferSize);
 		T len = 0;
@@ -153,7 +154,7 @@ private:
 				ostr.write(buffer.begin(), n);
 				if ((len < rangeLength) && istr && ostr)
 				{
-					const std::size_t inputLen = rangeLength - len;
+					const std::size_t inputLen = static_cast<std::size_t>(rangeLength - len);
 					if (bufferSize > inputLen)
 						bufferSize = inputLen;
 					istr.read(buffer.begin(), bufferSize);

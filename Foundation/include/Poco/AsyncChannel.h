@@ -64,8 +64,12 @@ public:
 	/// logging thread.
 
 	void log(const Message& msg) override;
-	/// Queues the message for processing by the
-	/// background thread.
+		/// Queues the message for processing by the
+		/// background thread.
+
+	void log(Message&& msg) override;
+		/// Queues the message for processing by the
+		/// background thread, moving the message to avoid copying.
 
 	void setProperty(const std::string& name, const std::string& value) override;
 	/// Sets or changes a configuration property.
@@ -97,6 +101,14 @@ public:
 	/// removes the limit.
 	///
 	/// The "queueSize" property is set-only.
+	///
+	/// The "enableCpuAffinity" property pins the background
+	/// logging thread to a specific CPU core (the last core by
+	/// default). This can reduce latency variance by avoiding
+	/// thread migration. Values: "true" or "false" (default).
+	/// Only supported on Linux and Windows.
+	///
+	/// The "enableCpuAffinity" property is set-only.
 
 protected:
 	~AsyncChannel() override;
@@ -104,6 +116,9 @@ protected:
 	void setPriority(const std::string& value);
 
 private:
+	template <typename M>
+	void logImpl(M&& msg);
+
 	Channel::Ptr _pChannel;
 	Thread    _thread;
 	FastMutex _threadMutex;
@@ -112,6 +127,7 @@ private:
 	std::size_t _queueSize = 0;
 	std::size_t _dropCount = 0;
 	std::atomic<bool> _closed;
+	bool _enableCpuAffinity = false;
 };
 
 

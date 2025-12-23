@@ -8,6 +8,13 @@ file(GLOB SRCS_G_REMOVE
 	src/TestLibraryMissingDeps.cpp
 	src/TestPlugin.cpp
 )
+# Exclude FastLogger tests if FastLogger is disabled
+if(NOT ENABLE_FASTLOGGER)
+	list(APPEND SRCS_G_REMOVE
+		src/FastLoggerTest.cpp
+		src/FastLoggerChannelsTest.cpp
+	)
+endif()
 list(REMOVE_ITEM SRCS_G ${SRCS_G_REMOVE})
 POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
 

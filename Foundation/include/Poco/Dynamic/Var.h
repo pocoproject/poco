@@ -21,6 +21,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Format.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/Types.h"
 #include "Poco/OrderedMap.h"
 #include "Poco/OrderedSet.h"
 #include "Poco/Dynamic/VarHolder.h"
@@ -216,8 +217,8 @@ public:
 			throw InvalidAccessException("Can not extract empty value.");
 		else
 			throw BadCastException(Poco::format("Can not convert %s to %s.",
-				std::string(pHolder->type().name()),
-				std::string(typeid(T).name())));
+				Poco::demangle(pHolder->type().name()),
+				Poco::demangle<T>()));
 	}
 
 	template <typename T>

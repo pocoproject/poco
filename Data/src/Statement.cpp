@@ -209,7 +209,7 @@ bool Statement::isType(unsigned int type) const
 	std::size_t sz = _pParseResult->size();
 	if (sz)
 	{
-		for (int i = 0; i < sz; ++i)
+		for (std::size_t i = 0; i < sz; ++i)
 		{
 			if (_pParseResult->getStatement(i)->type() != st)
 				return false;
@@ -223,7 +223,7 @@ bool Statement::isType(unsigned int type) const
 bool Statement::hasType(unsigned int type) const
 {
 	const auto st = static_cast<Parser::StatementType>(type);
-	for (int i = 0; i < _pParseResult->size(); ++i)
+	for (std::size_t i = 0; i < _pParseResult->size(); ++i)
 	{
 		if (_pParseResult->getStatement(i)->type() == st)
 			return true;

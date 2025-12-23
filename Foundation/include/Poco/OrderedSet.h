@@ -27,7 +27,7 @@
 #ifdef max
 #undef max
 #endif
-#include "Poco/ordered_hash.h"
+
 #include "Poco/ordered_set.h"
 
 

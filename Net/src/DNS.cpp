@@ -434,17 +434,14 @@ void DNS::aierror(int code, const std::string& arg)
 
 /*** Bootstring parameters for Punycode ***/
 
-enum
-{
-	base = 36,
-	tmin = 1,
-	tmax = 26,
-	skew = 38,
-	damp = 700,
-	initial_bias = 72,
-	initial_n = 0x80,
-	delimiter = 0x2D
-};
+constexpr punycode_uint base = 36;
+constexpr punycode_uint tmin = 1;
+constexpr punycode_uint tmax = 26;
+constexpr punycode_uint skew = 38;
+constexpr punycode_uint damp = 700;
+constexpr punycode_uint initial_bias = 72;
+constexpr punycode_uint initial_n = 0x80;
+constexpr punycode_uint delimiter = 0x2D;
 
 /* basic(cp) tests whether cp is a basic code point: */
 #define basic(cp) ((punycode_uint)(cp) < 0x80)

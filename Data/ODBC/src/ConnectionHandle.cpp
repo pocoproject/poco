@@ -15,8 +15,6 @@
 #include "Poco/Data/ODBC/ConnectionHandle.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/ODBCException.h"
-#include "Poco/Error.h"
-#include "Poco/Debugger.h"
 
 
 namespace Poco {
@@ -30,8 +28,6 @@ const std::string ConnectionHandle::CANT_SET_ATTR_SQLSTATE = "HY011";
 
 
 ConnectionHandle::ConnectionHandle(const std::string& connectString, SQLULEN loginTimeout, SQLULEN timeout):
-	_pEnvironment(SQL_NULL_HENV),
-	_hdbc(SQL_NULL_HDBC),
 	_connectString(connectString)
 {
 	alloc();
@@ -59,8 +55,8 @@ void ConnectionHandle::alloc()
 	if (Utility::isError(SQLAllocHandle(SQL_HANDLE_DBC, _pEnvironment->handle(), &_hdbc)))
 	{
 		delete _pEnvironment;
-		_pEnvironment = SQL_NULL_HENV;
-		_hdbc = SQL_NULL_HDBC;
+		_pEnvironment = nullptr;
+		_hdbc = POCO_ODBC_NULL_HDBC;
 		throw ODBCException("ODBC: Could not allocate connection handle.");
 	}
 }
@@ -68,16 +64,16 @@ void ConnectionHandle::alloc()
 
 void ConnectionHandle::free()
 {
-	if (_hdbc != SQL_NULL_HDBC)
+	if (_hdbc != POCO_ODBC_NULL_HDBC)
 	{
 		SQLFreeHandle(SQL_HANDLE_DBC, _hdbc);
-		_hdbc = SQL_NULL_HDBC;
+		_hdbc = POCO_ODBC_NULL_HDBC;
 	}
 
 	if (_pEnvironment)
 	{
 		delete _pEnvironment;
-		_pEnvironment = SQL_NULL_HENV;
+		_pEnvironment = nullptr;
 	}
 }
 
@@ -144,15 +140,15 @@ bool ConnectionHandle::connect(const std::string& connectString, SQLULEN loginTi
 		// different login and connection timeouts. Last but not least, some ODBC drivers (eg. DataDirect
 		// for Oracle) flat out refuse to set login timeout and return error - that's why these calls
 		// are wrapped in try/catch and silently ignore errors.
-		if (getTimeout() != timeout)
+		if (static_cast<SQLULEN>(getTimeout()) != timeout)
 			setTimeout(static_cast<int>(timeout));
-		if (getLoginTimeout() != loginTimeout)
+		if (static_cast<SQLULEN>(getLoginTimeout()) != loginTimeout)
 			setLoginTimeout(loginTimeout);
 	}
 	catch(NotSupportedException&){}
 	catch(InvalidAccessException&){}
 
-	return _hdbc != SQL_NULL_HDBC;
+	return _hdbc != POCO_ODBC_NULL_HDBC;
 }
 
 

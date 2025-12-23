@@ -17,6 +17,11 @@
 #ifndef Data_ODBC_Unicode_WIN32_INCLUDED
 #define Data_ODBC_Unicode_WIN32_INCLUDED
 
+#include "Poco/Buffer.h"
+#include "Poco/UnicodeConverter.h"
+#include <sql.h>
+#include <sqltypes.h>
+#include <string>
 
 namespace Poco {
 namespace Data {

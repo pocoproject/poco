@@ -419,7 +419,7 @@ void Application::setArgs(const ArgVec& args)
 	_pConfig->setInt("application.argc"s, (int) args.size());
 	_unprocessedArgs = args;
 	std::string argvKey = "application.argv[";
-	for (int i = 0; i < args.size(); ++i)
+	for (std::size_t i = 0; i < args.size(); ++i)
 	{
 		_pConfig->setString(argvKey + NumberFormatter::format(i) + "]", args[i]);
 	}

@@ -15,19 +15,74 @@
 #include "Poco/Timezone.h"
 #include "Poco/Exception.h"
 #include "Poco/Environment.h"
+#include <mutex>
 #include <ctime>
+#include <cstdlib>
+#include <string>
 
 
 namespace Poco {
 
 
+class TZInfo
+{
+public:
+	TZInfo()
+	{
+		reload();
+	}
+
+	int utcOffset()
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+
+		if (tzChanged())
+			reloadNoLock();
+		return _tzOffset;
+	}
+
+	void reload()
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		reloadNoLock();
+	}
+
+private:
+	void reloadNoLock()
+	{
+		std::time_t now = std::time(nullptr);
+		struct std::tm t;
+		gmtime_r(&now, &t);
+		std::time_t utc = std::mktime(&t);
+		_tzOffset = now - utc;
+		cacheTZ();
+	}
+
+	void cacheTZ()
+	{
+		const char* tz = std::getenv("TIMEZONE");
+		_cachedTZ = tz ? tz : "";
+	}
+
+	bool tzChanged() const
+	{
+		const char* tz = std::getenv("TIMEZONE");
+		std::string currentTZ = tz ? tz : "";
+		return currentTZ != _cachedTZ;
+	}
+
+	std::mutex _mutex;
+	int _tzOffset;
+	std::string _cachedTZ;
+};
+
+
+static TZInfo tzInfo;
+
+
 int Timezone::utcOffset()
 {
-	std::time_t now = std::time(nullptr);
-	struct std::tm t;
-	gmtime_r(&now, &t);
-	std::time_t utc = std::mktime(&t);
-	return now - utc;
+	return tzInfo.utcOffset();
 }
 
 
@@ -82,6 +137,12 @@ std::string Timezone::standardName()
 std::string Timezone::dstName()
 {
 	return name();
+}
+
+
+void Timezone::reloadCache()
+{
+	tzInfo.reload();
 }
 
 

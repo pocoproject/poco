@@ -24,8 +24,8 @@ ifdef POCO_SQLITE_UNBUNDLED
 else
 	objects += sqlite3
 	prebuild = $(shell \
-		ln -sf $(POCO_BASE)/dependencies/sqlite3/src/*.c     src/ \
-		ln -sf $(POCO_BASE)/dependencies/sqlite3/src/*.h     src/ \
+		ln -sf $(POCO_BASE)/dependencies/sqlite3/src/*.c src/ && \
+		ln -sf $(POCO_BASE)/dependencies/sqlite3/src/*.h src/ \
 	)
 endif
 

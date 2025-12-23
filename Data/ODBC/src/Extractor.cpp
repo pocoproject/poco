@@ -302,7 +302,7 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 		{
 			StatementDiagnostics d(_rStmt);
 			std::size_t fieldCount = d.fields().size();
-			for (int i = 0; i < fieldCount; ++i)
+			for (std::size_t i = 0; i < fieldCount; ++i)
 			{
 				if (d.sqlState(i) == "01004"s)
 				{
@@ -328,7 +328,7 @@ bool Extractor::extractManualImpl<std::string>(std::size_t pos, std::string& val
 			break;
 
 		_lengths[pos] += len;
-		if (_lengths[pos] <= maxSize)
+		if (static_cast<std::size_t>(_lengths[pos]) <= maxSize)
 			val.append(pChar, len);
 		else
 			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, static_cast<std::size_t>(_lengths[pos]), maxSize));
@@ -366,7 +366,7 @@ bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val
 		{
 			StatementDiagnostics d(_rStmt);
 			std::size_t fieldCount = d.fields().size();
-			for (int i = 0; i < fieldCount; ++i)
+			for (std::size_t i = 0; i < fieldCount; ++i)
 			{
 				if (d.sqlState(i) == "01004"s)
 				{
@@ -392,7 +392,7 @@ bool Extractor::extractManualImpl<UTF16String>(std::size_t pos, UTF16String& val
 			break;
 
 		_lengths[pos] += len;
-		if (_lengths[pos] <= maxSize)
+		if (static_cast<std::size_t>(_lengths[pos]) <= maxSize)
 			val.append(pChar, len / sizeof(UTF16Char));
 		else
 			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, static_cast<std::size_t>(_lengths[pos]), maxSize));
@@ -444,7 +444,7 @@ bool Extractor::extractManualImpl<Poco::Data::CLOB>(std::size_t pos,
 
 		fetchedSize = len > CHUNK_SIZE ? CHUNK_SIZE : len;
 		_lengths[pos] += fetchedSize;
-		if (_lengths[pos] <= maxSize)
+		if (static_cast<std::size_t>(_lengths[pos]) <= maxSize)
 			val.appendRaw(pChar, fetchedSize);
 		else
 			throw DataException(format(FLD_SIZE_EXCEEDED_FMT, fetchedSize, maxSize));
@@ -1563,7 +1563,7 @@ bool Extractor::isNull(std::size_t col, std::size_t row)
 		}
 	}
 	else
-		return SQL_NULL_DATA == _pPreparator->actualDataSize(col, row);
+		return static_cast<std::size_t>(SQL_NULL_DATA) == _pPreparator->actualDataSize(col, row);
 }
 
 

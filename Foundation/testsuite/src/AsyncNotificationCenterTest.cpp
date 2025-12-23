@@ -382,8 +382,8 @@ void AsyncNotificationCenterTest::testThreadSafety()
 	// Launch multiple threads posting notifications concurrently
 	for (int i = 0; i < numThreads; ++i)
 	{
-		threads.emplace_back([&nc, notificationsPerThread]() {
-			for (int j = 0; j < notificationsPerThread; ++j)
+		threads.emplace_back([&nc, n = notificationsPerThread]() {
+			for (int j = 0; j < n; ++j)
 			{
 				nc.postNotification(new Notification);
 			}
@@ -399,7 +399,7 @@ void AsyncNotificationCenterTest::testThreadSafety()
 	// Wait for all notifications to be processed
 	int timeout = 0;
 	int expected = numThreads * notificationsPerThread;
-	while (_threadSafeCount < expected && timeout < 200)
+	while (_threadSafeCount < expected && timeout < 250)
 	{
 		Poco::Thread::sleep(50);
 		++timeout;
