@@ -337,6 +337,7 @@ std::string LoggerTest::doTestFormatThreadName(ThreadFactory makeThread)
 		parts.push_back(logMsg.substr(p, q-p));
 		p = q + 1;
 	}
+	assertTrue (parts.size() >= 5);
 	assertEqual( ThreadNameTestStrings::loggerName, parts[0] );
 	assertEqual( ThreadNameTestStrings::threadName, parts[2] );
 	assertEqual( "I", parts[3] );

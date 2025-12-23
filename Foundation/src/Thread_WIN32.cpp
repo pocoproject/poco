@@ -227,8 +227,13 @@ long ThreadImpl::currentOsTidImpl()
 
 void ThreadImpl::setCurrentNameImpl(const std::string& threadName)
 {
-	std::wstring wname(threadName.begin(), threadName.end());
-	SetThreadDescription(GetCurrentThread(), wname.c_str());
+	int wideLen = MultiByteToWideChar(CP_UTF8, 0, threadName.c_str(), -1, NULL, 0);
+	if (wideLen > 0)
+	{
+		std::wstring wname(wideLen, L'\0');
+		MultiByteToWideChar(CP_UTF8, 0, threadName.c_str(), -1, &wname[0], wideLen);
+		SetThreadDescription(GetCurrentThread(), wname.c_str());
+	}
 }
 
 
