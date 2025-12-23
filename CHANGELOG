@@ -11,6 +11,18 @@ MongoDB replica set support, a new reactor-based HTTP server implementation, ULI
 support, C++17 modernization of core classes, and significant third-party library
 upgrades.
 
+Contributors:
+
+Matej Kenda, Aleksandar Fabijanic, siren186, Günter Obiltschnig, nyashbox,
+Lara Dzivdzanovic, Gleb Popov, Andrew Auclair, Mikhail Khachayants, Alexander Bychuk,
+solarobot, Tomislav Petrović, Andrew Slabko, sky92zwq, Duncan Cunningham,
+Marian Krivoš, Miko (Toyosatomimi no Miko), Ben Wolsieffer, Luis Caro Campos, Jonas Bülow,
+Friedrich Wilckens, Austin Beer, Rajendra Singh, Miracle-1996, Nathan Jensen,
+Peter Zmanovsky, nitram96, Nino Belušić, Matthew Stoltenberg, Katalin Rebhan,
+Eric Engels, Milan Tepic, David Roman, Mert Övün, lanthora, Jouke Witteveen,
+Jeremy Rifkin, Dan Rosser, Étienne Dupuis, Thomas Beutlich, Sergei Trofimovich, Kacper Piwiński,
+Peter Klotz, Kari Argillander, Hussein Ismail, Mias du Plessis
+
 Notable Features:
 
 Poco::MongoDB:
@@ -111,7 +123,7 @@ Features:
 - PR #5068 MongoDB: Add replica set support with automatic failover
 - PR #4999 Modules: Add C++20 modules component
 - PR #4946 Net: Add reactor-based HTTP server
-- GH #5080 Foundation: Add benchmark infrastructure
+- PR #5081 Foundation: Add benchmark infrastructure and FastLogger
 - GH #5069 Missing DLLs not reported on Windows
 - GH #5060 Auto-configure AsyncNotificationCenter number of workers
 - GH #5058 Add event notifications to Redis
@@ -127,6 +139,8 @@ Features:
 
 Enhancements and Third-Party Updates:
 
+- PR #5136 Data: C++17 modernization of TypeHandler with variadic templates
+- PR #5130 fix: Resolve compiler warnings and fix potential bugs
 - PR #5119 Util: Add [[nodiscard]] to createView/createLocalView
 - PR #5103 fix: Resolve compiler warnings across multiple modules
 - PR #5100 fix(Net): Use MessageHeader::quote() for boundary in HTMLForm
@@ -164,7 +178,6 @@ Enhancements and Third-Party Updates:
 - GH #4348 0 (or NULL) for null pointer shall be replaced with nullptr
 - GH #4202 Foundation: LogFileImpl::createFile() fails if path does not exist
 - GH #2731 Poco::format() supports %g and %G format specifiers
-- GH #5080 Add benchmark infrastructure
 
 Bug Fixes:
 
