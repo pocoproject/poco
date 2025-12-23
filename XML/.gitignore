@@ -1,0 +1,21 @@
+# Build-time symlinks to bundled expat library
+# Created by prebuild step in Makefile when POCO_UNBUNDLED is not set
+src/ascii.h
+src/asciitab.h
+src/expat.h
+src/expat_config.h
+src/expat_external.h
+src/iasciitab.h
+src/internal.h
+src/latin1tab.h
+src/nametab.h
+src/siphash.h
+src/utf8tab.h
+src/xmlparse.cpp
+src/xmlrole.c
+src/xmlrole.h
+src/xmltok.c
+src/xmltok.h
+src/xmltok_impl.c
+src/xmltok_impl.h
+src/xmltok_ns.c
