@@ -1529,6 +1529,26 @@ void SQLiteTest::testBLOB()
 }
 
 
+void SQLiteTest::testStdTuple()
+{
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	tmp << "DROP TABLE IF EXISTS Tuples", now;
+	tmp << "CREATE TABLE Tuples "
+		"(i INTEGER, r REAL, s VARCHAR, d DATETIME)", now;
+
+	using Row = std::tuple<int, double, std::string, DateTime>;
+	Row r(1, 2.5, std::string("abc"), DateTime(1965, 6, 18, 5, 35, 1));
+
+	tmp << "INSERT INTO Tuples VALUES (?,?,?,?)", use(r), now;
+
+	Row ret(-1, 3.2, std::string("def"), DateTime());
+	assertTrue (ret != r);
+	tmp << "SELECT * FROM Tuples", into(ret), now;
+	assertTrue (ret == r);
+}
+
+
+
 void SQLiteTest::testTuple10()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -2135,6 +2155,55 @@ void SQLiteTest::testPrimaryKeyConstraint()
 	}
 
 	ses.commit();
+}
+
+
+void SQLiteTest::testOptional()
+{
+	Session ses (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	ses << "DROP TABLE IF EXISTS OptionalTest", now;
+
+	ses << "CREATE TABLE OptionalTest (i INTEGER, r REAL, s VARCHAR, d DATETIME)", now;
+
+	ses << "INSERT INTO OptionalTest VALUES(:i, :r, :s, :d)", use(null), use(null), use(null), use(null), now;
+
+	std::optional<int> i = 1;
+	std::optional<double> f = 1.5;
+	std::optional<std::string> s = std::string("abc");
+	std::optional<DateTime> d = DateTime();
+
+	assertTrue (i.has_value());
+	assertTrue (f.has_value());
+	assertTrue (s.has_value());
+	assertTrue (d.has_value());
+
+	ses << "SELECT i, r, s, d FROM OptionalTest", into(i), into(f), into(s), into(d), now;
+
+	assertTrue (!i.has_value());
+	assertTrue (!f.has_value());
+	assertTrue (!s.has_value());
+	assertTrue (!d.has_value());
+
+	ses << "DELETE FROM OptionalTest", now;
+
+	i = 1;
+	f = 1.5;
+	s = std::string("abc");
+	d = DateTime(1965, 6, 18, 5, 35, 1);
+
+	ses << "INSERT INTO OptionalTest VALUES(:i, :r, :s, :d)", use(i), use(f), use(s), use(d), now;
+
+	std::optional<int> di;
+	std::optional<double> df;
+    std::optional<std::string> ds;
+    std::optional<DateTime> dd;
+
+    ses << "SELECT i, r, s, d FROM OptionalTest", into(di), into(df), into(ds), into(dd), now;
+
+	assertTrue (i == di);
+	assertTrue (f == df);
+	assertTrue (s == ds);
+	assertTrue (d == dd);
 }
 
 
@@ -3932,6 +4001,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testNonexistingDB);
 	CppUnit_addTest(pSuite, SQLiteTest, testCLOB);
 	CppUnit_addTest(pSuite, SQLiteTest, testBLOB);
+	CppUnit_addTest(pSuite, SQLiteTest, testStdTuple);
 	CppUnit_addTest(pSuite, SQLiteTest, testTuple10);
 	CppUnit_addTest(pSuite, SQLiteTest, testTupleVector10);
 	CppUnit_addTest(pSuite, SQLiteTest, testTuple9);
@@ -3956,6 +4026,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testUUID);
 	CppUnit_addTest(pSuite, SQLiteTest, testInternalExtraction);
 	CppUnit_addTest(pSuite, SQLiteTest, testPrimaryKeyConstraint);
+	CppUnit_addTest(pSuite, SQLiteTest, testOptional);
 	CppUnit_addTest(pSuite, SQLiteTest, testNullable);
 	CppUnit_addTest(pSuite, SQLiteTest, testNullableVector);
 	CppUnit_addTest(pSuite, SQLiteTest, testNulls);
