@@ -436,7 +436,7 @@ private:
 	}
 
 	// Prevent VC8 warning "operator= could not be generated"
-	Extractor& operator = (const Extractor&);
+	Extractor& operator = (const Extractor&) = delete;
 
 private:
 	StatementExecutor& _statementExecutor;

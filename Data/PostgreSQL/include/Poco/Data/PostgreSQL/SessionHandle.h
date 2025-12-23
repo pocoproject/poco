@@ -185,8 +185,8 @@ private:
 	bool isConnectedNoLock() const;
 	std::string lastErrorNoLock() const;
 
-	SessionHandle(const SessionHandle&);
-	SessionHandle& operator= (const SessionHandle&);
+	SessionHandle(const SessionHandle&) = delete;
+	SessionHandle& operator= (const SessionHandle&) = delete;
 
 private:
 	mutable Poco::FastMutex   _sessionMutex;

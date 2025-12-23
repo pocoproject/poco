@@ -51,13 +51,9 @@ public:
 		/// The getter method for a property.
 
 	AbstractSessionImpl(const std::string& connectionString,
-		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT): SessionImpl(connectionString, timeout),
-			_storage(std::string("deque")),
-			_bulk(false),
-			_emptyStringIsNull(false),
-			_forceEmptyString(false),
-			_sqlParse(false),
-			_autoCommit(true)
+		std::size_t timeout = LOGIN_TIMEOUT_DEFAULT):
+			SessionImpl(connectionString, timeout),
+			_storage(std::string("deque"))
 		/// Creates the AbstractSessionImpl.
 		///
 		/// Adds "storage" property and sets the default internal storage container
@@ -132,12 +128,10 @@ public:
 			&AbstractSessionImpl<C>::getAutoCommit);
 	}
 
-	~AbstractSessionImpl()
+	~AbstractSessionImpl() override = default;
 		/// Destroys the AbstractSessionImpl.
-	{
-	}
 
-	bool hasFeature(const std::string& name) const
+	bool hasFeature(const std::string& name) const override
 		/// Looks a feature up in the features map
 		/// and returns true if there is one.
 	{
@@ -147,7 +141,7 @@ public:
 			it->second.setter;
 	}
 
-	void setFeature(const std::string& name, bool state)
+	void setFeature(const std::string& name, bool state) override
 		/// Looks a feature up in the features map
 		/// and calls the feature's setter, if there is one.
 	{
@@ -162,7 +156,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
-	bool getFeature(const std::string& name) const
+	bool getFeature(const std::string& name) const override
 		/// Looks a feature up in the features map
 		/// and calls the feature's getter, if there is one.
 	{
@@ -177,7 +171,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
-	bool hasProperty(const std::string& name) const
+	bool hasProperty(const std::string& name) const override
 		/// Looks a property up in the properties map
 		/// and returns true if there is one.
 	{
@@ -187,7 +181,7 @@ public:
 			it->second.setter;
 	}
 
-	void setProperty(const std::string& name, const Poco::Any& value)
+	void setProperty(const std::string& name, const Poco::Any& value) override
 		/// Looks a property up in the properties map
 		/// and calls the property's setter, if there is one.
 	{
@@ -202,7 +196,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
-	Poco::Any getProperty(const std::string& name) const
+	Poco::Any getProperty(const std::string& name) const override
 		/// Looks a property up in the properties map
 		/// and calls the property's getter, if there is one.
 	{
@@ -389,11 +383,11 @@ private:
 	FeatureMap  _features;
 	PropertyMap _properties;
 	std::string _storage;
-	bool        _bulk;
-	bool        _emptyStringIsNull;
-	bool        _forceEmptyString;
-	bool        _sqlParse;
-	bool        _autoCommit;
+	bool        _bulk{false};
+	bool        _emptyStringIsNull{false};
+	bool        _forceEmptyString{false};
+	bool        _sqlParse{false};
+	bool        _autoCommit{true};
 	Poco::Any   _handle;
 };
 

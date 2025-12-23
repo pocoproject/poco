@@ -87,8 +87,8 @@ public:
 	}
 
 private:
-	Handle(const Handle&);
-	const Handle& operator=(const Handle&);
+	Handle(const Handle&) = delete;
+	const Handle& operator=(const Handle&) = delete;
 
 	operator H& ()
 		/// Conversion operator into reference to native type.

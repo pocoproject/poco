@@ -29,6 +29,8 @@ namespace Data {
 class Data_API Bulk
 {
 public:
+	Bulk() = delete;
+
 	Bulk(const Limit& limit);
 		/// Creates the Bulk.
 
@@ -46,8 +48,6 @@ public:
 		/// this bulk object.
 
 private:
-	Bulk();
-
 	Limit _limit;
 };
 
@@ -73,7 +73,7 @@ namespace Keywords {
 inline Bulk bulk(const Limit& limit = Limit(Limit::LIMIT_UNLIMITED, false, false))
 	/// Convenience function for creation of bulk.
 {
-	return Bulk(limit);
+	return {limit};
 }
 
 
@@ -87,7 +87,7 @@ inline void bulk(Void)
 } // namespace Keywords
 
 
-typedef void (*BulkFnType)(Void);
+using BulkFnType = void (*)(Void);
 
 
 } } // namespace Poco::Data

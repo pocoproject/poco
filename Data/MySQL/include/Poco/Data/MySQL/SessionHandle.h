@@ -34,6 +34,10 @@ public:
 	explicit SessionHandle(MYSQL* mysql);
 		/// Creates session handle
 
+	SessionHandle(const SessionHandle&) = delete;
+
+	SessionHandle& operator=(const SessionHandle&) = delete;
+
 	~SessionHandle();
 		/// Destroy handle, close connection
 
@@ -77,10 +81,6 @@ public:
 		/// Checks if the connection is alive.
 
 	operator MYSQL* ();
-
-private:
-	SessionHandle(const SessionHandle&);
-	SessionHandle& operator=(const SessionHandle&);
 
 private:
 	MYSQL* _pHandle;

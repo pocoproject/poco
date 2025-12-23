@@ -76,276 +76,276 @@ public:
 		Poco::TextEncoding::Ptr pDBEncoding = nullptr);
 		/// Creates the Binder.
 
-	~Binder();
+	~Binder() override;
 		/// Destroys the Binder.
 
-	void bind(std::size_t pos, const Poco::Int8& val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int8& val, Direction dir) override;
 		/// Binds an Int8.
 
-	void bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir) override;
 		/// Binds an Int8 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::Int8>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::Int8>& val, Direction dir) override;
 		/// Binds an Int8 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::Int8>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::Int8>& val, Direction dir) override;
 		/// Binds an Int8 list.
 
-	void bind(std::size_t pos, const Poco::UInt8& val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt8& val, Direction dir) override;
 		/// Binds an UInt8.
 
-	void bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir) override;
 		/// Binds an UInt8 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::UInt8>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::UInt8>& val, Direction dir) override;
 		/// Binds an UInt8 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::UInt8>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::UInt8>& val, Direction dir) override;
 		/// Binds an UInt8 list.
 
-	void bind(std::size_t pos, const Poco::Int16& val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int16& val, Direction dir) override;
 		/// Binds an Int16.
 
-	void bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir) override;
 		/// Binds an Int16 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::Int16>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::Int16>& val, Direction dir) override;
 		/// Binds an Int16 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::Int16>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::Int16>& val, Direction dir) override;
 		/// Binds an Int16 list.
 
-	void bind(std::size_t pos, const Poco::UInt16& val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt16& val, Direction dir) override;
 		/// Binds an UInt16.
 
-	void bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir) override;
 		/// Binds an UInt16 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::UInt16>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::UInt16>& val, Direction dir) override;
 		/// Binds an UInt16 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::UInt16>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::UInt16>& val, Direction dir) override;
 		/// Binds an UInt16 list.
 
-	void bind(std::size_t pos, const Poco::Int32& val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int32& val, Direction dir) override;
 		/// Binds an Int32.
 
-	void bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir) override;
 		/// Binds an Int32 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::Int32>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::Int32>& val, Direction dir) override;
 		/// Binds an Int32 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir) override;
 		/// Binds an Int32 list.
 
-	void bind(std::size_t pos, const Poco::UInt32& val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt32& val, Direction dir) override;
 		/// Binds an UInt32.
 
-	void bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir) override;
 		/// Binds an UInt32 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::UInt32>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::UInt32>& val, Direction dir) override;
 		/// Binds an UInt32 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir) override;
 		/// Binds an UInt32 list.
 
-	void bind(std::size_t pos, const Poco::Int64& val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int64& val, Direction dir) override;
 		/// Binds an Int64.
 
-	void bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir) override;
 		/// Binds an Int64 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::Int64>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::Int64>& val, Direction dir) override;
 		/// Binds an Int64 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir) override;
 		/// Binds an Int64 list.
 
-	void bind(std::size_t pos, const Poco::UInt64& val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt64& val, Direction dir) override;
 		/// Binds an UInt64.
 
-	void bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir) override;
 		/// Binds an UInt64 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::UInt64>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::UInt64>& val, Direction dir) override;
 		/// Binds an UInt64 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir) override;
 		/// Binds an UInt64 list.
 
 #ifndef POCO_INT64_IS_LONG
-	void bind(std::size_t pos, const long& val, Direction dir);
+	void bind(std::size_t pos, const long& val, Direction dir) override;
 		/// Binds a long.
 
-	void bind(std::size_t pos, const unsigned long& val, Direction dir);
+	void bind(std::size_t pos, const unsigned long& val, Direction dir) override;
 		/// Binds an unsigned long.
 
-	void bind(std::size_t pos, const std::vector<long>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<long>& val, Direction dir) override;
 		/// Binds a long vector.
 
-	void bind(std::size_t pos, const std::deque<long>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<long>& val, Direction dir) override;
 		/// Binds a long deque.
 
-	void bind(std::size_t pos, const std::list<long>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<long>& val, Direction dir) override;
 		/// Binds a long list.
 #endif
 
-	void bind(std::size_t pos, const bool& val, Direction dir);
+	void bind(std::size_t pos, const bool& val, Direction dir) override;
 		/// Binds a boolean.
 
-	void bind(std::size_t pos, const std::vector<bool>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<bool>& val, Direction dir) override;
 		/// Binds a boolean vector.
 
-	void bind(std::size_t pos, const std::deque<bool>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<bool>& val, Direction dir) override;
 		/// Binds a boolean deque.
 
-	void bind(std::size_t pos, const std::list<bool>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<bool>& val, Direction dir) override;
 		/// Binds a boolean list.
 
-	void bind(std::size_t pos, const float& val, Direction dir);
+	void bind(std::size_t pos, const float& val, Direction dir) override;
 		/// Binds a float.
 
-	void bind(std::size_t pos, const std::vector<float>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<float>& val, Direction dir) override;
 		/// Binds a float vector.
 
-	void bind(std::size_t pos, const std::deque<float>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<float>& val, Direction dir) override;
 		/// Binds a float deque.
 
-	void bind(std::size_t pos, const std::list<float>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<float>& val, Direction dir) override;
 		/// Binds a float list.
 
-	void bind(std::size_t pos, const double& val, Direction dir);
+	void bind(std::size_t pos, const double& val, Direction dir) override;
 		/// Binds a double.
 
-	void bind(std::size_t pos, const std::vector<double>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<double>& val, Direction dir) override;
 		/// Binds a double vector.
 
-	void bind(std::size_t pos, const std::deque<double>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<double>& val, Direction dir) override;
 		/// Binds a double deque.
 
-	void bind(std::size_t pos, const std::list<double>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<double>& val, Direction dir) override;
 		/// Binds a double list.
 
-	void bind(std::size_t pos, const char& val, Direction dir);
+	void bind(std::size_t pos, const char& val, Direction dir) override;
 		/// Binds a single character.
 
-	void bind(std::size_t pos, const std::vector<char>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<char>& val, Direction dir) override;
 		/// Binds a character vector.
 
-	void bind(std::size_t pos, const std::deque<char>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<char>& val, Direction dir) override;
 		/// Binds a character deque.
 
-	void bind(std::size_t pos, const std::list<char>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<char>& val, Direction dir) override;
 		/// Binds a character list.
 
-	void bind(std::size_t pos, const std::string& val, Direction dir);
+	void bind(std::size_t pos, const std::string& val, Direction dir) override;
 		/// Binds a string.
 
-	void bind(std::size_t pos, const std::vector<std::string>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<std::string>& val, Direction dir) override;
 		/// Binds a string vector.
 
-	void bind(std::size_t pos, const std::deque<std::string>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<std::string>& val, Direction dir) override;
 		/// Binds a string deque.
 
-	void bind(std::size_t pos, const std::list<std::string>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<std::string>& val, Direction dir) override;
 		/// Binds a string list.
 
-	void bind(std::size_t pos, const UTF16String& val, Direction dir);
+	void bind(std::size_t pos, const UTF16String& val, Direction dir) override;
 		/// Binds a string.
 
-	void bind(std::size_t pos, const std::vector<UTF16String>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<UTF16String>& val, Direction dir) override;
 		/// Binds a string vector.
 
-	void bind(std::size_t pos, const std::deque<UTF16String>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<UTF16String>& val, Direction dir) override;
 		/// Binds a string deque.
 
-	void bind(std::size_t pos, const std::list<UTF16String>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<UTF16String>& val, Direction dir) override;
 		/// Binds a string list.
 
-	void bind(std::size_t pos, const BLOB& val, Direction dir);
+	void bind(std::size_t pos, const BLOB& val, Direction dir) override;
 		/// Binds a BLOB. In-bound only.
 
-	void bind(std::size_t pos, const CLOB& val, Direction dir);
+	void bind(std::size_t pos, const CLOB& val, Direction dir) override;
 		/// Binds a CLOB. In-bound only.
 
-	void bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir) override;
 		/// Binds a BLOB vector.
 
-	void bind(std::size_t pos, const std::deque<BLOB>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<BLOB>& val, Direction dir) override;
 		/// Binds a BLOB deque.
 
-	void bind(std::size_t pos, const std::list<BLOB>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<BLOB>& val, Direction dir) override;
 		/// Binds a BLOB list.
 
-	void bind(std::size_t pos, const std::vector<CLOB>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<CLOB>& val, Direction dir) override;
 		/// Binds a CLOB vector.
 
-	void bind(std::size_t pos, const std::deque<CLOB>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<CLOB>& val, Direction dir) override;
 		/// Binds a CLOB deque.
 
-	void bind(std::size_t pos, const std::list<CLOB>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<CLOB>& val, Direction dir) override;
 		/// Binds a CLOB list.
 
-	void bind(std::size_t pos, const Date& val, Direction dir);
+	void bind(std::size_t pos, const Date& val, Direction dir) override;
 		/// Binds a Date.
 
-	void bind(std::size_t pos, const std::vector<Date>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Date>& val, Direction dir) override;
 		/// Binds a Date vector.
 
-	void bind(std::size_t pos, const std::deque<Date>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Date>& val, Direction dir) override;
 		/// Binds a Date deque.
 
-	void bind(std::size_t pos, const std::list<Date>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Date>& val, Direction dir) override;
 		/// Binds a Date list.
 
-	void bind(std::size_t pos, const Time& val, Direction dir);
+	void bind(std::size_t pos, const Time& val, Direction dir) override;
 		/// Binds a Time.
 
-	void bind(std::size_t pos, const std::vector<Time>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Time>& val, Direction dir) override;
 		/// Binds a Time vector.
 
-	void bind(std::size_t pos, const std::deque<Time>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Time>& val, Direction dir) override;
 		/// Binds a Time deque.
 
-	void bind(std::size_t pos, const std::list<Time>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Time>& val, Direction dir) override;
 		/// Binds a Time list.
 
-	void bind(std::size_t pos, const DateTime& val, Direction dir);
+	void bind(std::size_t pos, const DateTime& val, Direction dir) override;
 		/// Binds a DateTime.
 
-	void bind(std::size_t pos, const std::vector<DateTime>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<DateTime>& val, Direction dir) override;
 		/// Binds a DateTime vector.
 
-	void bind(std::size_t pos, const std::deque<DateTime>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<DateTime>& val, Direction dir) override;
 		/// Binds a DateTime deque.
 
-	void bind(std::size_t pos, const std::list<DateTime>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<DateTime>& val, Direction dir) override;
 		/// Binds a DateTime list.
 
-	void bind(std::size_t pos, const UUID& val, Direction dir);
+	void bind(std::size_t pos, const UUID& val, Direction dir) override;
 		/// Binds a UUID.
 
-	void bind(std::size_t pos, const std::vector<Poco::UUID>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::UUID>& val, Direction dir) override;
 		/// Binds a UUID vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::UUID>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::UUID>& val, Direction dir) override;
 		/// Binds a UUID deque.
 
-	void bind(std::size_t pos, const std::list<Poco::UUID>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::UUID>& val, Direction dir) override;
 		/// Binds a UUID list.
 
-	void bind(std::size_t pos, const NullData& val, Direction dir);
+	void bind(std::size_t pos, const NullData& val, Direction dir) override;
 		/// Binds a null. In-bound only.
 
-	void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir) override;
 		/// Binds a null vector.
 
-	void bind(std::size_t pos, const std::deque<NullData>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<NullData>& val, Direction dir) override;
 		/// Binds a null deque.
 
-	void bind(std::size_t pos, const std::list<NullData>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<NullData>& val, Direction dir) override;
 		/// Binds a null list.
 
 	template <typename T>
@@ -382,7 +382,7 @@ public:
 		/// Transfers the results of non-POD outbound parameters from internal
 		/// holders back into the externally supplied buffers.
 
-	void reset();
+	void reset() override;
 		/// Clears the cached storage.
 
 private:
@@ -410,7 +410,7 @@ private:
 	void describeParameter(std::size_t pos);
 		/// Sets the description field for the parameter, if needed.
 
-	void bind(std::size_t pos, const char* const& pVal, Direction dir);
+	void bind(std::size_t pos, const char* const& pVal, Direction dir) override;
 		/// Binds a const char ptr.
 		/// This is a private no-op in this implementation
 		/// due to security risk.

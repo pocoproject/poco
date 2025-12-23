@@ -81,7 +81,7 @@ public:
 	void swap(MetaColumn& other) noexcept;
 		/// Swaps the contents with another instance.
 
-	~MetaColumn();
+	virtual ~MetaColumn();
 		/// Destroys the MetaColumn.
 
 	const std::string& name() const;

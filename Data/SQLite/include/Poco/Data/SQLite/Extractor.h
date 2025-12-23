@@ -54,7 +54,7 @@ public:
 	Extractor(sqlite3_stmt* pStmt);
 		/// Creates the Extractor.
 
-	~Extractor();
+	~Extractor() override;
 		/// Destroys the Extractor.
 
 	bool extract(std::size_t pos, Poco::Int8& val) override;

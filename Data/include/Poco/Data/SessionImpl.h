@@ -20,7 +20,6 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/RefCountedObject.h"
-#include "Poco/String.h"
 #include "Poco/Format.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/AutoPtr.h"
@@ -62,8 +61,12 @@ public:
 		std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl.
 
-	virtual ~SessionImpl();
+	~SessionImpl() override;
 		/// Destroys the SessionImpl.
+
+	SessionImpl() = delete;
+	SessionImpl(const SessionImpl&) = delete;
+	SessionImpl& operator = (const SessionImpl&) = delete;
 
 	const std::string& dbmsName() const;
 		/// Returns the DBMS name. The name must be set by the
@@ -209,9 +212,6 @@ protected:
 		/// a connected session.
 
 private:
-	SessionImpl();
-	SessionImpl(const SessionImpl&);
-	SessionImpl& operator = (const SessionImpl&);
 
 	std::string _dbmsName;
 	std::string _connectionString;

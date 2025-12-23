@@ -38,7 +38,7 @@ public:
 	explicit ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position);
 		/// Creates the ODBCMetaColumn.
 
-	~ODBCMetaColumn();
+	~ODBCMetaColumn() override;
 		/// Destroys the ODBCMetaColumn.
 
 	std::size_t dataLength() const;
@@ -52,7 +52,7 @@ public:
 		/// Returns true if column is unsigned or a non-numeric data type.
 
 private:
-	ODBCMetaColumn();
+	ODBCMetaColumn() = delete;
 
 	static const int NAME_BUFFER_LENGTH = 2048;
 

@@ -38,17 +38,17 @@ public:
 	AbstractPreparation(PreparatorPtr pPreparator);
 		/// Creates the AbstractPreparation.
 
+	AbstractPreparation(const AbstractPreparation&) = delete;
+
 	virtual ~AbstractPreparation();
 		/// Destroys the AbstractPreparation.
+
+	AbstractPreparation& operator = (const AbstractPreparation&) = delete;
 
 	virtual void prepare() = 0;
 		/// Prepares data.
 
 protected:
-	AbstractPreparation();
-	AbstractPreparation(const AbstractPreparation&);
-	AbstractPreparation& operator = (const AbstractPreparation&);
-
 	PreparatorPtr preparation();
 		/// Returns the preparation object
 

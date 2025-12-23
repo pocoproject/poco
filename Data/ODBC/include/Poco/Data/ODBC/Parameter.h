@@ -58,7 +58,7 @@ public:
 		/// Returns true if column allows null values, false otherwise.
 
 private:
-	Parameter();
+	Parameter() = delete;
 
 	void init();
 

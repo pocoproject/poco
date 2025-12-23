@@ -100,6 +100,7 @@ public:
 	void testTupleVector9();
 	void testTuple10();
 	void testTupleVector10();
+	void testStdTuple();
 
 	void testDateTime();
 
@@ -107,6 +108,7 @@ public:
 
 	void testInternalExtraction();
 	void testPrimaryKeyConstraint();
+	void testOptional();
 	void testNullable();
 	void testNullableVector();
 	void testNulls();
