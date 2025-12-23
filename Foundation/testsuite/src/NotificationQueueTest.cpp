@@ -23,6 +23,7 @@ using Poco::NotificationQueue;
 using Poco::Notification;
 using Poco::Thread;
 using Poco::RunnableAdapter;
+using CppUnit::waitForCondition;
 
 
 namespace
@@ -167,7 +168,7 @@ void NotificationQueueTest::testThreads()
 	{
 		_queue.enqueueNotification(new Notification);
 	}
-	while (!_queue.empty()) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return _queue.empty(); }, 10000));
 	Thread::sleep(20);
 	_queue.wakeUpAll();
 	t1.join();

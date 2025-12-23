@@ -21,6 +21,7 @@ using Poco::Thread;
 using Poco::Runnable;
 using Poco::Semaphore;
 using Poco::TimeoutException;
+using CppUnit::waitForCondition;
 
 
 class SemaRunnable: public Runnable

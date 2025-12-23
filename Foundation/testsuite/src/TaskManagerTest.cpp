@@ -45,6 +45,7 @@ using Poco::SystemException;
 using Poco::NullPointerException;
 using Poco::AutoPtr;
 using Poco::Stopwatch;
+using CppUnit::waitForCondition;
 
 
 namespace
@@ -254,11 +255,11 @@ void TaskManagerTest::testFinish()
 	tm.addObserver(NObserver<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
 	tm.start(pTT.duplicate());
-	while (pTT->state() < Task::TASK_RUNNING) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT->state() >= Task::TASK_RUNNING; }, 5000));
 	assertTrue (pTT->progress() == 0);
 	Thread::sleep(200);
 	pTT->cont();
-	while (to.progress() == 0) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return to.progress() > 0; }, 5000));
 	assertTrue (to.progress() == 0.5);
 	assertTrue (to.started());
 	assertTrue (pTT->state() == Task::TASK_RUNNING);
@@ -266,13 +267,13 @@ void TaskManagerTest::testFinish()
 	assertTrue (list.size() == 1);
 	assertTrue (tm.count() == 1);
 	pTT->cont();
-	while (pTT->progress() != 1.0) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT->progress() == 1.0f; }, 5000));
 	pTT->cont();
-	while (pTT->state() != Task::TASK_FINISHED) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT->state() == Task::TASK_FINISHED; }, 5000));
 	assertTrue (pTT->state() == Task::TASK_FINISHED);
-	while (!to.finished()) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return to.finished(); }, 5000));
 	assertTrue (to.finished());
-	while (tm.count() == 1) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return tm.count() == 0; }, 5000));
 	list = tm.taskList();
 	assertTrue (list.empty());
 	assertTrue (!to.error());
@@ -297,11 +298,11 @@ void TaskManagerTest::testCancel()
 	tm.addObserver(NObserver<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
 	tm.start(pTT.duplicate());
-	while (pTT->state() < Task::TASK_RUNNING) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT->state() >= Task::TASK_RUNNING; }, 5000));
 	assertTrue (pTT->progress() == 0);
 	Thread::sleep(200);
 	pTT->cont();
-	while (pTT->progress() != 0.5) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT->progress() == 0.5f; }, 5000));
 	assertTrue (to.progress() == 0.5);
 	assertTrue (to.started());
 	assertTrue (pTT->state() == Task::TASK_RUNNING);
@@ -309,15 +310,15 @@ void TaskManagerTest::testCancel()
 	assertTrue (list.size() == 1);
 	assertTrue (tm.count() == 1);
 	tm.cancelAll();
-	while (pTT->state() != Task::TASK_CANCELLING) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT->state() == Task::TASK_CANCELLING; }, 5000));
 	pTT->cont();
 	assertTrue (to.cancelled());
 	pTT->cont();
-	while (pTT->state() != Task::TASK_FINISHED) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT->state() == Task::TASK_FINISHED; }, 5000));
 	assertTrue (pTT->state() == Task::TASK_FINISHED);
-	while (!to.finished()) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return to.finished(); }, 5000));
 	assertTrue (to.finished());
-	while (tm.count() == 1) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return tm.count() == 0; }, 5000));
 	list = tm.taskList();
 	assertTrue (list.empty());
 	assertTrue (!to.error());
@@ -484,7 +485,7 @@ void TaskManagerTest::testCustom()
 	assertTrue (tm.taskList().size() == 5);
 
 	tm.cancelAll();
-	while (tm.count() > 0) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return tm.count() == 0; }, 5000));
 	assertTrue (tm.count() == 0);
 	tm.joinAll();
 }
@@ -534,15 +535,15 @@ void TaskManagerTest::testMultiTasks()
 	assertTrue (list.size() == 3);
 
 	tm.cancelAll();
-	while (tm.count() > 0) Thread::sleep(100);
+	assertTrue (waitForCondition([&]{ return tm.count() == 0; }, 5000));
 	assertTrue (tm.count() == 0);
 	tm.joinAll();
 
-	while (pTT1->state() != Task::TASK_FINISHED) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT1->state() == Task::TASK_FINISHED; }, 5000));
 	assertFalse (pTT1->hasOwner());
-	while (pTT2->state() != Task::TASK_FINISHED) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT2->state() == Task::TASK_FINISHED; }, 5000));
 	assertFalse (pTT2->hasOwner());
-	while (pTT3->state() != Task::TASK_FINISHED) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT3->state() == Task::TASK_FINISHED; }, 5000));
 	assertFalse (pTT3->hasOwner());
 }
 

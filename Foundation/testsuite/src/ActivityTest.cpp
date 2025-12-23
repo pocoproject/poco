@@ -17,6 +17,7 @@
 
 using Poco::Activity;
 using Poco::Thread;
+using CppUnit::waitForCondition;
 
 
 namespace
@@ -112,8 +113,9 @@ void ActivityTest::testActivity()
 	assertTrue (activeObj.activity().isStopped());
 	activeObj.activity().start();
 	assertTrue (!activeObj.activity().isStopped());
-	Thread::sleep(1000);
-	assertTrue (activeObj.activity().isRunning());
+	assertTrue (waitForCondition([&]{ return activeObj.activity().isRunning(); }, 5000));
+	// Wait for the activity to actually run at least once before stopping
+	assertTrue (waitForCondition([&]{ return activeObj.count() > 0; }, 5000));
 	activeObj.activity().stop();
 	activeObj.activity().wait();
 	assertTrue (activeObj.count() > 0);
@@ -125,8 +127,7 @@ void ActivityTest::testActivityFinishes()
 	assertTrue (briefActiveObj.activity().isStopped());
 	briefActiveObj.activity().start();
 	assertTrue (!briefActiveObj.activity().isStopped());
-	Thread::sleep(100);
-	assertTrue (!briefActiveObj.activity().isRunning());
+	assertTrue (waitForCondition([&]{ return !briefActiveObj.activity().isRunning(); }, 5000));
 	assertTrue (briefActiveObj.count() == 3);
 }
 
