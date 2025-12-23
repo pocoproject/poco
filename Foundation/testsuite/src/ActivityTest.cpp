@@ -13,6 +13,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Activity.h"
 #include "Poco/Thread.h"
+#include <atomic>
 
 
 using Poco::Activity;
@@ -42,7 +43,7 @@ namespace
 
 		Poco::UInt64 count() const
 		{
-			return _count;
+			return _count.load();
 		}
 
 	protected:
@@ -53,8 +54,8 @@ namespace
 		}
 
 	private:
-		Activity<ActiveObject> _activity;
-		Poco::UInt64           _count;
+		Activity<ActiveObject>        _activity;
+		std::atomic<Poco::UInt64>     _count;
 	};
 
 	class BriefActiveObject
@@ -77,22 +78,23 @@ namespace
 
 		Poco::UInt64 count() const
 		{
-			return _count;
+			return _count.load();
 		}
+
 	protected:
 		void run()
 		{
 			while (!_activity.isStopped())
 			{
 				++_count;
-				if(_count > 2)
+				if (_count.load() > 2)
 					break;
-
 			}
 		}
+
 	private:
-		Activity<BriefActiveObject> _activity;
-		Poco::UInt64           _count;
+		Activity<BriefActiveObject>   _activity;
+		std::atomic<Poco::UInt64>     _count;
 	};
 }
 
