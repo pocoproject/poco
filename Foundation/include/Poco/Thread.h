@@ -245,6 +245,17 @@ public:
 		/// Returns the operating system specific thread ID for the current thread.
 		/// On error, or if the platform does not support this functionality, it returns zero.
 
+	static void setCurrentName(const std::string& name);
+		/// Sets the name of the current thread.
+		/// Support for this feature varies across platforms.
+		/// Any errors are silently ignored.
+
+	static std::string getCurrentName();
+		/// Returns the name of the current thread.
+		/// Support for this feature varies across platforms.
+		/// Returns an empty string if not supported, on error,
+		/// or if no name has been set for the thread.
+
 	bool setAffinity(int coreId);
 		/// Sets the thread affinity to the coreID.
 		/// Returns true if succesful.
@@ -432,6 +443,24 @@ inline Thread::TID Thread::currentTid()
 inline long Thread::currentOsTid()
 {
 	return currentOsTidImpl();
+}
+
+inline void Thread::setCurrentName(const std::string& name)
+{
+#ifndef POCO_NO_THREADNAME
+	setCurrentNameImpl(name);
+#else
+	(void)name;
+#endif
+}
+
+inline std::string Thread::getCurrentName()
+{
+#ifndef POCO_NO_THREADNAME
+	return getCurrentNameImpl();
+#else
+	return std::string();
+#endif
 }
 
 inline bool Thread::setAffinity(int coreId)

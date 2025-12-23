@@ -79,6 +79,8 @@ public:
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
 	static long currentOsTidImpl();
+	static void setCurrentNameImpl(const std::string& name);
+	static std::string getCurrentNameImpl();
 	bool setAffinityImpl(int);
 	int getAffinityImpl() const;
 

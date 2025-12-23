@@ -21,3 +21,8 @@ class CppUnit::TestCaller<class WinServiceTest>.testServiceReturnsTrueIfStopped
 class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom
 class CppUnit::TestCaller<class ICMPSocketTest>.testMTU
 class CppUnit::TestCaller<class HTTPSClientSessionTest>.testCachedSession
+class CppUnit::TestCaller<class SyslogTest>.testListener
+class CppUnit::TestCaller<class SyslogTest>.testChannelFacility
+class CppUnit::TestCaller<class SyslogTest>.testChannelOpenClose
+class CppUnit::TestCaller<class SyslogTest>.testOldBSD
+class CppUnit::TestCaller<class SyslogTest>.testStructuredData

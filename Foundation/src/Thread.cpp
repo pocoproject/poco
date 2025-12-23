@@ -16,7 +16,6 @@
 #include "Poco/Mutex.h"
 #include "Poco/Exception.h"
 #include "Poco/ThreadLocal.h"
-#include "Poco/AtomicCounter.h"
 #include <sstream>
 
 
@@ -232,7 +231,7 @@ std::string Thread::makeName()
 
 int Thread::uniqueId()
 {
-	static Poco::AtomicCounter counter;
+	static std::atomic<int> counter;
 	return ++counter;
 }
 
