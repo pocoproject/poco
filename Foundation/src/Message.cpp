@@ -174,7 +174,9 @@ void Message::init()
 	{
 		// Not a POCO thread, use native OS thread ID.
 		_tid = Thread::currentOsTid();
+#ifndef POCO_NO_THREADNAME
 		_thread = Thread::getCurrentName();
+#endif
 	}
 }
 
