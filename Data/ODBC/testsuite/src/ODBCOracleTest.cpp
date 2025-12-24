@@ -1018,6 +1018,8 @@ CppUnit::Test* ODBCOracleTest::suite()
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTransaction);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testTransactor);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testNullable);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testStdOptional);
+		CppUnit_addTest(pSuite, ODBCOracleTest, testStdTupleWithOptional);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testUnicode);
 		CppUnit_addTest(pSuite, ODBCOracleTest, testReconnect);
 

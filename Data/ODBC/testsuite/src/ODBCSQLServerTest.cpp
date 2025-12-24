@@ -1203,6 +1203,8 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransactor);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNullable);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStdOptional);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStdTupleWithOptional);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testUnicode);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testEncoding);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testReconnect);
