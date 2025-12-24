@@ -760,6 +760,15 @@ void ODBCOracleTest::recreateNullableTable()
 }
 
 
+void ODBCOracleTest::recreateNullableStringTable()
+{
+	dropObject("TABLE", "NullableStringTest");
+	try { *_pSession << "CREATE TABLE NullableStringTest (Id INTEGER, Address VARCHAR2(30), Age INTEGER)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; failmsg ("recreateNullableStringTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; failmsg ("recreateNullableStringTable()"); }
+}
+
+
 void ODBCOracleTest::recreatePersonTable()
 {
 	dropObject("TABLE", "Person");
