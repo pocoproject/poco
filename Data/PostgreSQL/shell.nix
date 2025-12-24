@@ -1,3 +1,14 @@
+# Nix shell environment for running Poco::Data::PostgreSQL tests.
+#
+# Usage:
+#   nix-shell
+#
+# This sets up PostgreSQL with ODBC driver and configures the Poco
+# build environment. The database starts automatically and stops
+# when the shell exits.
+#
+# Test database: postgres (user: postgres, trust authentication)
+
 { pkgs ? import <nixpkgs> {} }:
 
 let

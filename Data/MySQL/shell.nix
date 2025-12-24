@@ -1,3 +1,14 @@
+# Nix shell environment for running Poco::Data::MySQL tests.
+#
+# Usage:
+#   nix-shell
+#
+# This sets up MariaDB with ODBC driver, creates a test database,
+# and configures the Poco build environment. The database starts
+# automatically and stops when the shell exits.
+#
+# Test database: pocotest (user: pocotest, password: pocotest)
+
 { pkgs ? import <nixpkgs> {} }:
 
 let
