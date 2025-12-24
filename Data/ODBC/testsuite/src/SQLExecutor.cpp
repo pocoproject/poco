@@ -122,7 +122,7 @@ SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession,
 	CppUnit::TestCase(name),
 	_pSession(pSession),
 	_pEncSession(pEncSession),
-	_dataExecutor("Poco::Data SQL Executor", pSession, pEncSession)
+	_dataExecutor(name, pSession, pEncSession)
 {
 }
 
