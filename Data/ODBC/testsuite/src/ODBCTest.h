@@ -162,6 +162,8 @@ public:
 	virtual void testTransaction();
 	virtual void testTransactor();
 	virtual void testNullable();
+	virtual void testStdOptional();
+	virtual void testStdTupleWithOptional();
 
 	virtual void testUnicode();
 	virtual void testEncoding();
@@ -173,6 +175,7 @@ protected:
 
 	virtual void dropObject(const std::string& type, const std::string& name);
 	virtual void recreateNullableTable();
+	virtual void recreateNullableStringTable();
 	virtual void recreatePersonTable();
 	virtual void recreatePersonTupleTable();
 	virtual void recreatePersonBLOBTable();
@@ -199,14 +202,16 @@ protected:
 		std::string& pwd,
 		std::string& dbConnString,
 		const std::string& db = "",
-		const std::string& dbEncoding = "");
+		const std::string& dbEncoding = "",
+		bool quiet = false);
 
 	static bool canConnect(const std::string& driver,
 		std::string& dsn,
 		std::string& uid,
 		std::string& pwd,
 		std::string& dbConnString,
-		const std::string& db = "");
+		const std::string& db = "",
+		bool quiet = false);
 
 	bool bindValue(int i);
 
@@ -287,6 +292,12 @@ inline void ODBCTest::dropObject(const std::string& type, const std::string& nam
 inline void ODBCTest::recreateNullableTable()
 {
 	throw Poco::NotImplementedException("ODBCTest::recreateNullableTable()");
+}
+
+
+inline void ODBCTest::recreateNullableStringTable()
+{
+	throw Poco::NotImplementedException("ODBCTest::recreateNullableStringTable()");
 }
 
 

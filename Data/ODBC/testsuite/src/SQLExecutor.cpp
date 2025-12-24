@@ -122,7 +122,7 @@ SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession,
 	CppUnit::TestCase(name),
 	_pSession(pSession),
 	_pEncSession(pEncSession),
-	_dataExecutor("Poco::Data SQL Executor", pSession, pEncSession)
+	_dataExecutor(name, pSession, pEncSession)
 {
 }
 
@@ -547,7 +547,8 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				}
 				else
 				{
-					assertTrue (59 == sixth.second);
+					// Some drivers round up (59), others truncate (58)
+					assertTrue (58 == sixth.second || 59 == sixth.second);
 				}
 			}
 

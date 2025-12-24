@@ -1332,6 +1332,36 @@ void ODBCTest::testNullable()
 }
 
 
+void ODBCTest::testStdOptional()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateNullableStringTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->stdOptional();
+		i += 2;
+	}
+}
+
+
+void ODBCTest::testStdTupleWithOptional()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateNullableStringTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->stdTupleWithOptional();
+		i += 2;
+	}
+}
+
+
 void ODBCTest::testUnicode()
 {
 #if defined (POCO_ODBC_UNICODE)
@@ -1392,7 +1422,8 @@ bool ODBCTest::canConnect(const std::string& driver,
 	std::string& uid,
 	std::string& pwd,
 	std::string& dbConnString,
-	const std::string& db)
+	const std::string& db,
+	bool quiet)
 {
 	Utility::DriverMap::iterator itDrv = _drivers.begin();
 	for (; itDrv != _drivers.end(); ++itDrv)
@@ -1411,7 +1442,8 @@ bool ODBCTest::canConnect(const std::string& driver,
 		uid = "";
 		pwd = "";
 		dbConnString = "";
-		std::cout << driver << " driver NOT found, tests not available." << std::endl;
+		if (!quiet)
+			std::cout << driver << " driver NOT found, tests not available." << std::endl;
 		return false;
 	}
 
@@ -1460,10 +1492,11 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	std::string& pwd,
 	std::string& dbConnString,
 	const std::string& db,
-	const std::string& dbEncoding)
+	const std::string& dbEncoding,
+	bool quiet)
 {
 	Utility::drivers(_drivers);
-	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db)) return nullptr;
+	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db, quiet)) return nullptr;
 
 	try
 	{

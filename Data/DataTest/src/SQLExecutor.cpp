@@ -44,6 +44,8 @@
 #include <iostream>
 #include <sstream>
 #include <iterator>
+#include <optional>
+#include <tuple>
 
 
 using Poco::Data::Session;
@@ -4002,16 +4004,29 @@ void SQLExecutor::setTransactionIsolation(Session& session, Poco::UInt32 ti)
 
 void SQLExecutor::autoCommit()
 {
-	bool autoCommit = session().getFeature("autoCommit");
+	try
+	{
+		bool autoCommit = session().getFeature("autoCommit");
 
-	session().setFeature("autoCommit", true);
-	assertTrue (!session().isTransaction());
-	session().setFeature("autoCommit", false);
-	assertTrue (!session().isTransaction());
-	session().setFeature("autoCommit", true);
-	assertTrue (!session().isTransaction());
+		session().setFeature("autoCommit", true);
+		assertTrue (!session().isTransaction());
+		session().setFeature("autoCommit", false);
+		assertTrue (!session().isTransaction());
+		session().setFeature("autoCommit", true);
+		assertTrue (!session().isTransaction());
 
-	session().setFeature("autoCommit", autoCommit);
+		session().setFeature("autoCommit", autoCommit);
+	}
+	catch(const Poco::Exception& ex)
+	{
+		std::cerr << ex.displayText() << std::endl;
+		throw;
+	}
+	catch(const std::exception& ex)
+	{
+		std::cerr << ex.what() << std::endl;
+		throw;
+	}
 }
 
 
@@ -4019,16 +4034,16 @@ void SQLExecutor::transactionIsolation()
 {
 	try
 	{
-	auto ti = session().getTransactionIsolation();
+		auto ti = session().getTransactionIsolation();
 
-	// these are just calls to check the transactional capabilities of the session
-	// they will print diagnostics to stderr if a transaction isolation level is not supported
-	setTransactionIsolation(session(), Session::TRANSACTION_READ_UNCOMMITTED);
-	setTransactionIsolation(session(), Session::TRANSACTION_REPEATABLE_READ);
-	setTransactionIsolation(session(), Session::TRANSACTION_SERIALIZABLE);
-	setTransactionIsolation(session(), Session::TRANSACTION_READ_COMMITTED);
+		// these are just calls to check the transactional capabilities of the session
+		// they will print diagnostics to stderr if a transaction isolation level is not supported
+		setTransactionIsolation(session(), Session::TRANSACTION_READ_UNCOMMITTED);
+		setTransactionIsolation(session(), Session::TRANSACTION_REPEATABLE_READ);
+		setTransactionIsolation(session(), Session::TRANSACTION_SERIALIZABLE);
+		setTransactionIsolation(session(), Session::TRANSACTION_READ_COMMITTED);
 
-	setTransactionIsolation(session(), ti);
+		setTransactionIsolation(session(), ti);
 	}
 	catch(const Poco::Exception& ex)
 	{
@@ -4603,6 +4618,132 @@ void SQLExecutor::encoding(const std::string& dbConnString)
 		std::cerr << ex.what() << std::endl;
 		throw;
 	}
+}
+
+
+void SQLExecutor::stdOptional()
+{
+	Int32 id = 0;
+	std::optional<std::string> address("Address");
+	std::optional<Int32> age = 10;
+
+	try { session() << formatSQL("INSERT INTO NullableStringTest VALUES(?, ?, ?)"), use(id), use(address), use(age), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	id++;
+	address = null;
+	age = null;
+
+	try { session() << formatSQL("INSERT INTO NullableStringTest VALUES(?, ?, ?)"), use(id), use(address), use(age), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	std::optional<std::string> resAddress;
+	std::optional<Int32> resAge;
+
+	try { session() << formatSQL("SELECT Address, Age FROM NullableStringTest WHERE Id = ?"), into(resAddress), into(resAge), use(id), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	assertTrue(resAddress == address);
+	assertTrue(resAge == age);
+	assertTrue(!resAddress.has_value());
+	assertTrue(null == resAddress);
+	assertTrue(resAddress == null);
+
+	resAddress = std::string("Test");
+	assertTrue(resAddress.has_value());
+	assertTrue(resAddress == std::string("Test"));
+	assertTrue(std::string("Test") == resAddress);
+	assertTrue(null != resAddress);
+	assertTrue(resAddress != null);
+}
+
+
+void SQLExecutor::stdTupleWithOptional()
+{
+	using Info = std::tuple<Int32, std::optional<std::string>, std::optional<Int32>>;
+
+	Info info(0, std::string("Address"), 10);
+
+	try { session() << formatSQL("INSERT INTO NullableStringTest VALUES(?, ?, ?)"), use(info), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	using std::get;
+
+	get<0>(info)++;
+	get<1>(info).reset();
+
+	try { session() << formatSQL("INSERT INTO NullableStringTest VALUES(?, ?, ?)"), use(info), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	get<0>(info)++;
+	get<1>(info) = std::string("Address!");
+	get<2>(info).reset();
+
+	try { session() << formatSQL("INSERT INTO NullableStringTest VALUES(?, ?, ?)"), use(info), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	std::vector<Info> infos;
+	infos.push_back(Info(10, std::string("A"), 0));
+	infos.push_back(Info(11, std::nullopt, 12));
+	infos.push_back(Info(12, std::string("B"), std::nullopt));
+
+	try { session() << formatSQL("INSERT INTO NullableStringTest VALUES(?, ?, ?)"), use(infos), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	std::vector<Info> result;
+
+	try { session() << "SELECT Id, Address, Age FROM NullableStringTest", into(result), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	assertTrue(get<1>(result[0]) == std::string("Address"));
+	assertTrue(get<2>(result[0]) == 10);
+
+	assertTrue(get<1>(result[1]) == null);
+	assertTrue(get<2>(result[1]) == 10);
+
+	assertTrue(get<1>(result[2]) == std::string("Address!"));
+	assertTrue(get<2>(result[2]) == null);
+
+	assertTrue(get<1>(result[3]) == std::string("A"));
+	assertTrue(get<2>(result[3]) == 0);
+
+	assertTrue(get<1>(result[4]) == null);
+	assertTrue(get<2>(result[4]) == 12);
+
+	assertTrue(get<1>(result[5]) == std::string("B"));
+	assertTrue(get<2>(result[5]) == null);
 }
 
 

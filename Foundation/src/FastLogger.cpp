@@ -1696,6 +1696,7 @@ void FastLogger::ensureBackendStarted()
 		// Use a no-op error notifier to suppress queue reallocation messages
 		options.error_notifier = [](std::string const&) { /* suppress */ };
 
+#if defined(__linux__) || defined(_WIN32)
 		// Check if CPU affinity is enabled (default: false, same as Quill)
 		// Can be set via setBackendOption("enableCpuAffinity", "true") before first logger creation
 		bool enableCpuAffinity = false;
@@ -1733,6 +1734,7 @@ void FastLogger::ensureBackendStarted()
 			}
 		}
 #endif
+#endif // __linux__ || _WIN32
 
 		// Apply any pending backend options
 		{

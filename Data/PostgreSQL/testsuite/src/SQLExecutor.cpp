@@ -142,7 +142,7 @@ private:
 SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession):
 	CppUnit::TestCase(name),
 	_pSession(pSession),
-	_dataExecutor("Poco::Data SQL Executor", pSession, nullptr, true)
+	_dataExecutor(name, pSession, nullptr, true)
 {
 }
 
@@ -1086,4 +1086,16 @@ void SQLExecutor::transaction(const std::string& connect)
 void SQLExecutor::reconnect()
 {
 	_dataExecutor.reconnect();
+}
+
+
+void SQLExecutor::stdOptional()
+{
+	_dataExecutor.stdOptional();
+}
+
+
+void SQLExecutor::stdTupleWithOptional()
+{
+	_dataExecutor.stdTupleWithOptional();
 }

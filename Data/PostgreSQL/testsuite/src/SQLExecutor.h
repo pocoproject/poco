@@ -104,6 +104,9 @@ public:
 
 	void reconnect();
 
+	void stdOptional();
+	void stdTupleWithOptional();
+
 private:
 	void setTransactionIsolation(Poco::Data::Session& session, Poco::UInt32 ti);
 

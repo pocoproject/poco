@@ -903,6 +903,15 @@ void ODBCSQLServerTest::recreateNullableTable()
 }
 
 
+void ODBCSQLServerTest::recreateNullableStringTable()
+{
+	dropObject("TABLE", "NullableStringTest");
+	try { *_pSession << "CREATE TABLE NullableStringTest (Id INTEGER, Address VARCHAR(30), Age INTEGER)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; failmsg ("recreateNullableStringTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; failmsg ("recreateNullableStringTable()"); }
+}
+
+
 void ODBCSQLServerTest::recreatePersonTable()
 {
 	dropObject("TABLE", "Person");
@@ -1203,6 +1212,8 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransactor);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNullable);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStdOptional);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStdTupleWithOptional);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testUnicode);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testEncoding);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testReconnect);

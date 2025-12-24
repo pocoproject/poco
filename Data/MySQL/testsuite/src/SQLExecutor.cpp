@@ -145,7 +145,8 @@ private:
 
 SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession):
 	CppUnit::TestCase(name),
-	_pSession(pSession)
+	_pSession(pSession),
+	_dataExecutor(name, pSession, nullptr, false)
 {
 }
 
@@ -2124,4 +2125,16 @@ void SQLExecutor::sessionPoolAndUnicode(const std::string& connString)
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 
 	assertTrue (text == text2);
+}
+
+
+void SQLExecutor::stdOptional()
+{
+	_dataExecutor.stdOptional();
+}
+
+
+void SQLExecutor::stdTupleWithOptional()
+{
+	_dataExecutor.stdTupleWithOptional();
 }
