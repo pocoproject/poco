@@ -1,7 +1,12 @@
 # Nix shell environment for running Poco::Data::MySQL tests.
 #
+# Install Nix (if not already installed):
+#   sh <(curl -L https://nixos.org/nix/install) --daemon
+#
 # Usage:
-#   nix-shell
+#   nix-shell [--pure]
+#
+# (--pure is recommended to avoid interference from host environment)
 #
 # This sets up MariaDB with ODBC driver, creates a test database,
 # and configures the Poco build environment. The database starts
