@@ -50,6 +50,7 @@ public:
 private:
 	void dropObject(const std::string& type, const std::string& name) override;
 	void recreateNullableTable() override;
+	void recreateNullableStringTable() override;
 	void recreatePersonTable() override;
 	void recreatePersonBLOBTable() override;
 	void recreatePersonDateTable() override;

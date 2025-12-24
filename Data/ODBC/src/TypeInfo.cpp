@@ -36,6 +36,13 @@ TypeInfo::~TypeInfo()
 }
 
 
+void TypeInfo::reset()
+{
+	_typeInfo.clear();
+	_pHDBC = nullptr;
+}
+
+
 void TypeInfo::fillCTypes()
 {
 	_cDataTypes.insert(ValueType(SQL_CHAR, SQL_C_CHAR));

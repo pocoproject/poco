@@ -23,6 +23,8 @@
 #include "Poco/Data/RecordSet.h"
 #include "Poco/Exception.h"
 #include <iostream>
+#include <optional>
+#include <tuple>
 
 using namespace Poco::Data::Keywords;
 
@@ -369,6 +371,8 @@ public:
 		assertTrue(dd.isEmpty());
 	}
 	void nullable();
+	void stdOptional();
+	void stdTupleWithOptional();
 
 	void unicode(const std::string& dbConnString);
 	void encoding(const std::string& dbConnString);

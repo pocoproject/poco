@@ -19,6 +19,6 @@ endif
 
 target         = testrunner
 target_version = 1
-target_libs    = PocoDataMySQL PocoData PocoFoundation CppUnit
+target_libs    = PocoDataMySQL PocoDataTest PocoData PocoFoundation CppUnit
 
 include $(POCO_BASE)/build/rules/exec

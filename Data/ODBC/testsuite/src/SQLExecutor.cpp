@@ -547,7 +547,8 @@ void SQLExecutor::bareboneODBCTest(const std::string& dbConnString,
 				}
 				else
 				{
-					assertTrue (59 == sixth.second);
+					// Some drivers round up (59), others truncate (58)
+					assertTrue (58 == sixth.second || 59 == sixth.second);
 				}
 			}
 

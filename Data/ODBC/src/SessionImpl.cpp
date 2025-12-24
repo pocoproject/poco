@@ -339,7 +339,7 @@ Poco::UInt32 SessionImpl::getTransactionIsolation() const
 
 bool SessionImpl::hasTransactionIsolation(Poco::UInt32 ti) const
 {
-	if (isTransaction()) throw InvalidAccessException();
+	if (isTransaction()) throw InvalidAccessException("Cannot check transaction isolation while in transaction");
 
 	Poco::UInt32 old = getTransactionIsolation();
 	if (old == ti) return true;
@@ -393,6 +393,7 @@ Poco::UInt32 SessionImpl::transactionIsolation(SQLULEN isolation)
 void SessionImpl::autoCommit(const std::string&, bool val)
 {
 	if (val == isAutoCommit()) return;
+
 	if (val && isTransaction())
 	{
 		throw InvalidAccessException("autoCommit not "
@@ -492,6 +493,7 @@ void SessionImpl::close()
 	}
 
 	_db.disconnect();
+	_dataTypes.reset();
 	setProperty("handle", SQL_NULL_HDBC);
 }
 

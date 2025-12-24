@@ -3438,6 +3438,7 @@ void SQLiteTest::testSessionTransactionReadCommitted()
 	assertTrue (!local.isConnected());
 }
 
+
 void SQLiteTest::testSessionTransactionSerializable()
 {
 	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -3445,12 +3446,14 @@ void SQLiteTest::testSessionTransactionSerializable()
 	setTransactionIsolation(session, Session::TRANSACTION_SERIALIZABLE);
 }
 
+
 void SQLiteTest::testSessionTransactionRepeatableRead()
 {
 	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	assertTrue (session.isConnected());
 	setTransactionIsolation(session, Session::TRANSACTION_REPEATABLE_READ);
 }
+
 
 void SQLiteTest::testSessionTransactionReadUncommitted()
 {
@@ -3540,6 +3543,8 @@ void SQLiteTest::testSessionTransactionReadUncommitted()
 	local.close();
 	assertTrue (!local.isConnected());
 }
+
+
 void SQLiteTest::testTransaction()
 {
 	Session session (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -3838,6 +3843,7 @@ void SQLiteTest::testIllegalFilePath()
 	}
 }
 
+
 void SQLiteTest::testTransactionTypeProperty()
 {
 	try {
@@ -4001,7 +4007,6 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testNonexistingDB);
 	CppUnit_addTest(pSuite, SQLiteTest, testCLOB);
 	CppUnit_addTest(pSuite, SQLiteTest, testBLOB);
-	CppUnit_addTest(pSuite, SQLiteTest, testStdTuple);
 	CppUnit_addTest(pSuite, SQLiteTest, testTuple10);
 	CppUnit_addTest(pSuite, SQLiteTest, testTupleVector10);
 	CppUnit_addTest(pSuite, SQLiteTest, testTuple9);

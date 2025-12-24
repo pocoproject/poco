@@ -265,7 +265,7 @@ inline Poco::Any SessionImpl::getMaxFieldSize(const std::string& rName) const
 
 inline void SessionImpl::setDataTypeInfo(const std::string& rName, const Poco::Any& rValue)
 {
-	throw InvalidAccessException();
+	throw InvalidAccessException("dataTypeInfo is read-only");
 }
 
 

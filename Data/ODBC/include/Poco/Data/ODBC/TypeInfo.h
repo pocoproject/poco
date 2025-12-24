@@ -185,6 +185,9 @@ public:
 	void fillTypeInfo(const SQLHDBC* pHDBC);
 		/// Fills the data type info structure for the database.
 
+	void reset();
+		/// Clears cached type info, allowing refill on next fillTypeInfo call.
+
 	Dynamic::Var getInfo(SQLSMALLINT type, const std::string& param) const;
 		/// Returns information about specified data type as specified by parameter 'type'.
 		/// The requested information is specified by parameter 'param'.

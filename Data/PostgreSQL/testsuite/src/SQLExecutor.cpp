@@ -1087,3 +1087,15 @@ void SQLExecutor::reconnect()
 {
 	_dataExecutor.reconnect();
 }
+
+
+void SQLExecutor::stdOptional()
+{
+	_dataExecutor.stdOptional();
+}
+
+
+void SQLExecutor::stdTupleWithOptional()
+{
+	_dataExecutor.stdTupleWithOptional();
+}
