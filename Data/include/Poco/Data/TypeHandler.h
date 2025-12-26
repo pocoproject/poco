@@ -32,6 +32,9 @@
 #if defined(POCO_COMPILER_GCC) && (__GNUC__ >= 12)
 	#pragma GCC diagnostic push
 	#pragma GCC diagnostic ignored "-Wuse-after-free"
+#elif defined (POCO_COMPILER_MSVC)
+#pragma warning(push)
+#pragma warning(disable : 4624)
 #endif
 
 namespace Poco {
@@ -536,6 +539,8 @@ public:
 
 #if defined(POCO_COMPILER_GCC) && (__GNUC__ >= 12)
 	#pragma GCC diagnostic pop
+#elif defined (POCO_COMPILER_MSVC)
+#pragma warning(pop)
 #endif
 
 #endif // Data_TypeHandler_INCLUDED
