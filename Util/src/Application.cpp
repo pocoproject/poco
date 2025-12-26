@@ -379,7 +379,7 @@ Application::ArgVec Application::toArgs(int argc, char* argv[])
 }
 
 #if defined(_WIN32)
-ArgVec toArgs(int argc, wchar_t* argv[])
+Application::ArgVec Application::toArgs(int argc, wchar_t* argv[])
 {
 	ArgVec args;
 	args.reserve(argc);
