@@ -19,16 +19,6 @@ namespace Poco {
 namespace Util {
 
 
-Subsystem::Subsystem()
-{
-}
-
-
-Subsystem::~Subsystem()
-{
-}
-
-
 void Subsystem::reinitialize(Application& app)
 {
 	uninitialize();
