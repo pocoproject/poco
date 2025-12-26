@@ -137,14 +137,16 @@ public:
 		///     Application::instance().addSubsystem(new MySubsystem);
 		/// is okay.
 
-	void init(int argc, char* argv[]);
+	void init(int argc, char* argv[])
 		/// Processes the application's command line arguments
 		/// and sets the application's properties (e.g.,
 		/// "application.path", "application.name", etc.).
 		///
 		/// Note that as of release 1.3.7, init() no longer
 		/// calls initialize(). This is now called from run().
-
+	{
+		init(toArgs(argc, argv));
+	}
 #if defined(_WIN32)
 	void init(int argc, wchar_t* argv[]);
 		/// Processes the application's command line arguments
@@ -156,6 +158,9 @@ public:
 		///
 		/// This Windows-specific version of init is used for passing
 		/// Unicode command line arguments from wmain().
+	{
+		init(toArgs(argc, argv));
+	}
 #endif
 
 	void init(const ArgVec& args);
@@ -326,31 +331,31 @@ public:
 		///
 		/// Returns zero width and height if the window size cannot be determined.
 
-	const char* name() const;
+	const char* name() const override;
 
 protected:
-	void initialize(Application& self);
+	void initialize(Application& self) override;
 		/// Initializes the application and all registered subsystems.
 		/// Subsystems are always initialized in the exact same order
 		/// in which they have been registered.
 		///
 		/// Overriding implementations must call the base class implementation.
 
-	void uninitialize();
+	void uninitialize() override;
 		/// Uninitializes the application and all registered subsystems.
 		/// Subsystems are always uninitialized in reverse order in which
 		/// they have been initialized.
 		///
 		/// Overriding implementations must call the base class implementation.
 
-	void reinitialize(Application& self);
+	void reinitialize(Application& self) override;
 		/// Re-nitializes the application and all registered subsystems.
 		/// Subsystems are always reinitialized in the exact same order
 		/// in which they have been registered.
 		///
 		/// Overriding implementations must call the base class implementation.
 
-	virtual void defineOptions(OptionSet& options);
+	void defineOptions(OptionSet& options) override;
 		/// Called before command line processing begins.
 		/// If a subclass wants to support command line arguments,
 		/// it must override this method.
@@ -402,17 +407,22 @@ protected:
 	void init();
 		/// Common initialization code.
 
-	~Application();
+	~Application() override;
 		/// Destroys the Application and deletes all registered subsystems.
+
+	static ArgVec toArgs(int argc, char* argv[]);
+
+#if defined(_WIN32)
+	static ArgVec toArgs(int argc, wchar_t* argv[]);
+#endif
 
 private:
 	void setup();
-	void setArgs(int argc, char* argv[]);
 	void setArgs(const ArgVec& args);
 	void processOptions();
 
-	typedef LayeredConfiguration::Ptr ConfigPtr;
-	typedef Poco::Logger::Ptr LoggerPtr;
+	using ConfigPtr = LayeredConfiguration::Ptr;
+	using LoggerPtr = Poco::Logger::Ptr;
 
 	ConfigPtr       _pConfig;
 	SubsystemVec    _subsystems;
@@ -435,8 +445,6 @@ private:
 
 	friend class LoggingSubsystem;
 
-	Application(const Application&);
-	Application& operator = (const Application&);
 };
 
 

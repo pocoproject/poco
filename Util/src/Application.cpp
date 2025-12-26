@@ -85,14 +85,8 @@ Application::Application():
 
 
 Application::Application(int argc, char* argv[]):
-	_pConfig(new LayeredConfiguration),
-	_initialized(false),
-	_unixOptions(true),
-	_pLogger(&Logger::get("ApplicationStartup"s)),
-	_stopOptionsProcessing(false),
-	_ignoreUnknownOptions(false)
+    Application()
 {
-	setup();
 	init(argc, argv);
 }
 
@@ -135,28 +129,6 @@ void Application::addSubsystem(Subsystem* pSubsystem)
 
 	_subsystems.push_back(pSubsystem);
 }
-
-
-void Application::init(int argc, char* argv[])
-{
-	setArgs(argc, argv);
-	init();
-}
-
-
-#if defined(_WIN32)
-void Application::init(int argc, wchar_t* argv[])
-{
-	std::vector<std::string> args;
-	for (int i = 0; i < argc; ++i)
-	{
-		std::string arg;
-		Poco::UnicodeConverter::toUTF8(argv[i], arg);
-		args.push_back(arg);
-	}
-	init(args);
-}
-#endif
 
 
 void Application::init(const ArgVec& args)
@@ -203,7 +175,8 @@ void Application::uninitialize()
 {
 	if (_initialized)
 	{
-		for (SubsystemVec::reverse_iterator it = _subsystems.rbegin(); it != _subsystems.rend(); ++it)
+		// uninitialize subsystems in reverse order
+		for (auto it = _subsystems.rbegin(); it != _subsystems.rend(); ++it)
 		{
 			_pLogger->debug("Uninitializing subsystem: "s + (*it)->name());
 			(*it)->uninitialize();
@@ -396,19 +369,29 @@ int Application::main(const ArgVec& args)
 }
 
 
-void Application::setArgs(int argc, char* argv[])
+Application::ArgVec Application::toArgs(int argc, char* argv[])
 {
-	_command = argv[0];
-	_pConfig->setInt("application.argc"s, argc);
-	_unprocessedArgs.reserve(argc);
-	std::string argvKey = "application.argv[";
+	ArgVec args;
+	args.reserve(argc);
+	for (int i = 0; i < argc; ++i)
+		args.push_back(std::string(argv[i]));
+	return args;
+}
+
+#if defined(_WIN32)
+ArgVec toArgs(int argc, wchar_t* argv[])
+{
+	ArgVec args;
+	args.reserve(argc);
 	for (int i = 0; i < argc; ++i)
 	{
-		std::string arg(argv[i]);
-		_pConfig->setString(argvKey + NumberFormatter::format(i) + "]", arg);
-		_unprocessedArgs.push_back(arg);
+		std::string arg;
+		Poco::UnicodeConverter::toUTF8(argv[i], arg);
+		args.push_back(arg);
 	}
+	return args;
 }
+#endif
 
 
 void Application::setArgs(const ArgVec& args)
