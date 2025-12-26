@@ -148,7 +148,7 @@ public:
 		init(toArgs(argc, argv));
 	}
 #if defined(_WIN32)
-	void init(int argc, wchar_t* argv[]);
+	void init(int argc, wchar_t* argv[])
 		/// Processes the application's command line arguments
 		/// and sets the application's properties (e.g.,
 		/// "application.path", "application.name", etc.).
