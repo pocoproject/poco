@@ -19,16 +19,6 @@ namespace Poco {
 namespace Util {
 
 
-AbstractOptionCallback::AbstractOptionCallback()
-{
-}
-
-
-AbstractOptionCallback::AbstractOptionCallback(const AbstractOptionCallback&)
-{
-}
-
-
 AbstractOptionCallback::~AbstractOptionCallback()
 {
 }

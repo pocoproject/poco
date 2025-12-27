@@ -20,16 +20,6 @@ namespace Poco {
 namespace Util {
 
 
-MapConfiguration::MapConfiguration()
-{
-}
-
-
-MapConfiguration::~MapConfiguration()
-{
-}
-
-
 void MapConfiguration::copyTo(AbstractConfiguration& config)
 {
 	AbstractConfiguration::ScopedLock lock(*this);
@@ -44,7 +34,7 @@ void MapConfiguration::copyTo(AbstractConfiguration& config)
 void MapConfiguration::clear()
 {
 	AbstractConfiguration::ScopedLock lock(*this);
-	
+
 	_map.clear();
 }
 

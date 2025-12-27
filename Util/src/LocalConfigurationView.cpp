@@ -25,11 +25,6 @@ LocalConfigurationView::LocalConfigurationView(const std::string& prefix, Abstra
 }
 
 
-LocalConfigurationView::~LocalConfigurationView()
-{
-}
-
-
 bool LocalConfigurationView::getRaw(const std::string& key, std::string& value) const
 {
 	std::string translatedKey = translateKey(key);

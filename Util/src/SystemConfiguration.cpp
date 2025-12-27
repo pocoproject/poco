@@ -60,16 +60,6 @@ const std::string SystemConfiguration::PID            = "system.pid";
 const std::string SystemConfiguration::ENV            = "system.env.";
 
 
-SystemConfiguration::SystemConfiguration()
-{
-}
-
-
-SystemConfiguration::~SystemConfiguration()
-{
-}
-
-
 bool SystemConfiguration::getRaw(const std::string& key, std::string& value) const
 {
 	if (key == OSNAME)

@@ -41,11 +41,6 @@ AbstractConfiguration::AbstractConfiguration():
 }
 
 
-AbstractConfiguration::~AbstractConfiguration()
-{
-}
-
-
 bool AbstractConfiguration::hasProperty(const std::string& key) const
 {
 	Mutex::ScopedLock lock(_mutex);
@@ -174,7 +169,7 @@ Poco::Int16 AbstractConfiguration::getInt16(const std::string& key) const
 		throw NotFoundException(key);
 }
 
-	
+
 Poco::Int16 AbstractConfiguration::getInt16(const std::string& key, Poco::Int16 defaultValue) const
 {
 	Mutex::ScopedLock lock(_mutex);
@@ -336,7 +331,7 @@ void AbstractConfiguration::setInt16(const std::string& key, Poco::Int16 value)
 	setRawWithEvent(key, NumberFormatter::format(value));
 }
 
-	
+
 void AbstractConfiguration::setUInt16(const std::string& key, Poco::UInt16 value)
 {
 	setRawWithEvent(key, NumberFormatter::format(value));
@@ -348,7 +343,7 @@ void AbstractConfiguration::setInt32(const std::string& key, Poco::Int32 value)
 	setRawWithEvent(key, NumberFormatter::format(value));
 }
 
-	
+
 void AbstractConfiguration::setUInt32(const std::string& key, Poco::UInt32 value)
 {
 	setRawWithEvent(key, NumberFormatter::format(value));

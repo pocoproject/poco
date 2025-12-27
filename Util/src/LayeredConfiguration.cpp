@@ -25,16 +25,6 @@ namespace Poco {
 namespace Util {
 
 
-LayeredConfiguration::LayeredConfiguration()
-{
-}
-
-
-LayeredConfiguration::~LayeredConfiguration()
-{
-}
-
-
 void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig)
 {
 	add(pConfig, highest(), false);

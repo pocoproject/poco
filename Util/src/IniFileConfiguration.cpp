@@ -35,11 +35,6 @@ namespace Poco {
 namespace Util {
 
 
-IniFileConfiguration::IniFileConfiguration()
-{
-}
-
-
 IniFileConfiguration::IniFileConfiguration(std::istream& istr)
 {
 	load(istr);
@@ -49,11 +44,6 @@ IniFileConfiguration::IniFileConfiguration(std::istream& istr)
 IniFileConfiguration::IniFileConfiguration(const std::string& path)
 {
 	load(path);
-}
-
-
-IniFileConfiguration::~IniFileConfiguration()
-{
 }
 
 

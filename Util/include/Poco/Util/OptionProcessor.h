@@ -75,10 +75,10 @@ public:
 	OptionProcessor(const OptionSet& options);
 		/// Creates the OptionProcessor, using the given OptionSet.
 
-	~OptionProcessor();
+	~OptionProcessor() = default;
 		/// Destroys the OptionProcessor.
 
-	void setUnixStyle(bool flag);
+	void setUnixStyle(bool flag)
 		/// Enables (flag == true) or disables (flag == false) Unix-style
 		/// option processing.
 		///
@@ -89,9 +89,15 @@ public:
 		///
 		/// If Unix-style processing is disabled, options are expected to
 		/// begin with a slash ('/'), followed by a (partial) full option name.
+	{
+		_unixStyle = flag;
+	}
 
-	bool isUnixStyle() const;
+	bool isUnixStyle() const
 		/// Returns true iff Unix-style option processing is enabled.
+	{
+		return _unixStyle;
+	}
 
 	bool process(const std::string& argument, std::string& optionName, std::string& optionArg);
 		/// Examines and processes the given command line argument.
@@ -122,13 +128,6 @@ private:
 };
 
 
-//
-// inlines
-//
-inline bool OptionProcessor::isUnixStyle() const
-{
-	return _unixStyle;
-}
 
 
 } } // namespace Poco::Util

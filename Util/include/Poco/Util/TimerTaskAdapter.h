@@ -35,6 +35,8 @@ class TimerTaskAdapter: public TimerTask
 public:
 	typedef void (C::*Callback)(TimerTask&);
 
+	TimerTaskAdapter() = delete;
+
 	TimerTaskAdapter(C& object, Callback method): _pObject(&object), _method(method)
 		/// Creates the TimerTaskAdapter, using the given
 		/// object and its member function as task target.
@@ -50,14 +52,10 @@ public:
 	}
 
 protected:
-	~TimerTaskAdapter()
+	~TimerTaskAdapter() = default;
 		/// Destroys the TimerTaskAdapter.
-	{
-	}
 
 private:
-	TimerTaskAdapter();
-
 	C*       _pObject;
 	Callback _method;
 };

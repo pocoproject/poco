@@ -27,11 +27,6 @@ ConfigurationView::ConfigurationView(const std::string& prefix, AbstractConfigur
 }
 
 
-ConfigurationView::~ConfigurationView()
-{
-}
-
-
 bool ConfigurationView::getRaw(const std::string& key, std::string& value) const
 {
 	std::string translatedKey = translateKey(key);

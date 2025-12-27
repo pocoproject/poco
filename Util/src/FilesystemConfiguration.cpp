@@ -38,11 +38,6 @@ FilesystemConfiguration::FilesystemConfiguration(const std::string& path):
 }
 
 
-FilesystemConfiguration::~FilesystemConfiguration()
-{
-}
-
-
 void FilesystemConfiguration::clear()
 {
 	File regDir(_path);

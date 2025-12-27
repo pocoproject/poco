@@ -29,11 +29,6 @@ namespace Poco {
 namespace Util {
 
 
-PropertyFileConfiguration::PropertyFileConfiguration()
-{
-}
-
-
 PropertyFileConfiguration::PropertyFileConfiguration(std::istream& istr)
 {
 	load(istr);
@@ -43,11 +38,6 @@ PropertyFileConfiguration::PropertyFileConfiguration(std::istream& istr)
 PropertyFileConfiguration::PropertyFileConfiguration(const std::string& path)
 {
 	load(path);
-}
-
-
-PropertyFileConfiguration::~PropertyFileConfiguration()
-{
 }
 
 

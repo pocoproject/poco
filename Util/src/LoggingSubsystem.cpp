@@ -26,16 +26,6 @@ namespace Poco {
 namespace Util {
 
 
-LoggingSubsystem::LoggingSubsystem()
-{
-}
-
-
-LoggingSubsystem::~LoggingSubsystem()
-{
-}
-
-
 const char* LoggingSubsystem::name() const
 {
 	return "Logging Subsystem";

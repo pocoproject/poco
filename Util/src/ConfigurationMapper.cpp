@@ -31,11 +31,6 @@ ConfigurationMapper::ConfigurationMapper(const std::string& fromPrefix, const st
 }
 
 
-ConfigurationMapper::~ConfigurationMapper()
-{
-}
-
-
 bool ConfigurationMapper::getRaw(const std::string& key, std::string& value) const
 {
 	std::string translatedKey = translateKey(key);

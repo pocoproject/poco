@@ -32,11 +32,6 @@ RegExpValidator::RegExpValidator(const std::string& regexp):
 }
 
 
-RegExpValidator::~RegExpValidator()
-{
-}
-
-
 void RegExpValidator::validate(const Option& option, const std::string& value)
 {
 	if (!RegularExpression::match(value, _regexp, RegularExpression::RE_ANCHORED | RegularExpression::RE_UTF8))

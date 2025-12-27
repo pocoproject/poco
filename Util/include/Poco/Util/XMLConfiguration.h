@@ -80,53 +80,29 @@ class Util_API XMLConfiguration: public AbstractConfiguration
 	/// in them.
 {
 public:
-	XMLConfiguration();
-		/// Creates an empty XMLConfiguration with a "config" root element.
-
-	XMLConfiguration(char delim);
+	XMLConfiguration(char delim = '.');
 		/// Creates an empty XMLConfiguration with a "config" root element,
-		/// using the given delimiter char instead of the default '.'.
+		/// using the given delimiter char.
 
-	XMLConfiguration(Poco::XML::InputSource* pInputSource);
+	XMLConfiguration(Poco::XML::InputSource* pInputSource, char delim = '.');
 		/// Creates an XMLConfiguration and loads the XML document from
-		/// the given InputSource.
+		/// the given InputSource, using the given delimiter char.
 
-	XMLConfiguration(Poco::XML::InputSource* pInputSource, char delim);
+	XMLConfiguration(std::istream& istr, char delim = '.');
 		/// Creates an XMLConfiguration and loads the XML document from
-		/// the given InputSource. Uses the given delimiter char instead
-		/// of the default '.'.
+		/// the given stream, using the given delimiter char.
 
-	XMLConfiguration(std::istream& istr);
+	XMLConfiguration(const std::string& path, char delim = '.');
 		/// Creates an XMLConfiguration and loads the XML document from
-		/// the given stream.
+		/// the given path, using the given delimiter char.
 
-	XMLConfiguration(std::istream& istr, char delim);
-		/// Creates an XMLConfiguration and loads the XML document from
-		/// the given stream. Uses the given delimiter char instead
-		/// of the default '.'.
+	XMLConfiguration(const Poco::XML::Document* pDocument, char delim = '.');
+		/// Creates the XMLConfiguration using the given XML document
+		/// using the given delimiter char.
 
-	XMLConfiguration(const std::string& path);
-		/// Creates an XMLConfiguration and loads the XML document from
-		/// the given path.
-
-	XMLConfiguration(const std::string& path, char delim);
-		/// Creates an XMLConfiguration and loads the XML document from
-		/// the given path. Uses the given delimiter char instead
-		/// of the default '.'.
-
-	XMLConfiguration(const Poco::XML::Document* pDocument);
-		/// Creates the XMLConfiguration using the given XML document.
-
-	XMLConfiguration(const Poco::XML::Document* pDocument, char delim);
-		/// Creates the XMLConfiguration using the given XML document.
-		/// Uses the given delimiter char instead of the default '.'.
-
-	XMLConfiguration(const Poco::XML::Node* pNode);
-		/// Creates the XMLConfiguration using the given XML node.
-
-	XMLConfiguration(const Poco::XML::Node* pNode, char delim);
-		/// Creates the XMLConfiguration using the given XML node.
-		/// Uses the given delimiter char instead of the default '.'.
+	XMLConfiguration(const Poco::XML::Node* pNode, char delim = '.');
+		/// Creates the XMLConfiguration using the given XML node
+		/// using the given delimiter char.
 
 	void load(Poco::XML::InputSource* pInputSource);
 		/// Loads the XML document containing the configuration data
@@ -179,23 +155,29 @@ public:
 		/// This can be used to use a DOMWriter with custom options.
 
 protected:
-	bool getRaw(const std::string& key, std::string& value) const;
-	void setRaw(const std::string& key, const std::string& value);
-	void enumerate(const std::string& key, Keys& range) const;
-	void removeRaw(const std::string& key);
-	~XMLConfiguration();
+	bool getRaw(const std::string& key, std::string& value) const override;
+	void setRaw(const std::string& key, const std::string& value) override;
+	void enumerate(const std::string& key, Keys& range) const override;
+	void removeRaw(const std::string& key) override;
+
+	~XMLConfiguration() = default;
 
 private:
-	const Poco::XML::Node* findNode(const std::string& key) const;
-	Poco::XML::Node* findNode(const std::string& key);
-	Poco::XML::Node* findNode(std::string::const_iterator& it, const std::string::const_iterator& end, Poco::XML::Node* pNode, bool create = false) const;
-	static Poco::XML::Node* findElement(const std::string& name, Poco::XML::Node* pNode, bool create);
-	static Poco::XML::Node* findElement(int index, Poco::XML::Node* pNode, bool create);
-	static Poco::XML::Node* findElement(const std::string& attr, const std::string& value, Poco::XML::Node* pNode);
-	static Poco::XML::Node* findAttribute(const std::string& name, Poco::XML::Node* pNode, bool create);
+	using Document = Poco::XML::Document;
+	using Node = Poco::XML::Node;
+	using Element = Poco::XML::Element;
+	using Attr = Poco::XML::Attr;
 
-	Poco::XML::AutoPtr<Poco::XML::Node>     _pRoot;
-	Poco::XML::AutoPtr<Poco::XML::Document> _pDocument;
+	const Node* findNode(const std::string& key) const;
+	Node* findNode(const std::string& key);
+	Node* findNode(std::string::const_iterator& it, const std::string::const_iterator& end, Node* pNode, bool create = false) const;
+	static Node* findElement(const std::string& name, Node* pNode, bool create);
+	static Node* findElement(int index, Node* pNode, bool create);
+	static Node* findElement(const std::string& attr, const std::string& value, Node* pNode);
+	static Node* findAttribute(const std::string& name, Node* pNode, bool create);
+
+	Poco::XML::AutoPtr<Node>     _pRoot;
+	Poco::XML::AutoPtr<Document> _pDocument;
 	char _delim;
 };
 

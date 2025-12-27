@@ -21,18 +21,8 @@ namespace Poco {
 namespace Util {
 
 
-OptionSet::OptionSet()
-{
-}
-
-
 OptionSet::OptionSet(const OptionSet& options):
 	_options(options._options)
-{
-}
-
-
-OptionSet::~OptionSet()
 {
 }
 

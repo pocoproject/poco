@@ -36,13 +36,13 @@ class Util_API LoggingSubsystem: public Subsystem
 	/// is not specified.
 {
 public:
-	LoggingSubsystem();
+	LoggingSubsystem() = default;
 	const char* name() const;
 
 protected:
 	void initialize(Application& self);
 	void uninitialize();
-	~LoggingSubsystem();
+	~LoggingSubsystem() = default;
 };
 
 

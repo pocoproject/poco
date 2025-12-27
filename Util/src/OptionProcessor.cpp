@@ -30,17 +30,6 @@ OptionProcessor::OptionProcessor(const OptionSet& options):
 }
 
 
-OptionProcessor::~OptionProcessor()
-{
-}
-
-
-void OptionProcessor::setUnixStyle(bool flag)
-{
-	_unixStyle = flag;
-}
-
-
 bool OptionProcessor::process(const std::string& argument, std::string& optionName, std::string& optionArg)
 {
 	optionName.clear();

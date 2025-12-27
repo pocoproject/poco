@@ -56,11 +56,6 @@ JSONConfiguration::JSONConfiguration(const JSON::Object::Ptr& object) : _object(
 }
 
 
-JSONConfiguration::~JSONConfiguration()
-{
-}
-
-
 void JSONConfiguration::load(const std::string& path)
 {
 	Poco::FileInputStream fis(path);
@@ -159,7 +154,7 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 				JSON::Array::Ptr newArray;
 				JSON::Array::Ptr parentArray;
 				JSON::Array::Ptr topArray;
-				for(std::vector<int>::iterator it = indexes.begin(); it != indexes.end(); ++it)
+				for (int idx: indexes)
 				{
 					newArray = new JSON::Array();
 					if (topArray.isNull())
@@ -167,12 +162,12 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 						topArray = newArray;
 					}
 
-					if (! parentArray.isNull())
+					if (!parentArray.isNull())
 					{
 						parentArray->add(newArray);
 					}
 
-					for(int i = 0; i <= *it - 1; ++i)
+					for (int i = 0; i < idx; ++i)
 					{
 						Poco::Dynamic::Var nullValue;
 						newArray->add(nullValue);
@@ -205,7 +200,7 @@ JSON::Object::Ptr JSONConfiguration::findStart(const std::string& key, std::stri
 				{
 					JSON::Array::Ptr arr = result.extract<JSON::Array::Ptr>();
 
-					for(std::vector<int>::iterator it = indexes.begin(); it != indexes.end() - 1; ++it)
+					for (auto it = indexes.begin(); it != indexes.end() - 1; ++it)
 					{
 						JSON::Array::Ptr currentArray = arr;
 						arr = arr->getArray(*it);
@@ -282,7 +277,7 @@ void JSONConfiguration::setValue(const std::string& key, const Dynamic::Var& val
 		}
 
 		JSON::Array::Ptr arr = result.extract<JSON::Array::Ptr>();
-		for (std::vector<int>::iterator it = indexes.begin(); it != indexes.end() - 1; ++it)
+		for (auto it = indexes.begin(); it != indexes.end() - 1; ++it)
 		{
 			JSON::Array::Ptr nextArray = arr->getArray(*it);
 			if (nextArray.isNull())
@@ -374,7 +369,7 @@ void JSONConfiguration::removeRaw(const std::string& key)
 		if (!result.isEmpty() && result.type() == typeid(JSON::Array::Ptr))
 		{
 			JSON::Array::Ptr arr = result.extract<JSON::Array::Ptr>();
-			for(std::vector<int>::iterator it = indexes.begin(); it != indexes.end() - 1; ++it)
+			for (auto it = indexes.begin(); it != indexes.end() - 1; ++it)
 			{
 				arr = arr->getArray(*it);
 			}

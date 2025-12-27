@@ -61,6 +61,10 @@ public:
 		/// Creates the Timer, using a timer thread with
 		/// the given priority.
 
+	Timer(const Timer&) = delete;
+
+	Timer& operator = (const Timer&) = delete;
+
 	~Timer();
 		/// Destroys the Timer, cancelling all pending tasks.
 
@@ -186,9 +190,6 @@ protected:
 	static void validateTask(const TimerTask::Ptr& pTask);
 
 private:
-	Timer(const Timer&);
-	Timer& operator = (const Timer&);
-
 	Poco::TimedNotificationQueue _queue;
 	Poco::Thread _thread;
 };

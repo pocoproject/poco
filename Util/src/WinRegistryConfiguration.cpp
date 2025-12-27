@@ -37,11 +37,6 @@ WinRegistryConfiguration::WinRegistryConfiguration(const std::string& rootPath, 
 }
 
 
-WinRegistryConfiguration::~WinRegistryConfiguration()
-{
-}
-
-
 bool WinRegistryConfiguration::getRaw(const std::string& key, std::string& value) const
 {
 	std::string keyName;

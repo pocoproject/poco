@@ -39,8 +39,8 @@ public:
 		/// Destroys the AbstractOptionCallback.
 
 protected:
-	AbstractOptionCallback();
-	AbstractOptionCallback(const AbstractOptionCallback&);
+	AbstractOptionCallback() = default;
+	AbstractOptionCallback(const AbstractOptionCallback&) = default;
 };
 
 
@@ -70,10 +70,8 @@ public:
 	{
 	}
 
-	~OptionCallback()
+	~OptionCallback() = default;
 		/// Destroys the OptionCallback.
-	{
-	}
 
 	OptionCallback& operator = (const OptionCallback& cb)
 	{
