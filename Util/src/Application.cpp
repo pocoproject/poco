@@ -5,7 +5,7 @@
 // Package: Application
 // Module:  Application
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -38,8 +38,8 @@
 #include "Poco/AutoPtr.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/UnWindows.h"
-#endif
-#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+#include "Poco/UnicodeConverter.h"
+#elif defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 #include "Poco/SignalHandler.h"
 #include <stdio.h>
 #include <sys/ioctl.h>
@@ -48,7 +48,6 @@
 #include <termios.h>
 #endif
 #endif
-#include "Poco/UnicodeConverter.h"
 
 
 using Poco::Logger;
@@ -196,12 +195,6 @@ void Application::reinitialize(Application& self)
 }
 
 
-void Application::setUnixOptions(bool flag)
-{
-	_unixOptions = flag;
-}
-
-
 int Application::loadConfiguration(int priority)
 {
 	int n = 0;
@@ -300,17 +293,6 @@ std::string Application::commandPath() const
 }
 
 
-void Application::stopOptionsProcessing()
-{
-	_stopOptionsProcessing = true;
-}
-
-
-void Application::ignoreUnknownOptions()
-{
-	_ignoreUnknownOptions = true;
-}
-
 Application::WindowSize Application::windowSize()
 {
 	WindowSize size{0, 0};
@@ -374,9 +356,12 @@ Application::ArgVec Application::toArgs(int argc, char* argv[])
 	ArgVec args;
 	args.reserve(argc);
 	for (int i = 0; i < argc; ++i)
+	{
 		args.push_back(std::string(argv[i]));
+	}
 	return args;
 }
+
 
 #if defined(_WIN32)
 Application::ArgVec Application::toArgs(int argc, wchar_t* argv[])
@@ -398,9 +383,10 @@ void Application::setArgs(const ArgVec& args)
 {
 	poco_assert (!args.empty());
 
+	_argv = args;
 	_command = args[0];
+	_unprocessedArgs.assign(args.begin() + 1, args.end());
 	_pConfig->setInt("application.argc"s, (int) args.size());
-	_unprocessedArgs = args;
 	std::string argvKey = "application.argv[";
 	for (std::size_t i = 0; i < args.size(); ++i)
 	{
@@ -414,10 +400,7 @@ void Application::processOptions()
 	defineOptions(_options);
 	OptionProcessor processor(_options);
 	processor.setUnixStyle(_unixOptions);
-	_argv = _unprocessedArgs;
-	_unprocessedArgs.erase(_unprocessedArgs.begin());
-	ArgVec::iterator it = _unprocessedArgs.begin();
-	while (it != _unprocessedArgs.end() && !_stopOptionsProcessing)
+	for (auto it = _unprocessedArgs.begin(); it != _unprocessedArgs.end() && !_stopOptionsProcessing; )
 	{
 		std::string name;
 		std::string value;

@@ -147,6 +147,7 @@ public:
 	{
 		init(toArgs(argc, argv));
 	}
+
 #if defined(_WIN32)
 	void init(int argc, wchar_t* argv[])
 		/// Processes the application's command line arguments
@@ -376,7 +377,7 @@ protected:
 	void setLogger(Poco::Logger& logger);
 		/// Sets the logger used by the application.
 
-	virtual int main(const std::vector<std::string>& args);
+	virtual int main(const ArgVec& args);
 		/// The application's main logic.
 		///
 		/// Unprocessed command line arguments are passed in args.
@@ -444,7 +445,6 @@ private:
 	static Application* _pInstance;
 
 	friend class LoggingSubsystem;
-
 };
 
 
@@ -462,9 +462,28 @@ template <class C> C& Application::getSubsystem() const
 	throw Poco::NotFoundException("The subsystem has not been registered", typeid(C).name());
 }
 
+
 inline Application::SubsystemVec& Application::subsystems()
 {
 	return _subsystems;
+}
+
+
+inline void Application::setUnixOptions(bool flag)
+{
+	_unixOptions = flag;
+}
+
+
+inline void Application::stopOptionsProcessing()
+{
+	_stopOptionsProcessing = true;
+}
+
+
+inline void Application::ignoreUnknownOptions()
+{
+	_ignoreUnknownOptions = true;
 }
 
 
@@ -527,9 +546,7 @@ inline const Poco::Timestamp& Application::startTime() const
 inline Poco::Timespan Application::uptime() const
 {
 	Poco::Timestamp now;
-	Poco::Timespan uptime = now - _startTime;
-
-	return uptime;
+	return now - _startTime;
 }
 
 

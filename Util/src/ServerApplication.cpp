@@ -5,7 +5,7 @@
 // Package: Application
 // Module:  ServerApplication
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -15,35 +15,36 @@
 #include "Poco/Util/ServerApplication.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionSet.h"
-#include "Poco/Util/OptionException.h"
+//#include "Poco/Util/OptionException.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/FileStream.h"
 #include "Poco/Exception.h"
 #if !defined(POCO_VXWORKS)
 #include "Poco/Process.h"
-#include "Poco/NamedEvent.h"
 #endif
-#include "Poco/NumberFormatter.h"
-#include "Poco/Logger.h"
-#include "Poco/String.h"
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <signal.h>
 #include <sys/stat.h>
-#include <fstream>
 #elif defined(POCO_OS_FAMILY_WINDOWS)
+#include "Poco/Format.h"
+#include "Poco/NamedEvent.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/Logger.h"
+#include "Poco/String.h"
+#include "Poco/UnicodeConverter.h"
 #include "Poco/Util/WinService.h"
 #include "Poco/Util/WinRegistryKey.h"
 #include "Poco/UnWindows.h"
 #include <cstring>
 #endif
-#include "Poco/UnicodeConverter.h"
-#include "Poco/Format.h"
 
-
+#if defined(POCO_OS_FAMILY_WINDOWS)
 using Poco::NumberFormatter;
+#endif
+
 using Poco::Exception;
 using Poco::SystemException;
 using namespace std::string_literals;
@@ -58,8 +59,7 @@ Poco::NamedEvent      ServerApplication::_terminate(Poco::ProcessImpl::terminati
 Poco::Event           ServerApplication::_terminated;
 SERVICE_STATUS        ServerApplication::_serviceStatus;
 SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = nullptr;
-#endif
-#if defined(POCO_VXWORKS) || POCO_OS == POCO_OS_ANDROID
+#elif defined(POCO_VXWORKS) || POCO_OS == POCO_OS_ANDROID
 Poco::Event ServerApplication::_terminate;
 #endif
 
