@@ -1274,6 +1274,13 @@ void DataTest::testJSONRowFormatter()
 	assertTrue(row1.namesToString() == "");
 	assertTrue(row1.valuesToString() == "{\"field0\":0,\"field1\":\"1\",\"field2\":\"2007-03-13T08:12:15Z\",\"field3\":null,\"field4\":4}");
 	assertTrue(row1.valuesToString() == ",{\"field0\":0,\"field1\":\"1\",\"field2\":\"2007-03-13T08:12:15Z\",\"field3\":null,\"field4\":4}");
+
+	Row row2;
+	row2.append("date", Date(2007, 3, 13));
+	row2.append("time", Time(8, 12, 15));
+	row2.setFormatter(new JSONRowFormatter(JSONRowFormatter::JSON_FMT_MODE_FULL));
+	row2.namesToString();
+	assertTrue(row2.valuesToString() == "{\"date\":\"2007/03/13\",\"time\":\"08:12:15\"}");
 }
 
 
@@ -1393,6 +1400,11 @@ void DataTest::testDateAndTime()
 	Var vTime = t;
 	t1 = vTime;
 	assertTrue (t == t1);
+
+	assertTrue (vDate.isDate());
+	assertFalse (vDate.isTime());
+	assertTrue (vTime.isTime());
+	assertFalse (vTime.isDate());
 }
 
 
