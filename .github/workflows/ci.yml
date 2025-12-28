@@ -1029,6 +1029,54 @@ jobs:
             PWD=`pwd`
             ctest --output-on-failure
 
+  nix-gcc-make-odbc-sqlserver:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Install uidmap for rootless podman
+        run: sudo apt-get update && sudo apt-get install -y uidmap
+
+      - name: Configure subuid/subgid for rootless podman
+        run: |
+          sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 $USER
+
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: nix-shell Data/ODBC/mssql.nix --pure --run "build_and_test"
+
+  nix-gcc-make-odbc-oracle:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Install uidmap for rootless podman
+        run: sudo apt-get update && sudo apt-get install -y uidmap
+
+      - name: Configure subuid/subgid for rootless podman
+        run: |
+          sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 $USER
+
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: nix-shell Data/ODBC/oracle.nix --pure --run "build_and_test"
+
   linux-gcc-cmake-sqlite-no-sqlparser:
     runs-on: ubuntu-24.04
     steps:
