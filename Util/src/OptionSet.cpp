@@ -21,20 +21,6 @@ namespace Poco {
 namespace Util {
 
 
-OptionSet::OptionSet(const OptionSet& options):
-	_options(options._options)
-{
-}
-
-
-OptionSet& OptionSet::operator = (const OptionSet& options)
-{
-	if (&options != this)
-		_options = options._options;
-	return *this;
-}
-
-
 void OptionSet::addOption(const Option& option)
 {
 	poco_assert (!option.fullName().empty());
@@ -94,18 +80,6 @@ const Option& OptionSet::getOption(const std::string& name, bool matchShort) con
 		return *pOption;
 	else
 		throw UnknownOptionException(name);
-}
-
-
-OptionSet::Iterator OptionSet::begin() const
-{
-	return _options.begin();
-}
-
-
-OptionSet::Iterator OptionSet::end() const
-{
-	return _options.end();
 }
 
 

@@ -112,7 +112,7 @@ void XMLConfiguration::load(const std::string& path)
 }
 
 
-void XMLConfiguration::load(const Poco::XML::Document* pDocument)
+void XMLConfiguration::load(const Document* pDocument)
 {
 	poco_check_ptr (pDocument);
 
@@ -123,7 +123,7 @@ void XMLConfiguration::load(const Poco::XML::Document* pDocument)
 }
 
 
-void XMLConfiguration::load(const Poco::XML::Node* pNode)
+void XMLConfiguration::load(const Node* pNode)
 {
 	poco_check_ptr (pNode);
 
@@ -273,7 +273,7 @@ void XMLConfiguration::removeRaw(const std::string& key)
 				pParent->removeChild(pNode);
 			}
 		}
-		else if (pNode->nodeType() == Poco::XML::Node::ATTRIBUTE_NODE)
+		else if (pNode->nodeType() == Node::ATTRIBUTE_NODE)
 		{
 			auto pAttr = dynamic_cast<Attr*>(pNode);
 			Element* pOwner = pAttr->ownerElement();

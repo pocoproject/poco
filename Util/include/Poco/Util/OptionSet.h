@@ -37,13 +37,13 @@ public:
 	OptionSet() = default;
 		/// Creates the OptionSet.
 
-	OptionSet(const OptionSet& options);
+	OptionSet(const OptionSet& options) = default;
 		/// Creates an option set from another one.
 
 	~OptionSet() = default;
 		/// Destroys the OptionSet.
 
-	OptionSet& operator = (const OptionSet& options);
+	OptionSet& operator = (const OptionSet& options) = default;
 		/// Assignment operator.
 
 	void addOption(const Option& option);
@@ -71,11 +71,17 @@ public:
 		/// Throws an AmbiguousOptionException if a partial full name matches
 		/// more than one option.
 
-	Iterator begin() const;
+	Iterator begin() const
 		/// Supports iterating over all options.
+	{
+		return _options.begin();
+	}
 
-	Iterator end() const;
+	Iterator end() const
 		/// Supports iterating over all options.
+	{
+		return _options.end();
+	}
 
 private:
 	OptionVec _options;
