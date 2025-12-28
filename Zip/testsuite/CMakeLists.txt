@@ -19,9 +19,15 @@ if(ANDROID)
 		COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} "-DTEST_FILES=${CMAKE_CURRENT_SOURCE_DIR}/data;" -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/Zip-testrunner -DTEST_PARAMETER=-all -P ${PROJECT_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake
 	)
 else()
+	if(WIN32)
+		set(CPPIGNORE_FILE "${PROJECT_SOURCE_DIR}/cppignore.win")
+	else()
+		set(CPPIGNORE_FILE "${PROJECT_SOURCE_DIR}/cppignore.lnx")
+	endif()
 	add_test(
 		NAME Zip
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND Zip-testrunner -ignore ${PROJECT_SOURCE_DIR}/cppignore.lnx -all
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND Zip-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
 	set_tests_properties(Zip PROPERTIES ENVIRONMENT POCO_BASE=${PROJECT_SOURCE_DIR})
 	# The test is run in the build directory. So the test data is copied there too
