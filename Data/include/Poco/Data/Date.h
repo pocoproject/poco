@@ -211,6 +211,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	bool isDate() const override
+	{
+		return true;
+	}
+
 	const Poco::Data::Date& value() const
 	{
 		return _val;

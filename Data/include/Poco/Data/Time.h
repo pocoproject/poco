@@ -215,6 +215,11 @@ public:
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	bool isTime() const override
+	{
+		return true;
+	}
+
 	const Poco::Data::Time& value() const
 	{
 		return _val;
