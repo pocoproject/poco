@@ -205,9 +205,10 @@ POLICYJSON
         unzip -o "$BASIC_ZIP" -d "$DATA_DIR"
         unzip -o "$ODBC_ZIP" -d "$DATA_DIR"
       )
+      download_status=$?
 
       # Check if download subshell succeeded
-      if [ $? -ne 0 ]; then
+      if [ "$download_status" -ne 0 ]; then
         echo ""
         echo "=== ORACLE INSTANT CLIENT DOWNLOAD FAILED ==="
         echo "Could not download or extract Oracle Instant Client."
