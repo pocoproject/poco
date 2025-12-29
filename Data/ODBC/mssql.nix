@@ -140,14 +140,14 @@ POLICYJSON
     # Add ODBC driver and its dependencies to library path (after poco_env.bash which sets LD_LIBRARY_PATH)
     export LD_LIBRARY_PATH="${pkgs.unixODBCDrivers.msodbcsql18}/lib:${pkgs.openssl.out}/lib:${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.unixODBC}/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
-    cat > "$ODBCSYSINI/odbcinst.ini" << 'EOF'
+    cat > "$ODBCSYSINI/odbcinst.ini" << EOF
 [ODBC Driver 18 for SQL Server]
 Description = Microsoft ODBC Driver 18 for SQL Server
 Driver = ${pkgs.unixODBCDrivers.msodbcsql18}/lib/libmsodbcsql-18.1.so.1.1
 UsageCount = 1
 EOF
 
-    cat > "$ODBCINI" << 'EOF'
+    cat > "$ODBCINI" << EOF
 [PocoDataSQLServerTest]
 Description = Poco SQL Server Test Database
 Driver = ODBC Driver 18 for SQL Server
