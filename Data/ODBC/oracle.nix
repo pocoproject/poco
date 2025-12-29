@@ -32,6 +32,18 @@ let
   instantClientVersion = "23_26";
   instantClientFullVersion = "23.26.0.0.0";
   instantClientPathVersion = "2326000";
+
+  # SHA256 checksums for Oracle Instant Client packages
+  # To update: download the files manually and run `sha256sum <filename>`
+  # Or run with placeholders first - the script will compute and print the actual hashes.
+  #
+  # x64 checksums for version 23.26.0.0.0:
+  # (Set to "placeholder-update-after-first-download" to compute on first run)
+  instantClientBasicSha256_x64 = "placeholder-update-after-first-download";
+  instantClientOdbcSha256_x64 = "placeholder-update-after-first-download";
+  # ARM64 uses "latest" URLs without version numbers - hashes may change when Oracle updates
+  instantClientBasicSha256_arm64 = "9c9a32051e97f087016fb334b7ad5c0aea8511ca8363afd8e0dc6ec4fc515c32";
+  instantClientOdbcSha256_arm64 = "11b2d0d53b15145a79b00837bbd6556314486f28e734ba909695c6f051c5d279";
 in
 pkgs.mkShell {
   buildInputs = with pkgs; [
@@ -152,7 +164,7 @@ POLICYJSON
         mkdir -p "$DATA_DIR/downloads"
         cd "$DATA_DIR/downloads"
 
-        # Detect architecture and set download URLs
+        # Detect architecture and set download URLs and expected checksums
         # Note: ARM64 uses different URL format than x64
         ARCH=$(uname -m)
         if [ "$ARCH" = "x86_64" ]; then
@@ -160,12 +172,16 @@ POLICYJSON
           ODBC_URL="https://download.oracle.com/otn_software/linux/instantclient/${instantClientPathVersion}/instantclient-odbc-linux.x64-${instantClientFullVersion}.zip"
           BASIC_ZIP="instantclient-basic-linux.x64-${instantClientFullVersion}.zip"
           ODBC_ZIP="instantclient-odbc-linux.x64-${instantClientFullVersion}.zip"
+          EXPECTED_BASIC_SHA256="${instantClientBasicSha256_x64}"
+          EXPECTED_ODBC_SHA256="${instantClientOdbcSha256_x64}"
         elif [ "$ARCH" = "aarch64" ]; then
           # ARM64 uses simplified URLs without version numbers
           BASIC_URL="https://download.oracle.com/otn_software/linux/instantclient/instantclient-basic-linux-arm64.zip"
           ODBC_URL="https://download.oracle.com/otn_software/linux/instantclient/instantclient-odbc-linux-arm64.zip"
           BASIC_ZIP="instantclient-basic-linux-arm64.zip"
           ODBC_ZIP="instantclient-odbc-linux-arm64.zip"
+          EXPECTED_BASIC_SHA256="${instantClientBasicSha256_arm64}"
+          EXPECTED_ODBC_SHA256="${instantClientOdbcSha256_arm64}"
         else
           echo "ERROR: Unsupported architecture: $ARCH"
           exit 1
@@ -200,6 +216,56 @@ POLICYJSON
             exit 1
           fi
         done
+
+        # Verify SHA256 checksums for integrity/security
+        echo "Verifying SHA256 checksums..."
+        CHECKSUM_FILE="$DATA_DIR/checksums-$ARCH.txt"
+        verify_sha256() {
+          local file="$1"
+          local expected="$2"
+          local varname="$3"
+          local actual
+          actual=$(sha256sum "$file" | cut -d' ' -f1)
+          # Save computed checksum to file for easy updating of oracle.nix
+          echo "$varname = \"$actual\";" >> "$CHECKSUM_FILE"
+          if [ "$expected" = "placeholder-update-after-first-download" ]; then
+            echo "WARNING: No checksum configured for $file"
+            echo "         Computed SHA256: $actual"
+            echo "         Please update oracle.nix with this checksum for security."
+            return 0
+          fi
+          if [ "$actual" != "$expected" ]; then
+            echo "ERROR: SHA256 checksum mismatch for $file"
+            echo "  Expected: $expected"
+            echo "  Actual:   $actual"
+            echo ""
+            echo "This could indicate a corrupted download or a security compromise."
+            echo "If Oracle has released a new version, update the checksums in oracle.nix."
+            return 1
+          fi
+          echo "  $file: OK"
+          return 0
+        }
+
+        rm -f "$CHECKSUM_FILE"
+        NEEDS_CHECKSUM_UPDATE=0
+        if [ "$ARCH" = "x86_64" ]; then
+          verify_sha256 "$BASIC_ZIP" "$EXPECTED_BASIC_SHA256" "instantClientBasicSha256_x64" || exit 1
+          verify_sha256 "$ODBC_ZIP" "$EXPECTED_ODBC_SHA256" "instantClientOdbcSha256_x64" || exit 1
+          [[ "$EXPECTED_BASIC_SHA256" == "placeholder"* ]] && NEEDS_CHECKSUM_UPDATE=1
+          [[ "$EXPECTED_ODBC_SHA256" == "placeholder"* ]] && NEEDS_CHECKSUM_UPDATE=1
+        else
+          verify_sha256 "$BASIC_ZIP" "$EXPECTED_BASIC_SHA256" "instantClientBasicSha256_arm64" || exit 1
+          verify_sha256 "$ODBC_ZIP" "$EXPECTED_ODBC_SHA256" "instantClientOdbcSha256_arm64" || exit 1
+          [[ "$EXPECTED_BASIC_SHA256" == "placeholder"* ]] && NEEDS_CHECKSUM_UPDATE=1
+          [[ "$EXPECTED_ODBC_SHA256" == "placeholder"* ]] && NEEDS_CHECKSUM_UPDATE=1
+        fi
+        if [ "$NEEDS_CHECKSUM_UPDATE" -eq 1 ] && [ -f "$CHECKSUM_FILE" ]; then
+          echo ""
+          echo "=== Copy these checksums to oracle.nix ==="
+          cat "$CHECKSUM_FILE"
+          echo "==========================================="
+        fi
 
         echo "Extracting Oracle Instant Client..."
         unzip -o "$BASIC_ZIP" -d "$DATA_DIR"
