@@ -21,6 +21,12 @@
 # - The Oracle Free container image is publicly available (no login required).
 # - The Oracle container image is large (~1.5GB) and may take time to download.
 # - Oracle startup takes several minutes; be patient on first run.
+#
+# Cleanup/Reset:
+# To completely reset the environment (e.g., after failed download or for a fresh start):
+#   podman stop poco-oracle-test && podman rm poco-oracle-test
+#   rm -rf Data/ODBC/.nix-oracle-data
+# This removes the container and all cached data (ODBC config, Oracle Instant Client).
 
 { pkgs ? import <nixpkgs> {} }:
 

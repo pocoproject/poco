@@ -22,6 +22,12 @@
 #   subuid/subgid for rootless podman (one-time setup).
 # - The Microsoft ODBC driver (msodbcsql18) is unfree software;
 #   this shell.nix automatically allows it.
+#
+# Cleanup/Reset:
+# To completely reset the environment (e.g., for a fresh start):
+#   podman stop poco-mssql-test && podman rm poco-mssql-test
+#   rm -rf Data/ODBC/.nix-mssql-data
+# This removes the container and all cached data (ODBC config).
 
 {
   pkgs ? import <nixpkgs> {
