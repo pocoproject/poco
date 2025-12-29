@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   nix-gcc-make-odbc-sqlserver:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -38,7 +38,7 @@ jobs:
           command: nix-shell Data/ODBC/mssql.nix --pure --run "build_and_test"
 
   nix-gcc-make-odbc-oracle:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
