@@ -180,7 +180,11 @@ POLICYJSON
         # Validate downloaded files are actual ZIP files (not HTML error pages)
         echo "Validating downloaded files..."
         for zipfile in "$BASIC_ZIP" "$ODBC_ZIP"; do
-          filesize=$(stat -c%s "$zipfile" 2>/dev/null || stat -f%z "$zipfile" 2>/dev/null)
+          filesize=$({ stat -c%s "$zipfile" 2>/dev/null || stat -f%z "$zipfile" 2>/dev/null || wc -c <"$zipfile"; })
+          if [ -z "$filesize" ]; then
+            echo "ERROR: Failed to determine size of $zipfile"
+            exit 1
+          fi
           echo "  $zipfile: $filesize bytes"
           if [ "$filesize" -lt 100000 ]; then
             echo "ERROR: $zipfile is too small ($filesize bytes) - likely an error page"
