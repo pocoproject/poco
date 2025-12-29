@@ -29,9 +29,9 @@ let
   containerName = "poco-oracle-test";
   oraclePassword = "poco";
   oraclePort = "1521";
-  instantClientVersion = "23_6";
-  instantClientFullVersion = "23.6.0.0.0";
-  instantClientPathVersion = "2360000";
+  instantClientVersion = "23_26";
+  instantClientFullVersion = "23.26.0.0.0";
+  instantClientPathVersion = "2326000";
 in
 pkgs.mkShell {
   buildInputs = with pkgs; [
@@ -147,6 +147,7 @@ POLICYJSON
     # Download Oracle Instant Client if not present
     if [ ! -d "$INSTANT_CLIENT_DIR" ]; then
       (
+        set -e  # Exit subshell on any error
         echo "Downloading Oracle Instant Client..."
         mkdir -p "$DATA_DIR/downloads"
         cd "$DATA_DIR/downloads"
@@ -171,15 +172,47 @@ POLICYJSON
         fi
 
         echo "Downloading: $BASIC_URL"
-        curl -L -o "$BASIC_ZIP" "$BASIC_URL" || { echo "Failed to download basic package"; exit 1; }
+        curl -L -f -o "$BASIC_ZIP" "$BASIC_URL" || { echo "ERROR: Failed to download basic package"; exit 1; }
 
         echo "Downloading: $ODBC_URL"
-        curl -L -o "$ODBC_ZIP" "$ODBC_URL" || { echo "Failed to download ODBC package"; exit 1; }
+        curl -L -f -o "$ODBC_ZIP" "$ODBC_URL" || { echo "ERROR: Failed to download ODBC package"; exit 1; }
+
+        # Validate downloaded files are actual ZIP files (not HTML error pages)
+        echo "Validating downloaded files..."
+        for zipfile in "$BASIC_ZIP" "$ODBC_ZIP"; do
+          filesize=$(stat -c%s "$zipfile" 2>/dev/null || stat -f%z "$zipfile" 2>/dev/null)
+          echo "  $zipfile: $filesize bytes"
+          if [ "$filesize" -lt 100000 ]; then
+            echo "ERROR: $zipfile is too small ($filesize bytes) - likely an error page"
+            echo "Contents:"
+            head -20 "$zipfile"
+            exit 1
+          fi
+          # Check ZIP magic number (PK)
+          if ! head -c2 "$zipfile" | grep -q "PK"; then
+            echo "ERROR: $zipfile is not a valid ZIP file"
+            echo "First 100 bytes:"
+            head -c100 "$zipfile"
+            exit 1
+          fi
+        done
 
         echo "Extracting Oracle Instant Client..."
         unzip -o "$BASIC_ZIP" -d "$DATA_DIR"
         unzip -o "$ODBC_ZIP" -d "$DATA_DIR"
       )
+
+      # Check if download subshell succeeded
+      if [ $? -ne 0 ]; then
+        echo ""
+        echo "=== ORACLE INSTANT CLIENT DOWNLOAD FAILED ==="
+        echo "Could not download or extract Oracle Instant Client."
+        echo "Please check network connectivity and try again."
+        echo ""
+        if [ ! -t 0 ]; then
+          exit 1
+        fi
+      fi
 
       # Find the actual extracted directory (version may differ)
       EXTRACTED_DIR=$(ls -d "$DATA_DIR"/instantclient_* 2>/dev/null | head -1)
