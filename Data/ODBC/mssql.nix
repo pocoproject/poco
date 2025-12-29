@@ -76,6 +76,7 @@ pkgs.mkShell {
   POCO_ODBC_LIB = "${pkgs.unixODBC}/lib";
 
   ODBCSYSINI = "${dataDir}/odbc";
+  ODBCINSTINI = "odbcinst.ini";
   ODBCINI = "${dataDir}/odbc/odbc.ini";
 
   # SQL Server connection info for tests
@@ -156,6 +157,17 @@ Database = model
 TrustServerCertificate = yes
 Encrypt = no
 EOF
+
+    # Flush files to disk to avoid potential race conditions
+    sync
+
+    # Verify ODBC configuration
+    echo "Verifying ODBC configuration..."
+    odbcinst -j
+    echo "Registered drivers:"
+    odbcinst -q -d
+    echo "Registered DSNs:"
+    odbcinst -q -s
 
     start_mssql() {
       if ! podman ps --format '{{.Names}}' | grep -q "^${containerName}$"; then
