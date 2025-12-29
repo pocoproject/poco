@@ -243,9 +243,10 @@ POLICYJSON
       echo "WARNING: Oracle ODBC driver library not found in $INSTANT_CLIENT_DIR"
       echo "Contents of $INSTANT_CLIENT_DIR:"
       ls -la "$INSTANT_CLIENT_DIR/" 2>/dev/null || echo "(failed to list directory)"
-      ODBC_DRIVER_LIB="$INSTANT_CLIENT_DIR/libsqora.so.23.1"
+      echo "No Oracle ODBC driver will be configured; odbcinst.ini may be invalid."
+    else
+      echo "Using ODBC driver library: $ODBC_DRIVER_LIB"
     fi
-    echo "Using ODBC driver library: $ODBC_DRIVER_LIB"
 
     cat > "$ODBCSYSINI/odbcinst.ini" << EOF
 [Oracle 23 ODBC driver]
