@@ -37,11 +37,12 @@ class Util_API LoggingSubsystem: public Subsystem
 {
 public:
 	LoggingSubsystem() = default;
-	const char* name() const;
+
+	const char* name() const override;
 
 protected:
-	void initialize(Application& self);
-	void uninitialize();
+	void initialize(Application& self) override;
+	void uninitialize() override;
 	~LoggingSubsystem() = default;
 };
 

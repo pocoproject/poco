@@ -46,16 +46,6 @@ namespace Poco {
 namespace Util {
 
 
-LoggingConfigurator::LoggingConfigurator()
-{
-}
-
-
-LoggingConfigurator::~LoggingConfigurator()
-{
-}
-
-
 void LoggingConfigurator::configure(AbstractConfiguration::Ptr pConfig)
 {
 	poco_check_ptr (pConfig);

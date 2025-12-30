@@ -54,6 +54,8 @@ class OptionCallback: public AbstractOptionCallback
 public:
 	typedef void (C::*Callback)(const std::string& name, const std::string& value);
 
+	OptionCallback() = delete;
+
 	OptionCallback(C* pObject, Callback method):
 		_pObject(pObject),
 		_method(method)
@@ -94,8 +96,6 @@ public:
 	}
 
 private:
-	OptionCallback();
-
 	C* _pObject;
 	Callback _method;
 };

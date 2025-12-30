@@ -139,15 +139,15 @@ protected:
 		{
 			logger().information("Command line:");
 			std::ostringstream ostr;
-			for (ArgVec::const_iterator it = argv().begin(); it != argv().end(); ++it)
+			for (const auto& arg: argv())
 			{
-				ostr << *it << ' ';
+				ostr << arg << ' ';
 			}
 			logger().information(ostr.str());
 			logger().information("Arguments to main():");
-			for (ArgVec::const_iterator it = args.begin(); it != args.end(); ++it)
+			for (const auto& arg: argv())
 			{
-				logger().information(*it);
+				logger().information(arg);
 			}
 			logger().information("Application properties:");
 			printProperties("");
@@ -172,11 +172,11 @@ protected:
 		}
 		else
 		{
-			for (AbstractConfiguration::Keys::const_iterator it = keys.begin(); it != keys.end(); ++it)
+			for (const auto& key : keys)
 			{
 				std::string fullKey = base;
 				if (!fullKey.empty()) fullKey += '.';
-				fullKey.append(*it);
+				fullKey.append(key);
 				printProperties(fullKey);
 			}
 		}

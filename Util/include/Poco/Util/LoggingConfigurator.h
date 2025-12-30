@@ -117,11 +117,15 @@ class Util_API LoggingConfigurator
 	///     logging.loggers.l2.level = debug
 {
 public:
-	LoggingConfigurator();
+	LoggingConfigurator() = default;
 		/// Creates the LoggingConfigurator.
 
-	~LoggingConfigurator();
+	LoggingConfigurator(const LoggingConfigurator&) = delete;
+
+	~LoggingConfigurator() = default;
 		/// Destroys the LoggingConfigurator.
+
+	LoggingConfigurator& operator = (const LoggingConfigurator&) = delete;
 
 	void configure(AbstractConfiguration::Ptr pConfig);
 		/// Configures the logging subsystem based on
@@ -159,9 +163,6 @@ private:
 	Poco::Channel::Ptr createChannel(AbstractConfiguration::Ptr pConfig);
 	void configureChannel(Channel::Ptr pChannel, AbstractConfiguration::Ptr pConfig);
 	void configureLogger(AbstractConfiguration::Ptr pConfig);
-
-	LoggingConfigurator(const LoggingConfigurator&);
-	LoggingConfigurator& operator = (const LoggingConfigurator&);
 };
 
 
