@@ -157,8 +157,7 @@ protected:
 
 	void printProperties(const std::string& base)
 	{
-		AbstractConfiguration::Keys keys;
-		config().keys(base, keys);
+		auto keys = config().keys(base);
 		if (keys.empty())
 		{
 			if (config().hasProperty(base))

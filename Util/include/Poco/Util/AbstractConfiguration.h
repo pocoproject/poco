@@ -380,6 +380,11 @@ public:
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
 
+
+	Keys keys(const std::string& key = std::string()) const;
+		// Returns the names of all subkeys under the given key.
+		/// If an empty key is passed, all root level keys are returned.
+
 	void keys(Keys& range) const;
 		/// Returns in range the names of all keys at root level.
 

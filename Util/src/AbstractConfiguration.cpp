@@ -384,6 +384,16 @@ void AbstractConfiguration::setBool(const std::string& key, bool value)
 }
 
 
+AbstractConfiguration::Keys AbstractConfiguration::keys(const std::string& key) const
+{
+	Mutex::ScopedLock lock(_mutex);
+
+	Keys range;
+	enumerate(key, range);
+	return range;
+}
+
+
 void AbstractConfiguration::keys(Keys& range) const
 {
 	Mutex::ScopedLock lock(_mutex);
