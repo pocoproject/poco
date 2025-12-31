@@ -57,6 +57,8 @@ public:
 		/// Creates the ConfigurationView. The ConfigurationView
 		/// retains (shared) ownership of the passed configuration.
 
+	const std::string& prefix() const { return _prefix; }
+
 protected:
 	bool getRaw(const std::string& key, std::string& value) const override;
 	void setRaw(const std::string& key, const std::string& value) override;
@@ -66,6 +68,8 @@ protected:
 	std::string translateKey(const std::string& key) const;
 
 	~ConfigurationView() = default;
+
+	const AbstractConfiguration::Ptr& pConfig() const { return _pConfig; }
 
 private:
 	std::string _prefix;

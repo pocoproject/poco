@@ -16,14 +16,14 @@
 #ifndef Util_LocalConfigurationView_INCLUDED
 #define Util_LocalConfigurationView_INCLUDED
 
-#include "Poco/Util/AbstractConfiguration.h"
+#include "Poco/Util/ConfigurationView.h"
 #include "Poco/Util/Util.h"
 
 namespace Poco {
 namespace Util {
 
 
-class Util_API LocalConfigurationView : public AbstractConfiguration
+class Util_API LocalConfigurationView : public ConfigurationView
 	/// This configuration implements a "view" into a sub-hierarchy
 	/// of another configuration.
 	///
@@ -51,17 +51,8 @@ public:
 
 protected:
 	bool getRaw(const std::string& key, std::string& value) const override;
-	void setRaw(const std::string& key, const std::string& value) override;
-	void enumerate(const std::string& key, Keys& range) const override;
-	void removeRaw(const std::string& key) override;
-
-	std::string translateKey(const std::string& key) const;
 
 	~LocalConfigurationView() = default;
-
-private:
-	std::string _prefix;
-	AbstractConfiguration::Ptr _pConfig;
 };
 
 
