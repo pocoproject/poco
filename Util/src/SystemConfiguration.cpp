@@ -41,28 +41,28 @@ namespace Util {
 
 
 std::map<std::string, std::function<std::string ()>> SystemConfiguration::_functions = {
-      { "system.osName", Environment::osName }
-    , { "system.osVersion", Environment::osVersion }
-    , { "system.osArchitecture", Environment::osArchitecture }
-    , { "system.nodeName", Environment::nodeName }
-    , { "system.nodeId", getNodeId }
-    , { "system.currentDir", Path::current }
-    , { "system.homeDir", Path::home }
-    , { "system.configHomeDir", Path::configHome }
-    , { "system.cacheHomeDir", Path::cacheHome }
-    , { "system.dataHomeDir", Path::dataHome }
-    , { "system.tempHomeDir", Path::tempHome }
-    , { "system.tempDir", Path::temp }
-    , { "system.configDir", Path::config }
-    , { "system.dateTime", []() { return Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::ISO8601_FORMAT);} }
+	  { "system.osName", Environment::osName }
+	, { "system.osVersion", Environment::osVersion }
+	, { "system.osArchitecture", Environment::osArchitecture }
+	, { "system.nodeName", Environment::nodeName }
+	, { "system.nodeId", getNodeId }
+	, { "system.currentDir", Path::current }
+	, { "system.homeDir", Path::home }
+	, { "system.configHomeDir", Path::configHome }
+	, { "system.cacheHomeDir", Path::cacheHome }
+	, { "system.dataHomeDir", Path::dataHome }
+	, { "system.tempHomeDir", Path::tempHome }
+	, { "system.tempDir", Path::temp }
+	, { "system.configDir", Path::config }
+	, { "system.dateTime", []() { return Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::ISO8601_FORMAT);} }
 #if !defined(POCO_VXWORKS)
-    , { "system.pid", []() { return Poco::NumberFormatter::format(Poco::Process::id()); } }
+	, { "system.pid", []() { return Poco::NumberFormatter::format(Poco::Process::id()); } }
 #endif
 };
 
 
 namespace {
-    const std::string ENV = "system.env.";
+	const std::string ENV = "system.env.";
 }
 
 
@@ -90,16 +90,17 @@ void SystemConfiguration::setRaw(const std::string& key, const std::string& valu
 
 void SystemConfiguration::enumerate(const std::string& key, Keys& range) const
 {
-    range.clear();
+	range.clear();
 	if (key.empty())
 	{
 		range.push_back("system"s);
 	}
 	else if (key == "system")
 	{
-	    for (auto& it: _functions)
-	    {
-			range.push_back(it.first.substr(key.size() + 1));
+		std::size_t sz = key.size() + 1;
+		for (auto& it: _functions)
+		{
+			range.push_back(it.first.substr(sz));
 		}
 		range.push_back("env"s);
 	}

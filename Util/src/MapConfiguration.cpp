@@ -41,7 +41,7 @@ void MapConfiguration::clear()
 
 bool MapConfiguration::getRaw(const std::string& key, std::string& value) const
 {
-	StringMap::const_iterator it = _map.find(key);
+	auto it = _map.find(key);
 	if (it != _map.end())
 	{
 		value = it->second;
@@ -88,28 +88,14 @@ void MapConfiguration::removeRaw(const std::string& key)
 	std::string prefix = key;
 	if (!prefix.empty()) prefix += '.';
 	std::string::size_type psize = prefix.size();
-	StringMap::iterator it = _map.begin();
-	StringMap::iterator itCur;
-	while (it != _map.end())
+	for (auto it = _map.begin(); it != _map.end(); )
 	{
-		itCur = it++;
-		if ((itCur->first == key) || (itCur->first.compare(0, psize, prefix) == 0))
+		if ((it->first == key) || (it->first.compare(0, psize, prefix) == 0))
 		{
-			_map.erase(itCur);
+			it = _map.erase(it);
 		}
+		else ++it;
 	}
-}
-
-
-MapConfiguration::iterator MapConfiguration::begin() const
-{
-	return _map.begin();
-}
-
-
-MapConfiguration::iterator MapConfiguration::end() const
-{
-	return _map.end();
 }
 
 

@@ -52,8 +52,15 @@ protected:
 	void enumerate(const std::string& key, Keys& range) const override;
 	void removeRaw(const std::string& key) override;
 
-	iterator begin() const;
-	iterator end() const;
+	iterator begin() const
+	{
+		return _map.begin();
+	}
+
+	iterator end() const
+	{
+		return _map.end();
+	}
 
 private:
 	StringMap _map;

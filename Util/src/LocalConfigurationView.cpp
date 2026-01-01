@@ -19,7 +19,7 @@ namespace Util {
 
 
 LocalConfigurationView::LocalConfigurationView(const std::string& prefix, AbstractConfiguration::Ptr pConfig) :
-    ConfigurationView(prefix, pConfig)
+    AbstractConfigurationView(prefix, pConfig)
 {
 }
 

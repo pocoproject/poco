@@ -5,7 +5,7 @@
 // Package: Configuration
 // Module:  LocalConfigurationView
 //
-// Definition of the ConfigurationView class.
+// Definition of the LocalConfigurationView class.
 //
 // Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
@@ -23,7 +23,7 @@ namespace Poco {
 namespace Util {
 
 
-class Util_API LocalConfigurationView : public ConfigurationView
+class Util_API LocalConfigurationView : public AbstractConfigurationView
 	/// This configuration implements a "view" into a sub-hierarchy
 	/// of another configuration.
 	///
@@ -49,10 +49,10 @@ public:
 		/// Creates the LocalConfigurationView. The LocalConfigurationView
 		/// retains (shared) ownership of the passed configuration.
 
+	~LocalConfigurationView() = default;
+
 protected:
 	bool getRaw(const std::string& key, std::string& value) const override;
-
-	~LocalConfigurationView() = default;
 };
 
 

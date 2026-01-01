@@ -535,6 +535,7 @@ private:
 	mutable Poco::Mutex _mutex;
 
 	friend class LayeredConfiguration;
+	friend class AbstractConfigurationView;
 	friend class ConfigurationView;
 	friend class LocalConfigurationView;
 	friend class ConfigurationMapper;

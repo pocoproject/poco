@@ -48,7 +48,7 @@ void PropertyFileConfiguration::load(std::istream& istr)
 	clear();
 	while (!istr.eof())
 	{
-		if(istr.fail())
+		if (istr.fail())
 		{
 			throw Poco::IOException("Broken input stream");
 		}
