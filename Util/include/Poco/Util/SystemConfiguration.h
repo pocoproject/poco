@@ -20,7 +20,8 @@
 
 #include "Poco/Util/Util.h"
 #include "Poco/Util/AbstractConfiguration.h"
-
+#include <map>
+#include <functional>
 
 namespace Poco {
 namespace Util {
@@ -72,25 +73,10 @@ protected:
 
 private:
 	static bool getEnv(const std::string& name, std::string& value);
+	static std::string getNodeId();
 
-	static const std::string OSNAME;
-	static const std::string OSVERSION;
-	static const std::string OSARCHITECTURE;
-	static const std::string NODENAME;
-	static const std::string NODEID;
-	static const std::string CURRENTDIR;
-	static const std::string HOMEDIR;
-	static const std::string CONFIGHOMEDIR;
-	static const std::string CACHEHOMEDIR;
-	static const std::string DATAHOMEDIR;
-	static const std::string TEMPHOMEDIR;
-	static const std::string TEMPDIR;
-	static const std::string CONFIGDIR;
-	static const std::string DATETIME;
-#if !defined(POCO_VXWORKS)
-	static const std::string PID;
-#endif
-	static const std::string ENV;
+	using SystemProperty = std::function<std::string ()>;
+	static std::map<std::string, SystemProperty> _functions;
 };
 
 
