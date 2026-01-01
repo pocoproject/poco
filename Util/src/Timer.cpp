@@ -5,7 +5,7 @@
 // Package: Timer
 // Module:  Timer
 //
-// Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2009-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0

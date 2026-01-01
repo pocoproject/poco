@@ -7,7 +7,7 @@
 //
 // Definition of the FastLoggerConfigurator class.
 //
-// Copyright (c) 2004-2024, Applied Informatics Software Engineering GmbH.,
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH,
 // Aleph ONE Software Engineering LLC
 // and Contributors.
 //

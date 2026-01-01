@@ -7,7 +7,7 @@
 //
 // Definition of the XMLConfiguration class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -24,7 +24,7 @@
 #ifndef POCO_UTIL_NO_XMLCONFIGURATION
 
 
-#include "Poco/Util/MapConfiguration.h"
+#include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/DOM/Document.h"
 #include "Poco/DOM/AutoPtr.h"
 #include "Poco/DOM/DOMWriter.h"
