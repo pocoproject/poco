@@ -139,8 +139,7 @@ void Application::init(const ArgVec& args)
 
 void Application::init()
 {
-	Path appPath;
-	getApplicationPath(appPath);
+	Path appPath = getApplicationPath();
 	_pConfig->setString("application.path"s, appPath.toString());
 	_pConfig->setString("application.name"s, appPath.getFileName());
 	_pConfig->setString("application.baseName"s, appPath.getBaseName());
@@ -198,8 +197,7 @@ void Application::reinitialize(Application& self)
 int Application::loadConfiguration(int priority)
 {
 	int n = 0;
-	Path appPath;
-	getApplicationPath(appPath);
+	Path appPath = getApplicationPath();
 	Path confPath;
 	if (findAppConfigFile(appPath.getBaseName(), "properties"s, confPath))
 	{
@@ -488,9 +486,7 @@ bool Application::findFile(Poco::Path& path) const
 {
 	if (path.isAbsolute()) return true;
 
-	Path appPath;
-	getApplicationPath(appPath);
-	Path base = appPath.parent();
+	Path base = getApplicationDirectory();
 	do
 	{
 		Path p(base, path);

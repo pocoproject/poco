@@ -247,9 +247,15 @@ public:
 		/// an exception, the exception will be propagated to the caller.
 
 	void getApplicationPath(Poco::Path& path) const;
+		/// Sets the path argument to the file path of the application executable.
+
+	Poco::Path getApplicationPath() const;
 		/// Returns the file path of the application executable.
 
 	void getApplicationDirectory(Poco::Path& dir) const;
+		/// Sets the path argument to the directory that contains the application executable.
+
+	Poco::Path getApplicationDirectory() const;
 		/// Returns the directory that contains the application executable.
 
 	std::string commandName() const;
@@ -490,6 +496,22 @@ inline void Application::ignoreUnknownOptions()
 inline bool Application::initialized() const
 {
 	return _initialized;
+}
+
+
+inline Poco::Path Application::getApplicationPath() const
+{
+	Poco::Path path;
+	getApplicationPath(path);
+	return path;
+}
+
+
+inline Poco::Path Application::getApplicationDirectory() const
+{
+	Poco::Path path;
+	getApplicationDirectory(path);
+	return path;
 }
 
 
