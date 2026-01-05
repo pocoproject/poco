@@ -149,7 +149,7 @@ public:
 	}
 
 #if defined(_WIN32)
-	void init(int argc, wchar_t* argv[])
+	void init(int argc, wchar_t** argv)
 		/// Processes the application's command line arguments
 		/// and sets the application's properties (e.g.,
 		/// "application.path", "application.name", etc.).
@@ -417,10 +417,10 @@ protected:
 	~Application() override;
 		/// Destroys the Application and deletes all registered subsystems.
 
-	static ArgVec toArgs(int argc, char* argv[]);
+	static ArgVec toArgs(int argc, char** argv);
 
 #if defined(_WIN32)
-	static ArgVec toArgs(int argc, wchar_t* argv[]);
+	static ArgVec toArgs(int argc, wchar_t** argv);
 #endif
 
 private:

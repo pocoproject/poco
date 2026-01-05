@@ -83,7 +83,7 @@ Application::Application():
 }
 
 
-Application::Application(int argc, char* argv[]):
+Application::Application(int argc, char** argv):
     Application()
 {
 	init(argc, argv);
