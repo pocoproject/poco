@@ -15,7 +15,6 @@
 #include "Poco/Util/ServerApplication.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionSet.h"
-//#include "Poco/Util/OptionException.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/FileStream.h"
 #include "Poco/Exception.h"
