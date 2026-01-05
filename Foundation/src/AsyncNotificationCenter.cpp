@@ -181,8 +181,8 @@ void AsyncNotificationCenter::start()
 
 	if (_mode == AsyncMode::NOTIFY || _mode == AsyncMode::BOTH)
 	{
-		auto dispatch = [this](std::stop_token stopToken, int id) {
-			this->dispatchNotifications(stopToken, id);
+		auto dispatch = [this](std::stop_token stopToken, std::size_t workerId) {
+			this->dispatchNotifications(stopToken, workerId);
 		};
 
 		for (std::size_t i {0}; i < _workersCount; ++i)
