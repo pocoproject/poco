@@ -127,7 +127,7 @@ public:
 	Application();
 		/// Creates the Application.
 
-	Application(int argc, char* argv[]);
+	Application(int argc, char** argv);
 		/// Creates the Application and calls init(argc, argv).
 
 	void addSubsystem(Subsystem* pSubsystem);
@@ -137,7 +137,7 @@ public:
 		///     Application::instance().addSubsystem(new MySubsystem);
 		/// is okay.
 
-	void init(int argc, char* argv[])
+	void init(int argc, char** argv)
 		/// Processes the application's command line arguments
 		/// and sets the application's properties (e.g.,
 		/// "application.path", "application.name", etc.).
