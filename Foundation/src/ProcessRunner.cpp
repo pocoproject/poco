@@ -120,11 +120,14 @@ void ProcessRunner::run()
 	ProcessHandle* pPH = nullptr;
 	try
 	{
-		_pPH = pPH = new ProcessHandle(Process::launch(_cmd, _args, _options));
+		pPH = new ProcessHandle(Process::launch(_cmd, _args, _options));
 		errHandle = Error::last();
 
 		_pid = pPH->id();
 		errPID = Error::last();
+
+		// Set _pPH after _pid to ensure pid() returns valid value when running() is true
+		_pPH = pPH;
 
 		_rc = pPH->wait();
 		errRC = Error::last();
@@ -168,28 +171,61 @@ void ProcessRunner::stop()
 		_sw.restart();
 		if (_pPH.exchange(nullptr) && ((pid = _pid.exchange(INVALID_PID))) != INVALID_PID)
 		{
+			if (pid <= 0)
+				throw Poco::IllegalStateException("Invalid PID, can't terminate process");
+
+			Process::requestTermination(pid);
 			while (Process::isRunning(pid))
 			{
-				if (pid > 0)
+				if (_sw.elapsedSeconds() > _timeout)
 				{
-					Process::requestTermination(pid);
-					checkStatus("Waiting for process termination");
+					Process::kill(pid);
+					Stopwatch killSw; killSw.start();
+					while (Process::isRunning(pid))
+					{
+						if (killSw.elapsedSeconds() > _timeout)
+						{
+							throw Poco::TimeoutException("Unable to terminate process");
+						}
+						Thread::sleep(10);
+					}
+					break;
 				}
-				else throw Poco::IllegalStateException("Invalid PID, can't terminate process");
+				Thread::sleep(10);
 			}
 			_t.join();
 		}
 
 		if (!_pidFile.empty())
 		{
-			if (!_pidFile.empty())
+			File pidFile(_pidFile);
+			if (pidFile.exists())
 			{
-				File pidFile(_pidFile);
 				std::string msg;
 				Poco::format(msg, "Waiting for PID file (pidFile: '%s')", _pidFile);
 				_sw.restart();
-				while (pidFile.exists()) checkStatus(msg);
+				while (pidFile.exists())
+				{
+					if (_sw.elapsedSeconds() > _timeout)
+					{
+						try
+						{
+							pidFile.remove(false);
+						}
+						catch (...)
+						{
+							// give up trying to remove stale pid file
+						}
+						break;
+					}
+					Thread::sleep(10);
+				}
 			}
+		}
+
+		{
+			Poco::FastMutex::ScopedLock l(_mutex);
+			_error.clear();
 		}
 	}
 	_started.store(false);
@@ -243,34 +279,50 @@ void ProcessRunner::start()
 
 		_t.start(*this);
 
-		std::string msg;
-		Poco::format(msg, "Waiting for process to start (pidFile: '%s')", _pidFile);
-		_sw.restart();
-
-		// wait for the process to be either running or completed by monitoring run counts.
-		while (!running() && prevRunCnt >= runCount()) checkStatus(msg);
-
-		// we could wait for the process handle != INVALID_PID,
-		// but if pidFile name was given, we should wait for
-		// the process to write it
-		if (!_pidFile.empty())
+		try
 		{
+			std::string msg;
+			Poco::format(msg, "Waiting for process to start (pidFile: '%s')", _pidFile);
 			_sw.restart();
-			// wait until process is fully initialized
-			File pidFile(_pidFile);
-			while (!pidFile.exists())
-				checkStatus(Poco::format("waiting for PID file '%s' creation.", _pidFile));
 
-			// verify that the file content is actually the process PID
-			FileInputStream fis(_pidFile);
-			PID fPID = 0;
-			if (fis.peek() != std::ifstream::traits_type::eof())
-				fis >> fPID;
-			while (fPID != pid())
+			// wait for the process to be either running or completed by monitoring run counts.
+			while (!running() && prevRunCnt >= runCount()) checkStatus(msg);
+
+			// we could wait for the process handle != INVALID_PID,
+			// but if pidFile name was given, we should wait for
+			// the process to write it
+			if (!_pidFile.empty())
 			{
-				fis.clear(); fis.seekg(0); fis >> fPID;
-				checkStatus(Poco::format("waiting for new PID (%s)", _pidFile));
+				_sw.restart();
+				// wait until process is fully initialized
+				File pidFile(_pidFile);
+				while (!pidFile.exists())
+					checkStatus(Poco::format("waiting for PID file '%s' creation.", _pidFile));
+
+				// verify that the file content is actually the process PID
+				FileInputStream fis(_pidFile);
+				PID fPID = 0;
+				if (fis.peek() != std::ifstream::traits_type::eof())
+					fis >> fPID;
+				while (fPID != pid())
+				{
+					fis.clear(); fis.seekg(0); fis >> fPID;
+					checkStatus(Poco::format("waiting for new PID (%s)", _pidFile));
+				}
 			}
+		}
+		catch (...)
+		{
+			// Clean up the process to prevent orphan
+			PID p = _pid.load();
+			if (p != INVALID_PID)
+			{
+				Process::kill(p);
+			}
+			if (_t.isRunning())
+				_t.join();
+			_started.store(false);
+			throw;
 		}
 	}
 	else
