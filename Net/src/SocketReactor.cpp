@@ -261,6 +261,34 @@ void SocketReactor::removeEventHandler(const Socket& socket, const Poco::Abstrac
 }
 
 
+void SocketReactor::remove(const Socket& socket)
+{
+	const SocketImpl* pImpl = socket.impl();
+	if (pImpl == nullptr) return;
+
+	// Remove from pollset first - prevents new events
+	// epoll_ctl may fail if socket FD is already in bad state, but we must
+	// still clean up handlers to prevent further dispatch attempts
+	try { _pollSet.remove(socket); }
+	catch (...) { }
+
+	// Get and remove the notifier under lock, but disable observers outside
+	// the lock to avoid deadlock with handlers calling back into reactor
+	NotifierPtr pNotifier;
+	{
+		ScopedLock lock(_mutex);
+		auto it = _handlers.find(pImpl->sockfd());
+		if (it != _handlers.end())
+		{
+			pNotifier = it->second;
+			_handlers.erase(it);
+		}
+	}
+	if (pNotifier)
+		pNotifier->disableObservers();
+}
+
+
 void SocketReactor::onTimeout()
 {
 	dispatch(_pTimeoutNotification);
@@ -275,9 +303,11 @@ void SocketReactor::onShutdown()
 
 void SocketReactor::dispatch(const Socket& socket, SocketNotification* pNotification)
 {
+	if (!_pollSet.has(socket)) return;  // Socket was removed, skip dispatch
+
 	NotifierPtr pNotifier = getNotifier(socket);
 	if (!pNotifier) return;
-	dispatch(pNotifier, pNotification);
+	pNotifier->dispatch(pNotification);
 }
 
 
@@ -292,7 +322,8 @@ void SocketReactor::dispatch(SocketNotification* pNotification)
 	}
 	for (auto& delegate : delegates)
 	{
-		dispatch(delegate, pNotification);
+		if (!_pollSet.has(delegate->socket())) continue;
+		delegate->dispatch(pNotification);
 	}
 }
 

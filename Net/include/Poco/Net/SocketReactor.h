@@ -227,9 +227,27 @@ public:
 		/// Usage:
 		///     Poco::NObserver<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
 		///     reactor.removeEventHandler(socket, obs);
+		///
+		/// Note: Using removeEventHandler() to remove all handlers for a socket
+		/// one-by-one is discouraged, especially in destructors. There is a race
+		/// condition between removing handlers and event dispatch - events may
+		/// still be dispatched to a handler while other handlers for the same
+		/// socket are being removed. Use remove() instead to atomically remove
+		/// all handlers for a socket.
 
 	bool has(const Socket& socket) const;
 		/// Returns true if socket is registered with this rector.
+
+	void remove(const Socket& socket);
+		/// Removes the socket from the reactor.
+		///
+		/// This removes the socket from the poll set and
+		/// removes all registered event handlers for the socket.
+		///
+		/// This is the preferred method for removing sockets during
+		/// cleanup/destruction, as it atomically removes the socket
+		/// from the poll set first (preventing new events) and then
+		/// removes all handlers.
 
 protected:
 	using NotifierPtr = Poco::AutoPtr<SocketNotifier>;
@@ -280,7 +298,6 @@ protected:
 
 private:
 
-	void dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification);
 	NotifierPtr getNotifier(const Socket& socket, bool makeNew = false);
 
 	void sleep();
@@ -334,19 +351,13 @@ inline bool SocketReactor::has(const Socket& socket) const
 
 inline void SocketReactor::onError(const Socket& socket, int code, const std::string& description)
 {
-	dispatch(socket, new ErrorNotification(this, socket, code, description));
+	dispatch(new ErrorNotification(this, socket, code, description));
 }
 
 
 inline void SocketReactor::onError(int code, const std::string& description)
 {
 	dispatch(new ErrorNotification(this, code, description));
-}
-
-
-inline void SocketReactor::dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification)
-{
-	pNotifier->dispatch(pNotification);
 }
 
 
