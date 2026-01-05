@@ -36,10 +36,15 @@ if(ANDROID)
 		COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} "-DTEST_FILES=${CMAKE_CURRENT_SOURCE_DIR}/data;${CMAKE_BINARY_DIR}/bin/TestApp;${CMAKE_BINARY_DIR}/bin/TestLibrary.so" -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/Foundation-testrunner -DTEST_PARAMETER=-all -P ${PROJECT_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake
 	)
 else()
+	if(WIN32)
+		set(CPPIGNORE_FILE "${PROJECT_SOURCE_DIR}/cppignore.win")
+	else()
+		set(CPPIGNORE_FILE "${PROJECT_SOURCE_DIR}/cppignore.lnx")
+	endif()
 	add_test(
 		NAME Foundation
 		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-		COMMAND Foundation-testrunner -ignore ${PROJECT_SOURCE_DIR}/cppignore.lnx -all
+		COMMAND Foundation-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
 	set_tests_properties(Foundation PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")	# The SharedLibaryTest has to look for shared libraries in the working directory
 	set_property(TEST Foundation APPEND PROPERTY ENVIRONMENT "PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}:$ENV{PATH}") # The ProcessTest has to look for the TestApp in the working directory
