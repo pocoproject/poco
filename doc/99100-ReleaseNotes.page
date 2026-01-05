@@ -25,7 +25,6 @@ Peter Klotz, Kari Argillander, Hussein Ismail, Mias du Plessis
 Poco::MongoDB:
   - Full replica set support: automatic server discovery, topology monitoring, failover
     handling, read preference-based server selection, connection pooling, and URI parsing.
-  - SSL socket factory support for secure connections.
   - Note: Legacy wire protocol (pre-MongoDB 5.1) has been removed. Use OP_MSG-based
     interface for all MongoDB operations.
 
@@ -44,9 +43,10 @@ Poco::Foundation:
     significant code reduction. Full backward API compatibility maintained.
   - New AsyncNotificationCenter for asynchronous notification dispatch with auto-configured
     worker threads.
-  - FastLogger (Quill wrapper, fully compatible with Poco Logging system).
+  - FastLogger (Quill wrapper, fully compatible with Poco Logging system)
   - Single/Multiple Producer, Single Consumer lock-free notification queues.
   - DataNotification class for carrying typed payloads in notifications.
+  - NativeThreadInfo support for including native thread ID and name in log messages.
   - Thread interrupt feature added for cooperative thread cancellation.
   - LogFileImpl::createFile() now creates parent directories if they don't exist.
   - Poco::format() now supports %g and %G format specifiers like printf().
@@ -103,19 +103,19 @@ Bundled Third-Party Library Upgrades:
 
 !!Security Fixes
 
-  - PR #5096 enh(deps): Upgrade bundled SQLite from 3.49.1 to 3.51.1
-  - PR #5093 enh(PDF): Upgrade bundled libpng from 1.6.43 to 1.6.53 (security fixes)
   - GH #5028 Upgrade bundled libexpat to 2.7.3 [fixes CVE]
   - GH #4912 Upgrade bundled PCRE2 to 10.47
-  - GH #4623 Poco::Zip library now checks archive consistency before extracting to prevent path traversal and zip bomb attacks
+  - GH #4623 Poco::Zip library now checks archive consistency before extracting to
+    prevent path traversal and zip bomb attacks
+  - PR #5096 enh(deps): Upgrade bundled SQLite from 3.49.1 to 3.51.1
+  - PR #5093 enh(PDF): Upgrade bundled libpng from 1.6.43 to 1.6.53 (security fixes)
 
 !!Features
 
-  - PR #5129 Foundation: Add ULID support
-  - PR #5068 MongoDB: Add replica set support with automatic failover
-  - PR #4999 Modules: Add C++20 modules component
-  - PR #4946 Net: Add reactor-based HTTP server
-  - PR #5081 Foundation: Add benchmark infrastructure and FastLogger
+  - GH #5134 Lock-free queues
+  - GH #5133 Add Channel::log(message&&)
+  - GH #5132 Make SpinlockMutex adaptive
+  - GH #5083 CppUnit: Improve test name display and selection
   - GH #5069 Missing DLLs not reported on Windows
   - GH #5060 Auto-configure AsyncNotificationCenter number of workers
   - GH #5058 Add event notifications to Redis
@@ -124,9 +124,32 @@ Bundled Third-Party Library Upgrades:
   - GH #4851 Foundation: AsyncNotificationCenter should dispatch asynchronously
   - GH #4731 Foundation: Allow specifying SharedLibrary flags in ClassLoader
   - GH #4518 Net: Update HTTP cookies to RFC 6265
+  - GH #3333 Foundation: Add NativeThreadInfo and blend in Message
+  - PR #5129 Foundation: Add ULID support
+  - PR #5081 Foundation: Add benchmark infrastructure and FastLogger
+  - PR #5068 MongoDB: Add replica set support with automatic failover
+  - PR #4999 Modules: Add C++20 modules component
+  - PR #4946 Net: Add reactor-based HTTP server
 
 !!Enhancements and Third-Party Updates
 
+  - GH #5150 Net: SocketReactor socket removal
+  - GH #5146 CMake: Use platform-specific cppignore files
+  - GH #5144 ODBC: Add nix shells for mssql and oracle
+  - GH #5115 Data/SQLite: Remove redundant error messages
+  - GH #5084 Add C++20 support and make it default
+  - GH #5078 Foundation: Improve logging system performance
+  - GH #5033 Build: Improve Linux debug build flags
+  - GH #5002 Data/ODBC: Oracle integer types fail with v23 driver
+  - GH #4962 Add `bool Application::exists()`
+  - GH #4958 Poco::Observer is obsolete in favour of Poco::NObserver
+  - GH #4789 Build: Provide zlib as shared dependency for Foundation and PDF
+  - GH #4651 Incorporate wdx_ziptype changes (fix for Poco::Zlib: Unexpected exceptions)
+  - GH #4348 0 (or NULL) for null pointer shall be replaced with nullptr
+  - GH #4202 Foundation: LogFileImpl::createFile() fails if path does not exist
+  - GH #2731 Poco::format() supports %g and %G format specifiers
+  - PR #5154 MongoDB: Document performance header cleanup
+  - PR #5153 Util: Modernize Poco::Util and clean up code duplications
   - PR #5136 Data: C++17 modernization of TypeHandler with variadic templates
   - PR #5130 fix: Resolve compiler warnings and fix potential bugs
   - PR #5119 Util: Add [[nodiscard]] to createView/createLocalView
@@ -154,26 +177,12 @@ Bundled Third-Party Library Upgrades:
   - PR #4879 CMake: Include pcre2 source files to unbundled build based on pcre2 library type
   - PR #4867 enh(Foundation): modernised header files (override, using, nullptr, ...)
   - PR #4841 enh(Poco::Dynamic): Modernised code to use C++17 features
-  - GH #5115 Data/SQLite: Remove redundant error messages
-  - GH #5084 Add C++20 support and make it default
-  - GH #5078 Foundation: Improve logging system performance
-  - GH #5033 Build: Improve Linux debug build flags
-  - GH #5002 Data/ODBC: Oracle integer types fail with v23 driver
-  - GH #4962 Add `bool Application::exists()`
-  - GH #4958 Poco::Observer is obsolete in favour of Poco::NObserver
-  - GH #4789 Build: Provide zlib as shared dependency for Foundation and PDF
-  - GH #4651 Incorporate wdx_ziptype changes (fix for Poco::Zlib: Unexpected exceptions)
-  - GH #4348 0 (or NULL) for null pointer shall be replaced with nullptr
-  - GH #4202 Foundation: LogFileImpl::createFile() fails if path does not exist
-  - GH #2731 Poco::format() supports %g and %G format specifiers
 
 !!Bug Fixes
 
-  - PR #5038 Prevent hostname being replaced with IP during handshake
-  - PR #5020 Poco::Path("C:") throws if path is disk-letter only
-  - PR #4994 chore(CI): Fix installation of Microsoft ODBC connector
-  - PR #4992 Fix building of FileStreamTest.cpp on FreeBSD
-  - PR #4986 Fix Thread_POSIX not compiling with Emscripten
+  - GH #5147 Net: Fix TSAN warnings in SocketImpl
+  - GH #5142 VarHolderImpl: Implement isDate/isTime diagnostics
+  - GH #5131 Build: Fix PCRE compile with clang/c++20 and GNU make
   - GH #5090 UBSan: Integer overflow errors in VarHolder.h
   - GH #5085 CMake build not stripping release binaries
   - GH #5083 CppUnit: Improve test name display and selection
@@ -220,6 +229,12 @@ Bundled Third-Party Library Upgrades:
   - GH #4122 Util: ServerApplication compile error with C++20
   - GH #3907 NetSSL_Win certificate verification failure with intermediate certificates
   - GH #3694 Poco::Zip::Compress::addFile with MemoryInputStream broken since 1.12.0
+  - PR #5140 Data: Refactor ODBC tests and fix testReconnect TypeInfo caching
+  - PR #5038 Prevent hostname being replaced with IP during handshake
+  - PR #5020 Poco::Path("C:") throws if path is disk-letter only
+  - PR #4994 chore(CI): Fix installation of Microsoft ODBC connector
+  - PR #4992 Fix building of FileStreamTest.cpp on FreeBSD
+  - PR #4986 Fix Thread_POSIX not compiling with Emscripten
 
 
 !!!Release 1.14.2
