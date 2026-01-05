@@ -19,10 +19,15 @@ if(ANDROID)
 		COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/XML-testrunner -DTEST_PARAMETER=-all -P ${CMAKE_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake
 	)
 else()
+	if(WIN32)
+		set(CPPIGNORE_FILE "${CMAKE_SOURCE_DIR}/cppignore.win")
+	else()
+		set(CPPIGNORE_FILE "${CMAKE_SOURCE_DIR}/cppignore.lnx")
+	endif()
 	add_test(
 		NAME XML
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		COMMAND XML-testrunner -ignore ${CMAKE_SOURCE_DIR}/cppignore.lnx -all
+		COMMAND XML-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
 	set_tests_properties(XML PROPERTIES ENVIRONMENT POCO_BASE=${CMAKE_SOURCE_DIR})
 endif()
