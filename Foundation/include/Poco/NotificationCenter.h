@@ -20,7 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Notification.h"
-#include "Poco/Mutex.h"
+#include "Poco/RWLock.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Observer.h"
 #include "Poco/NObserver.h"
@@ -186,11 +186,18 @@ public:
 		/// Returns a reference to the default
 		/// NotificationCenter.
 
+	void clear();
+		/// Disables and removes all observers.
+		///
+		/// This can be called to ensure that no more
+		/// notifications will be dispatched to observers,
+		/// even if they are currently being dispatched.
+
 protected:
 	using AbstractObserverPtr = SharedPtr<AbstractObserver>;
 	using ObserverList = std::vector<AbstractObserverPtr>;
 
-	Mutex& mutex()
+	RWLock& mutex()
 	{
 		return _mutex;
 	}
@@ -200,8 +207,8 @@ protected:
 
 private:
 
-	ObserverList  _observers;
-	mutable Mutex _mutex;
+	ObserverList   _observers;
+	mutable RWLock _mutex;
 };
 } // namespace Poco
 

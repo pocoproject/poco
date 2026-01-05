@@ -151,6 +151,11 @@ private:
 
 	using Adapter = RunnableAdapter<AsyncNotificationCenter>;
 
+	class ShutdownNotification: public Notification
+		/// Internal notification used to signal the dequeue loop to stop.
+	{
+	};
+
 	const AsyncMode _mode { AsyncMode::ENQUEUE };
 
 	// Async enqueue for notifications
@@ -169,7 +174,7 @@ private:
 
 	std::optional<NotificationTuple> nextNotification();
 
-	void dispatchNotifications(std::stop_token& stopToken, std::size_t workerId);
+	void dispatchNotifications(std::stop_token& stopToken, int workerId);
 		/// Dispatching function executed by each worker thread.
 
 	const std::size_t _workersCount { defaultWorkersCount() };
