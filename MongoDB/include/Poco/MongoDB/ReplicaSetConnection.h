@@ -20,15 +20,18 @@
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Connection.h"
-#include "Poco/MongoDB/ReplicaSet.h"
 #include "Poco/MongoDB/ReadPreference.h"
-#include "Poco/MongoDB/OpMsgMessage.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/SharedPtr.h"
 #include <functional>
 
 
 namespace Poco {
 namespace MongoDB {
+
+
+class OpMsgMessage;
+class ReplicaSet;
 
 
 class MongoDB_API ReplicaSetConnection

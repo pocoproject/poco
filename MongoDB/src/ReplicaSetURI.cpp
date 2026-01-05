@@ -13,9 +13,8 @@
 
 
 #include "Poco/MongoDB/ReplicaSetURI.h"
-#include "Poco/URI.h"
-#include "Poco/NumberParser.h"
 #include "Poco/Exception.h"
+#include "Poco/NumberParser.h"
 #include "Poco/String.h"
 #include <sstream>
 

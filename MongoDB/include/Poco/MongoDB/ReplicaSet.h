@@ -22,18 +22,21 @@
 #include "Poco/MongoDB/Connection.h"
 #include "Poco/MongoDB/ReadPreference.h"
 #include "Poco/MongoDB/TopologyDescription.h"
-#include "Poco/MongoDB/ReplicaSetURI.h"
 #include "Poco/Net/SocketAddress.h"
-#include <vector>
+#include <atomic>
+#include <chrono>
+#include <cstddef>
+#include <mutex>
 #include <string>
 #include <thread>
-#include <atomic>
-#include <mutex>
-#include <chrono>
+#include <vector>
 
 
 namespace Poco {
 namespace MongoDB {
+
+
+class ReplicaSetURI;
 
 
 class MongoDB_API ReplicaSet

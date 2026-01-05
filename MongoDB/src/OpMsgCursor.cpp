@@ -13,8 +13,11 @@
 
 
 #include "Poco/MongoDB/OpMsgCursor.h"
-#include "Poco/MongoDB/ReplicaSetConnection.h"
 #include "Poco/MongoDB/Array.h"
+#include "Poco/MongoDB/Connection.h"
+#include "Poco/MongoDB/ReplicaSetConnection.h"
+#include "Poco/Bugcheck.h"
+#include "Poco/Exception.h"
 
 //
 // NOTE:

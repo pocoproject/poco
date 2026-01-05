@@ -18,13 +18,18 @@
 #define MongoDB_Connection_INCLUDED
 
 
+#include "Poco/MongoDB/MongoDB.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/StreamSocket.h"
-#include "Poco/MongoDB/OpMsgMessage.h"
+#include "Poco/Timespan.h"
+#include <string>
 
 
 namespace Poco {
 namespace MongoDB {
+
+
+class OpMsgMessage;
 
 
 class MongoDB_API Connection

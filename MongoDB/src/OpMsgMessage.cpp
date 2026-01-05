@@ -12,9 +12,15 @@
 //
 
 #include "Poco/MongoDB/OpMsgMessage.h"
-#include "Poco/MongoDB/MessageHeader.h"
 #include "Poco/MongoDB/Array.h"
+#include "Poco/MongoDB/MessageHeader.h"
+#include "Poco/BinaryReader.h"
+#include "Poco/BinaryWriter.h"
+#include "Poco/Bugcheck.h"
+#include <istream>
 #include <map>
+#include <ostream>
+#include <sstream>
 
 #define POCO_MONGODB_DUMP	false
 

@@ -15,21 +15,23 @@
 #include "Poco/MongoDB/Database.h"
 #include "Poco/MongoDB/Array.h"
 #include "Poco/MongoDB/Binary.h"
-#include "Poco/Base64Encoder.h"
-#include "Poco/MD5Engine.h"
-#include "Poco/SHA1Engine.h"
-#include "Poco/PBKDF2Engine.h"
-#include "Poco/HMACEngine.h"
 #include "Poco/Base64Decoder.h"
-#include "Poco/MemoryStream.h"
-#include "Poco/StreamCopier.h"
+#include "Poco/Base64Encoder.h"
+#include "Poco/DigestEngine.h"
 #include "Poco/Exception.h"
-#include "Poco/RandomStream.h"
-#include "Poco/Random.h"
 #include "Poco/Format.h"
+#include "Poco/HMACEngine.h"
+#include "Poco/MD5Engine.h"
+#include "Poco/MemoryStream.h"
 #include "Poco/NumberParser.h"
-#include <sstream>
+#include "Poco/PBKDF2Engine.h"
+#include "Poco/Random.h"
+#include "Poco/RandomStream.h"
+#include "Poco/SHA1Engine.h"
+#include "Poco/StreamCopier.h"
 #include <map>
+#include <sstream>
+#include <utility>
 
 using namespace std::string_literals;
 

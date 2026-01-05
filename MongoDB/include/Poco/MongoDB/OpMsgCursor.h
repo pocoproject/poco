@@ -19,12 +19,15 @@
 
 
 #include "Poco/MongoDB/MongoDB.h"
-#include "Poco/MongoDB/Connection.h"
+#include "Poco/MongoDB/Document.h"
 #include "Poco/MongoDB/OpMsgMessage.h"
+
 
 namespace Poco {
 namespace MongoDB {
 
+
+class Connection;
 class ReplicaSetConnection;
 
 class MongoDB_API OpMsgCursor: public Document

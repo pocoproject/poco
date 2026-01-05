@@ -13,11 +13,14 @@
 
 
 #include "Poco/MongoDB/ReplicaSetConnection.h"
+#include "Poco/MongoDB/OpMsgMessage.h"
+#include "Poco/MongoDB/ReplicaSet.h"
 #include "Poco/MongoDB/TopologyDescription.h"
-#include "Poco/Net/NetException.h"
 #include "Poco/Exception.h"
+#include "Poco/Net/NetException.h"
+#include <algorithm>
+#include <exception>
 #include <set>
-#include <thread>
 
 using namespace std::literals;
 

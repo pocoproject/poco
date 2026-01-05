@@ -13,6 +13,8 @@
 
 
 #include "Poco/MongoDB/TopologyDescription.h"
+#include "Poco/MongoDB/Document.h"
+#include <utility>
 
 
 namespace Poco {

@@ -13,13 +13,15 @@
 
 
 #include "Poco/MongoDB/ReplicaSet.h"
-#include "Poco/MongoDB/ReplicaSetURI.h"
+#include "Poco/MongoDB/Document.h"
 #include "Poco/MongoDB/OpMsgMessage.h"
+#include "Poco/MongoDB/ReplicaSetURI.h"
 #include "Poco/MongoDB/TopologyChangeNotification.h"
+#include "Poco/Dynamic/Struct.h"
 #include "Poco/Exception.h"
-#include "Poco/Random.h"
 #include "Poco/NotificationCenter.h"
-#include <chrono>
+#include "Poco/Random.h"
+#include <exception>
 
 using namespace std::string_literals;
 

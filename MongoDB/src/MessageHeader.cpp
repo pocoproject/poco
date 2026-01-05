@@ -12,7 +12,9 @@
 //
 
 
-#include "Poco/MongoDB/Message.h"
+#include "Poco/MongoDB/MessageHeader.h"
+#include "Poco/BinaryReader.h"
+#include "Poco/BinaryWriter.h"
 #include "Poco/Exception.h"
 
 
