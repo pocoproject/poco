@@ -46,11 +46,11 @@ std::string Array::toString(int indent) const
 
 	if (indent > 0) oss << std::endl;
 
-	// Use protected accessor to get ordered names
-	const auto& names = orderedNames();
-	for (auto it = names.begin(), total = names.end(); it != total; ++it)
+	// Use protected accessor to get ordered elements
+	const auto& elems = elements();
+	for (auto it = elems.begin(); it != elems.end(); ++it)
 	{
-		if (it != names.begin())
+		if (it != elems.begin())
 		{
 			oss << ',';
 			if (indent > 0) oss << std::endl;
@@ -58,8 +58,7 @@ std::string Array::toString(int indent) const
 
 		for (int i = 0; i < indent; ++i) oss << ' ';
 
-		Element::Ptr element = Document::get(*it);
-		oss << element->toString(indent > 0 ? indent + 2 : 0);
+		oss << (*it)->toString(indent > 0 ? indent + 2 : 0);
 	}
 
 	if (indent > 0)
