@@ -382,7 +382,7 @@ public:
 
 
 	Keys keys(const std::string& key = std::string()) const;
-		// Returns the names of all subkeys under the given key.
+		/// Returns the names of all subkeys under the given key.
 		/// If an empty key is passed, all root level keys are returned.
 
 	void keys(Keys& range) const;
