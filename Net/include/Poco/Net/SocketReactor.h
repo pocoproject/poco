@@ -236,7 +236,7 @@ public:
 		/// all handlers for a socket.
 
 	bool has(const Socket& socket) const;
-		/// Returns true if socket is registered with this rector.
+		/// Returns true if socket is registered with this reactor.
 
 	void remove(const Socket& socket);
 		/// Removes the socket from the reactor.
