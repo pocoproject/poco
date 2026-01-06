@@ -16,6 +16,7 @@
 #include "Poco/AsyncNotificationCenter.h"
 
 #include "Poco/AbstractObserver.h"
+#include "Poco/RWLock.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Debugger.h"
 #include "Poco/ErrorHandler.h"
@@ -155,7 +156,7 @@ void AsyncNotificationCenter::notifyObservers(Notification::Ptr& pNotification)
 
 void AsyncNotificationCenter::start()
 {
-	Poco::ScopedLock l(mutex());
+	RWLock::ScopedLock l(mutex());
 
 	if (_mode == AsyncMode::ENQUEUE || _mode == AsyncMode::BOTH)
 	{
@@ -180,8 +181,8 @@ void AsyncNotificationCenter::start()
 
 	if (_mode == AsyncMode::NOTIFY || _mode == AsyncMode::BOTH)
 	{
-		auto dispatch = [this](std::stop_token stopToken, std::size_t id) {
-			this->dispatchNotifications(stopToken, id);
+		auto dispatch = [this](std::stop_token stopToken, std::size_t workerId) {
+			this->dispatchNotifications(stopToken, workerId);
 		};
 
 		for (std::size_t i {0}; i < _workersCount; ++i)
@@ -200,6 +201,7 @@ void AsyncNotificationCenter::stop()
 	{
 		if (_enqueueThreadStarted.exchange(false))
 		{
+			_nq.enqueueUrgentNotification(new ShutdownNotification);
 			_nq.wakeUpAll();
 			while (!_enqueueThreadDone) Thread::sleep(100);
 			_enqueueThread.join();
@@ -224,8 +226,11 @@ void AsyncNotificationCenter::dequeue()
 	Notification::Ptr pNf;
 	_enqueueThreadStarted = true;
 	_enqueueThreadDone = false;
-	while ((pNf = _nq.waitDequeueNotification()))
+	while (true)
 	{
+		pNf = _nq.waitDequeueNotification();
+		if (!pNf) break;
+		if (pNf.cast<ShutdownNotification>()) break;
 		try
 		{
 			notifyObservers(pNf);

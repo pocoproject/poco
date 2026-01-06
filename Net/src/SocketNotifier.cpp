@@ -88,4 +88,10 @@ void SocketNotifier::dispatch(SocketNotification* pNotification)
 }
 
 
+void SocketNotifier::disableObservers()
+{
+	_nc.clear();
+}
+
+
 } } // namespace Poco::Net

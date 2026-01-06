@@ -64,6 +64,13 @@ public:
 	std::size_t countObservers() const;
 		/// Returns the number of subscribers;
 
+	Socket socket() const;
+		/// Returns the socket.
+
+	void disableObservers();
+		/// Disables all observers, preventing any further
+		/// handler calls even if notifications are in flight.
+
 protected:
 	~SocketNotifier() override;
 		/// Destroys the SocketNotifier.
@@ -99,6 +106,12 @@ inline bool SocketNotifier::hasObserver(const Poco::AbstractObserver& observer) 
 inline bool SocketNotifier::hasObservers() const
 {
 	return _nc.hasObservers();
+}
+
+
+inline Socket SocketNotifier::socket() const
+{
+	return _socket;
 }
 
 

@@ -112,6 +112,11 @@ namespace
 
 		~ClientServiceHandler()
 		{
+			_reactor.remove(_socket);
+
+			// removing socket also removes all its observers;
+			// these are here only to test that no bad things happen on multiple removeEventHandler calls
+			// not recommended for production code, see https://github.com/pocoproject/poco/issues/5150
 			_reactor.removeEventHandler(_socket, _or);
 			_reactor.removeEventHandler(_socket, _ow);
 			_reactor.removeEventHandler(_socket, _ot);
@@ -282,6 +287,17 @@ namespace
 			reactor.addEventHandler(socket(), NObserver<FailConnector, ShutdownNotification>(*this, &FailConnector::onShutdown));
 		}
 
+		~FailConnector()
+		{
+			reactor()->remove(socket());
+
+			// removing socket also removes all its observers;
+			// these are here only to test that no bad things happen on multiple removeEventHandler calls
+			// not recommended for production code, see https://github.com/pocoproject/poco/issues/5150
+			reactor()->removeEventHandler(socket(), NObserver<FailConnector, TimeoutNotification>(*this, &FailConnector::onTimeout));
+			reactor()->removeEventHandler(socket(), NObserver<FailConnector, ShutdownNotification>(*this, &FailConnector::onShutdown));
+		}
+
 		void onShutdown(const AutoPtr<ShutdownNotification>& pNf)
 		{
 			_shutdown = true;
@@ -326,6 +342,11 @@ namespace
 
 		~DataServiceHandler()
 		{
+			_reactor.remove(_socket);
+
+			// removing socket also removes all its observers;
+			// these are here only to test that no bad things happen on multiple removeEventHandler calls
+			// not recommended for production code, see https://github.com/pocoproject/poco/issues/5150
 			_reactor.removeEventHandler(_socket, NObserver<DataServiceHandler, ReadableNotification>(*this, &DataServiceHandler::onReadable));
 			_reactor.removeEventHandler(_socket, NObserver<DataServiceHandler, ShutdownNotification>(*this, &DataServiceHandler::onShutdown));
 		}
@@ -670,6 +691,52 @@ void SocketReactorTest::testSocketReactorWakeup()
 }
 
 
+void SocketReactorTest::testSocketReactorRemove()
+{
+	SocketAddress ssa;
+	ServerSocket ss(ssa);
+	SocketReactor reactor;
+	Thread thread;
+	thread.start(reactor);
+
+	SocketAddress sa("127.0.0.1", ss.address().port());
+	StreamSocket sock(sa);
+	StreamSocket accepted = ss.acceptConnection();
+
+	// Add handlers
+	NObserver<SocketReactorTest, ReadableNotification> obsRead(*this, &SocketReactorTest::onReadable);
+	NObserver<SocketReactorTest, WritableNotification> obsWrite(*this, &SocketReactorTest::onWritable);
+	reactor.addEventHandler(accepted, obsRead);
+	reactor.addEventHandler(accepted, obsWrite);
+
+	// Verify socket is registered
+	assertTrue(reactor.has(accepted));
+	assertTrue(reactor.hasEventHandler(accepted, obsRead));
+	assertTrue(reactor.hasEventHandler(accepted, obsWrite));
+
+	// Remove socket completely
+	reactor.remove(accepted);
+
+	// Verify socket is no longer registered
+	assertTrue(!reactor.has(accepted));
+	assertTrue(!reactor.hasEventHandler(accepted, obsRead));
+	assertTrue(!reactor.hasEventHandler(accepted, obsWrite));
+
+	reactor.stop();
+	thread.join();
+}
+
+
+void SocketReactorTest::onReadable(const Poco::AutoPtr<Poco::Net::ReadableNotification>& pNf)
+{
+}
+
+
+void SocketReactorTest::onWritable(const Poco::AutoPtr<Poco::Net::WritableNotification>& pNf)
+{
+}
+
+
 void SocketReactorTest::setUp()
 {
 	ClientServiceHandler::setCloseOnTimeout(false);
@@ -693,6 +760,7 @@ CppUnit::Test* SocketReactorTest::suite()
 	CppUnit_addTest(pSuite, SocketReactorTest, testDataCollection);
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorDeadlock);
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketReactorWakeup);
+	CppUnit_addTest(pSuite, SocketReactorTest, testSocketReactorRemove);
 
 	return pSuite;
 }
