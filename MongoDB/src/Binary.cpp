@@ -14,8 +14,10 @@
 
 #include "Poco/MongoDB/Binary.h"
 #include "Poco/Base64Encoder.h"
-#include "Poco/StreamCopier.h"
+#include "Poco/Exception.h"
 #include "Poco/MemoryStream.h"
+#include "Poco/StreamCopier.h"
+#include <cstring>
 #include <sstream>
 
 using namespace std::string_literals;

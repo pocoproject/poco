@@ -15,6 +15,7 @@
 #include "Poco/MongoDB/ReadPreference.h"
 #include "Poco/MongoDB/TopologyDescription.h"
 #include "Poco/Format.h"
+#include <cmath>
 #include <limits>
 
 using namespace std::string_literals;

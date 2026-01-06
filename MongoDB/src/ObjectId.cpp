@@ -13,10 +13,10 @@
 
 
 #include "Poco/MongoDB/ObjectId.h"
-#include "Poco/Format.h"
 #include "Poco/Exception.h"
-#include <cstring>
+#include "Poco/Format.h"
 #include <cctype>
+#include <cstring>
 
 
 namespace Poco {

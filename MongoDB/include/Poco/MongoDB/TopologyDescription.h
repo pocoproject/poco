@@ -20,16 +20,20 @@
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/ServerDescription.h"
-#include "Poco/MongoDB/Document.h"
 #include "Poco/Net/SocketAddress.h"
-#include <vector>
+#include "Poco/Types.h"
+#include <cstddef>
 #include <map>
-#include <string>
 #include <mutex>
+#include <string>
+#include <vector>
 
 
 namespace Poco {
 namespace MongoDB {
+
+
+class Document;
 
 
 class MongoDB_API TopologyDescription

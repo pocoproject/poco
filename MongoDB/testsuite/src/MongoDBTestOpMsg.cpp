@@ -19,7 +19,9 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/UUIDGenerator.h"
 #include "MongoDBTest.h"
+
 #include <iostream>
+#include <sstream>
 
 
 using namespace Poco::MongoDB;

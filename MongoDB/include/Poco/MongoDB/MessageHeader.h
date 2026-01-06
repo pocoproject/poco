@@ -19,9 +19,17 @@
 
 
 #include "Poco/MongoDB/MongoDB.h"
+#include "Poco/Bugcheck.h"
+#include "Poco/Types.h"
 
 
 namespace Poco {
+
+
+class BinaryReader;
+class BinaryWriter;
+
+
 namespace MongoDB {
 
 

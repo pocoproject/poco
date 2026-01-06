@@ -13,12 +13,13 @@
 
 
 #include "Poco/MongoDB/Document.h"
-#include "Poco/MongoDB/Binary.h"
-#include "Poco/MongoDB/ObjectId.h"
 #include "Poco/MongoDB/Array.h"
-#include "Poco/MongoDB/RegularExpression.h"
+#include "Poco/MongoDB/Binary.h"
 #include "Poco/MongoDB/JavaScriptCode.h"
-#include <algorithm>
+#include "Poco/MongoDB/ObjectId.h"
+#include "Poco/MongoDB/RegularExpression.h"
+#include "Poco/Exception.h"
+#include "Poco/Timestamp.h"
 #include <sstream>
 
 
@@ -44,16 +45,27 @@ Array& Document::addNewArray(const std::string& name)
 }
 
 
+void Document::rebuildElementSet() const
+{
+	_elementSet.clear();
+	for (const auto& elem : _elements)
+	{
+		_elementSet.insert(elem);
+	}
+	_elementSetValid = true;
+}
+
+
 Element::Ptr Document::get(const std::string& name) const
 {
-	// O(1) hash map lookup instead of O(n) linear search
-	auto it = _elementMap.find(name);
-	if (it != _elementMap.end())
+	if (!_elementSetValid)
 	{
-		return it->second;
+		rebuildElementSet();
 	}
-
-	return Element::Ptr();  // Return empty pointer if not found
+	auto it = _elementSet.find(name);
+	if (it == _elementSet.end())
+		return nullptr;
+	return *it;
 }
 
 
@@ -152,11 +164,12 @@ void Document::read(BinaryReader& reader)
 		}
 
 		element->read(reader);
-		_elementNames.push_back(element->name());
-		_elementMap[element->name()] = element;  // Populate hash map for O(1) lookups
+		_elements.push_back(element);
 
 		reader >> type;
 	}
+	// Set will be built lazily on first get() call
+	_elementSetValid = false;
 }
 
 
@@ -170,9 +183,9 @@ std::string Document::toString(int indent) const
 
 	if (indent > 0) oss << std::endl;
 
-	for (auto it = _elementNames.begin(), total = _elementNames.end(); it != total; ++it)
+	for (auto it = _elements.begin(); it != _elements.end(); ++it)
 	{
-		if (it != _elementNames.begin())
+		if (it != _elements.begin())
 		{
 			oss << ',';
 			if (indent > 0) oss << std::endl;
@@ -184,8 +197,8 @@ std::string Document::toString(int indent) const
 			oss << indentStr;
 		}
 
-		const auto& element = _elementMap.at(*it);
-		oss << '"' << *it << '"';
+		const auto& element = *it;
+		oss << '"' << element->name() << '"';
 		oss << (indent > 0  ? " : " : ":");
 
 		oss << element->toString(indent > 0 ? indent + 2 : 0);
@@ -208,7 +221,7 @@ std::string Document::toString(int indent) const
 
 void Document::write(BinaryWriter& writer) const
 {
-	if (_elementNames.empty())
+	if (_elements.empty())
 	{
 		writer << 5;
 	}
@@ -216,9 +229,8 @@ void Document::write(BinaryWriter& writer) const
 	{
 		std::stringstream sstream;
 		Poco::BinaryWriter tempWriter(sstream, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
-		for (const auto& name : _elementNames)
+		for (const auto& element : _elements)
 		{
-			const auto& element = _elementMap.at(name);
 			tempWriter << static_cast<unsigned char>(element->type());
 			BSONWriter(tempWriter).writeCString(element->name());
 			element->write(tempWriter);
@@ -235,44 +247,45 @@ void Document::write(BinaryWriter& writer) const
 
 void Document::reserve(std::size_t size)
 {
-	_elementNames.reserve(size);
-	_elementMap.reserve(size);
+	_elements.reserve(size);
+	// Note: std::set doesn't support reserve()
 }
 
 
 Document& Document::addElement(Element::Ptr element)
 {
-	// Check if element with this name already exists
-	auto it = _elementMap.find(element->name());
-	if (it == _elementMap.end())
+	const std::string& name = element->name();
+
+	// Linear scan for duplicate check (faster for typical document sizes)
+	auto it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
+	if (it != _elements.end())
 	{
-		// New element - add name to vector and element to map
-		_elementNames.push_back(element->name());
-		_elementMap[element->name()] = element;
+		// Replace existing element
+		*it = element;
 	}
 	else
 	{
-		// Element exists - only update the map (replace existing)
-		_elementMap[element->name()] = element;
+		// New element: add to vector
+		_elements.push_back(element);
 	}
+
+	// Invalidate set - will be rebuilt lazily on first get()
+	_elementSetValid = false;
 	return *this;
 }
 
 
 bool Document::remove(const std::string& name)
 {
-	// Remove from hash map first (O(1))
-	auto mapIt = _elementMap.find(name);
-	if (mapIt == _elementMap.end())
+	// Linear scan to find element
+	auto it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
+	if (it == _elements.end())
 		return false;
 
-	_elementMap.erase(mapIt);
+	_elements.erase(it);
 
-	// Then remove from vector (O(n) but unavoidable for order preservation)
-	auto it = std::find(_elementNames.begin(), _elementNames.end(), name);
-	if (it != _elementNames.end())
-		_elementNames.erase(it);
-
+	// Invalidate set - will be rebuilt lazily on first get()
+	_elementSetValid = false;
 	return true;
 }
 

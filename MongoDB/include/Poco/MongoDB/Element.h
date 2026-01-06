@@ -20,18 +20,17 @@
 
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
-#include "Poco/SharedPtr.h"
-#include "Poco/Timestamp.h"
-#include "Poco/Nullable.h"
-#include "Poco/NumberFormatter.h"
 #include "Poco/DateTimeFormatter.h"
-#include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/BSONReader.h"
 #include "Poco/MongoDB/BSONWriter.h"
+#include "Poco/MongoDB/MongoDB.h"
+#include "Poco/Nullable.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/SharedPtr.h"
+#include "Poco/Timestamp.h"
+#include <cstdio>
 #include <string>
-#include <sstream>
-#include <iomanip>
-#include <list>
+#include <utility>
 
 
 namespace Poco {

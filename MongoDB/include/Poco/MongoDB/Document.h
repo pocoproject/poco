@@ -22,15 +22,58 @@
 #include "Poco/BinaryWriter.h"
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Element.h"
+#include <algorithm>
 #include <cstdlib>
-#include <unordered_map>
+#include <set>
+#include <string_view>
 #include <type_traits>
+#include <vector>
 
 
 namespace Poco {
 namespace MongoDB {
 
+
 class Array;
+
+/// Comparison functor for Element::Ptr with transparent lookup support (C++14+).
+/// Allows lookup by std::string without creating Element.
+struct ElementPtrCompare
+{
+	using is_transparent = void;
+
+	bool operator()(const Element::Ptr& lhs, const Element::Ptr& rhs) const noexcept
+	{
+		return lhs->name() < rhs->name();
+	}
+
+	bool operator()(const Element::Ptr& elem, const std::string& name) const noexcept
+	{
+		return elem->name() < name;
+	}
+
+	bool operator()(const std::string& name, const Element::Ptr& elem) const noexcept
+	{
+		return name < elem->name();
+	}
+};
+
+class MongoDB_API ElementFindByName
+{
+public:
+	ElementFindByName(std::string_view name) noexcept:
+		_name(name)
+	{
+	}
+
+	bool operator()(const Element::Ptr& element) const noexcept
+	{
+		return !element.isNull() && element->name() == _name;
+	}
+
+private:
+	std::string_view _name;
+};
 
 
 class MongoDB_API Document
@@ -120,7 +163,7 @@ public:
 		/// NotFoundException will be thrown. When the element can't be
 		/// converted a BadCastException will be thrown.
 	{
-		Element::Ptr element = get(name);
+		const Element::Ptr element = get(name);
 		if (element.isNull())
 		{
 			throw NotFoundException(name);
@@ -128,14 +171,14 @@ public:
 
 		if (ElementTraits<T>::TypeId == element->type())
 		{
-			auto* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
+			const auto* concrete = dynamic_cast<const ConcreteElement<T>* >(element.get());
 			if (concrete != nullptr)
 			{
 				return concrete->value();
 			}
 		}
-		throw BadCastException("Invalid type mismatch!");
 
+		throw BadCastException("Invalid type mismatch!");
 	}
 
 	template<typename T>
@@ -201,16 +244,27 @@ public:
 		/// Writes a document to the reader
 
 protected:
-	const std::vector<std::string>& orderedNames() const noexcept;
-		/// Returns const reference to element names in insertion order for read-only access by derived classes.
-		/// Direct modification is not allowed to maintain synchronization with hash map.
+
+	using LinearContainer = std::vector<Element::Ptr>;
+
+	const LinearContainer& elements() const noexcept;
+		/// Returns const reference to elements in insertion order for read-only access by derived classes.
 
 private:
-	std::vector<std::string> _elementNames;
-		/// Vector of element names in insertion order.
-	std::unordered_map<std::string, Element::Ptr> _elementMap;
-		/// Hash map for O(1) element lookups by name.
-		/// Maintained in sync with _elementNames for ordered access.
+	void rebuildElementSet() const;
+		/// Rebuilds _elementSet from _elements. Called lazily on first get() after modifications.
+
+	LinearContainer _elements;
+		/// Vector of elements in insertion order.
+
+	mutable std::set<Element::Ptr, ElementPtrCompare> _elementSet;
+		/// Ordered set for O(log n) element lookups by name.
+		/// Uses heterogeneous lookup (C++14+) - can search by string without creating Element.
+		/// Stores Element::Ptr directly, no string duplication.
+		/// Built lazily on first get() call after modifications.
+
+	mutable bool _elementSetValid = false;
+		/// Flag indicating whether _elementSet is in sync with _elements.
 };
 
 
@@ -227,42 +281,43 @@ inline Document& Document::addNewDocument(const std::string& name)
 
 inline void Document::clear() noexcept
 {
-	_elementNames.clear();
-	_elementMap.clear();
+	_elements.clear();
+	_elementSet.clear();
+	_elementSetValid = false;
 }
 
 
 inline bool Document::empty() const noexcept
 {
-	return _elementNames.empty();
+	return _elements.empty();
 }
 
 
 inline void Document::elementNames(std::vector<std::string>& keys) const
 {
-	keys.reserve(keys.size() + _elementNames.size());  // Pre-allocate to avoid reallocations
-	keys.insert(keys.end(), _elementNames.begin(), _elementNames.end());
+	keys.reserve(keys.size() + _elements.size());
+	for (const auto& elem : _elements)
+	{
+		keys.push_back(elem->name());
+	}
 }
 
 
 inline bool Document::exists(const std::string& name) const noexcept
 {
-	// O(1) lookup using hash map instead of O(n) linear search
-	return _elementMap.find(name) != _elementMap.end();
+	return std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name)) != _elements.end();
 }
-
-
 
 
 inline std::size_t Document::size() const noexcept
 {
-	return _elementNames.size();
+	return _elements.size();
 }
 
 
-inline const std::vector<std::string>& Document::orderedNames() const noexcept
+inline const Document::LinearContainer& Document::elements() const noexcept
 {
-	return _elementNames;
+	return _elements;
 }
 
 
