@@ -14,17 +14,13 @@
 
 #include "Poco/NotificationCenter.h"
 #include "Poco/Notification.h"
-#include "Poco/Observer.h"
-#include "Poco/AutoPtr.h"
 #include "Poco/RWLock.h"
 
 
 namespace Poco {
 
 
-NotificationCenter::NotificationCenter()
-{
-}
+NotificationCenter::NotificationCenter() = default;
 
 
 NotificationCenter::~NotificationCenter()
@@ -43,7 +39,7 @@ NotificationCenter::~NotificationCenter()
 void NotificationCenter::addObserver(const AbstractObserver& observer)
 {
 	RWLock::ScopedLock lock(_mutex);
-	_observers.push_back(observer.clone());
+	_observers.emplace_back(observer.clone());
 	_observers.back()->start();
 }
 
