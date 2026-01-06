@@ -7,7 +7,7 @@
 //
 // Definition of the FastLoggerConfigurator class.
 //
-// Copyright (c) 2004-2024, Applied Informatics Software Engineering GmbH.,
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH,
 // Aleph ONE Software Engineering LLC
 // and Contributors.
 //
@@ -65,10 +65,14 @@ class Util_API FastLoggerConfigurator
 	/// LoggingConfigurator - they configure separate logger hierarchies.
 {
 public:
-	FastLoggerConfigurator();
+	FastLoggerConfigurator() = default;
 		/// Creates the FastLoggerConfigurator.
 
-	~FastLoggerConfigurator();
+	FastLoggerConfigurator(const FastLoggerConfigurator&) = delete;
+
+	FastLoggerConfigurator& operator = (const FastLoggerConfigurator&) = delete;
+
+	~FastLoggerConfigurator() = default;
 		/// Destroys the FastLoggerConfigurator.
 
 	void configure(AbstractConfiguration::Ptr pConfig);
@@ -82,9 +86,6 @@ private:
 	void configureSinks(AbstractConfiguration::Ptr pConfig);
 	void configureFastLoggers(AbstractConfiguration::Ptr pConfig);
 	void configureFastLogger(AbstractConfiguration::Ptr pConfig);
-
-	FastLoggerConfigurator(const FastLoggerConfigurator&);
-	FastLoggerConfigurator& operator = (const FastLoggerConfigurator&);
 };
 
 

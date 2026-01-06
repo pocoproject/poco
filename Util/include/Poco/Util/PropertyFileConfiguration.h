@@ -7,7 +7,7 @@
 //
 // Definition of the PropertyFileConfiguration class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -55,7 +55,7 @@ class Util_API PropertyFileConfiguration: public MapConfiguration
 	/// a colon ':' nor an equal sign '=' character.
 {
 public:
-	PropertyFileConfiguration();
+	PropertyFileConfiguration() = default;
 		/// Creates an empty PropertyFileConfiguration.
 
 	PropertyFileConfiguration(std::istream& istr);
@@ -85,7 +85,7 @@ public:
 		/// Writes the configuration data to the given file.
 
 protected:
-	~PropertyFileConfiguration();
+	~PropertyFileConfiguration() = default;
 
 private:
 	void parseLine(std::istream& istr);

@@ -7,7 +7,7 @@
 //
 // Definition of the Application class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -127,7 +127,7 @@ public:
 	Application();
 		/// Creates the Application.
 
-	Application(int argc, char* argv[]);
+	Application(int argc, char** argv);
 		/// Creates the Application and calls init(argc, argv).
 
 	void addSubsystem(Subsystem* pSubsystem);
@@ -137,16 +137,19 @@ public:
 		///     Application::instance().addSubsystem(new MySubsystem);
 		/// is okay.
 
-	void init(int argc, char* argv[]);
+	void init(int argc, char** argv)
 		/// Processes the application's command line arguments
 		/// and sets the application's properties (e.g.,
 		/// "application.path", "application.name", etc.).
 		///
 		/// Note that as of release 1.3.7, init() no longer
 		/// calls initialize(). This is now called from run().
+	{
+		init(toArgs(argc, argv));
+	}
 
 #if defined(_WIN32)
-	void init(int argc, wchar_t* argv[]);
+	void init(int argc, wchar_t** argv)
 		/// Processes the application's command line arguments
 		/// and sets the application's properties (e.g.,
 		/// "application.path", "application.name", etc.).
@@ -156,6 +159,9 @@ public:
 		///
 		/// This Windows-specific version of init is used for passing
 		/// Unicode command line arguments from wmain().
+	{
+		init(toArgs(argc, argv));
+	}
 #endif
 
 	void init(const ArgVec& args);
@@ -241,9 +247,15 @@ public:
 		/// an exception, the exception will be propagated to the caller.
 
 	void getApplicationPath(Poco::Path& path) const;
+		/// Sets the path argument to the file path of the application executable.
+
+	Poco::Path getApplicationPath() const;
 		/// Returns the file path of the application executable.
 
 	void getApplicationDirectory(Poco::Path& dir) const;
+		/// Sets the path argument to the directory that contains the application executable.
+
+	Poco::Path getApplicationDirectory() const;
 		/// Returns the directory that contains the application executable.
 
 	std::string commandName() const;
@@ -326,31 +338,31 @@ public:
 		///
 		/// Returns zero width and height if the window size cannot be determined.
 
-	const char* name() const;
+	const char* name() const override;
 
 protected:
-	void initialize(Application& self);
+	void initialize(Application& self) override;
 		/// Initializes the application and all registered subsystems.
 		/// Subsystems are always initialized in the exact same order
 		/// in which they have been registered.
 		///
 		/// Overriding implementations must call the base class implementation.
 
-	void uninitialize();
+	void uninitialize() override;
 		/// Uninitializes the application and all registered subsystems.
 		/// Subsystems are always uninitialized in reverse order in which
 		/// they have been initialized.
 		///
 		/// Overriding implementations must call the base class implementation.
 
-	void reinitialize(Application& self);
+	void reinitialize(Application& self) override;
 		/// Re-nitializes the application and all registered subsystems.
 		/// Subsystems are always reinitialized in the exact same order
 		/// in which they have been registered.
 		///
 		/// Overriding implementations must call the base class implementation.
 
-	virtual void defineOptions(OptionSet& options);
+	void defineOptions(OptionSet& options) override;
 		/// Called before command line processing begins.
 		/// If a subclass wants to support command line arguments,
 		/// it must override this method.
@@ -371,7 +383,7 @@ protected:
 	void setLogger(Poco::Logger& logger);
 		/// Sets the logger used by the application.
 
-	virtual int main(const std::vector<std::string>& args);
+	virtual int main(const ArgVec& args);
 		/// The application's main logic.
 		///
 		/// Unprocessed command line arguments are passed in args.
@@ -402,17 +414,22 @@ protected:
 	void init();
 		/// Common initialization code.
 
-	~Application();
+	~Application() override;
 		/// Destroys the Application and deletes all registered subsystems.
+
+	static ArgVec toArgs(int argc, char** argv);
+
+#if defined(_WIN32)
+	static ArgVec toArgs(int argc, wchar_t** argv);
+#endif
 
 private:
 	void setup();
-	void setArgs(int argc, char* argv[]);
 	void setArgs(const ArgVec& args);
 	void processOptions();
 
-	typedef LayeredConfiguration::Ptr ConfigPtr;
-	typedef Poco::Logger::Ptr LoggerPtr;
+	using ConfigPtr = LayeredConfiguration::Ptr;
+	using LoggerPtr = Poco::Logger::Ptr;
 
 	ConfigPtr       _pConfig;
 	SubsystemVec    _subsystems;
@@ -434,9 +451,6 @@ private:
 	static Application* _pInstance;
 
 	friend class LoggingSubsystem;
-
-	Application(const Application&);
-	Application& operator = (const Application&);
 };
 
 
@@ -454,15 +468,50 @@ template <class C> C& Application::getSubsystem() const
 	throw Poco::NotFoundException("The subsystem has not been registered", typeid(C).name());
 }
 
+
 inline Application::SubsystemVec& Application::subsystems()
 {
 	return _subsystems;
 }
 
 
+inline void Application::setUnixOptions(bool flag)
+{
+	_unixOptions = flag;
+}
+
+
+inline void Application::stopOptionsProcessing()
+{
+	_stopOptionsProcessing = true;
+}
+
+
+inline void Application::ignoreUnknownOptions()
+{
+	_ignoreUnknownOptions = true;
+}
+
+
 inline bool Application::initialized() const
 {
 	return _initialized;
+}
+
+
+inline Poco::Path Application::getApplicationPath() const
+{
+	Poco::Path path;
+	getApplicationPath(path);
+	return path;
+}
+
+
+inline Poco::Path Application::getApplicationDirectory() const
+{
+	Poco::Path path;
+	getApplicationDirectory(path);
+	return path;
 }
 
 
@@ -519,9 +568,7 @@ inline const Poco::Timestamp& Application::startTime() const
 inline Poco::Timespan Application::uptime() const
 {
 	Poco::Timestamp now;
-	Poco::Timespan uptime = now - _startTime;
-
-	return uptime;
+	return now - _startTime;
 }
 
 

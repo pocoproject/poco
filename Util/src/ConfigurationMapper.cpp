@@ -5,7 +5,7 @@
 // Package: Configuration
 // Module:  ConfigurationMapper
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -28,11 +28,6 @@ ConfigurationMapper::ConfigurationMapper(const std::string& fromPrefix, const st
 
 	if (!_fromPrefix.empty()) _fromPrefix += '.';
 	if (!_toPrefix.empty()) _toPrefix += '.';
-}
-
-
-ConfigurationMapper::~ConfigurationMapper()
-{
 }
 
 

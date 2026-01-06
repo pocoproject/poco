@@ -5,7 +5,7 @@
 // Package: Application
 // Module:  ServerApplication
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -15,35 +15,35 @@
 #include "Poco/Util/ServerApplication.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionSet.h"
-#include "Poco/Util/OptionException.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/FileStream.h"
 #include "Poco/Exception.h"
 #if !defined(POCO_VXWORKS)
 #include "Poco/Process.h"
-#include "Poco/NamedEvent.h"
 #endif
-#include "Poco/NumberFormatter.h"
-#include "Poco/Logger.h"
-#include "Poco/String.h"
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <signal.h>
 #include <sys/stat.h>
-#include <fstream>
 #elif defined(POCO_OS_FAMILY_WINDOWS)
+#include "Poco/Format.h"
+#include "Poco/NamedEvent.h"
+#include "Poco/NumberFormatter.h"
+#include "Poco/Logger.h"
+#include "Poco/String.h"
+#include "Poco/UnicodeConverter.h"
 #include "Poco/Util/WinService.h"
 #include "Poco/Util/WinRegistryKey.h"
 #include "Poco/UnWindows.h"
 #include <cstring>
 #endif
-#include "Poco/UnicodeConverter.h"
-#include "Poco/Format.h"
 
-
+#if defined(POCO_OS_FAMILY_WINDOWS)
 using Poco::NumberFormatter;
+#endif
+
 using Poco::Exception;
 using Poco::SystemException;
 using namespace std::string_literals;
@@ -58,8 +58,7 @@ Poco::NamedEvent      ServerApplication::_terminate(Poco::ProcessImpl::terminati
 Poco::Event           ServerApplication::_terminated;
 SERVICE_STATUS        ServerApplication::_serviceStatus;
 SERVICE_STATUS_HANDLE ServerApplication::_serviceStatusHandle = nullptr;
-#endif
-#if defined(POCO_VXWORKS) || POCO_OS == POCO_OS_ANDROID
+#elif defined(POCO_VXWORKS) || POCO_OS == POCO_OS_ANDROID
 Poco::Event ServerApplication::_terminate;
 #endif
 
@@ -73,21 +72,10 @@ ServerApplication::ServerApplication()
 }
 
 
-ServerApplication::~ServerApplication()
-{
-}
-
-
 bool ServerApplication::isInteractive() const
 {
 	bool runsInBackground = config().getBool("application.runAsDaemon"s, false) || config().getBool("application.runAsService"s, false);
 	return !runsInBackground;
-}
-
-
-int ServerApplication::run()
-{
-	return Application::run();
 }
 
 
@@ -124,8 +112,18 @@ void ServerApplication::registerTerminateCallback(TerminateCallback tCB, const s
 }
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+void ServerApplication::handlePidFile(const std::string& name, const std::string& value)
+{
+	Poco::FileOutputStream ostr(value);
+	if (ostr.good())
+		ostr << Poco::Process::id() << std::endl;
+	else
+		throw Poco::CreateFileException("Cannot write PID to file", value);
+	Poco::TemporaryFile::registerForDeletion(value);
+}
 
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
 
 //
 // Windows specific code
@@ -222,43 +220,7 @@ void ServerApplication::waitForTerminationRequest()
 }
 
 
-int ServerApplication::run(int argc, char** argv)
-{
-	if (!hasConsole() && isService())
-	{
-		return 0;
-	}
-	else
-	{
-		int rc = EXIT_OK;
-		try
-		{
-			init(argc, argv);
-			switch (_action)
-			{
-			case SRV_REGISTER:
-				registerService();
-				rc = EXIT_OK;
-				break;
-			case SRV_UNREGISTER:
-				unregisterService();
-				rc = EXIT_OK;
-				break;
-			default:
-				rc = run();
-			}
-		}
-		catch (Exception& exc)
-		{
-			logger().log(exc);
-			rc = EXIT_SOFTWARE;
-		}
-		return rc;
-	}
-}
-
-
-int ServerApplication::run(const std::vector<std::string>& args)
+int ServerApplication::run(const ArgVec& args)
 {
 	if (!hasConsole() && isService())
 	{
@@ -270,42 +232,6 @@ int ServerApplication::run(const std::vector<std::string>& args)
 		try
 		{
 			init(args);
-			switch (_action)
-			{
-			case SRV_REGISTER:
-				registerService();
-				rc = EXIT_OK;
-				break;
-			case SRV_UNREGISTER:
-				unregisterService();
-				rc = EXIT_OK;
-				break;
-			default:
-				rc = run();
-			}
-		}
-		catch (Exception& exc)
-		{
-			logger().log(exc);
-			rc = EXIT_SOFTWARE;
-		}
-		return rc;
-	}
-}
-
-
-int ServerApplication::run(int argc, wchar_t** argv)
-{
-	if (!hasConsole() && isService())
-	{
-		return 0;
-	}
-	else
-	{
-		int rc = EXIT_OK;
-		try
-		{
-			init(argc, argv);
 			switch (_action)
 			{
 			case SRV_REGISTER:
@@ -415,7 +341,7 @@ void ServerApplication::defineOptions(OptionSet& options)
 			.repeatable(false)
 			.argument("automatic|manual"s)
 			.callback(OptionCallback<ServerApplication>(this, &ServerApplication::handleStartup)));
-	
+
 	options.addOption(
 		Option("pidfile"s, ""s, "Write the process ID of the application to given file."s)
 			.required(false)
@@ -470,23 +396,7 @@ void ServerApplication::waitForTerminationRequest()
 	terminateCallback();
 }
 
-
-int ServerApplication::run(int argc, char** argv)
-{
-	try
-	{
-		init(argc, argv);
-	}
-	catch (Exception& exc)
-	{
-		logger().log(exc);
-		return EXIT_CONFIG;
-	}
-	return run();
-}
-
-
-int ServerApplication::run(const std::vector<std::string>& args)
+int ServerApplication::run(const ArgVec& args)
 {
 	try
 	{
@@ -535,32 +445,7 @@ void ServerApplication::waitForTerminationRequest()
 }
 
 
-int ServerApplication::run(int argc, char** argv)
-{
-	bool runAsDaemon = isDaemon(argc, argv);
-	if (runAsDaemon)
-	{
-		beDaemon();
-	}
-	try
-	{
-		init(argc, argv);
-		if (runAsDaemon)
-		{
-			int rc = chdir("/");
-			if (rc != 0) return EXIT_OSERR;
-		}
-	}
-	catch (Exception& exc)
-	{
-		logger().log(exc);
-		return EXIT_CONFIG;
-	}
-	return run();
-}
-
-
-int ServerApplication::run(const std::vector<std::string>& args)
+int ServerApplication::run(const ArgVec& args)
 {
 	bool runAsDaemon = false;
 	for (const auto& arg: args)
@@ -590,18 +475,6 @@ int ServerApplication::run(const std::vector<std::string>& args)
 		return EXIT_CONFIG;
 	}
 	return run();
-}
-
-
-bool ServerApplication::isDaemon(int argc, char** argv)
-{
-	std::string option("--daemon"s);
-	for (int i = 1; i < argc; ++i)
-	{
-		if (option == argv[i])
-			return true;
-	}
-	return false;
 }
 
 
@@ -679,19 +552,7 @@ void ServerApplication::handleUMask(const std::string& name, const std::string& 
 	umask(mask);
 }
 
-
-#endif
-
-
-void ServerApplication::handlePidFile(const std::string& name, const std::string& value)
-{
-	Poco::FileOutputStream ostr(value);
-	if (ostr.good())
-		ostr << Poco::Process::id() << std::endl;
-	else
-		throw Poco::CreateFileException("Cannot write PID to file", value);
-	Poco::TemporaryFile::registerForDeletion(value);
-}
+#endif // POCO_OS_FAMILY_UNIX
 
 
 } } // namespace Poco::Util

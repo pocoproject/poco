@@ -7,7 +7,7 @@
 //
 // Definition of the AbstractConfiguration class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -109,6 +109,10 @@ public:
 	AbstractConfiguration();
 		/// Creates the AbstractConfiguration.
 
+	AbstractConfiguration(const AbstractConfiguration&) = delete;
+
+	AbstractConfiguration& operator = (const AbstractConfiguration&) = delete;
+
 	bool hasProperty(const std::string& key) const;
 		/// Returns true iff the property with the given key exists.
 
@@ -188,7 +192,7 @@ public:
 		/// Numbers starting with 0x are treated as hexadecimal.
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
-		
+
 	Poco::UInt32 getUInt32(const std::string& key) const;
 		/// Returns the 32-bit unsigned int value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
@@ -197,7 +201,7 @@ public:
 		/// Numbers starting with 0x are treated as hexadecimal.
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
-		
+
 	Poco::Int32 getInt32(const std::string& key, Poco::Int32 defaultValue) const;
 		/// If a property with the given key exists, returns the property's 32-bit int value,
 		/// otherwise returns the given default value.
@@ -206,7 +210,7 @@ public:
 		/// Numbers starting with 0x are treated as hexadecimal.
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
-		
+
 	Poco::UInt32 getUInt32(const std::string& key, Poco::UInt32 defaultValue) const;
 		/// If a property with the given key exists, returns the property's 32-bit unsigned int
 		/// value, otherwise returns the given default value.
@@ -224,7 +228,7 @@ public:
 		/// Numbers starting with 0x are treated as hexadecimal.
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
-		
+
 	Poco::UInt16 getUInt16(const std::string& key) const;
 		/// Returns the unsigned 16-bit int value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
@@ -233,7 +237,7 @@ public:
 		/// Numbers starting with 0x are treated as hexadecimal.
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
-		
+
 	Poco::Int16 getInt16(const std::string& key, Poco::Int16 defaultValue) const;
 		/// If a property with the given key exists, returns the property's 16-bit int value,
 		/// otherwise returns the given default value.
@@ -242,7 +246,7 @@ public:
 		/// Numbers starting with 0x are treated as hexadecimal.
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
-		
+
 	Poco::UInt16 getUInt16(const std::string& key, Poco::UInt16 defaultValue) const;
 		/// If a property with the given key exists, returns the property's unsigned 16-bit int
 		/// value, otherwise returns the given default value.
@@ -343,7 +347,7 @@ public:
 	virtual void setInt16(const std::string& key, Poco::Int16 value);
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
-		
+
 	virtual void setUInt16(const std::string& key, Poco::UInt16 value);
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
@@ -351,7 +355,7 @@ public:
 	virtual void setInt32(const std::string& key, Poco::Int32 value);
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
-		
+
 	virtual void setUInt32(const std::string& key, Poco::UInt32 value);
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
@@ -375,6 +379,11 @@ public:
 	virtual void setBool(const std::string& key, bool value);
 		/// Sets the property with the given key to the given value.
 		/// An already existing value for the key is overwritten.
+
+
+	Keys keys(const std::string& key = std::string()) const;
+		/// Returns the names of all subkeys under the given key.
+		/// If an empty key is passed, all root level keys are returned.
 
 	void keys(Keys& range) const;
 		/// Returns in range the names of all keys at root level.
@@ -402,7 +411,7 @@ public:
 		/// Creates a view (see LocalConfigurationView) into the configuration.
 		/// The returned Ptr must be assigned to an AbstractConfiguration::Ptr,
 		/// not a raw pointer, to prevent use-after-free.
-	
+
 	std::string expand(const std::string& value) const;
 		/// Replaces all occurrences of ${<property>} in value with the
 		/// value of the <property>. If <property> does not exist,
@@ -432,11 +441,11 @@ protected:
 	class ScopedLock
 		/// A helper class allowing to temporarily
 		/// lock an entire AbstractConfiguration,
-		/// for use by subclasses. A typical use 
+		/// for use by subclasses. A typical use
 		/// case is loading or saving an entire
 		/// configuration in a thread-safe way.
 		///
-		/// Caution: Thoughtless use of this class 
+		/// Caution: Thoughtless use of this class
 		/// may easily lead to deadlock situations
 		/// in connection with events if any of the
 		/// mutating methods (set...(), remove())
@@ -515,20 +524,18 @@ protected:
 	static bool parseBool(const std::string& value);
 	void setRawWithEvent(const std::string& key, std::string value);
 
-	virtual ~AbstractConfiguration();
+	~AbstractConfiguration() override = default;
 
 private:
 	std::string internalExpand(const std::string& value) const;
 	std::string uncheckedExpand(const std::string& value) const;
-
-	AbstractConfiguration(const AbstractConfiguration&);
-	AbstractConfiguration& operator = (const AbstractConfiguration&);
 
 	mutable int _depth;
 	bool        _eventsEnabled;
 	mutable Poco::Mutex _mutex;
 
 	friend class LayeredConfiguration;
+	friend class AbstractConfigurationView;
 	friend class ConfigurationView;
 	friend class LocalConfigurationView;
 	friend class ConfigurationMapper;
@@ -546,7 +553,7 @@ inline Poco::Int32 AbstractConfiguration::getInt32(const std::string& key) const
 	return getInt(key);
 }
 
-	
+
 inline Poco::Int32 AbstractConfiguration::getInt32(const std::string& key, Poco::Int32 defaultValue) const
 {
 	return getInt(key, defaultValue);

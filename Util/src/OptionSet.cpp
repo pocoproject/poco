@@ -5,7 +5,7 @@
 // Package: Options
 // Module:  OptionSet
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -19,30 +19,6 @@
 
 namespace Poco {
 namespace Util {
-
-
-OptionSet::OptionSet()
-{
-}
-
-
-OptionSet::OptionSet(const OptionSet& options):
-	_options(options._options)
-{
-}
-
-
-OptionSet::~OptionSet()
-{
-}
-
-
-OptionSet& OptionSet::operator = (const OptionSet& options)
-{
-	if (&options != this)
-		_options = options._options;
-	return *this;
-}
 
 
 void OptionSet::addOption(const Option& option)
@@ -104,18 +80,6 @@ const Option& OptionSet::getOption(const std::string& name, bool matchShort) con
 		return *pOption;
 	else
 		throw UnknownOptionException(name);
-}
-
-
-OptionSet::Iterator OptionSet::begin() const
-{
-	return _options.begin();
-}
-
-
-OptionSet::Iterator OptionSet::end() const
-{
-	return _options.end();
 }
 
 

@@ -5,7 +5,7 @@
 // Package: Configuration
 // Module:  AbstractConfiguration
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -37,11 +37,6 @@ namespace Util {
 AbstractConfiguration::AbstractConfiguration():
 	_depth(0),
 	_eventsEnabled(true)
-{
-}
-
-
-AbstractConfiguration::~AbstractConfiguration()
 {
 }
 
@@ -174,7 +169,7 @@ Poco::Int16 AbstractConfiguration::getInt16(const std::string& key) const
 		throw NotFoundException(key);
 }
 
-	
+
 Poco::Int16 AbstractConfiguration::getInt16(const std::string& key, Poco::Int16 defaultValue) const
 {
 	Mutex::ScopedLock lock(_mutex);
@@ -336,7 +331,7 @@ void AbstractConfiguration::setInt16(const std::string& key, Poco::Int16 value)
 	setRawWithEvent(key, NumberFormatter::format(value));
 }
 
-	
+
 void AbstractConfiguration::setUInt16(const std::string& key, Poco::UInt16 value)
 {
 	setRawWithEvent(key, NumberFormatter::format(value));
@@ -348,7 +343,7 @@ void AbstractConfiguration::setInt32(const std::string& key, Poco::Int32 value)
 	setRawWithEvent(key, NumberFormatter::format(value));
 }
 
-	
+
 void AbstractConfiguration::setUInt32(const std::string& key, Poco::UInt32 value)
 {
 	setRawWithEvent(key, NumberFormatter::format(value));
@@ -386,6 +381,16 @@ void AbstractConfiguration::setDouble(const std::string& key, double value)
 void AbstractConfiguration::setBool(const std::string& key, bool value)
 {
 	setRawWithEvent(key, value ? "true" : "false");
+}
+
+
+AbstractConfiguration::Keys AbstractConfiguration::keys(const std::string& key) const
+{
+	Mutex::ScopedLock lock(_mutex);
+
+	Keys range;
+	enumerate(key, range);
+	return range;
 }
 
 

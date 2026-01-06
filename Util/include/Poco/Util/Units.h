@@ -277,6 +277,13 @@ Value<V, U > operator * (const V& a, const Value<V, U>& b)
 
 
 template <typename V, typename U>
+Value<V, U> abs(const Value<V, U>& a)
+{
+    return Value<V, U>(std::abs(a.get()));
+}
+
+
+template <typename V, typename U>
 Value<V, Power<U, 1, 2> > sqrt(const Value<V, U>& a)
 {
 	return Value<V, Power<U, 1, 2> >(std::sqrt(a.get()));

@@ -5,7 +5,7 @@
 // Package: Options
 // Module:  Option
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -25,16 +25,6 @@ using Poco::icompare;
 
 namespace Poco {
 namespace Util {
-
-
-Option::Option():
-	_required(false),
-	_repeatable(false),
-	_argRequired(false),
-	_pValidator(nullptr),
-	_pCallback(nullptr)
-{
-}
 
 
 Option::Option(const Option& option):
@@ -58,12 +48,7 @@ Option::Option(const Option& option):
 
 Option::Option(const std::string& fullName, const std::string& shortName):
 	_shortName(shortName),
-	_fullName(fullName),
-	_required(false),
-	_repeatable(false),
-	_argRequired(false),
-	_pValidator(nullptr),
-	_pCallback(nullptr)
+	_fullName(fullName)
 {
 }
 
@@ -72,11 +57,7 @@ Option::Option(const std::string& fullName, const std::string& shortName, const 
 	_shortName(shortName),
 	_fullName(fullName),
 	_description(description),
-	_required(required),
-	_repeatable(false),
-	_argRequired(false),
-	_pValidator(nullptr),
-	_pCallback(nullptr)
+	_required(required)
 {
 }
 
@@ -86,11 +67,8 @@ Option::Option(const std::string& fullName, const std::string& shortName, const 
 	_fullName(fullName),
 	_description(description),
 	_required(required),
-	_repeatable(false),
 	_argName(argName),
-	_argRequired(argRequired),
-	_pValidator(nullptr),
-	_pCallback(nullptr)
+	_argRequired(argRequired)
 {
 }
 

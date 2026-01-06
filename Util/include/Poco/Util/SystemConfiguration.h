@@ -7,7 +7,7 @@
 //
 // Definition of the SystemConfiguration class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -20,7 +20,8 @@
 
 #include "Poco/Util/Util.h"
 #include "Poco/Util/AbstractConfiguration.h"
-
+#include <map>
+#include <functional>
 
 namespace Poco {
 namespace Util {
@@ -59,37 +60,23 @@ class Util_API SystemConfiguration: public AbstractConfiguration
 	/// in a NotImplementedException being thrown.
 {
 public:
-	SystemConfiguration();
+	SystemConfiguration() = default;
 		/// Creates the SystemConfiguration.
 
 protected:
-	bool getRaw(const std::string& key, std::string& value) const;
-	void setRaw(const std::string& key, const std::string& value);
-	void enumerate(const std::string& key, Keys& range) const;
-	void removeRaw(const std::string& key);
-	~SystemConfiguration();
+	bool getRaw(const std::string& key, std::string& value) const override;
+	void setRaw(const std::string& key, const std::string& value) override;
+	void enumerate(const std::string& key, Keys& range) const override;
+	void removeRaw(const std::string& key) override;
+
+	~SystemConfiguration() = default;
 
 private:
 	static bool getEnv(const std::string& name, std::string& value);
+	static std::string getNodeId();
 
-	static const std::string OSNAME;
-	static const std::string OSVERSION;
-	static const std::string OSARCHITECTURE;
-	static const std::string NODENAME;
-	static const std::string NODEID;
-	static const std::string CURRENTDIR;
-	static const std::string HOMEDIR;
-	static const std::string CONFIGHOMEDIR;
-	static const std::string CACHEHOMEDIR;
-	static const std::string DATAHOMEDIR;
-	static const std::string TEMPHOMEDIR;
-	static const std::string TEMPDIR;
-	static const std::string CONFIGDIR;
-	static const std::string DATETIME;
-#if !defined(POCO_VXWORKS)
-	static const std::string PID;
-#endif
-	static const std::string ENV;
+	using SystemProperty = std::function<std::string ()>;
+	static std::map<std::string, SystemProperty> _functions;
 };
 
 

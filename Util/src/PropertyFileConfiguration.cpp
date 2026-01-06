@@ -5,7 +5,7 @@
 // Package: Configuration
 // Module:  PropertyFileConfiguration
 //
-// Copyright (c) 2004-2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -29,11 +29,6 @@ namespace Poco {
 namespace Util {
 
 
-PropertyFileConfiguration::PropertyFileConfiguration()
-{
-}
-
-
 PropertyFileConfiguration::PropertyFileConfiguration(std::istream& istr)
 {
 	load(istr);
@@ -46,11 +41,6 @@ PropertyFileConfiguration::PropertyFileConfiguration(const std::string& path)
 }
 
 
-PropertyFileConfiguration::~PropertyFileConfiguration()
-{
-}
-
-
 void PropertyFileConfiguration::load(std::istream& istr)
 {
 	AbstractConfiguration::ScopedLock lock(*this);
@@ -58,7 +48,7 @@ void PropertyFileConfiguration::load(std::istream& istr)
 	clear();
 	while (!istr.eof())
 	{
-		if(istr.fail())
+		if (istr.fail())
 		{
 			throw Poco::IOException("Broken input stream");
 		}

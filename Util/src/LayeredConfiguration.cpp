@@ -5,7 +5,7 @@
 // Package: Configuration
 // Module:  LayeredConfiguration
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -23,16 +23,6 @@ using Poco::RuntimeException;
 
 namespace Poco {
 namespace Util {
-
-
-LayeredConfiguration::LayeredConfiguration()
-{
-}
-
-
-LayeredConfiguration::~LayeredConfiguration()
-{
-}
 
 
 void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig)

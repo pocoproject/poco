@@ -5,7 +5,7 @@
 // Package: Windows
 // Module:  WinRegistryConfiguration
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -34,11 +34,6 @@ WinRegistryConfiguration::WinRegistryConfiguration(const std::string& rootPath, 
 		if (_rootPath[_rootPath.length() - 1] != '\\')
 			_rootPath += '\\';
 	}
-}
-
-
-WinRegistryConfiguration::~WinRegistryConfiguration()
-{
 }
 
 

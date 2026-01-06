@@ -7,7 +7,7 @@
 //
 // Definition of the Subsystem class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -48,8 +48,12 @@ class Util_API Subsystem: public Poco::RefCountedObject
 	/// the performance, to a complete reinitialization.
 {
 public:
-	Subsystem();
+	Subsystem() = default;
 		/// Creates the Subsystem.
+
+	Subsystem(const Subsystem&) = delete;
+
+	Subsystem& operator = (const Subsystem&) = delete;
 
 	virtual const char* name() const = 0;
 		/// Returns the name of the subsystem.
@@ -81,14 +85,10 @@ protected:
 		/// the option to a configuration property or specify a callback
 		/// to handle the option.
 
-	virtual ~Subsystem();
+	~Subsystem() = default;
 		/// Destroys the Subsystem.
 
 	friend class Application;
-
-private:
-	Subsystem(const Subsystem&);
-	Subsystem& operator = (const Subsystem&);
 };
 
 

@@ -5,7 +5,7 @@
 // Package: Configuration
 // Module:  FastLoggerConfigurator
 //
-// Copyright (c) 2004-2024, Applied Informatics Software Engineering GmbH.,
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.,
 // Aleph ONE Software Engineering LLC
 // and Contributors.
 //
@@ -29,16 +29,6 @@ using namespace std::string_literals;
 
 namespace Poco {
 namespace Util {
-
-
-FastLoggerConfigurator::FastLoggerConfigurator()
-{
-}
-
-
-FastLoggerConfigurator::~FastLoggerConfigurator()
-{
-}
 
 
 void FastLoggerConfigurator::configure(AbstractConfiguration::Ptr pConfig)
@@ -83,12 +73,9 @@ void FastLoggerConfigurator::configureFastLoggers(AbstractConfiguration::Ptr pCo
 {
 	using LoggerMap = std::map<std::string, AutoPtr<AbstractConfiguration>>;
 
-	AbstractConfiguration::Keys loggers;
-	pConfig->keys(loggers);
-
 	// Use a map to sort loggers by name, ensuring parents are initialized before children
 	LoggerMap loggerMap;
-	for (const auto& l : loggers)
+	for (const auto& l : pConfig->keys())
 	{
 		// Skip the sinks section
 		if (l == "sinks"s) continue;
@@ -109,10 +96,7 @@ void FastLoggerConfigurator::configureFastLogger(AbstractConfiguration::Ptr pCon
 	std::string name = pConfig->getString("name"s, ""s);
 	FastLogger& logger = FastLogger::get(name);
 
-	AbstractConfiguration::Keys props;
-	pConfig->keys(props);
-
-	for (const auto& p : props)
+	for (const auto& p : pConfig->keys())
 	{
 		if (p != "name"s)
 		{

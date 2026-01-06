@@ -7,7 +7,7 @@
 //
 // Definition of the JSONConfiguration class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -61,80 +61,56 @@ class Util_API JSONConfiguration : public AbstractConfiguration
 	/// config.prop4.prop5 --> false
 {
 public:
-
 	JSONConfiguration();
 		/// Creates an empty configuration
-
 
 	JSONConfiguration(const std::string& path);
 		/// Creates a configuration and loads the JSON structure from the given file
 
-
 	JSONConfiguration(std::istream& istr);
 		/// Creates a configuration and loads the JSON structure from the given stream
-
 
 	JSONConfiguration(const JSON::Object::Ptr& object);
 		/// Creates a configuration from the given JSON object
 
-
-	virtual ~JSONConfiguration();
+	~JSONConfiguration() = default;
 		/// Destructor
-
 
 	void load(const std::string& path);
 		/// Loads the configuration from the given file
 
-
 	void load(std::istream& istr);
 		/// Loads the configuration from the given stream
-
 
 	void loadEmpty(const std::string& root);
 		/// Loads an empty object containing only a root object with the given name.
 
-
 	void save(std::ostream& ostr, unsigned int indent = 2) const;
 		/// Saves the configuration to the given stream
 
+	void setInt(const std::string& key, int value) override;
 
-	virtual void setInt(const std::string& key, int value);
+	void setBool(const std::string& key, bool value) override;
 
+	void setDouble(const std::string& key, double value) override;
 
-	virtual void setBool(const std::string& key, bool value);
+	void setString(const std::string& key, const std::string& value) override;
 
-
-	virtual void setDouble(const std::string& key, double value);
-
-
-	virtual void setString(const std::string& key, const std::string& value);
-
-
-	virtual void removeRaw(const std::string& key);
-
+	void removeRaw(const std::string& key) override;
 
 protected:
+	bool getRaw(const std::string & key, std::string & value) const override;
 
-	bool getRaw(const std::string & key, std::string & value) const;
+	void setRaw(const std::string& key, const std::string& value) override;
 
-
-	void setRaw(const std::string& key, const std::string& value);
-
-
-	void enumerate(const std::string& key, Keys& range) const;
-
+	void enumerate(const std::string& key, Keys& range) const override;
 
 private:
-
-
 	JSON::Object::Ptr findStart(const std::string& key, std::string& lastPart);
-
 
 	void getIndexes(std::string& name, std::vector<int>& indexes);
 
-
 	void setValue(const std::string& key, const Poco::Dynamic::Var& value);
-
 
 	JSON::Object::Ptr _object;
 };
@@ -147,4 +123,3 @@ private:
 
 
 #endif // Util_JSONConfiguration_INCLUDED
-

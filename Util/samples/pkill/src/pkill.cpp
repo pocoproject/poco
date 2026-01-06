@@ -82,9 +82,9 @@ protected:
 		}
 		else
 		{
-			for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
+			for (auto& arg: args)
 			{
-				Poco::Process::PID pid = Poco::NumberParser::parseUnsigned(*it);
+				Poco::Process::PID pid = Poco::NumberParser::parseUnsigned(arg);
 				if (_friendly)
 					Poco::Process::requestTermination(pid);
 				else

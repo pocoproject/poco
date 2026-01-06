@@ -5,7 +5,7 @@
 // Package: Application
 // Module:  LoggingSubsystem
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -24,16 +24,6 @@ using namespace std::string_literals;
 
 namespace Poco {
 namespace Util {
-
-
-LoggingSubsystem::LoggingSubsystem()
-{
-}
-
-
-LoggingSubsystem::~LoggingSubsystem()
-{
-}
 
 
 const char* LoggingSubsystem::name() const
