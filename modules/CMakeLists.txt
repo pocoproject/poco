@@ -251,7 +251,7 @@ set_target_properties(Modules
     PROPERTIES
     VERSION ${SHARED_LIBRARY_VERSION} 
     SOVERSION ${SHARED_LIBRARY_VERSION}
-    OUTPUT_NAME Modules
+    OUTPUT_NAME PocoModules
     DEFINE_SYMBOL Modules_EXPORTS
 )
 
