@@ -40,20 +40,34 @@ protected:
 	virtual ~FileImpl();
 	void swapImpl(FileImpl& file);
 	void setPathImpl(const std::string& path);
+	[[nodiscard]]
 	const std::string& getPathImpl() const;
+	[[nodiscard]]
 	std::string getExecutablePathImpl() const;
+	[[nodiscard]]
 	bool existsImpl() const;
+	[[nodiscard]]
 	bool canReadImpl() const;
+	[[nodiscard]]
 	bool canWriteImpl() const;
+	[[nodiscard]]
 	bool canExecuteImpl(const std::string& absolutePath) const;
+	[[nodiscard]]
 	bool isFileImpl() const;
+	[[nodiscard]]
 	bool isDirectoryImpl() const;
+	[[nodiscard]]
 	bool isLinkImpl() const;
+	[[nodiscard]]
 	bool isDeviceImpl() const;
+	[[nodiscard]]
 	bool isHiddenImpl() const;
+	[[nodiscard]]
 	Timestamp createdImpl() const;
+	[[nodiscard]]
 	Timestamp getLastModifiedImpl() const;
 	void setLastModifiedImpl(const Timestamp& ts);
+	[[nodiscard]]
 	FileSizeImpl getSizeImpl() const;
 	void setSizeImpl(FileSizeImpl size);
 	void setWriteableImpl(bool flag = true);
@@ -64,8 +78,11 @@ protected:
 	void removeImpl();
 	bool createFileImpl(bool createDirectories = false);
 	bool createDirectoryImpl();
+	[[nodiscard]]
 	FileSizeImpl totalSpaceImpl() const;
+	[[nodiscard]]
 	FileSizeImpl usableSpaceImpl() const;
+	[[nodiscard]]
 	FileSizeImpl freeSpaceImpl() const;
 	static void handleLastErrorImpl(int err, const std::string& path);
 	static void handleLastErrorImpl(const std::string& path);

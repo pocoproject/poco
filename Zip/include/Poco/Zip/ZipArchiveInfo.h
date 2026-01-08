@@ -43,24 +43,31 @@ public:
 	~ZipArchiveInfo();
 		/// Destroys the ZipArchiveInfo.
 
+	[[nodiscard]]
 	Poco::UInt16 getDiskNumber() const;
 		/// Get the number of the disk where this header can be found
 
+	[[nodiscard]]
 	Poco::UInt16 getFirstDiskForDirectoryHeader() const;
 		/// Returns the number of the disk that contains the start of the directory header
 
+	[[nodiscard]]
 	Poco::UInt16 getNumberOfEntries() const;
 		/// Returns the number of entries on this disk
 
+	[[nodiscard]]
 	Poco::UInt16 getTotalNumberOfEntries() const;
 		/// Returns the total number of entries on all disks
 
+	[[nodiscard]]
 	Poco::UInt32 getCentralDirectorySize() const;
 		/// Returns the size of the central directory in bytes
 
+	[[nodiscard]]
 	std::streamoff getHeaderOffset() const;
 		/// Returns the offset of the header in relation to the begin of this disk
 
+	[[nodiscard]]
 	const std::string& getZipComment() const;
 		/// Returns the (optional) Zip Comment
 
@@ -134,30 +141,39 @@ public:
 	~ZipArchiveInfo64();
 		/// Destroys the ZipArchiveInfo64.
 
+	[[nodiscard]]
 	Poco::UInt16 getVersionMadeBy() const;
 		/// The ZIP version used to create the file
 
+	[[nodiscard]]
 	Poco::UInt16 getRequiredVersion() const;
 		/// The minimum version required to extract the data
 
+	[[nodiscard]]
 	Poco::UInt32 getDiskNumber() const;
 		/// Get the number of the disk where this header can be found
 
+	[[nodiscard]]
 	Poco::UInt32 getFirstDiskForDirectoryHeader() const;
 		/// Returns the number of the disk that contains the start of the directory header
 
+	[[nodiscard]]
 	Poco::UInt64 getNumberOfEntries() const;
 		/// Returns the number of entries on this disk
 
+	[[nodiscard]]
 	Poco::UInt64 getTotalNumberOfEntries() const;
 		/// Returns the total number of entries on all disks
 
+	[[nodiscard]]
 	Poco::UInt64 getCentralDirectorySize() const;
 		/// Returns the size of the central directory in bytes
 
+	[[nodiscard]]
 	std::streamoff getCentralDirectoryOffset() const;
 		/// Returns the offset of the central directory from beginning of first disk
 
+	[[nodiscard]]
 	std::streamoff getHeaderOffset() const;
 		/// Returns the offset of the header in relation to the begin of this disk
 
@@ -179,6 +195,7 @@ public:
 	void setTotalNumberOfDisks(Poco::UInt32 val);
 		/// Sets the offset of the central directory from beginning of first disk
 
+	[[nodiscard]]
 	std::string createHeader() const;
 		/// Creates a header
 

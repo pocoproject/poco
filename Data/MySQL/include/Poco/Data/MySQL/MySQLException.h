@@ -53,12 +53,15 @@ public:
 	MySQLException& operator=(const MySQLException& exc);
 		/// Assignment operator.
 
+	[[nodiscard]]
 	const char* name() const noexcept;
 		/// Returns exception name.
 
+	[[nodiscard]]
 	const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
+	[[nodiscard]]
 	Poco::Exception* clone() const;
 		/// Creates an exact copy of the exception.
 		///

@@ -55,6 +55,7 @@ public:
 		///
 		/// Specify 0 for an unlimited line length.
 
+	[[nodiscard]]
 	int getLineLength() const;
 		/// Returns the currently set line length.
 
@@ -81,6 +82,7 @@ public:
 	HexBinaryEncoderIOS(std::ostream& ostr);
 	~HexBinaryEncoderIOS() override;
 	int close();
+	[[nodiscard]]
 	HexBinaryEncoderBuf* rdbuf();
 
 protected:

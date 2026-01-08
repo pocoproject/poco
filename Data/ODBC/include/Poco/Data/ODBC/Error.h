@@ -62,18 +62,21 @@ public:
 		return *this;
 	}
 
+	[[nodiscard]]
 	const Diagnostics<H, handleType>& diagnostics() const
 		/// Returns the associated diagnostics.
 	{
 		return *_pDiag;
 	}
 
+	[[nodiscard]]
 	int count() const
 		/// Returns the count of diagnostic records.
 	{
-		return (int) _pDiag->count();
+		return static_cast<int>(_pDiag->count());
 	}
 
+	[[nodiscard]]
 	std::string& toString(int index, std::string& str) const
 		/// Generates the string for the diagnostic record.
 	{
@@ -96,6 +99,7 @@ public:
 		return str;
 	}
 
+	[[nodiscard]]
 	std::string toString() const
 		/// Generates the string for the diagnostic record collection.
 	{

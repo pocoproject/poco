@@ -42,11 +42,13 @@ public:
 	{
 	}
 
+	[[nodiscard]]
 	Redis::Client::Ptr createObject()
 	{
 		return new Redis::Client(_address);
 	}
 
+	[[nodiscard]]
 	bool validateObject(Redis::Client::Ptr pObject)
 	{
 		return true;
@@ -97,6 +99,7 @@ public:
 		}
 	}
 
+	[[nodiscard]]
 	operator Client::Ptr()
 	{
 		return _client;

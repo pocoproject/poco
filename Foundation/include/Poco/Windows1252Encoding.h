@@ -31,8 +31,11 @@ class Foundation_API Windows1252Encoding: public TextEncoding
 public:
 	Windows1252Encoding();
 	~Windows1252Encoding() override;
+	[[nodiscard]]
 	const char* canonicalName() const override;
+	[[nodiscard]]
 	bool isA(const std::string& encodingName) const override;
+	[[nodiscard]]
 	const CharacterMap& characterMap() const override;
 	int convert(const unsigned char* bytes) const override;
 	int convert(int ch, unsigned char* bytes, int length) const override;

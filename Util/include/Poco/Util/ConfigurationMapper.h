@@ -72,11 +72,13 @@ public:
 	ConfigurationMapper& operator = (const ConfigurationMapper&) = delete;
 
 protected:
+	[[nodiscard]]
 	bool getRaw(const std::string& key, std::string& value) const override;
 	void setRaw(const std::string& key, const std::string& value) override;
 	void enumerate(const std::string& key, Keys& range) const override;
 	void removeRaw(const std::string& key) override;
 
+	[[nodiscard]]
 	std::string translateKey(const std::string& key) const;
 
 	~ConfigurationMapper() = default;

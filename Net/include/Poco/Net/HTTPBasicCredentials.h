@@ -61,15 +61,18 @@ public:
 	void setUsername(const std::string& username);
 		/// Sets the username.
 
+	[[nodiscard]]
 	const std::string& getUsername() const;
 		/// Returns the username.
 
 	void setPassword(const std::string& password);
 		/// Sets the password.
 
+	[[nodiscard]]
 	const std::string& getPassword() const;
 		/// Returns the password.
 
+	[[nodiscard]]
 	bool empty() const;
 		/// Returns true if both username and password are empty, otherwise false.
 

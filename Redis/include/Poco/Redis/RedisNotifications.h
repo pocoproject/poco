@@ -76,9 +76,11 @@ public:
 	virtual ~RedisErrorNotification();
 		/// Destroys the RedisErrorNotification.
 
+	[[nodiscard]]
 	const Exception& error() const;
 		/// Returns the error that caused this notification.
 
+	[[nodiscard]]
 	const std::string& message() const;
 		/// Returns the error message.
 

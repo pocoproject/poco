@@ -54,16 +54,19 @@ public:
 	{
 	}
 
+	[[nodiscard]]
 	std::size_t numOfColumnsHandled() const override
 	{
 		return 1;
 	}
 
+	[[nodiscard]]
 	std::size_t numOfRowsHandled() const override
 	{
 		return _val.size();
 	}
 
+	[[nodiscard]]
 	bool canBind() const override
 	{
 		return !_bound;
@@ -92,6 +95,7 @@ namespace Keywords {
 
 
 template <typename T>
+[[nodiscard]]
 AbstractBinding::Ptr use(const std::vector<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::vector.
 {
@@ -100,6 +104,7 @@ AbstractBinding::Ptr use(const std::vector<T>& t, BulkFnType, const std::string&
 
 
 template <typename T>
+[[nodiscard]]
 AbstractBinding::Ptr in(const std::vector<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::vector.
 {
@@ -108,6 +113,7 @@ AbstractBinding::Ptr in(const std::vector<T>& t, BulkFnType, const std::string& 
 
 
 template <typename T>
+[[nodiscard]]
 AbstractBinding::Ptr use(const std::deque<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::deque.
 {
@@ -116,6 +122,7 @@ AbstractBinding::Ptr use(const std::deque<T>& t, BulkFnType, const std::string& 
 
 
 template <typename T>
+[[nodiscard]]
 AbstractBinding::Ptr in(const std::deque<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::deque.
 {
@@ -124,6 +131,7 @@ AbstractBinding::Ptr in(const std::deque<T>& t, BulkFnType, const std::string& n
 
 
 template <typename T>
+[[nodiscard]]
 AbstractBinding::Ptr use(const std::list<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::list.
 {
@@ -132,6 +140,7 @@ AbstractBinding::Ptr use(const std::list<T>& t, BulkFnType, const std::string& n
 
 
 template <typename T>
+[[nodiscard]]
 AbstractBinding::Ptr in(const std::list<T>& t, BulkFnType, const std::string& name = "")
 	/// Convenience function for a more compact BulkBinding creation for std::list.
 {

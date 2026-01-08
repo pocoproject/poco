@@ -30,18 +30,22 @@ class JWT_API Serializer
 	/// A helper class for serializing and deserializing JWTs.
 {
 public:
+	[[nodiscard]]
 	static std::string serialize(const Poco::JSON::Object& object);
 		/// Serializes and base64-encodes a JSON object.
 
 	static void serialize(const Poco::JSON::Object& object, std::ostream& stream);
 		/// Serializes and base64-encodes a JSON object.
 
+	[[nodiscard]]
 	static Poco::JSON::Object::Ptr deserialize(const std::string& serialized);
 		/// Attempts to deserialize a base64-encoded serialized JSON object.
 
+	[[nodiscard]]
 	static Poco::JSON::Object::Ptr deserialize(std::istream& stream);
 		/// Attempts to deserialize a base64-encoded serialized JSON object.
 
+	[[nodiscard]]
 	static std::vector<std::string> split(const std::string& token);
 		/// Splits a serialized JWT into its components.
 };

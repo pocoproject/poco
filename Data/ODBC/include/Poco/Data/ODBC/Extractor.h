@@ -420,9 +420,11 @@ public:
 	void setDataExtraction(Preparator::DataExtraction ext);
 		/// Set data extraction mode.
 
+	[[nodiscard]]
 	Preparator::DataExtraction getDataExtraction() const;
 		/// Returns data extraction mode.
 
+	[[nodiscard]]
 	bool isNull(std::size_t col, std::size_t row = POCO_DATA_INVALID_ROW) override;
 		/// Returns true if the value at [col,row] is null.
 
@@ -448,7 +450,7 @@ private:
 		/// Resizes the vector holding extracted data lengths to the
 		/// appropriate size.
 
-	template<typename T>
+	template <typename T>
 	bool extractBoundImpl(std::size_t pos, T& val)
 	{
 		if (isNull(pos)) return false;
@@ -709,11 +711,13 @@ private:
 		return true;
 	}
 
+	[[nodiscard]]
 	bool isNullLengthIndicator(SQLLEN val) const;
 		/// The reason for this utility wrapper are platforms where
 		/// SQLLEN macro (a.k.a. SQLINTEGER) yields 64-bit value,
 		/// while SQL_NULL_DATA (#define'd as -1 literal) remains 32-bit.
 
+	[[nodiscard]]
 	SQLINTEGER columnSize(std::size_t pos) const;
 
 	const StatementHandle&     _rStmt;

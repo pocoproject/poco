@@ -58,9 +58,11 @@ public:
 	~NodeIterator();
 		/// Destroys the NodeIterator.
 
+	[[nodiscard]]
 	Node* root() const;
 		/// The root node of the NodeIterator, as specified when it was created.
 
+	[[nodiscard]]
 	unsigned long whatToShow() const;
 		/// This attribute determines which node types are presented via the iterator.
 		/// The available set of constants is defined in the NodeFilter interface.
@@ -68,9 +70,11 @@ public:
 		/// still be considered. Note that this skip takes precedence over the filter,
 		/// if any.
 
+	[[nodiscard]]
 	NodeFilter* filter() const;
 		/// The NodeFilter used to screen nodes.
 
+	[[nodiscard]]
 	bool expandEntityReferences() const;
 		/// The value of this flag determines whether the children of entity reference
 		/// nodes are visible to the iterator. If false, they and their descendants
@@ -89,15 +93,18 @@ public:
 		/// This implementation does not support entity reference expansion and
 		/// thus always returns false.
 
+	[[nodiscard]]
 	Node* nextNode();
 		/// Returns the next node in the set and advances the position of the iterator
 		/// in the set. After a NodeIterator is created, the first call to nextNode()
 		/// returns the first node in the set.
 
+	[[nodiscard]]
 	Node* previousNode();
 		/// Returns the previous node in the set and moves the position of the NodeIterator
 		/// backwards in the set.
 
+	[[nodiscard]]
 	Node* currentNodeNP() const;
 		/// Returns the current node in the set.
 		///
@@ -113,9 +120,13 @@ public:
 		/// the exception INVALID_STATE_ERR.
 
 protected:
+	[[nodiscard]]
 	bool accept(Node* pNode) const;
+	[[nodiscard]]
 	Node* next() const;
+	[[nodiscard]]
 	Node* previous() const;
+	[[nodiscard]]
 	Node* last();
 
 private:

@@ -276,6 +276,7 @@ public:
 		/// Setting this flag allows sending datagrams to
 		/// the broadcast address.
 
+	[[nodiscard]]
 	bool getBroadcast() const;
 		/// Returns the value of the SO_BROADCAST socket option.
 

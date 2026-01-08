@@ -49,28 +49,35 @@ public:
 		/// Destroys the SQLiteStatementImpl.
 
 protected:
+	[[nodiscard]]
 	std::size_t columnsReturned() const override;
 		/// Returns number of columns returned by query.
 
+	[[nodiscard]]
 	int affectedRowCount() const override;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 		/// All changes are counted, even if they are later undone by a ROLLBACK or ABORT.
 		/// Changes associated with creating and dropping tables are not counted.
 
+	[[nodiscard]]
 	const MetaColumn& metaColumn(std::size_t pos) const override;
 		/// Returns column meta data.
 
+	[[nodiscard]]
 	bool hasNext() override;
 		/// Returns true if a call to next() will return data.
 
+	[[nodiscard]]
 	std::size_t next() override;
 		/// Retrieves the next row from the resultset and returns 1.
 		/// Will throw, if the resultset is empty.
 
+	[[nodiscard]]
 	bool canBind() const override;
 		/// Returns true if a valid statement is set and we can bind.
 
+	[[nodiscard]]
 	bool canCompile() const override;
 		/// Returns true if statement can compile.
 
@@ -85,9 +92,11 @@ protected:
 	void bindImpl() override;
 		/// Binds parameters
 
+	[[nodiscard]]
 	AbstractExtraction::ExtractorPtr extractor() override;
 		/// Returns the concrete extractor used by the statement.
 
+	[[nodiscard]]
 	AbstractBinding::BinderPtr binder() override;
 		/// Returns the concrete binder used by the statement.
 

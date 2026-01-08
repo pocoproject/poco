@@ -98,6 +98,7 @@ public:
 		/// and sets the "WWW-Authenticate" header field
 		/// according to the given realm.
 
+	[[nodiscard]]
 	bool sent() const;
 		/// Returns true if the response (header) has been sent.
 

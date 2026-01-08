@@ -593,7 +593,7 @@ void DateTimeParserTest::testCustom()
 
 	try
 	{
-		DateTimeParser::parse("%h:%M %a", "", tzd);
+		[[maybe_unused]] DateTime dt1 = DateTimeParser::parse("%h:%M %a", "", tzd);
 		fail ("must fail");
 	}
 	catch (SyntaxException&)
@@ -602,7 +602,7 @@ void DateTimeParserTest::testCustom()
 
 	try
 	{
-		DateTimeParser::parse("", "12:30 PM", tzd);
+		[[maybe_unused]] DateTime dt1 = DateTimeParser::parse("", "12:30 PM", tzd);
 		fail ("must fail");
 	}
 	catch (SyntaxException&)
@@ -611,7 +611,7 @@ void DateTimeParserTest::testCustom()
 
 	try
 	{
-		DateTimeParser::parse("", "", tzd);
+		[[maybe_unused]] DateTime dt1 = DateTimeParser::parse("", "", tzd);
 		fail ("must fail");
 	}
 	catch (SyntaxException&)

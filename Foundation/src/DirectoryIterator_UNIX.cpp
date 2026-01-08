@@ -36,7 +36,7 @@ DirectoryIteratorImpl::DirectoryIteratorImpl(const std::string& path): _pDir(nul
 #endif
 	if (!_pDir) File::handleLastError(path);
 
-	next();
+	[[maybe_unused]] const std::string& s = next();
 }
 
 

@@ -53,6 +53,7 @@ public:
 	TLSSlot(const TLSSlot&) = delete;
 	TLSSlot& operator=(const TLSSlot&) = delete;
 
+	[[nodiscard]]
 	C& value()
 	{
 		return _value;
@@ -75,9 +76,11 @@ public:
 	~ThreadLocalStorage();
 		/// Deletes the TLS.
 
+	[[nodiscard]]
 	TLSAbstractSlot*& get(const void* key);
 		/// Returns the slot for the given key.
 
+	[[nodiscard]]
 	static ThreadLocalStorage& current();
 		/// Returns the TLS object for the current thread
 		/// (which may also be the main thread).
@@ -133,6 +136,7 @@ public:
 		return get();
 	}
 
+	[[nodiscard]]
 	C& get()
 		/// Returns a reference to the underlying data object.
 		/// The reference can be used to modify the object.

@@ -74,23 +74,32 @@ public:
 	virtual int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
 	virtual int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
 	virtual void sendUrgent(unsigned char data);
+	[[nodiscard]]
 	virtual int available();
+	[[nodiscard]]
 	virtual bool secure() const;
 	virtual void setSendBufferSize(int size);
+	[[nodiscard]]
 	virtual int getSendBufferSize();
 	virtual void setReceiveBufferSize(int size);
+	[[nodiscard]]
 	virtual int getReceiveBufferSize();
 	virtual void setSendTimeout(const Poco::Timespan& timeout);
+	[[nodiscard]]
 	virtual Poco::Timespan getSendTimeout();
 	virtual void setReceiveTimeout(const Poco::Timespan& timeout);
+	[[nodiscard]]
 	virtual Poco::Timespan getReceiveTimeout();
 	virtual void setBlocking(bool flag);
+	[[nodiscard]]
 	virtual bool getBlocking() const;
 
 	// Internal
+	[[nodiscard]]
 	int frameFlags() const;
 		/// Returns the frame flags of the most recently received frame.
 
+	[[nodiscard]]
 	bool mustMaskPayload() const;
 		/// Returns true if the payload must be masked.
 
@@ -99,6 +108,7 @@ public:
 		///
 		/// The default is std::numeric_limits<int>::max().
 
+	[[nodiscard]]
 	int getMaxPayloadSize() const;
 		/// Returns the maximum payload size for receiveFrame().
 		///
@@ -132,11 +142,16 @@ protected:
 		Poco::Buffer<char> payload{0};
 	};
 
+	[[nodiscard]]
 	int peekHeader(ReceiveState& receiveState);
 	void skipHeader(int headerLength);
+	[[nodiscard]]
 	int receivePayload(char *buffer, int payloadLength, char mask[MASK_LENGTH], bool useMask, int maskOffset);
+	[[nodiscard]]
 	int receiveNBytes(void* buffer, int length);
+	[[nodiscard]]
 	int receiveSomeBytes(char* buffer, int length);
+	[[nodiscard]]
 	int peekSomeBytes(char* buffer, int length);
 	virtual ~WebSocketImpl();
 

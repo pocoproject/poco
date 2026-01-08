@@ -76,21 +76,27 @@ public:
 	~RSAKeyImpl();
 		/// Destroys the RSAKeyImpl.
 
+	[[nodiscard]]
 	RSA* getRSA();
 		/// Returns the OpenSSL RSA object.
 
+	[[nodiscard]]
 	const RSA* getRSA() const;
 		/// Returns the OpenSSL RSA object.
 
+	[[nodiscard]]
 	int size() const;
 		/// Returns the RSA modulus size.
 
+	[[nodiscard]]
 	ByteVec modulus() const;
 		/// Returns the RSA modulus.
 
+	[[nodiscard]]
 	ByteVec encryptionExponent() const;
 		/// Returns the RSA encryption exponent.
 
+	[[nodiscard]]
 	ByteVec decryptionExponent() const;
 		/// Returns the RSA decryption exponent.
 
@@ -114,6 +120,7 @@ private:
 	RSAKeyImpl();
 
 	void freeRSA();
+	[[nodiscard]]
 	static ByteVec convertToByteVec(const BIGNUM* bn);
 
 	RSA* _pRSA;

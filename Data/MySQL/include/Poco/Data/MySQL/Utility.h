@@ -32,24 +32,31 @@ class MySQL_API Utility
 	/// Various utility functions for MySQL.
 {
 public:
+	[[nodiscard]]
 	static std::string serverInfo(MYSQL* pHandle);
 		/// Returns server info.
 
+	[[nodiscard]]
 	static std::string serverInfo(Poco::Data::Session& session);
 		/// Returns server info.
 
+	[[nodiscard]]
 	static unsigned long serverVersion(MYSQL* pHandle);
 		/// Returns server version.
 
+	[[nodiscard]]
 	static unsigned long serverVersion(Poco::Data::Session& session);
 		/// Returns server version.
 
+	[[nodiscard]]
 	static std::string hostInfo(MYSQL* pHandle);
 		/// Returns host info.
 
+	[[nodiscard]]
 	static std::string hostInfo(Poco::Data::Session& session);
 		/// Returns host info.
 
+	[[nodiscard]]
 	static MYSQL* handle(Poco::Data::Session& session);
 		/// Returns native MySQL handle for the session.
 };

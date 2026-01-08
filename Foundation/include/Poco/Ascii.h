@@ -56,6 +56,7 @@ public:
 		ACP_PRINT    = 0x0200
 	};
 
+	[[nodiscard]]
 	static int properties(int ch);
 		/// Return the ASCII character properties for the
 		/// character with the given ASCII value.
@@ -63,54 +64,68 @@ public:
 		/// If the character is outside the ASCII range
 		/// (0 .. 127), 0 is returned.
 
+	[[nodiscard]]
 	static bool hasSomeProperties(int ch, int properties);
 		/// Returns true if the given character is
 		/// within the ASCII range and has at least one of
 		/// the given properties.
 
+	[[nodiscard]]
 	static bool hasProperties(int ch, int properties);
 		/// Returns true if the given character is
 		/// within the ASCII range and has all of
 		/// the given properties.
 
+	[[nodiscard]]
 	static bool isAscii(int ch);
 		/// Returns true iff the given character code is within
 		/// the ASCII range (0 .. 127).
 
+	[[nodiscard]]
 	static bool isSpace(int ch);
 		/// Returns true iff the given character is a whitespace.
 
+	[[nodiscard]]
 	static bool isDigit(int ch);
 		/// Returns true iff the given character is a digit.
 
+	[[nodiscard]]
 	static bool isHexDigit(int ch);
 		/// Returns true iff the given character is a hexadecimal digit.
 
+	[[nodiscard]]
 	static bool isPunct(int ch);
 		/// Returns true iff the given character is a punctuation character.
 
+	[[nodiscard]]
 	static bool isAlpha(int ch);
 		/// Returns true iff the given character is an alphabetic character.
 
+	[[nodiscard]]
 	static bool isAlphaNumeric(int ch);
 		/// Returns true iff the given character is an alphabetic character.
 
+	[[nodiscard]]
 	static bool isLower(int ch);
 		/// Returns true iff the given character is a lowercase alphabetic
 		/// character.
 
+	[[nodiscard]]
 	static bool isUpper(int ch);
 		/// Returns true iff the given character is an uppercase alphabetic
 		/// character.
 
+	[[nodiscard]]
 	static bool isPrintable(int ch);
 		/// Returns true iff the given character is printable.
 
+	[[nodiscard]]
 	static int toLower(int ch);
 		/// If the given character is an uppercase character,
 		/// return its lowercase counterpart, otherwise return
 		/// the character.
 
+	[[nodiscard]]
 	static int toUpper(int ch);
 		/// If the given character is a lowercase character,
 		/// return its uppercase counterpart, otherwise return

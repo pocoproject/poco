@@ -62,6 +62,7 @@ public:
 	virtual ~KeyPair();
 		/// Destroys the KeyPair.
 
+	[[nodiscard]]
 	virtual int size() const;
 		/// Returns the RSA modulus size.
 
@@ -81,12 +82,15 @@ public:
 		/// If a null pointer is passed for a stream, the corresponding
 		/// key is not exported.
 
+	[[nodiscard]]
 	KeyPairImpl::Ptr impl() const;
 		/// Returns the impl object.
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// Returns key pair name
 
+	[[nodiscard]]
 	Type type() const;
 		/// Returns key pair type
 

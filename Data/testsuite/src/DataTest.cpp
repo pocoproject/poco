@@ -548,7 +548,7 @@ void DataTest::testColumnVector()
 
 	try
 	{
-		POCO_UNUSED int i; i = c[100];
+		[[maybe_unused]] int i; i = c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -651,7 +651,7 @@ void DataTest::testColumnVectorBool()
 
 	try
 	{
-		POCO_UNUSED bool b; b = c[100];
+		[[maybe_unused]] bool b; b = c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -727,7 +727,7 @@ void DataTest::testColumnDeque()
 
 	try
 	{
-		POCO_UNUSED int i; i = c[100];
+		[[maybe_unused]] int i; i = c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -844,7 +844,7 @@ void DataTest::testColumnList()
 
 	try
 	{
-		POCO_UNUSED int i; i = c[100];
+		[[maybe_unused]] int i; i = c[100];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }
@@ -951,13 +951,13 @@ void DataTest::testRow()
 
 	try
 	{
-		POCO_UNUSED int i; i = row[5].convert<int>();
+		[[maybe_unused]] int i; i = row[5].convert<int>();
 		fail ("must fail");
 	}catch (RangeException&) {}
 
 	try
 	{
-		POCO_UNUSED int i; i = row["a bad name"].convert<int>();
+		[[maybe_unused]] int i; i = row["a bad name"].convert<int>();
 		fail ("must fail");
 	}catch (NotFoundException&) {}
 
@@ -1279,7 +1279,7 @@ void DataTest::testJSONRowFormatter()
 	row2.append("date", Date(2007, 3, 13));
 	row2.append("time", Time(8, 12, 15));
 	row2.setFormatter(new JSONRowFormatter(JSONRowFormatter::JSON_FMT_MODE_FULL));
-	row2.namesToString();
+	[[maybe_unused]] std::string _ = row2.namesToString();
 	assertTrue(row2.valuesToString() == "{\"date\":\"2007/03/13\",\"time\":\"08:12:15\"}");
 }
 

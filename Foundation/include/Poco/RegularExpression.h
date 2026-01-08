@@ -118,6 +118,7 @@ public:
 		/// Throws a RegularExpressionException in case of an error.
 		/// Returns the number of matches.
 
+	[[nodiscard]]
 	bool match(const std::string& subject, std::string::size_type offset = 0) const;
 		/// Returns true if and only if the subject matches the regular expression.
 		///
@@ -125,9 +126,11 @@ public:
 		/// matching, which means that the empty string will never match and
 		/// the pattern is treated as if it starts with a ^.
 
+	[[nodiscard]]
 	bool match(const std::string& subject, std::string::size_type offset, int options) const;
 		/// Returns true if and only if the subject matches the regular expression.
 
+	[[nodiscard]]
 	bool operator == (const std::string& subject) const;
 		/// Returns true if and only if the subject matches the regular expression.
 		///
@@ -135,6 +138,7 @@ public:
 		/// matching, which means that the empty string will never match and
 		/// the pattern is treated as if it starts with a ^.
 
+	[[nodiscard]]
 	bool operator != (const std::string& subject) const;
 		/// Returns true if and only if the subject does not match the regular expression.
 		///
@@ -190,6 +194,7 @@ public:
 		/// $0 is the captured substring. $1 ... $n are the substrings matching the subpatterns.
 		/// Returns the number of replaced occurrences.
 
+	[[nodiscard]]
 	static bool match(const std::string& subject, const std::string& pattern, int options = 0);
 		/// Matches the given subject string against the regular expression given in pattern,
 		/// using the given options.

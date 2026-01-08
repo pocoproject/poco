@@ -103,10 +103,14 @@ public:
 		/// Sets indentation.
 
 private:
+	[[nodiscard]]
 	const char* endLine() const;
-	unsigned indent();
+	[[nodiscard]]
+	unsigned int indent();
+	[[nodiscard]]
 	bool printFlat() const;
 	void arrayValue();
+	[[nodiscard]]
 	bool array() const;
 
 	std::ostream& _out;

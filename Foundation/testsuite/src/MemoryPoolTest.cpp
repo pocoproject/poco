@@ -51,10 +51,10 @@ void MemoryPoolTest::testMemoryPool()
 
 	try
 	{
-		pool1.get();
+		[[maybe_unused]] void* ptr = pool1.get();
 		fail("pool exhausted - must throw exception");
 	}
-	catch (Poco::OutOfMemoryException&)
+	catch ([[maybe_unused]] Poco::OutOfMemoryException& e)
 	{
 	}
 

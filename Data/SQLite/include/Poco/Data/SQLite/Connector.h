@@ -40,9 +40,11 @@ public:
 	~Connector() override;
 		/// Destroys the Connector.
 
+	[[nodiscard]]
 	const std::string& name() const override;
 		/// Returns the name associated with this connector.
 
+	[[nodiscard]]
 	Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString,
 		std::size_t timeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT) override;
 		/// Creates a SQLite SessionImpl object and initializes it with the given connectionString.

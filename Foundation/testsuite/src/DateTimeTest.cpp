@@ -648,15 +648,15 @@ void DateTimeTest::testSetYearDay()
 	const int num_data = sizeof data / sizeof *data;
 	for (int di = 0; di < num_data; ++di)
 	{
-		const int POCO_UNUSED line = data[di].d_lineNum;
+		[[maybe_unused]] const int line = data[di].d_lineNum;
 		const int year = data[di].d_year;
-		const unsigned int POCO_UNUSED day = data[di].d_day;
+		[[maybe_unused]] const unsigned int day = data[di].d_day;
 
 		const int exp_month = data[di].d_expMonth;
 		const unsigned int exp_day   = data[di].d_expDay;
 		const DateTime r(year, exp_month, exp_day);
 		DateTime x;
-		const DateTime& POCO_UNUSED X = x;
+		[[maybe_unused]] const DateTime& X = x;
 
 #if 0
 		// TODO - need to be able to assign a day number in the year
@@ -701,16 +701,16 @@ void DateTimeTest::testSetYearDay()
 	const int num_data2 = sizeof data2 / sizeof *data2;
 	for (int di = 0; di < num_data2; ++di)
 	{
-		const int POCO_UNUSED line  = data2[di].d_lineNum;
-		const int POCO_UNUSED year  = data2[di].d_year;
-		const int POCO_UNUSED day   = data2[di].d_day;
+		[[maybe_unused]] const int line  = data2[di].d_lineNum;
+		[[maybe_unused]] const int year  = data2[di].d_year;
+		[[maybe_unused]] const int day   = data2[di].d_day;
 		const int exp   = data2[di].d_exp;
 		DateTime x;
-		const DateTime& POCO_UNUSED X = x;
+		[[maybe_unused]] const DateTime& X = x;
 		if (1 == exp)
 		{
 			DateTime r;
-			const POCO_UNUSED DateTime& r2 = r;
+			[[maybe_unused]] const DateTime& r2 = r;
 #if 0
 			r.set(year, day);
 #endif

@@ -44,6 +44,7 @@ public:
 	virtual ~CryptoTransform();
 		/// Destroys the CryptoTransform.
 
+	[[nodiscard]]
 	virtual std::size_t blockSize() const = 0;
 		/// Returns the block size for this CryptoTransform.
 
@@ -53,6 +54,7 @@ public:
 		/// no padding is performed, the total amount of data encrypted or decrypted must then be a multiple of
 		/// the block size or an error will occur.
 
+	[[nodiscard]]
 	virtual std::string getTag(std::size_t tagSize = 16) = 0;
 		/// Returns the GCM tag after encrypting using GCM mode.
 		///

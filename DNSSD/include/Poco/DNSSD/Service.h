@@ -128,13 +128,16 @@ public:
 	~Service();
 		/// Destroys the Service.
 
+	[[nodiscard]]
 	Poco::Int32 networkInterface() const;
 		/// The id of the interface on which the remote service is running, or zero
 		/// if the service is available on all interfaces.
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// The name of the service.
 
+	[[nodiscard]]
 	const std::string& fullName() const;
 		/// Returns the full name of the service.
 		///
@@ -142,6 +145,7 @@ public:
 		/// This name is escaped following standard DNS rules.
 		/// The full name will be empty for an unresolved service.
 
+	[[nodiscard]]
 	const std::string& type() const;
 		/// The registration type of the service, consisting of service type
 		/// and network protocol (delimited by a dot, as in "_ftp._tcp"),
@@ -149,24 +153,29 @@ public:
 		///
 		/// The protocol is always either "_tcp" or "_udp".
 
+	[[nodiscard]]
 	const std::string& domain() const;
 		/// The domain the service is registered on.
 
+	[[nodiscard]]
 	const std::string& host() const;
 		/// Returns the host name of the host providing the service.
 		///
 		/// Will be empty for an unresolved service.
 
+	[[nodiscard]]
 	Poco::UInt16 port() const;
 		/// Returns the port number on which the service is available.
 		///
 		/// Will be 0 for an unresolved service.
 
+	[[nodiscard]]
 	const Properties& properties() const;
 		/// Returns the contents of the TXT record associated with the service.
 		///
 		/// Will be empty for an unresolved service.
 
+	[[nodiscard]]
 	Properties& properties();
 		/// Returns the contents of the TXT record associated with the service.
 		///

@@ -91,15 +91,19 @@ public:
 	~Thread();
 		/// Destroys the thread.
 
+	[[nodiscard]]
 	int id() const;
 		/// Returns the unique thread ID of the thread.
 
+	[[nodiscard]]
 	TID tid() const;
 		/// Returns the native thread ID of the thread.
 
+	[[nodiscard]]
 	std::string name() const;
 		/// Returns the name of the thread.
 
+	[[nodiscard]]
 	std::string getName() const;
 		/// Returns the name of the thread.
 
@@ -113,6 +117,7 @@ public:
 		/// Some platform only allow changing a thread's priority
 		/// if the process has certain privileges.
 
+	[[nodiscard]]
 	Priority getPriority() const;
 		/// Returns the thread's priority.
 
@@ -124,16 +129,19 @@ public:
 		/// only used on POSIX platforms where the values SCHED_OTHER (default),
 		/// SCHED_FIFO and SCHED_RR are supported.
 
+	[[nodiscard]]
 	int getOSPriority() const;
 		/// Returns the thread's priority, expressed as an operating system
 		/// specific priority value.
 		///
 		/// May return 0 if the priority has not been explicitly set.
 
+	[[nodiscard]]
 	static int getMinOSPriority(int policy = POLICY_DEFAULT);
 		/// Returns the minimum operating system-specific priority value,
 		/// which can be passed to setOSPriority() for the given policy.
 
+	[[nodiscard]]
 	static int getMaxOSPriority(int policy = POLICY_DEFAULT);
 		/// Returns the maximum operating system-specific priority value,
 		/// which can be passed to setOSPriority() for the given policy.
@@ -144,6 +152,7 @@ public:
 		/// Typically, the real stack size is rounded up to the nearest
 		/// page size multiple.
 
+	[[nodiscard]]
 	int getStackSize() const;
 		/// Returns the thread's stack size in bytes.
 		/// If the default stack size is used, 0 is returned.
@@ -193,6 +202,7 @@ public:
 		/// to complete. Returns true if the thread has finished,
 		/// false otherwise.
 
+	[[nodiscard]]
 	bool isRunning() const;
 		/// Returns true if the thread is running.
 
@@ -234,13 +244,16 @@ public:
 	static void yield();
 		/// Yields cpu to other threads.
 
+	[[nodiscard]]
 	static Thread* current();
 		/// Returns the Thread object for the currently active thread.
 		/// If the current thread is the main thread, 0 is returned.
 
+	[[nodiscard]]
 	static TID currentTid();
 		/// Returns the native thread ID for the current thread.
 
+	[[nodiscard]]
 	static long currentOsTid();
 		/// Returns the operating system specific thread ID for the current thread.
 		/// On error, or if the platform does not support this functionality, it returns zero.
@@ -250,6 +263,7 @@ public:
 		/// Support for this feature varies across platforms.
 		/// Any errors are silently ignored.
 
+	[[nodiscard]]
 	static std::string getCurrentName();
 		/// Returns the name of the current thread.
 		/// Support for this feature varies across platforms.
@@ -262,11 +276,13 @@ public:
 		/// Returns false if not succesful or not
 		/// implemented.
 
+	[[nodiscard]]
 	int getAffinity() const;
 		/// Returns the thread affinity.
 		/// Negative value means the thread has
 		/// no CPU core affinity.
 
+	[[nodiscard]]
 	bool isInterrupted();
 		/// Tests whether current thread has been interrupted.
 		/// Return true if the task running on this thread should be stopped.
@@ -297,15 +313,18 @@ public:
 		/// Clear the the interrupted status.
 
 protected:
+	[[nodiscard]]
 	ThreadLocalStorage& tls();
 		/// Returns a reference to the thread's local storage.
 
 	void clearTLS();
 		/// Clears the thread's local storage.
 
+	[[nodiscard]]
 	std::string makeName();
 		/// Creates a unique name for a thread.
 
+	[[nodiscard]]
 	static int uniqueId();
 		/// Creates and returns a unique id for a thread.
 

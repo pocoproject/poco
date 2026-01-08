@@ -48,6 +48,7 @@ public:
 	~StreamConverterBuf() override;
 	/// Destroys the StreamConverterBuf.
 
+	[[nodiscard]]
 	int errors() const;
 		/// Returns the number of encoding errors encountered.
 
@@ -78,7 +79,9 @@ public:
 	StreamConverterIOS(std::istream& istr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
 	StreamConverterIOS(std::ostream& ostr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar = '?');
 	~StreamConverterIOS() override;
+	[[nodiscard]]
 	StreamConverterBuf* rdbuf();
+	[[nodiscard]]
 	int errors() const;
 
 protected:

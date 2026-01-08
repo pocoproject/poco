@@ -58,6 +58,7 @@ public:
 protected:
 	int readFromDevice();
 	int writeToDevice(char c);
+	[[nodiscard]]
 	int readOne();
 
 private:
@@ -102,6 +103,7 @@ public:
 		/// Writes the terminating period, followed by
 		/// CR-LF.
 
+	[[nodiscard]]
 	MailStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
 

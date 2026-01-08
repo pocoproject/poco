@@ -126,6 +126,7 @@ public:
 			/// over the document tree.
 	};
 
+	[[nodiscard]]
 	virtual short acceptNode(Node* node) = 0;
 		/// Test whether a specified node is visible in the logical view of a TreeWalker
 		/// or NodeIterator. This function will be called by the implementation of TreeWalker

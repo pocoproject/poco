@@ -21,6 +21,8 @@ public:
 		Poco::Net::ServerSocket& socket, Poco::Net::SocketReactor& reactor, TCPServerParams::Ptr pParams);
 
 	~TCPReactorAcceptor();
+	
+	[[nodiscard]]
 	SocketReactor& reactor();
 
 	void setRecvMessageCallback(const RecvMessageCallback& cb)
@@ -29,6 +31,7 @@ public:
 	}
 
 private:
+	[[nodiscard]]
 	TCPReactorServerConnection* createServiceHandler(Poco::Net::StreamSocket& socket) override;
 
 private:

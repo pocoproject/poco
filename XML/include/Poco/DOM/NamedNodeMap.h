@@ -45,6 +45,7 @@ class XML_API NamedNodeMap: public DOMObject
 	/// release() when no longer needed.
 {
 public:
+	[[nodiscard]]
 	virtual Node* getNamedItem(const XMLString& name) const = 0;
 		/// Retrieves a node specified by name.
 
@@ -61,16 +62,19 @@ public:
 		/// attached to an element, if the removed attribute is known to have a default
 		/// value, an attribute immediately appears containing the default value.
 
+	[[nodiscard]]
 	virtual Node* item(unsigned long index) const = 0;
 		/// Returns the index'th item in the map. If index is greater
 		/// than or equal to the number of nodes in the map, this
 		/// returns null.
 
+	[[nodiscard]]
 	virtual unsigned long length() const = 0;
 		/// Returns the number of nodes in the map. The range of valid
 		/// child node indices is 0 to length - 1 inclusive.
 
 	// DOM Level 2
+	[[nodiscard]]
 	virtual Node* getNamedItemNS(const XMLString& namespaceURI, const XMLString& localName) const = 0;
 		/// Retrieves a node specified by name.
 

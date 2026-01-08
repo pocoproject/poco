@@ -71,7 +71,7 @@ void SocketProactorTest::testTCPSocketProactor()
 	{
 		if (sw.elapsedSeconds() > 1)
 			fail("SocketProactor receive completion timed out.", __LINE__, __FILE__);
-		proactor.poll();
+		[[maybe_unused]] int _ = proactor.poll();
 	}
 
 	assertTrue (sent);
@@ -96,7 +96,7 @@ void SocketProactorTest::testTCPSocketProactor()
 	{
 		if (sw.elapsedSeconds() > 1)
 			fail("SocketProactor receive completion timed out.", __LINE__, __FILE__);
-		proactor.poll(&handled);
+		[[maybe_unused]] int _ = proactor.poll(&handled);
 		handledTot += handled;
 	}
 	while (handledTot < 2);
@@ -124,7 +124,7 @@ void SocketProactorTest::testTCPSocketProactor()
 	{
 		if (sw.elapsedSeconds() > 1)
 			fail("SocketProactor send completion timed out.", __LINE__, __FILE__);
-		proactor.poll();
+		[[maybe_unused]] int _ = proactor.poll();
 	}
 	assertTrue (error);
 	assertTrue(errorPassed);
@@ -169,7 +169,7 @@ void SocketProactorTest::testUDPSocketProactor()
 	{
 		if (sw.elapsedSeconds() > 1)
 			fail("SocketProactor receive completion timed out.", __LINE__, __FILE__);
-		proactor.poll();
+		[[maybe_unused]] int _ = proactor.poll();
 	}
 
 	assertTrue (sent);
@@ -197,7 +197,7 @@ void SocketProactorTest::testUDPSocketProactor()
 	{
 		if (sw.elapsedSeconds() > 1)
 			fail("SocketProactor receiveFrom timed out.", __LINE__, __FILE__);
-		proactor.poll(&handled);
+		[[maybe_unused]] int _ = proactor.poll(&handled);
 		handledTot += handled;
 	} while (handledTot < 2);
 
@@ -249,7 +249,7 @@ void SocketProactorTest::testSocketProactorStartStop()
 	{
 		if (sw.elapsedSeconds() > 1)
 			fail("SocketProactor receiveFrom timed out.", __LINE__, __FILE__);
-		proactor.poll();
+		[[maybe_unused]] int _ = proactor.poll();
 	}
 
 	assertTrue (sent);
@@ -281,7 +281,7 @@ void SocketProactorTest::testSocketProactorStartStop()
 	{
 		if (sw.elapsedSeconds() > 1)
 			fail("SocketProactor receiveFrom timed out.", __LINE__, __FILE__);
-		proactor.poll();
+		[[maybe_unused]] int _ = proactor.poll();
 	}
 
 	assertTrue(std::string(buf.begin(), buf.end()) == hello);

@@ -289,7 +289,7 @@ void LocalDateTime::determineTzd(bool adjust)
 	else
 	{
 		int dst;
-		dstOffset(dst);
+		[[maybe_unused]] std::time_t _ = dstOffset(dst);
 		_tzd = (Timezone::utcOffset() + dst);
 	}
 }

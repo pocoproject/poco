@@ -43,15 +43,18 @@ public:
 	virtual ~Transcoder();
 		/// Destroys the Transcoder.
 
+	[[nodiscard]]
 	static Ptr create(Poco::TextEncoding::Ptr pFromEncoding = nullptr,
 		Poco::TextEncoding::Ptr pToEncoding = nullptr);
 		/// Returns a unique pointer to Transcode instance;
 		/// if there is no need for transcoding, null pointer
 		/// is returned.
 
+	[[nodiscard]]
 	std::string fromEncoding() const;
 		/// Returns "from" encoding canonical name.
 
+	[[nodiscard]]
 	std::string toEncoding() const;
 		/// Returns "from" encoding canonical name.
 

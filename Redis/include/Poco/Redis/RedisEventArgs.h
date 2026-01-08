@@ -38,10 +38,12 @@ public:
 	~RedisEventArgs();
 		/// Destroys the RedisEventArgs.
 
+	[[nodiscard]]
 	RedisType::Ptr message() const;
 		/// Returns the message retrieved from the Redis server.
 		/// This can be a NULL pointer when this event is about an exception.
 
+	[[nodiscard]]
 	const Exception* exception() const;
 		/// Returns the exception if any, otherwise it returns null pointer.
 
@@ -52,6 +54,7 @@ public:
 		/// event. Use this for example for pub/sub when there are no
 		/// subcribers anymore.
 
+	[[nodiscard]]
 	bool isStopped() const;
 		/// Returns true when the AsyncReader will stop.
 

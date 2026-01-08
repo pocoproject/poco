@@ -193,7 +193,7 @@ void XMLStreamParserTest::testParser()
 		std::istringstream is("<root a='abc'/>");
 		XMLStreamParser p(is, "test");
 		p.nextExpect(XMLStreamParser::EV_START_ELEMENT, "root");
-		p.attribute<int>("a");
+		[[maybe_unused]] int value = p.attribute<int>("a");
 		assertTrue (false);
 	}
 	catch (const Poco::Exception&)

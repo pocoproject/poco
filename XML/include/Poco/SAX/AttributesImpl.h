@@ -69,27 +69,42 @@ public:
 	AttributesImpl& operator = (AttributesImpl&& attributes) noexcept;
 		/// Assignment operator.
 
+	[[nodiscard]]
 	int getIndex(const XMLString& name) const;
+	[[nodiscard]]
 	int getIndex(const XMLString& namespaceURI, const XMLString& localName) const;
+	[[nodiscard]]
 	int getLength() const;
+	[[nodiscard]]
 	const XMLString& getLocalName(int i) const;
+	[[nodiscard]]
 	const XMLString& getQName(int i) const;
+	[[nodiscard]]
 	const XMLString& getType(int i) const;
+	[[nodiscard]]
 	const XMLString& getType(const XMLString& qname) const;
+	[[nodiscard]]
 	const XMLString& getType(const XMLString& namespaceURI, const XMLString& localName) const;
+	[[nodiscard]]
 	const XMLString& getValue(int i) const;
+	[[nodiscard]]
 	const XMLString& getValue(const XMLString& qname) const;
+	[[nodiscard]]
 	const XMLString& getValue(const XMLString& namespaceURI, const XMLString& localName) const;
+	[[nodiscard]]
 	const XMLString& getURI(int i) const;
 
+	[[nodiscard]]
 	bool isSpecified(int i) const;
 		/// Returns true unless the attribute value was provided by DTD defaulting.
 		/// Extension from Attributes2 interface.
 
+	[[nodiscard]]
 	bool isSpecified(const XMLString& qname) const;
 		/// Returns true unless the attribute value was provided by DTD defaulting.
 		/// Extension from Attributes2 interface.
 
+	[[nodiscard]]
 	bool isSpecified(const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Returns true unless the attribute value was provided by DTD defaulting.
 		/// Extension from Attributes2 interface.
@@ -150,14 +165,18 @@ public:
 	void setURI(int i, const XMLString& namespaceURI);
 		/// Sets the namespace URI of an attribute.
 
+	[[nodiscard]]
 	iterator begin() const;
 		/// Iterator support.
 
+	[[nodiscard]]
 	iterator end() const;
 		/// Iterator support.
 
 protected:
+	[[nodiscard]]
 	Attribute* find(const XMLString& qname) const;
+	[[nodiscard]]
 	Attribute* find(const XMLString& namespaceURI, const XMLString& localName) const;
 
 	struct EmptyAttribute: Attribute

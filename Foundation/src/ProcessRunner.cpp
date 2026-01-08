@@ -72,7 +72,7 @@ ProcessRunner::ProcessRunner(const std::string& cmd,
 				if (pos == 0)
 				{
 					_pidFile = a.substr(fmt.length());
-					PIDFile::getFileName(_pidFile);
+					[[maybe_unused]] std::string s = PIDFile::getFileName(_pidFile);
 					break;
 				}
 			}

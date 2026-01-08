@@ -113,6 +113,7 @@ public:
 		_delegates.clear();
 	}
 
+	[[nodiscard]]
 	bool empty() const
 	{
 		return _delegates.empty();
@@ -214,6 +215,7 @@ public:
 		_delegates.clear();
 	}
 
+	[[nodiscard]]
 	bool empty() const
 	{
 		return _delegates.empty();

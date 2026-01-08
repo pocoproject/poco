@@ -108,15 +108,19 @@ public:
 	void swap(Var& other);
 		/// Swaps the content of the this Var with the other Var.
 
+	[[nodiscard]]
 	ConstIterator begin() const;
 		/// Returns the const Var iterator.
 
+	[[nodiscard]]
 	ConstIterator end() const;
 		/// Returns the const Var iterator.
 
+	[[nodiscard]]
 	Iterator begin();
 		/// Returns the Var iterator.
 
+	[[nodiscard]]
 	Iterator end();
 		/// Returns the Var iterator.
 
@@ -144,6 +148,7 @@ public:
 	}
 
 	template <typename T>
+	[[nodiscard]]
 	T convert() const
 		/// Invoke this method to perform a safe conversion.
 		///
@@ -170,6 +175,7 @@ public:
 	}
 
 	template <typename T>
+	[[nodiscard]]
 	operator T () const
 		/// Safe conversion operator for implicit type
 		/// conversions. If the requested type T is same as the
@@ -197,6 +203,7 @@ public:
 	}
 
 	template <typename T>
+	[[nodiscard]]
 	const T& extract() const
 		/// Returns a const reference to the actual value.
 		///
@@ -230,6 +237,7 @@ public:
 		return *this;
 	}
 
+	[[nodiscard]]
 	bool operator ! () const;
 		/// Logical NOT operator.
 
@@ -252,13 +260,13 @@ public:
 	Var& operator ++ ();
 		/// Pre-increment operator
 
-	const Var operator ++ (int);
+	const Var operator ++ ([[maybe_unused]] int n);
 		/// Post-increment operator
 
 	Var& operator -- ();
 		/// Pre-decrement operator
 
-	const Var operator -- (int);
+	const Var operator -- ([[maybe_unused]] int n);
 		/// Post-decrement operator
 
 	template <typename T>
@@ -335,6 +343,7 @@ public:
 		/// Division assignment operator specialization for Var
 
 	template <typename T>
+	[[nodiscard]]
 	bool operator == (const T& other) const
 		/// Equality operator
 	{
@@ -342,13 +351,16 @@ public:
 		return convert<T>() == other;
 	}
 
+	[[nodiscard]]
 	bool operator == (const char* other) const;
 		/// Equality operator overload for const char*
 
+	[[nodiscard]]
 	bool operator == (const Var& other) const;
 		/// Equality operator overload for Var
 
 	template <typename T>
+	[[nodiscard]]
 	bool operator != (const T& other) const
 		/// Inequality operator
 	{
@@ -356,13 +368,16 @@ public:
 		return convert<T>() != other;
 	}
 
+	[[nodiscard]]
 	bool operator != (const Var& other) const;
 		/// Inequality operator overload for Var
 
+	[[nodiscard]]
 	bool operator != (const char* other) const;
 		/// Inequality operator overload for const char*
 
 	template <typename T>
+	[[nodiscard]]
 	bool operator < (const T& other) const
 		/// Less than operator
 	{
@@ -370,10 +385,12 @@ public:
 		return convert<T>() < other;
 	}
 
+	[[nodiscard]]
 	bool operator < (const Var& other) const;
 		/// Less than operator overload for Var
 
 	template <typename T>
+	[[nodiscard]]
 	bool operator <= (const T& other) const
 		/// Less than or equal operator
 	{
@@ -381,10 +398,12 @@ public:
 		return convert<T>() <= other;
 	}
 
+	[[nodiscard]]
 	bool operator <= (const Var& other) const;
 		/// Less than or equal operator overload for Var
 
 	template <typename T>
+	[[nodiscard]]
 	bool operator > (const T& other) const
 		/// Greater than operator
 	{
@@ -392,10 +411,12 @@ public:
 		return convert<T>() > other;
 	}
 
+	[[nodiscard]]
 	bool operator > (const Var& other) const;
 		/// Greater than operator overload for Var
 
 	template <typename T>
+	[[nodiscard]]
 	bool operator >= (const T& other) const
 		/// Greater than or equal operator
 	{
@@ -403,10 +424,12 @@ public:
 		return convert<T>() >= other;
 	}
 
+	[[nodiscard]]
 	bool operator >= (const Var& other) const;
 		/// Greater than or equal operator overload for Var
 
 	template <typename T>
+	[[nodiscard]]
 	bool operator || (const T& other) const
 		/// Logical OR operator
 	{
@@ -414,10 +437,12 @@ public:
 		return convert<bool>() || other;
 	}
 
+	[[nodiscard]]
 	bool operator || (const Var& other) const;
 		/// Logical OR operator operator overload for Var
 
 	template <typename T>
+	[[nodiscard]]
 	bool operator && (const T& other) const
 		/// Logical AND operator.
 	{
@@ -425,56 +450,70 @@ public:
 		return convert<bool>() && other;
 	}
 
+	[[nodiscard]]
 	bool operator && (const Var& other) const;
 		/// Logical AND operator operator overload for Var.
 
+	[[nodiscard]]
 	bool isArray() const;
 		/// Returns true if Var is an array.
 
+	[[nodiscard]]
 	bool isVector() const;
 		/// Returns true if Var represents a vector.
 
+	[[nodiscard]]
 	bool isList() const;
 		/// Returns true if Var represents a list.
 
+	[[nodiscard]]
 	bool isDeque() const;
 		/// Returns true if Var represents a deque.
 
+	[[nodiscard]]
 	bool isStruct() const;
 		/// Returns true if Var represents a struct.
 
+	[[nodiscard]]
 	bool isOrdered() const;
 		/// Returns true if Var represents an ordered struct,
 		/// false if struct is sorted.
 
+	[[nodiscard]]
 	char& at(std::size_t n);
 		/// Returns character at position n. This function only works with
 		/// Var containing a std::string.
 
 
 	template <typename T>
+	[[nodiscard]]
 	Var& operator [] (const T& n)
 	{
 		return getAt(n);
 	}
 
 	template <typename T>
+	[[nodiscard]]
 	const Var& operator [] (const T& n) const
 	{
 		return const_cast<Var*>(this)->getAt(n);
 	}
 
+	[[nodiscard]]
 	Var& operator [] (const std::string& name);
 		/// Index operator by name, only use on Vars where isStruct
 		/// returns true! In all other cases InvalidAccessException is thrown.
 
+	[[nodiscard]]
 	const Var& operator [] (const std::string& name) const;
 		/// Index operator by name, only use on Vars where isStruct
 		/// returns true! In all other cases InvalidAccessException is thrown.
 
+	[[nodiscard]]
 	const std::type_info& type() const;
 		/// Returns the type information of the stored content.
 
+	[[nodiscard]]
 	std::string typeName(bool demangle = true) const;
 		/// Returns the type name of the stored content.
 		/// If demangling is available and emangle is true,
@@ -488,91 +527,117 @@ public:
 	void clear();
 		/// Empties Var.
 
+	[[nodiscard]]
 	bool isEmpty() const;
 		/// Returns true if empty.
 
+	[[nodiscard]]
 	bool isInteger() const;
 		/// Returns true if stored value is integer.
 
+	[[nodiscard]]
 	bool isSigned() const;
 		/// Returns true if stored value is signed.
 
+	[[nodiscard]]
 	bool isNumeric() const;
 		/// Returns true if stored value is numeric.
 		/// Returns false for numeric strings (e.g. "123" is string, not number)
 
+	[[nodiscard]]
 	bool isBoolean() const;
 		/// Returns true if stored value is boolean.
 		/// Returns false for boolean strings (e.g. "true" is string, not number)
 
+	[[nodiscard]]
 	bool isString() const;
 		/// Returns true if stored value is std::string.
 
+	[[nodiscard]]
 	bool isDate() const;
 		/// Returns true if stored value represents a date.
 
+	[[nodiscard]]
 	bool isTime() const;
 		/// Returns true if stored value represents time or date/time.
 
+	[[nodiscard]]
 	bool isDateTime() const;
 		/// Returns true if stored value represents a date/time.
 
+	[[nodiscard]]
 	bool isUUID() const;
 		/// Returns true if stored value is a Poco::UUID.
 
+	[[nodiscard]]
 	std::size_t size() const;
 		/// Returns the size of this Var.
 		/// This function returns 0 when Var is empty, 1 for POD or the size (i.e. length)
 		/// for held container.
 
+	[[nodiscard]]
 	std::string toString() const;
 		/// Returns the stored value as string.
 
+	[[nodiscard]]
 	static Var parse(const std::string& val);
 		/// Parses the string which must be in JSON format
 
+	[[nodiscard]]
 	static std::string toString(const Var& var);
 		/// Converts the Var to a string in JSON format. Note that toString(const Var&) will return
 		/// a different result than Var::convert<std::string>() and Var::toString()!
 
 private:
+	[[nodiscard]]
 	Var& getAt(std::size_t n);
+	[[nodiscard]]
 	Var& getAt(const std::string& n);
 
+	[[nodiscard]]
 	static Var parse(const std::string& val, std::string::size_type& offset);
 		/// Parses the string which must be in JSON format
 
+	[[nodiscard]]
 	static Var parseObject(const std::string& val, std::string::size_type& pos);
+	[[nodiscard]]
 	static Var parseArray(const std::string& val, std::string::size_type& pos);
+	[[nodiscard]]
 	static std::string parseString(const std::string& val, std::string::size_type& pos);
+	[[nodiscard]]
 	static std::string parseJSONString(const std::string& val, std::string::size_type& pos);
 	static void skipWhiteSpace(const std::string& val, std::string::size_type& pos);
 
 	template <typename T>
+	[[nodiscard]]
 	T add(const Var& other) const
 	{
 		return convert<T>() + other.convert<T>();
 	}
 
 	template <typename T>
+	[[nodiscard]]
 	T subtract(const Var& other) const
 	{
 		return convert<T>() - other.convert<T>();
 	}
 
 	template <typename T>
+	[[nodiscard]]
 	T multiply(const Var& other) const
 	{
 		return convert<T>() * other.convert<T>();
 	}
 
 	template <typename T>
+	[[nodiscard]]
 	T divide(const Var& other) const
 	{
 		return convert<T>() / other.convert<T>();
 	}
 
 	template <typename T, typename E>
+	[[nodiscard]]
 	VarHolderImpl<T>* holderImpl(const std::string errorMessage = "") const
 	{
 		VarHolder* pHolder = content();
@@ -587,11 +652,13 @@ private:
 	}
 
 	template <typename T, typename N>
+	[[nodiscard]]
 	Var& structIndexOperator(T* pStr, N n) const
 	{
 		return pStr->operator[](n);
 	}
 
+	[[nodiscard]]
 	VarHolder* content() const
 	{
 		return _placeholder.content();
@@ -662,6 +729,7 @@ inline void Var::swap(Var& other)
 }
 
 
+
 inline const std::type_info& Var::type() const
 {
 	VarHolder* pHolder = content();
@@ -683,10 +751,12 @@ inline Var::ConstIterator Var::begin() const
 	return {const_cast<Var*>(this), false};
 }
 
+
 inline Var::ConstIterator Var::end() const
 {
 	return {const_cast<Var*>(this), true};
 }
+
 
 inline Var::Iterator Var::begin()
 {
@@ -694,6 +764,7 @@ inline Var::Iterator Var::begin()
 
 	return {const_cast<Var*>(this), false};
 }
+
 
 inline Var::Iterator Var::end()
 {

@@ -39,10 +39,12 @@ class XML_API DocumentType: public AbstractContainerNode
 	/// The DOM Level 1 doesn't support editing DocumentType nodes.
 {
 public:
+	[[nodiscard]]
 	const XMLString& name() const;
 		/// The name of the DTD; i.e., the name immediately following the
 		/// DOCTYPE keyword.
 
+	[[nodiscard]]
 	NamedNodeMap* entities() const;
 		/// A NamedNodeMap containing the general entities,
 		/// both external and internal, declared in the DTD.
@@ -56,6 +58,7 @@ public:
 		/// The returned NamedNodeMap must be released with a call
 		/// to release() when no longer needed.
 
+	[[nodiscard]]
 	NamedNodeMap* notations() const;
 		/// A NamedNodeMap containing the notations declared in the DTD. Duplicates
 		/// are discarded. Every node in this map also implements the Notation interface.
@@ -66,18 +69,23 @@ public:
 		/// to release() when no longer needed.
 
 	// DOM Level 2
+	[[nodiscard]]
 	const XMLString& publicId() const;
 		/// Returns the public identifier of the external DTD subset.
 
+	[[nodiscard]]
 	const XMLString& systemId() const;
 		/// Returns the system identifier of the external DTD subset.
 
+	[[nodiscard]]
 	const XMLString& internalSubset() const;
 		/// Returns the internal DTD subset. This implementation
 		/// returns an empty string.
 
 	// Node
+	[[nodiscard]]
 	const XMLString& nodeName() const;
+	[[nodiscard]]
 	unsigned short nodeType() const;
 
 protected:
@@ -85,6 +93,7 @@ protected:
 	DocumentType(Document* pOwner, const DocumentType& dt);
 	~DocumentType();
 
+	[[nodiscard]]
 	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:

@@ -105,12 +105,14 @@ public:
 		return *this;
 	}
 
+	[[nodiscard]]
 	bool operator == (const LOB& other) const
 		/// Compares for equality LOB by value.
 	{
 		return *_pContent == *other._pContent;
 	}
 
+	[[nodiscard]]
 	bool operator != (const LOB& other) const
 		/// Compares for inequality LOB by value.
 	{
@@ -124,12 +126,14 @@ public:
 		swap(_pContent, other._pContent);
 	}
 
+	[[nodiscard]]
 	const std::vector<T>& content() const
 		/// Returns the content.
 	{
 		return *_pContent;
 	}
 
+	[[nodiscard]]
 	const T* rawContent() const
 		/// Returns the raw content.
 		///
@@ -141,6 +145,7 @@ public:
 			return _pContent->data();
 	}
 
+	[[nodiscard]]
 	T* rawContent()
 		/// Returns the raw content.
 		///
@@ -200,22 +205,26 @@ public:
 		std::vector<T>(*_pContent).swap(*_pContent);
 	}
 
+	[[nodiscard]]
 	Iterator begin() const
 	{
 		return _pContent->begin();
 	}
 
+	[[nodiscard]]
 	Iterator end() const
 	{
 		return _pContent->end();
 	}
 
+	[[nodiscard]]
 	std::size_t size() const
 		/// Returns the size of the LOB in bytes.
 	{
 		return static_cast<std::size_t>(_pContent->size());
 	}
 
+	[[nodiscard]]
 	std::size_t capacity() const
 		/// Returns the capacity of the underlying buffer.
 	{
@@ -247,14 +256,14 @@ inline void swap(LOB<T>& b1, LOB<T>& b2) noexcept
 
 namespace std
 {
-	template<>
+	template <>
 	inline void swap<Poco::Data::BLOB>(Poco::Data::BLOB& b1, Poco::Data::BLOB& b2) noexcept
 		/// Full template specalization of std:::swap for BLOB
 	{
 		b1.swap(b2);
 	}
 
-	template<>
+	template <>
 	inline void swap<Poco::Data::CLOB>(Poco::Data::CLOB& c1, Poco::Data::CLOB& c2) noexcept
 		/// Full template specalization of std:::swap for CLOB
 	{
@@ -284,6 +293,7 @@ public:
 	{
 	}
 
+	[[nodiscard]]
 	const std::type_info& type() const
 	{
 		return typeid(Poco::Data::BLOB);
@@ -294,11 +304,13 @@ public:
 		val.assign(_val.begin(), _val.end());
 	}
 
+	[[nodiscard]]
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	[[nodiscard]]
 	const Poco::Data::BLOB& value() const
 	{
 		return _val;
@@ -322,6 +334,7 @@ public:
 	{
 	}
 
+	[[nodiscard]]
 	const std::type_info& type() const
 	{
 		return typeid(Poco::Data::CLOB);
@@ -332,11 +345,13 @@ public:
 		val.assign(_val.begin(), _val.end());
 	}
 
+	[[nodiscard]]
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	[[nodiscard]]
 	const Poco::Data::CLOB& value() const
 	{
 		return _val;

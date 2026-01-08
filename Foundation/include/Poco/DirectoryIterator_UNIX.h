@@ -34,7 +34,9 @@ public:
 	void duplicate();
 	void release();
 
+	[[nodiscard]]
 	const std::string& get() const;
+	[[nodiscard]]
 	const std::string& next();
 
 private:

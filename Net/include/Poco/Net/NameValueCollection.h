@@ -63,6 +63,7 @@ public:
 	void swap(NameValueCollection& nvc) noexcept;
 		/// Swaps the NameValueCollection with another one.
 
+	[[nodiscard]]
 	const std::string& operator [] (const std::string& name) const;
 		/// Returns the value of the (first) name-value pair with the given name.
 		///
@@ -74,43 +75,53 @@ public:
 	void add(const std::string& name, const std::string& value);
 		/// Adds a new name-value pair with the given name and value.
 
+	[[nodiscard]]
 	const std::string& get(const std::string& name) const;
 		/// Returns the value of the first name-value pair with the given name.
 		///
 		/// Throws a NotFoundException if the name-value pair does not exist.
 
+	[[nodiscard]]
 	std::string get(const std::string& name, const std::string& defaultValue) const;
 		/// Returns the value of the first name-value pair with the given name.
 		/// If no value with the given name has been found, the defaultValue is returned.
 
+	[[nodiscard]]
 	bool has(const std::string& name) const;
 		/// Returns true if there is at least one name-value pair
 		/// with the given name.
 
+	[[nodiscard]]
 	ConstIterator find(const std::string& name) const;
 		/// Returns an iterator pointing to the first name-value pair
 		/// with the given name.
 
+	[[nodiscard]]
 	Iterator find(const std::string& name);
 		/// Returns an iterator pointing to the first name-value pair
 		/// with the given name.
 
+	[[nodiscard]]
 	ConstIterator begin() const;
 		/// Returns an iterator pointing to the begin of
 		/// the name-value pair collection.
 
+	[[nodiscard]]
 	Iterator begin();
 		/// Returns an iterator pointing to the begin of
 		/// the name-value pair collection.
 
+	[[nodiscard]]
 	ConstIterator end() const;
 		/// Returns an iterator pointing to the end of
 		/// the name-value pair collection.
 
+	[[nodiscard]]
 	Iterator end();
 		/// Returns an iterator pointing to the end of 
 		/// the name-value pair collection.
 
+	[[nodiscard]]
 	bool empty() const;
 		/// Returns true iff the header does not have any content.
 

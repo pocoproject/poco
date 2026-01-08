@@ -99,6 +99,7 @@ public:
 	void removeRaw(const std::string& key) override;
 
 protected:
+	[[nodiscard]]
 	bool getRaw(const std::string & key, std::string & value) const override;
 
 	void setRaw(const std::string& key, const std::string& value) override;

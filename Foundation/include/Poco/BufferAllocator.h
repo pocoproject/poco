@@ -34,6 +34,7 @@ class BufferAllocator
 public:
 	using char_type = ch;
 
+	[[nodiscard]]
 	static char_type* allocate(std::streamsize size)
 	{
 		return new char_type[static_cast<std::size_t>(size)];
