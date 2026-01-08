@@ -19,6 +19,7 @@
 #include "Poco/Environment.h"
 #include "Poco/ProcessOptions.h"
 #include "Poco/Thread.h"
+#include <csignal>
 #include <iostream>
 
 
