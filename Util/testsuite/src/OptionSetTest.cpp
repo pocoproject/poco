@@ -102,28 +102,28 @@ void OptionSetTest::testOptionSet()
 
 	try
 	{
-		set.getOption("in");
+		[[maybe_unused]] const Option& opt = set.getOption("in");
 		fail("ambiguous - must throw");
 	}
-	catch (Poco::Util::AmbiguousOptionException&)
+	catch ([[maybe_unused]] Poco::Util::AmbiguousOptionException& e)
 	{
 	}
 
 	try
 	{
-		set.getOption("he");
+		[[maybe_unused]] const Option& opt = set.getOption("he");
 		fail("ambiguous - must throw");
 	}
-	catch (Poco::Util::AmbiguousOptionException&)
+	catch ([[maybe_unused]] Poco::Util::AmbiguousOptionException& e)
 	{
 	}
 
 	try
 	{
-		set.getOption("i");
+		[[maybe_unused]] const Option& opt = set.getOption("i");
 		fail("ambiguous - must throw");
 	}
-	catch (Poco::Util::AmbiguousOptionException&)
+	catch ([[maybe_unused]] Poco::Util::AmbiguousOptionException& e)
 	{
 	}
 }

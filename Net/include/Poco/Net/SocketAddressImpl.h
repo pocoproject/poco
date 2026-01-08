@@ -36,12 +36,19 @@ public:
 
 	virtual ~SocketAddressImpl();
 
+	[[nodiscard]]
 	virtual IPAddress host() const = 0;
+	[[nodiscard]]
 	virtual UInt16 port() const = 0;
+	[[nodiscard]]
 	virtual poco_socklen_t length() const = 0;
+	[[nodiscard]]
 	virtual const struct sockaddr* addr() const = 0;
+	[[nodiscard]]
 	virtual int af() const = 0;
+	[[nodiscard]]
 	virtual Family family() const = 0;
+	[[nodiscard]]
 	virtual std::string toString() const = 0;
 
 protected:
@@ -59,12 +66,19 @@ public:
 	IPv4SocketAddressImpl();
 	IPv4SocketAddressImpl(const struct sockaddr_in* addr);
 	IPv4SocketAddressImpl(const void* addr, UInt16 port);
+	[[nodiscard]]
 	IPAddress host() const;
+	[[nodiscard]]
 	UInt16 port() const;
+	[[nodiscard]]
 	poco_socklen_t length() const;
+	[[nodiscard]]
 	const struct sockaddr* addr() const;
+	[[nodiscard]]
 	int af() const;
+	[[nodiscard]]
 	Family family() const;
+	[[nodiscard]]
 	std::string toString() const;
 
 private:
@@ -121,12 +135,19 @@ public:
 	IPv6SocketAddressImpl(const struct sockaddr_in6* addr);
 	IPv6SocketAddressImpl(const void* addr, UInt16 port);
 	IPv6SocketAddressImpl(const void* addr, UInt16 port, UInt32 scope);
+	[[nodiscard]]
 	IPAddress host() const;
+	[[nodiscard]]
 	UInt16 port() const;
+	[[nodiscard]]
 	poco_socklen_t length() const;
+	[[nodiscard]]
 	const struct sockaddr* addr() const;
+	[[nodiscard]]
 	int af() const;
+	[[nodiscard]]
 	Family family() const;
+	[[nodiscard]]
 	std::string toString() const;
 
 private:
@@ -187,13 +208,21 @@ public:
 	LocalSocketAddressImpl(const char* path);
 	LocalSocketAddressImpl(const char* path, std::size_t length);
 	~LocalSocketAddressImpl();
+	[[nodiscard]]
 	IPAddress host() const;
+	[[nodiscard]]
 	UInt16 port() const;
+	[[nodiscard]]
 	poco_socklen_t length() const;
+	[[nodiscard]]
 	const struct sockaddr* addr() const;
+	[[nodiscard]]
 	int af() const;
+	[[nodiscard]]
 	Family family() const;
+	[[nodiscard]]
 	const char* path() const;
+	[[nodiscard]]
 	std::string toString() const;
 
 private:

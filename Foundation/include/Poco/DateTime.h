@@ -153,12 +153,15 @@ public:
 	void swap(DateTime& dateTime) noexcept;
 		/// Swaps the DateTime with another one.
 
+	[[nodiscard]]
 	int year() const;
 		/// Returns the year.
 
+	[[nodiscard]]
 	int month() const;
 		/// Returns the month (1 to 12).
 
+	[[nodiscard]]
 	int week(int firstDayOfWeek = MONDAY) const;
 		/// Returns the week number within the year.
 		/// FirstDayOfWeek should be either SUNDAY (0) or MONDAY (1).
@@ -172,57 +175,77 @@ public:
 		/// For 2007, which starts on a Monday, week 1 will be the week starting on Monday, January 1.
 		/// There will be no week 0 in 2007.
 
+	[[nodiscard]]
 	int day() const;
 		/// Returns the day within the month (1 to 31).
 
+	[[nodiscard]]
 	int dayOfWeek() const;
 		/// Returns the weekday (0 to 6, where
 		/// 0 = Sunday, 1 = Monday, ..., 6 = Saturday).
 
+	[[nodiscard]]
 	int dayOfYear() const;
 		/// Returns the number of the day in the year.
 		/// January 1 is 1, February 1 is 32, etc.
 
+	[[nodiscard]]
 	int hour() const;
 		/// Returns the hour (0 to 23).
 
+	[[nodiscard]]
 	int hourAMPM() const;
 		/// Returns the hour (0 to 12).
 
+	[[nodiscard]]
 	bool isAM() const;
 		/// Returns true if hour < 12;
 
+	[[nodiscard]]
 	bool isPM() const;
 		/// Returns true if hour >= 12.
 
+	[[nodiscard]]
 	int minute() const;
 		/// Returns the minute (0 to 59).
 
+	[[nodiscard]]
 	int second() const;
 		/// Returns the second (0 to 59).
 
+	[[nodiscard]]
 	int millisecond() const;
 		/// Returns the millisecond (0 to 999)
 
+	[[nodiscard]]
 	int microsecond() const;
 		/// Returns the microsecond (0 to 999)
 
+	[[nodiscard]]
 	double julianDay() const;
-		/// Returns the julian day for the date and time.
+		/// Returns the Julian day for the date and time.
 
+	[[nodiscard]]
 	Timestamp timestamp() const;
 		/// Returns the date and time expressed as a Timestamp.
 
+	[[nodiscard]]
 	Timestamp::UtcTimeVal utcTime() const;
 		/// Returns the date and time expressed in UTC-based
 		/// time. UTC base time is midnight, October 15, 1582.
 		/// Resolution is 100 nanoseconds.
 
+	[[nodiscard]]
 	bool operator == (const DateTime& dateTime) const;
+	[[nodiscard]]
 	bool operator != (const DateTime& dateTime) const;
+	[[nodiscard]]
 	bool operator <  (const DateTime& dateTime) const;
+	[[nodiscard]]
 	bool operator <= (const DateTime& dateTime) const;
+	[[nodiscard]]
 	bool operator >  (const DateTime& dateTime) const;
+	[[nodiscard]]
 	bool operator >= (const DateTime& dateTime) const;
 
 	DateTime  operator +  (const Timespan& span) const;
@@ -231,6 +254,7 @@ public:
 	DateTime& operator += (const Timespan& span);
 	DateTime& operator -= (const Timespan& span);
 
+	[[nodiscard]]
 	tm makeTM() const;
 		/// Converts DateTime to tm struct.
 
@@ -240,14 +264,17 @@ public:
 	void makeLocal(int tzd);
 		/// Converts a UTC time into a local time, by applying the given time zone differential.
 
+	[[nodiscard]]
 	static bool isLeapYear(int year);
 		/// Returns true if the given year is a leap year;
 		/// false otherwise.
 
+	[[nodiscard]]
 	static int daysOfMonth(int year, int month);
 		/// Returns the number of days in the given month
 		/// and year. Month is from 1 to 12.
 
+	[[nodiscard]]
 	static bool isValid(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int millisecond = 0, int microsecond = 0);
 		/// Checks if the given date and time is valid
 		/// (all arguments are within a proper range).
@@ -261,13 +288,16 @@ protected:
 		///
 		/// Throws Poco::InvalidArgumentException if any of the arguments is not valid.
 
+	[[nodiscard]]
 	static double toJulianDay(Timestamp::UtcTimeVal utcTime);
 		/// Computes the Julian day for an UTC time.
 
+	[[nodiscard]]
 	static double toJulianDay(int year, int month, int day, int hour = 0, int minute = 0, int second = 0, int millisecond = 0, int microsecond = 0);
 		/// Computes the Julian day for a Gregorian calendar date and time.
 		/// See <http://vsg.cape.com/~pbaum/date/jdimp.htm>, section 2.3.1 for the algorithm.
 
+	[[nodiscard]]
 	static Timestamp::UtcTimeVal toUtcTime(double julianDay);
 		/// Computes the UTC time for a Julian day.
 

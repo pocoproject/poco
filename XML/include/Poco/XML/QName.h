@@ -49,24 +49,31 @@ public:
 	QName& operator = (QName&& qname) noexcept;
 	void swap(QName& qname) noexcept;
 
+	[[nodiscard]]
 	const std::string& namespaceURI() const;
 		/// Returns the namespace URI part of the name.
 
+	[[nodiscard]]
 	const std::string& localName() const;
 		/// Returns the local part of the name.
 
+	[[nodiscard]]
 	const std::string& prefix() const;
 		/// Returns the namespace prefix of the name.
 
+	[[nodiscard]]
 	std::string& namespaceURI();
 		/// Returns the namespace URI part of the name.
 
+	[[nodiscard]]
 	std::string& localName();
 		/// Returns the local part of the name.
 
+	[[nodiscard]]
 	std::string& prefix();
 		/// Returns the namespace prefix of the name.
 
+	[[nodiscard]]
 	std::string toString() const;
 		/// Returns a printable representation in the [<namespace>#]<name> form.
 
@@ -124,18 +131,21 @@ inline std::string& QName::prefix()
 XML_API std::ostream& operator << (std::ostream&, const QName&);
 
 
+[[nodiscard]]
 inline bool operator < (const QName& x, const QName& y)
 {
 	return x._ns < y._ns || (x._ns == y._ns && x._name < y._name);
 }
 
 
+[[nodiscard]]
 inline bool operator == (const QName& x, const QName& y)
 {
 	return x._ns == y._ns && x._name == y._name;
 }
 
 
+[[nodiscard]]
 inline bool operator != (const QName& x, const QName& y)
 {
 	return !(x == y);

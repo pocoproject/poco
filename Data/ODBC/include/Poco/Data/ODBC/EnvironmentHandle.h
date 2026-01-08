@@ -40,16 +40,20 @@ public:
 	~EnvironmentHandle();
 		/// Destroys the EnvironmentHandle.
 
+	[[nodiscard]]
 	operator const SQLHENV& () const;
 		/// Const conversion operator into reference to native type.
 
+	[[nodiscard]]
 	const SQLHENV& handle() const;
 		/// Returns const reference to handle.
 
 private:
+	[[nodiscard]]
 	operator SQLHENV& ();
 		/// Conversion operator into reference to native type.
 
+	[[nodiscard]]
 	SQLHENV& handle();
 		/// Returns reference to handle.
 

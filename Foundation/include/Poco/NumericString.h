@@ -59,7 +59,8 @@ typedef Poco::Int64 intmax_t;
 namespace Poco {
 
 
-template<typename T>
+template <typename T>
+[[nodiscard]]
 inline bool isNegative(T x)
 {
 	if constexpr (std::is_signed_v<T>)
@@ -69,7 +70,8 @@ inline bool isNegative(T x)
 }
 
 
-template<typename To, typename From>
+template <typename To, typename From>
+[[nodiscard]]
 inline bool isIntOverflow(From val)
 {
 	poco_assert_dbg (std::numeric_limits<From>::is_integer);
@@ -91,7 +93,8 @@ inline bool isIntOverflow(From val)
 }
 
 
-template<typename R, typename F, typename S>
+template <typename R, typename F, typename S>
+[[nodiscard]]
 bool safeMultiply(R& result, F f, S s)
 {
 	using CT = std::common_type_t<R, F, S>;
@@ -135,6 +138,7 @@ bool safeMultiply(R& result, F f, S s)
 
 
 template <typename F, typename T>
+[[nodiscard]]
 inline T& isSafeIntCast(F from)
 	/// Returns true if it is safe to cast
 	/// integer from F to T.
@@ -145,6 +149,7 @@ inline T& isSafeIntCast(F from)
 
 
 template <typename F, typename T>
+[[nodiscard]]
 inline T& safeIntCast(F from, T& to)
 	/// Returns cast value if it is safe
 	/// to cast integer from F to T,
@@ -158,6 +163,7 @@ inline T& safeIntCast(F from, T& to)
 	throw BadCastException("safeIntCast: Integer overflow");
 }
 
+[[nodiscard]]
 inline char decimalSeparator()
 	/// Returns decimal separator from global locale or
 	/// default '.' for platforms where locale is unavailable.
@@ -170,6 +176,7 @@ inline char decimalSeparator()
 }
 
 
+[[nodiscard]]
 inline char thousandSeparator()
 	/// Returns thousand separator from global locale or
 	/// default ',' for platforms where locale is unavailable.
@@ -331,11 +338,13 @@ namespace Impl {
 			return _cur -= decr;
 		}
 
+		[[nodiscard]]
 		operator char* () const
 		{
 			return _cur;
 		}
 
+		[[nodiscard]]
 		std::size_t span() const
 		{
 			return _end - _beg;

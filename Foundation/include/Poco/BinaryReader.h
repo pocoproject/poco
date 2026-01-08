@@ -126,21 +126,27 @@ public:
 		/// A byte-order mark is a 16-bit integer with a value of 0xFEFF,
 		/// written in host byte order.
 
+	[[nodiscard]]
 	bool good();
 		/// Returns _istr.good();
 
+	[[nodiscard]]
 	bool fail();
 		/// Returns _istr.fail();
 
+	[[nodiscard]]
 	bool bad();
 		/// Returns _istr.bad();
 
+	[[nodiscard]]
 	bool eof();
 		/// Returns _istr.eof();
 
+	[[nodiscard]]
 	std::istream& stream() const;
 		/// Returns the underlying stream.
 
+	[[nodiscard]]
 	StreamByteOrder byteOrder() const;
 		/// Returns the byte-order used by the reader, which is
 		/// either BIG_ENDIAN_BYTE_ORDER or LITTLE_ENDIAN_BYTE_ORDER.
@@ -148,6 +154,7 @@ public:
 	void setExceptions(std::ios_base::iostate st = (std::istream::failbit | std::istream::badbit));
 		/// Sets the stream to throw exception on specified state (default failbit and badbit);
 
+	[[nodiscard]]
 	std::streamsize available() const;
 		/// Returns the number of available bytes in the stream.
 
@@ -179,16 +186,19 @@ public:
 
 	~BasicMemoryBinaryReader() = default;
 
+	[[nodiscard]]
 	const Buffer<T>& data() const
 	{
 		return _data;
 	}
 
+	[[nodiscard]]
 	const MemoryInputStream& stream() const
 	{
 		return _istr;
 	}
 
+	[[nodiscard]]
 	MemoryInputStream& stream()
 	{
 		return _istr;

@@ -125,7 +125,7 @@ void SQLiteStatementImpl::compileImpl()
 		//during previous step, switch to the next set if there is one provided
 		if (hasMoreDataSets())
 		{
-			activateNextDataSet();
+			(void)activateNextDataSet();
 			_isExtracted = false;
 		}
 	}

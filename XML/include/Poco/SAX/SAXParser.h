@@ -67,6 +67,7 @@ public:
 		/// Sets the encoding used by the parser if no
 		/// encoding is specified in the XML document.
 
+	[[nodiscard]]
 	const XMLString& getEncoding() const;
 		/// Returns the name of the encoding used by
 		/// the parser if no encoding is specified in
@@ -77,17 +78,23 @@ public:
 
 	/// XMLReader
 	void setEntityResolver(EntityResolver* pResolver);
+	[[nodiscard]]
 	EntityResolver* getEntityResolver() const;
 	void setDTDHandler(DTDHandler* pDTDHandler);
+	[[nodiscard]]
 	DTDHandler* getDTDHandler() const;
 	void setContentHandler(ContentHandler* pContentHandler);
+	[[nodiscard]]
 	ContentHandler* getContentHandler() const;
 	void setErrorHandler(ErrorHandler* pErrorHandler);
+	[[nodiscard]]
 	ErrorHandler* getErrorHandler() const;
 	void setFeature(const XMLString& featureId, bool state);
+	[[nodiscard]]
 	bool getFeature(const XMLString& featureId) const;
 	void setProperty(const XMLString& propertyId, const XMLString& value);
 	void setProperty(const XMLString& propertyId, void* value);
+	[[nodiscard]]
 	void* getProperty(const XMLString& propertyId) const;
 	void parse(InputSource* pSource);
 	void parse(const XMLString& systemId);

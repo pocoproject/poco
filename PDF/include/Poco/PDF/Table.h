@@ -31,13 +31,17 @@ public:
 	void setColumnWidth(int col, double width);
 	void setFonts(Cell::FontMapPtr pFontMap);
 
+	[[nodiscard]]
 	const std::string name() const;
+	[[nodiscard]]
 	const Cells& cells() const;
 
 	void addRow();
 	void addRow(const TableRow& row);
 
+	[[nodiscard]]
 	std::size_t rows() const;
+	[[nodiscard]]
 	std::size_t columns() const;
 
 	void draw(Page& page, float x, float y, float width, float height);

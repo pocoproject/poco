@@ -84,9 +84,11 @@ public:
 	~ProcessRunner() override;
 		/// Destroys the ProcessRunner.
 
+	[[nodiscard]]
 	PID pid() const;
 		/// Returns the process PID.
 
+	[[nodiscard]]
 	const std::string& pidFile() const;
 		/// Returns the process PID filename.
 		/// Returns empty string when pid filename
@@ -94,6 +96,7 @@ public:
 		/// explicitly, or implicitly through
 		/// command line argument.
 
+	[[nodiscard]]
 	bool running() const;
 		/// Returns true if process is running.
 
@@ -112,15 +115,19 @@ public:
 		///
 		/// Calling stop() on a stopped process is a no-op.
 
+	[[nodiscard]]
 	std::string cmdLine() const;
 		/// Returns process full command line.
 
+	[[nodiscard]]
 	int result() const;
 		/// Returns process return code.
 
+	[[nodiscard]]
 	int runCount() const;
 		/// Returns the number of times the process has been executed.
 
+	[[nodiscard]]
 	const std::string& error() const;
 		/// Returns the error message.
 
@@ -133,6 +140,7 @@ private:
 #endif
 	static const int RESULT_UNKNOWN = -1;
 
+	[[nodiscard]]
 	static Args pidArgFormat()
 	{
 #if defined(POCO_OS_FAMILY_WINDOWS)

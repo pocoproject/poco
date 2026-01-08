@@ -107,6 +107,7 @@ public:
 	void parse(std::istream& in);
 		/// Parse a template from an input stream.
 
+	[[nodiscard]]
 	Timestamp parseTime() const;
 		/// Returns the time when the template was parsed.
 
@@ -114,10 +115,15 @@ public:
 		/// Renders the template and send the output to the stream.
 
 private:
+	[[nodiscard]]
 	std::string readText(std::istream& in);
+	[[nodiscard]]
 	std::string readWord(std::istream& in);
+	[[nodiscard]]
 	std::string readQuery(std::istream& in);
+	[[nodiscard]]
 	std::string readTemplateCommand(std::istream& in);
+	[[nodiscard]]
 	std::string readString(std::istream& in);
 	void readWhiteSpace(std::istream& in);
 

@@ -377,6 +377,7 @@ namespace Net {
 
 typedef std::vector<SocketBuf> SocketBufVec;
 
+[[nodiscard]]
 inline int SocketBufVecSize(const SocketBufVec& sbv)
 	/// Returns total length of all SocketBufs in the vector.
 {

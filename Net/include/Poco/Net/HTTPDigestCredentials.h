@@ -60,15 +60,18 @@ public:
 	void setUsername(const std::string& username);
 		/// Sets the username.
 
+	[[nodiscard]]
 	const std::string& getUsername() const;
 		/// Returns the username.
 
 	void setPassword(const std::string& password);
 		/// Sets the password.
 
+	[[nodiscard]]
 	const std::string& getPassword() const;
 		/// Returns the password.
 
+	[[nodiscard]]
 	bool empty() const;
 		/// Returns true if both username and password are empty, otherwise false.
 
@@ -108,6 +111,7 @@ public:
 		/// Updates internal state and adds proxy authentication information to
 		/// the given HTTPRequest.
 
+	[[nodiscard]]
 	bool verifyAuthInfo(const HTTPRequest& request) const;
 		/// Verifies the digest authentication information in the given HTTPRequest
 		/// by recomputing the response and comparing it with what's in the request.
@@ -115,14 +119,17 @@ public:
 		/// Note: This method creates a HTTPAuthenticationParams object from the request
 		/// and calls verifyAuthParams() with request and params.
 
+	[[nodiscard]]
 	bool verifyAuthParams(const HTTPRequest& request, const HTTPAuthenticationParams& params) const;
 		/// Verifies the digest authentication information in the given HTTPRequest
 		/// and HTTPAuthenticationParams by recomputing the response and comparing
 		/// it with what's in the request.
 
+	[[nodiscard]]
 	bool isAlgorithmSupported(const std::string& algorithm) const;
 		/// Check if digest algorithm is supported
 
+	[[nodiscard]]
 	static std::string createNonce();
 		/// Creates a random nonce string.
 

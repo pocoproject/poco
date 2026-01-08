@@ -68,7 +68,7 @@ void JSONConfiguration::load(std::istream& istr)
 	AbstractConfiguration::ScopedLock lock(*this);
 
 	JSON::Parser parser;
-	parser.parse(istr);
+	[[maybe_unused]] Dynamic::Var parsed = parser.parse(istr);
 	Dynamic::Var result = parser.result();
 	if (result.type() == typeid(JSON::Object::Ptr))
 	{

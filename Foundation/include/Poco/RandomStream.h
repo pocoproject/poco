@@ -50,6 +50,7 @@ class Foundation_API RandomIOS: public virtual std::ios
 public:
 	RandomIOS();
 	~RandomIOS() override;
+	[[nodiscard]]
 	RandomBuf* rdbuf();
 
 protected:

@@ -62,18 +62,21 @@ public:
 	void swap(MailRecipient& recipient) noexcept;
 		/// Exchanges the content of two recipients.
 
+	[[nodiscard]]
 	RecipientType getType() const;
 		/// Returns the type of the recipient.
 
 	void setType(RecipientType type);
 		/// Sets the type of the recipient.
 
+	[[nodiscard]]
 	const std::string& getAddress() const;
 		/// Returns the address of the recipient.
 
 	void setAddress(const std::string& address);
 		/// Sets the address of the recipient.
 
+	[[nodiscard]]
 	const std::string& getRealName() const;
 		/// Returns the real name of the recipient.
 

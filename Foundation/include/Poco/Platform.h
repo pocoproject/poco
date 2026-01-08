@@ -285,13 +285,6 @@
 #endif
 
 
-#ifdef __GNUC__
-#define POCO_UNUSED __attribute__((unused))
-#else
-#define POCO_UNUSED
-#endif // __GNUC__
-
-
 #if !defined(POCO_ARCH)
 	#error "Unknown Hardware Architecture."
 #endif

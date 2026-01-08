@@ -49,17 +49,21 @@ public:
 
 	EventException& operator = (const EventException& exc);
 
+	[[nodiscard]]
 	const char* name() const noexcept;
 		/// Returns a static string describing the exception.
 
+	[[nodiscard]]
 	const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
+	[[nodiscard]]
 	unsigned short code() const;
 		/// Returns the Event exception code.
 
 protected:
-	Poco::Exception* clone() const;
+	[[nodiscard]]
+	Exception* clone() const;
 
 private:
 	EventException();
