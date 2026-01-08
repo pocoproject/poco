@@ -45,14 +45,17 @@ public:
 	void restart();
 		/// Resets and starts the stopwatch.
 
+	[[nodiscard]]
 	Clock::ClockDiff elapsed() const;
 		/// Returns the elapsed time in microseconds
 		/// since the stopwatch started.
 
+	[[nodiscard]]
 	int elapsedSeconds() const;
 		/// Returns the number of seconds elapsed
 		/// since the stopwatch started.
 
+	[[nodiscard]]
 	static Clock::ClockVal resolution();
 		/// Returns the resolution of the stopwatch.
 

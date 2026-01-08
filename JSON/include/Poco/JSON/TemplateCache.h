@@ -51,6 +51,7 @@ public:
 		/// Add a path for resolving template paths.
 		/// The order of check is FIFO.
 
+	[[nodiscard]]
 	Template::Ptr getTemplate(const Path& path);
 		/// Returns a template from the cache.
 		/// When the template file is not yet loaded
@@ -60,6 +61,7 @@ public:
 		/// even when the template isn't stored anymore in
 		/// the cache.
 
+	[[nodiscard]]
 	static TemplateCache* instance();
 		/// Returns the only instance of this cache.
 
@@ -68,6 +70,7 @@ public:
 
 private:
 	void setup();
+	[[nodiscard]]
 	Path resolvePath(const Path& path) const;
 
 	static TemplateCache*                _pInstance;

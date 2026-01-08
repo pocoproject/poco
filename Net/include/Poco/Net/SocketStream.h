@@ -81,12 +81,14 @@ public:
 		///
 		/// Flushes the buffer, but does not close the socket.
 
+	[[nodiscard]]
 	SocketStreamBuf* rdbuf();
 		/// Returns a pointer to the internal SocketStreamBuf.
 
 	void close();
 		/// Flushes the stream and closes the socket.
 
+	[[nodiscard]]
 	StreamSocket socket() const;
 		/// Returns the underlying socket.
 

@@ -47,6 +47,7 @@ public:
 	Notification(const std::string& name = ""s);
 		/// Creates the notification.
 
+	[[nodiscard]]
 	virtual std::string name() const;
 		/// Returns the name of the notification.
 		/// The default implementation returns the class name.
@@ -81,18 +82,21 @@ public:
 
 	~DataNotification() override = default;
 
+	[[nodiscard]]
 	std::string topic() const
 		/// Returns the notification topic.
 	{
 		return name();
 	}
 
+	[[nodiscard]]
 	const T& payload() const
 		/// Returns the payload.
 	{
 		return _payload;
 	}
 
+	[[nodiscard]]
 	T& payload()
 		/// Returns a modifiable reference to the payload.
 	{

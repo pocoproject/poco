@@ -77,6 +77,7 @@ using UIntPtr = std::uintptr_t;
 #endif
 
 
+[[nodiscard]]
 inline std::string Foundation_API demangle(const char* typeName)
 {
 	std::string result(typeName);
@@ -105,6 +106,7 @@ inline std::string Foundation_API demangle(const char* typeName)
 
 
 template <typename T>
+[[nodiscard]]
 std::string demangle()
 {
 	return demangle(typeid(T).name());
@@ -112,6 +114,7 @@ std::string demangle()
 
 
 template <typename T>
+[[nodiscard]]
 std::string demangle(const T& t)
 {
 	return demangle(typeid(std::remove_const_t<std::remove_reference_t<decltype(t)>>).name());

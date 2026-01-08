@@ -652,6 +652,7 @@ public:
 		/// Needed only for data lengths greater than 1 (i.e. for
 		/// bulk operations).
 
+	[[nodiscard]]
 	Poco::UInt32 getLength() const;
 		/// Returns the length of prepared data. Defaults to 1.
 		/// The length is greater than one for bulk operations.
@@ -659,6 +660,7 @@ public:
 	void setBulk(bool bulkPrep = true);
 		/// Sets bulk operation flag (always false at object creation time)
 
+	[[nodiscard]]
 	bool isBulk() const;
 		/// Returns bulk operation flag.
 

@@ -55,6 +55,7 @@ public:
 
 	Subsystem& operator = (const Subsystem&) = delete;
 
+	[[nodiscard]]
 	virtual const char* name() const = 0;
 		/// Returns the name of the subsystem.
 		/// Must be implemented by subclasses.

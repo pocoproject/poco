@@ -122,11 +122,13 @@ public:
 			}
 		}
 
+		[[nodiscard]]
 		bool operator == (const ConstIterator& it) const
 		{
 			return _vecIt == it._vecIt && (_vecIt == _endIt || _buckIt == it._buckIt);
 		}
 
+		[[nodiscard]]
 		bool operator != (const ConstIterator& it) const
 		{
 			return _vecIt != it._vecIt || (_vecIt != _endIt && _buckIt != it._buckIt);
@@ -272,6 +274,7 @@ public:
 		swap(_size, table._size);
 	}
 
+	[[nodiscard]]
 	ConstIterator begin() const
 		/// Returns an iterator pointing to the first entry, if one exists.
 	{
@@ -287,12 +290,14 @@ public:
 			return ConstIterator(it, itEnd, it->begin());
 	}
 
+	[[nodiscard]]
 	ConstIterator end() const
 		/// Returns an iterator pointing to the end of the table.
 	{
 		return ConstIterator(_buckets.end(), _buckets.end(), _buckets.front().end());
 	}
 
+	[[nodiscard]]
 	Iterator begin()
 		/// Returns an iterator pointing to the first entry, if one exists.
 	{
@@ -308,12 +313,14 @@ public:
 			return Iterator(it, itEnd, it->begin());
 	}
 
+	[[nodiscard]]
 	Iterator end()
 		/// Returns an iterator pointing to the end of the table.
 	{
 		return Iterator(_buckets.end(), _buckets.end(), _buckets.front().end());
 	}
 
+	[[nodiscard]]
 	ConstIterator find(const Value& value) const
 		/// Finds an entry in the table.
 	{
@@ -326,6 +333,7 @@ public:
 			return end();
 	}
 
+	[[nodiscard]]
 	Iterator find(const Value& value)
 		/// Finds an entry in the table.
 	{
@@ -338,6 +346,7 @@ public:
 			return end();
 	}
 
+	[[nodiscard]]
 	std::size_t count(const Value& value) const
 		/// Returns the number of elements with the given
 		/// value, with is either 1 or 0.
@@ -399,18 +408,21 @@ public:
 		swap(emptyTable);
 	}
 
+	[[nodiscard]]
 	std::size_t size() const
 		/// Returns the number of elements in the table.
 	{
 		return _size;
 	}
 
+	[[nodiscard]]
 	bool empty() const
 		/// Returns true iff the table is empty.
 	{
 		return _size == 0;
 	}
 
+	[[nodiscard]]
 	std::size_t buckets() const
 		/// Returns the number of allocated buckets.
 	{
@@ -418,6 +430,7 @@ public:
 	}
 
 protected:
+	[[nodiscard]]
 	std::size_t bucketAddress(const Value& value) const
 	{
 		std::size_t n = _hash(value);
@@ -427,6 +440,7 @@ protected:
 			return n % (2*_front);
 	}
 
+	[[nodiscard]]
 	std::size_t bucketAddressForHash(std::size_t hash)
 	{
 		if (hash % _front >= _split)
@@ -476,6 +490,7 @@ protected:
 		}
 	}
 
+	[[nodiscard]]
 	static std::size_t calcSize(std::size_t initialSize)
 	{
 		std::size_t size = 32;

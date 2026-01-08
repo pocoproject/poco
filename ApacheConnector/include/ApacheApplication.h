@@ -31,9 +31,11 @@ public:
 		/// Initializes the application if called for the first
 		/// time; does nothing in later calls.
 
+	[[nodiscard]]
 	ApacheRequestHandlerFactory& factory();
 		/// Returns the ApacheRequestHandlerFactory.
 
+	[[nodiscard]]
 	static ApacheApplication& instance();
 		/// Returns the application instance.
 

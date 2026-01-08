@@ -86,6 +86,7 @@ public:
 		/// This is done by setting the IP_MULTICAST_IF/IPV6_MULTICAST_IF
 		/// socket option.
 
+	[[nodiscard]]
 	NetworkInterface getInterface() const;
 		/// Returns the interface used for sending multicast packets.
 
@@ -95,6 +96,7 @@ public:
 		/// Sets the value of the IP_MULTICAST_LOOP/IPV6_MULTICAST_LOOP
 		/// socket option.
 
+	[[nodiscard]]
 	bool getLoopback() const;
 		/// Returns true iff loopback for multicast packets is enabled,
 		/// false otherwise.
@@ -105,7 +107,8 @@ public:
 		/// Sets the value of the IP_MULTICAST_TTL/IPV6_MULTICAST_HOPS
 		/// socket option.
 
-	unsigned getTimeToLive() const;
+	[[nodiscard]]
+	unsigned int getTimeToLive() const;
 		/// Returns the TTL/hop limit for outgoing packets.
 
 	void joinGroup(const IPAddress& groupAddress);
@@ -121,6 +124,7 @@ public:
 		/// Leaves the specified multicast group at the given interface.
 
 private:
+	[[nodiscard]]
 	static NetworkInterface findFirstInterface(const IPAddress& groupAddress);
 		/// Returns first multicast-eligible network interface.
 };

@@ -104,9 +104,11 @@ public:
 	void postNotification(Notification::Ptr pNotification) override;
 		/// Enqueues notification into the notification queue.
 
+	[[nodiscard]]
 	int backlog() const override;
 		/// Returns the number of notifications in the notification queue.
 
+	[[nodiscard]]
 	std::vector<NotificationResult> synchronousDispatch(Notification::Ptr pNotification);
 		/// Dispatches the notification synchronously to all observers that have a function
 		/// for synchronous notification processing and accept the notification.
@@ -134,6 +136,7 @@ public:
 
 #if (POCO_HAVE_JTHREAD)
 
+	[[nodiscard]]
 	static std::size_t defaultWorkersCount();
 		/// Returns the default number of worker threads based on hardware capabilities.
 		/// Scales from 2 (embedded) to 6 (server) based on available CPU cores.

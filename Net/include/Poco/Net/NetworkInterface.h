@@ -120,21 +120,26 @@ public:
 	NetworkInterface& operator = (const NetworkInterface& interfc);
 		/// Assigns another NetworkInterface.
 
+	[[nodiscard]]
 	bool operator < (const NetworkInterface& other) const;
 		/// Operator less-than.
 
+	[[nodiscard]]
 	bool operator == (const NetworkInterface& other) const;
 		/// Operator equal. Compares interface indices.
 
 	void swap(NetworkInterface& other) noexcept;
 		/// Swaps the NetworkInterface with another one.
 
-	unsigned index() const;
+	[[nodiscard]]
+	unsigned int index() const;
 		/// Returns the interface OS index.
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// Returns the interface name.
 
+	[[nodiscard]]
 	const std::string& displayName() const;
 		/// Returns the interface display name.
 		///
@@ -144,6 +149,7 @@ public:
 		///
 		/// On other platforms this is the same as name().
 
+	[[nodiscard]]
 	const std::string& adapterName() const;
 		/// Returns the interface adapter name.
 		///
@@ -152,6 +158,7 @@ public:
 		///
 		/// On other platforms this is the same as name().
 
+	[[nodiscard]]
 	const IPAddress& firstAddress(IPAddress::Family family) const;
 		/// Returns the first IP address bound to the interface.
 		/// Throws NotFoundException if the address family is not
@@ -162,6 +169,7 @@ public:
 		/// If the address family is not configured on the interface,
 		/// the address returned in addr will be unspecified (wildcard).
 
+	[[nodiscard]]
 	const IPAddress& address(unsigned index = 0) const;
 		/// Returns the IP address bound to the interface at index position.
 
@@ -171,54 +179,71 @@ public:
 	void addAddress(const IPAddress& address, const IPAddress& subnetMask, const IPAddress& broadcastAddress);
 		/// Adds address to the interface.
 
+	[[nodiscard]]
 	const AddressList& addressList() const;
 		/// Returns the list of IP addresses bound to the interface.
 
+	[[nodiscard]]
 	const IPAddress& subnetMask(unsigned index = 0) const;
 		/// Returns the subnet mask for this network interface.
 
+	[[nodiscard]]
 	const IPAddress& broadcastAddress(unsigned index = 0) const;
 		/// Returns the broadcast address for this network interface.
 
+	[[nodiscard]]
 	const IPAddress& destAddress(unsigned index = 0) const;
 		/// Returns the IPv4 point-to-point destination address for this network interface.
 
+	[[nodiscard]]
 	const MACAddress& macAddress() const;
 		/// Returns MAC (Media Access Control) address for the interface.
 
-	unsigned mtu() const;
+	[[nodiscard]]
+	unsigned int mtu() const;
 		/// Returns the MTU for this interface.
 
+	[[nodiscard]]
 	NetworkInterface::Type type() const;
 		/// returns the MIB IfType of the interface.
 
+	[[nodiscard]]
 	bool supportsIP() const;
 		/// Returns true if the interface supports IP.
 
+	[[nodiscard]]
 	bool supportsIPv4() const;
 		/// Returns true if the interface supports IPv4.
 
+	[[nodiscard]]
 	bool supportsIPv6() const;
 		/// Returns true if the interface supports IPv6.
 
+	[[nodiscard]]
 	bool supportsBroadcast() const;
 		/// Returns true if the interface supports broadcast.
 
+	[[nodiscard]]
 	bool supportsMulticast() const;
 		/// Returns true if the interface supports multicast.
 
+	[[nodiscard]]
 	bool isLoopback() const;
 		/// Returns true if the interface is loopback.
 
+	[[nodiscard]]
 	bool isPointToPoint() const;
 		/// Returns true if the interface is point-to-point.
 
+	[[nodiscard]]
 	bool isRunning() const;
 		/// Returns true if the interface is running.
 
+	[[nodiscard]]
 	bool isUp() const;
 		/// Returns true if the interface is up.
 
+	[[nodiscard]]
 	static NetworkInterface forName(const std::string& name, bool requireIPv6 = false);
 		/// Returns the NetworkInterface for the given name.
 		///
@@ -228,6 +253,7 @@ public:
 		/// Throws an InterfaceNotFoundException if an interface
 		/// with the give name does not exist.
 
+	[[nodiscard]]
 	static NetworkInterface forName(const std::string& name, IPVersion ipVersion);
 		/// Returns the NetworkInterface for the given name.
 		///
@@ -238,18 +264,21 @@ public:
 		/// Throws an InterfaceNotFoundException if an interface
 		/// with the give name does not exist.
 
+	[[nodiscard]]
 	static NetworkInterface forAddress(const IPAddress& address);
 		/// Returns the NetworkInterface for the given IP address.
 		///
 		/// Throws an InterfaceNotFoundException if an interface
 		/// with the give address does not exist.
 
+	[[nodiscard]]
 	static NetworkInterface forIndex(unsigned index);
 		/// Returns the NetworkInterface for the given interface index.
 		///
 		/// Throws an InterfaceNotFoundException if an interface
 		/// with the given index does not exist.
 
+	[[nodiscard]]
 	static List list(bool ipOnly = true, bool upOnly = true);
 		/// Returns a list with all network interfaces
 		/// on the system.
@@ -265,6 +294,7 @@ public:
 		/// multiple NetworkInterface entries are listed for
 		/// the same interface.
 
+	[[nodiscard]]
 	static Map map(bool ipOnly = true, bool upOnly = true);
 		/// Returns a map containing system network interfaces
 		/// Map is keyed by interface system indices.
@@ -308,12 +338,15 @@ protected:
 		MACAddress* pMACAddress = nullptr);
 		/// Creates the NetworkInterface.
 
+	[[nodiscard]]
 	IPAddress interfaceNameToAddress(const std::string& interfaceName) const;
 		/// Determines the IPAddress bound to the interface with the given name.
 
-	unsigned interfaceNameToIndex(const std::string& interfaceName) const;
+	[[nodiscard]]
+	unsigned int interfaceNameToIndex(const std::string& interfaceName) const;
 		/// Determines the interface index of the interface with the given name.
 
+	[[nodiscard]]
 	NetworkInterfaceImpl& impl() { return *_pImpl; };
 
 private:

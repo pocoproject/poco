@@ -159,7 +159,9 @@ private:
 	void configureFormatters(AbstractConfiguration::Ptr pConfig);
 	void configureChannels(AbstractConfiguration::Ptr pConfig);
 	void configureLoggers(AbstractConfiguration::Ptr pConfig);
+	[[nodiscard]]
 	Poco::Formatter::Ptr createFormatter(AbstractConfiguration::Ptr pConfig);
+	[[nodiscard]]
 	Poco::Channel::Ptr createChannel(AbstractConfiguration::Ptr pConfig);
 	void configureChannel(Channel::Ptr pChannel, AbstractConfiguration::Ptr pConfig);
 	void configureLogger(AbstractConfiguration::Ptr pConfig);
