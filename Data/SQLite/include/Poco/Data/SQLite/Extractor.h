@@ -423,6 +423,7 @@ public:
 	bool extract(std::size_t pos, std::list<Poco::Dynamic::Var>& val) override;
 		/// Throws NotImplementedException.
 
+	[[nodiscard]]
 	bool isNull(std::size_t pos, std::size_t row = POCO_DATA_INVALID_ROW) override;
 		/// Returns true if the current row value at pos column is null.
 		/// Because of the loss of information about null-ness of the

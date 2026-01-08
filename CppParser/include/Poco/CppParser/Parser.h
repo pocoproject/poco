@@ -91,9 +91,13 @@ protected:
 	void popNameSpace();
 	NameSpace* currentNameSpace() const;
 
+	[[nodiscard]]
 	static bool isIdentifier(const Poco::Token* pToken);
+	[[nodiscard]]
 	static bool isOperator(const Poco::Token* pToken, int kind);
+	[[nodiscard]]
 	static bool isKeyword(const Poco::Token* pToken, int kind);
+	[[nodiscard]]
 	static bool isEOF(const Poco::Token* pToken);
 	static void expectOperator(const Poco::Token* pToken, int kind, const std::string& msg);
 	static void syntaxError(const std::string& msg);

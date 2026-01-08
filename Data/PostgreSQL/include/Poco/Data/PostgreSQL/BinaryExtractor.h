@@ -403,7 +403,9 @@ public:
 		/// Extracts a Dynamic::Var list.
 
 private:
+	[[nodiscard]]
 	const OutputParameter& extractPreamble(std::size_t aPosition) const;
+	[[nodiscard]]
 	bool isColumnNull(const OutputParameter& anOutputParameter) const;
 
 	// Prevent VC8 warning "operator= could not be generated"

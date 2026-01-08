@@ -37,24 +37,30 @@ public:
 	~ICMPPacket();
 		/// Destroys the ICMPPacket.
 
+	[[nodiscard]]
 	const Poco::UInt8* packet();
 		/// Returns raw ICMP packet. ICMP header and data are included in the returned packet.
 
+	[[nodiscard]]
 	int packetSize() const;
 		/// Returns the total length of packet (header + data);
 
+	[[nodiscard]]
 	Poco::UInt16 sequence() const;
 		/// Returns the most recent sequence number generated.
 
 	void setDataSize(int dataSize);
 		/// Sets data size.
 
+	[[nodiscard]]
 	int getDataSize() const;
 		/// Returns data size.
 
+	[[nodiscard]]
 	int maxPacketSize() const;
 		/// Returns the total length of packet (header + data);
 
+	[[nodiscard]]
 	struct timeval time(Poco::UInt8* buffer = nullptr, int length = 0) const;
 		/// Returns current epoch time if either buffer or length are equal to zero.
 		/// Otherwise, it extracts the time value from the supplied buffer and
@@ -62,12 +68,14 @@ public:
 		///
 		/// Supplied buffer includes IP header, ICMP header and data.
 
+	[[nodiscard]]
 	bool validReplyID(Poco::UInt8* buffer, int length) const;
 		/// Returns true if the extracted id is recognized
 		/// (equals the process id).
 		///
 		/// Supplied buffer includes IP header, ICMP header and data.
 
+	[[nodiscard]]
 	std::string errorDescription(Poco::UInt8* buffer, int length, int& type, int& code);
 		/// Returns error description string.
 		/// If supplied buffer contains an ICMP echo reply packet, an
@@ -77,6 +85,7 @@ public:
 		///
 		/// Supplied buffer includes IP header, ICMP header and data.
 
+	[[nodiscard]]
 	std::string typeDescription(int typeId);
 		/// Returns the description of the packet type.
 

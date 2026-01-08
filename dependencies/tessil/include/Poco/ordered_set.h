@@ -179,32 +179,48 @@ class ordered_set {
     return *this;
   }
 
+  [[nodiscard]]
   allocator_type get_allocator() const { return m_ht.get_allocator(); }
 
   /*
    * Iterators
    */
+  [[nodiscard]]
   iterator begin() noexcept { return m_ht.begin(); }
+  [[nodiscard]]
   const_iterator begin() const noexcept { return m_ht.begin(); }
+  [[nodiscard]]
   const_iterator cbegin() const noexcept { return m_ht.cbegin(); }
 
+  [[nodiscard]]
   iterator end() noexcept { return m_ht.end(); }
+  [[nodiscard]]
   const_iterator end() const noexcept { return m_ht.end(); }
+  [[nodiscard]]
   const_iterator cend() const noexcept { return m_ht.cend(); }
 
+  [[nodiscard]]
   reverse_iterator rbegin() noexcept { return m_ht.rbegin(); }
+  [[nodiscard]]
   const_reverse_iterator rbegin() const noexcept { return m_ht.rbegin(); }
+  [[nodiscard]]
   const_reverse_iterator rcbegin() const noexcept { return m_ht.rcbegin(); }
 
+  [[nodiscard]]
   reverse_iterator rend() noexcept { return m_ht.rend(); }
+  [[nodiscard]]
   const_reverse_iterator rend() const noexcept { return m_ht.rend(); }
+  [[nodiscard]]
   const_reverse_iterator rcend() const noexcept { return m_ht.rcend(); }
 
   /*
    * Capacity
    */
+  [[nodiscard]]
   bool empty() const noexcept { return m_ht.empty(); }
+  [[nodiscard]]
   size_type size() const noexcept { return m_ht.size(); }
+  [[nodiscard]]
   size_type max_size() const noexcept { return m_ht.max_size(); }
 
   /*
@@ -343,6 +359,7 @@ class ordered_set {
   /*
    * Lookup
    */
+  [[nodiscard]]
   size_type count(const Key& key) const { return m_ht.count(key); }
 
   /**
@@ -350,6 +367,7 @@ class ordered_set {
    * hash value should be the same as hash_function()(key). Useful to speed-up
    * the lookup if you already have the hash.
    */
+  [[nodiscard]]
   size_type count(const Key& key, std::size_t precalculated_hash) const {
     return m_ht.count(key, precalculated_hash);
   }
@@ -362,6 +380,7 @@ class ordered_set {
   template <
       class K, class KE = KeyEqual,
       typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  [[nodiscard]]
   size_type count(const K& key) const {
     return m_ht.count(key);
   }
@@ -376,10 +395,12 @@ class ordered_set {
   template <
       class K, class KE = KeyEqual,
       typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  [[nodiscard]]
   size_type count(const K& key, std::size_t precalculated_hash) const {
     return m_ht.count(key, precalculated_hash);
   }
 
+  [[nodiscard]]
   iterator find(const Key& key) { return m_ht.find(key); }
 
   /**
@@ -387,15 +408,18 @@ class ordered_set {
    * hash value should be the same as hash_function()(key). Useful to speed-up
    * the lookup if you already have the hash.
    */
+  [[nodiscard]]
   iterator find(const Key& key, std::size_t precalculated_hash) {
     return m_ht.find(key, precalculated_hash);
   }
 
+  [[nodiscard]]
   const_iterator find(const Key& key) const { return m_ht.find(key); }
 
   /**
    * @copydoc find(const Key& key, std::size_t precalculated_hash)
    */
+  [[nodiscard]]
   const_iterator find(const Key& key, std::size_t precalculated_hash) const {
     return m_ht.find(key, precalculated_hash);
   }
@@ -408,6 +432,7 @@ class ordered_set {
   template <
       class K, class KE = KeyEqual,
       typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  [[nodiscard]]
   iterator find(const K& key) {
     return m_ht.find(key);
   }
@@ -422,6 +447,7 @@ class ordered_set {
   template <
       class K, class KE = KeyEqual,
       typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  [[nodiscard]]
   iterator find(const K& key, std::size_t precalculated_hash) {
     return m_ht.find(key, precalculated_hash);
   }
@@ -432,6 +458,7 @@ class ordered_set {
   template <
       class K, class KE = KeyEqual,
       typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  [[nodiscard]]
   const_iterator find(const K& key) const {
     return m_ht.find(key);
   }
@@ -446,10 +473,12 @@ class ordered_set {
   template <
       class K, class KE = KeyEqual,
       typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  [[nodiscard]]
   const_iterator find(const K& key, std::size_t precalculated_hash) const {
     return m_ht.find(key, precalculated_hash);
   }
 
+  [[nodiscard]]
   bool contains(const Key& key) const { return m_ht.contains(key); }
 
   /**
@@ -457,6 +486,7 @@ class ordered_set {
    * hash value should be the same as hash_function()(key). Useful to speed-up
    * the lookup if you already have the hash.
    */
+  [[nodiscard]]
   bool contains(const Key& key, std::size_t precalculated_hash) const {
     return m_ht.contains(key, precalculated_hash);
   }
@@ -469,6 +499,7 @@ class ordered_set {
   template <
       class K, class KE = KeyEqual,
       typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  [[nodiscard]]
   bool contains(const K& key) const {
     return m_ht.contains(key);
   }
@@ -483,10 +514,12 @@ class ordered_set {
   template <
       class K, class KE = KeyEqual,
       typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  [[nodiscard]]
   bool contains(const K& key, std::size_t precalculated_hash) const {
     return m_ht.contains(key, precalculated_hash);
   }
 
+  [[nodiscard]]
   std::pair<iterator, iterator> equal_range(const Key& key) {
     return m_ht.equal_range(key);
   }
@@ -496,11 +529,13 @@ class ordered_set {
    * hash value should be the same as hash_function()(key). Useful to speed-up
    * the lookup if you already have the hash.
    */
+  [[nodiscard]]
   std::pair<iterator, iterator> equal_range(const Key& key,
                                             std::size_t precalculated_hash) {
     return m_ht.equal_range(key, precalculated_hash);
   }
 
+  [[nodiscard]]
   std::pair<const_iterator, const_iterator> equal_range(const Key& key) const {
     return m_ht.equal_range(key);
   }
@@ -508,6 +543,7 @@ class ordered_set {
   /**
    * @copydoc equal_range(const Key& key, std::size_t precalculated_hash)
    */
+  [[nodiscard]]
   std::pair<const_iterator, const_iterator> equal_range(
       const Key& key, std::size_t precalculated_hash) const {
     return m_ht.equal_range(key, precalculated_hash);
@@ -521,6 +557,7 @@ class ordered_set {
   template <
       class K, class KE = KeyEqual,
       typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  [[nodiscard]]
   std::pair<iterator, iterator> equal_range(const K& key) {
     return m_ht.equal_range(key);
   }
@@ -535,6 +572,7 @@ class ordered_set {
   template <
       class K, class KE = KeyEqual,
       typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  [[nodiscard]]
   std::pair<iterator, iterator> equal_range(const K& key,
                                             std::size_t precalculated_hash) {
     return m_ht.equal_range(key, precalculated_hash);
@@ -546,6 +584,7 @@ class ordered_set {
   template <
       class K, class KE = KeyEqual,
       typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  [[nodiscard]]
   std::pair<const_iterator, const_iterator> equal_range(const K& key) const {
     return m_ht.equal_range(key);
   }
@@ -556,6 +595,7 @@ class ordered_set {
   template <
       class K, class KE = KeyEqual,
       typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  [[nodiscard]]
   std::pair<const_iterator, const_iterator> equal_range(
       const K& key, std::size_t precalculated_hash) const {
     return m_ht.equal_range(key, precalculated_hash);
@@ -564,13 +604,17 @@ class ordered_set {
   /*
    * Bucket interface
    */
+  [[nodiscard]]
   size_type bucket_count() const { return m_ht.bucket_count(); }
+  [[nodiscard]]
   size_type max_bucket_count() const { return m_ht.max_bucket_count(); }
 
   /*
    *  Hash policy
    */
+  [[nodiscard]]
   float load_factor() const { return m_ht.load_factor(); }
+  [[nodiscard]]
   float max_load_factor() const { return m_ht.max_load_factor(); }
   void max_load_factor(float ml) { m_ht.max_load_factor(ml); }
 
@@ -580,7 +624,9 @@ class ordered_set {
   /*
    * Observers
    */
+  [[nodiscard]]
   hasher hash_function() const { return m_ht.hash_function(); }
+  [[nodiscard]]
   key_equal key_eq() const { return m_ht.key_eq(); }
 
   /*
@@ -590,6 +636,7 @@ class ordered_set {
   /**
    * Convert a const_iterator to an iterator.
    */
+  [[nodiscard]]
   iterator mutable_iterator(const_iterator pos) {
     return m_ht.mutable_iterator(pos);
   }
@@ -600,23 +647,27 @@ class ordered_set {
    * Return an iterator to the element at index. Return end() if index ==
    * size().
    */
+  [[nodiscard]]
   iterator nth(size_type index) { return m_ht.nth(index); }
 
   /**
    * @copydoc nth(size_type index)
    */
+  [[nodiscard]]
   const_iterator nth(size_type index) const { return m_ht.nth(index); }
 
   /**
    * Return const_reference to the first element. Requires the container to not
    * be empty.
    */
+  [[nodiscard]]
   const_reference front() const { return m_ht.front(); }
 
   /**
    * Return const_reference to the last element. Requires the container to not
    * be empty.
    */
+  [[nodiscard]]
   const_reference back() const { return m_ht.back(); }
 
   /**
@@ -626,6 +677,7 @@ class ordered_set {
   template <class U = values_container_type,
             typename std::enable_if<
                 tsl::detail_ordered_hash::is_vector<U>::value>::type* = nullptr>
+  [[nodiscard]]
   const typename values_container_type::value_type* data() const noexcept {
     return m_ht.data();
   }
@@ -635,6 +687,7 @@ class ordered_set {
    * same order as the insertion order and are contiguous in the structure, no
    * holes (size() == values_container().size()).
    */
+  [[nodiscard]]
   const values_container_type& values_container() const noexcept {
     return m_ht.values_container();
   }
@@ -649,6 +702,7 @@ class ordered_set {
   template <class U = values_container_type,
             typename std::enable_if<
                 tsl::detail_ordered_hash::is_vector<U>::value>::type* = nullptr>
+  [[nodiscard]]
   size_type capacity() const noexcept {
     return m_ht.capacity();
   }
@@ -793,6 +847,7 @@ class ordered_set {
    * `Deserializer` function object if compatibility is required.
    */
   template <class Deserializer>
+  [[nodiscard]]
   static ordered_set deserialize(Deserializer& deserializer,
                                  bool hash_compatible = false) {
     ordered_set set(0);
@@ -801,21 +856,27 @@ class ordered_set {
     return set;
   }
 
+  [[nodiscard]]
   friend bool operator==(const ordered_set& lhs, const ordered_set& rhs) {
     return lhs.m_ht == rhs.m_ht;
   }
+  [[nodiscard]]
   friend bool operator!=(const ordered_set& lhs, const ordered_set& rhs) {
     return lhs.m_ht != rhs.m_ht;
   }
+  [[nodiscard]]
   friend bool operator<(const ordered_set& lhs, const ordered_set& rhs) {
     return lhs.m_ht < rhs.m_ht;
   }
+  [[nodiscard]]
   friend bool operator<=(const ordered_set& lhs, const ordered_set& rhs) {
     return lhs.m_ht <= rhs.m_ht;
   }
+  [[nodiscard]]
   friend bool operator>(const ordered_set& lhs, const ordered_set& rhs) {
     return lhs.m_ht > rhs.m_ht;
   }
+  [[nodiscard]]
   friend bool operator>=(const ordered_set& lhs, const ordered_set& rhs) {
     return lhs.m_ht >= rhs.m_ht;
   }

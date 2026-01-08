@@ -97,6 +97,7 @@ public:
 	void removeWork();
 		/// Removes all scheduled work.
 
+	[[nodiscard]]
 	int scheduledWork();
 		/// Returns the number of scheduled functions.
 
@@ -105,6 +106,7 @@ public:
 		/// from the front of the schedule queue.
 		/// Default is removal of all scheduled functions.
 
+	[[nodiscard]]
 	int permanentWork();
 		/// Returns the number of permanent functions.
 
@@ -113,6 +115,7 @@ public:
 		/// from the front of the schedule queue.
 		/// Default is removal of all functions.
 
+	[[nodiscard]]
 	int poll(int* pHandled = nullptr);
 		/// Polls all registered sockets and calls their respective handlers.
 		/// If pHandled is not null, after the call it contains the total number
@@ -154,6 +157,7 @@ public:
 		/// The timeout is passed to the Socket::select()
 		/// method.
 
+	[[nodiscard]]
 	Poco::Timespan getTimeout() const;
 		/// Returns the timeout.
 
@@ -192,12 +196,15 @@ public:
 	bool hasSocketHandlers() const;
 		/// Returns true if proactor had at least one I/O completion handler.
 
+	[[nodiscard]]
 	bool has(const Socket& sock) const;
 		/// Returns true if socket is registered with this proactor.
 
+	[[nodiscard]]
 	bool isRunning() const;
 		/// Returns true if this proactor is running
 
+	[[nodiscard]]
 	bool ioCompletionInProgress() const;
 		/// Returns true if there are not executed handlers from last IO.
 
@@ -310,6 +317,7 @@ private:
 			_nq.wakeUpAll();
 		}
 
+		[[nodiscard]]
 		int queueSize() const
 		{
 			return _nq.size();
@@ -373,11 +381,13 @@ private:
 		/// The value of _timeout can grow up to
 		/// _maxTimeout value.
 
+	[[nodiscard]]
 	int error(Socket& sock);
 		/// Enqueues the completion handlers and removes
 		/// them from the handlers list after the operation
 		/// successfully completes.
 
+	[[nodiscard]]
 	bool hasHandlers(SubscriberMap& handlers, int sockfd);
 	void deleteHandler(IOHandlerList& handlers, IOHandlerList::iterator& it);
 
@@ -438,6 +448,7 @@ private:
 		/// Enqueues the completion handler into the I/O
 		/// completion handler.
 
+	[[nodiscard]]
 	Worker& worker();
 
 	std::atomic<bool> _isRunning;

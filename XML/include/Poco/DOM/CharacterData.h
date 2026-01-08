@@ -39,10 +39,12 @@ class XML_API CharacterData: public AbstractNode
 	/// Indexing on character data is done in XMLChar units.
 {
 public:
+	[[nodiscard]]
 	const XMLString& data() const;
 		/// Returns the character data of the node that
 		/// implements the interface.
 
+	[[nodiscard]]
 	const XMLString& getData() const;
 		/// Returns the character data of the node that
 		/// implements the interface.
@@ -51,11 +53,13 @@ public:
 		/// Sets the character data of the node that
 		/// implements the interface.
 
+	[[nodiscard]]
 	unsigned long length() const;
 		/// Returns the number of XMLChars that are available
 		/// through getData and substringData. This may have the
 		/// value zero.
 
+	[[nodiscard]]
 	XMLString substringData(unsigned long offset, unsigned long count) const;
 		/// Extracts a range of data from the node.
 		/// If offset and count exceeds the length, then all
@@ -76,6 +80,7 @@ public:
 		/// offset with the specified string.
 
 	// Non-standard extensions
+	[[nodiscard]]
 	XMLString trimmedData() const;
 		/// Returns the character data of that node with
 		/// all surrounding whitespace removed.
@@ -83,6 +88,7 @@ public:
 		/// This method is an extension to the W3C Document Object Model.
 
 	// Node
+	[[nodiscard]]
 	const XMLString& getNodeValue() const;
 	void setNodeValue(const XMLString& value);
 

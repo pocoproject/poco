@@ -235,7 +235,7 @@ void ProcessRunnerTest::testProcessRunner()
 			assertTrue (pr.cmdLine() == cmdLine(cmd, args));
 			assertTrue (pr.pidFile().empty()); // ProcessRunner has no PID file
 
-			PIDFile::getFileName(pidFile);
+			[[maybe_unused]] std::string s = PIDFile::getFileName(pidFile);
 			Stopwatch sw; sw.start();
 			while (!File(pidFile).exists())
 				checkTimeout(sw, "Waiting for PID file", 1000, __LINE__);
@@ -257,7 +257,7 @@ void ProcessRunnerTest::testProcessRunner()
 			assertTrue (pr.cmdLine() == cmdLine(cmd, args));
 			assertTrue (pr.pidFile().empty()); // ProcessRunner has no PID file
 
-			PIDFile::getFileName(pidFile);
+			[[maybe_unused]] std::string s = PIDFile::getFileName(pidFile);
 			Stopwatch sw; sw.start();
 			while (!File(pidFile).exists())
 				checkTimeout(sw, "Waiting for PID file", 1000, __LINE__);

@@ -61,6 +61,7 @@ public:
 	void enableFTPS(bool enable = true);
 		/// Enable or disable FTPS (FTP over SSL/TLS).
 
+	[[nodiscard]]
 	bool isSecure() const;
 		/// Returns true if the session is FTPS.
 

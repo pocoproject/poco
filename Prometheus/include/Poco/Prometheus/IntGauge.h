@@ -70,6 +70,7 @@ public:
 		/// Must only be set once, immediately after creating
 		/// the IntGauge.
 
+	[[nodiscard]]
 	Sample value() const;
 		/// Returns the IntGauge's current value.
 

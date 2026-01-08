@@ -139,25 +139,32 @@ public:
 	~Record();
 		/// Destroys the Service.
 
+	[[nodiscard]]
 	Poco::Int32 networkInterface() const;
 		/// The id of the interface on which the remote service is running, or zero
 		/// if no interface has been specified.
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// The full domain name of the record.
 
+	[[nodiscard]]
 	Poco::UInt16 type() const;
 		/// The record's type (e.g., RT_PTR).
 
+	[[nodiscard]]
 	Poco::UInt16 clazz() const;
 		/// The record's class, which is usually RC_IN.
 
+	[[nodiscard]]
 	Poco::UInt16 length() const;
 		/// The length of the record.
 
+	[[nodiscard]]
 	const void* data() const;
 		/// The actual data.
 
+	[[nodiscard]]
 	Poco::UInt32 ttl() const;
 		/// The time-to-live for the record in seconds.
 

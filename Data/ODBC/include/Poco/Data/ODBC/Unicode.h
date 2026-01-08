@@ -56,6 +56,7 @@ namespace ODBC {
 #endif
 
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLColAttribute(SQLHSTMT hstmt,
 	SQLUSMALLINT   iCol,
 	SQLUSMALLINT   iField,
@@ -65,6 +66,7 @@ SQLRETURN ODBC_API SQLColAttribute(SQLHSTMT hstmt,
 	NumAttrPtrType pNumAttr);
 
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLColAttributes(SQLHSTMT hstmt,
 	SQLUSMALLINT icol,
 	SQLUSMALLINT fDescType,
@@ -73,6 +75,7 @@ SQLRETURN ODBC_API SQLColAttributes(SQLHSTMT hstmt,
 	SQLSMALLINT* pcbDesc,
 	SQLLEN*      pfDesc);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLConnect(SQLHDBC hdbc,
 	SQLCHAR*    szDSN,
 	SQLSMALLINT cbDSN,
@@ -81,6 +84,7 @@ SQLRETURN ODBC_API SQLConnect(SQLHDBC hdbc,
 	SQLCHAR*    szAuthStr,
 	SQLSMALLINT cbAuthStr);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLDescribeCol(SQLHSTMT hstmt,
 	SQLUSMALLINT icol,
 	SQLCHAR*     szColName,
@@ -91,6 +95,7 @@ SQLRETURN ODBC_API SQLDescribeCol(SQLHSTMT hstmt,
 	SQLSMALLINT* pibScale,
 	SQLSMALLINT* pfNullable);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLError(SQLHENV henv,
 	SQLHDBC      hdbc,
 	SQLHSTMT     hstmt,
@@ -100,27 +105,32 @@ SQLRETURN ODBC_API SQLError(SQLHENV henv,
 	SQLSMALLINT  cbErrorMsgMax,
 	SQLSMALLINT* pcbErrorMsg);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLExecDirect(SQLHSTMT hstmt,
 	SQLCHAR*   szSqlStr,
 	SQLINTEGER cbSqlStr);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLGetConnectAttr(SQLHDBC hdbc,
 	SQLINTEGER  fAttribute,
 	SQLPOINTER  rgbValue,
 	SQLINTEGER  cbValueMax,
 	SQLINTEGER* pcbValue);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLGetCursorName(SQLHSTMT hstmt,
 	SQLCHAR*     szCursor,
 	SQLSMALLINT  cbCursorMax,
 	SQLSMALLINT* pcbCursor);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLSetDescField(SQLHDESC DescriptorHandle,
 	SQLSMALLINT RecNumber,
 	SQLSMALLINT FieldIdentifier,
 	SQLPOINTER  Value,
 	SQLINTEGER  BufferLength);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLGetDescField(SQLHDESC hdesc,
 	SQLSMALLINT iRecord,
 	SQLSMALLINT iField,
@@ -128,6 +138,7 @@ SQLRETURN ODBC_API SQLGetDescField(SQLHDESC hdesc,
 	SQLINTEGER	cbValueMax,
 	SQLINTEGER* pcbValue);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLGetDescRec(SQLHDESC hdesc,
 	SQLSMALLINT  iRecord,
 	SQLCHAR*     szName,
@@ -140,6 +151,7 @@ SQLRETURN ODBC_API SQLGetDescRec(SQLHDESC hdesc,
 	SQLSMALLINT* pScale,
 	SQLSMALLINT* pNullable);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLGetDiagField(SQLSMALLINT fHandleType,
 	SQLHANDLE    handle,
 	SQLSMALLINT  iRecord,
@@ -148,6 +160,7 @@ SQLRETURN ODBC_API SQLGetDiagField(SQLSMALLINT fHandleType,
 	SQLSMALLINT  cbDiagInfoMax,
 	SQLSMALLINT* pcbDiagInfo);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLGetDiagRec(SQLSMALLINT fHandleType,
 	SQLHANDLE    handle,
 	SQLSMALLINT  iRecord,
@@ -157,30 +170,36 @@ SQLRETURN ODBC_API SQLGetDiagRec(SQLSMALLINT fHandleType,
 	SQLSMALLINT  cbErrorMsgMax,
 	SQLSMALLINT* pcbErrorMsg);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLPrepare(SQLHSTMT hstmt,
 	SQLCHAR*   szSqlStr,
 	SQLINTEGER cbSqlStr);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLSetConnectAttr(SQLHDBC hdbc,
 	SQLINTEGER fAttribute,
 	SQLPOINTER rgbValue,
 	SQLINTEGER cbValue);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLSetCursorName(SQLHSTMT hstmt,
 	SQLCHAR*    szCursor,
 	SQLSMALLINT cbCursor);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLSetStmtAttr(SQLHSTMT hstmt,
 	SQLINTEGER fAttribute,
 	SQLPOINTER rgbValue,
 	SQLINTEGER cbValueMax);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLGetStmtAttr(SQLHSTMT hstmt,
 	SQLINTEGER  fAttribute,
 	SQLPOINTER  rgbValue,
 	SQLINTEGER  cbValueMax,
 	SQLINTEGER* pcbValue);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLColumns(SQLHSTMT hstmt,
 	SQLCHAR*    szCatalogName,
 	SQLSMALLINT cbCatalogName,
@@ -191,23 +210,28 @@ SQLRETURN ODBC_API SQLColumns(SQLHSTMT hstmt,
 	SQLCHAR*    szColumnName,
 	SQLSMALLINT cbColumnName);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLGetConnectOption(SQLHDBC hdbc,
 	SQLUSMALLINT fOption,
 	SQLPOINTER   pvParam);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLGetInfo(SQLHDBC hdbc,
 	SQLUSMALLINT fInfoType,
 	SQLPOINTER   rgbInfoValue,
 	SQLSMALLINT  cbInfoValueMax,
 	SQLSMALLINT* pcbInfoValue);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLGetTypeInfo(SQLHSTMT StatementHandle,
 	SQLSMALLINT	DataType);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLSetConnectOption(SQLHDBC hdbc,
 	SQLUSMALLINT fOption,
 	SQLULEN      vParam);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLSpecialColumns(SQLHSTMT hstmt,
 	SQLUSMALLINT fColType,
 	SQLCHAR*     szCatalogName,
@@ -219,6 +243,7 @@ SQLRETURN ODBC_API SQLSpecialColumns(SQLHSTMT hstmt,
 	SQLUSMALLINT fScope,
 	SQLUSMALLINT fNullable);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLStatistics(SQLHSTMT hstmt,
 	SQLCHAR*     szCatalogName,
 	SQLSMALLINT  cbCatalogName,
@@ -229,6 +254,7 @@ SQLRETURN ODBC_API SQLStatistics(SQLHSTMT hstmt,
 	SQLUSMALLINT fUnique,
 	SQLUSMALLINT fAccuracy);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLTables(SQLHSTMT hstmt,
 	SQLCHAR*    szCatalogName,
 	SQLSMALLINT cbCatalogName,
@@ -239,6 +265,7 @@ SQLRETURN ODBC_API SQLTables(SQLHSTMT hstmt,
 	SQLCHAR*    szTableType,
 	SQLSMALLINT cbTableType);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLDataSources(SQLHENV henv,
 	SQLUSMALLINT fDirection,
 	SQLCHAR*     szDSN,
@@ -248,6 +275,7 @@ SQLRETURN ODBC_API SQLDataSources(SQLHENV henv,
 	SQLSMALLINT  cbDescriptionMax,
 	SQLSMALLINT* pcbDescription);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLDriverConnect(SQLHDBC hdbc,
 	SQLHWND      hwnd,
 	SQLCHAR*     szConnStrIn,
@@ -257,6 +285,7 @@ SQLRETURN ODBC_API SQLDriverConnect(SQLHDBC hdbc,
 	SQLSMALLINT* pcbConnStrOut,
 	SQLUSMALLINT fDriverCompletion);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLBrowseConnect(SQLHDBC hdbc,
 	SQLCHAR*     szConnStrIn,
 	SQLSMALLINT  cbConnStrIn,
@@ -264,6 +293,7 @@ SQLRETURN ODBC_API SQLBrowseConnect(SQLHDBC hdbc,
 	SQLSMALLINT  cbConnStrOutMax,
 	SQLSMALLINT* pcbConnStrOut);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLColumnPrivileges(SQLHSTMT hstmt,
 	SQLCHAR*    szCatalogName,
 	SQLSMALLINT cbCatalogName,
@@ -274,6 +304,7 @@ SQLRETURN ODBC_API SQLColumnPrivileges(SQLHSTMT hstmt,
 	SQLCHAR*    szColumnName,
 	SQLSMALLINT cbColumnName);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLForeignKeys(SQLHSTMT hstmt,
 	SQLCHAR*    szPkCatalogName,
 	SQLSMALLINT cbPkCatalogName,
@@ -288,6 +319,7 @@ SQLRETURN ODBC_API SQLForeignKeys(SQLHSTMT hstmt,
 	SQLCHAR*    szFkTableName,
 	SQLSMALLINT cbFkTableName);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLNativeSql(SQLHDBC hdbc,
 	SQLCHAR*    szSqlStrIn,
 	SQLINTEGER  cbSqlStrIn,
@@ -295,6 +327,7 @@ SQLRETURN ODBC_API SQLNativeSql(SQLHDBC hdbc,
 	SQLINTEGER  cbSqlStrMax,
 	SQLINTEGER* pcbSqlStr);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLPrimaryKeys(SQLHSTMT hstmt,
 	SQLCHAR*    szCatalogName,
 	SQLSMALLINT cbCatalogName,
@@ -303,6 +336,7 @@ SQLRETURN ODBC_API SQLPrimaryKeys(SQLHSTMT hstmt,
 	SQLCHAR*    szTableName,
 	SQLSMALLINT cbTableName);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLProcedureColumns(SQLHSTMT hstmt,
 	SQLCHAR*    szCatalogName,
 	SQLSMALLINT cbCatalogName,
@@ -313,6 +347,7 @@ SQLRETURN ODBC_API SQLProcedureColumns(SQLHSTMT hstmt,
 	SQLCHAR*    szColumnName,
 	SQLSMALLINT cbColumnName);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLProcedures(SQLHSTMT hstmt,
 	SQLCHAR*    szCatalogName,
 	SQLSMALLINT cbCatalogName,
@@ -321,6 +356,7 @@ SQLRETURN ODBC_API SQLProcedures(SQLHSTMT hstmt,
 	SQLCHAR*    szProcName,
 	SQLSMALLINT cbProcName);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLTablePrivileges(SQLHSTMT hstmt,
 	SQLCHAR*    szCatalogName,
 	SQLSMALLINT cbCatalogName,
@@ -329,6 +365,7 @@ SQLRETURN ODBC_API SQLTablePrivileges(SQLHSTMT hstmt,
 	SQLCHAR*    szTableName,
 	SQLSMALLINT cbTableName);
 
+[[nodiscard]]
 SQLRETURN ODBC_API SQLDrivers(SQLHENV henv,
 	SQLUSMALLINT fDirection,
 	SQLCHAR*     szDriverDesc,
@@ -343,12 +380,14 @@ SQLRETURN ODBC_API SQLDrivers(SQLHENV henv,
 /// inlines
 ///
 
+[[nodiscard]]
 inline bool isString(SQLPOINTER pValue, SQLINTEGER length)
 {
 	return (SQL_NTS == length || length > 0) && pValue;
 }
 
 
+[[nodiscard]]
 inline SQLINTEGER stringLength(SQLPOINTER pValue, SQLINTEGER length)
 {
 	if (SQL_NTS != length) return length;
@@ -364,6 +403,7 @@ inline SQLINTEGER stringLength(SQLPOINTER pValue, SQLINTEGER length)
 /// inlines
 ///
 
+[[nodiscard]]
 inline SQLRETURN SQLColAttribute(SQLHSTMT hstmt,
 	SQLUSMALLINT   iCol,
 	SQLUSMALLINT   iField,
@@ -382,6 +422,7 @@ inline SQLRETURN SQLColAttribute(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLColAttributes(SQLHSTMT hstmt,
 	SQLUSMALLINT icol,
 	SQLUSMALLINT fDescType,
@@ -400,6 +441,7 @@ inline SQLRETURN SQLColAttributes(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLConnect(SQLHDBC hdbc,
 	SQLCHAR*    szDSN,
 	SQLSMALLINT cbDSN,
@@ -418,6 +460,7 @@ inline SQLRETURN SQLConnect(SQLHDBC hdbc,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLDescribeCol(SQLHSTMT hstmt,
 	SQLUSMALLINT icol,
 	SQLCHAR*     szColName,
@@ -440,6 +483,7 @@ inline SQLRETURN SQLDescribeCol(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLError(SQLHENV henv,
 	SQLHDBC      hdbc,
 	SQLHSTMT     hstmt,
@@ -454,6 +498,7 @@ inline SQLRETURN SQLError(SQLHENV henv,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLExecDirect(SQLHSTMT hstmt,
 	SQLCHAR*   szSqlStr,
 	SQLINTEGER cbSqlStr)
@@ -462,6 +507,7 @@ inline SQLRETURN SQLExecDirect(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLGetConnectAttr(SQLHDBC hdbc,
 	SQLINTEGER  fAttribute,
 	SQLPOINTER  rgbValue,
@@ -476,6 +522,7 @@ inline SQLRETURN SQLGetConnectAttr(SQLHDBC hdbc,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLGetCursorName(SQLHSTMT hstmt,
 	SQLCHAR*     szCursor,
 	SQLSMALLINT  cbCursorMax,
@@ -485,6 +532,7 @@ inline SQLRETURN SQLGetCursorName(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLSetDescField(SQLHDESC DescriptorHandle,
 	SQLSMALLINT RecNumber,
 	SQLSMALLINT FieldIdentifier,
@@ -499,6 +547,7 @@ inline SQLRETURN SQLSetDescField(SQLHDESC DescriptorHandle,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLGetDescField(SQLHDESC hdesc,
 	SQLSMALLINT iRecord,
 	SQLSMALLINT iField,
@@ -515,6 +564,7 @@ inline SQLRETURN SQLGetDescField(SQLHDESC hdesc,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLGetDescRec(SQLHDESC hdesc,
 	SQLSMALLINT  iRecord,
 	SQLCHAR*     szName,
@@ -541,6 +591,7 @@ inline SQLRETURN SQLGetDescRec(SQLHDESC hdesc,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLGetDiagField(SQLSMALLINT fHandleType,
 	SQLHANDLE    handle,
 	SQLSMALLINT  iRecord,
@@ -559,6 +610,7 @@ inline SQLRETURN SQLGetDiagField(SQLSMALLINT fHandleType,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLGetDiagRec(SQLSMALLINT fHandleType,
 	SQLHANDLE    handle,
 	SQLSMALLINT  iRecord,
@@ -579,6 +631,7 @@ inline SQLRETURN SQLGetDiagRec(SQLSMALLINT fHandleType,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLPrepare(SQLHSTMT hstmt,
 	SQLCHAR*   szSqlStr,
 	SQLINTEGER cbSqlStr)
@@ -587,6 +640,7 @@ inline SQLRETURN SQLPrepare(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLSetConnectAttr(SQLHDBC hdbc,
 	SQLINTEGER fAttribute,
 	SQLPOINTER rgbValue,
@@ -596,6 +650,7 @@ inline SQLRETURN SQLSetConnectAttr(SQLHDBC hdbc,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLSetCursorName(SQLHSTMT hstmt,
 	SQLCHAR*    szCursor,
 	SQLSMALLINT cbCursor)
@@ -604,6 +659,7 @@ inline SQLRETURN SQLSetCursorName(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLSetStmtAttr(SQLHSTMT hstmt,
 	SQLINTEGER fAttribute,
 	SQLPOINTER rgbValue,
@@ -613,6 +669,7 @@ inline SQLRETURN SQLSetStmtAttr(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLGetStmtAttr(SQLHSTMT hstmt,
 	SQLINTEGER  fAttribute,
 	SQLPOINTER  rgbValue,
@@ -627,6 +684,7 @@ inline SQLRETURN SQLGetStmtAttr(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLColumns(SQLHSTMT hstmt,
 	SQLCHAR*    szCatalogName,
 	SQLSMALLINT cbCatalogName,
@@ -649,6 +707,7 @@ inline SQLRETURN SQLColumns(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLGetConnectOption(SQLHDBC hdbc,
 	SQLUSMALLINT fOption,
 	SQLPOINTER   pvParam)
@@ -657,6 +716,7 @@ inline SQLRETURN SQLGetConnectOption(SQLHDBC hdbc,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLGetInfo(SQLHDBC hdbc,
 	SQLUSMALLINT fInfoType,
 	SQLPOINTER   rgbInfoValue,
@@ -671,6 +731,7 @@ inline SQLRETURN SQLGetInfo(SQLHDBC hdbc,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLGetTypeInfo(SQLHSTMT StatementHandle,
 	SQLSMALLINT	DataType)
 {
@@ -678,6 +739,7 @@ inline SQLRETURN SQLGetTypeInfo(SQLHSTMT StatementHandle,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLSetConnectOption(SQLHDBC hdbc,
 	SQLUSMALLINT fOption,
 	SQLULEN      vParam)
@@ -686,6 +748,7 @@ inline SQLRETURN SQLSetConnectOption(SQLHDBC hdbc,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLSpecialColumns(SQLHSTMT hstmt,
 	SQLUSMALLINT fColType,
 	SQLCHAR*     szCatalogName,
@@ -710,6 +773,7 @@ inline SQLRETURN SQLSpecialColumns(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLStatistics(SQLHSTMT hstmt,
 	SQLCHAR*     szCatalogName,
 	SQLSMALLINT  cbCatalogName,
@@ -732,6 +796,7 @@ inline SQLRETURN SQLStatistics(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLTables(SQLHSTMT hstmt,
 	SQLCHAR*    szCatalogName,
 	SQLSMALLINT cbCatalogName,
@@ -754,6 +819,7 @@ inline SQLRETURN SQLTables(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLDataSources(SQLHENV henv,
 	SQLUSMALLINT fDirection,
 	SQLCHAR*     szDSN,
@@ -774,6 +840,7 @@ inline SQLRETURN SQLDataSources(SQLHENV henv,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLDriverConnect(SQLHDBC hdbc,
 	SQLHWND      hwnd,
 	SQLCHAR*     szConnStrIn,
@@ -794,6 +861,7 @@ inline SQLRETURN SQLDriverConnect(SQLHDBC hdbc,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLBrowseConnect(SQLHDBC hdbc,
 	SQLCHAR*     szConnStrIn,
 	SQLSMALLINT  cbConnStrIn,
@@ -810,6 +878,7 @@ inline SQLRETURN SQLBrowseConnect(SQLHDBC hdbc,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLColumnPrivileges(SQLHSTMT hstmt,
 	SQLCHAR*    szCatalogName,
 	SQLSMALLINT cbCatalogName,
@@ -832,6 +901,7 @@ inline SQLRETURN SQLColumnPrivileges(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLForeignKeys(SQLHSTMT hstmt,
 	SQLCHAR*    szPkCatalogName,
 	SQLSMALLINT cbPkCatalogName,
@@ -862,6 +932,7 @@ inline SQLRETURN SQLForeignKeys(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLNativeSql(SQLHDBC hdbc,
 	SQLCHAR*    szSqlStrIn,
 	SQLINTEGER  cbSqlStrIn,
@@ -878,6 +949,7 @@ inline SQLRETURN SQLNativeSql(SQLHDBC hdbc,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLPrimaryKeys(SQLHSTMT hstmt,
 	SQLCHAR*    szCatalogName,
 	SQLSMALLINT cbCatalogName,
@@ -896,6 +968,7 @@ inline SQLRETURN SQLPrimaryKeys(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLProcedureColumns(SQLHSTMT hstmt,
 	SQLCHAR*    szCatalogName,
 	SQLSMALLINT cbCatalogName,
@@ -918,6 +991,7 @@ inline SQLRETURN SQLProcedureColumns(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLProcedures(SQLHSTMT hstmt,
 	SQLCHAR*    szCatalogName,
 	SQLSMALLINT cbCatalogName,
@@ -936,6 +1010,7 @@ inline SQLRETURN SQLProcedures(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLTablePrivileges(SQLHSTMT hstmt,
 	SQLCHAR*    szCatalogName,
 	SQLSMALLINT cbCatalogName,
@@ -954,6 +1029,7 @@ inline SQLRETURN SQLTablePrivileges(SQLHSTMT hstmt,
 }
 
 
+[[nodiscard]]
 inline SQLRETURN SQLDrivers(SQLHENV henv,
 	SQLUSMALLINT fDirection,
 	SQLCHAR*     szDriverDesc,

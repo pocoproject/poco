@@ -65,19 +65,25 @@ public:
 	void addValue(EnumValue* pValue);
 		/// Adds an enum value. The Enum takes ownership of the value.
 
+	[[nodiscard]]
 	Iterator begin() const;
 		/// Returns an iterator for iterating over the Enum's EnumValue's.
 
+	[[nodiscard]]
 	Iterator end() const;
 		/// Returns an iterator for iterating over the Enum's EnumValue's.
 
+	[[nodiscard]]
 	const std::string& baseType() const;
 		/// Returns the base type or an empty string if no base type has been specified.
 
+	[[nodiscard]]
 	int flags() const;
 		/// Returns the flags.
 
+	[[nodiscard]]
 	Symbol::Kind kind() const;
+	[[nodiscard]]
 	std::string toString() const;
 
 protected:

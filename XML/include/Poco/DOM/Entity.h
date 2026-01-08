@@ -61,23 +61,28 @@ class XML_API Entity: public AbstractContainerNode
 	/// An Entity node does not have any parent.
 {
 public:
+	[[nodiscard]]
 	const XMLString& publicId() const;
 		/// Returns the public identifier associated with
 		/// the entity, if specified. If the public identifier
 		/// was not specified, this is the empty string.
 
+	[[nodiscard]]
 	const XMLString& systemId() const;
 		/// Returns the system identifier associated with
 		/// the entity, if specified. If the system identifier
 		/// was not specified, this is the empty string.
 
+	[[nodiscard]]
 	const XMLString& notationName() const;
 		/// Returns, for unparsed entities, the name of the
 		/// notation for the entity. For parsed entities, this
 		/// is the empty string.
 
 	// Node
+	[[nodiscard]]
 	const XMLString& nodeName() const;
+	[[nodiscard]]
 	unsigned short nodeType() const;
 
 protected:
@@ -85,6 +90,7 @@ protected:
 	Entity(Document* pOwnerDocument, const Entity& entity);
 	~Entity();
 
+	[[nodiscard]]
 	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:

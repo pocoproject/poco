@@ -33,78 +33,78 @@ public:
 	~Preparator();
 		/// Destroys the Preparator.
 
-	void prepare(std::size_t pos, const Poco::Int8&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::Int8& val);
 		/// Prepares an Int8.
 
-	void prepare(std::size_t pos, const Poco::UInt8&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::UInt8& val);
 		/// Prepares an UInt8.
 
-	void prepare(std::size_t pos, const Poco::Int16&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::Int16& val);
 		/// Prepares an Int16.
 
-	void prepare(std::size_t pos, const Poco::UInt16&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::UInt16& val);
 		/// Prepares an UInt16.
 
-	void prepare(std::size_t pos, const Poco::Int32&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::Int32& val);
 		/// Prepares an Int32.
 
-	void prepare(std::size_t pos, const Poco::UInt32&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::UInt32& val);
 		/// Prepares an UInt32.
 
-	void prepare(std::size_t pos, const Poco::Int64&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::Int64& val);
 		/// Prepares an Int64.
 
-	void prepare(std::size_t pos, const Poco::UInt64&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::UInt64& val);
 		/// Prepares an UInt64.
 
 #ifndef POCO_INT64_IS_LONG
-	void prepare(std::size_t pos, const long&);
+	void prepare(std::size_t pos, [[maybe_unused]] const long& val);
 		/// Prepares a long.
 
-	void prepare(std::size_t pos, const unsigned long&);
+	void prepare(std::size_t pos, [[maybe_unused]] const unsigned long& val);
 		/// Prepares an unsigned long.
 #endif
 
-	void prepare(std::size_t pos, const bool&);
+	void prepare(std::size_t pos, [[maybe_unused]] const bool& val);
 		/// Prepares a boolean.
 
-	void prepare(std::size_t pos, const float&);
+	void prepare(std::size_t pos, [[maybe_unused]] const float& val);
 		/// Prepares a float.
 
-	void prepare(std::size_t pos, const double&);
+	void prepare(std::size_t pos, [[maybe_unused]] const double& val);
 		/// Prepares a double.
 
-	void prepare(std::size_t pos, const char&);
+	void prepare(std::size_t pos, [[maybe_unused]] const char& val);
 		/// Prepares a single character.
 
-	void prepare(std::size_t pos, const std::string&);
+	void prepare(std::size_t pos, [[maybe_unused]] const std::string& val);
 		/// Prepares a string.
 
-	void prepare(std::size_t pos, const Poco::UTF16String&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::UTF16String& val);
 		/// Prepares a UTF16String.
 
-	void prepare(std::size_t pos, const Poco::Data::BLOB&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::Data::BLOB& val);
 		/// Prepares a BLOB.
 
-	void prepare(std::size_t pos, const Poco::Data::CLOB&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::Data::CLOB& val);
 		/// Prepares a CLOB.
 
-	void prepare(std::size_t pos, const Poco::Data::Date&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::Data::Date& val);
 		/// Prepares a Date.
 
-	void prepare(std::size_t pos, const Poco::Data::Time&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::Data::Time& val);
 		/// Prepares a Time.
 
-	void prepare(std::size_t pos, const Poco::DateTime&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::DateTime& val);
 		/// Prepares a DateTime.
 
-	void prepare(std::size_t pos, const Poco::UUID&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::UUID& val);
 		/// Prepares a UUID.
 
-	void prepare(std::size_t pos, const Poco::Any&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::Any& val);
 		/// Prepares an Any.
 
-	void prepare(std::size_t pos, const Poco::Dynamic::Var&);
+	void prepare(std::size_t pos, [[maybe_unused]] const Poco::Dynamic::Var& val);
 		/// Prepares a Var.
 };
 

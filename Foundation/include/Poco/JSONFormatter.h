@@ -77,6 +77,7 @@ public:
 		/// If any other property name is given, a PropertyNotSupported
 		/// exception is thrown.
 
+	[[nodiscard]]
 	std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name or
 		/// throws a PropertyNotSupported exception if the given
@@ -86,7 +87,9 @@ public:
 	static const std::string PROP_THREAD;
 
 protected:
+	[[nodiscard]]
 	std::string getThread(const Message& message) const;
+	[[nodiscard]]
 	static const std::string& getPriorityName(int prio);
 
 	enum ThreadFormat

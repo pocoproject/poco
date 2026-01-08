@@ -147,51 +147,65 @@ public:
 		/// The Option takes ownership of the Validator and
 		/// deletes it when it's no longer needed.
 
+	[[nodiscard]]
 	const std::string& shortName() const;
 		/// Returns the short name of the option.
 
+	[[nodiscard]]
 	const std::string& fullName() const;
 		/// Returns the full name of the option.
 
+	[[nodiscard]]
 	const std::string& description() const;
 		/// Returns the description of the option.
 
+	[[nodiscard]]
 	bool required() const;
 		/// Returns true if the option is required, false if not.
 
+	[[nodiscard]]
 	bool repeatable() const;
 		/// Returns true if the option can be specified more than
 		/// once, or false if at most once.
 
+	[[nodiscard]]
 	bool takesArgument() const;
 		/// Returns true if the options takes an (optional) argument.
 
+	[[nodiscard]]
 	bool argumentRequired() const;
 		/// Returns true if the argument is required.
 
+	[[nodiscard]]
 	const std::string& argumentName() const;
 		/// Returns the argument name, if specified.
 
+	[[nodiscard]]
 	const std::string& group() const;
 		/// Returns the option group the option is part of,
 		/// or an empty string, if the option is not part of
 		/// a group.
 
+	[[nodiscard]]
 	const std::string& binding() const;
 		/// Returns the property name the option is bound to,
 		/// or an empty string in case it is not bound.
 
+	[[nodiscard]]
 	AbstractOptionCallback* callback() const;
 		/// Returns a pointer to the callback method for the option,
 		/// or NULL if no callback has been specified.
 
+	[[nodiscard]]
 	Validator* validator() const;
 		/// Returns the option's Validator, if one has been specified,
 		/// or NULL otherwise.
 
+	[[nodiscard]]
 	AbstractConfiguration::Ptr config() const;
 		/// Returns the configuration, if specified, or NULL otherwise.
 
+	[[nodiscard]]
 	bool matchesShort(const std::string& option) const;
 		/// Returns true if the given option string matches the
 		/// short name.
@@ -201,6 +215,7 @@ public:
 		/// or the option string must partially match the full
 		/// name (case insensitive).
 
+	[[nodiscard]]
 	bool matchesFull(const std::string& option) const;
 		/// Returns true if the given option string matches the
 		/// full name.
@@ -208,6 +223,7 @@ public:
 		/// The option string must match the full
 		/// name (case insensitive).
 
+	[[nodiscard]]
 	bool matchesPartial(const std::string& option) const;
 		/// Returns true if the given option string partially matches the
 		/// full name.

@@ -146,18 +146,23 @@ public:
 	void flush();
 		/// Flushes the underlying stream.
 
+	[[nodiscard]]
 	bool good();
 		/// Returns _ostr.good();
 
+	[[nodiscard]]
 	bool fail();
 		/// Returns _ostr.fail();
 
+	[[nodiscard]]
 	bool bad();
 		/// Returns _ostr.bad();
 
+	[[nodiscard]]
 	std::ostream& stream() const;
 		/// Returns the underlying stream.
 
+	[[nodiscard]]
 	StreamByteOrder byteOrder() const;
 		/// Returns the byte ordering used by the writer, which is
 		/// either BIG_ENDIAN_BYTE_ORDER or LITTLE_ENDIAN_BYTE_ORDER.
@@ -200,21 +205,25 @@ public:
 		}
 	}
 
+	[[nodiscard]]
 	Buffer<T>& data()
 	{
 		return _data;
 	}
 
+	[[nodiscard]]
 	const Buffer<T>& data() const
 	{
 		return _data;
 	}
 
+	[[nodiscard]]
 	const MemoryOutputStream& stream() const
 	{
 		return _ostr;
 	}
 
+	[[nodiscard]]
 	MemoryOutputStream& stream()
 	{
 		return _ostr;

@@ -84,23 +84,29 @@ public:
 	virtual ~MetaColumn();
 		/// Destroys the MetaColumn.
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// Returns column name.
 
+	[[nodiscard]]
 	std::size_t length() const;
 		/// Returns column maximum length.
 
+	[[nodiscard]]
 	std::size_t precision() const;
 		/// Returns column precision.
 		/// Valid for floating point fields only
 		/// (zero for other data types).
 
+	[[nodiscard]]
 	std::size_t position() const;
 		/// Returns column position.
 
+	[[nodiscard]]
 	ColumnDataType type() const;
 		/// Returns column type.
 
+	[[nodiscard]]
 	bool isNullable() const;
 		/// Returns true if column allows null values, false otherwise.
 

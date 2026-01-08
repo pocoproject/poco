@@ -37,6 +37,7 @@ class XML_API XMLFilter: public XMLReader
 	/// all EntityResolver, DTDHandler, ContentHandler and ErrorHandler events automatically.
 {
 public:
+	[[nodiscard]]
 	virtual XMLReader* getParent() const = 0;
 		/// Set the parent reader.
 		///

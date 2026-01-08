@@ -47,6 +47,7 @@ private:
 		{
 		}
 
+		[[nodiscard]]
 		operator AtomicCounter::ValueType ()
 		{
 			return static_cast<AtomicCounter::ValueType>(val);
@@ -153,6 +154,7 @@ public:
 		handler().notify();
 	}
 
+	[[nodiscard]]
 	bool handlerStopped() const
 		/// Returns true if all handlers are stopped.
 	{
@@ -171,6 +173,7 @@ public:
 		for (; it != end; ++it) (*it)->stop();
 	}
 
+	[[nodiscard]]
 	bool handlerDone() const
 		/// Returns true if all handlers are done processing data.
 	{
@@ -200,6 +203,7 @@ private:
 		if (++_handler == _handlers.end()) _handler = _handlers.begin();
 	}
 
+	[[nodiscard]]
 	UDPHandlerImpl<S>& handler()
 		/// Returns the reference to the current handler.
 	{

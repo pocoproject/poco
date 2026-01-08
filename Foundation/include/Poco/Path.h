@@ -117,9 +117,11 @@ public:
 	Path& assign(const char* path);
 		/// Assigns a string containing a path.
 
+	[[nodiscard]]
 	std::string toString() const;
 		/// Returns a string containing the path in native format.
 
+	[[nodiscard]]
 	std::string toString(Style style) const;
 		/// Returns a string containing the path in the given format.
 
@@ -180,16 +182,20 @@ public:
 		/// If the given path is absolute, it replaces the current one.
 		/// Otherwise, the relative path is appended to the current path.
 
+	[[nodiscard]]
 	bool isAbsolute() const;
 		/// Returns true iff the path is absolute.
 
+	[[nodiscard]]
 	bool isRelative() const;
 		/// Returns true iff the path is relative.
 
+	[[nodiscard]]
 	bool isDirectory() const;
 		/// Returns true iff the path references a directory
 		/// (the filename part is empty).
 
+	[[nodiscard]]
 	bool isFile() const;
 		/// Returns true iff the path references a file
 		/// (the filename part is not empty).
@@ -199,6 +205,7 @@ public:
 		/// Setting a non-empty node automatically makes
 		/// the path an absolute one.
 
+	[[nodiscard]]
 	const std::string& getNode() const;
 		/// Returns the node name.
 
@@ -207,16 +214,20 @@ public:
 		/// Setting a non-empty device automatically makes
 		/// the path an absolute one.
 
+	[[nodiscard]]
 	const std::string& getDevice() const;
 		/// Returns the device name.
 
+	[[nodiscard]]
 	int depth() const;
 		/// Returns the number of directories in the directory list.
 
+	[[nodiscard]]
 	const std::string& directory(int n) const;
 		/// Returns the n'th directory in the directory list.
 		/// If n == depth(), returns the filename.
 
+	[[nodiscard]]
 	const std::string& operator [] (int n) const;
 		/// Returns the n'th directory in the directory list.
 		/// If n == depth(), returns the filename.
@@ -233,6 +244,7 @@ public:
 	Path& setFileName(const std::string& name);
 		/// Sets the filename.
 
+	[[nodiscard]]
 	const std::string& getFileName() const;
 		/// Returns the filename.
 
@@ -240,6 +252,7 @@ public:
 		/// Sets the basename part of the filename and
 		/// does not change the extension.
 
+	[[nodiscard]]
 	std::string getBaseName() const;
 		/// Returns the basename (the filename sans
 		/// extension) of the path.
@@ -247,33 +260,41 @@ public:
 	Path& setExtension(const std::string& extension);
 		/// Sets the filename extension.
 
+	[[nodiscard]]
 	std::string getExtension() const;
 		/// Returns the filename extension.
 
+	[[nodiscard]]
 	const std::string& version() const;
 		/// Returns the file version. VMS only.
 
 	Path& clear();
 		/// Clears all components.
 
+	[[nodiscard]]
 	Path parent() const;
 		/// Returns a path referring to the path's
 		/// directory.
 
+	[[nodiscard]]
 	Path absolute() const;
 		/// Returns an absolute variant of the path,
 		/// taking the current working directory as base.
 
+	[[nodiscard]]
 	Path absolute(const Path& base) const;
 		/// Returns an absolute variant of the path,
 		/// taking the given path as base.
 
+	[[nodiscard]]
 	static Path forDirectory(const std::string& path);
 		/// Creates a path referring to a directory.
 
+	[[nodiscard]]
 	static Path forDirectory(const std::string& path, Style style);
 		/// Creates a path referring to a directory.
 
+	[[nodiscard]]
 	static char separator();
 		/// Returns the platform's path name separator, which separates
 		/// the components (names) in a path.
@@ -282,6 +303,7 @@ public:
 		/// this is the backslash '\'. On OpenVMS systems, this is the
 		/// period '.'.
 
+	[[nodiscard]]
 	static char pathSeparator();
 		/// Returns the platform's path separator, which separates
 		/// single paths in a list of paths.
@@ -290,6 +312,7 @@ public:
 		/// this is the semicolon ';'. On OpenVMS systems, this is the
 		/// comma ','.
 
+	[[nodiscard]]
 	static std::string addDirectorySeparator(const std::string& path);
 		/// Adds a separator to the end of a string to create the correct syntax for a path.
 		/// If the source path already has a trailing separator, no separator will be added.
@@ -298,6 +321,7 @@ public:
 		/// this is the backslash '\'. On OpenVMS systems, this is the
 		/// period '.'.
 
+	[[nodiscard]]
 	static std::string addDirectorySeparator(const std::string& path, Style style);
 		/// Adds a separator to the end of a string to create the correct syntax for a path.
 		/// If the source path already has a trailing separator, no separator will be added.
@@ -306,50 +330,61 @@ public:
 		/// this is the backslash '\'. On OpenVMS systems, this is the
 		/// period '.'.
 
+	[[nodiscard]]
 	static std::string self();
 		/// Return path to the executable file, empty string if failed.
 		/// The path is absolute one.
 
+	[[nodiscard]]
 	static std::string current();
 		/// Returns the current working directory.
 
+	[[nodiscard]]
 	static std::string home();
 		/// Returns the user's home directory.
 
+	[[nodiscard]]
 	static std::string configHome();
 		/// Returns the user's config directory.
 		///
 		/// On Unix systems, this is the '~/.config/'. On Windows systems,
 		/// this is '%APPDATA%' (typically C:\Users\user\AppData\Roaming).
 
+	[[nodiscard]]
 	static std::string dataHome();
 		/// Returns the user's data directory.
 		///
 		/// On Unix systems, this is the '~/.local/share/'. On Windows systems,
 		/// this is '%LOCALAPPDATA%' (typically C:\Users\user\AppData\Local).
 
+	[[nodiscard]]
 	static std::string tempHome();
 		/// Returns the user's temp directory.
 		///
 		/// On Unix systems, this is the '~/.local/temp/'.
 
+	[[nodiscard]]
 	static std::string cacheHome();
 		/// Returns the user's cache directory.
 		///
 		/// On Unix systems, this is the '~/.cache/'. On Windows systems,
 		/// this is the same as tempHome().
 
+	[[nodiscard]]
 	static std::string temp();
 		/// Returns the temporary directory.
 
+	[[nodiscard]]
 	static std::string config();
 		/// Returns the systemwide config directory.
 		///
 		/// On Unix systems, this is the '/etc/'.
 
+	[[nodiscard]]
 	static std::string null();
 		/// Returns the name of the null device.
 
+	[[nodiscard]]
 	static std::string expand(const std::string& path);
 		/// Expands all environment variables contained in the path.
 		///
@@ -379,6 +414,7 @@ public:
 		/// path of the file is stored in the path given as argument and true is returned.
 		/// Otherwise false is returned and the path argument remains unchanged.
 
+	[[nodiscard]]
 	static std::string transcode(const std::string& path);
 		/// On Windows, this function converts a string (usually containing a path)
 		/// encoded in UTF-8 into a string encoded in the current Windows code page.
@@ -394,8 +430,11 @@ protected:
 	void parseWindows(const std::string& path);
 	void parseVMS(const std::string& path);
 	void parseGuess(const std::string& path);
+	[[nodiscard]]
 	std::string buildUnix() const;
+	[[nodiscard]]
 	std::string buildWindows() const;
+	[[nodiscard]]
 	std::string buildVMS() const;
 
 private:

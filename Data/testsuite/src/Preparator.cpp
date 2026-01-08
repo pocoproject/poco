@@ -28,124 +28,124 @@ Preparator::~Preparator()
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::Int8&)
+void Preparator::prepare(std::size_t pos, const Poco::Int8& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::UInt8&)
+void Preparator::prepare(std::size_t pos, const Poco::UInt8& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::Int16&)
+void Preparator::prepare(std::size_t pos, const Poco::Int16& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::UInt16&)
+void Preparator::prepare(std::size_t pos, const Poco::UInt16& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::Int32&)
+void Preparator::prepare(std::size_t pos, const Poco::Int32& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::UInt32&)
+void Preparator::prepare(std::size_t pos, const Poco::UInt32& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::Int64&)
+void Preparator::prepare(std::size_t pos, const Poco::Int64& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::UInt64&)
+void Preparator::prepare(std::size_t pos, const Poco::UInt64& val)
 {
 }
 
 
 #ifndef POCO_INT64_IS_LONG
-void Preparator::prepare(std::size_t pos, const long&)
+void Preparator::prepare(std::size_t pos, const long& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const unsigned long&)
+void Preparator::prepare(std::size_t pos, const unsigned long& val)
 {
 }
 #endif
 
 
-void Preparator::prepare(std::size_t pos, const bool&)
+void Preparator::prepare(std::size_t pos, const bool& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const float&)
+void Preparator::prepare(std::size_t pos, const float& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const double&)
+void Preparator::prepare(std::size_t pos, const double& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const char&)
+void Preparator::prepare(std::size_t pos, const char& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const std::string&)
+void Preparator::prepare(std::size_t pos, const std::string& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::UTF16String&)
+void Preparator::prepare(std::size_t pos, const Poco::UTF16String& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::Data::BLOB&)
+void Preparator::prepare(std::size_t pos, const Poco::Data::BLOB& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::Data::CLOB&)
+void Preparator::prepare(std::size_t pos, const Poco::Data::CLOB& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::Data::Date&)
+void Preparator::prepare(std::size_t pos, const Poco::Data::Date& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::Data::Time&)
+void Preparator::prepare(std::size_t pos, const Poco::Data::Time& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::DateTime&)
+void Preparator::prepare(std::size_t pos, const Poco::DateTime& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::UUID&)
+void Preparator::prepare(std::size_t pos, const Poco::UUID& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::Any&)
+void Preparator::prepare(std::size_t pos, const Poco::Any& val)
 {
 }
 
 
-void Preparator::prepare(std::size_t pos, const Poco::Dynamic::Var&)
+void Preparator::prepare(std::size_t pos, const Poco::Dynamic::Var& val)
 {
 }
 
