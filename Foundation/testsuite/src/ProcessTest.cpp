@@ -18,6 +18,7 @@
 #include "Poco/Format.h"
 #include "Poco/Environment.h"
 #include "Poco/Thread.h"
+#include <csignal>
 
 
 using namespace std::string_literals;
