@@ -45,8 +45,10 @@ public:
 	int wait() const;
 	int wait(int options) const;
 	int tryWait() const;
+	bool isRunning() const;
 
 private:
+	static int statusToExitCode(int status);
 	const std::atomic<pid_t> _pid;
 	mutable Event _event;
 	mutable std::optional<std::atomic<int>> _status;
