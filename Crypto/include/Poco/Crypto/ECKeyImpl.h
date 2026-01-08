@@ -71,9 +71,11 @@ public:
 		/// Destroys the ECKeyImpl.
 
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	[[nodiscard]]
 	EVP_PKEY* getEVPPKey();
 		/// Returns the OpenSSL EVP_PKEY object.
 
+	[[nodiscard]]
 	const EVP_PKEY* getEVPPKey() const;
 		/// Returns the OpenSSL EVP_PKEY object.
 #endif
@@ -82,22 +84,27 @@ public:
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	POCO_DEPRECATED("use getEVPPKey() instead")
 #endif
+	[[nodiscard]]
 	EC_KEY* getECKey();
 		/// Returns the OpenSSL EC key.
 
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	POCO_DEPRECATED("use getEVPPKey() instead")
 #endif
+	[[nodiscard]]
 	const EC_KEY* getECKey() const;
 		/// Returns the OpenSSL EC key.
 #endif
 
+	[[nodiscard]]
 	int size() const;
 		/// Returns the EC key length in bits.
 
+	[[nodiscard]]
 	int groupId() const;
 		/// Returns the EC key group integer Id.
 
+	[[nodiscard]]
 	std::string groupName() const;
 		/// Returns the EC key group name.
 
@@ -117,6 +124,7 @@ public:
 		/// If a null pointer is passed for a stream, the corresponding
 		/// key is not exported.
 
+	[[nodiscard]]
 	static std::string getCurveName(int nid = -1);
 		/// Returns elliptical curve name corresponding to
 		/// the given nid; if nid is not found, returns
@@ -126,12 +134,14 @@ public:
 		///
 		/// If no curves are found, returns empty string;
 
+	[[nodiscard]]
 	static int getCurveNID(std::string& name);
 		/// Returns the NID of the specified curve.
 		///
 		/// If name is empty, returns the first curve NID
 		/// and updates the name accordingly.
 
+	[[nodiscard]]
 	static bool hasCurve(const std::string& name);
 		/// Returns true if the named curve is found,
 		/// false otherwise.

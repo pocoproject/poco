@@ -13,6 +13,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Util/JSONConfiguration.h"
 #include "Poco/JSON/JSONException.h"
+#include <string>
 
 
 using Poco::Util::JSONConfiguration;
@@ -74,10 +75,10 @@ void JSONConfigurationTest::testLoad()
 
 	try
 	{
-		config.getString("propertyUnknown");
+		[[maybe_unused]] std::string _ = config.getString("propertyUnknown");
 		assertTrue (true);
 	}
-	catch(NotFoundException& nfe)
+	catch([[maybe_unused]] NotFoundException& nfe)
 	{
 	}
 }
@@ -126,10 +127,10 @@ void JSONConfigurationTest::testConfigurationView()
 
 	try
 	{
-		pView->getString("[1]");
+		[[maybe_unused]] std::string _ = pView->getString("[1]");
 		fail ("must throw on index out of bounds");
 	}
-	catch(Poco::NotFoundException&){}
+	catch([[maybe_unused]] Poco::NotFoundException& e){}
 }
 
 

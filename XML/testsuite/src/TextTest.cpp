@@ -121,7 +121,7 @@ void TextTest::testSplit()
 	AutoPtr<Element> pElem = pDoc->createElement("elem");
 	AutoPtr<Text> pText1 = pDoc->createCDATASection("foobar");
 	pElem->appendChild(pText1);
-	pText1->splitText(3);
+	[[maybe_unused]] Text* pText2 = pText1->splitText(3);
 	assertTrue (pElem->firstChild()->nodeValue() == "foo");
 	assertTrue (pElem->lastChild()->nodeValue() == "bar");
 }
@@ -133,7 +133,7 @@ void TextTest::testSplitCDATA()
 	AutoPtr<Element> pElem = pDoc->createElement("elem");
 	AutoPtr<Text> pText1 = pDoc->createTextNode("foobar");
 	pElem->appendChild(pText1);
-	pText1->splitText(3);
+	[[maybe_unused]] Text* pText2 = pText1->splitText(3);
 	assertTrue (pElem->firstChild()->nodeValue() == "foo");
 	assertTrue (pElem->lastChild()->nodeValue() == "bar");
 

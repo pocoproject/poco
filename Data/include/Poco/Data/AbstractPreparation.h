@@ -48,6 +48,7 @@ public:
 		/// Prepares data.
 
 protected:
+	[[nodiscard]]
 	PreparatorPtr preparation();
 		/// Returns the preparation object
 

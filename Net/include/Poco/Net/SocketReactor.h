@@ -207,6 +207,7 @@ public:
 		///
 		/// The timeout is passed to the PollSet::poll() method.
 
+	[[nodiscard]]
 	const Poco::Timespan& getTimeout() const;
 		/// Returns the timeout.
 
@@ -217,6 +218,7 @@ public:
 		///     Poco::NObserver<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
 		///     reactor.addEventHandler(socket, obs);
 
+	[[nodiscard]]
 	bool hasEventHandler(const Socket& socket, const Poco::AbstractObserver& observer);
 		/// Returns true if the observer is registered with SocketReactor for the given socket.
 
@@ -234,6 +236,7 @@ public:
 		/// socket are being removed. Use remove() instead to atomically remove
 		/// all handlers for a socket.
 
+	[[nodiscard]]
 	bool has(const Socket& socket) const;
 		/// Returns true if socket is registered with this reactor.
 
@@ -282,12 +285,18 @@ protected:
 	void dispatch(SocketNotification* pNotification);
 		/// Dispatches the given notification to all observers.
 
+	[[nodiscard]]
 	bool hasSocketHandlers();
 
+	[[nodiscard]]
 	const Params& getParams() const;
+	[[nodiscard]]
 	int getThreadAffinity() const;
+	[[nodiscard]]
 	const std::atomic<bool>& mustStop() const;
+	[[nodiscard]]
 	const EventHandlerMap& getHandlers() const;
+	[[nodiscard]]
 	const PollSet& getPollSet() const;
 	Notification* getReadableNotification();
 	Notification* getWritableNotification();
@@ -297,6 +306,7 @@ protected:
 
 private:
 
+	[[nodiscard]]
 	NotifierPtr getNotifier(const Socket& socket, bool makeNew = false);
 
 	void sleep();

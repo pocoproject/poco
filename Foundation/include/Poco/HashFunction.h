@@ -29,6 +29,7 @@ template <class T>
 struct POCO_DEPRECATED("use Hash") HashFunction
 	/// A generic hash function.
 {
+	[[nodiscard]]
 	UInt32 operator () (T key, UInt32 maxValue) const
 		/// Returns the hash value for the given key.
 	{
@@ -41,6 +42,7 @@ template <>
 struct POCO_DEPRECATED("use Hash") HashFunction<std::string>
 	/// A generic hash function.
 {
+	[[nodiscard]]
 	UInt32 operator () (const std::string& key, UInt32 maxValue) const
 		/// Returns the hash value for the given key.
 	{

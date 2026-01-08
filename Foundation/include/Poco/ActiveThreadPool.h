@@ -55,12 +55,15 @@ public:
 		/// Currently running threads will remain active
 		/// until they complete.
 
+	[[nodiscard]]
 	int capacity() const;
 		/// Returns the capacity of threads.
 
+	[[nodiscard]]
 	int getStackSize() const;
 		/// Returns the stack size used to create new threads.
 
+	[[nodiscard]]
 	int expiryTimeout() const;
 		/// Returns the thread expiry timeout value in milliseconds.
 		/// The default expiryTimeout is 30000 milliseconds (30 seconds).
@@ -75,11 +78,13 @@ public:
 	void joinAll();
 		/// Waits for all threads to exit and removes all threads from the thread pool.
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// Returns the name of the thread pool,
 		/// or an empty string if no name has been
 		/// specified in the constructor.
 
+	[[nodiscard]]
 	static ActiveThreadPool& defaultPool();
 		/// Returns a reference to the default
 		/// thread pool.

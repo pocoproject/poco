@@ -77,6 +77,7 @@ using UIntPtr = std::uintptr_t;
 #endif
 
 
+[[nodiscard]]
 inline std::string Foundation_API demangle(const char* typeName)
 	/// Returns a human-readable type name from a mangled type name.
 	///
@@ -133,6 +134,7 @@ inline std::string Foundation_API demangle(const char* typeName)
 
 
 template <typename T>
+[[nodiscard]]
 std::string demangle()
 	/// Returns a human-readable name for type T.
 {
@@ -141,6 +143,7 @@ std::string demangle()
 
 
 template <typename T>
+[[nodiscard]]
 std::string demangle(const T& t)
 	/// Returns a human-readable name for the type of instance t.
 {

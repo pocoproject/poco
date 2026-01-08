@@ -62,18 +62,21 @@ public:
 	void registerFormatterClass(const std::string& className, FormatterFactory* pFactory);
 		/// Registers a formatter class with the LoggingFactory.
 
+	[[nodiscard]]
 	Channel::Ptr createChannel(const std::string& className) const;
 		/// Creates a new Channel instance from specified class.
 		///
 		/// Throws a NotFoundException if the specified channel class
 		/// has not been registered.
 
+	[[nodiscard]]
 	Formatter::Ptr createFormatter(const std::string& className) const;
 		/// Creates a new Formatter instance from specified class.
 		///
 		/// Throws a NotFoundException if the specified formatter class
 		/// has not been registered.
 
+	[[nodiscard]]
 	static LoggingFactory& defaultFactory();
 		/// Returns a reference to the default
 		/// LoggingFactory.

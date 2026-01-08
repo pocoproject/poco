@@ -56,39 +56,55 @@ public:
 	ThreadImpl();
 	~ThreadImpl();
 
+	[[nodiscard]]
 	TIDImpl tidImpl() const;
 	void setNameImpl(const std::string& threadName);
+	[[nodiscard]]
 	std::string getNameImpl() const;
+	[[nodiscard]]
 	std::string getOSThreadNameImpl();
 		/// Returns the thread's name, expressed as an operating system
 		/// specific name value. Return empty string if thread is not running.
 		/// For test used only.
 	void setPriorityImpl(int prio);
+	[[nodiscard]]
 	int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio, int policy = 0);
+	[[nodiscard]]
 	int getOSPriorityImpl() const;
+	[[nodiscard]]
 	static int getMinOSPriorityImpl(int policy);
+	[[nodiscard]]
 	static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
+	[[nodiscard]]
 	int getStackSizeImpl() const;
 	void startImpl(SharedPtr<Runnable> pTarget);
 	void joinImpl();
 	bool joinImpl(long milliseconds);
+	[[nodiscard]]
 	bool isRunningImpl() const;
 	static void yieldImpl();
+	[[nodiscard]]
 	static ThreadImpl* currentImpl();
+	[[nodiscard]]
 	static TIDImpl currentTidImpl();
+	[[nodiscard]]
 	static long currentOsTidImpl();
 	static void setCurrentNameImpl(const std::string& name);
+	[[nodiscard]]
 	static std::string getCurrentNameImpl();
-	bool setAffinityImpl(int);
+	bool setAffinityImpl([[maybe_unused]] int coreID);
+	[[nodiscard]]
 	int getAffinityImpl() const;
 
 protected:
 #if defined(_DLL)
+	[[nodiscard]]
 	static DWORD WINAPI runnableEntry(LPVOID pThread);
 #else
-	static unsigned __stdcall runnableEntry(void* pThread);
+	[[nodiscard]]
+	static unsigned int __stdcall runnableEntry(void* pThread);
 #endif
 
 	void createImpl(Entry ent, void* pData);

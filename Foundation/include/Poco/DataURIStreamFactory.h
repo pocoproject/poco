@@ -37,6 +37,7 @@ public:
 	~DataURIStreamFactory() override;
 	/// Destroys the DataURIStreamFactory.
 
+	[[nodiscard]]
 	std::istream* open(const URI& uri) override;
 		/// Creates an input stream returning decoded data from the given data URI.
 		///

@@ -90,6 +90,7 @@ public:
 		/// Encoding must be either "application/x-www-form-urlencoded"
 		/// (which is the default) or "multipart/form-data".
 
+	[[nodiscard]]
 	const std::string& getEncoding() const;
 		/// Returns the encoding used for posting the form.
 
@@ -162,6 +163,7 @@ public:
 		/// degrades performance, as the request content must be generated
 		/// twice, first to determine its size, then to actually send it.
 
+	[[nodiscard]]
 	std::streamsize calculateContentLength();
 		/// Calculate the content length for the form.
 		/// May be UNKNOWN_CONTENT_LENGTH if not possible
@@ -175,10 +177,12 @@ public:
 		/// Writes the form data to the given output stream,
 		/// using the specified encoding.
 
+	[[nodiscard]]
 	const std::string& boundary() const;
 		/// Returns the MIME boundary used for writing
 		/// multipart form data.
 
+	[[nodiscard]]
 	int getFieldLimit() const;
 		/// Returns the maximum number of header fields
 		/// allowed.
@@ -197,6 +201,7 @@ public:
 		/// Sets the maximum size for form field values
 		/// stored as strings.
 
+	[[nodiscard]]
 	std::size_t getValueLengthLimit() const;
 		/// Returns the maximum size for form field values
 		/// stored as strings.

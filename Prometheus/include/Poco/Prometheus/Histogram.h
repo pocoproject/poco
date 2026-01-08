@@ -60,9 +60,11 @@ public:
 		///
 		/// Can only be used if no labels have been defined.
 
+	[[nodiscard]]
 	HistogramData data() const;
 		/// Returns the histogram's data.
 
+	[[nodiscard]]
 	const std::vector<double>& bucketBounds() const;
 		/// Returns the buckets upper bounds
 
@@ -156,6 +158,7 @@ public:
 		/// Must only be set once, immediately after creating
 		/// the Histogram.
 
+	[[nodiscard]]
 	const std::vector<double> buckets() const;
 		/// Returns the configured bucket upper bounds.
 
@@ -170,10 +173,12 @@ public:
 		///
 		/// Can only be used if no labels have been defined.
 
+	[[nodiscard]]
 	HistogramData data() const;
 		/// Returns the histogram's data.
 
 	// LabeledMetricImpl
+	[[nodiscard]]
 	std::unique_ptr<HistogramSample> createSample() const override;
 
 	// Collector

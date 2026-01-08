@@ -63,6 +63,7 @@ class Net_API HTTPChunkedIOS: public virtual std::ios
 public:
 	HTTPChunkedIOS(HTTPSession& session, HTTPChunkedStreamBuf::openmode mode, MessageHeader* pTrailer = nullptr);
 	~HTTPChunkedIOS();
+	[[nodiscard]]
 	HTTPChunkedStreamBuf* rdbuf();
 
 protected:
@@ -77,6 +78,7 @@ public:
 	HTTPChunkedInputStream(HTTPSession& session, MessageHeader* pTrailer = nullptr);
 	~HTTPChunkedInputStream();
 
+	[[nodiscard]]
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
 
@@ -92,6 +94,7 @@ public:
 	HTTPChunkedOutputStream(HTTPSession& session, MessageHeader* pTrailer = nullptr);
 	~HTTPChunkedOutputStream();
 
+	[[nodiscard]]
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
 

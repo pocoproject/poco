@@ -164,10 +164,12 @@ public:
 		/// _fileName is used. If member variable is empty string,
 		/// document is saved to the memory stream.
 
+	[[nodiscard]]
 	DataPtr data(SizeType& sz);
 		/// Returns the document content as raw data and data size in
 		/// the sz argument.
 
+	[[nodiscard]]
 	SizeType size();
 		/// Resets the document stream, reads the document into the stream and
 		/// returns the document data size.
@@ -180,21 +182,26 @@ public:
 	void setPageLayout(PageLayout pageLayout);
 		/// Sets the page layout.
 
+	[[nodiscard]]
 	PageLayout getPageLayout() const;
 		/// Returns the current page layout.
 
 	void setPageMode(PageMode pageMode);
 		/// Sets the page mode.
 
+	[[nodiscard]]
 	PageMode getPageMode() const;
 		/// Returns the current page mode.
 
+	[[nodiscard]]
 	const Page& getPage(int index);
 		/// Returns the page at index position.
 
+	[[nodiscard]]
 	const Page& operator [] (int index);
 		/// Returns the page at index position.
 
+	[[nodiscard]]
 	const Page& getCurrentPage();
 		/// Returns the current page.
 
@@ -212,6 +219,7 @@ public:
 
 	const Font& loadFont(const std::string& name, const std::string& encoding);
 
+	[[nodiscard]]
 	const Font& font(const std::string& name, const std::string& encoding = "");
 		/// Looks for the font with specified name in the font container.
 		/// If the font is not found, it is created.
@@ -246,6 +254,7 @@ public:
 	const Encoder& loadEncoder(const std::string& name);
 		/// Loads the encoder.
 
+	[[nodiscard]]
 	const Encoder& getCurrentEncoder();
 		/// Returns the current encoder.
 
@@ -298,6 +307,7 @@ public:
 	void setInfo(Info info, const LocalDateTime& dt);
 		/// Sets the document creation or moidification date.
 
+	[[nodiscard]]
 	std::string getInfo(Info info);
 		/// Returns the document info.
 
@@ -307,6 +317,7 @@ public:
 	void setPermission(Permission perm);
 		/// Sets the permission on the document.
 
+	[[nodiscard]]
 	std::size_t pageCount() const;
 		/// Returns number of pages in the document.
 

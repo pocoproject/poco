@@ -136,7 +136,7 @@ bool ODBCAccessTest::canConnect(const std::string& driver, const std::string& ds
 	}
 
 	Utility::DSNMap dataSources;
-	Utility::dataSources(dataSources);
+	[[maybe_unused]] Utility::DSNMap m = Utility::dataSources(dataSources);
 	Utility::DSNMap::iterator itDSN = dataSources.begin();
 	for (; itDSN != dataSources.end(); ++itDSN)
 	{
@@ -179,7 +179,7 @@ void ODBCAccessTest::tearDown()
 
 bool ODBCAccessTest::init(const std::string& driver, const std::string& dsn)
 {
-	Utility::drivers(_drivers);
+	[[maybe_unused]] Utility::DriverMap m = Utility::drivers(_drivers);
 	if (!canConnect(driver, dsn)) return false;
 
 	try

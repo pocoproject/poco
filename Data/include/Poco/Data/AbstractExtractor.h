@@ -428,6 +428,7 @@ public:
 	virtual bool extract(std::size_t pos, Poco::Nullable<Poco::Dynamic::Var>& val);
 		/// Extracts a nullable Var.
 
+	[[nodiscard]]
 	virtual bool isNull(std::size_t col, std::size_t row = POCO_DATA_INVALID_ROW) = 0;
 		/// Returns true if the value at [col,row] position is null.
 
@@ -435,6 +436,7 @@ public:
 		/// Resets any information internally cached by the extractor.
 
 protected:
+	[[nodiscard]]
 	bool transcodeRequired() const;
 	void transcode(const std::string& from, std::string& to);
 	void reverseTranscode(const std::string& from, std::string& to);

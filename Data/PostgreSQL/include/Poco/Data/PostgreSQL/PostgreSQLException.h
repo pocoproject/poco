@@ -47,12 +47,15 @@ public:
 	PostgreSQLException& operator = (const PostgreSQLException& exc);
 		/// Assignment operator.
 
+	[[nodiscard]]
 	const char* name() const noexcept;
 		/// Returns exception name.
 
+	[[nodiscard]]
 	const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
+	[[nodiscard]]
 	Poco::Exception* clone() const;
 		/// Creates an exact copy of the exception.
 		///
@@ -66,6 +69,7 @@ public:
 		/// copy of an exception (see clone()), then
 		/// throwing it again.
 
+	[[nodiscard]]
 	const char* sqlState() const noexcept;
 		/// Returns the SqlState
 

@@ -123,10 +123,14 @@ public:
 
 	void run(TestResult* result, const Test::Callback& callback = nullptr) override;
 	virtual TestResult* run();
+	[[nodiscard]]
 	int countTestCases() const override;
+	[[nodiscard]]
 	std::string toString() const override;
+	[[nodiscard]]
 	Test::Type getType() const override;
 	void setType(Test::Type testType);
+	[[nodiscard]]
 	const std::string& name() const;
 
 	virtual void setUp();

@@ -50,12 +50,14 @@ public:
 	static void uninitialize();
 		/// Shuts down the OpenSSL machinery.
 
+	[[nodiscard]]
 	static bool isFIPSEnabled();
 		/// Returns true if FIPS mode is enabled, false otherwise.
 
 	static void enableFIPSMode(bool enabled);
 		/// Enable or disable FIPS mode. If FIPS is not available, this method doesn't do anything.
 
+	[[nodiscard]]
 	static bool haveLegacyProvider();
 		/// Returns true if the OpenSSL legacy provider is available, otherwise false.
 

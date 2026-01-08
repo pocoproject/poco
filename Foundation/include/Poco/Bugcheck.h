@@ -39,19 +39,23 @@ class Foundation_API Bugcheck
 	/// automatically provide useful context information.
 {
 public:
-	[[noreturn]] static void assertion(const char* cond, const char* file, LineNumber line, const char* text = nullptr);
+	[[noreturn]]
+	static void assertion(const char* cond, const char* file, LineNumber line, const char* text = nullptr);
 		/// An assertion failed. Break into the debugger, if
 		/// possible, then throw an AssertionViolationException.
 
-	[[noreturn]] static void nullPointer(const char* ptr, const char* file, LineNumber line);
+	[[noreturn]]
+	static void nullPointer(const char* ptr, const char* file, LineNumber line);
 		/// An null pointer was encountered. Break into the debugger, if
 		/// possible, then throw an NullPointerException.
 
-	[[noreturn]] static void bugcheck(const char* file, LineNumber line);
+	[[noreturn]]
+	static void bugcheck(const char* file, LineNumber line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
 
-	[[noreturn]] static void bugcheck(const char* msg, const char* file, LineNumber line);
+	[[noreturn]]
+	static void bugcheck(const char* msg, const char* file, LineNumber line);
 		/// An internal error was encountered. Break into the debugger, if
 		/// possible, then throw an BugcheckException.
 
@@ -70,6 +74,7 @@ public:
 		/// possible.
 
 protected:
+	[[nodiscard]]
 	static std::string what(const char* msg, const char* file, LineNumber line, const char* text = nullptr);
 };
 

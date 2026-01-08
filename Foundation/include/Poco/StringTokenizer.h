@@ -52,20 +52,26 @@ public:
 	~StringTokenizer();
 		/// Destroys the tokenizer.
 
+	[[nodiscard]]
 	Iterator begin() const;
+	[[nodiscard]]
 	Iterator end() const;
 
+	[[nodiscard]]
 	const std::string& operator [] (std::size_t index) const;
 		/// Returns const reference the index'th token.
 		/// Throws a RangeException if the index is out of range.
 
+	[[nodiscard]]
 	std::string& operator [] (std::size_t index);
 		/// Returns reference to the index'th token.
 		/// Throws a RangeException if the index is out of range.
 
+	[[nodiscard]]
 	bool has(const std::string& token) const;
 		/// Returns true if token exists, false otherwise.
 
+	[[nodiscard]]
 	std::string::size_type find(const std::string& token, std::string::size_type pos = 0) const;
 		/// Returns the index of the first occurrence of the token
 		/// starting at position pos.
@@ -76,9 +82,11 @@ public:
 		/// equal to oldToken with newToken.
 		/// Returns the number of modified tokens.
 
+	[[nodiscard]]
 	std::size_t count() const;
 		/// Returns the total number of tokens.
 
+	[[nodiscard]]
 	std::size_t count(const std::string& token) const;
 		/// Returns the number of tokens equal to the specified token.
 

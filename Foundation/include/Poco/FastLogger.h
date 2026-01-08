@@ -71,6 +71,7 @@ public:
 	using Ptr = AutoPtr<FastLogger>;
 	using Priority = Message::Priority;
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// Returns the name of the logger.
 
@@ -78,6 +79,7 @@ public:
 		/// Sets the Channel. For FastLogger this is a no-op as Quill
 		/// handles output internally, but provided for API compatibility.
 
+	[[nodiscard]]
 	Channel::Ptr getChannel() const;
 		/// Returns the Channel. For FastLogger this returns a null pointer
 		/// as Quill handles output internally, but provided for API compatibility.
@@ -89,6 +91,7 @@ public:
 		/// Setting the log level to zero turns off
 		/// logging for that logger.
 
+	[[nodiscard]]
 	int getLevel() const;
 		/// Returns the logger's log level.
 
@@ -113,6 +116,7 @@ public:
 		///   - channel: Sets the channel via LoggingRegistry
 		///   - level: Sets the log level
 
+	[[nodiscard]]
 	std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.
 		///
@@ -248,53 +252,68 @@ public:
 		/// followed by the same sixteen bytes as ASCII characters.
 		/// For bytes outside the range 32 .. 127, a dot is printed.
 
+	[[nodiscard]]
 	bool is(int level) const;
 		/// Returns true if at least the given log level is set.
 
+	[[nodiscard]]
 	bool fatal() const;
 		/// Returns true if the log level is at least PRIO_FATAL.
 
+	[[nodiscard]]
 	bool critical() const;
 		/// Returns true if the log level is at least PRIO_CRITICAL.
 
+	[[nodiscard]]
 	bool error() const;
 		/// Returns true if the log level is at least PRIO_ERROR.
 
+	[[nodiscard]]
 	bool warning() const;
 		/// Returns true if the log level is at least PRIO_WARNING.
 
+	[[nodiscard]]
 	bool notice() const;
 		/// Returns true if the log level is at least PRIO_NOTICE.
 
+	[[nodiscard]]
 	bool information() const;
 		/// Returns true if the log level is at least PRIO_INFORMATION.
 
+	[[nodiscard]]
 	bool debug() const;
 		/// Returns true if the log level is at least PRIO_DEBUG.
 
+	[[nodiscard]]
 	bool trace() const;
 		/// Returns true if the log level is at least PRIO_TRACE.
 
+	[[nodiscard]]
 	static FastLogger& get(const std::string& name);
 		/// Returns a reference to the FastLogger with the given name.
 		/// If the logger does not exist, it is created based on its parent.
 
+	[[nodiscard]]
 	static FastLogger& unsafeGet(const std::string& name);
 		/// Returns a reference to the FastLogger with the given name.
 		/// Non-thread-safe version for use during initialization.
 
+	[[nodiscard]]
 	static FastLogger& create(const std::string& name, int level = Priority::PRIO_INFORMATION);
 		/// Creates and returns a reference to a FastLogger with the
 		/// given name and log level.
 
+	[[nodiscard]]
 	static FastLogger& create(const std::string& name, Channel::Ptr pChannel, int level = Priority::PRIO_INFORMATION);
 		/// Creates and returns a reference to a FastLogger with the
 		/// given name, Channel and log level. The Channel is accepted for
 		/// API compatibility but ignored (Quill handles output internally).
 
+	[[nodiscard]]
 	static FastLogger& root();
 		/// Returns a reference to the root logger.
 
+	[[nodiscard]]
 	static Ptr has(const std::string& name);
 		/// Returns a pointer to the FastLogger if it exists, null otherwise.
 
@@ -308,6 +327,7 @@ public:
 	static void names(std::vector<std::string>& names);
 		/// Fills the vector with names of all defined loggers.
 
+	[[nodiscard]]
 	static int parseLevel(const std::string& level);
 		/// Parses a symbolic log level string and returns the numeric level.
 
@@ -324,19 +344,23 @@ public:
 		/// Sets a property on all loggers that are descendants of
 		/// the logger with the given name.
 
+	[[nodiscard]]
 	static std::string format(const std::string& fmt, const std::string& arg);
 		/// Replaces all occurrences of $0 in fmt with the string given in arg and
 		/// returns the result. To include a dollar sign in the result string,
 		/// specify two dollar signs ($$) in the format string.
 
+	[[nodiscard]]
 	static std::string format(const std::string& fmt, const std::string& arg0, const std::string& arg1);
 		/// Replaces all occurrences of $<n> in fmt with the string given in arg<n> and
 		/// returns the result.
 
+	[[nodiscard]]
 	static std::string format(const std::string& fmt, const std::string& arg0, const std::string& arg1, const std::string& arg2);
 		/// Replaces all occurrences of $<n> in fmt with the string given in arg<n> and
 		/// returns the result.
 
+	[[nodiscard]]
 	static std::string format(const std::string& fmt, const std::string& arg0, const std::string& arg1, const std::string& arg2, const std::string& arg3);
 		/// Replaces all occurrences of $<n> in fmt with the string given in arg<n> and
 		/// returns the result.
@@ -399,6 +423,7 @@ protected:
 	void logToQuill(void* pQuillLogger, const std::string& text, Priority prio);
 		/// Emits text at the given priority to the given Quill logger (quill::Logger*).
 
+  [[nodiscard]]
 	void* resolveSourceLogger(const std::string& source);
 		/// Returns the Quill logger (quill::Logger*) to use for a message with the
 		/// given source. When this FastLogger is used as a Poco::Logger channel,
@@ -407,9 +432,12 @@ protected:
 		/// field is preserved. Falls back to this FastLogger's own Quill logger when
 		/// the message has no source or no channel has been configured.
 
+  [[nodiscard]]
 	static std::string formatImpl(const std::string& fmt, int argc, std::string argv[]);
+	[[nodiscard]]
 	static FastLogger& parent(const std::string& name);
 	static void add(Ptr pLogger);
+	[[nodiscard]]
 	static Ptr find(const std::string& name);
 	static void ensureBackendStarted();
 

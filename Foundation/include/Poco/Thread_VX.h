@@ -69,38 +69,53 @@ public:
 	ThreadImpl();
 	~ThreadImpl();
 
+	[[nodiscard]]
 	TIDImpl tidImpl() const;
 	void setNameImpl(const std::string& threadName);
+	[[nodiscard]]
 	std::string getNameImpl() const;
+	[[nodiscard]]
 	std::string getOSThreadNameImpl();
 		/// Returns the thread's name, expressed as an operating system
 		/// specific name value. Return empty string if thread is not running.
 		/// For test used only.
 	void setPriorityImpl(int prio);
+	[[nodiscard]]
 	int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio, int policy = 0);
+	[[nodiscard]]
 	int getOSPriorityImpl() const;
+	[[nodiscard]]
 	static int getMinOSPriorityImpl(int policy);
+	[[nodiscard]]
 	static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
+	[[nodiscard]]
 	int getStackSizeImpl() const;
 	void startImpl(Runnable& target);
 	void startImpl(Callable target, void* pData = 0);
 
 	void joinImpl();
 	bool joinImpl(long milliseconds);
+	[[nodiscard]]
 	bool isRunningImpl() const;
 	static void yieldImpl();
+	[[nodiscard]]
 	static ThreadImpl* currentImpl();
+	[[nodiscard]]
 	static TIDImpl currentTidImpl();
+	[[nodiscard]]
 	static long currentOsTidImpl();
 	bool setAffinityImpl(int coreID);
+	[[nodiscard]]
 	int getAffinityImpl() const;
 
 protected:
 	static void runnableEntry(void* pThread, int, int, int, int, int, int, int, int, int);
 	static void callableEntry(void* pThread, int, int, int, int, int, int, int, int, int);
+	[[nodiscard]]
 	static int mapPrio(int prio);
+	[[nodiscard]]
 	static int reverseMapPrio(int osPrio);
 
 	struct ThreadData: public RefCountedObject

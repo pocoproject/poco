@@ -36,6 +36,7 @@ class XML_API DocumentEvent
 	/// Event model.
 {
 public:
+	[[nodiscard]]
 	virtual Event* createEvent(const XMLString& eventType) const = 0;
 		/// Creates an event of the specified type.
 		///

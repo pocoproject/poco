@@ -91,30 +91,35 @@ public:
 		_container.swap(map._container);
 	}
 
+	[[nodiscard]]
 	ConstIterator begin() const
 		/// Returns the beginning of the map.
 	{
 		return _container.begin();
 	}
 
+	[[nodiscard]]
 	ConstIterator end() const
 		/// Returns the end of the map.
 	{
 		return _container.end();
 	}
 
+	[[nodiscard]]
 	Iterator begin()
 		/// Returns the beginning of the map.
 	{
 		return _container.begin();
 	}
 
+	[[nodiscard]]
 	Iterator end()
 		/// Returns the end of the map.
 	{
 		return _container.end();
 	}
 
+	[[nodiscard]]
 	ConstIterator find(const KeyType& key) const
 		/// Finds the first occurrence of the key and
 		/// returns iterator pointing to the found entry
@@ -130,6 +135,7 @@ public:
 		return itEnd;
 	}
 
+	[[nodiscard]]
 	Iterator find(const KeyType& key)
 		/// Finds the first occurrence of the key and
 		/// returns iterator pointing to the found entry
@@ -189,16 +195,19 @@ public:
 		_container.clear();
 	}
 
+	[[nodiscard]]
 	std::size_t size() const
 	{
 		return _container.size();
 	}
 
+	[[nodiscard]]
 	bool empty() const
 	{
 		return _container.empty();
 	}
 
+	[[nodiscard]]
 	ConstReference operator [] (const KeyType& key) const
 	{
 		ConstIterator it = find(key);
@@ -208,6 +217,7 @@ public:
 			throw NotFoundException();
 	}
 
+	[[nodiscard]]
 	Reference operator [] (const KeyType& key)
 	{
 		Iterator it = find(key);
@@ -225,11 +235,13 @@ public:
 
 private:
 	template <typename T1, typename T2>
+	[[nodiscard]]
 	bool isEqual(T1 val1, T2 val2) const
 	{
 		return val1 == val2;
 	}
 
+	[[nodiscard]]
 	bool isEqual(const std::string& s1, const std::string& s2) const
 	{
 		if (!CaseSensitive)
@@ -238,16 +250,19 @@ private:
 			return s1 == s2;
 	}
 
+	[[nodiscard]]
 	bool isEqual(const std::string& s1, const char* s2) const
 	{
 		return isEqual(s1, std::string(s2));
 	}
 
+	[[nodiscard]]
 	bool isEqual(const char* s1, const std::string& s2) const
 	{
 		return isEqual(std::string(s1), s2);
 	}
 
+	[[nodiscard]]
 	bool isEqual(const char* s1, const char* s2) const
 	{
 		return isEqual(std::string(s1), std::string(s2));

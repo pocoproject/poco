@@ -69,6 +69,7 @@ public:
 		/// must be in initialization file format.
 
 protected:
+	[[nodiscard]]
 	bool getRaw(const std::string& key, std::string& value) const override;
 	void setRaw(const std::string& key, const std::string& value) override;
 	void enumerate(const std::string& key, Keys& range) const override;
@@ -81,6 +82,7 @@ private:
 
 	struct ICompare
 	{
+		[[nodiscard]]
 		bool operator () (const std::string& s1, const std::string& s2) const;
 	};
 	typedef std::map<std::string, std::string, ICompare> IStringMap;

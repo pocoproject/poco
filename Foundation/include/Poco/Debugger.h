@@ -34,6 +34,7 @@ class Foundation_API Debugger
 	/// in debug mode (the macro _DEBUG is defined).
 {
 public:
+	[[nodiscard]]
 	static bool isAvailable();
 		/// Returns true if a debugger is available, false otherwise.
 		/// On Windows, this function uses the IsDebuggerPresent()
@@ -63,6 +64,7 @@ public:
 	static void enter(const char* file, LineNumber line);
 		/// Writes a debug message to the debugger log and breaks into it.
 
+	[[nodiscard]]
 	static constexpr std::string_view sourceFile(const std::string_view& fileName)
 		/// Utility function for reporting the source file name. The file path is
 		/// truncated and only the source file name (with extension) is returned.

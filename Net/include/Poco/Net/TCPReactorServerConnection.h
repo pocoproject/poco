@@ -28,7 +28,9 @@ public:
 	void onShutdown(const AutoPtr<ShutdownNotification>& pNf);
 
 	void handleClose();
+	[[nodiscard]]
 	const StreamSocket& socket();
+	[[nodiscard]]
 	std::string& buffer();
 
 	void setRecvMessageCallback(const RecvMessageCallback& cb);

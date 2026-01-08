@@ -30,7 +30,9 @@ class XML_API ChildNodesList: public NodeList
 	// by Node::getChildNodes().
 {
 public:
+	[[nodiscard]]
 	Node* item(unsigned long index) const;
+	[[nodiscard]]
 	unsigned long length() const;
 
 	void autoRelease();

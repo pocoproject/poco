@@ -60,6 +60,7 @@ public:
 	BasicUnbufferedStreamBuf(const BasicUnbufferedStreamBuf&) = delete;
 	BasicUnbufferedStreamBuf& operator=(const BasicUnbufferedStreamBuf&) = delete;
 
+	[[nodiscard]]
 	int_type overflow(int_type c) override
 	{
 		if (c != char_traits::eof())
@@ -68,6 +69,7 @@ public:
 			return c;
 	}
 
+	[[nodiscard]]
 	int_type underflow() override
 	{
 		if (_ispb)
@@ -86,6 +88,7 @@ public:
 		}
 	}
 
+	[[nodiscard]]
 	int_type uflow() override
 	{
 		if (_ispb)
@@ -104,6 +107,7 @@ public:
 		}
 	}
 
+	[[nodiscard]]
 	int_type pbackfail(int_type c) override
 	{
 		if (_ispb)
@@ -118,6 +122,7 @@ public:
 		}
 	}
 
+	[[nodiscard]]
 	std::streamsize xsgetn(char_type* p, std::streamsize count) override
 		/// Some platforms (for example, Compaq C++) have buggy implementations of
 		/// xsgetn that handle null buffers incorrectly.
@@ -137,6 +142,7 @@ public:
 	}
 
 protected:
+	[[nodiscard]]
 	static int_type charToInt(char_type c)
 	{
 		return char_traits::to_int_type(c);

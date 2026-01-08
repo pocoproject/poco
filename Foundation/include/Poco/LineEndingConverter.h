@@ -71,6 +71,7 @@ public:
 		/// In theory, any character sequence can be used as newline sequence.
 		/// In practice, however, only the above three make sense.
 
+	[[nodiscard]]
 	const std::string& getNewLine() const;
 		/// Returns the line ending currently in use.
 
@@ -120,9 +121,11 @@ public:
 		/// If an empty string is given, all newline characters are removed from
 		/// the stream.
 
+	[[nodiscard]]
 	const std::string& getNewLine() const;
 		/// Returns the line ending currently in use.
 
+	[[nodiscard]]
 	LineEndingConverterStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
 

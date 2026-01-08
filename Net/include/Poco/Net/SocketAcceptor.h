@@ -150,10 +150,11 @@ public:
 	{
 		StreamSocket sock = _socket.acceptConnection();
 		_pReactor->wakeUp();
-		createServiceHandler(sock);
+		[[maybe_unused]] ServiceHandler* handler = createServiceHandler(sock);
 	}
 
 protected:
+	[[nodiscard]]
 	virtual ServiceHandler* createServiceHandler(StreamSocket& socket)
 		/// Create and initialize a new ServiceHandler instance.
 		///
@@ -162,6 +163,7 @@ protected:
 		return new ServiceHandler(socket, *_pReactor);
 	}
 
+	[[nodiscard]]
 	SocketReactor* reactor()
 		/// Returns a pointer to the SocketReactor where
 		/// this SocketAcceptor is registered.
@@ -171,6 +173,7 @@ protected:
 		return _pReactor;
 	}
 
+	[[nodiscard]]
 	Socket& socket()
 		/// Returns a reference to the SocketAcceptor's socket.
 	{

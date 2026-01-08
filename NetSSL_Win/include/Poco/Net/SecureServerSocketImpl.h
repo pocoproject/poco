@@ -160,10 +160,12 @@ public:
 		///
 		/// Throws a Poco::InvalidAccessException.
 
+	[[nodiscard]]
 	bool secure() const;
 		/// Returns true iff the socket's connection is secure
 		/// (using SSL or TLS).
 
+	[[nodiscard]]
 	Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.
 

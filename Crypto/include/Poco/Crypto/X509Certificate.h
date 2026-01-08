@@ -89,29 +89,36 @@ public:
 	~X509Certificate();
 		/// Destroys the X509Certificate.
 
+	[[nodiscard]]
 	long version() const;
 		/// Returns the version of the certificate.
 
+	[[nodiscard]]
 	const std::string& serialNumber() const;
 		/// Returns the certificate serial number as a
 		/// string in decimal encoding.
 
+	[[nodiscard]]
 	const std::string& issuerName() const;
 		/// Returns the certificate issuer's distinguished name.
 
+	[[nodiscard]]
 	std::string issuerName(NID nid) const;
 		/// Extracts the information specified by the given
 		/// NID (name identifier) from the certificate issuer's
 		/// distinguished name.
 
+	[[nodiscard]]
 	const std::string& subjectName() const;
 		/// Returns the certificate subject's distinguished name.
 
+	[[nodiscard]]
 	std::string subjectName(NID nid) const;
 		/// Extracts the information specified by the given
 		/// NID (name identifier) from the certificate subject's
 		/// distinguished name.
 
+	[[nodiscard]]
 	std::string commonName() const;
 		/// Returns the common name stored in the certificate
 		/// subject's distinguished name.
@@ -120,9 +127,11 @@ public:
 		/// Extracts the common name and the alias domain names from the
 		/// certificate.
 
+	[[nodiscard]]
 	Poco::DateTime validFrom() const;
 		/// Returns the date and time the certificate is valid from.
 
+	[[nodiscard]]
 	Poco::DateTime expiresOn() const;
 		/// Returns the date and time the certificate expires.
 
@@ -139,6 +148,7 @@ public:
 		/// Writes the certificate to the file given by path.
 		/// The certificate is written in PEM format.
 
+	[[nodiscard]]
 	bool issuedBy(const X509Certificate& issuerCertificate) const;
 		/// Checks whether the certificate has been issued by
 		/// the issuer given by issuerCertificate. This can be
@@ -151,6 +161,7 @@ public:
 		/// Returns true if verification against the issuer certificate
 		/// was successful, false otherwise.
 
+	[[nodiscard]]
 	bool equals(const X509Certificate& otherCertificate) const;
 		/// Checks whether the certificate is equal to
 		/// the other certificate, by comparing the hashes
@@ -159,14 +170,17 @@ public:
 		/// Returns true if both certificates are identical,
 		/// otherwise false.
 
+	[[nodiscard]]
 	const X509* certificate() const;
 		/// Returns the underlying OpenSSL certificate.
 
+	[[nodiscard]]
 	X509* dup() const;
 		/// Duplicates and returns the underlying OpenSSL certificate. Note that
 		/// the caller assumes responsibility for the lifecycle of the created
 		/// certificate.
 
+	[[nodiscard]]
 	std::string signatureAlgorithm() const;
 		/// Returns the certificate signature algorithm long name.
 

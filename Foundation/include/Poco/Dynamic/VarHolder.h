@@ -64,7 +64,7 @@ class Var;
 
 namespace Impl {
 
-
+[[nodiscard]]
 bool Foundation_API isJSONString(const Var& any);
 	/// Returns true for values that should be JSON-formatted as string.
 
@@ -137,7 +137,8 @@ public:
 	virtual ~VarHolder();
 		/// Destroys the VarHolder.
 
-	[[nodiscard]] virtual VarHolder* clone(Placeholder<VarHolder>* pHolder = nullptr) const = 0;
+	[[nodiscard]]
+	virtual VarHolder* clone(Placeholder<VarHolder>* pHolder = nullptr) const = 0;
 		/// Implementation must implement this function to
 		/// deep-copy the VarHolder.
 		/// If small object optimization is enabled (i.e. if
@@ -145,7 +146,8 @@ public:
 		/// instantiated in-place if it's size is smaller
 		/// than POCO_SMALL_OBJECT_SIZE.
 
-	[[nodiscard]] virtual const std::type_info& type() const = 0;
+	[[nodiscard]]
+	virtual const std::type_info& type() const = 0;
 		/// Implementation must return the type information
 		/// (typeid) for the stored content.
 
@@ -241,66 +243,82 @@ public:
 	/// Throws BadCastException. Must be overridden in a type
 	/// specialization in order to support the conversion.
 
-	[[nodiscard]] virtual bool isArray() const;
+	[[nodiscard]]
+	virtual bool isArray() const;
 		/// Returns true.
 
-	[[nodiscard]] virtual bool isVector() const;
+	[[nodiscard]]
+	virtual bool isVector() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	[[nodiscard]] virtual bool isList() const;
+	[[nodiscard]]
+	virtual bool isList() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	[[nodiscard]] virtual bool isDeque() const;
+	[[nodiscard]]
+	virtual bool isDeque() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	[[nodiscard]] virtual bool isStruct() const;
+	[[nodiscard]]
+	virtual bool isStruct() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	[[nodiscard]] virtual bool isOrdered() const;
+	[[nodiscard]]
+	virtual bool isOrdered() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	[[nodiscard]] virtual bool isInteger() const;
+	[[nodiscard]]
+	virtual bool isInteger() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	[[nodiscard]] virtual bool isSigned() const;
+	[[nodiscard]]
+	virtual bool isSigned() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	[[nodiscard]] virtual bool isNumeric() const;
+	[[nodiscard]]
+	virtual bool isNumeric() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	[[nodiscard]] virtual bool isBoolean() const;
+	[[nodiscard]]
+	virtual bool isBoolean() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	[[nodiscard]] virtual bool isString() const;
+	[[nodiscard]]
+	virtual bool isString() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	[[nodiscard]] virtual bool isDate() const;
+	[[nodiscard]]
+	virtual bool isDate() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	[[nodiscard]] virtual bool isTime() const;
+	[[nodiscard]]
+	virtual bool isTime() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	[[nodiscard]] virtual bool isDateTime() const;
+	[[nodiscard]]
+	virtual bool isDateTime() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	[[nodiscard]] virtual bool isUUID() const;
+	[[nodiscard]]
+	virtual bool isUUID() const;
 		/// Returns false. Must be properly overridden in a type
 		/// specialization in order to support the diagnostic.
 
-	[[nodiscard]] virtual std::size_t size() const;
+	[[nodiscard]]
+	virtual std::size_t size() const;
 		/// Returns 1 iff Var is not empty or this function overridden.
 
 protected:
@@ -308,6 +326,7 @@ protected:
 		/// Creates the VarHolder.
 
 	template <typename T>
+	[[nodiscard]]
 	VarHolder* cloneHolder(Placeholder<VarHolder>* pVarHolder, const T& val) const
 		/// Instantiates value holder wrapper.
 		///
@@ -430,6 +449,7 @@ protected:
 private:
 
 	template <typename F, typename T>
+	[[nodiscard]]
 	static std::string rangeExcCastStr(const F& from)
 		/// Returns a string representation of 'from' cast to the largest
 		/// integer type matching T's signedness. Used in range exception messages.
@@ -452,12 +472,14 @@ private:
 	}
 
 	template <typename T, std::enable_if_t<std::is_same_v<T, bool>, bool> = true>
+	[[nodiscard]]
 	static constexpr int numValDigits(const T& value)
 	{
 		return 1;
 	}
 
 	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<T, bool>, bool> = true>
+	[[nodiscard]]
 	static constexpr int numValDigits(const T& value)
 		/// Returns the number of binary digits (bits) needed to represent
 		/// the magnitude of the given integer value.
@@ -484,6 +506,7 @@ private:
 	}
 
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	[[nodiscard]]
 	static int numValDigits(T value)
 		/// Returns approximate number of binary digits for a floating point value.
 		/// Uses ilogb() to get the exponent, which represents the bit position
@@ -497,12 +520,14 @@ private:
 	}
 
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	[[nodiscard]]
 	static constexpr int numTypeDigits()
 	{
 		return std::numeric_limits<T>::digits;
 	}
 
 	template <typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
+	[[nodiscard]]
 	static constexpr int numTypeDigits()
 	{
 		return numValDigits(std::numeric_limits<T>::max());
@@ -511,6 +536,7 @@ private:
 	template <typename F, typename T,
 		std::enable_if_t<std::is_integral_v<F>, bool> = true,
 		std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
+	[[nodiscard]]
 	static bool isPrecisionLost(const F& from)
 		// Checks for loss of precision in integral -> floating point conversion.
 	{

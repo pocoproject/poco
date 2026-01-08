@@ -37,6 +37,7 @@ class Util_API LoggingSubsystem: public Subsystem
 public:
 	LoggingSubsystem();
 
+	[[nodiscard]]
 	const char* name() const override;
 
 protected:

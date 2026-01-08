@@ -122,6 +122,7 @@ public:
 		doRemove(it);
 	}
 
+	[[nodiscard]]
 	bool has(const TKey& key) const
 		/// Returns true if the cache contains a value for the key.
 	{
@@ -129,6 +130,7 @@ public:
 		return doHas(key);
 	}
 
+	[[nodiscard]]
 	SharedPtr<TValue> get(const TKey& key)
 		/// Returns a SharedPtr of the value. The SharedPointer will remain valid
 		/// even when cache replacement removes the element.
@@ -145,6 +147,7 @@ public:
 		doClear();
 	}
 
+	[[nodiscard]]
 	std::size_t size()
 		/// Returns the number of cached elements
 	{
@@ -164,6 +167,7 @@ public:
 		doReplace();
 	}
 
+	[[nodiscard]]
 	std::set<TKey> getAllKeys()
 		/// Returns a copy of all keys stored in the cache
 	{
@@ -302,6 +306,7 @@ protected:
 		}
 	}
 
+	[[nodiscard]]
 	bool doHas(const TKey& key) const
 		/// Returns true if the cache contains a value for the key
 	{
@@ -319,6 +324,7 @@ protected:
 		return result;
 	}
 
+	[[nodiscard]]
 	SharedPtr<TValue> doGet(const TKey& key)
 		/// Returns a SharedPtr of the cache entry, returns 0 if for
 		/// the key no value was found

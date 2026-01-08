@@ -53,6 +53,7 @@ public:
 	void close();
 		/// Flushes a writing streambuf
 
+	[[nodiscard]]
 	Poco::UInt64 bytesWritten() const;
 
 protected:

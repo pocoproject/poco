@@ -39,6 +39,7 @@ protected:
 	void unlockImpl();
 
 private:
+	[[nodiscard]]
 	std::string getFileName();
 
 	std::string _name;

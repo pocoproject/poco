@@ -62,9 +62,11 @@ public:
 	virtual ~DirectoryIterator();
 		/// Destroys the DirectoryIterator.
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// Returns the current filename.
 
+	[[nodiscard]]
 	const Path& path() const;
 		/// Returns the current path.
 
@@ -76,7 +78,7 @@ public:
 	virtual DirectoryIterator& operator ++ ();   // prefix
 
 	POCO_DEPRECATED("Please use the prefix increment operator instead")
-	DirectoryIterator operator ++ (int); // postfix
+	DirectoryIterator operator ++ ([[maybe_unused]] int n); // postfix
 		/// Please use the prefix increment operator instead.
 
 	const File& operator * () const;
@@ -84,7 +86,9 @@ public:
 	const File* operator -> () const;
 	File* operator -> ();
 
+	[[nodiscard]]
 	bool operator == (const DirectoryIterator& iterator) const;
+	[[nodiscard]]
 	bool operator != (const DirectoryIterator& iterator) const;
 
 protected:

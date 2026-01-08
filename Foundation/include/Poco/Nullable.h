@@ -158,42 +158,49 @@ public:
 		std::swap(_optional, other._optional);
 	}
 
+	[[nodiscard]]
 	bool operator == (const Nullable<C>& other) const
 		/// Compares two Nullables for equality
 	{
 		return _optional == other._optional;
 	}
 
+	[[nodiscard]]
 	bool operator == (const C& value) const
 		/// Compares Nullable with value for equality
 	{
 		return (_optional.has_value() && _optional.value() == value);
 	}
 
+	[[nodiscard]]
 	bool operator == (const NullType&) const
 		/// Compares Nullable with NullData for equality
 	{
 		return !_optional.has_value();
 	}
 
+	[[nodiscard]]
 	bool operator != (const C& value) const
 		/// Compares Nullable with value for non equality
 	{
 		return !(*this == value);
 	}
 
+	[[nodiscard]]
 	bool operator != (const Nullable<C>& other) const
 		/// Compares two Nullables for non equality
 	{
 		return !(*this == other);
 	}
 
+	[[nodiscard]]
 	bool operator != (const NullType&) const
 		/// Compares with NullData for non equality
 	{
 		return _optional.has_value();
 	}
 
+	[[nodiscard]]
 	bool operator < (const Nullable<C>& other) const
 		/// Compares two Nullable objects. Return true if this object's
 		/// value is smaler than the other object's value.
@@ -202,6 +209,7 @@ public:
 		return _optional < other._optional;
 	}
 
+	[[nodiscard]]
 	bool operator > (const Nullable<C>& other) const
 		/// Compares two Nullable objects. Return true if this object's
 		/// value is greater than the other object's value.
@@ -210,6 +218,7 @@ public:
 		return !(*this == other) && !(*this < other);
 	}
 
+	[[nodiscard]]
 	C& value()
 		/// Returns the Nullable's value.
 		///
@@ -221,6 +230,7 @@ public:
 			throw NullValueException();
 	}
 
+	[[nodiscard]]
 	const C& value() const
 		/// Returns the Nullable's value.
 		///
@@ -232,6 +242,7 @@ public:
 			throw NullValueException();
 	}
 
+	[[nodiscard]]
 	const C& value(const C& deflt) const
 		/// Returns the Nullable's value, or the
 		/// given default value if the Nullable is empty.
@@ -242,24 +253,28 @@ public:
 		return deflt;
 	}
 
+	[[nodiscard]]
 	explicit operator C& ()
 		/// Get reference to the value
 	{
 		return value();
 	}
 
+	[[nodiscard]]
 	explicit operator const C& () const
 		/// Get const reference to the value
 	{
 		return value();
 	}
 
+	[[nodiscard]]
 	operator const NullType& () const
 		/// Get reference to the value
 	{
 		return _null;
 	}
 
+	[[nodiscard]]
 	bool isNull() const
 		/// Returns true if the Nullable is empty.
 	{
@@ -294,6 +309,7 @@ std::ostream& operator<<(std::ostream& out, const Nullable<C>& obj)
 
 
 template <typename C>
+[[nodiscard]]
 bool operator == (const NullType&, const Nullable<C>& n)
 	/// Returns true if this Nullable is null.
 {
@@ -302,6 +318,7 @@ bool operator == (const NullType&, const Nullable<C>& n)
 
 
 template <typename C>
+[[nodiscard]]
 bool operator != (const C& c, const Nullable<C>& n)
 	/// Compares Nullable with value for non equality
 {
@@ -310,6 +327,7 @@ bool operator != (const C& c, const Nullable<C>& n)
 
 
 template <typename C>
+[[nodiscard]]
 bool operator == (const C& c, const Nullable<C>& n)
 	/// Compares Nullable with NullData for equality
 {
@@ -318,6 +336,7 @@ bool operator == (const C& c, const Nullable<C>& n)
 
 
 template <typename C>
+[[nodiscard]]
 bool operator != (const NullType&, const Nullable<C>& n)
 	/// Returns true if this Nullable is not null.
 {

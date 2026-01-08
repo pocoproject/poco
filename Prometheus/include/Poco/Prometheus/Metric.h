@@ -39,9 +39,11 @@ public:
 		UNTYPED
 	};
 
+	[[nodiscard]]
 	Type type() const;
 		/// Returns the metric's type.
 
+	[[nodiscard]]
 	const std::string& help() const;
 		/// Returns the metric's help text.
 
