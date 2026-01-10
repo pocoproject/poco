@@ -38,24 +38,34 @@ NotificationCenter::~NotificationCenter()
 
 void NotificationCenter::addObserver(const AbstractObserver& observer)
 {
-	RWLock::ScopedWriteLock lock(_mutex);
-	_observers.emplace_back(observer.clone());
-	_observers.back()->start();
+	AbstractObserverPtr pObserver = observer.clone();
+	{
+		RWLock::ScopedWriteLock lock(_mutex);
+		_observers.push_back(pObserver);
+	}
+
+	pObserver->start();
 }
 
 
 void NotificationCenter::removeObserver(const AbstractObserver& observer)
 {
-	RWLock::ScopedWriteLock lock(_mutex);
-	for (auto it = _observers.begin(); it != _observers.end(); ++it)
+	AbstractObserverPtr pObserverToDisable;
 	{
-		if (observer.equals(**it))
+		RWLock::ScopedWriteLock lock(_mutex);
+		for (auto it = _observers.begin(); it != _observers.end(); ++it)
 		{
-			(*it)->disable();
-			_observers.erase(it);
-			return;
+			if (observer.equals(**it))
+			{
+				pObserverToDisable = std::move(*it);
+				_observers.erase(it);
+				break;
+			}
 		}
 	}
+
+	if (pObserverToDisable)
+		pObserverToDisable->disable();
 }
 
 
@@ -76,7 +86,7 @@ NotificationCenter::ObserverList NotificationCenter::observersToNotify(const Not
 		RWLock::ScopedReadLock lock(_mutex);
 		observers = _observers;
 	}
-	// Filter outside the lock to avoid lock-order-inversion with NObserver mutex
+
 	ObserverList ret;
 	for (auto& o : observers)
 	{
@@ -144,10 +154,14 @@ NotificationCenter& NotificationCenter::defaultCenter()
 
 void NotificationCenter::clear()
 {
-	RWLock::ScopedWriteLock lock(_mutex);
-	for (auto& o: _observers)
+	ObserverList observers;
+	{
+		RWLock::ScopedWriteLock lock(_mutex);
+		_observers.swap(observers);
+	}
+
+	for (auto& o: observers)
 		o->disable();
-	_observers.clear();
 }
 
 

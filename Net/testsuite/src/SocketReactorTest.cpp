@@ -24,6 +24,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Thread.h"
 #include <sstream>
+#include <chrono>
 
 
 using Poco::Net::SocketReactor;
@@ -444,6 +445,73 @@ namespace
 		StreamSocket   _socket;
 		SocketReactor& _reactor;
 	};
+
+
+	// Handler that aggressively queries and modifies reactor from within notifications
+	// Tests the NotificationCenter deadlock fix by calling removeEventHandler while
+	// holding Observer mutex, concurrent with other threads adding/removing handlers
+	class ConcurrentRemovalHandler
+	{
+	public:
+		ConcurrentRemovalHandler(StreamSocket& sock, SocketReactor& r, std::atomic<int>& callCount):
+			_socket(sock), _reactor(r), _callCount(callCount),
+			_or(*this, &ConcurrentRemovalHandler::onReadable),
+			_ow(*this, &ConcurrentRemovalHandler::onWritable),
+			_removeCount(0)
+		{
+			_reactor.addEventHandler(_socket, _or);
+			_reactor.addEventHandler(_socket, _ow);
+		}
+
+		~ConcurrentRemovalHandler()
+		{
+			// Clean up any remaining handlers
+			try {
+				_reactor.removeEventHandler(_socket, _or);
+			} catch (...) {}
+			try {
+				_reactor.removeEventHandler(_socket, _ow);
+			} catch (...) {}
+		}
+
+		void onReadable(const AutoPtr<ReadableNotification>& pNf)
+		{
+			int count = ++_callCount;
+
+			// Query reactor state while holding Observer mutex
+			// This would deadlock if NC held lock while calling observer methods
+			_reactor.hasEventHandler(_socket, _or);
+			_reactor.hasEventHandler(_socket, _ow);
+			_reactor.has(_socket);
+
+			// Every 3rd call, remove a handler from within the notification
+			// This is the exact scenario from the bug report
+			if (count % 3 == 0 && _removeCount++ == 0)
+			{
+				_reactor.removeEventHandler(_socket, _ow);
+			}
+
+			// Read data to keep socket active
+			char buffer[64];
+			try {
+				_socket.receiveBytes(buffer, sizeof(buffer));
+			} catch (...) {}
+		}
+
+		void onWritable(const AutoPtr<WritableNotification>& pNf)
+		{
+			// Query reactor while in handler
+			_reactor.hasEventHandler(_socket, _or);
+		}
+
+	private:
+		StreamSocket _socket;
+		SocketReactor& _reactor;
+		std::atomic<int>& _callCount;
+		NObserver<ConcurrentRemovalHandler, ReadableNotification> _or;
+		NObserver<ConcurrentRemovalHandler, WritableNotification> _ow;
+		int _removeCount;
+	};
 }
 
 
@@ -727,6 +795,106 @@ void SocketReactorTest::testSocketReactorRemove()
 }
 
 
+void SocketReactorTest::testConcurrentHandlerRemoval()
+{
+	// This test specifically exercises the NotificationCenter deadlock fix
+	// by having handlers call removeEventHandler while holding Observer mutex,
+	// while other threads are adding/removing handlers concurrently
+
+	SocketAddress ssa;
+	ServerSocket ss(ssa);
+	SocketReactor reactor;
+	Thread thread;
+	thread.start(reactor);
+
+	SocketAddress sa("127.0.0.1", ss.address().port());
+	std::vector<StreamSocket> sockets;
+	std::vector<StreamSocket> accepted;
+
+	// Create multiple socket connections
+	const int numSockets = 10;
+	for (int i = 0; i < numSockets; ++i)
+	{
+		sockets.push_back(StreamSocket(sa));
+		accepted.push_back(ss.acceptConnection());
+	}
+
+	std::atomic<int> callCount(0);
+	std::vector<ConcurrentRemovalHandler*> handlers;
+
+	// Create handlers for all sockets
+	for (auto& sock : accepted)
+	{
+		handlers.push_back(new ConcurrentRemovalHandler(sock, reactor, callCount));
+	}
+
+	// Thread that continuously adds/removes handlers
+	std::atomic<bool> stop(false);
+	Thread modifyThread;
+	modifyThread.startFunc([&]() {
+		int iterations = 0;
+		while (!stop && iterations++ < 20)
+		{
+			// Try to add/remove handlers concurrently with notifications
+			for (auto& sock : accepted)
+			{
+				NObserver<SocketReactorTest, ReadableNotification> obs(*this, &SocketReactorTest::onReadable);
+				try {
+					reactor.addEventHandler(sock, obs);
+					Thread::sleep(10);
+					reactor.removeEventHandler(sock, obs);
+				} catch (...) {
+					// Socket might be removed by handler, that's okay
+				}
+			}
+			Thread::sleep(50);
+		}
+	});
+
+	// Send data to trigger notifications
+	for (int i = 0; i < 5; ++i)
+	{
+		for (auto& sock : sockets)
+		{
+			std::string data = "test";
+			try {
+				sock.sendBytes(data.data(), (int)data.size());
+			} catch (...) {}
+		}
+		Thread::sleep(50);
+	}
+
+	// Wait for test to complete with timeout
+	auto startTime = std::chrono::steady_clock::now();
+	const auto timeout = std::chrono::seconds(10);
+
+	while (modifyThread.isRunning())
+	{
+		Thread::sleep(100);
+		auto elapsed = std::chrono::steady_clock::now() - startTime;
+		if (elapsed > timeout)
+		{
+			stop = true;
+			fail("Deadlock detected: concurrent handler removal test timed out");
+			break;
+		}
+	}
+
+	stop = true;
+	modifyThread.join();
+
+	// Clean up
+	for (auto* handler : handlers)
+		delete handler;
+
+	reactor.stop();
+	thread.join();
+
+	// Verify handlers were called
+	assertTrue(callCount > 0);
+}
+
+
 void SocketReactorTest::onReadable(const Poco::AutoPtr<Poco::Net::ReadableNotification>& pNf)
 {
 }
@@ -761,6 +929,7 @@ CppUnit::Test* SocketReactorTest::suite()
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorDeadlock);
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketReactorWakeup);
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketReactorRemove);
+	CppUnit_addTest(pSuite, SocketReactorTest, testConcurrentHandlerRemoval);
 
 	return pSuite;
 }
