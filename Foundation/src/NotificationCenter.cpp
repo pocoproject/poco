@@ -38,7 +38,7 @@ NotificationCenter::~NotificationCenter()
 
 void NotificationCenter::addObserver(const AbstractObserver& observer)
 {
-	RWLock::ScopedLock lock(_mutex);
+	RWLock::ScopedWriteLock lock(_mutex);
 	_observers.emplace_back(observer.clone());
 	_observers.back()->start();
 }
@@ -46,7 +46,7 @@ void NotificationCenter::addObserver(const AbstractObserver& observer)
 
 void NotificationCenter::removeObserver(const AbstractObserver& observer)
 {
-	RWLock::ScopedLock lock(_mutex);
+	RWLock::ScopedWriteLock lock(_mutex);
 	for (auto it = _observers.begin(); it != _observers.end(); ++it)
 	{
 		if (observer.equals(**it))
@@ -144,7 +144,7 @@ NotificationCenter& NotificationCenter::defaultCenter()
 
 void NotificationCenter::clear()
 {
-	RWLock::ScopedLock lock(_mutex);
+	RWLock::ScopedWriteLock lock(_mutex);
 	for (auto& o: _observers)
 		o->disable();
 	_observers.clear();
