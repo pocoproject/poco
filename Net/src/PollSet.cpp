@@ -87,6 +87,9 @@ public:
 
 	~PollSetImpl()
 	{
+		// Signal shutdown and close fds to wake up epoll_wait().
+		// Then wait for poll() to exit before freeing memory,
+		// since epoll_wait() writes to _events.
 		_closed.store(true, std::memory_order_release);
 #ifdef WEPOLL_H_
 		if (_epollfd) close(_epollfd);
@@ -94,6 +97,8 @@ public:
 		if (_eventfd > 0) close(_eventfd.exchange(0));
 		if (_epollfd >= 0) close(_epollfd);
 #endif
+		while (_polling.load(std::memory_order_acquire))
+			Poco::Thread::yield();
 	}
 
 	void add(const Socket& socket, int mode)
@@ -167,13 +172,17 @@ public:
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 
+		if (_closed.load(std::memory_order_acquire))
+			return result;
+		_polling.store(true, std::memory_order_release);
 		while (true)
 		{
 			Poco::Timestamp start;
 			rc = epoll_wait(_epollfd, _events.data(), static_cast<int>(_events.size()), static_cast<int>(remainingTime.totalMilliseconds()));
 			if (rc == 0)
 			{
-				if (keepWaiting(start, remainingTime)) continue;
+				if (!_closed.load(std::memory_order_acquire) && keepWaiting(start, remainingTime)) continue;
+				_polling.store(false, std::memory_order_release);
 				return result;
 			}
 
@@ -189,14 +198,18 @@ public:
 				// if interrupted and there's still time left, keep waiting
 				if (SocketImpl::lastError() == POCO_EINTR)
 				{
-					if (keepWaiting(start, remainingTime)) continue;
+					if (!_closed.load(std::memory_order_acquire) && keepWaiting(start, remainingTime)) continue;
 				}
 				else if (_closed.load(std::memory_order_acquire))
+				{
+					_polling.store(false, std::memory_order_release);
 					return result;
+				}
 				else SocketImpl::error();
 			}
 			break;
 		}
+		_polling.store(false, std::memory_order_release);
 
 		if (_closed.load(std::memory_order_acquire))
 			return result;
@@ -343,6 +356,7 @@ private:
 	std::atomic<int> _eventfd;
 	EPollHandle      _epollfd;
 	std::atomic<bool> _closed{false};
+	std::atomic<bool> _polling{false};
 };
 
 
