@@ -15,6 +15,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
 #include <atomic>
+#include <cstring>
 
 
 using Poco::Pipe;

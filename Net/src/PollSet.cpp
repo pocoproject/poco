@@ -49,7 +49,7 @@ namespace Net {
 
 
 #ifdef WEPOLL_H_
-namespace 
+namespace
 {
 	int close(HANDLE h)
 	{
@@ -178,7 +178,7 @@ public:
 			// if we are hitting the events limit, resize it; even without resizing, the subseqent
 			// calls would round-robin through the remaining ready sockets, but it's better to give
 			// the call enough room once we start hitting the boundary
-			if (rc > 0 && static_cast<size_t>(rc) >= _events.size()) 
+			if (rc > 0 && static_cast<size_t>(rc) >= _events.size())
 			{
 				_events.resize(_events.size()*2);
 			}
@@ -357,7 +357,7 @@ public:
 	~PollSetImpl()
 	{
 		_closed.store(true, std::memory_order_release);
-		_pipe.close();
+		try { _pipe.close(); } catch (...) { }
 	}
 
 	void add(const Socket& socket, int mode)
@@ -503,9 +503,9 @@ public:
 
 	void wakeUp()
 	{
+		static const char c = 1;
 		if (_closed.load(std::memory_order_acquire))
 			return;
-		char c = 1;
 		_pipe.writeBytes(&c, 1);
 	}
 
