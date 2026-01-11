@@ -86,6 +86,7 @@ public:
 
 	~PollSetImpl()
 	{
+		_closed.store(true, std::memory_order_release);
 #ifdef WEPOLL_H_
 		if (_epollfd) close(_epollfd);
 #else
@@ -189,10 +190,15 @@ public:
 				{
 					if (keepWaiting(start, remainingTime)) continue;
 				}
+				else if (_closed.load(std::memory_order_acquire))
+					return result;
 				else SocketImpl::error();
 			}
 			break;
 		}
+
+		if (_closed.load(std::memory_order_acquire))
+			return result;
 
 		ScopedLock lock(_mutex);
 
@@ -231,6 +237,8 @@ public:
 
 	void wakeUp()
 	{
+		if (_closed.load(std::memory_order_acquire))
+			return;
 #ifdef WEPOLL_H_
 		char val = 1;
 		_pEventSocket->sendTo(&val, sizeof(val), _pEventSocket->address());
@@ -333,6 +341,7 @@ private:
 	std::vector<struct epoll_event> _events;
 	std::atomic<int> _eventfd;
 	EPollHandle      _epollfd;
+	std::atomic<bool> _closed{false};
 };
 
 
@@ -468,6 +477,10 @@ public:
 			}
 		}
 		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
+
+		if (_closed.load(std::memory_order_acquire))
+			return result;
+
 		if (rc < 0) SocketImpl::error();
 
 		{
