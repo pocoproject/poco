@@ -184,13 +184,13 @@ private:
 
 inline void IOLock::leave()
 {
-	_inProgress.store(false, std::memory_order_release);
+	_inProgress.store(false);
 }
 
 
 inline bool IOLock::isClosed() const
 {
-	return _closed.load(std::memory_order_acquire);
+	return _closed.load();
 }
 
 

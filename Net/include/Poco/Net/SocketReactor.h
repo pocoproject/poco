@@ -28,6 +28,7 @@
 #include "Poco/Observer.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Event.h"
+#include "Poco/IOLock.h"
 #include <map>
 #include <atomic>
 
@@ -322,6 +323,7 @@ private:
 	NotificationPtr   _pShutdownNotification;
 	MutexType         _mutex;
 	Poco::Event       _event;
+	Poco::IOLock      _runLock;
 
 	friend class SocketNotifier;
 };

@@ -170,47 +170,42 @@ public:
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 
-		{
-			ScopedIOLock pollLock(_pollLock);
-			if (!pollLock)
-				return result;
+		ScopedIOLock pollLock(_pollLock);
+		if (!pollLock)
+			return result;
 
-			while (true)
+		while (true)
+		{
+			Poco::Timestamp start;
+			rc = epoll_wait(_epollfd, _events.data(), static_cast<int>(_events.size()), static_cast<int>(remainingTime.totalMilliseconds()));
+			if (rc == 0)
 			{
-				Poco::Timestamp start;
-				rc = epoll_wait(_epollfd, _events.data(), static_cast<int>(_events.size()), static_cast<int>(remainingTime.totalMilliseconds()));
-				if (rc == 0)
+				if (!pollLock.isClosed() && keepWaiting(start, remainingTime)) continue;
+				return result;
+			}
+
+			// if we are hitting the events limit, resize it; even without resizing, the subseqent
+			// calls would round-robin through the remaining ready sockets, but it's better to give
+			// the call enough room once we start hitting the boundary
+			if (rc > 0 && static_cast<size_t>(rc) >= _events.size())
+			{
+				_events.resize(_events.size()*2);
+			}
+			else if (rc < 0)
+			{
+				// if interrupted and there's still time left, keep waiting
+				if (SocketImpl::lastError() == POCO_EINTR)
 				{
 					if (!pollLock.isClosed() && keepWaiting(start, remainingTime)) continue;
+				}
+				else if (pollLock.isClosed())
+				{
 					return result;
 				}
-
-				// if we are hitting the events limit, resize it; even without resizing, the subseqent
-				// calls would round-robin through the remaining ready sockets, but it's better to give
-				// the call enough room once we start hitting the boundary
-				if (rc > 0 && static_cast<size_t>(rc) >= _events.size())
-				{
-					_events.resize(_events.size()*2);
-				}
-				else if (rc < 0)
-				{
-					// if interrupted and there's still time left, keep waiting
-					if (SocketImpl::lastError() == POCO_EINTR)
-					{
-						if (!pollLock.isClosed() && keepWaiting(start, remainingTime)) continue;
-					}
-					else if (pollLock.isClosed())
-					{
-						return result;
-					}
-					else SocketImpl::error();
-				}
-				break;
+				else SocketImpl::error();
 			}
+			break;
 		}
-
-		if (_pollLock.isClosed())
-			return result;
 
 		ScopedLock lock(_mutex);
 
@@ -445,6 +440,11 @@ public:
 	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)
 	{
 		PollSet::SocketModeMap result;
+
+		ScopedIOLock pollLock(_pollLock);
+		if (!pollLock)
+			return result;
+
 		{
 			Poco::FastMutex::ScopedLock lock(_mutex);
 
@@ -479,58 +479,50 @@ public:
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 
+		do
 		{
-			ScopedIOLock pollLock(_pollLock);
-			if (!pollLock)
-				return result;
-
-			do
+			Poco::Timestamp start;
+			rc = ::poll(_pollfds.data(), _pollfds.size(), remainingTime.totalMilliseconds());
+			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
 			{
-				Poco::Timestamp start;
-				rc = ::poll(_pollfds.data(), _pollfds.size(), remainingTime.totalMilliseconds());
-				if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
-				{
-					Poco::Timestamp end;
-					Poco::Timespan waited = end - start;
-					if (waited < remainingTime)
-						remainingTime -= waited;
-					else
-						remainingTime = 0;
-				}
+				Poco::Timestamp end;
+				Poco::Timespan waited = end - start;
+				if (waited < remainingTime)
+					remainingTime -= waited;
+				else
+					remainingTime = 0;
 			}
-			while (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !pollLock.isClosed());
 		}
+		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !pollLock.isClosed());
 
-		if (_pollLock.isClosed())
+		if (pollLock.isClosed())
 			return result;
 
 		if (rc < 0) SocketImpl::error();
 
+		if (_pollfds[0].revents & POLLIN)
 		{
-			if (_pollfds[0].revents & POLLIN)
-			{
-				char c;
-				_pipe.readBytes(&c, 1);
-			}
+			char c;
+			_pipe.readBytes(&c, 1);
+		}
 
-			Poco::FastMutex::ScopedLock lock(_mutex);
+		Poco::FastMutex::ScopedLock lock(_mutex);
 
-			if (!_socketMap.empty())
+		if (!_socketMap.empty())
+		{
+			for (auto it = _pollfds.begin() + 1; it != _pollfds.end(); ++it)
 			{
-				for (auto it = _pollfds.begin() + 1; it != _pollfds.end(); ++it)
+				auto its = _socketMap.find(it->fd);
+				if (its != _socketMap.end())
 				{
-					auto its = _socketMap.find(it->fd);
-					if (its != _socketMap.end())
-					{
-						if (it->revents & POLLIN)
-							result[its->second] |= PollSet::POLL_READ;
-						if (it->revents & POLLOUT)
-							result[its->second] |= PollSet::POLL_WRITE;
-						if (it->revents & POLLERR || (it->revents & POLLHUP))
-							result[its->second] |= PollSet::POLL_ERROR;
-					}
-					it->revents = 0;
+					if (it->revents & POLLIN)
+						result[its->second] |= PollSet::POLL_READ;
+					if (it->revents & POLLOUT)
+						result[its->second] |= PollSet::POLL_WRITE;
+					if (it->revents & POLLERR || (it->revents & POLLHUP))
+						result[its->second] |= PollSet::POLL_ERROR;
 				}
+				it->revents = 0;
 			}
 		}
 
@@ -631,6 +623,10 @@ public:
 		fd_set fdExcept;
 		int nfd = 0;
 
+		ScopedIOLock pollLock(_pollLock);
+		if (!pollLock)
+			return result;
+
 		FD_ZERO(&fdRead);
 		FD_ZERO(&fdWrite);
 		FD_ZERO(&fdExcept);
@@ -666,56 +662,48 @@ public:
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 
+		do
 		{
-			ScopedIOLock pollLock(_pollLock);
-			if (!pollLock)
-				return result;
-
-			do
+			struct timeval tv;
+			tv.tv_sec  = (long) remainingTime.totalSeconds();
+			tv.tv_usec = (long) remainingTime.useconds();
+			Poco::Timestamp start;
+			rc = ::select(nfd + 1, &fdRead, &fdWrite, &fdExcept, &tv);
+			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
 			{
-				struct timeval tv;
-				tv.tv_sec  = (long) remainingTime.totalSeconds();
-				tv.tv_usec = (long) remainingTime.useconds();
-				Poco::Timestamp start;
-				rc = ::select(nfd + 1, &fdRead, &fdWrite, &fdExcept, &tv);
-				if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
-				{
-					Poco::Timestamp end;
-					Poco::Timespan waited = end - start;
-					if (waited < remainingTime)
-						remainingTime -= waited;
-					else
-						remainingTime = 0;
-				}
+				Poco::Timestamp end;
+				Poco::Timespan waited = end - start;
+				if (waited < remainingTime)
+					remainingTime -= waited;
+				else
+					remainingTime = 0;
 			}
-			while (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !pollLock.isClosed());
 		}
+		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !pollLock.isClosed());
 
-		if (_pollLock.isClosed())
+		if (pollLock.isClosed())
 			return result;
 
 		if (rc < 0) SocketImpl::error();
 
-		{
-			Poco::FastMutex::ScopedLock lock(_mutex);
+		Poco::FastMutex::ScopedLock lock(_mutex);
 
-			for (auto it = _map.begin(); it != _map.end(); ++it)
+		for (auto it = _map.begin(); it != _map.end(); ++it)
+		{
+			poco_socket_t fd = it->first.impl()->sockfd();
+			if (fd != POCO_INVALID_SOCKET)
 			{
-				poco_socket_t fd = it->first.impl()->sockfd();
-				if (fd != POCO_INVALID_SOCKET)
+				if (FD_ISSET(fd, &fdRead))
 				{
-					if (FD_ISSET(fd, &fdRead))
-					{
-						result[it->first] |= PollSet::POLL_READ;
-					}
-					if (FD_ISSET(fd, &fdWrite))
-					{
-						result[it->first] |= PollSet::POLL_WRITE;
-					}
-					if (FD_ISSET(fd, &fdExcept))
-					{
-						result[it->first] |= PollSet::POLL_ERROR;
-					}
+					result[it->first] |= PollSet::POLL_READ;
+				}
+				if (FD_ISSET(fd, &fdWrite))
+				{
+					result[it->first] |= PollSet::POLL_WRITE;
+				}
+				if (FD_ISSET(fd, &fdExcept))
+				{
+					result[it->first] |= PollSet::POLL_ERROR;
 				}
 			}
 		}

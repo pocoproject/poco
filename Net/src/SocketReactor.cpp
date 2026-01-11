@@ -64,11 +64,18 @@ SocketReactor::SocketReactor(const Params& params, int threadAffinity):
 }
 
 
-SocketReactor::~SocketReactor() = default;
+SocketReactor::~SocketReactor()
+{
+	stop();
+	_runLock.close();
+}
 
 
 void SocketReactor::run()
 {
+	ScopedIOLock runLock(_runLock);
+	if (!runLock) return;
+
 	if (_threadAffinity >= 0)
 	{
 		Poco::Thread* pThread = Thread::current();

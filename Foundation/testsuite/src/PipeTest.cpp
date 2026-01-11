@@ -16,6 +16,7 @@
 #include "Poco/Runnable.h"
 #include <atomic>
 #include <cstring>
+#include <iostream>
 
 
 using Poco::Pipe;
@@ -165,12 +166,14 @@ void PipeTest::testCloseRace()
 	// Test concurrent close and read - this should not crash or hang
 	for (int i = 0; i < 100; ++i)
 	{
+		std::cerr << "  iteration " << i << ": create" << std::flush;
 		Pipe pipe;
 		std::atomic<int> readCount{0};
 		std::atomic<bool> stop{false};
 
 		PipeReader reader(pipe, readCount, stop);
 		Thread readerThread;
+		std::cerr << " start" << std::flush;
 		readerThread.start(reader);
 
 		// Write some data
@@ -182,10 +185,13 @@ void PipeTest::testCloseRace()
 		Thread::sleep(1);
 
 		// Close the pipe while reader might be reading
+		std::cerr << " close" << std::flush;
 		pipe.close();
 
 		// Wait for reader to finish
+		std::cerr << " join" << std::flush;
 		readerThread.join();
+		std::cerr << " done" << std::endl;
 	}
 }
 
