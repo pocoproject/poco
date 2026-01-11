@@ -867,6 +867,7 @@ void SocketReactorTest::testConcurrentHandlerRemoval()
 	// Wait for test to complete with timeout
 	auto startTime = std::chrono::steady_clock::now();
 	const auto timeout = std::chrono::seconds(10);
+	bool timedOut = false;
 
 	while (modifyThread.isRunning())
 	{
@@ -874,21 +875,23 @@ void SocketReactorTest::testConcurrentHandlerRemoval()
 		auto elapsed = std::chrono::steady_clock::now() - startTime;
 		if (elapsed > timeout)
 		{
-			stop = true;
-			fail("Deadlock detected: concurrent handler removal test timed out");
+			timedOut = true;
 			break;
 		}
 	}
 
+	// Always cleanup - must happen before fail() which throws
 	stop = true;
 	modifyThread.join();
 
-	// Clean up
+	reactor.stop();
+	thread.join();
+
 	for (auto* handler : handlers)
 		delete handler;
 
-	reactor.stop();
-	thread.join();
+	if (timedOut)
+		failmsg("Deadlock detected: concurrent handler removal test timed out");
 
 	// Verify handlers were called
 	assertTrue(callCount > 0);
