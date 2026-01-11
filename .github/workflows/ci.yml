@@ -439,6 +439,91 @@ jobs:
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
+  macos-clang-cmake-openssl3-visibility-hidden-intel-tsan:
+    runs-on: macos-15-intel
+    env:
+      TSAN_OPTIONS: "suppressions=${{ github.workspace }}/tsan.suppress,second_deadlock_stack=1"
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install openssl@3
+      - run: >-
+          cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden
+          -DPOCO_SANITIZEFLAGS="-fsanitize=thread" -DENABLE_TESTS=ON
+          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
+          -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
+          -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
+          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON
+          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
+          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
+          -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
+      - run: cmake --build cmake-build --target all --parallel 4
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            sudo -s
+            TSAN_OPTIONS=${TSAN_OPTIONS}
+            PWD=`pwd`
+            ctest -V
+
+  macos-clang-cmake-openssl3-visibility-hidden-intel-asan:
+    runs-on: macos-15-intel
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install openssl@3
+      - run: >-
+          cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden
+          -DPOCO_SANITIZEFLAGS="-fsanitize=address" -DENABLE_TESTS=ON
+          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
+          -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
+          -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
+          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON
+          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
+          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
+          -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
+      - run: cmake --build cmake-build --target all --parallel 4
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            sudo -s
+            PWD=`pwd`
+            ctest -V
+
+  macos-clang-cmake-openssl3-visibility-hidden-intel-ubsan:
+    runs-on: macos-15-intel
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install openssl@3
+      # Foundation tests do not link with vptr sanitizer. Disable it.
+      - run: >-
+          cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden
+          -DPOCO_SANITIZEFLAGS="-fsanitize=undefined;-fno-sanitize=vptr" -DENABLE_TESTS=ON
+          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
+          -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
+          -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
+          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON
+          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
+          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
+          -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
+      - run: cmake --build cmake-build --target all --parallel 4
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            sudo -s
+            PWD=`pwd`
+            ctest -V
+
   macos-clang-cmake-trace:
     runs-on: macos-latest
     steps:
