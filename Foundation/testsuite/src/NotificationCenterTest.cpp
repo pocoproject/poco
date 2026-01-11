@@ -458,7 +458,8 @@ void NotificationCenterTest::testDeadlock()
 	}
 
 	// Test 2: Concurrent access to test for deadlocks
-	NotificationCenter nc;
+	static NotificationCenter nc;
+	nc.clear(); // Ensure clean state for each test run
 	_pNC = &nc;
 	_handlerStarted = false;
 
