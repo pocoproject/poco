@@ -44,6 +44,10 @@ PipeImpl::~PipeImpl()
 
 int PipeImpl::writeBytes(const void* buffer, int length)
 {
+	ScopedIOLock lock(_writeLock);
+	if (!lock)
+		return 0;
+
 	poco_assert (_writefd != -1);
 
 	int n;
@@ -51,7 +55,11 @@ int PipeImpl::writeBytes(const void* buffer, int length)
 	{
 		n = write(_writefd.load(std::memory_order_relaxed), buffer, length);
 	}
-	while (n < 0 && errno == EINTR);
+	while (n < 0 && errno == EINTR && !lock.isClosed());
+
+	if (lock.isClosed())
+		return 0;
+
 	if (n >= 0)
 		return n;
 	else
@@ -61,6 +69,10 @@ int PipeImpl::writeBytes(const void* buffer, int length)
 
 int PipeImpl::readBytes(void* buffer, int length)
 {
+	ScopedIOLock lock(_readLock);
+	if (!lock)
+		return 0;
+
 	poco_assert (_readfd != -1);
 
 	int n;
@@ -68,7 +80,11 @@ int PipeImpl::readBytes(void* buffer, int length)
 	{
 		n = read(_readfd.load(std::memory_order_relaxed), buffer, length);
 	}
-	while (n < 0 && errno == EINTR);
+	while (n < 0 && errno == EINTR && !lock.isClosed());
+
+	if (lock.isClosed())
+		return 0;
+
 	if (n >= 0)
 		return n;
 	else
@@ -90,21 +106,21 @@ PipeImpl::Handle PipeImpl::writeHandle() const
 
 void PipeImpl::closeRead()
 {
+	_readLock.markClosed();
 	int fd = _readfd.exchange(-1, std::memory_order_acq_rel);
 	if (fd != -1)
-	{
 		close(fd);
-	}
+	_readLock.wait();
 }
 
 
 void PipeImpl::closeWrite()
 {
+	_writeLock.markClosed();
 	int fd = _writefd.exchange(-1, std::memory_order_acq_rel);
 	if (fd != -1)
-	{
 		close(fd);
-	}
+	_writeLock.wait();
 }
 
 

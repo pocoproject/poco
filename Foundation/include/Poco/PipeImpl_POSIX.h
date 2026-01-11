@@ -20,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/IOLock.h"
 #include <atomic>
 
 
@@ -45,6 +46,8 @@ public:
 private:
 	std::atomic<int> _readfd{-1};
 	std::atomic<int> _writefd{-1};
+	IOLock _readLock;
+	IOLock _writeLock;
 };
 
 

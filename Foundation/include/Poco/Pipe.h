@@ -20,7 +20,6 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/PipeImpl.h"
-#include <atomic>
 
 
 namespace Poco {
@@ -107,8 +106,6 @@ public:
 
 private:
 	PipeImpl* _pImpl;
-	std::atomic<bool> _readClosed{false};
-	std::atomic<bool> _writeClosed{false};
 };
 
 
@@ -117,16 +114,12 @@ private:
 //
 inline int Pipe::writeBytes(const void* buffer, int length)
 {
-	if (_writeClosed.load(std::memory_order_acquire))
-		return 0;
 	return _pImpl->writeBytes(buffer, length);
 }
 
 
 inline int Pipe::readBytes(void* buffer, int length)
 {
-	if (_readClosed.load(std::memory_order_acquire))
-		return 0;
 	return _pImpl->readBytes(buffer, length);
 }
 

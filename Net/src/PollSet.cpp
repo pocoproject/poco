@@ -15,8 +15,7 @@
 #include "Poco/Net/PollSet.h"
 #include "Poco/Net/SocketImpl.h"
 #include "Poco/Mutex.h"
-#include "Poco/Thread.h"
-#include <atomic>
+#include "Poco/IOLock.h"
 #include <set>
 
 
@@ -87,18 +86,17 @@ public:
 
 	~PollSetImpl()
 	{
-		// Signal shutdown and close fds to wake up epoll_wait().
-		// Then wait for poll() to exit before freeing memory,
-		// since epoll_wait() writes to _events.
-		_closed.store(true, std::memory_order_release);
+		// Signal shutdown, close fds to wake up epoll_wait(), then wait
+		// for poll() to exit before freeing memory (since epoll_wait()
+		// writes to _events).
+		_pollLock.markClosed();
 #ifdef WEPOLL_H_
 		if (_epollfd) close(_epollfd);
 #else
 		if (_eventfd > 0) close(_eventfd.exchange(0));
 		if (_epollfd >= 0) close(_epollfd);
 #endif
-		while (_polling.load(std::memory_order_acquire))
-			Poco::Thread::yield();
+		_pollLock.wait();
 	}
 
 	void add(const Socket& socket, int mode)
@@ -172,46 +170,46 @@ public:
 		Poco::Timespan remainingTime(timeout);
 		int rc;
 
-		if (_closed.load(std::memory_order_acquire))
-			return result;
-		_polling.store(true, std::memory_order_release);
-		while (true)
 		{
-			Poco::Timestamp start;
-			rc = epoll_wait(_epollfd, _events.data(), static_cast<int>(_events.size()), static_cast<int>(remainingTime.totalMilliseconds()));
-			if (rc == 0)
-			{
-				if (!_closed.load(std::memory_order_acquire) && keepWaiting(start, remainingTime)) continue;
-				_polling.store(false, std::memory_order_release);
+			ScopedIOLock pollLock(_pollLock);
+			if (!pollLock)
 				return result;
-			}
 
-			// if we are hitting the events limit, resize it; even without resizing, the subseqent
-			// calls would round-robin through the remaining ready sockets, but it's better to give
-			// the call enough room once we start hitting the boundary
-			if (rc > 0 && static_cast<size_t>(rc) >= _events.size())
+			while (true)
 			{
-				_events.resize(_events.size()*2);
-			}
-			else if (rc < 0)
-			{
-				// if interrupted and there's still time left, keep waiting
-				if (SocketImpl::lastError() == POCO_EINTR)
+				Poco::Timestamp start;
+				rc = epoll_wait(_epollfd, _events.data(), static_cast<int>(_events.size()), static_cast<int>(remainingTime.totalMilliseconds()));
+				if (rc == 0)
 				{
-					if (!_closed.load(std::memory_order_acquire) && keepWaiting(start, remainingTime)) continue;
-				}
-				else if (_closed.load(std::memory_order_acquire))
-				{
-					_polling.store(false, std::memory_order_release);
+					if (!pollLock.isClosed() && keepWaiting(start, remainingTime)) continue;
 					return result;
 				}
-				else SocketImpl::error();
-			}
-			break;
-		}
-		_polling.store(false, std::memory_order_release);
 
-		if (_closed.load(std::memory_order_acquire))
+				// if we are hitting the events limit, resize it; even without resizing, the subseqent
+				// calls would round-robin through the remaining ready sockets, but it's better to give
+				// the call enough room once we start hitting the boundary
+				if (rc > 0 && static_cast<size_t>(rc) >= _events.size())
+				{
+					_events.resize(_events.size()*2);
+				}
+				else if (rc < 0)
+				{
+					// if interrupted and there's still time left, keep waiting
+					if (SocketImpl::lastError() == POCO_EINTR)
+					{
+						if (!pollLock.isClosed() && keepWaiting(start, remainingTime)) continue;
+					}
+					else if (pollLock.isClosed())
+					{
+						return result;
+					}
+					else SocketImpl::error();
+				}
+				break;
+			}
+		}
+
+		if (_pollLock.isClosed())
 			return result;
 
 		ScopedLock lock(_mutex);
@@ -251,7 +249,7 @@ public:
 
 	void wakeUp()
 	{
-		if (_closed.load(std::memory_order_acquire))
+		if (_pollLock.isClosed())
 			return;
 #ifdef WEPOLL_H_
 		char val = 1;
@@ -355,8 +353,7 @@ private:
 	std::vector<struct epoll_event> _events;
 	std::atomic<int> _eventfd;
 	EPollHandle      _epollfd;
-	std::atomic<bool> _closed{false};
-	std::atomic<bool> _polling{false};
+	IOLock          _pollLock;
 };
 
 
@@ -380,13 +377,12 @@ public:
 
 	~PollSetImpl()
 	{
-		// Signal shutdown and close pipe to wake up poll().
-		// Then wait for poll() to exit before freeing memory,
-		// since ::poll() writes to _pollfds.
-		_closed.store(true, std::memory_order_release);
+		// Signal shutdown, close pipe to wake up poll(), then wait
+		// for poll() to exit before freeing memory (since ::poll()
+		// writes to _pollfds).
+		_pollLock.markClosed();
 		try { _pipe.close(); } catch (...) { }
-		while (_polling.load(std::memory_order_acquire))
-			Poco::Thread::yield();
+		_pollLock.wait();
 	}
 
 	void add(const Socket& socket, int mode)
@@ -482,27 +478,30 @@ public:
 
 		Poco::Timespan remainingTime(timeout);
 		int rc;
-		if (_closed.load(std::memory_order_acquire))
-			return result;
-		_polling.store(true, std::memory_order_release);
-		do
-		{
-			Poco::Timestamp start;
-			rc = ::poll(_pollfds.data(), _pollfds.size(), remainingTime.totalMilliseconds());
-			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
-			{
-				Poco::Timestamp end;
-				Poco::Timespan waited = end - start;
-				if (waited < remainingTime)
-					remainingTime -= waited;
-				else
-					remainingTime = 0;
-			}
-		}
-		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !_closed.load(std::memory_order_acquire));
-		_polling.store(false, std::memory_order_release);
 
-		if (_closed.load(std::memory_order_acquire))
+		{
+			ScopedIOLock pollLock(_pollLock);
+			if (!pollLock)
+				return result;
+
+			do
+			{
+				Poco::Timestamp start;
+				rc = ::poll(_pollfds.data(), _pollfds.size(), remainingTime.totalMilliseconds());
+				if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
+				{
+					Poco::Timestamp end;
+					Poco::Timespan waited = end - start;
+					if (waited < remainingTime)
+						remainingTime -= waited;
+					else
+						remainingTime = 0;
+				}
+			}
+			while (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !pollLock.isClosed());
+		}
+
+		if (_pollLock.isClosed())
 			return result;
 
 		if (rc < 0) SocketImpl::error();
@@ -541,7 +540,7 @@ public:
 	void wakeUp()
 	{
 		static const char c = 1;
-		if (_closed.load(std::memory_order_acquire))
+		if (_pollLock.isClosed())
 			return;
 		_pipe.writeBytes(&c, 1);
 	}
@@ -568,8 +567,7 @@ private:
 	std::set<poco_socket_t>         _removeSet;
 	std::vector<pollfd>             _pollfds;
 	Poco::Pipe                      _pipe;
-	std::atomic<bool>               _closed{false};
-	std::atomic<bool>               _polling{false};
+	IOLock                         _pollLock;
 };
 
 
@@ -582,6 +580,13 @@ private:
 class PollSetImpl
 {
 public:
+	~PollSetImpl()
+	{
+		// Wait for poll() to exit before freeing memory.
+		// Note: select() cannot be woken up, so we just wait for timeout.
+		_pollLock.close();
+	}
+
 	void add(const Socket& socket, int mode)
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
@@ -620,6 +625,7 @@ public:
 
 	PollSet::SocketModeMap poll(const Poco::Timespan& timeout)
 	{
+		PollSet::SocketModeMap result;
 		fd_set fdRead;
 		fd_set fdWrite;
 		fd_set fdExcept;
@@ -655,29 +661,39 @@ public:
 			}
 		}
 
-		PollSet::SocketModeMap result;
 		if (nfd == 0) return result;
 
 		Poco::Timespan remainingTime(timeout);
 		int rc;
-		do
+
 		{
-			struct timeval tv;
-			tv.tv_sec  = (long) remainingTime.totalSeconds();
-			tv.tv_usec = (long) remainingTime.useconds();
-			Poco::Timestamp start;
-			rc = ::select(nfd + 1, &fdRead, &fdWrite, &fdExcept, &tv);
-			if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
+			ScopedIOLock pollLock(_pollLock);
+			if (!pollLock)
+				return result;
+
+			do
 			{
-				Poco::Timestamp end;
-				Poco::Timespan waited = end - start;
-				if (waited < remainingTime)
-					remainingTime -= waited;
-				else
-					remainingTime = 0;
+				struct timeval tv;
+				tv.tv_sec  = (long) remainingTime.totalSeconds();
+				tv.tv_usec = (long) remainingTime.useconds();
+				Poco::Timestamp start;
+				rc = ::select(nfd + 1, &fdRead, &fdWrite, &fdExcept, &tv);
+				if (rc < 0 && SocketImpl::lastError() == POCO_EINTR)
+				{
+					Poco::Timestamp end;
+					Poco::Timespan waited = end - start;
+					if (waited < remainingTime)
+						remainingTime -= waited;
+					else
+						remainingTime = 0;
+				}
 			}
+			while (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !pollLock.isClosed());
 		}
-		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
+
+		if (_pollLock.isClosed())
+			return result;
+
 		if (rc < 0) SocketImpl::error();
 
 		{
@@ -721,6 +737,7 @@ public:
 private:
 	mutable Poco::FastMutex _mutex;
 	PollSet::SocketModeMap  _map;
+	IOLock                  _pollLock;
 };
 
 
