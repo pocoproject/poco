@@ -15,6 +15,7 @@
 #include "Poco/Net/PollSet.h"
 #include "Poco/Net/SocketImpl.h"
 #include "Poco/Mutex.h"
+#include "Poco/Thread.h"
 #include <atomic>
 #include <set>
 
@@ -365,8 +366,13 @@ public:
 
 	~PollSetImpl()
 	{
+		// Signal shutdown and close pipe to wake up poll().
+		// Then wait for poll() to exit before freeing memory,
+		// since ::poll() writes to _pollfds.
 		_closed.store(true, std::memory_order_release);
 		try { _pipe.close(); } catch (...) { }
+		while (_polling.load(std::memory_order_acquire))
+			Poco::Thread::yield();
 	}
 
 	void add(const Socket& socket, int mode)
@@ -462,6 +468,9 @@ public:
 
 		Poco::Timespan remainingTime(timeout);
 		int rc;
+		if (_closed.load(std::memory_order_acquire))
+			return result;
+		_polling.store(true, std::memory_order_release);
 		do
 		{
 			Poco::Timestamp start;
@@ -476,7 +485,8 @@ public:
 					remainingTime = 0;
 			}
 		}
-		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR);
+		while (rc < 0 && SocketImpl::lastError() == POCO_EINTR && !_closed.load(std::memory_order_acquire));
+		_polling.store(false, std::memory_order_release);
 
 		if (_closed.load(std::memory_order_acquire))
 			return result;
@@ -545,6 +555,7 @@ private:
 	std::vector<pollfd>             _pollfds;
 	Poco::Pipe                      _pipe;
 	std::atomic<bool>               _closed{false};
+	std::atomic<bool>               _polling{false};
 };
 
 
