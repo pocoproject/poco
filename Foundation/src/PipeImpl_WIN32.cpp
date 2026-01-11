@@ -26,8 +26,11 @@ PipeImpl::PipeImpl()
 	attr.lpSecurityDescriptor = nullptr;
 	attr.bInheritHandle       = FALSE;
 
-	if (!CreatePipe(&_readHandle, &_writeHandle, &attr, 0))
+	HANDLE readHandle, writeHandle;
+	if (!CreatePipe(&readHandle, &writeHandle, &attr, 0))
 		throw CreateFileException("anonymous pipe");
+	_readHandle.store(readHandle, std::memory_order_relaxed);
+	_writeHandle.store(writeHandle, std::memory_order_relaxed);
 }
 
 
@@ -43,7 +46,7 @@ int PipeImpl::writeBytes(const void* buffer, int length)
 	poco_assert (_writeHandle != INVALID_HANDLE_VALUE);
 
 	DWORD bytesWritten = 0;
-	if (!WriteFile(_writeHandle, buffer, length, &bytesWritten, nullptr))
+	if (!WriteFile(_writeHandle.load(std::memory_order_relaxed), buffer, length, &bytesWritten, nullptr))
 		throw WriteFileException("anonymous pipe");
 	return bytesWritten;
 }
@@ -54,7 +57,7 @@ int PipeImpl::readBytes(void* buffer, int length)
 	poco_assert (_readHandle != INVALID_HANDLE_VALUE);
 
 	DWORD bytesRead = 0;
-	BOOL ok = ReadFile(_readHandle, buffer, length, &bytesRead, nullptr);
+	BOOL ok = ReadFile(_readHandle.load(std::memory_order_relaxed), buffer, length, &bytesRead, nullptr);
 	if (ok || GetLastError() == ERROR_BROKEN_PIPE)
 		return bytesRead;
 	else
@@ -64,32 +67,32 @@ int PipeImpl::readBytes(void* buffer, int length)
 
 PipeImpl::Handle PipeImpl::readHandle() const
 {
-	return _readHandle;
+	return _readHandle.load(std::memory_order_relaxed);
 }
 
 
 PipeImpl::Handle PipeImpl::writeHandle() const
 {
-	return _writeHandle;
+	return _writeHandle.load(std::memory_order_relaxed);
 }
 
 
 void PipeImpl::closeRead()
 {
-	if (_readHandle != INVALID_HANDLE_VALUE)
+	HANDLE handle = _readHandle.exchange(INVALID_HANDLE_VALUE, std::memory_order_acq_rel);
+	if (handle != INVALID_HANDLE_VALUE)
 	{
-		CloseHandle(_readHandle);
-		_readHandle = INVALID_HANDLE_VALUE;
+		CloseHandle(handle);
 	}
 }
 
 
 void PipeImpl::closeWrite()
 {
-	if (_writeHandle != INVALID_HANDLE_VALUE)
+	HANDLE handle = _writeHandle.exchange(INVALID_HANDLE_VALUE, std::memory_order_acq_rel);
+	if (handle != INVALID_HANDLE_VALUE)
 	{
-		CloseHandle(_writeHandle);
-		_writeHandle = INVALID_HANDLE_VALUE;
+		CloseHandle(handle);
 	}
 }
 

@@ -15,6 +15,7 @@
 #include "Poco/Net/PollSet.h"
 #include "Poco/Net/SocketImpl.h"
 #include "Poco/Mutex.h"
+#include <atomic>
 #include <set>
 
 
@@ -355,6 +356,7 @@ public:
 
 	~PollSetImpl()
 	{
+		_closed.store(true, std::memory_order_release);
 		_pipe.close();
 	}
 
@@ -501,6 +503,8 @@ public:
 
 	void wakeUp()
 	{
+		if (_closed.load(std::memory_order_acquire))
+			return;
 		char c = 1;
 		_pipe.writeBytes(&c, 1);
 	}
@@ -527,6 +531,7 @@ private:
 	std::set<poco_socket_t>         _removeSet;
 	std::vector<pollfd>             _pollfds;
 	Poco::Pipe                      _pipe;
+	std::atomic<bool>               _closed{false};
 };
 
 

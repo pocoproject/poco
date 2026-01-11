@@ -20,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/RefCountedObject.h"
+#include <atomic>
 
 
 namespace Poco {
@@ -42,8 +43,8 @@ public:
 	void closeWrite();
 
 private:
-	int _readfd;
-	int _writefd;
+	std::atomic<int> _readfd{-1};
+	std::atomic<int> _writefd{-1};
 };
 
 

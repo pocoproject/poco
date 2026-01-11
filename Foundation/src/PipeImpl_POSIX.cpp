@@ -28,8 +28,8 @@ PipeImpl::PipeImpl()
 	int rc = pipe(fds);
 	if (rc == 0)
 	{
-		_readfd  = fds[0];
-		_writefd = fds[1];
+		_readfd.store(fds[0], std::memory_order_relaxed);
+		_writefd.store(fds[1], std::memory_order_relaxed);
 	}
 	else throw CreateFileException("anonymous pipe");
 }
@@ -49,7 +49,7 @@ int PipeImpl::writeBytes(const void* buffer, int length)
 	int n;
 	do
 	{
-		n = write(_writefd, buffer, length);
+		n = write(_writefd.load(std::memory_order_relaxed), buffer, length);
 	}
 	while (n < 0 && errno == EINTR);
 	if (n >= 0)
@@ -66,7 +66,7 @@ int PipeImpl::readBytes(void* buffer, int length)
 	int n;
 	do
 	{
-		n = read(_readfd, buffer, length);
+		n = read(_readfd.load(std::memory_order_relaxed), buffer, length);
 	}
 	while (n < 0 && errno == EINTR);
 	if (n >= 0)
@@ -78,32 +78,32 @@ int PipeImpl::readBytes(void* buffer, int length)
 
 PipeImpl::Handle PipeImpl::readHandle() const
 {
-	return _readfd;
+	return _readfd.load(std::memory_order_relaxed);
 }
 
 
 PipeImpl::Handle PipeImpl::writeHandle() const
 {
-	return _writefd;
+	return _writefd.load(std::memory_order_relaxed);
 }
 
 
 void PipeImpl::closeRead()
 {
-	if (_readfd != -1)
+	int fd = _readfd.exchange(-1, std::memory_order_acq_rel);
+	if (fd != -1)
 	{
-		close(_readfd);
-		_readfd = -1;
+		close(fd);
 	}
 }
 
 
 void PipeImpl::closeWrite()
 {
-	if (_writefd != -1)
+	int fd = _writefd.exchange(-1, std::memory_order_acq_rel);
+	if (fd != -1)
 	{
-		close(_writefd);
-		_writefd = -1;
+		close(fd);
 	}
 }
 

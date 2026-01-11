@@ -25,7 +25,9 @@ Pipe::Pipe():
 
 
 Pipe::Pipe(const Pipe& pipe):
-	_pImpl(pipe._pImpl)
+	_pImpl(pipe._pImpl),
+	_readClosed(pipe._readClosed.load(std::memory_order_acquire)),
+	_writeClosed(pipe._writeClosed.load(std::memory_order_acquire))
 {
 	_pImpl->duplicate();
 }
@@ -44,6 +46,8 @@ Pipe& Pipe::operator = (const Pipe& pipe)
 		_pImpl->release();
 		_pImpl = pipe._pImpl;
 		_pImpl->duplicate();
+		_readClosed.store(pipe._readClosed.load(std::memory_order_acquire), std::memory_order_release);
+		_writeClosed.store(pipe._writeClosed.load(std::memory_order_acquire), std::memory_order_release);
 	}
 	return *this;
 }
@@ -54,12 +58,16 @@ void Pipe::close(CloseMode mode)
 	switch (mode)
 	{
 	case CLOSE_READ:
+		_readClosed.store(true, std::memory_order_release);
 		_pImpl->closeRead();
 		break;
 	case CLOSE_WRITE:
+		_writeClosed.store(true, std::memory_order_release);
 		_pImpl->closeWrite();
 		break;
 	default:
+		_readClosed.store(true, std::memory_order_release);
+		_writeClosed.store(true, std::memory_order_release);
 		_pImpl->closeRead();
 		_pImpl->closeWrite();
 		break;
