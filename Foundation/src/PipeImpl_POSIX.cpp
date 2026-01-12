@@ -107,20 +107,20 @@ PipeImpl::Handle PipeImpl::writeHandle() const
 void PipeImpl::closeRead()
 {
 	_readLock.markClosed();
+	_readLock.wait();  // wait for any in-progress read to finish
 	int fd = _readfd.exchange(-1, std::memory_order_acq_rel);
 	if (fd != -1)
 		close(fd);
-	_readLock.wait();
 }
 
 
 void PipeImpl::closeWrite()
 {
 	_writeLock.markClosed();
+	_writeLock.wait();  // wait for any in-progress write to finish
 	int fd = _writefd.exchange(-1, std::memory_order_acq_rel);
 	if (fd != -1)
 		close(fd);
-	_writeLock.wait();
 }
 
 

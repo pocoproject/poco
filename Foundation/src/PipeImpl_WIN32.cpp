@@ -36,8 +36,8 @@ PipeImpl::PipeImpl()
 
 PipeImpl::~PipeImpl()
 {
+	closeWrite();  // close write first to send EOF to blocked readers
 	closeRead();
-	closeWrite();
 }
 
 
@@ -98,20 +98,20 @@ PipeImpl::Handle PipeImpl::writeHandle() const
 void PipeImpl::closeRead()
 {
 	_readLock.markClosed();
+	_readLock.wait();  // wait for any in-progress read to finish
 	HANDLE handle = _readHandle.exchange(INVALID_HANDLE_VALUE, std::memory_order_acq_rel);
 	if (handle != INVALID_HANDLE_VALUE)
 		CloseHandle(handle);
-	_readLock.wait();
 }
 
 
 void PipeImpl::closeWrite()
 {
 	_writeLock.markClosed();
+	_writeLock.wait();  // wait for any in-progress write to finish
 	HANDLE handle = _writeHandle.exchange(INVALID_HANDLE_VALUE, std::memory_order_acq_rel);
 	if (handle != INVALID_HANDLE_VALUE)
 		CloseHandle(handle);
-	_writeLock.wait();
 }
 
 
