@@ -110,6 +110,7 @@ void PipeTest::testCloseWrite()
 
 void PipeTest::testCopy()
 {
+	std::cerr << "  testCopy: start" << std::endl;
 	Pipe pipe1;
 	Pipe pipe2(pipe1);
 
@@ -117,14 +118,17 @@ void PipeTest::testCopy()
 	int len = static_cast<int>(std::strlen(data));
 
 	// Write through pipe1
+	std::cerr << "  testCopy: write" << std::endl;
 	int written = pipe1.writeBytes(data, len);
 	assertEqual(len, written);
 
 	// Read through pipe2 (same underlying pipe)
+	std::cerr << "  testCopy: read" << std::endl;
 	char buffer[64] = {0};
 	int read = pipe2.readBytes(buffer, sizeof(buffer));
 	assertEqual(len, read);
 	assertEqual(std::string(data), std::string(buffer, read));
+	std::cerr << "  testCopy: done" << std::endl;
 }
 
 
@@ -163,17 +167,17 @@ namespace
 
 void PipeTest::testCloseRace()
 {
+	std::cerr << "  testCloseRace: start" << std::endl;
 	// Test concurrent close and read - this should not crash or hang
 	for (int i = 0; i < 100; ++i)
 	{
-		std::cerr << "  iteration " << i << ": create" << std::flush;
+		std::cerr << "  testCloseRace: iteration " << i << std::endl;
 		Pipe pipe;
 		std::atomic<int> readCount{0};
 		std::atomic<bool> stop{false};
 
 		PipeReader reader(pipe, readCount, stop);
 		Thread readerThread;
-		std::cerr << " start" << std::flush;
 		readerThread.start(reader);
 
 		// Write some data
@@ -185,14 +189,12 @@ void PipeTest::testCloseRace()
 		Thread::sleep(1);
 
 		// Close the pipe while reader might be reading
-		std::cerr << " close" << std::flush;
 		pipe.close();
 
 		// Wait for reader to finish
-		std::cerr << " join" << std::flush;
 		readerThread.join();
-		std::cerr << " done" << std::endl;
 	}
+	std::cerr << "  testCloseRace: done" << std::endl;
 }
 
 
@@ -214,8 +216,8 @@ CppUnit::Test* PipeTest::suite()
 	CppUnit_addTest(pSuite, PipeTest, testClose);
 	CppUnit_addTest(pSuite, PipeTest, testCloseRead);
 	CppUnit_addTest(pSuite, PipeTest, testCloseWrite);
-	//CppUnit_addTest(pSuite, PipeTest, testCopy);
-	//CppUnit_addTest(pSuite, PipeTest, testCloseRace);
+	CppUnit_addTest(pSuite, PipeTest, testCopy);
+	CppUnit_addTest(pSuite, PipeTest, testCloseRace);
 
 	return pSuite;
 }
