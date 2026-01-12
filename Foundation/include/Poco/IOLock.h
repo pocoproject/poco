@@ -7,7 +7,7 @@
 //
 // Definition of the IOLock class.
 //
-// Copyright (c) 2004-2008, Applied Informatics Software Engineering GmbH.,
+// Copyright (c) 2026, Applied Informatics Software Engineering GmbH.,
 // Aleph ONE Software Engineering LLC,
 // and Contributors.
 //
@@ -84,10 +84,11 @@ public:
 
 	void wait();
 		/// Waits for any in-progress IO operation to complete.
+		/// Uses atomic wait if available, otherwise busy-waits.
 		/// Call after markClosed() and after closing the resource.
 
 	bool tryWait(int milliseconds);
-		/// Waits for any in-progress IO operation to complete,
+		/// Busy-waits for any in-progress IO operation to complete,
 		/// up to the specified timeout.
 		/// Returns true if no IO is in progress, false if timed out.
 
@@ -181,12 +182,6 @@ private:
 //
 // inlines
 //
-
-inline void IOLock::leave()
-{
-	_inProgress.store(false);
-}
-
 
 inline bool IOLock::isClosed() const
 {

@@ -5,7 +5,7 @@
 // Package: Threading
 // Module:  IOLock
 //
-// Copyright (c) 2004-2008, Applied Informatics Software Engineering GmbH.,
+// Copyright (c) 2026, Applied Informatics Software Engineering GmbH.,
 // Aleph ONE Software Engineering LLC,
 // and Contributors.
 //
@@ -26,10 +26,22 @@ bool IOLock::enter()
 	_inProgress.store(true);
 	if (_closed.load())
 	{
-		_inProgress.store(false);
+		_inProgress.store(false, std::memory_order_release);
+#ifdef POCO_HAVE_ATOMIC_WAIT
+		_inProgress.notify_one();
+#endif
 		return false;
 	}
 	return true;
+}
+
+
+void IOLock::leave()
+{
+	_inProgress.store(false, std::memory_order_release);
+#ifdef POCO_HAVE_ATOMIC_WAIT
+	_inProgress.notify_one();
+#endif
 }
 
 
@@ -48,15 +60,22 @@ void IOLock::markClosed()
 
 void IOLock::wait()
 {
+#ifdef POCO_HAVE_ATOMIC_WAIT
+	auto old = _inProgress.load(std::memory_order_acquire);
+	// spurious wakeups possible, hence the loop
+	while (_inProgress.load(std::memory_order_acquire))
+		_inProgress.wait(old, std::memory_order_relaxed);
+#else
 	while (_inProgress.load())
 		std::this_thread::sleep_for(std::chrono::microseconds(10));
+#endif // POCO_HAVE_ATOMIC_WAIT
 }
 
 
 bool IOLock::tryWait(int milliseconds)
 {
 	auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(milliseconds);
-	while (_inProgress.load())
+	while (_inProgress.load(std::memory_order_acquire))
 	{
 		if (std::chrono::steady_clock::now() >= deadline)
 			return false;
