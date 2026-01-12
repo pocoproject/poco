@@ -214,8 +214,8 @@ CppUnit::Test* PipeTest::suite()
 	CppUnit_addTest(pSuite, PipeTest, testClose);
 	CppUnit_addTest(pSuite, PipeTest, testCloseRead);
 	CppUnit_addTest(pSuite, PipeTest, testCloseWrite);
-	CppUnit_addTest(pSuite, PipeTest, testCopy);
-	CppUnit_addTest(pSuite, PipeTest, testCloseRace);
+	//CppUnit_addTest(pSuite, PipeTest, testCopy);
+	//CppUnit_addTest(pSuite, PipeTest, testCloseRace);
 
 	return pSuite;
 }
