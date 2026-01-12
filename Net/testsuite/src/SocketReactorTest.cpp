@@ -28,6 +28,7 @@
 
 
 using Poco::Net::SocketReactor;
+using Poco::Net::ScopedSocketReactor;
 using Poco::Net::SocketConnector;
 using Poco::Net::SocketAcceptor;
 using Poco::Net::ParallelSocketAcceptor;
@@ -803,9 +804,7 @@ void SocketReactorTest::testConcurrentHandlerRemoval()
 
 	SocketAddress ssa;
 	ServerSocket ss(ssa);
-	SocketReactor reactor;
-	Thread thread;
-	thread.start(reactor);
+	ScopedSocketReactor reactor;
 
 	SocketAddress sa("127.0.0.1", ss.address().port());
 	std::vector<StreamSocket> sockets;
@@ -825,70 +824,69 @@ void SocketReactorTest::testConcurrentHandlerRemoval()
 	// Create handlers for all sockets
 	for (auto& sock : accepted)
 	{
-		handlers.push_back(new ConcurrentRemovalHandler(sock, reactor, callCount));
+		handlers.push_back(new ConcurrentRemovalHandler(sock, *reactor, callCount));
 	}
 
 	// Thread that continuously adds/removes handlers
 	std::atomic<bool> stop(false);
+	std::atomic<int> completedIterations(0);
+	const int targetIterations = 20;
+
 	Thread modifyThread;
 	modifyThread.startFunc([&]() {
-		int iterations = 0;
-		while (!stop && iterations++ < 20)
+		for (int i = 0; i < targetIterations && !stop; ++i)
 		{
 			// Try to add/remove handlers concurrently with notifications
 			for (auto& sock : accepted)
 			{
+				if (stop) break;
 				NObserver<SocketReactorTest, ReadableNotification> obs(*this, &SocketReactorTest::onReadable);
 				try {
-					reactor.addEventHandler(sock, obs);
+					reactor->addEventHandler(sock, obs);
 					Thread::sleep(10);
-					reactor.removeEventHandler(sock, obs);
+					reactor->removeEventHandler(sock, obs);
 				} catch (...) {
 					// Socket might be removed by handler, that's okay
 				}
 			}
-			Thread::sleep(50);
+			++completedIterations;
 		}
 	});
 
-	// Send data to trigger notifications
-	for (int i = 0; i < 5; ++i)
+	// Send data to trigger notifications while polling for completion
+	auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(10);
+	int dataSent = 0;
+
+	while (completedIterations < targetIterations)
 	{
-		for (auto& sock : sockets)
+		if (std::chrono::steady_clock::now() >= deadline)
+			break;
+
+		// Send some data to trigger notifications
+		if (dataSent < 5)
 		{
-			std::string data = "test";
-			try {
-				sock.sendBytes(data.data(), (int)data.size());
-			} catch (...) {}
+			for (auto& sock : sockets)
+			{
+				std::string data = "test";
+				try {
+					sock.sendBytes(data.data(), (int)data.size());
+				} catch (...) {}
+			}
+			++dataSent;
 		}
 		Thread::sleep(50);
 	}
 
-	// Wait for test to complete with timeout
-	auto startTime = std::chrono::steady_clock::now();
-	const auto timeout = std::chrono::seconds(10);
-	bool timedOut = false;
-
-	while (modifyThread.isRunning())
-	{
-		Thread::sleep(100);
-		auto elapsed = std::chrono::steady_clock::now() - startTime;
-		if (elapsed > timeout)
-		{
-			timedOut = true;
-			break;
-		}
-	}
+	bool timedOut = (completedIterations < targetIterations);
 
 	// Always cleanup - must happen before fail() which throws
 	stop = true;
 	modifyThread.join();
 
-	reactor.stop();
-	thread.join();
-
 	for (auto* handler : handlers)
 		delete handler;
+
+	// ScopedSocketReactor automatically stops and joins on destruction
 
 	if (timedOut)
 		failmsg("Deadlock detected: concurrent handler removal test timed out");
