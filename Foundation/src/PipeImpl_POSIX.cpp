@@ -37,8 +37,8 @@ PipeImpl::PipeImpl()
 
 PipeImpl::~PipeImpl()
 {
+	closeWrite();  // close write first to send EOF to blocked readers
 	closeRead();
-	closeWrite();
 }
 
 

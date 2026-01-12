@@ -16,7 +16,6 @@
 #include "Poco/Runnable.h"
 #include <atomic>
 #include <cstring>
-#include <iostream>
 
 
 using Poco::Pipe;
@@ -110,7 +109,6 @@ void PipeTest::testCloseWrite()
 
 void PipeTest::testCopy()
 {
-	std::cerr << "  testCopy: start" << std::endl;
 	Pipe pipe1;
 	Pipe pipe2(pipe1);
 
@@ -118,17 +116,14 @@ void PipeTest::testCopy()
 	int len = static_cast<int>(std::strlen(data));
 
 	// Write through pipe1
-	std::cerr << "  testCopy: write" << std::endl;
 	int written = pipe1.writeBytes(data, len);
 	assertEqual(len, written);
 
 	// Read through pipe2 (same underlying pipe)
-	std::cerr << "  testCopy: read" << std::endl;
 	char buffer[64] = {0};
 	int read = pipe2.readBytes(buffer, sizeof(buffer));
 	assertEqual(len, read);
 	assertEqual(std::string(data), std::string(buffer, read));
-	std::cerr << "  testCopy: done" << std::endl;
 }
 
 
@@ -167,11 +162,9 @@ namespace
 
 void PipeTest::testCloseRace()
 {
-	std::cerr << "  testCloseRace: start" << std::endl;
 	// Test concurrent close and read - this should not crash or hang
 	for (int i = 0; i < 100; ++i)
 	{
-		std::cerr << "  testCloseRace: iteration " << i << std::endl;
 		Pipe pipe;
 		std::atomic<int> readCount{0};
 		std::atomic<bool> stop{false};
@@ -194,7 +187,6 @@ void PipeTest::testCloseRace()
 		// Wait for reader to finish
 		readerThread.join();
 	}
-	std::cerr << "  testCloseRace: done" << std::endl;
 }
 
 
