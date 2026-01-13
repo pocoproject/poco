@@ -37,6 +37,8 @@ public:
 	void testNullable();
 	void testAscii();
 	void testSrcLoc();
+	void testDemangle();
+	void testDemangleDot();
 
 	void setUp();
 	void tearDown();

@@ -118,6 +118,43 @@ std::string demangle(const T& t)
 }
 
 
+inline std::string Foundation_API demangleDot(const std::string& name)
+	/// Replaces :: with . in a demangled type name.
+{
+	std::string result;
+	result.reserve(name.size());
+	for (std::size_t i = 0; i < name.size(); ++i)
+	{
+		if (name[i] == ':' && i + 1 < name.size() && name[i + 1] == ':')
+		{
+			result += '.';
+			++i; // skip next ':'
+		}
+		else
+		{
+			result += name[i];
+		}
+	}
+	return result;
+}
+
+
+template <typename T>
+std::string demangleDot()
+	/// Returns demangled type name with :: replaced by .
+{
+	return demangleDot(demangle<T>());
+}
+
+
+template <typename T>
+std::string demangleDot(const T& t)
+	/// Returns demangled type name with :: replaced by .
+{
+	return demangleDot(demangle(t));
+}
+
+
 } // namespace Poco
 
 

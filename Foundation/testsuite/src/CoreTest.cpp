@@ -24,6 +24,7 @@
 #include "Poco/BasicEvent.h"
 #include "Poco/Delegate.h"
 #include "Poco/Debugger.h"
+#include "Poco/Types.h"
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -1164,6 +1165,44 @@ void CoreTest::testSrcLoc()
 }
 
 
+void CoreTest::testDemangle()
+{
+#if defined(POCO_HAVE_CXXABI_H) || defined(_MSC_VER)
+	// Test demangle with template type
+	std::string name = Poco::demangle<int>();
+	assertEqual ("int", name);
+
+	// Test demangle with const char* (typeid name)
+	std::string intName = Poco::demangle(typeid(int).name());
+	assertEqual ("int", intName);
+
+	// Test demangle with instance
+	int value = 42;
+	std::string instanceName = Poco::demangle(value);
+	assertEqual ("int", instanceName);
+
+	// Test demangle with nested namespace type
+	std::string nestedName = Poco::demangle<Poco::AtomicCounter>();
+	assertEqual ("Poco::AtomicCounter", nestedName);
+#endif
+}
+
+
+void CoreTest::testDemangleDot()
+{
+#if defined(POCO_HAVE_CXXABI_H) || defined(_MSC_VER)
+	// Test demangleDot with template type
+	std::string typeName = Poco::demangleDot<Poco::AtomicCounter>();
+	assertEqual ("Poco.AtomicCounter", typeName);
+
+	// Test demangleDot with instance
+	Poco::AtomicCounter ac;
+	std::string instanceName = Poco::demangleDot(ac);
+	assertEqual ("Poco.AtomicCounter", instanceName);
+#endif
+}
+
+
 void CoreTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -1208,6 +1247,8 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
 	CppUnit_addTest(pSuite, CoreTest, testAscii);
 	CppUnit_addTest(pSuite, CoreTest, testSrcLoc);
+	CppUnit_addTest(pSuite, CoreTest, testDemangle);
+	CppUnit_addTest(pSuite, CoreTest, testDemangleDot);
 
 	return pSuite;
 }
