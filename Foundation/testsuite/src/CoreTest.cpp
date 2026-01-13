@@ -107,6 +107,20 @@ struct Large
 };
 
 
+enum TestEnum
+{
+	TEST_VALUE_ONE,
+	TEST_VALUE_TWO
+};
+
+
+union TestUnion
+{
+	int intVal;
+	float floatVal;
+};
+
+
 //
 // The bugcheck test is normally disabled, as it
 // causes a break into the debugger.
@@ -1181,9 +1195,25 @@ void CoreTest::testDemangle()
 	std::string instanceName = Poco::demangle(value);
 	assertEqual ("int", instanceName);
 
-	// Test demangle with nested namespace type
+	// Test demangle with nested namespace type (class)
+	// MSVC returns "class Poco::AtomicCounter" - prefix should be stripped
 	std::string nestedName = Poco::demangle<Poco::AtomicCounter>();
 	assertEqual ("Poco::AtomicCounter", nestedName);
+
+	// Test demangle with struct type
+	// MSVC returns "struct Parent" - prefix should be stripped
+	std::string structName = Poco::demangle<Parent>();
+	assertEqual ("Parent", structName);
+
+	// Test demangle with enum type
+	// MSVC returns "enum TestEnum" - prefix should be stripped
+	std::string enumName = Poco::demangle<TestEnum>();
+	assertEqual ("TestEnum", enumName);
+
+	// Test demangle with union type
+	// MSVC returns "union TestUnion" - prefix should be stripped
+	std::string unionName = Poco::demangle<TestUnion>();
+	assertEqual ("TestUnion", unionName);
 #endif
 }
 
