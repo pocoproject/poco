@@ -153,16 +153,18 @@ inline std::string Foundation_API demangleDot(const std::string& name)
 {
 	std::string result;
 	result.reserve(name.size());
-	for (std::size_t i = 0; i < name.size(); ++i)
+	std::size_t i = 0;
+	while (i < name.size())
 	{
 		if (name[i] == ':' && i + 1 < name.size() && name[i + 1] == ':')
 		{
 			result += '.';
-			++i; // skip next ':'
+			i += 2; // skip both ':' characters
 		}
 		else
 		{
 			result += name[i];
+			++i;
 		}
 	}
 	return result;
