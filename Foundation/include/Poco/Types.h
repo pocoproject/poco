@@ -21,11 +21,11 @@
 #include "Poco/Foundation.h"
 #include <cstdint>
 #include <type_traits>
+#include <typeinfo>
+#include <cstdlib>
 
 #if defined(POCO_HAVE_CXXABI_H)
-	#include <typeinfo>
 	#include <cxxabi.h>
-	#include <cstdlib>
 #endif
 
 namespace Poco {
