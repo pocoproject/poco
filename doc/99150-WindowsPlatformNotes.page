@@ -3,18 +3,14 @@ AAAIntroduction
 
 !!!Introduction
 
-The Windows versions of the POCO C++ Libraries are built with Visual Studio.
+The Windows versions of the POCO C++ Libraries are built with CMake and Visual Studio.
 Basic support for building with MinGW is there as well, but at this time
 is not officially supported and may or may not work.
 
-Starting with release 1.10.0 the POCO C++ Libraries support new
-build configurations in the solution files for Visual Studio 2015 and newer,
-for building Win32 (32-bit) and x64 (64-bit) variants.
-
 The following build configurations are available:
-  * debug_shared, release_shared: dynamic link libraries (DLL) and dynamically linked executables, with DLL C/C++ runtime libraries.
-  * debug_static_md, release_static_md: static libraries and statically linked executables with DLL C/C++ runtime libraries.
-  * debug_static_mt, release_static_mt: static libraries and statically linked executables with static runtime libraries.
+  * Debug/Release with BUILD_SHARED_LIBS=ON: dynamic link libraries (DLL) with DLL C/C++ runtime libraries (/MD).
+  * Debug/Release with BUILD_SHARED_LIBS=OFF: static libraries with DLL C/C++ runtime libraries (/MD).
+  * Debug/Release with BUILD_SHARED_LIBS=OFF and POCO_MT=ON: static libraries with static C/C++ runtime libraries (/MT).
 
 
 !!!Libraries And Linking Considerations
@@ -27,7 +23,8 @@ a few rules must be kept in mind.
 
   * The default is to link the POCO C++ Libraries dynamically (DLL).
   * To link statically, the code using the POCO C++ Libraries must be compiled
-    with the preprocessor symbol <[POCO_STATIC]> defined.
+    with the preprocessor symbol <[POCO_STATIC]> defined. CMake sets this automatically
+    when building with BUILD_SHARED_LIBS=OFF.
 
 
 !!Library Naming Conventions
@@ -41,17 +38,17 @@ The following naming conventions are used:
   * Static libraries built using the DLL C/C++ runtime libraries are
     named PocoLIBmd.lib (release) and PocoLIBmdd.lib (debug).
 
-32-bit libraries are placed in the <*lib*> directory. 64-bit libraries
-are placed in the <*lib64*> directory. DLLs are placed in <*bin*> (32-bit)
-or <*bin64*> (64-bit). 64-bit DLLs are named PocoLIB64.dll for release
-and PocoLIB64d.dll for debug, respectively.
+With CMake, libraries and executables are placed in the build directory.
+The exact location depends on the generator and configuration used.
 
 
 !!MSVC Compiler Notes
 
-!!!C++ standard version not properly defined
+!!!C++ standard version
 
-In order to work around that, `/Zc:__cplusplus` compiler flag is necesary.
+MSVC does not correctly report the C++ standard version via the `__cplusplus` macro by default.
+The `/Zc:__cplusplus` compiler flag is required to fix this. CMake sets this flag automatically
+when building the POCO C++ Libraries.
 
 See the following issues for details and explanations:
 
