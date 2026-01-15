@@ -226,4 +226,14 @@
 	#define POCO_ENABLE_FASTLOGGER
 #endif
 
+#if defined(__APPLE__) && __has_include(<Availability.h>)
+	#include <Availability.h>
+	#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 110000
+		 #define POCO_HAVE_ATOMIC_WAIT 1
+	#endif
+#elif defined(__cpp_lib_atomic_wait)
+	// Standard feature test macro (C++20)
+	#define POCO_HAVE_ATOMIC_WAIT 1
+#endif
+
 #endif // Foundation_Config_INCLUDED

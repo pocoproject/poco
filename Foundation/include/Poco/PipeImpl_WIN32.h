@@ -20,7 +20,9 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/RefCountedObject.h"
+#include "Poco/IOLock.h"
 #include "Poco/UnWindows.h"
+#include <atomic>
 
 
 namespace Poco {
@@ -43,8 +45,10 @@ public:
 	void closeWrite();
 
 private:
-	HANDLE _readHandle;
-	HANDLE _writeHandle;
+	std::atomic<HANDLE> _readHandle{INVALID_HANDLE_VALUE};
+	std::atomic<HANDLE> _writeHandle{INVALID_HANDLE_VALUE};
+	IOLock _readLock;
+	IOLock _writeLock;
 };
 
 

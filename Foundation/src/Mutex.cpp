@@ -194,4 +194,5 @@ bool SpinlockMutex::tryLock(long milliseconds)
 	return false;
 }
 
+
 } // namespace Poco

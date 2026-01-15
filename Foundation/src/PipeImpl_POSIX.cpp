@@ -28,8 +28,8 @@ PipeImpl::PipeImpl()
 	int rc = pipe(fds);
 	if (rc == 0)
 	{
-		_readfd  = fds[0];
-		_writefd = fds[1];
+		_readfd.store(fds[0], std::memory_order_relaxed);
+		_writefd.store(fds[1], std::memory_order_relaxed);
 	}
 	else throw CreateFileException("anonymous pipe");
 }
@@ -37,21 +37,29 @@ PipeImpl::PipeImpl()
 
 PipeImpl::~PipeImpl()
 {
+	closeWrite();  // close write first to send EOF to blocked readers
 	closeRead();
-	closeWrite();
 }
 
 
 int PipeImpl::writeBytes(const void* buffer, int length)
 {
+	ScopedIOLock lock(_writeLock);
+	if (!lock)
+		return 0;
+
 	poco_assert (_writefd != -1);
 
 	int n;
 	do
 	{
-		n = write(_writefd, buffer, length);
+		n = write(_writefd.load(std::memory_order_relaxed), buffer, length);
 	}
-	while (n < 0 && errno == EINTR);
+	while (n < 0 && errno == EINTR && !lock.isClosed());
+
+	if (lock.isClosed())
+		return 0;
+
 	if (n >= 0)
 		return n;
 	else
@@ -61,14 +69,22 @@ int PipeImpl::writeBytes(const void* buffer, int length)
 
 int PipeImpl::readBytes(void* buffer, int length)
 {
+	ScopedIOLock lock(_readLock);
+	if (!lock)
+		return 0;
+
 	poco_assert (_readfd != -1);
 
 	int n;
 	do
 	{
-		n = read(_readfd, buffer, length);
+		n = read(_readfd.load(std::memory_order_relaxed), buffer, length);
 	}
-	while (n < 0 && errno == EINTR);
+	while (n < 0 && errno == EINTR && !lock.isClosed());
+
+	if (lock.isClosed())
+		return 0;
+
 	if (n >= 0)
 		return n;
 	else
@@ -78,33 +94,33 @@ int PipeImpl::readBytes(void* buffer, int length)
 
 PipeImpl::Handle PipeImpl::readHandle() const
 {
-	return _readfd;
+	return _readfd.load(std::memory_order_relaxed);
 }
 
 
 PipeImpl::Handle PipeImpl::writeHandle() const
 {
-	return _writefd;
+	return _writefd.load(std::memory_order_relaxed);
 }
 
 
 void PipeImpl::closeRead()
 {
-	if (_readfd != -1)
-	{
-		close(_readfd);
-		_readfd = -1;
-	}
+	_readLock.markClosed();
+	_readLock.wait();  // wait for any in-progress read to finish
+	int fd = _readfd.exchange(-1, std::memory_order_acq_rel);
+	if (fd != -1)
+		close(fd);
 }
 
 
 void PipeImpl::closeWrite()
 {
-	if (_writefd != -1)
-	{
-		close(_writefd);
-		_writefd = -1;
-	}
+	_writeLock.markClosed();
+	_writeLock.wait();  // wait for any in-progress write to finish
+	int fd = _writefd.exchange(-1, std::memory_order_acq_rel);
+	if (fd != -1)
+		close(fd);
 }
 
 

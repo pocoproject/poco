@@ -27,6 +27,10 @@ namespace Poco {
 namespace Net {
 
 
+//
+// SocketReactor
+//
+
 SocketReactor::SocketReactor():
 	_stop(false),
 	_pReadableNotification(new ReadableNotification(this)),
@@ -64,7 +68,10 @@ SocketReactor::SocketReactor(const Params& params, int threadAffinity):
 }
 
 
-SocketReactor::~SocketReactor() = default;
+SocketReactor::~SocketReactor()
+{
+	stop();
+}
 
 
 void SocketReactor::run()
@@ -325,6 +332,32 @@ void SocketReactor::dispatch(SocketNotification* pNotification)
 		if (!_pollSet.has(delegate->socket())) continue;
 		delegate->dispatch(pNotification);
 	}
+}
+
+
+//
+// ScopedSocketReactor
+//
+
+ScopedSocketReactor::ScopedSocketReactor():
+	_pReactor(new SocketReactor)
+{
+	_thread.start(*_pReactor);
+}
+
+
+ScopedSocketReactor::ScopedSocketReactor(const SocketReactor::Params& params):
+	_pReactor(new SocketReactor(params))
+{
+	_thread.start(*_pReactor);
+}
+
+
+ScopedSocketReactor::~ScopedSocketReactor()
+{
+	_pReactor->stop();
+	_thread.join();
+	delete _pReactor;
 }
 
 

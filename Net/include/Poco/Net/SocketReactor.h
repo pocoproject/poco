@@ -28,6 +28,7 @@
 #include "Poco/Observer.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Event.h"
+#include "Poco/Thread.h"
 #include <map>
 #include <atomic>
 
@@ -35,14 +36,15 @@
 namespace Poco {
 
 
-class Thread;
-
-
 namespace Net {
 
 
 class Socket;
 
+
+//
+// SocketReactor
+//
 
 class Net_API SocketReactor: public Poco::Runnable
 	/// This class, which is part of the Reactor pattern,
@@ -418,6 +420,99 @@ inline Notification* SocketReactor::getTimeoutNotification()
 inline Notification* SocketReactor::getShutdownNotification()
 {
 	return _pShutdownNotification;
+}
+
+
+//
+// ScopedSocketReactor
+//
+
+class Net_API ScopedSocketReactor
+	/// RAII wrapper that starts a SocketReactor in a thread and
+	/// automatically stops and joins on destruction.
+	///
+	/// Usage:
+	///
+	///     ScopedSocketReactor reactor;
+	///     reactor->addEventHandler(socket, observer);
+	///     // ... reactor runs in background thread ...
+	///     // automatically stopped and joined when reactor goes out of scope
+	///
+{
+public:
+	ScopedSocketReactor();
+		/// Creates and starts the reactor.
+
+	explicit ScopedSocketReactor(const SocketReactor::Params& params);
+		/// Creates and starts the reactor with the given parameters.
+
+	~ScopedSocketReactor();
+		/// Stops the reactor and joins the thread.
+
+	SocketReactor& operator*();
+		/// Returns a reference to the reactor.
+
+	const SocketReactor& operator*() const;
+		/// Returns a const reference to the reactor.
+
+	SocketReactor* operator->();
+		/// Returns a pointer to the reactor.
+
+	const SocketReactor* operator->() const;
+		/// Returns a const pointer to the reactor.
+
+	SocketReactor& reactor();
+		/// Returns a reference to the reactor.
+
+	Poco::Thread& thread();
+		/// Returns a reference to the thread.
+
+private:
+	ScopedSocketReactor(const ScopedSocketReactor&) = delete;
+	ScopedSocketReactor& operator=(const ScopedSocketReactor&) = delete;
+
+	SocketReactor* _pReactor;
+	Poco::Thread _thread;
+};
+
+
+//
+// inlines
+//
+
+inline SocketReactor& ScopedSocketReactor::operator*()
+{
+	return *_pReactor;
+}
+
+
+inline const SocketReactor& ScopedSocketReactor::operator*() const
+{
+	return *_pReactor;
+}
+
+
+inline SocketReactor* ScopedSocketReactor::operator->()
+{
+	return _pReactor;
+}
+
+
+inline const SocketReactor* ScopedSocketReactor::operator->() const
+{
+	return _pReactor;
+}
+
+
+inline SocketReactor& ScopedSocketReactor::reactor()
+{
+	return *_pReactor;
+}
+
+
+inline Poco::Thread& ScopedSocketReactor::thread()
+{
+	return _thread;
 }
 
 

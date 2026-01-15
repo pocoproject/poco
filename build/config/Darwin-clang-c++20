@@ -12,7 +12,25 @@ LINKMODE ?= SHARED
 
 ARCHFLAGS          ?= -arch $(POCO_HOST_OSARCH)
 SANITIZEFLAGS      ?=
-OSFLAGS            ?= -mmacosx-version-min=10.15 -isysroot $(shell xcrun --show-sdk-path)
+OSFLAGS            ?= -mmacosx-version-min=11.0 -isysroot $(shell xcrun --show-sdk-path)
+#
+# sanitize flags:
+#
+
+#  -fsanitize=address
+
+# UBSan adds the vptr sanitizer, and V8 exposes polymorphic
+# classes (e.g., v8::ArrayBuffer::Allocator) without RTTI
+# in the shared library. When we build the JS components
+# with -fsanitize=undefined, the vptr checks require typeinfo
+# for every polymorphic class; since V8 stripped it, the linker
+# trips over typeinfo for v8::ArrayBuffer::Allocator.
+# With vptr checks disabled, linking against V8 succeeds, and
+# UBSan still covers the other undefined-behavior categories.
+#  -fsanitize=undefined -fno-sanitize=vptr
+
+#  -fsanitize=thread
+#  -fsanitize=memory
 
 ifeq ($(POCO_HOST_OSARCH),arm64)
 OPENSSL_DIR        ?= /opt/homebrew/opt/openssl
