@@ -24,6 +24,7 @@
 #include "Poco/BasicEvent.h"
 #include "Poco/Delegate.h"
 #include "Poco/Debugger.h"
+#include "Poco/Types.h"
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -103,6 +104,20 @@ struct Large
 	Large() : i(1), j(2), k(3), l(4) { }
 	long i,j,k;
 	const long l;
+};
+
+
+enum TestEnum
+{
+	TEST_VALUE_ONE,
+	TEST_VALUE_TWO
+};
+
+
+union TestUnion
+{
+	int intVal;
+	float floatVal;
 };
 
 
@@ -1164,6 +1179,60 @@ void CoreTest::testSrcLoc()
 }
 
 
+void CoreTest::testDemangle()
+{
+#if defined(POCO_HAVE_CXXABI_H) || defined(_MSC_VER)
+	// Test demangle with template type
+	std::string name = Poco::demangle<int>();
+	assertEqual ("int", name);
+
+	// Test demangle with const char* (typeid name)
+	std::string intName = Poco::demangle(typeid(int).name());
+	assertEqual ("int", intName);
+
+	// Test demangle with instance
+	int value = 42;
+	std::string instanceName = Poco::demangle(value);
+	assertEqual ("int", instanceName);
+
+	// Test demangle with nested namespace type (class)
+	// MSVC returns "class Poco::AtomicCounter" - prefix should be stripped
+	std::string nestedName = Poco::demangle<Poco::AtomicCounter>();
+	assertEqual ("Poco::AtomicCounter", nestedName);
+
+	// Test demangle with struct type
+	// MSVC returns "struct Parent" - prefix should be stripped
+	std::string structName = Poco::demangle<Parent>();
+	assertEqual ("Parent", structName);
+
+	// Test demangle with enum type
+	// MSVC returns "enum TestEnum" - prefix should be stripped
+	std::string enumName = Poco::demangle<TestEnum>();
+	assertEqual ("TestEnum", enumName);
+
+	// Test demangle with union type
+	// MSVC returns "union TestUnion" - prefix should be stripped
+	std::string unionName = Poco::demangle<TestUnion>();
+	assertEqual ("TestUnion", unionName);
+#endif
+}
+
+
+void CoreTest::testDemangleDot()
+{
+#if defined(POCO_HAVE_CXXABI_H) || defined(_MSC_VER)
+	// Test demangleDot with template type
+	std::string typeName = Poco::demangleDot<Poco::AtomicCounter>();
+	assertEqual ("Poco.AtomicCounter", typeName);
+
+	// Test demangleDot with instance
+	Poco::AtomicCounter ac;
+	std::string instanceName = Poco::demangleDot(ac);
+	assertEqual ("Poco.AtomicCounter", instanceName);
+#endif
+}
+
+
 void CoreTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -1208,6 +1277,8 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
 	CppUnit_addTest(pSuite, CoreTest, testAscii);
 	CppUnit_addTest(pSuite, CoreTest, testSrcLoc);
+	CppUnit_addTest(pSuite, CoreTest, testDemangle);
+	CppUnit_addTest(pSuite, CoreTest, testDemangleDot);
 
 	return pSuite;
 }
