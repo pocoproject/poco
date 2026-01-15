@@ -50,7 +50,10 @@ The easiest way to install OpenSSL on Windows is to use a binary
 (prebuilt) release, for example the one from Shining Light
 Productions that comes with a
 [Windows installer](https://www.slproweb.com/products/Win32OpenSSL.html).
-OpenSSL can also be installed via the `vcpkg` package manager.
+OpenSSL can also be installed via the `vcpkg` package manager. One may
+also use the
+[WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/)
+package.
 
 On Windows, POCO can also use the native Windows TLS APIs (SChannel).
 
@@ -70,10 +73,22 @@ $ sudo apt-get -y update && sudo apt-get -y install git g++ cmake libssl-dev lib
 $ sudo dnf install -y git gcc-c++ cmake openssl-devel mysql-devel postgresql-devel
 ```
 
+#### Arch Linux
+
+```
+$ sudo pacman -Syu --noconfirm git gcc make cmake openssl mariadb-libs postgresql-libs
+```
+
 #### macOS (with Homebrew)
 
 ```
 $ brew install cmake openssl mysql-client libpq
+```
+
+#### Windows (with WinGet)
+
+```
+$ winget install --id -e Git.Git LLVM.LLVM Kitware.CMake ShiningLight.OpenSSL.Dev PostgreSQL.PostgreSQL Oracle.MySQL Microsoft.msodbcsql
 ```
 
 ### Building with CMake (Linux, macOS, Windows)

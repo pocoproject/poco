@@ -99,7 +99,8 @@ does not have OpenSSL, please get it from https://www.openssl.org or
 another source. You do not have to build OpenSSL yourself - a binary
 distribution is fine (e.g., apt-get install openssl libssl-dev).
 On macOS, install OpenSSL via Homebrew (brew install openssl).
-On Windows, OpenSSL can be installed with vcpkg.
+On Windows, OpenSSL can be installed with vcpkg, or through WinGet 
+(winget install -e --id ShiningLight.OpenSSL.Dev).
 
 The easiest way to install OpenSSL on Windows is to get the pre-built
 libraries from the pocoproject/openssl Git repository at
