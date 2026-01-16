@@ -153,7 +153,7 @@ protected:
 		helpFormatter.setHeader(
 			"\n"
 			"The Applied Informatics XML Schema and WSDL C++ Code Generator.\n"
-			"Copyright (c) 2008-2024 by Applied Informatics Software Engineering GmbH.\n"
+			"Copyright (c) 2008-2026 by Applied Informatics Software Engineering GmbH.\n"
 			"All rights reserved.\n\n"
 			"This program parses XML Schema and WSDL files and generates "
 			"C++ classes annotated with Remoting attributes "
@@ -392,11 +392,11 @@ protected:
 				std::map<std::string, SchemaInfo>::const_iterator itAS = _schemas.find(itC->first);
 				if (itAS == _schemas.end())
 					throw Poco::XSD::Types::XSDException("no schema info for " + itC->first);
-				
+
 				int options = 0;
 				if (itAS->second.preserveOptional())
 					options |= CppWriter::OPT_PRESERVE_OPTIONAL;
-				
+
 				if (itAS->second.timestamps())
 					options |= CppWriter::OPT_HEADER_TIMESTAMPS;
 
