@@ -59,6 +59,7 @@ public:
 #endif
 	};
 
+	[[nodiscard]]
 	static HostEntry hostByName(const std::string& hostname, unsigned hintFlags =
 #ifdef POCO_HAVE_ADDRINFO
 		DNS_HINT_AI_CANONNAME | DNS_HINT_AI_ADDRCONFIG
@@ -83,6 +84,7 @@ public:
 		///
 		/// Throws an IOException in case of any other error.
 
+	[[nodiscard]]
 	static HostEntry hostByAddress(const IPAddress& address, unsigned hintFlags =
 #ifdef POCO_HAVE_ADDRINFO
 		DNS_HINT_AI_CANONNAME | DNS_HINT_AI_ADDRCONFIG
@@ -101,6 +103,7 @@ public:
 		///
 		/// Throws an IOException in case of any other error.
 
+	[[nodiscard]]
 	static HostEntry resolve(const std::string& address);
 		/// Returns a HostEntry object containing the DNS information
 		/// for the host with the given IP address or host name.
@@ -119,10 +122,12 @@ public:
 		///
 		/// Throws an IOException in case of any other error.
 
+	[[nodiscard]]
 	static IPAddress resolveOne(const std::string& address);
 		/// Convenience method that calls resolve(address) and returns
 		/// the first address from the HostInfo.
 
+	[[nodiscard]]
 	static HostEntry thisHost();
 		/// Returns a HostEntry object containing the DNS information
 		/// for this host.
@@ -144,33 +149,39 @@ public:
 		/// has been compiled with -DPOCO_HAVE_LIBRESOLV. Otherwise
 		/// it will do nothing.
 
+	[[nodiscard]]
 	static std::string hostName();
 		/// Returns the host name of this host.
 
+	[[nodiscard]]
 	static bool isIDN(const std::string& hostname);
 		/// Returns true if the given hostname is an internationalized
 		/// domain name (IDN) containing non-ASCII characters, otherwise false.
 		///
 		/// The IDN must be UTF-8 encoded.
 
+	[[nodiscard]]
 	static bool isEncodedIDN(const std::string& hostname);
 		/// Returns true if the given hostname is an Punycode-encoded
 		/// internationalized domain name (IDN), otherwise false.
 		///
 		/// An encoded IDN starts with the character sequence "xn--".
 
+	[[nodiscard]]
 	static std::string encodeIDN(const std::string& idn);
 		/// Encodes the given IDN (internationalized domain name), which must
 		/// be in UTF-8 encoding.
 		///
 		/// The resulting string will be encoded according to Punycode.
 
+	[[nodiscard]]
 	static std::string decodeIDN(const std::string& encodedIDN);
 		/// Decodes the given Punycode-encoded IDN (internationalized domain name).
 		///
 		/// The resulting string will be UTF-8 encoded.
 
 protected:
+	[[nodiscard]]
 	static int lastError();
 		/// Returns the code of the last error.
 
@@ -180,12 +191,14 @@ protected:
 	static void aierror(int code, const std::string& arg);
 		/// Throws an exception according to the getaddrinfo() error code.
 
+	[[nodiscard]]
 	static std::string encodeIDNLabel(const std::string& idn);
 		/// Encodes the given IDN (internationalized domain name) label, which must
 		/// be in UTF-8 encoding.
 		///
 		/// The resulting string will be encoded according to Punycode.
 
+	[[nodiscard]]
 	static std::string decodeIDNLabel(const std::string& encodedIDN);
 		/// Decodes the given Punycode-encoded IDN (internationalized domain name) label.
 		///

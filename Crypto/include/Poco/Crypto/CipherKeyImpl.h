@@ -76,33 +76,41 @@ public:
 	virtual ~CipherKeyImpl();
 		/// Destroys the CipherKeyImpl.
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// Returns the name of the Cipher.
 
+	[[nodiscard]]
 	int keySize() const;
 		/// Returns the key size of the Cipher.
 
+	[[nodiscard]]
 	int blockSize() const;
 		/// Returns the block size of the Cipher.
 
+	[[nodiscard]]
 	int ivSize() const;
 		/// Returns the IV size of the Cipher.
 
+	[[nodiscard]]
 	Mode mode() const;
 		/// Returns the Cipher's mode of operation.
 
+	[[nodiscard]]
 	const ByteVec& getKey() const;
 		/// Returns the key for the Cipher.
 
 	void setKey(const ByteVec& key);
 		/// Sets the key for the Cipher.
 
+	[[nodiscard]]
 	const ByteVec& getIV() const;
 		/// Returns the initialization vector (IV) for the Cipher.
 
 	void setIV(const ByteVec& iv);
 		/// Sets the initialization vector (IV) for the Cipher.
 
+	[[nodiscard]]
 	const EVP_CIPHER* cipher();
 		/// Returns the cipher object
 

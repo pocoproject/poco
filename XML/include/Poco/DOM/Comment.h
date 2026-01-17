@@ -35,7 +35,9 @@ class XML_API Comment: public CharacterData
 {
 public:
 	// Node
+	[[nodiscard]]
 	const XMLString& nodeName() const;
+	[[nodiscard]]
 	unsigned short nodeType() const;
 
 protected:
@@ -43,6 +45,7 @@ protected:
 	Comment(Document* pOwnerDocument, const Comment& comment);
 	~Comment();
 
+	[[nodiscard]]
 	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:

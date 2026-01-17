@@ -140,6 +140,7 @@ public:
 	ServerApplication();
 		/// Creates the ServerApplication.
 
+	[[nodiscard]]
 	bool isInteractive() const;
 		/// Returns true if the application runs from the command line.
 		/// Returns false if the application runs as a Unix daemon
@@ -207,7 +208,9 @@ private:
 	static void __stdcall ServiceControlHandler(DWORD control);
 	static void __stdcall ServiceMain(DWORD argc, LPWSTR* argv);
 
+	[[nodiscard]]
 	bool hasConsole();
+	[[nodiscard]]
 	bool isService();
 	void beService();
 	void registerService();

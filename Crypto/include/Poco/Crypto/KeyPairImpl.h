@@ -50,6 +50,7 @@ public:
 	virtual ~KeyPairImpl();
 		/// Destroys the KeyPairImpl.
 
+	[[nodiscard]]
 	virtual int size() const = 0;
 		/// Returns the key size.
 
@@ -69,9 +70,11 @@ public:
 		/// If a null pointer is passed for a stream, the corresponding
 		/// key is not exported.
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// Returns key pair name
 
+	[[nodiscard]]
 	Type type() const;
 		/// Returns key pair type
 

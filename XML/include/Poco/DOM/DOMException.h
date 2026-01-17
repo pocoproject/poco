@@ -70,18 +70,22 @@ public:
 
 	DOMException& operator = (const DOMException& exc);
 
+	[[nodiscard]]
 	const char* name() const noexcept;
 		/// Returns a static string describing the exception.
 
+	[[nodiscard]]
 	const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
+	[[nodiscard]]
 	Poco::Exception* clone() const;
 		/// Creates an exact copy of the exception.
 
 	void rethrow() const;
 		/// (Re)Throws the exception.
 
+	[[nodiscard]]
 	unsigned short code() const;
 		/// Returns the DOM exception code.
 

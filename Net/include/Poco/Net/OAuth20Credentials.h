@@ -83,12 +83,14 @@ public:
 	void setBearerToken(const std::string& bearerToken);
 		/// Sets the bearer token.
 
+	[[nodiscard]]
 	const std::string& getBearerToken() const;
 		/// Returns the bearer token.
 
 	void setScheme(const std::string& scheme);
 		/// Sets the Authorization header scheme.
 
+	[[nodiscard]]
 	const std::string& getScheme() const;
 		/// Returns the Authorization header scheme.
 

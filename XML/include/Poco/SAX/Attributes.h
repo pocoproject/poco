@@ -50,23 +50,29 @@ class XML_API Attributes
 	/// implementation to implementation.
 {
 public:
+	[[nodiscard]]
 	virtual int getIndex(const XMLString& name) const = 0;
 		/// Look up the index of an attribute by a qualified name.
 
+	[[nodiscard]]
 	virtual int getIndex(const XMLString& namespaceURI, const XMLString& localName) const = 0;
 		/// Look up the index of an attribute by a namspace name.
 
+	[[nodiscard]]
 	virtual int getLength() const = 0;
 		/// Return the number of attributes in the list.
 		///
 		/// Once you know the number of attributes, you can iterate through the list.
 
+	[[nodiscard]]
 	virtual const XMLString& getLocalName(int i) const = 0;
 		/// Look up a local attribute name by index.
 
+	[[nodiscard]]
 	virtual const XMLString& getQName(int i) const = 0;
 		/// Look up a qualified attribute name by index.
 
+	[[nodiscard]]
 	virtual const XMLString& getType(int i) const = 0;
 		/// Look up an attribute type by index.
 		///
@@ -80,32 +86,38 @@ public:
 		/// For an enumerated attribute that is not a notation, the parser will report the type
 		/// as "NMTOKEN".
 
+	[[nodiscard]]
 	virtual const XMLString& getType(const XMLString& qname) const = 0;
 		/// Look up an attribute type by a qualified name.
 		///
 		/// See getType(int) for a description of the possible types.
 
+	[[nodiscard]]
 	virtual const XMLString& getType(const XMLString& namespaceURI, const XMLString& localName) const = 0;
 		/// Look up an attribute type by a namespace name.
 		///
 		/// See getType(int) for a description of the possible types.
 
+	[[nodiscard]]
 	virtual const XMLString& getValue(int i) const = 0;
 		/// Look up an attribute value by index.
 		///
 		/// If the attribute value is a list of tokens (IDREFS, ENTITIES, or NMTOKENS), the tokens
 		/// will be concatenated into a single string with each token separated by a single space.
 
+	[[nodiscard]]
 	virtual const XMLString& getValue(const XMLString& qname) const = 0;
 		/// Look up an attribute value by a qualified name.
 		///
 		/// See getValue(int) for a description of the possible values.
 
+	[[nodiscard]]
 	virtual const XMLString& getValue(const XMLString& uri, const XMLString& localName) const = 0;
 		/// Look up an attribute value by a namespace name.
 		///
 		/// See getValue(int) for a description of the possible values.
 
+	[[nodiscard]]
 	virtual const XMLString& getURI(int i) const = 0;
 		/// Look up a namespace URI by index.
 

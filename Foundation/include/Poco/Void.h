@@ -47,21 +47,23 @@ public:
 	Void& operator = (const Void& v);
 		/// Assigns another void.
 
-	bool operator ==(const Void& v) const;
+	[[nodiscard]]
+	bool operator == ([[maybe_unused]] const Void& v) const;
 		/// Will return always true due to Voids having no members.
 
-	bool operator !=(const Void& v) const;
+	[[nodiscard]]
+	bool operator != ([[maybe_unused]] const Void& v) const;
 		/// Will return always false due to Voids having no members.
 };
 
 
-inline bool Void::operator ==(const Void& /*v*/) const
+inline bool Void::operator == ([[maybe_unused]] const Void& v) const
 {
 	return true;
 }
 
 
-inline bool Void::operator !=(const Void& /*v*/) const
+inline bool Void::operator != ([[maybe_unused]] const Void& v) const
 {
 	return false;
 }

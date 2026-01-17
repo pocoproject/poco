@@ -76,10 +76,12 @@ public:
 	~TypeInfo();
 		/// Destroys the TypeInfo.
 
+	[[nodiscard]]
 	SQLSMALLINT cDataType(SQLSMALLINT sqlDataType) const;
 		/// Returns C data type corresponding to supplied SQL data type.
 
 	template <SQLSMALLINT T>
+	[[nodiscard]]
 	static constexpr SQLSMALLINT cDataType()
 		/// Returns C data type corresponding to supplied SQL data type.
 	{
@@ -129,10 +131,12 @@ public:
 		return 0;
 	}
 
+	[[nodiscard]]
 	SQLSMALLINT sqlDataType(SQLSMALLINT cDataType) const;
 		/// Returns SQL data type corresponding to supplied C data type.
 
 	template <SQLSMALLINT T>
+	[[nodiscard]]
 	static constexpr SQLSMALLINT sqlDataType()
 		/// Returns SQL data type corresponding to supplied C data type.
 	{
@@ -188,11 +192,13 @@ public:
 	void reset();
 		/// Clears cached type info, allowing refill on next fillTypeInfo call.
 
+	[[nodiscard]]
 	Dynamic::Var getInfo(SQLSMALLINT type, const std::string& param) const;
 		/// Returns information about specified data type as specified by parameter 'type'.
 		/// The requested information is specified by parameter 'param'.
 		/// Will fail with a Poco::NotFoundException thrown if the param is not found
 
+	[[nodiscard]]
 	bool tryGetInfo(SQLSMALLINT type, const std::string& param, Dynamic::Var& result) const;
 		/// Returns information about specified data type as specified by parameter 'type' in param result.
 		/// The requested information is specified by parameter 'param'.

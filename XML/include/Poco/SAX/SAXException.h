@@ -104,28 +104,35 @@ public:
 	SAXParseException& operator = (const SAXParseException& exc);
 		/// Assignment operator.
 
+	[[nodiscard]]
 	const char* name() const noexcept;
 		/// Returns a static string describing the exception.
 
+	[[nodiscard]]
 	const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
+	[[nodiscard]]
 	Poco::Exception* clone() const;
 		/// Creates an exact copy of the exception.
 
 	void rethrow() const;
 		/// (Re)Throws the exception.
 
+	[[nodiscard]]
 	const XMLString& getPublicId() const;
 		/// Get the public identifier of the entity where the exception occurred.
 
+	[[nodiscard]]
 	const XMLString& getSystemId() const;
 		/// Get the system identifier of the entity where the exception occurred.
 
+	[[nodiscard]]
 	int getLineNumber() const;
 		/// The line number of the end of the text where the exception occurred.
 		/// The first line is line 1.
 
+	[[nodiscard]]
 	int getColumnNumber() const;
 		/// The column number of the end of the text where the exception occurred.
 		/// The first column in a line is position 1.
