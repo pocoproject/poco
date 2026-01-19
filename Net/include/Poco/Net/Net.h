@@ -103,7 +103,7 @@ std::string Net_API htmlize(const std::string& str);
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT)
 
-extern "C" const struct Net_API NetworkInitializer pocoNetworkInitializer;
+extern "C" const struct NetworkInitializer Net_API pocoNetworkInitializer;
 
 #if defined(POCO_COMPILER_MINGW)
 	#define POCO_NET_FORCE_SYMBOL(x) static void *__ ## x ## _fp = (void*)&x;
