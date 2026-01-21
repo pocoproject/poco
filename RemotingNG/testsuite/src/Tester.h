@@ -22,6 +22,7 @@
 #include "Poco/Nullable.h"
 #include "Poco/URI.h"
 #include "Poco/UUID.h"
+#include "Poco/ULID.h"
 #include "Poco/DateTime.h"
 #include "Poco/LocalDateTime.h"
 #include "Poco/Timestamp.h"
@@ -85,6 +86,7 @@ struct Struct2
 	std::vector<Struct1::Ptr> anotherVector;
 	Poco::URI anURI;
 	Poco::UUID anUUID;
+	Poco::ULID anULID;
 	Poco::DateTime aDateTime;
 	Poco::LocalDateTime aLocalDateTime;
 	Poco::Timestamp aTimestamp;
