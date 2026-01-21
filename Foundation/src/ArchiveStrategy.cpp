@@ -228,6 +228,35 @@ void ArchiveStrategy::compressFile(const std::string& path)
 }
 
 
+void ArchiveStrategy::archiveByNumber(const std::string& basePath)
+{
+	int n = -1;
+	std::string path;
+	do
+	{
+		path = basePath;
+		path.append(".");
+		NumberFormatter::append(path, ++n);
+	}
+	while (exists(path));
+
+	while (n >= 0)
+	{
+		std::string oldPath = basePath;
+		if (n > 0)
+		{
+			oldPath.append(".");
+			NumberFormatter::append(oldPath, n - 1);
+		}
+		std::string newPath = basePath;
+		newPath.append(".");
+		NumberFormatter::append(newPath, n);
+		moveFile(oldPath, newPath);
+		--n;
+	}
+}
+
+
 //
 // ArchiveByNumberStrategy
 //
@@ -258,30 +287,7 @@ LogFile* ArchiveByNumberStrategy::archive(LogFile* pFile)
 
 	std::string basePath = pFile->path();
 	delete pFile;
-	int n = -1;
-	std::string path;
-	do
-	{
-		path = basePath;
-		path.append(".");
-		NumberFormatter::append(path, ++n);
-	}
-	while (exists(path));
-
-	while (n >= 0)
-	{
-		std::string oldPath = basePath;
-		if (n > 0)
-		{
-			oldPath.append(".");
-			NumberFormatter::append(oldPath, n - 1);
-		}
-		std::string newPath = basePath;
-		newPath.append(".");
-		NumberFormatter::append(newPath, n);
-		moveFile(oldPath, newPath);
-		--n;
-	}
+	archiveByNumber(basePath);
 
 	// If no compression was started, invoke purge callback now.
 	// Otherwise, it will be invoked when compression completes.

@@ -89,6 +89,11 @@ private:
 
 protected:
 	PurgeCallback _purgeCallback;
+
+	void archiveByNumber(const std::string& basePath);
+		/// A monotonic increasing number is appended to the
+		/// log file name. The most recent archived file
+		/// always has the number zero.
 };
 
 
@@ -135,7 +140,7 @@ public:
 		delete pFile;
 		std::string archPath = path;
 		archPath.append(".");
-		DateTimeFormatter::append(archPath, DT().timestamp(), "%Y%m%d%H%M%S%i");
+		DateTimeFormatter::append(archPath, DT().timestamp(), _dateTimeFormat);
 
 		if (exists(archPath)) archiveByNumber(archPath);
 		else moveFile(path, archPath);
@@ -148,37 +153,13 @@ public:
 		return new LogFile(path);
 	}
 
-private:
-	void archiveByNumber(const std::string& basePath)
-		/// A monotonic increasing number is appended to the
-		/// log file name. The most recent archived file
-		/// always has the number zero.
+	void setTimestampFormat(const std::string& fmt)
 	{
-		int n = -1;
-		std::string path;
-		do
-		{
-			path = basePath;
-			path.append(".");
-			NumberFormatter::append(path, ++n);
-		}
-		while (exists(path));
-
-		while (n >= 0)
-		{
-			std::string oldPath = basePath;
-			if (n > 0)
-			{
-				oldPath.append(".");
-				NumberFormatter::append(oldPath, n - 1);
-			}
-			std::string newPath = basePath;
-			newPath.append(".");
-			NumberFormatter::append(newPath, n);
-			moveFile(oldPath, newPath);
-			--n;
-		}
+	    _dateTimeFormat = fmt;
 	}
+
+private:
+    std::string _dateTimeFormat = "%Y%m%d%H%M%S%i";
 };
 
 
