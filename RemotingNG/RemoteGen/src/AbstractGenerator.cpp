@@ -754,6 +754,8 @@ const std::set<std::string> AbstractGenerator::initBuiltinTypes()
 	builtins.insert("Poco::URI");
 	builtins.insert("UUID");
 	builtins.insert("Poco::UUID");
+	builtins.insert("ULID");
+	builtins.insert("Poco::ULID");
 
 	return builtins;
 }
