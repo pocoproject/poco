@@ -28,6 +28,7 @@
 #include "Poco/SharedPtr.h"
 #include "Poco/URI.h"
 #include "Poco/UUID.h"
+#include "Poco/ULID.h"
 #include "Poco/Timestamp.h"
 #include "Poco/DateTime.h"
 #include "Poco/LocalDateTime.h"
@@ -567,6 +568,17 @@ class TypeDeserializer<Poco::UUID>
 {
 public:
 	static bool deserialize(const std::string& name, bool isMandatory, Deserializer& deser, Poco::UUID& value)
+	{
+		return deser.deserialize(name, isMandatory, value);
+	}
+};
+
+
+template <>
+class TypeDeserializer<Poco::ULID>
+{
+public:
+	static bool deserialize(const std::string& name, bool isMandatory, Deserializer& deser, Poco::ULID& value)
 	{
 		return deser.deserialize(name, isMandatory, value);
 	}
