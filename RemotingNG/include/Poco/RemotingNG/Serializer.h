@@ -25,6 +25,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
 #include "Poco/UUID.h"
+#include "Poco/ULID.h"
 #include "Poco/URI.h"
 #include "Poco/Exception.h"
 #include <vector>
@@ -177,7 +178,12 @@ public:
 		/// The default implementation serializes to string.
 
 	virtual void serialize(const std::string& name, const Poco::UUID& value);
-		/// Serialize a Poco::URI.
+		/// Serialize a Poco::UUID.
+		///
+		/// The default implementation serializes to string.
+
+	virtual void serialize(const std::string& name, const Poco::ULID& value);
+		/// Serialize a Poco::ULID.
 		///
 		/// The default implementation serializes to string.
 

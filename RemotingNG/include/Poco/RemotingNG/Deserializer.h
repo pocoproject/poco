@@ -25,6 +25,7 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
 #include "Poco/UUID.h"
+#include "Poco/ULID.h"
 #include "Poco/URI.h"
 #include <vector>
 
@@ -216,6 +217,11 @@ public:
 
 	virtual bool deserialize(const std::string& name, bool isMandatory, Poco::UUID& value);
 		/// Deserializes a Poco::UUID.
+		///
+		/// The default implementation expects a string representation.
+
+	virtual bool deserialize(const std::string& name, bool isMandatory, Poco::ULID& value);
+		/// Deserializes a Poco::ULID.
 		///
 		/// The default implementation expects a string representation.
 

@@ -27,6 +27,7 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/URI.h"
 #include "Poco/UUID.h"
+#include "Poco/ULID.h"
 #include "Poco/Timestamp.h"
 #include "Poco/DateTime.h"
 #include "Poco/LocalDateTime.h"
@@ -397,6 +398,17 @@ class TypeSerializer<Poco::UUID>
 {
 public:
 	static void serialize(const std::string& name, const Poco::UUID& value, Serializer& ser)
+	{
+		ser.serialize(name, value);
+	}
+};
+
+
+template <>
+class TypeSerializer<Poco::ULID>
+{
+public:
+	static void serialize(const std::string& name, const Poco::ULID& value, Serializer& ser)
 	{
 		ser.serialize(name, value);
 	}

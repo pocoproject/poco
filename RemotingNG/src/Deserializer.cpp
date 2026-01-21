@@ -123,6 +123,18 @@ bool Deserializer::deserialize(const std::string& name, bool isMandatory, Poco::
 }
 
 
+bool Deserializer::deserialize(const std::string& name, bool isMandatory, Poco::ULID& value)
+{
+	std::string str;
+	bool found = deserialize(name, isMandatory, str);
+	if (found)
+		value.parse(str);
+	else
+		value = Poco::ULID();
+	return found;
+}
+
+
 void Deserializer::pushAttribute(const std::string& /*attrNamespace*/, const std::string& /*attrName*/, bool /*isMandatory*/)
 {
 }
