@@ -40,14 +40,15 @@ public:
 	{
 		using namespace std::string_literals;
 		
-		static const std::string REMOTING__NAMES[] = {"aVector"s,"anotherVector"s,"anURI"s,"anUUID"s,"aDateTime"s,"aLocalDateTime"s,"aTimestamp"s,""s};
+		static const std::string REMOTING__NAMES[] = {"aVector"s,"anotherVector"s,"anURI"s,"anUUID"s,"anULID"s,"aDateTime"s,"aLocalDateTime"s,"aTimestamp"s,""s};
 		TypeSerializer<std::vector<Struct1>>::serialize(REMOTING__NAMES[0], value.aVector, ser);
 		TypeSerializer<std::vector<Poco::SharedPtr<Struct1>>>::serialize(REMOTING__NAMES[1], value.anotherVector, ser);
 		TypeSerializer<Poco::URI>::serialize(REMOTING__NAMES[2], value.anURI, ser);
 		TypeSerializer<Poco::UUID>::serialize(REMOTING__NAMES[3], value.anUUID, ser);
-		TypeSerializer<Poco::DateTime>::serialize(REMOTING__NAMES[4], value.aDateTime, ser);
-		TypeSerializer<Poco::LocalDateTime>::serialize(REMOTING__NAMES[5], value.aLocalDateTime, ser);
-		TypeSerializer<Poco::Timestamp>::serialize(REMOTING__NAMES[6], value.aTimestamp, ser);
+		TypeSerializer<Poco::ULID>::serialize(REMOTING__NAMES[4], value.anULID, ser);
+		TypeSerializer<Poco::DateTime>::serialize(REMOTING__NAMES[5], value.aDateTime, ser);
+		TypeSerializer<Poco::LocalDateTime>::serialize(REMOTING__NAMES[6], value.aLocalDateTime, ser);
+		TypeSerializer<Poco::Timestamp>::serialize(REMOTING__NAMES[7], value.aTimestamp, ser);
 	}
 
 };
