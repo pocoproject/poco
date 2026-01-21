@@ -85,6 +85,13 @@ void Serializer::serialize(const std::string& name, const Poco::UUID& value)
 }
 
 
+void Serializer::serialize(const std::string& name, const Poco::ULID& value)
+{
+	const std::string str(value.toString());
+	serialize(name, str);
+}
+
+
 void Serializer::pushAttribute(const std::string&, const std::string&)
 {
 }
