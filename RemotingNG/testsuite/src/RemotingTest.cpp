@@ -363,7 +363,8 @@ bool operator == (const Struct2& s1, const Struct2& s2)
 	    && s1.aDateTime == s2.aDateTime
 	    && s1.aLocalDateTime == s2.aLocalDateTime
 	    && s1.aTimestamp == s2.aTimestamp
-	    && s1.anUUID == s2.anUUID;
+	    && s1.anUUID == s2.anUUID
+		&& s1.anULID == s2.anULID;
 
 	if (!equal) return false;
 	if (s1.aVector.size() != s2.aVector.size()) return false;
@@ -825,6 +826,7 @@ void RemotingTest::testStruct2(ITester::Ptr pTester)
 	s21.anotherVector.push_back(Struct1::Ptr());
 	s21.anURI = "http://www.appinf.com";
 	s21.anUUID.parse("01234567-ABCD-EF00-1234-0123456789AB");
+	s21.anULID.parse("01BX5ZZKBKACTAV9WEVGEMMVRY");
 	s21.aDateTime.assign(2009, 11, 9, 13, 23, 23, 200);
 	s21.aLocalDateTime.assign(7200, 2009, 11, 9, 13, 23, 23, 200, 0);
 	s21.aTimestamp = s21.aDateTime.timestamp();
@@ -870,6 +872,7 @@ void RemotingTest::testStruct3(ITester::Ptr pTester)
 	s21.anotherVector.push_back(Struct1::Ptr());
 	s21.anURI = "http://www.appinf.com";
 	s21.anUUID.parse("01234567-ABCD-EF00-1234-0123456789AB");
+	s21.anULID.parse("01BX5ZZKBKACTAV9WEVGEMMVRY");
 	s21.aDateTime.assign(2009, 11, 9, 13, 23, 23, 200);
 	s21.aLocalDateTime.assign(7200, 2009, 11, 9, 13, 23, 23, 200, 0);
 	s21.aTimestamp = s21.aDateTime.timestamp();
