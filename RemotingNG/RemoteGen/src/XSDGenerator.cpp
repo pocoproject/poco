@@ -960,6 +960,8 @@ std::map<std::string, std::string> XSDGenerator::initTypeMapping()
 	ret.insert(std::make_pair("Poco::URI", "string"));
 	ret.insert(std::make_pair("UUID", "string"));
 	ret.insert(std::make_pair("Poco::UUID", "string"));
+	ret.insert(std::make_pair("ULID", "string"));
+	ret.insert(std::make_pair("Poco::ULID", "string"));
 	ret.insert(std::make_pair("vector < char >", "base64Binary"));
 	return ret;
 }

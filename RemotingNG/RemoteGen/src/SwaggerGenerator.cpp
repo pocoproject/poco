@@ -81,6 +81,8 @@ const std::map<std::string, std::pair<std::string, std::string>> SwaggerGenerato
 	{"Poco::URI"s, {"string"s, ""s}},
 	{"UUID"s, {"string"s, ""s}},
 	{"Poco::UUID"s, {"string"s, ""s}},
+	{"ULID"s, {"string"s, ""s}},
+	{"Poco::ULID"s, {"string"s, ""s}},
 	{"vector < char >"s, {"string"s, "byte"s}},
 	{"std::vector < char >"s, {"string"s, "byte"s}}
 };

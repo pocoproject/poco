@@ -377,7 +377,7 @@ void SOAPRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request, Po
 	std::string ce = request.get("Content-Encoding"s, ""s);
 	if (!ce.empty() && ce != "gzip")
 	{
-		response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNSUPPORTEDMEDIATYPE);
+		response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_UNSUPPORTED_MEDIA_TYPE);
 		response.setContentLength(0);
 		response.send();
 		return;
