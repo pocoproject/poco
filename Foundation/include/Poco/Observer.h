@@ -42,6 +42,23 @@ class POCO_DEPRECATED("use `NObserver` instead") Observer: public AbstractObserv
 	/// use the NObserver class template, which uses an AutoPtr to
 	/// pass the Notification to the callback function, thus freeing
 	/// you from memory management issues.
+	///
+	/// Thread Safety:
+	///
+	/// The notify() method uses atomic load for _pObject and does not
+	/// hold any lock during callback invocation. This prevents
+	/// lock-order-inversion deadlocks when handlers call back into
+	/// NotificationCenter (e.g., to remove themselves during disconnect).
+	///
+	/// Callers must ensure:
+	///   - The observed object outlives all pending notifications.
+	///     This is inherent to the observer pattern: if object C is
+	///     destroyed while notifications are in flight (e.g., queued
+	///     in AsyncObserver), undefined behavior occurs.
+	///   - Assignment operators should not be used concurrently with
+	///     notification delivery. Observer instances are typically
+	///     created once and registered; concurrent modification during
+	///     active notification dispatch is not supported.
 {
 public:
 	using Callback = void (C::*)(N *);

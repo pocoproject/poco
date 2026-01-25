@@ -51,6 +51,23 @@ class NObserver: public AbstractObserver
 	///     To enable this functionality, a matcher function must be provided.
 	///     Null matcher means no matching is performed and all notificiations
 	///     of the type subscribed to are dispatched.
+	///
+	/// Thread Safety:
+	///
+	/// The handle() method uses atomic load for _pObject and does not
+	/// hold any lock during callback invocation. This prevents
+	/// lock-order-inversion deadlocks when handlers call back into
+	/// NotificationCenter (e.g., to remove themselves during disconnect).
+	///
+	/// Callers must ensure:
+	///   - The observed object outlives all pending notifications.
+	///     This is inherent to the observer pattern: if object C is
+	///     destroyed while notifications are in flight (e.g., queued
+	///     in AsyncObserver), undefined behavior occurs.
+	///   - Assignment operators should not be used concurrently with
+	///     notification delivery. Observer instances are typically
+	///     created once and registered; concurrent modification during
+	///     active notification dispatch is not supported.
 {
 public:
 	using Type = NObserver<C, N>;
