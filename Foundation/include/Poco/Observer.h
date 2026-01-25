@@ -75,11 +75,11 @@ public:
 
 	void notify(Notification *pNf) const override
 	{
-		Poco::Mutex::ScopedLock lock(_mutex);
-		if (_pObject)
+		C* pObject = _pObject.load();
+		if (pObject)
 		{
 			pNf->duplicate();
-			(_pObject->*_method)(static_cast<N*>(pNf));
+			(pObject->*_method)(static_cast<N*>(pNf));
 		}
 	}
 
@@ -107,14 +107,12 @@ public:
 
 	void disable() override
 	{
-		Poco::Mutex::ScopedLock lock(_mutex);
 		_pObject = nullptr;
 	}
 
 private:
 	std::atomic<C*> _pObject;
 	Callback _method;
-	mutable Poco::Mutex _mutex;
 };
 
 
