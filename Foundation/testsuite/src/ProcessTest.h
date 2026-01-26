@@ -32,6 +32,8 @@ public:
 	void testLaunchArgs();
 	void testLaunchInvalidCommand();
 	void testIsRunning();
+	void testIsRunningAllowsForTermination();
+	void testSignalExitCode();
 
 	void setUp();
 	void tearDown();
