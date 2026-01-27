@@ -62,6 +62,7 @@ public:
 
 	bool handleZipEntry(std::istream& zipStream, const ZipLocalFileHeader& hdr) override;
 
+	[[nodiscard]]
 	const ZipMapping& mapping() const;
 		/// A ZipMapping stores as key the full name of the ZipFileInfo/ZipLocalFileHeader and as value the decompressed file
 		/// If for a ZipFileInfo no mapping exists, there was an error during decompression and the entry is considered to be corrupt

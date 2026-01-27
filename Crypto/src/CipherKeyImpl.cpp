@@ -55,8 +55,8 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	_key(),
 	_iv()
 {
-	// dummy access to Cipherfactory so that the EVP lib is initilaized
-	CipherFactory::defaultFactory();
+	// dummy access to Cipherfactory so that the EVP lib is initialized
+	(void)CipherFactory::defaultFactory();
 	_pCipher = EVP_get_cipherbyname(name.c_str());
 
 	if (!_pCipher)
@@ -83,7 +83,7 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name,
 	_iv(iv)
 {
 	// dummy access to Cipherfactory so that the EVP lib is initialized
-	CipherFactory::defaultFactory();
+	(void)CipherFactory::defaultFactory();
 	_pCipher = EVP_get_cipherbyname(name.c_str());
 
 	if (!_pCipher)
@@ -98,8 +98,8 @@ CipherKeyImpl::CipherKeyImpl(const std::string& name):
 	_key(),
 	_iv()
 {
-	// dummy access to Cipherfactory so that the EVP lib is initilaized
-	CipherFactory::defaultFactory();
+	// dummy access to Cipherfactory so that the EVP lib is initialized
+	(void)CipherFactory::defaultFactory();
 	_pCipher = EVP_get_cipherbyname(name.c_str());
 
 	if (!_pCipher)

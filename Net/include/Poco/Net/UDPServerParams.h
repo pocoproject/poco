@@ -42,23 +42,29 @@ public:
 	~UDPServerParams();
 		/// Destroys UDPServerParams.
 
+	[[nodiscard]]
 	const Poco::Net::SocketAddress& address() const;
 		/// Returns the server address.
 
+	[[nodiscard]]
 	Poco::Timespan timeout() const;
 		/// Returns polling timeout.
 
+	[[nodiscard]]
 	int numberOfSockets() const;
 		/// Returns nuber of sockets for the server.
 
+	[[nodiscard]]
 	std::size_t handlerBufListSize() const;
 		/// Returns the number of handler buffers allocated
 		/// before buffers start being reused.
 
+	[[nodiscard]]
 	bool notifySender() const;
 		/// Returns the flag inidcating whether server
 		/// should send notifications back to the client.
 
+	[[nodiscard]]
 	int backlogThreshold() const;
 		/// Size of mesage or error backlogs at which server
 		/// reports backlogs back to the client. Only meaningful

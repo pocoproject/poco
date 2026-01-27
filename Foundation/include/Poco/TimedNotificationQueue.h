@@ -122,9 +122,11 @@ public:
 		/// assigned to a Notification::Ptr, to avoid potential
 		/// memory management issues.
 
+	[[nodiscard]]
 	bool empty() const;
 		/// Returns true iff the queue is empty.
 
+	[[nodiscard]]
 	int size() const;
 		/// Returns the number of notifications in the queue.
 

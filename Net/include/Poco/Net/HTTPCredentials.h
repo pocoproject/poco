@@ -97,12 +97,14 @@ public:
 	void setUsername(const std::string& username);
 		/// Sets the username.
 
+	[[nodiscard]]
 	const std::string& getUsername() const;
 		/// Returns the username.
 
 	void setPassword(const std::string& password);
 		/// Sets the password.
 
+	[[nodiscard]]
 	const std::string& getPassword() const;
 		/// Returns the password.
 
@@ -110,10 +112,12 @@ public:
 		/// Sets the target host. Only used for SSPI-based NTLM authentication using
 		/// the credentials of the currently logged-in user on Windows.
 
+	[[nodiscard]]
 	const std::string& getHost() const;
 		/// Returns the target host. Only used for SSPI-based NTLM authentication using
 		/// the credentials of the currently logged-in user on Windows.
 
+	[[nodiscard]]
 	bool empty() const;
 		/// Returns true if both username and password are empty, otherwise false.
 
@@ -141,30 +145,39 @@ public:
 		/// Updates internal state (in case of digest authentication) and
 		/// replaces proxy authentication information in the request accordingly.
 
+	[[nodiscard]]
 	static bool isBasicCredentials(const std::string& header);
 		/// Returns true if authentication header is for Basic authentication.
 
+	[[nodiscard]]
 	static bool isDigestCredentials(const std::string& header);
 		/// Returns true if authentication header is for Digest authentication.
 
+	[[nodiscard]]
 	static bool isNTLMCredentials(const std::string& header);
 		/// Returns true if authentication header is for NTLM authentication.
 
+	[[nodiscard]]
 	static bool hasBasicCredentials(const HTTPRequest& request);
 		/// Returns true if an Authorization header with Basic credentials is present in the request.
 
+	[[nodiscard]]
 	static bool hasDigestCredentials(const HTTPRequest& request);
 		/// Returns true if an Authorization header with Digest credentials is present in the request.
 
+	[[nodiscard]]
 	static bool hasNTLMCredentials(const HTTPRequest& request);
 		/// Returns true if an Authorization header with NTLM credentials is present in the request.
 
+	[[nodiscard]]
 	static bool hasProxyBasicCredentials(const HTTPRequest& request);
 		/// Returns true if a Proxy-Authorization header with Basic credentials is present in the request.
 
+	[[nodiscard]]
 	static bool hasProxyDigestCredentials(const HTTPRequest& request);
 		/// Returns true if a Proxy-Authorization header with Digest credentials is present in the request.
 
+	[[nodiscard]]
 	static bool hasProxyNTLMCredentials(const HTTPRequest& request);
 		/// Returns true if a Proxy-Authorization header with Digest credentials is present in the request.
 

@@ -170,29 +170,39 @@ public:
 	SocketAddress& operator = (SocketAddress&& socketAddress);
 		/// Move-assigns another SocketAddress.
 
+	[[nodiscard]]
 	IPAddress host() const;
 		/// Returns the host IP address.
 
+	[[nodiscard]]
 	Poco::UInt16 port() const;
 		/// Returns the port number.
 
+	[[nodiscard]]
 	poco_socklen_t length() const;
 		/// Returns the length of the internal native socket address.
 
+	[[nodiscard]]
 	const struct sockaddr* addr() const;
 		/// Returns a pointer to the internal native socket address.
 
+	[[nodiscard]]
 	int af() const;
 		/// Returns the address family (AF_INET or AF_INET6) of the address.
 
+	[[nodiscard]]
 	std::string toString() const;
 		/// Returns a string representation of the address.
 
+	[[nodiscard]]
 	Family family() const;
 		/// Returns the address family of the host's address.
 
+	[[nodiscard]]
 	bool operator < (const SocketAddress& socketAddress) const;
+	[[nodiscard]]
 	bool operator == (const SocketAddress& socketAddress) const;
+	[[nodiscard]]
 	bool operator != (const SocketAddress& socketAddress) const;
 
 	enum
@@ -223,6 +233,7 @@ private:
 	typedef Poco::Net::Impl::SocketAddressImpl Impl;
 	typedef Poco::AutoPtr<Impl> Ptr;
 
+	[[nodiscard]]
 	Ptr pImpl() const;
 
 	void newIPv4();

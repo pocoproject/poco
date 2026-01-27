@@ -70,12 +70,15 @@ public:
 		NOTATION_NODE                 /// The node is a Notation.
 	};
 
+	[[nodiscard]]
 	virtual const XMLString& nodeName() const = 0;
 		/// Returns the name of this node, depending on its type.
 
+	[[nodiscard]]
 	const XMLString& nodeValue() const;
 		/// Returns the value of this node, depending on its type.
 
+	[[nodiscard]]
 	virtual const XMLString& getNodeValue() const = 0;
 		/// Returns the value of this node, depending on its type.
 
@@ -83,37 +86,45 @@ public:
 		/// Sets the value of this node. Throws an exception
 		/// if the node is read-only.
 
+	[[nodiscard]]
 	virtual unsigned short nodeType() const = 0;
 		/// Returns a code representing the type of the underlying object.
 
+	[[nodiscard]]
 	virtual Node* parentNode() const = 0;
 		/// The parent of this node. All nodes, except Attr, Document, DocumentFragment,
 		/// Entity, and Notation may have a parent. However, if a node has just been
 		/// created and not yet added to the tree, or if it has been removed from the
 		/// tree, this is null.
 
+	[[nodiscard]]
 	virtual NodeList* childNodes() const = 0;
 		/// Returns a NodeList containing all children of this node.
 		///
 		/// The returned NodeList must be released with a call
 		/// to release() when no longer needed.
 
+	[[nodiscard]]
 	virtual Node* firstChild() const = 0;
 		/// Returns the first child of this node. If there is no such
 		/// node, this returns null.
 
+	[[nodiscard]]
 	virtual Node* lastChild() const = 0;
 		/// Returns the last child of this node. If there is no such
 		/// node, this returns null.
 
+	[[nodiscard]]
 	virtual Node* previousSibling() const = 0;
 		/// Returns the node immediately preceding this node. If there
 		/// is no such node, this returns null.
 
+	[[nodiscard]]
 	virtual Node* nextSibling() const = 0;
 		/// Returns the node immediately following this node. If there
 		/// is no such node, this returns null.
 
+	[[nodiscard]]
 	virtual NamedNodeMap* attributes() const = 0;
 		/// Returns a NamedNodeMap containing the attributes of this
 		/// node (if it is an Element) or null otherwise.
@@ -121,6 +132,7 @@ public:
 		/// The returned NamedNodeMap must be released with a call
 		/// to release() when no longer needed.
 
+	[[nodiscard]]
 	virtual Document* ownerDocument() const = 0;
 		/// Returns the Document object associated with this node.
 		/// This is also the Document object used to create new nodes.
@@ -157,11 +169,13 @@ public:
 		/// Appends the node newChild to the end of the list of children of this node.
 		/// If newChild is already in the tree, it is first removed.
 
+	[[nodiscard]]
 	virtual bool hasChildNodes() const = 0;
 		/// This is a convenience method to allow easy determination of whether a
 		/// node has any children.
 		/// Returns true if the node has any children, false otherwise.
 
+	[[nodiscard]]
 	virtual Node* cloneNode(bool deep) const = 0;
 		/// Returns a duplicate of this node, i.e., serves as a generic copy constructor
 		/// for nodes. The duplicate node has no parent; (parentNode is null.).
@@ -192,10 +206,12 @@ public:
 		/// operation alone may not be sufficient, since XPointers do not differentiate
 		/// between Text nodes and CDATASection nodes.
 
+	[[nodiscard]]
 	virtual bool isSupported(const XMLString& feature, const XMLString& version) const = 0;
 		/// Tests whether the DOM implementation implements a specific
 		/// feature and that feature is supported by this node.
 
+	[[nodiscard]]
 	virtual const XMLString& namespaceURI() const = 0;
 		/// Returns the namespace URI of the node.
 		/// This is not a computed value that is the result of a namespace lookup based on an
@@ -206,24 +222,29 @@ public:
 		/// DOM Level 1 method, such as createElement from the Document interface, this is always the
 		/// empty string.
 
+	[[nodiscard]]
 	virtual XMLString prefix() const = 0;
 		/// Returns the namespace prefix from the qualified name of the node.
 
+	[[nodiscard]]
 	virtual const XMLString& localName() const = 0;
 		/// Returns the local name of the node.
 
+	[[nodiscard]]
 	virtual bool hasAttributes() const = 0;
 		/// Returns whether this node (if it is an element) has any attributes.
 
 	// Extensions
 	using NSMap = Poco::XML::NamespaceSupport;
 
+	[[nodiscard]]
 	virtual XMLString innerText() const = 0;
 		/// Returns a string containing the concatenated values of the node
 		/// and all its child nodes.
 		///
 		/// This method is not part of the W3C Document Object Model.
 
+	[[nodiscard]]
 	virtual Node* getNodeByPath(const XMLString& path) const = 0;
 		/// Searches a node (element or attribute) based on a simplified XPath
 		/// expression.
@@ -248,6 +269,7 @@ public:
 		///
 		/// This method is an extension to the W3C Document Object Model.
 
+	[[nodiscard]]
 	virtual Node* getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const = 0;
 		/// Searches a node (element or attribute) based on a simplified XPath
 		/// expression. The given NSMap must contain mappings from namespace

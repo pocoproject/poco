@@ -55,16 +55,22 @@ public:
 	void checkConsistency();
 		/// Check archive's consistency
 
+	[[nodiscard]]
 	FileInfos::const_iterator fileInfoBegin() const;
 
+	[[nodiscard]]
 	FileInfos::const_iterator fileInfoEnd() const;
 
+	[[nodiscard]]
 	FileHeaders::const_iterator findHeader(const std::string& fileName) const;
 
+	[[nodiscard]]
 	FileHeaders::const_iterator headerBegin() const;
 
+	[[nodiscard]]
 	FileHeaders::const_iterator headerEnd() const;
 
+	[[nodiscard]]
 	const std::string& getZipComment() const;
 
 private:

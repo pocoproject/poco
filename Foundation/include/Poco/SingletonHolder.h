@@ -47,6 +47,7 @@ public:
 		delete _pS;
 	}
 
+	[[nodiscard]]
 	S* get()
 		/// Returns a pointer to the singleton object
 		/// hold by the SingletonHolder. The first call

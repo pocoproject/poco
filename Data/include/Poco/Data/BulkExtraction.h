@@ -68,21 +68,25 @@ public:
 	{
 	}
 
+	[[nodiscard]]
 	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<C>::size();
 	}
 
+	[[nodiscard]]
 	std::size_t numOfRowsHandled() const override
 	{
 		return _rResult.size();
 	}
 
+	[[nodiscard]]
 	std::size_t numOfRowsAllowed() const override
 	{
 		return getLimit();
 	}
 
+	[[nodiscard]]
 	bool isNull(std::size_t row) const override
 	{
 		try
@@ -113,6 +117,7 @@ public:
 	{
 	}
 
+	[[nodiscard]]
 	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t col) override
 	{
 		Poco::UInt32 limit = getLimit();
@@ -123,6 +128,7 @@ public:
 	}
 
 protected:
+	[[nodiscard]]
 	const C& result() const
 	{
 		return _rResult;
@@ -175,6 +181,7 @@ public:
 		_pColumn->reset();
 	}
 
+	[[nodiscard]]
 	const CValType& value(int index) const
 	{
 		try
@@ -187,11 +194,13 @@ public:
 		}
 	}
 
+	[[nodiscard]]
 	bool isNull(std::size_t row) const override
 	{
 		return BulkExtraction<C>::isNull(row);
 	}
 
+	[[nodiscard]]
 	const Column<C>& column() const
 	{
 		return *_pColumn;

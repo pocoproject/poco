@@ -68,10 +68,12 @@ public:
 		/// then the originalfile will be either deleted or renamed to .bak,
 		/// then, the temp file will be renamed to the original zip file name.
 
+	[[nodiscard]]
 	const ZipArchive& originalArchive() const;
 		/// Returns the original archive information
 
 private:
+	[[nodiscard]]
 	const ZipLocalFileHeader& getForChange(const std::string& zipPath) const;
 		/// Searches for the entry given by the zipPath.
 		/// Throws an exception if the entry does not exist

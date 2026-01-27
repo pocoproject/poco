@@ -135,6 +135,7 @@ public:
 		if (_notify) notify(usedBefore);
 	}
 
+	[[nodiscard]]
 	std::size_t peek(T* pBuffer, std::size_t length) const
 		/// Peeks into the data currently in the FIFO
 		/// without actually extracting it.
@@ -154,6 +155,7 @@ public:
 		return length;
 	}
 
+	[[nodiscard]]
 	std::size_t peek(Poco::Buffer<T>& buffer, std::size_t length = 0) const
 		/// Peeks into the data currently in the FIFO
 		/// without actually extracting it.
@@ -269,18 +271,21 @@ public:
 		return write(buffer.begin(), length);
 	}
 
+	[[nodiscard]]
 	std::size_t size() const
 		/// Returns the size of the buffer.
 	{
 		return _buffer.size();
 	}
 
+	[[nodiscard]]
 	std::size_t used() const
 		/// Returns the size of the used portion of the buffer.
 	{
 		return _used;
 	}
 
+	[[nodiscard]]
 	std::size_t available() const
 		/// Returns the size of the available portion of the buffer.
 	{
@@ -356,6 +361,7 @@ public:
 		if (_notify) notify(usedBefore);
 	}
 
+	[[nodiscard]]
 	T* begin()
 		/// Returns the pointer to the beginning of the buffer.
 	{
@@ -371,6 +377,7 @@ public:
 		return _buffer.begin();
 	}
 
+	[[nodiscard]]
 	T* next()
 		/// Returns the pointer to the next available position in the buffer.
 	{
@@ -378,6 +385,7 @@ public:
 		return begin() + _used;
 	}
 
+	[[nodiscard]]
 	T& operator [] (std::size_t index)
 		/// Returns value at index position.
 		/// Throws InvalidAccessException if index is larger than
@@ -390,6 +398,7 @@ public:
 		return _buffer[_begin + index];
 	}
 
+	[[nodiscard]]
 	const T& operator [] (std::size_t index) const
 		/// Returns value at index position.
 		/// Throws InvalidAccessException if index is larger than
@@ -402,6 +411,7 @@ public:
 		return _buffer[_begin + index];
 	}
 
+	[[nodiscard]]
 	const Buffer<T>& buffer() const
 		/// Returns const reference to the underlying buffer.
 	{
@@ -435,6 +445,7 @@ public:
 		}
 	}
 
+	[[nodiscard]]
 	bool isValid() const
 		/// Returns true if error flag is not set on the buffer,
 		/// otherwise returns false.
@@ -462,30 +473,35 @@ public:
 		_eof = eof;
 	}
 
+	[[nodiscard]]
 	bool hasEOF() const
 		/// Returns true if EOF flag has been set.
 	{
 		return _eof;
 	}
 
+	[[nodiscard]]
 	bool isEOF() const
 		/// Returns true if EOF flag has been set and buffer is empty.
 	{
 		return isEmpty() && _eof;
 	}
 
+	[[nodiscard]]
 	bool isEmpty() const
 		/// Returns true is buffer is empty, false otherwise.
 	{
 		return 0 == _used;
 	}
 
+	[[nodiscard]]
 	bool isFull() const
 		/// Returns true is buffer is full, false otherwise.
 	{
 		return size() == _used;
 	}
 
+	[[nodiscard]]
 	bool isReadable() const
 		/// Returns true if buffer contains data and is not
 		/// in error state.
@@ -493,6 +509,7 @@ public:
 		return !isEmpty() && isValid();
 	}
 
+	[[nodiscard]]
 	bool isWritable() const
 		/// Returns true if buffer is not full and is not
 		/// in error state.
@@ -506,12 +523,14 @@ public:
 		_notify = notify;
 	}
 
+	[[nodiscard]]
 	bool getNotify() const
 		/// Returns true if notifications are enabled, false otherwise.
 	{
 		return _notify;
 	}
 
+	[[nodiscard]]
 	Mutex& mutex()
 		/// Returns reference to mutex.
 	{

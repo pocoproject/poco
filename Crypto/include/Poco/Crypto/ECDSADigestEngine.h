@@ -58,6 +58,7 @@ public:
 	~ECDSADigestEngine();
 		/// Destroys the ECDSADigestEngine.
 
+	[[nodiscard]]
 	std::size_t digestLength() const;
 		/// Returns the length of the digest in bytes.
 
@@ -79,6 +80,7 @@ public:
 		///
 		/// Can be called multiple times.
 
+	[[nodiscard]]
 	bool verify(const DigestEngine::Digest& signature);
 		/// Verifies the data against the signature.
 		///
@@ -110,12 +112,15 @@ public:
 	~ECDSASignature();
 		/// Destroys the ECDSASignature.
 
+	[[nodiscard]]
 	ByteVec toDER() const;
 		/// Returns a buffer containing the DER-encoded signature.
 
+	[[nodiscard]]
 	ByteVec rawR() const;
 		/// Returns a raw P value.
 
+	[[nodiscard]]
 	ByteVec rawS() const;
 		/// Returns a raw Q value.
 

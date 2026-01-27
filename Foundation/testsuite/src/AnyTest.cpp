@@ -154,14 +154,14 @@ void AnyTest::testAnyCastToReference()
 
 	try
 	{
-		AnyCast<char &>(a);
+		[[maybe_unused]] char& c = AnyCast<char &>(a);
 		failmsg ("AnyCast to incorrect reference type");
 	}
 	catch (BadCastException&) { }
 
 	try
 	{
-		AnyCast<const char &>(b),
+		[[maybe_unused]] const char& c = AnyCast<const char &>(b);
 		failmsg ("AnyCast to incorrect const reference type");
 	}
 	catch (BadCastException&) { }
@@ -175,7 +175,7 @@ void AnyTest::testAnyBadCast()
 
 	try
 	{
-		AnyCast<const char *>(value);
+		[[maybe_unused]] const char* c = AnyCast<const char *>(value);
 		fail ("must throw");
 	}
 	catch (BadCastException&) { }
@@ -328,7 +328,7 @@ void AnyTest::testAnyInt()
 	std::string* s = AnyCast<std::string>(&a);
 	assertTrue (s == nullptr);
 
-	int POCO_UNUSED tmp = AnyCast<int>(a);
+	[[maybe_unused]] int tmp = AnyCast<int>(a);
 	const Any c = a;
 	tmp = AnyCast<int>(a);
 }
@@ -362,7 +362,7 @@ void AnyTest::testAnyPointer()
 	assertTrue (s == nullptr);
 	assertTrue (AnyCast<std::nullptr_t>(&a) == nullptr);
 
-	int* POCO_UNUSED tmp = AnyCast<int*>(a);
+	[[maybe_unused]] int* tmp = AnyCast<int*>(a);
 	const Any c = a;
 	tmp = AnyCast<int*>(a);
 
@@ -373,17 +373,17 @@ void AnyTest::testAnyPointer()
 	assertTrue (AnyHoldsNullPtr<std::nullptr_t>(&nullPtr));
 	try
 	{
-		AnyHoldsNullPtr<void*>(nullPtr);
+		[[maybe_unused]] bool ptr = AnyHoldsNullPtr<void*>(nullPtr);
 		fail ("AnyCast must fail", __LINE__, __FILE__);
 	}
-	catch(const Poco::BadCastException&) {}
+	catch([[maybe_unused]] const Poco::BadCastException& e) {}
 	nullPtr = &i;
 	try
 	{
 		assertFalse (AnyHoldsNullPtr<std::nullptr_t>(nullPtr));
 		fail ("AnyCast must fail", __LINE__, __FILE__);
 	}
-	catch(const Poco::BadCastException&) {}
+	catch([[maybe_unused]] const Poco::BadCastException& e) {}
 	assertFalse (AnyHoldsNullPtr<int*>(nullPtr));
 
 	void* voidPtr = nullptr;
@@ -391,10 +391,10 @@ void AnyTest::testAnyPointer()
 	assertTrue (AnyHoldsNullPtr<void*>(nullVoidPtr));
 	try
 	{
-		AnyHoldsNullPtr<std::nullptr_t>(voidPtr);
+		[[maybe_unused]] bool ptr = AnyHoldsNullPtr<std::nullptr_t>(voidPtr);
 		fail ("AnyCast must fail", __LINE__, __FILE__);
 	}
-	catch(const Poco::BadCastException&) {}
+	catch([[maybe_unused]] const Poco::BadCastException& e) {}
 
 	using FP = void (AnyTest::*)();
 	FP fp = nullptr;
@@ -402,10 +402,10 @@ void AnyTest::testAnyPointer()
 	assertTrue (AnyHoldsNullPtr<FP>(funcPtr));
 	try
 	{
-		AnyHoldsNullPtr<FP>(voidPtr);
+		[[maybe_unused]] bool ptr = AnyHoldsNullPtr<FP>(voidPtr);
 		fail ("AnyCast must fail", __LINE__, __FILE__);
 	}
-	catch(const Poco::BadCastException&) {}
+	catch([[maybe_unused]] const Poco::BadCastException& e) {}
 	funcPtr = &AnyTest::testAnyPointer;
 	assertFalse (AnyHoldsNullPtr<FP>(funcPtr));
 
@@ -416,10 +416,10 @@ void AnyTest::testAnyPointer()
 	objPtr = &AnyTest::_dummyObject;
 	try
 	{
-		AnyHoldsNullPtr<OP>(funcPtr);
+		[[maybe_unused]] bool ptr = AnyHoldsNullPtr<OP>(funcPtr);
 		fail ("AnyCast must fail", __LINE__, __FILE__);
 	}
-	catch(const Poco::BadCastException&) {}
+	catch([[maybe_unused]] const Poco::BadCastException& e) {}
 
 	assertFalse (AnyHoldsNullPtr<OP>(objPtr));
 
@@ -430,10 +430,10 @@ void AnyTest::testAnyPointer()
 	memPtr = &AnyTest::_dummy;
 	try
 	{
-		AnyHoldsNullPtr<MP>(objPtr);
+		[[maybe_unused]] bool ptr = AnyHoldsNullPtr<MP>(objPtr);
 		fail ("AnyCast must fail", __LINE__, __FILE__);
 	}
-	catch(const Poco::BadCastException&) {}
+	catch([[maybe_unused]] const Poco::BadCastException& e) {}
 
 	assertFalse (AnyHoldsNullPtr<MP>(memPtr));
 }

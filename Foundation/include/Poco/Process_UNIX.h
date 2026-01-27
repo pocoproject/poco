@@ -38,6 +38,7 @@ public:
 	ProcessHandleImpl(pid_t pid);
 	~ProcessHandleImpl() override;
 
+	[[nodiscard]]
 	pid_t id() const;
 	int wait() const;
 	int tryWait() const;
@@ -54,6 +55,7 @@ public:
 	using ArgsImpl = std::vector<std::string>;
 	using EnvImpl = std::map<std::string, std::string>;
 
+	[[nodiscard]]
 	static PIDImpl idImpl();
 	static void timesImpl(long& userTime, long& kernelTime);
 	static void timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kernelTime);
@@ -68,7 +70,9 @@ public:
 		int options = 0);
 	static void killImpl(ProcessHandleImpl& handle);
 	static void killImpl(PIDImpl pid);
+	[[nodiscard]]
 	static bool isRunningImpl(const ProcessHandleImpl& handle);
+	[[nodiscard]]
 	static bool isRunningImpl(PIDImpl pid);
 	static void requestTerminationImpl(PIDImpl pid);
 
