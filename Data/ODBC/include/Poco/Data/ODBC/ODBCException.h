@@ -88,18 +88,21 @@ public:
 		return *this;
 	}
 
+	[[nodiscard]]
 	const char* name() const noexcept
 		/// Returns the name of the exception
 	{
 		return "ODBC handle exception";
 	}
 
+	[[nodiscard]]
 	const char* className() const noexcept
 		/// Returns the HandleException class name.
 	{
 		return typeid(*this).name();
 	}
 
+	[[nodiscard]]
 	Poco::Exception* clone() const
 		/// Clones the HandleException
 	{
@@ -112,12 +115,14 @@ public:
 		throw *this;
 	}
 
+	[[nodiscard]]
 	const Diagnostics<H, handleType>& diagnostics() const
 		/// Returns error diagnostics.
 	{
 		return _error.diagnostics();
 	}
 
+	[[nodiscard]]
 	std::string toString() const
 		/// Returns the formatted error diagnostics for the handle.
 	{
@@ -126,6 +131,7 @@ public:
 			_error.toString());
 	}
 
+	[[nodiscard]]
 	static std::string errorString(const H& handle)
 		/// Returns the error diagnostics string for the handle.
 	{

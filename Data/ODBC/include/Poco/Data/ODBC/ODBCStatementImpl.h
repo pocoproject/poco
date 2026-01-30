@@ -49,31 +49,39 @@ public:
 	~ODBCStatementImpl() override;
 		/// Destroys the ODBCStatementImpl.
 
+	[[nodiscard]]
 	std::string nativeSQL();
 		/// Returns the SQL string as modified by the driver.
 
 protected:
+	[[nodiscard]]
 	std::size_t columnsReturned() const override;
 		/// Returns number of columns returned by query.
 
+	[[nodiscard]]
 	int affectedRowCount() const override;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert or update.
 
+	[[nodiscard]]
 	const MetaColumn& metaColumn(std::size_t pos) const override;
 		/// Returns column meta data.
 
+	[[nodiscard]]
 	bool hasNext() override;
 		/// Returns true if a call to next() will return data.
 
+	[[nodiscard]]
 	std::size_t next() override;
 		/// Retrieves the next row or set of rows from the resultset.
 		/// Returns the number of rows retrieved.
 		/// Will throw, if the resultset is empty.
 
+	[[nodiscard]]
 	bool canBind() const override;
 		/// Returns true if a valid statement is set and we can bind.
 
+	[[nodiscard]]
 	bool canCompile() const override;
 		/// Returns true if another compile is possible.
 
@@ -84,9 +92,11 @@ protected:
 	void bindImpl() override;
 		/// Binds all parameters and executes the statement.
 
+	[[nodiscard]]
 	AbstractExtraction::ExtractorPtr extractor() override;
 		/// Returns the concrete extractor used by the statement.
 
+	[[nodiscard]]
 	AbstractBinding::BinderPtr binder() override;
 		/// Returns the concrete binder used by the statement.
 
@@ -118,6 +128,7 @@ private:
 	void makeInternalExtractors();
 		/// Creates internal extractors if none were supplied from the user.
 
+	[[nodiscard]]
 	bool isStoredProcedure() const override;
 		/// Returns true if SQL is a stored procedure call.
 
@@ -128,12 +139,14 @@ private:
 		/// it is called upon the first check for data availability
 		/// (see hasNext() function).
 
+	[[nodiscard]]
 	bool hasData() const;
 		/// Returns true if statement returns data.
 
 	void makeStep();
 		/// Fetches the next row of data.
 
+	[[nodiscard]]
 	bool nextRowReady() const;
 		/// Returns true if there is a row fetched but not yet extracted.
 

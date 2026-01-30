@@ -85,6 +85,7 @@ public:
 	void setTimeout(const Poco::Timespan& timeout);
 		/// Sets the timeout for socket operations.
 
+	[[nodiscard]]
 	Poco::Timespan getTimeout() const;
 		/// Returns the timeout for socket operations.
 
@@ -96,6 +97,7 @@ public:
 		/// for switching to passive mode. The same applies to
 		/// EPRT and PORT for active connections.
 
+	[[nodiscard]]
 	bool getPassive() const;
 		/// Returns true iff passive mode is enabled for this connection.
 
@@ -124,6 +126,7 @@ public:
 		/// Throws a FTPException in case of a FTP-specific error, or a
 		/// NetException in case of a general network communication failure.
 
+	[[nodiscard]]
 	std::string systemType();
 		/// Returns the system type of the FTP server.
 		///
@@ -138,6 +141,7 @@ public:
 		/// Throws a FTPException in case of a FTP-specific error, or a
 		/// NetException in case of a general network communication failure.
 
+	[[nodiscard]]
 	FileType getFileType() const;
 		/// Returns the file type for transferring files.
 
@@ -150,6 +154,7 @@ public:
 		/// Throws a FTPException in case of a FTP-specific error, or a
 		/// NetException in case of a general network communication failure.
 
+	[[nodiscard]]
 	std::string getWorkingDirectory();
 		/// Returns the current working directory on the server.
 		///
@@ -296,15 +301,19 @@ public:
 		/// Sends the given command verbatim to the server
 		/// and waits for a response.
 
+	[[nodiscard]]
 	bool isOpen() const;
 		/// Returns true if the connection with FTP server is opened.
 
+	[[nodiscard]]
 	bool isLoggedIn() const;
 		/// Returns true if the session is logged in.
 
+	[[nodiscard]]
 	bool isSecure() const;
 		/// Returns true if the session is FTPS.
 
+	[[nodiscard]]
 	const std::string& welcomeMessage();
 		/// Returns the welcome message.
 
@@ -325,14 +334,21 @@ protected:
 		DEFAULT_TIMEOUT = 30000000 // 30 seconds default timeout for socket operations
 	};
 
+	[[nodiscard]]
 	const std::string& getHost() const;
 		/// Returns the host name
 
+	[[nodiscard]]
 	static bool isPositivePreliminary(int status);
+	[[nodiscard]]
 	static bool isPositiveCompletion(int status);
+	[[nodiscard]]
 	static bool isPositiveIntermediate(int status);
+	[[nodiscard]]
 	static bool isTransientNegative(int status);
+	[[nodiscard]]
 	static bool isPermanentNegative(int status);
+	[[nodiscard]]
 	std::string extractPath(const std::string& response);
 	virtual StreamSocket establishDataConnection(const std::string& command, const std::string& arg);
 	StreamSocket activeDataConnection(const std::string& command, const std::string& arg);

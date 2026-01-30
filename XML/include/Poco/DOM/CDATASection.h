@@ -58,10 +58,13 @@ class XML_API CDATASection: public Text
 {
 public:
 	// Text
+	[[nodiscard]]
 	Text* splitText(unsigned long offset);
 
 	// Node
+	[[nodiscard]]
 	const XMLString& nodeName() const;
+	[[nodiscard]]
 	unsigned short nodeType() const;
 
 protected:
@@ -69,6 +72,7 @@ protected:
 	CDATASection(Document* pOwnerDocument, const CDATASection& sec);
 	~CDATASection();
 
+	[[nodiscard]]
 	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:

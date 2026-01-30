@@ -75,7 +75,7 @@ void NetworkInterfaceTest::testMap()
 			std::cout << "=============" << std::endl << std::endl;
 		}
 	}
-	catch (Poco::NotImplementedException&)
+	catch ([[maybe_unused]] Poco::NotImplementedException& e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;
@@ -119,7 +119,7 @@ void NetworkInterfaceTest::testList()
 			std::cout << "==============" << std::endl << std::endl;
 		}
 	}
-	catch (Poco::NotImplementedException&)
+	catch ([[maybe_unused]] Poco::NotImplementedException& e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;
@@ -139,7 +139,7 @@ void NetworkInterfaceTest::testForName()
 			assertTrue (ifc.name() == it->second.name());
 		}
 	}
-	catch (Poco::NotImplementedException&)
+	catch ([[maybe_unused]] Poco::NotImplementedException& e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;
@@ -172,10 +172,10 @@ void NetworkInterfaceTest::testForAddress()
 			{
 				try
 				{
-					it->second.firstAddress(IPAddress::IPv4);
+					[[maybe_unused]] IPAddress _ = it->second.firstAddress(IPAddress::IPv4);
 					fail ("must throw");
 				}
-				catch (NotFoundException&) { }
+				catch ([[maybe_unused]] NotFoundException& e) { }
 
 				IPAddress addr(IPAddress::IPv4);
 				assertTrue (addr.isWildcard());
@@ -184,7 +184,7 @@ void NetworkInterfaceTest::testForAddress()
 			}
 		}
 	}
-	catch (Poco::NotImplementedException&)
+	catch ([[maybe_unused]] Poco::NotImplementedException& e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;
@@ -204,7 +204,7 @@ void NetworkInterfaceTest::testForIndex()
 			assertTrue (ifc.index() == it->second.index());
 		}
 	}
-	catch (Poco::NotImplementedException&)
+	catch ([[maybe_unused]] Poco::NotImplementedException& e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;
@@ -231,7 +231,7 @@ void NetworkInterfaceTest::testMapIpOnly()
 				std::cout << "MAC Address:" << mac << std::endl;
 		}
 	}
-	catch (Poco::NotImplementedException&)
+	catch ([[maybe_unused]] Poco::NotImplementedException& e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;
@@ -251,7 +251,7 @@ void NetworkInterfaceTest::testMapUpOnly()
 			assertTrue (it->second.isUp());
 		}
 	}
-	catch (Poco::NotImplementedException&)
+	catch ([[maybe_unused]] Poco::NotImplementedException& e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;
@@ -298,7 +298,7 @@ void NetworkInterfaceTest::testListMapConformance()
 
 		assertTrue (counter == l.size());
 	}
-	catch (Poco::NotImplementedException&)
+	catch ([[maybe_unused]] Poco::NotImplementedException& e)
 	{
 	#if POCO_OS != POCO_OS_ANDROID
 		throw;

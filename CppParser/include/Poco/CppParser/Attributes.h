@@ -47,36 +47,43 @@ public:
 	Attributes& operator = (const Attributes& attrs);
 		/// Assignment operator.
 
+	[[nodiscard]]
 	bool has(const std::string& name) const;
 		/// Returns true if an attribute with the given name exists.
 
+	[[nodiscard]]
 	std::string getString(const std::string& name) const;
 		/// Returns the attribute's value as a string.
 		///
 		/// Throws a Poco::NotFoundException if the attribute does not exist.
 
+	[[nodiscard]]
 	std::string getString(const std::string& name, const std::string& defaultValue) const;
 		/// Returns the attribute's value as a string, if it exists.
 		/// Returns the defaultValue if the attribute does not exist.
 
+	[[nodiscard]]
 	int getInt(const std::string& name) const;
 		/// Returns the attribute's value as an integer.
 		///
 		/// Throws a Poco::NotFoundException if the attribute does not exist.
 		/// Throws a Poco::SyntaxException if the stored value is not an integer.
 
+	[[nodiscard]]
 	int getInt(const std::string& name, int defaultValue) const;
 		/// Returns the attribute's value as an integer, if it exists.
 		/// Returns the defaultValue if the attribute does not exist.
 		///
 		/// Throws a Poco::SyntaxException if the stored value is not an integer.
 
+	[[nodiscard]]
 	bool getBool(const std::string& name) const;
 		/// Returns the attribute's value as a boolean.
 		/// The returned value is 'true', iff the stored value is not "false".
 		///
 		/// Throws a Poco::NotFoundException if the attribute does not exist.
 
+	[[nodiscard]]
 	bool getBool(const std::string& name, bool defaultValue) const;
 		/// Returns the attribute's value as a boolean, if it exists.
 		/// The returned value is 'true', iff the stored value is not "false".
@@ -88,10 +95,15 @@ public:
 		/// Removes the attribute with the given name.
 		/// Does nothing if the attribute does not exist.
 
+	[[nodiscard]]
 	const std::string& operator [] (const std::string& name) const;
+
+	[[nodiscard]]
 	std::string& operator [] (const std::string& name);
 
+	[[nodiscard]]
 	Iterator begin() const;
+	[[nodiscard]]
 	Iterator end() const;
 
 	void clear();

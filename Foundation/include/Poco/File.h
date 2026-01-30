@@ -102,9 +102,11 @@ public:
 	void swap(File& file) noexcept;
 		/// Swaps the file with another one.
 
+	[[nodiscard]]
 	const std::string& path() const;
 		/// Returns the path.
 
+	[[nodiscard]]
 	std::string absolutePath() const;
 		/// Returns absolute path.
 		/// Attempts to find the existing file
@@ -112,9 +114,11 @@ public:
 		/// environment variable.
 		/// If the file doesn't exist, returns empty string.
 
+	[[nodiscard]]
 	bool exists() const;
 		/// Returns true iff the file exists.
 
+	[[nodiscard]]
 	bool existsAnywhere() const;
 		/// If the file path is relative, searches
 		/// for the file in the current working directory
@@ -123,9 +127,11 @@ public:
 		/// functionality is identical to the
 		/// exists() call.
 
+	[[nodiscard]]
 	bool canRead() const;
 		/// Returns true iff the file is readable.
 
+	[[nodiscard]]
 	bool canWrite() const;
 		/// Returns true iff the file is writeable.
 
@@ -137,18 +143,23 @@ public:
 		/// On Unix platforms, the executable permission
 		/// bit must be set.
 
+	[[nodiscard]]
 	bool isFile() const;
 		/// Returns true iff the file is a regular file.
 
+	[[nodiscard]]
 	bool isLink() const;
 		/// Returns true iff the file is a symbolic link.
 
+	[[nodiscard]]
 	bool isDirectory() const;
 		/// Returns true iff the file is a directory.
 
+	[[nodiscard]]
 	bool isDevice() const;
 		/// Returns true iff the file is a device.
 
+	[[nodiscard]]
 	bool isHidden() const;
 		/// Returns true if the file is hidden.
 		///
@@ -158,6 +169,7 @@ public:
 		/// On Unix platforms, the file name must
 		/// begin with a period for this to be true.
 
+	[[nodiscard]]
 	Timestamp created() const;
 		/// Returns the creation date of the file.
 		///
@@ -167,12 +179,14 @@ public:
 		/// On such platforms, created() returns
 		/// the time of the last inode modification.
 
+	[[nodiscard]]
 	Timestamp getLastModified() const;
 		/// Returns the modification date of the file.
 
 	File& setLastModified(const Timestamp& ts);
 		/// Sets the modification date of the file.
 
+	[[nodiscard]]
 	FileSize getSize() const;
 		/// Returns the size of the file in bytes.
 
@@ -252,20 +266,29 @@ public:
 		/// Fills the vector with the names of all
 		/// files in the directory.
 
+	[[nodiscard]]
 	FileSize totalSpace() const;
 		/// Returns the total size in bytes of the partition containing this path.
 
+	[[nodiscard]]
 	FileSize usableSpace() const;
 		/// Returns the number of usable free bytes on the partition containing this path.
 
+	[[nodiscard]]
 	FileSize freeSpace() const;
 		/// Returns the number of free bytes on the partition containing this path.
 
+	[[nodiscard]]
 	bool operator == (const File& file) const;
+	[[nodiscard]]
 	bool operator != (const File& file) const;
+	[[nodiscard]]
 	bool operator <  (const File& file) const;
+	[[nodiscard]]
 	bool operator <= (const File& file) const;
+	[[nodiscard]]
 	bool operator >  (const File& file) const;
+	[[nodiscard]]
 	bool operator >= (const File& file) const;
 
 	static void handleLastError(const std::string& path);

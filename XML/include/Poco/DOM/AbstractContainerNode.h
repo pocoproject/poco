@@ -34,16 +34,22 @@ class XML_API AbstractContainerNode: public AbstractNode
 {
 public:
 	// Node
+	[[nodiscard]]
 	Node* firstChild() const;
+	[[nodiscard]]
 	Node* lastChild() const;
 	Node* insertBefore(Node* newChild, Node* refChild);
 	Node* insertAfterNP(Node* newChild, Node* refChild);
 	Node* replaceChild(Node* newChild, Node* oldChild);
 	Node* removeChild(Node* oldChild);
 	Node* appendChild(Node* newChild);
+	[[nodiscard]]
 	bool hasChildNodes() const;
+	[[nodiscard]]
 	bool hasAttributes() const;
+	[[nodiscard]]
 	Node* getNodeByPath(const XMLString& path) const;
+	[[nodiscard]]
 	Node* getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const;
 
 protected:
@@ -54,13 +60,21 @@ protected:
 	void dispatchNodeRemovedFromDocument();
 	void dispatchNodeInsertedIntoDocument();
 
+	[[nodiscard]]
 	static const Node* findNode(XMLString::const_iterator& it, const XMLString::const_iterator& end, const Node* pNode, const NSMap* pNSMap, bool& indexBound);
+	[[nodiscard]]
 	static const Node* findElement(const XMLString& name, const Node* pNode, const NSMap* pNSMap);
+	[[nodiscard]]
 	static const Node* findElement(int index, const Node* pNode, const NSMap* pNSMap);
+	[[nodiscard]]
 	static const Node* findElement(const XMLString& attr, const XMLString& value, const Node* pNode, const NSMap* pNSMap);
+	[[nodiscard]]
 	static const Attr* findAttribute(const XMLString& name, const Node* pNode, const NSMap* pNSMap);
+	[[nodiscard]]
 	bool hasAttributeValue(const XMLString& name, const XMLString& value, const NSMap* pNSMap) const;
+	[[nodiscard]]
 	static bool namesAreEqual(const Node* pNode1, const Node* pNode2, const NSMap* pNSMap);
+	[[nodiscard]]
 	static bool namesAreEqual(const Node* pNode, const XMLString& name, const NSMap* pNSMap);
 
 	static const XMLString WILDCARD;

@@ -34,6 +34,7 @@ class Net_API FTPPasswordProvider
 	/// provide a password.
 {
 public:
+	[[nodiscard]]
 	virtual std::string password(const std::string& username, const std::string& host) = 0;
 		/// Provide the password for the given user on the given host.
 
@@ -79,6 +80,7 @@ public:
 		/// during application initialization, before the
 		/// FTPStreamFactory is used for the first time.
 
+	[[nodiscard]]
 	static const std::string& getAnonymousPassword();
 		/// Returns the password used for anonymous FTP.
 
@@ -91,6 +93,7 @@ public:
 		/// during application initialization, before the
 		/// FTPStreamFactory is used for the first time.
 
+	[[nodiscard]]
 	static FTPPasswordProvider* getPasswordProvider();
 		/// Returns the FTPPasswordProvider currently in use,
 		/// or NULL if no one has been set.

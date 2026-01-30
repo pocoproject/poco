@@ -90,10 +90,12 @@ public:
 	virtual void value(bool b) = 0;
 		/// A boolean value is read.
 
+	[[nodiscard]]
 	virtual Poco::Dynamic::Var asVar() const;
 		/// Returns the result of the parser (an object, array or string),
 		/// empty Var if there is no result.
 
+	[[nodiscard]]
 	virtual Poco::DynamicStruct asStruct() const;
 		/// Returns the result of the parser (an object, array or string),
 		/// empty Var if there is no result.

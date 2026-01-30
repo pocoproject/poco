@@ -44,6 +44,7 @@ public:
 	virtual ~Query();
 		/// Destroys the Query.
 
+	[[nodiscard]]
 	Object::Ptr findObject(const std::string& path) const;
 		/// Search for an object.
 		///
@@ -54,6 +55,7 @@ public:
 		/// internally, a shared pointer to new (heap-allocated) Object is
 		/// returned; this may be expensive operation.
 
+	[[nodiscard]]
 	Object& findObject(const std::string& path, Object& obj) const;
 		/// Search for an object.
 		///
@@ -61,6 +63,7 @@ public:
 		/// Object through the reference passed in. When the object can't be
 		/// found, the provided Object is emptied and returned.
 
+	[[nodiscard]]
 	Array::Ptr findArray(const std::string& path) const;
 		/// Search for an array.
 		///
@@ -71,6 +74,7 @@ public:
 		/// internally, a shared pointer to new (heap-allocated) Object is
 		/// returned; this may be expensive operation.
 
+	[[nodiscard]]
 	Array& findArray(const std::string& path, Array& obj) const;
 		/// Search for an array.
 		///
@@ -78,6 +82,7 @@ public:
 		/// Object through the reference passed in. When the array can't be
 		/// found, the provided Object is emptied and returned.
 
+	[[nodiscard]]
 	Dynamic::Var find(const std::string& path) const;
 		/// Searches a value.
 		///
@@ -85,7 +90,8 @@ public:
 		/// the name of the first child. When the value can't be found
 		/// an empty value is returned.
 
-	template<typename T>
+	template <typename T>
+	[[nodiscard]]
 	T findValue(const std::string& path, const T& def) const
 		/// Searches for a value will convert it to the given type.
 		/// When the value can't be found or has an invalid type
@@ -106,6 +112,7 @@ public:
 		return result;
 	}
 
+	[[nodiscard]]
 	std::string findValue(const char* path, const char* def) const
 		/// Searches for a value will convert it to the given type.
 		/// When the value can't be found or has an invalid type

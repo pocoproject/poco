@@ -313,9 +313,11 @@ public:
 	Statement& operator , (const char* value);
 		/// Adds the value to the list of values to be supplied to the SQL string formatting function.
 
+	[[nodiscard]]
 	const std::string& toString() const;
 		/// Creates a string from the accumulated SQL statement.
 
+	[[nodiscard]]
 	Optional<std::size_t> statementsCount() const;
 		/// Returns the total number of SQL statements held in the accummulated SQL statement.
 		///
@@ -331,22 +333,27 @@ public:
 		///
 		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
+	[[nodiscard]]
 	const std::string& parseError();
 		/// Returns the SQL statement parse error message, if any.
 		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns an empty string.
 
+	[[nodiscard]]
 	Optional<bool> isSelect() const;
 		/// Returns true if the statement consists only of SELECT statement(s).
 		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
+	[[nodiscard]]
 	Optional<bool> isInsert() const;
 		/// Returns true if the statement consists only of INSERT statement(s).
 		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
+	[[nodiscard]]
 	Optional<bool> isUpdate() const;
 		/// Returns true if the statement consists only of UPDATE statement(s).
 		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
+	[[nodiscard]]
 	Optional<bool> isDelete() const;
 		/// Returns true if the statement consists only of DELETE statement(s).
 		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
@@ -355,14 +362,17 @@ public:
 		/// Returns true if the statement contains a SELECT statement.
 		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
+	[[nodiscard]]
 	Optional<bool> hasInsert() const;
 		/// Returns true if the statement contains an INSERT statement.
 		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
+	[[nodiscard]]
 	Optional<bool> hasUpdate() const;
 		/// Returns true if the statement contains an UPDATE statement.
 		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
 
+	[[nodiscard]]
 	Optional<bool> hasDelete() const;
 		/// Returns true if the statement contains a DELETE statement.
 		/// For Poco::Data builds with POCO_DATA_NO_SQL_PARSER, it always returns unspecified.
@@ -419,6 +429,7 @@ public:
 		/// from the now() manipulator. This setting does not affect the statement's
 		/// capability to be executed synchronously by directly calling execute().
 
+	[[nodiscard]]
 	bool isAsync() const;
 		/// Returns true if statement was marked for asynchronous execution.
 
@@ -428,13 +439,16 @@ public:
 		/// asynchronous statement is the execution result (i.e. number of
 		/// rows retrieved). For synchronous statements, the return value is zero.
 
+	[[nodiscard]]
 	bool initialized();
 		/// Returns true if the statement was initialized (i.e. not executed yet).
 
+	[[nodiscard]]
 	bool paused();
 		/// Returns true if the statement was paused (a range limit stopped it
 		/// and there is more work to do).
 
+	[[nodiscard]]
 	bool done();
 		/// Returns true if the statement was completely executed or false if a range limit stopped it
 		/// and there is more work to do. When no limit is set, it will always return true after calling execute().
@@ -445,47 +459,59 @@ public:
 	Statement& reset();
 		/// Resets the Statement so that it can be filled with a new SQL query.
 
+	[[nodiscard]]
 	bool canModifyStorage();
 		/// Returns true if statement is in a state that allows the internal storage to be modified.
 
+	[[nodiscard]]
 	Storage storage() const;
 		/// Returns the internal storage type for the statement.
 
 	void setStorage(const std::string& storage);
 		/// Sets the internal storage type for the statement.
 
+	[[nodiscard]]
 	const std::string& getStorage() const;
 		/// Returns the internal storage type for the statement.
 
+	[[nodiscard]]
 	std::size_t columnsExtracted(int dataSet = StatementImpl::USE_CURRENT_DATA_SET) const;
 		/// Returns the number of columns returned for current data set.
 		/// Default value indicates current data set (if any).
 
+	[[nodiscard]]
 	std::size_t rowsExtracted(int dataSet = StatementImpl::USE_CURRENT_DATA_SET) const;
 		/// Returns the number of rows returned for current data set during last statement
 		/// execution. Default value indicates current data set (if any).
 
+	[[nodiscard]]
 	std::size_t subTotalRowCount(int dataSet = StatementImpl::USE_CURRENT_DATA_SET) const;
 		/// Returns the number of rows extracted so far for the data set.
 		/// Default value indicates current data set (if any).
 
+	[[nodiscard]]
 	std::size_t affectedRowCount() const;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 
+	[[nodiscard]]
 	std::size_t extractionCount() const;
 		/// Returns the number of extraction storage buffers associated
 		/// with the current data set.
 
+	[[nodiscard]]
 	std::size_t dataSetCount() const;
 		/// Returns the number of data sets associated with the statement.
 
+	[[nodiscard]]
 	std::size_t nextDataSet();
 		/// Returns the index of the next data set.
 
+	[[nodiscard]]
 	std::size_t previousDataSet();
 		/// Returns the index of the previous data set.
 
+	[[nodiscard]]
 	bool hasMoreDataSets() const;
 		/// Returns false if the current data set index points to the last
 		/// data set. Otherwise, it returns true.
@@ -494,33 +520,42 @@ public:
 		/// Sets the row formatter for this statement.
 		/// Statement takes the ownership of the formatter.
 
+	[[nodiscard]]
 	State state() const;
 		/// Returns the statement state.
 
 protected:
 	using ImplPtr = StatementImpl::Ptr;
 
+	[[nodiscard]]
 	const AbstractExtractionVec& extractions() const;
 		/// Returns the extractions vector.
 
+	[[nodiscard]]
 	const MetaColumn& metaColumn(std::size_t pos) const;
 		/// Returns the type for the column at specified position.
 
+	[[nodiscard]]
 	const MetaColumn& metaColumn(const std::string& name) const;
 		/// Returns the type for the column with specified name.
 
+	[[nodiscard]]
 	 bool isNull(std::size_t col, std::size_t row) const;
 		/// Returns true if the current row value at column pos is null.
 
+	[[nodiscard]]
 	 bool isBulkExtraction() const;
 		/// Returns true if this statement extracts data in bulk.
 
+	[[nodiscard]]
 	ImplPtr impl() const;
 		/// Returns pointer to statement implementation.
 
+	[[nodiscard]]
 	const RowFormatter::Ptr& getRowFormatter();
 		/// Returns the row formatter for this statement.
 
+	[[nodiscard]]
 	Session session();
 		/// Returns the underlying session.
 
@@ -555,9 +590,11 @@ private:
 
 #ifndef POCO_DATA_NO_SQL_PARSER
 
+	[[nodiscard]]
 	bool isType(unsigned int type) const;
 		/// Returns true if the statement is of the argument type.
 
+	[[nodiscard]]
 	bool hasType(unsigned int type) const;
 		/// Returns true if the statement is of the argument type.
 

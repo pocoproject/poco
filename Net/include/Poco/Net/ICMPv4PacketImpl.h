@@ -131,21 +131,25 @@ public:
 	~ICMPv4PacketImpl();
 		/// Destructor.
 
+	[[nodiscard]]
 	int packetSize() const;
 		/// Returns the total length of packet (header + data);
 
+	[[nodiscard]]
 	struct timeval time(Poco::UInt8* buffer = nullptr, int length = 0) const;
 		/// Returns current epoch time if either buffer or length are equal to zero.
 		/// Otherwise, it extracts the time value from the supplied buffer.
 		///
 		/// Buffer includes IP header, ICMP header and data.
 
+	[[nodiscard]]
 	bool validReplyID(Poco::UInt8* buffer, int length) const;
 		/// Returns true if the extracted id is recognized
 		/// (i.e. equals the process id).
 		///
 		/// Buffer includes IP header, ICMP header and data.
 
+	[[nodiscard]]
 	virtual std::string errorDescription(Poco::UInt8* buffer, int length, int& type, int& code);
 		/// Returns error description string.
 		/// If supplied buffer contains ICMPv4 echo reply packet, an
@@ -155,6 +159,7 @@ public:
 		///
 		/// Buffer includes IP header, ICMP header and data.
 
+	[[nodiscard]]
 	virtual std::string typeDescription(int typeId);
 		/// Returns the description of the packet type.
 
@@ -168,7 +173,9 @@ public:
 
 private:
 	void initPacket();
+	[[nodiscard]]
 	Header* header(Poco::UInt8* buffer, int length) const;
+	[[nodiscard]]
 	Poco::UInt8* data(Poco::UInt8* buffer, int length) const;
 
 	static const std::string DESTINATION_UNREACHABLE_CODE[DESTINATION_UNREACHABLE_LENGTH];

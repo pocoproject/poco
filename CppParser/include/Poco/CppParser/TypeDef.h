@@ -36,8 +36,10 @@ public:
 	~TypeDef();
 		/// Destroys the TypeDef.
 
+	[[nodiscard]]
 	Symbol::Kind kind() const;
 
+	[[nodiscard]]
 	std::string baseType() const;
 		/// Returns the underlying base type.
 };
@@ -53,8 +55,10 @@ public:
 	~TypeAlias();
 		/// Destroys the TypeAlias.
 
+	[[nodiscard]]
 	Symbol::Kind kind() const;
 
+	[[nodiscard]]
 	std::string baseType() const;
 		/// Returns the underlying base type.
 };

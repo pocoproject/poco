@@ -67,6 +67,7 @@ class Net_API HTTPFixedLengthIOS: public virtual std::ios
 public:
 	HTTPFixedLengthIOS(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length, HTTPFixedLengthStreamBuf::openmode mode);
 	~HTTPFixedLengthIOS();
+	[[nodiscard]]
 	HTTPFixedLengthStreamBuf* rdbuf();
 
 protected:
@@ -81,6 +82,7 @@ public:
 	HTTPFixedLengthInputStream(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length);
 	~HTTPFixedLengthInputStream();
 
+	[[nodiscard]]
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
 
@@ -96,6 +98,7 @@ public:
 	HTTPFixedLengthOutputStream(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length);
 	~HTTPFixedLengthOutputStream();
 
+	[[nodiscard]]
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
 

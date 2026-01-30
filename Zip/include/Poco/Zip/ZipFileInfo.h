@@ -45,34 +45,48 @@ public:
 	~ZipFileInfo();
 		/// Destroys the ZipFileInfo.
 
+	[[nodiscard]]
 	ZipCommon::CompressionMethod getCompressionMethod() const;
 
+	[[nodiscard]]
 	bool isEncrypted() const;
 
+	[[nodiscard]]
 	const Poco::DateTime& lastModifiedAt() const;
 
+	[[nodiscard]]
 	Poco::UInt32 getCRC() const;
 
+	[[nodiscard]]
 	Poco::UInt32 getHeaderSize() const;
 		/// Returns the total size of the header including filename + other additional fields
 
+	[[nodiscard]]
 	Poco::UInt64 getCompressedSize() const;
 
+	[[nodiscard]]
 	Poco::UInt64 getUncompressedSize() const;
 
+	[[nodiscard]]
 	Poco::UInt64 getOffset() const;
 		/// Where on the disk starts the localheader. Combined with the disk number gives the exact location of the header
 
+	[[nodiscard]]
 	const std::string& getFileName() const;
 
+	[[nodiscard]]
 	bool isFile() const;
 
+	[[nodiscard]]
 	bool isDirectory() const;
 
+	[[nodiscard]]
 	bool hasExtraField() const;
 
+	[[nodiscard]]
 	const std::string& getExtraField() const;
 
+	[[nodiscard]]
 	const std::string& getFileComment() const;
 
 	void getVersionMadeBy(int& major, int& minor) const;
@@ -81,18 +95,23 @@ public:
 	void getRequiredVersion(int& major, int& minor) const;
 		/// The minimum version required to extract the data
 
+	[[nodiscard]]
 	ZipCommon::HostSystem getHostSystem() const;
 
+	[[nodiscard]]
 	Poco::UInt16 getDiskNumberStart() const;
 		/// The number of the disk on which this file begins (multidisk archives)
 
+	[[nodiscard]]
 	ZipCommon::FileType getFileType() const;
 		/// Binary or ASCII file?
 
+	[[nodiscard]]
 	std::string createHeader() const;
 
 	void setOffset(Poco::UInt64 val);
 
+	[[nodiscard]]
 	bool needsZip64() const;
 
 	void setZip64Data();
@@ -127,20 +146,28 @@ private:
 
 	void parseDateTime();
 
+	[[nodiscard]]
 	Poco::UInt32 getCRCFromHeader() const;
 
+	[[nodiscard]]
 	Poco::UInt32 getCompressedSizeFromHeader() const;
 
+	[[nodiscard]]
 	Poco::UInt32 getUncompressedSizeFromHeader() const;
 
+	[[nodiscard]]
 	Poco::UInt32 getOffsetFromHeader() const;
 
+	[[nodiscard]]
 	Poco::UInt16 getFileNameLength() const;
 
+	[[nodiscard]]
 	Poco::UInt16 getExtraFieldLength() const;
 
+	[[nodiscard]]
 	Poco::UInt16 getFileCommentLength() const;
 
+	[[nodiscard]]
 	Poco::UInt32 getExternalFileAttributes() const;
 
 	void setUnixAttributes();

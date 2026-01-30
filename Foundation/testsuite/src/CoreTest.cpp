@@ -524,7 +524,7 @@ void CoreTest::testFIFOBufferChar()
 	assertTrue ('7' == f[2]);
 	assertTrue ('8' == f[3]);
 	assertTrue ('9' == f[4]);
-	try { T POCO_UNUSED i = f[10]; fail ("must fail"); }
+	try { [[maybe_unused]] T i = f[10]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
 	v.clear();
@@ -552,7 +552,7 @@ void CoreTest::testFIFOBufferChar()
 	assertTrue ('h' == f[12]);
 	assertTrue ('i' == f[13]);
 	assertTrue ('j' == f[14]);
-	try { T POCO_UNUSED i = f[15]; fail ("must fail"); }
+	try { [[maybe_unused]] T i = f[15]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
 	f.read(b, 10);
@@ -564,7 +564,7 @@ void CoreTest::testFIFOBufferChar()
 	assertTrue ('h' == f[2]);
 	assertTrue ('i' == f[3]);
 	assertTrue ('j' == f[4]);
-	try { T POCO_UNUSED i = f[5]; fail ("must fail"); }
+	try { [[maybe_unused]] T i = f[5]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
 	assertTrue (1 == _notToReadable);
@@ -580,7 +580,7 @@ void CoreTest::testFIFOBufferChar()
 	assertTrue (5 == b.size());
 	assertTrue (20 == f.size());
 	assertTrue (0 == f.used());
-	try { T POCO_UNUSED i = f[0]; fail ("must fail"); }
+	try { [[maybe_unused]] T i = f[0]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 	assertTrue (f.isEmpty());
 
@@ -851,7 +851,7 @@ void CoreTest::testFIFOBufferInt()
 	assertTrue (7 == f[2]);
 	assertTrue (8 == f[3]);
 	assertTrue (9 == f[4]);
-	try { T POCO_UNUSED i = f[10]; fail ("must fail"); }
+	try { [[maybe_unused]] T i = f[10]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
 	v.clear();
@@ -879,7 +879,7 @@ void CoreTest::testFIFOBufferInt()
 	assertTrue (17 == f[12]);
 	assertTrue (18 == f[13]);
 	assertTrue (19 == f[14]);
-	try { T POCO_UNUSED i = f[15]; fail ("must fail"); }
+	try { [[maybe_unused]] T i = f[15]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
 	f.read(b, 10);
@@ -891,14 +891,14 @@ void CoreTest::testFIFOBufferInt()
 	assertTrue (17 == f[2]);
 	assertTrue (18 == f[3]);
 	assertTrue (19 == f[4]);
-	try { T POCO_UNUSED i = f[5]; fail ("must fail"); }
+	try { [[maybe_unused]] T i = f[5]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
 	f.read(b, 6);
 	assertTrue (5 == b.size());
 	assertTrue (20 == f.size());
 	assertTrue (0 == f.used());
-	try { T POCO_UNUSED i = f[0]; fail ("must fail"); }
+	try { [[maybe_unused]] T i = f[0]; fail ("must fail"); }
 	catch (InvalidAccessException&) { }
 
 	assertTrue (f.isEmpty());
@@ -1041,7 +1041,7 @@ void CoreTest::testNullable()
 
 	try
 	{
-		int POCO_UNUSED tmp = n1.value();
+		[[maybe_unused]] int tmp = n1.value();
 		fail("null value, must throw");
 	}
 	catch (Poco::NullValueException&)

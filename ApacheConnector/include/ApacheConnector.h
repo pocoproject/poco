@@ -26,6 +26,7 @@ public:
 	ApacheRequestRec(request_rec* _pRec);
 		/// Creates the ApacheRequestRec;
 
+	[[nodiscard]]
 	bool haveRequestBody();
 		/// Returns true if the request contains a body.
 
@@ -56,6 +57,7 @@ public:
 		/// Copies the request uri and header fields from the Apache request
 		/// to the ApacheServerRequest.
 
+	[[nodiscard]]
 	bool secure();
 		/// Returns true if the request is using a secure
 		/// connection. Returns false if no secure connection

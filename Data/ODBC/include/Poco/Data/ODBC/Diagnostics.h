@@ -67,7 +67,7 @@ public:
 	{
 		std::memset(_connectionName, 0, sizeof(_connectionName));
 		std::memset(_serverName, 0, sizeof(_serverName));
-		diagnostics();
+		(void)diagnostics();
 	}
 
 	~Diagnostics()
@@ -75,6 +75,7 @@ public:
 	{
 	}
 
+	[[nodiscard]]
 	std::string sqlState(int index) const
 		/// Returns SQL state.
 	{
@@ -82,6 +83,7 @@ public:
 		return std::string((char*) _fields[index]._sqlState);
 	}
 
+	[[nodiscard]]
 	std::string message(int index) const
 		/// Returns error message.
 	{
@@ -89,6 +91,7 @@ public:
 		return std::string((char*) _fields[index]._message);
 	}
 
+	[[nodiscard]]
 	long nativeError(int index) const
 		/// Returns native error code.
 	{
@@ -96,6 +99,7 @@ public:
 		return _fields[index]._nativeError;
 	}
 
+	[[nodiscard]]
 	std::string connectionName() const
 		/// Returns the connection name.
 		/// If there is no active connection, connection name defaults to NONE.
@@ -105,6 +109,7 @@ public:
 		return std::string((char*) _connectionName);
 	}
 
+	[[nodiscard]]
 	std::string serverName() const
 		/// Returns the server name.
 		/// If the connection has not been established, server name defaults to NONE.
@@ -114,6 +119,7 @@ public:
 		return std::string((char*) _serverName);
 	}
 
+	[[nodiscard]]
 	int count() const
 		/// Returns the number of contained diagnostic records.
 	{
@@ -126,21 +132,25 @@ public:
 		_fields.clear();
 	}
 
+	[[nodiscard]]
 	const FieldVec& fields() const
 	{
 		return _fields;
 	}
 
+	[[nodiscard]]
 	Iterator begin() const
 	{
 		return _fields.begin();
 	}
 
+	[[nodiscard]]
 	Iterator end() const
 	{
 		return _fields.end();
 	}
 
+	[[nodiscard]]
 	const Diagnostics& diagnostics()
 	{
 		if (POCO_ODBC_NULL_HANDLE == _handle) return *this;
@@ -219,6 +229,7 @@ public:
 	}
 
 protected:
+	[[nodiscard]]
 	const H& handle() const
 	{
 		return _handle;

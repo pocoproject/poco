@@ -48,6 +48,7 @@ protected:
 	void setAllowCommentsImpl(bool comments);
 		/// Allow or disallow comments. By default, comments are not allowed.
 
+	[[nodiscard]]
 	bool getAllowCommentsImpl() const;
 		/// Returns true if comments are allowed, false otherwise.
 		///
@@ -58,6 +59,7 @@ protected:
 		///
 		/// By default, null byte is allowed.
 
+	[[nodiscard]]
 	bool getAllowNullByteImpl() const;
 		/// Returns true if null byte is allowed, false otherwise.
 		///
@@ -66,24 +68,30 @@ protected:
 	void setDepthImpl(std::size_t depth);
 		/// Sets the allowed JSON depth.
 
+	[[nodiscard]]
 	std::size_t getDepthImpl() const;
 		/// Returns the allowed JSON depth.
 
+	[[nodiscard]]
 	Dynamic::Var parseImpl(const std::string& json);
 		/// Parses JSON from a string.
 
+	[[nodiscard]]
 	Dynamic::Var parseImpl(std::istream& in);
 		/// Parses JSON from an input stream.
 
 	void setHandlerImpl(const Handler::Ptr& pHandler);
 		/// Set the Handler.
 
+	[[nodiscard]]
 	const Handler::Ptr& getHandlerImpl();
 		/// Returns the Handler.
 
+	[[nodiscard]]
 	Dynamic::Var asVarImpl() const;
 		/// Returns the result of parsing;
 
+	[[nodiscard]]
 	Dynamic::Var resultImpl() const;
 		/// Returns the result of parsing as Dynamic::Var;
 
@@ -97,6 +105,7 @@ private:
 	void handle(const std::string& json);
 	void handle(std::istream& json);
 	void stripComments(std::string& json);
+	[[nodiscard]]
 	bool checkError();
 
 	struct json_stream* _pJSON;

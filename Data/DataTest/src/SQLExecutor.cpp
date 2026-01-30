@@ -377,17 +377,17 @@ void SQLExecutor::sessionPool(const std::string& connector, const std::string& c
 	{
 		sp.setFeature("autoBind"s, true);
 		fail("SessionPool must throw on setFeature after the first session was created.", __LINE__, __FILE__);
-	}	catch(const Poco::InvalidAccessException&) {}
+	}	catch([[maybe_unused]] const Poco::InvalidAccessException& e) {}
 	try
 	{
 		sp.setProperty("storage"s, "deque"s);
 		fail("SessionPool must throw on valid setProperty after the first session was created.", __LINE__, __FILE__);
-	}	catch(const Poco::InvalidAccessException&) {}
+	}	catch([[maybe_unused]] const Poco::InvalidAccessException& e) {}
 	try
 	{
 		sp.setFeature("bulk"s, true);
 		fail("SessionPool must throw on valid setFeature after the first session was created.", __LINE__, __FILE__);
-	}	catch(const Poco::InvalidAccessException&) {}
+	}	catch([[maybe_unused]] const Poco::InvalidAccessException& e) {}
 
 	std::vector<Session> sessions;
 	for (int i = 0; i < maxSessions-minSessions; ++i)
@@ -399,23 +399,23 @@ void SQLExecutor::sessionPool(const std::string& connector, const std::string& c
 	{
 		Session s = sp.get();
 		fail("SessionPool must throw when no sesions available.", __LINE__, __FILE__);
-	}	catch(const Poco::Data::SessionPoolExhaustedException&) {}
+	}	catch([[maybe_unused]] const Poco::Data::SessionPoolExhaustedException& e) {}
 
 	sp.shutdown();
 	try
 	{
 		Session s = sp.get();
 		fail("SessionPool that was shut down must throw on get.", __LINE__, __FILE__);
-	}	catch(const Poco::InvalidAccessException&) {}
+	}	catch([[maybe_unused]] const Poco::InvalidAccessException& e) {}
 
 	{
 		SessionPool pool(connector, connectString, 1, 4, 2, 10);
 
-		try { pool.getFeature("g1"); fail ("getting an unsuported feature must fail", __LINE__, __FILE__); }
-		catch ( Poco::NotFoundException& ) { }
+		try { [[maybe_unused]] bool feature = pool.getFeature("g1"); fail ("getting an unsuported feature must fail", __LINE__, __FILE__); }
+		catch ( [[maybe_unused]] Poco::NotFoundException& e ) { }
 
-		try { pool.getProperty("r1"); fail ("getting an unsuported property must fail", __LINE__, __FILE__); }
-		catch ( Poco::NotFoundException& ) { }
+		try { [[maybe_unused]] Poco::Any property = pool.getProperty("r1"); fail ("getting an unsuported property must fail", __LINE__, __FILE__); }
+		catch ( [[maybe_unused]] Poco::NotFoundException& e ) { }
 
 		assertTrue (pool.capacity() == 4);
 		assertTrue (pool.allocated() == 0);
@@ -427,14 +427,14 @@ void SQLExecutor::sessionPool(const std::string& connector, const std::string& c
 		Session ss1(pool.get());
 
 		try { pool.setFeature("f1", true); fail ("setting an unsuported feature must fail", __LINE__, __FILE__); }
-		catch (Poco::InvalidAccessException&) { }
-		catch (Poco::NotImplementedException&) { }
-		catch (Poco::Data::NotSupportedException&) { }
+		catch ([[maybe_unused]] Poco::InvalidAccessException& e) { }
+		catch ([[maybe_unused]] Poco::NotImplementedException& e) { }
+		catch ([[maybe_unused]] Poco::Data::NotSupportedException& e) { }
 
 		try { pool.setProperty("p1", 1); fail ("setting an unsuported property must fail", __LINE__, __FILE__); }
-		catch (Poco::InvalidAccessException&) { }
-		catch (Poco::NotImplementedException&) { }
-		catch (Poco::Data::NotSupportedException&) { }
+		catch ([[maybe_unused]] Poco::InvalidAccessException& e) { }
+		catch ([[maybe_unused]] Poco::NotImplementedException& e) { }
+		catch ([[maybe_unused]] Poco::Data::NotSupportedException& e) { }
 
 		assertTrue (pool.capacity() == 4);
 		assertTrue (pool.allocated() == 1);
@@ -476,7 +476,7 @@ void SQLExecutor::sessionPool(const std::string& connector, const std::string& c
 			Session s6(pool.get());
 			fail("pool exhausted - must throw", __LINE__, __FILE__);
 		}
-		catch (Poco::Data::SessionPoolExhaustedException&) { }
+		catch ([[maybe_unused]] const Poco::Data::SessionPoolExhaustedException& e) {}
 
 		s5.close();
 		assertTrue (pool.capacity() == 4);
@@ -492,7 +492,7 @@ void SQLExecutor::sessionPool(const std::string& connector, const std::string& c
 			s5 << "DROP TABLE IF EXISTS Test", now;
 			fail("session unusable - must throw", __LINE__, __FILE__);
 		}
-		catch (Poco::Data::SessionUnavailableException&) { }
+		catch ([[maybe_unused]] Poco::Data::SessionUnavailableException& e) { }
 
 		s4.close();
 		assertTrue (pool.capacity() == 4);
@@ -540,7 +540,7 @@ void SQLExecutor::sessionPool(const std::string& connector, const std::string& c
 			Session s7(pool.get());
 			fail("pool shut down - must throw", __LINE__, __FILE__);
 		}
-		catch (InvalidAccessException&) { }
+		catch ([[maybe_unused]] Poco::InvalidAccessException& e) { }
 
 		assertTrue (pool.capacity() == 4);
 		assertTrue (pool.allocated() == 0);
@@ -2854,14 +2854,14 @@ void SQLExecutor::internalExtraction()
 			int i = rset.value<int>(0,0);
 			assertTrue (1 == i);
 		}
-		catch(BadCastException&)
+		catch([[maybe_unused]] BadCastException& e)
 		{
 			try
 			{
 				Poco::Int64 l = rset.value<Poco::Int64>(0,0);
 				assertTrue (1 == l);
 			}
-			catch(BadCastException&) // Oracle really has no integers
+			catch([[maybe_unused]] BadCastException& e) // Oracle really has no integers
 			{
 				double l = rset.value<double>(0,0);
 				assertTrue (0.9 < l && l < 1.1);
@@ -2876,14 +2876,14 @@ void SQLExecutor::internalExtraction()
 			int a = rset.value<int>(0,2);
 			assertTrue (3 == a);
 		}
-		catch(BadCastException&)
+		catch([[maybe_unused]] BadCastException& e)
 		{
 			try
 			{
 				Poco::Int64 l = rset.value<Poco::Int64>(0,2);
 				assertTrue (3 == l);
 			}
-			catch(BadCastException&) // Oracle really has no integers
+			catch([[maybe_unused]] BadCastException& e) // Oracle really has no integers
 			{
 				double l = rset.value<double>(0,2);
 				assertTrue (2.9 < l && l < 3.1);
@@ -2895,7 +2895,7 @@ void SQLExecutor::internalExtraction()
 			double d = rset.value<double>(1,1);
 			assertTrue (2.5 == d);
 		}
-		catch (BadCastException&)
+		catch ([[maybe_unused]] BadCastException& e)
 		{
 			float f = rset.value<float>(1,1);
 			assertTrue (2.5 == f);
@@ -2905,7 +2905,7 @@ void SQLExecutor::internalExtraction()
 		{
 			s = rset.value<std::string>(2, 2);
 		}
-		catch (BadCastException&)
+		catch ([[maybe_unused]] BadCastException& e)
 		{
 			UTF16String us = rset.value<Poco::UTF16String>(2, 2);
 			Poco::UnicodeConverter::convert(us, s);
@@ -2923,7 +2923,7 @@ void SQLExecutor::internalExtraction()
 			for (int j = 1; it != end; ++it, ++j)
 				assertTrue (*it == j);
 		}
-		catch(BadCastException&)
+		catch([[maybe_unused]] BadCastException& e)
 		{
 			try
 			{
@@ -2933,7 +2933,7 @@ void SQLExecutor::internalExtraction()
 				for (Poco::Int64 l = 1; it != end; ++it, ++l)
 					assertTrue (*it == l);
 			}
-			catch(BadCastException&) // Oracle really has no integers
+			catch([[maybe_unused]] BadCastException& e) // Oracle really has no integers
 			{
 				const Column<std::deque<double>>& col = rset.column<std::deque<double> >(0);
 				Column<std::deque<double>>::Iterator it = col.begin();
@@ -2952,7 +2952,7 @@ void SQLExecutor::internalExtraction()
 			int ii = rset.value<int>(0,0);
 			assertEqual (4, ii);
 		}
-		catch(BadCastException&)
+		catch([[maybe_unused]] BadCastException& e)
 		{
 			try
 			{
@@ -2960,7 +2960,7 @@ void SQLExecutor::internalExtraction()
 				double d = rset.value<double>(0,0);
 				assertEqual (4, int(d));
 			}
-			catch(BadCastException&)
+			catch([[maybe_unused]] BadCastException& e)
 			{
 				//this is for PostgreSQL
 				Poco::Int64 big = rset.value<Poco::Int64>(0,0);
@@ -2971,17 +2971,17 @@ void SQLExecutor::internalExtraction()
 		s = rset.value("cnt", 0).convert<std::string>();
 		assertTrue ("4" == s);
 
-		try { rset.column<std::deque<int> >(100); fail ("must fail"); }
-		catch (RangeException&) { }
+		try { [[maybe_unused]] auto col = rset.column<std::deque<int> >(100); fail ("must fail"); }
+		catch ([[maybe_unused]] RangeException& e) { }
 
-		try	{ rset.value<std::string>(0,0); fail ("must fail"); }
-		catch (BadCastException&) {	}
+		try	{ [[maybe_unused]] auto val = rset.value<std::string>(0,0); fail ("must fail"); }
+		catch ([[maybe_unused]] BadCastException& e) {	}
 
 		stmt = (session() << "DELETE FROM Vectors", now);
 		rset = stmt;
 
-		try { rset.column<std::deque<int> >(0); fail ("must fail"); }
-		catch (RangeException&) { }
+		try { [[maybe_unused]] auto col = rset.column<std::deque<int> >(0); fail ("must fail"); }
+		catch ([[maybe_unused]] RangeException& e) { }
 	}
 	catch(DataException& ce)
 	{
@@ -3027,7 +3027,7 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 		{
 			da = rset.value(0, 1);
 			fail ("must fail");
-		} catch (InvalidAccessException&)
+		} catch ([[maybe_unused]] InvalidAccessException& e)
 		{
 			da = rset.value(0, 1, false);
 			assertTrue (2 == da);
