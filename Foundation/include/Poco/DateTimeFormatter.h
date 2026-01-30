@@ -74,7 +74,7 @@ public:
 		///   * %i - millisecond (000 .. 999)
 		///   * %c - centisecond (0 .. 9)
 		///   * %F - fractional seconds/microseconds (000000 - 999999)
-		///   * %z - time zone differential in ISO 8601 format (Z or +NN.NN)
+		///   * %z - time zone differential in ISO 8601 format (Z or +NN:NN)
 		///   * %Z - time zone differential in RFC format (GMT or +NNNN)
 		///   * %% - percent sign
 		///
