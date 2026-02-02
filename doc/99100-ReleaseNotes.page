@@ -62,7 +62,8 @@ Build System:
   - CMake uninstall target renamed to 'uninstall-poco' to avoid conflicts.
 
 Bundled Third-Party Library Upgrades:
-  - expat 2.7.1 → 2.7.3 - fixes CVE-2025-59375 (DoS via memory allocation), CVE-2024-8176 (stack overflow)
+  - expat 2.7.1 → 2.7.4 - fixes CVE-2026-24515 (NULL pointer dereference), CVE-2026-25210 (integer overflow),
+    CVE-2025-59375 (DoS via memory allocation), CVE-2024-8176 (stack overflow)
   - PCRE2 10.44 → 10.47 - skips 10.45 which had CVE-2025-58050 (heap-buffer-overflow)
   - SQLite 3.49.1 → 3.51.1 - fixes CVE-2025-6965 (memory corruption)
   - libpng 1.6.43 → 1.6.53 - fixes CVE-2025-64720, CVE-2025-65018 (buffer overflows), 5 security fixes total
@@ -91,6 +92,7 @@ Bundled Third-Party Library Upgrades:
 
 !!Security Fixes
 
+  - GH #5177 Upgrade bundled expat to 2.7.4 [fixes CVE-2026-24515, CVE-2026-25210]
   - PR #5096 enh(deps): Upgrade bundled SQLite from 3.49.1 to 3.51.1
   - PR #5093 enh(PDF): Upgrade bundled libpng from 1.6.43 to 1.6.53 (security fixes)
   - GH #5028 Upgrade bundled libexpat to 2.7.3 [fixes CVE]
@@ -100,6 +102,7 @@ Bundled Third-Party Library Upgrades:
 
 !!Features
 
+  - GH #5163 Foundation: Add demangleDot function for type name formatting
   - GH #5162 Add IOLock
   - GH #5134 Lock-free queues
   - GH #5133 Add Channel::log(message&&)
@@ -122,10 +125,13 @@ Bundled Third-Party Library Upgrades:
 
 !!Enhancements and Third-Party Updates
 
+  - PR #5186 Foundation: Proper implementation of File::getExecutablePath
+  - GH #5178 XML: Use vanilla Expat sources instead of POCO-patched version
   - PR #5166 Update readme with Windows and Arch Linux instructions
   - PR #5154 MongoDB: Document performance header cleanup
   - PR #5153 Util: Modernize Poco::Util and clean up code duplications
   - GH #5150 Net: SocketReactor socket removal
+  - PR #5149 Build: Add unit testing build to oss-fuzz build script
   - GH #5146 CMake: Use platform-specific cppignore files
   - GH #5144 ODBC: Add nix shells for mssql and oracle
   - PR #5136 Data: C++17 modernization of TypeHandler with variadic templates
@@ -172,9 +178,23 @@ Bundled Third-Party Library Upgrades:
 
 !!Bug Fixes
 
+  - GH #5191 Process/Win: Fix PROCESS_CLOSE_STD* flags closing parent's handles
+    instead of child's
+  - GH #5187 Foundation: Use setenv instead of putenv in Environment
+  - PR #5183 MongoDB: Fix Document::toString() to produce valid JSON by quoting
+    all string-like values
+  - GH #5182 Data: SQLChannel does not create directory for absolute paths
+  - GH #5180 Foundation: Fix ProcessRunner::start() to handle Windows executables
+    without .exe extension
+  - GH #5175 Foundation: Fix format specifiers in DateTimeFormatter and
+    PatternFormatter
+  - GH #5174 Foundation: Fix bad casing in include
+  - GH #5172 Foundation: Fix DateTimeParser tests with day 0
+  - GH #5168 Foundation: Lock-Order-Inversion Deadlock in NObserver/Observer
   - PR #5165 fix(Foundation): VS2022 clang-cl compatibility
   - GH #5161 Pipe is not thread-safe
   - GH #5159 Lock-order-inversion deadlock in NotificationCenter
+  - GH #5158 Foundation: Change lock type to ScopedWriteLock in NotificationCenter
   - GH #5147 Net: Fix TSAN warnings in SocketImpl
   - GH #5142 VarHolderImpl: Implement isDate/isTime diagnostics
   - PR #5140 Data: Refactor ODBC tests and fix testReconnect TypeInfo caching
@@ -183,6 +203,8 @@ Bundled Third-Party Library Upgrades:
   - PR #5114 fix(Foundation): Fix deadlock in NotificationCenter removeObserver
   - PR #5107 fix(Zip): Improve parsing of non-standard ZIP archives
   - GH #5090 UBSan: Integer overflow errors in VarHolder.h
+  - GH #5087 Net: Fix dll attribute position in pocoNetworkInitializer to support
+    MinGW-GCC/Clang
   - GH #5085 CMake build not stripping release binaries
   - GH #5083 CppUnit: Improve test name display and selection
   - GH #5070 CMake does not produce proper binary names
@@ -211,6 +233,7 @@ Bundled Third-Party Library Upgrades:
   - GH #4973 MSVC 2017 Build error: Cannot open include file 'version'
   - GH #4970 Net: Deadlock in SocketReactor when removing handler from callback
   - GH #4969 MongoDB::Database::authSCRAM() fails due to protocol typographic error
+  - PR #4966 Foundation: Resolve Poco::format ambiguity with std::format in C++23
   - GH #4949 Foundation: TaskManager memory leak
   - GH #4947 Build: ENABLE_SEVENZIP and ENABLE_ZIP still require ENABLE_XML
   - GH #4924 Data/PostgreSQL: RecordSet does not recognize UUID field
