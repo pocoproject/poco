@@ -27,9 +27,6 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #cmakedefine HAVE_INTTYPES_H
 
-/* Define to 1 if you have the `bsd' library (-lbsd). */
-#cmakedefine HAVE_LIBBSD
-
 /* Define to 1 if you have the <memory.h> header file. */
 #cmakedefine HAVE_MEMORY_H
 
