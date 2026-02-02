@@ -1,9 +1,6 @@
 # Expat XML parser library
-# Version: 2.7.3
-# Source: https://github.com/libexpat/libexpat/releases/tag/R_2_7_3
-#
-# Note: src/xmlparse.cpp is generated from expat's xmlparse.c with POCO-specific modifications.
-# Use the patch_expat_xmlparse target to regenerate it after upgrading expat.
+# Version: 2.7.4
+# Source: https://github.com/libexpat/libexpat/releases/tag/R_2_7_4
 
 if(POCO_UNBUNDLED)
 	if (ENABLE_XML)
@@ -15,11 +12,8 @@ if(POCO_UNBUNDLED)
 		set_target_properties(EXPAT::EXPAT PROPERTIES IMPORTED_GLOBAL TRUE)
 	endif()
 else()
-
 	# Sources
-	file(GLOB SRCS_G "src/*.c" "src/*.cpp")
-	# Exclude original xmlparse.c (we use the patched xmlparse.cpp)
-	list(FILTER SRCS_G EXCLUDE REGEX ".*xmlparse\\.c$")
+	file(GLOB SRCS_G "src/*.c")
 	POCO_SOURCES(SRCS expat ${SRCS_G})
 
 	# Headers
@@ -31,31 +25,26 @@ else()
 
 	set_property(TARGET _BUNDLED_EXPAT PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-	target_compile_definitions(
-		_BUNDLED_EXPAT
-		PUBLIC XML_DTD XML_GE XML_STATIC
+	# Platform-specific entropy source for Expat's hash salt generation
+	if(WIN32)
+		# Windows uses rand_s() by default
+	elseif(APPLE OR CMAKE_SYSTEM_NAME MATCHES ".*BSD")
+		target_compile_definitions(_BUNDLED_EXPAT PRIVATE HAVE_ARC4RANDOM_BUF)
+	elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+		target_compile_definitions(_BUNDLED_EXPAT PRIVATE HAVE_GETRANDOM)
+	elseif(UNIX)
+		target_compile_definitions(_BUNDLED_EXPAT PRIVATE XML_DEV_URANDOM)
+	endif()
+
+	target_compile_definitions(_BUNDLED_EXPAT
+		PUBLIC XML_DTD XML_STATIC
 		PRIVATE XML_NS HAVE_EXPAT_CONFIG_H
 	)
 
 	target_include_directories(_BUNDLED_EXPAT
 		PUBLIC
 			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
-		PRIVATE
-			${CMAKE_SOURCE_DIR}/Foundation/include
 	)
 
 	add_library(EXPAT::EXPAT ALIAS _BUNDLED_EXPAT)
 endif()
-
-# Custom target to regenerate xmlparse.cpp from original xmlparse.c
-# This target is NOT included in ALL - run manually with: cmake --build . --target patch_expat_xmlparse
-add_custom_target(patch_expat_xmlparse
-	COMMAND ${CMAKE_COMMAND} -E echo "Patching xmlparse.c for POCO..."
-	COMMAND ${CMAKE_COMMAND} -E copy xmlparse.c xmlparse.c.bak
-	COMMAND patch xmlparse.c < ${CMAKE_CURRENT_SOURCE_DIR}/xmlparse_poco.patch
-	COMMAND ${CMAKE_COMMAND} -E rename xmlparse.c xmlparse.cpp
-	COMMAND ${CMAKE_COMMAND} -E rename xmlparse.c.bak xmlparse.c
-	COMMAND ${CMAKE_COMMAND} -E echo "Done. xmlparse.cpp has been updated."
-	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src
-	COMMENT "Applying POCO patches to expat xmlparse.c"
-)
