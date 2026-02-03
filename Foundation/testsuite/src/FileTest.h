@@ -45,6 +45,7 @@ public:
 	void testLongPath();
 	void testUnixFileExtension();
 	void testTemporaryFile();
+	void testGetExecutablePath();
 
 	void setUp();
 	void tearDown();

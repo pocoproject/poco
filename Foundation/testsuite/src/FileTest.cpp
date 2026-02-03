@@ -693,6 +693,94 @@ void FileTest::testTemporaryFile()
 }
 
 
+void FileTest::testGetExecutablePath()
+{
+	// Test 1: Path without extension
+	{
+		File f("myexecutable");
+		std::string execPath = f.getExecutablePath();
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		// On Windows, .exe should be appended
+		assertEqual ("myexecutable.exe", execPath);
+#else
+		// On Unix, path is unchanged
+		assertEqual ("myexecutable", execPath);
+#endif
+	}
+
+	// Test 2: Path with extension - should be unchanged on all platforms
+	{
+		File f("myexecutable.sh");
+		std::string execPath = f.getExecutablePath();
+		assertEqual ("myexecutable.sh", execPath);
+	}
+
+	// Test 3: Path with .exe extension - should be unchanged
+	{
+		File f("myexecutable.exe");
+		std::string execPath = f.getExecutablePath();
+		assertEqual ("myexecutable.exe", execPath);
+	}
+
+	// Test 4: Absolute path without extension
+	{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		File f(R"(C:\path\to\myexecutable)");
+		std::string execPath = f.getExecutablePath();
+		assertEqual (R"(C:\path\to\myexecutable.exe)", execPath);
+#else
+		File f("/usr/bin/myexecutable");
+		std::string execPath = f.getExecutablePath();
+		assertEqual ("/usr/bin/myexecutable", execPath);
+#endif
+	}
+
+	// Test 5: Absolute path with extension - unchanged
+	{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		File f(R"(C:\path\to\myexecutable.bat)");
+		std::string execPath = f.getExecutablePath();
+		assertEqual (R"(C:\path\to\myexecutable.bat)", execPath);
+#else
+		File f("/usr/bin/python3.11");
+		std::string execPath = f.getExecutablePath();
+		assertEqual ("/usr/bin/python3.11", execPath);
+#endif
+	}
+
+	// Test 6: Relative path with directory
+	{
+		File f("subdir/myexecutable");
+		std::string execPath = f.getExecutablePath();
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		// Path::toString() returns native separators (backslashes on Windows)
+		assertEqual (R"(subdir\myexecutable.exe)", execPath);
+#else
+		assertEqual ("subdir/myexecutable", execPath);
+#endif
+	}
+
+	// Test 7: Verify getExecutablePath works with existsAnywhere for real executables
+	{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		File f("cmd");
+		std::string execPath = f.getExecutablePath();
+		assertEqual ("cmd.exe", execPath);
+		File execFile(execPath);
+		assertTrue (execFile.existsAnywhere());
+		assertTrue (execFile.canExecute());
+#else
+		File f("ls");
+		std::string execPath = f.getExecutablePath();
+		assertEqual ("ls", execPath);
+		// ls should be findable in PATH
+		assertTrue (f.existsAnywhere());
+		assertTrue (f.canExecute());
+#endif
+	}
+}
+
+
 void FileTest::setUp()
 {
 	File f("testfile.dat");
@@ -744,6 +832,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testLongPath);
 	CppUnit_addTest(pSuite, FileTest, testUnixFileExtension);
 	CppUnit_addTest(pSuite, FileTest, testTemporaryFile);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePath);
 
 	return pSuite;
 }
