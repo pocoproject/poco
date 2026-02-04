@@ -772,10 +772,10 @@ void FileTest::testGetExecutablePath()
 	// Test 7: Verify getExecutablePath works with existsAnywhere for real executables
 	{
 #if defined(POCO_OS_FAMILY_WINDOWS)
-		File f("cmd");
+		File f("hostname");
 		std::string execPath = f.getExecutablePath();
 		std::cerr << "Test 7: '" << execPath << "'" << std::endl;
-		assertEqual ("cmd.exe", execPath);
+		assertEqual ("hostname.exe", execPath);
 		File execFile(execPath);
 		std::cerr << "Test 7: existsAnywhere=" << execFile.existsAnywhere() << " canExecute=" << execFile.canExecute() << std::endl;
 		assertTrue (execFile.existsAnywhere());
