@@ -147,6 +147,12 @@ std::string File::absolutePath() const
 }
 
 
+std::string File::getExecutablePath() const
+{
+	return getExecutablePathImpl();
+}
+
+
 bool File::exists() const
 {
 	if (path().empty()) return false;

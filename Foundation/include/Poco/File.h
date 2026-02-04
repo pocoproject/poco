@@ -112,6 +112,16 @@ public:
 		/// environment variable.
 		/// If the file doesn't exist, returns empty string.
 
+	std::string getExecutablePath() const;
+		/// Returns the executable path.
+		///
+		/// On Windows, if the path has no extension, appends ".exe".
+		/// On other platforms, returns the path unchanged.
+		///
+		/// This is useful when launching executables on Windows,
+		/// where the .exe extension is often omitted but required
+		/// for file existence checks.
+
 	bool exists() const;
 		/// Returns true iff the file exists.
 
