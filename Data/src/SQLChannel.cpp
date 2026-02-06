@@ -75,6 +75,7 @@ SQLChannel::SQLChannel():
 	_stop(false),
 	_logged(0)
 {
+	setProperty(PROP_DIRECTORY, Path::tempHome());
 	_pLogThread->start(*this);
 }
 
@@ -106,6 +107,7 @@ SQLChannel::SQLChannel(const std::string& connector,
 	_stop(false),
 	_logged(0)
 {
+	setProperty(PROP_DIRECTORY, Path::tempHome());
 	_pLogThread->start(*this);
 }
 
@@ -644,13 +646,12 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 	else if (name == PROP_DIRECTORY)
 	{
 		std::string dir = value;
-		if (!Path(File(dir).path()).isAbsolute())
-		{
-			Path d(dir);
-			dir = d.makeDirectory().makeAbsolute().toString();
-			File f(dir);
-			if (!f.exists()) f.createDirectories();
-		}
+
+		Path d(dir);
+		dir = d.makeDirectory().makeAbsolute().toString();
+		File f(dir);
+		if (!f.exists()) f.createDirectories();
+
 		_directory = dir;
 	}
 	else if (name == PROP_FILE)

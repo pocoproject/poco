@@ -1556,9 +1556,8 @@ void DataTest::testSQLParse()
 
 void DataTest::testSQLChannel()
 {
-	const std::string dir = Path::tempHome();
 	AutoPtr<SQLChannel> pChannel = new SQLChannel();
-	pChannel->setProperty("directory", dir);
+	const std::string dir = pChannel->getProperty("directory");
 	Stopwatch sw; sw.start();
 	while (!pChannel->isRunning())
 	{
