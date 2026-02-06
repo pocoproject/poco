@@ -37,10 +37,10 @@
 #include <cstring>
 
 #if (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
-#define STATFSFN statvfs
+#define STATFSFN ::statvfs
 #define STATFSSTRUCT statvfs
 #else
-#define STATFSFN statfs
+#define STATFSFN ::statfs
 #define STATFSSTRUCT statfs
 #endif
 
@@ -83,7 +83,12 @@ void FileImpl::setPathImpl(const std::string& path)
 
 std::string FileImpl::getExecutablePathImpl() const
 {
-	return _path;
+	if (_path.empty()) return {};
+
+	if (_path.find('/') != std::string::npos)
+		return existsImpl() ? _path : std::string{};
+
+	return findInPath(_path);
 }
 
 
@@ -92,7 +97,7 @@ bool FileImpl::existsImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	return stat(_path.c_str(), &st) == 0;
+	return ::stat(_path.c_str(), &st) == 0;
 }
 
 
@@ -101,14 +106,14 @@ bool FileImpl::canReadImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (::stat(_path.c_str(), &st) == 0)
 	{
-		if (st.st_uid == geteuid())
+		if (st.st_uid == ::geteuid())
 			return (st.st_mode & S_IRUSR) != 0;
-		else if (st.st_gid == getegid())
+		else if (st.st_gid == ::getegid())
 			return (st.st_mode & S_IRGRP) != 0;
 		else
-			return (st.st_mode & S_IROTH) != 0 || geteuid() == 0;
+			return (st.st_mode & S_IROTH) != 0 || ::geteuid() == 0;
 	}
 	else handleLastErrorImpl(_path);
 	return false;
@@ -120,14 +125,14 @@ bool FileImpl::canWriteImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (::stat(_path.c_str(), &st) == 0)
 	{
-		if (st.st_uid == geteuid())
+		if (st.st_uid == ::geteuid())
 			return (st.st_mode & S_IWUSR) != 0;
-		else if (st.st_gid == getegid())
+		else if (st.st_gid == ::getegid())
 			return (st.st_mode & S_IWGRP) != 0;
 		else
-			return (st.st_mode & S_IWOTH) != 0 || geteuid() == 0;
+			return (st.st_mode & S_IWOTH) != 0 || ::geteuid() == 0;
 	}
 	else handleLastErrorImpl(_path);
 	return false;
@@ -139,17 +144,7 @@ bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 	poco_assert (!absolutePath.empty());
 
 	struct stat st;
-	if (stat(absolutePath.c_str(), &st) == 0)
-	{
-		if (st.st_uid == geteuid() || geteuid() == 0)
-			return (st.st_mode & S_IXUSR) != 0;
-		else if (st.st_gid == getegid())
-			return (st.st_mode & S_IXGRP) != 0;
-		else
-			return (st.st_mode & S_IXOTH) != 0;
-	}
-	else handleLastErrorImpl(_path);
-	return false;
+	return ::stat(absolutePath.c_str(), &st) == 0 && S_ISREG(st.st_mode) && ::access(absolutePath.c_str(), X_OK) == 0;
 }
 
 
@@ -158,7 +153,7 @@ bool FileImpl::isFileImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (::stat(_path.c_str(), &st) == 0)
 		return S_ISREG(st.st_mode);
 	else
 		handleLastErrorImpl(_path);
@@ -171,7 +166,7 @@ bool FileImpl::isDirectoryImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (::stat(_path.c_str(), &st) == 0)
 		return S_ISDIR(st.st_mode);
 	else
 		handleLastErrorImpl(_path);
@@ -184,7 +179,7 @@ bool FileImpl::isLinkImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (lstat(_path.c_str(), &st) == 0)
+	if (::lstat(_path.c_str(), &st) == 0)
 		return S_ISLNK(st.st_mode);
 	else
 		handleLastErrorImpl(_path);
@@ -197,7 +192,7 @@ bool FileImpl::isDeviceImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (::stat(_path.c_str(), &st) == 0)
 		return S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode);
 	else
 		handleLastErrorImpl(_path);
@@ -289,7 +284,7 @@ FileImpl::FileSizeImpl FileImpl::getSizeImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) == 0)
+	if (::stat(_path.c_str(), &st) == 0)
 		return st.st_size;
 	else
 		handleLastErrorImpl(_path);
@@ -301,7 +296,7 @@ void FileImpl::setSizeImpl(FileSizeImpl size)
 {
 	poco_assert (!_path.empty());
 
-	if (truncate(_path.c_str(), size) != 0)
+	if (::truncate(_path.c_str(), size) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -311,7 +306,7 @@ void FileImpl::setWriteableImpl(bool flag)
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) != 0)
+	if (::stat(_path.c_str(), &st) != 0)
 		handleLastErrorImpl(_path);
 	mode_t mode;
 	if (flag)
@@ -323,7 +318,7 @@ void FileImpl::setWriteableImpl(bool flag)
 		mode_t wmask = S_IWUSR | S_IWGRP | S_IWOTH;
 		mode = st.st_mode & ~wmask;
 	}
-	if (chmod(_path.c_str(), mode) != 0)
+	if (::chmod(_path.c_str(), mode) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -333,7 +328,7 @@ void FileImpl::setExecutableImpl(bool flag)
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(_path.c_str(), &st) != 0)
+	if (::stat(_path.c_str(), &st) != 0)
 		handleLastErrorImpl(_path);
 	mode_t mode;
 	if (flag)
@@ -349,7 +344,7 @@ void FileImpl::setExecutableImpl(bool flag)
 		mode_t wmask = S_IXUSR | S_IXGRP | S_IXOTH;
 		mode = st.st_mode & ~wmask;
 	}
-	if (chmod(_path.c_str(), mode) != 0)
+	if (::chmod(_path.c_str(), mode) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -358,36 +353,36 @@ void FileImpl::copyToImpl(const std::string& path, int options) const
 {
 	poco_assert (!_path.empty());
 
-	int sd = open(_path.c_str(), O_RDONLY);
+	int sd = ::open(_path.c_str(), O_RDONLY);
 	if (sd == -1) handleLastErrorImpl(_path);
 
 	struct stat st;
-	if (fstat(sd, &st) != 0)
+	if (::fstat(sd, &st) != 0)
 	{
 		int err = errno;
-		close(sd);
+		::close(sd);
 		handleLastErrorImpl(err, _path);
 	}
 	const long blockSize = st.st_blksize;
 	int dd;
 	if (options & OPT_FAIL_ON_OVERWRITE_IMPL) {
-		dd = open(path.c_str(), O_CREAT | O_TRUNC | O_EXCL | O_WRONLY, st.st_mode);
+		dd = ::open(path.c_str(), O_CREAT | O_TRUNC | O_EXCL | O_WRONLY, st.st_mode);
 	} else {
-		dd = open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, st.st_mode);
+		dd = ::open(path.c_str(), O_CREAT | O_TRUNC | O_WRONLY, st.st_mode);
 	}
 	if (dd == -1)
 	{
 		int err = errno;
-		close(sd);
+		::close(sd);
 		handleLastErrorImpl(err, path);
 	}
 	Buffer<char> buffer(blockSize);
 	try
 	{
 		int n;
-		while ((n = read(sd, buffer.begin(), blockSize)) > 0)
+		while ((n = ::read(sd, buffer.begin(), blockSize)) > 0)
 		{
-			if (write(dd, buffer.begin(), n) != n)
+			if (::write(dd, buffer.begin(), n) != n)
 				handleLastErrorImpl(path);
 		}
 		if (n < 0)
@@ -397,18 +392,18 @@ void FileImpl::copyToImpl(const std::string& path, int options) const
 	}
 	catch (...)
 	{
-		close(sd);
-		close(dd);
+		::close(sd);
+		::close(dd);
 		throw;
 	}
-	close(sd);
-	if (fsync(dd) != 0)
+	::close(sd);
+	if (::fsync(dd) != 0)
 	{
 		int err = errno;
-		close(dd);
+		::close(dd);
 		handleLastErrorImpl(err, path);
 	}
-	if (close(dd) != 0)
+	if (::close(dd) != 0)
 	{
 		handleLastErrorImpl(path);
 	}
@@ -421,10 +416,10 @@ void FileImpl::renameToImpl(const std::string& path, int options)
 
 	struct stat st;
 
-	if (stat(path.c_str(), &st) == 0 && (options & OPT_FAIL_ON_OVERWRITE_IMPL))
+	if (::stat(path.c_str(), &st) == 0 && (options & OPT_FAIL_ON_OVERWRITE_IMPL))
 		throw FileExistsException(path, EEXIST);
 
-	if (rename(_path.c_str(), path.c_str()) != 0)
+	if (::rename(_path.c_str(), path.c_str()) != 0)
 		handleLastErrorImpl(_path);
 }
 
@@ -435,12 +430,12 @@ void FileImpl::linkToImpl(const std::string& path, int type) const
 
 	if (type == 0)
 	{
-		if (link(_path.c_str(), path.c_str()) != 0)
+		if (::link(_path.c_str(), path.c_str()) != 0)
 			handleLastErrorImpl(_path);
 	}
 	else
 	{
-		if (symlink(_path.c_str(), path.c_str()) != 0)
+		if (::symlink(_path.c_str(), path.c_str()) != 0)
 			handleLastErrorImpl(_path);
 	}
 }
@@ -452,9 +447,9 @@ void FileImpl::removeImpl()
 
 	int rc;
 	if (!isLinkImpl() && isDirectoryImpl())
-		rc = rmdir(_path.c_str());
+		rc = ::rmdir(_path.c_str());
 	else
-		rc = unlink(_path.c_str());
+		rc = ::unlink(_path.c_str());
 	if (rc) handleLastErrorImpl(_path);
 }
 
@@ -468,10 +463,10 @@ bool FileImpl::createFileImpl(bool createDirectories)
 		p.makeDirectory();
 	}
 
-	int n = open(_path.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	int n = ::open(_path.c_str(), O_WRONLY | O_CREAT | O_EXCL, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
 	if (n != -1)
 	{
-		close(n);
+		::close(n);
 		return true;
 	}
 	if (n == -1 && errno == EEXIST)
@@ -488,7 +483,7 @@ bool FileImpl::createDirectoryImpl()
 
 	if (existsImpl() && isDirectoryImpl())
 		return false;
-	if (mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0)
+	if (::mkdir(_path.c_str(), S_IRWXU | S_IRWXG | S_IRWXO) != 0)
 		handleLastErrorImpl(_path);
 	return true;
 }

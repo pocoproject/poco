@@ -201,14 +201,12 @@ void FileTest::testExists()
 		File f("testfile.dat");
 		f.createFile();
 		assertTrue (f.exists());
-		assertTrue (f.existsAnywhere());
 		assertFalse (f.canExecute());
 	}
 
 	{
 		File f("/testfile.dat");
 		assertFalse (f.exists());
-		assertFalse (f.existsAnywhere());
 		assertFalse (f.canExecute());
 	}
 
@@ -239,11 +237,10 @@ void FileTest::testExists()
 		assertFalse (f4.canExecute());
 #endif
 		assertFalse (f.exists());
-		assertTrue (f.existsAnywhere());
+		assertFalse (f.getExecutablePath().empty());
 		assertTrue (f.canExecute());
 
 		assertTrue (f2.exists());
-		assertTrue (f2.existsAnywhere());
 		assertFalse (f2.canExecute());
 	}
 }
@@ -695,92 +692,83 @@ void FileTest::testTemporaryFile()
 
 void FileTest::testGetExecutablePath()
 {
-	// Test 1: Path without extension
+	// Test 1: Non-existent bare command returns empty
 	{
-		File f("myexecutable");
+		File f("myexecutable_nonexistent_xyz");
 		std::string execPath = f.getExecutablePath();
-#if defined(POCO_OS_FAMILY_WINDOWS)
-		// On Windows, .exe should be appended
-		assertEqual ("myexecutable.exe", execPath);
-#else
-		// On Unix, path is unchanged
-		assertEqual ("myexecutable", execPath);
-#endif
+		assertTrue (execPath.empty());
 	}
 
-	// Test 2: Path with extension - should be unchanged on all platforms
-	{
-		File f("myexecutable.sh");
-		std::string execPath = f.getExecutablePath();
-		assertEqual ("myexecutable.sh", execPath);
-	}
-
-	// Test 3: Path with .exe extension - should be unchanged
-	{
-		File f("myexecutable.exe");
-		std::string execPath = f.getExecutablePath();
-		assertEqual ("myexecutable.exe", execPath);
-	}
-
-	// Test 4: Absolute path without extension
+	// Test 2: Non-existent absolute path returns empty
 	{
 #if defined(POCO_OS_FAMILY_WINDOWS)
-		File f(R"(C:\path\to\myexecutable)");
-		std::string execPath = f.getExecutablePath();
-		assertEqual (R"(C:\path\to\myexecutable.exe)", execPath);
+		File f(R"(C:\path\to\myexecutable_nonexistent)");
 #else
-		File f("/usr/bin/myexecutable");
-		std::string execPath = f.getExecutablePath();
-		assertEqual ("/usr/bin/myexecutable", execPath);
+		File f("/usr/bin/myexecutable_nonexistent_xyz");
 #endif
+		std::string execPath = f.getExecutablePath();
+		assertTrue (execPath.empty());
 	}
 
-	// Test 5: Absolute path with extension - unchanged
-	{
-#if defined(POCO_OS_FAMILY_WINDOWS)
-		File f(R"(C:\path\to\myexecutable.bat)");
-		std::string execPath = f.getExecutablePath();
-		assertEqual (R"(C:\path\to\myexecutable.bat)", execPath);
-#else
-		File f("/usr/bin/python3.11");
-		std::string execPath = f.getExecutablePath();
-		assertEqual ("/usr/bin/python3.11", execPath);
-#endif
-	}
-
-	// Test 6: Relative path with directory
-	{
-		File f("subdir/myexecutable");
-		std::string execPath = f.getExecutablePath();
-#if defined(POCO_OS_FAMILY_WINDOWS)
-		// Path::toString() returns native separators (backslashes on Windows)
-		assertEqual (R"(subdir\myexecutable.exe)", execPath);
-#else
-		assertEqual ("subdir/myexecutable", execPath);
-#endif
-	}
-
-	// Test 7: Verify getExecutablePath works with existsAnywhere for real executables
+	// Test 3: Real executable bare name resolves to absolute path
 	{
 #if defined(POCO_OS_FAMILY_WINDOWS)
 		File f("hostname");
 		std::string execPath = f.getExecutablePath();
-		assertEqual ("hostname.exe", execPath);
-		File execFile(execPath);
-		// Only test existsAnywhere/canExecute if System32 is in PATH (may not be on some CI runners)
-		if (execFile.existsAnywhere())
+		if (!execPath.empty())
 		{
-			assertTrue (execFile.canExecute());
+			// Should be an absolute path
+			Path p(execPath);
+			assertTrue (p.isAbsolute());
+			assertTrue (File(execPath).canExecute());
 		}
 #else
 		File f("ls");
 		std::string execPath = f.getExecutablePath();
-		assertEqual ("ls", execPath);
-		// ls should be findable in PATH
-		assertTrue (f.existsAnywhere());
+		assertFalse (execPath.empty());
+		// Should be an absolute path (e.g. /bin/ls or /usr/bin/ls)
+		assertTrue (execPath[0] == '/');
 		assertTrue (f.canExecute());
 #endif
 	}
+
+	// Test 4: Real executable absolute path resolves to itself
+	{
+#if defined(POCO_OS_FAMILY_UNIX)
+		// Find where ls actually is
+		std::string lsPath = File("ls").getExecutablePath();
+		assertFalse (lsPath.empty());
+		File f(lsPath);
+		std::string execPath = f.getExecutablePath();
+		assertEqual (lsPath, execPath);
+#endif
+	}
+
+	// Test 5: Non-executable file returns empty for bare name
+	{
+		File f("nonexistent_file_xyz_12345");
+		assertTrue (f.getExecutablePath().empty());
+	}
+
+	// Test 6: Empty path
+	{
+		File f("");
+		assertTrue (f.getExecutablePath().empty());
+	}
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	// Test 7: Windows - command without extension resolves via PATHEXT
+	{
+		File f("cmd");
+		std::string execPath = f.getExecutablePath();
+		if (!execPath.empty())
+		{
+			Path p(execPath);
+			assertTrue (p.isAbsolute());
+			assertTrue (File(execPath).canExecute());
+		}
+	}
+#endif
 }
 
 

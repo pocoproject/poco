@@ -106,32 +106,35 @@ public:
 		/// Returns the path.
 
 	std::string absolutePath() const;
-		/// Returns absolute path.
-		/// Attempts to find the existing file
-		/// using curent work directory and the PATH
-		/// environment variable.
-		/// If the file doesn't exist, returns empty string.
+		/// Returns the absolute path.
+		///
+		/// If the path is already absolute, returns it unchanged.
+		/// If the path is relative, resolves it against the
+		/// current working directory.
 
 	std::string getExecutablePath() const;
-		/// Returns the executable path.
+		/// Resolves the executable path.
 		///
-		/// On Windows, if the path has no extension, appends ".exe".
-		/// On other platforms, returns the path unchanged.
+		/// If the path is absolute, checks whether it is executable
+		/// and returns it, or returns an empty string if not found.
 		///
-		/// This is useful when launching executables on Windows,
-		/// where the .exe extension is often omitted but required
-		/// for file existence checks.
+		/// If the path is a bare filename (no directory separator),
+		/// searches the current directory and the PATH environment
+		/// variable for an executable match.
+		///
+		/// On Windows, also tries appending each PATHEXT extension
+		/// (e.g. .EXE, .CMD, .BAT) using SearchPathW.
+		///
+		/// Returns the fully resolved absolute path on success,
+		/// or an empty string if no executable was found.
 
 	bool exists() const;
 		/// Returns true iff the file exists.
 
 	bool existsAnywhere() const;
-		/// If the file path is relative, searches
-		/// for the file in the current working directory
-		/// and the environment paths.
-		/// If the file path is absolute, the
-		/// functionality is identical to the
-		/// exists() call.
+		/// Returns true iff the file exists anywhere in the
+		/// file system, including in directories listed in
+		/// the PATH environment variable.
 
 	bool canRead() const;
 		/// Returns true iff the file is readable.
@@ -142,10 +145,14 @@ public:
 	bool canExecute() const;
 		/// Returns true iff the file is executable.
 		///
-		/// On Windows, the file must have
-		/// the extension ".EXE" to be executable.
-		/// On Unix platforms, the executable permission
-		/// bit must be set.
+		/// First resolves the executable path using
+		/// getExecutablePath(). If the resolved path is empty,
+		/// returns false.
+		///
+		/// On Windows, checks whether the file's extension
+		/// matches any PATHEXT entry (e.g. .EXE, .CMD, .BAT).
+		/// On Unix platforms, uses access(X_OK) to check
+		/// the executable permission.
 
 	bool isFile() const;
 		/// Returns true iff the file is a regular file.

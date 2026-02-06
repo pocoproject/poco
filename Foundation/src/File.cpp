@@ -19,6 +19,12 @@
 #include "Poco/StringTokenizer.h"
 
 
+namespace Poco {
+// Forward declaration so platform Impl files can call it.
+std::string findInPath(const std::string& name);
+}
+
+
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "File_WIN32U.cpp"
 #elif defined(POCO_VXWORKS)
@@ -30,6 +36,41 @@
 
 
 namespace Poco {
+
+
+std::string findInPath(const std::string& name)
+{
+	Path curPath(Path::current());
+	curPath.append(name);
+	if (File(curPath).exists())
+		return curPath.toString();
+
+	const std::string envPath = Environment::get("PATH", "");
+	if (envPath.empty()) return {};
+
+	const std::string pathSeparator(1, Path::pathSeparator());
+	const StringTokenizer st(envPath, pathSeparator,
+		StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+
+	for (const auto& dir : st)
+	{
+		try
+		{
+			std::string candidate(dir);
+			if (candidate.size() && candidate.back() != Path::separator())
+				candidate.append(1, Path::separator());
+			candidate.append(name);
+			if (File(candidate).exists())
+				return candidate;
+		}
+		catch (const Poco::PathSyntaxException&)
+		{
+			// shield against bad PATH environment entries
+		}
+	}
+
+	return {};
+}
 
 
 File::File()
@@ -99,51 +140,12 @@ void File::swap(File& file) noexcept
 
 std::string File::absolutePath() const
 {
-	std::string ret;
+	if (path().empty())
+		return {};
 
-	if (Path(path()).isAbsolute())
-		// TODO: Should this return empty string if file does not exists to be consistent
-		// with the function documentation?
-		ret = getPathImpl();
-	else
-	{
-		Path curPath(Path::current());
-		curPath.append(path());
-		if (File(curPath).exists())
-			ret = curPath.toString();
-		else
-		{
-			const std::string envPath = Environment::get("PATH", "");
-			const std::string pathSeparator(1, Path::pathSeparator());
-			if (!envPath.empty())
-			{
-				const StringTokenizer st(envPath, pathSeparator,
-					StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-
-				for (const auto& p: st)
-				{
-					try
-					{
-						std::string fileName(p);
-						if (p.size() && p.back() != Path::separator())
-							fileName.append(1, Path::separator());
-						fileName.append(path());
-						if (File(fileName).exists())
-						{
-							ret = fileName;
-							break;
-						}
-					}
-					catch (const Poco::PathSyntaxException&)
-					{
-						// shield against bad PATH environment entries
-					}
-				}
-			}
-		}
-	}
-
-	return ret;
+	Path p(path());
+	p.makeAbsolute();
+	return p.toString();
 }
 
 
@@ -163,14 +165,8 @@ bool File::exists() const
 bool File::existsAnywhere() const
 {
 	if (path().empty()) return false;
-
-	if (Path(path()).isAbsolute())
-		return existsImpl();
-
-	if (File(absolutePath()).exists())
-		return true;
-
-	return false;
+	if (existsImpl()) return true;
+	return !findInPath(path()).empty();
 }
 
 
@@ -188,14 +184,10 @@ bool File::canWrite() const
 
 bool File::canExecute() const
 {
-	// Resolve (platform-specific) executable path and absolute path from relative.
-	const auto execPath { getExecutablePathImpl() };
-	const auto absPath { File(execPath).absolutePath() };
-	if (absPath.empty() || !File(absPath).exists())
-	{
+	const std::string execPath = getExecutablePathImpl();
+	if (execPath.empty())
 		return false;
-	}
-	return canExecuteImpl(absPath);
+	return canExecuteImpl(execPath);
 }
 
 
