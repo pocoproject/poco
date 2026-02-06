@@ -43,9 +43,6 @@ public:
 	static unsigned processorCountImpl();
 
 private:
-	using StringMap = std::map<std::string, std::string>;
-
-	static StringMap _map;
 	static FastMutex _mutex;
 };
 
