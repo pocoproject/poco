@@ -527,6 +527,9 @@ void BSONTest::testBinaryGeneric()
 	assertEqual(static_cast<int>(retrieved->subtype()), static_cast<int>(Binary::SUBTYPE_GENERIC));
 	assertEqual(retrieved->toRawString(), data);
 
+	// Verify toString produces quoted Base64 (valid JSON value)
+	assertEqual(retrieved->toString(), R"("SGVsbG8sIEJpbmFyeSBXb3JsZCE=")");
+
 	// Test Binary(const char*, unsigned char) constructor with string literal
 	Binary::Ptr strLitBin = new Binary("String Literal", Binary::SUBTYPE_GENERIC);
 	doc->add("strLitBinary", strLitBin);
@@ -563,9 +566,22 @@ void BSONTest::testBinaryUUID()
 	Poco::UUID retrievedUuid = retrieved->uuid();
 	assertTrue(uuid == retrievedUuid);
 
-	// Verify the string representation contains UUID formatting
+	// Verify toString produces quoted UUID (valid JSON value)
 	std::string uuidStr = retrieved->toString();
-	assertTrue(uuidStr.find("UUID") != std::string::npos);
+	assertTrue(uuidStr.front() == '"');
+	assertTrue(uuidStr.back() == '"');
+	assertTrue(uuidStr.find("UUID(") != std::string::npos);
+
+	// Test with a known UUID
+	Poco::UUID knownUuid("550e8400-e29b-41d4-a716-446655440000");
+	Binary::Ptr knownBin = new Binary(knownUuid);
+	assertEqual(knownBin->toString(), R"--("UUID(550e8400-e29b-41d4-a716-446655440000)")--");
+
+	// Verify document toString with UUID is valid JSON
+	Document::Ptr uuidDoc = new Document();
+	uuidDoc->add("id"s, knownBin);
+	assertEqual(uuidDoc->toString(), R"--({"id":"UUID(550e8400-e29b-41d4-a716-446655440000)"})--");
+
 }
 
 
@@ -611,6 +627,9 @@ void BSONTest::testObjectID()
 	ObjectId::Ptr retrieved = doc->get<ObjectId::Ptr>("_id");
 	assertFalse(retrieved.isNull());
 	assertEqual(retrieved->toString(), "507f1f77bcf86cd799439011");
+
+	// Verify document toString quotes the ObjectId (valid JSON value)
+	assertEqual(doc->toString(), R"({"_id":"507f1f77bcf86cd799439011"})");
 }
 
 
@@ -662,6 +681,11 @@ void BSONTest::testRegularExpression()
 
 	assertEqual(regex3->getPattern(), "\\d+");
 	assertEqual(regex3->getOptions(), "g");
+
+	// Verify document toString quotes the regex (valid JSON value)
+	Document::Ptr regexDoc = new Document();
+	regexDoc->add("re"s, regex1);
+	assertEqual(regexDoc->toString(), R"({"re":"/^test.*/i"})");
 }
 
 
@@ -689,6 +713,11 @@ void BSONTest::testJavaScriptCode()
 
 	assertEqual(retrieved1->getCode(), "function() { return 42; }");
 	assertEqual(retrieved2->getCode(), "var x = 10; var y = 20; return x + y;");
+
+	// Verify document toString quotes the JavaScript code (valid JSON value)
+	Document::Ptr jsDoc = new Document();
+	jsDoc->add("code"s, js1);
+	assertEqual(jsDoc->toString(), R"({"code":"function() { return 42; }"})");
 }
 
 
