@@ -15,6 +15,7 @@
 #include "Poco/File_VX.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
+#include "Poco/Path.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -64,7 +65,22 @@ void FileImpl::setPathImpl(const std::string& path)
 
 std::string FileImpl::getExecutablePathImpl() const
 {
-	return _path;
+	if (_path.empty()) return {};
+
+	if (_path.find('/') != std::string::npos)
+	{
+		if (!existsImpl()) return {};
+		Path p(_path);
+		p.makeAbsolute();
+		std::string absPath = p.toString();
+		if (!canExecuteImpl(absPath)) return {};
+		return absPath;
+	}
+
+	std::string found = findInPath(_path);
+	if (!found.empty() && !canExecuteImpl(found))
+		return {};
+	return found;
 }
 
 
@@ -95,7 +111,11 @@ bool FileImpl::canWriteImpl() const
 
 bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 {
-	return false;
+	poco_assert (!absolutePath.empty());
+
+	// VxWorks has no permission bits; any regular file is potentially executable.
+	struct stat st;
+	return ::stat(const_cast<char*>(absolutePath.c_str()), &st) == 0 && S_ISREG(st.st_mode);
 }
 
 
