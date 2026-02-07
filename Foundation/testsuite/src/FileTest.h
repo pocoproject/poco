@@ -53,6 +53,9 @@ public:
 	void testGetExecutablePathDirectory();
 	void testGetExecutablePathRelative();
 	void testGetExecutablePathPATHEXT();
+#if defined(POCO_OS_FAMILY_UNIX)
+	void testGetExecutablePathThreadSafety();
+#endif
 
 	void setUp();
 	void tearDown();

@@ -129,6 +129,12 @@ public:
 		///
 		/// Returns the fully resolved absolute path on success,
 		/// or an empty string if no executable was found.
+		///
+		/// Known limitation on Windows: If the PATH environment variable
+		/// contains UNC paths (e.g., \\server\share\bin), SearchPathW may
+		/// not find executables in those locations when searching for bare
+		/// filenames. This is a Windows API limitation, not a Poco limitation.
+		/// Workaround: Use the full UNC path including the executable name.
 
 	bool exists() const;
 		/// Returns true iff the file exists.

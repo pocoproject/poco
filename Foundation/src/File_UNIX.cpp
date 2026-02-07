@@ -87,12 +87,24 @@ std::string FileImpl::getExecutablePathImpl() const
 
 	if (_path.find('/') != std::string::npos)
 	{
-		if (!existsImpl()) return {};
 		Path p(_path);
 		p.makeAbsolute();
 		std::string absPath = p.toString();
-		if (!canExecuteImpl(absPath)) return {};
-		return absPath;
+
+		// Optimized: check existence and executability in one stat() call
+		struct stat st;
+		if (::stat(absPath.c_str(), &st) != 0 || !S_ISREG(st.st_mode))
+			return {};
+
+		bool executable;
+		if (st.st_uid == ::geteuid() || ::geteuid() == 0)
+			executable = (st.st_mode & S_IXUSR) != 0;
+		else if (st.st_gid == ::getegid())
+			executable = (st.st_mode & S_IXGRP) != 0;
+		else
+			executable = (st.st_mode & S_IXOTH) != 0;
+
+		return executable ? absPath : std::string();
 	}
 
 	std::string found = findInPath(_path);

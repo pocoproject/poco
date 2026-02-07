@@ -16,8 +16,13 @@
 #include "Poco/Path.h"
 #include "Poco/Exception.h"
 #include "Poco/Thread.h"
+#include "Poco/Environment.h"
 #include <fstream>
 #include <set>
+#include <atomic>
+#include <vector>
+#include <thread>
+#include <chrono>
 #if defined(POCO_OS_FAMILY_UNIX)
 #include <sys/stat.h>
 #include <unistd.h>
@@ -851,6 +856,113 @@ void FileTest::tearDown()
 }
 
 
+#if defined(POCO_OS_FAMILY_UNIX)
+void FileTest::testGetExecutablePathThreadSafety()
+{
+	// Test thread safety of PATH caching implementation (POSIX only)
+	// Four threads: 2 calling getExecutablePath(), 2 modifying PATH
+
+	std::vector<std::thread> threads;
+	std::atomic<int> errorCount(0);
+	std::atomic<bool> stopFlag(false);
+
+	// Save original PATH
+	std::string originalPath = Poco::Environment::get("PATH", "");
+
+	auto execThreadFunc = [&errorCount, &stopFlag]()
+	{
+		try
+		{
+			for (int i = 0; i < 500 && !stopFlag.load(); ++i)
+			{
+				// Test executable lookup in PATH
+				File f("ls");
+				std::string path = f.getExecutablePath();
+				if (path.empty())
+				{
+					errorCount++;
+					break;
+				}
+
+				// Verify it's absolute
+				if (path[0] != '/')
+				{
+					errorCount++;
+					break;
+				}
+
+				// Verify canExecute consistency
+				if (!f.canExecute())
+				{
+					errorCount++;
+					break;
+				}
+
+				// Test another executable
+				File f2("sh");
+				std::string path2 = f2.getExecutablePath();
+				if (!path2.empty() && !f2.canExecute())
+				{
+					errorCount++;
+					break;
+				}
+			}
+		}
+		catch (...)
+		{
+			errorCount++;
+		}
+	};
+
+	auto pathModifyThreadFunc = [&errorCount, &stopFlag, &originalPath]()
+	{
+		try
+		{
+			for (int i = 0; i < 200 && !stopFlag.load(); ++i)
+			{
+				// Modify PATH to trigger cache invalidation
+				if (i % 2 == 0)
+					Poco::Environment::set("PATH", originalPath + ":/tmp");
+				else
+					Poco::Environment::set("PATH", originalPath);
+
+				// Small delay to let other threads run
+				std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			}
+		}
+		catch (...)
+		{
+			errorCount++;
+		}
+	};
+
+	// Launch 2 threads that call getExecutablePath()
+	for (int i = 0; i < 2; ++i)
+	{
+		threads.emplace_back(execThreadFunc);
+	}
+
+	// Launch 2 threads that modify PATH
+	for (int i = 0; i < 2; ++i)
+	{
+		threads.emplace_back(pathModifyThreadFunc);
+	}
+
+	// Wait for all threads to complete
+	for (auto& t : threads)
+	{
+		t.join();
+	}
+
+	// Restore original PATH
+	Poco::Environment::set("PATH", originalPath);
+
+	// Verify no errors occurred
+	assertEqual(0, errorCount.load());
+}
+#endif
+
+
 CppUnit::Test* FileTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FileTest");
@@ -884,6 +996,9 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathDirectory);
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathRelative);
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathPATHEXT);
+#if defined(POCO_OS_FAMILY_UNIX)
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathThreadSafety);
+#endif
 
 	return pSuite;
 }

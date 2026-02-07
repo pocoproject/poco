@@ -69,12 +69,16 @@ std::string FileImpl::getExecutablePathImpl() const
 
 	if (_path.find('/') != std::string::npos)
 	{
-		if (!existsImpl()) return {};
 		Path p(_path);
 		p.makeAbsolute();
 		std::string absPath = p.toString();
-		if (!canExecuteImpl(absPath)) return {};
-		return absPath;
+
+		// Optimized: check existence and executability in one stat() call
+		// VxWorks has no permission bits; any regular file is potentially executable
+		struct stat st;
+		if (::stat(const_cast<char*>(absPath.c_str()), &st) == 0 && S_ISREG(st.st_mode))
+			return absPath;
+		return {};
 	}
 
 	std::string found = findInPath(_path);

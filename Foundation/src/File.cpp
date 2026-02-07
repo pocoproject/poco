@@ -17,6 +17,7 @@
 #include "Poco/DirectoryIterator.h"
 #include "Poco/Environment.h"
 #include "Poco/StringTokenizer.h"
+#include <mutex>
 
 
 namespace Poco {
@@ -38,6 +39,45 @@ std::string findInPath(const std::string& name);
 namespace Poco {
 
 
+namespace {
+
+/// Return cached PATH directories as a vector of strings.
+/// Cache is refreshed if the PATH environment variable changes.
+/// Thread-safe: uses mutex to protect cache updates.
+std::vector<std::string> getPathDirectories()
+{
+	static std::mutex mutex;
+	static std::string cachedPath;
+	static std::vector<std::string> cachedDirs;
+
+	std::lock_guard<std::mutex> lock(mutex);
+
+	const std::string currentPath = Environment::get("PATH", "");
+
+	if (currentPath != cachedPath)
+	{
+		cachedPath = currentPath;
+		cachedDirs.clear();
+
+		if (!currentPath.empty())
+		{
+			const std::string pathSeparator(1, Path::pathSeparator());
+			const StringTokenizer st(currentPath, pathSeparator,
+				StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+
+			for (const auto& dir : st)
+			{
+				cachedDirs.push_back(dir);
+			}
+		}
+	}
+
+	return cachedDirs;
+}
+
+} // anonymous namespace
+
+
 std::string findInPath(const std::string& name)
 {
 	Path curPath(Path::current());
@@ -48,14 +88,10 @@ std::string findInPath(const std::string& name)
 		return curPath.toString();
 	}
 
-	const std::string envPath = Environment::get("PATH", "");
-	if (envPath.empty()) return {};
+	const std::vector<std::string> dirs = getPathDirectories();
+	if (dirs.empty()) return {};
 
-	const std::string pathSeparator(1, Path::pathSeparator());
-	const StringTokenizer st(envPath, pathSeparator,
-		StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-
-	for (const auto& dir : st)
+	for (const auto& dir : dirs)
 	{
 		try
 		{
@@ -168,6 +204,7 @@ bool File::existsAnywhere() const
 {
 	if (path().empty()) return false;
 	if (existsImpl()) return true;
+	if (Path(path()).isAbsolute()) return false;
 	return !findInPath(path()).empty();
 }
 

@@ -51,6 +51,34 @@ private:
 };
 
 
+namespace {
+
+/// Return cached PATHEXT extensions as a vector of strings.
+/// Initialized once at first call.
+/// Thread-safe: static initialization is thread-safe in C++11+, and
+/// the returned reference remains valid for the lifetime of the program.
+const std::vector<std::string>& getPathExtensions()
+{
+	static const std::vector<std::string> extensions = []()
+	{
+		std::vector<std::string> result;
+		const std::string pathExt = Environment::get("PATHEXT", ".EXE");
+		const StringTokenizer st(pathExt, ";",
+			StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+
+		for (const auto& ext : st)
+		{
+			result.push_back(ext);
+		}
+		return result;
+	}();
+
+	return extensions;
+}
+
+} // anonymous namespace
+
+
 FileImpl::FileImpl()
 {
 }
@@ -129,11 +157,9 @@ std::string FileImpl::getExecutablePathImpl() const
 		return result;
 
 	// Try each PATHEXT extension via SearchPathW
-	const std::string pathExt = Environment::get("PATHEXT", ".EXE");
-	const StringTokenizer st(pathExt, ";",
-		StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+	const auto& extensions = getPathExtensions();
 
-	for (const auto& ext : st)
+	for (const auto& ext : extensions)
 	{
 		std::wstring wExt;
 		UnicodeConverter::toUTF16(ext, wExt);
@@ -205,12 +231,10 @@ bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 	std::string ext = p.getExtension();
 	if (ext.empty()) return false;
 
-	const std::string pathExt = Environment::get("PATHEXT", ".EXE");
-	const StringTokenizer st(pathExt, ";",
-		StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+	const auto& extensions = getPathExtensions();
 
 	std::string dotExt = "." + ext;
-	for (const auto& entry : st)
+	for (const auto& entry : extensions)
 	{
 		if (icompare(dotExt, entry) == 0)
 			return true;
