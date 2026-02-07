@@ -18,6 +18,10 @@
 #include "Poco/Thread.h"
 #include <fstream>
 #include <set>
+#if defined(POCO_OS_FAMILY_UNIX)
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include <Windows.h>
 #endif
@@ -690,83 +694,132 @@ void FileTest::testTemporaryFile()
 }
 
 
-void FileTest::testGetExecutablePath()
+void FileTest::testGetExecutablePathNonExistent()
 {
-	// Test 1: Non-existent bare command returns empty
-	{
-		File f("myexecutable_nonexistent_xyz");
-		std::string execPath = f.getExecutablePath();
-		assertTrue (execPath.empty());
-	}
+	// Non-existent bare command returns empty
+	File f("myexecutable_nonexistent_xyz");
+	assertTrue (f.getExecutablePath().empty());
 
-	// Test 2: Non-existent absolute path returns empty
-	{
+	// Non-existent absolute path returns empty
 #if defined(POCO_OS_FAMILY_WINDOWS)
-		File f(R"(C:\path\to\myexecutable_nonexistent)");
+	File f2(R"(C:\path\to\myexecutable_nonexistent)");
 #else
-		File f("/usr/bin/myexecutable_nonexistent_xyz");
+	File f2("/usr/bin/myexecutable_nonexistent_xyz");
 #endif
-		std::string execPath = f.getExecutablePath();
-		assertTrue (execPath.empty());
-	}
+	assertTrue (f2.getExecutablePath().empty());
+}
 
-	// Test 3: Real executable bare name resolves to absolute path
-	{
+
+void FileTest::testGetExecutablePathResolve()
+{
+	// Real executable bare name resolves to absolute path
 #if defined(POCO_OS_FAMILY_WINDOWS)
-		File f("hostname");
-		std::string execPath = f.getExecutablePath();
-		if (!execPath.empty())
-		{
-			// Should be an absolute path
-			Path p(execPath);
-			assertTrue (p.isAbsolute());
-			assertTrue (File(execPath).canExecute());
-		}
-#else
-		File f("ls");
-		std::string execPath = f.getExecutablePath();
-		assertFalse (execPath.empty());
-		// Should be an absolute path (e.g. /bin/ls or /usr/bin/ls)
-		assertTrue (execPath[0] == '/');
-		assertTrue (f.canExecute());
-#endif
-	}
-
-	// Test 4: Real executable absolute path resolves to itself
+	File f("hostname");
+	std::string execPath = f.getExecutablePath();
+	if (!execPath.empty())
 	{
+		Path p(execPath);
+		assertTrue (p.isAbsolute());
+		assertTrue (File(execPath).canExecute());
+	}
+#else
+	File f("ls");
+	std::string execPath = f.getExecutablePath();
+	assertFalse (execPath.empty());
+	// Should be an absolute path (e.g. /bin/ls or /usr/bin/ls)
+	assertTrue (execPath[0] == '/');
+	assertTrue (f.canExecute());
+#endif
+}
+
+
+void FileTest::testGetExecutablePathAbsolute()
+{
 #if defined(POCO_OS_FAMILY_UNIX)
-		// Find where ls actually is
-		std::string lsPath = File("ls").getExecutablePath();
-		assertFalse (lsPath.empty());
-		File f(lsPath);
-		std::string execPath = f.getExecutablePath();
-		assertEqual (lsPath, execPath);
+	// Real executable absolute path resolves to itself
+	std::string lsPath = File("ls").getExecutablePath();
+	assertFalse (lsPath.empty());
+	File f(lsPath);
+	std::string execPath = f.getExecutablePath();
+	assertEqual (lsPath, execPath);
 #endif
-	}
+}
 
-	// Test 5: Non-executable file returns empty for bare name
-	{
-		File f("nonexistent_file_xyz_12345");
-		assertTrue (f.getExecutablePath().empty());
-	}
 
-	// Test 6: Empty path
-	{
-		File f("");
-		assertTrue (f.getExecutablePath().empty());
-	}
+void FileTest::testGetExecutablePathNonExecutable()
+{
+	// Non-executable file returns empty
+#if defined(POCO_OS_FAMILY_UNIX)
+	TemporaryFile tmp;
+	tmp.createFile();
+	chmod(tmp.path().c_str(), 0644);
+	File f(tmp.path());
+	assertTrue (f.getExecutablePath().empty());
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+	// A temp file without PATHEXT extension is not executable
+	TemporaryFile tmp;
+	tmp.createFile();
+	File f(tmp.path());
+	assertTrue (f.getExecutablePath().empty());
+#endif
+}
 
+
+void FileTest::testGetExecutablePathEmpty()
+{
+	File f("");
+	assertTrue (f.getExecutablePath().empty());
+}
+
+
+void FileTest::testGetExecutablePathDirectory()
+{
+	// Directory returns empty (not a regular file)
+	File f(Path::temp());
+	assertTrue (f.getExecutablePath().empty());
+}
+
+
+void FileTest::testGetExecutablePathRelative()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	// Relative path with separator resolves to absolute
+	std::string lsPath = File("ls").getExecutablePath();
+	assertFalse (lsPath.empty());
+	TemporaryFile tmpDir;
+	tmpDir.createDirectories();
+	std::string linkPath = tmpDir.path() + "/myls";
+	symlink(lsPath.c_str(), linkPath.c_str());
+	File f(linkPath);
+	std::string execPath = f.getExecutablePath();
+	assertFalse (execPath.empty());
+	Path p(execPath);
+	assertTrue (p.isAbsolute());
+	assertTrue (File(execPath).canExecute());
+#endif
+
+	// Non-existent relative path with separator returns empty
+#if defined(POCO_OS_FAMILY_UNIX)
+	File f2("./nonexistent_xyz_12345");
+	assertTrue (f2.getExecutablePath().empty());
+#elif defined(POCO_OS_FAMILY_WINDOWS)
+	File f2(R"(.\nonexistent_xyz_12345)");
+	assertTrue (f2.getExecutablePath().empty());
+#endif
+}
+
+
+void FileTest::testGetExecutablePathPATHEXT()
+{
 #if defined(POCO_OS_FAMILY_WINDOWS)
-	// Test 7: Windows - command without extension resolves via PATHEXT
+	// Command without extension resolves via PATHEXT
+	File f("cmd");
+	std::string execPath = f.getExecutablePath();
+	if (!execPath.empty())
 	{
-		File f("cmd");
-		std::string execPath = f.getExecutablePath();
-		if (!execPath.empty())
-		{
-			Path p(execPath);
-			assertTrue (p.isAbsolute());
-			assertTrue (File(execPath).canExecute());
-		}
+		Path p(execPath);
+		assertTrue (p.isAbsolute());
+		assertTrue (File(execPath).canExecute());
 	}
 #endif
 }
@@ -823,7 +876,14 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testLongPath);
 	CppUnit_addTest(pSuite, FileTest, testUnixFileExtension);
 	CppUnit_addTest(pSuite, FileTest, testTemporaryFile);
-	CppUnit_addTest(pSuite, FileTest, testGetExecutablePath);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathNonExistent);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathResolve);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathAbsolute);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathNonExecutable);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathEmpty);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathDirectory);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathRelative);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathPATHEXT);
 
 	return pSuite;
 }

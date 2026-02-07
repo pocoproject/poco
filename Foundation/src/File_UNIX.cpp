@@ -86,9 +86,19 @@ std::string FileImpl::getExecutablePathImpl() const
 	if (_path.empty()) return {};
 
 	if (_path.find('/') != std::string::npos)
-		return existsImpl() ? _path : std::string{};
+	{
+		if (!existsImpl()) return {};
+		Path p(_path);
+		p.makeAbsolute();
+		std::string absPath = p.toString();
+		if (!canExecuteImpl(absPath)) return {};
+		return absPath;
+	}
 
-	return findInPath(_path);
+	std::string found = findInPath(_path);
+	if (!found.empty() && !canExecuteImpl(found))
+		return {};
+	return found;
 }
 
 
@@ -144,7 +154,15 @@ bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 	poco_assert (!absolutePath.empty());
 
 	struct stat st;
-	return ::stat(absolutePath.c_str(), &st) == 0 && S_ISREG(st.st_mode) && ::access(absolutePath.c_str(), X_OK) == 0;
+	if (::stat(absolutePath.c_str(), &st) != 0 || !S_ISREG(st.st_mode))
+		return false;
+
+	if (st.st_uid == ::geteuid() || ::geteuid() == 0)
+		return (st.st_mode & S_IXUSR) != 0;
+	else if (st.st_gid == ::getegid())
+		return (st.st_mode & S_IXGRP) != 0;
+	else
+		return (st.st_mode & S_IXOTH) != 0;
 }
 
 

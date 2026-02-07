@@ -43,7 +43,10 @@ std::string findInPath(const std::string& name)
 	Path curPath(Path::current());
 	curPath.append(name);
 	if (File(curPath).exists())
+	{
+		curPath.makeAbsolute();
 		return curPath.toString();
+	}
 
 	const std::string envPath = Environment::get("PATH", "");
 	if (envPath.empty()) return {};
@@ -56,12 +59,11 @@ std::string findInPath(const std::string& name)
 	{
 		try
 		{
-			std::string candidate(dir);
-			if (candidate.size() && candidate.back() != Path::separator())
-				candidate.append(1, Path::separator());
+			Path candidate(dir);
 			candidate.append(name);
+			candidate.makeAbsolute();
 			if (File(candidate).exists())
-				return candidate;
+				return candidate.toString();
 		}
 		catch (const Poco::PathSyntaxException&)
 		{

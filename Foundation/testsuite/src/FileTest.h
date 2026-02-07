@@ -45,7 +45,14 @@ public:
 	void testLongPath();
 	void testUnixFileExtension();
 	void testTemporaryFile();
-	void testGetExecutablePath();
+	void testGetExecutablePathNonExistent();
+	void testGetExecutablePathResolve();
+	void testGetExecutablePathAbsolute();
+	void testGetExecutablePathNonExecutable();
+	void testGetExecutablePathEmpty();
+	void testGetExecutablePathDirectory();
+	void testGetExecutablePathRelative();
+	void testGetExecutablePathPATHEXT();
 
 	void setUp();
 	void tearDown();

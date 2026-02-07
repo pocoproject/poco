@@ -115,15 +115,17 @@ public:
 	std::string getExecutablePath() const;
 		/// Resolves the executable path.
 		///
-		/// If the path is absolute, checks whether it is executable
-		/// and returns it, or returns an empty string if not found.
+		/// If the path contains a directory separator, checks whether
+		/// it exists and is executable, resolves it to an absolute
+		/// path and returns it.
 		///
 		/// If the path is a bare filename (no directory separator),
 		/// searches the current directory and the PATH environment
 		/// variable for an executable match.
 		///
 		/// On Windows, also tries appending each PATHEXT extension
-		/// (e.g. .EXE, .CMD, .BAT) using SearchPathW.
+		/// (e.g. .EXE, .CMD, .BAT) if the bare filename is not
+		/// found as-is.
 		///
 		/// Returns the fully resolved absolute path on success,
 		/// or an empty string if no executable was found.
@@ -145,14 +147,8 @@ public:
 	bool canExecute() const;
 		/// Returns true iff the file is executable.
 		///
-		/// First resolves the executable path using
-		/// getExecutablePath(). If the resolved path is empty,
-		/// returns false.
-		///
-		/// On Windows, checks whether the file's extension
-		/// matches any PATHEXT entry (e.g. .EXE, .CMD, .BAT).
-		/// On Unix platforms, uses access(X_OK) to check
-		/// the executable permission.
+		/// Resolves the executable path using getExecutablePath().
+		/// If the resolved path is empty, returns false.
 
 	bool isFile() const;
 		/// Returns true iff the file is a regular file.
@@ -219,18 +215,18 @@ public:
 		/// The target path can be a directory.
 		///
 		/// A directory is copied recursively.
-		/// If options is set to OPT_FAIL_ON_OVERWRITE the Method throws an FileExists Exception
+		/// If options is set to OPT_FAIL_ON_OVERWRITE the method throws a FileExistsException
 		/// if the File already exists.
 
 	void moveTo(const std::string& path, int options = 0);
 		/// Copies the file (or directory) to the given path and
 		/// removes the original file. The target path can be a directory.
-		/// If options is set to OPT_FAIL_ON_OVERWRITE the Method throws an FileExists Exception
+		/// If options is set to OPT_FAIL_ON_OVERWRITE the method throws a FileExistsException
 		/// if the File already exists.
 
 	void renameTo(const std::string& path, int options = 0);
 		/// Renames the file to the new name.
-		/// If options is set to OPT_FAIL_ON_OVERWRITE the Method throws an FileExists Exception
+		/// If options is set to OPT_FAIL_ON_OVERWRITE the method throws a FileExistsException
 		/// if the File already exists.
 
 	void linkTo(const std::string& path, LinkType type = LINK_SYMBOLIC) const;

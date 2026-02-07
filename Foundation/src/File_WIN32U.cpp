@@ -18,6 +18,7 @@
 #include "Poco/String.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/UnWindows.h"
+#include <vector>
 
 
 namespace Poco {
@@ -96,17 +97,36 @@ std::string FileImpl::getExecutablePathImpl() const
 	std::wstring uname;
 	UnicodeConverter::toUTF16(_path, uname);
 
-	// First, try the filename as-is
+	auto searchPath = [&uname](const WCHAR* ext) -> std::string
 	{
-		WCHAR buf[MAX_PATH];
-		DWORD len = ::SearchPathW(NULL, uname.c_str(), NULL, MAX_PATH, buf, NULL);
-		if (len > 0 && len < MAX_PATH)
+		static constexpr std::size_t INITIAL_BUF_LEN {256};
+		std::vector<WCHAR> buf(INITIAL_BUF_LEN);
+		DWORD len = ::SearchPathW(NULL, uname.c_str(), ext, buf.size(), buf.data(), NULL);
+		if (len == 0)
 		{
-			std::string result;
-			UnicodeConverter::toUTF8(buf, len, result);
-			return result;
+			// Not found
+			return {};
 		}
-	}
+		if (len > INITIAL_BUF_LEN)
+		{
+			// Buffer too small, resize and retry
+			buf.resize(len);
+			len = ::SearchPathW(NULL, uname.c_str(), ext, buf.size(), buf.data(), NULL);
+		}
+		if (len == 0)
+		{
+			// Failure (very unlikely)
+			return {};
+		}
+		std::string result;
+		UnicodeConverter::toUTF8(buf.data(), len, result);
+		return result;
+	};
+
+	// First, try the filename as-is (validate executability to reject non-executable matches)
+	std::string result = searchPath(NULL);
+	if (!result.empty() && canExecuteImpl(result))
+		return result;
 
 	// Try each PATHEXT extension via SearchPathW
 	const std::string pathExt = Environment::get("PATHEXT", ".EXE");
@@ -117,14 +137,11 @@ std::string FileImpl::getExecutablePathImpl() const
 	{
 		std::wstring wExt;
 		UnicodeConverter::toUTF16(ext, wExt);
-		WCHAR buf[MAX_PATH];
-		DWORD len = ::SearchPathW(NULL, uname.c_str(), wExt.c_str(), MAX_PATH, buf, NULL);
-		if (len > 0 && len < MAX_PATH)
-		{
-			std::string result;
-			UnicodeConverter::toUTF8(buf, len, result);
+		result = searchPath(wExt.c_str());
+		// SearchPathW ignores the extension when the filename contains
+		// a path separator; verify the result actually has the extension.
+		if (!result.empty() && icompare(result, result.size() - ext.size(), ext.size(), ext) == 0)
 			return result;
-		}
 	}
 
 	return {};
