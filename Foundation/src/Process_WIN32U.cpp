@@ -306,8 +306,8 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 	}
 	if (options & PROCESS_CLOSE_STDIN)
 	{
-		HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
-		if (hStdIn) CloseHandle(hStdIn);
+		if (startupInfo.hStdInput) CloseHandle(startupInfo.hStdInput);
+		startupInfo.hStdInput = 0;
 	}
 
 	// outPipe may be the same as errPipe, so we duplicate first and close later.
@@ -340,16 +340,16 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		startupInfo.hStdError = 0;
 	}
 	if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
-	if (options & PROCESS_CLOSE_STDOUT) 
+	if (options & PROCESS_CLOSE_STDOUT)
 	{
-		HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-		if (hStdOut) CloseHandle(hStdOut);
+		if (startupInfo.hStdOutput) CloseHandle(startupInfo.hStdOutput);
+		startupInfo.hStdOutput = 0;
 	}
 	if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
-	if (options & PROCESS_CLOSE_STDERR) 
+	if (options & PROCESS_CLOSE_STDERR)
 	{
-		HANDLE hStdErr = GetStdHandle(STD_ERROR_HANDLE);
-		if (hStdErr) CloseHandle(hStdErr);
+		if (startupInfo.hStdError) CloseHandle(startupInfo.hStdError);
+		startupInfo.hStdError = 0;
 	}
 
 	if (mustInheritHandles)
