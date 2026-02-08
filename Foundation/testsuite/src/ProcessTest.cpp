@@ -17,6 +17,8 @@
 #include "Poco/Path.h"
 #include "Poco/Format.h"
 #include "Poco/Environment.h"
+#include "Poco/ProcessOptions.h"
+#include <iostream>
 
 
 using namespace std::string_literals;
@@ -287,6 +289,68 @@ void ProcessTest::testIsRunning()
 }
 
 
+void ProcessTest::testLaunchCloseHandles()
+{
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd += name;
+#else
+	cmd = name;
+#endif
+
+	// Test PROCESS_CLOSE_STDIN: verify the flag doesn't crash parent or child.
+	{
+		std::vector<std::string> args;
+		args.push_back("-hello");
+		ProcessHandle ph = Process::launch(cmd, args, Poco::PROCESS_CLOSE_STDIN);
+		int rc = ph.wait();
+		assertTrue (rc == 1);
+	}
+
+	// Test PROCESS_CLOSE_STDOUT: child writes to stdout with -hello mode.
+	// Critically, the parent's stdout must still work afterward.
+	{
+		std::vector<std::string> args;
+		args.push_back("-hello");
+		ProcessHandle ph = Process::launch(cmd, args, Poco::PROCESS_CLOSE_STDOUT);
+		int rc = ph.wait();
+		assertTrue (rc == 1);
+		std::cout << "parent stdout ok" << std::flush;
+		assertTrue (std::cout.good());
+	}
+
+	// Test PROCESS_CLOSE_STDERR: the parent's stderr must still work afterward.
+	{
+		std::vector<std::string> args;
+		args.push_back("arg1");
+		ProcessHandle ph = Process::launch(cmd, args, Poco::PROCESS_CLOSE_STDERR);
+		int rc = ph.wait();
+		assertTrue (rc == 1);
+		std::cerr << "parent stderr ok" << std::flush;
+		assertTrue (std::cerr.good());
+	}
+
+	// Test all flags combined.
+	{
+		std::vector<std::string> args;
+		args.push_back("-hello");
+		ProcessHandle ph = Process::launch(cmd, args,
+			Poco::PROCESS_CLOSE_STDIN | Poco::PROCESS_CLOSE_STDOUT | Poco::PROCESS_CLOSE_STDERR);
+		int rc = ph.wait();
+		assertTrue (rc == 1);
+		std::cout << "parent stdout ok" << std::flush;
+		assertTrue (std::cout.good());
+		std::cerr << "parent stderr ok" << std::flush;
+		assertTrue (std::cerr.good());
+	}
+}
+
+
 void ProcessTest::setUp()
 {
 }
@@ -309,6 +373,7 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchArgs);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchInvalidCommand);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunning);
+	CppUnit_addTest(pSuite, ProcessTest, testLaunchCloseHandles);
 
 	return pSuite;
 }
