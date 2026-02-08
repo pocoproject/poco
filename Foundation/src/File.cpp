@@ -17,6 +17,13 @@
 #include "Poco/DirectoryIterator.h"
 #include "Poco/Environment.h"
 #include "Poco/StringTokenizer.h"
+#include <mutex>
+
+
+namespace Poco {
+// Forward declaration so platform Impl files can call it.
+std::string findInPath(const std::string& name);
+}
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -30,6 +37,78 @@
 
 
 namespace Poco {
+
+
+namespace {
+
+/// Return cached PATH directories as a vector of strings.
+/// Cache is refreshed if the PATH environment variable changes.
+/// Thread-safe: uses mutex to protect cache updates.
+std::vector<std::string> getPathDirectories()
+{
+	static std::mutex mutex;
+	static std::string cachedPath;
+	static std::vector<std::string> cachedDirs;
+
+	std::lock_guard<std::mutex> lock(mutex);
+
+	const std::string currentPath = Environment::get("PATH", "");
+
+	if (currentPath != cachedPath)
+	{
+		cachedPath = currentPath;
+		cachedDirs.clear();
+
+		if (!currentPath.empty())
+		{
+			const std::string pathSeparator(1, Path::pathSeparator());
+			const StringTokenizer st(currentPath, pathSeparator,
+				StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+
+			for (const auto& dir : st)
+			{
+				cachedDirs.push_back(dir);
+			}
+		}
+	}
+
+	return cachedDirs;
+}
+
+} // anonymous namespace
+
+
+std::string findInPath(const std::string& name)
+{
+	Path curPath(Path::current());
+	curPath.append(name);
+	if (File(curPath).exists())
+	{
+		curPath.makeAbsolute();
+		return curPath.toString();
+	}
+
+	const std::vector<std::string> dirs = getPathDirectories();
+	if (dirs.empty()) return {};
+
+	for (const auto& dir : dirs)
+	{
+		try
+		{
+			Path candidate(dir);
+			candidate.append(name);
+			candidate.makeAbsolute();
+			if (File(candidate).exists())
+				return candidate.toString();
+		}
+		catch (const Poco::PathSyntaxException&)
+		{
+			// shield against bad PATH environment entries
+		}
+	}
+
+	return {};
+}
 
 
 File::File()
@@ -99,51 +178,12 @@ void File::swap(File& file) noexcept
 
 std::string File::absolutePath() const
 {
-	std::string ret;
+	if (path().empty())
+		return {};
 
-	if (Path(path()).isAbsolute())
-		// TODO: Should this return empty string if file does not exists to be consistent
-		// with the function documentation?
-		ret = getPathImpl();
-	else
-	{
-		Path curPath(Path::current());
-		curPath.append(path());
-		if (File(curPath).exists())
-			ret = curPath.toString();
-		else
-		{
-			const std::string envPath = Environment::get("PATH", "");
-			const std::string pathSeparator(1, Path::pathSeparator());
-			if (!envPath.empty())
-			{
-				const StringTokenizer st(envPath, pathSeparator,
-					StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-
-				for (const auto& p: st)
-				{
-					try
-					{
-						std::string fileName(p);
-						if (p.size() && p.back() != Path::separator())
-							fileName.append(1, Path::separator());
-						fileName.append(path());
-						if (File(fileName).exists())
-						{
-							ret = fileName;
-							break;
-						}
-					}
-					catch (const Poco::PathSyntaxException&)
-					{
-						// shield against bad PATH environment entries
-					}
-				}
-			}
-		}
-	}
-
-	return ret;
+	Path p(path());
+	p.makeAbsolute();
+	return p.toString();
 }
 
 
@@ -163,14 +203,9 @@ bool File::exists() const
 bool File::existsAnywhere() const
 {
 	if (path().empty()) return false;
-
-	if (Path(path()).isAbsolute())
-		return existsImpl();
-
-	if (File(absolutePath()).exists())
-		return true;
-
-	return false;
+	if (existsImpl()) return true;
+	if (Path(path()).isAbsolute()) return false;
+	return !findInPath(path()).empty();
 }
 
 
@@ -188,14 +223,10 @@ bool File::canWrite() const
 
 bool File::canExecute() const
 {
-	// Resolve (platform-specific) executable path and absolute path from relative.
-	const auto execPath { getExecutablePathImpl() };
-	const auto absPath { File(execPath).absolutePath() };
-	if (absPath.empty() || !File(absPath).exists())
-	{
+	const std::string execPath = getExecutablePathImpl();
+	if (execPath.empty())
 		return false;
-	}
-	return canExecuteImpl(absPath);
+	return canExecuteImpl(execPath);
 }
 
 
