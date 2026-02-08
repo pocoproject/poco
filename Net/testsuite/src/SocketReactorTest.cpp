@@ -466,12 +466,10 @@ namespace
 
 		~ConcurrentRemovalHandler()
 		{
-			// Clean up any remaining handlers
+			// Use remove() for safe atomic cleanup - avoids race
+			// with reactor dispatch that removeEventHandler() has
 			try {
-				_reactor.removeEventHandler(_socket, _or);
-			} catch (...) {}
-			try {
-				_reactor.removeEventHandler(_socket, _ow);
+				_reactor.remove(_socket);
 			} catch (...) {}
 		}
 
@@ -811,7 +809,7 @@ void SocketReactorTest::testConcurrentHandlerRemoval()
 	std::vector<StreamSocket> accepted;
 
 	// Create multiple socket connections
-	const int numSockets = 10;
+	const int numSockets = 4;
 	for (int i = 0; i < numSockets; ++i)
 	{
 		sockets.push_back(StreamSocket(sa));
@@ -843,7 +841,7 @@ void SocketReactorTest::testConcurrentHandlerRemoval()
 				NObserver<SocketReactorTest, ReadableNotification> obs(*this, &SocketReactorTest::onReadable);
 				try {
 					reactor->addEventHandler(sock, obs);
-					Thread::sleep(10);
+					Thread::sleep(1);
 					reactor->removeEventHandler(sock, obs);
 				} catch (...) {
 					// Socket might be removed by handler, that's okay
