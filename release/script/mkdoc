@@ -10,6 +10,8 @@
 # usage: mkdoc [<specfile>]
 #
 
+set -e
+
 if [ "$POCO_BASE" = "" ] ; then
   echo "Error: POCO_BASE not set."
   exit 1

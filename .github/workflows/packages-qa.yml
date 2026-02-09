@@ -22,7 +22,6 @@ jobs:
         run: |
           export POCO_BASE=`pwd`
           export PATH=$POCO_BASE/release/script:$PATH
-          export LD_LIBRARY_PATH=$POCO_BASE/stage/tools/cmake-build/lib
           mkdoc all
 
   mkrelease_win:

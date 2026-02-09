@@ -7,6 +7,8 @@
 # usage: mkrelease [-i] [-f specfile] <version> [<component>...]
 #
 
+set -e
+
 if [ "$1" = "" ] ; then
 	echo "usage: $0 [-i] <version> [<component>...]"
 	echo "       -i          - include internal tools"
@@ -120,15 +122,11 @@ mkdir -p ${target}/CppUnit/doc
 mkdir -p ${target}/CppUnit/include/CppUnit
 mkdir -p ${target}/CppUnit/src
 
-cp ${POCO_BASE}/CppUnit/doc/* ${target}/CppUnit/doc >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/include/CppUnit/* ${target}/CppUnit/include/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/src/* ${target}/CppUnit/src >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.sln ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vcxproj ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.vcxproj.filters ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/Makefile ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/*.progen ${target}/CppUnit >/dev/null 2>&1
-cp ${POCO_BASE}/CppUnit/CMakeLists.txt ${target}/CppUnit >/dev/null 2>&1
+cp ${POCO_BASE}/CppUnit/doc/* ${target}/CppUnit/doc >/dev/null 2>&1 || true
+cp ${POCO_BASE}/CppUnit/include/CppUnit/* ${target}/CppUnit/include/CppUnit >/dev/null 2>&1 || true
+cp ${POCO_BASE}/CppUnit/src/* ${target}/CppUnit/src >/dev/null 2>&1 || true
+cp ${POCO_BASE}/CppUnit/Makefile ${target}/CppUnit >/dev/null 2>&1 || true
+cp ${POCO_BASE}/CppUnit/CMakeLists.txt ${target}/CppUnit >/dev/null 2>&1 || true
 
 #
 # Copy components
@@ -259,5 +257,3 @@ if [ "$output" = "" ] ; then
 		/usr/bin/zip -r -q poco-${version}.zip poco-${version}
 	fi
 fi
-
-exit 0
