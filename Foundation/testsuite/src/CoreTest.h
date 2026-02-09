@@ -29,6 +29,7 @@ public:
 	void testBugcheck();
 	void testFPE();
 	void testEnvironment();
+	void testEnvironmentMultiThread();
 	void testBuffer();
 	void testFIFOBufferChar();
 	void testFIFOBufferInt();
