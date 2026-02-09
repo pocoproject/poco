@@ -724,11 +724,18 @@ const Token* Parser::parseFunc(const Token* pNext, const std::string& attrs, std
 		if (!pNext->is(Token::INTEGER_LITERAL_TOKEN) && !isKeyword(pNext, IdentifierToken::KW_DEFAULT) && !isKeyword(pNext, IdentifierToken::KW_DELETE))
 			syntaxError("0, default or delete");
 		if (isKeyword(pNext, IdentifierToken::KW_DEFAULT))
-			pFunc->makeDefault();
+		{
+			if (pFunc) pFunc->makeDefault();
+		}
 		else if (isKeyword(pNext, IdentifierToken::KW_DELETE))
-			pFunc->makeDelete();
+		{
+			if (pFunc) pFunc->makeDelete();
+		}
+		else
+		{
+			if (pFunc) pFunc->makePureVirtual();
+		}
 		pNext = next();
-		if (pFunc) pFunc->makePureVirtual();
 		expectOperator(pNext, OperatorToken::OP_SEMICOLON, ";");
 	}
 	else if (isOperator(pNext, OperatorToken::OP_OPENBRACE) || isOperator(pNext, OperatorToken::OP_COLON))
