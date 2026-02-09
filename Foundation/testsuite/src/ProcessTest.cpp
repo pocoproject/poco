@@ -312,7 +312,7 @@ void ProcessTest::testLaunchCloseHandles()
 		assertTrue (rc == 1);
 	}
 
-	// Test PROCESS_CLOSE_STDOUT: child writes to stdout with -hello mode.
+	// Test PROCESS_CLOSE_STDOUT: child runs in -hello mode but with its stdout closed.
 	// Critically, the parent's stdout must still work afterward.
 	{
 		std::vector<std::string> args;
