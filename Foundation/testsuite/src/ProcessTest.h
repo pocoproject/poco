@@ -32,6 +32,7 @@ public:
 	void testLaunchArgs();
 	void testLaunchInvalidCommand();
 	void testIsRunning();
+	void testLaunchCloseHandles();
 
 	void setUp();
 	void tearDown();
