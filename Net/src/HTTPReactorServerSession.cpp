@@ -210,6 +210,19 @@ int HTTPReactorServerSession::peek()
 	}
 }
 
+int HTTPReactorServerSession::read(char* buffer, std::streamsize length)
+{
+	if (_idx < _complete)
+	{
+		int n = (int) (_complete - _idx);
+		if (n > length) n = (int) length;
+		std::memcpy(buffer, _buf.c_str() + _idx, n);
+		_idx += n;
+		return n;
+	}
+	return 0;
+}
+
 int HTTPReactorServerSession::write(const char* buffer, std::streamsize length)
 {
 	try
