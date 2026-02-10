@@ -1,7 +1,7 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.15.0 (2025-12-22)
+Release 1.15.0 (2026-02-10)
 ===========================
 
 Summary of Changes:
@@ -22,7 +22,7 @@ Peter Zmanovsky, nitram96, Nino Belušić, Matthew Stoltenberg, Katalin Rebhan,
 Eric Engels, Milan Tepic, David Roman, Mert Övün, lanthora, Jouke Witteveen,
 Jeremy Rifkin, Dan Rosser, Étienne Dupuis, Thomas Beutlich, Sergei Trofimovich, Kacper Piwiński,
 Peter Klotz, Kari Argillander, Hussein Ismail, Mias du Plessis, Wei Liguo,
-Arthur Chan, Olivier Smeesters, Karthik Bhat A, Jonas Bülow
+Arthur Chan, Olivier Smeesters, Karthik Bhat A
 
 Notable Features:
 

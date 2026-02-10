@@ -99,18 +99,12 @@ does not have OpenSSL, please get it from https://www.openssl.org or
 another source. You do not have to build OpenSSL yourself - a binary
 distribution is fine (e.g., apt-get install openssl libssl-dev).
 On macOS, install OpenSSL via Homebrew (brew install openssl).
-On Windows, OpenSSL can be installed with vcpkg, or through WinGet 
+On Windows, OpenSSL can be installed with vcpkg, or through WinGet
 (winget install -e --id ShiningLight.OpenSSL.Dev).
 
-The easiest way to install OpenSSL on Windows is to get the pre-built
-libraries from the pocoproject/openssl Git repository at
-<https://github.com/pocoproject/openssl>. This repository is included
-as a submodule in the poco GitHub repository, but not in the release
-source code packages.
-
 Depending on where you have installed the OpenSSL libraries,
-you might have to edit the build script (buildwin.cmd), or add the
-necessary paths to the INCLUDE and LIB environment variables.
+you might have to add the necessary paths to the INCLUDE and LIB
+environment variables, or set OPENSSL_ROOT_DIR when using CMake.
 
 The Data library requires ODBC support on your system if you want
 to build the ODBC connector (which is the default). On Windows

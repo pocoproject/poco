@@ -254,12 +254,12 @@ a POP3 server.
 !!! Putting It All Together
 
 The following example shows the implementation of a simple HTTP server using the
-POCO libraries. The server returns a HTML document showing the current
+POCO libraries. The server returns an HTML document showing the current
 date and time. The application framework is used to build a server
 application that can run as a Windows service, or Unix daemon process.
 Of course, the same executable can also directly be started from the
 shell. For use with the HTTP server framework, a <[TimeRequestHandler]>
-class is defined that serves incoming requests by returning a HTML
+class is defined that serves incoming requests by returning an HTML
 document containing the current date and time. Also, for each incoming
 request, a message is logged using the logging framework. Together with
 the <[TimeRequestHandler]> class, a corresponding factory class,

@@ -137,7 +137,7 @@ On macOS, it's recommended to install OpenSSL via Homebrew.
 On Windows, it is recommended to use one of the pre-built binary packages. A list
 is available on [[https://github.com/openssl/openssl/wiki/Binaries OpenSSL GitHub]].
 
-Shining Light Productions [[http://www.slproweb.com/products/Win32OpenSSL.html installer]]
+Shining Light Productions [[https://www.slproweb.com/products/Win32OpenSSL.html installer]]
 is well supported by CMake.
 
 !ODBC

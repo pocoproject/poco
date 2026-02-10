@@ -25,7 +25,7 @@ and [Getting Started](https://docs.pocoproject.org/current/00200-GettingStarted.
 ### Prerequisites
 
 - CMake 3.26 or newer
-- A C++17 compiler (Visual C++ 2017, GCC 8.0, Clang 5, or newer)
+- A C++17 compiler (Visual C++ 2019, GCC 8.0, Clang 5, or newer)
 - C++20 is supported and recommended; some features are only available with C++20
 - OpenSSL 1.1.1 or newer headers and libraries (optional, but recommended)
 - MySQL, PostgreSQL, ODBC, and Apache/APR client libraries (optional)
@@ -190,10 +190,10 @@ on the Conan Center Index repository.
 
 ### Building Without CMake
 
-If you do not want to or cannot use CMake, POCO can also be built with GNU Make 
+If you do not want to or cannot use CMake, POCO can also be built with GNU Make
 (Linux, macOS and other supported Unix platforms).
 
-Please refer to the [documentation](https://pocoproject.org/docs) for more information.
+Please refer to the [documentation](https://docs.pocoproject.org/current/) for more information.
 
 
 ### Getting POCO via a Package Manager
