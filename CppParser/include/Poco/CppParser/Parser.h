@@ -81,8 +81,10 @@ protected:
 	const Poco::Token* parseBaseClassList(const Poco::Token* pNext, Struct* pClass);
 	const Poco::Token* parseClassMembers(const Poco::Token* pNext, Struct* pClass);
 	const Poco::Token* parseAccess(const Poco::Token* pNext);
+	const Poco::Token* parseStaticAssert(const Poco::Token* pNext);
 	const Poco::Token* parseIdentifier(const Poco::Token* pNext, std::string& id);
 	const Poco::Token* parseAttributes(const Poco::Token* pNext, std::string& attrs);
+	const Poco::Token* parseParenthesized(const Poco::Token* pNext, std::string& decl);
 
 	void addSymbol(Symbol* pSymbol, int lineNumber, bool addGST = true);
 	void pushNameSpace(NameSpace* pNameSpace, int lineNumber, bool addGST = true);

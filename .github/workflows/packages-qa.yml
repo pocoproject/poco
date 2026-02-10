@@ -16,13 +16,12 @@ jobs:
         uses: actions/checkout@v2
       -
         name: Install packages
-        run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev redis-server libmysqlclient-dev libpq-dev
+        run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev redis-server libmysqlclient-dev libpq-dev
       -
         name: Build documentation
         run: |
           export POCO_BASE=`pwd`
           export PATH=$POCO_BASE/release/script:$PATH
-          export LD_LIBRARY_PATH=$POCO_BASE/stage/tools/lib/Linux/x86_64
           mkdoc all
 
   mkrelease_win:

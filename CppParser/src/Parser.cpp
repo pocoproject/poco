@@ -46,6 +46,12 @@ namespace Poco {
 namespace CppParser {
 
 
+// Context-sensitive identifiers (not reserved keywords in C++,
+// but have special meaning in certain contexts)
+static const std::string ID_OVERRIDE("override");
+static const std::string ID_FINAL("final");
+
+
 Parser::Parser(NameSpace::SymbolTable& gst, const std::string& file, std::istream& istr):
 	_gst(gst),
 	_istr(istr),
@@ -198,6 +204,9 @@ const Token* Parser::parseFile(const Token* pNext)
 		case IdentifierToken::KW_ENUM:
 			pNext = parseEnum(pNext);
 			break;
+		case IdentifierToken::KW_STATIC_ASSERT:
+			pNext = parseStaticAssert(pNext);
+			break;
 		default:
 			pNext = parseVarFunc(pNext);
 		}
@@ -263,12 +272,22 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 			case IdentifierToken::KW_ENUM:
 				pNext = parseEnum(pNext);
 				break;
+			case IdentifierToken::KW_STATIC_ASSERT:
+				pNext = parseStaticAssert(pNext);
+				break;
 			default:
 				pNext = parseVarFunc(pNext);
 			}
 		}
 		expectOperator(pNext, OperatorToken::OP_CLOSBRACE, "}");
 		pNext = next();
+	}
+	else if (isOperator(pNext, OperatorToken::OP_OPENBRACE))
+	{
+		// Anonymous namespace (namespace { ... }) contains implementation
+		// details not relevant for API documentation; skip the entire block.
+		pNext = parseBlock(pNext);
+		return pNext;
 	}
 	else syntaxError("namespace name");
 	popNameSpace();
@@ -305,7 +324,7 @@ const Token* Parser::parseClass(const Token* pNext, std::string& decl)
 	pNext = next();
 
 	bool isFinal = false;
-	if (isIdentifier(pNext) && pNext->asString() == "final")
+	if (isIdentifier(pNext) && pNext->asString() == ID_FINAL)
 	{
 		pNext = next();
 		isFinal = true;
@@ -423,6 +442,9 @@ const Token* Parser::parseClassMembers(const Token* pNext, Struct* /*pClass*/)
 			break;
 		case IdentifierToken::KW_FRIEND:
 			pNext = parseFriend(pNext);
+			break;
+		case IdentifierToken::KW_STATIC_ASSERT:
+			pNext = parseStaticAssert(pNext);
 			break;
 		case OperatorToken::OP_COMPL:
 		default:
@@ -569,12 +591,19 @@ const Token* Parser::parseFriend(const Token* pNext)
 {
 	poco_assert (isKeyword(pNext, IdentifierToken::KW_FRIEND));
 
+	// Friend declarations come in two forms:
+	//   friend class Foo;                          — ends with ;
+	//   friend bool operator==(A a, B b) { ... }  — inline definition ends with }
+	// Skip the entire declaration in both cases.
 	pNext = next();
-
-	while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) && !isEOF(pNext))
+	while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) &&
+	       !isOperator(pNext, OperatorToken::OP_OPENBRACE) &&
+	       !isEOF(pNext))
 		pNext = next();
 
-	if (isOperator(pNext, OperatorToken::OP_SEMICOLON))
+	if (isOperator(pNext, OperatorToken::OP_OPENBRACE))
+		pNext = parseBlock(pNext);
+	else if (isOperator(pNext, OperatorToken::OP_SEMICOLON))
 		pNext = next();
 	return pNext;
 }
@@ -601,6 +630,18 @@ const Token* Parser::parseVarFunc(const Token* pNext, std::string& decl)
 	}
 	else
 	{
+		while (isKeyword(pNext, IdentifierToken::KW_ALIGNAS) ||
+		       isKeyword(pNext, IdentifierToken::KW_DECLTYPE))
+		{
+			// These keywords take parenthesized arguments and are part
+			// of the declaration, not function names
+			append(decl, pNext);
+			pNext = next();
+			if (isOperator(pNext, OperatorToken::OP_OPENPARENT))
+			{
+				pNext = parseParenthesized(pNext, decl);
+			}
+		}
 		append(decl, pNext);
 		pNext = next();
 		bool isOperatorKeyword = false;
@@ -691,6 +732,7 @@ const Token* Parser::parseFunc(const Token* pNext, const std::string& attrs, std
 		{
 			if (pFunc) pFunc->makeConst();
 			pNext = next();
+			continue;
 		}
 		if (isKeyword(pNext, IdentifierToken::KW_THROW))
 		{
@@ -702,13 +744,18 @@ const Token* Parser::parseFunc(const Token* pNext, const std::string& attrs, std
 		{
 			if (pFunc) pFunc->makeNoexcept();
 			pNext = next();
+			if (isOperator(pNext, OperatorToken::OP_OPENPARENT))
+			{
+				std::string tmp;
+				pNext = parseParenthesized(pNext, tmp);
+			}
 		}
-		else if (isIdentifier(pNext) && pNext->asString() == "override")
+		else if (isIdentifier(pNext) && pNext->asString() == ID_OVERRIDE)
 		{
 			if (pFunc) pFunc->makeOverride();
 			pNext = next();
 		}
-		else if (isIdentifier(pNext) && pNext->asString() == "final")
+		else if (isIdentifier(pNext) && pNext->asString() == ID_FINAL)
 		{
 			if (pFunc) pFunc->makeFinal();
 			pNext = next();
@@ -717,6 +764,7 @@ const Token* Parser::parseFunc(const Token* pNext, const std::string& attrs, std
 		{
 			break; // handled below
 		}
+		else break;
 	}
 	if (isOperator(pNext, OperatorToken::OP_ASSIGN))
 	{
@@ -724,11 +772,18 @@ const Token* Parser::parseFunc(const Token* pNext, const std::string& attrs, std
 		if (!pNext->is(Token::INTEGER_LITERAL_TOKEN) && !isKeyword(pNext, IdentifierToken::KW_DEFAULT) && !isKeyword(pNext, IdentifierToken::KW_DELETE))
 			syntaxError("0, default or delete");
 		if (isKeyword(pNext, IdentifierToken::KW_DEFAULT))
-			pFunc->makeDefault();
+		{
+			if (pFunc) pFunc->makeDefault();
+		}
 		else if (isKeyword(pNext, IdentifierToken::KW_DELETE))
-			pFunc->makeDelete();
+		{
+			if (pFunc) pFunc->makeDelete();
+		}
+		else
+		{
+			if (pFunc) pFunc->makePureVirtual();
+		}
 		pNext = next();
-		if (pFunc) pFunc->makePureVirtual();
 		expectOperator(pNext, OperatorToken::OP_SEMICOLON, ";");
 	}
 	else if (isOperator(pNext, OperatorToken::OP_OPENBRACE) || isOperator(pNext, OperatorToken::OP_COLON))
@@ -953,6 +1008,44 @@ const Poco::Token* Parser::parseAttributes(const Poco::Token* pNext, std::string
 		append(attrs, pNext);
 		pNext = next();
 	}
+	return pNext;
+}
+
+
+const Token* Parser::parseParenthesized(const Token* pNext, std::string& decl)
+{
+	poco_assert (isOperator(pNext, OperatorToken::OP_OPENPARENT));
+
+	append(decl, pNext);
+	pNext = next();
+	int depth = 1;
+	while (depth > 0 && !isEOF(pNext))
+	{
+		if (isOperator(pNext, OperatorToken::OP_OPENPARENT))
+			++depth;
+		else if (isOperator(pNext, OperatorToken::OP_CLOSPARENT))
+			--depth;
+		if (depth > 0)
+		{
+			append(decl, pNext);
+			pNext = next();
+		}
+	}
+	append(decl, pNext); // closing ')'
+	pNext = next();
+	return pNext;
+}
+
+
+const Token* Parser::parseStaticAssert(const Token* pNext)
+{
+	poco_assert (isKeyword(pNext, IdentifierToken::KW_STATIC_ASSERT));
+
+	// skip static_assert(...); — not a declaration
+	while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) && !isEOF(pNext))
+		pNext = next();
+	if (isOperator(pNext, OperatorToken::OP_SEMICOLON))
+		pNext = next();
 	return pNext;
 }
 
