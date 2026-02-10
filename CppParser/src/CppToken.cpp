@@ -370,11 +370,11 @@ void IdentifierToken::finish(std::istream& istr)
 		next = istr.peek();
 	}
 
-	// C++11 raw string literals: R"delim(...)delim", also u8R"...", uR"...", LR"..."
+	// C++11 raw string literals: R"delim(...)delim", also u8R"...", uR"...", UR"...", LR"..."
 	// Without this handling, the tokenizer would split R"(")" into separate tokens:
 	//   identifier 'R', string literal '("', operator ')', and an unterminated '"',
 	// causing "Unterminated character literal" errors downstream.
-	if ((_value == "R" || _value == "u8R" || _value == "uR" || _value == "LR")
+	if ((_value == "R" || _value == "u8R" || _value == "uR" || _value == "UR" || _value == "LR")
 		&& istr.peek() == '"')
 	{
 		finishRawString(istr);

@@ -81,7 +81,11 @@ cmake -S$tools -B$cmake_build \
 cmake --build $cmake_build --target PocoDoc --parallel 8
 
 export PATH=$cmake_build/bin:$PATH
-export LD_LIBRARY_PATH=$cmake_build/lib:$LD_LIBRARY_PATH
+if [ -n "$LD_LIBRARY_PATH" ] ; then
+  export LD_LIBRARY_PATH="$cmake_build/lib:$LD_LIBRARY_PATH"
+else
+  export LD_LIBRARY_PATH="$cmake_build/lib"
+fi
 echo PATH=$PATH
 
 echo "Building documentation $release (using $docConfig)"
