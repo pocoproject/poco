@@ -211,7 +211,10 @@ void ProcessRunner::stop()
 			NamedEvent terminateEvent(Process::terminationEventName(pid));
 			terminateEvent.set();
 #else
-			Process::requestTermination(pid);
+			if (_options & PROCESS_KILL_TREE)
+				::kill(-pid, SIGINT); // signal entire process group
+			else
+				Process::requestTermination(pid);
 #endif
 
 #if !defined(POCO_OS_FAMILY_WINDOWS)
