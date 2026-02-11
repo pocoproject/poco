@@ -43,7 +43,9 @@ enum ProcessOptions
 		/// On Windows, creates a Job Object with JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE.
 		///
 		/// On Unix/Linux, the child is placed in a new process group via
-		/// setpgid(0, 0). On stop, the entire process group is signaled.
+		/// setpgid(0, 0). On stop, the termination request is sent to the
+		/// main process; if it does not exit before the timeout expires,
+		/// the entire process group is signaled (forcibly) with SIGKILL.
 };
 
 
