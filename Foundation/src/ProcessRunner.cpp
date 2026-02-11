@@ -26,6 +26,7 @@
 #include "Poco/UnWindows.h"
 #else
 #include <signal.h>
+#include <cerrno>
 #endif
 #include <fstream>
 
@@ -223,13 +224,17 @@ void ProcessRunner::stop()
 				// Wait for the entire process group to exit.
 				// setpgid(0, 0) was called in the child, so -pid
 				// addresses the whole group.
-				while (::kill(-pid, 0) == 0)
+				// kill(-pid, 0) returns 0 if any process in the group exists
+				// and we have permission, or -1 with errno:
+				//   ESRCH  - no such process group (done)
+				//   EPERM  - group exists but no permission (still alive)
+				while (::kill(-pid, 0) == 0 || errno == EPERM)
 				{
 					if (_sw.elapsedSeconds() > _timeout)
 					{
 						::kill(-pid, SIGKILL);
 						Stopwatch killSw; killSw.start();
-						while (::kill(-pid, 0) == 0)
+						while (::kill(-pid, 0) == 0 || errno == EPERM)
 						{
 							if (killSw.elapsedSeconds() > _timeout)
 							{
