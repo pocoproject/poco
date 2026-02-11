@@ -141,14 +141,30 @@ void ProcessRunner::run()
 			{
 				JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = {};
 				jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-				SetInformationJobObject(static_cast<HANDLE>(_hJob),
-					JobObjectExtendedLimitInformation, &jeli, sizeof(jeli));
+				if (!SetInformationJobObject(static_cast<HANDLE>(_hJob),
+					JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)))
+				{
+					CloseHandle(static_cast<HANDLE>(_hJob));
+					_hJob = nullptr;
+				}
+			}
+			if (_hJob)
+			{
 				HANDLE hProc = OpenProcess(PROCESS_SET_QUOTA | PROCESS_TERMINATE,
 					FALSE, static_cast<DWORD>(pPH->id()));
 				if (hProc)
 				{
-					AssignProcessToJobObject(static_cast<HANDLE>(_hJob), hProc);
+					if (!AssignProcessToJobObject(static_cast<HANDLE>(_hJob), hProc))
+					{
+						CloseHandle(static_cast<HANDLE>(_hJob));
+						_hJob = nullptr;
+					}
 					CloseHandle(hProc);
+				}
+				else
+				{
+					CloseHandle(static_cast<HANDLE>(_hJob));
+					_hJob = nullptr;
 				}
 			}
 		}
