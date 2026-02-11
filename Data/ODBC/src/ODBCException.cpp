@@ -20,7 +20,7 @@ namespace Poco {
 namespace Data {
 namespace ODBC {
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(ODBC_EXPORTS)
 template class ODBC_API HandleException<SQLHENV, SQL_HANDLE_ENV>;
 template class ODBC_API HandleException<SQLHDBC, SQL_HANDLE_DBC>;
 template class ODBC_API HandleException<SQLHSTMT, SQL_HANDLE_STMT>;

@@ -22,7 +22,7 @@ namespace Poco {
 namespace Dynamic {
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(Foundation_EXPORTS)
 
 template class Foundation_API Struct<std::string>;
 template class Foundation_API Struct<int>;

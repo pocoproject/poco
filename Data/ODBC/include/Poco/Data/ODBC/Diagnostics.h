@@ -245,7 +245,7 @@ private:
 // explicit instantiation definition
 #ifndef POCO_DOC
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(ODBC_EXPORTS)
 extern template class Diagnostics<SQLHENV, SQL_HANDLE_ENV>;
 extern template class Diagnostics<SQLHDBC, SQL_HANDLE_DBC>;
 extern template class Diagnostics<SQLHSTMT, SQL_HANDLE_STMT>;
