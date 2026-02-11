@@ -24,12 +24,14 @@
 #include "Poco/DateTimeFormat.h"
 #include "Poco/Exception.h"
 #include "Poco/ThreadPool.h"
+#include "Poco/StreamCopier.h"
 #include "Poco/Util/ServerApplication.h"
 #include "Poco/Util/Option.h"
 #include "Poco/Util/OptionSet.h"
 #include "Poco/Util/HelpFormatter.h"
 #include <cstdio>
 #include <iostream>
+#include <sstream>
 
 #include "Poco/Net/HTTPReactorServer.h"
 
@@ -89,6 +91,38 @@ private:
 };
 
 
+class BodyEchoRequestHandler: public HTTPRequestHandler
+	/// Echo the request body back to the client.
+{
+public:
+	BodyEchoRequestHandler()
+	{
+	}
+
+	void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+	{
+		Application& app = Application::instance();
+		app.logger().information("Request from " + request.clientAddress().toString());
+
+		app.logger().information("Method: " + request.getMethod() + ", URI: " + request.getURI());
+
+		std::string contentType = request.get("Content-Type", "text/plain");
+		app.logger().information("Content-Type: " + contentType);
+
+		std::ostringstream ostrBody;
+		Poco::StreamCopier::copyStream(request.stream(), ostrBody);
+		std::string body = ostrBody.str();
+		app.logger().information("Request body length: " + std::to_string(body.length()));
+
+		response.setChunkedTransferEncoding(true);
+		response.setContentType(contentType);
+
+		std::ostream& ostr = response.send();
+		ostr << body;
+	}
+};
+
+
 class TimeRequestHandlerFactory: public HTTPRequestHandlerFactory
 {
 public:
@@ -100,6 +134,8 @@ public:
 	{
 		if (request.getURI() == "/")
 			return new TimeRequestHandler(_format, _delay);
+		else if (request.getURI() == "/echo" || request.getURI() == "/body")
+			return new BodyEchoRequestHandler();
 		else
 			return nullptr;
 	}
