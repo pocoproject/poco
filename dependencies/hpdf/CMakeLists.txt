@@ -8,6 +8,11 @@ POCO_SOURCES(SRCS hpdf ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "src/*.h")
 POCO_HEADERS(SRCS hpdf ${HDRS_G})
 
+if (NOT TARGET PNG::PNG)
+	message(WARNING "PNG not found; hpdf will not be built.")
+	return()
+endif()
+
 add_library(_BUNDLED_HPDF OBJECT EXCLUDE_FROM_ALL ${SRCS})
 
 set_property(TARGET _BUNDLED_HPDF PROPERTY POSITION_INDEPENDENT_CODE ON)

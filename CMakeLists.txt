@@ -169,8 +169,10 @@ else()
 	set(_enable_default OFF)
 endif()
 
-# Allow enabling and disabling components
-option(ENABLE_FOUNDATION "Enable Foundation" ON)
+# Foundation is always required; force it ON regardless of user setting
+set(ENABLE_FOUNDATION ON CACHE BOOL "Enable Foundation (required)" FORCE)
+
+# Allow enabling and disabling optional components
 
 option(ENABLE_ENCODINGS "Enable Encodings" ${_enable_default})
 option(ENABLE_XML "Enable XML" ${_enable_default})
@@ -277,12 +279,10 @@ if(ENABLE_FUZZING)
 endif()
 
 if(POCO_UNBUNDLED)
-	if (POCO_SQLITE_UNBUNDLED)
-		message(STATUS "Using external sqlite")
-		message(STATUS "Using internal zlib, pcre2, expat, libpng, ...")
-	else()
-		message(STATUS "Using external sqlite, zlib, pcre2, expat, libpng, ...")
-	endif()
+	message(STATUS "Using external sqlite, zlib, pcre2, expat, libpng, ...")
+elseif(POCO_SQLITE_UNBUNDLED)
+	message(STATUS "Using external sqlite")
+	message(STATUS "Using internal zlib, pcre2, expat, libpng, ...")
 else()
 	message(STATUS "Using internal sqlite, zlib, pcre2, expat, libpng, ...")
 endif()
