@@ -178,6 +178,11 @@ private:
 	Stopwatch _sw;
 	std::string _error;
 	mutable Poco::FastMutex _mutex;
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	void* _hJob = nullptr;
+		/// Windows Job Object handle for PROCESS_KILL_TREE.
+		/// Stored as void* to avoid including Windows.h.
+#endif
 };
 
 

@@ -23,6 +23,7 @@
 #include "Poco/Error.h"
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/NamedEvent.h"
+#include "Poco/UnWindows.h"
 #endif
 #include <fstream>
 
@@ -129,6 +130,26 @@ void ProcessRunner::run()
 		_pid = pPH->id();
 		errPID = Error::last();
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		if (_options & PROCESS_KILL_TREE)
+		{
+			_hJob = CreateJobObjectW(nullptr, nullptr);
+			if (_hJob)
+			{
+				JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = {};
+				jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+				SetInformationJobObject(static_cast<HANDLE>(_hJob),
+					JobObjectExtendedLimitInformation, &jeli, sizeof(jeli));
+				HANDLE hProc = OpenProcess(PROCESS_SET_QUOTA | PROCESS_TERMINATE,
+					FALSE, static_cast<DWORD>(pPH->id()));
+				if (hProc)
+				{
+					AssignProcessToJobObject(static_cast<HANDLE>(_hJob), hProc);
+					CloseHandle(hProc);
+				}
+			}
+		}
+#endif
 		// Set _pPH after _pid to ensure pid() returns valid value when running() is true
 		_pPH = pPH;
 
@@ -210,6 +231,14 @@ void ProcessRunner::stop()
 			}
 			_t.join();
 		}
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		if (_hJob)
+		{
+			CloseHandle(static_cast<HANDLE>(_hJob));
+			_hJob = nullptr;
+		}
+#endif
 
 		if (!_pidFile.empty())
 		{
