@@ -128,7 +128,7 @@ if (NOT POCO_MINIMAL_BUILD)
 	endif()
 
 	if(APR_FOUND AND APRUTIL_FOUND AND APACHE2_FOUND AND
-		EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector AND ENABLE_APACHECONNECTOR)
+		EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector)
 		option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" ON)
 	else()
 		option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" OFF)
@@ -160,7 +160,6 @@ else()
 	option(ENABLE_CRYPTO "Enable Crypto" OFF)
 	option(ENABLE_JWT "Enable JWT" OFF)
 	option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" OFF)
-	option(ENABLE_DATA "Enable Data" OFF)
 	option(ENABLE_DATA_MYSQL "Enable Data MySQL or MariaDB" OFF)
 	option(ENABLE_DATA_POSTGRESQL "Enable Data PosgreSQL" OFF)
 	option(ENABLE_DATA_ODBC "Enable Data ODBC" OFF)
@@ -177,8 +176,9 @@ set(ENABLE_FOUNDATION ON CACHE BOOL "Enable Foundation (required)" FORCE)
 option(ENABLE_ENCODINGS "Enable Encodings" ${_enable_default})
 option(ENABLE_XML "Enable XML" ${_enable_default})
 option(ENABLE_JSON "Enable JSON" ${_enable_default})
-option(ENABLE_MONGODB "Enable MongoDB" ${_enable_default})
+option(ENABLE_DATA "Enable Data" ${_enable_default})
 option(ENABLE_DATA_SQLITE "Enable Data SQlite" ${_enable_default})
+option(ENABLE_MONGODB "Enable MongoDB" ${_enable_default})
 option(ENABLE_REDIS "Enable Redis" ${_enable_default})
 option(ENABLE_PROMETHEUS "Enable Prometheus" ${_enable_default})
 option(ENABLE_UTIL "Enable Util" ${_enable_default})
@@ -210,14 +210,6 @@ endif()
 
 if(POCO_ENABLE_CPP20)
 	option(ENABLE_MODULES "Build Poco.* C++ modules" OFF)
-endif()
-
-if(ENABLE_ACTIVERECORD AND NOT ENABLE_DATA)
-	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
-endif()
-
-if(ENABLE_ACTIVERECORD AND NOT ENABLE_XML)
-	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
 endif()
 
 option(ENABLE_CPPUNIT
@@ -343,8 +335,14 @@ if(ENABLE_PAGECOMPILER_FILE2PAGE)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 endif()
 
+if(ENABLE_ACTIVERECORD_COMPILER)
+	set(ENABLE_ACTIVERECORD ON CACHE BOOL "Enable ActiveRecord" FORCE)
+	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+endif()
+
 if(ENABLE_ACTIVERECORD)
 	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
+	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
 endif()
 
 if(ENABLE_DATA_MYSQL OR ENABLE_DATA_ODBC OR ENABLE_DATA_POSTGRESQL)
@@ -563,7 +561,7 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/Zip AND ENABLE_ZIP)
 	list(APPEND Poco_COMPONENTS "Zip")
 endif()
 
-if(APRUTIL_FOUND AND APACHE_FOUND AND
+if(APRUTIL_FOUND AND APACHE2_FOUND AND
 	EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector AND ENABLE_APACHECONNECTOR)
 	add_subdirectory(ApacheConnector)
 	list(APPEND Poco_COMPONENTS "ApacheConnector")
