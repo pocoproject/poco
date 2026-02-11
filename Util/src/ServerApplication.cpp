@@ -270,7 +270,7 @@ bool ServerApplication::isService()
 
 bool ServerApplication::hasConsole()
 {
-	if (GetConsoleWindow() != NULL) return true;
+	if (GetConsoleWindow() != nullptr) return true;
 	// If any standard handle is valid, we were launched interactively
 	// (not by the SCM). Checking all three handles covers the case where
 	// stdout/stderr are closed (PROCESS_CLOSE_STDOUT|PROCESS_CLOSE_STDERR)
@@ -282,7 +282,7 @@ bool ServerApplication::hasConsole()
 	};
 	for (HANDLE h : handles)
 	{
-		if (h != INVALID_HANDLE_VALUE && h != NULL)
+		if (h != INVALID_HANDLE_VALUE && h != nullptr)
 			return true;
 	}
 	return false;
