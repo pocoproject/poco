@@ -137,6 +137,11 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		struct inheritance inherit;
 		std::memset(&inherit, 0, sizeof(inherit));
 		inherit.flags = SPAWN_ALIGN_DEFAULT | SPAWN_CHECK_SCRIPT | SPAWN_SEARCH_PATH;
+		if (options & PROCESS_KILL_TREE)
+		{
+			inherit.flags |= SPAWN_SETGROUP;
+			inherit.pgroup = SPAWN_NEWPGROUP;
+		}
 		int fdmap[3];
 		fdmap[0] = inPipe  ? inPipe->readHandle()   : 0;
 		fdmap[1] = outPipe ? outPipe->writeHandle() : 1;
