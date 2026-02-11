@@ -21,6 +21,9 @@
 #include "Poco/Path.h"
 #include "Poco/String.h"
 #include "Poco/Error.h"
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#include "Poco/NamedEvent.h"
+#endif
 #include <fstream>
 
 
@@ -174,7 +177,19 @@ void ProcessRunner::stop()
 			if (pid <= 0)
 				throw Poco::IllegalStateException("Invalid PID, can't terminate process");
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+			// On Windows, Process::requestTermination() creates a temporary NamedEvent,
+			// signals it, and immediately destroys it. If the child process has not yet
+			// created its own NamedEvent handle (during static initialization of its
+			// ServerApplication::_terminate member), the kernel event object is destroyed
+			// when our handle closes, and the termination signal is lost.
+			// Keep the NamedEvent alive here so the kernel object persists until the child
+			// opens its own handle and receives the signal.
+			NamedEvent terminateEvent(Process::terminationEventName(pid));
+			terminateEvent.set();
+#else
 			Process::requestTermination(pid);
+#endif
 			while (Process::isRunning(pid))
 			{
 				if (_sw.elapsedSeconds() > _timeout)
