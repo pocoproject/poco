@@ -1,12 +1,8 @@
 
 
-if(POCO_UNBUNDLED)	
+if(POCO_UNBUNDLED)
 	if (ENABLE_PDF)
 		find_package(PNG REQUIRED)
-	else()
-		find_package(PNG)
-	endif()
-	if (PNG_FOUND)
 		set_target_properties(PNG::PNG PROPERTIES IMPORTED_GLOBAL TRUE)
 	endif()
 else()
