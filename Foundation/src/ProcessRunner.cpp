@@ -24,6 +24,8 @@
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/NamedEvent.h"
 #include "Poco/UnWindows.h"
+#else
+#include <signal.h>
 #endif
 #include <fstream>
 
@@ -211,23 +213,53 @@ void ProcessRunner::stop()
 #else
 			Process::requestTermination(pid);
 #endif
-			while (Process::isRunning(pid))
+
+#if !defined(POCO_OS_FAMILY_WINDOWS)
+			if (_options & PROCESS_KILL_TREE)
 			{
-				if (_sw.elapsedSeconds() > _timeout)
+				// Wait for the entire process group to exit.
+				// setpgid(0, 0) was called in the child, so -pid
+				// addresses the whole group.
+				while (::kill(-pid, 0) == 0)
 				{
-					Process::kill(pid);
-					Stopwatch killSw; killSw.start();
-					while (Process::isRunning(pid))
+					if (_sw.elapsedSeconds() > _timeout)
 					{
-						if (killSw.elapsedSeconds() > _timeout)
+						::kill(-pid, SIGKILL);
+						Stopwatch killSw; killSw.start();
+						while (::kill(-pid, 0) == 0)
 						{
-							throw Poco::TimeoutException("Unable to terminate process");
+							if (killSw.elapsedSeconds() > _timeout)
+							{
+								throw Poco::TimeoutException("Unable to terminate process tree");
+							}
+							Thread::sleep(10);
 						}
-						Thread::sleep(10);
+						break;
 					}
-					break;
+					Thread::sleep(10);
 				}
-				Thread::sleep(10);
+			}
+			else
+#endif
+			{
+				while (Process::isRunning(pid))
+				{
+					if (_sw.elapsedSeconds() > _timeout)
+					{
+						Process::kill(pid);
+						Stopwatch killSw; killSw.start();
+						while (Process::isRunning(pid))
+						{
+							if (killSw.elapsedSeconds() > _timeout)
+							{
+								throw Poco::TimeoutException("Unable to terminate process");
+							}
+							Thread::sleep(10);
+						}
+						break;
+					}
+					Thread::sleep(10);
+				}
 			}
 			_t.join();
 		}

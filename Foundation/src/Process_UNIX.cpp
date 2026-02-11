@@ -256,6 +256,12 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 				close(j);
 			}
 
+			// Create a new process group so the entire tree can be signaled.
+			if (options & PROCESS_KILL_TREE)
+			{
+				setpgid(0, 0);
+			}
+
 			execvp(argv[0], &argv[0]);
 			break;
 		}
