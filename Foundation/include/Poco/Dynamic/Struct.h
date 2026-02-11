@@ -286,7 +286,7 @@ private:
 };
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(Foundation_EXPORTS)
 
 extern template class Struct<std::string>;
 extern template class Struct<int>;

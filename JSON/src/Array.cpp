@@ -23,7 +23,7 @@ using Poco::Dynamic::Var;
 // Explicitly instatiated shared pointer in JSON library is required to
 // have known instance of the pointer to be used with VarHolder when
 // compiling with -fvisibility=hidden
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(JSON_EXPORTS)
 template class JSON_API Poco::SharedPtr<Poco::JSON::Array>;
 #else
 template class Poco::SharedPtr<Poco::JSON::Array>;

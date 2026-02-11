@@ -22,7 +22,7 @@ namespace ODBC {
 // explicit instantiation definition
 #ifndef POCO_DOC
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(ODBC_EXPORTS)
 template class ODBC_API Error<SQLHENV, SQL_HANDLE_ENV>;
 template class ODBC_API Error<SQLHDBC, SQL_HANDLE_DBC>;
 template class ODBC_API Error<SQLHSTMT, SQL_HANDLE_STMT>;
