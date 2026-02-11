@@ -8,8 +8,13 @@ POCO_SOURCES(SRCS hpdf ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "src/*.h")
 POCO_HEADERS(SRCS hpdf ${HDRS_G})
 
+# hpdf requires PNG. When PNG::PNG is not available (e.g. unbundled mode
+# without system libpng), skip building hpdf. Only warn when the user
+# actually requested PDF support — otherwise the missing target is expected.
 if (NOT TARGET PNG::PNG)
-	message(WARNING "PNG not found; hpdf will not be built.")
+	if (ENABLE_PDF)
+		message(WARNING "PNG not found; hpdf will not be built.")
+	endif()
 	return()
 endif()
 

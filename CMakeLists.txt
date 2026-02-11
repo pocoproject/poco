@@ -270,13 +270,62 @@ if(ENABLE_FUZZING)
 	endif()
 endif()
 
+# -- Dependency status summary --
+# Report which third-party libraries are bundled (internal) vs system (external).
+# Always present: zlib, pcre2, utf8proc.
+# Feature-gated: expat (XML), sqlite (Data/SQLite), libpng (PDF).
+set(_opt_deps "")
+if(ENABLE_XML)
+	string(APPEND _opt_deps ", expat")
+endif()
+if(ENABLE_DATA_SQLITE)
+	string(APPEND _opt_deps ", sqlite")
+endif()
+if(ENABLE_PDF)
+	string(APPEND _opt_deps ", libpng")
+endif()
+
 if(POCO_UNBUNDLED)
-	message(STATUS "Using external sqlite, zlib, pcre2, expat, libpng, ...")
+	# All bundled deps become external
+	message(STATUS "Using external zlib, pcre2, utf8proc${_opt_deps}")
 elseif(POCO_SQLITE_UNBUNDLED)
-	message(STATUS "Using external sqlite")
-	message(STATUS "Using internal zlib, pcre2, expat, libpng, ...")
+	# Only sqlite is external; rebuild the internal list without it
+	if(ENABLE_DATA_SQLITE)
+		message(STATUS "Using external sqlite")
+	endif()
+	set(_int_deps "")
+	if(ENABLE_XML)
+		string(APPEND _int_deps ", expat")
+	endif()
+	if(ENABLE_PDF)
+		string(APPEND _int_deps ", libpng")
+	endif()
+	message(STATUS "Using internal zlib, pcre2, utf8proc${_int_deps}")
 else()
-	message(STATUS "Using internal sqlite, zlib, pcre2, expat, libpng, ...")
+	# Fully bundled
+	message(STATUS "Using internal zlib, pcre2, utf8proc${_opt_deps}")
+endif()
+
+# Always-external dependencies: these are never bundled, only report when enabled
+set(_ext_deps "")
+if(ENABLE_NETSSL OR ENABLE_CRYPTO OR ENABLE_JWT)
+	list(APPEND _ext_deps "OpenSSL")
+endif()
+if(ENABLE_DATA_MYSQL)
+	list(APPEND _ext_deps "MySQL")
+endif()
+if(ENABLE_DATA_POSTGRESQL)
+	list(APPEND _ext_deps "PostgreSQL")
+endif()
+if(ENABLE_DATA_ODBC)
+	list(APPEND _ext_deps "ODBC")
+endif()
+if(ENABLE_APACHECONNECTOR)
+	list(APPEND _ext_deps "APR" "Apache")
+endif()
+if(_ext_deps)
+	list(JOIN _ext_deps ", " _ext_deps_str)
+	message(STATUS "Using external ${_ext_deps_str}")
 endif()
 
 # Disable fork exec
