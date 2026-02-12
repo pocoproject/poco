@@ -179,9 +179,27 @@ private:
 	std::string _error;
 	mutable Poco::FastMutex _mutex;
 #if defined(POCO_OS_FAMILY_WINDOWS)
-	void* _hJob = nullptr;
-		/// Windows Job Object handle for PROCESS_KILL_TREE.
-		/// Stored as void* to avoid including Windows.h.
+	struct HandleGuard
+		/// RAII wrapper for a Windows HANDLE.
+		/// Closes the handle on destruction or reset.
+	{
+		HANDLE handle = nullptr;
+
+		HandleGuard() = default;
+		~HandleGuard() { reset(); }
+		HandleGuard(const HandleGuard&) = delete;
+		HandleGuard& operator=(const HandleGuard&) = delete;
+
+		void reset(HANDLE h = nullptr)
+		{
+			if (handle) CloseHandle(handle);
+			handle = h;
+		}
+
+		explicit operator bool() const { return handle != nullptr; }
+	};
+
+	HandleGuard _hJob;
 #endif
 };
 

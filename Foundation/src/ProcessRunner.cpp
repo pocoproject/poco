@@ -136,16 +136,15 @@ void ProcessRunner::run()
 #if defined(POCO_OS_FAMILY_WINDOWS)
 		if (_options & PROCESS_KILL_TREE)
 		{
-			_hJob = CreateJobObjectW(nullptr, nullptr);
+			_hJob.reset(CreateJobObjectW(nullptr, nullptr));
 			if (_hJob)
 			{
 				JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = {};
 				jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
-				if (!SetInformationJobObject(static_cast<HANDLE>(_hJob),
+				if (!SetInformationJobObject(_hJob.handle,
 					JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)))
 				{
-					CloseHandle(static_cast<HANDLE>(_hJob));
-					_hJob = nullptr;
+					_hJob.reset();
 				}
 			}
 			if (_hJob)
@@ -154,17 +153,13 @@ void ProcessRunner::run()
 					FALSE, static_cast<DWORD>(pPH->id()));
 				if (hProc)
 				{
-					if (!AssignProcessToJobObject(static_cast<HANDLE>(_hJob), hProc))
-					{
-						CloseHandle(static_cast<HANDLE>(_hJob));
-						_hJob = nullptr;
-					}
+					if (!AssignProcessToJobObject(_hJob.handle, hProc))
+						_hJob.reset();
 					CloseHandle(hProc);
 				}
 				else
 				{
-					CloseHandle(static_cast<HANDLE>(_hJob));
-					_hJob = nullptr;
+					_hJob.reset();
 				}
 			}
 		}
@@ -199,6 +194,9 @@ void ProcessRunner::run()
 		setError("Unknown exception"s);
 	}
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	_hJob.reset();
+#endif
 	_pid = INVALID_PID;
 	_pPH = nullptr;
 	++_runCount;
@@ -289,11 +287,7 @@ void ProcessRunner::stop()
 		}
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
-		if (_hJob)
-		{
-			CloseHandle(static_cast<HANDLE>(_hJob));
-			_hJob = nullptr;
-		}
+		_hJob.reset();
 #endif
 
 		if (!_pidFile.empty())
