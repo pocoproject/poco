@@ -264,12 +264,20 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 			// Create a new process group so the entire tree can be signaled.
 			if (options & PROCESS_KILL_TREE)
 			{
-				setpgid(0, 0);
+				if (setpgid(0, 0) != 0)
+					_exit(73);
 			}
 
 			execvp(argv[0], &argv[0]);
 			break;
 		}
+
+		// Close the race window where stop() could be called before the
+		// child reaches setpgid(0, 0). setpgid(pid, pid) is idempotent
+		// with the child's call; if the child already called it, this
+		// is a harmless no-op (EACCES after exec is also benign).
+		if (options & PROCESS_KILL_TREE)
+			setpgid(pid, pid);
 
 		if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
 		if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
