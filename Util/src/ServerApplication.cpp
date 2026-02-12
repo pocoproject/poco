@@ -271,10 +271,12 @@ bool ServerApplication::isService()
 bool ServerApplication::hasConsole()
 {
 	if (GetConsoleWindow() != nullptr) return true;
-	// If any standard handle is valid, we were launched interactively
-	// (not by the SCM). Checking all three handles covers the case where
-	// stdout/stderr are closed (PROCESS_CLOSE_STDOUT|PROCESS_CLOSE_STDERR)
-	// but stdin is still inherited from the parent.
+	// If any standard handle is a character device (console), we were
+	// launched interactively (not by the SCM). Checking all three handles
+	// covers the case where stdout/stderr are closed
+	// (PROCESS_CLOSE_STDOUT|PROCESS_CLOSE_STDERR) but stdin is still
+	// inherited from the parent. GetFileType() distinguishes actual console
+	// handles from pipes/files that SCM may redirect for logging.
 	HANDLE handles[] = {
 		GetStdHandle(STD_OUTPUT_HANDLE),
 		GetStdHandle(STD_INPUT_HANDLE),
@@ -283,7 +285,10 @@ bool ServerApplication::hasConsole()
 	for (HANDLE h : handles)
 	{
 		if (h != INVALID_HANDLE_VALUE && h != nullptr)
-			return true;
+		{
+			if (GetFileType(h) == FILE_TYPE_CHAR)
+				return true;
+		}
 	}
 	return false;
 }
