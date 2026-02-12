@@ -21,7 +21,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
 #include "Poco/FileStream.h"
-#include <Windows.h>
+#include <windows.h>
 
 namespace Poco {
 

@@ -24,10 +24,14 @@
 #include "Poco/BasicEvent.h"
 #include "Poco/Delegate.h"
 #include "Poco/Debugger.h"
+#include "Poco/Types.h"
+#include <atomic>
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <sstream>
+#include <thread>
 #include <vector>
-#include <cstring>
 
 using namespace std::string_literals;
 
@@ -103,6 +107,20 @@ struct Large
 	Large() : i(1), j(2), k(3), l(4) { }
 	long i,j,k;
 	const long l;
+};
+
+
+enum TestEnum
+{
+	TEST_VALUE_ONE,
+	TEST_VALUE_TWO
+};
+
+
+union TestUnion
+{
+	int intVal;
+	float floatVal;
 };
 
 
@@ -231,6 +249,85 @@ void CoreTest::testEnvironment()
 #elif defined(__APPLE__)
 	assertTrue (osName == "Darwin");
 #endif
+}
+
+
+void CoreTest::testEnvironmentMultiThread()
+{
+	// Stress test for concurrent environment variable access.
+	// Tests thread safety of Poco::Environment get()/set() across threads.
+
+	const int numWriters = 4;
+	const int numReaders = 4;
+	const int iterations = 200;
+	std::atomic<bool> failed{false};
+	std::atomic<int> readCount{0};
+	std::atomic<bool> stop{false};
+
+	std::vector<std::thread> threads;
+
+	// Writer threads - use Poco::Environment::set()
+	for (int id = 0; id < numWriters; ++id)
+	{
+		threads.emplace_back([id, iterations, &failed, &stop]()
+		{
+			std::string name = "POCO_MT_TEST_" + std::to_string(id);
+			for (int i = 0; i < iterations && !failed && !stop; ++i)
+			{
+				try
+				{
+					std::string value = "val_" + std::to_string(id) + "_" + std::to_string(i);
+					Environment::set(name, value);
+				}
+				catch (...)
+				{
+					failed = true;
+				}
+			}
+		});
+	}
+
+	// Reader threads - use Poco::Environment::get() which serializes with set()
+	// via the internal mutex. Raw getenv() concurrent with setenv() is a known
+	// POSIX data race on the environment variable array that cannot be fixed at
+	// library level.
+	for (int id = 0; id < numReaders; ++id)
+	{
+		threads.emplace_back([id, numWriters, iterations, &failed, &readCount, &stop]()
+		{
+			for (int i = 0; i < iterations && !failed && !stop; ++i)
+			{
+				for (int v = 0; v < numWriters && !failed; ++v)
+				{
+					std::string name = "POCO_MT_TEST_" + std::to_string(v);
+					try
+					{
+						std::string val = Environment::get(name);
+						++readCount;
+						if (val.empty()) failed = true;
+					}
+					catch (Poco::NotFoundException&)
+					{
+						// Variable not yet set by writer thread
+					}
+					catch (...)
+					{
+						failed = true;
+					}
+				}
+			}
+		});
+	}
+
+	for (auto& t : threads)
+	{
+		t.join();
+	}
+
+	assertFalse(failed.load());
+	assertTrue(readCount.load() > 0);
+
+	std::cout << "Environment multi-thread test: " << readCount.load() << " native reads" << std::endl;
 }
 
 
@@ -1164,6 +1261,60 @@ void CoreTest::testSrcLoc()
 }
 
 
+void CoreTest::testDemangle()
+{
+#if defined(POCO_HAVE_CXXABI_H) || defined(_MSC_VER)
+	// Test demangle with template type
+	std::string name = Poco::demangle<int>();
+	assertEqual ("int", name);
+
+	// Test demangle with const char* (typeid name)
+	std::string intName = Poco::demangle(typeid(int).name());
+	assertEqual ("int", intName);
+
+	// Test demangle with instance
+	int value = 42;
+	std::string instanceName = Poco::demangle(value);
+	assertEqual ("int", instanceName);
+
+	// Test demangle with nested namespace type (class)
+	// MSVC returns "class Poco::AtomicCounter" - prefix should be stripped
+	std::string nestedName = Poco::demangle<Poco::AtomicCounter>();
+	assertEqual ("Poco::AtomicCounter", nestedName);
+
+	// Test demangle with struct type
+	// MSVC returns "struct Parent" - prefix should be stripped
+	std::string structName = Poco::demangle<Parent>();
+	assertEqual ("Parent", structName);
+
+	// Test demangle with enum type
+	// MSVC returns "enum TestEnum" - prefix should be stripped
+	std::string enumName = Poco::demangle<TestEnum>();
+	assertEqual ("TestEnum", enumName);
+
+	// Test demangle with union type
+	// MSVC returns "union TestUnion" - prefix should be stripped
+	std::string unionName = Poco::demangle<TestUnion>();
+	assertEqual ("TestUnion", unionName);
+#endif
+}
+
+
+void CoreTest::testDemangleDot()
+{
+#if defined(POCO_HAVE_CXXABI_H) || defined(_MSC_VER)
+	// Test demangleDot with template type
+	std::string typeName = Poco::demangleDot<Poco::AtomicCounter>();
+	assertEqual ("Poco.AtomicCounter", typeName);
+
+	// Test demangleDot with instance
+	Poco::AtomicCounter ac;
+	std::string instanceName = Poco::demangleDot(ac);
+	assertEqual ("Poco.AtomicCounter", instanceName);
+#endif
+}
+
+
 void CoreTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -1200,6 +1351,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testFixedLength);
 	CppUnit_addTest(pSuite, CoreTest, testBugcheck);
 	CppUnit_addTest(pSuite, CoreTest, testEnvironment);
+	CppUnit_addTest(pSuite, CoreTest, testEnvironmentMultiThread);
 	CppUnit_addTest(pSuite, CoreTest, testBuffer);
 	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferChar);
 	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferInt);
@@ -1208,6 +1360,8 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testNullable);
 	CppUnit_addTest(pSuite, CoreTest, testAscii);
 	CppUnit_addTest(pSuite, CoreTest, testSrcLoc);
+	CppUnit_addTest(pSuite, CoreTest, testDemangle);
+	CppUnit_addTest(pSuite, CoreTest, testDemangleDot);
 
 	return pSuite;
 }

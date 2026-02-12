@@ -143,7 +143,7 @@ struct ElementTraits<Binary::Ptr>
 
 	static std::string toString(const Binary::Ptr& value, int indent = 0)
 	{
-		return value.isNull() ? "" : value->toString();
+		return value.isNull() ? R"("<null>")" : value->toString();
 	}
 };
 

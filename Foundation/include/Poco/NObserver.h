@@ -51,6 +51,23 @@ class NObserver: public AbstractObserver
 	///     To enable this functionality, a matcher function must be provided.
 	///     Null matcher means no matching is performed and all notificiations
 	///     of the type subscribed to are dispatched.
+	///
+	/// Thread Safety:
+	///
+	/// The handle() method uses atomic load for _pObject and does not
+	/// hold any lock during callback invocation. This prevents
+	/// lock-order-inversion deadlocks when handlers call back into
+	/// NotificationCenter (e.g., to remove themselves during disconnect).
+	///
+	/// Callers must ensure:
+	///   - The observed object outlives all pending notifications.
+	///     This is inherent to the observer pattern: if object C is
+	///     destroyed while notifications are in flight (e.g., queued
+	///     in AsyncObserver), undefined behavior occurs.
+	///   - Assignment operators should not be used concurrently with
+	///     notification delivery. Observer instances are typically
+	///     created once and registered; concurrent modification during
+	///     active notification dispatch is not supported.
 {
 public:
 	using Type = NObserver<C, N>;
@@ -169,8 +186,6 @@ public:
 
 	void disable() override
 	{
-		Poco::Mutex::ScopedLock lock(_mutex);
-
 		_pObject = nullptr;
 	}
 
@@ -178,46 +193,44 @@ protected:
 
 	void handle(const NotificationPtr& ptr) const
 	{
-		Mutex::ScopedLock lock(_mutex);
-
-		if (_pObject != nullptr)
-			(_pObject->*_handler)(ptr);
+		// Read atomically, call handler without holding lock to avoid
+		// lock-order-inversion deadlock with handlers that call back
+		// into NotificationCenter (e.g., during disconnect handling)
+		C* pObject = _pObject.load();
+		if (pObject != nullptr)
+			(pObject->*_handler)(ptr);
 	}
 
 	NotificationResult handleSync(const NotificationPtr& ptr) const
 	{
-		Mutex::ScopedLock lock(_mutex);
+		C* pObject = _pObject.load();
+		SyncHandler syncHandler = _syncHandler;
 
-		if (_pObject == nullptr || _syncHandler == nullptr)
+		if (pObject == nullptr || syncHandler == nullptr)
 			return {};
 
-		return (_pObject->*_syncHandler)(ptr);
+		return (pObject->*syncHandler)(ptr);
 	}
 
 	bool hasMatcher() const
 	{
-		return _pObject != nullptr &&
+		return _pObject.load() != nullptr &&
 			   (_matcher != nullptr || _matcherFunc != nullptr);
 	}
 
 	bool match(const Notification::Ptr& ptr) const
 	{
-		Mutex::ScopedLock l(_mutex);
-		if (_pObject == nullptr)
+		C* pObject = _pObject.load();
+		if (pObject == nullptr)
 			return false;
 
 		if (_matcher)
-			return (_pObject->*_matcher)(ptr->name());
+			return (pObject->*_matcher)(ptr->name());
 
 		if (_matcherFunc)
 			return _matcherFunc(ptr->name());
 
 		return false;
-	}
-
-	Mutex& mutex() const
-	{
-		return _mutex;
 	}
 
 private:
@@ -226,8 +239,6 @@ private:
 	SyncHandler _syncHandler {nullptr};
 	Matcher _matcher {nullptr};
 	MatcherFunc _matcherFunc;
-
-	mutable Poco::Mutex _mutex;
 };
 
 

@@ -15,6 +15,7 @@
 
 
 #include "Poco/CppParser/CppParser.h"
+#include "Poco/CppParser/NameSpace.h"
 #include "CppUnit/TestCase.h"
 
 
@@ -27,6 +28,14 @@ public:
 	void testParseDir();
 	void testExtractName();
 	void testNumberLiterals();
+	void testTokenizerRawStrings();
+	void testTokenizerStringSuffixes();
+	void testParseStaticAssert();
+	void testParseAlignas();
+	void testParseNoexceptExpr();
+	void testParseDeleteDefault();
+	void testParseAnonymousNamespace();
+	void testParseFriendInline();
 
 	void setUp();
 	void tearDown();
@@ -35,6 +44,9 @@ public:
 
 protected:
 	void testNumberLiteral(const std::string& literal);
+	void testRawStringLiteral(const std::string& prefix, const std::string& rawLiteral);
+	void testStringSuffix(const std::string& literal, const std::string& expected);
+	void parseString(const std::string& code, Poco::CppParser::NameSpace::SymbolTable& st);
 
 private:
 };

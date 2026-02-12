@@ -263,13 +263,13 @@ void ProcessRunner::start()
 {
 	if (!_started.exchange(true))
 	{
-		File exe(_cmd);
-		if (!exe.existsAnywhere())
+		std::string execPath = File(_cmd).getExecutablePath();
+		if (execPath.empty())
 		{
 			throw Poco::FileNotFoundException(
 				Poco::format("ProcessRunner::start(%s): command not found", _cmd));
 		}
-		else if (!File(exe.absolutePath()).canExecute())
+		else if (!File(execPath).canExecute())
 		{
 			throw Poco::ExecuteFileException(
 				Poco::format("ProcessRunner::start(%s): cannot execute", _cmd));

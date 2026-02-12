@@ -209,6 +209,8 @@ public:
 	int asInteger() const;
 
 private:
+	void finishRawString(std::istream& istr);
+
 	using KWMap = std::map<std::string, int>;
 
 	KWMap _kwMap;

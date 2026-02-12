@@ -84,7 +84,7 @@ std::string Binary::toString(int indent) const
 	{
 		try
 		{
-			return "UUID(\""s + uuid().toString() + "\")"s;
+			return R"("UUID()"s + uuid().toString() + ")\""s;
 		}
 		catch (...)
 		{
@@ -94,10 +94,12 @@ std::string Binary::toString(int indent) const
 
 	// Default: Base64 encode the binary data
 	std::ostringstream oss;
+	oss << '"';
 	Base64Encoder encoder(oss);
 	MemoryInputStream mis(reinterpret_cast<const char*>(_buffer.begin()), _buffer.size());
 	StreamCopier::copyStream(mis, encoder);
 	encoder.close();
+	oss << '"';
 	return oss.str();
 }
 

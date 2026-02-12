@@ -137,14 +137,14 @@ struct ElementTraits<RegularExpression::Ptr>
 			return "null";
 		}
 
-		// Format as /pattern/options similar to MongoDB shell
-		std::string result;
-		result.reserve(value->getPattern().size() + value->getOptions().size() + 3);
-		result += '/';
-		result += value->getPattern();
-		result += '/';
-		result += value->getOptions();
-		return result;
+		// Format as /pattern/options similar to MongoDB shell, quoted for valid JSON
+		std::string formatted;
+		formatted.reserve(value->getPattern().size() + value->getOptions().size() + 2);
+		formatted += '/';
+		formatted += value->getPattern();
+		formatted += '/';
+		formatted += value->getOptions();
+		return ElementTraits<std::string>::toString(formatted, indent);
 	}
 };
 

@@ -131,7 +131,7 @@ struct ElementTraits<ObjectId::Ptr>
 		int indent = 0,
 		const std::string& fmt = "%02x")
 	{
-		return id->toString(fmt);
+		return R"(")" + id->toString(fmt) + '"';
 	}
 };
 

@@ -76,7 +76,8 @@ struct ElementTraits<JavaScriptCode::Ptr>
 
 	static std::string toString(const JavaScriptCode::Ptr& value, int indent = 0)
 	{
-		return value.isNull() ? "" : value->getCode();
+		if (value.isNull()) return R"("<null>")";
+		return ElementTraits<std::string>::toString(value->getCode(), indent);
 	}
 };
 

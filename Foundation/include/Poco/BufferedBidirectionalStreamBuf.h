@@ -182,7 +182,7 @@ private:
 // We provide an instantiation for char.
 //
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(Foundation_EXPORTS)
 extern template class BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>>;
 #else
 extern template class Foundation_API BasicBufferedBidirectionalStreamBuf<char, std::char_traits<char>>;

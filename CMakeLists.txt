@@ -128,7 +128,7 @@ if (NOT POCO_MINIMAL_BUILD)
 	endif()
 
 	if(APR_FOUND AND APRUTIL_FOUND AND APACHE2_FOUND AND
-		EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector AND ENABLE_APACHECONNECTOR)
+		EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector)
 		option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" ON)
 	else()
 		option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" OFF)
@@ -160,7 +160,6 @@ else()
 	option(ENABLE_CRYPTO "Enable Crypto" OFF)
 	option(ENABLE_JWT "Enable JWT" OFF)
 	option(ENABLE_APACHECONNECTOR "Enable ApacheConnector" OFF)
-	option(ENABLE_DATA "Enable Data" OFF)
 	option(ENABLE_DATA_MYSQL "Enable Data MySQL or MariaDB" OFF)
 	option(ENABLE_DATA_POSTGRESQL "Enable Data PosgreSQL" OFF)
 	option(ENABLE_DATA_ODBC "Enable Data ODBC" OFF)
@@ -169,14 +168,17 @@ else()
 	set(_enable_default OFF)
 endif()
 
-# Allow enabling and disabling components
-option(ENABLE_FOUNDATION "Enable Foundation" ON)
+# Foundation is always required; force it ON regardless of user setting
+set(ENABLE_FOUNDATION ON CACHE BOOL "Enable Foundation (required)" FORCE)
+
+# Allow enabling and disabling optional components
 
 option(ENABLE_ENCODINGS "Enable Encodings" ${_enable_default})
 option(ENABLE_XML "Enable XML" ${_enable_default})
 option(ENABLE_JSON "Enable JSON" ${_enable_default})
-option(ENABLE_MONGODB "Enable MongoDB" ${_enable_default})
+option(ENABLE_DATA "Enable Data" ${_enable_default})
 option(ENABLE_DATA_SQLITE "Enable Data SQlite" ${_enable_default})
+option(ENABLE_MONGODB "Enable MongoDB" ${_enable_default})
 option(ENABLE_REDIS "Enable Redis" ${_enable_default})
 option(ENABLE_PROMETHEUS "Enable Prometheus" ${_enable_default})
 option(ENABLE_UTIL "Enable Util" ${_enable_default})
@@ -208,14 +210,6 @@ endif()
 
 if(POCO_ENABLE_CPP20)
 	option(ENABLE_MODULES "Build Poco.* C++ modules" OFF)
-endif()
-
-if(ENABLE_ACTIVERECORD AND NOT ENABLE_DATA)
-	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
-endif()
-
-if(ENABLE_ACTIVERECORD AND NOT ENABLE_XML)
-	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
 endif()
 
 option(ENABLE_CPPUNIT
@@ -276,15 +270,62 @@ if(ENABLE_FUZZING)
 	endif()
 endif()
 
+# -- Dependency status summary --
+# Report which third-party libraries are bundled (internal) vs system (external).
+# Always present: zlib, pcre2, utf8proc.
+# Feature-gated: expat (XML), sqlite (Data/SQLite), libpng (PDF).
+set(_opt_deps "")
+if(ENABLE_XML)
+	string(APPEND _opt_deps ", expat")
+endif()
+if(ENABLE_DATA_SQLITE)
+	string(APPEND _opt_deps ", sqlite")
+endif()
+if(ENABLE_PDF)
+	string(APPEND _opt_deps ", libpng")
+endif()
+
 if(POCO_UNBUNDLED)
-	if (POCO_SQLITE_UNBUNDLED)
+	# All bundled deps become external
+	message(STATUS "Using external zlib, pcre2, utf8proc${_opt_deps}")
+elseif(POCO_SQLITE_UNBUNDLED)
+	# Only sqlite is external; rebuild the internal list without it
+	if(ENABLE_DATA_SQLITE)
 		message(STATUS "Using external sqlite")
-		message(STATUS "Using internal zlib, pcre2, expat, libpng, ...")
-	else()
-		message(STATUS "Using external sqlite, zlib, pcre2, expat, libpng, ...")
 	endif()
+	set(_int_deps "")
+	if(ENABLE_XML)
+		string(APPEND _int_deps ", expat")
+	endif()
+	if(ENABLE_PDF)
+		string(APPEND _int_deps ", libpng")
+	endif()
+	message(STATUS "Using internal zlib, pcre2, utf8proc${_int_deps}")
 else()
-	message(STATUS "Using internal sqlite, zlib, pcre2, expat, libpng, ...")
+	# Fully bundled
+	message(STATUS "Using internal zlib, pcre2, utf8proc${_opt_deps}")
+endif()
+
+# Always-external dependencies: these are never bundled, only report when enabled
+set(_ext_deps "")
+if(ENABLE_NETSSL OR ENABLE_CRYPTO OR ENABLE_JWT)
+	list(APPEND _ext_deps "OpenSSL")
+endif()
+if(ENABLE_DATA_MYSQL)
+	list(APPEND _ext_deps "MySQL")
+endif()
+if(ENABLE_DATA_POSTGRESQL)
+	list(APPEND _ext_deps "PostgreSQL")
+endif()
+if(ENABLE_DATA_ODBC)
+	list(APPEND _ext_deps "ODBC")
+endif()
+if(ENABLE_APACHECONNECTOR)
+	list(APPEND _ext_deps "APR" "Apache")
+endif()
+if(_ext_deps)
+	list(JOIN _ext_deps ", " _ext_deps_str)
+	message(STATUS "Using external ${_ext_deps_str}")
 endif()
 
 # Disable fork exec
@@ -343,8 +384,14 @@ if(ENABLE_PAGECOMPILER_FILE2PAGE)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 endif()
 
+if(ENABLE_ACTIVERECORD_COMPILER)
+	set(ENABLE_ACTIVERECORD ON CACHE BOOL "Enable ActiveRecord" FORCE)
+	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+endif()
+
 if(ENABLE_ACTIVERECORD)
 	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
+	set(ENABLE_XML ON CACHE BOOL "Enable XML" FORCE)
 endif()
 
 if(ENABLE_DATA_MYSQL OR ENABLE_DATA_ODBC OR ENABLE_DATA_POSTGRESQL)
@@ -563,7 +610,7 @@ if(EXISTS ${PROJECT_SOURCE_DIR}/Zip AND ENABLE_ZIP)
 	list(APPEND Poco_COMPONENTS "Zip")
 endif()
 
-if(APRUTIL_FOUND AND APACHE_FOUND AND
+if(APRUTIL_FOUND AND APACHE2_FOUND AND
 	EXISTS ${PROJECT_SOURCE_DIR}/ApacheConnector AND ENABLE_APACHECONNECTOR)
 	add_subdirectory(ApacheConnector)
 	list(APPEND Poco_COMPONENTS "ApacheConnector")
