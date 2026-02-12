@@ -136,6 +136,13 @@ public:
 	void connect(const Poco::Net::SocketAddress& addrs);
 		/// Connects to the given MongoDB server.
 
+	void connect(const Poco::Net::SocketAddress& addrs, const Poco::Timespan& connectTimeout, const Poco::Timespan& socketTimeout = 0);
+		/// Connects to the given MongoDB server with the specified connect timeout.
+		/// If connectTimeout is non-zero, the connection attempt will be aborted
+		/// after the specified time.
+		/// If socketTimeout is non-zero, the send and receive timeouts on the socket
+		/// will be set after a successful connection.
+
 	void connect(const Poco::Net::StreamSocket& socket);
 		/// Connects using an already connected socket.
 
