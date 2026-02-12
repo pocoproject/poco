@@ -227,7 +227,10 @@ void ProcessRunner::stop()
 			terminateEvent.set();
 #else
 			if (_options & PROCESS_KILL_TREE)
-				::kill(-pid, SIGINT); // signal entire process group
+			{
+				if (::kill(-pid, SIGINT) != 0 && errno != ESRCH)
+					throw Poco::SystemException(Poco::format("Cannot signal process group %d", (int)pid));
+			}
 			else
 				Process::requestTermination(pid);
 #endif
