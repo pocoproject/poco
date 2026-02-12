@@ -56,6 +56,17 @@ ReplicaSetConnection::ReplicaSetConnection(ReplicaSet& replicaSet, const ReadPre
 }
 
 
+ReplicaSetConnection::ReplicaSetConnection(ReplicaSet& replicaSet, const ReadPreference& readPref,
+	Poco::Timespan connectTimeout, Poco::Timespan socketTimeout):
+	_replicaSet(replicaSet),
+	_readPreference(readPref),
+	_connectTimeout(connectTimeout),
+	_socketTimeout(socketTimeout),
+	_hasTimeouts(true)
+{
+}
+
+
 ReplicaSetConnection::~ReplicaSetConnection() = default;
 
 
@@ -162,7 +173,11 @@ void ReplicaSetConnection::ensureConnection()
 {
 	if (_connection.isNull())
 	{
-		_connection = _replicaSet.getConnection(_readPreference);
+		if (_hasTimeouts)
+			_connection = _replicaSet.getConnection(_readPreference, _connectTimeout, _socketTimeout);
+		else
+			_connection = _replicaSet.getConnection(_readPreference);
+
 		if (_connection.isNull())
 		{
 			throw Poco::IOException("No suitable server found in replica set");
@@ -215,12 +230,16 @@ void ReplicaSetConnection::executeWithRetry(std::function<void()> operation)
 		_connection = nullptr;
 
 		// Get new connection, avoiding servers we've already tried
-		Connection::Ptr newConn = _replicaSet.getConnection(_readPreference);
+		Connection::Ptr newConn = _hasTimeouts
+			? _replicaSet.getConnection(_readPreference, _connectTimeout, _socketTimeout)
+			: _replicaSet.getConnection(_readPreference);
 		if (newConn.isNull())
 		{
 			// No servers currently available - use coordinated retry logic.
 			// This ensures only one thread performs the sleep/refresh cycle.
-			newConn = _replicaSet.waitForServerAvailability(_readPreference);
+			newConn = _hasTimeouts
+				? _replicaSet.waitForServerAvailability(_readPreference, _connectTimeout, _socketTimeout)
+				: _replicaSet.waitForServerAvailability(_readPreference);
 
 			// Clear tried servers since we're starting fresh after waiting
 			triedServers.clear();
