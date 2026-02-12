@@ -20,7 +20,7 @@
 #include "Poco/Dynamic/Struct.h"
 #include "Poco/Exception.h"
 #include "Poco/NotificationCenter.h"
-#include "Poco/Random.h"
+#include "Poco/Timespan.h"
 #include <exception>
 
 using namespace std::string_literals;
@@ -62,7 +62,8 @@ ReplicaSet::ReplicaSet(const Config& config):
 
 
 ReplicaSet::ReplicaSet(const std::vector<Net::SocketAddress>& seeds):
-	ReplicaSet(Config())
+	_config(),
+	_topology()
 {
 	_config.seeds = seeds;
 
@@ -113,9 +114,9 @@ ReplicaSet::ReplicaSet(const std::string& uri)
 
 	_config.setName = parsedURI.replicaSet();
 	_config.readPreference = parsedURI.readPreference();
-	_config.connectTimeoutSeconds = (parsedURI.connectTimeoutMS() + 999) / 1000;  // Convert ms to seconds (round up)
-	_config.socketTimeoutSeconds = (parsedURI.socketTimeoutMS() + 999) / 1000;    // Convert ms to seconds (round up)
-	_config.heartbeatFrequencySeconds = (parsedURI.heartbeatFrequencyMS() + 999) / 1000;  // Convert ms to seconds (round up)
+	_config.connectTimeoutSeconds = static_cast<unsigned int>((static_cast<Poco::UInt64>(parsedURI.connectTimeoutMS()) + 999) / 1000);
+	_config.socketTimeoutSeconds = static_cast<unsigned int>((static_cast<Poco::UInt64>(parsedURI.socketTimeoutMS()) + 999) / 1000);
+	_config.heartbeatFrequencySeconds = static_cast<unsigned int>((static_cast<Poco::UInt64>(parsedURI.heartbeatFrequencyMS()) + 999) / 1000);
 	_config.serverReconnectRetries = parsedURI.reconnectRetries();
 	_config.serverReconnectDelaySeconds = parsedURI.reconnectDelay();
 
@@ -166,9 +167,9 @@ ReplicaSet::ReplicaSet(const ReplicaSetURI& uri)
 
 	_config.setName = uri.replicaSet();
 	_config.readPreference = uri.readPreference();
-	_config.connectTimeoutSeconds = (uri.connectTimeoutMS() + 999) / 1000;  // Convert ms to seconds (round up)
-	_config.socketTimeoutSeconds = (uri.socketTimeoutMS() + 999) / 1000;    // Convert ms to seconds (round up)
-	_config.heartbeatFrequencySeconds = (uri.heartbeatFrequencyMS() + 999) / 1000;  // Convert ms to seconds (round up)
+	_config.connectTimeoutSeconds = static_cast<unsigned int>((static_cast<Poco::UInt64>(uri.connectTimeoutMS()) + 999) / 1000);
+	_config.socketTimeoutSeconds = static_cast<unsigned int>((static_cast<Poco::UInt64>(uri.socketTimeoutMS()) + 999) / 1000);
+	_config.heartbeatFrequencySeconds = static_cast<unsigned int>((static_cast<Poco::UInt64>(uri.heartbeatFrequencyMS()) + 999) / 1000);
 	_config.serverReconnectRetries = uri.reconnectRetries();
 	_config.serverReconnectDelaySeconds = uri.reconnectDelay();
 
@@ -209,6 +210,13 @@ Connection::Ptr ReplicaSet::getConnection(const ReadPreference& readPref)
 }
 
 
+Connection::Ptr ReplicaSet::getConnection(const ReadPreference& readPref,
+	const Poco::Timespan& connectTimeout, const Poco::Timespan& socketTimeout)
+{
+	return selectServer(readPref, connectTimeout, socketTimeout);
+}
+
+
 Connection::Ptr ReplicaSet::getPrimaryConnection()
 {
 	return selectServer(ReadPreference(ReadPreference::Primary));
@@ -223,13 +231,14 @@ Connection::Ptr ReplicaSet::getSecondaryConnection()
 
 Connection::Ptr ReplicaSet::waitForServerAvailability(const ReadPreference& readPref)
 {
-	// Timeopoint when this thread started to wait for the server to become available
-	const auto waitStartTime = std::chrono::steady_clock::now();
-
 	// Coordinate waiting between threads to avoid redundant refresh attempts
 	std::lock_guard<std::mutex> lock(_serverAvailabilityRetryMutex);
 
-	if (waitStartTime <= _topologyRefreshTime)
+	// Capture wait start time inside the lock to prevent race condition where
+	// another thread could refresh topology between time capture and lock acquisition
+	const auto waitStartTime = std::chrono::steady_clock::now();
+
+	if (waitStartTime <= _topologyRefreshTime.load())
 	{
 		// Another thread recently refreshed, try getting connection without waiting
 		return getConnection(readPref);
@@ -299,6 +308,7 @@ void ReplicaSet::startMonitoring()
 void ReplicaSet::stopMonitoring()
 {
 	_stopMonitoring.store(true);
+	_monitorCV.notify_all();
 
 	if (_monitorThread.joinable())
 	{
@@ -358,18 +368,12 @@ void ReplicaSet::monitor() noexcept
 			// Ignore errors during monitoring
 		}
 
-		// Sleep for heartbeat frequency
-		auto sleepUntil = std::chrono::steady_clock::now() +
-			std::chrono::seconds(_config.heartbeatFrequencySeconds);
-
-		// Check stop flag periodically during sleep
-		while (std::chrono::steady_clock::now() < sleepUntil)
+		// Sleep for heartbeat frequency, waking immediately if stop is requested
 		{
-			if (_stopMonitoring.load())
-			{
-				return;
-			}
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			std::unique_lock<std::mutex> lock(_monitorMutex);
+			_monitorCV.wait_for(lock,
+				std::chrono::seconds(_config.heartbeatFrequencySeconds),
+				[this]() { return _stopMonitoring.load(); });
 		}
 	}
 }
@@ -391,8 +395,7 @@ Connection::Ptr ReplicaSet::selectServer(const ReadPreference& readPref)
 		}
 
 		// Randomly select from eligible servers for load balancing
-		Poco::Random random;
-		int index = random.next(static_cast<int>(eligible.size()));
+		int index = _random.next(static_cast<int>(eligible.size()));
 		selectedAddress = eligible[index].address();
 	}
 
@@ -401,42 +404,118 @@ Connection::Ptr ReplicaSet::selectServer(const ReadPreference& readPref)
 }
 
 
+Connection::Ptr ReplicaSet::selectServer(const ReadPreference& readPref,
+	const Poco::Timespan& connectTimeout, const Poco::Timespan& socketTimeout)
+{
+	Net::SocketAddress selectedAddress;
+
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+
+		std::vector<ServerDescription> eligible = readPref.selectServers(_topology);
+
+		if (eligible.empty())
+		{
+			return nullptr;
+		}
+
+		int index = _random.next(static_cast<int>(eligible.size()));
+		selectedAddress = eligible[index].address();
+	}
+
+	return createConnection(selectedAddress, connectTimeout, socketTimeout);
+}
+
+
 Connection::Ptr ReplicaSet::createConnection(const Net::SocketAddress& address)
 {
+	// Snapshot config values under lock to avoid data race with setSocketFactory()
+	Connection::SocketFactory* factory = nullptr;
+	unsigned int connectTimeoutSec = 0;
+	unsigned int socketTimeoutSec = 0;
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		factory = _config.socketFactory;
+		connectTimeoutSec = _config.connectTimeoutSeconds;
+		socketTimeoutSec = _config.socketTimeoutSeconds;
+	}
+
 	Connection::Ptr conn = new Connection();
 
 	try
 	{
-		if (_config.socketFactory != nullptr)
+		if (factory != nullptr)
 		{
 			// Use custom socket factory (e.g., for SSL/TLS)
 			// Custom factories can be set via Config or using setSocketFactory().
 			// They can access timeout values via configuration().connectTimeoutSeconds
 			// and configuration().socketTimeoutSeconds to properly configure sockets.
-			conn->connect(address.toString(), *_config.socketFactory);
+			conn->connect(address.toString(), *factory);
 		}
 		else
 		{
-			conn->connect(address);
+			Poco::Timespan connectTimeout(static_cast<long>(connectTimeoutSec), 0);
+			Poco::Timespan socketTimeout(static_cast<long>(socketTimeoutSec), 0);
+			conn->connect(address, connectTimeout, socketTimeout);
 		}
 
-		// Note: Connection class doesn't expose socket() accessor, so socket timeouts
-		// must be configured during socket creation via custom SocketFactory.
-
 		return conn;
+	}
+	catch (const std::exception& e)
+	{
+		// Mark server as unknown on connection failure, preserving error details
+		std::lock_guard<std::mutex> lock(_mutex);
+		_topology.markServerUnknown(address, "Connection failed: "s + e.what());
+		throw;
 	}
 	catch (...)
 	{
 		// Mark server as unknown on connection failure
 		std::lock_guard<std::mutex> lock(_mutex);
-		_topology.markServerUnknown(address, "Connection failed");
+		_topology.markServerUnknown(address, "Connection failed: unknown error"s);
 		throw;
 	}
 }
 
 
-void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address) noexcept
+Connection::Ptr ReplicaSet::createConnection(const Net::SocketAddress& address,
+	const Poco::Timespan& connectTimeout, const Poco::Timespan& socketTimeout)
 {
+	Connection::Ptr conn = new Connection();
+
+	try
+	{
+		conn->connect(address, connectTimeout, socketTimeout);
+		return conn;
+	}
+	catch (const std::exception& e)
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		_topology.markServerUnknown(address, "Connection failed: "s + e.what());
+		throw;
+	}
+	catch (...)
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		_topology.markServerUnknown(address, "Connection failed: unknown error"s);
+		throw;
+	}
+}
+
+
+void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address)
+{
+	// Snapshot config values under lock to avoid data race with setSocketFactory()
+	Connection::SocketFactory* factory = nullptr;
+	unsigned int connectTimeoutSec = 0;
+	unsigned int socketTimeoutSec = 0;
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		factory = _config.socketFactory;
+		connectTimeoutSec = _config.connectTimeoutSeconds;
+		socketTimeoutSec = _config.socketTimeoutSeconds;
+	}
+
 	Connection::Ptr conn = new Connection();
 
 	try
@@ -444,19 +523,18 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address) noex
 		// Measure RTT
 		auto startTime = std::chrono::high_resolution_clock::now();
 
-		if (_config.socketFactory != nullptr)
+		if (factory != nullptr)
 		{
 			// Custom factories can be set via Config or using setSocketFactory().
 			// They can access timeout values via configuration() to configure sockets.
-			conn->connect(address.toString(), *_config.socketFactory);
+			conn->connect(address.toString(), *factory);
 		}
 		else
 		{
-			conn->connect(address);
+			Poco::Timespan connectTimeout(static_cast<long>(connectTimeoutSec), 0);
+			Poco::Timespan socketTimeout(static_cast<long>(socketTimeoutSec), 0);
+			conn->connect(address, connectTimeout, socketTimeout);
 		}
-
-		// Note: Connection class doesn't expose socket() accessor, so socket timeouts
-		// must be configured during socket creation via custom SocketFactory.
 
 		// Send hello command
 		OpMsgMessage request("admin"s, ""s);
@@ -507,7 +585,7 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address) noex
 }
 
 
-void ReplicaSet::updateTopologyFromAllServers() noexcept
+void ReplicaSet::updateTopologyFromAllServers()
 {
 	// Capture current topology before refresh
 	TopologyDescription oldTopology;
@@ -538,7 +616,7 @@ void ReplicaSet::updateTopologyFromAllServers() noexcept
 	}
 
 	// Update timestamp after refreshing topology
-	_topologyRefreshTime = std::chrono::steady_clock::now();
+	_topologyRefreshTime.store(std::chrono::steady_clock::now());
 
 	// Get new topology and compare using comparison operator
 	TopologyDescription newTopology;

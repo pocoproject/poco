@@ -20,6 +20,7 @@
 
 #include "Poco/MongoDB/Connection.h"
 #include "Poco/ObjectPool.h"
+#include "Poco/Timespan.h"
 
 
 namespace Poco {
@@ -32,6 +33,9 @@ class PoolableObjectFactory<MongoDB::Connection, MongoDB::Connection::Ptr>
 	///
 	/// If a Connection::SocketFactory is given, it must live for the entire
 	/// lifetime of the PoolableObjectFactory.
+	///
+	/// It is strongly recommended to use one of the timeout-aware constructors
+	/// to avoid indefinite hangs when the server is unreachable.
 {
 public:
 	PoolableObjectFactory(Net::SocketAddress& address):
@@ -46,6 +50,22 @@ public:
 	{
 	}
 
+	PoolableObjectFactory(Net::SocketAddress& address, Poco::Timespan connectTimeout, Poco::Timespan socketTimeout = 0):
+		_address(address),
+		_pSocketFactory(nullptr),
+		_connectTimeout(connectTimeout),
+		_socketTimeout(socketTimeout)
+	{
+	}
+
+	PoolableObjectFactory(const std::string& address, Poco::Timespan connectTimeout, Poco::Timespan socketTimeout = 0):
+		_address(address),
+		_pSocketFactory(nullptr),
+		_connectTimeout(connectTimeout),
+		_socketTimeout(socketTimeout)
+	{
+	}
+
 	PoolableObjectFactory(const std::string& uri, MongoDB::Connection::SocketFactory& socketFactory):
 		_uri(uri),
 		_pSocketFactory(&socketFactory)
@@ -55,9 +75,15 @@ public:
 	MongoDB::Connection::Ptr createObject()
 	{
 		if (_pSocketFactory)
+		{
 			return new MongoDB::Connection(_uri, *_pSocketFactory);
+		}
 		else
-			return new MongoDB::Connection(_address);
+		{
+			MongoDB::Connection::Ptr conn = new MongoDB::Connection();
+			conn->connect(_address, _connectTimeout, _socketTimeout);
+			return conn;
+		}
 	}
 
 	bool validateObject(MongoDB::Connection::Ptr pObject)
@@ -80,7 +106,9 @@ public:
 private:
 	Net::SocketAddress _address;
 	std::string _uri;
-	MongoDB::Connection::SocketFactory* _pSocketFactory;
+	MongoDB::Connection::SocketFactory* _pSocketFactory = nullptr;
+	Poco::Timespan _connectTimeout;
+	Poco::Timespan _socketTimeout;
 };
 
 
