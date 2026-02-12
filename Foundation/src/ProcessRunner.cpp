@@ -242,14 +242,24 @@ void ProcessRunner::stop()
 				// and we have permission, or -1 with errno:
 				//   ESRCH  - no such process group (done)
 				//   EPERM  - group exists but no permission (still alive)
-				while (::kill(-pid, 0) == 0 || errno == EPERM)
+				// Note: errno must be captured immediately after kill()
+				// since Thread::sleep() may overwrite it.
+				for (;;)
 				{
+					int rc = ::kill(-pid, 0);
+					int err = errno;
+					if (rc == -1 && err != EPERM)
+						break;
 					if (_sw.elapsedSeconds() > _timeout)
 					{
 						::kill(-pid, SIGKILL);
 						Stopwatch killSw; killSw.start();
-						while (::kill(-pid, 0) == 0 || errno == EPERM)
+						for (;;)
 						{
+							rc = ::kill(-pid, 0);
+							err = errno;
+							if (rc == -1 && err != EPERM)
+								break;
 							if (killSw.elapsedSeconds() > _timeout)
 							{
 								throw Poco::TimeoutException("Unable to terminate process tree");
