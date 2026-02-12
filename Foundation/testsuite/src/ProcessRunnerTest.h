@@ -29,6 +29,8 @@ public:
 
 	void testPIDFile();
 	void testProcessRunner();
+	void testKillTree();
+	void testKillTreeWithChild();
 
 	void setUp();
 	void tearDown();
