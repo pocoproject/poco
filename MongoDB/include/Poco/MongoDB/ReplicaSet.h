@@ -195,9 +195,18 @@ public:
 
 	Connection::Ptr waitForServerAvailability(const ReadPreference& readPref);
 		/// Waits for a server to become available for the given read preference.
+		/// Uses timeouts from Config.
 		/// This method coordinates waiting between multiple threads - only one thread
 		/// performs the actual sleep and topology refresh, while others benefit from
 		/// the refresh done by the first thread.
+		/// Returns a connection if a server becomes available, or null if still unavailable.
+		/// Thread-safe: uses internal synchronization to prevent redundant refresh attempts.
+
+	Connection::Ptr waitForServerAvailability(const ReadPreference& readPref,
+		const Poco::Timespan& connectTimeout, const Poco::Timespan& socketTimeout);
+		/// Waits for a server to become available for the given read preference,
+		/// using the specified connect and socket timeouts instead of
+		/// the values from Config.
 		/// Returns a connection if a server becomes available, or null if still unavailable.
 		/// Thread-safe: uses internal synchronization to prevent redundant refresh attempts.
 
