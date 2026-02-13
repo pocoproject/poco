@@ -371,6 +371,7 @@ void ProcessRunnerTest::testKillTree()
 		checkTimeout(sw, "Waiting for process to stop", 1000, __LINE__);
 	assertFalse (pr.running());
 	assertEqual (pr.result(), 0);
+	assertTrue (pr.error().empty());
 
 	// Verify process is actually gone
 	assertFalse (Process::isRunning(pid));
@@ -432,6 +433,7 @@ void ProcessRunnerTest::testKillTreeWithChild()
 		while (pr.running())
 			checkTimeout(sw, "Waiting for process to stop", 2000, __LINE__);
 		assertFalse (pr.running());
+		assertTrue (pr.error().empty());
 
 		// Both parent and child should be gone
 		assertFalse (Process::isRunning(parentPid));
