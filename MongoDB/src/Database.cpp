@@ -339,13 +339,12 @@ Poco::MongoDB::Document::Ptr Database::createIndex(
 	}
 
 	MongoDB::Document::Ptr index = new MongoDB::Document();
+	index->add("key"s, keys);
+	index->add("ns"s, _dbname + '.' + collection);
 	if (!indexName.empty())
 	{
 		index->add("name"s, indexName);
 	}
-	index->add("key"s, keys);
-	index->add("ns"s, _dbname + '.' + collection);
-	index->add("name"s, indexName);
 
 	if (options & INDEX_UNIQUE) {
 		index->add("unique"s, true);

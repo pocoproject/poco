@@ -154,13 +154,19 @@ inline void BSONReader::read<Binary::Ptr>(Binary::Ptr& to)
 	Poco::Int32 size;
 	_reader >> size;
 
+	if (size < 0)
+		throw Poco::DataFormatException("Invalid BSON binary size: " + std::to_string(size));
+	if (size > BSON_MAX_DOCUMENT_SIZE)
+		throw Poco::DataFormatException("BSON binary size exceeds maximum: " + std::to_string(size));
+
 	to->buffer().resize(size);
 
 	unsigned char subtype;
 	_reader >> subtype;
 	to->subtype(subtype);
 
-	_reader.readRaw(reinterpret_cast<char*>(to->buffer().begin()), size);
+	if (size > 0)
+		_reader.readRaw(reinterpret_cast<char*>(to->buffer().begin()), size);
 }
 
 

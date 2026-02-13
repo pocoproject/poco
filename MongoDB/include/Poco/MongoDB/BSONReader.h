@@ -20,6 +20,7 @@
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/BinaryReader.h"
+#include "Poco/Exception.h"
 
 
 namespace Poco {
@@ -72,6 +73,8 @@ inline std::string BSONReader::readCString()
 		{
 			if (c == 0x00) return val;
 			else val += c;
+			if (val.size() > static_cast<std::size_t>(BSON_MAX_DOCUMENT_SIZE))
+				throw Poco::DataFormatException("BSON cstring exceeds maximum size");
 		}
 	}
 	return val;
