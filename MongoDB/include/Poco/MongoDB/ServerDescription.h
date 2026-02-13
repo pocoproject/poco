@@ -22,6 +22,7 @@
 #include "Poco/MongoDB/Document.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Timestamp.h"
+#include <limits>
 #include <vector>
 #include <string>
 
@@ -93,7 +94,13 @@ public:
 		/// Returns the server address.
 
 	[[nodiscard]] Timestamp lastUpdateTime() const;
-		/// Returns the timestamp of the last successful update.
+		/// Returns the timestamp of the last successful update from the driver.
+
+	[[nodiscard]] Poco::Int64 lastWriteDate() const;
+		/// Returns the server's last write date in microseconds since epoch.
+		/// Parsed from lastWrite.lastWriteDate in the hello response.
+		/// See: https://www.mongodb.com/docs/manual/reference/command/hello/#std-label-hello-lastWrite
+		/// Returns 0 if not available (server didn't report it).
 
 	[[nodiscard]] Poco::Int64 roundTripTime() const;
 		/// Returns the round-trip time in microseconds.
@@ -153,7 +160,8 @@ private:
 	Net::SocketAddress _address;
 	ServerType _type{Unknown};
 	Timestamp _lastUpdateTime;
-	Poco::Int64 _roundTripTime{0};
+	Poco::Int64 _lastWriteDate{0};
+	Poco::Int64 _roundTripTime{std::numeric_limits<Poco::Int64>::max()};
 	std::string _setName;
 	Document _tags;
 	std::string _error;
@@ -181,6 +189,12 @@ inline const Net::SocketAddress& ServerDescription::address() const
 inline Timestamp ServerDescription::lastUpdateTime() const
 {
 	return _lastUpdateTime;
+}
+
+
+inline Poco::Int64 ServerDescription::lastWriteDate() const
+{
+	return _lastWriteDate;
 }
 
 

@@ -231,6 +231,30 @@ Connection::Ptr ReplicaSet::getSecondaryConnection()
 
 Connection::Ptr ReplicaSet::waitForServerAvailability(const ReadPreference& readPref)
 {
+	// Snapshot Config timeouts under lock, then delegate to the timeout-aware overload.
+	Poco::Timespan connectTimeout;
+	Poco::Timespan socketTimeout;
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		connectTimeout = Poco::Timespan(static_cast<long>(_config.connectTimeoutSeconds), 0);
+		socketTimeout = Poco::Timespan(static_cast<long>(_config.socketTimeoutSeconds), 0);
+	}
+	return waitForServerAvailability(readPref, connectTimeout, socketTimeout);
+}
+
+
+Connection::Ptr ReplicaSet::waitForServerAvailability(const ReadPreference& readPref,
+	const Poco::Timespan& connectTimeout, const Poco::Timespan& socketTimeout)
+{
+	// Snapshot config values under lock to avoid data race
+	std::size_t reconnectRetries = 0;
+	unsigned int reconnectDelaySec = 0;
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		reconnectRetries = _config.serverReconnectRetries;
+		reconnectDelaySec = _config.serverReconnectDelaySeconds;
+	}
+
 	// Coordinate waiting between threads to avoid redundant refresh attempts
 	std::lock_guard<std::mutex> lock(_serverAvailabilityRetryMutex);
 
@@ -241,27 +265,21 @@ Connection::Ptr ReplicaSet::waitForServerAvailability(const ReadPreference& read
 	if (waitStartTime <= _topologyRefreshTime.load())
 	{
 		// Another thread recently refreshed, try getting connection without waiting
-		return getConnection(readPref);
+		return getConnection(readPref, connectTimeout, socketTimeout);
 	}
 
-	// Retry up to serverReconnectRetries times to wait for servers to become available
-	for (std::size_t i = 0; i < _config.serverReconnectRetries; ++i)
+	for (std::size_t i = 0; i < reconnectRetries; ++i)
 	{
-		// Sleep before refreshing topology
-		std::this_thread::sleep_for(std::chrono::seconds(_config.serverReconnectDelaySeconds));
-
-		// Refresh topology to discover available servers
+		std::this_thread::sleep_for(std::chrono::seconds(reconnectDelaySec));
 		refreshTopology();
 
-		// Try to get a connection after refresh
-		Connection::Ptr conn = getConnection(readPref);
+		Connection::Ptr conn = getConnection(readPref, connectTimeout, socketTimeout);
 		if (!conn.isNull())
 		{
 			return conn;
 		}
 	}
 
-	// All retries exhausted, no servers available
 	return nullptr;
 }
 
@@ -356,6 +374,13 @@ bool ReplicaSet::hasPrimary() const
 
 void ReplicaSet::monitor() noexcept
 {
+	// Snapshot config value under lock to avoid data race
+	unsigned int heartbeatSec = 0;
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		heartbeatSec = _config.heartbeatFrequencySeconds;
+	}
+
 	while (!_stopMonitoring.load())
 	{
 		try
@@ -372,7 +397,7 @@ void ReplicaSet::monitor() noexcept
 		{
 			std::unique_lock<std::mutex> lock(_monitorMutex);
 			_monitorCV.wait_for(lock,
-				std::chrono::seconds(_config.heartbeatFrequencySeconds),
+				std::chrono::seconds(heartbeatSec),
 				[this]() { return _stopMonitoring.load(); });
 		}
 	}
@@ -387,7 +412,8 @@ Connection::Ptr ReplicaSet::selectServer(const ReadPreference& readPref)
 		std::lock_guard<std::mutex> lock(_mutex);
 
 		// Select servers based on read preference
-		std::vector<ServerDescription> eligible = readPref.selectServers(_topology);
+		const Poco::Int64 heartbeatUs = static_cast<Poco::Int64>(_config.heartbeatFrequencySeconds) * 1000000;
+		std::vector<ServerDescription> eligible = readPref.selectServers(_topology, heartbeatUs);
 
 		if (eligible.empty())
 		{
@@ -412,7 +438,8 @@ Connection::Ptr ReplicaSet::selectServer(const ReadPreference& readPref,
 	{
 		std::lock_guard<std::mutex> lock(_mutex);
 
-		std::vector<ServerDescription> eligible = readPref.selectServers(_topology);
+		const Poco::Int64 heartbeatUs = static_cast<Poco::Int64>(_config.heartbeatFrequencySeconds) * 1000000;
+		std::vector<ServerDescription> eligible = readPref.selectServers(_topology, heartbeatUs);
 
 		if (eligible.empty())
 		{
@@ -481,11 +508,27 @@ Connection::Ptr ReplicaSet::createConnection(const Net::SocketAddress& address)
 Connection::Ptr ReplicaSet::createConnection(const Net::SocketAddress& address,
 	const Poco::Timespan& connectTimeout, const Poco::Timespan& socketTimeout)
 {
+	// Snapshot factory under lock to avoid data race with setSocketFactory()
+	Connection::SocketFactory* factory = nullptr;
+	{
+		std::lock_guard<std::mutex> lock(_mutex);
+		factory = _config.socketFactory;
+	}
+
 	Connection::Ptr conn = new Connection();
 
 	try
 	{
-		conn->connect(address, connectTimeout, socketTimeout);
+		if (factory != nullptr)
+		{
+			// Use custom socket factory (e.g., for SSL/TLS)
+			// Custom factories are responsible for applying their own timeouts.
+			conn->connect(address.toString(), *factory);
+		}
+		else
+		{
+			conn->connect(address, connectTimeout, socketTimeout);
+		}
 		return conn;
 	}
 	catch (const std::exception& e)

@@ -111,8 +111,14 @@ public:
 	[[nodiscard]] Poco::Int64 maxStalenessSeconds() const;
 		/// Returns the max staleness in seconds, or NO_MAX_STALENESS if not set.
 
-	[[nodiscard]] std::vector<ServerDescription> selectServers(const TopologyDescription& topology) const;
+	[[nodiscard]] std::vector<ServerDescription> selectServers(
+		const TopologyDescription& topology,
+		Poco::Int64 heartbeatFrequencyUs = 10000000) const;
 		/// Selects eligible servers from the topology based on this read preference.
+		/// heartbeatFrequencyUs is the topology monitoring interval in microseconds,
+		/// used in the maxStalenessSeconds calculation per the MongoDB Server Selection spec.
+		/// See: https://github.com/mongodb/specifications/blob/master/source/server-selection/server-selection.md
+		/// Defaults to 10 seconds (10000000 us) per the MongoDB specification.
 		/// Returns a vector of eligible servers.
 		/// If no servers match, returns an empty vector.
 
@@ -137,7 +143,8 @@ public:
 private:
 	bool matchesTags(const ServerDescription& server) const;
 	std::vector<ServerDescription> filterByTags(const std::vector<ServerDescription>& servers) const;
-	std::vector<ServerDescription> filterByMaxStaleness(const std::vector<ServerDescription>& servers, const ServerDescription& primary) const;
+	std::vector<ServerDescription> filterByMaxStaleness(const std::vector<ServerDescription>& servers,
+		const ServerDescription& primary, Poco::Int64 heartbeatFrequencyUs) const;
 	std::vector<ServerDescription> selectByNearest(const std::vector<ServerDescription>& servers) const;
 
 	Mode _mode{Primary};
