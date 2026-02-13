@@ -15,7 +15,6 @@
 #include "Poco/MongoDB/ReadPreference.h"
 #include "Poco/MongoDB/TopologyDescription.h"
 #include "Poco/Format.h"
-#include <cmath>
 #include <limits>
 
 using namespace std::string_literals;
@@ -57,7 +56,9 @@ ReadPreference& ReadPreference::operator=(const ReadPreference& other) = default
 ReadPreference& ReadPreference::operator=(ReadPreference&& other) noexcept = default;
 
 
-std::vector<ServerDescription> ReadPreference::selectServers(const TopologyDescription& topology) const
+std::vector<ServerDescription> ReadPreference::selectServers(
+	const TopologyDescription& topology,
+	Poco::Int64 heartbeatFrequencyUs) const
 {
 	std::vector<ServerDescription> eligible;
 
@@ -87,7 +88,7 @@ std::vector<ServerDescription> ReadPreference::selectServers(const TopologyDescr
 				eligible = filterByTags(secondaries);
 				if (_maxStalenessSeconds != NO_MAX_STALENESS)
 				{
-					eligible = filterByMaxStaleness(eligible, primary);
+					eligible = filterByMaxStaleness(eligible, primary, heartbeatFrequencyUs);
 				}
 			}
 		}
@@ -100,7 +101,7 @@ std::vector<ServerDescription> ReadPreference::selectServers(const TopologyDescr
 			if (_maxStalenessSeconds != NO_MAX_STALENESS)
 			{
 				ServerDescription primary = topology.findPrimary();
-				eligible = filterByMaxStaleness(eligible, primary);
+				eligible = filterByMaxStaleness(eligible, primary, heartbeatFrequencyUs);
 			}
 		}
 		break;
@@ -112,7 +113,7 @@ std::vector<ServerDescription> ReadPreference::selectServers(const TopologyDescr
 			if (_maxStalenessSeconds != NO_MAX_STALENESS)
 			{
 				ServerDescription primary = topology.findPrimary();
-				eligible = filterByMaxStaleness(eligible, primary);
+				eligible = filterByMaxStaleness(eligible, primary, heartbeatFrequencyUs);
 			}
 
 			if (eligible.empty())
@@ -145,7 +146,7 @@ std::vector<ServerDescription> ReadPreference::selectServers(const TopologyDescr
 			if (_maxStalenessSeconds != NO_MAX_STALENESS)
 			{
 				ServerDescription primary = topology.findPrimary();
-				eligible = filterByMaxStaleness(eligible, primary);
+				eligible = filterByMaxStaleness(eligible, primary, heartbeatFrequencyUs);
 			}
 
 			// Select by nearest (lowest RTT)
@@ -250,41 +251,87 @@ std::vector<ServerDescription> ReadPreference::filterByTags(const std::vector<Se
 
 std::vector<ServerDescription> ReadPreference::filterByMaxStaleness(
 	const std::vector<ServerDescription>& servers,
-	const ServerDescription& primary) const
+	const ServerDescription& primary,
+	Poco::Int64 heartbeatFrequencyUs) const
 {
 	if (_maxStalenessSeconds == NO_MAX_STALENESS)
 	{
 		return servers;  // No filtering needed
 	}
 
-	// Note: Proper staleness calculation requires lastWriteDate from server responses
-	// For now, we implement a simplified version based on lastUpdateTime
-	// A full implementation would compare lastWriteDate timestamps
+	// MongoDB Server Selection Specification — maxStalenessSeconds
+	// See: https://github.com/mongodb/specifications/blob/master/source/server-selection/server-selection.md#maxstalenessseconds
+	//
+	// When a primary is known:
+	//   staleness = (S.lastUpdateTime - S.lastWriteDate) - (P.lastUpdateTime - P.lastWriteDate) + heartbeatFrequency
+	//
+	// When no primary is known:
+	//   staleness = SMax.lastWriteDate - S.lastWriteDate + heartbeatFrequency
+	//   where SMax is the secondary with the most recent lastWriteDate.
 
 	std::vector<ServerDescription> result;
 	result.reserve(servers.size());
-	const Poco::Int64 maxStalenessMs = _maxStalenessSeconds * 1000000;  // Convert to microseconds
+	const Poco::Int64 maxStalenessUs = _maxStalenessSeconds * 1000000;  // Convert to microseconds
 
-	for (const auto& server : servers)
+	if (primary.type() != ServerDescription::Unknown && primary.lastWriteDate() != 0)
 	{
-		// Calculate staleness as the difference between primary and secondary update times
-		// This is a simplified approximation
-		if (primary.type() != ServerDescription::Unknown)
-		{
-			Poco::Int64 staleness = std::abs(
-				primary.lastUpdateTime().epochMicroseconds() -
-				server.lastUpdateTime().epochMicroseconds()
-			);
+		// Primary is known — use the primary-based formula
+		const Poco::Int64 primaryIdleUs =
+			primary.lastUpdateTime().epochMicroseconds() - primary.lastWriteDate();
 
-			if (staleness <= maxStalenessMs)
+		for (const auto& server : servers)
+		{
+			if (server.lastWriteDate() == 0)
+			{
+				// Server didn't report lastWriteDate; include it to avoid
+				// incorrectly filtering out servers that don't support the field.
+				result.push_back(server);
+				continue;
+			}
+
+			const Poco::Int64 serverIdleUs =
+				server.lastUpdateTime().epochMicroseconds() - server.lastWriteDate();
+			const Poco::Int64 stalenessUs = serverIdleUs - primaryIdleUs + heartbeatFrequencyUs;
+
+			if (stalenessUs <= maxStalenessUs)
 			{
 				result.push_back(server);
 			}
 		}
-		else
+	}
+	else
+	{
+		// No primary known — use the secondary-max-based formula.
+		// Find the secondary with the most recent lastWriteDate.
+		Poco::Int64 maxWriteDateUs = 0;
+		for (const auto& server : servers)
 		{
-			// No primary available, include all secondaries
-			result.push_back(server);
+			if (server.lastWriteDate() > maxWriteDateUs)
+			{
+				maxWriteDateUs = server.lastWriteDate();
+			}
+		}
+
+		if (maxWriteDateUs == 0)
+		{
+			// No server reported lastWriteDate; include all servers.
+			return servers;
+		}
+
+		for (const auto& server : servers)
+		{
+			if (server.lastWriteDate() == 0)
+			{
+				result.push_back(server);
+				continue;
+			}
+
+			const Poco::Int64 stalenessUs = maxWriteDateUs - server.lastWriteDate() + heartbeatFrequencyUs;
+
+			if (stalenessUs <= maxStalenessUs)
+			{
+				result.push_back(server);
+			}
 		}
 	}
 
@@ -309,14 +356,13 @@ std::vector<ServerDescription> ReadPreference::selectByNearest(const std::vector
 		}
 	}
 
-	// Select servers within 15ms of minimum RTT (MongoDB spec)
-	const Poco::Int64 localThresholdMs = 15000;  // 15ms in microseconds
+	// Select servers within the local threshold of minimum RTT (MongoDB spec)
 	std::vector<ServerDescription> result;
 	result.reserve(servers.size());
 
 	for (const auto& server : servers)
 	{
-		if (server.roundTripTime() <= minRTT + localThresholdMs)
+		if (server.roundTripTime() <= minRTT + DEFAULT_LOCAL_THRESHOLD_US)
 		{
 			result.emplace_back(server);
 		}
