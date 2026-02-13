@@ -53,6 +53,17 @@ enum ProcessOptions
 };
 
 
+/// Exit codes used by the child process to signal pre-exec failures
+/// back to the parent. These are chosen to avoid collision with common
+/// application exit codes.
+static constexpr int PROCESS_EXIT_EXEC_FAILED    = 72;
+	/// execvp() failed (command not found, permission denied, etc.)
+
+static constexpr int PROCESS_EXIT_SETPGID_FAILED = 73;
+	/// setpgid(0, 0) failed in child (PROCESS_KILL_TREE).
+	/// The specific errno is lost (child address space).
+
+
 } // namespace Poco
 
 

@@ -174,6 +174,15 @@ void ProcessRunner::run()
 		{
 			Poco::FastMutex::ScopedLock l(_mutex);
 
+#if !defined(POCO_OS_FAMILY_WINDOWS)
+			if ((_options & PROCESS_KILL_TREE) && _rc == PROCESS_EXIT_SETPGID_FAILED)
+			{
+				Poco::format(_error, "ProcessRunner::run(%s): "
+					"child failed to create process group (setpgid failed, exit code %d)",
+					_cmd, _rc.load());
+			}
+			else
+#endif
 			Poco::format(_error, "ProcessRunner::run() error; "
 				"handle=%d (%d:%s); pid=%d (%d:%s); return=%d (%d:%s)",
 				(pPH ? pPH->id() : 0), errHandle, Error::getMessage(errHandle),

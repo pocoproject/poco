@@ -265,7 +265,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 			if (options & PROCESS_KILL_TREE)
 			{
 				if (setpgid(0, 0) != 0)
-					_exit(73);
+					_exit(PROCESS_EXIT_SETPGID_FAILED);
 			}
 
 			execvp(argv[0], &argv[0]);
@@ -286,7 +286,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 	}
 	while (false);
 
-	_exit(72);
+	_exit(PROCESS_EXIT_EXEC_FAILED);
 #else
 	throw Poco::NotImplementedException("platform does not allow fork/exec");
 #endif
