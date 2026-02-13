@@ -4,6 +4,10 @@ cmake_minimum_required(VERSION 3.26.0)
 # Must be set before the project.
 set(CMAKE_OSX_DEPLOYMENT_TARGET "13.3" CACHE STRING "macOS minimum supported target")
 
+# Compiler selection (must be processed before project())
+# Provides POCO_COMPILER and POCO_CROSS_COMPILE cache variables.
+include(cmake/PocoCompilerSelect.cmake)
+
 project(Poco)
 
 file(STRINGS "${PROJECT_SOURCE_DIR}/libversion" SHARED_LIBRARY_VERSION)
@@ -736,6 +740,13 @@ message(STATUS "[cmake] Installation target path: ${CMAKE_INSTALL_PREFIX}")
 if(CMAKE_TOOLCHAIN_FILE)
 	message(STATUS "[cmake] Use toolchain file:		${CMAKE_TOOLCHAIN_FILE}")
 endif()
+if(POCO_COMPILER_SELECTION)
+	message(STATUS "[cmake] POCO compiler select:   ${POCO_COMPILER_SELECTION}")
+endif()
+message(STATUS "[cmake] C compiler:             ${CMAKE_C_COMPILER}")
+message(STATUS "[cmake] C++ compiler:           ${CMAKE_CXX_COMPILER}")
+message(STATUS "[cmake] C++ compiler ID:        ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "[cmake] C++ compiler version:   ${CMAKE_CXX_COMPILER_VERSION}")
 if (ENABLE_MODULES)
     if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.28)
         message(STATUS "Building Poco.* C++ modules")
