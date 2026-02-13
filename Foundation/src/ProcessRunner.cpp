@@ -223,6 +223,12 @@ void ProcessRunner::stop()
 			// when our handle closes, and the termination signal is lost.
 			// Keep the NamedEvent alive here so the kernel object persists until the child
 			// opens its own handle and receives the signal.
+			//
+			// Note: When PROCESS_KILL_TREE is set, the NamedEvent only reaches the
+			// leader process (Poco ServerApplication). Non-Poco children in the Job
+			// Object receive no graceful signal — they are terminated when the Job
+			// handle is closed (_hJob.reset()). This is a platform limitation:
+			// Windows has no equivalent of Unix process-group signals.
 			NamedEvent terminateEvent(Process::terminationEventName(pid));
 			terminateEvent.set();
 #else

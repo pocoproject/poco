@@ -40,12 +40,16 @@ enum ProcessOptions
 		/// Ensures that all child processes (and their descendants) are
 		/// terminated when the ProcessRunner is stopped or destroyed.
 		///
-		/// On Windows, creates a Job Object with JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE.
-		///
 		/// On Unix/Linux, the child is placed in a new process group via
-		/// setpgid(0, 0). On stop, the termination request is sent to the
-		/// main process; if it does not exit before the timeout expires,
-		/// the entire process group is signaled (forcibly) with SIGKILL.
+		/// setpgid(0, 0). On stop, SIGINT is sent to the entire process
+		/// group. If the group does not exit before the timeout expires,
+		/// SIGKILL is sent to the entire group.
+		///
+		/// On Windows, creates a Job Object with JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE.
+		/// On stop, a graceful termination signal (NamedEvent) is sent to
+		/// the leader process only. Non-Poco children in the tree receive
+		/// no graceful signal — they are terminated when the Job Object
+		/// handle is closed after the leader exits or the timeout expires.
 };
 
 
