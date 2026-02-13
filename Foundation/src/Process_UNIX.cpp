@@ -137,6 +137,11 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		struct inheritance inherit;
 		std::memset(&inherit, 0, sizeof(inherit));
 		inherit.flags = SPAWN_ALIGN_DEFAULT | SPAWN_CHECK_SCRIPT | SPAWN_SEARCH_PATH;
+		if (options & PROCESS_KILL_TREE)
+		{
+			inherit.flags |= SPAWN_SETGROUP;
+			inherit.pgroup = SPAWN_NEWPGROUP;
+		}
 		int fdmap[3];
 		fdmap[0] = inPipe  ? inPipe->readHandle()   : 0;
 		fdmap[1] = outPipe ? outPipe->writeHandle() : 1;
@@ -256,9 +261,23 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 				close(j);
 			}
 
+			// Create a new process group so the entire tree can be signaled.
+			if (options & PROCESS_KILL_TREE)
+			{
+				if (setpgid(0, 0) != 0)
+					_exit(PROCESS_EXIT_SETPGID_FAILED);
+			}
+
 			execvp(argv[0], &argv[0]);
 			break;
 		}
+
+		// Close the race window where stop() could be called before the
+		// child reaches setpgid(0, 0). setpgid(pid, pid) is idempotent
+		// with the child's call; if the child already called it, this
+		// is a harmless no-op (EACCES after exec is also benign).
+		if (options & PROCESS_KILL_TREE)
+			setpgid(pid, pid);
 
 		if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
 		if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
@@ -267,7 +286,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 	}
 	while (false);
 
-	_exit(72);
+	_exit(PROCESS_EXIT_EXEC_FAILED);
 #else
 	throw Poco::NotImplementedException("platform does not allow fork/exec");
 #endif

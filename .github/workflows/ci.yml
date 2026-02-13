@@ -855,7 +855,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: supercharge/mongodb-github-action@1.10.0
+      - uses: supercharge/mongodb-github-action@1.12.1
       - run: sudo apt -y update && sudo apt -y install libssl-dev
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_MONGODB=ON -DENABLE_TESTS=ON
@@ -1167,7 +1167,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: supercharge/mongodb-github-action@1.10.0
+      - uses: supercharge/mongodb-github-action@1.12.1
       - run: sudo apt -y update
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_SQLITE=ON
