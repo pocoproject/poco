@@ -136,6 +136,8 @@ void ProcessRunner::run()
 #if defined(POCO_OS_FAMILY_WINDOWS)
 		if (_options & PROCESS_KILL_TREE)
 		{
+			std::string jobErr;
+
 			_hJob.reset(CreateJobObjectW(nullptr, nullptr));
 			if (_hJob)
 			{
@@ -144,8 +146,13 @@ void ProcessRunner::run()
 				if (!SetInformationJobObject(_hJob.handle(),
 					JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)))
 				{
+					Poco::format(jobErr, "SetInformationJobObject: %s", Error::getMessage(Error::last()));
 					_hJob.reset();
 				}
+			}
+			else
+			{
+				Poco::format(jobErr, "CreateJobObjectW: %s", Error::getMessage(Error::last()));
 			}
 			if (_hJob)
 			{
@@ -154,13 +161,23 @@ void ProcessRunner::run()
 				if (hProc)
 				{
 					if (!AssignProcessToJobObject(_hJob.handle(), hProc))
+					{
+						Poco::format(jobErr, "AssignProcessToJobObject: %s", Error::getMessage(Error::last()));
 						_hJob.reset();
+					}
 					CloseHandle(hProc);
 				}
 				else
 				{
+					Poco::format(jobErr, "OpenProcess: %s", Error::getMessage(Error::last()));
 					_hJob.reset();
 				}
+			}
+			if (!jobErr.empty())
+			{
+				Poco::FastMutex::ScopedLock l(_mutex);
+				Poco::format(_error, "ProcessRunner::run(%s): PROCESS_KILL_TREE degraded, %s",
+					_cmd, jobErr);
 			}
 		}
 #endif
