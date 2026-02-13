@@ -21,6 +21,13 @@
 #include "Poco/Path.h"
 #include "Poco/String.h"
 #include "Poco/Error.h"
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#include "Poco/NamedEvent.h"
+#include "Poco/UnWindows.h"
+#else
+#include <signal.h>
+#include <cerrno>
+#endif
 #include <fstream>
 
 
@@ -126,6 +133,54 @@ void ProcessRunner::run()
 		_pid = pPH->id();
 		errPID = Error::last();
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		if (_options & PROCESS_KILL_TREE)
+		{
+			std::string jobErr;
+
+			_hJob.reset(CreateJobObjectW(nullptr, nullptr));
+			if (_hJob)
+			{
+				JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = {};
+				jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+				if (!SetInformationJobObject(_hJob.handle(),
+					JobObjectExtendedLimitInformation, &jeli, sizeof(jeli)))
+				{
+					Poco::format(jobErr, "SetInformationJobObject: %s", Error::getMessage(Error::last()));
+					_hJob.reset();
+				}
+			}
+			else
+			{
+				Poco::format(jobErr, "CreateJobObjectW: %s", Error::getMessage(Error::last()));
+			}
+			if (_hJob)
+			{
+				HANDLE hProc = OpenProcess(PROCESS_SET_QUOTA | PROCESS_TERMINATE,
+					FALSE, static_cast<DWORD>(pPH->id()));
+				if (hProc)
+				{
+					if (!AssignProcessToJobObject(_hJob.handle(), hProc))
+					{
+						Poco::format(jobErr, "AssignProcessToJobObject: %s", Error::getMessage(Error::last()));
+						_hJob.reset();
+					}
+					CloseHandle(hProc);
+				}
+				else
+				{
+					Poco::format(jobErr, "OpenProcess: %s", Error::getMessage(Error::last()));
+					_hJob.reset();
+				}
+			}
+			if (!jobErr.empty())
+			{
+				Poco::FastMutex::ScopedLock l(_mutex);
+				Poco::format(_error, "ProcessRunner::run(%s): PROCESS_KILL_TREE degraded, %s",
+					_cmd, jobErr);
+			}
+		}
+#endif
 		// Set _pPH after _pid to ensure pid() returns valid value when running() is true
 		_pPH = pPH;
 
@@ -136,6 +191,15 @@ void ProcessRunner::run()
 		{
 			Poco::FastMutex::ScopedLock l(_mutex);
 
+#if !defined(POCO_OS_FAMILY_WINDOWS)
+			if ((_options & PROCESS_KILL_TREE) && _rc == PROCESS_EXIT_SETPGID_FAILED)
+			{
+				Poco::format(_error, "ProcessRunner::run(%s): "
+					"child failed to create process group (setpgid failed, exit code %d)",
+					_cmd, _rc.load());
+			}
+			else
+#endif
 			Poco::format(_error, "ProcessRunner::run() error; "
 				"handle=%d (%d:%s); pid=%d (%d:%s); return=%d (%d:%s)",
 				(pPH ? pPH->id() : 0), errHandle, Error::getMessage(errHandle),
@@ -156,6 +220,9 @@ void ProcessRunner::run()
 		setError("Unknown exception"s);
 	}
 
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	_hJob.reset();
+#endif
 	_pid = INVALID_PID;
 	_pPH = nullptr;
 	++_runCount;
@@ -174,27 +241,99 @@ void ProcessRunner::stop()
 			if (pid <= 0)
 				throw Poco::IllegalStateException("Invalid PID, can't terminate process");
 
-			Process::requestTermination(pid);
-			while (Process::isRunning(pid))
+#if defined(POCO_OS_FAMILY_WINDOWS)
+			// On Windows, Process::requestTermination() creates a temporary NamedEvent,
+			// signals it, and immediately destroys it. If the child process has not yet
+			// created its own NamedEvent handle (during static initialization of its
+			// ServerApplication::_terminate member), the kernel event object is destroyed
+			// when our handle closes, and the termination signal is lost.
+			// Keep the NamedEvent alive here so the kernel object persists until the child
+			// opens its own handle and receives the signal.
+			//
+			// Note: When PROCESS_KILL_TREE is set, the NamedEvent only reaches the
+			// leader process (Poco ServerApplication). Non-Poco children in the Job
+			// Object receive no graceful signal — they are terminated when the Job
+			// handle is closed (_hJob.reset()). This is a platform limitation:
+			// Windows has no equivalent of Unix process-group signals.
+			NamedEvent terminateEvent(Process::terminationEventName(pid));
+			terminateEvent.set();
+#else
+			if (_options & PROCESS_KILL_TREE)
 			{
-				if (_sw.elapsedSeconds() > _timeout)
+				if (::kill(-pid, SIGINT) != 0 && errno != ESRCH)
+					throw Poco::SystemException(Poco::format("Cannot signal process group %d", (int)pid));
+			}
+			else
+				Process::requestTermination(pid);
+#endif
+
+#if !defined(POCO_OS_FAMILY_WINDOWS)
+			if (_options & PROCESS_KILL_TREE)
+			{
+				// Wait for the entire process group to exit.
+				// setpgid(0, 0) was called in the child, so -pid
+				// addresses the whole group.
+				// kill(-pid, 0) returns 0 if any process in the group exists
+				// and we have permission, or -1 with errno:
+				//   ESRCH  - no such process group (done)
+				//   EPERM  - group exists but no permission (still alive)
+				// Note: errno must be captured immediately after kill()
+				// since Thread::sleep() may overwrite it.
+				for (;;)
 				{
-					Process::kill(pid);
-					Stopwatch killSw; killSw.start();
-					while (Process::isRunning(pid))
+					int rc = ::kill(-pid, 0);
+					int err = errno;
+					if (rc == -1 && err != EPERM)
+						break;
+					if (_sw.elapsedSeconds() > _timeout)
 					{
-						if (killSw.elapsedSeconds() > _timeout)
+						::kill(-pid, SIGKILL);
+						Stopwatch killSw; killSw.start();
+						for (;;)
 						{
-							throw Poco::TimeoutException("Unable to terminate process");
+							rc = ::kill(-pid, 0);
+							err = errno;
+							if (rc == -1 && err != EPERM)
+								break;
+							if (killSw.elapsedSeconds() > _timeout)
+							{
+								throw Poco::TimeoutException("Unable to terminate process tree");
+							}
+							Thread::sleep(10);
 						}
-						Thread::sleep(10);
+						break;
 					}
-					break;
+					Thread::sleep(10);
 				}
-				Thread::sleep(10);
+			}
+			else
+#endif
+			{
+				while (Process::isRunning(pid))
+				{
+					if (_sw.elapsedSeconds() > _timeout)
+					{
+						Process::kill(pid);
+						Stopwatch killSw; killSw.start();
+						while (Process::isRunning(pid))
+						{
+							if (killSw.elapsedSeconds() > _timeout)
+							{
+								throw Poco::TimeoutException("Unable to terminate process");
+							}
+							Thread::sleep(10);
+						}
+						break;
+					}
+					Thread::sleep(10);
+				}
 			}
 			_t.join();
 		}
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		_hJob.reset();
+#endif
 
 		if (!_pidFile.empty())
 		{
