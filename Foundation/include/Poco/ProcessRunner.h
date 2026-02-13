@@ -183,20 +183,49 @@ private:
 		/// RAII wrapper for a Windows HANDLE.
 		/// Closes the handle on destruction or reset.
 	{
-		HANDLE handle = nullptr;
-
 		HandleGuard() = default;
-		~HandleGuard() { reset(); }
+		~HandleGuard() { close(); }
+
 		HandleGuard(const HandleGuard&) = delete;
 		HandleGuard& operator=(const HandleGuard&) = delete;
 
-		void reset(HANDLE h = nullptr)
+		HandleGuard(HandleGuard&& other) noexcept: _handle(other._handle)
 		{
-			if (handle) CloseHandle(handle);
-			handle = h;
+			other._handle = nullptr;
 		}
 
-		explicit operator bool() const { return handle != nullptr; }
+		HandleGuard& operator=(HandleGuard&& other) noexcept
+		{
+			if (this != &other)
+			{
+				close();
+				_handle = other._handle;
+				other._handle = nullptr;
+			}
+			return *this;
+		}
+
+		HANDLE handle() const { return _handle; }
+
+		void reset(HANDLE h = nullptr)
+		{
+			if (h != _handle)
+			{
+				close();
+				_handle = h;
+			}
+		}
+
+		explicit operator bool() const { return _handle != nullptr; }
+
+	private:
+		void close()
+		{
+			if (_handle) CloseHandle(_handle);
+			_handle = nullptr;
+		}
+
+		HANDLE _handle = nullptr;
 	};
 
 	HandleGuard _hJob;
