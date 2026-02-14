@@ -1,4 +1,6 @@
-
+# LZMA SDK (7-Zip)
+# Version: 26.00
+# Source: https://github.com/ip7z/7zip/releases/tag/26.00
 
 # Sources
 #file(GLOB SRCS_G "src/*.c")
