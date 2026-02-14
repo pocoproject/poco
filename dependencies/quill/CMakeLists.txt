@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.12...4.0)
+# Quill - High-performance logging library
+# Version: 11.0.2
+# Source: https://github.com/odygrd/quill/releases/tag/v11.0.2
 project(quill)
 
 #-------------------------------------------------------------------------------------------------------

@@ -1,4 +1,5 @@
-
+# pdjson - public domain JSON parser
+# Source: https://github.com/skeeto/pdjson
 
 # Sources
 file(GLOB SRCS_G "src/*.c")
