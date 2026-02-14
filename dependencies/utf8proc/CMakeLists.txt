@@ -1,3 +1,6 @@
+# utf8proc Unicode processing library
+# Version: 2.11.1
+# Source: https://github.com/JuliaStrings/utf8proc/releases/tag/v2.11.1
 
 if(POCO_UNBUNDLED)
 	find_package(Utf8Proc REQUIRED)
