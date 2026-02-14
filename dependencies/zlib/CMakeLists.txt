@@ -1,4 +1,11 @@
-
+# zlib compression library
+# Version: 1.3.1.2
+# Source: https://github.com/madler/zlib/releases/tag/v1.3.1.2
+#
+# Only the core inflate/deflate/crc32/adler32 sources are bundled.
+# The gz* file-based API (gzclose.c, gzlib.c, gzread.c, gzwrite.c)
+# and uncompress convenience wrapper (uncompr.c) are omitted because
+# Poco only uses the low-level streaming API.
 
 if(POCO_UNBUNDLED)
 	find_package(ZLIB REQUIRED)
