@@ -1,4 +1,6 @@
-
+# PCRE2 - Perl Compatible Regular Expressions
+# Version: 10.47
+# Source: https://github.com/PCRE2Project/pcre2/releases/tag/pcre2-10.47
 
 if(POCO_UNBUNDLED)
 	find_package(PCRE2 REQUIRED)
