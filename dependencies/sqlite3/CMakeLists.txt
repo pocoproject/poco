@@ -1,4 +1,6 @@
-
+# SQLite database engine
+# Version: 3.51.2
+# Source: https://www.sqlite.org/2026/sqlite-amalgamation-3510200.zip
 
 if(POCO_SQLITE_UNBUNDLED)
 	if (ENABLE_DATA_SQLITE)
