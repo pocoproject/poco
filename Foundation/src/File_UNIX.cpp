@@ -17,6 +17,8 @@
 #include "Poco/Exception.h"
 #include "Poco/Error.h"
 #include "Poco/Path.h"
+#include "Poco/Environment.h"
+#include "Poco/StringTokenizer.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -107,10 +109,49 @@ std::string FileImpl::getExecutablePathImpl() const
 		return executable ? absPath : std::string();
 	}
 
-	std::string found = findInPath(_path);
-	if (!found.empty() && !canExecuteImpl(found))
-		return {};
-	return found;
+	// Bare name — search CWD then PATH, requiring regular executable file.
+	// Cannot use findInPath() here because it returns the first existing
+	// entry (including directories) with no way to continue searching.
+	auto isExecutableFile = [](const std::string& absPath) -> bool
+	{
+		struct stat st;
+		if (::stat(absPath.c_str(), &st) != 0 || !S_ISREG(st.st_mode))
+			return false;
+		if (st.st_uid == ::geteuid() || ::geteuid() == 0)
+			return (st.st_mode & S_IXUSR) != 0;
+		else if (st.st_gid == ::getegid())
+			return (st.st_mode & S_IXGRP) != 0;
+		else
+			return (st.st_mode & S_IXOTH) != 0;
+	};
+
+	{
+		Path curPath(Path::current());
+		curPath.append(_path);
+		curPath.makeAbsolute();
+		std::string absPath = curPath.toString();
+		if (isExecutableFile(absPath))
+			return absPath;
+	}
+
+	const std::string currentPath = Environment::get("PATH", "");
+	const std::string pathSep(1, Path::pathSeparator());
+	const StringTokenizer st(currentPath, pathSep,
+		StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
+	for (const auto& dir : st)
+	{
+		try
+		{
+			Path candidate(dir);
+			candidate.append(_path);
+			candidate.makeAbsolute();
+			std::string absPath = candidate.toString();
+			if (isExecutableFile(absPath))
+				return absPath;
+		}
+		catch (const Poco::PathSyntaxException&) {}
+	}
+	return {};
 }
 
 

@@ -19,6 +19,26 @@
 #include "Poco/FileStream.h"
 #include "Poco/ProcessOptions.h"
 #include "Poco/Process.h"
+#include "Poco/Environment.h"
+#include "Poco/TemporaryFile.h"
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#include <direct.h>
+#else
+#include <unistd.h>
+#endif
+
+
+namespace
+{
+	int changeDir(const char* path)
+	{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		return _chdir(path);
+#else
+		return chdir(path);
+#endif
+	}
+}
 
 
 using namespace Poco;
@@ -454,6 +474,69 @@ void ProcessRunnerTest::testKillTreeWithChild()
 }
 
 
+void ProcessRunnerTest::testPathResolution()
+{
+	std::string name("TestApp");
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
+
+	// Find the TestApp binary directory (same locations the other tests use)
+	std::string cmdDir;
+	Path selfDir(Path(Path::self()).makeParent());
+	if (File(Path(selfDir, name)).exists())
+		cmdDir = selfDir.toString();
+	else if (File(Path(Path::current(), name)).exists())
+		cmdDir = Path::current();
+	else
+		cmdDir = Path::current();
+
+	std::string savedPath = Environment::get("PATH", "");
+	Environment::set("PATH", cmdDir + Path::pathSeparator() + savedPath);
+
+	std::string savedCwd = Path::current();
+	std::string tmpDir = TemporaryFile::tempName() + Path::separator();
+	File(tmpDir).createDirectories();
+
+	try
+	{
+		// bare command name found via PATH should resolve and run
+		{
+			changeDir(tmpDir.c_str());
+			ProcessRunner pr(name, {}, "", ProcessRunner::NO_OUT, 10, false, {});
+			pr.start();
+			Stopwatch sw; sw.start();
+			while (pr.running())
+				checkTimeout(sw, "Waiting for process to finish", 2000, __LINE__);
+			assertEqual (0, pr.result());
+		}
+
+		// a directory with the same name as the command in CWD must not
+		// shadow the real executable on PATH
+		{
+			File(tmpDir + name).createDirectories();
+			changeDir(tmpDir.c_str());
+			ProcessRunner pr(name, {}, "", ProcessRunner::NO_OUT, 10, false, {});
+			pr.start();
+			Stopwatch sw; sw.start();
+			while (pr.running())
+				checkTimeout(sw, "Waiting for process to finish", 2000, __LINE__);
+			assertEqual (0, pr.result());
+		}
+	}
+	catch (...)
+	{
+		changeDir(savedCwd.c_str());
+		Environment::set("PATH", savedPath);
+		File(tmpDir).remove(true);
+		throw;
+	}
+	changeDir(savedCwd.c_str());
+	Environment::set("PATH", savedPath);
+	File(tmpDir).remove(true);
+}
+
+
 std::string ProcessRunnerTest::cmdLine(const std::string& cmd, const ProcessRunner::Args& args)
 {
 	std::string cmdL = cmd + ' ';
@@ -498,6 +581,7 @@ CppUnit::Test* ProcessRunnerTest::suite()
 	CppUnit_addTest(pSuite, ProcessRunnerTest, testProcessRunner);
 	CppUnit_addTest(pSuite, ProcessRunnerTest, testKillTree);
 	CppUnit_addTest(pSuite, ProcessRunnerTest, testKillTreeWithChild);
+	CppUnit_addTest(pSuite, ProcessRunnerTest, testPathResolution);
 
 	return pSuite;
 }

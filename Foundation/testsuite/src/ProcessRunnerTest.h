@@ -31,6 +31,7 @@ public:
 	void testProcessRunner();
 	void testKillTree();
 	void testKillTreeWithChild();
+	void testPathResolution();
 
 	void setUp();
 	void tearDown();
