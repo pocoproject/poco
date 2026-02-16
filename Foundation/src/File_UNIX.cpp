@@ -92,53 +92,22 @@ std::string FileImpl::getExecutablePathImpl() const
 		Path p(_path);
 		p.makeAbsolute();
 		std::string absPath = p.toString();
-
-		// Optimized: check existence and executability in one stat() call
-		struct stat st;
-		if (::stat(absPath.c_str(), &st) != 0 || !S_ISREG(st.st_mode))
-			return {};
-
-		bool executable;
-		if (st.st_uid == ::geteuid() || ::geteuid() == 0)
-			executable = (st.st_mode & S_IXUSR) != 0;
-		else if (st.st_gid == ::getegid())
-			executable = (st.st_mode & S_IXGRP) != 0;
-		else
-			executable = (st.st_mode & S_IXOTH) != 0;
-
-		return executable ? absPath : std::string();
+		return canExecuteImpl(absPath) ? absPath : std::string();
 	}
 
 	// Bare name — search CWD then PATH, requiring regular executable file.
 	// Cannot use findInPath() here because it returns the first existing
 	// entry (including directories) with no way to continue searching.
-	auto isExecutableFile = [](const std::string& absPath) -> bool
-	{
-		struct stat st;
-		if (::stat(absPath.c_str(), &st) != 0 || !S_ISREG(st.st_mode))
-			return false;
-		if (st.st_uid == ::geteuid() || ::geteuid() == 0)
-			return (st.st_mode & S_IXUSR) != 0;
-		else if (st.st_gid == ::getegid())
-			return (st.st_mode & S_IXGRP) != 0;
-		else
-			return (st.st_mode & S_IXOTH) != 0;
-	};
-
 	{
 		Path curPath(Path::current());
 		curPath.append(_path);
 		curPath.makeAbsolute();
 		std::string absPath = curPath.toString();
-		if (isExecutableFile(absPath))
+		if (canExecuteImpl(absPath))
 			return absPath;
 	}
 
-	const std::string currentPath = Environment::get("PATH", "");
-	const std::string pathSep(1, Path::pathSeparator());
-	const StringTokenizer st(currentPath, pathSep,
-		StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-	for (const auto& dir : st)
+	for (const auto& dir : getPathDirectories())
 	{
 		try
 		{
@@ -146,7 +115,7 @@ std::string FileImpl::getExecutablePathImpl() const
 			candidate.append(_path);
 			candidate.makeAbsolute();
 			std::string absPath = candidate.toString();
-			if (isExecutableFile(absPath))
+			if (canExecuteImpl(absPath))
 				return absPath;
 		}
 		catch (const Poco::PathSyntaxException&) {}
@@ -210,7 +179,9 @@ bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 	if (::stat(absolutePath.c_str(), &st) != 0 || !S_ISREG(st.st_mode))
 		return false;
 
-	if (st.st_uid == ::geteuid() || ::geteuid() == 0)
+	if (::geteuid() == 0)
+		return (st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0;
+	else if (st.st_uid == ::geteuid())
 		return (st.st_mode & S_IXUSR) != 0;
 	else if (st.st_gid == ::getegid())
 		return (st.st_mode & S_IXGRP) != 0;
