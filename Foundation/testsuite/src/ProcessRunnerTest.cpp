@@ -489,7 +489,7 @@ void ProcessRunnerTest::testPathResolution()
 	else if (File(Path(Path::current(), name)).exists())
 		cmdDir = Path::current();
 	else
-		cmdDir = Path::current();
+		cmdDir = selfDir.toString();
 
 	std::string savedPath = Environment::get("PATH", "");
 	Environment::set("PATH", cmdDir + Path::pathSeparator() + savedPath);
