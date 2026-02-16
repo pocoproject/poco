@@ -22,6 +22,7 @@ public:
 
 	~TCPReactorAcceptor();
 	SocketReactor& reactor();
+	void stop();
 
 	void setRecvMessageCallback(const RecvMessageCallback& cb)
 	{

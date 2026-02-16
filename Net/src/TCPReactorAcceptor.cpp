@@ -16,7 +16,7 @@ TCPReactorAcceptor::TCPReactorAcceptor(
 	int workerThreads = _useSelfReactor ? 0 : _pParams->getMaxThreads();
 	if (workerThreads > 0)
 	{
-		_threadPool = std::make_shared<Poco::ThreadPool>("TCPRA", workerThreads, workerThreads);
+		_threadPool = std::make_shared<Poco::ThreadPool>("TCPRW", workerThreads, workerThreads);
 	}
 	for (int i = 0; i < workerThreads; i++)
 	{
@@ -28,6 +28,16 @@ TCPReactorAcceptor::TCPReactorAcceptor(
 
 TCPReactorAcceptor::~TCPReactorAcceptor()
 {
+	stop();
+}
+
+void TCPReactorAcceptor::stop() {
+	for(auto& worker: _wokerReactors) {
+		worker->stop();
+	}
+	if(_threadPool) {
+		_threadPool->joinAll();
+	}
 }
 
 SocketReactor& TCPReactorAcceptor::reactor()
