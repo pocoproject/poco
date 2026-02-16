@@ -91,13 +91,16 @@ public:
 	void setIsolation(Poco::UInt32 ti);
 		/// Sets the transaction isolation level.
 
+	[[nodiscard]]
 	Poco::UInt32 getIsolation();
 		/// Returns the transaction isolation level.
 
+	[[nodiscard]]
 	bool hasIsolation(Poco::UInt32 ti);
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
+	[[nodiscard]]
 	bool isIsolation(Poco::UInt32 ti);
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
@@ -138,6 +141,7 @@ public:
 	void rollback();
 		/// Rolls back the current transaction.
 
+	[[nodiscard]]
 	bool isActive();
 		/// Returns false after the transaction has been committed or rolled back,
 		/// true if the transaction is ongoing.

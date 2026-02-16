@@ -32,7 +32,7 @@ class CppParser_API Utility
 	/// Various helpers for parsing and analyzing C++ header files.
 {
 public:
-	class CppParser_API FwdDeclBlock
+	class CppParser_API [[nodiscard]]FwdDeclBlock
 	{
 	public:
 		std::string beginNameSpaceDecl;      // contains either $(NS)_BEGIN or the namespace x { decl

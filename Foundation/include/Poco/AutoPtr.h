@@ -189,6 +189,7 @@ public:
 	}
 
 	template <class Other>
+	[[nodiscard]]
 	AutoPtr<Other> cast() const
 		/// Casts the AutoPtr via a dynamic cast to the given type.
 		/// Returns an AutoPtr containing nullptr if the cast fails.
@@ -202,6 +203,7 @@ public:
 	}
 
 	template <class Other>
+	[[nodiscard]]
 	AutoPtr<Other> unsafeCast() const
 		/// Casts the AutoPtr via a static cast to the given type.
 		/// Example: (assume class Sub: public Super)
@@ -245,137 +247,164 @@ public:
 			throw NullPointerException();
 	}
 
+	[[nodiscard]]
 	C* get()
 	{
 		return _ptr;
 	}
 
+	[[nodiscard]]
 	const C* get() const
 	{
 		return _ptr;
 	}
 
+	[[nodiscard]]
 	operator C* ()
 	{
 		return _ptr;
 	}
 
+	[[nodiscard]]
 	operator const C* () const
 	{
 		return _ptr;
 	}
 
+	[[nodiscard]]
 	bool operator ! () const
 	{
 		return _ptr == nullptr;
 	}
 
+	[[nodiscard]]
 	bool isNull() const
 	{
 		return _ptr == nullptr;
 	}
 
+	[[nodiscard]]
 	C* duplicate()
 	{
 		if (_ptr) _ptr->duplicate();
 		return _ptr;
 	}
 
+	[[nodiscard]]
 	bool operator == (const AutoPtr& ptr) const
 	{
 		return _ptr == ptr._ptr;
 	}
 
+	[[nodiscard]]
 	bool operator == (const C* ptr) const
 	{
 		return _ptr == ptr;
 	}
 
+	[[nodiscard]]
 	bool operator == (C* ptr) const
 	{
 		return _ptr == ptr;
 	}
 
+	[[nodiscard]]
 	bool operator == (std::nullptr_t ptr) const
 	{
 		return _ptr == ptr;
 	}
 
+	[[nodiscard]]
 	bool operator != (const AutoPtr& ptr) const
 	{
 		return _ptr != ptr._ptr;
 	}
 
+	[[nodiscard]]
 	bool operator != (const C* ptr) const
 	{
 		return _ptr != ptr;
 	}
 
+	[[nodiscard]]
 	bool operator != (C* ptr) const
 	{
 		return _ptr != ptr;
 	}
 
+	[[nodiscard]]
 	bool operator != (std::nullptr_t ptr) const
 	{
 		return _ptr != ptr;
 	}
 
+	[[nodiscard]]
 	bool operator < (const AutoPtr& ptr) const
 	{
 		return _ptr < ptr._ptr;
 	}
 
+	[[nodiscard]]
 	bool operator < (const C* ptr) const
 	{
 		return _ptr < ptr;
 	}
 
+	[[nodiscard]]
 	bool operator < (C* ptr) const
 	{
 		return _ptr < ptr;
 	}
 
+	[[nodiscard]]
 	bool operator <= (const AutoPtr& ptr) const
 	{
 		return _ptr <= ptr._ptr;
 	}
 
+	[[nodiscard]]
 	bool operator <= (const C* ptr) const
 	{
 		return _ptr <= ptr;
 	}
 
+	[[nodiscard]]
 	bool operator <= (C* ptr) const
 	{
 		return _ptr <= ptr;
 	}
 
+	[[nodiscard]]
 	bool operator > (const AutoPtr& ptr) const
 	{
 		return _ptr > ptr._ptr;
 	}
 
+	[[nodiscard]]
 	bool operator > (const C* ptr) const
 	{
 		return _ptr > ptr;
 	}
 
+	[[nodiscard]]
 	bool operator > (C* ptr) const
 	{
 		return _ptr > ptr;
 	}
 
+	[[nodiscard]]
 	bool operator >= (const AutoPtr& ptr) const
 	{
 		return _ptr >= ptr._ptr;
 	}
 
+	[[nodiscard]]
 	bool operator >= (const C* ptr) const
 	{
 		return _ptr >= ptr;
 	}
 
+	[[nodiscard]]
 	bool operator >= (C* ptr) const
 	{
 		return _ptr >= ptr;
@@ -393,7 +422,8 @@ inline void swap(AutoPtr<C>& p1, AutoPtr<C>& p2) noexcept
 }
 
 
-template<typename T, typename... Args>
+template <typename T, typename... Args>
+[[nodiscard]]
 AutoPtr<T> makeAuto(Args&&... args)
 {
 	return AutoPtr<T>(new T(std::forward<Args>(args)...));

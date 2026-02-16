@@ -122,27 +122,34 @@ public:
 		Poco::UInt32 offset;
 	};
 
+	[[nodiscard]]
 	static std::vector<unsigned char> createNonce();
 		/// Creates an 8-byte client nonce for NTLM authentication.
 
+	[[nodiscard]]
 	static Poco::UInt64 createTimestamp();
 		/// Creates the NTLM timestamp in tenths of a microsecond since January 1, 1601,
 		/// using the current system time.
 
+	[[nodiscard]]
 	static std::vector<unsigned char> createPasswordHash(const std::string& password);
 		/// Creates the NTLM password hash (MD4 of UTF-16-converted password).
 
+	[[nodiscard]]
 	static std::vector<unsigned char> createNTLMv2Hash(const std::string& username, const std::string& target, const std::string& password);
 		/// Creates the NTLMv2 hash, which is the HMAC-MD5 of the concatenated UTF-16 uppercase username and target,
 		/// using the password hash as HMAC passphrase.
 
+	[[nodiscard]]
 	static std::vector<unsigned char> createLMv2Response(const std::vector<unsigned char>& ntlm2Hash, const std::vector<unsigned char>& challenge, const std::vector<unsigned char>& nonce);
 		/// Creates the LMv2 response by computing the HMAC-MD5 of the challenge and nonce, using the
 		/// ntlm2Hash (see createNTLMv2Hash()) as HMAC passphrase.
 
+	[[nodiscard]]
 	static std::vector<unsigned char> createNTLMv2Response(const std::vector<unsigned char>& ntlm2Hash, const std::vector<unsigned char>& challenge, const std::vector<unsigned char>& nonce, const std::vector<unsigned char>& targetInfo, Poco::UInt64 timestamp);
 		/// Creates the NTLMv2 response by creating the "blob" and prepending its HMAC-MD5, using the ntlm2Hash as HMAC passphrase.
 
+	[[nodiscard]]
 	static std::vector<unsigned char> formatNegotiateMessage(const NegotiateMessage& message);
 		/// Creates the NTLM Type 1 Negotiate message used for initiating NTLM authentication from the client.
 
@@ -151,6 +158,7 @@ public:
 		///
 		/// Returns true if the message was parsed successfully, otherwise false.
 
+	[[nodiscard]]
 	static std::vector<unsigned char> formatAuthenticateMessage(const AuthenticateMessage& message);
 		/// Creates the NTLM Type 3 Authenticate message used for sending the response to the challenge.
 
@@ -164,9 +172,11 @@ public:
 		/// Splits a username containing a domain into plain username and domain.
 		/// Supported formats are <DOMAIN>\<username> and <username>@<DOMAIN>.
 
+	[[nodiscard]]
 	static std::string toBase64(const std::vector<unsigned char>& buffer);
 		/// Converts the buffer to a base64-encoded string.
 
+	[[nodiscard]]
 	static std::vector<unsigned char> fromBase64(const std::string& base64);
 		/// Decodes the given base64-encoded string.
 

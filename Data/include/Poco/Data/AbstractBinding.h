@@ -56,21 +56,25 @@ public:
 	void setBinder(BinderPtr pBinder);
 		/// Sets the object used for binding; object does NOT take ownership of the pointer.
 
+	[[nodiscard]]
 	BinderPtr getBinder() const;
 		/// Returns the AbstractBinder used for binding data.
 
+	[[nodiscard]]
 	virtual std::size_t numOfColumnsHandled() const = 0;
 		/// Returns the number of columns that the binding handles.
 		///
 		/// The trivial case will be one single column but when
 		/// complex types are used this value can be larger than one.
 
+	[[nodiscard]]
 	virtual std::size_t numOfRowsHandled() const = 0;
 		/// Returns the number of rows that the binding handles.
 		///
 		/// The trivial case will be one single row but
 		/// for collection data types it can be larger.
 
+	[[nodiscard]]
 	virtual bool canBind() const = 0;
 		/// Returns true if we have enough data to bind
 
@@ -80,15 +84,19 @@ public:
 	virtual void reset() = 0;
 		/// Allows a binding to be reused.
 
+	[[nodiscard]]
 	AbstractBinder::Direction getDirection() const;
 		/// Returns the binding direction.
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// Returns the name for this binding.
 
+	[[nodiscard]]
 	bool isBulk() const;
 		/// Returns true if extraction is bulk.
 
+	[[nodiscard]]
 	Poco::UInt32 bulkSize() const;
 		/// Returns the size of the bulk binding.
 

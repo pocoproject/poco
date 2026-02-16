@@ -36,27 +36,33 @@ public:
 	virtual ~ICMPPacketImpl();
 		/// Destructor.
 
+	[[nodiscard]]
 	const Poco::UInt8* packet(bool init = true);
 		/// Returns raw ICMP packet.
 		/// ICMP header and data are included in the packet.
 		/// If init is true, initPacket() is called.
 
+	[[nodiscard]]
 	virtual int packetSize() const = 0;
 		/// Returns the total size of packet (ICMP header + data) in number of octets.
 		/// Must be overridden.
 
+	[[nodiscard]]
 	virtual int maxPacketSize() const;
 		/// Returns the maximum permitted size of packet in number of octets.
 
+	[[nodiscard]]
 	Poco::UInt16 sequence() const;
 		/// Returns the most recent sequence number generated.
 
 	void setDataSize(int dataSize);
 		/// Sets data size.
 
+	[[nodiscard]]
 	int getDataSize() const;
 		/// Returns data size.
 
+	[[nodiscard]]
 	virtual struct timeval time(Poco::UInt8* buffer = nullptr, int length = 0) const = 0;
 		/// Returns current epoch time if either argument is equal to zero.
 		/// Otherwise, it extracts the time value from the supplied buffer.
@@ -64,6 +70,7 @@ public:
 		/// Supplied buffer includes IP header, ICMP header and data.
 		/// Must be overridden.
 
+	[[nodiscard]]
 	virtual bool validReplyID(unsigned char* buffer, int length) const = 0;
 		/// Returns true if the extracted id is recognized
 		/// (i.e. equals the process id).
@@ -71,6 +78,7 @@ public:
 		/// Supplied buffer includes IP header, ICMP header and data.
 		/// Must be overridden.
 
+	[[nodiscard]]
 	virtual std::string errorDescription(Poco::UInt8* buffer, int length, int& type, int& code) = 0;
 		/// Returns error description string.
 		/// If supplied buffer contains an ICMP echo reply packet, an
@@ -81,6 +89,7 @@ public:
 		/// Supplied buffer includes IP header, ICMP header and data.
 		/// Must be overridden.
 
+	[[nodiscard]]
 	virtual std::string typeDescription(int typeId) = 0;
 		/// Returns the description of the packet type.
 		/// Must be overridden.
@@ -100,6 +109,7 @@ protected:
 		/// (Re)assembles the packet.
 		/// Must be overridden.
 
+	[[nodiscard]]
 	Poco::UInt16 checksum(Poco::UInt16 *addr, Poco::Int32 len);
 		/// Calculates the checksum for supplied buffer.
 

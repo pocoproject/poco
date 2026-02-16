@@ -52,47 +52,63 @@ public:
 	virtual ~ZipLocalFileHeader();
 		/// Destroys the ZipLocalFileHeader.
 
+	[[nodiscard]]
 	ZipCommon::HostSystem getHostSystem() const;
 
+	[[nodiscard]]
 	int getMajorVersionNumber() const;
 
+	[[nodiscard]]
 	int getMinorVersionNumber() const;
 
 	void getRequiredVersion(int& major, int& minor) const;
 		/// The minimum version required to extract the data
 
+	[[nodiscard]]
 	Poco::UInt32 getHeaderSize() const;
 		/// Returns the total size of the header including filename + extra field size
 
 	void setStartPos(std::streamoff start);
 		/// Sets the start position to start and the end position to start+compressedSize
 
+	[[nodiscard]]
 	std::streamoff getStartPos() const;
 		/// Returns the position of the first byte of the header in the file stream
 
+	[[nodiscard]]
 	std::streamoff getEndPos() const;
 		/// Points past the last byte of the file entry (ie. either the first byte of the next header, or the directory)
 
+	[[nodiscard]]
 	std::streamoff getDataStartPos() const;
 		/// Returns the streamoffset for the very first byte of data. Will be equal to DataEndPos if no data present
 
+	[[nodiscard]]
 	std::streamoff getDataEndPos() const;
 
+	[[nodiscard]]
 	ZipCommon::CompressionMethod getCompressionMethod() const;
 
+	[[nodiscard]]
 	ZipCommon::CompressionLevel getCompressionLevel() const;
 	/// Returns the compression level used. Only valid when the compression method is CM_DEFLATE
 
+	[[nodiscard]]
 	bool isEncrypted() const;
 
+	[[nodiscard]]
 	bool hasSupportedCompressionMethod() const;
 
+	[[nodiscard]]
 	const Poco::DateTime& lastModifiedAt() const;
 
+	[[nodiscard]]
 	Poco::UInt32 getCRC() const;
 
+	[[nodiscard]]
 	Poco::UInt64 getCompressedSize() const;
 
+	[[nodiscard]]
 	Poco::UInt64 getUncompressedSize() const;
 
 	void setCRC(Poco::UInt32 val);
@@ -101,28 +117,37 @@ public:
 
 	void setUncompressedSize(Poco::UInt64 val);
 
+	[[nodiscard]]
 	const std::string& getFileName() const;
 
+	[[nodiscard]]
 	bool isFile() const;
 
+	[[nodiscard]]
 	bool isDirectory() const;
 
+	[[nodiscard]]
 	bool hasExtraField() const;
 
+	[[nodiscard]]
 	const std::string& getExtraField() const;
 
+	[[nodiscard]]
 	bool hasData() const;
 
+	[[nodiscard]]
 	bool searchCRCAndSizesAfterData() const;
 
 	void setSearchCRCAndSizesAfterData(bool val);
 
 	void setFileName(const std::string& fileName, bool isDirectory);
 
+	[[nodiscard]]
 	bool needsZip64() const;
 
 	void setZip64Data();
 
+	[[nodiscard]]
 	std::string createHeader() const;
 		/// Creates a header
 
@@ -133,14 +158,19 @@ private:
 
 	void init(const Poco::Path& fileName, ZipCommon::CompressionMethod cm, ZipCommon::CompressionLevel cl);
 
+	[[nodiscard]]
 	Poco::UInt16 getFileNameLength() const;
 
+	[[nodiscard]]
 	Poco::UInt16 getExtraFieldLength() const;
 
+	[[nodiscard]]
 	Poco::UInt32 getCRCFromHeader() const;
 
+	[[nodiscard]]
 	Poco::UInt32 getCompressedSizeFromHeader() const;
 
+	[[nodiscard]]
 	Poco::UInt32 getUncompressedSizeFromHeader() const;
 
 	void setRequiredVersion(int major, int minor);

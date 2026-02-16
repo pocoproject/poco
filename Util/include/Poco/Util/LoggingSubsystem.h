@@ -38,6 +38,7 @@ class Util_API LoggingSubsystem: public Subsystem
 public:
 	LoggingSubsystem() = default;
 
+	[[nodiscard]]
 	const char* name() const override;
 
 protected:

@@ -32,87 +32,146 @@ class Foundation_API ByteOrder
 	/// integers of various sizes.
 {
 public:
+	[[nodiscard]]
 	static Int8 flipBytes(Int8 value);
+	[[nodiscard]]
 	static UInt8 flipBytes(UInt8 value);
+	[[nodiscard]]
 	static Int16 flipBytes(Int16 value);
+	[[nodiscard]]
 	static UInt16 flipBytes(UInt16 value);
+	[[nodiscard]]
 	static Int32 flipBytes(Int32 value);
+	[[nodiscard]]
 	static UInt32 flipBytes(UInt32 value);
+	[[nodiscard]]
 	static float flipBytes(float value);
+	[[nodiscard]]
 	static double flipBytes(double value);
+	[[nodiscard]]
 #if defined(POCO_HAVE_INT64)
+	[[nodiscard]]
 	static Int64 flipBytes(Int64 value);
+	[[nodiscard]]
 	static UInt64 flipBytes(UInt64 value);
 #endif
 
+	[[nodiscard]]
 	static Int8 toBigEndian(Int8 value);
+	[[nodiscard]]
 	static UInt8 toBigEndian(UInt8 value);
+	[[nodiscard]]
 	static Int16 toBigEndian(Int16 value);
+	[[nodiscard]]
 	static UInt16 toBigEndian (UInt16 value);
+	[[nodiscard]]
 	static Int32 toBigEndian(Int32 value);
+	[[nodiscard]]
 	static UInt32 toBigEndian (UInt32 value);
 #if defined(POCO_HAVE_INT64)
+	[[nodiscard]]
 	static Int64 toBigEndian(Int64 value);
+	[[nodiscard]]
 	static UInt64 toBigEndian (UInt64 value);
 #endif
 
+	[[nodiscard]]
 	static Int8 fromBigEndian(Int8 value);
+	[[nodiscard]]
 	static UInt8 fromBigEndian(UInt8 value);
+	[[nodiscard]]
 	static Int16 fromBigEndian(Int16 value);
+	[[nodiscard]]
 	static UInt16 fromBigEndian (UInt16 value);
+	[[nodiscard]]
 	static Int32 fromBigEndian(Int32 value);
+	[[nodiscard]]
 	static UInt32 fromBigEndian (UInt32 value);
 #if defined(POCO_HAVE_INT64)
+	[[nodiscard]]
 	static Int64 fromBigEndian(Int64 value);
+	[[nodiscard]]
 	static UInt64 fromBigEndian (UInt64 value);
 #endif
-
+	
+	[[nodiscard]]
 	static Int8 toLittleEndian(Int8 value);
+	[[nodiscard]]
 	static UInt8 toLittleEndian(UInt8 value);
+	[[nodiscard]]
 	static Int16 toLittleEndian(Int16 value);
+	[[nodiscard]]
 	static UInt16 toLittleEndian (UInt16 value);
+	[[nodiscard]]
 	static Int32 toLittleEndian(Int32 value);
+	[[nodiscard]]
 	static UInt32 toLittleEndian (UInt32 value);
 #if defined(POCO_HAVE_INT64)
+	[[nodiscard]]
 	static Int64 toLittleEndian(Int64 value);
+	[[nodiscard]]
 	static UInt64 toLittleEndian (UInt64 value);
 #endif
 
+	[[nodiscard]]
 	static Int8 fromLittleEndian(Int8 value);
+	[[nodiscard]]
 	static UInt8 fromLittleEndian(UInt8 value);
+	[[nodiscard]]
 	static Int16 fromLittleEndian(Int16 value);
+	[[nodiscard]]
 	static UInt16 fromLittleEndian (UInt16 value);
+	[[nodiscard]]
 	static Int32 fromLittleEndian(Int32 value);
+	[[nodiscard]]
 	static UInt32 fromLittleEndian (UInt32 value);
 #if defined(POCO_HAVE_INT64)
+	[[nodiscard]]
 	static Int64 fromLittleEndian(Int64 value);
+	[[nodiscard]]
 	static UInt64 fromLittleEndian (UInt64 value);
 #endif
 
+	[[nodiscard]]
 	static Int8 toNetwork(Int8 value);
+	[[nodiscard]]
 	static UInt8 toNetwork(UInt8 value);
+	[[nodiscard]]
 	static Int16 toNetwork(Int16 value);
+	[[nodiscard]]
 	static UInt16 toNetwork (UInt16 value);
+	[[nodiscard]]
 	static Int32 toNetwork(Int32 value);
+	[[nodiscard]]
 	static UInt32 toNetwork (UInt32 value);
 #if defined(POCO_HAVE_INT64)
+	[[nodiscard]]
 	static Int64 toNetwork(Int64 value);
+	[[nodiscard]]
 	static UInt64 toNetwork (UInt64 value);
 #endif
 
+	[[nodiscard]]
 	static Int8 fromNetwork(Int8 value);
+	[[nodiscard]]
 	static UInt8 fromNetwork(UInt8 value);
+	[[nodiscard]]
 	static Int16 fromNetwork(Int16 value);
+	[[nodiscard]]
 	static UInt16 fromNetwork (UInt16 value);
+	[[nodiscard]]
 	static Int32 fromNetwork(Int32 value);
+	[[nodiscard]]
 	static UInt32 fromNetwork (UInt32 value);
 #if defined(POCO_HAVE_INT64)
+	[[nodiscard]]
 	static Int64 fromNetwork(Int64 value);
+	[[nodiscard]]
 	static UInt64 fromNetwork (UInt64 value);
 #endif
 
 private:
-	template<typename T>
+	template <typename T>
 	static T flip(T value)
 	{
 		T flip = value;

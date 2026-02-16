@@ -130,6 +130,7 @@ public:
 		/// The host must not be changed once there is an
 		/// open connection to the server.
 
+	[[nodiscard]]
 	const std::string& getHost() const;
 		/// Returns the host name of the target HTTP server.
 
@@ -139,6 +140,7 @@ public:
 		/// The port number must not be changed once there is an
 		/// open connection to the server.
 
+	[[nodiscard]]
 	Poco::UInt16 getPort() const;
 		/// Returns the port number of the target HTTP server.
 
@@ -177,9 +179,11 @@ public:
 	void setProxyPort(Poco::UInt16 port);
 		/// Sets the port number of the proxy server.
 
+	[[nodiscard]]
 	const std::string& getProxyHost() const;
 		/// Returns the proxy host name.
 
+	[[nodiscard]]
 	Poco::UInt16 getProxyPort() const;
 		/// Returns the proxy port number.
 
@@ -191,6 +195,7 @@ public:
 		/// Sets the username for proxy authentication.
 		/// Only Basic authentication is supported.
 
+	[[nodiscard]]
 	const std::string& getProxyUsername() const;
 		/// Returns the username for proxy authentication.
 
@@ -198,12 +203,14 @@ public:
 		/// Sets the password for proxy authentication.
 		/// Only Basic authentication is supported.
 
+	[[nodiscard]]
 	const std::string& getProxyPassword() const;
 		/// Returns the password for proxy authentication.
 
 	void setProxyConfig(const ProxyConfig& config);
 		/// Sets the proxy configuration.
 
+	[[nodiscard]]
 	const ProxyConfig& getProxyConfig() const;
 		/// Returns the proxy configuration.
 
@@ -217,12 +224,14 @@ public:
 		/// The global proxy configuration should be set at start up, before
 		/// the first HTTPClientSession instance is created.
 
+	[[nodiscard]]
 	static const ProxyConfig& getGlobalProxyConfig();
 		/// Returns the global proxy configuration.
 
 	void setKeepAliveTimeout(const Poco::Timespan& timeout);
 		/// Sets the connection timeout for HTTP connections.
 
+	[[nodiscard]]
 	const Poco::Timespan& getKeepAliveTimeout() const;
 		/// Returns the connection timeout for HTTP connections.
 
@@ -308,10 +317,12 @@ public:
 		/// the request or response stream changes into
 		/// fail or bad state, but not eof state).
 
+	[[nodiscard]]
 	virtual bool secure() const;
 		/// Return true iff the session uses SSL or TLS,
 		/// or false otherwise.
 
+	[[nodiscard]]
 	bool bypassProxy() const;
 		/// Returns true if the proxy should be bypassed
 		/// for the current host.
@@ -333,6 +344,7 @@ protected:
 	std::ostream& sendRequestImpl(const HTTPRequest& request);
 		/// Sends the given HTTPRequest over an existing connection.
 
+	[[nodiscard]]
 	virtual std::string proxyRequestPrefix() const;
 		/// Returns the prefix prepended to the URI for proxy requests
 		/// (e.g., "http://myhost.com").

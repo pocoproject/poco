@@ -42,9 +42,11 @@ public:
 	~Connector() override;
 		/// Destroys the Connector.
 
+	[[nodiscard]]
 	const std::string& name() const override;
 		/// Returns the name associated with this connector.
 
+	[[nodiscard]]
 	Poco::Data::SessionImpl::Ptr createSession(const std::string&  aConnectionString,
 		std::size_t aTimeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT) override;
 		/// Creates a PostgreSQL SessionImpl object and initializes it with the given connectionString.

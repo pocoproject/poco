@@ -990,8 +990,8 @@ void SQLExecutor::internalExtraction()
 	const Column<IntDeq>& col = rset.column<IntDeq>(0);
 	assertTrue (col[0] == 1);
 
-	try { rset.column<IntDeq>(100); fail("must fail"); }
-	catch (Poco::RangeException&) {}
+	try { [[maybe_unused]] const Column<IntDeq>& _ = rset.column<IntDeq>(100); fail("must fail"); }
+	catch ([[maybe_unused]] Poco::RangeException& e) {}
 
 	const Column<IntDeq>& col1 = rset.column<IntDeq>(0);
 	assertTrue ("int0" == col1.name());
@@ -1015,8 +1015,8 @@ void SQLExecutor::internalExtraction()
 	stmt = (*_pSession << "DELETE FROM Vectors", now);
 	rset = stmt;
 
-	try { rset.column<IntDeq>(0); fail("must fail"); }
-	catch (RangeException&) {}
+	try { [[maybe_unused]] const Column<IntDeq>& _ = rset.column<IntDeq>(0); fail("must fail"); }
+	catch ([[maybe_unused]] RangeException& e) {}
 }
 
 

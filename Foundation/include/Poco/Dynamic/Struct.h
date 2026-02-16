@@ -33,6 +33,7 @@ namespace Dynamic {
 
 
 template <typename S, typename I = typename S::ConstIterator>
+[[nodiscard]]
 std::string structToString(const S& data, bool wrap = true)
 	/// Utility function for converting DynamicStruct to std::string.
 	/// Set wrap to false in order to prevent string values wrapping
@@ -102,12 +103,14 @@ public:
 	virtual ~Struct() = default;
 		/// Destroys the Struct.
 
+	[[nodiscard]]
 	inline Var& operator [] (const K& name)
 		/// Returns the Var with the given name, creates an entry if not found.
 	{
 		return _data[name];
 	}
 
+	[[nodiscard]]
 	const Var& operator [] (const K& name) const
 		/// Returns the Var with the given name, throws a
 		/// NotFoundException if the data member is not found.
@@ -117,12 +120,14 @@ public:
 		return it->second;
 	}
 
+	[[nodiscard]]
 	inline bool contains(const K& name) const
 		/// Returns true if the Struct contains a member with the given name
 	{
 		return find(name) != end();
 	}
 
+	[[nodiscard]]
 	inline Iterator find(const K& name)
 		/// Returns an iterator, pointing to the <name,Var> pair containing
 		/// the element, or it returns end() if the member was not found
@@ -130,6 +135,7 @@ public:
 		return _data.find(name);
 	}
 
+	[[nodiscard]]
 	inline ConstIterator find(const K& name) const
 		/// Returns a const iterator, pointing to the <name,Var> pair containing
 		/// the element, or it returns end() if the member was not found
@@ -137,24 +143,28 @@ public:
 		return _data.find(name);
 	}
 
+	[[nodiscard]]
 	inline Iterator end()
 		/// Returns the end iterator for the Struct
 	{
 		return _data.end();
 	}
 
+	[[nodiscard]]
 	inline ConstIterator end() const
 		/// Returns the end const iterator for the Struct
 	{
 		return _data.end();
 	}
 
+	[[nodiscard]]
 	inline Iterator begin()
 		/// Returns the begin iterator for the Struct
 	{
 		return _data.begin();
 	}
 
+	[[nodiscard]]
 	inline ConstIterator begin() const
 		/// Returns the begin const iterator for the Struct
 	{
@@ -208,18 +218,21 @@ public:
 		_data.swap(other._data);
 	}
 
+	[[nodiscard]]
 	inline bool empty() const
 		/// Returns true if the Struct doesn't contain any members
 	{
 		return _data.empty();
 	}
 
+	[[nodiscard]]
 	SizeType size() const
 		/// Returns the number of members the Struct contains
 	{
 		return _data.size();
 	}
 
+	[[nodiscard]]
 	inline NameSet members() const
 		/// Returns a sorted collection containing all member names
 	{
@@ -230,31 +243,34 @@ public:
 		return keys;
 	}
 
+	[[nodiscard]]
 	inline Var getVar(const K& key) const
 		/// Returns the var value of the element with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 	{
 		ConstIterator it = find(key);
-		if(it == end())
+		if (it == end())
 		{
 			throw NotFoundException("Key not found in Struct");
 		}
 		return it->second;
 	}
 
-	template<typename DefT = Var>
+	template <typename DefT = Var>
+	[[nodiscard]]
 	inline Var getVar(const K& key, const DefT& defaultValue) const
 		/// Returns the var value of the element with the given name.
 		/// or defaultValue if none is found.
 	{
 		ConstIterator it = find(key);
-		if(it == end())
+		if (it == end())
 		{
 			return defaultValue;
 		}
 		return it->second;
 	}
 
+	[[nodiscard]]
 	std::string toString(bool wrap = true) const
 		/// Returns the DynamicStruct as string.
 		///
@@ -320,6 +336,7 @@ public:
 
 	~VarHolderImpl() override = default;
 
+	[[nodiscard]]
 	const std::type_info& type() const override
 	{
 		return typeid(ValueType);
@@ -405,61 +422,73 @@ public:
 		throw BadCastException("Struct -> Poco::Timestamp");
 	}
 
+	[[nodiscard]]
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	[[nodiscard]]
 	const ValueType& value() const
 	{
 		return _val;
 	}
 
+	[[nodiscard]]
 	bool isArray() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isStruct() const override
 	{
 		return true;
 	}
 
+	[[nodiscard]]
 	bool isOrdered() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isInteger() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isSigned() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isNumeric() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isString() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	std::size_t size() const override
 	{
 		return _val.size();
 	}
 
+	[[nodiscard]]
 	Var& operator [] (const KeyType& name)
 	{
 		return _val[name];
 	}
 
+	[[nodiscard]]
 	const Var& operator [] (const KeyType& name) const
 	{
 		return _val[name];
@@ -485,6 +514,7 @@ public:
 
 	~VarHolderImpl() override = default;
 
+	[[nodiscard]]
 	const std::type_info& type() const override
 	{
 		return typeid(ValueType);
@@ -570,61 +600,73 @@ public:
 		throw BadCastException("Struct -> Poco::Timestamp");
 	}
 
+	[[nodiscard]]
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	[[nodiscard]]
 	const ValueType& value() const
 	{
 		return _val;
 	}
 
+	[[nodiscard]]
 	bool isArray() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isStruct() const override
 	{
 		return true;
 	}
 
+	[[nodiscard]]
 	bool isOrdered() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isInteger() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isSigned() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isNumeric() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isString() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	std::size_t size() const override
 	{
 		return _val.size();
 	}
 
+	[[nodiscard]]
 	Var& operator [] (const KeyType& name)
 	{
 		return _val[name];
 	}
 
+	[[nodiscard]]
 	const Var& operator [] (const KeyType& name) const
 	{
 		return _val[name];
@@ -650,6 +692,7 @@ public:
 
 	~VarHolderImpl() override = default;
 
+	[[nodiscard]]
 	const std::type_info& type() const override
 	{
 		return typeid(ValueType);
@@ -735,61 +778,73 @@ public:
 		throw BadCastException("Struct -> Poco::Timestamp");
 	}
 
+	[[nodiscard]]
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	[[nodiscard]]
 	const ValueType& value() const
 	{
 		return _val;
 	}
 
+	[[nodiscard]]
 	bool isArray() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isStruct() const override
 	{
 		return true;
 	}
 
+	[[nodiscard]]
 	bool isOrdered() const override
 	{
 		return true;
 	}
 
+	[[nodiscard]]
 	bool isInteger() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isSigned() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isNumeric() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isString() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	std::size_t size() const override
 	{
 		return _val.size();
 	}
 
+	[[nodiscard]]
 	Var& operator [] (const KeyType& name)
 	{
 		return _val[name];
 	}
 
+	[[nodiscard]]
 	const Var& operator [] (const KeyType& name) const
 	{
 		return _val[name];
@@ -815,6 +870,7 @@ public:
 
 	~VarHolderImpl() override = default;
 
+	[[nodiscard]]
 	const std::type_info&type() const override
 	{
 		return typeid(ValueType);
@@ -900,61 +956,73 @@ public:
 		throw BadCastException("Struct -> Poco::Timestamp");
 	}
 
-	VarHolder *clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
+	[[nodiscard]]
+	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	[[nodiscard]]
 	const ValueType& value() const
 	{
 		return _val;
 	}
 
+	[[nodiscard]]
 	bool isArray() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isStruct() const override
 	{
 		return true;
 	}
 
+	[[nodiscard]]
 	bool isOrdered() const override
 	{
 		return true;
 	}
 
+	[[nodiscard]]
 	bool isInteger() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isSigned() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isNumeric() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isString() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	std::size_t size() const override
 	{
 		return _val.size();
 	}
 
+	[[nodiscard]]
 	Var& operator [] (const KeyType& name)
 	{
 		return _val[name];
 	}
 
+	[[nodiscard]]
 	const Var& operator [] (const KeyType& name) const
 	{
 		return _val[name];

@@ -45,6 +45,7 @@ public:
 		/// and deletes the object if the count
 		/// reaches zero.
 
+	[[nodiscard]]
 	int referenceCount() const;
 		/// Returns the reference count.
 
