@@ -9,8 +9,8 @@ namespace Net {
 
 
 TCPReactorServer::TCPReactorServer(int port, TCPServerParams::Ptr pParams)
-	: _threadPool("TCPR", pParams->getAcceptorNum()), _reactors(pParams->getAcceptorNum()), _port(port),
-	  _pParams(pParams)
+	: _threadPool("TCPRA", pParams->getAcceptorNum()), _reactors(pParams->getAcceptorNum()), _port(port),
+	  _pParams(pParams), _stopped(false)
 {
 	for (auto& reactor : _reactors)
 	{
@@ -44,6 +44,10 @@ void TCPReactorServer::setRecvMessageCallback(const RecvMessageCallback& cb)
 
 void TCPReactorServer::stop()
 {
+	if (_stopped.exchange(true))
+	{
+		return;
+	}
 	for (auto& reactor : _reactors)
 	{
 		reactor.stop();

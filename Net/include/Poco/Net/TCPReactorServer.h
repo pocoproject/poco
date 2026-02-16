@@ -6,6 +6,7 @@
 #include "Poco/Net/TCPReactorAcceptor.h"
 #include "Poco/Net/TCPServerParams.h"
 #include "Poco/ThreadPool.h"
+#include <atomic>
 #include <vector>
 
 namespace Poco { namespace Net {
@@ -41,6 +42,7 @@ private:
 	std::vector<ServerSocket>                        _sockets;
 	TCPServerParams::Ptr                             _pParams;
 	int                                              _port;
+	std::atomic<bool>                                _stopped;
 };
 
 }} // namespace Poco::Net
