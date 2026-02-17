@@ -17,6 +17,9 @@
 #include "Poco/Runnable.h"
 #include "Poco/RunnableAdapter.h"
 #include "Poco/Random.h"
+#include <atomic>
+#include <functional>
+#include <vector>
 
 
 using Poco::NotificationQueue;
@@ -220,6 +223,60 @@ void NotificationQueueTest::work()
 }
 
 
+void NotificationQueueTest::testWakeUpAllBeforeWait()
+{
+	// Reproduce lost-wakeup race: wakeUpAll() is called when no thread is
+	// in waitDequeueNotification() yet.  Without the fix, the thread that
+	// subsequently enters the wait blocks forever.
+	const int NUM_THREADS = 3;
+	NotificationQueue queue;
+	std::atomic<int> exited(0);
+
+	// Call wakeUpAll() BEFORE any thread enters the wait.
+	queue.wakeUpAll();
+
+	// Now start threads that call waitDequeueNotification().
+	// They must all return null immediately rather than blocking.
+	auto worker = [&queue, &exited]()
+	{
+		Notification* pNf = queue.waitDequeueNotification();
+		poco_assert(pNf == nullptr);
+		++exited;
+	};
+
+	std::vector<Thread*> threads;
+
+	// Use raw threads to run the lambda via a simple Runnable wrapper
+	struct LambdaRunnable : public Poco::Runnable
+	{
+		std::function<void()> fn;
+		explicit LambdaRunnable(std::function<void()> f) : fn(std::move(f)) {}
+		void run() override { fn(); }
+	};
+
+	std::vector<LambdaRunnable*> runnables;
+	for (int i = 0; i < NUM_THREADS; ++i)
+	{
+		auto* r = new LambdaRunnable(worker);
+		runnables.push_back(r);
+		auto* t = new Thread;
+		threads.push_back(t);
+		t->start(*r);
+	}
+
+	// Wait for threads — with the fix they return immediately.
+	// Without the fix this would hang, so use a generous timeout.
+	for (auto* t : threads)
+	{
+		assertTrue(t->tryJoin(5000));
+		delete t;
+	}
+	for (auto* r : runnables) delete r;
+
+	assertTrue(exited == NUM_THREADS);
+}
+
+
 CppUnit::Test* NotificationQueueTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("NotificationQueueTest");
@@ -229,6 +286,7 @@ CppUnit::Test* NotificationQueueTest::suite()
 	CppUnit_addTest(pSuite, NotificationQueueTest, testWaitDequeue);
 	CppUnit_addTest(pSuite, NotificationQueueTest, testThreads);
 	CppUnit_addTest(pSuite, NotificationQueueTest, testDefaultQueue);
+	CppUnit_addTest(pSuite, NotificationQueueTest, testWakeUpAllBeforeWait);
 
 	return pSuite;
 }
