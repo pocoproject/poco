@@ -244,8 +244,7 @@ void NotificationQueueTest::testWakeUpAllBeforeWait()
 	auto worker = [&queue, &exited]()
 	{
 		Notification* pNf = queue.waitDequeueNotification();
-		poco_assert(pNf == nullptr);
-		++exited;
+		if (!pNf) ++exited;
 	};
 
 	std::vector<Thread*> threads;
@@ -270,13 +269,22 @@ void NotificationQueueTest::testWakeUpAllBeforeWait()
 
 	// Wait for threads — with the fix they return immediately.
 	// Without the fix this would hang, so use a generous timeout.
+	bool allJoined = true;
 	for (auto* t : threads)
 	{
-		assertTrue(t->tryJoin(5000));
-		delete t;
+		if (!t->tryJoin(5000))
+			allJoined = false;
 	}
+	if (!allJoined)
+	{
+		// Unblock any stuck threads before destroying Thread objects.
+		queue.wakeUpAll();
+		for (auto* t : threads) t->join();
+	}
+	for (auto* t : threads) delete t;
 	for (auto* r : runnables) delete r;
 
+	assertTrue(allJoined);
 	assertTrue(exited == NUM_THREADS);
 
 	// Part 2: verify queue is reusable after wakeUpAll().
