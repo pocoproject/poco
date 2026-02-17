@@ -26,7 +26,6 @@ using Poco::NotificationQueue;
 using Poco::Notification;
 using Poco::Thread;
 using Poco::RunnableAdapter;
-using CppUnit::waitForCondition;
 
 
 namespace
@@ -173,7 +172,12 @@ void NotificationQueueTest::testThreads()
 	}
 	// Wait for queue to drain, but always cleanup threads before asserting
 	// to avoid detached threads accessing destroyed Thread objects
-	bool queueEmptied = waitForCondition([&]{ return _queue.empty(); }, 20000);
+	bool queueEmptied = false;
+	for (int i = 0; i < 2000 && !queueEmptied; ++i)
+	{
+		queueEmptied = _queue.empty();
+		if (!queueEmptied) Thread::sleep(10);
+	}
 	Thread::sleep(20);
 	_queue.wakeUpAll();
 	t1.join();
@@ -274,6 +278,48 @@ void NotificationQueueTest::testWakeUpAllBeforeWait()
 	for (auto* r : runnables) delete r;
 
 	assertTrue(exited == NUM_THREADS);
+
+	// Part 2: verify queue is reusable after wakeUpAll().
+	// Enqueuing a notification must reset _wokeUp so that
+	// waitDequeueNotification() blocks and returns the notification
+	// rather than returning nullptr.
+	queue.enqueueNotification(new QTestNotification("after-wakeup"));
+
+	Thread t;
+	std::atomic<bool> gotNotification(false);
+	std::string receivedData;
+	auto reusableWorker = [&queue, &gotNotification, &receivedData]()
+	{
+		Notification* pNf = queue.waitDequeueNotification(5000);
+		if (pNf)
+		{
+			QTestNotification* pTNf = dynamic_cast<QTestNotification*>(pNf);
+			if (pTNf) receivedData = pTNf->data();
+			pNf->release();
+			gotNotification = true;
+		}
+	};
+
+	LambdaRunnable reusableRun(reusableWorker);
+	t.start(reusableRun);
+	assertTrue(t.tryJoin(5000));
+	assertTrue(gotNotification);
+	assertTrue(receivedData == "after-wakeup");
+
+	// Part 3: verify that a blocking wait (no notification queued)
+	// works after the queue has been reused — i.e. _wokeUp is false
+	// and waitDequeueNotification(timeout) times out normally.
+	Thread t2;
+	std::atomic<bool> timedOut(false);
+	auto timeoutWorker = [&queue, &timedOut]()
+	{
+		Notification* pNf = queue.waitDequeueNotification(100);
+		if (!pNf) timedOut = true;
+	};
+	LambdaRunnable timeoutRun(timeoutWorker);
+	t2.start(timeoutRun);
+	assertTrue(t2.tryJoin(5000));
+	assertTrue(timedOut);
 }
 
 
