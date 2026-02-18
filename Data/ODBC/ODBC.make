@@ -51,9 +51,9 @@ SYSLIBS += -L$(POCO_ODBC_LIB)
 ## MinGW
 ##
 ifeq ($(POCO_CONFIG),MinGW)
-# -DODBCVER=0x0300: SQLHandle declaration issue
+# -DODBCVER=0x0350: SQL_GUID type depends on ODBC version 0x0350 (ODBC 3.5)
 # -DNOMINMAX      : MIN/MAX macros defined in windows conflict with libstdc++
-CXXFLAGS += -DODBCVER=0x0300 -DNOMINMAX
+CXXFLAGS += -DODBCVER=0x0350 -DNOMINMAX
 
 ##
 ## unixODBC
