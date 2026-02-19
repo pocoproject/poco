@@ -33,10 +33,13 @@ void HeaderGenerator::generate() const
 	writeHeaderComment(_class.name + ".h");
 	std::string guard = includeGuard(_class.nameSpace, _class.name);
 	stream()
+		<< "#pragma once\n"
 		<< "#ifndef " << guard << "\n"
 		<< "#define " << guard << "\n"
 		<< "\n\n";
-	stream() << "#include \"Poco/ActiveRecord/ActiveRecord.h\"\n";
+	stream() << "#include <Poco/ActiveRecord/ActiveRecord.h>\n";
+	if (!_class.dllExport.empty())
+		writeInclude(_class.nameSpace, "Config"s);
 	for (const auto& ref: _class.references)
 	{
 		writeInclude(_class.nameSpace, ref);
@@ -71,7 +74,10 @@ std::string HeaderGenerator::includeGuard(const std::string& nameSpace, const st
 
 void HeaderGenerator::writeClass() const
 {
-	stream() << "class " << _class.name << ": public ";
+	stream() << "class ";
+	if (!_class.dllExport.empty())
+		stream() << _class.dllExport << " ";
+	stream() << _class.name << ": public ";
 	if (_class.key.empty())
 		stream() << "Poco::ActiveRecord::KeylessActiveRecord";
 	else
@@ -235,7 +241,6 @@ void HeaderGenerator::writeVariables() const
 void HeaderGenerator::writeGetter(const Property& property) const
 {
 	stream() << "\t" << paramType(property) << " " << property.name << "() const;\n";
-
 }
 
 
