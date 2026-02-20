@@ -29,6 +29,7 @@
 #endif
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include <Windows.h>
+#include <direct.h>
 #endif
 
 using Poco::File;
@@ -785,6 +786,55 @@ void FileTest::testGetExecutablePathDirectory()
 }
 
 
+void FileTest::testGetExecutablePathDirectoryShadow()
+{
+	// A directory in CWD with the same name as an executable on PATH
+	// must not shadow the real executable.
+#if defined(POCO_OS_FAMILY_UNIX)
+	std::string exeName("ls");
+#else
+	std::string exeName("hostname");
+#endif
+
+	std::string realPath = File(exeName).getExecutablePath();
+	if (realPath.empty()) return; // skip if exe not found on this system
+
+	std::string savedCwd = Path::current();
+	std::string tmpDir = TemporaryFile::tempName() + Path::separator();
+	File(tmpDir).createDirectories();
+	// Create a directory named like the executable in CWD
+	File(tmpDir + exeName).createDirectories();
+
+	try
+	{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		_chdir(tmpDir.c_str());
+#else
+		chdir(tmpDir.c_str());
+#endif
+		std::string resolved = File(exeName).getExecutablePath();
+		assertFalse (resolved.empty());
+		assertEqual (realPath, resolved);
+	}
+	catch (...)
+	{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		_chdir(savedCwd.c_str());
+#else
+		chdir(savedCwd.c_str());
+#endif
+		File(tmpDir).remove(true);
+		throw;
+	}
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	_chdir(savedCwd.c_str());
+#else
+	chdir(savedCwd.c_str());
+#endif
+	File(tmpDir).remove(true);
+}
+
+
 void FileTest::testGetExecutablePathRelative()
 {
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -994,6 +1044,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathNonExecutable);
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathEmpty);
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathDirectory);
+	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathDirectoryShadow);
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathRelative);
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathPATHEXT);
 #if defined(POCO_OS_FAMILY_UNIX)

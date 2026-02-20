@@ -26,19 +26,6 @@ std::string findInPath(const std::string& name);
 }
 
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
-#include "File_WIN32U.cpp"
-#elif defined(POCO_VXWORKS)
-#include "File_VX.cpp"
-#elif defined(POCO_OS_FAMILY_UNIX)
-#include "File_UNIX.cpp"
-#endif
-#include "Poco/Thread.h"
-
-
-namespace Poco {
-
-
 namespace {
 
 /// Return cached PATH directories as a vector of strings.
@@ -46,6 +33,10 @@ namespace {
 /// Thread-safe: uses mutex to protect cache updates.
 std::vector<std::string> getPathDirectories()
 {
+	using Poco::Environment;
+	using Poco::Path;
+	using Poco::StringTokenizer;
+
 	static std::mutex mutex;
 	static std::string cachedPath;
 	static std::vector<std::string> cachedDirs;
@@ -76,6 +67,19 @@ std::vector<std::string> getPathDirectories()
 }
 
 } // anonymous namespace
+
+
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#include "File_WIN32U.cpp"
+#elif defined(POCO_VXWORKS)
+#include "File_VX.cpp"
+#elif defined(POCO_OS_FAMILY_UNIX)
+#include "File_UNIX.cpp"
+#endif
+#include "Poco/Thread.h"
+
+
+namespace Poco {
 
 
 std::string findInPath(const std::string& name)
