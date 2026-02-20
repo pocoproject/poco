@@ -17,6 +17,8 @@
 #include "Poco/Exception.h"
 #include "Poco/Error.h"
 #include "Poco/Path.h"
+#include "Poco/Environment.h"
+#include "Poco/StringTokenizer.h"
 #include <algorithm>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -90,27 +92,35 @@ std::string FileImpl::getExecutablePathImpl() const
 		Path p(_path);
 		p.makeAbsolute();
 		std::string absPath = p.toString();
-
-		// Optimized: check existence and executability in one stat() call
-		struct stat st;
-		if (::stat(absPath.c_str(), &st) != 0 || !S_ISREG(st.st_mode))
-			return {};
-
-		bool executable;
-		if (st.st_uid == ::geteuid() || ::geteuid() == 0)
-			executable = (st.st_mode & S_IXUSR) != 0;
-		else if (st.st_gid == ::getegid())
-			executable = (st.st_mode & S_IXGRP) != 0;
-		else
-			executable = (st.st_mode & S_IXOTH) != 0;
-
-		return executable ? absPath : std::string();
+		return canExecuteImpl(absPath) ? absPath : std::string();
 	}
 
-	std::string found = findInPath(_path);
-	if (!found.empty() && !canExecuteImpl(found))
-		return {};
-	return found;
+	// Bare name — search CWD then PATH, requiring regular executable file.
+	// Cannot use findInPath() here because it returns the first existing
+	// entry (including directories) with no way to continue searching.
+	{
+		Path curPath(Path::current());
+		curPath.append(_path);
+		curPath.makeAbsolute();
+		std::string absPath = curPath.toString();
+		if (canExecuteImpl(absPath))
+			return absPath;
+	}
+
+	for (const auto& dir : getPathDirectories())
+	{
+		try
+		{
+			Path candidate(dir);
+			candidate.append(_path);
+			candidate.makeAbsolute();
+			std::string absPath = candidate.toString();
+			if (canExecuteImpl(absPath))
+				return absPath;
+		}
+		catch (const Poco::PathSyntaxException&) {}
+	}
+	return {};
 }
 
 
@@ -169,7 +179,9 @@ bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 	if (::stat(absolutePath.c_str(), &st) != 0 || !S_ISREG(st.st_mode))
 		return false;
 
-	if (st.st_uid == ::geteuid() || ::geteuid() == 0)
+	if (::geteuid() == 0)
+		return (st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0;
+	else if (st.st_uid == ::geteuid())
 		return (st.st_mode & S_IXUSR) != 0;
 	else if (st.st_gid == ::getegid())
 		return (st.st_mode & S_IXGRP) != 0;
