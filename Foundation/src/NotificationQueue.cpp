@@ -40,6 +40,7 @@ void NotificationQueue::enqueueNotification(Notification::Ptr pNotification)
 {
 	poco_check_ptr (pNotification);
 	FastMutex::ScopedLock lock(_mutex);
+	_wokeUp = false;
 	if (_waitQueue.empty())
 	{
 		_nfQueue.push_back(std::move(pNotification));
@@ -58,6 +59,7 @@ void NotificationQueue::enqueueUrgentNotification(Notification::Ptr pNotificatio
 {
 	poco_check_ptr (pNotification);
 	FastMutex::ScopedLock lock(_mutex);
+	_wokeUp = false;
 	if (_waitQueue.empty())
 	{
 		_nfQueue.push_front(std::move(pNotification));
@@ -87,6 +89,7 @@ Notification* NotificationQueue::waitDequeueNotification()
 		FastMutex::ScopedLock lock(_mutex);
 		pNf = dequeueOne();
 		if (pNf) return pNf.duplicate();
+		if (_wokeUp) return nullptr;
 		pWI = new WaitInfo;
 		_waitQueue.push_back(pWI);
 	}
@@ -105,6 +108,7 @@ Notification* NotificationQueue::waitDequeueNotification(long milliseconds)
 		FastMutex::ScopedLock lock(_mutex);
 		pNf = dequeueOne();
 		if (pNf) return pNf.duplicate();
+		if (_wokeUp) return nullptr;
 		pWI = new WaitInfo;
 		_waitQueue.push_back(pWI);
 	}
@@ -145,6 +149,7 @@ void NotificationQueue::dispatch(NotificationCenter& notificationCenter)
 void NotificationQueue::wakeUpAll()
 {
 	FastMutex::ScopedLock lock(_mutex);
+	_wokeUp = true;
 	for (auto p: _waitQueue)
 	{
 		p->nfAvailable.set();
