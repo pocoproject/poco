@@ -250,6 +250,9 @@
 	#if __has_include(<cxxabi.h>)
 		#define POCO_HAVE_CXXABI_H
 	#endif
+	#if defined (__MINGW32__) || defined (__MINGW64__)
+		#define POCO_COMPILER_MINGW
+	#endif
 #elif defined(_MSC_VER)
 	#define POCO_COMPILER_MSVC
 #elif defined (__GNUC__)
