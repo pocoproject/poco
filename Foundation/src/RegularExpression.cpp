@@ -154,7 +154,7 @@ int RegularExpression::match(const std::string& subject, std::string::size_type 
 	matches.clear();
 
 	MatchData matchData(reinterpret_cast<pcre2_code*>(_pcre));
-	int rc = pcre2_match(reinterpret_cast<pcre2_code*>(_pcre), reinterpret_cast<PCRE2_SPTR>(subject.c_str()), subject.size(), offset, options & 0xFFFF, matchData, nullptr);
+	int rc = pcre2_match(reinterpret_cast<pcre2_code*>(_pcre), reinterpret_cast<PCRE2_SPTR>(subject.c_str()), subject.size(), offset, matchOptions(options), matchData, nullptr);
 	if (rc == PCRE2_ERROR_NOMATCH)
 	{
 		return 0;

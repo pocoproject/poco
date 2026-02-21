@@ -42,6 +42,7 @@ public:
 	void testSubst5();
 	void testError();
 	void testGroup();
+	void testMatchCaptureGroupCount();
 
 	void setUp();
 	void tearDown();
