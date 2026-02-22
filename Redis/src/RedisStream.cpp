@@ -15,7 +15,6 @@
 
 
 #include "Poco/Redis/RedisStream.h"
-#include "Poco/Exception.h"
 #include <iostream>
 
 
@@ -40,19 +39,11 @@ RedisStreamBuf::~RedisStreamBuf()
 }
 
 
-std::streamsize RedisStreamBuf::readFromDevice(char* buffer, std::streamsize len)
+int RedisStreamBuf::readFromDevice(char* buffer, std::streamsize len)
 {
 	try
 	{
 		return _redis.receiveBytes(buffer, static_cast<int>(len));
-	}
-	catch (Poco::TimeoutException&)
-	{
-		return -1;
-	}
-	catch (Poco::Exception&)
-	{
-		return _redis.getError();
 	}
 	catch (...)
 	{
@@ -61,19 +52,11 @@ std::streamsize RedisStreamBuf::readFromDevice(char* buffer, std::streamsize len
 }
 
 
-std::streamsize RedisStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+int RedisStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	try
 	{
 		return _redis.sendBytes(buffer, static_cast<int>(length));
-	}
-	catch (Poco::TimeoutException&)
-	{
-		return -1;
-	}
-	catch (Poco::Exception&)
-	{
-		return _redis.getError();
 	}
 	catch (...)
 	{
