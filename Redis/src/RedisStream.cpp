@@ -39,7 +39,7 @@ RedisStreamBuf::~RedisStreamBuf()
 }
 
 
-int RedisStreamBuf::readFromDevice(char* buffer, std::streamsize len)
+std::streamsize RedisStreamBuf::readFromDevice(char* buffer, std::streamsize len)
 {
 	try
 	{
@@ -52,7 +52,7 @@ int RedisStreamBuf::readFromDevice(char* buffer, std::streamsize len)
 }
 
 
-int RedisStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize RedisStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	try
 	{
