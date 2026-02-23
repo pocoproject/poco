@@ -131,6 +131,7 @@ public:
 	~AbstractSessionImpl() override = default;
 		/// Destroys the AbstractSessionImpl.
 
+	[[nodiscard]]
 	bool hasFeature(const std::string& name) const override
 		/// Looks a feature up in the features map
 		/// and returns true if there is one.
@@ -156,6 +157,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
+	[[nodiscard]]
 	bool getFeature(const std::string& name) const override
 		/// Looks a feature up in the features map
 		/// and calls the feature's getter, if there is one.
@@ -171,6 +173,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
+	[[nodiscard]]
 	bool hasProperty(const std::string& name) const override
 		/// Looks a property up in the properties map
 		/// and returns true if there is one.
@@ -196,6 +199,7 @@ public:
 		else throw NotSupportedException(name);
 	}
 
+	[[nodiscard]]
 	Poco::Any getProperty(const std::string& name) const override
 		/// Looks a property up in the properties map
 		/// and calls the property's getter, if there is one.
@@ -223,6 +227,7 @@ public:
 		_storage = Poco::RefAnyCast<std::string>(value);
 	}
 
+	[[nodiscard]]
 	Poco::Any getStorage(const std::string& name="") const
 		/// Returns the storage type
 	{
@@ -235,6 +240,7 @@ public:
 		_handle = handle;
 	}
 
+	[[nodiscard]]
 	Poco::Any getHandle(const std::string& name="") const
 		/// Returns the native session handle.
 	{
@@ -247,6 +253,7 @@ public:
 		_bulk = bulk;
 	}
 
+	[[nodiscard]]
 	bool getBulk(const std::string& name="") const
 		/// Returns the execution type
 	{
@@ -265,6 +272,7 @@ public:
 		_emptyStringIsNull = emptyStringIsNull;
 	}
 
+	[[nodiscard]]
 	bool getEmptyStringIsNull(const std::string& name="") const
 		/// Returns the setting for the behavior regarding empty variable
 		/// length strings. See setEmptyStringIsNull(const std::string&, bool)
@@ -286,6 +294,7 @@ public:
 		_forceEmptyString = forceEmptyString;
 	}
 
+	[[nodiscard]]
 	bool getForceEmptyString(const std::string& name="") const
 		/// Returns the setting for the behavior regarding empty variable
 		/// length strings. See setForceEmptyString(const std::string&, bool)
@@ -307,6 +316,7 @@ public:
 	}
 
 
+	[[nodiscard]]
 	bool getSQLParse(const std::string& name = "") const
 		/// Returns the value of the SQL parsing flag.
 	{
@@ -357,6 +367,7 @@ protected:
 		_autoCommit = autoCommit;
 	}
 
+	[[nodiscard]]
 	bool getAutoCommit(const std::string& name = "") const
 		/// Returns the value of the automatic commit flag.
 		/// See setAutoCommit() documentation for more details.

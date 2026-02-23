@@ -103,30 +103,37 @@ public:
 	void setEscapeUnicode(bool escape = true);
 		/// Sets the flag for escaping unicode.
 
+	[[nodiscard]]
 	bool getEscapeUnicode() const;
 		/// Returns the flag for escaping unicode.
 	
 	void setLowercaseHex(bool lowercaseHex);
 		/// Sets the flag for using lowercase hex numbers
 
+	[[nodiscard]]
 	bool getLowercaseHex() const;
 		/// Returns the flag for using lowercase hex numbers
 
+	[[nodiscard]]
 	ValueVec::const_iterator begin() const;
 		/// Returns the begin iterator for values.
 
+	[[nodiscard]]
 	ValueVec::const_iterator end() const;
 		/// Returns the end iterator for values.
 
+	[[nodiscard]]
 	Dynamic::Var get(unsigned int index) const;
 		/// Retrieves the element at the given index.
 		/// Will return an empty value when the element doesn't exist.
 
+	[[nodiscard]]
 	Array::Ptr getArray(unsigned int index) const;
 		/// Retrieves an array. When the element is not
 		/// an Array or doesn't exist, an empty SharedPtr is returned.
 
-	template<typename T>
+	template <typename T>
+	[[nodiscard]]
 	T getElement(unsigned int index) const
 		/// Retrieves an element and tries to convert it to the
 		/// template type. The convert<T> method of
@@ -138,39 +145,50 @@ public:
 		return value.convert<T>();
 	}
 
+	[[nodiscard]]
 	SharedPtr<Object> getObject(unsigned int index) const;
 		/// Retrieves an object. When the element is not
 		/// an object or doesn't exist, an empty SharedPtr is returned.
 
+	[[nodiscard]]
 	std::size_t size() const;
 		/// Returns the size of the array.
 
+	[[nodiscard]]
 	bool empty() const;
  		/// Returns true if the array is empty, false otherwise.
 
+	[[nodiscard]]
 	bool isArray(unsigned int index) const;
 		/// Returns true when the element is an array.
 
+	[[nodiscard]]
 	bool isArray(const Dynamic::Var& value) const;
 		/// Returns true when the element is an array.
 
+	[[nodiscard]]
 	bool isArray(ConstIterator& value) const;
 		/// Returns true when the element is an array.
 
+	[[nodiscard]]
 	bool isNull(unsigned int index) const;
 		/// Returns true when the element is null or
 		/// when the element doesn't exist.
 
+	[[nodiscard]]
 	bool isObject(unsigned int index) const;
 		/// Returns true when the element is an object.
 
+	[[nodiscard]]
 	bool isObject(const Dynamic::Var& value) const;
 		/// Returns true when the element is an object.
 
+	[[nodiscard]]
 	bool isObject(ConstIterator& value) const;
 		/// Returns true when the element is an object.
 
-	template<typename T>
+	template <typename T>
+	[[nodiscard]]
 	T optElement(unsigned int index, const T& def) const
 		/// Returns the element at the given index. When
 		/// the element is null, doesn't exist or can't
@@ -205,9 +223,11 @@ public:
 	void remove(unsigned int index);
 		/// Removes the element on the given index.
 
+	[[nodiscard]]
 	operator const Poco::Dynamic::Array& () const;
 		/// Conversion operator to Dynamic::Array.
 
+	[[nodiscard]]
 	static Poco::Dynamic::Array makeArray(const JSON::Array::Ptr& arr);
 		/// Utility function for creation of array.
 

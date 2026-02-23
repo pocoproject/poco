@@ -40,11 +40,14 @@ public:
 	Cell(const AttributedString& content, FontMapPtr pFontMap, const std::string& encoding = "UTF-8" , bool trueType = true, int widthAsPct=-1);
 	~Cell();
 
+	[[nodiscard]]
 	const std::string& getName() const;
 	void setName(const std::string& name);
+	[[nodiscard]]
 	const AttributedString& getContent() const;
 	void setContent(const AttributedString& content);
-	unsigned getOutline() const;
+	[[nodiscard]]
+	unsigned int getOutline() const;
 	void setOutline(Outline outline, bool show = true);
 	void borderLeft(bool show = true);
 	void borderTop(bool show = true);
@@ -53,13 +56,17 @@ public:
 	void borderTopBottom(bool show = true);
 	void borderLeftRight(bool show = true);
 	void borderAll(bool show = true);
+	[[nodiscard]]
 	float getLineWidth() const;
 	void setLineWidth(float width);
 	void setFonts(FontMapPtr pFontMap);
+	[[nodiscard]]
 	FontMapPtr getFonts() const { return _pFontMap; }
 	void draw(Page& page, float x, float y, float width, float height);
+	[[nodiscard]]
 	int getWidthAsPct() const;
 	void setWidthAsPct(int width);
+	[[nodiscard]]
 	bool hasWidth() const;
 
 private:

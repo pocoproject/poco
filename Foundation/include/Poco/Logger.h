@@ -82,6 +82,7 @@ class Foundation_API Logger: public Channel
 public:
 	using Ptr = AutoPtr<Logger>;
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// Returns the name of the logger, which is set as the
 		/// message source on all messages created by the logger.
@@ -89,6 +90,7 @@ public:
 	void setChannel(Channel::Ptr pChannel);
 		/// Attaches the given Channel to the Logger.
 
+	[[nodiscard]]
 	Channel::Ptr getChannel() const;
 		/// Returns the Channel attached to the logger.
 
@@ -99,6 +101,7 @@ public:
 		/// Setting the log level to zero turns off
 		/// logging for that Logger.
 
+	[[nodiscard]]
 	int getLevel() const;
 		/// Returns the Logger's log level.
 
@@ -335,48 +338,61 @@ public:
 		/// followed by the same sixteen bytes as ASCII characters.
 		/// For bytes outside the range 32 .. 127, a dot is printed.
 
+	[[nodiscard]]
 	bool is(int level) const;
 		/// Returns true if at least the given log level is set.
 
+	[[nodiscard]]
 	bool fatal() const;
 		/// Returns true if the log level is at least PRIO_FATAL.
 
+	[[nodiscard]]
 	bool critical() const;
 		/// Returns true if the log level is at least PRIO_CRITICAL.
 
+	[[nodiscard]]
 	bool error() const;
 		/// Returns true if the log level is at least PRIO_ERROR.
 
+	[[nodiscard]]
 	bool warning() const;
 		/// Returns true if the log level is at least PRIO_WARNING.
 
+	[[nodiscard]]
 	bool notice() const;
 		/// Returns true if the log level is at least PRIO_NOTICE.
 
+	[[nodiscard]]
 	bool information() const;
 		/// Returns true if the log level is at least PRIO_INFORMATION.
 
+	[[nodiscard]]
 	bool debug() const;
 		/// Returns true if the log level is at least PRIO_DEBUG.
 
+	[[nodiscard]]
 	bool trace() const;
 		/// Returns true if the log level is at least PRIO_TRACE.
 
+	[[nodiscard]]
 	static std::string format(const std::string& fmt, const std::string& arg);
 		/// Replaces all occurrences of $0 in fmt with the string given in arg and
 		/// returns the result. To include a dollar sign in the result string,
 		/// specify two dollar signs ($$) in the format string.
 
+	[[nodiscard]]
 	static std::string format(const std::string& fmt, const std::string& arg0, const std::string& arg1);
 		/// Replaces all occurrences of $<n> in fmt with the string given in arg<n> and
 		/// returns the result. To include a dollar sign in the result string,
 		/// specify two dollar signs ($$) in the format string.
 
+	[[nodiscard]]
 	static std::string format(const std::string& fmt, const std::string& arg0, const std::string& arg1, const std::string& arg2);
 		/// Replaces all occurrences of $<n> in fmt with the string given in arg<n> and
 		/// returns the result. To include a dollar sign in the result string,
 		/// specify two dollar signs ($$) in the format string.
 
+	[[nodiscard]]
 	static std::string format(const std::string& fmt, const std::string& arg0, const std::string& arg1, const std::string& arg2, const std::string& arg3);
 		/// Replaces all occurrences of $<n> in fmt with the string given in arg<n> and
 		/// returns the result. To include a dollar sign in the result string,
@@ -398,11 +414,13 @@ public:
 		/// Sets or changes a configuration property for all loggers
 		/// that are descendants of the Logger with the given name.
 
+	[[nodiscard]]
 	static Logger& get(const std::string& name);
 		/// Returns a reference to the Logger with the given name.
 		/// If the Logger does not yet exist, it is created, based
 		/// on its parent logger.
 
+	[[nodiscard]]
 	static Logger& unsafeGet(const std::string& name);
 		/// Returns a reference to the Logger with the given name.
 		/// If the Logger does not yet exist, it is created, based
@@ -413,15 +431,18 @@ public:
 		/// The only time this method should be used is during
 		/// program initialization, when only one thread is running.
 
+	[[nodiscard]]
 	static Logger& create(const std::string& name, Channel::Ptr pChannel, int level = Message::PRIO_INFORMATION);
 		/// Creates and returns a reference to a Logger with the
 		/// given name. The Logger's Channel and log level as set as
 		/// specified.
 
+	[[nodiscard]]
 	static Logger& root();
 		/// Returns a reference to the root logger, which is the ultimate
 		/// ancestor of all Loggers.
 
+	[[nodiscard]]
 	static Ptr has(const std::string& name);
 		/// Returns a pointer to the Logger with the given name if it
 		/// exists, or a null pointer otherwise.
@@ -441,6 +462,7 @@ public:
 		/// Fills the given vector with the names
 		/// of all currently defined loggers.
 
+	[[nodiscard]]
 	static int parseLevel(const std::string& level);
 		/// Parses a symbolic log level from a string and
 		/// returns the resulting numeric level.
@@ -473,9 +495,12 @@ protected:
 	void log(const std::string& text, Message::Priority prio, const char* file, LineNumber line);
 	void log(std::string&& text, Message::Priority prio, const char* file, LineNumber line);
 
+	[[nodiscard]]
 	static std::string format(const std::string& fmt, int argc, std::string argv[]);
+	[[nodiscard]]
 	static Logger& parent(const std::string& name);
 	static void add(Ptr pLogger);
+	[[nodiscard]]
 	static Ptr find(const std::string& name);
 
 private:

@@ -49,6 +49,7 @@ public:
 	~UUIDGenerator();
 		/// Destroys the UUIDGenerator.
 
+	[[nodiscard]]
 	UUID create();
 		/// Creates a new time-based UUID, using the MAC address of
 		/// one of the system's ethernet adapters.
@@ -56,9 +57,11 @@ public:
 		/// Throws a SystemException if no MAC address can be
 		/// obtained.
 
+	[[nodiscard]]
 	UUID createFromName(const UUID& nsid, const std::string& name);
 		/// Creates a name-based UUID.
 
+	[[nodiscard]]
 	UUID createFromName(const UUID& nsid, const std::string& name, DigestEngine& de);
 		/// Creates a name-based UUID, using the given digest engine.
 		///
@@ -66,12 +69,15 @@ public:
 		/// must be either an instance of MD5Engine or SHA1Engine. The version field of
 		/// the UUID will be set accordingly.
 
+	[[nodiscard]]
 	UUID createFromName(const UUID& nsid, const std::string& name, DigestEngine& de, UUID::Version version);
 		/// Creates a name-based UUID, using the given digest engine and version.
 
+	[[nodiscard]]
 	UUID createRandom();
 		/// Creates a random UUID.
 
+	[[nodiscard]]
 	UUID createOne();
 		/// Tries to create and return a time-based UUID (see create()), and,
 		/// if that does not work due to the unavailability of a MAC address,
@@ -80,10 +86,12 @@ public:
 		/// The UUID::version() method can be used to determine the actual kind of
 		/// the UUID generated.
 
+	[[nodiscard]]
 	UUID createV6();
 		/// Creates a time-based version 6 UUID (according to RFC 9562) with a MAC address. 
 		/// If no MAC address is available, a random MAC address will be generated.
 
+	[[nodiscard]]
 	UUID createV7();
 		/// Creates a time-based version 7 UUID (according to RFC 9652).
 
@@ -94,10 +102,12 @@ public:
 		/// Seeds the internal pseudo random generator used for time-based UUIDs
 		/// with a random seed obtained from a RandomInputStream.
 
+	[[nodiscard]]
 	static UUIDGenerator& defaultGenerator();
 		/// Returns a reference to the default UUIDGenerator.
 
 protected:
+	[[nodiscard]]
 	Timestamp::UtcTimeVal timeStamp();
 
 private:

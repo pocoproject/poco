@@ -66,9 +66,11 @@ public:
 	~TreeWalker();
 		/// Destroys the TreeWalker.
 
+	[[nodiscard]]
 	Node* root() const;
 		/// The root node of the TreeWalker, as specified when it was created.
 
+	[[nodiscard]]
 	unsigned long whatToShow() const;
 		/// This attribute determines which node types are presented via the TreeWalker.
 		/// The available set of constants is defined in the NodeFilter interface. Nodes
@@ -76,9 +78,11 @@ public:
 		/// be considered. Note that this skip takes precedence over the filter, if
 		/// any.
 
+	[[nodiscard]]
 	NodeFilter* filter() const;
 		/// The NodeFilter used to screen nodes.
 
+	[[nodiscard]]
 	bool expandEntityReferences() const;
 		/// The value of this flag determines whether the children of entity reference
 		/// nodes are visible to the iterator. If false, they and their descendants
@@ -97,6 +101,7 @@ public:
 		/// This implementation does not support entity reference expansion and
 		/// thus always returns false.
 
+	[[nodiscard]]
 	Node* currentNode() const;
 		/// The node at which the TreeWalker is currently positioned.
 		/// Alterations to the DOM tree may cause the current node to no longer be accepted
@@ -107,44 +112,52 @@ public:
 		/// view, by applying the filters in the requested direction; if no traversal
 		/// is possible, currentNode is not changed.
 
+	[[nodiscard]]
 	Node* getCurrentNode() const;
 		/// See currentNode().
 
 	void setCurrentNode(Node* pNode);
 		/// Sets the current node.
 
+	[[nodiscard]]
 	Node* parentNode();
 		/// Moves to and returns the closest visible ancestor node of the current node.
 		/// If the search for parentNode attempts to step upward from the TreeWalker's
 		/// root node, or if it fails to find a visible ancestor node, this method retains
 		/// the current position and returns null.
 
+	[[nodiscard]]
 	Node* firstChild();
 		/// Moves the TreeWalker to the first visible child of the current node, and
 		/// returns the new node. If the current node has no visible children, returns
 		/// null, and retains the current node.
 
+	[[nodiscard]]
 	Node* lastChild();
 		/// Moves the TreeWalker to the last visible child of the current node, and
 		/// returns the new node. If the current node has no visible children, returns
 		/// null, and retains the current node.
 
+	[[nodiscard]]
 	Node* previousSibling();
 		/// Moves the TreeWalker to the previous sibling of the current node, and returns
 		/// the new node. If the current node has no visible previous sibling, returns
 		/// null, and retains the current node.
 
+	[[nodiscard]]
 	Node* nextSibling();
 		/// Moves the TreeWalker to the next sibling of the current node, and returns
 		/// the new node. If the current node has no visible next sibling, returns null,
 		/// and retains the current node.
 
+	[[nodiscard]]
 	Node* previousNode();
 		/// Moves the TreeWalker to the previous visible node in document order relative
 		/// to the current node, and returns the new node. If the current node has no
 		/// previous node, or if the search for previousNode attempts to step upward
 		/// from the TreeWalker's root node, returns null, and retains the current node.
 
+	[[nodiscard]]
 	Node* nextNode();
 		/// Moves the TreeWalker to the next visible node in document order relative
 		/// to the current node, and returns the new node. If the current node has no
@@ -153,7 +166,9 @@ public:
 
 protected:
 	int accept(Node* pNode) const;
+	[[nodiscard]]
 	Node* next(Node* pNode) const;
+	[[nodiscard]]
 	Node* previous(Node* pNode) const;
 
 private:

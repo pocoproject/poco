@@ -63,6 +63,7 @@ public:
 		/// Decrements the reference count and deletes the object if the reference count reaches zero.
 
 protected:
+	[[nodiscard]]
 	unsigned long hash(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName);
 	~NamePool();
 

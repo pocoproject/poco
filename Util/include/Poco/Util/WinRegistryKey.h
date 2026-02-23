@@ -83,6 +83,7 @@ public:
 		/// Sets the string value (REG_SZ) with the given name.
 		/// An empty name denotes the default value.
 
+	[[nodiscard]]
 	std::string getString(const std::string& name);
 		/// Returns the string value (REG_SZ) with the given name.
 		/// An empty name denotes the default value.
@@ -93,6 +94,7 @@ public:
 		/// Sets the expandable string value (REG_EXPAND_SZ) with the given name.
 		/// An empty name denotes the default value.
 
+	[[nodiscard]]
 	std::string getStringExpand(const std::string& name);
 		/// Returns the string value (REG_EXPAND_SZ) with the given name.
 		/// An empty name denotes the default value.
@@ -105,6 +107,7 @@ public:
 		/// Sets the string value (REG_BINARY) with the given name.
 		/// An empty name denotes the default value.
 
+	[[nodiscard]]
 	std::vector<char> getBinary(const std::string& name);
 		/// Returns the string value (REG_BINARY) with the given name.
 		/// An empty name denotes the default value.
@@ -115,6 +118,7 @@ public:
 		/// Sets the numeric (REG_DWORD) value with the given name.
 		/// An empty name denotes the default value.
 
+	[[nodiscard]]
 	int getInt(const std::string& name);
 		/// Returns the numeric value (REG_DWORD) with the given name.
 		/// An empty name denotes the default value.
@@ -127,6 +131,7 @@ public:
 		/// Sets the numeric (REG_QWORD) value with the given name.
 		/// An empty name denotes the default value.
 
+	[[nodiscard]]
 	Poco::Int64 getInt64(const std::string& name);
 		/// Returns the numeric value (REG_QWORD) with the given name.
 		/// An empty name denotes the default value.
@@ -143,12 +148,15 @@ public:
 	void deleteKey();
 		/// Recursively deletes the key and all subkeys.
 
+	[[nodiscard]]
 	bool exists();
 		/// Returns true iff the key exists.
 
+	[[nodiscard]]
 	Type type(const std::string& name);
 		/// Returns the type of the key value.
 
+	[[nodiscard]]
 	bool exists(const std::string& name);
 		/// Returns true iff the given value exists under that key.
 
@@ -158,14 +166,18 @@ public:
 	void values(Values& vals);
 		/// Appends all value names to vals;
 
+	[[nodiscard]]
 	bool isReadOnly() const;
 		/// Returns true iff the key has been opened for read-only access only.
 
 protected:
 	void open();
 	void close();
+	[[nodiscard]]
 	std::string key() const;
+	[[nodiscard]]
 	std::string key(const std::string& valueName) const;
+	[[nodiscard]]
 	HKEY handle();
 	void handleSetError(const std::string& name);
 	static HKEY handleFor(const std::string& rootKey);

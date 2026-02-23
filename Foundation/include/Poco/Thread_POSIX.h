@@ -61,42 +61,59 @@ public:
 	ThreadImpl();
 	~ThreadImpl();
 
+	[[nodiscard]]
 	TIDImpl tidImpl() const;
 	void setNameImpl(const std::string& threadName);
+	[[nodiscard]]
 	std::string getNameImpl() const;
 #ifndef POCO_NO_THREADNAME
+	[[nodiscard]]
 	std::string getOSThreadNameImpl();
 		/// Returns the thread's name, expressed as an operating system
 		/// specific name value. Return empty string if thread is not running.
 		/// For test used only.
 #endif
 	void setPriorityImpl(int prio);
+	[[nodiscard]]
 	int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio, int policy = SCHED_OTHER);
+	[[nodiscard]]
 	int getOSPriorityImpl() const;
+	[[nodiscard]]
 	static int getMinOSPriorityImpl(int policy);
+	[[nodiscard]]
 	static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
+	[[nodiscard]]
 	int getStackSizeImpl() const;
 	void setSignalMaskImpl(uint32_t sigMask);
 	void startImpl(SharedPtr<Runnable> pTarget);
 	void joinImpl();
 	bool joinImpl(long milliseconds);
+	[[nodiscard]]
 	bool isRunningImpl() const;
 	static void yieldImpl();
+	[[nodiscard]]
 	static ThreadImpl* currentImpl();
+	[[nodiscard]]
 	static TIDImpl currentTidImpl();
+	[[nodiscard]]
 	static long currentOsTidImpl();
 #ifndef POCO_NO_THREADNAME
 	static void setCurrentNameImpl(const std::string& name);
+	[[nodiscard]]
 	static std::string getCurrentNameImpl();
 #endif
 	bool setAffinityImpl(int coreID);
+	[[nodiscard]]
 	int getAffinityImpl() const;
 
 protected:
+	[[nodiscard]]
 	static void* runnableEntry(void* pThread);
+	[[nodiscard]]
 	static int mapPrio(int prio, int policy = SCHED_OTHER);
+	[[nodiscard]]
 	static int reverseMapPrio(int osPrio, int policy = SCHED_OTHER);
 
 private:
@@ -112,6 +129,7 @@ private:
 		{
 			pthread_key_delete(_key);
 		}
+		[[nodiscard]]
 		ThreadImpl* get() const
 		{
 			return reinterpret_cast<ThreadImpl*>(pthread_getspecific(_key));

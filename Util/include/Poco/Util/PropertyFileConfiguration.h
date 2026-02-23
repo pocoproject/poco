@@ -89,6 +89,7 @@ protected:
 
 private:
 	void parseLine(std::istream& istr);
+	[[nodiscard]]
 	static int readChar(std::istream& istr);
 };
 

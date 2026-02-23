@@ -61,11 +61,14 @@ public:
 	void addParameter(Parameter* pParam);
 		/// Adds a parameter to the function.
 
+	[[nodiscard]]
 	const std::string& getReturnParameter() const;
 
+	[[nodiscard]]
 	Iterator begin() const;
 		/// Returns an iterator for iterating over the Function's Parameter's.
 
+	[[nodiscard]]
 	Iterator end() const;
 		/// Returns an iterator for iterating over the Function's Parameter's.
 
@@ -93,52 +96,67 @@ public:
 	void makeDelete();
 		/// Sets the FN_DELETE flag.
 
+	[[nodiscard]]
 	int flags() const;
 		/// Returns the function's flags.
 
+	[[nodiscard]]
 	bool isConstructor() const;
 		/// Returns true iff the function is a constructor.
 
+	[[nodiscard]]
 	bool isDestructor() const;
 		/// Returns true iff the function is a destructor.
 
+	[[nodiscard]]
 	bool isMethod() const;
 		/// Returns true iff the function is a method (it's part of
 		/// a Struct and it's neither a constructor nor a destructor).
 
+	[[nodiscard]]
 	bool isFunction() const;
 		/// Returns true iff the function is not a member of a class
 		/// (a freestanding function).
 
+	[[nodiscard]]
 	bool isConst() const;
 		/// Returns true iff the method is const.
 
+	[[nodiscard]]
 	bool isDefault() const;
 		/// Returns true iff the method has a default implementation.
 
+	[[nodiscard]]
 	bool isDeleted() const;
 		/// Returns true iff the method has been deleted.
 
+	[[nodiscard]]
 	bool isVirtual() const;
 		/// Returns true if the method is virtual. Also examines base
 		/// classes to check for a virtual function with the same
 		/// signature.
 
+	[[nodiscard]]
 	bool isStatic() const;
 		/// Returns true iff the method is static.
 
+	[[nodiscard]]
 	int countParameters() const;
 		/// Returns the number of parameters.
 
+	[[nodiscard]]
 	std::string signature() const;
 		/// Returns the signature of the function.
 
+	[[nodiscard]]
 	Function* getOverridden() const;
 		/// If the function is virtual and overrides a function in a
 		/// base class, the base class function is returned.
 		/// Otherwise, null is returned.
 
+	[[nodiscard]]
 	Symbol::Kind kind() const;
+	[[nodiscard]]
 	std::string toString() const;
 
 private:

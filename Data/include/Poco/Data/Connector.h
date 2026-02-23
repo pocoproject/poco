@@ -41,9 +41,11 @@ public:
 	virtual ~Connector();
 		/// Destroys the Connector.
 
+	[[nodiscard]]
 	virtual const std::string& name() const = 0;
 		/// Returns the name associated with this connector.
 
+	[[nodiscard]]
 	virtual Poco::AutoPtr<SessionImpl> createSession(const std::string& connectionString,
 		std::size_t timeout = SessionImpl::LOGIN_TIMEOUT_DEFAULT) = 0;
 		/// Create a SessionImpl object and initialize it with the given connectionString.

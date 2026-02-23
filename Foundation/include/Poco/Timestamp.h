@@ -83,11 +83,17 @@ public:
 	void update();
 		/// Updates the Timestamp with the current time.
 
+	[[nodiscard]]
 	bool operator == (const Timestamp& ts) const;
+	[[nodiscard]]
 	bool operator != (const Timestamp& ts) const;
+	[[nodiscard]]
 	bool operator >  (const Timestamp& ts) const;
+	[[nodiscard]]
 	bool operator >= (const Timestamp& ts) const;
+	[[nodiscard]]
 	bool operator <  (const Timestamp& ts) const;
+	[[nodiscard]]
 	bool operator <= (const Timestamp& ts) const;
 
 	Timestamp  operator +  (TimeDiff d) const;
@@ -100,47 +106,57 @@ public:
 	Timestamp& operator -= (TimeDiff d);
 	Timestamp& operator -= (const Timespan& span);
 
+	[[nodiscard]]
 	std::time_t epochTime() const;
 		/// Returns the timestamp expressed in time_t.
 		/// time_t base time is midnight, January 1, 1970.
 		/// Resolution is one second.
 
+	[[nodiscard]]
 	UtcTimeVal utcTime() const;
 		/// Returns the timestamp expressed in UTC-based
 		/// time. UTC base time is midnight, October 15, 1582.
 		/// Resolution is 100 nanoseconds.
 
+	[[nodiscard]]
 	TimeVal epochMicroseconds() const;
 		/// Returns the timestamp expressed in microseconds
 		/// since the Unix epoch, midnight, January 1, 1970.
 
+	[[nodiscard]]
 	TimeDiff elapsed() const;
 		/// Returns the time elapsed since the time denoted by
 		/// the timestamp. Equivalent to Timestamp() - *this.
 
+	[[nodiscard]]
 	bool isElapsed(TimeDiff interval) const;
 		/// Returns true iff the given interval has passed
 		/// since the time denoted by the timestamp.
 
+	[[nodiscard]]
 	TimeVal raw() const;
 		/// Returns the raw time value.
 		///
 		/// Same as epochMicroseconds().
 
+	[[nodiscard]]
 	static Timestamp fromEpochTime(std::time_t t);
 		/// Creates a timestamp from a std::time_t.
 
+	[[nodiscard]]
 	static Timestamp fromUtcTime(UtcTimeVal val);
 		/// Creates a timestamp from a UTC time value
 		/// (100 nanosecond intervals since midnight,
 		/// October 15, 1582).
 
+	[[nodiscard]]
 	static constexpr TimeDiff resolution();
 		/// Returns the resolution in units per second.
 		/// Since the timestamp has microsecond resolution,
 		/// the returned value is always 1000000.
 
 #if defined(_WIN32)
+	[[nodiscard]]
 	static Timestamp fromFileTimeNP(UInt32 fileTimeLow, UInt32 fileTimeHigh);
 	void toFileTimeNP(UInt32& fileTimeLow, UInt32& fileTimeHigh) const;
 #endif

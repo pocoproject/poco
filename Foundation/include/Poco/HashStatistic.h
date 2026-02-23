@@ -41,31 +41,39 @@ public:
 	virtual ~HashStatistic();
 		/// Destroys the HashStatistic.
 
+	[[nodiscard]]
 	UInt32 maxPositionsOfTable() const;
 		/// Returns the maximum number of different hash values possible for the table
 
+	[[nodiscard]]
 	UInt32 numberOfEntries() const;
 		/// Returns the total number of entries currently stored in the HashTable
 
+	[[nodiscard]]
 	UInt32 numberOfZeroPositions() const;
 		/// Returns the number of hash positions that contain no entry.
 
+	[[nodiscard]]
 	double avgEntriesPerHash() const;
 		/// Returns the average number of entries per position in the Hashtable, the higher this value the less efficient
 		/// performs hashing. If a large value is returned and getNumberOfZeroPositions also returns a large value, this
 		/// indicates an inefficient hashing function. If the number of zero entries is low, resizing the HashTable, should
 		/// be enough to improve performance
 
+	[[nodiscard]]
 	double avgEntriesPerHashExclZeroEntries() const;
 		/// Same as getAvgEntriesPerHash but hash values that contain no entry are ignored,
 		/// getAvgEntriesPerHashExclZeroEntries >= getAvgEntriesPerHash will always be true.
 
+	[[nodiscard]]
 	UInt32 maxEntriesPerHash() const;
 		/// Returns the maximum number of entries per hash value found in the current table.
 
+	[[nodiscard]]
 	const std::vector<UInt32> detailedEntriesPerHash() const;
 		/// Will either be an empty vector or will contain for each possible hash value, the number of entries currently stored
 
+	[[nodiscard]]
 	std::string toString() const;
 		/// Converts the whole data structure into a string.
 

@@ -220,112 +220,111 @@ void NumberParserTest::testParseError()
 
 	try
 	{
-		NumberParser::parse("");
-		NumberParser::parseBool("");
+		[[maybe_unused]] int i = NumberParser::parse("");
+		[[maybe_unused]] bool b = NumberParser::parseBool("");
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 
 	try
 	{
-		NumberParser::parse(" ");
-		NumberParser::parseBool("");
+		[[maybe_unused]] int i = NumberParser::parse(" ");
+		[[maybe_unused]] bool b = NumberParser::parseBool(" ");
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 
 	try
 	{
-		NumberParser::parse(" 123");
-		NumberParser::parseBool("");
+		[[maybe_unused]] int i = NumberParser::parse(" 123");
+		[[maybe_unused]] bool b = NumberParser::parseBool("");
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 
 	try
 	{
-		NumberParser::parse("1 1");
-		NumberParser::parseBool("");
+		[[maybe_unused]] int i = NumberParser::parse("1 1");
+		[[maybe_unused]] bool b = NumberParser::parseBool("");
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 
 	try
 	{
-		NumberParser::parse("asd");
-		NumberParser::parseBool("asd");
+		[[maybe_unused]] int i = NumberParser::parse("asd");
+		[[maybe_unused]] bool b = NumberParser::parseBool("asd");
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 
 	try
 	{
-		NumberParser::parseUnsigned("a123");
+		[[maybe_unused]] unsigned int u = NumberParser::parseUnsigned("a123");
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 
 	try
 	{
-		NumberParser::parseUnsigned("-123");
+		[[maybe_unused]] unsigned int u = NumberParser::parseUnsigned("-123");
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 
 	try
 	{
-		NumberParser::parseHex("z23");
+		[[maybe_unused]] unsigned int u = NumberParser::parseHex("z23");
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 
 	try
 	{
-		NumberParser::parseHex("23z");
+		[[maybe_unused]] unsigned int u = NumberParser::parseHex("23z");
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 
 #if defined(POCO_HAVE_INT64)
 
 	try
 	{
-		NumberParser::parse64("asd");
+		[[maybe_unused]] Int64 i = NumberParser::parse64("asd");
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 
 	try
 	{
-		NumberParser::parseUnsigned64("");
+		[[maybe_unused]] UInt64 u = NumberParser::parseUnsigned64("");
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 
 	try
 	{
-		NumberParser::parseHex64("zaz");
+		[[maybe_unused]] UInt64 u = NumberParser::parseHex64("zaz");
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 
 	try
 	{
-		NumberParser::parseHex64("12345z");
+		[[maybe_unused]] UInt64 u = NumberParser::parseHex64("12345z");
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 
 	try
 	{
-		NumberParser::parseHex64(format("123%c45", ts));
+		[[maybe_unused]] UInt64 u = NumberParser::parseHex64(format("123%c45", ts));
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 
 #endif // POCO_HAVE_INT64
 
 #ifndef POCO_NO_FPENVIRONMENT
 	try
 	{
-		NumberParser::parseFloat(format("a12%c3", dp));
+		[[maybe_unused]] double d = NumberParser::parseFloat(format("a12%c3", dp));
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
-
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 #endif // POCO_NO_FPENVIRONMENT
 
 	try
 	{
 		const char test[] = { char(-23), char(-108), char(-103), char(-24), char(-81), char(-81), 0 };
-		Poco::NumberParser::parse(test);
+		[[maybe_unused]] int i = Poco::NumberParser::parse(test);
 		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+	} catch ([[maybe_unused]] SyntaxException& e) { }
 }
 
 

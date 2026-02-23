@@ -62,21 +62,27 @@ public:
 	void execute();
 		/// Executes the statement.
 
+	[[nodiscard]]
 	bool fetch();
 		/// Fetches the data for the current row
 
+	[[nodiscard]]
 	std::size_t getAffectedRowCount() const;
 		/// get the count of rows affected by the statement
 
+	[[nodiscard]]
 	std::size_t columnsReturned() const;
 		/// get the count of columns returned by the statement
 
+	[[nodiscard]]
 	const MetaColumn& metaColumn(std::size_t aPosition) const;
 		/// Returns the reference to the specified metacolumn - 0 based
 
+	[[nodiscard]]
 	const OutputParameter& resultColumn(std::size_t aPosition) const;
 		/// Returns the reference to the specified result - 0 based
 
+	[[nodiscard]]
 	operator PGresult* ();
 		/// Cast operator to native result handle type.
 

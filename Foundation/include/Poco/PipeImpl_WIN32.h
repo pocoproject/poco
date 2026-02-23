@@ -39,7 +39,9 @@ public:
 	~PipeImpl();
 	int writeBytes(const void* buffer, int length);
 	int readBytes(void* buffer, int length);
+	[[nodiscard]]
 	Handle readHandle() const;
+	[[nodiscard]]
 	Handle writeHandle() const;
 	void closeRead();
 	void closeWrite();

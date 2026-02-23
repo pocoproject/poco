@@ -203,6 +203,7 @@ public:
 		return (_statementCreator << t);
 	}
 
+	[[nodiscard]]
 	const std::string& dbmsName() const;
 		/// Returns the DBMS name. The name must be set by the
 		/// implementation.
@@ -222,15 +223,18 @@ public:
 	void close();
 		/// Closes the session.
 
+	[[nodiscard]]
 	bool isConnected() const;
 		/// Returns true iff session is connected, false otherwise.
 
 	void reconnect();
 		/// Closes the session and opens it.
 
+	[[nodiscard]]
 	bool isGood() const;
 		/// Returns true iff the session is good and can be used, false otherwise.
 
+	[[nodiscard]]
 	bool isAutocommit() const;
 		/// Returns true iff the session is in autocommit mode, false otherwise.
 		/// If the session does not support autocommit, it is assumed not to
@@ -241,12 +245,14 @@ public:
 	void setLoginTimeout(std::size_t timeout);
 		/// Sets the session login timeout value.
 
+	[[nodiscard]]
 	std::size_t getLoginTimeout() const;
 		/// Returns the session login timeout value.
 
 	void setConnectionTimeout(std::size_t timeout);
 		/// Sets the session connection timeout value.
 
+	[[nodiscard]]
 	std::size_t getConnectionTimeout();
 		/// Returns the session connection timeout value.
 
@@ -266,37 +272,46 @@ public:
 		/// If `session` was in autocommit mode when the transaction started (begin() call),
 		/// it is switched back to autocommit mode.
 
+	[[nodiscard]]
 	bool canTransact();
 		/// Returns true if session has transaction capabilities.
 
+	[[nodiscard]]
 	bool isTransaction();
 		/// Returns true iff a transaction is in progress, false otherwise.
 
 	void setTransactionIsolation(Poco::UInt32);
 		/// Sets the transaction isolation level.
 
+	[[nodiscard]]
 	Poco::UInt32 getTransactionIsolation();
 		/// Returns the transaction isolation level.
 
+	[[nodiscard]]
 	bool hasTransactionIsolation(Poco::UInt32 ti);
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
+	[[nodiscard]]
 	bool isTransactionIsolation(Poco::UInt32 ti);
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
+	[[nodiscard]]
 	std::string connector() const;
 		/// Returns the connector name for this session.
 
+	[[nodiscard]]
 	std::string uri() const;
 		/// Returns the URI for this session.
 
+	[[nodiscard]]
 	static std::string uri(const std::string& connector,
 		const std::string& connectionString);
 		/// Utility function that teturns the URI formatted from supplied
 		/// arguments as "connector:///connectionString".
 
+	[[nodiscard]]
 	bool hasFeature(const std::string& name) const;
 		/// Returns true if session has the named feature.
 
@@ -309,6 +324,7 @@ public:
 		/// Throws a NotSupportedException if the requested feature is
 		/// not supported by the underlying implementation.
 
+	[[nodiscard]]
 	bool getFeature(const std::string& name) const;
 		/// Look up the state of a feature.
 		///
@@ -318,6 +334,7 @@ public:
 		/// Throws a NotSupportedException if the requested feature is
 		/// not supported by the underlying implementation.
 
+	[[nodiscard]]
 	bool hasProperty(const std::string& name) const;
 		/// Returns true if session has the named property.
 
@@ -330,6 +347,7 @@ public:
 		/// Throws a NotSupportedException if the requested property is
 		/// not supported by the underlying implementation.
 
+	[[nodiscard]]
 	Poco::Any getProperty(const std::string& name) const;
 		/// Look up the value of a property.
 		///
@@ -339,6 +357,7 @@ public:
 		/// Throws a NotSupportedException if the requested property is
 		/// not supported by the underlying implementation.
 
+	[[nodiscard]]
 	SessionImpl* impl();
 		/// Returns a pointer to the underlying SessionImpl.
 

@@ -122,36 +122,42 @@ public:
 	void setConsumerKey(const std::string& consumerKey);
 		/// Sets the consumer key.
 
+	[[nodiscard]]
 	const std::string& getConsumerKey() const;
 		/// Returns the consumer key.
 
 	void setConsumerSecret(const std::string& consumerSecret);
 		/// Sets the consumer secret.
 
+	[[nodiscard]]
 	const std::string& getConsumerSecret() const;
 		/// Returns the consumer secret.
 
 	void setToken(const std::string& token);
 		/// Sets the token.
 
+	[[nodiscard]]
 	const std::string& getToken() const;
 		/// Returns the token.
 
 	void setTokenSecret(const std::string& tokenSecret);
 		/// Sets the token.
 
+	[[nodiscard]]
 	const std::string& getTokenSecret() const;
 		/// Returns the token secret.
 
 	void setRealm(const std::string& realm);
 		/// Sets the optional realm to be included in the Authorization header.
 
+	[[nodiscard]]
 	const std::string& getRealm() const;
 		/// Returns the optional realm to be included in the Authorization header.
 
 	void setCallback(const std::string& uri);
 		/// Sets the callback URI.
 
+	[[nodiscard]]
 	const std::string& getCallback() const;
 		/// Returns the callback URI.
 
@@ -163,6 +169,7 @@ public:
 		/// Adds an OAuth 1.0A Authentication header to the given request, using
 		/// the given signature method.
 
+	[[nodiscard]]
 	bool verify(const HTTPRequest& request, const Poco::URI& uri);
 		/// Verifies the signature of the given request.
 		///
@@ -173,6 +180,7 @@ public:
 		/// Throws a NotAuthenticatedException if the request does not contain OAuth
 		/// credentials, or in case of an unsupported OAuth version or signature method.
 
+	[[nodiscard]]
 	bool verify(const HTTPRequest& request, const Poco::URI& uri, const Poco::Net::HTMLForm& params);
 		/// Verifies the signature of the given request.
 		///
@@ -202,14 +210,17 @@ protected:
 	void signHMACSHA1(Poco::Net::HTTPRequest& request, const std::string& uri, const Poco::Net::HTMLForm& params) const;
 		/// Signs the given HTTP request according to OAuth 1.0A HMAC-SHA1 signature method.
 
+	[[nodiscard]]
 	std::string createNonce() const;
 		/// Creates a nonce, which is basically a Base64-encoded 32 character random
 		/// string, with non-alphanumeric characters removed.
 
+	[[nodiscard]]
 	std::string createSignature(const Poco::Net::HTTPRequest& request, const std::string& uri, const Poco::Net::HTMLForm& params, const std::string& nonce, const std::string& timestamp) const;
 		/// Creates a OAuth signature for the given request and its parameters, according
 		/// to <https://dev.twitter.com/docs/auth/creating-signature>.
 
+	[[nodiscard]]
 	static std::string percentEncode(const std::string& str);
 		/// Percent-encodes the given string according to Twitter API's rules,
 		/// given in <https://dev.twitter.com/docs/auth/percent-encoding-parameters>.

@@ -96,6 +96,7 @@ public:
 	void setRecipients(const Recipients& recipient);
 		/// Clears existing and sets new recipient list for the message.
 
+	[[nodiscard]]
 	const Recipients& recipients() const;
 		/// Returns the recipients of the message.
 
@@ -107,6 +108,7 @@ public:
 		/// in the subject, use RFC 2047 word encoding
 		/// (see encodeWord()).
 
+	[[nodiscard]]
 	const std::string& getSubject() const;
 		/// Returns the subject of the message.
 
@@ -123,6 +125,7 @@ public:
 		/// in the sender, use RFC 2047 word encoding
 		/// (see encodeWord()).
 
+	[[nodiscard]]
 	const std::string& getSender() const;
 		/// Returns the sender of the message (taken
 		/// from the From header field).
@@ -141,6 +144,7 @@ public:
 		/// not be used. Content lines always should be terminated with a
 		/// proper CRLF sequence.
 
+	[[nodiscard]]
 	const std::string& getContent() const;
 		/// Returns the content of the mail message.
 		///
@@ -154,15 +158,18 @@ public:
 	void setContentType(const MediaType& mediaType);
 		/// Sets the content type for the message.
 
+	[[nodiscard]]
 	const std::string& getContentType() const;
 		/// Returns the content type for the message.
 
 	void setDate(const Poco::Timestamp& dateTime);
 		/// Sets the Date header to the given date/time value.
 
+	[[nodiscard]]
 	Poco::Timestamp getDate() const;
 		/// Returns the value of the Date header.
 
+	[[nodiscard]]
 	bool isMultipart() const;
 		/// Returns true iff the message is a multipart message.
 
@@ -204,6 +211,7 @@ public:
 		/// To include non-ASCII characters in the part name or filename,
 		/// use RFC 2047 word encoding (see encodeWord()).
 
+	[[nodiscard]]
 	PartSource* createPartStore(const std::string& content,
 		const std::string& mediaType,
 		const std::string& filename = "");
@@ -214,6 +222,7 @@ public:
 		/// responsibility to delete it after use. Typical use is handler
 		/// passing it back to MailMessage, which takes care of the cleanup.
 
+	[[nodiscard]]
 	const PartVec& parts() const;
 		/// Returns const reference to the vector containing part stores.
 
@@ -273,7 +282,9 @@ protected:
 	void readMultipart(std::istream& istr, PartHandler& handler);
 	void readPart(std::istream& istr, const MessageHeader& header, PartHandler& handler);
 	void handlePart(std::istream& istr, const MessageHeader& header, PartHandler& handler);
+	[[nodiscard]]
 	static const std::string& contentTransferEncodingToString(ContentTransferEncoding encoding);
+	[[nodiscard]]
 	static int lineLength(const std::string& str);
 	static void appendRecipient(const MailRecipient& recipient, std::string& str);
 
@@ -320,6 +331,7 @@ public:
 		/// use RFC 2047 word encoding (see encodeWord()).
 
 	// PartSource
+	[[nodiscard]]
 	std::istream& stream();
 
 protected:

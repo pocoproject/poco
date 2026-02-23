@@ -27,6 +27,7 @@
 namespace Poco {
 
 
+[[nodiscard]]
 std::string Foundation_API format(const std::string& fmt, const Any& value);
 	/// This function implements sprintf-style formatting in a typesafe way.
 	/// Various variants of the function are available, supporting a
@@ -153,6 +154,7 @@ void format(std::string& result, const char* fmt, T arg1, Args... args)
 
 
 template <typename T, typename... Args>
+[[nodiscard]]
 std::string format(const std::string& fmt, T arg1, Args... args)
 	/// Returns the formatted string.
 {
@@ -167,6 +169,7 @@ std::string format(const std::string& fmt, T arg1, Args... args)
 
 
 template <typename T, typename... Args>
+[[nodiscard]]
 std::string format(const char* fmt, T arg1, Args... args)
 	/// Returns the formatted string.
 {

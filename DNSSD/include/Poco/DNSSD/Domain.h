@@ -44,12 +44,15 @@ public:
 	~Domain();
 		/// Destroys the Domain.
 
+	[[nodiscard]]
 	Poco::Int32 networkInterface() const;
 		/// Returns the index of the network interface the domain was discovered on.
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// Returns the name of the domain.
 
+	[[nodiscard]]
 	bool isDefault() const;
 		/// Returns true if the domain is the default domain.
 

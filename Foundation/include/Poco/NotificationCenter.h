@@ -152,6 +152,7 @@ public:
 		removeObserver(NObserver<C, N>(object, method, matcher));
 	}
 
+	[[nodiscard]]
 	bool hasObserver(const AbstractObserver& observer) const;
 		/// Returns true if the observer is registered with this NotificationCenter.
 
@@ -167,21 +168,25 @@ public:
 		///    notificationCenter.postNotification(new MyNotification);
 		/// does not result in a memory leak.
 
+	[[nodiscard]]
 	bool hasObservers() const;
 		/// Returns true iff there is at least one registered observer.
 		///
 		/// Can be used to improve performance if an expensive notification
 		/// shall only be created and posted if there are any observers.
 
+	[[nodiscard]]
 	std::size_t countObservers() const;
 		/// Returns the number of registered observers.
 
+	[[nodiscard]]
 	virtual int backlog() const;
 		/// Returns the sum of queued notifications
 		/// for all observers (applies only to asynchronous observers,
 		/// regular observers post notifications syncronously and
 		/// never have a backlog).
 
+	[[nodiscard]]
 	static NotificationCenter& defaultCenter();
 		/// Returns a reference to the default
 		/// NotificationCenter.
@@ -197,11 +202,13 @@ protected:
 	using AbstractObserverPtr = SharedPtr<AbstractObserver>;
 	using ObserverList = std::vector<AbstractObserverPtr>;
 
+	[[nodiscard]]
 	RWLock& mutex()
 	{
 		return _mutex;
 	}
 
+	[[nodiscard]]
 	ObserverList observersToNotify(const Notification::Ptr& pNotification) const;
 	virtual void notifyObservers(Notification::Ptr& pNotification);
 

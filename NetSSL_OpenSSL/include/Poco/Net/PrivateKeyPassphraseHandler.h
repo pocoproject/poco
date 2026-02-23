@@ -62,6 +62,7 @@ public:
 	virtual void onPrivateKeyRequested(const void* pSender, std::string& privateKey) = 0;
 		/// Returns the requested private key in the parameter privateKey.
 
+	[[nodiscard]]
 	bool serverSide() const;
 
 private:

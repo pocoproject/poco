@@ -51,25 +51,38 @@ public:
 	void open(const std::string& connect = "");
 	void close();
 	void reset();
+	[[nodiscard]]
 	bool isConnected() const;
+	[[nodiscard]]
 	bool isGood() const;
 	void setConnectionTimeout(std::size_t timeout);
+	[[nodiscard]]
 	std::size_t getConnectionTimeout() const;
+	[[nodiscard]]
 	bool canTransact() const;
+	[[nodiscard]]
 	bool isTransaction() const;
 	void setTransactionIsolation(Poco::UInt32);
+	[[nodiscard]]
 	Poco::UInt32 getTransactionIsolation() const;
+	[[nodiscard]]
 	bool hasTransactionIsolation(Poco::UInt32) const;
+	[[nodiscard]]
 	bool isTransactionIsolation(Poco::UInt32) const;
+	[[nodiscard]]
 	const std::string& connectorName() const;
 	bool hasFeature(const std::string& name) const;
 	void setFeature(const std::string& name, bool state);
+	[[nodiscard]]
 	bool getFeature(const std::string& name) const;
+	[[nodiscard]]
 	bool hasProperty(const std::string& name) const;
 	void setProperty(const std::string& name, const Poco::Any& value);
+	[[nodiscard]]
 	Poco::Any getProperty(const std::string& name) const;
 
 protected:
+	[[nodiscard]]
 	SessionImpl* access() const;
 		/// Updates the last access timestamp,
 		/// verifies validity of the session
@@ -78,6 +91,7 @@ protected:
 		/// Throws an SessionUnavailableException if the
 		/// session is no longer valid.
 
+	[[nodiscard]]
 	SessionImpl* impl() const;
 		/// Returns a pointer to the SessionImpl.
 

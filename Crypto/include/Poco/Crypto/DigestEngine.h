@@ -43,15 +43,19 @@ public:
 	~DigestEngine();
 		/// Destroys the DigestEngine.
 
+	[[nodiscard]]
 	const std::string& algorithm() const;
 		/// Returns the name of the digest algorithm.
 
+	[[nodiscard]]
 	int nid() const;
 		/// Returns the NID (OpenSSL object identifier) of the digest algorithm.
 
 	// DigestEngine
+	[[nodiscard]]
 	std::size_t digestLength() const;
 	void reset();
+	[[nodiscard]]
 	const Poco::DigestEngine::Digest& digest();
 
 protected:

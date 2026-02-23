@@ -40,8 +40,11 @@ public:
 	OpenSSLException(const OpenSSLException& exc);
 	~OpenSSLException() noexcept;
 	OpenSSLException& operator = (const OpenSSLException& exc);
+	[[nodiscard]]
 	const char* name() const noexcept;
+	[[nodiscard]]
 	const char* className() const noexcept;
+	[[nodiscard]]
 	Poco::Exception* clone() const;
 	void rethrow() const;
 

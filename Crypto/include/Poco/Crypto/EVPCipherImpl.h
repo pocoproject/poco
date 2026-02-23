@@ -45,12 +45,15 @@ public:
 	virtual ~EVPCipherImpl();
 		/// Destroys the EVPCipherImpl.
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// Returns the name of the Cipher.
 
+	[[nodiscard]]
 	CryptoTransform::Ptr createEncryptor();
 		/// Creates an encryptor object.
 
+	[[nodiscard]]
 	CryptoTransform::Ptr createDecryptor();
 		/// Creates a decryptor object.
 

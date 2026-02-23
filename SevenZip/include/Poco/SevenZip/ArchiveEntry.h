@@ -65,26 +65,33 @@ public:
 	void swap(ArchiveEntry& entry) noexcept;
 		/// Swaps the entry with another one.
 
+	[[nodiscard]]
 	EntryType type() const;
 		/// Returns the type of the entry.
 
+	[[nodiscard]]
 	const std::string& path() const;
 		/// Return the UTF-8 encoded path.
 
+	[[nodiscard]]
 	Poco::UInt64 size() const;
 		/// Returns the original size of the file.
 
+	[[nodiscard]]
 	Poco::Timestamp lastModified() const;
 		/// Returns the date and time of last modification.
 
+	[[nodiscard]]
 	Poco::UInt32 attributes() const;
 		/// Returns the entry attributes as a bitmask.
 		///
 		/// See the EntryAttributes enumeration for valid values.
 
+	[[nodiscard]]
 	bool isFile() const;
 		/// Returns true iff the entry represents a file.
 
+	[[nodiscard]]
 	bool isDirectory() const;
 		/// Returns true iff the entry represents a directory.
 
@@ -92,6 +99,7 @@ protected:
 	ArchiveEntry(EntryType type, const std::string& path, Poco::UInt64 size, Poco::Timestamp lastModified, Poco::UInt32 attributes, Poco::UInt32 index);
 		/// Creates an ArchiveEntry.
 
+	[[nodiscard]]
 	Poco::UInt32 index() const;
 		/// Returns the index of the entry within the archive.
 

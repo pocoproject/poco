@@ -53,30 +53,38 @@ public:
 	virtual ~RedisType();
 		/// Destroys the RedisType.
 
+	[[nodiscard]]
 	bool isArray() const;
 		/// Returns true when the value is a Redis array.
 
+	[[nodiscard]]
 	bool isBulkString() const;
 		/// Returns true when the value is a Redis bulkstring.
 
+	[[nodiscard]]
 	bool isError() const;
 		/// Returns true when the value is a Redis error.
 
+	[[nodiscard]]
 	bool isInteger() const;
 		/// Returns true when the value is a Redis integer (64 bit integer).
 
+	[[nodiscard]]
 	bool isSimpleString() const;
 		/// Returns true when the value is a simple string.
 
+	[[nodiscard]]
 	virtual int type() const = 0;
 		/// Returns the type of the value.
 
 	virtual void read(RedisInputStream& input) = 0;
 		/// Reads the value from the stream.
 
+	[[nodiscard]]
 	virtual std::string toString() const = 0;
 		/// Converts the value to a RESP (REdis Serialization Protocol) string.
 
+	[[nodiscard]]
 	static RedisType::Ptr createRedisType(char marker);
 		/// Create a Redis type based on the marker:
 		///
@@ -220,7 +228,7 @@ struct RedisTypeTraits<BulkString>
 			input.read(&*s.begin(), length);
 			value.assign(s);
 
-			input.getline(); // Read and ignore /r/n
+			[[maybe_unused]] std::string ignored = input.getline(); // Read and ignore /r/n
 		}
 	}
 };

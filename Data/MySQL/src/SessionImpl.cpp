@@ -272,19 +272,19 @@ Poco::UInt32 SessionImpl::getTransactionIsolation() const
 
 	if (serverInfo.find(MARIADB_SERVERINFO) != std::string::npos) //MariaDB
 	{
-		getSetting("tx_isolation", isolation);
+		(void)getSetting("tx_isolation", isolation);
 		isolation = isolation.c_str();
 	}
 	else //MySQL
 	{
 		if (version >= 80000)
 		{
-			getSetting("transaction_isolation", isolation);
+			(void)getSetting("transaction_isolation", isolation);
 			isolation = isolation.c_str();
 		}
 		else
 		{
-			getSetting("tx_isolation", isolation);
+			(void)getSetting("tx_isolation", isolation);
 		}
 	}
 	Poco::replaceInPlace(isolation, "-", " ");

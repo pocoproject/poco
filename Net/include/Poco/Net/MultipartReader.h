@@ -37,6 +37,7 @@ class Net_API MultipartStreamBuf: public Poco::BufferedStreamBuf
 public:
 	MultipartStreamBuf(std::istream& istr, const std::string& boundary);
 	~MultipartStreamBuf();
+	[[nodiscard]]
 	bool lastPart() const;
 
 protected:
@@ -60,7 +61,9 @@ class Net_API MultipartIOS: public virtual std::ios
 public:
 	MultipartIOS(std::istream& istr, const std::string& boundary);
 	~MultipartIOS();
+	[[nodiscard]]
 	MultipartStreamBuf* rdbuf();
+	[[nodiscard]]
 	bool lastPart() const;
 
 protected:
@@ -121,12 +124,14 @@ public:
 		/// available, or if no boundary line can be found in
 		/// the input stream.
 
+	[[nodiscard]]
 	bool hasNextPart();
 		/// Returns true iff more parts are available.
 		///
 		/// Before the first call to nextPart(), returns
 		/// always true.
 
+	[[nodiscard]]
 	std::istream& stream() const;
 		/// Returns a reference to the reader's stream that
 		/// can be used to read the current part.
@@ -135,6 +140,7 @@ public:
 		/// nextPart() is called or the MultipartReader
 		/// object is destroyed.
 
+	[[nodiscard]]
 	const std::string& boundary() const;
 		/// Returns the multipart boundary used by this reader.
 
@@ -142,6 +148,7 @@ protected:
 	void findFirstBoundary();
 	void guessBoundary();
 	void parseHeader(MessageHeader& messageHeader);
+	[[nodiscard]]
 	bool readLine(std::string& line, std::string::size_type n);
 
 private:

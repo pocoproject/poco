@@ -106,10 +106,12 @@ public:
 		/// Returns true if column names printing is enabled,
 		/// false otherwise.
 
+	[[nodiscard]]
 	bool isSmall() const;
 		/// Returns true if compact mode formatting is enabled,
 		/// false otherwise.
 
+	[[nodiscard]]
 	bool isFull() const;
 		/// Returns true if full mode formatting is enabled,
 		/// false otherwise.

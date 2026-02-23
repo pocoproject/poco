@@ -37,6 +37,7 @@ public:
 	~ULIDGenerator();
 		/// Destroys the ULIDGenerator.
 
+	[[nodiscard]]
 	ULID create();
 		/// Creates a new ULID based on the current time.
 		///
@@ -44,6 +45,7 @@ public:
 		/// subsequent calls to create() in the same millisecond, create() will wait for the 
 		/// current millisecond to elapse before generating a new ULID.
 
+	[[nodiscard]]
 	ULID create(UInt64 time);
 		/// Creates a new ULID based on the given time (milliseconds
 		/// since UNIX epoch).
@@ -51,6 +53,7 @@ public:
 		/// NOTE: In the very rare case of an overflow of the random part due to too many subsequent
 		/// calls to create() with the same time, throws a RuntimeException.
 
+	[[nodiscard]]
 	static ULIDGenerator& defaultGenerator();
 		/// Returns a reference to the default ULIDGenerator.
 

@@ -48,6 +48,7 @@ public:
 
 	~MemoryPool();
 
+	[[nodiscard]]
 	void* get();
 		/// Returns a memory block. If there are no more blocks
 		/// in the pool, a new block will be allocated.
@@ -58,12 +59,15 @@ public:
 	void release(void* ptr);
 		/// Releases a memory block and returns it to the pool.
 
+	[[nodiscard]]
 	std::size_t blockSize() const;
 		/// Returns the block size.
 
+	[[nodiscard]]
 	int allocated() const;
 		/// Returns the number of allocated blocks.
 
+	[[nodiscard]]
 	int available() const;
 		/// Returns the number of available blocks in the pool.
 
@@ -79,7 +83,7 @@ private:
 		BLOCK_RESERVE = 128
 	};
 
-	using BlockVec = std::vector<char *>;
+	using BlockVec = std::vector<char*>;
 
 	std::size_t _blockSize;
 	int         _maxAlloc;
@@ -293,6 +297,7 @@ public:
 	FastMemoryPool(const FastMemoryPool&) = delete;
 	FastMemoryPool& operator=(const FastMemoryPool&) = delete;
 
+	[[nodiscard]]
 	void* get()
 		/// Returns pointer to the next available
 		/// memory block. If the pool is exhausted,
@@ -325,18 +330,21 @@ public:
 		_firstBlock = new (ptr) Block(_firstBlock);
 	}
 
+	[[nodiscard]]
 	std::size_t blockSize() const
 		/// Returns the block size in bytes.
 	{
 		return sizeof(Block);
 	}
 
+	[[nodiscard]]
 	std::size_t allocated() const
 		/// Returns the total amount of memory allocated, in bytes.
 	{
 		return _buckets.size() * _blocksPerBucket;
 	}
 
+	[[nodiscard]]
 	std::size_t available() const
 		/// Returns currently available amount of memory in bytes.
 	{

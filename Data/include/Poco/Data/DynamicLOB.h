@@ -36,8 +36,8 @@ using CLOB = LOB<char>;
 namespace Poco {
 namespace Dynamic {
 
-template <> Data_API Var::operator Poco::Data::CLOB () const;
-template <> Data_API Var::operator Poco::Data::BLOB () const;
+template <> [[nodiscard]] Data_API Var::operator Poco::Data::CLOB () const;
+template <> [[nodiscard]] Data_API Var::operator Poco::Data::BLOB () const;
 
 } } // namespace Poco::Dynamic
 

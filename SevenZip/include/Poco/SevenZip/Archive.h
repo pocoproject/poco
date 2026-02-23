@@ -69,16 +69,20 @@ public:
 	~Archive();
 		/// Destroys the Archive.
 
+	[[nodiscard]]
 	const std::string& path() const;
 		/// Returns the path of the archive in the filesystem.
 
+	[[nodiscard]]
 	std::size_t size() const;
 		/// Returns the number of entries in the archive.
 
+	[[nodiscard]]
 	ConstIterator begin() const;
 		/// Returns an iterator for iterating over the
 		/// file or directory entries in the archive.
 
+	[[nodiscard]]
 	ConstIterator end() const;
 		/// Returns the end iterator.
 
@@ -91,6 +95,7 @@ public:
 		/// Progress and errors for single entries will be reported
 		/// via the extracted and failed events.
 
+	[[nodiscard]]
 	std::string extract(const ArchiveEntry& entry, const std::string& destPath);
 		/// Extracts a specific entry to the given path.
 		///

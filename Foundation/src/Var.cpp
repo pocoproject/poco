@@ -199,7 +199,7 @@ Var& Var::operator ++ ()
 }
 
 
-const Var Var::operator ++ (int)
+const Var Var::operator ++ ([[maybe_unused]] int n)
 {
 	if (!isInteger())
 		throw InvalidArgumentException("Invalid operation for this data type.");
@@ -219,7 +219,7 @@ Var& Var::operator -- ()
 }
 
 
-const Var Var::operator -- (int)
+const Var Var::operator -- ([[maybe_unused]] int n)
 {
 	if (!isInteger())
 		throw InvalidArgumentException("Invalid operation for this data type.");

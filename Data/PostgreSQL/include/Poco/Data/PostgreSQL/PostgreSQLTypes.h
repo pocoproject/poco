@@ -64,6 +64,7 @@ const Oid MACADDROID     = 829;
 const Oid UUIDOID        = 2950;
 
 
+[[nodiscard]]
 Poco::Data::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID);
 
 
@@ -78,14 +79,19 @@ public:
 
 	~InputParameter();
 
+	[[nodiscard]]
 	CDT fieldType() const;
+	[[nodiscard]]
 	const void* pData() const;
+	[[nodiscard]]
 	std::size_t size() const;
+	[[nodiscard]]
 	bool isBinary() const;
 
 	void setStringVersionRepresentation(const std::string& aString);
 	void setNonStringVersionRepresentation(const void* aPtr, std::size_t theSize);
 
+	[[nodiscard]]
 	const void* pInternalRepresentation() const;
 
 private:
@@ -116,11 +122,17 @@ public:
 	void setValues(CDT fieldType, Oid internalFieldType, std::size_t rowNumber,
 		const char* dataPtr, std::size_t size, bool isNull);
 
+	[[nodiscard]]
 	CDT fieldType() const;
+	[[nodiscard]]
 	Oid internalFieldType() const;
+	[[nodiscard]]
 	std::size_t rowNumber() const;
+	[[nodiscard]]
 	const char* pData() const;
+	[[nodiscard]]
 	std::size_t size() const;
+	[[nodiscard]]
 	bool isNull() const;
 
 private:

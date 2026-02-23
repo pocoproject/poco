@@ -42,16 +42,19 @@ class Foundation_API Environment
 public:
 	using NodeId = UInt8[6]; /// Ethernet address.
 
+	[[nodiscard]]
 	static std::string get(const std::string& name);
 		/// Returns the value of the environment variable
 		/// with the given name. Throws a NotFoundException
 		/// if the variable does not exist.
 
+	[[nodiscard]]
 	static std::string get(const std::string& name, const std::string& defaultValue);
 		/// Returns the value of the environment variable
 		/// with the given name. If the environment variable
 		/// is undefined, returns defaultValue instead.
 
+	[[nodiscard]]
 	static bool has(const std::string& name);
 		/// Returns true iff an environment variable
 		/// with the given name is defined.
@@ -60,9 +63,11 @@ public:
 		/// Sets the environment variable with the given name
 		/// to the given value.
 
+	[[nodiscard]]
 	static std::string osName();
 		/// Returns the operating system name.
 
+	[[nodiscard]]
 	static std::string osDisplayName();
 		/// Returns the operating system name in a
 		/// "user-friendly" way.
@@ -73,12 +78,15 @@ public:
 		/// On other platforms, returns the same as
 		/// osName().
 
+	[[nodiscard]]
 	static std::string osVersion();
 		/// Returns the operating system version.
 
+	[[nodiscard]]
 	static std::string osArchitecture();
 		/// Returns the operating system architecture.
 
+	[[nodiscard]]
 	static std::string nodeName();
 		/// Returns the node (or host) name.
 
@@ -88,17 +96,20 @@ public:
 		///
 		/// Throws a SystemException if no Ethernet adapter is available.
 
+	[[nodiscard]]
 	static std::string nodeId();
 		/// Returns the Ethernet address (format "xx:xx:xx:xx:xx:xx")
 		/// of the first Ethernet adapter found on the system.
 		///
 		/// Throws a SystemException if no Ethernet adapter is available.
 
-	static unsigned processorCount();
+	[[nodiscard]]
+	static unsigned int processorCount();
 		/// Returns the number of processors installed in the system.
 		///
 		/// If the number of processors cannot be determined, returns 1.
 
+	[[nodiscard]]
 	static Poco::UInt32 libraryVersion();
 		/// Returns the POCO C++ Libraries version as a hexadecimal
 		/// number in format 0xAABBCCDD, where
@@ -112,17 +123,21 @@ public:
 		///    - Ax mark alpha releases, and
 		///    - Bx mark beta releases.
 
+	[[nodiscard]]
 	static Poco::Int32 os();
 		/// Return the operating system as defined
 		/// in the include Foundation/Platform.h (POCO_OS)
 
+	[[nodiscard]]
 	static Poco::Int32 arch();
 		/// Return the underlying cpu architecture that runs this operating system
 		/// as defined in Foundation/Platform (POCO_ARCH)
 
+	[[nodiscard]]
 	static bool isUnix();
 		/// Return true if the operating system belongs to the Linux family
 
+	[[nodiscard]]
 	static bool isWindows();
 		/// Return true if the operating system belongs to the Windows family
 };

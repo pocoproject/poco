@@ -37,9 +37,11 @@ public:
 	~Decl();
 		/// Destroys the Decl.
 
+	[[nodiscard]]
 	const std::string& declaration() const;
 		/// Returns the declaration.
 
+	[[nodiscard]]
 	std::string toString() const;
 
 protected:

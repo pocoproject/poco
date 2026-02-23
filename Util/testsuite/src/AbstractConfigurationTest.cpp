@@ -26,7 +26,9 @@ using Poco::Util::AbstractConfiguration;
 using Poco::Util::MapConfiguration;
 using Poco::NumberFormatter;
 using Poco::AutoPtr;
+using Poco::Int16;
 using Poco::Int64;
+using Poco::UInt16;
 using Poco::UInt64;
 
 
@@ -68,7 +70,7 @@ void AbstractConfigurationTest::testGetString()
 		std::string res = pConf->getString("foo");
 		fail("nonexistent property - must throw");
 	}
-	catch (Poco::NotFoundException&)
+	catch ([[maybe_unused]] Poco::NotFoundException& e)
 	{
 	}
 
@@ -92,10 +94,10 @@ void AbstractConfigurationTest::testGetInt()
 
 	try
 	{
-		pConf->getInt("prop1");
+		[[maybe_unused]] int _ = pConf->getInt("prop1");
 		fail("not a number - must throw");
 	}
-	catch (Poco::SyntaxException&)
+	catch ([[maybe_unused]] Poco::SyntaxException& e)
 	{
 	}
 
@@ -117,28 +119,28 @@ void AbstractConfigurationTest::testGetInt16()
 	
 	try
 	{
-		pConf->getInt16("prop1");
+		[[maybe_unused]] Int16 _ = pConf->getInt16("prop1");
 		fail("not a number - must throw");
 	}
-	catch (Poco::SyntaxException&)
+	catch ([[maybe_unused]] Poco::SyntaxException& e)
 	{
 	}
 
 	try
 	{
-		pConf->getInt16("prop4.notint16");
+		[[maybe_unused]] Int16 _ = pConf->getInt16("prop4.notint16");
 		fail("too big for UInt16 - must throw");
 	}
-	catch (Poco::RangeException&)
+	catch ([[maybe_unused]] Poco::RangeException& e)
 	{
 	}
 
 	try
 	{
-		pConf->getUInt16("prop4.notuint16");
+		[[maybe_unused]] UInt16 _ = pConf->getUInt16("prop4.notuint16");
 		fail("too big for UInt16 - must throw");
 	}
-	catch (Poco::RangeException&)
+	catch ([[maybe_unused]] Poco::RangeException& e)
 	{
 	}
 
@@ -162,10 +164,10 @@ void AbstractConfigurationTest::testGetInt64()
 
 	try
 	{
-		[[maybe_unused]] Int64 x = pConf->getInt64("prop1");
+		[[maybe_unused]] Int64 _ = pConf->getInt64("prop1");
 		fail("not a number - must throw");
 	}
-	catch (Poco::SyntaxException&)
+	catch ([[maybe_unused]] Poco::SyntaxException& e)
 	{
 	}
 
@@ -185,10 +187,10 @@ void AbstractConfigurationTest::testGetDouble()
 
 	try
 	{
-		pConf->getDouble("prop1");
+		[[maybe_unused]] double _ = pConf->getDouble("prop1");
 		fail("not a number - must throw");
 	}
-	catch (Poco::SyntaxException&)
+	catch ([[maybe_unused]] Poco::SyntaxException& e)
 	{
 	}
 
@@ -213,10 +215,10 @@ void AbstractConfigurationTest::testGetBool()
 
 	try
 	{
-		pConf->getBool("prop1");
+		[[maybe_unused]] bool _ = pConf->getBool("prop1");
 		fail("not a boolean - must throw");
 	}
-	catch (Poco::SyntaxException&)
+	catch ([[maybe_unused]] Poco::SyntaxException& e)
 	{
 	}
 
@@ -236,10 +238,10 @@ void AbstractConfigurationTest::testExpand()
 
 	try
 	{
-		std::string s = pConf->getString("ref3");
+		[[maybe_unused]] std::string s = pConf->getString("ref3");
 		fail("circular reference - must throw");
 	}
-	catch (Poco::CircularReferenceException&)
+	catch ([[maybe_unused]] Poco::CircularReferenceException& e)
 	{
 	}
 
@@ -262,7 +264,7 @@ void AbstractConfigurationTest::testExpand()
 		assertTrue (pConf->expand("default=${undefined:value}") == "default=${undefined:value}");
 		assertTrue (pConf->expand("default:${undefined::value}") == "default:${undefined::value}");
 	}
-	catch (Poco::PathSyntaxException&)
+	catch ([[maybe_unused]] Poco::PathSyntaxException& e)
 	{
 		// Note: This will result in an invalid path (on Windows), throwing an exception which can be safely ignored.
 	}

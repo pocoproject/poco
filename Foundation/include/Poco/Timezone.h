@@ -29,20 +29,24 @@ class Foundation_API Timezone
 	/// This class provides information about the current timezone.
 {
 public:
+	[[nodiscard]]
 	static int utcOffset();
 		/// Returns the offset of local time to UTC, in seconds.
 		///     local time = UTC + utcOffset() + dst().
 
+	[[nodiscard]]
 	static int dst();
 		/// Returns the daylight saving time offset in seconds if
 		/// daylight saving time is in use.
 		///     local time = UTC + utcOffset() + dst().
 
+	[[nodiscard]]
 	static int dst(const Poco::Timestamp& timestamp);
 		/// Returns the daylight saving time offset in seconds if
 		/// daylight saving time is in use for the given time.
 		///     local time = UTC + utcOffset() + dst().
 
+	[[nodiscard]]
 	static bool isDst(const Timestamp& timestamp);
 		/// Returns true if daylight saving time is in effect
 		/// for the given time. Depending on the operating system
@@ -50,17 +54,21 @@ public:
 		/// date ranges, as the C library's localtime() function
 		/// is used.
 
+	[[nodiscard]]
 	static int tzd();
 		/// Returns the time zone differential for the current timezone.
 		/// The timezone differential is computed as utcOffset() + dst()
 		/// and is expressed in seconds.
 
+	[[nodiscard]]
 	static std::string name();
 		/// Returns the timezone name currently in effect.
 
+	[[nodiscard]]
 	static std::string standardName();
 		/// Returns the timezone name if not daylight saving time is in effect.
 
+	[[nodiscard]]
 	static std::string dstName();
 		/// Returns the timezone name if daylight saving time is in effect.
 

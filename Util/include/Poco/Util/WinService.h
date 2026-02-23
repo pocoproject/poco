@@ -76,12 +76,15 @@ public:
 	~WinService();
 		/// Destroys the WinService.
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// Returns the service name.
 
+	[[nodiscard]]
 	std::string displayName() const;
 		/// Returns the service's display name.
 
+	[[nodiscard]]
 	std::string path() const;
 		/// Returns the path to the service executable.
 		///
@@ -104,12 +107,15 @@ public:
 		///
 		/// Throws a NotFoundException if the service has not been registered.
 
+	[[nodiscard]]
 	bool isRegistered() const;
 		/// Returns true if the service has been registered with the Service Control Manager.
 
+	[[nodiscard]]
 	bool isRunning() const;
 		/// Returns true if the service is currently running.
 
+	[[nodiscard]]
 	bool isStopped() const;
 		/// Returns true if the service is currently stopped.
 
@@ -128,6 +134,7 @@ public:
 	void setStartup(Startup startup);
 		/// Sets the startup mode for the service.
 
+	[[nodiscard]]
 	Startup getStartup() const;
 		/// Returns the startup mode for the service.
 
@@ -136,12 +143,14 @@ public:
 		/// If one of the Actions is SVC_RUN_COMMAND the command Parameter is added.
 		/// If one of the Actions is SVC_REBOOT the Reboot Message is set.
 
+	[[nodiscard]]
 	FailureActionTypeVector getFailureActions() const;
 		/// Returns the Failure Actions for the service.
 
 	void setDescription(const std::string& description);
 		/// Sets the service description in the registry.
 
+	[[nodiscard]]
 	std::string getDescription() const;
 		/// Returns the service description from the registry.
 
@@ -153,8 +162,10 @@ protected:
 
 private:
 	void open() const;
+	[[nodiscard]]
 	bool tryOpen() const;
 	void close() const;
+	[[nodiscard]]
 	POCO_LPQUERY_SERVICE_CONFIG config() const;
 
 	WinService();

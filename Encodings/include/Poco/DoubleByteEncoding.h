@@ -46,12 +46,19 @@ public:
 	};
 
 	// TextEncoding
+	[[nodiscard]]
 	const char* canonicalName() const;
+	[[nodiscard]]
 	bool isA(const std::string& encodingName) const;
+	[[nodiscard]]
 	const CharacterMap& characterMap() const;
+	[[nodiscard]]
 	int convert(const unsigned char* bytes) const;
+	[[nodiscard]]
 	int convert(int ch, unsigned char* bytes, int length) const;
+	[[nodiscard]]
 	int queryConvert(const unsigned char* bytes, int length) const;
+	[[nodiscard]]
 	int sequenceLength(const unsigned char* bytes, int length) const;
 
 protected:
@@ -91,12 +98,14 @@ protected:
 	~DoubleByteEncoding();
 		/// Destroys the DoubleByteEncoding.
 
+	[[nodiscard]]
 	int map(Poco::UInt16 encoded) const;
 		/// Maps a double-byte encoded character to its Unicode code point.
 		///
 		/// Returns the Unicode code point, or -1 if the encoded character is bad
 		/// and cannot be mapped.
 
+	[[nodiscard]]
 	int reverseMap(int cp) const;
 		/// Maps a Unicode code point to its double-byte representation.
 		///

@@ -170,7 +170,9 @@ protected:
 	};
 
 	~ColorConsoleChannel() override;
+	[[nodiscard]]
 	Color parseColor(const std::string& color) const;
+	[[nodiscard]]
 	std::string formatColor(Color color) const;
 	void initColors();
 

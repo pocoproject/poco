@@ -145,7 +145,7 @@ void VarTest::testInt8()
 
 	try
 	{
-		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -239,7 +239,7 @@ void VarTest::testInt16()
 
 	try
 	{
-		Int32 POCO_UNUSED value2; value2 = a1.extract<Int32>();
+		[[maybe_unused]] Int32 value2; value2 = a1.extract<Int32>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -333,7 +333,7 @@ void VarTest::testInt32()
 
 	try
 	{
-		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -427,7 +427,7 @@ void VarTest::testInt64()
 
 	try
 	{
-		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -529,7 +529,7 @@ void VarTest::testUInt8()
 
 	try
 	{
-		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -623,7 +623,7 @@ void VarTest::testUInt16()
 
 	try
 	{
-		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -717,7 +717,7 @@ void VarTest::testUInt32()
 
 	try
 	{
-		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -811,7 +811,7 @@ void VarTest::testUInt64()
 
 	try
 	{
-		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -905,7 +905,7 @@ void VarTest::testBool()
 
 	try
 	{
-		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -982,7 +982,7 @@ void VarTest::testChar()
 
 	try
 	{
-		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -994,7 +994,7 @@ void VarTest::testChar()
 void VarTest::testFloat()
 {
 	Var any("0");
-	float POCO_UNUSED f = any;
+	[[maybe_unused]] float f = any;
 
 	float src = 32.0F;
 	Var a1 = src;
@@ -1062,7 +1062,7 @@ void VarTest::testFloat()
 
 	try
 	{
-		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1092,7 +1092,7 @@ void VarTest::testDouble()
 {
 	double d = 0;
 	Var v(d);
-	float POCO_UNUSED f = v;
+	[[maybe_unused]] float f = v;
 
 	double src = 32.0;
 	Var a1 = src;
@@ -1160,7 +1160,7 @@ void VarTest::testDouble()
 
 	try
 	{
-		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1250,7 +1250,7 @@ void VarTest::testString()
 
 	try
 	{
-		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1345,7 +1345,7 @@ void VarTest::testLong()
 
 	try
 	{
-		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1439,7 +1439,7 @@ void VarTest::testULong()
 
 	try
 	{
-		Int16 POCO_UNUSED value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1532,7 +1532,7 @@ void VarTest::testLongLong()
 
 	try
 	{
-		POCO_UNUSED Int16 value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1626,7 +1626,7 @@ void VarTest::testULongLong()
 
 	try
 	{
-		POCO_UNUSED Int16 value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1723,7 +1723,7 @@ void VarTest::testEnumType()
 
 	try
 	{
-		POCO_UNUSED Int16 value2; value2 = a1.extract<Int16>();
+		[[maybe_unused]] Int16 value2; value2 = a1.extract<Int16>();
 		fail("bad cast - must throw");
 	}
 	catch (Poco::BadCastException&)
@@ -1764,7 +1764,7 @@ void VarTest::testUDT()
 
 	try
 	{
-		float POCO_UNUSED f = da1;
+		[[maybe_unused]] float f = da1;
 		fail ("must fail");
 	}
 	catch (BadCastException&) { }
@@ -2104,26 +2104,26 @@ void VarTest::testLimitsFloat()
 	{
 		constexpr double iMin = -1 * std::numeric_limits<float>::max();
 		Var da = iMin * 10;
-		try { float POCO_UNUSED f; f = da; fail("must throw", __LINE__, __FILE__); }
+		try { [[maybe_unused]] float f; f = da; fail("must throw", __LINE__, __FILE__); }
 		catch (RangeException&) {}
 
 		constexpr double iMax = std::numeric_limits<float>::max();
 		da = iMax * 10;
-		try { float POCO_UNUSED f; f = da; fail("must throw", __LINE__, __FILE__); }
+		try { [[maybe_unused]] float f; f = da; fail("must throw", __LINE__, __FILE__); }
 		catch (RangeException&) {}
 	}
 
 	int64_t i = std::numeric_limits<int>::max();
 	Var anyInt = i;
-	try { anyInt.convert<float>(); fail("must throw", __LINE__, __FILE__); }
+	try { [[maybe_unused]] float converted = anyInt.convert<float>(); fail("must throw", __LINE__, __FILE__); }
 	catch (RangeException&) {}
 
 	Var anyFloat = 1.0f;
 	anyFloat = i;
-	anyFloat.convert<int>();
+	[[maybe_unused]] int converted = anyFloat.convert<int>();
 	assertTrue (anyFloat.convert<int64_t>() == i);
 
-	try { float POCO_UNUSED fl = anyFloat; fail("must throw", __LINE__, __FILE__); }
+	try { [[maybe_unused]] float fl = anyFloat; fail("must throw", __LINE__, __FILE__); }
 	catch (Poco::RangeException&) {}
 
 	i = std::numeric_limits<int64_t>::max();
@@ -3145,13 +3145,13 @@ void VarTest::testEmpty()
 
 	try
 	{
-		int POCO_UNUSED i = da;
+		[[maybe_unused]] int i = da;
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
 
 	try
 	{
-		int POCO_UNUSED i = da.extract<int>();
+		[[maybe_unused]] int i = da.extract<int>();
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
 }

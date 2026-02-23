@@ -93,9 +93,11 @@ public:
 		///
 		/// If the system identifier is a URL, it must be fully resolved (it may not be a relative URL).
 
+	[[nodiscard]]
 	const XMLString& getPublicId() const;
 		/// Get the public identifier for this input source.
 
+	[[nodiscard]]
 	const XMLString& getSystemId() const;
 		/// Get the system identifier for this input source.
 
@@ -104,12 +106,14 @@ public:
 		/// The SAX parser will ignore this if there is also a character stream specified, but it
 		/// will use a byte stream in preference to opening a URI connection itself.
 
+	[[nodiscard]]
 	XMLByteInputStream* getByteStream() const;
 		/// Get the byte stream for this input source.
 
 	void setCharacterStream(XMLCharInputStream& istr);
 		/// Set the character stream for this input source.
 
+	[[nodiscard]]
 	XMLCharInputStream* getCharacterStream() const;
 		/// Get the character stream for this input source.
 
@@ -118,6 +122,7 @@ public:
 		/// The encoding must be a string acceptable for an XML encoding declaration
 		/// (see section 4.3.3 of the XML 1.0 recommendation).
 
+	[[nodiscard]]
 	const XMLString& getEncoding() const;
 		/// Get the character encoding for a byte stream or URI.
 

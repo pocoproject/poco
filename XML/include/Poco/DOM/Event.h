@@ -48,28 +48,35 @@ public:
 		BUBBLING_PHASE  = 3  /// The current event phase is the capturing phase.
 	};
 
+	[[nodiscard]]
 	const XMLString& type() const;
 		/// The name of the event (case-insensitive). The name must be an XML name.
 
+	[[nodiscard]]
 	EventTarget* target() const;
 		/// Used to indicate the EventTarget to which the event was originally dispatched.
 
+	[[nodiscard]]
 	EventTarget* currentTarget() const;
 		/// Used to indicate the EventTarget whose EventListeners are currently being
 		/// processed. This is particularly useful during capturing and bubbling.
 
+	[[nodiscard]]
 	PhaseType eventPhase() const;
 		/// Used to indicate which phase of event flow is currently being evaluated.
 
+	[[nodiscard]]
 	bool bubbles() const;
 		/// Used to indicate whether or not an event is a bubbling event.
 		/// If the event can bubble the value is true, else the value is false.
 
+	[[nodiscard]]
 	bool cancelable() const;
 		/// Used to indicate whether or not an event can have its default action
 		/// prevented. If the default action can be prevented the value is
 		/// true, else the value is false.
 
+	[[nodiscard]]
 	Poco::UInt64 timeStamp() const;
 		/// Used to specify the time (in milliseconds relative to the epoch) at
 		/// which the event was created. Due to the fact that some
@@ -116,9 +123,11 @@ protected:
 	Event(Document* pOwnerDocument, const XMLString& type, EventTarget* pTarget, bool canBubble, bool isCancelable);
 	~Event();
 
+	[[nodiscard]]
 	bool isCanceled() const;
 		/// returns true if and only if the event has been cancelled.
 
+	[[nodiscard]]
 	bool isStopped() const;
 		/// returns true if and only if propagation of the event has been stopped.
 

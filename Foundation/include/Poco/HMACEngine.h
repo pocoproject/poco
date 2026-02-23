@@ -68,6 +68,7 @@ public:
 	HMACEngine(const HMACEngine&) = delete;
 	HMACEngine& operator=(const HMACEngine&) = delete;
 
+	[[nodiscard]]
 	std::size_t digestLength() const override { return DIGEST_SIZE; }
 
 	void reset() override
@@ -76,6 +77,7 @@ public:
 		_engine.update(_ipad, BLOCK_SIZE);
 	}
 
+	[[nodiscard]]
 	const DigestEngine::Digest& digest() override
 	{
 		const DigestEngine::Digest& d = _engine.digest();

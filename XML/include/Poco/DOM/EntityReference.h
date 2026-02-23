@@ -50,7 +50,9 @@ class XML_API EntityReference: public AbstractNode
 {
 public:
 	// Node
+	[[nodiscard]]
 	const XMLString& nodeName() const;
+	[[nodiscard]]
 	unsigned short nodeType() const;
 
 protected:
@@ -58,6 +60,7 @@ protected:
 	EntityReference(Document* pOwnerDocument, const EntityReference& ref);
 	~EntityReference();
 
+	[[nodiscard]]
 	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:

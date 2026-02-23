@@ -61,9 +61,11 @@ class XML_API Attr: public AbstractNode
 	/// attribute values.
 {
 public:
+	[[nodiscard]]
 	const XMLString& name() const;
 		/// Returns the name of this attribute.
 
+	[[nodiscard]]
 	bool specified() const;
 		/// If this attribute was explicitly given a value in the original document,
 		/// this is true; otherwise, it is false. Note that the implementation is in
@@ -87,11 +89,13 @@ public:
 		///       was just created or was obtained from some removal or cloning operation)
 		///       specified is true.
 
+	[[nodiscard]]
 	const XMLString& value() const;
 		/// Returns the value of the attribute as a string. Character
 		/// and general entity references are replaced with their values. See also the
 		/// method getAttribute on the Element interface.
 
+	[[nodiscard]]
 	const XMLString& getValue() const;
 		/// Returns the value of the attribute as a string. Character
 		/// and general entity references are replaced with their values. See also the
@@ -105,22 +109,32 @@ public:
 		/// Element interface.
 
 	// DOM Level 2
+	[[nodiscard]]
 	Element* ownerElement() const;
 		/// The Element node this attribute is attached to or null
 		/// if this attribute is not in use.
 
 	// Node
+	[[nodiscard]]
 	Node* parentNode() const;
+	[[nodiscard]]
 	const XMLString& nodeName() const;
+	[[nodiscard]]
 	const XMLString& getNodeValue() const;
 	void setNodeValue(const XMLString& value);
+	[[nodiscard]]
 	unsigned short nodeType() const;
+	[[nodiscard]]
 	Node* previousSibling() const;
+	[[nodiscard]]
 	const XMLString& namespaceURI() const;
+	[[nodiscard]]
 	XMLString prefix() const;
+	[[nodiscard]]
 	const XMLString& localName() const;
 
 	// Non-standard extensions
+	[[nodiscard]]
 	XMLString innerText() const;
 
 protected:
@@ -128,6 +142,7 @@ protected:
 	Attr(Document* pOwnerDocument, const Attr& attr);
 	~Attr();
 
+	[[nodiscard]]
 	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:

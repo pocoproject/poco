@@ -75,6 +75,7 @@ public:
 		/// The empty (default) prefix will be included in this enumeration; note that
 		/// this behaviour differs from that of getPrefix() and getPrefixes().
 
+	[[nodiscard]]
 	const XMLString& getPrefix(const XMLString& namespaceURI) const;
 		/// Return one of the prefixes mapped to a Namespace URI.
 		///
@@ -82,6 +83,7 @@ public:
 		/// will make an arbitrary selection; if you want all of the prefixes, use the
 		/// getPrefixes() method instead.
 
+	[[nodiscard]]
 	bool isMapped(const XMLString& namespaceURI) const;
 		/// Returns true if the given namespaceURI has been mapped to a prefix,
 		/// false otherwise.
@@ -108,6 +110,7 @@ public:
 		/// to check for the presence of a default Namespace, use the getURI() method
 		/// with an argument of "".
 
+	[[nodiscard]]
 	const XMLString& getURI(const XMLString& prefix) const;
 		/// Look up a prefix and get the currently-mapped Namespace URI.
 		///
@@ -150,6 +153,7 @@ public:
 		/// You must not attempt to declare additional Namespace prefixes after popping
 		/// a context, unless you push another context first.
 
+	[[nodiscard]]
 	bool processName(const XMLString& qname, XMLString& namespaceURI, XMLString& localName, bool isAttribute) const;
 		/// Process a raw XML 1.0 name.
 		/// This method processes a raw XML 1.0 name in the current context

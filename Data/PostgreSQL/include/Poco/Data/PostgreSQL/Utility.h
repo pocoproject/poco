@@ -32,33 +32,43 @@ class PostgreSQL_API Utility
 	/// Various utility functions for PostgreSQL.
 {
 public:
+	[[nodiscard]]
 	static std::string serverInfo(SessionHandle* aHandlePtr);
 		/// Returns server info.
 
+	[[nodiscard]]
 	static std::string serverInfo(Poco::Data::Session& aSession);
 		/// Returns server info.
 
+	[[nodiscard]]
 	static int serverVersion(SessionHandle* aHandlePtr);
 		/// Returns server version.
 
+	[[nodiscard]]
 	static int serverVersion(Poco::Data::Session& aSession);
 		/// Returns server version.
 
+	[[nodiscard]]
 	static std::string hostInfo(SessionHandle* aHandlePtr);
 		/// Returns host info.
 
+	[[nodiscard]]
 	static std::string hostInfo(Poco::Data::Session& aSession);
 		/// Returns host info.
 
+	[[nodiscard]]
 	static std::string sessionEncoding(SessionHandle* aHandlePtr);
 		/// Returns session encoding.
 
+	[[nodiscard]]
 	static std::string sessionEncoding(Poco::Data::Session& aSession);
 		/// Returns session encoding.
 
+	[[nodiscard]]
 	static bool hasMicrosecond() { return true; }
 		/// Rturns true if microseconds are suported.
 
+	[[nodiscard]]
 	static SessionHandle* handle(Poco::Data::Session& aSession);
 		/// Returns native PostgreSQL handle for the session.
 };

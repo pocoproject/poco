@@ -347,7 +347,7 @@ bool ODBCStatementImpl::hasNext()
 
 		if (!nextRowReady())
 		{
-			if (hasMoreDataSets()) activateNextDataSet();
+			if (hasMoreDataSets()) (void)activateNextDataSet();
 			else return false;
 
 			if (SQL_NO_DATA == SQLMoreResults(_stmt))

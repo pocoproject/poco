@@ -111,24 +111,28 @@ public:
 			_pImpl->release();
 	}
 
+	[[nodiscard]]
 	const std::string& name() const
 		/// Returns the current filename.
 	{
 		return _path.getFileName();
 	}
 
+	[[nodiscard]]
 	const Poco::Path& path() const
 		/// Returns the current path.
 	{
 		return _path;
 	}
 
+	[[nodiscard]]
 	UInt16 depth() const
 		/// Depth of recursion (counting from 1).
 	{
 		return _pImpl->depth();
 	}
 
+	[[nodiscard]]
 	UInt16 maxDepth() const
 		/// Max depth of recursion (counting from 1).
 	{
@@ -228,14 +232,16 @@ private:
 //
 // friend comparsion operators
 //
-template<class T1, class T2>
-inline bool operator ==(const RecursiveDirectoryIterator<T1>& a, const RecursiveDirectoryIterator<T2>& b)
+template <class T1, class T2>
+[[nodiscard]]
+inline bool operator == (const RecursiveDirectoryIterator<T1>& a, const RecursiveDirectoryIterator<T2>& b)
 {
 	return a.path().toString() == b.path().toString();;
 }
 
-template<class T1, class T2>
-inline bool operator !=(const RecursiveDirectoryIterator<T1>& a, const RecursiveDirectoryIterator<T2>& b)
+template <class T1, class T2>
+[[nodiscard]]
+inline bool operator != (const RecursiveDirectoryIterator<T1>& a, const RecursiveDirectoryIterator<T2>& b)
 {
 	return a.path().toString() != b.path().toString();;
 }

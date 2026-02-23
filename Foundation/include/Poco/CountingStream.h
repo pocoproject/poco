@@ -46,12 +46,15 @@ public:
 	~CountingStreamBuf() override;
 		/// Destroys the CountingStream.
 
+	[[nodiscard]]
 	std::streamsize chars() const;
 		/// Returns the total number of characters.
 
+	[[nodiscard]]
 	std::streamsize lines() const;
 		/// Returns the total number of lines.
 
+	[[nodiscard]]
 	std::streamsize pos() const;
 		/// Returns the number of characters on the current line.
 
@@ -64,6 +67,7 @@ public:
 		/// This is mainly useful when parsing C/C++
 		/// preprocessed source code containing #line directives.
 
+	[[nodiscard]]
 	std::streamsize getCurrentLineNumber() const;
 		/// Returns the current line number (same as lines()).
 
@@ -110,12 +114,15 @@ public:
 	~CountingIOS() override;
 		/// Destroys the stream.
 
+	[[nodiscard]]
 	std::streamsize chars() const;
 		/// Returns the total number of characters.
 
+	[[nodiscard]]
 	std::streamsize lines() const;
 		/// Returns the total number of lines.
 
+	[[nodiscard]]
 	std::streamsize pos() const;
 		/// Returns the number of characters on the current line.
 
@@ -128,6 +135,7 @@ public:
 		/// This is mainly useful when parsing C/C++
 		/// preprocessed source code containing #line directives.
 
+	[[nodiscard]]
 	std::streamsize getCurrentLineNumber() const;
 		/// Returns the current line number (same as lines()).
 
@@ -140,6 +148,7 @@ public:
 	void addPos(std::streamsize pos);
 		/// Add to the number of characters on the current line.
 
+	[[nodiscard]]
 	CountingStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
 

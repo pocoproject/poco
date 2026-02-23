@@ -46,9 +46,11 @@ public:
 	AttributedString(const std::string& str, Alignment align = ALIGN_LEFT, int style = (int)STYLE_PLAIN);
 	AttributedString& operator=(const std::string&);
 	AttributedString& operator=(const char*);
+	[[nodiscard]]
 	operator const std::string&();
 
 	void setAttribute(int attr, const Poco::Dynamic::Var& value);
+	[[nodiscard]]
 	Poco::Dynamic::Var getAttribute(int attr);
 	void clearAttribute(int attr);
 

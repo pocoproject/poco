@@ -79,18 +79,21 @@ public:
 		return *this;
 	}
 
+	[[nodiscard]]
 	inline const K& first() const
 		/// Returns the first member of the pair.
 	{
 		return _data.first;
 	}
 
+	[[nodiscard]]
 	inline const Var& second() const
 		/// Returns the second member of the pair.
 	{
 		return _data.second;
 	}
 
+	[[nodiscard]]
 	std::string toString()
 	{
 		std::string str;
@@ -113,6 +116,7 @@ public:
 
 	~VarHolderImpl() override = default;
 
+	[[nodiscard]]
 	const std::type_info& type() const override
 	{
 		return typeid(Pair<std::string>);
@@ -205,41 +209,49 @@ public:
 		throw BadCastException("Pair -> Poco::Timestamp");
 	}
 
+	[[nodiscard]]
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	[[nodiscard]]
 	const Pair<std::string>& value() const
 	{
 		return _val;
 	}
 
+	[[nodiscard]]
 	bool isArray() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isStruct() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isInteger() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isSigned() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isNumeric() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isString() const override
 	{
 		return false;
@@ -260,6 +272,7 @@ public:
 
 	~VarHolderImpl() override = default;
 
+	[[nodiscard]]
 	const std::type_info& type() const override
 	{
 		return typeid(Pair<int>);
@@ -352,39 +365,47 @@ public:
 		throw BadCastException("Pair -> Poco::Timestamp");
 	}
 
+	[[nodiscard]]
 	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
 
+	[[nodiscard]]
 	const Pair<int>& value() const
 	{
 		return _val;
 	}
 
+	[[nodiscard]]
 	bool isArray() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isStruct() const override {
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isInteger() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isSigned() const override {
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isNumeric() const override
 	{
 		return false;
 	}
 
+	[[nodiscard]]
 	bool isString() const override {
 		return false;
 	}

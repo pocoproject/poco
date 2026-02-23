@@ -209,7 +209,7 @@ void Random::seed(UInt32 x)
 		lim = 10 * _randDeg;
 	}
 	for (i = 0; i < lim; i++)
-		next();
+		[[maybe_unused]] UInt32 x = next();
 }
 
 

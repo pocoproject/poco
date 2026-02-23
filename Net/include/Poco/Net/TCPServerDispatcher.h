@@ -62,27 +62,35 @@ public:
 	void stop();
 		/// Stops the dispatcher.
 
+	[[nodiscard]]
 	int currentThreads() const;
 		/// Returns the number of currently used threads.
 
+	[[nodiscard]]
 	int maxThreads() const;
 		/// Returns the maximum number of threads available.
 
+	[[nodiscard]]
 	Int64 totalConnections() const;
 		/// Returns the total number of handled connections.
 
+	[[nodiscard]]
 	int currentConnections() const;
 		/// Returns the number of currently handled connections.
 
+	[[nodiscard]]
 	int maxConcurrentConnections() const;
 		/// Returns the maximum number of concurrently handled connections.
 
+	[[nodiscard]]
 	int queuedConnections() const;
 		/// Returns the number of queued connections.
 
+	[[nodiscard]]
 	int refusedConnections() const;
 		/// Returns the number of refused connections.
 
+	[[nodiscard]]
 	const TCPServerParams& params() const;
 		/// Returns a const reference to the TCPServerParam object.
 

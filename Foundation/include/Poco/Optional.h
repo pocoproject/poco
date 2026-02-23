@@ -132,6 +132,7 @@ public:
 		swap(_optional, other._optional);
 	}
 
+	[[nodiscard]]
 	const C& value() const
 		/// Returns the Optional's value.
 		///
@@ -140,9 +141,10 @@ public:
 		if (_optional.has_value())
 			return _optional.value();
 
-		throw Poco::NullValueException();
+		throw NullValueException();
 	}
 
+	[[nodiscard]]
 	const C& value(const C& deflt) const
 		/// Returns the Optional's value, or the
 		/// given default value if the Optional's
@@ -154,6 +156,7 @@ public:
 		return deflt;
 	}
 
+	[[nodiscard]]
 	bool isSpecified() const
 		/// Returns true iff the Optional's value has been specified.
 	{

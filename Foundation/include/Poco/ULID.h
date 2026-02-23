@@ -63,6 +63,7 @@ public:
 		/// members and returns true. Otherwise leaves the
 		/// object unchanged and returns false.
 
+	[[nodiscard]]
 	std::string toString() const;
 		/// Returns a string representation of the ULID, 
 		/// using Crockford's Base 32 encoding.
@@ -79,36 +80,49 @@ public:
 		/// The buffer need not be aligned.
 		/// There must have room for at least 16 bytes.
 
+	[[nodiscard]]
 	Poco::UInt64 time() const;
 		/// Returns the 48-bit time part of the ULID
 		/// (milliseconds since Unix epoch).
 
+	[[nodiscard]]
 	Poco::UInt16 randomHigh() const;
 		/// Returns the most significant 16 bits of the 80-bit
 		/// random part of the ULID.
 
+	[[nodiscard]]
 	Poco::UInt64 randomLow() const;
 		/// Returns the least significant 64 bits of the 80-bit
 		/// random part of the ULID.
 
+	[[nodiscard]]
 	bool operator == (const ULID& ulid) const;
+	[[nodiscard]]
 	bool operator != (const ULID& ulid) const;
+	[[nodiscard]]
 	bool operator <  (const ULID& ulid) const;
+	[[nodiscard]]
 	bool operator <= (const ULID& ulid) const;
+	[[nodiscard]]
 	bool operator >  (const ULID& ulid) const;
+	[[nodiscard]]
 	bool operator >= (const ULID& ulid) const;
 
+	[[nodiscard]]
 	bool isNull() const;
 		/// Returns true iff the ULID is nil (in other words,
 		/// consists of all zeros).
 
+	[[nodiscard]]
 	static const ULID& null();
 		/// Returns a null/nil ULID.
 
 protected:
+	[[nodiscard]]
 	int compare(const ULID& ulid) const;
 
 	template <typename T>
+	[[nodiscard]]
 	static T decode(char c)
 	{
 		return static_cast<T>(REVERSE_ENCODING[static_cast<unsigned char>(c)]);

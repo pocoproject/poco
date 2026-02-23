@@ -56,6 +56,7 @@ public:
 		/// Sets the encoding used by the parser if no
 		/// encoding is specified in the XML document.
 
+	[[nodiscard]]
 	const XMLString& getEncoding() const;
 		/// Returns the name of the encoding used by
 		/// the parser if no encoding is specified in
@@ -75,24 +76,30 @@ public:
 		/// which, when activated, causes the WhitespaceFilter to
 		/// be used.
 
+	[[nodiscard]]
 	bool getFeature(const XMLString& name) const;
 		/// Look up the value of a feature.
 		///
 		/// If a feature is not recognized by the DOMParser, the
 		/// DOMParser queries the underlying SAXParser for the feature.
 
+	[[nodiscard]]
 	Document* parse(const XMLString& uri);
 		/// Parse an XML document from a location identified by an URI.
 
+	[[nodiscard]]
 	Document* parse(InputSource* pInputSource);
 		/// Parse an XML document from a location identified by an InputSource.
 
+	[[nodiscard]]
 	Document* parseString(const std::string& xml);
 		/// Parse an XML document from a string.
 
+	[[nodiscard]]
 	Document* parseMemory(const char* xml, std::size_t size);
 		/// Parse an XML document from memory.
 
+	[[nodiscard]]
 	EntityResolver* getEntityResolver() const;
 		/// Returns the entity resolver used by the underlying SAXParser.
 
@@ -108,6 +115,7 @@ public:
 		///
 		/// The default limit is 256.
 
+	[[nodiscard]]
 	std::size_t getMaxElementDepth() const;
 		/// Returns the maximum element depth.
 

@@ -45,16 +45,21 @@ public:
 		/// Synchronous notification processing. Blocks and returns a result.
 		/// Default implementation throws NotImplementedException.
 
+	[[nodiscard]]
 	virtual bool equals(const AbstractObserver& observer) const = 0;
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use `bool accepts(Notification::Ptr&)` instead")
 	virtual bool accepts(Notification* pNf, const char* pName) const = 0;
 
+	[[nodiscard]]
 	virtual bool accepts(const Notification::Ptr& pNf) const = 0;
 
+	[[nodiscard]]
 	virtual bool acceptsSync() const;
 		/// Returns true if this observer supports synchronous notification processing.
 
+	[[nodiscard]]
 	virtual AbstractObserver* clone() const = 0;
 
 	virtual void start();
@@ -64,6 +69,7 @@ public:
 
 	virtual void disable() = 0;
 
+	[[nodiscard]]
 	virtual int backlog() const;
 		/// Returns number of queued messages that this Observer has.
 		/// For non-active (synchronous) observers, always returns zero.
