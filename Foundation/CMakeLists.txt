@@ -180,7 +180,7 @@ else()
 endif(CYGWIN)
 
 if(ENABLE_TRACE)
-	target_link_libraries(Foundation PRIVATE Poco::Trace)
+	target_link_libraries(Foundation PRIVATE "$<BUILD_LOCAL_INTERFACE:cpptrace::cpptrace>")
 endif()
 
 if(CMAKE_SYSTEM MATCHES "SunOS")
