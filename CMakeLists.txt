@@ -288,6 +288,9 @@ endif()
 if(ENABLE_PDF)
 	string(APPEND _opt_deps ", libpng")
 endif()
+if(ENABLE_TRACE)
+	string(APPEND _opt_deps ", cpptrace")
+endif()
 
 if(POCO_UNBUNDLED)
 	# All bundled deps become external
@@ -643,11 +646,6 @@ endif()
 if(EXISTS ${PROJECT_SOURCE_DIR}/Encodings/Compiler AND ENABLE_ENCODINGS_COMPILER)
 	add_subdirectory(Encodings/Compiler)
 	list(APPEND Poco_COMPONENTS "EncodingsCompiler")
-endif()
-
-if(ENABLE_TRACE)
-	add_subdirectory(Trace)
-	list(APPEND Poco_COMPONENTS "Trace")
 endif()
 
 if(ENABLE_MODULES AND CMAKE_VERSION VERSION_GREATER_EQUAL 3.28)

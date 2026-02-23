@@ -7,7 +7,7 @@
 include $(POCO_BASE)/build/rules/global
 
 ifdef POCO_ENABLE_TRACE
-INCLUDE += -I $(POCO_BASE)/Trace/include/Poco/Trace
+INCLUDE += -I$(POCO_BASE)/dependencies/cpptrace/include
 endif
 
 objects = ArchiveStrategy Ascii ASCIIEncoding AsyncChannel AsyncNotificationCenter ActiveThreadPool\
@@ -85,7 +85,7 @@ target         = PocoFoundation
 target_version = $(LIBVERSION)
 target_libs    =
 ifdef POCO_ENABLE_TRACE
-target_libs   += PocoTrace
+target_libs   += cpptrace
 endif
 
 ifeq ($(findstring MinGW, $(POCO_CONFIG)), MinGW)
