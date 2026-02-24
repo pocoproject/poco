@@ -128,8 +128,10 @@ bool FileImpl::isFileImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(const_cast<char*>(_path.c_str()), &st) == 0)
+	if (::stat(const_cast<char*>(_path.c_str()), &st) == 0)
 		return S_ISREG(st.st_mode);
+	else if (errno == ENOENT)
+		return false;
 	else
 		handleLastErrorImpl(_path);
 	return false;
@@ -141,8 +143,10 @@ bool FileImpl::isDirectoryImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(const_cast<char*>(_path.c_str()), &st) == 0)
+	if (::stat(const_cast<char*>(_path.c_str()), &st) == 0)
 		return S_ISDIR(st.st_mode);
+	else if (errno == ENOENT)
+		return false;
 	else
 		handleLastErrorImpl(_path);
 	return false;
@@ -160,8 +164,10 @@ bool FileImpl::isDeviceImpl() const
 	poco_assert (!_path.empty());
 
 	struct stat st;
-	if (stat(const_cast<char*>(_path.c_str()), &st) == 0)
+	if (::stat(const_cast<char*>(_path.c_str()), &st) == 0)
 		return S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode);
+	else if (errno == ENOENT)
+		return false;
 	else
 		handleLastErrorImpl(_path);
 	return false;

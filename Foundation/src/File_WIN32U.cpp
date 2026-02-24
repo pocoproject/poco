@@ -204,6 +204,9 @@ bool FileImpl::canReadImpl() const
 	{
 		switch (::GetLastError())
 		{
+		case ERROR_FILE_NOT_FOUND:
+		case ERROR_PATH_NOT_FOUND:
+		case ERROR_INVALID_DRIVE:
 		case ERROR_ACCESS_DENIED:
 			return false;
 		default:
@@ -220,7 +223,17 @@ bool FileImpl::canWriteImpl() const
 
 	DWORD attr = ::GetFileAttributesW(_upath.c_str());
 	if (attr == INVALID_FILE_ATTRIBUTES)
-		handleLastErrorImpl(_path);
+	{
+		switch (::GetLastError())
+		{
+		case ERROR_FILE_NOT_FOUND:
+		case ERROR_PATH_NOT_FOUND:
+		case ERROR_INVALID_DRIVE:
+			return false;
+		default:
+			handleLastErrorImpl(_path);
+		}
+	}
 	return (attr & FILE_ATTRIBUTE_READONLY) == 0;
 }
 
@@ -246,7 +259,22 @@ bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 
 bool FileImpl::isFileImpl() const
 {
-	return !isDirectoryImpl() && !isDeviceImpl();
+	poco_assert (!_path.empty());
+
+	DWORD attr = ::GetFileAttributesW(_upath.c_str());
+	if (attr == INVALID_FILE_ATTRIBUTES)
+	{
+		switch (::GetLastError())
+		{
+		case ERROR_FILE_NOT_FOUND:
+		case ERROR_PATH_NOT_FOUND:
+		case ERROR_INVALID_DRIVE:
+			return false;
+		default:
+			handleLastErrorImpl(_path);
+		}
+	}
+	return (attr & FILE_ATTRIBUTE_DIRECTORY) == 0 && !isDeviceImpl();
 }
 
 
@@ -256,7 +284,17 @@ bool FileImpl::isDirectoryImpl() const
 
 	DWORD attr = ::GetFileAttributesW(_upath.c_str());
 	if (attr == INVALID_FILE_ATTRIBUTES)
-		handleLastErrorImpl(_path);
+	{
+		switch (::GetLastError())
+		{
+		case ERROR_FILE_NOT_FOUND:
+		case ERROR_PATH_NOT_FOUND:
+		case ERROR_INVALID_DRIVE:
+			return false;
+		default:
+			handleLastErrorImpl(_path);
+		}
+	}
 	return (attr & FILE_ATTRIBUTE_DIRECTORY) != 0;
 }
 
@@ -267,7 +305,17 @@ bool FileImpl::isLinkImpl() const
 
 	DWORD attr = ::GetFileAttributesW(_upath.c_str());
 	if (attr == INVALID_FILE_ATTRIBUTES)
-		handleLastErrorImpl(_path);
+	{
+		switch (::GetLastError())
+		{
+		case ERROR_FILE_NOT_FOUND:
+		case ERROR_PATH_NOT_FOUND:
+		case ERROR_INVALID_DRIVE:
+			return false;
+		default:
+			handleLastErrorImpl(_path);
+		}
+	}
 	return (attr & FILE_ATTRIBUTE_DIRECTORY) == 0 && (attr & FILE_ATTRIBUTE_REPARSE_POINT) != 0;
 }
 
@@ -294,7 +342,17 @@ bool FileImpl::isHiddenImpl() const
 
 	DWORD attr = ::GetFileAttributesW(_upath.c_str());
 	if (attr == INVALID_FILE_ATTRIBUTES)
-		handleLastErrorImpl(_path);
+	{
+		switch (::GetLastError())
+		{
+		case ERROR_FILE_NOT_FOUND:
+		case ERROR_PATH_NOT_FOUND:
+		case ERROR_INVALID_DRIVE:
+			return false;
+		default:
+			handleLastErrorImpl(_path);
+		}
+	}
 	return (attr & FILE_ATTRIBUTE_HIDDEN) != 0;
 }
 
