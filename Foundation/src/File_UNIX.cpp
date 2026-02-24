@@ -147,7 +147,10 @@ bool FileImpl::canReadImpl() const
 		else
 			return (st.st_mode & S_IROTH) != 0 || ::geteuid() == 0;
 	}
-	else handleLastErrorImpl(_path);
+	else if (const auto err = errno; err == ENOENT)
+		return false;
+	else
+		handleLastErrorImpl(err, _path);
 	return false;
 }
 
@@ -166,7 +169,10 @@ bool FileImpl::canWriteImpl() const
 		else
 			return (st.st_mode & S_IWOTH) != 0 || ::geteuid() == 0;
 	}
-	else handleLastErrorImpl(_path);
+	else if (const auto err = errno; err == ENOENT)
+		return false;
+	else
+		handleLastErrorImpl(err, _path);
 	return false;
 }
 
@@ -197,8 +203,10 @@ bool FileImpl::isFileImpl() const
 	struct stat st;
 	if (::stat(_path.c_str(), &st) == 0)
 		return S_ISREG(st.st_mode);
+	else if (const auto err = errno; err == ENOENT)
+		return false;
 	else
-		handleLastErrorImpl(_path);
+		handleLastErrorImpl(err, _path);
 	return false;
 }
 
@@ -210,8 +218,10 @@ bool FileImpl::isDirectoryImpl() const
 	struct stat st;
 	if (::stat(_path.c_str(), &st) == 0)
 		return S_ISDIR(st.st_mode);
+	else if (const auto err = errno; err == ENOENT)
+		return false;
 	else
-		handleLastErrorImpl(_path);
+		handleLastErrorImpl(err, _path);
 	return false;
 }
 
@@ -223,8 +233,10 @@ bool FileImpl::isLinkImpl() const
 	struct stat st;
 	if (::lstat(_path.c_str(), &st) == 0)
 		return S_ISLNK(st.st_mode);
+	else if (const auto err = errno; err == ENOENT)
+		return false;
 	else
-		handleLastErrorImpl(_path);
+		handleLastErrorImpl(err, _path);
 	return false;
 }
 
@@ -236,8 +248,10 @@ bool FileImpl::isDeviceImpl() const
 	struct stat st;
 	if (::stat(_path.c_str(), &st) == 0)
 		return S_ISCHR(st.st_mode) || S_ISBLK(st.st_mode);
+	else if (const auto err = errno; err == ENOENT)
+		return false;
 	else
-		handleLastErrorImpl(_path);
+		handleLastErrorImpl(err, _path);
 	return false;
 }
 

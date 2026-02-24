@@ -55,41 +55,13 @@ void FileTest::testFileAttributes1()
 	File f("testfile.dat");
 	assertTrue (!f.exists());
 
-	try
-	{
-		bool POCO_UNUSED flag = f.canRead();
-		failmsg("file does not exist - must throw exception");
-	}
-	catch (Exception&)
-	{
-	}
-
-	try
-	{
-		bool POCO_UNUSED flag = f.canWrite();
-		failmsg("file does not exist - must throw exception");
-	}
-	catch (Exception&)
-	{
-	}
-
-	try
-	{
-		bool POCO_UNUSED flag = f.isFile();
-		failmsg("file does not exist - must throw exception");
-	}
-	catch (Exception&)
-	{
-	}
-
-	try
-	{
-		bool POCO_UNUSED flag = f.isDirectory();
-		failmsg("file does not exist - must throw exception");
-	}
-	catch (Exception&)
-	{
-	}
+	assertFalse (f.canRead());
+	assertFalse (f.canWrite());
+	assertFalse (f.isFile());
+	assertFalse (f.isDirectory());
+	assertFalse (f.isLink());
+	assertFalse (f.isDevice());
+	assertFalse (f.isHidden());
 
 	try
 	{
