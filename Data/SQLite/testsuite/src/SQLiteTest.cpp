@@ -305,6 +305,48 @@ void SQLiteTest::testBind()
 }
 
 
+void SQLiteTest::testAddBindingReuse()
+{
+	Session session(Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	session << "DROP TABLE IF EXISTS test", now;
+	session << "CREATE TABLE test (id INTEGER, name VARCHAR(30))", now;
+	session << "INSERT INTO test VALUES(1, 'Alice')", now;
+	session << "INSERT INTO test VALUES(2, 'Bob')", now;
+	session << "INSERT INTO test VALUES(3, 'Charlie')", now;
+
+	Statement stmt(session);
+	stmt << "SELECT name FROM test WHERE id = ?";
+
+	// first execute
+	int id = 1;
+	Poco::Data::AbstractBindingVec bindings;
+	bindings.push_back(Poco::Data::Keywords::bind(id, "id"));
+	stmt.addBinding(bindings, true);
+	std::string name;
+	stmt.addExtract(into(name));
+	stmt.execute();
+	assertTrue (name == "Alice");
+
+	// second execute with new binding — this is the bug scenario from #5220
+	id = 2;
+	Poco::Data::AbstractBindingVec bindings2;
+	bindings2.push_back(Poco::Data::Keywords::bind(id, "id"));
+	stmt.addBinding(bindings2, true);
+	name.clear();
+	stmt.execute();
+	assertTrue (name == "Bob");
+
+	// third execute to confirm repeated reuse
+	id = 3;
+	Poco::Data::AbstractBindingVec bindings3;
+	bindings3.push_back(Poco::Data::Keywords::bind(id, "id"));
+	stmt.addBinding(bindings3, true);
+	name.clear();
+	stmt.execute();
+	assertTrue (name == "Charlie");
+}
+
+
 void SQLiteTest::testBinding()
 {
 	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
@@ -4061,6 +4103,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testIllegalFilePath);
 	CppUnit_addTest(pSuite, SQLiteTest, testTransactionTypeProperty);
 	CppUnit_addTest(pSuite, SQLiteTest, testRecordsetCopyMove);
+	CppUnit_addTest(pSuite, SQLiteTest, testAddBindingReuse);
 
 	return pSuite;
 }
