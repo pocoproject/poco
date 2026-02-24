@@ -148,6 +148,7 @@ public:
 	void testTransactionTypeProperty();
 
 	void testRecordsetCopyMove();
+	void testAddBindingReuse();
 
 	void setUp();
 	void tearDown();

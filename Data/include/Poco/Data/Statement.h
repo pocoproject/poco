@@ -180,10 +180,12 @@ public:
 	Statement& addBinding(C& bindingCont, bool reset)
 		/// Registers binding container with the Statement.
 	{
-		if (reset) _pImpl->resetBinding();
-		typename C::iterator itAB = bindingCont.begin();
-		typename C::iterator itABEnd = bindingCont.end();
-		for (; itAB != itABEnd; ++itAB) addBind(*itAB);
+		if (reset)
+		{
+			_pImpl->resetBinding();
+			_pImpl->bindings().clear();
+		}
+		for (auto& ab : bindingCont) addBind(ab);
 		return *this;
 	}
 
