@@ -30,6 +30,11 @@ namespace MongoDB {
 
 class MongoDB_API OpMsgMessage: public Message
 	/// This class represents a request/response (OP_MSG) to send requests and receive responses to/from MongoDB.
+	///
+	/// THREAD SAFETY:
+	/// This class is NOT thread-safe. OpMsgMessage instances must not be accessed
+	/// concurrently from multiple threads without external synchronization.
+	/// Each thread should use its own message instances.
 {
 public:
 
@@ -42,7 +47,6 @@ public:
 	static const std::string CMD_UPDATE;
 	static const std::string CMD_FIND;
 	static const std::string CMD_FIND_AND_MODIFY;
-	static const std::string CMD_GET_MORE;
 
 	// Aggregation
 	static const std::string CMD_AGGREGATE;
@@ -91,41 +95,38 @@ public:
 
 	virtual ~OpMsgMessage();
 
-	const std::string& databaseName() const;
+	[[nodiscard]] const std::string& databaseName() const;
 
-	const std::string& collectionName() const;	
+	[[nodiscard]] const std::string& collectionName() const;
 
 	void setCommandName(const std::string& command);
 		/// Sets the command name and clears the command document
 
-	void setCursor(Poco::Int64 cursorID, Poco::Int32 batchSize = -1);
-		/// Sets the command "getMore" for the cursor id with batch size (if it is not negative).
-
-	const std::string& commandName() const;
+	[[nodiscard]] const std::string& commandName() const;
 		/// Current command name.
 
 	void setAcknowledgedRequest(bool ack);
-		/// Set false to create request that does not return response. 
+		/// Set false to create request that does not return response.
 		/// It has effect only for commands that write or delete documents.
 		/// Default is true (request returns acknowledge response).
 
-	bool acknowledgedRequest() const;
+	[[nodiscard]] bool acknowledgedRequest() const;
 
-	UInt32 flags() const;
+	[[nodiscard]] UInt32 flags() const;
 
 	Document& body();
 		/// Access to body document.
 		/// Additional query arguments shall be added after setting the command name.
 
-	const Document& body() const;
+	[[nodiscard]] const Document& body() const;
 
 	Document::Vector& documents();
 		/// Documents prepared for request or retrieved in response.
 
-	const Document::Vector& documents() const;
+	[[nodiscard]] const Document::Vector& documents() const;
 		/// Documents prepared for request or retrieved in response.
 
-	bool responseOk() const;
+	[[nodiscard]] bool responseOk() const;
 		/// Reads "ok" status from the response message.
 
 	void clear();
@@ -138,6 +139,14 @@ public:
 		/// Reads the response from the stream.
 
 private:
+
+	// Only used by the cursor
+	static const std::string CMD_GET_MORE;
+
+	friend class OpMsgCursor;
+
+	void setCursor(Poco::Int64 cursorID, Poco::Int32 batchSize = -1);
+		/// Sets the command "getMore" for the cursor id with batch size (if it is not negative).
 
 	std::string			_databaseName;
 	std::string			_collectionName;

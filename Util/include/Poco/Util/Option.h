@@ -7,7 +7,7 @@
 //
 // Definition of the Option class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -70,7 +70,7 @@ class Util_API Option
 	///        .argument("directory");
 {
 public:
-	Option();
+	Option() = default;
 		/// Creates an empty Option.
 
 	Option(const Option& option);
@@ -231,14 +231,14 @@ private:
 	std::string _shortName;
 	std::string _fullName;
 	std::string _description;
-	bool        _required;
-	bool        _repeatable;
+	bool        _required{false};
+	bool        _repeatable{false};
 	std::string _argName;
-	bool        _argRequired;
+	bool        _argRequired{false};
 	std::string _group;
 	std::string _binding;
-	Validator*  _pValidator;
-	AbstractOptionCallback* _pCallback;
+	Validator*  _pValidator{nullptr};
+	AbstractOptionCallback* _pCallback{nullptr};
 	AbstractConfiguration::Ptr _pConfig;
 };
 

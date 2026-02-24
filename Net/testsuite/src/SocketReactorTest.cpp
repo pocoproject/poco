@@ -19,14 +19,16 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
-#include "Poco/Observer.h"
+#include "Poco/NObserver.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Exception.h"
 #include "Poco/Thread.h"
 #include <sstream>
+#include <chrono>
 
 
 using Poco::Net::SocketReactor;
+using Poco::Net::ScopedSocketReactor;
 using Poco::Net::SocketConnector;
 using Poco::Net::SocketAcceptor;
 using Poco::Net::ParallelSocketAcceptor;
@@ -39,7 +41,7 @@ using Poco::Net::WritableNotification;
 using Poco::Net::TimeoutNotification;
 using Poco::Net::ErrorNotification;
 using Poco::Net::ShutdownNotification;
-using Poco::Observer;
+using Poco::NObserver;
 using Poco::Stopwatch;
 using Poco::IllegalStateException;
 using Poco::Thread;
@@ -58,16 +60,13 @@ namespace
 			_socket(socket),
 			_reactor(reactor)
 		{
-			_reactor.addEventHandler(_socket, Observer<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
+			_reactor.addEventHandler(_socket, NObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
 		}
 
-		~EchoServiceHandler()
-		{
-		}
+		~EchoServiceHandler() = default;
 
-		void onReadable(ReadableNotification* pNf)
+		void onReadable(const AutoPtr<ReadableNotification>& pNf)
 		{
-			pNf->release();
 			char buffer[8];
 			int n = _socket.receiveBytes(buffer, sizeof(buffer));
 			if (n > 0)
@@ -76,7 +75,7 @@ namespace
 			}
 			else
 			{
-				_reactor.removeEventHandler(_socket, Observer<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
+				_reactor.removeEventHandler(_socket, NObserver<EchoServiceHandler, ReadableNotification>(*this, &EchoServiceHandler::onReadable));
 				delete this;
 			}
 		}
@@ -115,15 +114,19 @@ namespace
 
 		~ClientServiceHandler()
 		{
+			_reactor.remove(_socket);
+
+			// removing socket also removes all its observers;
+			// these are here only to test that no bad things happen on multiple removeEventHandler calls
+			// not recommended for production code, see https://github.com/pocoproject/poco/issues/5150
 			_reactor.removeEventHandler(_socket, _or);
 			_reactor.removeEventHandler(_socket, _ow);
 			_reactor.removeEventHandler(_socket, _ot);
 			_reactor.removeEventHandler(_socket, _os);
 		}
 
-		void onReadable(ReadableNotification* pNf)
+		void onReadable(const AutoPtr<ReadableNotification>& pNf)
 		{
-			pNf->release();
 			char buffer[32];
 			int n = _socket.receiveBytes(buffer, sizeof(buffer));
 			if (n > 0)
@@ -135,7 +138,7 @@ namespace
 			else
 			{
 				checkReadableObserverCount(1);
-				_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, ReadableNotification>(*this, &ClientServiceHandler::onReadable));
+				_reactor.removeEventHandler(_socket, NObserver<ClientServiceHandler, ReadableNotification>(*this, &ClientServiceHandler::onReadable));
 				checkReadableObserverCount(0);
 				if (_once)
 				{
@@ -151,20 +154,18 @@ namespace
 			}
 		}
 
-		void onWritable(WritableNotification* pNf)
+		void onWritable(const AutoPtr<WritableNotification>& pNf)
 		{
-			pNf->release();
 			checkWritableObserverCount(1);
-			_reactor.removeEventHandler(_socket, Observer<ClientServiceHandler, WritableNotification>(*this, &ClientServiceHandler::onWritable));
+			_reactor.removeEventHandler(_socket, NObserver<ClientServiceHandler, WritableNotification>(*this, &ClientServiceHandler::onWritable));
 			checkWritableObserverCount(0);
 			std::string data(DATA_SIZE, 'x');
 			_socket.sendBytes(data.data(), (int) data.length());
 			_socket.shutdownSend();
 		}
 
-		void onTimeout(TimeoutNotification* pNf)
+		void onTimeout(const AutoPtr<TimeoutNotification>& pNf)
 		{
-			pNf->release();
 			_timeout = true;
 			if (_closeOnTimeout)
 			{
@@ -173,9 +174,8 @@ namespace
 			}
 		}
 
-		void onShutdown(ShutdownNotification* pNf)
+		void onShutdown(const AutoPtr<ShutdownNotification>& pNf)
 		{
-			pNf->release();
 			delete this;
 		}
 
@@ -254,10 +254,10 @@ namespace
 
 		StreamSocket                                         _socket;
 		SocketReactor&                                       _reactor;
-		Observer<ClientServiceHandler, ReadableNotification> _or;
-		Observer<ClientServiceHandler, WritableNotification> _ow;
-		Observer<ClientServiceHandler, TimeoutNotification>  _ot;
-		Observer<ClientServiceHandler, ShutdownNotification> _os;
+		NObserver<ClientServiceHandler, ReadableNotification> _or;
+		NObserver<ClientServiceHandler, WritableNotification> _ow;
+		NObserver<ClientServiceHandler, TimeoutNotification>  _ot;
+		NObserver<ClientServiceHandler, ShutdownNotification> _os;
 		std::stringstream                                    _str;
 		static std::string                                   _data;
 		static bool                                          _readableError;
@@ -285,19 +285,28 @@ namespace
 			_failed(false),
 			_shutdown(false)
 		{
-			reactor.addEventHandler(socket(), Observer<FailConnector, TimeoutNotification>(*this, &FailConnector::onTimeout));
-			reactor.addEventHandler(socket(), Observer<FailConnector, ShutdownNotification>(*this, &FailConnector::onShutdown));
+			reactor.addEventHandler(socket(), NObserver<FailConnector, TimeoutNotification>(*this, &FailConnector::onTimeout));
+			reactor.addEventHandler(socket(), NObserver<FailConnector, ShutdownNotification>(*this, &FailConnector::onShutdown));
 		}
 
-		void onShutdown(ShutdownNotification* pNf)
+		~FailConnector()
 		{
-			pNf->release();
+			reactor()->remove(socket());
+
+			// removing socket also removes all its observers;
+			// these are here only to test that no bad things happen on multiple removeEventHandler calls
+			// not recommended for production code, see https://github.com/pocoproject/poco/issues/5150
+			reactor()->removeEventHandler(socket(), NObserver<FailConnector, TimeoutNotification>(*this, &FailConnector::onTimeout));
+			reactor()->removeEventHandler(socket(), NObserver<FailConnector, ShutdownNotification>(*this, &FailConnector::onShutdown));
+		}
+
+		void onShutdown(const AutoPtr<ShutdownNotification>& pNf)
+		{
 			_shutdown = true;
 		}
 
-		void onTimeout(TimeoutNotification* pNf)
+		void onTimeout(const AutoPtr<TimeoutNotification>& pNf)
 		{
-			pNf->release();
 			_failed = true;
 			reactor()->stop();
 		}
@@ -320,7 +329,7 @@ namespace
 	class DataServiceHandler
 	{
 	public:
-		typedef std::vector<std::string> Data;
+		using Data = std::vector<std::string>;
 
 		DataServiceHandler(StreamSocket& socket, SocketReactor& reactor):
 				_socket(socket),
@@ -328,20 +337,24 @@ namespace
 				_pos(0)
 		{
 			_data.resize(1);
-			_reactor.addEventHandler(_socket, Observer<DataServiceHandler, ReadableNotification>(*this, &DataServiceHandler::onReadable));
-			_reactor.addEventHandler(_socket, Observer<DataServiceHandler, ShutdownNotification>(*this, &DataServiceHandler::onShutdown));
+			_reactor.addEventHandler(_socket, NObserver<DataServiceHandler, ReadableNotification>(*this, &DataServiceHandler::onReadable));
+			_reactor.addEventHandler(_socket, NObserver<DataServiceHandler, ShutdownNotification>(*this, &DataServiceHandler::onShutdown));
 			_socket.setBlocking(false);
 		}
 
 		~DataServiceHandler()
 		{
-			_reactor.removeEventHandler(_socket, Observer<DataServiceHandler, ReadableNotification>(*this, &DataServiceHandler::onReadable));
-			_reactor.removeEventHandler(_socket, Observer<DataServiceHandler, ShutdownNotification>(*this, &DataServiceHandler::onShutdown));
+			_reactor.remove(_socket);
+
+			// removing socket also removes all its observers;
+			// these are here only to test that no bad things happen on multiple removeEventHandler calls
+			// not recommended for production code, see https://github.com/pocoproject/poco/issues/5150
+			_reactor.removeEventHandler(_socket, NObserver<DataServiceHandler, ReadableNotification>(*this, &DataServiceHandler::onReadable));
+			_reactor.removeEventHandler(_socket, NObserver<DataServiceHandler, ShutdownNotification>(*this, &DataServiceHandler::onShutdown));
 		}
 
-		void onReadable(ReadableNotification* pNf)
+		void onReadable(const AutoPtr<ReadableNotification>& pNf)
 		{
-			pNf->release();
 			char buffer[64];
 			int n = 0;
 			do
@@ -371,9 +384,8 @@ namespace
 			} while (true);
 		}
 
-		void onShutdown(ShutdownNotification* pNf)
+		void onShutdown(const AutoPtr<ShutdownNotification>& pNf)
 		{
-			pNf->release();
 			delete this;
 		}
 
@@ -402,20 +414,19 @@ namespace
 		DummyServiceHandler(StreamSocket& socket, SocketReactor& reactor) : _socket(socket),
 			_reactor(reactor)
 		{
-			_reactor.addEventHandler(_socket, Observer<DummyServiceHandler, ReadableNotification>(*this, &DummyServiceHandler::onReadable));
-			_reactor.addEventHandler(_socket, Observer<DummyServiceHandler, ShutdownNotification>(*this, &DummyServiceHandler::onShutdown));
+			_reactor.addEventHandler(_socket, NObserver<DummyServiceHandler, ReadableNotification>(*this, &DummyServiceHandler::onReadable));
+			_reactor.addEventHandler(_socket, NObserver<DummyServiceHandler, ShutdownNotification>(*this, &DummyServiceHandler::onShutdown));
 			_socket.setBlocking(false);
 		}
 
 		~DummyServiceHandler()
 		{
-			_reactor.removeEventHandler(_socket, Observer<DummyServiceHandler, ReadableNotification>(*this, &DummyServiceHandler::onReadable));
-			_reactor.removeEventHandler(_socket, Observer<DummyServiceHandler, ShutdownNotification>(*this, &DummyServiceHandler::onShutdown));
+			_reactor.removeEventHandler(_socket, NObserver<DummyServiceHandler, ReadableNotification>(*this, &DummyServiceHandler::onReadable));
+			_reactor.removeEventHandler(_socket, NObserver<DummyServiceHandler, ShutdownNotification>(*this, &DummyServiceHandler::onShutdown));
 		}
 
-		void onReadable(ReadableNotification* pNf)
+		void onReadable(const AutoPtr<ReadableNotification>& pNf)
 		{
-			pNf->release();
 			std::vector<char> buffer;
 			int n = 0;
 			while ((n = _socket.available()))
@@ -426,15 +437,79 @@ namespace
 			}
 		}
 
-		void onShutdown(ShutdownNotification* pNf)
+		void onShutdown(const AutoPtr<ShutdownNotification>& pNf)
 		{
-			pNf->release();
 			delete this;
 		}
 
 	private:
 		StreamSocket   _socket;
 		SocketReactor& _reactor;
+	};
+
+
+	// Handler that aggressively queries and modifies reactor from within notifications
+	// Tests the NotificationCenter deadlock fix by calling removeEventHandler while
+	// holding Observer mutex, concurrent with other threads adding/removing handlers
+	class ConcurrentRemovalHandler
+	{
+	public:
+		ConcurrentRemovalHandler(StreamSocket& sock, SocketReactor& r, std::atomic<int>& callCount):
+			_socket(sock), _reactor(r), _callCount(callCount),
+			_or(*this, &ConcurrentRemovalHandler::onReadable),
+			_ow(*this, &ConcurrentRemovalHandler::onWritable),
+			_removeCount(0)
+		{
+			_reactor.addEventHandler(_socket, _or);
+			_reactor.addEventHandler(_socket, _ow);
+		}
+
+		~ConcurrentRemovalHandler()
+		{
+			// Use remove() for safe atomic cleanup - avoids race
+			// with reactor dispatch that removeEventHandler() has
+			try {
+				_reactor.remove(_socket);
+			} catch (...) {}
+		}
+
+		void onReadable(const AutoPtr<ReadableNotification>& pNf)
+		{
+			int count = ++_callCount;
+
+			// Query reactor state while holding Observer mutex
+			// This would deadlock if NC held lock while calling observer methods
+			_reactor.hasEventHandler(_socket, _or);
+			_reactor.hasEventHandler(_socket, _ow);
+			_reactor.has(_socket);
+
+			// Every 3rd call, remove a handler from within the notification
+			// This is the exact scenario from the bug report
+			if (count % 3 == 0 && _removeCount++ == 0)
+			{
+				_reactor.removeEventHandler(_socket, _ow);
+			}
+
+			// Read data to keep socket active
+			char buffer[64];
+			try {
+				_socket.receiveBytes(buffer, sizeof(buffer));
+			} catch (...) {}
+		}
+
+		void onWritable(const AutoPtr<WritableNotification>& pNf)
+		{
+			// Query reactor while in handler
+			_reactor.hasEventHandler(_socket, _or);
+		}
+
+	private:
+		StreamSocket _socket;
+		SocketReactor& _reactor;
+		std::atomic<int>& _callCount;
+		NObserver<ConcurrentRemovalHandler, ReadableNotification> _or;
+		NObserver<ConcurrentRemovalHandler, WritableNotification> _ow;
+		int _removeCount;
 	};
 }
 
@@ -444,9 +519,7 @@ SocketReactorTest::SocketReactorTest(const std::string& name): CppUnit::TestCase
 }
 
 
-SocketReactorTest::~SocketReactorTest()
-{
-}
+SocketReactorTest::~SocketReactorTest() = default;
 
 
 void SocketReactorTest::testSocketReactor()
@@ -685,6 +758,152 @@ void SocketReactorTest::testSocketReactorWakeup()
 }
 
 
+void SocketReactorTest::testSocketReactorRemove()
+{
+	SocketAddress ssa;
+	ServerSocket ss(ssa);
+	SocketReactor reactor;
+	Thread thread;
+	thread.start(reactor);
+
+	SocketAddress sa("127.0.0.1", ss.address().port());
+	StreamSocket sock(sa);
+	StreamSocket accepted = ss.acceptConnection();
+
+	// Add handlers
+	NObserver<SocketReactorTest, ReadableNotification> obsRead(*this, &SocketReactorTest::onReadable);
+	NObserver<SocketReactorTest, WritableNotification> obsWrite(*this, &SocketReactorTest::onWritable);
+	reactor.addEventHandler(accepted, obsRead);
+	reactor.addEventHandler(accepted, obsWrite);
+
+	// Verify socket is registered
+	assertTrue(reactor.has(accepted));
+	assertTrue(reactor.hasEventHandler(accepted, obsRead));
+	assertTrue(reactor.hasEventHandler(accepted, obsWrite));
+
+	// Remove socket completely
+	reactor.remove(accepted);
+
+	// Verify socket is no longer registered
+	assertTrue(!reactor.has(accepted));
+	assertTrue(!reactor.hasEventHandler(accepted, obsRead));
+	assertTrue(!reactor.hasEventHandler(accepted, obsWrite));
+
+	reactor.stop();
+	thread.join();
+}
+
+
+void SocketReactorTest::testConcurrentHandlerRemoval()
+{
+	// This test specifically exercises the NotificationCenter deadlock fix
+	// by having handlers call removeEventHandler while holding Observer mutex,
+	// while other threads are adding/removing handlers concurrently
+
+	SocketAddress ssa;
+	ServerSocket ss(ssa);
+	ScopedSocketReactor reactor;
+
+	SocketAddress sa("127.0.0.1", ss.address().port());
+	std::vector<StreamSocket> sockets;
+	std::vector<StreamSocket> accepted;
+
+	// Create multiple socket connections
+	const int numSockets = 4;
+	for (int i = 0; i < numSockets; ++i)
+	{
+		sockets.push_back(StreamSocket(sa));
+		accepted.push_back(ss.acceptConnection());
+	}
+
+	std::atomic<int> callCount(0);
+	std::vector<ConcurrentRemovalHandler*> handlers;
+
+	// Create handlers for all sockets
+	for (auto& sock : accepted)
+	{
+		handlers.push_back(new ConcurrentRemovalHandler(sock, *reactor, callCount));
+	}
+
+	// Thread that continuously adds/removes handlers
+	std::atomic<bool> stop(false);
+	std::atomic<int> completedIterations(0);
+	const int targetIterations = 20;
+
+	Thread modifyThread;
+	modifyThread.startFunc([&]() {
+		for (int i = 0; i < targetIterations && !stop; ++i)
+		{
+			// Try to add/remove handlers concurrently with notifications
+			for (auto& sock : accepted)
+			{
+				if (stop) break;
+				NObserver<SocketReactorTest, ReadableNotification> obs(*this, &SocketReactorTest::onReadable);
+				try {
+					reactor->addEventHandler(sock, obs);
+					Thread::sleep(1);
+					reactor->removeEventHandler(sock, obs);
+				} catch (...) {
+					// Socket might be removed by handler, that's okay
+				}
+			}
+			++completedIterations;
+		}
+	});
+
+	// Send data to trigger notifications while polling for completion
+	auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(10);
+	int dataSent = 0;
+
+	while (completedIterations < targetIterations)
+	{
+		if (std::chrono::steady_clock::now() >= deadline)
+			break;
+
+		// Send some data to trigger notifications
+		if (dataSent < 5)
+		{
+			for (auto& sock : sockets)
+			{
+				std::string data = "test";
+				try {
+					sock.sendBytes(data.data(), (int)data.size());
+				} catch (...) {}
+			}
+			++dataSent;
+		}
+		Thread::sleep(50);
+	}
+
+	bool timedOut = (completedIterations < targetIterations);
+
+	// Always cleanup - must happen before fail() which throws
+	stop = true;
+	modifyThread.join();
+
+	for (auto* handler : handlers)
+		delete handler;
+
+	// ScopedSocketReactor automatically stops and joins on destruction
+
+	if (timedOut)
+		failmsg("Deadlock detected: concurrent handler removal test timed out");
+
+	// Verify handlers were called
+	assertTrue(callCount > 0);
+}
+
+
+void SocketReactorTest::onReadable(const Poco::AutoPtr<Poco::Net::ReadableNotification>& pNf)
+{
+}
+
+
+void SocketReactorTest::onWritable(const Poco::AutoPtr<Poco::Net::WritableNotification>& pNf)
+{
+}
+
+
 void SocketReactorTest::setUp()
 {
 	ClientServiceHandler::setCloseOnTimeout(false);
@@ -708,6 +927,8 @@ CppUnit::Test* SocketReactorTest::suite()
 	CppUnit_addTest(pSuite, SocketReactorTest, testDataCollection);
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorDeadlock);
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketReactorWakeup);
+	CppUnit_addTest(pSuite, SocketReactorTest, testSocketReactorRemove);
+	CppUnit_addTest(pSuite, SocketReactorTest, testConcurrentHandlerRemoval);
 
 	return pSuite;
 }

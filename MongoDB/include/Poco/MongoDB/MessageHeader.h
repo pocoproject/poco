@@ -7,7 +7,7 @@
 //
 // Definition of the MessageHeader class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -19,10 +19,17 @@
 
 
 #include "Poco/MongoDB/MongoDB.h"
-#include "Poco/MongoDB/MessageHeader.h"
+#include "Poco/Bugcheck.h"
+#include "Poco/Types.h"
 
 
 namespace Poco {
+
+
+class BinaryReader;
+class BinaryWriter;
+
+
 namespace MongoDB {
 
 
@@ -32,31 +39,15 @@ class Message; // Required to disambiguate friend declaration in MessageHeader.
 class MongoDB_API MessageHeader
 	/// Represents the message header which is always prepended to a
 	/// MongoDB request or response message.
+	///
+	/// INTERNAL: This class is an implementation detail of the MongoDB
+	/// protocol and not intended for direct use.
 {
 public:
 	static constexpr Int32 MSG_HEADER_SIZE = 16;
 
 	enum OpCode
 	{
-#if false
-		// Opcodes deprecated in MongoDB 5.0
-		OP_REPLY [[deprecated]] = 1,
-		OP_UPDATE [[deprecated]] = 2001,
-		OP_INSERT [[deprecated]] = 2002,
-		OP_QUERY [[deprecated]] = 2004,
-		OP_GET_MORE [[deprecated]] = 2005,
-		OP_DELETE [[deprecated]] = 2006,
-		OP_KILL_CURSORS [[deprecated]] = 2007,
-#else
-		OP_REPLY = 1,
-		OP_UPDATE = 2001,
-		OP_INSERT = 2002,
-		OP_QUERY = 2004,
-		OP_GET_MORE = 2005,
-		OP_DELETE = 2006,
-		OP_KILL_CURSORS = 2007,
-#endif
-
 		/// Opcodes supported in MongoDB 5.1 and later
 		OP_COMPRESSED = 2012,
 		OP_MSG = 2013
@@ -74,19 +65,19 @@ public:
 	void write(BinaryWriter& writer);
 		/// Writes the header using the given BinaryWriter.
 
-	Int32 getMessageLength() const;
+	[[nodiscard]] Int32 getMessageLength() const;
 		/// Returns the message length.
 
-	OpCode opCode() const;
+	[[nodiscard]] OpCode opCode() const;
 		/// Returns the OpCode.
 
-	Int32 getRequestID() const;
+	[[nodiscard]] Int32 getRequestID() const;
 		/// Returns the request ID of the current message.
 
 	void setRequestID(Int32 id);
 		/// Sets the request ID of the current message.
 
-	Int32 responseTo() const;
+	[[nodiscard]] Int32 responseTo() const;
 		/// Returns the request id from the original request.
 
 private:

@@ -21,6 +21,7 @@
 
 
 #include "Poco/Foundation.h"
+#include <cstddef>
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include <windows.h>
 #endif
@@ -54,7 +55,7 @@
 
 #include "Poco/Data/ODBC/Unicode.h"
 
-#if (__cplusplus >= 201703L)
+#if POCO_HAVE_CPP17_COMPILER
 	#if __has_include(<msodbcsql.h>)
 		#include <msodbcsql.h>
 		#define POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
@@ -76,6 +77,18 @@
 		#endif
 	#endif
 #endif
+
+
+//
+// ODBC headers define SQL_NULL_HANDLE, SQL_NULL_HENV, SQL_NULL_HDBC, SQL_NULL_HSTMT
+// as literal 0, which triggers -Wzero-as-null-pointer-constant warnings in C++.
+// We define these as nullptr to use in place of the ODBC macros.
+//
+constexpr std::nullptr_t POCO_ODBC_NULL_HANDLE = nullptr;
+constexpr std::nullptr_t POCO_ODBC_NULL_HENV   = nullptr;
+constexpr std::nullptr_t POCO_ODBC_NULL_HDBC   = nullptr;
+constexpr std::nullptr_t POCO_ODBC_NULL_HSTMT  = nullptr;
+constexpr std::nullptr_t POCO_ODBC_NULL_HDESC  = nullptr;
 
 
 //

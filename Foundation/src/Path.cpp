@@ -454,9 +454,9 @@ Path& Path::setDevice(const std::string& device)
 
 const std::string& Path::directory(int n) const
 {
-	poco_assert (0 <= n && n <= _dirs.size());
+	poco_assert (0 <= n && static_cast<std::size_t>(n) <= _dirs.size());
 
-	if (n < _dirs.size())
+	if (static_cast<std::size_t>(n) < _dirs.size())
 		return _dirs[n];
 	else
 		return _name;
@@ -465,9 +465,9 @@ const std::string& Path::directory(int n) const
 
 const std::string& Path::operator [] (int n) const
 {
-	poco_assert (0 <= n && n <= _dirs.size());
+	poco_assert (0 <= n && static_cast<std::size_t>(n) <= _dirs.size());
 
-	if (n < _dirs.size())
+	if (static_cast<std::size_t>(n) < _dirs.size())
 		return _dirs[n];
 	else
 		return _name;
@@ -821,8 +821,14 @@ void Path::parseWindows(const std::string& path)
 				_absolute = true;
 				_device += d;
 				++it;
-				if (it == end || (*it != '\\' && *it != '/')) throw PathSyntaxException(path);
-				++it;
+				if (it != end)
+				{
+					if ((*it != '\\' && *it != '/'))
+					{
+						throw PathSyntaxException(path);
+					}
+					++it;
+				}
 			}
 			else --it;
 		}
@@ -923,7 +929,7 @@ void Path::parseVMS(const std::string& path)
 							if (!_absolute) throw PathSyntaxException(path);
 							++it;
 							if (it != end && *it == '.') throw PathSyntaxException(path);
-							int d = int(_dirs.size());
+							auto d = _dirs.size();
 							while (it != end && *it != ']')
 							{
 								name.clear();
@@ -1114,11 +1120,11 @@ std::string Path::transcode(const std::string& path)
 #if defined(_WIN32)
 	std::wstring uniPath;
 	UnicodeConverter::toUTF16(path, uniPath);
-	DWORD len = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, uniPath.c_str(), static_cast<int>(uniPath.length()), NULL, 0, NULL, NULL);
+	DWORD len = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, uniPath.c_str(), static_cast<int>(uniPath.length()), nullptr, 0, nullptr, nullptr);
 	if (len > 0)
 	{
 		Buffer<char> buffer(len);
-		DWORD rc = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, uniPath.c_str(), static_cast<int>(uniPath.length()), buffer.begin(), static_cast<int>(buffer.size()), NULL, NULL);
+		DWORD rc = WideCharToMultiByte(CP_ACP, WC_NO_BEST_FIT_CHARS, uniPath.c_str(), static_cast<int>(uniPath.length()), buffer.begin(), static_cast<int>(buffer.size()), nullptr, nullptr);
 		if (rc)
 		{
 			return std::string(buffer.begin(), buffer.size());

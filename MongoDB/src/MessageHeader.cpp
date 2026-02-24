@@ -5,14 +5,16 @@
 // Package: MongoDB
 // Module:  MessageHeader
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
 
 
-#include "Poco/MongoDB/Message.h"
+#include "Poco/MongoDB/MessageHeader.h"
+#include "Poco/BinaryReader.h"
+#include "Poco/BinaryWriter.h"
 #include "Poco/Exception.h"
 
 

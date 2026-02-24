@@ -21,7 +21,7 @@
 #include <istream>
 #include <streambuf>
 #include <clocale>
-#include "pdjson.h"
+#include <pdjson.h>
 
 
 using json_stream = struct json_stream;

@@ -60,6 +60,19 @@ public:
 		/// If the channel has not been opened yet, the log()
 		/// method will open it.
 
+	virtual void log(Message&& msg);
+		/// Logs the given message to the channel by moving it.
+		///
+		/// This overload allows channels that need to store or queue
+		/// messages (such as AsyncChannel) to avoid copying the message.
+		///
+		/// The default implementation simply calls log(const Message&),
+		/// which is appropriate for channels that immediately process
+		/// and discard the message (e.g., ConsoleChannel, FileChannel).
+		///
+		/// Subclasses that buffer or queue messages should override
+		/// this method to take advantage of move semantics.
+
 	void setProperty(const std::string& name, const std::string& value) override;
 		/// Throws a PropertyNotSupportedException.
 

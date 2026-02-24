@@ -7,7 +7,7 @@
 //
 // Definition of the Timer class.
 //
-// Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2009-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -60,6 +60,10 @@ public:
 	explicit Timer(Poco::Thread::Priority priority);
 		/// Creates the Timer, using a timer thread with
 		/// the given priority.
+
+	Timer(const Timer&) = delete;
+
+	Timer& operator = (const Timer&) = delete;
 
 	~Timer();
 		/// Destroys the Timer, cancelling all pending tasks.
@@ -186,9 +190,6 @@ protected:
 	static void validateTask(const TimerTask::Ptr& pTask);
 
 private:
-	Timer(const Timer&);
-	Timer& operator = (const Timer&);
-
 	Poco::TimedNotificationQueue _queue;
 	Poco::Thread _thread;
 };

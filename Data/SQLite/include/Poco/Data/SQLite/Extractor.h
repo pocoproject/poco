@@ -33,7 +33,7 @@
 #include "Poco/UTFString.h"
 #include "Poco/Any.h"
 #include "Poco/Dynamic/Var.h"
-#include "sqlite3.h"
+#include <sqlite3.h>
 #include <vector>
 #include <utility>
 
@@ -54,7 +54,7 @@ public:
 	Extractor(sqlite3_stmt* pStmt);
 		/// Creates the Extractor.
 
-	~Extractor();
+	~Extractor() override;
 		/// Destroys the Extractor.
 
 	bool extract(std::size_t pos, Poco::Int8& val) override;

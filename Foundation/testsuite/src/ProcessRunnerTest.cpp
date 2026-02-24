@@ -2,7 +2,7 @@
 // ProcessRunnerTest.cpp
 //
 // Copyright (c) 2023, Applied Informatics Software Engineering GmbH.
-// Aleph ONE Software Engineering d.o.o.,
+// Aleph ONE Software Engineering LLC,
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -17,6 +17,28 @@
 #include "Poco/Path.h"
 #include "Poco/File.h"
 #include "Poco/FileStream.h"
+#include "Poco/ProcessOptions.h"
+#include "Poco/Process.h"
+#include "Poco/Environment.h"
+#include "Poco/TemporaryFile.h"
+#if defined(POCO_OS_FAMILY_WINDOWS)
+#include <direct.h>
+#else
+#include <unistd.h>
+#endif
+
+
+namespace
+{
+	int changeDir(const char* path)
+	{
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		return _chdir(path);
+#else
+		return chdir(path);
+#endif
+	}
+}
 
 
 using namespace Poco;
@@ -333,6 +355,188 @@ void ProcessRunnerTest::testProcessRunner()
 }
 
 
+void ProcessRunnerTest::testKillTree()
+{
+#if POCO_OS != POCO_OS_ANDROID
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG)
+	name += "d";
+#endif
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd += name;
+#else
+	cmd = name;
+#endif
+
+	std::vector<std::string> args;
+	char c = Path::separator();
+	std::string pidFile = Poco::format("run%c%s.pid", c, name);
+	args.push_back(std::string("--pidfile=").append(pidFile));
+	ProcessRunner pr(cmd, args, "", ProcessRunner::NO_OUT | PROCESS_KILL_TREE, 10, false);
+	assertFalse (pr.running());
+	pr.start();
+	Stopwatch sw; sw.start();
+	while (!pr.running())
+		checkTimeout(sw, "Waiting for process to start", 1000, __LINE__);
+	assertTrue (pr.running());
+
+	ProcessRunner::PID pid = pr.pid();
+	assertTrue (pid > 0);
+
+	pr.stop();
+	sw.restart();
+	while (pr.running())
+		checkTimeout(sw, "Waiting for process to stop", 1000, __LINE__);
+	assertFalse (pr.running());
+	assertEqual (pr.result(), 0);
+	assertTrue (pr.error().empty());
+
+	// Verify process is actually gone
+	assertFalse (Process::isRunning(pid));
+#endif
+}
+
+
+void ProcessRunnerTest::testKillTreeWithChild()
+{
+#if POCO_OS != POCO_OS_ANDROID
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG)
+	name += "d";
+#endif
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd += name;
+#else
+	cmd = name;
+#endif
+
+	std::vector<std::string> args;
+	char c = Path::separator();
+	std::string pidFile = Poco::format("run%c%s.pid", c, name);
+	std::string childPidFile = Poco::format("run%c%s-child.pid", c, name);
+	args.push_back(std::string("--pidfile=").append(pidFile));
+	args.push_back(std::string("--spawn-child=").append(childPidFile));
+
+	{
+		ProcessRunner pr(cmd, args, "", ProcessRunner::NO_OUT | PROCESS_KILL_TREE, 10, false);
+		assertFalse (pr.running());
+		pr.start();
+		Stopwatch sw; sw.start();
+		while (!pr.running())
+			checkTimeout(sw, "Waiting for process to start", 1000, __LINE__);
+		assertTrue (pr.running());
+
+		// Wait for child PID file to appear
+		sw.restart();
+		while (!File(childPidFile).exists())
+			checkTimeout(sw, "Waiting for child PID file", 5000, __LINE__);
+
+		// Read child PID
+		ProcessRunner::PID childPid = 0;
+		{
+			FileInputStream fis(childPidFile);
+			fis >> childPid;
+		}
+		assertTrue (childPid > 0);
+		assertTrue (Process::isRunning(childPid));
+
+		ProcessRunner::PID parentPid = pr.pid();
+		assertTrue (parentPid > 0);
+
+		// Stop with PROCESS_KILL_TREE — should kill both parent and child
+		pr.stop();
+		sw.restart();
+		while (pr.running())
+			checkTimeout(sw, "Waiting for process to stop", 2000, __LINE__);
+		assertFalse (pr.running());
+		assertTrue (pr.error().empty());
+
+		// Both parent and child should be gone
+		assertFalse (Process::isRunning(parentPid));
+
+		// Give a moment for child to fully exit
+		Thread::sleep(100);
+		assertFalse (Process::isRunning(childPid));
+	}
+
+	// PID files should be cleaned up
+	// (parent's PID file is managed by ProcessRunner,
+	//  child's PID file is managed by child's PIDFile RAII)
+	assertFalse (File(pidFile).exists());
+	// Child PID file may still exist if child was killed before PIDFile destructor ran
+	File cf(childPidFile);
+	if (cf.exists()) cf.remove();
+#endif
+}
+
+
+void ProcessRunnerTest::testPathResolution()
+{
+	std::string name("TestApp");
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
+
+	// Find the TestApp binary directory (same locations the other tests use)
+	std::string cmdDir;
+	Path selfDir(Path(Path::self()).makeParent());
+	if (File(Path(selfDir, name)).exists())
+		cmdDir = selfDir.toString();
+	else if (File(Path(Path::current(), name)).exists())
+		cmdDir = Path::current();
+	else
+		cmdDir = selfDir.toString();
+
+	std::string savedPath = Environment::get("PATH", "");
+	Environment::set("PATH", cmdDir + Path::pathSeparator() + savedPath);
+
+	std::string savedCwd = Path::current();
+	std::string tmpDir = TemporaryFile::tempName() + Path::separator();
+	File(tmpDir).createDirectories();
+
+	try
+	{
+		// bare command name found via PATH should resolve and run
+		{
+			changeDir(tmpDir.c_str());
+			ProcessRunner pr(name, {}, "", ProcessRunner::NO_OUT, 10, false, {});
+			pr.start();
+			Stopwatch sw; sw.start();
+			while (pr.running())
+				checkTimeout(sw, "Waiting for process to finish", 2000, __LINE__);
+			assertEqual (0, pr.result());
+		}
+
+		// a directory with the same name as the command in CWD must not
+		// shadow the real executable on PATH
+		{
+			File(tmpDir + name).createDirectories();
+			changeDir(tmpDir.c_str());
+			ProcessRunner pr(name, {}, "", ProcessRunner::NO_OUT, 10, false, {});
+			pr.start();
+			Stopwatch sw; sw.start();
+			while (pr.running())
+				checkTimeout(sw, "Waiting for process to finish", 2000, __LINE__);
+			assertEqual (0, pr.result());
+		}
+	}
+	catch (...)
+	{
+		changeDir(savedCwd.c_str());
+		Environment::set("PATH", savedPath);
+		File(tmpDir).remove(true);
+		throw;
+	}
+	changeDir(savedCwd.c_str());
+	Environment::set("PATH", savedPath);
+	File(tmpDir).remove(true);
+}
+
+
 std::string ProcessRunnerTest::cmdLine(const std::string& cmd, const ProcessRunner::Args& args)
 {
 	std::string cmdL = cmd + ' ';
@@ -375,6 +579,9 @@ CppUnit::Test* ProcessRunnerTest::suite()
 
 	CppUnit_addTest(pSuite, ProcessRunnerTest, testPIDFile);
 	CppUnit_addTest(pSuite, ProcessRunnerTest, testProcessRunner);
+	CppUnit_addTest(pSuite, ProcessRunnerTest, testKillTree);
+	CppUnit_addTest(pSuite, ProcessRunnerTest, testKillTreeWithChild);
+	CppUnit_addTest(pSuite, ProcessRunnerTest, testPathResolution);
 
 	return pSuite;
 }

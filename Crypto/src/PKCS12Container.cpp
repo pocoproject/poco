@@ -19,7 +19,6 @@
 
 
 #include "Poco/Crypto/PKCS12Container.h"
-#include "Poco/NumberFormatter.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>
 #include <openssl/err.h>
@@ -29,7 +28,7 @@ namespace Poco {
 namespace Crypto {
 
 
-PKCS12Container::PKCS12Container(std::istream& istr, const std::string& password): _pKey(0)
+PKCS12Container::PKCS12Container(std::istream& istr, const std::string& password) : _pKey(nullptr)
 {
 	std::ostringstream ostr;
 	Poco::StreamCopier::copyStream(istr, ostr);
@@ -38,7 +37,7 @@ PKCS12Container::PKCS12Container(std::istream& istr, const std::string& password
 	BIO *pBIO = BIO_new_mem_buf(const_cast<char*>(cont.data()), static_cast<int>(cont.size()));
 	if (pBIO)
 	{
-		PKCS12* pPKCS12 = 0;
+		PKCS12* pPKCS12 = nullptr;
 		d2i_PKCS12_bio(pBIO, &pPKCS12);
 		BIO_free(pBIO);
 		if (!pPKCS12) throw OpenSSLException("PKCS12Container(istream&, const string&)");
@@ -51,12 +50,12 @@ PKCS12Container::PKCS12Container(std::istream& istr, const std::string& password
 }
 
 
-PKCS12Container::PKCS12Container(const std::string& path, const std::string& password): _pKey(0)
+PKCS12Container::PKCS12Container(const std::string& path, const std::string& password) : _pKey(nullptr)
 {
 	FILE* pFile = fopen(path.c_str(), "rb");
 	if (pFile)
 	{
-		PKCS12* pPKCS12 = d2i_PKCS12_fp(pFile, NULL);
+		PKCS12* pPKCS12 = d2i_PKCS12_fp(pFile, nullptr);
 		fclose (pFile);
 		if (!pPKCS12) throw OpenSSLException("PKCS12Container(const string&, const string&)");
 		load(pPKCS12, password);
@@ -145,8 +144,8 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 {
 	if (pPKCS12)
 	{
-		X509* pCert = 0;
-		STACK_OF(X509)* pCA = 0;
+		X509* pCert = nullptr;
+		STACK_OF(X509)* pCA = nullptr;
 		if (PKCS12_parse(pPKCS12, password.c_str(), &_pKey, &pCert, &pCA))
 		{
 			if (pCert)

@@ -20,8 +20,11 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/AbstractObserver.h"
+#include "Poco/AutoPtr.h"
 #include "Poco/Mutex.h"
 
+#include <atomic>
+#include <functional>
 
 namespace Poco {
 
@@ -48,28 +51,68 @@ class NObserver: public AbstractObserver
 	///     To enable this functionality, a matcher function must be provided.
 	///     Null matcher means no matching is performed and all notificiations
 	///     of the type subscribed to are dispatched.
+	///
+	/// Thread Safety:
+	///
+	/// The handle() method uses atomic load for _pObject and does not
+	/// hold any lock during callback invocation. This prevents
+	/// lock-order-inversion deadlocks when handlers call back into
+	/// NotificationCenter (e.g., to remove themselves during disconnect).
+	///
+	/// Callers must ensure:
+	///   - The observed object outlives all pending notifications.
+	///     This is inherent to the observer pattern: if object C is
+	///     destroyed while notifications are in flight (e.g., queued
+	///     in AsyncObserver), undefined behavior occurs.
+	///   - Assignment operators should not be used concurrently with
+	///     notification delivery. Observer instances are typically
+	///     created once and registered; concurrent modification during
+	///     active notification dispatch is not supported.
 {
 public:
 	using Type = NObserver<C, N>;
 	using NotificationPtr = AutoPtr<N>;
-	using Callback = void (C::*)(const NotificationPtr&);
-	using Handler = Callback;
+	using Handler = void (C::*)(const NotificationPtr&);
+	using SyncHandler = NotificationResult (C::*)(const NotificationPtr&);
 	using Matcher = bool (C::*)(const std::string&) const;
+	using MatcherFunc = std::function<bool(const std::string&)>;
 
 	NObserver() = delete;
 
-	NObserver(C& object, Handler method, Matcher matcher = nullptr):
+	NObserver(C& object, Handler method, Matcher matcher = nullptr, SyncHandler syncMethod = nullptr):
 		_pObject(&object),
 		_handler(method),
+		_syncHandler(syncMethod),
 		_matcher(matcher)
+	{
+	}
+
+	NObserver(C& object, Handler method, MatcherFunc matcherFunc, SyncHandler syncMethod = nullptr):
+		_pObject(&object),
+		_handler(method),
+		_syncHandler(syncMethod),
+		_matcher(nullptr),
+		_matcherFunc(matcherFunc)
 	{
 	}
 
 	NObserver(const NObserver& observer):
 		AbstractObserver(observer),
-		_pObject(observer._pObject),
+		_pObject(observer._pObject.load()),
 		_handler(observer._handler),
-		_matcher(observer._matcher)
+		_syncHandler(observer._syncHandler),
+		_matcher(observer._matcher),
+		_matcherFunc(observer._matcherFunc)
+	{
+	}
+
+	NObserver(NObserver&& observer):
+		AbstractObserver(observer),
+		_pObject(observer._pObject.exchange(nullptr)),
+		_handler(std::move(observer._handler)),
+		_syncHandler(std::move(observer._syncHandler)),
+		_matcher(std::move(observer._matcher)),
+		_matcherFunc(std::move(observer._matcherFunc))
 	{
 	}
 
@@ -80,8 +123,23 @@ public:
 		if (&observer != this)
 		{
 			_pObject = observer._pObject;
-			_handler  = observer._handler;
-			_matcher  = observer._matcher;
+			_handler = observer._handler;
+			_syncHandler = observer._syncHandler;
+			_matcher = observer._matcher;
+			_matcherFunc = observer._matcherFunc;
+		}
+		return *this;
+	}
+
+	NObserver& operator = (NObserver&& observer)
+	{
+		if (&observer != this)
+		{
+			_pObject = observer._pObject.exchange(nullptr);
+			_handler = std::move(observer._handler);
+			_syncHandler = std::move(observer._syncHandler);
+			_matcher = std::move(observer._matcher);
+			_matcherFunc = std::move(observer._matcherFunc);
 		}
 		return *this;
 	}
@@ -91,13 +149,18 @@ public:
 		handle(NotificationPtr(static_cast<N*>(pNf), true));
 	}
 
-	bool equals(const AbstractObserver& abstractObserver) const override
+	NotificationResult notifySync(Notification* pNf) const override
 	{
-		const NObserver* pObs = dynamic_cast<const NObserver*>(&abstractObserver);
-		return pObs && pObs->_pObject == _pObject && pObs->_handler == _handler && pObs->_matcher == _matcher;
+		return handleSync(NotificationPtr(static_cast<N*>(pNf), true));
 	}
 
-	POCO_DEPRECATED("use `bool accepts(const Notification::Ptr&)` instead")
+	bool equals(const AbstractObserver& abstractObserver) const override
+	{
+		const auto* pObs = dynamic_cast<const NObserver*>(&abstractObserver);
+		return pObs && pObs->_pObject == _pObject && pObs->_handler == _handler;
+	}
+
+	POCO_DEPRECATED("use `bool accepts(const Notification::Ptr&)` instead with matcher function if needed")
 	bool accepts(Notification* pNf, const char* pName) const override
 	{
 		return (!pName || pNf->name() == pName) && dynamic_cast<N*>(pNf) != nullptr;
@@ -105,7 +168,15 @@ public:
 
 	bool accepts(const Notification::Ptr& pNf) const override
 	{
-		return (match(pNf) && (pNf.template cast<N>() != nullptr));
+		if (hasMatcher())
+			return match(pNf);
+		else
+			return pNf.template cast<N>() != nullptr;
+	}
+
+	bool acceptsSync() const override
+	{
+		return _pObject != nullptr && _syncHandler != nullptr;
 	}
 
 	AbstractObserver* clone() const override
@@ -115,8 +186,6 @@ public:
 
 	void disable() override
 	{
-		Poco::Mutex::ScopedLock lock(_mutex);
-
 		_pObject = nullptr;
 	}
 
@@ -124,29 +193,52 @@ protected:
 
 	void handle(const NotificationPtr& ptr) const
 	{
-		Mutex::ScopedLock lock(_mutex);
+		// Read atomically, call handler without holding lock to avoid
+		// lock-order-inversion deadlock with handlers that call back
+		// into NotificationCenter (e.g., during disconnect handling)
+		C* pObject = _pObject.load();
+		if (pObject != nullptr)
+			(pObject->*_handler)(ptr);
+	}
 
-		if (_pObject)
-			(_pObject->*_handler)(ptr);
+	NotificationResult handleSync(const NotificationPtr& ptr) const
+	{
+		C* pObject = _pObject.load();
+		SyncHandler syncHandler = _syncHandler;
+
+		if (pObject == nullptr || syncHandler == nullptr)
+			return {};
+
+		return (pObject->*syncHandler)(ptr);
+	}
+
+	bool hasMatcher() const
+	{
+		return _pObject.load() != nullptr &&
+			   (_matcher != nullptr || _matcherFunc != nullptr);
 	}
 
 	bool match(const Notification::Ptr& ptr) const
 	{
-		Mutex::ScopedLock l(_mutex);
+		C* pObject = _pObject.load();
+		if (pObject == nullptr)
+			return false;
 
-		return _pObject && (!_matcher || (_pObject->*_matcher)(ptr->name()));
-	}
+		if (_matcher)
+			return (pObject->*_matcher)(ptr->name());
 
-	Mutex& mutex() const
-	{
-		return _mutex;
+		if (_matcherFunc)
+			return _matcherFunc(ptr->name());
+
+		return false;
 	}
 
 private:
-	C*       _pObject;
-	Callback _handler;
-	Matcher _matcher;
-	mutable Poco::Mutex _mutex;
+	std::atomic<C*> _pObject {nullptr};
+	Handler _handler {nullptr};
+	SyncHandler _syncHandler {nullptr};
+	Matcher _matcher {nullptr};
+	MatcherFunc _matcherFunc;
 };
 
 

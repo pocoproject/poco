@@ -30,7 +30,7 @@ Transaction::Transaction(Poco::Data::Session& rSession, Poco::Logger* pLogger):
 
 Transaction::Transaction(Poco::Data::Session& rSession, bool start):
 	_rSession(rSession),
-	_pLogger(0)
+	_pLogger(nullptr)
 {
 	if (start) begin();
 }

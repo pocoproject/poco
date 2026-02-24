@@ -7,7 +7,7 @@
 //
 // Definition of the BSONReader class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -49,7 +49,7 @@ public:
 		_reader >> t;
 	}
 
-	std::string readCString();
+	[[nodiscard]] std::string readCString();
 		/// Reads a cstring from the reader.
 		/// A cstring is a string terminated with a 0x00.
 

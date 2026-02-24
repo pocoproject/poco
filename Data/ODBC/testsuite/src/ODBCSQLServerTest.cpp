@@ -417,6 +417,30 @@ catch(Poco::Exception& ex)
 }
 }
 
+void ODBCSQLServerTest::testUUIDsBulk()
+{
+	try
+	{
+		if (!_pSession) fail("Test not available.");
+
+		_pSession->setFeature("autoBind", true);
+		_pSession->setFeature("autoExtract", true);
+
+		recreateUUIDsTable();
+		int rows = 1000;
+		std::vector<Poco::UUID> uuids(rows);
+		for (int i = 0; i < rows; ++i) {
+			uuids[i]= Poco::UUIDGenerator::defaultGenerator().createRandom();
+		}
+
+		*_pSession << "INSERT INTO Strings VALUES (?)"s, use(uuids, bulk), Poco::Data::Keywords::now;
+	}
+	catch (Poco::Exception& ex)
+	{
+		std::cout << ex.displayText() << std::endl;
+	}
+}
+
 
 void ODBCSQLServerTest::testBulk()
 {
@@ -879,6 +903,15 @@ void ODBCSQLServerTest::recreateNullableTable()
 }
 
 
+void ODBCSQLServerTest::recreateNullableStringTable()
+{
+	dropObject("TABLE", "NullableStringTest");
+	try { *_pSession << "CREATE TABLE NullableStringTest (Id INTEGER, Address VARCHAR(30), Age INTEGER)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.toString() << std::endl; failmsg ("recreateNullableStringTable()"); }
+	catch(StatementException& se){ std::cout << se.toString() << std::endl; failmsg ("recreateNullableStringTable()"); }
+}
+
+
 void ODBCSQLServerTest::recreatePersonTable()
 {
 	dropObject("TABLE", "Person");
@@ -1119,6 +1152,7 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testPrepare);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulk);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNullBulk);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testUUIDsBulk);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testBulkPerformance);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetSimple);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSetComplex);
@@ -1178,6 +1212,8 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testSessionTransaction);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testTransactor);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testNullable);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStdOptional);
+		CppUnit_addTest(pSuite, ODBCSQLServerTest, testStdTupleWithOptional);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testUnicode);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testEncoding);
 		CppUnit_addTest(pSuite, ODBCSQLServerTest, testReconnect);
@@ -1186,5 +1222,5 @@ CppUnit::Test* ODBCSQLServerTest::suite()
 		return pSuite;
 	}
 
-	return 0;
+	return nullptr;
 }

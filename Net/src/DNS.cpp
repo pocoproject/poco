@@ -76,7 +76,7 @@ HostEntry DNS::hostByName(const std::string& hostname, unsigned
 	struct addrinfo hints;
 	std::memset(&hints, 0, sizeof(hints));
 	hints.ai_flags = hintFlags;
-	int rc = getaddrinfo(hostname.c_str(), NULL, &hints, &pAI);
+	int rc = getaddrinfo(hostname.c_str(), nullptr, &hints, &pAI);
 	if (rc == 0)
 	{
 		HostEntry result(pAI);
@@ -118,14 +118,14 @@ HostEntry DNS::hostByAddress(const IPAddress& address, unsigned
 #if defined(POCO_HAVE_ADDRINFO)
 	SocketAddress sa(address, 0);
 	char fqname[1024];
-	int rc = getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), NULL, 0, NI_NAMEREQD);
+	int rc = getnameinfo(sa.addr(), sa.length(), fqname, sizeof(fqname), nullptr, 0, NI_NAMEREQD);
 	if (rc == 0)
 	{
 		struct addrinfo* pAI;
 		struct addrinfo hints;
 		std::memset(&hints, 0, sizeof(hints));
 		hints.ai_flags = hintFlags;
-		rc = getaddrinfo(fqname, NULL, &hints, &pAI);
+		rc = getaddrinfo(fqname, nullptr, &hints, &pAI);
 		if (rc == 0)
 		{
 			HostEntry result(pAI);
@@ -411,15 +411,15 @@ void DNS::aierror(int code, const std::string& arg)
 
   B. Disclaimer and license
 
-    Regarding this entire document or any portion of it (including
-    the pseudocode and C code), the author makes no guarantees and
-    is not responsible for any damage resulting from its use.  The
-    author grants irrevocable permission to anyone to use, modify,
-    and distribute it in any way that does not diminish the rights
-    of anyone else to use, modify, and distribute it, provided that
-    redistributed derivative works do not contain misleading author or
-    version information.  Derivative works need not be licensed under
-    similar terms.
+	Regarding this entire document or any portion of it (including
+	the pseudocode and C code), the author makes no guarantees and
+	is not responsible for any damage resulting from its use.  The
+	author grants irrevocable permission to anyone to use, modify,
+	and distribute it in any way that does not diminish the rights
+	of anyone else to use, modify, and distribute it, provided that
+	redistributed derivative works do not contain misleading author or
+	version information.  Derivative works need not be licensed under
+	similar terms.
 
   C. Punycode sample implementation
 
@@ -434,17 +434,14 @@ void DNS::aierror(int code, const std::string& arg)
 
 /*** Bootstring parameters for Punycode ***/
 
-enum
-{
-	base = 36,
-	tmin = 1,
-	tmax = 26,
-	skew = 38,
-	damp = 700,
-	initial_bias = 72,
-	initial_n = 0x80,
-	delimiter = 0x2D
-};
+constexpr punycode_uint base = 36;
+constexpr punycode_uint tmin = 1;
+constexpr punycode_uint tmax = 26;
+constexpr punycode_uint skew = 38;
+constexpr punycode_uint damp = 700;
+constexpr punycode_uint initial_bias = 72;
+constexpr punycode_uint initial_n = 0x80;
+constexpr punycode_uint delimiter = 0x2D;
 
 /* basic(cp) tests whether cp is a basic code point: */
 #define basic(cp) ((punycode_uint)(cp) < 0x80)

@@ -5,34 +5,33 @@
 // Package: MongoDB
 // Module:  Connection
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
 //
 
 
-#include "Poco/Net/SocketStream.h"
 #include "Poco/MongoDB/Connection.h"
 #include "Poco/MongoDB/Database.h"
-#include "Poco/URI.h"
-#include "Poco/Format.h"
-#include "Poco/NumberParser.h"
+#include "Poco/MongoDB/OpMsgMessage.h"
 #include "Poco/Exception.h"
+#include "Poco/Format.h"
+#include "Poco/Net/SocketStream.h"
+#include "Poco/NumberParser.h"
+#include "Poco/URI.h"
+
+using namespace std::string_literals;
 
 
 namespace Poco {
 namespace MongoDB {
 
 
-Connection::SocketFactory::SocketFactory()
-{
-}
+Connection::SocketFactory::SocketFactory() = default;
 
 
-Connection::SocketFactory::~SocketFactory()
-{
-}
+Connection::SocketFactory::~SocketFactory() = default;
 
 
 Poco::Net::StreamSocket Connection::SocketFactory::createSocket(const std::string& host, int port, Poco::Timespan connectTimeout, bool secure)
@@ -51,11 +50,7 @@ Poco::Net::StreamSocket Connection::SocketFactory::createSocket(const std::strin
 }
 
 
-Connection::Connection():
-	_address(),
-	_socket()
-{
-}
+Connection::Connection() = default;
 
 
 Connection::Connection(const std::string& hostAndPort):
@@ -165,19 +160,19 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
 	Poco::URI::QueryParameters params = theURI.getQueryParameters();
 	for (Poco::URI::QueryParameters::const_iterator it = params.begin(); it != params.end(); ++it)
 	{
-		if (it->first == "ssl")
+		if (it->first == "ssl"s)
 		{
-			ssl = (it->second == "true");
+			ssl = (it->second == "true"s);
 		}
-		else if (it->first == "connectTimeoutMS")
+		else if (it->first == "connectTimeoutMS"s)
 		{
 			connectTimeout = static_cast<Poco::Timespan::TimeDiff>(1000)*Poco::NumberParser::parse(it->second);
 		}
-		else if (it->first == "socketTimeoutMS")
+		else if (it->first == "socketTimeoutMS"s)
 		{
 			socketTimeout = static_cast<Poco::Timespan::TimeDiff>(1000)*Poco::NumberParser::parse(it->second);
 		}
-		else if (it->first == "authMechanism")
+		else if (it->first == "authMechanism"s)
 		{
 			authMechanism = it->second;
 		}
@@ -213,22 +208,6 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
 void Connection::disconnect()
 {
 	_socket.close();
-}
-
-
-void Connection::sendRequest(RequestMessage& request)
-{
-	Poco::Net::SocketOutputStream sos(_socket);
-	request.send(sos);
-}
-
-
-void Connection::sendRequest(RequestMessage& request, ResponseMessage& response)
-{
-	sendRequest(request);
-
-	Poco::Net::SocketInputStream sis(_socket);
-	response.read(sis);
 }
 
 

@@ -29,7 +29,7 @@ int Symbol::_nextId = 0;
 
 Symbol::Symbol():
 	_id(_nextId++),
-	_pNameSpace(0),
+	_pNameSpace(nullptr),
 	_access(ACC_PUBLIC),
 	_line(-1),
 	_order(0)

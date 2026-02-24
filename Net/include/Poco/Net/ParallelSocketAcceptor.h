@@ -45,7 +45,7 @@ class ParallelSocketAcceptor
 {
 public:
 	using ParallelReactor = Poco::Net::ParallelSocketReactor<SR>;
-	using Observer = Poco::Observer<ParallelSocketAcceptor, ReadableNotification>;
+	using Observer = Poco::NObserver<ParallelSocketAcceptor, ReadableNotification>;
 
 	explicit ParallelSocketAcceptor(ServerSocket& socket,
 		unsigned threads = Poco::Environment::processorCount(),
@@ -134,10 +134,9 @@ public:
 		}
 	}
 
-	void onAccept(ReadableNotification* pNotification)
+	void onAccept(const AutoPtr<ReadableNotification>& pNotification)
 		/// Accepts connection and creates event handler.
 	{
-		pNotification->release();
 		StreamSocket sock = _socket.acceptConnection();
 		_pReactor->wakeUp();
 		createServiceHandler(sock);

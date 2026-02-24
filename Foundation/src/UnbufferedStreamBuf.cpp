@@ -16,7 +16,7 @@
 
 namespace Poco {
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(Foundation_EXPORTS)
 template class Foundation_API BasicUnbufferedStreamBuf<char, std::char_traits<char>>;
 #else
 template class BasicUnbufferedStreamBuf<char, std::char_traits<char>>;

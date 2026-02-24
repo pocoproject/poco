@@ -17,6 +17,7 @@
 #include "Poco/Path.h"
 #include "Poco/File.h"
 #include "Poco/Format.h"
+#include "Poco/Environment.h"
 #include "TestPlugin.h"
 
 
@@ -28,6 +29,7 @@ using Poco::NotFoundException;
 using Poco::InvalidAccessException;
 using Poco::Path;
 using Poco::File;
+using Poco::Environment;
 
 
 ClassLoaderTest::ClassLoaderTest(const std::string& name): CppUnit::TestCase(name)
@@ -47,6 +49,10 @@ template class ClassLoader<TestPlugin>;
 
 void ClassLoaderTest::testClassLoader1()
 {
+#ifdef POCO_STATIC
+	return; // Skip test in static builds where TestLibrary is not built
+#endif
+
 	std::string libraryPath = getFullName("TestLibrary");
 	ClassLoader<TestPlugin> cl;
 
@@ -86,6 +92,10 @@ void ClassLoaderTest::testClassLoader1()
 
 void ClassLoaderTest::testClassLoader2()
 {
+#ifdef POCO_STATIC
+	return; // Skip test in static builds where TestLibrary is not built
+#endif
+
 	std::string libraryPath = getFullName("TestLibrary");
 	ClassLoader<TestPlugin> cl;
 	cl.loadLibrary(libraryPath);
@@ -174,6 +184,10 @@ void ClassLoaderTest::testClassLoader2()
 
 void ClassLoaderTest::testClassLoader3()
 {
+#ifdef POCO_STATIC
+	return; // Skip test in static builds where TestLibrary is not built
+#endif
+
 	std::string libraryPath = getFullName("TestLibrary");
 	ClassLoader<TestPlugin> cl;
 	cl.loadLibrary(libraryPath);
@@ -196,27 +210,33 @@ void ClassLoaderTest::testClassLoader3()
 
 std::string ClassLoaderTest::getFullName(const std::string& libName)
 {
-	std::string name = Path::expand("$POCO_BASE");
-	char c = Path::separator();
-	std::string OSNAME = Path::expand("$OSNAME");
-	std::string OSARCH = Path::expand("$OSARCH");
-	name.append(1, c)
-		.append(Poco::format("Foundation%ctestsuite%cbin%c", c, c, c))
-		.append(Poco::format("%s%c%s%c", OSNAME, c, OSARCH, c))
-		.append(libName).append(SharedLibrary::suffix());
+	// Get the directory where the test executable is located
+	Path selfPath(Path::self());
+	selfPath.setFileName("");
+	std::string name = selfPath.toString() + libName + SharedLibrary::suffix();
 
-	// CMake
-	if (!File(name).exists())
+	if (File(name).exists())
+		return name;
+
+	// Fallback: make build layout
+	std::string pocoBase = Environment::get("POCO_BASE", "");
+	if (!pocoBase.empty())
 	{
-		name = Path::expand("$POCO_BASE");
-		name.append(Poco::format("%ccmake-build%cbin%c", c, c, c))
+		char c = Path::separator();
+		std::string OSNAME = Environment::get("OSNAME", "");
+		std::string OSARCH = Environment::get("OSARCH", "");
+		name = pocoBase;
+		name.append(1, c)
+			.append(Poco::format("Foundation%ctestsuite%cbin%c", c, c, c))
+			.append(Poco::format("%s%c%s%c", OSNAME, c, OSARCH, c))
 			.append(libName).append(SharedLibrary::suffix());
+
+		if (File(name).exists())
+			return name;
 	}
 
-	if (!File(name).exists())
-		name = libName + SharedLibrary::suffix();
-
-	return name;
+	// Last resort: just the library name
+	return libName + SharedLibrary::suffix();
 }
 
 

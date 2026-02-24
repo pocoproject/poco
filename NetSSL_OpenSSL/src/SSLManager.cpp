@@ -264,8 +264,8 @@ int SSLManager::privateKeyPassphraseCallback(char* pBuf, int size, int flag, voi
 
 	strncpy(pBuf, (char *)(pwd.c_str()), size);
 	pBuf[size - 1] = '\0';
-	if (size > pwd.length())
-		size = (int) pwd.length();
+	if (static_cast<std::size_t>(size) > pwd.length())
+		size = static_cast<int>(pwd.length());
 
 	return size;
 }
@@ -316,7 +316,7 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 	X509* pPeerIssuerCert = nullptr;
 	STACK_OF(X509)* pCertChain = SSL_get_peer_cert_chain(pSSL);
 	unsigned certChainLen = sk_X509_num(pCertChain);
-	for (int i= 0; i < certChainLen ; i++)
+	for (unsigned i = 0; i < certChainLen; i++)
 	{
 		if (!pPeerIssuerCert)
 		{
@@ -567,7 +567,7 @@ void SSLManager::initPassphraseHandler(bool server)
 
 	std::string className(config.getString(prefix + CFG_DELEGATE_HANDLER, VAL_DELEGATE_HANDLER));
 
-	const PrivateKeyFactory* pFactory = 0;
+	const PrivateKeyFactory* pFactory = nullptr;
 	if (privateKeyFactoryMgr().hasFactory(className))
 	{
 		pFactory = privateKeyFactoryMgr().getFactory(className);
@@ -594,7 +594,7 @@ void SSLManager::initCertificateHandler(bool server)
 
 	std::string className(config.getString(prefix+CFG_CERTIFICATE_HANDLER, VAL_CERTIFICATE_HANDLER));
 
-	const CertificateHandlerFactory* pFactory = 0;
+	const CertificateHandlerFactory* pFactory = nullptr;
 	if (certificateHandlerFactoryMgr().hasFactory(className))
 	{
 		pFactory = certificateHandlerFactoryMgr().getFactory(className);

@@ -245,6 +245,17 @@ public:
 		/// Returns the operating system specific thread ID for the current thread.
 		/// On error, or if the platform does not support this functionality, it returns zero.
 
+	static void setCurrentName(const std::string& name);
+		/// Sets the name of the current thread.
+		/// Support for this feature varies across platforms.
+		/// Any errors are silently ignored.
+
+	static std::string getCurrentName();
+		/// Returns the name of the current thread.
+		/// Support for this feature varies across platforms.
+		/// Returns an empty string if not supported, on error,
+		/// or if no name has been set for the thread.
+
 	bool setAffinity(int coreId);
 		/// Sets the thread affinity to the coreID.
 		/// Returns true if succesful.
@@ -255,6 +266,35 @@ public:
 		/// Returns the thread affinity.
 		/// Negative value means the thread has
 		/// no CPU core affinity.
+
+	bool isInterrupted();
+		/// Tests whether current thread has been interrupted.
+		/// Return true if the task running on this thread should be stopped.
+		/// An interruption can be requested by interrupt().
+		///
+		/// This function can be used to make long running tasks cleanly interruptible.
+		/// Never checking or acting on the value returned by this function is safe,
+		/// however it is advisable do so regularly in long running functions.
+		/// Take care not to call it too often, to keep the overhead low.
+		/// 
+		/// See also checkInterrupted().
+
+	void checkInterrupted();
+		/// Tests whether current thread has been interrupted.
+		/// Throws Poco::ThreadInterruptedException if isInterrupted() return true.
+		///
+		/// Note: The interrupted status of the thread is cleared by this method.
+
+	void interrupt();
+		/// Interrupts this thread.
+		///
+		/// This function does not stop any event loop running on the thread and
+		/// does not terminate it in any way.
+		///
+		/// See also isInterrupted().
+
+	void clearInterrupt();
+		/// Clear the the interrupted status.
 
 protected:
 	ThreadLocalStorage& tls();
@@ -301,6 +341,7 @@ private:
 	int                 _id;
 	ThreadLocalStorage* _pTLS;
 	Event               _event;
+	std::atomic_bool    _interruptionRequested;
 
 	friend class ThreadLocalStorage;
 	friend class PooledThread;
@@ -402,6 +443,24 @@ inline Thread::TID Thread::currentTid()
 inline long Thread::currentOsTid()
 {
 	return currentOsTidImpl();
+}
+
+inline void Thread::setCurrentName(const std::string& name)
+{
+#ifndef POCO_NO_THREADNAME
+	setCurrentNameImpl(name);
+#else
+	(void)name;
+#endif
+}
+
+inline std::string Thread::getCurrentName()
+{
+#ifndef POCO_NO_THREADNAME
+	return getCurrentNameImpl();
+#else
+	return std::string();
+#endif
 }
 
 inline bool Thread::setAffinity(int coreId)

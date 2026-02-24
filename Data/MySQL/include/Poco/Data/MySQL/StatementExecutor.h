@@ -41,6 +41,10 @@ public:
 	explicit StatementExecutor(MYSQL* mysql);
 		/// Creates the StatementExecutor.
 
+	StatementExecutor(const StatementExecutor&) = delete;
+
+	StatementExecutor& operator=(const StatementExecutor&) = delete;
+
 	~StatementExecutor();
 		/// Destroys the StatementExecutor.
 
@@ -69,10 +73,6 @@ public:
 
 	operator MYSQL_STMT* ();
 		/// Cast operator to native handle type.
-
-private:
-	StatementExecutor(const StatementExecutor&);
-	StatementExecutor& operator=(const StatementExecutor&);
 
 private:
 	MYSQL*      _pSessionHandle;

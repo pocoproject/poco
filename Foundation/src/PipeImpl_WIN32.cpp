@@ -23,27 +23,39 @@ PipeImpl::PipeImpl()
 {
 	SECURITY_ATTRIBUTES attr;
 	attr.nLength              = sizeof(attr);
-	attr.lpSecurityDescriptor = NULL;
+	attr.lpSecurityDescriptor = nullptr;
 	attr.bInheritHandle       = FALSE;
 
-	if (!CreatePipe(&_readHandle, &_writeHandle, &attr, 0))
+	HANDLE readHandle, writeHandle;
+	if (!CreatePipe(&readHandle, &writeHandle, &attr, 0))
 		throw CreateFileException("anonymous pipe");
+	_readHandle.store(readHandle, std::memory_order_relaxed);
+	_writeHandle.store(writeHandle, std::memory_order_relaxed);
 }
 
 
 PipeImpl::~PipeImpl()
 {
+	closeWrite();  // close write first to send EOF to blocked readers
 	closeRead();
-	closeWrite();
 }
 
 
 int PipeImpl::writeBytes(const void* buffer, int length)
 {
+	ScopedIOLock lock(_writeLock);
+	if (!lock)
+		return 0;
+
 	poco_assert (_writeHandle != INVALID_HANDLE_VALUE);
 
 	DWORD bytesWritten = 0;
-	if (!WriteFile(_writeHandle, buffer, length, &bytesWritten, NULL))
+	BOOL ok = WriteFile(_writeHandle.load(std::memory_order_relaxed), buffer, length, &bytesWritten, nullptr);
+
+	if (lock.isClosed())
+		return 0;
+
+	if (!ok)
 		throw WriteFileException("anonymous pipe");
 	return bytesWritten;
 }
@@ -51,11 +63,20 @@ int PipeImpl::writeBytes(const void* buffer, int length)
 
 int PipeImpl::readBytes(void* buffer, int length)
 {
+	ScopedIOLock lock(_readLock);
+	if (!lock)
+		return 0;
+
 	poco_assert (_readHandle != INVALID_HANDLE_VALUE);
 
 	DWORD bytesRead = 0;
-	BOOL ok = ReadFile(_readHandle, buffer, length, &bytesRead, NULL);
-	if (ok || GetLastError() == ERROR_BROKEN_PIPE)
+	BOOL ok = ReadFile(_readHandle.load(std::memory_order_relaxed), buffer, length, &bytesRead, nullptr);
+	DWORD lastError = GetLastError();
+
+	if (lock.isClosed())
+		return 0;
+
+	if (ok || lastError == ERROR_BROKEN_PIPE)
 		return bytesRead;
 	else
 		throw ReadFileException("anonymous pipe");
@@ -64,33 +85,33 @@ int PipeImpl::readBytes(void* buffer, int length)
 
 PipeImpl::Handle PipeImpl::readHandle() const
 {
-	return _readHandle;
+	return _readHandle.load(std::memory_order_relaxed);
 }
 
 
 PipeImpl::Handle PipeImpl::writeHandle() const
 {
-	return _writeHandle;
+	return _writeHandle.load(std::memory_order_relaxed);
 }
 
 
 void PipeImpl::closeRead()
 {
-	if (_readHandle != INVALID_HANDLE_VALUE)
-	{
-		CloseHandle(_readHandle);
-		_readHandle = INVALID_HANDLE_VALUE;
-	}
+	_readLock.markClosed();
+	_readLock.wait();  // wait for any in-progress read to finish
+	HANDLE handle = _readHandle.exchange(INVALID_HANDLE_VALUE, std::memory_order_acq_rel);
+	if (handle != INVALID_HANDLE_VALUE)
+		CloseHandle(handle);
 }
 
 
 void PipeImpl::closeWrite()
 {
-	if (_writeHandle != INVALID_HANDLE_VALUE)
-	{
-		CloseHandle(_writeHandle);
-		_writeHandle = INVALID_HANDLE_VALUE;
-	}
+	_writeLock.markClosed();
+	_writeLock.wait();  // wait for any in-progress write to finish
+	HANDLE handle = _writeHandle.exchange(INVALID_HANDLE_VALUE, std::memory_order_acq_rel);
+	if (handle != INVALID_HANDLE_VALUE)
+		CloseHandle(handle);
 }
 
 

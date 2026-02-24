@@ -15,11 +15,7 @@
 #include "Poco/DeflatingStream.h"
 #include "Poco/Exception.h"
 #include <memory>
-#if defined(POCO_UNBUNDLED)
 #include <zlib.h>
-#else
-#include "zlib.h"
-#endif
 
 
 namespace Poco {
@@ -28,7 +24,7 @@ namespace Poco {
 DeflatingStreamBuf::DeflatingStreamBuf(std::istream& istr, StreamType type, int level):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_eof(false)
 {
 	std::unique_ptr<char[]> buffer(new char[DEFLATE_BUFFER_SIZE]);
@@ -48,7 +44,7 @@ DeflatingStreamBuf::DeflatingStreamBuf(std::istream& istr, StreamType type, int 
 DeflatingStreamBuf::DeflatingStreamBuf(std::istream& istr, int windowBits, int level):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_eof(false)
 {
 	std::unique_ptr<char[]> buffer(new char[DEFLATE_BUFFER_SIZE]);
@@ -67,7 +63,7 @@ DeflatingStreamBuf::DeflatingStreamBuf(std::istream& istr, int windowBits, int l
 
 DeflatingStreamBuf::DeflatingStreamBuf(std::ostream& ostr, StreamType type, int level):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_eof(false)
 {
@@ -87,7 +83,7 @@ DeflatingStreamBuf::DeflatingStreamBuf(std::ostream& ostr, StreamType type, int 
 
 DeflatingStreamBuf::DeflatingStreamBuf(std::ostream& ostr, int windowBits, int level):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_eof(false)
 {
@@ -123,7 +119,7 @@ DeflatingStreamBuf::~DeflatingStreamBuf()
 int DeflatingStreamBuf::close()
 {
 	BufferedStreamBuf::sync();
-	_pIstr = 0;
+	_pIstr = nullptr;
 	if (_pOstr)
 	{
 		if (_pZstr->next_out)
@@ -145,7 +141,7 @@ int DeflatingStreamBuf::close()
 			}
 		}
 		_pOstr->flush();
-		_pOstr = 0;
+		_pOstr = nullptr;
 	}
 	return 0;
 }
@@ -184,7 +180,7 @@ int DeflatingStreamBuf::sync()
 }
 
 
-int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (!_pIstr) return 0;
 	if (_pZstr->avail_in == 0 && !_eof)
@@ -202,7 +198,7 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		}
 		else
 		{
-			_pZstr->next_in  = 0;
+			_pZstr->next_in  = nullptr;
 			_pZstr->avail_in = 0;
 			_eof = true;
 		}
@@ -214,13 +210,13 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		int rc = deflate(_pZstr, _eof ? Z_FINISH : Z_NO_FLUSH);
 		if (_eof && rc == Z_STREAM_END)
 		{
-			_pIstr = 0;
-			return static_cast<int>(length) - _pZstr->avail_out;
+			_pIstr = nullptr;
+			return length - _pZstr->avail_out;
 		}
 		if (rc != Z_OK) throw IOException(zError(rc));
 		if (_pZstr->avail_out == 0)
 		{
-			return static_cast<int>(length);
+			return length;
 		}
 		if (_pZstr->avail_in == 0)
 		{
@@ -237,7 +233,7 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 			}
 			else
 			{
-				_pZstr->next_in  = 0;
+				_pZstr->next_in  = nullptr;
 				_pZstr->avail_in = 0;
 				_eof = true;
 			}
@@ -246,7 +242,7 @@ int DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 }
 
 
-int DeflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize DeflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	if (length == 0 || !_pOstr) return 0;
 
@@ -274,7 +270,7 @@ int DeflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length
 			break;
 		}
 	}
-	return static_cast<int>(length);
+	return length;
 }
 
 

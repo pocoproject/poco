@@ -14,7 +14,6 @@
 #define MongoDBTest_INCLUDED
 
 
-#include "Poco/MongoDB/MongoDB.h"
 #include "Poco/MongoDB/Connection.h"
 #include "CppUnit/TestCase.h"
 
@@ -30,27 +29,11 @@ public:
 	void tearDown();
 
 	void testObjectID();
-	void testArray();
 	void testBuildInfo();
 	void testHello();
 	void testConnectURI();
 
-	// Old wire protocol
-	void testInsertRequest();
-	void testQueryRequest();
-	void testDBQueryRequest();
-	void testCountCommand();
-	void testDBCountCommand();
-	void testDBCount2Command();
-	void testDeleteRequest();
-
-	void testConnectionPool();
-	void testCursorRequest();
-	void testCommand();
-	void testUUID();
-
-	// New wire protocol using OP_CMD
-	void testOpCmdUUID();
+	// OP_MSG wire protocol
 	void testOpCmdHello();
 	void testOpCmdWriteRead();
 	void testOpCmdInsert();
@@ -64,6 +47,7 @@ public:
 	void testOpCmdUnaknowledgedInsert();
 	void testOpCmdConnectionPool();
 	void testOpCmdDropDatabase();
+	void testDBCount();
 
 	static CppUnit::Test* suite();
 

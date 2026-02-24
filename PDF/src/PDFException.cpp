@@ -13,9 +13,8 @@
 
 
 #include "Poco/PDF/PDFException.h"
-#include "Poco/Format.h"
+#include <hpdf.h>
 #include <string>
-#include <typeinfo>
 
 
 namespace Poco {
@@ -58,7 +57,7 @@ void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_
 		throw InvalidArgumentException("Internal error. The consistency of the data was lost.");
 	case HPDF_EXCEED_GSTATE_LIMIT:
 		throw IllegalStateException("The depth of the stack exceeded HPDF_LIMIT_MAX_GSTATE.");
-	case HPDF_FAILD_TO_ALLOC_MEM:
+	case HPDF_FAILED_TO_ALLOC_MEM:
 		throw IllegalStateException("Memory allocation failed.");
 	case HPDF_FILE_IO_ERROR:
 		throw IOException("File processing failed. (A detailed code is set.)");

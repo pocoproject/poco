@@ -145,7 +145,8 @@ private:
 
 SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession):
 	CppUnit::TestCase(name),
-	_pSession(pSession)
+	_pSession(pSession),
+	_dataExecutor(name, pSession, nullptr, false)
 {
 }
 
@@ -158,14 +159,14 @@ SQLExecutor::~SQLExecutor()
 void SQLExecutor::bareboneMySQLTest(const char* host, const char* user, const char* pwd, const char* db, int port, const char* tableCreateString)
 {
 	int rc;
-	MYSQL* hsession = mysql_init(0);
-	assertTrue (hsession != 0);
+	MYSQL* hsession = mysql_init(nullptr);
+	assertTrue (hsession != nullptr);
 
-	MYSQL* tmp = mysql_real_connect(hsession, host, user, pwd, db, port, 0, 0);
+	MYSQL* tmp = mysql_real_connect(hsession, host, user, pwd, db, port, nullptr, 0);
 	assertTrue (tmp == hsession);
 
 	MYSQL_STMT* hstmt = mysql_stmt_init(hsession);
-	assertTrue (hstmt != 0);
+	assertTrue (hstmt != nullptr);
 
 	std::string sql = "DROP TABLE Test";
 	mysql_real_query(hsession, sql.c_str(), static_cast<unsigned long>(sql.length()));
@@ -185,7 +186,7 @@ void SQLExecutor::bareboneMySQLTest(const char* host, const char* user, const ch
 	int fourth = 4;
 	float fifth = 1.5;
 
-	MYSQL_BIND bind_param[5] = {{0}};
+	MYSQL_BIND bind_param[5] = {};
 
 	bind_param[0].buffer		= const_cast<char*>(str[0].c_str());
 	bind_param[0].buffer_length = static_cast<unsigned long>(str[0].length());
@@ -225,7 +226,7 @@ void SQLExecutor::bareboneMySQLTest(const char* host, const char* user, const ch
 	fourth = 0;
 	fifth = 0.0f;
 
-	MYSQL_BIND bind_result[5] = {{0}};
+	MYSQL_BIND bind_result[5] = {};
 
 	bind_result[0].buffer		= chr[0];
 	bind_result[0].buffer_length = sizeof(chr[0]);
@@ -1396,6 +1397,22 @@ void SQLExecutor::timestamp()
 	assertTrue (bd == birthday);
 
 	std::cout << std::endl << RecordSet(*_pSession, "SELECT * FROM Person");
+
+	Statement stmt(*_pSession);
+	stmt <<  "INSERT INTO Person VALUES (?,?,?,?)", use(lastName), use(firstName), use(address), use(birthday);
+	lastName = "Ridley";
+	firstName = "Sam";
+	birthday = DateTime(1982, 6, 13, 5, 30, 10, 0, 0);
+	try { stmt.execute(); }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	try { *_pSession << "SELECT Birthday FROM Person WHERE LastName = 'Ridley'", into(bd), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (bd == birthday);
+
+
 }
 
 
@@ -2108,4 +2125,16 @@ void SQLExecutor::sessionPoolAndUnicode(const std::string& connString)
 	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
 
 	assertTrue (text == text2);
+}
+
+
+void SQLExecutor::stdOptional()
+{
+	_dataExecutor.stdOptional();
+}
+
+
+void SQLExecutor::stdTupleWithOptional()
+{
+	_dataExecutor.stdTupleWithOptional();
 }

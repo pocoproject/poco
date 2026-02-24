@@ -11,19 +11,25 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 )
 
 add_executable(JSON-testrunner ${TEST_SRCS})
+set_target_properties(JSON-testrunner PROPERTIES DEBUG_POSTFIX "d")
 if(ANDROID)
 	add_test(
 		NAME JSON
 		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-		COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} "-DTEST_FILES=${CMAKE_CURRENT_SOURCE_DIR}/data;" -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/JSON-testrunner -DTEST_PARAMETER=-all -P ${CMAKE_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake
+		COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} "-DTEST_FILES=${CMAKE_CURRENT_SOURCE_DIR}/data;" -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/JSON-testrunner -DTEST_PARAMETER=-all -P ${PROJECT_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake
 	)
 else()
+	if(WIN32)
+		set(CPPIGNORE_FILE "${PROJECT_SOURCE_DIR}/cppignore.win")
+	else()
+		set(CPPIGNORE_FILE "${PROJECT_SOURCE_DIR}/cppignore.lnx")
+	endif()
 	add_test(
 		NAME JSON
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		COMMAND JSON-testrunner -ignore ${CMAKE_SOURCE_DIR}/cppignore.lnx -all
+		COMMAND JSON-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
-	set_tests_properties(JSON PROPERTIES ENVIRONMENT POCO_BASE=${CMAKE_SOURCE_DIR})
+	set_tests_properties(JSON PROPERTIES ENVIRONMENT POCO_BASE=${PROJECT_SOURCE_DIR})
 	# The test is run in the build directory. So the test data is copied there too
 	add_custom_command(
 		TARGET JSON-testrunner POST_BUILD

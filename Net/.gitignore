@@ -1,0 +1,5 @@
+# Build-time symlinks to bundled libraries
+# Created by prebuild step in Makefile for MinGW builds
+
+# wepoll (Windows epoll emulation for MinGW)
+src/wepoll.c

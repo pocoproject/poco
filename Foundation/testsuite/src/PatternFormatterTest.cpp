@@ -106,6 +106,78 @@ void PatternFormatterTest::testPatternFormatter()
 }
 
 
+void PatternFormatterTest::testExtractBasename()
+{
+	PatternFormatter fmt;
+	fmt.setProperty("pattern", "%O");
+	std::string result;
+
+	// Test Unix-style paths (should work on all platforms)
+	Message msg1("src", "text", Message::PRIO_INFORMATION, "/path/to/file.cpp", 1);
+	fmt.format(msg1, result);
+	assertTrue (result == "file.cpp");
+
+	result.clear();
+	Message msg2("src", "text", Message::PRIO_INFORMATION, "/very/long/path/to/source/file/TestFile.cpp", 42);
+	fmt.format(msg2, result);
+	assertTrue (result == "TestFile.cpp");
+
+	// Test filename only (no path)
+	result.clear();
+	Message msg3("src", "text", Message::PRIO_INFORMATION, "file.cpp", 1);
+	fmt.format(msg3, result);
+	assertTrue (result == "file.cpp");
+
+	// Test empty path
+	result.clear();
+	Message msg4("src", "text", Message::PRIO_INFORMATION, "", 1);
+	fmt.format(msg4, result);
+	assertTrue (result == "");
+
+	// Test null path
+	result.clear();
+	Message msg5("src", "text", Message::PRIO_INFORMATION, nullptr, 1);
+	fmt.format(msg5, result);
+	assertTrue (result == "");
+
+	// Test path ending with separator
+	result.clear();
+	Message msg6("src", "text", Message::PRIO_INFORMATION, "/path/to/dir/", 1);
+	fmt.format(msg6, result);
+	assertTrue (result == "");
+
+	// Test root path
+	result.clear();
+	Message msg7("src", "text", Message::PRIO_INFORMATION, "/", 1);
+	fmt.format(msg7, result);
+	assertTrue (result == "");
+
+#if defined(_WIN32)
+	// On Windows, backslash is also a separator
+	result.clear();
+	Message msg8("src", "text", Message::PRIO_INFORMATION, "C:\\path\\to\\file.cpp", 1);
+	fmt.format(msg8, result);
+	assertTrue (result == "file.cpp");
+
+	result.clear();
+	Message msg9("src", "text", Message::PRIO_INFORMATION, "C:\\path/mixed\\separators/file.cpp", 1);
+	fmt.format(msg9, result);
+	assertTrue (result == "file.cpp");
+#else
+	// On Unix, backslash is a valid filename character, not a separator
+	result.clear();
+	Message msg8("src", "text", Message::PRIO_INFORMATION, "/path/to/fi\\le.cpp", 1);
+	fmt.format(msg8, result);
+	assertTrue (result == "fi\\le.cpp");
+
+	result.clear();
+	Message msg9("src", "text", Message::PRIO_INFORMATION, "/path/file\\with\\backslashes.cpp", 1);
+	fmt.format(msg9, result);
+	assertTrue (result == "file\\with\\backslashes.cpp");
+#endif
+}
+
+
 void PatternFormatterTest::setUp()
 {
 }
@@ -121,6 +193,7 @@ CppUnit::Test* PatternFormatterTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("PatternFormatterTest");
 
 	CppUnit_addTest(pSuite, PatternFormatterTest, testPatternFormatter);
+	CppUnit_addTest(pSuite, PatternFormatterTest, testExtractBasename);
 
 	return pSuite;
 }

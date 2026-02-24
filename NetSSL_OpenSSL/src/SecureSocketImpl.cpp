@@ -93,7 +93,6 @@ void SecureSocketImpl::acceptSSL()
 		throw SSLException("Cannot create SSL object");
 	}
 
-#if OPENSSL_VERSION_NUMBER >= 0x1010100fL
 	/* TLS 1.3 server sends session tickets after a handhake as part of
 	* the SSL_accept(). If a client finishes all its job before server
 	* sends the tickets, SSL_accept() fails with EPIPE errno. Since we
@@ -105,7 +104,6 @@ void SecureSocketImpl::acceptSSL()
 		throw SSLException("Cannot create SSL object");
 	}
 	//Otherwise we can perform two-way shutdown. Client must call SSL_read() before the final SSL_shutdown().
-#endif
 
 	::SSL_set_bio(_pSSL, pBIO, pBIO);
 	::SSL_set_accept_state(_pSSL);
@@ -178,12 +176,10 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 		SSL_set_tlsext_host_name(_pSSL, _peerHostName.c_str());
 	}
 
-#if OPENSSL_VERSION_NUMBER >= 0x10001000L
 	if(_pContext->ocspStaplingResponseVerificationEnabled())
 	{
 		SSL_set_tlsext_status_type(_pSSL, TLSEXT_STATUSTYPE_ocsp);
 	}
-#endif
 
 	if (_pSession && _pSession->isResumable())
 	{
@@ -603,7 +599,7 @@ int SecureSocketImpl::handleError(int rc)
 				throw SSLException(msg);
 			}
 		}
- 		break;
+		break;
 	}
 	return rc;
 }

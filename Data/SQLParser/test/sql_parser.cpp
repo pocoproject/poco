@@ -17,14 +17,14 @@ void test_tokens(const std::string& query, const std::vector<int16_t>& expected_
   ASSERT_EQ(expected_tokens.size(), tokens.size());
 
   for (unsigned i = 0; i < expected_tokens.size(); ++i) {
-    ASSERT_EQ(expected_tokens[i], tokens[i]);
+	ASSERT_EQ(expected_tokens[i], tokens[i]);
   }
 }
 
 TEST(SQLParserTokenizeTest) {
   test_tokens("SELECT * FROM test;", {SQL_SELECT, '*', SQL_FROM, SQL_IDENTIFIER, ';'});
   test_tokens("SELECT a, 'b' FROM test WITH HINT;",
-              {SQL_SELECT, SQL_IDENTIFIER, ',', SQL_STRING, SQL_FROM, SQL_IDENTIFIER, SQL_WITH, SQL_HINT, ';'});
+			  {SQL_SELECT, SQL_IDENTIFIER, ',', SQL_STRING, SQL_FROM, SQL_IDENTIFIER, SQL_WITH, SQL_HINT, ';'});
 }
 
 TEST(SQLParserTokenizeStringifyTest) {

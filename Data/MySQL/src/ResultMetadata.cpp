@@ -74,7 +74,7 @@ namespace
 		case MYSQL_TYPE_BLOB:
 #ifdef POCO_MYSQL_JSON
 		case MYSQL_TYPE_JSON:
-#endif		
+#endif
 			return field.length;
 
 		default:
@@ -168,8 +168,8 @@ void ResultMetadata::reset()
 
 void ResultMetadata::freeMemory()
 {
-	for (std::vector<char*>::iterator it = _buffer.begin(); it != _buffer.end(); ++it)
-		std::free(*it);
+    for (auto c: _buffer)
+        std::free(c);
 }
 
 

@@ -16,7 +16,6 @@
 #include "Poco/Mutex.h"
 #include "Poco/Exception.h"
 #include "Poco/ThreadLocal.h"
-#include "Poco/AtomicCounter.h"
 #include <sstream>
 
 
@@ -43,11 +42,9 @@ public:
 	{
 	}
 
-	~RunnableHolder()
-	{
-	}
+	~RunnableHolder() override = default;
 
-	void run()
+	void run() override
 	{
 		_target.run();
 	}
@@ -85,7 +82,8 @@ private:
 Thread::Thread(uint32_t sigMask):
 	_id(uniqueId()),
 	_pTLS(nullptr),
-	_event(Event::EVENT_AUTORESET)
+	_event(Event::EVENT_AUTORESET),
+	_interruptionRequested(false)
 {
 	setNameImpl(makeName());
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -97,7 +95,8 @@ Thread::Thread(uint32_t sigMask):
 Thread::Thread(const std::string& name, uint32_t sigMask):
 	_id(uniqueId()),
 	_pTLS(nullptr),
-	_event(Event::EVENT_AUTORESET)
+	_event(Event::EVENT_AUTORESET),
+	_interruptionRequested(false)
 {
 	setNameImpl(name);
 #if defined(POCO_OS_FAMILY_UNIX)
@@ -175,6 +174,35 @@ void Thread::wakeUp()
 }
 
 
+bool Thread::isInterrupted()
+{
+	return _interruptionRequested.load(std::memory_order_relaxed);
+}
+
+
+void Thread::checkInterrupted()
+{
+	bool expected = true;
+	if (_interruptionRequested.compare_exchange_strong(expected, false))
+	{
+		throw Poco::ThreadInterruptedException("Thread interrupted");
+	}
+}
+
+
+void Thread::interrupt()
+{
+	_interruptionRequested.store(true, std::memory_order_relaxed);
+	wakeUp();
+}
+
+
+void Thread::clearInterrupt()
+{
+	_interruptionRequested.store(false, std::memory_order_relaxed);
+}
+
+
 ThreadLocalStorage& Thread::tls()
 {
 	if (!_pTLS)
@@ -203,7 +231,7 @@ std::string Thread::makeName()
 
 int Thread::uniqueId()
 {
-	static Poco::AtomicCounter counter;
+	static std::atomic<int> counter;
 	return ++counter;
 }
 

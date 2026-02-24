@@ -22,6 +22,7 @@ using Poco::Task;
 using Poco::Thread;
 using Poco::Event;
 using Poco::AutoPtr;
+using CppUnit::waitForCondition;
 
 
 namespace
@@ -105,10 +106,10 @@ void TaskTest::testFinish()
 	thr.start(*pTT);
 	assertTrue (pTT->progress() == 0);
 	pTT->cont();
-	while (pTT->progress() != 0.5) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT->progress() == 0.5f; }, 5000));
 	assertTrue (pTT->state() == Task::TASK_RUNNING);
 	pTT->cont();
-	while (pTT->progress() != 1.0) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT->progress() == 1.0f; }, 5000));
 	pTT->cont();
 	thr.join();
 	assertTrue (pTT->state() == Task::TASK_FINISHED);
@@ -119,10 +120,10 @@ void TaskTest::testFinish()
 	thr.start(*pTT);
 	assertTrue (pTT->progress() == 0);
 	pTT->cont();
-	while (pTT->progress() != 0.5) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT->progress() == 0.5f; }, 5000));
 	assertTrue (pTT->state() == Task::TASK_RUNNING);
 	pTT->cont();
-	while (pTT->progress() != 1.0) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT->progress() == 1.0f; }, 5000));
 	pTT->cont();
 	thr.join();
 	assertTrue (pTT->state() == Task::TASK_FINISHED);
@@ -137,7 +138,7 @@ void TaskTest::testCancel1()
 	thr.start(*pTT);
 	assertTrue (pTT->progress() == 0);
 	pTT->cont();
-	while (pTT->progress() != 0.5) Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT->progress() == 0.5f; }, 5000));
 	assertTrue (pTT->state() == Task::TASK_RUNNING);
 	pTT->cancel();
 	assertTrue (pTT->state() == Task::TASK_CANCELLING);
@@ -153,8 +154,7 @@ void TaskTest::testCancel2()
 	assertTrue (pTT->state() == Task::TASK_IDLE);
 	Thread thr;
 	thr.start(*pTT);
-	while (pTT->state() != Task::TASK_RUNNING)
-		Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT->state() == Task::TASK_RUNNING; }, 5000));
 	assertTrue (pTT->progress() == 0);
 	pTT->cancel();
 	assertTrue (pTT->state() == Task::TASK_CANCELLING);
@@ -172,8 +172,7 @@ void TaskTest::testCancelNoStart()
 	assertTrue (pTT->state() == Task::TASK_CANCELLING);
 	Thread thr;
 	thr.start(*pTT);
-	while (pTT->state() != Task::TASK_FINISHED)
-		Thread::sleep(50);
+	assertTrue (waitForCondition([&]{ return pTT->state() == Task::TASK_FINISHED; }, 5000));
 	assertTrue (pTT->state() == Task::TASK_FINISHED);
 	assertFalse (pTT->started());
 }

@@ -23,6 +23,7 @@
 #include "Poco/ScopedLock.h"
 #include "Poco/Timestamp.h"
 #include <atomic>
+#include <thread>
 
 #ifdef POCO_ENABLE_STD_MUTEX
 #include "Poco/Mutex_STD.h"
@@ -156,6 +157,12 @@ private:
 class Foundation_API SpinlockMutex
 	/// A SpinlockMutex, implemented in terms of std::atomic_flag, as
 	/// busy-wait mutual exclusion.
+	///
+	/// Spins adaptively: spin briefly, then yield, then sleep.
+	/// This avoids burning CPU while still being fast for uncontended locks.
+	/// On C++20, uses test() with relaxed ordering for efficient polling
+	/// (avoids cache line bouncing), then test_and_set() with acquire
+	/// only when the lock appears free.
 	///
 	/// While in some cases (eg. locking small blocks of code)
 	/// busy-waiting may be an optimal solution, in many scenarios
@@ -327,38 +334,10 @@ inline void FastMutex::unlock()
 // SpinlockMutex
 //
 
-inline void SpinlockMutex::lock()
-{
-	while (_flag.test_and_set(std::memory_order_acquire));
-}
-
-
-inline void SpinlockMutex::lock(long milliseconds)
-{
-	Timestamp now;
-	Timestamp::TimeDiff diff(Timestamp::TimeDiff(milliseconds)*1000);
-	while (_flag.test_and_set(std::memory_order_acquire))
-	{
-		if (now.isElapsed(diff)) throw TimeoutException();
-	}
-}
-
 
 inline bool SpinlockMutex::tryLock()
 {
 	return !_flag.test_and_set(std::memory_order_acquire);
-}
-
-
-inline bool SpinlockMutex::tryLock(long milliseconds)
-{
-	Timestamp now;
-	Timestamp::TimeDiff diff(Timestamp::TimeDiff(milliseconds)*1000);
-	while (_flag.test_and_set(std::memory_order_acquire))
-	{
-		if (now.isElapsed(diff)) return false;
-	}
-	return true;
 }
 
 

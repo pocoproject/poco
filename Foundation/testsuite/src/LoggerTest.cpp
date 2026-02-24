@@ -14,13 +14,22 @@
 #include "Poco/Logger.h"
 #include "Poco/AutoPtr.h"
 #include "TestChannel.h"
-
+#include "Poco/Thread.h"
+#include "Poco/Event.h"
+#include "Poco/PatternFormatter.h"
+#include "Poco/FormattingChannel.h"
+#include <thread>
+#include <memory>
+#include <vector>
 
 using Poco::Logger;
 using Poco::Channel;
 using Poco::Message;
 using Poco::AutoPtr;
-
+using Poco::PatternFormatter;
+using Poco::FormattingChannel;
+using Poco::Event;
+using Poco::Thread;
 
 LoggerTest::LoggerTest(const std::string& name): CppUnit::TestCase(name)
 {
@@ -285,10 +294,96 @@ void LoggerTest::testDump()
 	root.dump("", buffer3, sizeof(buffer3));
 	msg = pChannel->list().begin()->getText();
 	assertTrue (msg == "0000  00 01 02 03 04 05 06 07  08 09 0A 0B 0C 0D 0E 0F  ................\n"
-	               "0010  20 41 42 1F 7F 7E                                  AB..~");
+				   "0010  20 41 42 1F 7F 7E                                  AB..~");
 	pChannel->clear();
 }
 
+namespace ThreadNameTestStrings {
+const std::string loggerName = "Logger";
+const std::string threadName = "ThreadName";
+const std::string message = "Test message";
+}
+
+template <typename ThreadFactory>
+std::string LoggerTest::doTestFormatThreadName(ThreadFactory makeThread)
+{
+	AutoPtr<TestChannel> pChannel = new TestChannel;
+	AutoPtr<PatternFormatter> fmt = new PatternFormatter("%s:%I:%T:%q:%t");
+	AutoPtr<FormattingChannel> pFmtChannel = new FormattingChannel(fmt, pChannel);
+
+	Logger& logger = Logger::get(ThreadNameTestStrings::loggerName);
+	logger.setChannel(pFmtChannel);
+	logger.setLevel(Message::PRIO_INFORMATION);
+
+	Event ev;
+	auto thr = makeThread(
+		ThreadNameTestStrings::threadName,
+		[&ev, &logger] {
+			logger.information(ThreadNameTestStrings::message);
+			ev.set();
+		});
+	ev.wait();
+
+	thr->join();
+
+	const std::string logMsg = pChannel->getLastMessage().getText();
+	std::vector<std::string> parts;
+	std::size_t p = 0;
+	while (p < logMsg.size())
+	{
+		auto q = logMsg.find(':', p);
+		if (q == std::string::npos)
+		{
+			q = logMsg.size();
+		}
+		parts.push_back(logMsg.substr(p, q - p));
+		p = q + 1;
+	}
+	assertTrue (parts.size() >= 5);
+	assertEqual( ThreadNameTestStrings::loggerName, parts[0] );
+	assertEqual( ThreadNameTestStrings::threadName, parts[2] );
+	assertEqual( "I", parts[3] );
+	assertEqual( ThreadNameTestStrings::message, parts[4] );
+
+	return parts[1];
+}
+
+
+void LoggerTest::testFormatThreadName()
+{
+	Thread thr(ThreadNameTestStrings::threadName);
+	std::string expectedTid = std::to_string(thr.id());
+
+	std::string actualTid = doTestFormatThreadName(
+		[&thr](std::string, auto body) {
+			thr.startFunc(std::move(body));
+			return &thr;
+		}
+	);
+	assertEqual( expectedTid, actualTid );
+}
+
+
+void LoggerTest::testFormatStdThreadName()
+{
+#ifndef POCO_NO_THREADNAME
+	std::unique_ptr<std::thread> thrPtr;
+	std::string expectedTid;
+	std::string actualTid = doTestFormatThreadName(
+		[&thrPtr, &expectedTid](std::string name, auto bodyIn) {
+			thrPtr = std::make_unique<std::thread>(
+				[name, body = std::move(bodyIn), &expectedTid] {
+					expectedTid = std::to_string(Thread::currentOsTid());
+					Thread::setCurrentName(name);
+					body();
+				}
+			);
+			return thrPtr.get();
+		}
+	);
+	assertEqual( expectedTid, actualTid );
+#endif
+}
 
 void LoggerTest::setUp()
 {
@@ -309,6 +404,8 @@ CppUnit::Test* LoggerTest::suite()
 	CppUnit_addTest(pSuite, LoggerTest, testFormat);
 	CppUnit_addTest(pSuite, LoggerTest, testFormatAny);
 	CppUnit_addTest(pSuite, LoggerTest, testDump);
+	CppUnit_addTest(pSuite, LoggerTest, testFormatThreadName);
+	CppUnit_addTest(pSuite, LoggerTest, testFormatStdThreadName);
 
 	return pSuite;
 }

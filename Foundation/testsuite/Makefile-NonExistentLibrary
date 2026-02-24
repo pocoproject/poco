@@ -1,0 +1,15 @@
+#
+# Makefile
+#
+# Makefile for NonExistentLibrary stub (used by TestLibraryMissingDeps)
+#
+
+include $(POCO_BASE)/build/rules/global
+
+objects = NonExistentStub
+
+target         = NonExistentLibrary
+target_version = 1
+target_libs    =
+
+include $(POCO_BASE)/build/rules/lib

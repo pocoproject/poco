@@ -27,6 +27,17 @@ namespace Poco {
 class Foundation_API Environment
 	/// This class provides access to environment variables
 	/// and some general system information.
+	///
+	/// Thread Safety: The get(), has(), and set() methods are
+	/// internally synchronized and safe to call concurrently.
+	/// However, on POSIX platforms, concurrent use of the C
+	/// library functions getenv()/setenv() from other code
+	/// (e.g. third-party libraries) is NOT safe. POSIX setenv()
+	/// may reallocate environment variable entries, invalidating
+	/// pointers returned by a concurrent getenv() in another
+	/// thread. Callers that mix Poco::Environment with direct
+	/// environment variable access must provide their own
+	/// external synchronization.
 {
 public:
 	using NodeId = UInt8[6]; /// Ethernet address.

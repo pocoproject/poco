@@ -248,7 +248,7 @@ public:
 	template <class Other>
 	SharedPtr<Other, RC, RP> cast() const
 		/// Casts the SharedPtr via a dynamic cast to the given type.
-		/// Returns an SharedPtr containing NULL if the cast fails.
+		/// Returns an SharedPtr containing nullptr if the cast fails.
 		/// Example: (assume class Sub: public Super)
 		///    SharedPtr<Super> super(new Sub());
 		///    SharedPtr<Sub> sub = super.cast<Sub>();

@@ -21,7 +21,6 @@
 #include "Poco/Data/Data.h"
 #include "Poco/Data/MetaColumn.h"
 #include "Poco/SharedPtr.h"
-#include "Poco/RefCountedObject.h"
 #include <vector>
 #include <list>
 #include <deque>
@@ -46,6 +45,8 @@ public:
 	using Size = typename C::size_type;
 	using Type = typename C::value_type;
 
+	Column() = delete;
+
 	Column(const MetaColumn& metaColumn, Container* pData):
 		_metaColumn(metaColumn),
 		_pData(pData)
@@ -69,10 +70,8 @@ public:
 	{
 	}
 
-	~Column()
+	~Column() = default;
 		/// Destroys the Column.
-	{
-	}
 
 	Column& operator = (const Column& col)
 		/// Assignment operator.
@@ -179,8 +178,6 @@ public:
 	}
 
 private:
-	Column();
-
 	MetaColumn   _metaColumn;
 	ContainerPtr _pData;
 };
@@ -224,10 +221,10 @@ public:
 		_deque.assign(_pData->begin(), _pData->end());
 	}
 
-	~Column()
+	Column() = delete;
+
+	~Column() = default;
 		/// Destroys the Column.
-	{
-	}
 
 	Column& operator = (const Column& col)
 		/// Assignment operator.
@@ -331,7 +328,6 @@ public:
 	}
 
 private:
-	Column();
 
 	MetaColumn               _metaColumn;
 	ContainerPtr             _pData;
@@ -365,10 +361,10 @@ public:
 	{
 	}
 
-	~Column()
+	Column() = delete;
+
+	~Column() = default;
 		/// Destroys the Column.
-	{
-	}
 
 	Column& operator = (const Column& col)
 		/// Assignment operator.
@@ -484,7 +480,6 @@ public:
 	}
 
 private:
-	Column();
 
 	MetaColumn   _metaColumn;
 	ContainerPtr _pData;
@@ -502,4 +497,3 @@ inline void swap(Column<C>& c1, Column<C>& c2) noexcept
 
 
 #endif // Data_Column_INCLUDED
-

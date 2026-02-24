@@ -7,7 +7,7 @@
 //
 // Definition of the RegExpValidator class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -31,19 +31,19 @@ class Util_API RegExpValidator: public Validator
 	/// a regular expression.
 {
 public:
+	RegExpValidator() = delete;
+
 	RegExpValidator(const std::string& regexp);
 		/// Creates the RegExpValidator, using the given regular expression.
 
-	~RegExpValidator();
+	~RegExpValidator() = default;
 		/// Destroys the RegExpValidator.
 
-	void validate(const Option& option, const std::string& value);
+	void validate(const Option& option, const std::string& value) override;
 		/// Validates the value for the given option by
 		/// matching it with the regular expression.
 
 private:
-	RegExpValidator();
-
 	std::string _regexp;
 };
 

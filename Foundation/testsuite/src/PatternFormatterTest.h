@@ -25,6 +25,7 @@ public:
 	~PatternFormatterTest();
 
 	void testPatternFormatter();
+	void testExtractBasename();
 
 	void setUp();
 	void tearDown();

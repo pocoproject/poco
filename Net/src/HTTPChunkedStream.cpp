@@ -15,6 +15,7 @@
 #include "Poco/Net/HTTPChunkedStream.h"
 #include "Poco/Net/HTTPHeaderStream.h"
 #include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/NumberParser.h"
 #include "Poco/Ascii.h"
@@ -68,7 +69,7 @@ void HTTPChunkedStreamBuf::close()
 }
 
 
-int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	static const int eof = std::char_traits<char>::eof();
 
@@ -87,6 +88,7 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		}
 		else
 		{
+			_session.setException(MessageException("Incomplete chunked transfer encoding"));
 			_chunk = -1;
 			return eof;
 		}
@@ -94,8 +96,11 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 	if (_chunk > 0)
 	{
 		if (length > _chunk) length = _chunk;
-		int n = _session.read(buffer, length);
-		if (n > 0) _chunk -= n;
+		std::streamsize n = _session.read(buffer, length);
+		if (n > 0)
+			_chunk -= n;
+		else
+			_session.setException(MessageException("Incomplete chunked transfer encoding"));
 		return n;
 	}
 	else if (_chunk == 0)
@@ -126,7 +131,7 @@ int HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 }
 
 
-int HTTPChunkedStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize HTTPChunkedStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	_chunkBuffer.clear();
 	NumberFormatter::appendHex(_chunkBuffer, length);
@@ -134,7 +139,7 @@ int HTTPChunkedStreamBuf::writeToDevice(const char* buffer, std::streamsize leng
 	_chunkBuffer.append(buffer, static_cast<std::string::size_type>(length));
 	_chunkBuffer.append("\r\n", 2);
 	_session.write(_chunkBuffer.data(), static_cast<std::streamsize>(_chunkBuffer.size()));
-	return static_cast<int>(length);
+	return length;
 }
 
 

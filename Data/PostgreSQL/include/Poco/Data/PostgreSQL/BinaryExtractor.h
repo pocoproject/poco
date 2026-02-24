@@ -44,7 +44,7 @@ public:
 	BinaryExtractor(StatementExecutor& st);
 		/// Creates the Extractor.
 
-	virtual ~BinaryExtractor();
+	~BinaryExtractor() override;
 		/// Destroys the Extractor.
 
 	bool extract(std::size_t pos, Poco::Int8& val) override;
@@ -407,7 +407,7 @@ private:
 	bool isColumnNull(const OutputParameter& anOutputParameter) const;
 
 	// Prevent VC8 warning "operator= could not be generated"
-	BinaryExtractor& operator = (const BinaryExtractor&);
+	BinaryExtractor& operator = (const BinaryExtractor&) = delete;
 
 private:
 	template <typename T>
@@ -428,7 +428,7 @@ private:
 //
 inline bool BinaryExtractor::isColumnNull(const OutputParameter& anOutputParameter) const
 {
-	return anOutputParameter.isNull() || 0 == anOutputParameter.pData();
+	return anOutputParameter.isNull() || nullptr == anOutputParameter.pData();
 }
 
 

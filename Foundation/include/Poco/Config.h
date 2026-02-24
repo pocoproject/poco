@@ -189,6 +189,22 @@
 #define POCO_HAVE_CPP20_COMPILER (__cplusplus >= 202002L)
 #define POCO_HAVE_CPP23_COMPILER (__cplusplus >= 202302L)
 
+#if (POCO_HAVE_CPP20_COMPILER)
+#include <version>
+#if defined(__cpp_lib_jthread)
+	#define POCO_HAVE_JTHREAD true
+#else
+	#define POCO_HAVE_JTHREAD false
+#endif
+#if defined(__cpp_lib_atomic_shared_ptr) && __cpp_lib_atomic_shared_ptr >= 201711L
+	#define POCO_HAVE_ATOMIC_SHARED_PTR true
+#else
+	#define POCO_HAVE_ATOMIC_SHARED_PTR false
+#endif
+#else
+	#define POCO_HAVE_ATOMIC_SHARED_PTR false
+#endif
+
 // Option to silence deprecation warnings.
 #ifndef POCO_SILENCE_DEPRECATED
 	#define POCO_DEPRECATED(reason) [[deprecated(reason)]]
@@ -201,5 +217,23 @@
 
 // Uncomment to enable stack trace autogeneration in Exception
 //#define POCO_ENABLE_TRACE 1
+
+// Enable FastLogger (Quill-based high-performance logger) by default.
+// FastLogger provides ~9ns logging latency using the Quill library.
+// Uncomment to disable FastLogger:
+// #define POCO_NO_FASTLOGGER
+#if !defined(POCO_NO_FASTLOGGER) && !defined(POCO_ENABLE_FASTLOGGER)
+	#define POCO_ENABLE_FASTLOGGER
+#endif
+
+#if defined(__APPLE__) && __has_include(<Availability.h>)
+	#include <Availability.h>
+	#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 110000
+		 #define POCO_HAVE_ATOMIC_WAIT 1
+	#endif
+#elif defined(__cpp_lib_atomic_wait)
+	// Standard feature test macro (C++20)
+	#define POCO_HAVE_ATOMIC_WAIT 1
+#endif
 
 #endif // Foundation_Config_INCLUDED

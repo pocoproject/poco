@@ -21,9 +21,9 @@ namespace PDF {
 class PDF_API Cell
 {
 public:
-	typedef SharedPtr<Cell> Ptr;
-	typedef std::map<int, std::string> FontMap;
-	typedef SharedPtr<FontMap> FontMapPtr;
+	using Ptr = SharedPtr<Cell>;
+	using FontMap = std::map<int, std::string>;
+	using FontMapPtr = SharedPtr<FontMap>;
 
 	enum Outline
 	{
@@ -34,7 +34,9 @@ public:
 		OUTLINE_BOTTOM = 8
 	};
 
-	Cell(const AttributedString& content = "", const std::string& name = "", FontMapPtr pFontMap = 0);
+	Cell(const AttributedString& content = "",
+		 const std::string& name = "",
+		 FontMapPtr pFontMap = nullptr);
 	Cell(const AttributedString& content, FontMapPtr pFontMap, const std::string& encoding = "UTF-8" , bool trueType = true, int widthAsPct=-1);
 	~Cell();
 
@@ -71,106 +73,8 @@ private:
 	int                _widthAsPct;
 };
 
-
-typedef std::vector<Cell> TableRow;
-
-
-//
-// inlines
-//
-
-inline const std::string& Cell::getName() const
-{
-	return _name;
-}
-
-
-inline void Cell::setName(const std::string& name)
-{
-	_name = name;
-}
-
-
-inline const AttributedString& Cell::getContent() const
-{
-	return _content;
-}
-
-
-inline void Cell::setContent(const AttributedString& content)
-{
-	_content = content;
-}
-
-
-inline unsigned Cell::getOutline() const
-{
-	return _outline;
-}
-
-
-inline void Cell::setOutline(Cell::Outline outline, bool show)
-{
-	if (show) _outline |= outline;
-	else      _outline &= ~outline;
-}
-
-
-inline void Cell::borderLeft(bool show)
-{
-	setOutline(OUTLINE_LEFT, show);
-}
-
-
-inline void Cell::borderTop(bool show)
-{
-	setOutline(OUTLINE_TOP, show);
-}
-
-
-inline void Cell::borderRight(bool show)
-{
-	setOutline(OUTLINE_RIGHT, show);
-}
-
-
-inline void Cell::borderBottom(bool show)
-{
-	setOutline(OUTLINE_BOTTOM, show);
-}
-
-
-inline float Cell::getLineWidth() const
-{
-	return _lineWidth;
-}
-
-
-inline void Cell::setLineWidth(float width)
-{
-	_lineWidth = width;
-}
-
-
-inline int Cell::getWidthAsPct() const
-{
-	return _widthAsPct;
-}
-
-
-inline void Cell::setWidthAsPct(int width)
-{
-	_widthAsPct = width;
-}
-
-
-inline bool Cell::hasWidth() const
-{
-	return _widthAsPct > 0;
-}
-
+using TableRow = std::vector<Cell>;
 
 } } // namespace Poco::PDF
-
 
 #endif // PDF_Cell_INCLUDED

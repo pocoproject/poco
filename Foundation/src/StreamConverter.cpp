@@ -21,7 +21,7 @@ namespace Poco {
 
 StreamConverterBuf::StreamConverterBuf(std::istream& istr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar):
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_inEncoding(inEncoding),
 	_outEncoding(outEncoding),
 	_defaultChar(defaultChar),
@@ -33,7 +33,7 @@ StreamConverterBuf::StreamConverterBuf(std::istream& istr, const TextEncoding& i
 
 
 StreamConverterBuf::StreamConverterBuf(std::ostream& ostr, const TextEncoding& inEncoding, const TextEncoding& outEncoding, int defaultChar):
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_inEncoding(inEncoding),
 	_outEncoding(outEncoding),
@@ -111,10 +111,10 @@ int StreamConverterBuf::writeToDevice(char c)
 				++_errors;
 				return -1;
 			}
-			int n = _outEncoding.convert(uc, _buffer, sizeof(_buffer));
-			if (n == 0) n = _outEncoding.convert(_defaultChar, _buffer, sizeof(_buffer));
-			poco_assert_dbg (n <= sizeof(_buffer));
-			_pOstr->write((char*) _buffer, n);
+			int written = _outEncoding.convert(uc, _buffer, sizeof(_buffer));
+			if (written == 0) written = _outEncoding.convert(_defaultChar, _buffer, sizeof(_buffer));
+			poco_assert_dbg (written <= sizeof(_buffer));
+			_pOstr->write((char*) _buffer, written);
 			_sequenceLength = 0;
 			_pos = 0;
 		}

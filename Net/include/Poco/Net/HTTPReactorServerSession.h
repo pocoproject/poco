@@ -53,10 +53,10 @@ private:
 
 private:
 	std::string&   _buf;
-	char*          _pcur;
-	char*          _pend;
-	int            _idx;
-	int            _complete;
+	char*          _pcur{nullptr};
+	char*          _pend{nullptr};
+	int            _idx{0};
+	int            _complete{0};
 	StreamSocket   _realsocket;
 };
 

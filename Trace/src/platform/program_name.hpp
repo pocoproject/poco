@@ -95,6 +95,18 @@ namespace detail {
 }
 }
 
+#elif IS_FREEBSD
+
+#include <stdlib.h>
+
+namespace cpptrace {
+namespace detail {
+    inline const char* program_name() {
+        return getprogname();
+    }
+}
+}
+
 #endif
 
 #endif

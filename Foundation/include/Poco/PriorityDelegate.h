@@ -7,7 +7,7 @@
 //
 // Implementation of the PriorityDelegate template.
 //
-// Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -23,6 +23,7 @@
 #include "Poco/PriorityExpire.h"
 #include "Poco/FunctionPriorityDelegate.h"
 #include "Poco/Mutex.h"
+#include <type_traits>
 
 
 namespace Poco {
@@ -30,9 +31,13 @@ namespace Poco {
 
 template <class TObj, class TArgs, bool useSender = true>
 class PriorityDelegate: public AbstractPriorityDelegate<TArgs>
+	/// Wraps a member function for use as a PriorityDelegate.
+	/// Use useSender=true for callbacks that take sender as first parameter.
 {
 public:
-	using NotifyMethod = void (TObj::*)(const void *, TArgs &);
+	using NotifyMethod = std::conditional_t<useSender,
+		void (TObj::*)(const void*, TArgs&),
+		void (TObj::*)(TArgs&)>;
 
 	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
 		AbstractPriorityDelegate<TArgs>(prio),
@@ -68,7 +73,14 @@ public:
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverObject)
 		{
-			(_receiverObject->*_receiverMethod)(sender, arguments);
+			if constexpr (useSender)
+			{
+				(_receiverObject->*_receiverMethod)(sender, arguments);
+			}
+			else
+			{
+				(_receiverObject->*_receiverMethod)(arguments);
+			}
 			return true;
 		}
 		else return false;
@@ -88,7 +100,7 @@ public:
 	void disable()
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_receiverObject = 0;
+		_receiverObject = nullptr;
 	}
 
 protected:
@@ -98,81 +110,14 @@ protected:
 };
 
 
-template <class TObj, class TArgs>
-class PriorityDelegate<TObj, TArgs, false>: public AbstractPriorityDelegate<TArgs>
+template <class TObj, bool useSender>
+class PriorityDelegate<TObj, void, useSender>: public AbstractPriorityDelegate<void>
+	/// Specialization for void arguments (no TArgs parameter).
 {
 public:
-	using NotifyMethod = void (TObj::*)(TArgs &);
-
-	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
-		AbstractPriorityDelegate<TArgs>(prio),
-		_receiverObject(obj),
-		_receiverMethod(method)
-	{
-	}
-
-	PriorityDelegate(const PriorityDelegate& delegate):
-		AbstractPriorityDelegate<TArgs>(delegate),
-		_receiverObject(delegate._receiverObject),
-		_receiverMethod(delegate._receiverMethod)
-	{
-	}
-
-	PriorityDelegate& operator = (const PriorityDelegate& delegate)
-	{
-		if (&delegate != this)
-		{
-			this->_receiverObject = delegate._receiverObject;
-			this->_receiverMethod = delegate._receiverMethod;
-			this->_priority       = delegate._priority;
-		}
-		return *this;
-	}
-
-	~PriorityDelegate() = default;
-
-	PriorityDelegate() = delete;
-
-	bool notify(const void* sender, TArgs& arguments)
-	{
-		Mutex::ScopedLock lock(_mutex);
-		if (_receiverObject)
-		{
-			(_receiverObject->*_receiverMethod)(arguments);
-			return true;
-		}
-		return false;
-	}
-
-	bool equals(const AbstractDelegate<TArgs>& other) const
-	{
-		const PriorityDelegate* pOtherDelegate = dynamic_cast<const PriorityDelegate*>(other.unwrap());
-		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
-	}
-
-	AbstractDelegate<TArgs>* clone() const
-	{
-		return new PriorityDelegate(*this);
-	}
-
-	void disable()
-	{
-		Mutex::ScopedLock lock(_mutex);
-		_receiverObject = 0;
-	}
-
-protected:
-	TObj*        _receiverObject;
-	NotifyMethod _receiverMethod;
-	Mutex _mutex;
-};
-
-
-template <class TObj>
-class PriorityDelegate<TObj, void, true>: public AbstractPriorityDelegate<void>
-{
-public:
-	using NotifyMethod = void (TObj::*)(const void *);
+	using NotifyMethod = std::conditional_t<useSender,
+		void (TObj::*)(const void*),
+		void (TObj::*)()>;
 
 	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
 		AbstractPriorityDelegate<void>(prio),
@@ -208,7 +153,14 @@ public:
 		Mutex::ScopedLock lock(_mutex);
 		if (_receiverObject)
 		{
-			(_receiverObject->*_receiverMethod)(sender);
+			if constexpr (useSender)
+			{
+				(_receiverObject->*_receiverMethod)(sender);
+			}
+			else
+			{
+				(_receiverObject->*_receiverMethod)();
+			}
 			return true;
 		}
 		else return false;
@@ -228,77 +180,7 @@ public:
 	void disable() override
 	{
 		Mutex::ScopedLock lock(_mutex);
-		_receiverObject = 0;
-	}
-
-protected:
-	TObj*        _receiverObject;
-	NotifyMethod _receiverMethod;
-	Mutex _mutex;
-};
-
-
-template <class TObj>
-class PriorityDelegate<TObj, void, false>: public AbstractPriorityDelegate<void>
-{
-public:
-	using NotifyMethod = void (TObj::*)();
-
-	PriorityDelegate(TObj* obj, NotifyMethod method, int prio):
-		AbstractPriorityDelegate<void>(prio),
-		_receiverObject(obj),
-		_receiverMethod(method)
-	{
-	}
-
-	PriorityDelegate(const PriorityDelegate& delegate):
-		AbstractPriorityDelegate<void>(delegate),
-		_receiverObject(delegate._receiverObject),
-		_receiverMethod(delegate._receiverMethod)
-	{
-	}
-
-	PriorityDelegate& operator = (const PriorityDelegate& delegate)
-	{
-		if (&delegate != this)
-		{
-			this->_receiverObject = delegate._receiverObject;
-			this->_receiverMethod = delegate._receiverMethod;
-			this->_priority       = delegate._priority;
-		}
-		return *this;
-	}
-
-	~PriorityDelegate() override = default;
-
-	PriorityDelegate() = delete;
-
-	bool notify(const void* sender) override
-	{
-		Mutex::ScopedLock lock(_mutex);
-		if (_receiverObject)
-		{
-			(_receiverObject->*_receiverMethod)();
-			return true;
-		}
-		return false;
-	}
-
-	bool equals(const AbstractDelegate<void>& other) const override
-	{
-		const PriorityDelegate* pOtherDelegate = dynamic_cast<const PriorityDelegate*>(other.unwrap());
-		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
-	}
-
-	AbstractDelegate<void>* clone() const override
-	{
-		return new PriorityDelegate(*this);
-	}
-
-	void disable() override
-	{
-		Mutex::ScopedLock lock(_mutex);
-		_receiverObject = 0;
+		_receiverObject = nullptr;
 	}
 
 protected:

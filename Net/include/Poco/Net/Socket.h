@@ -134,10 +134,14 @@ public:
 	void close();
 		/// Closes the socket.
 
-	POCO_DEPRECATED("Use PollSet instead")
+#if !defined(POCO_HAVE_FD_EPOLL) && !defined(POCO_HAVE_FD_POLL)
+	POCO_DEPRECATED("select() is obsolete, use PollSet instead")
+#endif
 	static int select(SocketList& readList, SocketList& writeList, SocketList& exceptList, const Poco::Timespan& timeout);
-		/// Determines the status of one or more sockets,
-		/// using a call to select().
+		/// Determines the status of one or more sockets.
+		///
+		/// Uses epoll (Linux, Windows, Android), poll (BSD), or
+		/// select() as fallback on platforms where neither is available.
 		///
 		/// ReadList contains the list of sockets which should be
 		/// checked for readability.
@@ -165,8 +169,8 @@ public:
 		/// In this case, the return value may be greater than the sum
 		/// of all sockets in all list.
 		///
-		/// This function is deprecated and may be removed in the future releases,
-		/// please use PollSet class instead.
+		/// On platforms without epoll or poll support, this function uses
+		/// the select() system call and is deprecated - use PollSet instead.
 
 	bool poll(const Poco::Timespan& timeout, int mode) const;
 		/// Determines the status of the socket, using a

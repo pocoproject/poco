@@ -19,13 +19,10 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/ODBC/Connector.h"
 #include "Poco/Data/ODBC/TypeInfo.h"
-#include "Poco/Data/ODBC/Binder.h"
-#include "Poco/Data/ODBC/Handle.h"
+#include "Poco/Data/ODBC/ConnectionHandle.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/AbstractSessionImpl.h"
-#include "Poco/TextEncoding.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Mutex.h"
 #ifdef POCO_OS_FAMILY_WINDOWS
@@ -67,69 +64,69 @@ public:
 		/// Creates the SessionImpl. Opens a connection to the database.
 		/// Throws NotConnectedException if connection was not succesful.
 
-	POCO_DEPRECATED("") SessionImpl(const std::string& connect,
+	POCO_DEPRECATED("Use other constructors.") SessionImpl(const std::string& connect,
 		Poco::Any maxFieldSize = ODBC_MAX_FIELD_SIZE,
 		bool enforceCapability=false,
 		bool autoBind = true,
 		bool autoExtract = true);
 		/// Creates the SessionImpl. Opens a connection to the database.
 
-	~SessionImpl();
+	~SessionImpl() override;
 		/// Destroys the SessionImpl.
 
-	Poco::SharedPtr<Poco::Data::StatementImpl> createStatementImpl();
+	Poco::SharedPtr<Poco::Data::StatementImpl> createStatementImpl() override;
 		/// Returns an ODBC StatementImpl
 
 	void addFeatures();
 		/// Adds the ODBC session features and properties.
 
-	void open(const std::string& connect = "");
+	void open(const std::string& connect = "") override;
 		/// Opens a connection to the Database
 
-	void close();
+	void close() override;
 		/// Closes the connection
 
-	bool isConnected() const;
+	bool isConnected() const override;
 		/// Returns true if session is connected
 
-	void setConnectionTimeout(std::size_t timeout);
+	void setConnectionTimeout(std::size_t timeout) override;
 		/// Sets the session connection timeout value.
 
-	std::size_t getConnectionTimeout() const;
+	std::size_t getConnectionTimeout() const override;
 		/// Returns the session connection timeout value.
 
-	void begin();
+	void begin() override;
 		/// Starts a transaction
 
-	void commit();
+	void commit() override;
 		/// Commits and ends a transaction
 
-	void rollback();
+	void rollback() override;
 		/// Aborts a transaction
 
-	void reset();
+	void reset() override;
 		/// Do nothing
 
-	bool isTransaction() const;
+	bool isTransaction() const override;
 		/// Returns true iff a transaction is in progress.
 
-	const std::string& connectorName() const;
+	const std::string& connectorName() const override;
 		/// Returns the name of the connector.
 
-	bool canTransact() const;
+	bool canTransact() const override;
 		/// Returns true if connection is transaction-capable.
 
-	void setTransactionIsolation(Poco::UInt32 ti);
+	void setTransactionIsolation(Poco::UInt32 ti) override;
 		/// Sets the transaction isolation level.
 
-	Poco::UInt32 getTransactionIsolation() const;
+	Poco::UInt32 getTransactionIsolation() const override;
 		/// Returns the transaction isolation level.
 
-	bool hasTransactionIsolation(Poco::UInt32) const;
+	bool hasTransactionIsolation(Poco::UInt32) const override;
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	bool isTransactionIsolation(Poco::UInt32) const;
+	bool isTransactionIsolation(Poco::UInt32) const override;
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
@@ -268,7 +265,7 @@ inline Poco::Any SessionImpl::getMaxFieldSize(const std::string& rName) const
 
 inline void SessionImpl::setDataTypeInfo(const std::string& rName, const Poco::Any& rValue)
 {
-	throw InvalidAccessException();
+	throw InvalidAccessException("dataTypeInfo is read-only");
 }
 
 

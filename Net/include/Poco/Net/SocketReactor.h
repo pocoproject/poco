@@ -28,6 +28,7 @@
 #include "Poco/Observer.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Event.h"
+#include "Poco/Thread.h"
 #include <map>
 #include <atomic>
 
@@ -35,14 +36,15 @@
 namespace Poco {
 
 
-class Thread;
-
-
 namespace Net {
 
 
 class Socket;
 
+
+//
+// SocketReactor
+//
 
 class Net_API SocketReactor: public Poco::Runnable
 	/// This class, which is part of the Reactor pattern,
@@ -215,8 +217,8 @@ public:
 		/// Registers an event handler with the SocketReactor.
 		///
 		/// Usage:
-		///     Poco::Observer<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
-		///     reactor.addEventHandler(obs);
+		///     Poco::NObserver<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
+		///     reactor.addEventHandler(socket, obs);
 
 	bool hasEventHandler(const Socket& socket, const Poco::AbstractObserver& observer);
 		/// Returns true if the observer is registered with SocketReactor for the given socket.
@@ -225,11 +227,29 @@ public:
 		/// Unregisters an event handler with the SocketReactor.
 		///
 		/// Usage:
-		///     Poco::Observer<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
-		///     reactor.removeEventHandler(obs);
+		///     Poco::NObserver<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
+		///     reactor.removeEventHandler(socket, obs);
+		///
+		/// Note: Using removeEventHandler() to remove all handlers for a socket
+		/// one-by-one is discouraged, especially in destructors. There is a race
+		/// condition between removing handlers and event dispatch - events may
+		/// still be dispatched to a handler while other handlers for the same
+		/// socket are being removed. Use remove() instead to atomically remove
+		/// all handlers for a socket.
 
 	bool has(const Socket& socket) const;
-		/// Returns true if socket is registered with this rector.
+		/// Returns true if socket is registered with this reactor.
+
+	void remove(const Socket& socket);
+		/// Removes the socket from the reactor.
+		///
+		/// This removes the socket from the poll set and
+		/// removes all registered event handlers for the socket.
+		///
+		/// This is the preferred method for removing sockets during
+		/// cleanup/destruction, as it atomically removes the socket
+		/// from the poll set first (preventing new events) and then
+		/// removes all handlers.
 
 protected:
 	using NotifierPtr = Poco::AutoPtr<SocketNotifier>;
@@ -280,7 +300,6 @@ protected:
 
 private:
 
-	void dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification);
 	NotifierPtr getNotifier(const Socket& socket, bool makeNew = false);
 
 	void sleep();
@@ -344,12 +363,6 @@ inline void SocketReactor::onError(int code, const std::string& description)
 }
 
 
-inline void SocketReactor::dispatch(NotifierPtr& pNotifier, SocketNotification* pNotification)
-{
-	pNotifier->dispatch(pNotification);
-}
-
-
 inline const SocketReactor::Params& SocketReactor::getParams() const
 {
 	return _params;
@@ -407,6 +420,99 @@ inline Notification* SocketReactor::getTimeoutNotification()
 inline Notification* SocketReactor::getShutdownNotification()
 {
 	return _pShutdownNotification;
+}
+
+
+//
+// ScopedSocketReactor
+//
+
+class Net_API ScopedSocketReactor
+	/// RAII wrapper that starts a SocketReactor in a thread and
+	/// automatically stops and joins on destruction.
+	///
+	/// Usage:
+	///
+	///     ScopedSocketReactor reactor;
+	///     reactor->addEventHandler(socket, observer);
+	///     // ... reactor runs in background thread ...
+	///     // automatically stopped and joined when reactor goes out of scope
+	///
+{
+public:
+	ScopedSocketReactor();
+		/// Creates and starts the reactor.
+
+	explicit ScopedSocketReactor(const SocketReactor::Params& params);
+		/// Creates and starts the reactor with the given parameters.
+
+	~ScopedSocketReactor();
+		/// Stops the reactor and joins the thread.
+
+	SocketReactor& operator*();
+		/// Returns a reference to the reactor.
+
+	const SocketReactor& operator*() const;
+		/// Returns a const reference to the reactor.
+
+	SocketReactor* operator->();
+		/// Returns a pointer to the reactor.
+
+	const SocketReactor* operator->() const;
+		/// Returns a const pointer to the reactor.
+
+	SocketReactor& reactor();
+		/// Returns a reference to the reactor.
+
+	Poco::Thread& thread();
+		/// Returns a reference to the thread.
+
+private:
+	ScopedSocketReactor(const ScopedSocketReactor&) = delete;
+	ScopedSocketReactor& operator=(const ScopedSocketReactor&) = delete;
+
+	SocketReactor* _pReactor;
+	Poco::Thread _thread;
+};
+
+
+//
+// inlines
+//
+
+inline SocketReactor& ScopedSocketReactor::operator*()
+{
+	return *_pReactor;
+}
+
+
+inline const SocketReactor& ScopedSocketReactor::operator*() const
+{
+	return *_pReactor;
+}
+
+
+inline SocketReactor* ScopedSocketReactor::operator->()
+{
+	return _pReactor;
+}
+
+
+inline const SocketReactor* ScopedSocketReactor::operator->() const
+{
+	return _pReactor;
+}
+
+
+inline SocketReactor& ScopedSocketReactor::reactor()
+{
+	return *_pReactor;
+}
+
+
+inline Poco::Thread& ScopedSocketReactor::thread()
+{
+	return _thread;
 }
 
 

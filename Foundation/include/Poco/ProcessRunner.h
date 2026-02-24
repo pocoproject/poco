@@ -8,7 +8,7 @@
 // Definition of the ProcessRunner class.
 //
 // Copyright (c) 2023, Applied Informatics Software Engineering GmbH.
-// Aleph ONE Software Engineering d.o.o.,
+// Aleph ONE Software Engineering LLC,
 // and Contributors.
 //
 // SPDX-License-Identifier:    BSL-1.0
@@ -125,7 +125,12 @@ public:
 		/// Returns the error message.
 
 private:
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	// On Windows, 0 is the invalid/error value returned by GetProcessId()
+	static const Poco::ProcessHandle::PID INVALID_PID = 0;
+#else
 	static const Poco::ProcessHandle::PID INVALID_PID = -1;
+#endif
 	static const int RESULT_UNKNOWN = -1;
 
 	static Args pidArgFormat()
@@ -173,6 +178,58 @@ private:
 	Stopwatch _sw;
 	std::string _error;
 	mutable Poco::FastMutex _mutex;
+#if defined(POCO_OS_FAMILY_WINDOWS)
+	struct HandleGuard
+		/// RAII wrapper for a Windows HANDLE.
+		/// Closes the handle on destruction or reset.
+	{
+		HandleGuard() = default;
+		~HandleGuard() { close(); }
+
+		HandleGuard(const HandleGuard&) = delete;
+		HandleGuard& operator=(const HandleGuard&) = delete;
+
+		HandleGuard(HandleGuard&& other) noexcept: _handle(other._handle)
+		{
+			other._handle = nullptr;
+		}
+
+		HandleGuard& operator=(HandleGuard&& other) noexcept
+		{
+			if (this != &other)
+			{
+				close();
+				_handle = other._handle;
+				other._handle = nullptr;
+			}
+			return *this;
+		}
+
+		HANDLE handle() const { return _handle; }
+
+		void reset(HANDLE h = nullptr)
+		{
+			if (h != _handle)
+			{
+				close();
+				_handle = h;
+			}
+		}
+
+		explicit operator bool() const { return _handle != nullptr; }
+
+	private:
+		void close()
+		{
+			if (_handle) CloseHandle(_handle);
+			_handle = nullptr;
+		}
+
+		HANDLE _handle = nullptr;
+	};
+
+	HandleGuard _hJob;
+#endif
 };
 
 

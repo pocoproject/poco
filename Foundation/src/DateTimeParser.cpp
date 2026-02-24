@@ -285,8 +285,33 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 				++itf;
 			}
 		}
-		else ++itf;
+		else
+		{
+			// Match literal characters from format against input
+			if (Ascii::isSpace(*itf))
+			{
+				// Whitespace in format: skip whitespace in both
+				while (itf != endf && Ascii::isSpace(*itf)) ++itf;
+				while (it != end && Ascii::isSpace(*it)) ++it;
+			}
+			else if (it != end && *it == *itf)
+			{
+				// Non-whitespace literal matches - advance both
+				++it;
+				++itf;
+			}
+			else
+			{
+				// Literal doesn't match - just skip format char (lenient mode for backwards compatibility)
+				++itf;
+			}
+		}
 	}
+	// Skip trailing whitespace
+	while (it != end && Ascii::isSpace(*it)) ++it;
+	// Check for unconsumed input
+	if (it != end)
+		throw SyntaxException("Invalid DateTimeString: " + dtStr + ", unexpected trailing characters");
 	if (!monthParsed) month = 1;
 	if (!dayParsed) day = 1;
 	if (DateTime::isValid(year, month, day, hour, minute, second, millis, micros))
@@ -483,8 +508,8 @@ int DateTimeParser::parseMonth(std::string::const_iterator& it, const std::strin
 	while (it != end && Ascii::isAlpha(*it))
 	{
 		char ch = (*it++);
-		if (isFirst) { month += Ascii::toUpper(ch); isFirst = false; }
-		else month += Ascii::toLower(ch);
+		if (isFirst) { month += static_cast<char>(Ascii::toUpper(ch)); isFirst = false; }
+		else month += static_cast<char>(Ascii::toLower(ch));
 	}
 	if (month.length() < 3) throw SyntaxException("Month name must be at least three characters long", month);
 	for (int i = 0; i < 12; ++i)
@@ -504,8 +529,8 @@ int DateTimeParser::parseDayOfWeek(std::string::const_iterator& it, const std::s
 	while (it != end && Ascii::isAlpha(*it))
 	{
 		char ch = (*it++);
-		if (isFirst) { dow += Ascii::toUpper(ch); isFirst = false; }
-		else dow += Ascii::toLower(ch);
+		if (isFirst) { dow += static_cast<char>(Ascii::toUpper(ch)); isFirst = false; }
+		else dow += static_cast<char>(Ascii::toLower(ch));
 	}
 	if (dow.length() < 3) throw SyntaxException("Weekday name must be at least three characters long", dow);
 	for (int i = 0; i < 7; ++i)
@@ -524,7 +549,7 @@ int DateTimeParser::parseAMPM(std::string::const_iterator& it, const std::string
 	while (it != end && Ascii::isAlpha(*it))
 	{
 		char ch = (*it++);
-		ampm += Ascii::toUpper(ch);
+		ampm += static_cast<char>(Ascii::toUpper(ch));
 	}
 	if (ampm == "AM")
 	{

@@ -48,9 +48,9 @@ public:
 	{
 		DEFAULT = 0,
 			/// formatHex defaults: No 0x prefix, uppercase hexadecimal values
-		PREFIX = 1 << 0,
+		HEX_PREFIX = (1 << 0),
 			/// formatHex: Prepend prefix 0x
-		LOWERCASE = 1 << 1
+		HEX_LOWERCASE = (1 << 1)
 			/// formatHex: Use lowercase letters for hexadecimal values
 	};
 
@@ -654,36 +654,36 @@ private:
 
 inline NumberFormatter::Options operator | (NumberFormatter::Options lhs, NumberFormatter::Options rhs)
 {
-    using T = std::underlying_type_t<NumberFormatter::Options>;
-    return static_cast<NumberFormatter::Options>(static_cast<T>(lhs) | static_cast<T>(rhs));
+	using T = std::underlying_type_t<NumberFormatter::Options>;
+	return static_cast<NumberFormatter::Options>(static_cast<T>(lhs) | static_cast<T>(rhs));
 }
 
 
 inline NumberFormatter::Options& operator |= (NumberFormatter::Options& lhs, NumberFormatter::Options rhs)
 {
-    lhs = lhs | rhs;
-    return lhs;
+	lhs = lhs | rhs;
+	return lhs;
 }
 
 
 inline NumberFormatter::Options operator & (NumberFormatter::Options lhs, NumberFormatter::Options rhs)
 {
-    using T = std::underlying_type_t<NumberFormatter::Options>;
-    return static_cast<NumberFormatter::Options>(static_cast<T>(lhs) & static_cast<T>(rhs));
+	using T = std::underlying_type_t<NumberFormatter::Options>;
+	return static_cast<NumberFormatter::Options>(static_cast<T>(lhs) & static_cast<T>(rhs));
 }
 
 
 inline NumberFormatter::Options& operator &= (NumberFormatter::Options& lhs, NumberFormatter::Options rhs)
 {
-    lhs = lhs & rhs;
-    return lhs;
+	lhs = lhs & rhs;
+	return lhs;
 }
 
 
 inline bool NumberFormatter::isEnabled(Options options, Options opt)
 {
 	using T = std::underlying_type_t<Options>;
-    return static_cast<T>(options & opt) != 0;
+	return static_cast<T>(options & opt) != 0;
 }
 
 
@@ -750,7 +750,7 @@ inline std::string NumberFormatter::format0(unsigned int value, int width)
 inline std::string NumberFormatter::formatHex(unsigned value, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX),-1, ' ', 0, isEnabled(options, Options::LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::HEX_PREFIX), -1, ' ', 0, isEnabled(options, Options::HEX_LOWERCASE));
 	return result;
 }
 
@@ -758,7 +758,7 @@ inline std::string NumberFormatter::formatHex(unsigned value, Options options)
 inline std::string NumberFormatter::formatHex(unsigned value, int width, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX), width, '0', 0, isEnabled(options, Options::LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::HEX_PREFIX), width, '0', 0, isEnabled(options, Options::HEX_LOWERCASE));
 	return result;
 }
 
@@ -826,7 +826,7 @@ inline std::string NumberFormatter::format0(unsigned long value, int width)
 inline std::string NumberFormatter::formatHex(unsigned long value, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX), -1, ' ', 0, isEnabled(options, Options::LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::HEX_PREFIX), -1, ' ', 0, isEnabled(options, Options::HEX_LOWERCASE));
 	return result;
 }
 
@@ -834,7 +834,7 @@ inline std::string NumberFormatter::formatHex(unsigned long value, Options optio
 inline std::string NumberFormatter::formatHex(unsigned long value, int width, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX), width, '0', 0, isEnabled(options, Options::LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::HEX_PREFIX), width, '0', 0, isEnabled(options, Options::HEX_LOWERCASE));
 	return result;
 }
 
@@ -905,7 +905,7 @@ inline std::string NumberFormatter::format0(unsigned long long value, int width)
 inline std::string NumberFormatter::formatHex(unsigned long long value, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX), -1, ' ', 0, isEnabled(options, Options::LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::HEX_PREFIX), -1, ' ', 0, isEnabled(options, Options::HEX_LOWERCASE));
 	return result;
 }
 
@@ -913,7 +913,7 @@ inline std::string NumberFormatter::formatHex(unsigned long long value, Options 
 inline std::string NumberFormatter::formatHex(unsigned long long value, int width, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX), width, '0', 0, isEnabled(options, Options::LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::HEX_PREFIX), width, '0', 0, isEnabled(options, Options::HEX_LOWERCASE));
 	return result;
 }
 
@@ -984,7 +984,7 @@ inline std::string NumberFormatter::format0(UInt64 value, int width)
 inline std::string NumberFormatter::formatHex(UInt64 value, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX), -1, ' ', 0, isEnabled(options, Options::LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::HEX_PREFIX), -1, ' ', 0, isEnabled(options, Options::HEX_LOWERCASE));
 	return result;
 }
 
@@ -992,7 +992,7 @@ inline std::string NumberFormatter::formatHex(UInt64 value, Options options)
 inline std::string NumberFormatter::formatHex(UInt64 value, int width, Options options)
 {
 	std::string result;
-	intToStr(value, 0x10, result, isEnabled(options, Options::PREFIX), width, '0', 0, isEnabled(options, Options::LOWERCASE));
+	intToStr(value, 0x10, result, isEnabled(options, Options::HEX_PREFIX), width, '0', 0, isEnabled(options, Options::HEX_LOWERCASE));
 	return result;
 }
 

@@ -7,7 +7,7 @@
 //
 // Definition of the MapConfiguration class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -31,8 +31,11 @@ class Util_API MapConfiguration: public AbstractConfiguration
 	/// An implementation of AbstractConfiguration that stores configuration data in a map.
 {
 public:
-	MapConfiguration();
+	MapConfiguration() = default;
 		/// Creates an empty MapConfiguration.
+
+	~MapConfiguration() = default;
+		/// Destroyes the MapConfiguration.
 
 	void copyTo(AbstractConfiguration& config);
 		/// Copies all configuration properties to the given configuration.
@@ -41,17 +44,23 @@ public:
 		/// Clears the configuration.
 
 protected:
-	typedef std::map<std::string, std::string> StringMap;
-	typedef StringMap::const_iterator iterator;
+	using StringMap = std::map<std::string, std::string>;
+	using iterator = StringMap::const_iterator;
 
-	bool getRaw(const std::string& key, std::string& value) const;
-	void setRaw(const std::string& key, const std::string& value);
-	void enumerate(const std::string& key, Keys& range) const;
-	void removeRaw(const std::string& key);
-	~MapConfiguration();
+	bool getRaw(const std::string& key, std::string& value) const override;
+	void setRaw(const std::string& key, const std::string& value) override;
+	void enumerate(const std::string& key, Keys& range) const override;
+	void removeRaw(const std::string& key) override;
 
-	iterator begin() const;
-	iterator end() const;
+	iterator begin() const
+	{
+		return _map.begin();
+	}
+
+	iterator end() const
+	{
+		return _map.end();
+	}
 
 private:
 	StringMap _map;

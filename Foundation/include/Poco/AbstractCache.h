@@ -83,7 +83,7 @@ public:
 	}
 
 	void update(const TKey& key, const TValue& val)
-		/// Adds the key value pair to the cache. Note that adding a NULL SharedPtr will fail!
+		/// Adds the key value pair to the cache. Note that adding a nullptr SharedPtr will fail!
 		/// If for the key already an entry exists, it will be overwritten.
 		/// The difference to add is that no remove or add events are thrown in this case,
 		/// just a simply silent update is performed
@@ -94,7 +94,7 @@ public:
 	}
 
 	void add(const TKey& key, SharedPtr<TValue > val)
-		/// Adds the key value pair to the cache. Note that adding a NULL SharedPtr will fail!
+		/// Adds the key value pair to the cache. Note that adding a nullptr SharedPtr will fail!
 		/// If for the key already an entry exists, it will be overwritten, ie. first a remove event
 		/// is thrown, then a add event
 	{
@@ -103,7 +103,7 @@ public:
 	}
 
 	void update(const TKey& key, SharedPtr<TValue > val)
-		/// Adds the key value pair to the cache. Note that adding a NULL SharedPtr will fail!
+		/// Adds the key value pair to the cache. Note that adding a nullptr SharedPtr will fail!
 		/// If for the key already an entry exists, it will be overwritten.
 		/// The difference to add is that no remove or add events are thrown in this case,
 		/// just an Update is thrown

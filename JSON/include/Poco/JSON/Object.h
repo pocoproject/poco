@@ -41,7 +41,7 @@ class JSON_API Object;
 
 }
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(JSON_EXPORTS)
 // Explicitly instatiated shared pointer in JSON library
 extern template class Poco::SharedPtr<Poco::JSON::Object>;
 #else
@@ -271,7 +271,7 @@ private:
 	}
 
 	template <typename C>
-	void doStringify(const C& container, std::ostream& out, unsigned int indent, unsigned int step) const
+	void doStringify(const C& container, std::ostream& out, unsigned int indent, int step) const
 	{
 		int options = Poco::JSON_WRAP_STRINGS;
 		options |= _escapeUnicode ? Poco::JSON_ESCAPE_UNICODE : 0;
@@ -290,14 +290,14 @@ private:
 			Stringifier::stringify(getKey(it), out, indent, step, options);
 			out << ((indent > 0) ? ": " : ":");
 
-			Stringifier::stringify(getValue(it), out, indent + step, step, options);
+			Stringifier::stringify(getValue(it), out, indent + static_cast<unsigned int>(step), step, options);
 
 			if (++it != container.end()) out << ',';
 
 			if (step > 0) out << std::endl;
 		}
 
-		if (indent >= step) indent -= step;
+		if (step > 0 && indent >= static_cast<unsigned int>(step)) indent -= static_cast<unsigned int>(step);
 
 		for (unsigned int i = 0; i < indent; i++) out << ' ';
 
@@ -371,7 +371,8 @@ private:
 	bool              _lowercaseHex;
 	mutable StructPtr    _pStruct;
 	mutable OrdStructPtr _pOrdStruct;
-	mutable bool         _modified;
+	mutable bool         _structModified;
+	mutable bool         _ordStructModified;
 };
 
 
@@ -488,7 +489,8 @@ inline void Object::remove(const std::string& key)
 		}
 	}
 	_values.erase(key);
-	_modified = true;
+	_structModified = true;
+	_ordStructModified = true;
 }
 
 

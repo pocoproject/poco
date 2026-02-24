@@ -69,7 +69,7 @@ class Foundation_API PatternFormatter: public Formatter
 	///   * %i - message date/time millisecond (000 .. 999)
 	///   * %c - message date/time centisecond (0 .. 9)
 	///   * %F - message date/time fractional seconds/microseconds (000000 - 999999)
-	///   * %z - time zone differential in ISO 8601 format (Z or +NN.NN)
+	///   * %z - time zone differential in ISO 8601 format (Z or +NN:NN)
 	///   * %Z - time zone differential in RFC format (GMT or +NNNN)
 	///   * %L - convert time to local time (must be specified before any date/time specifier; does not itself output anything)
 	///   * %E - epoch time (UTC, seconds since midnight, January 1, 1970)
@@ -133,7 +133,7 @@ private:
 		}
 
 		char key;
-		int length;
+		std::size_t length;
 		std::string property;
 		std::string prepend;
 	};
@@ -145,6 +145,9 @@ private:
 
 	void parsePriorityNames();
 
+	static const char* extractBasename(const char* path);
+		/// Extracts the filename from a path without creating a Path object.
+
 	static const std::string DEFAULT_PRIORITY_NAMES;
 
 	std::vector<PatternAction> _patternActions;
@@ -152,6 +155,7 @@ private:
 	std::string _pattern;
 	std::string _priorityNames;
 	std::string _priorities[9];
+	static std::string _cachedNodeName;
 };
 
 

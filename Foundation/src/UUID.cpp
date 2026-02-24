@@ -55,7 +55,7 @@ UUID::UUID(const char* uuid)
 }
 
 
-UUID::UUID(UInt32 timeLow, UInt32 timeMid, UInt32 timeHiAndVersion, UInt16 clockSeq, UInt8 node[]):
+UUID::UUID(UInt32 timeLow, UInt16 timeMid, UInt16 timeHiAndVersion, UInt16 clockSeq, UInt8 node[]):
 	_timeLow(timeLow),
 	_timeMid(timeMid),
 	_timeHiAndVersion(timeHiAndVersion),
@@ -201,7 +201,7 @@ std::string UUID::toString() const
 	result += '-';
 	appendHex(result, _clockSeq);
 	result += '-';
-	for (int i = 0; i < sizeof(_node); ++i)
+	for (std::size_t i = 0; i < sizeof(_node); ++i)
 		appendHex(result, _node[i]);
 	return result;
 }
@@ -263,7 +263,7 @@ int UUID::compare(const UUID& uuid) const
 	if (_timeMid != uuid._timeMid) return _timeMid < uuid._timeMid ? -1 : 1;
 	if (_timeHiAndVersion != uuid._timeHiAndVersion) return _timeHiAndVersion < uuid._timeHiAndVersion ? -1 : 1;
 	if (_clockSeq != uuid._clockSeq) return _clockSeq < uuid._clockSeq ? -1 : 1;
-	for (int i = 0; i < sizeof(_node); ++i)
+	for (std::size_t i = 0; i < sizeof(_node); ++i)
 	{
 		if (_node[i] < uuid._node[i])
 			return -1;

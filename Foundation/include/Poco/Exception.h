@@ -20,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include <stdexcept>
+#include <typeinfo>
 
 
 namespace Poco {
@@ -230,6 +231,7 @@ POCO_DECLARE_EXCEPTION(Foundation_API, RegularExpressionException, RuntimeExcept
 POCO_DECLARE_EXCEPTION(Foundation_API, LibraryLoadException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, LibraryAlreadyLoadedException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, NoThreadAvailableException, RuntimeException)
+POCO_DECLARE_EXCEPTION(Foundation_API, ThreadInterruptedException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, PropertyNotSupportedException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, PoolOverflowException, RuntimeException)
 POCO_DECLARE_EXCEPTION(Foundation_API, NoPermissionException, RuntimeException)

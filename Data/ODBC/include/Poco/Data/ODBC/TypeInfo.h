@@ -70,7 +70,7 @@ public:
 		SQLSMALLINT> TypeInfoTup;
 	typedef std::vector<TypeInfoTup> TypeInfoVec;
 
-	explicit TypeInfo(SQLHDBC* pHDBC=0);
+	explicit TypeInfo(SQLHDBC* pHDBC=nullptr);
 		/// Creates the TypeInfo.
 
 	~TypeInfo();
@@ -184,6 +184,9 @@ public:
 
 	void fillTypeInfo(const SQLHDBC* pHDBC);
 		/// Fills the data type info structure for the database.
+
+	void reset();
+		/// Clears cached type info, allowing refill on next fillTypeInfo call.
 
 	Dynamic::Var getInfo(SQLSMALLINT type, const std::string& param) const;
 		/// Returns information about specified data type as specified by parameter 'type'.

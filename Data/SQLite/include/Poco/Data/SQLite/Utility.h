@@ -148,7 +148,7 @@ public:
 		static CBMap retMap;
 		T* pRet = reinterpret_cast<T*>(eventHookRegister(pDB, callbackFn, pParam));
 
-		if (pRet == 0)
+		if (pRet == nullptr)
 		{
 			if (retMap.find(pDB) == retMap.end())
 			{
@@ -161,8 +161,8 @@ public:
 			CBMapItPair retMapRange = retMap.equal_range(pDB);
 			for (CBMapIt it = retMapRange.first; it != retMapRange.second; ++it)
 			{
-				poco_assert (it->second.first != 0);
-				if ((callbackFn == 0) && (*pRet == *it->second.second))
+				poco_assert (it->second.first != nullptr);
+				if ((callbackFn == nullptr) && (*pRet == *it->second.second))
 				{
 					retMap.erase(it);
 					return true;
@@ -208,8 +208,8 @@ private:
 		///
 		/// Column types are case-insensitive.
 
-	Utility(const Utility&);
-	Utility& operator = (const Utility&);
+	Utility(const Utility&) = delete;
+	Utility& operator = (const Utility&) = delete;
 
 	static void* eventHookRegister(sqlite3* pDB, UpdateCallbackType callbackFn, void* pParam);
 	static void* eventHookRegister(sqlite3* pDB, CommitCallbackType callbackFn, void* pParam);

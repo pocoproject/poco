@@ -436,7 +436,7 @@ private:
 	}
 
 	// Prevent VC8 warning "operator= could not be generated"
-	Extractor& operator = (const Extractor&);
+	Extractor& operator = (const Extractor&) = delete;
 
 private:
 	StatementExecutor& _statementExecutor;
@@ -448,7 +448,7 @@ private:
 //
 inline bool Extractor::isColumnNull(const OutputParameter& outputParameter) const
 {
-	return outputParameter.isNull() || 0 == outputParameter.pData();
+	return outputParameter.isNull() || nullptr == outputParameter.pData();
 }
 
 

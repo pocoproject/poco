@@ -44,6 +44,8 @@
 #include <iostream>
 #include <sstream>
 #include <iterator>
+#include <optional>
+#include <tuple>
 
 
 using Poco::Data::Session;
@@ -291,6 +293,10 @@ const std::string SQLExecutor::MULTI_SELECT =
 	"SELECT * FROM Test WHERE First = '5';";
 
 
+const float SQLExecutor::EPSILON_FLOAT = 1e-5f;
+const double SQLExecutor::EPSILON_DOUBLE = 1e-9;
+
+
 SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession, bool numberedPlaceHolders):
 	CppUnit::TestCase(name),
 	_pSession(pSession),
@@ -418,7 +424,7 @@ void SQLExecutor::sessionPool(const std::string& connector, const std::string& c
 		assertTrue (pool.available() == 4);
 		assertTrue (pool.dead() == 0);
 		assertTrue (pool.allocated() == pool.used() + pool.idle());
-		Session s1(pool.get());
+		Session ss1(pool.get());
 
 		try { pool.setFeature("f1", true); fail ("setting an unsuported feature must fail", __LINE__, __FILE__); }
 		catch (Poco::InvalidAccessException&) { }
@@ -1297,7 +1303,7 @@ void SQLExecutor::floats()
 		failmsg (__func__);
 	}
 
-	assertTrue (ret == data);
+	assertTrue (std::fabs(ret - data) < EPSILON_FLOAT);
 }
 
 
@@ -1331,7 +1337,7 @@ void SQLExecutor::doubles()
 		failmsg (__func__);
 	}
 
-	assertTrue (ret == data);
+	assertTrue (std::fabs(ret - data) < EPSILON_DOUBLE);
 }
 
 
@@ -1593,7 +1599,8 @@ void SQLExecutor::doBulkPerformance(Poco::UInt32 size)
 			use(floats),
 			use(dateTimes), now;
 		sw.stop();
-	}	catch(DataException& ce)
+	}
+	catch(DataException& ce)
 	{
 		std::cout << ce.displayText() << std::endl;
 		failmsg (__func__);
@@ -2849,8 +2856,16 @@ void SQLExecutor::internalExtraction()
 		}
 		catch(BadCastException&)
 		{
-			Poco::Int64 l = rset.value<Poco::Int64>(0,0);
-			assertTrue (1 == l);
+			try
+			{
+				Poco::Int64 l = rset.value<Poco::Int64>(0,0);
+				assertTrue (1 == l);
+			}
+			catch(BadCastException&) // Oracle really has no integers
+			{
+				double l = rset.value<double>(0,0);
+				assertTrue (0.9 < l && l < 1.1);
+			}
 		}
 
 		std::string s = rset.value(0,0).convert<std::string>();
@@ -2863,8 +2878,16 @@ void SQLExecutor::internalExtraction()
 		}
 		catch(BadCastException&)
 		{
-			Poco::Int64 l = rset.value<Poco::Int64>(0,2);
-			assertTrue (3 == l);
+			try
+			{
+				Poco::Int64 l = rset.value<Poco::Int64>(0,2);
+				assertTrue (3 == l);
+			}
+			catch(BadCastException&) // Oracle really has no integers
+			{
+				double l = rset.value<double>(0,2);
+				assertTrue (2.9 < l && l < 3.1);
+			}
 		}
 
 		try
@@ -2902,11 +2925,22 @@ void SQLExecutor::internalExtraction()
 		}
 		catch(BadCastException&)
 		{
-			const Column<std::deque<Poco::Int64>>& col = rset.column<std::deque<Poco::Int64> >(0);
-			Column<std::deque<Poco::Int64>>::Iterator it = col.begin();
-			Column<std::deque<Poco::Int64>>::Iterator end = col.end();
-			for (Poco::Int64 l = 1; it != end; ++it, ++l)
-				assertTrue (*it == l);
+			try
+			{
+				const Column<std::deque<Poco::Int64>>& col = rset.column<std::deque<Poco::Int64> >(0);
+				Column<std::deque<Poco::Int64>>::Iterator it = col.begin();
+				Column<std::deque<Poco::Int64>>::Iterator end = col.end();
+				for (Poco::Int64 l = 1; it != end; ++it, ++l)
+					assertTrue (*it == l);
+			}
+			catch(BadCastException&) // Oracle really has no integers
+			{
+				const Column<std::deque<double>>& col = rset.column<std::deque<double> >(0);
+				Column<std::deque<double>>::Iterator it = col.begin();
+				Column<std::deque<double>>::Iterator end = col.end();
+				for (double l = 0.9; it != end; ++it, ++l)
+					assertTrue (l < *it && *it < l + .2);
+			}
 		}
 
 		rset = (session() << "SELECT COUNT(*) AS cnt FROM Vectors", now);
@@ -2915,22 +2949,22 @@ void SQLExecutor::internalExtraction()
 		try
 		{
 			//this is what most drivers will return
-			int i = rset.value<int>(0,0);
-			assertTrue (4 == i);
+			int ii = rset.value<int>(0,0);
+			assertEqual (4, ii);
 		}
 		catch(BadCastException&)
 		{
 			try
 			{
 				//this is for Oracle
-				double i = rset.value<double>(0,0);
-				assertTrue (4 == int(i));
+				double d = rset.value<double>(0,0);
+				assertEqual (4, int(d));
 			}
 			catch(BadCastException&)
 			{
 				//this is for PostgreSQL
 				Poco::Int64 big = rset.value<Poco::Int64>(0,0);
-				assertTrue (4 == big);
+				assertEqual (4, big);
 			}
 		}
 
@@ -3856,10 +3890,10 @@ void SQLExecutor::sqlChannel(const std::string& connector, const std::string& co
 		Message msgWarnS("WarningSource", "d Warning sync message", Message::PRIO_WARNING);
 		pChannel->log(msgWarnS);
 		while (pChannel->logged() != 4) Thread::sleep(10);
-
+		Thread::sleep(100);
 		RecordSet rs(session(), "SELECT * FROM T_POCO_LOG ORDER by Text");
 		size_t rc = rs.rowCount();
-		assertTrue (4 == rc);
+		assertEqual (4, rc);
 		assertTrue ("InformationSource" == rs["Source"]);
 		assertTrue ("a Informational async message" == rs["Text"]);
 		rs.moveNext();
@@ -3970,16 +4004,29 @@ void SQLExecutor::setTransactionIsolation(Session& session, Poco::UInt32 ti)
 
 void SQLExecutor::autoCommit()
 {
-	bool autoCommit = session().getFeature("autoCommit");
+	try
+	{
+		bool autoCommit = session().getFeature("autoCommit");
 
-	session().setFeature("autoCommit", true);
-	assertTrue (!session().isTransaction());
-	session().setFeature("autoCommit", false);
-	assertTrue (!session().isTransaction());
-	session().setFeature("autoCommit", true);
-	assertTrue (!session().isTransaction());
+		session().setFeature("autoCommit", true);
+		assertTrue (!session().isTransaction());
+		session().setFeature("autoCommit", false);
+		assertTrue (!session().isTransaction());
+		session().setFeature("autoCommit", true);
+		assertTrue (!session().isTransaction());
 
-	session().setFeature("autoCommit", autoCommit);
+		session().setFeature("autoCommit", autoCommit);
+	}
+	catch(const Poco::Exception& ex)
+	{
+		std::cerr << ex.displayText() << std::endl;
+		throw;
+	}
+	catch(const std::exception& ex)
+	{
+		std::cerr << ex.what() << std::endl;
+		throw;
+	}
 }
 
 
@@ -3987,16 +4034,16 @@ void SQLExecutor::transactionIsolation()
 {
 	try
 	{
-	auto ti = session().getTransactionIsolation();
+		auto ti = session().getTransactionIsolation();
 
-	// these are just calls to check the transactional capabilities of the session
-	// they will print diagnostics to stderr if a transaction isolation level is not supported
-	setTransactionIsolation(session(), Session::TRANSACTION_READ_UNCOMMITTED);
-	setTransactionIsolation(session(), Session::TRANSACTION_REPEATABLE_READ);
-	setTransactionIsolation(session(), Session::TRANSACTION_SERIALIZABLE);
-	setTransactionIsolation(session(), Session::TRANSACTION_READ_COMMITTED);
+		// these are just calls to check the transactional capabilities of the session
+		// they will print diagnostics to stderr if a transaction isolation level is not supported
+		setTransactionIsolation(session(), Session::TRANSACTION_READ_UNCOMMITTED);
+		setTransactionIsolation(session(), Session::TRANSACTION_REPEATABLE_READ);
+		setTransactionIsolation(session(), Session::TRANSACTION_SERIALIZABLE);
+		setTransactionIsolation(session(), Session::TRANSACTION_READ_COMMITTED);
 
-	setTransactionIsolation(session(), ti);
+		setTransactionIsolation(session(), ti);
 	}
 	catch(const Poco::Exception& ex)
 	{
@@ -4571,6 +4618,132 @@ void SQLExecutor::encoding(const std::string& dbConnString)
 		std::cerr << ex.what() << std::endl;
 		throw;
 	}
+}
+
+
+void SQLExecutor::stdOptional()
+{
+	Int32 id = 0;
+	std::optional<std::string> address("Address");
+	std::optional<Int32> age = 10;
+
+	try { session() << formatSQL("INSERT INTO NullableStringTest VALUES(?, ?, ?)"), use(id), use(address), use(age), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	id++;
+	address = null;
+	age = null;
+
+	try { session() << formatSQL("INSERT INTO NullableStringTest VALUES(?, ?, ?)"), use(id), use(address), use(age), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	std::optional<std::string> resAddress;
+	std::optional<Int32> resAge;
+
+	try { session() << formatSQL("SELECT Address, Age FROM NullableStringTest WHERE Id = ?"), into(resAddress), into(resAge), use(id), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	assertTrue(resAddress == address);
+	assertTrue(resAge == age);
+	assertTrue(!resAddress.has_value());
+	assertTrue(null == resAddress);
+	assertTrue(resAddress == null);
+
+	resAddress = std::string("Test");
+	assertTrue(resAddress.has_value());
+	assertTrue(resAddress == std::string("Test"));
+	assertTrue(std::string("Test") == resAddress);
+	assertTrue(null != resAddress);
+	assertTrue(resAddress != null);
+}
+
+
+void SQLExecutor::stdTupleWithOptional()
+{
+	using Info = std::tuple<Int32, std::optional<std::string>, std::optional<Int32>>;
+
+	Info info(0, std::string("Address"), 10);
+
+	try { session() << formatSQL("INSERT INTO NullableStringTest VALUES(?, ?, ?)"), use(info), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	using std::get;
+
+	get<0>(info)++;
+	get<1>(info).reset();
+
+	try { session() << formatSQL("INSERT INTO NullableStringTest VALUES(?, ?, ?)"), use(info), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	get<0>(info)++;
+	get<1>(info) = std::string("Address!");
+	get<2>(info).reset();
+
+	try { session() << formatSQL("INSERT INTO NullableStringTest VALUES(?, ?, ?)"), use(info), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	std::vector<Info> infos;
+	infos.push_back(Info(10, std::string("A"), 0));
+	infos.push_back(Info(11, std::nullopt, 12));
+	infos.push_back(Info(12, std::string("B"), std::nullopt));
+
+	try { session() << formatSQL("INSERT INTO NullableStringTest VALUES(?, ?, ?)"), use(infos), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	std::vector<Info> result;
+
+	try { session() << "SELECT Id, Address, Age FROM NullableStringTest", into(result), now; }
+	catch (DataException& ce)
+	{
+		std::cout << ce.displayText() << std::endl;
+		failmsg(__func__);
+	}
+
+	assertTrue(get<1>(result[0]) == std::string("Address"));
+	assertTrue(get<2>(result[0]) == 10);
+
+	assertTrue(get<1>(result[1]) == null);
+	assertTrue(get<2>(result[1]) == 10);
+
+	assertTrue(get<1>(result[2]) == std::string("Address!"));
+	assertTrue(get<2>(result[2]) == null);
+
+	assertTrue(get<1>(result[3]) == std::string("A"));
+	assertTrue(get<2>(result[3]) == 0);
+
+	assertTrue(get<1>(result[4]) == null);
+	assertTrue(get<2>(result[4]) == 12);
+
+	assertTrue(get<1>(result[5]) == std::string("B"));
+	assertTrue(get<2>(result[5]) == null);
 }
 
 

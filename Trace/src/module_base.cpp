@@ -8,7 +8,7 @@
 #include <mutex>
 #include <unordered_map>
 
-#if IS_LINUX || IS_APPLE
+#if IS_LINUX || IS_APPLE || IS_FREEBSD
  #include <unistd.h>
  #include <dlfcn.h>
  #if IS_APPLE
@@ -23,7 +23,7 @@
 
 namespace cpptrace {
 namespace detail {
-    #if IS_LINUX
+    #if IS_LINUX || IS_FREEBSD
     Result<std::uintptr_t, internal_error> get_module_image_base(const std::string& object_path) {
         static std::mutex mutex;
         std::lock_guard<std::mutex> lock(mutex);

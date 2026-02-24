@@ -20,11 +20,7 @@
 #include "Poco/String.h"
 #include "Poco/Any.h"
 #include "Poco/Exception.h"
-#if defined(POCO_UNBUNDLED)
 #include <sqlite3.h>
-#else
-#include "sqlite3.h"
-#endif
 
 
 #ifndef SQLITE_OPEN_URI
@@ -42,6 +38,11 @@ const std::string Utility::TRANSACTION_TYPE_PROPERTY_KEY = "transactionType";
 const int Utility::THREAD_MODE_SINGLE = SQLITE_CONFIG_SINGLETHREAD;
 const int Utility::THREAD_MODE_MULTI = SQLITE_CONFIG_MULTITHREAD;
 const int Utility::THREAD_MODE_SERIAL = SQLITE_CONFIG_SERIALIZED;
+
+#if defined(POCO_SQLITE_UNBUNDLED)
+	#warning "Utility::_threadMode is set based on SQLITE_THREADSAFE, which may not reflect the actual threading mode used by unbundled SQLite"
+#endif
+
 int Utility::_threadMode =
 #if (SQLITE_THREADSAFE == 0)
 	SQLITE_CONFIG_SINGLETHREAD;
@@ -61,7 +62,7 @@ Utility::TypeMap Utility::_types;
 Poco::Mutex Utility::_mutex;
 
 
-Utility::SQLiteMutex::SQLiteMutex(sqlite3* pDB): _pMutex((pDB) ? sqlite3_db_mutex(pDB) : 0)
+Utility::SQLiteMutex::SQLiteMutex(sqlite3* pDB): _pMutex((pDB) ? sqlite3_db_mutex(pDB) : nullptr)
 {
 	if (_pMutex)
 		sqlite3_mutex_enter(_pMutex);
@@ -177,72 +178,73 @@ MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size
 
 void Utility::throwException(sqlite3* pDB, int rc, const std::string& addErrMsg)
 {
+	std::string errMsg = addErrMsg.empty() ? lastError(pDB) : addErrMsg;
 	switch (rc)
 	{
 	case SQLITE_OK:
 		break;
 	case SQLITE_ERROR:
-		throw InvalidSQLStatementException(lastError(pDB), addErrMsg);
+		throw InvalidSQLStatementException(errMsg);
 	case SQLITE_INTERNAL:
-		throw InternalDBErrorException(lastError(pDB), addErrMsg);
+		throw InternalDBErrorException(errMsg);
 	case SQLITE_PERM:
-		throw DBAccessDeniedException(lastError(pDB), addErrMsg);
+		throw DBAccessDeniedException(errMsg);
 	case SQLITE_ABORT:
-		throw ExecutionAbortedException(lastError(pDB), addErrMsg);
+		throw ExecutionAbortedException(errMsg);
 	case SQLITE_BUSY:
 	case SQLITE_BUSY_RECOVERY:
 #if defined(SQLITE_BUSY_SNAPSHOT)
 	case SQLITE_BUSY_SNAPSHOT:
 #endif
-		throw DBLockedException(lastError(pDB), addErrMsg);
+		throw DBLockedException(errMsg);
 	case SQLITE_LOCKED:
-		throw TableLockedException(lastError(pDB), addErrMsg);
+		throw TableLockedException(errMsg);
 	case SQLITE_NOMEM:
-		throw NoMemoryException(lastError(pDB), addErrMsg);
+		throw NoMemoryException(errMsg);
 	case SQLITE_READONLY:
-		throw ReadOnlyException(lastError(pDB), addErrMsg);
+		throw ReadOnlyException(errMsg);
 	case SQLITE_INTERRUPT:
-		throw InterruptException(lastError(pDB), addErrMsg);
+		throw InterruptException(errMsg);
 	case SQLITE_IOERR:
-		throw IOErrorException(lastError(pDB), addErrMsg);
+		throw IOErrorException(errMsg);
 	case SQLITE_CORRUPT:
-		throw CorruptImageException(lastError(pDB), addErrMsg);
+		throw CorruptImageException(errMsg);
 	case SQLITE_NOTFOUND:
-		throw TableNotFoundException(lastError(pDB), addErrMsg);
+		throw TableNotFoundException(errMsg);
 	case SQLITE_FULL:
-		throw DatabaseFullException(lastError(pDB), addErrMsg);
+		throw DatabaseFullException(errMsg);
 	case SQLITE_CANTOPEN:
-		throw CantOpenDBFileException(lastError(pDB), addErrMsg);
+		throw CantOpenDBFileException(errMsg);
 	case SQLITE_PROTOCOL:
-		throw LockProtocolException(lastError(pDB), addErrMsg);
+		throw LockProtocolException(errMsg);
 	case SQLITE_EMPTY:
-		throw InternalDBErrorException(lastError(pDB), addErrMsg);
+		throw InternalDBErrorException(errMsg);
 	case SQLITE_SCHEMA:
-		throw SchemaDiffersException(lastError(pDB), addErrMsg);
+		throw SchemaDiffersException(errMsg);
 	case SQLITE_TOOBIG:
-		throw RowTooBigException(lastError(pDB), addErrMsg);
+		throw RowTooBigException(errMsg);
 	case SQLITE_CONSTRAINT:
-		throw ConstraintViolationException(lastError(pDB), addErrMsg);
+		throw ConstraintViolationException(errMsg);
 	case SQLITE_MISMATCH:
-		throw DataTypeMismatchException(lastError(pDB), addErrMsg);
+		throw DataTypeMismatchException(errMsg);
 	case SQLITE_MISUSE:
-		throw InvalidLibraryUseException(lastError(pDB), addErrMsg);
+		throw InvalidLibraryUseException(errMsg);
 	case SQLITE_NOLFS:
-		throw OSFeaturesMissingException(lastError(pDB), addErrMsg);
+		throw OSFeaturesMissingException(errMsg);
 	case SQLITE_AUTH:
-		throw AuthorizationDeniedException(lastError(pDB), addErrMsg);
+		throw AuthorizationDeniedException(errMsg);
 	case SQLITE_FORMAT:
-		throw CorruptImageException(lastError(pDB), addErrMsg);
+		throw CorruptImageException(errMsg);
 	case SQLITE_NOTADB:
-		throw CorruptImageException(lastError(pDB), addErrMsg);
+		throw CorruptImageException(errMsg);
 	case SQLITE_RANGE:
-		throw InvalidSQLStatementException(lastError(pDB), addErrMsg);
+		throw InvalidSQLStatementException(errMsg);
 	case SQLITE_ROW:
 		break; // sqlite_step() has another row ready
 	case SQLITE_DONE:
 		break; // sqlite_step() has finished executing
 	default:
-		throw SQLiteException(Poco::format("Unknown error code: %d", rc), addErrMsg);
+		throw SQLiteException(Poco::format("Unknown error code: %d", rc), errMsg);
 	}
 }
 
@@ -255,7 +257,7 @@ bool Utility::fileToMemory(sqlite3* pInMemory, const std::string& fileName)
 
 	// Note: SQLITE_OPEN_READWRITE is required to correctly handle an existing hot journal.
 	// See #3135
-	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READWRITE | SQLITE_OPEN_URI, NULL);
+	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READWRITE | SQLITE_OPEN_URI, nullptr);
 	if(rc == SQLITE_OK )
 	{
 		pBackup = sqlite3_backup_init(pInMemory, "main", pFile, "main");
@@ -278,7 +280,7 @@ bool Utility::memoryToFile(const std::string& fileName, sqlite3* pInMemory)
 	sqlite3* pFile;
 	sqlite3_backup* pBackup;
 
-	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_URI, NULL);
+	rc = sqlite3_open_v2(fileName.c_str(), &pFile, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_URI, nullptr);
 	if(rc == SQLITE_OK )
 	{
 		pBackup = sqlite3_backup_init(pFile, "main", pInMemory, "main");

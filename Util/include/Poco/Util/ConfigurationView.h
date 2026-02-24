@@ -5,9 +5,9 @@
 // Package: Configuration
 // Module:  ConfigurationView
 //
-// Definition of the ConfigurationView class.
+// Definition of the AbstractConfigurationView and ConfigurationView classes.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -26,7 +26,37 @@ namespace Poco {
 namespace Util {
 
 
-class Util_API ConfigurationView: public AbstractConfiguration
+class Util_API AbstractConfigurationView: public AbstractConfiguration
+	/// This configuration implements a "view" into a sub-hierarchy
+	/// of another configuration.
+	///
+	/// AbstractConfigurationView functions as a base class for
+	/// ConfigurationView and LocalConfigurationView, providing
+	/// common features.
+{
+public:
+	AbstractConfigurationView(const std::string& prefix, AbstractConfiguration::Ptr pConfig);
+
+	const std::string& prefix() const { return _prefix; }
+
+protected:
+	void setRaw(const std::string& key, const std::string& value) override;
+	void enumerate(const std::string& key, Keys& range) const override;
+	void removeRaw(const std::string& key) override;
+
+	std::string translateKey(const std::string& key) const;
+
+	~AbstractConfigurationView() = default;
+
+	const AbstractConfiguration::Ptr& pConfig() const { return _pConfig; }
+
+private:
+	std::string _prefix;
+	AbstractConfiguration::Ptr _pConfig;
+};
+
+
+class Util_API ConfigurationView: public AbstractConfigurationView
 	/// This configuration implements a "view" into a sub-hierarchy
 	/// of another configuration.
 	///
@@ -45,7 +75,7 @@ class Util_API ConfigurationView: public AbstractConfiguration
 	/// A ConfigurationView is most useful in combination with a
 	/// LayeredConfiguration.
 	///
-	/// If a property is not found in the view, it is searched in
+    /// If a property is not found in the view, it is searched in
 	/// the original configuration. Given the above example configuration,
 	/// the property named "config.value1" will still be found in the view.
 	///
@@ -57,22 +87,10 @@ public:
 		/// Creates the ConfigurationView. The ConfigurationView
 		/// retains (shared) ownership of the passed configuration.
 
+	~ConfigurationView() = default;
+
 protected:
-	bool getRaw(const std::string& key, std::string& value) const;
-	void setRaw(const std::string& key, const std::string& value);
-	void enumerate(const std::string& key, Keys& range) const;
-	void removeRaw(const std::string& key);
-
-	std::string translateKey(const std::string& key) const;
-
-	~ConfigurationView();
-
-private:
-	ConfigurationView(const ConfigurationView&);
-	ConfigurationView& operator = (const ConfigurationView&);
-
-	std::string _prefix;
-	AbstractConfiguration::Ptr _pConfig;
+	bool getRaw(const std::string& key, std::string& value) const override;
 };
 
 

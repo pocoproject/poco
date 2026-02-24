@@ -43,7 +43,7 @@ public:
 		/// Throws an OptionException otherwise.
 
 protected:
-	Validator();
+	Validator() = default;
 		/// Creates the Validator.
 
 	virtual ~Validator();

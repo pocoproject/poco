@@ -19,7 +19,6 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/ODBC/EnvironmentHandle.h"
 #include "Poco/Data/ODBC/ConnectionHandle.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/ODBC/Utility.h"
@@ -41,7 +40,7 @@ class Handle
 public:
 	Handle(const ConnectionHandle& rConnection):
 		_rConnection(rConnection),
-		_handle(0)
+		_handle(nullptr)
 			/// Creates the Handle.
 	{
 		if (Utility::isError(SQLAllocHandle(handleType,
@@ -88,8 +87,8 @@ public:
 	}
 
 private:
-	Handle(const Handle&);
-	const Handle& operator=(const Handle&);
+	Handle(const Handle&) = delete;
+	const Handle& operator=(const Handle&) = delete;
 
 	operator H& ()
 		/// Conversion operator into reference to native type.

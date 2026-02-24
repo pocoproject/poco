@@ -522,6 +522,8 @@ public:
 	void transaction(const std::string& connect, bool readUncommitted = true);
 	void transactor();
 	void nullable();
+	void stdOptional();
+	void stdTupleWithOptional();
 
 	void unicode(const std::string& dbConnString);
 	void encoding(const std::string& dbConnString);
@@ -902,7 +904,7 @@ inline void SQLExecutor::internalExtraction()
 
 inline void SQLExecutor::filter(const std::string& query, const std::string& intFldName)
 {
-	_dataExecutor.filter();
+	_dataExecutor.filter(query, intFldName);
 }
 
 
@@ -1017,6 +1019,18 @@ inline void SQLExecutor::transactor()
 inline void SQLExecutor::nullable()
 {
 	_dataExecutor.nullable();
+}
+
+
+inline void SQLExecutor::stdOptional()
+{
+	_dataExecutor.stdOptional();
+}
+
+
+inline void SQLExecutor::stdTupleWithOptional()
+{
+	_dataExecutor.stdTupleWithOptional();
 }
 
 

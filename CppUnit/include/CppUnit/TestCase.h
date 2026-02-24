@@ -15,9 +15,39 @@
 #include <string>
 #include <vector>
 #include <typeinfo>
+#include <chrono>
+#include <thread>
 
 
 namespace CppUnit {
+
+
+template <typename Func>
+bool waitForCondition(Func condition, long timeoutMs, long pollIntervalMs = 100)
+	/// Waits for a condition to become true, with timeout.
+	///
+	/// This helper function is useful for testing asynchronous operations
+	/// or time-based expiration without using fixed Thread::sleep() calls.
+	///
+	/// The condition parameter is a callable that returns bool (e.g., a lambda).
+	/// The function polls the condition at regular intervals until it returns
+	/// true or the timeout expires.
+	///
+	/// Returns true if the condition was met within the timeout,
+	/// false if the timeout occurred.
+{
+	auto start = std::chrono::steady_clock::now();
+	auto timeout = std::chrono::milliseconds(timeoutMs);
+	auto pollInterval = std::chrono::milliseconds(pollIntervalMs);
+
+	while (std::chrono::steady_clock::now() - start < timeout)
+	{
+		if (condition())
+			return true;
+		std::this_thread::sleep_for(pollInterval);
+	}
+	return condition(); // Final check
+}
 
 
 class TestResult;
@@ -85,7 +115,7 @@ class TestResult;
  */
 class CppUnit_API TestCase: public Test
 {
-    REFERENCEOBJECT (TestCase)
+	REFERENCEOBJECT (TestCase)
 
 public:
 	TestCase(const std::string& name, Test::Type testType = Test::Normal);
@@ -108,55 +138,57 @@ protected:
 	TestResult* defaultResult();
 
 	void assertImplementation(bool condition,
-	                          const std::string& conditionExpression = "",
-	                          long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-	                          const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+							  const std::string& conditionExpression = "",
+							  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+							  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 	void loop1assertImplementation(bool condition,
-	                               const std::string& conditionExpression = "",
-	                               long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-                                   long dataLineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-	                               const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+								   const std::string& conditionExpression = "",
+								   long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+								   long dataLineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+								   const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 	void loop2assertImplementation(bool condition,
-	                               const std::string& conditionExpression = "",
-	                               long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-                                   long data1LineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-                                   long data2LineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-	                               const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+								   const std::string& conditionExpression = "",
+								   long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+								   long data1LineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+								   long data2LineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+								   const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 	template <typename T1, typename T2,
 		typename = std::enable_if_t<std::is_arithmetic_v<T1>, T1>,
 		typename = std::enable_if_t<std::is_arithmetic_v<T2>, T2>>
 	void assertEquals(T1 expected,
-	                  T2 actual,
-	                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-	                  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME)
+					  T2 actual,
+					  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+					  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME)
 	{
-		if (expected != actual)
+		// Use common_type to avoid sign-compare warnings when comparing mixed signed/unsigned types
+		using CommonType = std::common_type_t<T1, T2>;
+		if (static_cast<CommonType>(expected) != static_cast<CommonType>(actual))
 			assertImplementation(false, notEqualsMessage(expected, actual), lineNumber, fileName);
 	}
 
 	void assertEquals(double expected,
-	                  double actual,
-                      double delta,
-                      long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-                      const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+					  double actual,
+					  double delta,
+					  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+					  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 	void assertEquals(const std::string& expected,
-	                  const std::string& actual,
-	                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-	                  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+					  const std::string& actual,
+					  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+					  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 	void assertEquals(const char* expected,
-	                  const std::string& actual,
-	                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-	                  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+					  const std::string& actual,
+					  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+					  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 	void assertEquals(const void* expected,
-	                  const void* actual,
-	                  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-	                  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+					  const void* actual,
+					  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+					  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 	template <typename T1, typename T2,
 		typename = std::enable_if_t<std::is_arithmetic_v<T1>, T1>,
@@ -170,22 +202,22 @@ protected:
 	std::string notEqualsMessage(const std::string& expected, const std::string& actual);
 
 	void assertNotNull(const void* pointer,
-	                   const std::string& pointerExpression = "",
-	                   long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-	                   const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+					   const std::string& pointerExpression = "",
+					   long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+					   const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 	void assertNull(const void* pointer,
-	                const std::string& pointerExpression = "",
-	                long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-	                const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+					const std::string& pointerExpression = "",
+					long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+					const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 	void fail(const std::string& message = "",
-	          long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-	          const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+			  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+			  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 	void warn(const std::string& message = "",
-              long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
-              const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+			  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+			  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
 
 private:

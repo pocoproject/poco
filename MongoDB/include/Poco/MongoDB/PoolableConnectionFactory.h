@@ -7,7 +7,7 @@
 //
 // Definition of the PoolableConnectionFactory class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -36,13 +36,13 @@ class PoolableObjectFactory<MongoDB::Connection, MongoDB::Connection::Ptr>
 public:
 	PoolableObjectFactory(Net::SocketAddress& address):
 		_address(address),
-		_pSocketFactory(0)
+		_pSocketFactory(nullptr)
 	{
 	}
 
 	PoolableObjectFactory(const std::string& address):
 		_address(address),
-		_pSocketFactory(0)
+		_pSocketFactory(nullptr)
 	{
 	}
 

@@ -43,8 +43,10 @@
 #	include <sys/neutrino.h>
 #endif
 
-#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
-#	include <sys/prctl.h>
+#ifndef POCO_NO_THREADNAME
+	#if POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
+	#	include <sys/prctl.h>
+	#endif
 #endif
 
 #if POCO_OS == POCO_OS_LINUX
@@ -70,7 +72,7 @@ namespace
 			sigset_t sset;
 			sigemptyset(&sset);
 			sigaddset(&sset, SIGPIPE);
-			pthread_sigmask(SIG_BLOCK, &sset, 0);
+			pthread_sigmask(SIG_BLOCK, &sset, nullptr);
 		}
 		~SignalBlocker()
 		{
@@ -82,61 +84,6 @@ namespace
 #endif
 
 
-namespace
-{
-	std::string truncName(const std::string& name, int nameSize = POCO_MAX_THREAD_NAME_LEN)
-	{
-		if (name.size() > nameSize)
-			return name.substr(0, nameSize).append("~");
-		return name;
-	}
-
-#ifndef POCO_NO_THREADNAME
-	void setThreadName(const std::string& threadName)
-		/// Sets thread name. Support for this feature varies
-		/// on platforms. Any errors are ignored.
-	{
-#if (POCO_OS == POCO_OS_FREE_BSD)
-		pthread_setname_np(pthread_self(), truncName(threadName).c_str());
-#elif (POCO_OS == POCO_OS_MAC_OS_X)
-	#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
-		#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
-			pthread_setname_np(truncName(threadName).c_str()); // __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2)
-		#endif
-	#endif // __MAC_OS_X_VERSION_MIN_REQUIRED
-#elif (POCO_OS == POCO_OS_QNX)
-		pthread_setname_np(pthread_self(), truncName(threadName, _NTO_THREAD_NAME_MAX).c_str());
-#else
-		prctl(PR_SET_NAME, truncName(threadName).c_str());
-#endif
-	}
-
-	std::string getThreadName()
-	{
-	constexpr size_t nameSize =
-#if (POCO_OS == POCO_OS_QNX)
-			_NTO_THREAD_NAME_MAX;
-#else
-			POCO_MAX_THREAD_NAME_LEN;
-#endif
-		char name[nameSize + 1]{'\0'};
-#if (POCO_OS == POCO_OS_FREE_BSD)
-		pthread_getname_np(pthread_self(), name, nameSize + 1);
-#elif (POCO_OS == POCO_OS_MAC_OS_X)
-	#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
-		#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
-			pthread_getname_np(pthread_self(), name, nameSize + 1);
-		#endif
-	#endif // __MAC_OS_X_VERSION_MIN_REQUIRED
-#elif (POCO_OS == POCO_OS_QNX)
-		pthread_getname_np(pthread_self(), name, nameSize);
-#else
-		prctl(PR_GET_NAME, name);
-#endif
-		return name;
-	}
-#endif
-}
 
 
 namespace Poco {
@@ -168,9 +115,9 @@ void ThreadImpl::setNameImpl(const std::string& threadName)
 	{
 		int half = (POCO_MAX_THREAD_NAME_LEN - 1) / 2;
 #else
-	if (threadName.size() > std::min(POCO_MAX_THREAD_NAME_LEN, 15))
+	if (threadName.size() > static_cast<std::size_t>(std::min(POCO_MAX_THREAD_NAME_LEN, 15)))
 	{
-		int half = (std::min(POCO_MAX_THREAD_NAME_LEN, 15) - 1) / 2;
+		std::size_t half = static_cast<std::size_t>(std::min(POCO_MAX_THREAD_NAME_LEN, 15) - 1) / 2;
 #endif
 		std::string truncName(threadName, 0, half);
 		truncName.append("~");
@@ -196,7 +143,7 @@ std::string ThreadImpl::getNameImpl() const
 #ifndef POCO_NO_THREADNAME
 std::string ThreadImpl::getOSThreadNameImpl()
 {
-	return isRunningImpl() ? getThreadName() : "";
+	return isRunningImpl() ? getCurrentNameImpl() : "";
 }
 #endif
 
@@ -276,10 +223,10 @@ void ThreadImpl::setStackSizeImpl(int size)
 		const int STACK_PAGE_SIZE = 4096;
 		size = ((size + STACK_PAGE_SIZE - 1)/STACK_PAGE_SIZE)*STACK_PAGE_SIZE;
 #endif
- 		if (size < PTHREAD_STACK_MIN)
- 			size = PTHREAD_STACK_MIN;
+		if (size < PTHREAD_STACK_MIN)
+			size = PTHREAD_STACK_MIN;
 	}
- 	_pData->stackSize = size;
+	_pData->stackSize = size;
 #endif
 }
 
@@ -289,13 +236,13 @@ void ThreadImpl::setSignalMaskImpl(uint32_t sigMask)
 	sigset_t sset;
 	sigemptyset(&sset);
 
-	for (int sig = 0; sig < sizeof(uint32_t) * 8; ++sig)
+	for (std::size_t sig = 0; sig < sizeof(uint32_t) * 8; ++sig)
 	{
 		if ((sigMask & (1 << sig)) != 0)
 			sigaddset(&sset, sig);
 	}
 
-	pthread_sigmask(SIG_BLOCK, &sset, 0);
+	pthread_sigmask(SIG_BLOCK, &sset, nullptr);
 }
 
 
@@ -324,10 +271,11 @@ void ThreadImpl::startImpl(SharedPtr<Runnable> pTarget)
 	{
 		FastMutex::ScopedLock l(_pData->mutex);
 		_pData->pRunnableTarget = pTarget;
+		_pData->done.reset();
 		int errorCode;
 		if ((errorCode = pthread_create(&_pData->thread, &attributes, runnableEntry, this)))
 		{
-			_pData->pRunnableTarget = 0;
+			_pData->pRunnableTarget = nullptr;
 			pthread_attr_destroy(&attributes);
 			throw SystemException(Poco::format("cannot start thread (%s)",
 				Error::getMessage(errorCode)));
@@ -420,6 +368,71 @@ long ThreadImpl::currentOsTidImpl()
 }
 
 
+#ifndef POCO_NO_THREADNAME
+
+namespace
+{
+	std::string truncateName(const std::string& name, std::size_t maxLen = POCO_MAX_THREAD_NAME_LEN)
+	{
+		if (name.size() > maxLen)
+			return name.substr(0, maxLen).append("~");
+		return name;
+	}
+}
+
+
+void ThreadImpl::setCurrentNameImpl(const std::string& threadName)
+{
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+	#if (POCO_OS == POCO_OS_FREE_BSD)
+		pthread_setname_np(pthread_self(), truncateName(threadName).c_str());
+	#elif (POCO_OS == POCO_OS_MAC_OS_X)
+		#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+			#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
+				pthread_setname_np(truncateName(threadName).c_str());
+			#endif
+		#endif
+	#elif (POCO_OS == POCO_OS_QNX)
+		pthread_setname_np(pthread_self(), truncateName(threadName, _NTO_THREAD_NAME_MAX).c_str());
+	#else
+		prctl(PR_SET_NAME, truncateName(threadName).c_str());
+	#endif
+#endif
+}
+
+
+std::string ThreadImpl::getCurrentNameImpl()
+{
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+	constexpr std::size_t nameSize =
+	#if (POCO_OS == POCO_OS_QNX)
+		_NTO_THREAD_NAME_MAX;
+	#else
+		POCO_MAX_THREAD_NAME_LEN;
+	#endif
+	char name[nameSize + 1]{'\0'};
+	#if (POCO_OS == POCO_OS_FREE_BSD)
+		pthread_getname_np(pthread_self(), name, nameSize + 1);
+	#elif (POCO_OS == POCO_OS_MAC_OS_X)
+		#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
+			#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
+				pthread_getname_np(pthread_self(), name, nameSize + 1);
+			#endif
+		#endif
+	#elif (POCO_OS == POCO_OS_QNX)
+		pthread_getname_np(pthread_self(), name, nameSize);
+	#else
+		prctl(PR_GET_NAME, name);
+	#endif
+	return name;
+#else
+	return std::string();
+#endif
+}
+
+#endif // POCO_NO_THREADNAME
+
+
 void* ThreadImpl::runnableEntry(void* pThread)
 {
 	_currentThreadHolder.set(reinterpret_cast<ThreadImpl*>(pThread));
@@ -430,19 +443,19 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	sigaddset(&sset, SIGQUIT);
 	sigaddset(&sset, SIGTERM);
 	sigaddset(&sset, SIGPIPE);
-	pthread_sigmask(SIG_BLOCK, &sset, 0);
+	pthread_sigmask(SIG_BLOCK, &sset, nullptr);
 #endif
 
 	ThreadImpl* pThreadImpl = reinterpret_cast<ThreadImpl*>(pThread);
 #ifndef POCO_NO_THREADNAME
-	setThreadName(reinterpret_cast<Thread*>(pThread)->getName());
+	setCurrentNameImpl(reinterpret_cast<Thread*>(pThread)->getName());
 #endif
 	AutoPtr<ThreadData> pData = pThreadImpl->_pData;
 
 #ifndef POCO_NO_THREADNAME
 	{
 		FastMutex::ScopedLock lock(pData->mutex);
-		setThreadName(pData->name);
+		setCurrentNameImpl(pData->name);
 	}
 #endif
 
@@ -464,9 +477,9 @@ void* ThreadImpl::runnableEntry(void* pThread)
 	}
 
 	FastMutex::ScopedLock l(pData->mutex);
-	pData->pRunnableTarget = 0;
+	pData->pRunnableTarget = nullptr;
 	pData->done.set();
-	return 0;
+	return nullptr;
 }
 
 

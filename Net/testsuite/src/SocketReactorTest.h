@@ -16,6 +16,15 @@
 
 #include "Poco/Net/Net.h"
 #include "CppUnit/TestCase.h"
+#include "Poco/AutoPtr.h"
+
+namespace Poco {
+namespace Net {
+
+class ReadableNotification;
+class WritableNotification;
+
+} }
 
 
 class SocketReactorTest: public CppUnit::TestCase
@@ -32,6 +41,8 @@ public:
 	void testDataCollection();
 	void testSocketConnectorDeadlock();
 	void testSocketReactorWakeup();
+	void testSocketReactorRemove();
+	void testConcurrentHandlerRemoval();
 
 	void setUp();
 	void tearDown();
@@ -39,6 +50,8 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	void onReadable(const Poco::AutoPtr<Poco::Net::ReadableNotification>& pNf);
+	void onWritable(const Poco::AutoPtr<Poco::Net::WritableNotification>& pNf);
 };
 
 

@@ -24,7 +24,7 @@
 namespace Poco {
 
 
-Exception::Exception(int code): _pNested(0), _code(code)
+Exception::Exception(int code): _pNested(nullptr), _code(code)
 {
 #ifdef POCO_ENABLE_TRACE
 	std::ostringstream ostr;
@@ -35,7 +35,7 @@ Exception::Exception(int code): _pNested(0), _code(code)
 }
 
 
-Exception::Exception(const std::string& msg, int code): _msg(msg), _pNested(0), _code(code)
+Exception::Exception(const std::string& msg, int code): _msg(msg), _pNested(nullptr), _code(code)
 {
 #ifdef POCO_ENABLE_TRACE
 	std::ostringstream ostr;
@@ -46,7 +46,7 @@ Exception::Exception(const std::string& msg, int code): _msg(msg), _pNested(0), 
 }
 
 
-Exception::Exception(const std::string& msg, const std::string& arg, int code): _msg(msg), _pNested(0), _code(code)
+Exception::Exception(const std::string& msg, const std::string& arg, int code): _msg(msg), _pNested(nullptr), _code(code)
 {
 	if (!arg.empty())
 	{
@@ -78,7 +78,7 @@ Exception::Exception(const Exception& exc):
 	_msg(exc._msg),
 	_code(exc._code)
 {
-	_pNested = exc._pNested ? exc._pNested->clone() : 0;
+	_pNested = exc._pNested ? exc._pNested->clone() : nullptr;
 }
 
 
@@ -92,7 +92,7 @@ Exception& Exception::operator = (const Exception& exc)
 {
 	if (&exc != this)
 	{
-		Exception* newPNested = exc._pNested ? exc._pNested->clone() : 0;
+		Exception* newPNested = exc._pNested ? exc._pNested->clone() : nullptr;
 		delete _pNested;
 		_msg     = exc._msg;
 		_pNested = newPNested;
@@ -176,6 +176,7 @@ POCO_IMPLEMENT_EXCEPTION(RegularExpressionException, RuntimeException, "Error in
 POCO_IMPLEMENT_EXCEPTION(LibraryLoadException, RuntimeException, "Cannot load library")
 POCO_IMPLEMENT_EXCEPTION(LibraryAlreadyLoadedException, RuntimeException, "Library already loaded")
 POCO_IMPLEMENT_EXCEPTION(NoThreadAvailableException, RuntimeException, "No thread available")
+POCO_IMPLEMENT_EXCEPTION(ThreadInterruptedException, RuntimeException, "Thread interrupted")
 POCO_IMPLEMENT_EXCEPTION(PropertyNotSupportedException, RuntimeException, "Property not supported")
 POCO_IMPLEMENT_EXCEPTION(PoolOverflowException, RuntimeException, "Pool overflow")
 POCO_IMPLEMENT_EXCEPTION(NoPermissionException, RuntimeException, "No permission")

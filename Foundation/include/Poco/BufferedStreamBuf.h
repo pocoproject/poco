@@ -104,7 +104,7 @@ public:
 
 		char_traits::move(_pBuffer + (4 - putback), this->gptr() - putback, putback);
 
-		int n = readFromDevice(_pBuffer + 4, _bufsize - 4);
+		std::streamsize n = readFromDevice(_pBuffer + 4, _bufsize - 4);
 		if (n <= 0) return char_traits::eof();
 
 		this->setg(_pBuffer + (4 - putback), _pBuffer + 4, _pBuffer + 4 + n);
@@ -134,22 +134,22 @@ protected:
 	}
 
 private:
-	virtual int readFromDevice(char_type* /*buffer*/, std::streamsize /*length*/)
+	virtual std::streamsize readFromDevice(char_type* /*buffer*/, std::streamsize /*length*/)
 	{
 		return 0;
 	}
 
-	virtual int writeToDevice(const char_type* /*buffer*/, std::streamsize /*length*/)
+	virtual std::streamsize writeToDevice(const char_type* /*buffer*/, std::streamsize /*length*/)
 	{
 		return 0;
 	}
 
-	int flushBuffer()
+	std::streamsize flushBuffer()
 	{
-		int n = int(this->pptr() - this->pbase());
+		std::streamsize n = this->pptr() - this->pbase();
 		if (writeToDevice(this->pbase(), n) == n)
 		{
-			this->pbump(-n);
+			this->pbump(static_cast<int>(-n));
 			return n;
 		}
 		return -1;
@@ -164,7 +164,7 @@ private:
 // We provide an instantiation for char.
 //
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(Foundation_EXPORTS)
 extern template class BasicBufferedStreamBuf<char, std::char_traits<char>>;
 #else
 extern template class Foundation_API BasicBufferedStreamBuf<char, std::char_traits<char>>;

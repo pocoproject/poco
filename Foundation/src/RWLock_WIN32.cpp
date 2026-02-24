@@ -20,16 +20,16 @@ namespace Poco {
 
 RWLockImpl::RWLockImpl(): _readers(0), _writersWaiting(0), _writers(0)
 {
-	_mutex = CreateMutexW(NULL, FALSE, NULL);
-	if (_mutex == NULL)
+	_mutex = CreateMutexW(nullptr, FALSE, nullptr);
+	if (_mutex == nullptr)
 		throw SystemException("cannot create reader/writer lock");
 
-	_readEvent = CreateEventW(NULL, TRUE, TRUE, NULL);
-	if (_readEvent == NULL)
+	_readEvent = CreateEventW(nullptr, TRUE, TRUE, nullptr);
+	if (_readEvent == nullptr)
 		throw SystemException("cannot create reader/writer lock");
 
-	_writeEvent = CreateEventW(NULL, TRUE, TRUE, NULL);
-	if (_writeEvent == NULL)
+	_writeEvent = CreateEventW(nullptr, TRUE, TRUE, nullptr);
+	if (_writeEvent == nullptr)
 		throw SystemException("cannot create reader/writer lock");
 }
 

@@ -19,8 +19,10 @@
 
 
 #include "Poco/Data/Data.h"
+#include "Poco/Data/Column.h"
 #include "Poco/Data/AbstractExtraction.h"
 #include "Poco/Data/Bulk.h"
+#include "Poco/Data/Position.h"
 #include "Poco/Data/Preparation.h"
 #include <vector>
 
@@ -62,26 +64,26 @@ public:
 			result.resize(limit);
 	}
 
-	virtual ~BulkExtraction()
+	~BulkExtraction() override
 	{
 	}
 
-	std::size_t numOfColumnsHandled() const
+	std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<C>::size();
 	}
 
-	std::size_t numOfRowsHandled() const
+	std::size_t numOfRowsHandled() const override
 	{
 		return _rResult.size();
 	}
 
-	std::size_t numOfRowsAllowed() const
+	std::size_t numOfRowsAllowed() const override
 	{
 		return getLimit();
 	}
 
-	bool isNull(std::size_t row) const
+	bool isNull(std::size_t row) const override
 	{
 		try
 		{
@@ -93,7 +95,7 @@ public:
 		}
 	}
 
-	std::size_t extract(std::size_t col)
+	std::size_t extract(std::size_t col) override
 	{
 		AbstractExtractor::Ptr pExt = getExtractor();
 		TypeHandler<C>::extract(col, _rResult, _default, pExt);
@@ -107,11 +109,11 @@ public:
 		return _rResult.size();
 	}
 
-	virtual void reset()
+	virtual void reset() override
 	{
 	}
 
-	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t col)
+	AbstractPreparation::Ptr createPreparation(AbstractPreparator::Ptr& pPrep, std::size_t col) override
 	{
 		Poco::UInt32 limit = getLimit();
 		if (limit != _rResult.size()) _rResult.resize(limit);
@@ -162,13 +164,13 @@ public:
 	{
 	}
 
-	~InternalBulkExtraction()
+	~InternalBulkExtraction() override
 		/// Destroys InternalBulkExtraction.
 	{
 		delete _pColumn;
 	}
 
-	void reset()
+	void reset() override
 	{
 		_pColumn->reset();
 	}
@@ -185,7 +187,7 @@ public:
 		}
 	}
 
-	bool isNull(std::size_t row) const
+	bool isNull(std::size_t row) const override
 	{
 		return BulkExtraction<C>::isNull(row);
 	}
@@ -195,10 +197,11 @@ public:
 		return *_pColumn;
 	}
 
+	InternalBulkExtraction() = delete;
+	InternalBulkExtraction(const InternalBulkExtraction&) = delete;
+	InternalBulkExtraction& operator = (const InternalBulkExtraction&) = delete;
+
 private:
-	InternalBulkExtraction();
-	InternalBulkExtraction(const InternalBulkExtraction&);
-	InternalBulkExtraction& operator = (const InternalBulkExtraction&);
 
 	Column<C>* _pColumn;
 };
@@ -221,7 +224,7 @@ AbstractExtraction::Ptr into(std::vector<T>& t, BulkFnType, const Position& pos 
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::vector bulk extraction support.
 {
-	Poco::UInt32 size = static_cast<Poco::UInt32>(t.size());
+	auto size = static_cast<Poco::UInt32>(t.size());
 	if (0 == size) throw InvalidArgumentException("Zero length not allowed.");
 	return new BulkExtraction<std::vector<T>>(t, size, pos);
 }
@@ -241,7 +244,7 @@ AbstractExtraction::Ptr into(std::deque<T>& t, BulkFnType, const Position& pos =
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::deque bulk extraction support.
 {
-	Poco::UInt32 size = static_cast<Poco::UInt32>(t.size());
+	auto size = static_cast<Poco::UInt32>(t.size());
 	if (0 == size) throw InvalidArgumentException("Zero length not allowed.");
 	return new BulkExtraction<std::deque<T>>(t, size, pos);
 }
@@ -261,7 +264,7 @@ AbstractExtraction::Ptr into(std::list<T>& t, BulkFnType, const Position& pos = 
 	/// Convenience function to allow for a more compact creation of an extraction object
 	/// with std::list bulk extraction support.
 {
-	Poco::UInt32 size = static_cast<Poco::UInt32>(t.size());
+	auto size = static_cast<Poco::UInt32>(t.size());
 	if (0 == size) throw InvalidArgumentException("Zero length not allowed.");
 	return new BulkExtraction<std::list<T>>(t, size, pos);
 }

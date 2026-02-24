@@ -19,10 +19,10 @@
 #include "Poco/Util/IntValidator.h"
 #include "Poco/DNSSD/DNSSDResponder.h"
 #include "Poco/DNSSD/DNSSDBrowser.h"
-#if POCO_OS == POCO_OS_LINUX && !defined(POCO_DNSSD_USE_BONJOUR)
-#include "Poco/DNSSD/Avahi/Avahi.h"
-#else
+#if POCO_OS == POCO_OS_MAC_OS_X
 #include "Poco/DNSSD/Bonjour/Bonjour.h"
+#else
+#include "Poco/DNSSD/Avahi/Avahi.h"
 #endif
 #include "Poco/Delegate.h"
 #include "Poco/NumberParser.h"

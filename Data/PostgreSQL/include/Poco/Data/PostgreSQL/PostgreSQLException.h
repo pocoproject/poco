@@ -40,7 +40,6 @@ public:
 	explicit PostgreSQLException(const std::string& aMessage,const char * pAnSqlState);
 		/// Creates PostgreSQLException.
 
-
 	PostgreSQLException(const PostgreSQLException& exc);
 		/// Creates PostgreSQLException.
 

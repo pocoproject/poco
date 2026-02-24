@@ -75,6 +75,7 @@ SQLChannel::SQLChannel():
 	_stop(false),
 	_logged(0)
 {
+	setProperty(PROP_DIRECTORY, Path::tempHome());
 	_pLogThread->start(*this);
 }
 
@@ -106,6 +107,7 @@ SQLChannel::SQLChannel(const std::string& connector,
 	_stop(false),
 	_logged(0)
 {
+	setProperty(PROP_DIRECTORY, Path::tempHome());
 	_pLogThread->start(*this);
 }
 
@@ -237,7 +239,7 @@ bool SQLChannel::processBatch(int minBatch)
 			_text.push_back(msg.getText());
 			Poco::replaceInPlace(_text.back(), "'", "''");
 			_dateTime.emplace_back(msg.getTime());
-			if ((_source.size() >= minBatch) || flush)
+			if ((_source.size() >= static_cast<std::size_t>(minBatch)) || flush)
 				logSync(flush);
 			ret = true;
 		}
@@ -616,21 +618,21 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 	}
 	else if (name == PROP_MIN_BATCH)
 	{
-		int minBatch = NumberParser::parse(value);
+		std::size_t minBatch = NumberParser::parseUnsigned(value);
 		if (!minBatch)
 			throw Poco::InvalidArgumentException(Poco::format("SQLChannel::setProperty(%s,%s)", name, value));
 		_minBatch = minBatch;
 	}
 	else if (name == PROP_MAX_BATCH)
 	{
-		int maxBatch = NumberParser::parse(value);
+		std::size_t maxBatch = NumberParser::parseUnsigned(value);
 		if (!maxBatch)
 			throw Poco::InvalidArgumentException(Poco::format("SQLChannel::setProperty(%s,%s)", name, value));
 		_maxBatch = maxBatch;
 	}
 	else if (name == PROP_MAX_SQL)
 	{
-		int maxSQL = NumberParser::parse(value);
+		std::size_t maxSQL = NumberParser::parseUnsigned(value);
 		_maxSQL = maxSQL;
 	}
 	else if (name == PROP_BULK)
@@ -644,13 +646,12 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 	else if (name == PROP_DIRECTORY)
 	{
 		std::string dir = value;
-		if (!Path(File(dir).path()).isAbsolute())
-		{
-			Path d(dir);
-			dir = d.makeDirectory().makeAbsolute().toString();
-			File f(dir);
-			if (!f.exists()) f.createDirectories();
-		}
+
+		Path d(dir);
+		dir = d.makeDirectory().makeAbsolute().toString();
+		File f(dir);
+		if (!f.exists()) f.createDirectories();
+
 		_directory = dir;
 	}
 	else if (name == PROP_FILE)

@@ -35,20 +35,36 @@ class HTTPObserver: public AbstractObserver
 	/// See the NotificationCenter class for information on how
 	/// to use this template class.
 	///
-	/// This class template is quite similar to the Observer class
-	/// template. The differences are:
+	/// Note: Despite the similar naming, HTTPObserver is NOT related to the
+	/// deprecated Poco::Observer class. HTTPObserver derives directly from
+	/// AbstractObserver (like NObserver) and does not trigger deprecation warnings.
 	///
-	///   - HTTPObserver expects the callback function to accept a const AutoPtr&
-	///     instead of a plain pointer as argument, thus simplifying memory
-	///     management.
+	/// HTTPObserver vs NObserver:
 	///
-	///   - HTTPObserver expects the object to accept a shared pointer.
+	///   - Both use AutoPtr<N> for automatic notification memory management
 	///
-	///   - In addition to dispatching notifications based on the Notification runtime
-	///     type, HTTPObserver can also notify subscribers based on the Notification name.
-	///     To enable this functionality, a matcher function must be provided.
-	///     Null matcher means no matching is performed and all notificiations
-	///     of the type subscribed to are dispatched.
+	///   - NObserver takes a reference (C&) - observer does not own the object
+	///
+	///   - HTTPObserver takes a shared_ptr<C> - observer shares object ownership,
+	///     suitable for cases where the observed object may be destroyed while
+	///     still registered (e.g., connection objects using shared_from_this())
+	///
+	/// HTTPObserver cannot use the addNObserver() convenience method because
+	/// it requires shared_ptr ownership semantics. Instead, construct the
+	/// HTTPObserver explicitly and register it directly:
+	///
+	///     reactor.addEventHandler(socket,
+	///         HTTPObserver<MyClass, ReadableNotification>(
+	///             shared_from_this(), &MyClass::onReadable));
+	///
+	/// Or with NotificationCenter:
+	///
+	///     nc.addObserver(
+	///         HTTPObserver<MyClass, MyNotification>(
+	///             sharedPtr, &MyClass::handleNotification));
+	///
+	/// The addObserver(const AbstractObserver&) overload accepts any
+	/// AbstractObserver subclass and does not trigger deprecation warnings.
 {
 public:
 	using Type = HTTPObserver<C, N>;

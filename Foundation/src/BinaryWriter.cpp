@@ -24,7 +24,7 @@ namespace Poco {
 
 BinaryWriter::BinaryWriter(std::ostream& ostr, StreamByteOrder byteOrder):
 	_ostr(ostr),
-	_pTextConverter(0)
+	_pTextConverter(nullptr)
 {
 #if defined(POCO_ARCH_BIG_ENDIAN)
 	_flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);

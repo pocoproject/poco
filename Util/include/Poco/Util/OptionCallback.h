@@ -7,7 +7,7 @@
 //
 // Definition of the OptionCallback class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -39,8 +39,8 @@ public:
 		/// Destroys the AbstractOptionCallback.
 
 protected:
-	AbstractOptionCallback();
-	AbstractOptionCallback(const AbstractOptionCallback&);
+	AbstractOptionCallback() = default;
+	AbstractOptionCallback(const AbstractOptionCallback&) = default;
 };
 
 
@@ -53,6 +53,8 @@ class OptionCallback: public AbstractOptionCallback
 {
 public:
 	typedef void (C::*Callback)(const std::string& name, const std::string& value);
+
+	OptionCallback() = delete;
 
 	OptionCallback(C* pObject, Callback method):
 		_pObject(pObject),
@@ -70,10 +72,8 @@ public:
 	{
 	}
 
-	~OptionCallback()
+	~OptionCallback() = default;
 		/// Destroys the OptionCallback.
-	{
-	}
 
 	OptionCallback& operator = (const OptionCallback& cb)
 	{
@@ -96,8 +96,6 @@ public:
 	}
 
 private:
-	OptionCallback();
-
 	C* _pObject;
 	Callback _method;
 };

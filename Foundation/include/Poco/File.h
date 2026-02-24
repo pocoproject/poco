@@ -106,22 +106,43 @@ public:
 		/// Returns the path.
 
 	std::string absolutePath() const;
-		/// Returns absolute path.
-		/// Attempts to find the existing file
-		/// using curent work directory and the PATH
-		/// environment variable.
-		/// If the file doesn't exist, returns empty string.
+		/// Returns the absolute path.
+		///
+		/// If the path is already absolute, returns it unchanged.
+		/// If the path is relative, resolves it against the
+		/// current working directory.
+
+	std::string getExecutablePath() const;
+		/// Resolves the executable path.
+		///
+		/// If the path contains a directory separator, checks whether
+		/// it exists and is executable, resolves it to an absolute
+		/// path and returns it.
+		///
+		/// If the path is a bare filename (no directory separator),
+		/// searches the current directory and the PATH environment
+		/// variable for an executable match.
+		///
+		/// On Windows, also tries appending each PATHEXT extension
+		/// (e.g. .EXE, .CMD, .BAT) if the bare filename is not
+		/// found as-is.
+		///
+		/// Returns the fully resolved absolute path on success,
+		/// or an empty string if no executable was found.
+		///
+		/// Known limitation on Windows: If the PATH environment variable
+		/// contains UNC paths (e.g., \\server\share\bin), SearchPathW may
+		/// not find executables in those locations when searching for bare
+		/// filenames. This is a Windows API limitation, not a Poco limitation.
+		/// Workaround: Use the full UNC path including the executable name.
 
 	bool exists() const;
 		/// Returns true iff the file exists.
 
 	bool existsAnywhere() const;
-		/// If the file path is relative, searches
-		/// for the file in the current working directory
-		/// and the environment paths.
-		/// If the file path is absolute, the
-		/// functionality is identical to the
-		/// exists() call.
+		/// Returns true iff the file exists anywhere in the
+		/// file system, including in directories listed in
+		/// the PATH environment variable.
 
 	bool canRead() const;
 		/// Returns true iff the file is readable.
@@ -132,10 +153,8 @@ public:
 	bool canExecute() const;
 		/// Returns true iff the file is executable.
 		///
-		/// On Windows, the file must have
-		/// the extension ".EXE" to be executable.
-		/// On Unix platforms, the executable permission
-		/// bit must be set.
+		/// Resolves the executable path using getExecutablePath().
+		/// If the resolved path is empty, returns false.
 
 	bool isFile() const;
 		/// Returns true iff the file is a regular file.
@@ -202,18 +221,18 @@ public:
 		/// The target path can be a directory.
 		///
 		/// A directory is copied recursively.
-		/// If options is set to OPT_FAIL_ON_OVERWRITE the Method throws an FileExists Exception
+		/// If options is set to OPT_FAIL_ON_OVERWRITE the method throws a FileExistsException
 		/// if the File already exists.
 
 	void moveTo(const std::string& path, int options = 0);
 		/// Copies the file (or directory) to the given path and
 		/// removes the original file. The target path can be a directory.
-		/// If options is set to OPT_FAIL_ON_OVERWRITE the Method throws an FileExists Exception
+		/// If options is set to OPT_FAIL_ON_OVERWRITE the method throws a FileExistsException
 		/// if the File already exists.
 
 	void renameTo(const std::string& path, int options = 0);
 		/// Renames the file to the new name.
-		/// If options is set to OPT_FAIL_ON_OVERWRITE the Method throws an FileExists Exception
+		/// If options is set to OPT_FAIL_ON_OVERWRITE the method throws a FileExistsException
 		/// if the File already exists.
 
 	void linkTo(const std::string& path, LinkType type = LINK_SYMBOLIC) const;

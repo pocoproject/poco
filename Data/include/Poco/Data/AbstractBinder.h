@@ -45,7 +45,7 @@ class Transcoder;
 namespace Keywords {
 
 
-static const NullData null = std::nullopt;
+inline const NullData null = std::nullopt;
 
 
 } // namespace Keywords
@@ -365,6 +365,7 @@ protected:
 	void reverseTranscode(const std::string& from, std::string& to);
 
 	const std::string& toString(const UUID& uuid);
+	    /// Stores a string representation of uuid and returns a reference to it
 
 private:
 	using StringList = std::vector<std::string*>;

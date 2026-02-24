@@ -14,27 +14,20 @@
 
 #include "Poco/NotificationCenter.h"
 #include "Poco/Notification.h"
-#include "Poco/Observer.h"
-#include "Poco/AutoPtr.h"
+#include "Poco/RWLock.h"
 
 
 namespace Poco {
 
 
-NotificationCenter::NotificationCenter()
-{
-}
+NotificationCenter::NotificationCenter() = default;
 
 
 NotificationCenter::~NotificationCenter()
 {
 	try
 	{
-		Mutex::ScopedLock lock(_mutex);
-		for (auto& o: _observers)
-			o->disable();
-
-		_observers.clear();
+		clear();
 	}
 	catch(...)
 	{
@@ -45,30 +38,40 @@ NotificationCenter::~NotificationCenter()
 
 void NotificationCenter::addObserver(const AbstractObserver& observer)
 {
-	Mutex::ScopedLock lock(_mutex);
-	_observers.push_back(observer.clone());
-	_observers.back()->start();
+	AbstractObserverPtr pObserver = observer.clone();
+	{
+		RWLock::ScopedWriteLock lock(_mutex);
+		_observers.push_back(pObserver);
+	}
+
+	pObserver->start();
 }
 
 
 void NotificationCenter::removeObserver(const AbstractObserver& observer)
 {
-	Mutex::ScopedLock lock(_mutex);
-	for (ObserverList::iterator it = _observers.begin(); it != _observers.end(); ++it)
+	AbstractObserverPtr pObserverToDisable;
 	{
-		if (observer.equals(**it))
+		RWLock::ScopedWriteLock lock(_mutex);
+		for (auto it = _observers.begin(); it != _observers.end(); ++it)
 		{
-			(*it)->disable();
-			_observers.erase(it);
-			return;
+			if (observer.equals(**it))
+			{
+				pObserverToDisable = std::move(*it);
+				_observers.erase(it);
+				break;
+			}
 		}
 	}
+
+	if (pObserverToDisable)
+		pObserverToDisable->disable();
 }
 
 
 bool NotificationCenter::hasObserver(const AbstractObserver& observer) const
 {
-	Mutex::ScopedLock lock(_mutex);
+	RWLock::ScopedReadLock lock(_mutex);
 	for (const auto& p: _observers)
 		if (observer.equals(*p)) return true;
 
@@ -78,9 +81,14 @@ bool NotificationCenter::hasObserver(const AbstractObserver& observer) const
 
 NotificationCenter::ObserverList NotificationCenter::observersToNotify(const Notification::Ptr& pNotification) const
 {
+	ObserverList observers;
+	{
+		RWLock::ScopedReadLock lock(_mutex);
+		observers = _observers;
+	}
+
 	ObserverList ret;
-	ScopedLock<Mutex> lock(_mutex);
-	for (auto& o : _observers)
+	for (auto& o : observers)
 	{
 		if (o->accepts(pNotification))
 			ret.push_back(o);
@@ -109,7 +117,7 @@ void NotificationCenter::notifyObservers(Notification::Ptr& pNotification)
 
 bool NotificationCenter::hasObservers() const
 {
-	Mutex::ScopedLock lock(_mutex);
+	RWLock::ScopedReadLock lock(_mutex);
 
 	return !_observers.empty();
 }
@@ -117,7 +125,7 @@ bool NotificationCenter::hasObservers() const
 
 std::size_t NotificationCenter::countObservers() const
 {
-	Mutex::ScopedLock lock(_mutex);
+	RWLock::ScopedReadLock lock(_mutex);
 
 	return _observers.size();
 }
@@ -127,10 +135,10 @@ int NotificationCenter::backlog() const
 {
 	int cnt = 0;
 
-	ScopedLockWithUnlock<Mutex> lock(_mutex);
+	_mutex.readLock();
 	ObserverList observersToCount(_observers);
-	lock.unlock();
-	for (auto& p : observersToCount)
+	_mutex.unlock();
+	for (const auto& p : observersToCount)
 		cnt += p->backlog();
 
 	return cnt;
@@ -141,6 +149,19 @@ NotificationCenter& NotificationCenter::defaultCenter()
 {
 	static NotificationCenter nc;
 	return nc;
+}
+
+
+void NotificationCenter::clear()
+{
+	ObserverList observers;
+	{
+		RWLock::ScopedWriteLock lock(_mutex);
+		_observers.swap(observers);
+	}
+
+	for (auto& o: observers)
+		o->disable();
 }
 
 

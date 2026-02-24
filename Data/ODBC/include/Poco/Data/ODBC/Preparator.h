@@ -106,279 +106,279 @@ public:
 	Preparator(const Preparator& other);
 		/// Copy constructs the Preparator.
 
-	~Preparator();
+	~Preparator() override;
 		/// Destroys the Preparator.
 
-	void prepare(std::size_t pos, const Poco::Int8& val);
+	void prepare(std::size_t pos, const Poco::Int8& val) override;
 		/// Prepares an Int8.
 
-	void prepare(std::size_t pos, const std::vector<Poco::Int8>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::Int8>& val) override;
 		/// Prepares an Int8 vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::Int8>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::Int8>& val) override;
 		/// Prepares an Int8 deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::Int8>& val);
+	void prepare(std::size_t pos, const std::list<Poco::Int8>& val) override;
 		/// Prepares an Int8 list.
 
-	void prepare(std::size_t pos, const Poco::UInt8& val);
+	void prepare(std::size_t pos, const Poco::UInt8& val) override;
 		/// Prepares an UInt8.
 
-	void prepare(std::size_t pos, const std::vector<Poco::UInt8>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::UInt8>& val) override;
 		/// Prepares an UInt8 vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::UInt8>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::UInt8>& val) override;
 		/// Prepares an UInt8 deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::UInt8>& val);
+	void prepare(std::size_t pos, const std::list<Poco::UInt8>& val) override;
 		/// Prepares an UInt8 list.
 
-	void prepare(std::size_t pos, const Poco::Int16& val);
+	void prepare(std::size_t pos, const Poco::Int16& val) override;
 		/// Prepares an Int16.
 
-	void prepare(std::size_t pos, const std::vector<Poco::Int16>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::Int16>& val) override;
 		/// Prepares an Int16 vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::Int16>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::Int16>& val) override;
 		/// Prepares an Int16 deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::Int16>& val);
+	void prepare(std::size_t pos, const std::list<Poco::Int16>& val) override;
 		/// Prepares an Int16 list.
 
-	void prepare(std::size_t pos, const Poco::UInt16& val);
+	void prepare(std::size_t pos, const Poco::UInt16& val) override;
 		/// Prepares an UInt16.
 
-	void prepare(std::size_t pos, const std::vector<Poco::UInt16>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::UInt16>& val) override;
 		/// Prepares an UInt16 vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::UInt16>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::UInt16>& val) override;
 		/// Prepares an UInt16 deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::UInt16>& val);
+	void prepare(std::size_t pos, const std::list<Poco::UInt16>& val) override;
 		/// Prepares an UInt16 list.
 
-	void prepare(std::size_t pos, const Poco::Int32& val);
+	void prepare(std::size_t pos, const Poco::Int32& val) override;
 		/// Prepares an Int32.
 
-	void prepare(std::size_t pos, const std::vector<Poco::Int32>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::Int32>& val) override;
 		/// Prepares an Int32 vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::Int32>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::Int32>& val) override;
 		/// Prepares an Int32 deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::Int32>& val);
+	void prepare(std::size_t pos, const std::list<Poco::Int32>& val) override;
 		/// Prepares an Int32 list.
 
-	void prepare(std::size_t pos, const Poco::UInt32& val);
+	void prepare(std::size_t pos, const Poco::UInt32& val) override;
 		/// Prepares an UInt32.
 
-	void prepare(std::size_t pos, const std::vector<Poco::UInt32>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::UInt32>& val) override;
 		/// Prepares an UInt32 vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::UInt32>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::UInt32>& val) override;
 		/// Prepares an UInt32 deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::UInt32>& val);
+	void prepare(std::size_t pos, const std::list<Poco::UInt32>& val) override;
 		/// Prepares an UInt32 list.
 
-	void prepare(std::size_t pos, const Poco::Int64& val);
+	void prepare(std::size_t pos, const Poco::Int64& val) override;
 		/// Prepares an Int64.
 
-	void prepare(std::size_t pos, const std::vector<Poco::Int64>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::Int64>& val) override;
 		/// Prepares an Int64 vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::Int64>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::Int64>& val) override;
 		/// Prepares an Int64 deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::Int64>& val);
+	void prepare(std::size_t pos, const std::list<Poco::Int64>& val) override;
 		/// Prepares an Int64 list.
 
-	void prepare(std::size_t pos, const Poco::UInt64& val);
+	void prepare(std::size_t pos, const Poco::UInt64& val) override;
 		/// Prepares an UInt64.
 
-	void prepare(std::size_t pos, const std::vector<Poco::UInt64>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::UInt64>& val) override;
 		/// Prepares an UInt64 vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::UInt64>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::UInt64>& val) override;
 		/// Prepares an UInt64 deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::UInt64>& val);
+	void prepare(std::size_t pos, const std::list<Poco::UInt64>& val) override;
 		/// Prepares an UInt64 list.
 
 #ifndef POCO_INT64_IS_LONG
-	void prepare(std::size_t pos, const long& val);
+	void prepare(std::size_t pos, const long& val) override;
 		/// Prepares a long.
 
-	void prepare(std::size_t pos, const unsigned long& val);
+	void prepare(std::size_t pos, const unsigned long& val) override;
 		/// Prepares an unsigned long.
 
-	void prepare(std::size_t pos, const std::vector<long>& val);
+	void prepare(std::size_t pos, const std::vector<long>& val) override;
 		/// Prepares a long vector.
 
-	void prepare(std::size_t pos, const std::deque<long>& val);
+	void prepare(std::size_t pos, const std::deque<long>& val) override;
 		/// Prepares a long deque.
 
-	void prepare(std::size_t pos, const std::list<long>& val);
+	void prepare(std::size_t pos, const std::list<long>& val) override;
 		/// Prepares a long list.
 #endif
 
-	void prepare(std::size_t pos, const bool& val);
+	void prepare(std::size_t pos, const bool& val) override;
 		/// Prepares a boolean.
 
-	void prepare(std::size_t pos, const std::vector<bool>& val);
+	void prepare(std::size_t pos, const std::vector<bool>& val) override;
 		/// Prepares a boolean vector.
 
-	void prepare(std::size_t pos, const std::deque<bool>& val);
+	void prepare(std::size_t pos, const std::deque<bool>& val) override;
 		/// Prepares a boolean deque.
 
-	void prepare(std::size_t pos, const std::list<bool>& val);
+	void prepare(std::size_t pos, const std::list<bool>& val) override;
 		/// Prepares a boolean list.
 
-	void prepare(std::size_t pos, const float& val);
+	void prepare(std::size_t pos, const float& val) override;
 		/// Prepares a float.
 
-	void prepare(std::size_t pos, const std::vector<float>& val);
+	void prepare(std::size_t pos, const std::vector<float>& val) override;
 		/// Prepares a float vector.
 
-	void prepare(std::size_t pos, const std::deque<float>& val);
+	void prepare(std::size_t pos, const std::deque<float>& val) override;
 		/// Prepares a float deque.
 
-	void prepare(std::size_t pos, const std::list<float>& val);
+	void prepare(std::size_t pos, const std::list<float>& val) override;
 		/// Prepares a float list.
 
-	void prepare(std::size_t pos, const double& val);
+	void prepare(std::size_t pos, const double& val) override;
 		/// Prepares a double.
 
-	void prepare(std::size_t pos, const std::vector<double>& val);
+	void prepare(std::size_t pos, const std::vector<double>& val) override;
 		/// Prepares a double vector.
 
-	void prepare(std::size_t pos, const std::deque<double>& val);
+	void prepare(std::size_t pos, const std::deque<double>& val) override;
 		/// Prepares a double deque.
 
-	void prepare(std::size_t pos, const std::list<double>& val);
+	void prepare(std::size_t pos, const std::list<double>& val) override;
 		/// Prepares a double list.
 
-	void prepare(std::size_t pos, const char& val);
+	void prepare(std::size_t pos, const char& val) override;
 		/// Prepares a single character.
 
-	void prepare(std::size_t pos, const std::vector<char>& val);
+	void prepare(std::size_t pos, const std::vector<char>& val) override;
 		/// Prepares a single character vector.
 
-	void prepare(std::size_t pos, const std::deque<char>& val);
+	void prepare(std::size_t pos, const std::deque<char>& val) override;
 		/// Prepares a single character deque.
 
-	void prepare(std::size_t pos, const std::list<char>& val);
+	void prepare(std::size_t pos, const std::list<char>& val) override;
 		/// Prepares a single character list.
 
-	void prepare(std::size_t pos, const std::string& val);
+	void prepare(std::size_t pos, const std::string& val) override;
 		/// Prepares a string.
 
-	void prepare(std::size_t pos, const std::vector<std::string>& val);
+	void prepare(std::size_t pos, const std::vector<std::string>& val) override;
 		/// Prepares a string vector.
 
-	void prepare(std::size_t pos, const std::deque<std::string>& val);
+	void prepare(std::size_t pos, const std::deque<std::string>& val) override;
 		/// Prepares a string deque.
 
-	void prepare(std::size_t pos, const std::list<std::string>& val);
+	void prepare(std::size_t pos, const std::list<std::string>& val) override;
 		/// Prepares a string list.
 
-	void prepare(std::size_t pos, const UTF16String& val);
+	void prepare(std::size_t pos, const UTF16String& val) override;
 	/// Prepares a string.
 
-	void prepare(std::size_t pos, const std::vector<UTF16String>& val);
+	void prepare(std::size_t pos, const std::vector<UTF16String>& val) override;
 	/// Prepares a string vector.
 
-	void prepare(std::size_t pos, const std::deque<UTF16String>& val);
+	void prepare(std::size_t pos, const std::deque<UTF16String>& val) override;
 	/// Prepares a string deque.
 
-	void prepare(std::size_t pos, const std::list<UTF16String>& val);
+	void prepare(std::size_t pos, const std::list<UTF16String>& val) override;
 	/// Prepares a string list.
 
-	void prepare(std::size_t pos, const Poco::Data::BLOB& val);
+	void prepare(std::size_t pos, const Poco::Data::BLOB& val) override;
 		/// Prepares a BLOB.
 
-	void prepare(std::size_t pos, const std::vector<Poco::Data::BLOB>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::Data::BLOB>& val) override;
 		/// Prepares a BLOB vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::Data::BLOB>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::Data::BLOB>& val) override;
 		/// Prepares a BLOB deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::Data::BLOB>& val);
+	void prepare(std::size_t pos, const std::list<Poco::Data::BLOB>& val) override;
 		/// Prepares a BLOB list.
 
-	void prepare(std::size_t pos, const Poco::Data::CLOB& val);
+	void prepare(std::size_t pos, const Poco::Data::CLOB& val) override;
 		/// Prepares a CLOB.
 
-	void prepare(std::size_t pos, const std::vector<Poco::Data::CLOB>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::Data::CLOB>& val) override;
 		/// Prepares a CLOB vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::Data::CLOB>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::Data::CLOB>& val) override;
 		/// Prepares a CLOB deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::Data::CLOB>& val);
+	void prepare(std::size_t pos, const std::list<Poco::Data::CLOB>& val) override;
 		/// Prepares a CLOB list.
 
-	void prepare(std::size_t pos, const Poco::Data::Date& val);
+	void prepare(std::size_t pos, const Poco::Data::Date& val) override;
 		/// Prepares a Date.
 
-	void prepare(std::size_t pos, const std::vector<Poco::Data::Date>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::Data::Date>& val) override;
 		/// Prepares a Date vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::Data::Date>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::Data::Date>& val) override;
 		/// Prepares a Date deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::Data::Date>& val);
+	void prepare(std::size_t pos, const std::list<Poco::Data::Date>& val) override;
 		/// Prepares a Date list.
 
-	void prepare(std::size_t pos, const Poco::Data::Time& val);
+	void prepare(std::size_t pos, const Poco::Data::Time& val) override;
 		/// Prepares a Time.
 
-	void prepare(std::size_t pos, const std::vector<Poco::Data::Time>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::Data::Time>& val) override;
 		/// Prepares a Time vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::Data::Time>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::Data::Time>& val) override;
 		/// Prepares a Time deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::Data::Time>& val);
+	void prepare(std::size_t pos, const std::list<Poco::Data::Time>& val) override;
 		/// Prepares a Time list.
 
-	void prepare(std::size_t pos, const Poco::DateTime& val);
+	void prepare(std::size_t pos, const Poco::DateTime& val) override;
 		/// Prepares a DateTime.
 
-	void prepare(std::size_t pos, const std::vector<Poco::DateTime>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::DateTime>& val) override;
 		/// Prepares a DateTime vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::DateTime>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::DateTime>& val) override;
 		/// Prepares a DateTime deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::DateTime>& val);
+	void prepare(std::size_t pos, const std::list<Poco::DateTime>& val) override;
 		/// Prepares a DateTime list.
 
-	void prepare(std::size_t pos, const Poco::UUID& val);
+	void prepare(std::size_t pos, const Poco::UUID& val) override;
 		/// Prepares a UUID.
 
-	void prepare(std::size_t pos, const Poco::Any& val);
+	void prepare(std::size_t pos, const Poco::Any& val) override;
 		/// Prepares an Any.
 
-	void prepare(std::size_t pos, const std::vector<Poco::Any>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::Any>& val) override;
 		/// Prepares an Any vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::Any>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::Any>& val) override;
 		/// Prepares an Any deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::Any>& val);
+	void prepare(std::size_t pos, const std::list<Poco::Any>& val) override;
 		/// Prepares an Any list.
 
-	void prepare(std::size_t pos, const Poco::Dynamic::Var& val);
+	void prepare(std::size_t pos, const Poco::Dynamic::Var& val) override;
 		/// Prepares a Dynamic::Var.
 
-	void prepare(std::size_t pos, const std::vector<Poco::Dynamic::Var>& val);
+	void prepare(std::size_t pos, const std::vector<Poco::Dynamic::Var>& val) override;
 		/// Prepares a Dynamic::Var vector.
 
-	void prepare(std::size_t pos, const std::deque<Poco::Dynamic::Var>& val);
+	void prepare(std::size_t pos, const std::deque<Poco::Dynamic::Var>& val) override;
 		/// Prepares a Dynamic::Var deque.
 
-	void prepare(std::size_t pos, const std::list<Poco::Dynamic::Var>& val);
+	void prepare(std::size_t pos, const std::list<Poco::Dynamic::Var>& val) override;
 		/// Prepares a Dynamic::Var list.
 
 	std::size_t columns() const;
@@ -428,7 +428,7 @@ private:
 	Preparator& operator = (const Preparator&);
 
 	template <typename C>
-	void prepareImpl(std::size_t pos, const C* pVal = 0)
+	void prepareImpl(std::size_t pos, const C* pVal = nullptr)
 		/// Utility function to prepare Any and Dynamic::Var.
 	{
 		ODBCMetaColumn col(_rStmt, pos);
@@ -554,9 +554,9 @@ private:
 
 			case MetaColumn::FDT_UUID:
 				if (pVal)
-					return prepareFixedSize<DateTime>(pos, SQL_C_BINARY, 16);
+					return prepareFixedSize<Poco::UUID>(pos, SQL_C_BINARY, pVal->size());
 				else
-					return prepareFixedSize<DateTime>(pos, SQL_C_BINARY);
+					return prepareFixedSize<Poco::UUID>(pos, SQL_C_BINARY);
 
 			default:
 				throw DataFormatException("Unsupported data type.");
@@ -1185,7 +1185,7 @@ inline void Preparator::prepare(std::size_t pos, const std::list<Poco::DateTime>
 
 inline void Preparator::prepare(std::size_t pos, const Poco::UUID&)
 {
-	prepareCharArray<char, DT_CHAR_ARRAY>(pos, SQL_C_BINARY, 16, 16);
+	prepareVariableLen<char>(pos, SQL_C_BINARY, 16, DT_CHAR);
 }
 
 

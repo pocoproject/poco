@@ -9,8 +9,10 @@ namespace Net {
 
 
 TCPReactorServer::TCPReactorServer(int port, TCPServerParams::Ptr pParams)
-	: _threadPool("TCPRA", pParams->getAcceptorNum()), _reactors(pParams->getAcceptorNum()), _port(port),
-	  _pParams(pParams), _stopped(false)
+	: _threadPool("TCPRA", pParams->getAcceptorNum()),
+	  _reactors(pParams->getAcceptorNum()),
+	  _pParams(pParams),
+	  _port(port)
 {
 	for (auto& reactor : _reactors)
 	{

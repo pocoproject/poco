@@ -19,6 +19,7 @@
 
 
 #include "Poco/PDF/PDF.h"
+#include "Poco/PDF/Declarations.h"
 #include "Poco/Exception.h"
 
 

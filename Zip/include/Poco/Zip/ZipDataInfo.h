@@ -64,7 +64,7 @@ private:
 	enum
 	{
 		HEADER_POS = 0,
-		CRC32_POS  = HEADER_POS + ZipCommon::HEADER_SIZE,
+		CRC32_POS  = HEADER_POS + static_cast<int>(ZipCommon::HEADER_SIZE),
 		CRC32_SIZE = 4,
 		COMPRESSED_POS = CRC32_POS + CRC32_SIZE,
 		COMPRESSED_SIZE = 4,
@@ -115,7 +115,7 @@ private:
 	enum
 	{
 		HEADER_POS = 0,
-		CRC32_POS  = HEADER_POS + ZipCommon::HEADER_SIZE,
+		CRC32_POS  = HEADER_POS + static_cast<int>(ZipCommon::HEADER_SIZE),
 		CRC32_SIZE = 4,
 		COMPRESSED_POS = CRC32_POS + CRC32_SIZE,
 		COMPRESSED_SIZE = 8,

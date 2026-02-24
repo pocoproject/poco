@@ -23,9 +23,8 @@
 #include "Poco/Data/Date.h"
 #include "Poco/Data/Time.h"
 #include "Poco/DateTime.h"
-#include <sstream>
-#include <map>
 #include <sqltypes.h>
+#include <map>
 
 
 namespace Poco {
@@ -167,9 +166,24 @@ public:
 		for (; it != end; ++it, ++tIt) dateTimeSync(*tIt, *it);
 	}
 
+	static std::string sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type);
+		/// Returns the requested info about the DBMS or ODBC driver.
+		/// On error, returns "unknown".
+
 	static std::string dbmsName(const ConnectionHandle& db);
 		/// Returns the back end DBMS name.
-		/// On error, returns "unknown".
+
+	std::string dbmsVersion(const ConnectionHandle& db);
+		/// Returns the back end DBMS version.
+
+	std::string driverName(const ConnectionHandle& db);
+		/// Returns the driver name.
+
+	std::string driverVersion(const ConnectionHandle& db);
+		/// Returns the driver version.
+
+	std::string driverODBCVersion(const ConnectionHandle& db);
+		/// Returns the driver ODBC standard version.
 
 	template <typename T>
 	static constexpr SQLINTEGER sizeOf()

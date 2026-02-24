@@ -36,6 +36,13 @@ TypeInfo::~TypeInfo()
 }
 
 
+void TypeInfo::reset()
+{
+	_typeInfo.clear();
+	_pHDBC = nullptr;
+}
+
+
 void TypeInfo::fillCTypes()
 {
 	_cDataTypes.insert(ValueType(SQL_CHAR, SQL_C_CHAR));
@@ -95,7 +102,7 @@ void TypeInfo::fillTypeInfo(const SQLHDBC* pHDBC)
 		TypeInfoVec().swap(_typeInfo);
 
 		SQLRETURN rc;
-		SQLHSTMT hstmt = SQL_NULL_HSTMT;
+		SQLHSTMT hstmt = POCO_ODBC_NULL_HSTMT;
 
 		rc = SQLAllocHandle(SQL_HANDLE_STMT, *_pHDBC, &hstmt);
 		if (!SQL_SUCCEEDED(rc))

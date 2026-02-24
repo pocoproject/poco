@@ -7,7 +7,7 @@
 //
 // Definition of the TimerTask class.
 //
-// Copyright (c) 2009, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2009-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -43,6 +43,10 @@ public:
 	TimerTask();
 		/// Creates the TimerTask.
 
+	TimerTask(const TimerTask&) = delete;
+
+	TimerTask& operator = (const TimerTask&) = delete;
+
 	void cancel();
 		/// Cancels the execution of the timer.
 		/// If the task has been scheduled for one-time execution and has
@@ -67,13 +71,10 @@ public:
 		/// Updates the last execution of the timer task.
 
 protected:
-	~TimerTask();
+	~TimerTask() override;
 		/// Destroys the TimerTask.
 
 private:
-	TimerTask(const TimerTask&);
-	TimerTask& operator = (const TimerTask&);
-
 	Poco::Timestamp _lastExecution;
 	std::atomic<bool> _isCancelled;
 	mutable FastMutex _mutex;

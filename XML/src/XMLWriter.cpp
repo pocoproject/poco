@@ -60,7 +60,7 @@ const std::string XMLWriter::MARKUP_END_CDATA   = "]]>";
 
 
 XMLWriter::XMLWriter(XMLByteOutputStream& str, int options):
-	_pTextConverter(0),
+	_pTextConverter(nullptr),
 	_pInEncoding(new NATIVE_ENCODING),
 	_pOutEncoding(new Poco::UTF8Encoding),
 	_options(options),
@@ -83,9 +83,9 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options):
 
 
 XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Poco::TextEncoding& textEncoding):
-	_pTextConverter(0),
+	_pTextConverter(nullptr),
 	_pInEncoding(new NATIVE_ENCODING),
-	_pOutEncoding(0),
+	_pOutEncoding(nullptr),
 	_options(options),
 	_encoding(encodingName),
 	_depth(-1),
@@ -106,9 +106,9 @@ XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& e
 
 
 XMLWriter::XMLWriter(XMLByteOutputStream& str, int options, const std::string& encodingName, Poco::TextEncoding* pTextEncoding):
-	_pTextConverter(0),
+	_pTextConverter(nullptr),
 	_pInEncoding(new NATIVE_ENCODING),
-	_pOutEncoding(0),
+	_pOutEncoding(nullptr),
 	_options(options),
 	_encoding(encodingName),
 	_depth(-1),
@@ -333,7 +333,7 @@ void XMLWriter::characters(const XMLChar ch[], int start, int length)
 			case '<':  writeMarkup(MARKUP_LTENC); break;
 			case '>':  writeMarkup(MARKUP_GTENC); break;
 			default:
-				if (c >= 0 && c < 32)
+				if (static_cast<unsigned char>(c) < 32)
 				{
 					if (c == '\t' || c == '\r' || c == '\n')
 						writeXML(c);
@@ -923,7 +923,7 @@ void XMLWriter::writeAttributes(const AttributeMap& attributeMap)
 			case '\r': writeMarkup(MARKUP_CRENC); break;
 			case '\n': writeMarkup(MARKUP_LFENC); break;
 			default:
-				if (c >= 0 && c < 32)
+				if (static_cast<unsigned char>(c) < 32)
 					throw XMLException("Invalid character token.");
 				else
 					writeXML(c);
@@ -961,7 +961,7 @@ void XMLWriter::writeAttributes(const CanonicalAttributeMap& attributeMap)
 			case '\r': writeMarkup(MARKUP_CRENC); break;
 			case '\n': writeMarkup(MARKUP_LFENC); break;
 			default:
-				if (c >= 0 && c < 32)
+				if (static_cast<unsigned char>(c) < 32)
 					throw XMLException("Invalid character token.");
 				else
 					writeXML(c);

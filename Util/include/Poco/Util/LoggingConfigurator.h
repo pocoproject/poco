@@ -7,7 +7,7 @@
 //
 // Definition of the LoggingConfigurator class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -22,6 +22,7 @@
 #include "Poco/Formatter.h"
 #include "Poco/Channel.h"
 #include "Poco/Util/AbstractConfiguration.h"
+#include <string>
 
 
 namespace Poco {
@@ -95,6 +96,14 @@ class Util_API LoggingConfigurator
 	/// Furthermore, a "channel" property is supported, which can either refer
 	/// to a named channel, or which can contain an inline channel definition.
 	///
+	/// An optional "type" property can be used to specify the logger implementation.
+	/// If set to "fast", a FastLogger (based on Quill) will be used instead of the
+	/// standard Logger. FastLogger provides much lower latency (~9ns vs ~100ns) by
+	/// using asynchronous logging. If the "type" property is omitted or set to any
+	/// other value, the standard Logger is used. Note that FastLogger requires
+	/// POCO_ENABLE_FASTLOGGER to be defined; otherwise an InvalidAccessException
+	/// is thrown.
+	///
 	/// Examples:
 	///     logging.loggers.root.channel = c1
 	///     logging.loggers.root.level = warning
@@ -102,13 +111,21 @@ class Util_API LoggingConfigurator
 	///     logging.loggers.l1.channel.class = ConsoleChannel
 	///     logging.loggers.l1.channel.pattern = %s: [%p] %t
 	///     logging.loggers.l1.level = information
+	///     logging.loggers.l2.name = fastlogger1
+	///     logging.loggers.l2.type = fast
+	///     logging.loggers.l2.channel.class = ConsoleChannel
+	///     logging.loggers.l2.level = debug
 {
 public:
-	LoggingConfigurator();
+	LoggingConfigurator() = default;
 		/// Creates the LoggingConfigurator.
 
-	~LoggingConfigurator();
+	LoggingConfigurator(const LoggingConfigurator&) = delete;
+
+	~LoggingConfigurator() = default;
 		/// Destroys the LoggingConfigurator.
+
+	LoggingConfigurator& operator = (const LoggingConfigurator&) = delete;
 
 	void configure(AbstractConfiguration::Ptr pConfig);
 		/// Configures the logging subsystem based on
@@ -116,6 +133,27 @@ public:
 		///
 		/// A ConfigurationView can be used to pass only
 		/// a part of a larger configuration.
+
+	static void configure(
+		const std::string& level,
+		const std::string& pattern = "%Y-%m-%d %H:%M:%S.%i [%p] %s<%I>: %t",
+		const std::string& configTemplate =
+			"logging.loggers.root.channel = c1\n"
+			"logging.loggers.root.level = %s\n"
+			"logging.channels.c1.class = ColorConsoleChannel\n"
+			"logging.channels.c1.formatter = f1\n"
+			"logging.formatters.f1.class = PatternFormatter\n"
+			"logging.formatters.f1.pattern = %s\n"
+			"logging.formatters.f1.times = local\n");
+		/// Convenience method that configures logging with the specified
+		/// log level and pattern format.
+		///
+		/// The configTemplate uses Poco::format() placeholders:
+		///   - First %s is replaced with the level
+		///   - Second %s is replaced with the pattern
+		///
+		/// Default configuration sets up a ColorConsoleChannel with a
+		/// PatternFormatter using local time.
 
 private:
 	void configureFormatters(AbstractConfiguration::Ptr pConfig);
@@ -125,9 +163,6 @@ private:
 	Poco::Channel::Ptr createChannel(AbstractConfiguration::Ptr pConfig);
 	void configureChannel(Channel::Ptr pChannel, AbstractConfiguration::Ptr pConfig);
 	void configureLogger(AbstractConfiguration::Ptr pConfig);
-
-	LoggingConfigurator(const LoggingConfigurator&);
-	LoggingConfigurator& operator = (const LoggingConfigurator&);
 };
 
 

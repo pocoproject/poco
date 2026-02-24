@@ -11,17 +11,24 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 )
 
 add_executable(MongoDB-testrunner ${TEST_SRCS})
+set_target_properties(MongoDB-testrunner PROPERTIES DEBUG_POSTFIX "d")
 if(ANDROID)
 	add_test(
 		NAME MongoDB
 		WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-		COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/MongoDB-testrunner -DTEST_PARAMETER=-all -P ${CMAKE_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake
+		COMMAND ${CMAKE_COMMAND} -DANDROID_NDK=${ANDROID_NDK} -DLIBRARY_DIR=${CMAKE_BINARY_DIR}/lib -DUNITTEST=${CMAKE_BINARY_DIR}/bin/MongoDB-testrunner -DTEST_PARAMETER=-all -P ${PROJECT_SOURCE_DIR}/cmake/ExecuteOnAndroid.cmake
 	)
 else()
+	if(WIN32)
+		set(CPPIGNORE_FILE "${PROJECT_SOURCE_DIR}/cppignore.win")
+	else()
+		set(CPPIGNORE_FILE "${PROJECT_SOURCE_DIR}/cppignore.lnx")
+	endif()
 	add_test(
 		NAME MongoDB
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMAND MongoDB-testrunner -ignore ${CMAKE_SOURCE_DIR}/cppignore.lnx -all
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND MongoDB-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
-	set_tests_properties(MongoDB PROPERTIES ENVIRONMENT POCO_BASE=${CMAKE_SOURCE_DIR})
+	set_tests_properties(MongoDB PROPERTIES ENVIRONMENT POCO_BASE=${PROJECT_SOURCE_DIR})
 endif()
 target_link_libraries(MongoDB-testrunner PUBLIC Poco::MongoDB CppUnit)

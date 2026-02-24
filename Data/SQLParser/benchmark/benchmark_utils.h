@@ -22,13 +22,13 @@ std::string readFileContents(const std::string& file_path);
 
 #define PARSE_QUERY_BENCHMARK(name, query)\
   static void name(benchmark::State& st) {\
-    BM_ParseBenchmark(st, query);\
+	BM_ParseBenchmark(st, query);\
   }\
   BENCHMARK(name);
 
 #define TOKENIZE_QUERY_BENCHMARK(name, query)\
   static void name(benchmark::State& st) {\
-    BM_TokenizeBenchmark(st, query);\
+	BM_TokenizeBenchmark(st, query);\
   }\
   BENCHMARK(name);
 

@@ -18,6 +18,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/WebSocket.h"
 #include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/Buffer.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/BinaryReader.h"
@@ -42,6 +43,23 @@ WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, HTTPSession& s
 	poco_check_ptr(pStreamSocketImpl);
 	_pStreamSocketImpl->duplicate();
 	session.drainBuffer(_buffer);
+	// Enable TCP_NODELAY to prevent delays caused by Nagle's algorithm
+	// for small WebSocket frames. Skip for Unix domain sockets.
+	try
+	{
+#if defined(POCO_HAS_UNIX_SOCKET)
+		if (_pStreamSocketImpl->address().family() != SocketAddress::UNIX_LOCAL)
+#endif
+			_pStreamSocketImpl->setNoDelay(true);
+	}
+	catch (NetException&)
+	{
+		// Ignore - socket errors (e.g., not connected or doesn't support TCP options)
+	}
+	catch (Poco::Exception&)
+	{
+		// Ignore - other configuration errors (IOException, InvalidArgumentException, etc.)
+	}
 }
 
 
@@ -194,7 +212,7 @@ int WebSocketImpl::peekHeader(ReceiveState& receiveState)
 		Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
 		Poco::UInt64 l;
 		reader >> l;
-		if (l > _maxPayloadSize) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
+		if (l > static_cast<Poco::UInt64>(_maxPayloadSize)) throw WebSocketException("Payload too big", WebSocket::WS_ERR_PAYLOAD_TOO_BIG);
 		receiveState.payloadLength = static_cast<int>(l);
 		maskOffset = 10;
 	}
@@ -248,7 +266,7 @@ void WebSocketImpl::skipHeader(int headerLength)
 	if (headerLength > 0)
 	{
 		char header[MAX_HEADER_LENGTH];
-		int n = receiveNBytes(header, headerLength);
+		[[maybe_unused]] int n = receiveNBytes(header, headerLength);
 		poco_assert_dbg (n == headerLength);
 	}
 }

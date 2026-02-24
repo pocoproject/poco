@@ -194,11 +194,11 @@ public:
 		///
 		/// The default limit is 100.
 
-	void setValueLengthLimit(int limit);
+	void setValueLengthLimit(std::size_t limit);
 		/// Sets the maximum size for form field values
 		/// stored as strings.
 
-	int getValueLengthLimit() const;
+	std::size_t getValueLengthLimit() const;
 		/// Returns the maximum size for form field values
 		/// stored as strings.
 
@@ -232,7 +232,7 @@ private:
 	typedef std::vector<Part> PartVec;
 
 	int         _fieldLimit;
-	int         _valueLengthLimit;
+	std::size_t _valueLengthLimit;
 	std::string _encoding;
 	std::string _boundary;
 	PartVec     _parts;
@@ -260,7 +260,7 @@ inline int HTMLForm::getFieldLimit() const
 }
 
 
-inline int HTMLForm::getValueLengthLimit() const
+inline std::size_t HTMLForm::getValueLengthLimit() const
 {
 	return _valueLengthLimit;
 }

@@ -5,7 +5,7 @@
 // Package: MongoDB
 // Module:  Document
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -13,11 +13,13 @@
 
 
 #include "Poco/MongoDB/Document.h"
-#include "Poco/MongoDB/Binary.h"
-#include "Poco/MongoDB/ObjectId.h"
 #include "Poco/MongoDB/Array.h"
-#include "Poco/MongoDB/RegularExpression.h"
+#include "Poco/MongoDB/Binary.h"
 #include "Poco/MongoDB/JavaScriptCode.h"
+#include "Poco/MongoDB/ObjectId.h"
+#include "Poco/MongoDB/RegularExpression.h"
+#include "Poco/Exception.h"
+#include "Poco/Timestamp.h"
 #include <sstream>
 
 
@@ -43,17 +45,27 @@ Array& Document::addNewArray(const std::string& name)
 }
 
 
+void Document::rebuildElementSet() const
+{
+	_elementSet.clear();
+	for (const auto& elem : _elements)
+	{
+		_elementSet.insert(elem);
+	}
+	_elementSetValid = true;
+}
+
+
 Element::Ptr Document::get(const std::string& name) const
 {
-	Element::Ptr element;
-
-	auto it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
-	if (it != _elements.end())
+	if (!_elementSetValid)
 	{
-		return *it;
+		rebuildElementSet();
 	}
-
-	return element;
+	auto it = _elementSet.find(name);
+	if (it == _elementSet.end())
+		return nullptr;
+	return *it;
 }
 
 
@@ -64,18 +76,19 @@ Int64 Document::getInteger(const std::string& name) const
 
 	if (ElementTraits<double>::TypeId == element->type())
 	{
-		ConcreteElement<double>* concrete = dynamic_cast<ConcreteElement<double>*>(element.get());
-		if (concrete) return static_cast<Int64>(concrete->value());
+		// Type is already verified, static_cast is safe and ~10x faster than dynamic_cast
+		auto* concrete = static_cast<ConcreteElement<double>*>(element.get());
+		return static_cast<Int64>(concrete->value());
 	}
 	else if (ElementTraits<Int32>::TypeId == element->type())
 	{
-		ConcreteElement<Int32>* concrete = dynamic_cast<ConcreteElement<Int32>*>(element.get());
-		if (concrete) return concrete->value();
+		auto* concrete = static_cast<ConcreteElement<Int32>*>(element.get());
+		return concrete->value();
 	}
 	else if (ElementTraits<Int64>::TypeId == element->type())
 	{
-		ConcreteElement<Int64>* concrete = dynamic_cast<ConcreteElement<Int64>*>(element.get());
-		if (concrete) return concrete->value();
+		auto* concrete = static_cast<ConcreteElement<Int64>*>(element.get());
+		return concrete->value();
 	}
 	throw Poco::BadCastException("Invalid type mismatch!");
 }
@@ -142,7 +155,7 @@ void Document::read(BinaryReader& reader)
 		default:
 			{
 				std::stringstream ss;
-				ss << "Element " << name << " contains an unsupported type 0x" << std::hex << (int) type;
+				ss << "Element " << name << " contains an unsupported type 0x" << std::hex << static_cast<int>(type);
 				throw Poco::NotImplementedException(ss.str());
 			}
 		//TODO: x0F -> JavaScript code with scope
@@ -155,19 +168,22 @@ void Document::read(BinaryReader& reader)
 
 		reader >> type;
 	}
+	// Set will be built lazily on first get() call
+	_elementSetValid = false;
 }
 
 
 std::string Document::toString(int indent) const
 {
 	std::ostringstream oss;
+	// Pre-reserve reasonable capacity for small-medium documents to reduce reallocations
+	oss.str().reserve(256);
 
 	oss << '{';
 
 	if (indent > 0) oss << std::endl;
 
-
-	for (auto it = _elements.begin(), total = _elements.end(); it != total; ++it)
+	for (auto it = _elements.begin(); it != _elements.end(); ++it)
 	{
 		if (it != _elements.begin())
 		{
@@ -175,12 +191,17 @@ std::string Document::toString(int indent) const
 			if (indent > 0) oss << std::endl;
 		}
 
-		for (int i = 0; i < indent; ++i) oss << ' ';
+		if (indent > 0)
+		{
+			const std::string indentStr(indent, ' ');
+			oss << indentStr;
+		}
 
-		oss << '"' << (*it)->name() << '"';
+		const auto& element = *it;
+		oss << '"' << element->name() << '"';
 		oss << (indent > 0  ? " : " : ":");
 
-		oss << (*it)->toString(indent > 0 ? indent + 2 : 0);
+		oss << element->toString(indent > 0 ? indent + 2 : 0);
 	}
 
 	if (indent > 0)
@@ -188,7 +209,8 @@ std::string Document::toString(int indent) const
 		oss << std::endl;
 		if (indent >= 2) indent -= 2;
 
-		for (int i = 0; i < indent; ++i) oss << ' ';
+		const std::string indentStr(indent, ' ');
+		oss << indentStr;
 	}
 
 	oss << '}';
@@ -197,7 +219,7 @@ std::string Document::toString(int indent) const
 }
 
 
-void Document::write(BinaryWriter& writer)
+void Document::write(BinaryWriter& writer) const
 {
 	if (_elements.empty())
 	{
@@ -207,11 +229,10 @@ void Document::write(BinaryWriter& writer)
 	{
 		std::stringstream sstream;
 		Poco::BinaryWriter tempWriter(sstream, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
-		for (ElementSet::iterator it = _elements.begin(); it != _elements.end(); ++it)
+		for (const auto& element : _elements)
 		{
-			tempWriter << static_cast<unsigned char>((*it)->type());
-			BSONWriter(tempWriter).writeCString((*it)->name());
-			Element::Ptr element = *it;
+			tempWriter << static_cast<unsigned char>(element->type());
+			BSONWriter(tempWriter).writeCString(element->name());
 			element->write(tempWriter);
 		}
 		tempWriter.flush();
@@ -221,6 +242,51 @@ void Document::write(BinaryWriter& writer)
 		writer.writeRaw(sstream.str());
 	}
 	writer << '\0';
+}
+
+
+void Document::reserve(std::size_t size)
+{
+	_elements.reserve(size);
+	// Note: std::set doesn't support reserve()
+}
+
+
+Document& Document::addElement(Element::Ptr element)
+{
+	const std::string& name = element->name();
+
+	// Linear scan for duplicate check (faster for typical document sizes)
+	auto it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
+	if (it != _elements.end())
+	{
+		// Replace existing element
+		*it = element;
+	}
+	else
+	{
+		// New element: add to vector
+		_elements.push_back(element);
+	}
+
+	// Invalidate set - will be rebuilt lazily on first get()
+	_elementSetValid = false;
+	return *this;
+}
+
+
+bool Document::remove(const std::string& name)
+{
+	// Linear scan to find element
+	auto it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
+	if (it == _elements.end())
+		return false;
+
+	_elements.erase(it);
+
+	// Invalidate set - will be rebuilt lazily on first get()
+	_elementSetValid = false;
+	return true;
 }
 
 

@@ -60,6 +60,7 @@ CPackConfig.cmake
 CPackSourceConfig.cmake
 cmake_*
 cmake-build-*
+*Targets_installed.cmake
 
 # Packages #
 ############
@@ -174,3 +175,4 @@ node_modules
 # Debug files #
 ##############
 *.core
+

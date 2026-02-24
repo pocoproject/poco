@@ -130,7 +130,7 @@ public:
 		if ( RedisTypeTraits<T>::TypeId == element->type() )
 		{
 			auto* concrete = dynamic_cast<Type<T>* >(element.get());
-			if ( concrete != NULL ) return concrete->value();
+			if ( concrete != nullptr ) return concrete->value();
 		}
 		throw BadCastException();
 	}

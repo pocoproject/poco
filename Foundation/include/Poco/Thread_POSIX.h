@@ -87,6 +87,10 @@ public:
 	static ThreadImpl* currentImpl();
 	static TIDImpl currentTidImpl();
 	static long currentOsTidImpl();
+#ifndef POCO_NO_THREADNAME
+	static void setCurrentNameImpl(const std::string& name);
+	static std::string getCurrentNameImpl();
+#endif
 	bool setAffinityImpl(int coreID);
 	int getAffinityImpl() const;
 
@@ -124,7 +128,7 @@ private:
 	struct ThreadData: public RefCountedObject
 	{
 		ThreadData():
-			thread(0),
+			thread{},
 			prio(PRIO_NORMAL_IMPL),
 			osPrio(),
 			policy(SCHED_OTHER),

@@ -26,42 +26,42 @@ namespace Net {
 
 
 HTTPSession::HTTPSession():
-	_pBuffer(0),
-	_pCurrent(0),
-	_pEnd(0),
+	_pBuffer(nullptr),
+	_pCurrent(nullptr),
+	_pEnd(nullptr),
 	_keepAlive(false),
 	_connectionTimeout(HTTP_DEFAULT_CONNECTION_TIMEOUT),
 	_receiveTimeout(HTTP_DEFAULT_TIMEOUT),
 	_sendTimeout(HTTP_DEFAULT_TIMEOUT),
-	_pException(0)
+	_pException(nullptr)
 {
 }
 
 
 HTTPSession::HTTPSession(const StreamSocket& socket):
 	_socket(socket),
-	_pBuffer(0),
-	_pCurrent(0),
-	_pEnd(0),
+	_pBuffer(nullptr),
+	_pCurrent(nullptr),
+	_pEnd(nullptr),
 	_keepAlive(false),
 	_connectionTimeout(HTTP_DEFAULT_CONNECTION_TIMEOUT),
 	_receiveTimeout(HTTP_DEFAULT_TIMEOUT),
 	_sendTimeout(HTTP_DEFAULT_TIMEOUT),
-	_pException(0)
+	_pException(nullptr)
 {
 }
 
 
 HTTPSession::HTTPSession(const StreamSocket& socket, bool keepAlive):
 	_socket(socket),
-	_pBuffer(0),
-	_pCurrent(0),
-	_pEnd(0),
+	_pBuffer(nullptr),
+	_pCurrent(nullptr),
+	_pEnd(nullptr),
 	_keepAlive(keepAlive),
 	_connectionTimeout(HTTP_DEFAULT_CONNECTION_TIMEOUT),
 	_receiveTimeout(HTTP_DEFAULT_TIMEOUT),
 	_sendTimeout(HTTP_DEFAULT_TIMEOUT),
-	_pException(0)
+	_pException(nullptr)
 {
 }
 
@@ -196,7 +196,9 @@ void HTTPSession::connect(const SocketAddress& address)
 	_socket.connect(address, _connectionTimeout);
 	_socket.setReceiveTimeout(_receiveTimeout);
 	_socket.setSendTimeout(_sendTimeout);
+#if defined(POCO_HAS_UNIX_SOCKET)
 	if (address.family() != SocketAddress::UNIX_LOCAL)
+#endif
 		_socket.setNoDelay(true);
 	// There may be leftover data from a previous (failed) request in the buffer,
 	// so we clear it.
@@ -234,7 +236,7 @@ void HTTPSession::setException(const Poco::Exception& exc)
 void HTTPSession::clearException()
 {
 	delete _pException;
-	_pException = 0;
+	_pException = nullptr;
 }
 
 

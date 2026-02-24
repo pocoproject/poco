@@ -19,7 +19,6 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Data/ODBC/Error.h"
 #include "Poco/Data/DataException.h"
@@ -141,7 +140,7 @@ private:
 // explicit instantiation definition
 #ifndef POCO_DOC
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(ODBC_EXPORTS)
 extern template class HandleException<SQLHENV, SQL_HANDLE_ENV>;
 extern template class HandleException<SQLHDBC, SQL_HANDLE_DBC>;
 extern template class HandleException<SQLHSTMT, SQL_HANDLE_STMT>;

@@ -89,7 +89,7 @@ void Net_API uninitializeNetwork();
 	/// (Windows only, no-op elsewhere)
 
 
-std::string htmlize(const std::string& str);
+std::string Net_API htmlize(const std::string& str);
 	/// Returns a copy of html with reserved HTML
 	/// characters (<, >, ", &) propery escaped.
 
@@ -103,9 +103,9 @@ std::string htmlize(const std::string& str);
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT)
 
-extern "C" const struct Net_API NetworkInitializer pocoNetworkInitializer;
+extern "C" const struct NetworkInitializer Net_API pocoNetworkInitializer;
 
-#if defined(POCO_COMPILER_MINGW)
+#if defined(POCO_COMPILER_MINGW) || defined(__clang__)
 	#define POCO_NET_FORCE_SYMBOL(x) static void *__ ## x ## _fp = (void*)&x;
 #elif defined(Net_EXPORTS)
 	#if defined(_WIN64)

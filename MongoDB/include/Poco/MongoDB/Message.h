@@ -7,7 +7,7 @@
 //
 // Definition of the Message class.
 //
-// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2012-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -18,12 +18,10 @@
 #define MongoDB_Message_INCLUDED
 
 
-#include "Poco/Net/Socket.h"
-#include "Poco/BinaryReader.h"
-#include "Poco/BinaryWriter.h"
-#include "Poco/MongoDB/MongoDB.h"
+#include "Poco/Bugcheck.h"
 #include "Poco/MongoDB/MessageHeader.h"
-#include <sstream>
+#include "Poco/MongoDB/MongoDB.h"
+#include "Poco/Types.h"
 
 
 namespace Poco {
@@ -32,6 +30,9 @@ namespace MongoDB {
 
 class MongoDB_API Message
 	/// Base class for all messages send or retrieved from MongoDB server.
+	///
+	/// INTERNAL: This is a base class for OpMsgMessage and not intended
+	/// for direct use. Use OpMsgMessage instead.
 {
 public:
 	explicit Message(MessageHeader::OpCode opcode);
@@ -40,7 +41,7 @@ public:
 	virtual ~Message();
 		/// Destructor
 
-	MessageHeader& header();
+	[[nodiscard]] MessageHeader& header();
 		/// Returns the message header
 
 protected:

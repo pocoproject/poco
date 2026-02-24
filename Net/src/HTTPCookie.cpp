@@ -33,6 +33,7 @@ using Poco::DateTimeParser;
 using Poco::NumberFormatter;
 using Poco::NumberParser;
 using Poco::icompare;
+using namespace std::string_literals;
 
 
 namespace Poco {
@@ -71,51 +72,51 @@ HTTPCookie::HTTPCookie(const NameValueCollection& nvc):
 	{
 		const std::string& name  = p.first;
 		const std::string& value = p.second;
-		if (icompare(name, "comment") == 0)
+		if (icompare(name, "Comment"s) == 0)
 		{
-			setComment(value);
+			_comment = value;
 		}
-		else if (icompare(name, "domain") == 0)
+		else if (icompare(name, "Domain"s) == 0)
 		{
 			setDomain(value);
 		}
-		else if (icompare(name, "path") == 0)
+		else if (icompare(name, "Path"s) == 0)
 		{
 			setPath(value);
 		}
-		else if (icompare(name, "priority") == 0)
+		else if (icompare(name, "Priority"s) == 0)
 		{
 			setPriority(value);
 		}
-		else if (icompare(name, "max-age") == 0)
+		else if (icompare(name, "Max-Age"s) == 0)
 		{
 			setMaxAge(NumberParser::parse(value));
 		}
-		else if (icompare(name, "secure") == 0)
-		{
-			setSecure(true);
-		}
-		else if (icompare(name, "expires") == 0)
+		else if (icompare(name, "Expires"s) == 0)
 		{
 			int tzd;
 			DateTime exp = DateTimeParser::parse(value, tzd);
 			Timestamp now;
 			setMaxAge((int) ((exp.timestamp() - now) / Timestamp::resolution()));
 		}
-		else if (icompare(name, "SameSite") == 0)
+		else if (icompare(name, "Secure"s) == 0)
 		{
-			if (icompare(value, "None") == 0)
+			setSecure(true);
+		}
+		else if (icompare(name, "SameSite"s) == 0)
+		{
+			if (icompare(value, "None"s) == 0)
 				_sameSite = SAME_SITE_NONE;
-			else if (icompare(value, "Lax") == 0)
+			else if (icompare(value, "Lax"s) == 0)
 				_sameSite = SAME_SITE_LAX;
-			else if (icompare(value, "Strict") == 0)
+			else if (icompare(value, "Strict"s) == 0)
 				_sameSite = SAME_SITE_STRICT;
 		}
-		else if (icompare(name, "version") == 0)
+		else if (icompare(name, "Version"s) == 0)
 		{
-			setVersion(NumberParser::parse(value));
+			_version = NumberParser::parse(value);
 		}
-		else if (icompare(name, "HttpOnly") == 0)
+		else if (icompare(name, "HttpOnly"s) == 0)
 		{
 			setHttpOnly(true);
 		}
@@ -255,16 +256,16 @@ std::string HTTPCookie::toString() const
 	result.append("=");
 	if (_version == 0)
 	{
-		// Netscape cookie
+		// RFC 6265 (formerly Netscape) cookie
 		result.append(_value);
 		if (!_domain.empty())
 		{
-			result.append("; domain=");
+			result.append("; Domain=");
 			result.append(_domain);
 		}
 		if (!_path.empty())
 		{
-			result.append("; path=");
+			result.append("; Path=");
 			result.append(_path);
 		}
 		if (!_priority.empty())
@@ -276,7 +277,7 @@ std::string HTTPCookie::toString() const
 		{
 			Timestamp ts;
 			ts += _maxAge * Timestamp::resolution();
-			result.append("; expires=");
+			result.append("; Expires=");
 			DateTimeFormatter::append(result, ts, DateTimeFormat::HTTP_FORMAT);
 		}
 		switch (_sameSite)
@@ -295,7 +296,7 @@ std::string HTTPCookie::toString() const
 		}
 		if (_secure)
 		{
-			result.append("; secure");
+			result.append("; Secure");
 		}
 		if (_httpOnly)
 		{
@@ -355,7 +356,7 @@ std::string HTTPCookie::toString() const
 		}
 		if (_secure)
 		{
-			result.append("; secure");
+			result.append("; Secure");
 		}
 		if (_httpOnly)
 		{

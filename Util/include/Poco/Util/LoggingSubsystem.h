@@ -7,7 +7,7 @@
 //
 // Definition of the LoggingSubsystem class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -36,13 +36,14 @@ class Util_API LoggingSubsystem: public Subsystem
 	/// is not specified.
 {
 public:
-	LoggingSubsystem();
-	const char* name() const;
+	LoggingSubsystem() = default;
+
+	const char* name() const override;
 
 protected:
-	void initialize(Application& self);
-	void uninitialize();
-	~LoggingSubsystem();
+	void initialize(Application& self) override;
+	void uninitialize() override;
+	~LoggingSubsystem() = default;
 };
 
 

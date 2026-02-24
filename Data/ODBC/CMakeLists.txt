@@ -54,7 +54,7 @@ find_file(
 if (_msodbc_h)
 	get_filename_component(MSODBC_DIR ${_msodbc_h} DIRECTORY CACHE)
 	message(STATUS "ODBC: Found msodbcsql.h in: ${MSODBC_DIR}")
-	target_include_directories(DataODBC PUBLIC "${MSODBC_DIR}")
+	target_include_directories(DataODBC SYSTEM PRIVATE "${MSODBC_DIR}")
 
 	if (ENABLE_DATA_SQL_SERVER_BIG_STRINGS)
 		target_compile_definitions(DataODBC PUBLIC POCO_DATA_SQL_SERVER_BIG_STRINGS=1)

@@ -152,9 +152,9 @@ public:
 	}
 
 private:
-	Notifier();
-	Notifier(const Notifier&);
-	Notifier& operator=(const Notifier&);
+	Notifier() = delete;
+	Notifier(const Notifier&) = delete;
+	Notifier& operator=(const Notifier&) = delete;
 
 	const Session&     _session;
 	std::string        _table;

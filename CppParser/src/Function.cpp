@@ -213,7 +213,7 @@ bool Function::isVirtual() const
 		Struct* pClass = dynamic_cast<Struct*>(nameSpace());
 		return pClass && pClass->hasVirtualDestructor();
 	}
-	else return getOverridden() != 0;
+	else return getOverridden() != nullptr;
 }
 
 
@@ -235,7 +235,7 @@ Function* Function::getOverridden() const
 			}
 		}
 	}
-	return 0;
+	return nullptr;
 }
 
 

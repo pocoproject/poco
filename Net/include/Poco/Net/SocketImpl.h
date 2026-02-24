@@ -24,6 +24,7 @@
 #include "Poco/RefCountedObject.h"
 #include "Poco/Timespan.h"
 #include "Poco/Buffer.h"
+#include <atomic>
 
 
 namespace Poco {
@@ -578,7 +579,7 @@ private:
 	SocketImpl(const SocketImpl&);
 	SocketImpl& operator = (const SocketImpl&);
 
-	poco_socket_t  _sockfd;
+	std::atomic<poco_socket_t>  _sockfd;
 	Poco::Timespan _recvTimeout;
 	Poco::Timespan _sndTimeout;
 	bool           _blocking;
@@ -606,13 +607,13 @@ inline SocketImpl::Type SocketImpl::type()
 
 inline poco_socket_t SocketImpl::sockfd() const
 {
-	return _sockfd;
+	return _sockfd.load();
 }
 
 
 inline bool SocketImpl::initialized() const
 {
-	return _sockfd != POCO_INVALID_SOCKET;
+	return _sockfd.load() != POCO_INVALID_SOCKET;
 }
 
 

@@ -217,7 +217,7 @@ public:
 	static const std::string PROP_TABLE;
 	static const std::string PROP_ARCHIVE_TABLE;
 	static const std::string PROP_MAX_AGE;
-	POCO_DEPRECATED("") static const std::string PROP_ASYNC;
+	POCO_DEPRECATED("Not used, pending removal.") static const std::string PROP_ASYNC;
 	static const std::string PROP_TIMEOUT;
 	static const std::string PROP_MIN_BATCH;
 	static const std::string PROP_MAX_BATCH;
@@ -291,9 +291,9 @@ private:
 	std::string       _table;
 	std::atomic<bool> _tableChanged;
 	std::atomic<int>  _timeout;
-	std::atomic<int>  _minBatch;
-	std::atomic<int>  _maxBatch;
-	std::atomic<int>  _maxSQL;
+	std::atomic<std::size_t>  _minBatch;
+	std::atomic<std::size_t>  _maxBatch;
+	std::atomic<std::size_t>  _maxSQL;
 	std::atomic<bool> _bulk;
 	std::atomic<bool> _throw;
 	std::atomic<int>  _flush;

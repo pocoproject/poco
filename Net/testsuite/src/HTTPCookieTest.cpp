@@ -8,6 +8,11 @@
 //
 
 
+#ifndef POCO_SILENCE_DEPRECATED
+#define POCO_SILENCE_DEPRECATED
+#endif
+
+
 #include "HTTPCookieTest.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
@@ -50,26 +55,26 @@ void HTTPCookieTest::testCookie()
 	assertTrue (cookie.getValue() == "value");
 	assertTrue (cookie.toString() == "name=value");
 	cookie.setPath("/");
-	assertTrue (cookie.toString() == "name=value; path=/");
+	assertTrue (cookie.toString() == "name=value; Path=/");
 	cookie.setComment("comment");
-	assertTrue (cookie.toString() == "name=value; path=/");
+	assertTrue (cookie.toString() == "name=value; Path=/");
 	cookie.setDomain("appinf.com");
-	assertTrue (cookie.toString() == "name=value; domain=appinf.com; path=/");
+	assertTrue (cookie.toString() == "name=value; Domain=appinf.com; Path=/");
 	cookie.setSecure(true);
-	assertTrue (cookie.toString() == "name=value; domain=appinf.com; path=/; secure");
+	assertTrue (cookie.toString() == "name=value; Domain=appinf.com; Path=/; Secure");
 	cookie.setHttpOnly(true);
-	assertTrue (cookie.toString() == "name=value; domain=appinf.com; path=/; secure; HttpOnly");
+	assertTrue (cookie.toString() == "name=value; Domain=appinf.com; Path=/; Secure; HttpOnly");
 	cookie.setPriority("Low");
-	assertTrue (cookie.toString() == "name=value; domain=appinf.com; path=/; Priority=Low; secure; HttpOnly");
+	assertTrue (cookie.toString() == "name=value; Domain=appinf.com; Path=/; Priority=Low; Secure; HttpOnly");
 	cookie.setPriority("Medium");
-	assertTrue (cookie.toString() == "name=value; domain=appinf.com; path=/; Priority=Medium; secure; HttpOnly");
+	assertTrue (cookie.toString() == "name=value; Domain=appinf.com; Path=/; Priority=Medium; Secure; HttpOnly");
 	cookie.setPriority("High");
-	assertTrue (cookie.toString() == "name=value; domain=appinf.com; path=/; Priority=High; secure; HttpOnly");
+	assertTrue (cookie.toString() == "name=value; Domain=appinf.com; Path=/; Priority=High; Secure; HttpOnly");
 	cookie.setPriority("");
 	cookie.setHttpOnly(false);
 
 	cookie.setVersion(1);
-	assertTrue (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; secure; Version=\"1\"");
+	assertTrue (cookie.toString() == "name=\"value\"; Comment=\"comment\"; Domain=\"appinf.com\"; Path=\"/\"; Secure; Version=\"1\"");
 
 	cookie.setSecure(false);
 	cookie.setMaxAge(100);
@@ -153,8 +158,8 @@ void HTTPCookieTest::testCookieExpiry(DateTime expiryTime)
 {
 	NameValueCollection nvc;
 	nvc.add("name", "value");
-	std::string expiryString = DateTimeFormatter::format(expiryTime.timestamp(),DateTimeFormat::HTTP_FORMAT);
-	nvc.add("expires", expiryString);
+	std::string expiryString = DateTimeFormatter::format(expiryTime.timestamp(), DateTimeFormat::HTTP_FORMAT);
+	nvc.add("Expires", expiryString);
 
 	Timestamp before; //start of cookie lifetime
 	HTTPCookie cookie(nvc); //cookie created
@@ -170,7 +175,7 @@ void HTTPCookieTest::testCookieExpiry(DateTime expiryTime)
 	Timespan delta = after - before;
 
 	//pull out cookie expire time string
-	size_t startPos = cookieStringV0.find("expires=") + 8;
+	size_t startPos = cookieStringV0.find("Expires=") + 8;
 	std::string cookieExpireTimeStr = cookieStringV0.substr(startPos, cookieStringV0.find(";", startPos));
 	//convert to a DateTime
 	int tzd;

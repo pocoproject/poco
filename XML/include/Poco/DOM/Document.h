@@ -60,7 +60,7 @@ class XML_API Document: public AbstractContainerNode, public DocumentEvent
 public:
 	using AutoReleasePool = Poco::AutoReleasePool<DOMObject>;
 
-	explicit Document(NamePool* pNamePool = 0);
+	explicit Document(NamePool* pNamePool = nullptr);
 		/// Creates a new document. If pNamePool == 0, the document
 		/// creates its own name pool, otherwise it uses the given name pool.
 		/// Sharing a name pool makes sense for documents containing instances
@@ -70,7 +70,7 @@ public:
 		/// Creates a new document using a name pool with the given size, which
 		/// should be a prime number (e.g., 251, 509, 1021, 4093).
 
-	Document(DocumentType* pDocumentType, NamePool* pNamePool = 0);
+	Document(DocumentType* pDocumentType, NamePool* pNamePool = nullptr);
 		/// Creates a new document. If pNamePool == 0, the document
 		/// creates its own name pool, otherwise it uses the given name pool.
 		/// Sharing a name pool makes sense for documents containing instances

@@ -259,6 +259,15 @@ void RegularExpressionTest::testSubst4()
 }
 
 
+void RegularExpressionTest::testSubst5()
+{
+	RegularExpression re("\\s+$", RegularExpression::RE_MULTILINE | RegularExpression::RE_NEWLINE_ANYCRLF);
+	std::string s = "ABC 123  \n456 789 \nDEF  ";
+	assertTrue (re.subst(s, "", RegularExpression::RE_GLOBAL) == 3);
+	assertTrue (s == "ABC 123\n456 789\nDEF");
+}
+
+
 void RegularExpressionTest::testError()
 {
 	try
@@ -280,6 +289,41 @@ void RegularExpressionTest::testGroup()
 	assertTrue (matches[0].name == "");
 	assertTrue (matches[1].name == "group1");
 	assertTrue (matches[2].name == "group2");
+}
+
+
+void RegularExpressionTest::testMatchCaptureGroupCount()
+{
+	// Reproduces a bug where the MatchVec overload of match() returned
+	// only 1 result (full match) instead of 2 (full match + capture group).
+	// This caused JSONConfiguration::getIndexes() to fail when parsing
+	// array indices like "prop3[1]" because matches[1] was missing.
+	RegularExpression re("\\[([0-9]+)\\]");
+	RegularExpression::MatchVec matches;
+
+	assertTrue (re.match("prop3[1]", 0, matches) == 2);
+	assertTrue (matches.size() == 2);
+	// matches[0] is the full match: "[1]"
+	assertTrue (matches[0].offset == 5);
+	assertTrue (matches[0].length == 3);
+	// matches[1] is the captured group: "1"
+	assertTrue (matches[1].offset == 6);
+	assertTrue (matches[1].length == 1);
+
+	// Verify the captured substring is the index number
+	std::string num("prop3[1]", matches[1].offset, matches[1].length);
+	assertTrue (num == "1");
+
+	// Also test with a multi-digit index
+	assertTrue (re.match("arr[42]", 0, matches) == 2);
+	assertTrue (matches.size() == 2);
+	assertTrue (matches[0].offset == 3);
+	assertTrue (matches[0].length == 4);
+	assertTrue (matches[1].offset == 4);
+	assertTrue (matches[1].length == 2);
+
+	std::string num2("arr[42]", matches[1].offset, matches[1].length);
+	assertTrue (num2 == "42");
 }
 
 
@@ -312,8 +356,10 @@ CppUnit::Test* RegularExpressionTest::suite()
 	CppUnit_addTest(pSuite, RegularExpressionTest, testSubst2);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testSubst3);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testSubst4);
+	CppUnit_addTest(pSuite, RegularExpressionTest, testSubst5);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testError);
 	CppUnit_addTest(pSuite, RegularExpressionTest, testGroup);
+	CppUnit_addTest(pSuite, RegularExpressionTest, testMatchCaptureGroupCount);
 
 	return pSuite;
 }

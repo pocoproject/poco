@@ -24,9 +24,9 @@ namespace Data {
 namespace ODBC {
 
 
-EnvironmentHandle::EnvironmentHandle(): _henv(SQL_NULL_HENV)
+EnvironmentHandle::EnvironmentHandle(): _henv(POCO_ODBC_NULL_HENV)
 {
-	SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &_henv);
+	SQLRETURN rc = SQLAllocHandle(SQL_HANDLE_ENV, POCO_ODBC_NULL_HANDLE, &_henv);
 	if (Utility::isError(rc))
 		throw ODBCException("EnvironmentHandle: Could not initialize ODBC environment.");
 

@@ -83,8 +83,8 @@ public:
 private:
 	void clearResults();
 
-	StatementExecutor(const StatementExecutor&);
-	StatementExecutor& operator= (const StatementExecutor&);
+	StatementExecutor(const StatementExecutor&) = delete;
+	StatementExecutor& operator= (const StatementExecutor&) = delete;
 
 private:
 	typedef std::vector<MetaColumn> ColVec;

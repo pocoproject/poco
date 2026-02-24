@@ -20,17 +20,14 @@
 
 #include "Poco/Data/Data.h"
 #include "Poco/Data/Session.h"
-#include "Poco/Data/BulkExtraction.h"
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/RowIterator.h"
 #include "Poco/Data/RowFilter.h"
-#include "Poco/Data/LOB.h"
 #include "Poco/String.h"
 #include "Poco/Dynamic/Var.h"
 #include "Poco/Exception.h"
 #include "Poco/AutoPtr.h"
 #include <ostream>
-#include <limits>
 
 
 namespace Poco {
@@ -78,12 +75,12 @@ public:
 	static const std::size_t UNKNOWN_TOTAL_ROW_COUNT;
 
 	explicit RecordSet(const Statement& rStatement,
-		RowFormatter::Ptr pRowFormatter = 0);
+		RowFormatter::Ptr pRowFormatter = nullptr);
 		/// Creates the RecordSet.
 
 	RecordSet(Session& rSession,
 		const std::string& query,
-		RowFormatter::Ptr pRowFormatter = 0);
+		RowFormatter::Ptr pRowFormatter = nullptr);
 		/// Creates the RecordSet.
 
 	RecordSet(Session& rSession,
@@ -108,6 +105,8 @@ public:
 
 	RecordSet(RecordSet&& other) noexcept;
 		/// Move-creates the recordset.
+
+	RecordSet() = delete;
 
 	~RecordSet();
 		/// Destroys the RecordSet.
@@ -331,8 +330,6 @@ public:
 		/// Returns true if recordset is filtered.
 
 private:
-	RecordSet();
-
 	template<class C, class E>
 	std::size_t columnPosition(const std::string& name) const
 		/// Returns the position of the column with specified name.
@@ -343,12 +340,12 @@ private:
 		bool typeFound = false;
 
 		const AbstractExtractionVec& rExtractions = extractions();
-		AbstractExtractionVec::const_iterator it = rExtractions.begin();
-		AbstractExtractionVec::const_iterator end = rExtractions.end();
+		auto it = rExtractions.begin();
+		auto end = rExtractions.end();
 
 		for (; it != end; ++it)
 		{
-			ExtractionVecPtr pExtraction = dynamic_cast<ExtractionVecPtr>(it->get());
+			auto pExtraction = dynamic_cast<ExtractionVecPtr>(it->get());
 
 			if (pExtraction)
 			{
@@ -386,10 +383,10 @@ private:
 		if (!pExtraction)
 		{
 			throw Poco::BadCastException(Poco::format("Type dynamic cast failed!\n"
-				"Column: %z\nConversion:\n%s\n%s",
-				pos,
-				Poco::demangle(typeid(typename E::ValType).name()),
-				rExtractions[pos]->getHeldType()));
+				"Column: %z\nConversion:\n[%s]=>[%s]\n@%s",
+				pos, Poco::demangle<typename E::ValType>(),
+				rExtractions[pos]->getHeldType(),
+				poco_src_loc));
 		}
 		return pExtraction->column();
 	}

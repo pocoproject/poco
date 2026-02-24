@@ -293,7 +293,7 @@ protected:
 		if (usePipe)
 		{
 			Poco::Pipe inPipe;
-			ProcessHandle proc = Process::launch(exec, args, 0, &inPipe, 0);
+			ProcessHandle proc = Process::launch(exec, args, nullptr, &inPipe, nullptr);
 			return new Preprocessor(proc, new Poco::PipeInputStream(inPipe));
 		}
 		else

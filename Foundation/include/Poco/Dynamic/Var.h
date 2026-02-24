@@ -21,6 +21,7 @@
 #include "Poco/Foundation.h"
 #include "Poco/Format.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/Types.h"
 #include "Poco/OrderedMap.h"
 #include "Poco/OrderedSet.h"
 #include "Poco/Dynamic/VarHolder.h"
@@ -216,8 +217,8 @@ public:
 			throw InvalidAccessException("Can not extract empty value.");
 		else
 			throw BadCastException(Poco::format("Can not convert %s to %s.",
-				std::string(pHolder->type().name()),
-				std::string(typeid(T).name())));
+				Poco::demangle(pHolder->type().name()),
+				Poco::demangle<T>()));
 	}
 
 	template <typename T>
@@ -482,7 +483,6 @@ public:
 	POCO_DEPRECATED("Use clear() instead")
 	void empty();
 		/// Empties Var.
-		/// This function is deprecated and will be removed.
 		/// Please use clear().
 
 	void clear();
@@ -633,7 +633,7 @@ inline void Var::construct(const char* value)
 inline void Var::construct(const Var& other)
 {
 	if (!other.isEmpty())
-		other.content()->clone(&_placeholder);
+		(void) other.content()->clone(&_placeholder);
 }
 
 
@@ -2288,7 +2288,7 @@ inline bool operator >= (const unsigned long& other, const Var& da)
 } // namespace Dynamic
 
 
-using DynamicAny POCO_DEPRECATED("") = Dynamic::Var;
+using DynamicAny POCO_DEPRECATED("Replace with Poco::Dynamic::Var") = Dynamic::Var;
 
 
 } // namespace Poco

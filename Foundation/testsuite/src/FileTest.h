@@ -45,6 +45,18 @@ public:
 	void testLongPath();
 	void testUnixFileExtension();
 	void testTemporaryFile();
+	void testGetExecutablePathNonExistent();
+	void testGetExecutablePathResolve();
+	void testGetExecutablePathAbsolute();
+	void testGetExecutablePathNonExecutable();
+	void testGetExecutablePathEmpty();
+	void testGetExecutablePathDirectory();
+	void testGetExecutablePathDirectoryShadow();
+	void testGetExecutablePathRelative();
+	void testGetExecutablePathPATHEXT();
+#if defined(POCO_OS_FAMILY_UNIX)
+	void testGetExecutablePathThreadSafety();
+#endif
 
 	void setUp();
 	void tearDown();

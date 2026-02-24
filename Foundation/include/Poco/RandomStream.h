@@ -37,7 +37,7 @@ class Foundation_API RandomBuf: public BufferedStreamBuf
 public:
 	RandomBuf();
 	~RandomBuf() override;
-	int readFromDevice(char* buffer, std::streamsize length) override;
+	std::streamsize readFromDevice(char* buffer, std::streamsize length) override;
 };
 
 

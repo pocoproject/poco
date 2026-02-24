@@ -804,6 +804,42 @@ void DatagramSocketTest::testGatherScatterVariableUNIX()
 }
 
 
+void DatagramSocketTest::testClosedPortError()
+{
+	// Test for issue #4537: On Windows, sending UDP to a closed port and then
+	// calling receiveBytes(Buffer&) could crash with std::bad_array_new_length
+	// because available() returns -1 on connection reset error.
+	// This test verifies that receiveBytes handles this gracefully.
+	DatagramSocket ss(SocketAddress("127.0.0.1", 0), true, true);
+	ss.connect(SocketAddress("127.0.0.1", 39999)); // Assume nothing is listening
+
+	unsigned char values[5]{};
+	ss.sendBytes(values, 5);
+
+	Poco::Timespan timeout(100000); // 100ms
+
+	// On Windows, poll may return true due to ICMP port unreachable error.
+	// On other platforms, poll typically times out.
+	if (ss.poll(timeout, Socket::SELECT_READ))
+	{
+		Buffer<char> buffer(0);
+		try
+		{
+			// Before the fix, this would crash with std::bad_array_new_length
+			// when available() returned -1 (socket error).
+			// After the fix, it throws IOException.
+			ss.receiveBytes(buffer);
+		}
+		catch (const IOException&)
+		{
+			// Expected - socket error condition
+		}
+	}
+	// If poll times out (no error condition), that's fine too - test passes
+	ss.close();
+}
+
+
 void DatagramSocketTest::setUp()
 {
 }
@@ -831,6 +867,7 @@ CppUnit::Test* DatagramSocketTest::suite()
 #endif
 	CppUnit_addTest(pSuite, DatagramSocketTest, testGatherScatterFixed);
 	CppUnit_addTest(pSuite, DatagramSocketTest, testGatherScatterVariable);
+	CppUnit_addTest(pSuite, DatagramSocketTest, testClosedPortError);
 
 	return pSuite;
 }

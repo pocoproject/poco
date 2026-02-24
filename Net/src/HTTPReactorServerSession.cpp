@@ -10,10 +10,9 @@ namespace Net {
 HTTPReactorServerSession::HTTPReactorServerSession(
 	const StreamSocket& socket, std::string& buf, HTTPServerParams::Ptr pParams)
 	: // do not deliver socket to HTTPSession
-	  HTTPSession(), _buf(buf), _realsocket(socket), _complete(0), _idx(0)
+	  HTTPSession(), _buf(buf), _realsocket(socket)
 {
 	_pcur = const_cast<char*>(_buf.c_str());
-	_idx = 0;
 }
 /// Creates the HTTPReactorServerSession.
 
@@ -172,7 +171,7 @@ bool HTTPReactorServerSession::parseChunkSize(std::size_t& pos, std::size_t& chu
 
 void HTTPReactorServerSession::popCompletedRequest()
 {
-	if (_complete >= _buf.length())
+	if (static_cast<std::size_t>(_complete) >= _buf.length())
 	{
 		// All data has been processed
 		_buf.clear();

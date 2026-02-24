@@ -20,6 +20,7 @@
 #include "Poco/UTF16Encoding.h"
 #include "Poco/Buffer.h"
 #include "Poco/Exception.h"
+#include <algorithm>
 #include <iostream>
 
 
@@ -62,7 +63,7 @@ void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, SQLINTEGER length, SQLPOINTER pTar
 		throw DataFormatException("Error converting UTF-16 to UTF-8");
 
 	std::memset(pTarget, 0, targetLength);
-	std::strncpy((char*) pTarget, result.c_str(), result.size() < targetLength ? result.size() : targetLength);
+	std::strncpy((char*) pTarget, result.c_str(), std::min(result.size(), static_cast<std::size_t>(targetLength)));
 }
 
 
@@ -75,9 +76,6 @@ SQLRETURN SQLColAttribute(SQLHSTMT hstmt,
 	NumAttrPtrType pNumAttr)
 {
 	SQLSMALLINT cbCharAttr = 0;
-	if (!pcbCharAttr) pcbCharAttr = &cbCharAttr;
-
-	SQLSMALLINT cbCharAttr;
 	if (!pcbCharAttr) pcbCharAttr = &cbCharAttr;
 
 	if (isString(pCharAttr, cbCharAttrMax))

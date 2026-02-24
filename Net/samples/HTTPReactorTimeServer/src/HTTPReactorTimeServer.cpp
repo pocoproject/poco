@@ -137,7 +137,7 @@ public:
 		else if (request.getURI() == "/echo" || request.getURI() == "/body")
 			return new BodyEchoRequestHandler();
 		else
-			return 0;
+			return nullptr;
 	}
 
 private:

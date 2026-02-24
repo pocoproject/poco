@@ -110,6 +110,12 @@ void ArchiveStrategy::compress(bool flag)
 }
 
 
+void ArchiveStrategy::setPurgeCallback(PurgeCallback callback)
+{
+	_purgeCallback = std::move(callback);
+}
+
+
 void ArchiveStrategy::moveFile(const std::string& oldPath, const std::string& newPath)
 {
 	bool compressed = false;
@@ -214,7 +220,11 @@ void ArchiveStrategy::compressFile(const std::string& path)
 
 	_compressingCount--;
 	if (_compressingCount < 1)
+	{
 		_compressingComplete.broadcast();
+		if (_purgeCallback)
+			_purgeCallback();
+	}
 }
 
 
@@ -272,6 +282,12 @@ LogFile* ArchiveByNumberStrategy::archive(LogFile* pFile)
 		moveFile(oldPath, newPath);
 		--n;
 	}
+
+	// If no compression was started, invoke purge callback now.
+	// Otherwise, it will be invoked when compression completes.
+	if (_compressingCount == 0 && _purgeCallback)
+		_purgeCallback();
+
 	return new LogFile(basePath);
 }
 

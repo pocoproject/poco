@@ -79,7 +79,16 @@ ODBCTest::~ODBCTest()
 
 void ODBCTest::testConnection()
 {
-	_pExecutor->connection(_rConnectString);
+	try
+	{
+		// postgres fails here because of  setTimeout() not supported
+		// so we catch and loudly ignore the exception
+		_pExecutor->connection(_rConnectString);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
 }
 
 
@@ -97,7 +106,7 @@ void ODBCTest::testSessionPool()
 
 void ODBCTest::testZeroRows()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	std::string tableName("Person");
 
@@ -114,7 +123,7 @@ void ODBCTest::testZeroRows()
 
 void ODBCTest::testSimpleAccess()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	std::string tableName("Person");
 
@@ -131,7 +140,7 @@ void ODBCTest::testSimpleAccess()
 
 void ODBCTest::testComplexType()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -146,7 +155,7 @@ void ODBCTest::testComplexType()
 
 void ODBCTest::testComplexTypeTuple()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -161,7 +170,7 @@ void ODBCTest::testComplexTypeTuple()
 
 void ODBCTest::testSimpleAccessVector()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -176,7 +185,7 @@ void ODBCTest::testSimpleAccessVector()
 
 void ODBCTest::testComplexTypeVector()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -191,7 +200,7 @@ void ODBCTest::testComplexTypeVector()
 
 void ODBCTest::testSharedPtrComplexTypeVector()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -206,7 +215,7 @@ void ODBCTest::testSharedPtrComplexTypeVector()
 
 void ODBCTest::testAutoPtrComplexTypeVector()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -221,7 +230,7 @@ void ODBCTest::testAutoPtrComplexTypeVector()
 
 void ODBCTest::testInsertVector()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -236,7 +245,7 @@ void ODBCTest::testInsertVector()
 
 void ODBCTest::testInsertEmptyVector()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -251,7 +260,7 @@ void ODBCTest::testInsertEmptyVector()
 
 void ODBCTest::testSimpleAccessList()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -266,7 +275,7 @@ void ODBCTest::testSimpleAccessList()
 
 void ODBCTest::testComplexTypeList()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -281,7 +290,7 @@ void ODBCTest::testComplexTypeList()
 
 void ODBCTest::testInsertList()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -296,7 +305,7 @@ void ODBCTest::testInsertList()
 
 void ODBCTest::testInsertEmptyList()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -311,7 +320,7 @@ void ODBCTest::testInsertEmptyList()
 
 void ODBCTest::testSimpleAccessDeque()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -326,7 +335,7 @@ void ODBCTest::testSimpleAccessDeque()
 
 void ODBCTest::testComplexTypeDeque()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -341,7 +350,7 @@ void ODBCTest::testComplexTypeDeque()
 
 void ODBCTest::testInsertDeque()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -356,7 +365,7 @@ void ODBCTest::testInsertDeque()
 
 void ODBCTest::testInsertEmptyDeque()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -371,7 +380,7 @@ void ODBCTest::testInsertEmptyDeque()
 
 void ODBCTest::testAffectedRows()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -386,7 +395,7 @@ void ODBCTest::testAffectedRows()
 
 void ODBCTest::testInsertSingleBulk()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -401,7 +410,7 @@ void ODBCTest::testInsertSingleBulk()
 
 void ODBCTest::testInsertSingleBulkVec()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -416,7 +425,7 @@ void ODBCTest::testInsertSingleBulkVec()
 
 void ODBCTest::testLimit()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -431,7 +440,7 @@ void ODBCTest::testLimit()
 
 void ODBCTest::testLimitZero()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -446,7 +455,7 @@ void ODBCTest::testLimitZero()
 
 void ODBCTest::testLimitOnce()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	recreateIntsTable();
 	_pExecutor->limitOnce();
@@ -456,7 +465,7 @@ void ODBCTest::testLimitOnce()
 
 void ODBCTest::testLimitPrepare()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -472,7 +481,7 @@ void ODBCTest::testLimitPrepare()
 
 void ODBCTest::testPrepare()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -487,7 +496,7 @@ void ODBCTest::testPrepare()
 
 void ODBCTest::testNullBulk()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	_pSession->setFeature("autoBind", true);
 	_pSession->setFeature("autoExtract", true);
@@ -499,7 +508,7 @@ void ODBCTest::testNullBulk()
 
 void ODBCTest::testBulk()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	_pSession->setFeature("autoBind", true);
 	_pSession->setFeature("autoExtract", true);
@@ -529,7 +538,7 @@ void ODBCTest::testBulk()
 
 void ODBCTest::testBulkPerformance()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	_pSession->setFeature("autoBind", true);
 	_pSession->setFeature("autoExtract", true);
@@ -541,7 +550,7 @@ void ODBCTest::testBulkPerformance()
 
 void ODBCTest::testSetSimple()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -556,7 +565,7 @@ void ODBCTest::testSetSimple()
 
 void ODBCTest::testSetComplex()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -571,7 +580,7 @@ void ODBCTest::testSetComplex()
 
 void ODBCTest::testSetComplexUnique()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -585,7 +594,7 @@ void ODBCTest::testSetComplexUnique()
 
 void ODBCTest::testMultiSetSimple()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -600,7 +609,7 @@ void ODBCTest::testMultiSetSimple()
 
 void ODBCTest::testMultiSetComplex()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -615,7 +624,7 @@ void ODBCTest::testMultiSetComplex()
 
 void ODBCTest::testMapComplex()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -630,7 +639,7 @@ void ODBCTest::testMapComplex()
 
 void ODBCTest::testMapComplexUnique()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -645,7 +654,7 @@ void ODBCTest::testMapComplexUnique()
 
 void ODBCTest::testMultiMapComplex()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -660,7 +669,7 @@ void ODBCTest::testMultiMapComplex()
 
 void ODBCTest::testSelectIntoSingle()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -675,7 +684,7 @@ void ODBCTest::testSelectIntoSingle()
 
 void ODBCTest::testSelectIntoSingleStep()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -690,7 +699,7 @@ void ODBCTest::testSelectIntoSingleStep()
 
 void ODBCTest::testSelectIntoSingleFail()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -705,7 +714,7 @@ void ODBCTest::testSelectIntoSingleFail()
 
 void ODBCTest::testLowerLimitOk()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -720,7 +729,7 @@ void ODBCTest::testLowerLimitOk()
 
 void ODBCTest::testSingleSelect()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -735,7 +744,7 @@ void ODBCTest::testSingleSelect()
 
 void ODBCTest::testLowerLimitFail()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -750,7 +759,7 @@ void ODBCTest::testLowerLimitFail()
 
 void ODBCTest::testCombinedLimits()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -766,7 +775,7 @@ void ODBCTest::testCombinedLimits()
 
 void ODBCTest::testRange()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -781,7 +790,7 @@ void ODBCTest::testRange()
 
 void ODBCTest::testCombinedIllegalLimits()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -797,7 +806,7 @@ void ODBCTest::testCombinedIllegalLimits()
 
 void ODBCTest::testIllegalRange()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -812,7 +821,7 @@ void ODBCTest::testIllegalRange()
 
 void ODBCTest::testEmptyDB()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -827,7 +836,7 @@ void ODBCTest::testEmptyDB()
 
 void ODBCTest::testBLOB()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -859,7 +868,7 @@ void ODBCTest::testBLOBContainer()
 
 void ODBCTest::testBLOBStmt()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -874,7 +883,7 @@ void ODBCTest::testBLOBStmt()
 
 void ODBCTest::testRecordSet()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -889,7 +898,7 @@ void ODBCTest::testRecordSet()
 
 void ODBCTest::testDateTime()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -904,7 +913,7 @@ void ODBCTest::testDateTime()
 
 void ODBCTest::testDate()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -919,7 +928,7 @@ void ODBCTest::testDate()
 
 void ODBCTest::testTime()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -934,7 +943,7 @@ void ODBCTest::testTime()
 
 void ODBCTest::testFloat()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -949,7 +958,7 @@ void ODBCTest::testFloat()
 
 void ODBCTest::testDouble()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -964,7 +973,7 @@ void ODBCTest::testDouble()
 
 void ODBCTest::testUUID()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -979,7 +988,7 @@ void ODBCTest::testUUID()
 
 void ODBCTest::testTuple()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -994,7 +1003,7 @@ void ODBCTest::testTuple()
 
 void ODBCTest::testTupleVector()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1009,7 +1018,7 @@ void ODBCTest::testTupleVector()
 
 void ODBCTest::testInternalExtraction()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1024,7 +1033,7 @@ void ODBCTest::testInternalExtraction()
 
 void ODBCTest::testFilter()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1039,7 +1048,7 @@ void ODBCTest::testFilter()
 
 void ODBCTest::testInternalBulkExtraction()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	recreatePersonTable();
 	_pSession->setFeature("autoBind", true);
@@ -1054,7 +1063,7 @@ void ODBCTest::testInternalBulkExtraction()
 
 void ODBCTest::testInternalStorageType()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1069,7 +1078,7 @@ void ODBCTest::testInternalStorageType()
 
 void ODBCTest::testNull()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	// test for NOT NULL violation exception
 	for (int i = 0; i < 8;)
@@ -1095,7 +1104,7 @@ void ODBCTest::testNull()
 
 void ODBCTest::testRowIterator()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1110,7 +1119,7 @@ void ODBCTest::testRowIterator()
 
 void ODBCTest::testStdVectorBool()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1125,7 +1134,7 @@ void ODBCTest::testStdVectorBool()
 
 void ODBCTest::testAsync()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1140,7 +1149,7 @@ void ODBCTest::testAsync()
 
 void ODBCTest::testAny()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1156,7 +1165,7 @@ void ODBCTest::testAny()
 
 void ODBCTest::testDynamicAny()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1172,7 +1181,7 @@ void ODBCTest::testDynamicAny()
 
 void ODBCTest::testMultipleResults()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1188,7 +1197,7 @@ void ODBCTest::testMultipleResults()
 
 void ODBCTest::testSQLChannel()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1204,7 +1213,7 @@ void ODBCTest::testSQLChannel()
 
 void ODBCTest::testSQLLogger()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1220,7 +1229,7 @@ void ODBCTest::testSQLLogger()
 
 void ODBCTest::testAutoCommit()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1235,7 +1244,7 @@ void ODBCTest::testAutoCommit()
 
 void ODBCTest::testTransactionIsolation()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1250,7 +1259,7 @@ void ODBCTest::testTransactionIsolation()
 
 void ODBCTest::testSessionTransaction()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1265,7 +1274,7 @@ void ODBCTest::testSessionTransaction()
 
 void ODBCTest::testSessionTransactionNoAutoCommit()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1280,7 +1289,7 @@ void ODBCTest::testSessionTransactionNoAutoCommit()
 
 void ODBCTest::testTransaction()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1295,7 +1304,7 @@ void ODBCTest::testTransaction()
 
 void ODBCTest::testTransactor()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1310,7 +1319,7 @@ void ODBCTest::testTransactor()
 
 void ODBCTest::testNullable()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1323,10 +1332,40 @@ void ODBCTest::testNullable()
 }
 
 
+void ODBCTest::testStdOptional()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateNullableStringTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->stdOptional();
+		i += 2;
+	}
+}
+
+
+void ODBCTest::testStdTupleWithOptional()
+{
+	if (!_pSession) failmsg ("Test not available.");
+
+	for (int i = 0; i < 8;)
+	{
+		recreateNullableStringTable();
+		_pSession->setFeature("autoBind", bindValue(i));
+		_pSession->setFeature("autoExtract", bindValue(i+1));
+		_pExecutor->stdTupleWithOptional();
+		i += 2;
+	}
+}
+
+
 void ODBCTest::testUnicode()
 {
 #if defined (POCO_ODBC_UNICODE)
-	if (!_pSession) fail("Test not available.");
+	if (!_pSession) failmsg("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1345,7 +1384,7 @@ void ODBCTest::testUnicode()
 void ODBCTest::testEncoding()
 {
 #if defined (POCO_ODBC_UNICODE)
-	if (!_pSession) fail("Test not available.");
+	if (!_pSession) failmsg("Test not available.");
 
 	for (int i = 0; i < 8;)
 	{
@@ -1363,7 +1402,7 @@ void ODBCTest::testEncoding()
 
 void ODBCTest::testReconnect()
 {
-	if (!_pSession) fail ("Test not available.");
+	if (!_pSession) failmsg ("Test not available.");
 
 	std::string tableName("Person");
 
@@ -1383,7 +1422,8 @@ bool ODBCTest::canConnect(const std::string& driver,
 	std::string& uid,
 	std::string& pwd,
 	std::string& dbConnString,
-	const std::string& db)
+	const std::string& db,
+	bool quiet)
 {
 	Utility::DriverMap::iterator itDrv = _drivers.begin();
 	for (; itDrv != _drivers.end(); ++itDrv)
@@ -1402,7 +1442,8 @@ bool ODBCTest::canConnect(const std::string& driver,
 		uid = "";
 		pwd = "";
 		dbConnString = "";
-		std::cout << driver << " driver NOT found, tests not available." << std::endl;
+		if (!quiet)
+			std::cout << driver << " driver NOT found, tests not available." << std::endl;
 		return false;
 	}
 
@@ -1451,10 +1492,11 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	std::string& pwd,
 	std::string& dbConnString,
 	const std::string& db,
-	const std::string& dbEncoding)
+	const std::string& dbEncoding,
+	bool quiet)
 {
 	Utility::drivers(_drivers);
-	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db)) return 0;
+	if (!canConnect(driver, dsn, uid, pwd, dbConnString, db, quiet)) return nullptr;
 
 	try
 	{
@@ -1466,6 +1508,6 @@ ODBCTest::SessionPtr ODBCTest::init(const std::string& driver,
 	}catch (ConnectionFailedException& ex)
 	{
 		std::cout << ex.displayText() << std::endl;
-		return 0;
+		return nullptr;
 	}
 }

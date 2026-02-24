@@ -7,7 +7,7 @@
 //
 // Definition of the WinRegistryConfiguration class.
 //
-// Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2006-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -42,17 +42,17 @@ public:
 		/// All further keys are relative to the root path and can be
 		/// dot separated, e.g. the path MyService.ServiceName will be converted to
 		/// HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MyService\ServiceName.
-        /// The extraSam parameter will be passed along to WinRegistryKey, to control
-        /// registry virtualization for example.
+		/// The extraSam parameter will be passed along to WinRegistryKey, to control
+		/// registry virtualization for example.
 
 protected:
-	~WinRegistryConfiguration();
+	~WinRegistryConfiguration() = default;
 		/// Destroys the WinRegistryConfiguration.
 
-	bool getRaw(const std::string& key, std::string& value) const;
-	void setRaw(const std::string& key, const std::string& value);
-	void enumerate(const std::string& key, Keys& range) const;
-	void removeRaw(const std::string& key);
+	bool getRaw(const std::string& key, std::string& value) const override;
+	void setRaw(const std::string& key, const std::string& value) override;
+	void enumerate(const std::string& key, Keys& range) const override;
+	void removeRaw(const std::string& key) override;
 
 	std::string convertToRegFormat(const std::string& key, std::string& keyName) const;
 		/// Takes a key in the format of A.B.C and converts it to
@@ -61,7 +61,7 @@ protected:
 	friend class WinConfigurationTest;
 private:
 	std::string _rootPath;
-    REGSAM _extraSam;
+	REGSAM _extraSam;
 };
 
 

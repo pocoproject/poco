@@ -366,7 +366,7 @@ void LocalDateTimeTest::testTimezone()
 	std::time_t   tINCREMENT = (30 * 24 * 60 * 60); // 30 days
 	Timespan      tsINCREMENT(30*Timespan::DAYS);
 	LocalDateTime now;
-	std::time_t   t = std::time(NULL);
+	std::time_t   t = std::time(nullptr);
 	std::tm       then;
 	bool          foundDST = false;
 
@@ -405,7 +405,7 @@ void LocalDateTimeTest::testTimezone()
 			// to the LocalDateTime value. The comparision operator
 			// verifies the _dateTime and _tzd members.
 			LocalDateTime dt2;
-			t = std::time(NULL);
+			t = std::time(nullptr);
 			for (iterations = 0; iterations < 14; ++iterations)
 			{
 				t += tINCREMENT;

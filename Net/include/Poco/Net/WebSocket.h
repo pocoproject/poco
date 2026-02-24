@@ -54,6 +54,10 @@ class Net_API WebSocket: public StreamSocket
 	/// mode, by calling setBlocking(false). 
 	/// Please refer to the sendFrame() and receiveFrame() documentation
 	/// for non-blocking behavior.
+	///
+	/// TCP_NODELAY is automatically enabled on the underlying socket
+	/// to prevent delays from Nagle's algorithm when sending small
+	/// WebSocket frames.
 {
 public:
 	enum Mode
@@ -87,9 +91,9 @@ public:
 	enum SendFlags
 		/// Combined header flags and opcodes for use with sendFrame().
 	{
-                FRAME_TEXT   = static_cast<int>(FRAME_FLAG_FIN) | static_cast<int>(FRAME_OP_TEXT),
+				FRAME_TEXT   = static_cast<int>(FRAME_FLAG_FIN) | static_cast<int>(FRAME_OP_TEXT),
 			/// Use this for sending a single text (UTF-8) payload frame.
-                FRAME_BINARY = static_cast<int>(FRAME_FLAG_FIN) | static_cast<int>(FRAME_OP_BINARY)
+				FRAME_BINARY = static_cast<int>(FRAME_FLAG_FIN) | static_cast<int>(FRAME_OP_BINARY)
 			/// Use this for sending a single binary payload frame.
 	};
 

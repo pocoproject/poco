@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 	if (argc != 3)
 	{
 		std::cout << "usage: " << argv[0] << ": <input_file> <output_file>" << std::endl
-		          << "       read base64-encoded <input_file>, decode it and write the result to <output_file>" << std::endl;
+				  << "       read base64-encoded <input_file>, decode it and write the result to <output_file>" << std::endl;
 		return 1;
 	}
 

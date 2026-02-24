@@ -29,9 +29,9 @@ Message::Message():
 	_tid(0),
 	_ostid(0),
 	_pid(0),
-	_file(0),
+	_file(nullptr),
 	_line(0),
-	_pMap(0)
+	_pMap(nullptr)
 {
 	init();
 }
@@ -44,9 +44,24 @@ Message::Message(const std::string& source, const std::string& text, Priority pr
 	_tid(0),
 	_ostid(0),
 	_pid(0),
-	_file(0),
+	_file(nullptr),
 	_line(0),
-	_pMap(0)
+	_pMap(nullptr)
+{
+	init();
+}
+
+
+Message::Message(const std::string& source, std::string&& text, Priority prio):
+	_source(source),
+	_text(std::move(text)),
+	_prio(prio),
+	_tid(0),
+	_ostid(0),
+	_pid(0),
+	_file(nullptr),
+	_line(0),
+	_pMap(nullptr)
 {
 	init();
 }
@@ -61,7 +76,22 @@ Message::Message(const std::string& source, const std::string& text, Priority pr
 	_pid(0),
 	_file(file),
 	_line(line),
-	_pMap(0)
+	_pMap(nullptr)
+{
+	init();
+}
+
+
+Message::Message(const std::string& source, std::string&& text, Priority prio, const char* file, LineNumber line):
+	_source(source),
+	_text(std::move(text)),
+	_prio(prio),
+	_tid(0),
+	_ostid(0),
+	_pid(0),
+	_file(file),
+	_line(line),
+	_pMap(nullptr)
 {
 	init();
 }
@@ -82,7 +112,7 @@ Message::Message(const Message& msg):
 	if (msg._pMap)
 		_pMap = new StringMap(*msg._pMap);
 	else
-		_pMap = 0;
+		_pMap = nullptr;
 }
 
 
@@ -118,7 +148,7 @@ Message::Message(const Message& msg, const std::string& text):
 	if (msg._pMap)
 		_pMap = new StringMap(*msg._pMap);
 	else
-		_pMap = 0;
+		_pMap = nullptr;
 }
 
 
@@ -139,6 +169,14 @@ void Message::init()
 	{
 		_tid    = pThread->id();
 		_thread = pThread->name();
+	}
+	else
+	{
+		// Not a POCO thread, use native OS thread ID and name.
+		// getCurrentName() returns empty string if no name has been set
+		// or not available on the platform.
+		_tid = Thread::currentOsTid();
+		_thread = Thread::getCurrentName();
 	}
 }
 
@@ -256,20 +294,20 @@ const std::string& Message::get(const std::string& param) const
 	{
 		StringMap::const_iterator it = _pMap->find(param);
 		if (it != _pMap->end())
-	 		return it->second;
+			return it->second;
 	}
 
 	throw NotFoundException();
 }
 
 
-const std::string& Message::get(const std::string& param, const std::string& defaultValue) const
+std::string Message::get(const std::string& param, const std::string& defaultValue) const
 {
 	if (_pMap)
 	{
 		StringMap::const_iterator it = _pMap->find(param);
 		if (it != _pMap->end())
-	 		return it->second;
+			return it->second;
 	}
 
 	return defaultValue;

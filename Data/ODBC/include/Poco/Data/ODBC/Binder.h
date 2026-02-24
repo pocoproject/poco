@@ -22,8 +22,6 @@
 #include "Poco/Data/AbstractBinder.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/ODBC/Handle.h"
-#include "Poco/Data/ODBC/Parameter.h"
-#include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/TypeInfo.h"
 #include "Poco/Exception.h"
@@ -57,6 +55,8 @@ class ODBC_API Binder: public Poco::Data::AbstractBinder
 	/// Binds placeholders in the sql query to the provided values. Performs data types mapping.
 {
 public:
+	using AbstractBinder::bind;
+
 	typedef AbstractBinder::Direction Direction;
 	typedef std::map<SQLPOINTER, SQLLEN> ParamMap;
 
@@ -71,272 +71,281 @@ public:
 	Binder(const StatementHandle& rStmt,
 		std::size_t maxFieldSize,
 		ParameterBinding dataBinding = PB_IMMEDIATE,
-		const TypeInfo* pDataTypes = 0,
+		const TypeInfo* pDataTypes = nullptr,
 		Poco::TextEncoding::Ptr pFromEncoding = nullptr,
 		Poco::TextEncoding::Ptr pDBEncoding = nullptr);
 		/// Creates the Binder.
 
-	~Binder();
+	~Binder() override;
 		/// Destroys the Binder.
 
-	void bind(std::size_t pos, const Poco::Int8& val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int8& val, Direction dir) override;
 		/// Binds an Int8.
 
-	void bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::Int8>& val, Direction dir) override;
 		/// Binds an Int8 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::Int8>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::Int8>& val, Direction dir) override;
 		/// Binds an Int8 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::Int8>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::Int8>& val, Direction dir) override;
 		/// Binds an Int8 list.
 
-	void bind(std::size_t pos, const Poco::UInt8& val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt8& val, Direction dir) override;
 		/// Binds an UInt8.
 
-	void bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::UInt8>& val, Direction dir) override;
 		/// Binds an UInt8 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::UInt8>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::UInt8>& val, Direction dir) override;
 		/// Binds an UInt8 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::UInt8>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::UInt8>& val, Direction dir) override;
 		/// Binds an UInt8 list.
 
-	void bind(std::size_t pos, const Poco::Int16& val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int16& val, Direction dir) override;
 		/// Binds an Int16.
 
-	void bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::Int16>& val, Direction dir) override;
 		/// Binds an Int16 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::Int16>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::Int16>& val, Direction dir) override;
 		/// Binds an Int16 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::Int16>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::Int16>& val, Direction dir) override;
 		/// Binds an Int16 list.
 
-	void bind(std::size_t pos, const Poco::UInt16& val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt16& val, Direction dir) override;
 		/// Binds an UInt16.
 
-	void bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::UInt16>& val, Direction dir) override;
 		/// Binds an UInt16 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::UInt16>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::UInt16>& val, Direction dir) override;
 		/// Binds an UInt16 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::UInt16>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::UInt16>& val, Direction dir) override;
 		/// Binds an UInt16 list.
 
-	void bind(std::size_t pos, const Poco::Int32& val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int32& val, Direction dir) override;
 		/// Binds an Int32.
 
-	void bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::Int32>& val, Direction dir) override;
 		/// Binds an Int32 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::Int32>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::Int32>& val, Direction dir) override;
 		/// Binds an Int32 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::Int32>& val, Direction dir) override;
 		/// Binds an Int32 list.
 
-	void bind(std::size_t pos, const Poco::UInt32& val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt32& val, Direction dir) override;
 		/// Binds an UInt32.
 
-	void bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::UInt32>& val, Direction dir) override;
 		/// Binds an UInt32 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::UInt32>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::UInt32>& val, Direction dir) override;
 		/// Binds an UInt32 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::UInt32>& val, Direction dir) override;
 		/// Binds an UInt32 list.
 
-	void bind(std::size_t pos, const Poco::Int64& val, Direction dir);
+	void bind(std::size_t pos, const Poco::Int64& val, Direction dir) override;
 		/// Binds an Int64.
 
-	void bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::Int64>& val, Direction dir) override;
 		/// Binds an Int64 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::Int64>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::Int64>& val, Direction dir) override;
 		/// Binds an Int64 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::Int64>& val, Direction dir) override;
 		/// Binds an Int64 list.
 
-	void bind(std::size_t pos, const Poco::UInt64& val, Direction dir);
+	void bind(std::size_t pos, const Poco::UInt64& val, Direction dir) override;
 		/// Binds an UInt64.
 
-	void bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::UInt64>& val, Direction dir) override;
 		/// Binds an UInt64 vector.
 
-	void bind(std::size_t pos, const std::deque<Poco::UInt64>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Poco::UInt64>& val, Direction dir) override;
 		/// Binds an UInt64 deque.
 
-	void bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Poco::UInt64>& val, Direction dir) override;
 		/// Binds an UInt64 list.
 
 #ifndef POCO_INT64_IS_LONG
-	void bind(std::size_t pos, const long& val, Direction dir);
+	void bind(std::size_t pos, const long& val, Direction dir) override;
 		/// Binds a long.
 
-	void bind(std::size_t pos, const unsigned long& val, Direction dir);
+	void bind(std::size_t pos, const unsigned long& val, Direction dir) override;
 		/// Binds an unsigned long.
 
-	void bind(std::size_t pos, const std::vector<long>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<long>& val, Direction dir) override;
 		/// Binds a long vector.
 
-	void bind(std::size_t pos, const std::deque<long>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<long>& val, Direction dir) override;
 		/// Binds a long deque.
 
-	void bind(std::size_t pos, const std::list<long>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<long>& val, Direction dir) override;
 		/// Binds a long list.
 #endif
 
-	void bind(std::size_t pos, const bool& val, Direction dir);
+	void bind(std::size_t pos, const bool& val, Direction dir) override;
 		/// Binds a boolean.
 
-	void bind(std::size_t pos, const std::vector<bool>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<bool>& val, Direction dir) override;
 		/// Binds a boolean vector.
 
-	void bind(std::size_t pos, const std::deque<bool>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<bool>& val, Direction dir) override;
 		/// Binds a boolean deque.
 
-	void bind(std::size_t pos, const std::list<bool>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<bool>& val, Direction dir) override;
 		/// Binds a boolean list.
 
-	void bind(std::size_t pos, const float& val, Direction dir);
+	void bind(std::size_t pos, const float& val, Direction dir) override;
 		/// Binds a float.
 
-	void bind(std::size_t pos, const std::vector<float>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<float>& val, Direction dir) override;
 		/// Binds a float vector.
 
-	void bind(std::size_t pos, const std::deque<float>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<float>& val, Direction dir) override;
 		/// Binds a float deque.
 
-	void bind(std::size_t pos, const std::list<float>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<float>& val, Direction dir) override;
 		/// Binds a float list.
 
-	void bind(std::size_t pos, const double& val, Direction dir);
+	void bind(std::size_t pos, const double& val, Direction dir) override;
 		/// Binds a double.
 
-	void bind(std::size_t pos, const std::vector<double>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<double>& val, Direction dir) override;
 		/// Binds a double vector.
 
-	void bind(std::size_t pos, const std::deque<double>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<double>& val, Direction dir) override;
 		/// Binds a double deque.
 
-	void bind(std::size_t pos, const std::list<double>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<double>& val, Direction dir) override;
 		/// Binds a double list.
 
-	void bind(std::size_t pos, const char& val, Direction dir);
+	void bind(std::size_t pos, const char& val, Direction dir) override;
 		/// Binds a single character.
 
-	void bind(std::size_t pos, const std::vector<char>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<char>& val, Direction dir) override;
 		/// Binds a character vector.
 
-	void bind(std::size_t pos, const std::deque<char>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<char>& val, Direction dir) override;
 		/// Binds a character deque.
 
-	void bind(std::size_t pos, const std::list<char>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<char>& val, Direction dir) override;
 		/// Binds a character list.
 
-	void bind(std::size_t pos, const std::string& val, Direction dir);
+	void bind(std::size_t pos, const std::string& val, Direction dir) override;
 		/// Binds a string.
 
-	void bind(std::size_t pos, const std::vector<std::string>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<std::string>& val, Direction dir) override;
 		/// Binds a string vector.
 
-	void bind(std::size_t pos, const std::deque<std::string>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<std::string>& val, Direction dir) override;
 		/// Binds a string deque.
 
-	void bind(std::size_t pos, const std::list<std::string>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<std::string>& val, Direction dir) override;
 		/// Binds a string list.
 
-	void bind(std::size_t pos, const UTF16String& val, Direction dir);
+	void bind(std::size_t pos, const UTF16String& val, Direction dir) override;
 		/// Binds a string.
 
-	void bind(std::size_t pos, const std::vector<UTF16String>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<UTF16String>& val, Direction dir) override;
 		/// Binds a string vector.
 
-	void bind(std::size_t pos, const std::deque<UTF16String>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<UTF16String>& val, Direction dir) override;
 		/// Binds a string deque.
 
-	void bind(std::size_t pos, const std::list<UTF16String>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<UTF16String>& val, Direction dir) override;
 		/// Binds a string list.
 
-	void bind(std::size_t pos, const BLOB& val, Direction dir);
+	void bind(std::size_t pos, const BLOB& val, Direction dir) override;
 		/// Binds a BLOB. In-bound only.
 
-	void bind(std::size_t pos, const CLOB& val, Direction dir);
+	void bind(std::size_t pos, const CLOB& val, Direction dir) override;
 		/// Binds a CLOB. In-bound only.
 
-	void bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<BLOB>& val, Direction dir) override;
 		/// Binds a BLOB vector.
 
-	void bind(std::size_t pos, const std::deque<BLOB>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<BLOB>& val, Direction dir) override;
 		/// Binds a BLOB deque.
 
-	void bind(std::size_t pos, const std::list<BLOB>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<BLOB>& val, Direction dir) override;
 		/// Binds a BLOB list.
 
-	void bind(std::size_t pos, const std::vector<CLOB>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<CLOB>& val, Direction dir) override;
 		/// Binds a CLOB vector.
 
-	void bind(std::size_t pos, const std::deque<CLOB>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<CLOB>& val, Direction dir) override;
 		/// Binds a CLOB deque.
 
-	void bind(std::size_t pos, const std::list<CLOB>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<CLOB>& val, Direction dir) override;
 		/// Binds a CLOB list.
 
-	void bind(std::size_t pos, const Date& val, Direction dir);
+	void bind(std::size_t pos, const Date& val, Direction dir) override;
 		/// Binds a Date.
 
-	void bind(std::size_t pos, const std::vector<Date>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Date>& val, Direction dir) override;
 		/// Binds a Date vector.
 
-	void bind(std::size_t pos, const std::deque<Date>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Date>& val, Direction dir) override;
 		/// Binds a Date deque.
 
-	void bind(std::size_t pos, const std::list<Date>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Date>& val, Direction dir) override;
 		/// Binds a Date list.
 
-	void bind(std::size_t pos, const Time& val, Direction dir);
+	void bind(std::size_t pos, const Time& val, Direction dir) override;
 		/// Binds a Time.
 
-	void bind(std::size_t pos, const std::vector<Time>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Time>& val, Direction dir) override;
 		/// Binds a Time vector.
 
-	void bind(std::size_t pos, const std::deque<Time>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<Time>& val, Direction dir) override;
 		/// Binds a Time deque.
 
-	void bind(std::size_t pos, const std::list<Time>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<Time>& val, Direction dir) override;
 		/// Binds a Time list.
 
-	void bind(std::size_t pos, const DateTime& val, Direction dir);
+	void bind(std::size_t pos, const DateTime& val, Direction dir) override;
 		/// Binds a DateTime.
 
-	void bind(std::size_t pos, const std::vector<DateTime>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<DateTime>& val, Direction dir) override;
 		/// Binds a DateTime vector.
 
-	void bind(std::size_t pos, const std::deque<DateTime>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<DateTime>& val, Direction dir) override;
 		/// Binds a DateTime deque.
 
-	void bind(std::size_t pos, const std::list<DateTime>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<DateTime>& val, Direction dir) override;
 		/// Binds a DateTime list.
 
-	void bind(std::size_t pos, const UUID& val, Direction dir);
+	void bind(std::size_t pos, const UUID& val, Direction dir) override;
 		/// Binds a UUID.
 
-	void bind(std::size_t pos, const NullData& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<Poco::UUID>& val, Direction dir) override;
+		/// Binds a UUID vector.
+
+	void bind(std::size_t pos, const std::deque<Poco::UUID>& val, Direction dir) override;
+		/// Binds a UUID deque.
+
+	void bind(std::size_t pos, const std::list<Poco::UUID>& val, Direction dir) override;
+		/// Binds a UUID list.
+
+	void bind(std::size_t pos, const NullData& val, Direction dir) override;
 		/// Binds a null. In-bound only.
 
-	void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir);
+	void bind(std::size_t pos, const std::vector<NullData>& val, Direction dir) override;
 		/// Binds a null vector.
 
-	void bind(std::size_t pos, const std::deque<NullData>& val, Direction dir);
+	void bind(std::size_t pos, const std::deque<NullData>& val, Direction dir) override;
 		/// Binds a null deque.
 
-	void bind(std::size_t pos, const std::list<NullData>& val, Direction dir);
+	void bind(std::size_t pos, const std::list<NullData>& val, Direction dir) override;
 		/// Binds a null list.
 
 	template <typename T>
@@ -373,7 +382,7 @@ public:
 		/// Transfers the results of non-POD outbound parameters from internal
 		/// holders back into the externally supplied buffers.
 
-	void reset();
+	void reset() override;
 		/// Clears the cached storage.
 
 private:
@@ -401,7 +410,7 @@ private:
 	void describeParameter(std::size_t pos);
 		/// Sets the description field for the parameter, if needed.
 
-	void bind(std::size_t pos, const char* const& pVal, Direction dir);
+	void bind(std::size_t pos, const char* const& pVal, Direction dir) override;
 		/// Binds a const char ptr.
 		/// This is a private no-op in this implementation
 		/// due to security risk.
@@ -418,7 +427,7 @@ private:
 
 		getColSizeAndPrecision(pos, cDataType, colSize, decDigits);
 
-		_lengthIndicator.push_back(0);
+		_lengthIndicator.push_back(nullptr);
 
 		if (Utility::isError(SQLBindParameter(_rStmt,
 			(SQLUSMALLINT) pos + 1,
@@ -427,7 +436,7 @@ private:
 			Utility::sqlDataType(cDataType),
 			colSize,
 			decDigits,
-			(SQLPOINTER) &val, 0, 0)))
+			(SQLPOINTER) &val, 0, nullptr)))
 		{
 			throw StatementException(_rStmt, "ODBC::Binder::SQLBindParameter()");
 		}
@@ -483,7 +492,7 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length);
 		}
 
@@ -535,7 +544,7 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length);
 		}
 
@@ -573,7 +582,7 @@ private:
 		if (PB_IMMEDIATE != _paramBinding)
 			throw InvalidAccessException("Containers can only be bound immediately.");
 
-		const C* pVal = 0;
+		const C* pVal = nullptr;
 		if (!transcodeRequired()) pVal = &valC;
 		else
 		{
@@ -605,12 +614,12 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, SQL_NTS);
 		}
 
 		if (_charPtrs.size() <= pos)
-			_charPtrs.resize(pos + 1, 0);
+			_charPtrs.resize(pos + 1, nullptr);
 
 		_charPtrs[pos] = (char*) std::calloc(pVal->size() * size, sizeof(char));
 
@@ -676,12 +685,12 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, SQL_NTS);
 		}
 
 		if (_utf16CharPtrs.size() <= pos)
-			_utf16CharPtrs.resize(pos + 1, 0);
+			_utf16CharPtrs.resize(pos + 1, nullptr);
 
 		_utf16CharPtrs[pos] = (UTF16Char*)std::calloc(val.size() * size, sizeof(UTF16Char));
 
@@ -736,7 +745,7 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
@@ -751,7 +760,7 @@ private:
 		}
 
 		if (_charPtrs.size() <= pos)
-			_charPtrs.resize(pos + 1, 0);
+			_charPtrs.resize(pos + 1, nullptr);
 
 		_charPtrs[pos] = (char*) std::calloc(val.size() * size, sizeof(CharType));
 		poco_check_ptr (_charPtrs[pos]);
@@ -802,13 +811,13 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
 		if (_dateVecVec.size() <= pos)
 		{
-			_dateVecVec.resize(pos + 1, 0);
+			_dateVecVec.resize(pos + 1, nullptr);
 			_dateVecVec[pos] = new DateVec(length ? length : 1);
 		}
 
@@ -850,13 +859,13 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
 		if (_timeVecVec.size() <= pos)
 		{
-			_timeVecVec.resize(pos + 1, 0);
+			_timeVecVec.resize(pos + 1, nullptr);
 			_timeVecVec[pos] = new TimeVec(length ? length : 1);
 		}
 
@@ -899,13 +908,13 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1);
 		}
 
 		if (_dateTimeVecVec.size() <= pos)
 		{
-			_dateTimeVecVec.resize(pos + 1, 0);
+			_dateTimeVecVec.resize(pos + 1, nullptr);
 			_dateTimeVecVec[pos] = new DateTimeVec(length ? length : 1);
 		}
 
@@ -931,6 +940,63 @@ private:
 	}
 
 	template<typename C>
+	void bindImplContainerUUID(std::size_t pos, const C& val, Direction dir)
+	{
+		if (isOutBound(dir) || !isInBound(dir))
+			throw NotImplementedException("ODBC::Binder::bindImplContainerUUID():UUID container parameter type can only be inbound.");
+
+		if (PB_IMMEDIATE != _paramBinding)
+			throw InvalidAccessException("ODBC::Binder::bindImplContainerUUID():Containers can only be bound immediately.");
+
+		std::size_t length = val.size();
+
+		if (0 == length)
+			throw InvalidArgumentException("ODBC::Binder::bindImplContainerUUID():Empty Containers not allowed.");
+
+		setParamSetSize(length);
+
+		SQLINTEGER size = 16; // UUID is fixed 16 bytes
+		if (_vecLengthIndicator.size() <= pos)
+		{
+			_vecLengthIndicator.resize(pos + 1, nullptr);
+			_vecLengthIndicator[pos] = new LengthVec(length ? length : 1, size);
+		}
+
+		if (_charPtrs.size() <= pos)
+			_charPtrs.resize(pos + 1, nullptr);
+
+		_charPtrs[pos] = (char*)std::calloc(val.size() * size, sizeof(char));
+		std::size_t offset = 0;
+		for (typename C::const_iterator it = val.begin(); it != val.end(); ++it)
+		{
+			std::vector<char> bytes(16);
+			it->copyTo(bytes.data()); // Extract 16-byte binary data
+			if (bytes.size() != static_cast<std::size_t>(size))
+				throw LengthExceededException("Invalid UUID size");
+			std::memcpy(_charPtrs[pos] + offset, bytes.data(), size);
+			offset += size;
+		}
+
+		SQLINTEGER colSize = 0;
+		SQLSMALLINT decDigits = 0;
+		getColSizeAndPrecision(pos, SQL_C_BINARY, colSize, decDigits);
+
+		if (Utility::isError(SQLBindParameter(_rStmt,
+			(SQLUSMALLINT)pos + 1,
+			toODBCDirection(dir),
+			SQL_C_BINARY,
+			SQL_GUID,
+			colSize,
+			decDigits,
+			_charPtrs[pos],
+			(SQLINTEGER)size,
+			&(*_vecLengthIndicator[pos])[0])))
+		{
+			throw StatementException(_rStmt, "ODBC::Binder::bindImplContainerUUID():SQLBindParameter(UUID[])");
+		}
+	}
+
+	template<typename C>
 	void bindImplNullContainer(std::size_t pos, const C& val, Direction dir)
 	{
 		if (isOutBound(dir) || !isInBound(dir))
@@ -949,7 +1015,7 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length, SQL_NULL_DATA);
 		}
 
@@ -964,7 +1030,7 @@ private:
 			TypeInfo::sqlDataType<SQL_C_CHAR>(),
 			colSize,
 			decDigits,
-			0,
+			nullptr,
 			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
@@ -991,7 +1057,7 @@ private:
 
 		if (_vecLengthIndicator.size() <= pos)
 		{
-			_vecLengthIndicator.resize(pos + 1, 0);
+			_vecLengthIndicator.resize(pos + 1, nullptr);
 			_vecLengthIndicator[pos] = new LengthVec(length, SQL_NULL_DATA);
 			auto valIt = val.begin(), valEnd = val.end();
 			auto lenIt = _vecLengthIndicator[pos]->begin(), lenEnd = _vecLengthIndicator[pos]->end();
@@ -1014,7 +1080,7 @@ private:
 			TypeInfo::sqlDataType<SQL_C_CHAR>(),
 			colSize,
 			decDigits,
-			0,
+			nullptr,
 			0,
 			&(*_vecLengthIndicator[pos])[0])))
 		{
@@ -1576,6 +1642,24 @@ inline void Binder::bind(std::size_t pos, const std::deque<DateTime>& val, Direc
 inline void Binder::bind(std::size_t pos, const std::list<DateTime>& val, Direction dir)
 {
 	bindImplContainerDateTime(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::vector<Poco::UUID>& val, Direction dir)
+{
+	bindImplContainerUUID(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::deque<Poco::UUID>& val, Direction dir)
+{
+	bindImplContainerUUID(pos, val, dir);
+}
+
+
+inline void Binder::bind(std::size_t pos, const std::list<Poco::UUID>& val, Direction dir)
+{
+	bindImplContainerUUID(pos, val, dir);
 }
 
 

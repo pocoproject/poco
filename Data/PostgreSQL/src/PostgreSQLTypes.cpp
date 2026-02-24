@@ -96,7 +96,7 @@ Poco::Data::MetaColumn::ColumnDataType oidToColumnDataType(const Oid anOID)
 
 	//uuid
 	case UUIDOID:
-		cdt = Poco::Data::MetaColumn::FDT_BLOB;
+		cdt = Poco::Data::MetaColumn::FDT_UUID;
 		break;
 
 	// everything else is a string

@@ -32,14 +32,14 @@ const XMLString AbstractContainerNode::WILDCARD(toXMLString("*"));
 
 AbstractContainerNode::AbstractContainerNode(Document* pOwnerDocument):
 	AbstractNode(pOwnerDocument),
-	_pFirstChild(0)
+	_pFirstChild(nullptr)
 {
 }
 
 
 AbstractContainerNode::AbstractContainerNode(Document* pOwnerDocument, const AbstractContainerNode& node):
 	AbstractNode(pOwnerDocument, node),
-	_pFirstChild(0)
+	_pFirstChild(nullptr)
 {
 }
 
@@ -72,7 +72,7 @@ Node* AbstractContainerNode::lastChild() const
 		while (pChild->_pNext) pChild = pChild->_pNext;
 		return pChild;
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -343,7 +343,7 @@ Node* AbstractContainerNode::removeChild(Node* oldChild)
 
 Node* AbstractContainerNode::appendChild(Node* newChild)
 {
-	return insertBefore(newChild, 0);
+	return insertBefore(newChild, nullptr);
 }
 
 
@@ -402,13 +402,13 @@ Node* AbstractContainerNode::getNodeByPath(const XMLString& path) const
 			for (unsigned long i = 0; i < length; i++)
 			{
 				XMLString::const_iterator beg = it;
-				const Node* pNode = findNode(beg, path.end(), pList->item(i), 0, indexBound);
+				const Node* pNode = findNode(beg, path.end(), pList->item(i), nullptr, indexBound);
 				if (pNode) return const_cast<Node*>(pNode);
 			}
-			return 0;
+			return nullptr;
 		}
 	}
-	return const_cast<Node*>(findNode(it, path.end(), this, 0, indexBound));
+	return const_cast<Node*>(findNode(it, path.end(), this, nullptr, indexBound));
 }
 
 
@@ -448,7 +448,7 @@ Node* AbstractContainerNode::getNodeByPathNS(const XMLString& path, const NSMap&
 					if (pNode) return const_cast<Node*>(pNode);
 				}
 			}
-			return 0;
+			return nullptr;
 		}
 	}
 	return const_cast<Node*>(findNode(it, path.end(), this, &nsMap, indexBound));
@@ -540,7 +540,7 @@ const Node* AbstractContainerNode::findElement(const XMLString& name, const Node
 			return pNode;
 		pNode = pNode->nextSibling();
 	}
-	return 0;
+	return nullptr;
 }
 
 
@@ -586,7 +586,7 @@ const Node* AbstractContainerNode::findElement(const XMLString& attr, const XMLS
 
 const Attr* AbstractContainerNode::findAttribute(const XMLString& name, const Node* pNode, const NSMap* pNSMap)
 {
-	const Attr* pResult(0);
+	const Attr* pResult(nullptr);
 	const Element* pElem = dynamic_cast<const Element*>(pNode);
 	if (pElem)
 	{

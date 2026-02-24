@@ -47,17 +47,17 @@ void DateTimeParserTest::testISO8601()
 	assertTrue (dt.minute() == 30);
 	assertTrue (dt.second() == 0);
 	assertTrue (tzd == 0);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-08T12.30:00Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-00-08T12:30:00Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-00T12:30:00Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-00T33:30:00Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-00T12:80:00Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-00T12:30:90Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-0012:30:90Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-01-00X12:30:90Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "200501-00T12:30:90Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005-0100T12:30:90Z", tzd);
-	testBad(DateTimeFormat::ISO8601_FRAC_FORMAT, "2005_01+00T12:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-01-08T12.30:00Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-00-08T12:30:00Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-01-00T12:30:00Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-01-08T33:30:00Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-01-08T12:80:00Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-01-08T12:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-01-0812:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-01-08X12:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "200501-08T12:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005-0108T12:30:90Z", tzd);
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2005_01+08T12:30:90Z", tzd);
 
 	dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FORMAT, "2005-01-08T12:30:00+01:00", tzd);
 	assertTrue (dt.year() == 2005);
@@ -626,6 +626,15 @@ void DateTimeParserTest::testCustom()
 
 	// check that an invalid millisecond is detected with a custom format
 	testBad("T%H:%M:%s %z", "T12:30:00.Z", tzd);
+
+	// Issue #5030: trailing garbage should be rejected
+	dt = DateTimeParser::parse("%H:%M", "13:13", tzd);
+	assertTrue (dt.hour() == 13);
+	assertTrue (dt.minute() == 13);
+
+	testBad("%H:%M", "xxx", tzd);
+	testBad("%H:%M", "12345", tzd);  // trailing '5' is garbage
+	testBad("????", "12345", tzd);   // invalid format
 }
 
 

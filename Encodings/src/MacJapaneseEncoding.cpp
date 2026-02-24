@@ -21,7 +21,7 @@ namespace Poco {
 const char* MacJapaneseEncoding::_names[] =
 {
 	"MacJapanese",
-	NULL
+	nullptr
 };
 
 

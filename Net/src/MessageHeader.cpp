@@ -86,12 +86,20 @@ void MessageHeader::read(std::istream& istr)
 			throw MessageException("Too many header fields");
 		name.clear();
 		value.clear();
-		while (ch != eof && ch != ':' && ch != '\n' && name.length() < _nameLengthLimit) { name += ch; ch = buf.sbumpc(); }
+		while (ch != eof && ch != ':' && ch != '\n' && static_cast<int>(name.length()) < _nameLengthLimit)
+		{
+			name += ch;
+			ch = buf.sbumpc();
+		}
 		if (ch == '\n') { ch = buf.sbumpc(); continue; } // ignore invalid header lines
 		if (ch != ':') throw MessageException("Field name too long/no colon found");
 		if (ch != eof) ch = buf.sbumpc(); // ':'
 		while (ch != eof && Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n') ch = buf.sbumpc();
-		while (ch != eof && ch != '\r' && ch != '\n' && value.length() < _valueLengthLimit) { value += ch; ch = buf.sbumpc(); }
+		while (ch != eof && ch != '\r' && ch != '\n' && static_cast<int>(value.length()) < _valueLengthLimit)
+		{
+			value += ch;
+			ch = buf.sbumpc();
+		}
 		if (ch == '\r') ch = buf.sbumpc();
 		if (ch == '\n')
 			ch = buf.sbumpc();
@@ -99,7 +107,11 @@ void MessageHeader::read(std::istream& istr)
 			throw MessageException("Field value too long/no CRLF found");
 		while (ch == ' ' || ch == '\t') // folding
 		{
-			while (ch != eof && ch != '\r' && ch != '\n' && value.length() < _valueLengthLimit) { value += ch; ch = buf.sbumpc(); }
+			while (ch != eof && ch != '\r' && ch != '\n' && static_cast<int>(value.length()) < _valueLengthLimit)
+			{
+				value += ch;
+				ch = buf.sbumpc();
+			}
 			if (ch == '\r') ch = buf.sbumpc();
 			if (ch == '\n')
 				ch = buf.sbumpc();
@@ -373,7 +385,7 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 					hex += c;
 				}
 				hex = toUpper(hex);
-				tempout += (char)(int)strtol(hex.c_str(), 0, 16);
+				tempout += (char)(int)::strtol(hex.c_str(), nullptr, 16);
 				continue;
 			}
 			tempout += c;

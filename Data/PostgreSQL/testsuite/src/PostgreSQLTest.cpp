@@ -26,6 +26,7 @@
 #include "Poco/Data/DataException.h"
 #include <iostream>
 
+#include "Poco/Data/Transaction.h"
 
 using namespace Poco::Data;
 using namespace Poco::Data::Keywords;
@@ -41,8 +42,8 @@ using Poco::NamedTuple;
 using Poco::Environment;
 
 
-Poco::SharedPtr<Poco::Data::Session> PostgreSQLTest::_pSession = 0;
-Poco::SharedPtr<SQLExecutor> PostgreSQLTest::_pExecutor = 0;
+Poco::SharedPtr<Poco::Data::Session> PostgreSQLTest::_pSession = nullptr;
+Poco::SharedPtr<SQLExecutor> PostgreSQLTest::_pExecutor = nullptr;
 
 
 //
@@ -794,6 +795,37 @@ void PostgreSQLTest::testReconnect()
 }
 
 
+void PostgreSQLTest::testTransactionWithReconnect()
+{
+    if (!_pSession) fail ("Test not available.");
+
+    try
+    {
+        _pSession->begin();
+        *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now;
+        _pSession->reconnect();
+        _pSession->commit();
+    }
+    catch (Poco::Exception& e)
+    {
+        _pSession->rollback();
+        std::cout << e.displayText() << std::endl;
+    }
+
+    try
+    {
+        _pSession->begin();
+        *_pSession << "CREATE TABLE Person (LastName VARCHAR(30), FirstName VARCHAR(30), Address VARCHAR(30), Age INTEGER)", now;
+        _pSession->commit();
+    }
+    catch (Poco::Exception& e)
+    {
+        _pSession->rollback();
+        std::cout << e.displayText() << std::endl;
+    }
+}
+
+
 void PostgreSQLTest::testSqlState()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -887,6 +919,14 @@ void PostgreSQLTest::testNullableString()
 }
 
 
+void PostgreSQLTest::testOptionalString()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateNullableStringTable();
+	_pExecutor->stdOptional();
+}
+
 void PostgreSQLTest::testTupleWithNullable()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -909,8 +949,19 @@ void PostgreSQLTest::testTupleWithNullable()
 
 	std::vector<Info> infos;
 	infos.push_back(Info(10, std::string("A"), 0));
+	// GCC incorrectly warns about uninitialized access when copying Nullable<string>
+	// containing null into a Tuple. This is a false positive: when Nullable is null,
+	// the internal std::optional has no value and the string is never accessed.
+	// GCC's static analysis gets confused by the deep template instantiation chain.
+#if defined(__GNUC__) && !defined(__clang__)
+	#pragma GCC diagnostic push
+	#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 	infos.push_back(Info(11, null, 12));
 	infos.push_back(Info(12, std::string("B"), null));
+#if defined(__GNUC__) && !defined(__clang__)
+	#pragma GCC diagnostic pop
+#endif
 
 	*_pSession << "INSERT INTO NullableStringTest VALUES($1, $2, $3)", use(infos), now;
 
@@ -935,6 +986,15 @@ void PostgreSQLTest::testTupleWithNullable()
 
 	assertTrue (result[5].get<1>() == std::string("B"));
 	assertTrue (result[5].get<2>() == null);
+}
+
+
+void PostgreSQLTest::testStdTupleWithOptional()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	recreateNullableStringTable();
+	_pExecutor->stdTupleWithOptional();
 }
 
 
@@ -1254,7 +1314,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	catch (ConnectionFailedException& ex)
 	{
 		std::cout << ex.displayText() << std::endl;
-		return 0;
+		return nullptr;
 	}
 
 	std::cout << "*** Connected to [" << "PostgreSQL" << "] test database." << std::endl;
@@ -1314,8 +1374,10 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, PostgreSQLTest, testNull);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testNullableInt);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testNullableString);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testOptionalString);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testTupleWithNullable);
-		CppUnit_addTest(pSuite, PostgreSQLTest, testSqlState);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testStdTupleWithOptional);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testSqlState);
 
 	CppUnit_addTest(pSuite, PostgreSQLTest, testBinarySimpleAccess);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testBinaryComplexType);
@@ -1333,6 +1395,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, PostgreSQLTest, testSessionTransactionNoAutoCommit);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testTransaction);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testReconnect);
+    CppUnit_addTest(pSuite, PostgreSQLTest, testTransactionWithReconnect);
 
 	return pSuite;
 }

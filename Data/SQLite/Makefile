@@ -19,10 +19,14 @@ ifdef POCO_ENABLE_SQLITE_FTS5
 		SYSFLAGS += -DSQLITE_ENABLE_FTS5
 endif
 
-ifdef POCO_UNBUNDLED
+ifdef POCO_SQLITE_UNBUNDLED
 	SYSLIBS += -lsqlite3
 else
 	objects += sqlite3
+	prebuild = $(shell \
+		ln -sf $(POCO_BASE)/dependencies/sqlite3/src/*.c src/ && \
+		ln -sf $(POCO_BASE)/dependencies/sqlite3/src/*.h src/ \
+	)
 endif
 
 ifndef POCO_DATA_NO_SQL_PARSER

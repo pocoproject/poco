@@ -285,7 +285,7 @@ void SyslogParser::parsePrio(const std::string& line, std::size_t& pos, RemoteSy
 	++pos; // skip the >
 
 	int val = Poco::NumberParser::parse(valStr);
-	poco_assert (val >= 0 && val <= (RemoteSyslogChannel::SYSLOG_LOCAL7 + RemoteSyslogChannel::SYSLOG_DEBUG));
+	poco_assert (val >= 0 && val <= (static_cast<int>(RemoteSyslogChannel::SYSLOG_LOCAL7) + static_cast<int>(RemoteSyslogChannel::SYSLOG_DEBUG)));
 
 	Poco::UInt16 pri = static_cast<Poco::UInt16>(val);
 	// now get the lowest 3 bits
@@ -510,8 +510,8 @@ const std::string RemoteSyslogListener::LOG_PROP_STRUCTURED_DATA("structured-dat
 
 
 RemoteSyslogListener::RemoteSyslogListener():
-	_pListener(0),
-	_pParser(0),
+	_pListener(nullptr),
+	_pParser(nullptr),
 	_port(RemoteSyslogChannel::SYSLOG_PORT),
 	_reusePort(false),
 	_threads(1),
@@ -521,8 +521,8 @@ RemoteSyslogListener::RemoteSyslogListener():
 
 
 RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port):
-	_pListener(0),
-	_pParser(0),
+	_pListener(nullptr),
+	_pParser(nullptr),
 	_port(port),
 	_reusePort(false),
 	_threads(1),
@@ -532,8 +532,8 @@ RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port):
 
 
 RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port, int threads):
-	_pListener(0),
-	_pParser(0),
+	_pListener(nullptr),
+	_pParser(nullptr),
 	_port(port),
 	_reusePort(false),
 	_threads(threads),
@@ -543,8 +543,8 @@ RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port, int threads):
 
 
 RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port, bool reusePort, int threads):
-	_pListener(0),
-	_pParser(0),
+	_pListener(nullptr),
+	_pParser(nullptr),
 	_port(port),
 	_reusePort(reusePort),
 	_threads(threads),
@@ -653,8 +653,8 @@ void RemoteSyslogListener::close()
 	_threadPool.joinAll();
 	delete _pListener;
 	delete _pParser;
-	_pListener = 0;
-	_pParser = 0;
+	_pListener = nullptr;
+	_pParser = nullptr;
 	SplitterChannel::close();
 }
 

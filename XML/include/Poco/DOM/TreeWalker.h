@@ -54,7 +54,7 @@ class XML_API TreeWalker
 	/// does not conform to the DOM Level 2 Traversal specification.
 {
 public:
-	TreeWalker(Node* root, unsigned long whatToShow, NodeFilter* pFilter = 0);
+	TreeWalker(Node* root, unsigned long whatToShow, NodeFilter* pFilter = nullptr);
 		/// Creates a TreeWalker over the subtree rooted at the specified node.
 
 	TreeWalker(const TreeWalker& walker);

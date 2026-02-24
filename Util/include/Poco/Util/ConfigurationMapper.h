@@ -7,7 +7,7 @@
 //
 // Definition of the ConfigurationMapper class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -68,20 +68,20 @@ public:
 		/// Creates the ConfigurationMapper. The ConfigurationMapper
 		/// retains (shared) ownership of the passed configuration.
 
+	ConfigurationMapper(const ConfigurationMapper&) = delete;
+	ConfigurationMapper& operator = (const ConfigurationMapper&) = delete;
+
 protected:
-	bool getRaw(const std::string& key, std::string& value) const;
-	void setRaw(const std::string& key, const std::string& value);
-	void enumerate(const std::string& key, Keys& range) const;
-	void removeRaw(const std::string& key);
+	bool getRaw(const std::string& key, std::string& value) const override;
+	void setRaw(const std::string& key, const std::string& value) override;
+	void enumerate(const std::string& key, Keys& range) const override;
+	void removeRaw(const std::string& key) override;
 
 	std::string translateKey(const std::string& key) const;
 
-	~ConfigurationMapper();
+	~ConfigurationMapper() = default;
 
 private:
-	ConfigurationMapper(const ConfigurationMapper&);
-	ConfigurationMapper& operator = (const ConfigurationMapper&);
-
 	std::string _fromPrefix;
 	std::string _toPrefix;
 	AbstractConfiguration::Ptr _pConfig;

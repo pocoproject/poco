@@ -353,8 +353,8 @@ bool IdentifierToken::start(char c, std::istream& /*istr*/)
 {
 	_value = c;
 	return (c >= 'A' && c <= 'Z') ||
-	       (c >= 'a' && c <= 'z') ||
-	       (c == '_' || c == '$');
+		   (c >= 'a' && c <= 'z') ||
+		   (c == '_' || c == '$');
 }
 
 
@@ -368,6 +368,54 @@ void IdentifierToken::finish(std::istream& istr)
 	{
 		_value += (char) istr.get();
 		next = istr.peek();
+	}
+
+	// C++11 raw string literals: R"delim(...)delim", also u8R"...", uR"...", UR"...", LR"..."
+	// Without this handling, the tokenizer would split R"(")" into separate tokens:
+	//   identifier 'R', string literal '("', operator ')', and an unterminated '"',
+	// causing "Unterminated character literal" errors downstream.
+	if ((_value == "R" || _value == "u8R" || _value == "uR" || _value == "UR" || _value == "LR")
+		&& istr.peek() == '"')
+	{
+		finishRawString(istr);
+	}
+}
+
+
+void IdentifierToken::finishRawString(std::istream& istr)
+{
+	// Consume the entire raw string literal as part of this identifier token
+	// so that parseBlock() and other consumers can safely skip over it.
+	// The delimiter between " and ( can be any character sequence,
+	// e.g. R"---(content)---" has delimiter "---".
+	_value += (char) istr.get(); // consume opening "
+
+	// Read optional delimiter characters until '('
+	std::string delimiter;
+	int next = istr.peek();
+	while (next != -1 && next != '(' && next != '\n')
+	{
+		delimiter += (char) istr.get();
+		_value += delimiter.back();
+		next = istr.peek();
+	}
+	if (next == '(')
+	{
+		_value += (char) istr.get(); // consume '('
+		// Scan for closing sequence: )delimiter"
+		// Use a sliding window to match the end pattern correctly.
+		std::string endPattern = ")" + delimiter + "\"";
+		std::string window;
+		while (!istr.eof())
+		{
+			char c = (char) istr.get();
+			_value += c;
+			window += c;
+			if (window.size() > endPattern.size())
+				window.erase(0, 1);
+			if (window == endPattern)
+				break;
+		}
 	}
 }
 
@@ -420,6 +468,23 @@ void StringLiteralToken::finish(std::istream& istr)
 		_value += (char) next;
 	}
 	else throw SyntaxException("Unterminated string literal");
+
+	// C++14 string literal suffixes: "str"s (std::string), "str"sv (std::string_view),
+	// and user-defined literal suffixes starting with _ (e.g. "str"_mylit).
+	// Consume the suffix as part of this token so the parser doesn't see a
+	// stray identifier immediately following a string literal.
+	next = istr.peek();
+	if (next == 's' || next == '_')
+	{
+		while ((next >= 'A' && next <= 'Z') ||
+			   (next >= 'a' && next <= 'z') ||
+			   (next >= '0' && next <= '9') ||
+			   next == '_')
+		{
+			_value += (char) istr.get();
+			next = istr.peek();
+		}
+	}
 }
 
 
@@ -522,7 +587,7 @@ bool NumberLiteralToken::start(char c, std::istream& istr)
 	_value = c;
 	int next = istr.peek();
 	return (c >= '0' && c <= '9') ||
-	       (c == '.' && next >= '0' && next <= '9');
+		   (c == '.' && next >= '0' && next <= '9');
 }
 
 
@@ -670,13 +735,13 @@ void NumberLiteralToken::finishSuffix(std::istream& istr, int next)
 
 int NumberLiteralToken::asInteger() const
 {
-	return static_cast<int>(std::strtol(_value.c_str(), 0, 0));
+	return static_cast<int>(std::strtol(_value.c_str(), nullptr, 0));
 }
 
 
 double NumberLiteralToken::asFloat() const
 {
-	return std::strtod(_value.c_str(), 0);
+	return std::strtod(_value.c_str(), nullptr);
 }
 
 

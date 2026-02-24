@@ -26,6 +26,7 @@
 #include "Poco/Mutex.h"
 #include "Poco/Condition.h"
 #include <atomic>
+#include <functional>
 
 
 namespace Poco {
@@ -42,6 +43,8 @@ class Foundation_API ArchiveStrategy
 	/// using the gzip file format.
 {
 public:
+	using PurgeCallback = std::function<void()>;
+
 	ArchiveStrategy();
 	virtual ~ArchiveStrategy();
 
@@ -57,6 +60,10 @@ public:
 
 	void compress(bool flag = true);
 		/// Enables or disables compression of archived files.
+
+	void setPurgeCallback(PurgeCallback callback);
+		/// Sets a callback to be invoked after compression completes.
+		/// Used by FileChannel to trigger purging at the right time.
 
 protected:
 	void moveFile(const std::string& oldName, const std::string& newName);
@@ -79,6 +86,9 @@ private:
 
 	std::atomic<bool> _compress;
 	std::atomic<ArchiveCompressor*> _pCompressor;
+
+protected:
+	PurgeCallback _purgeCallback;
 };
 
 
@@ -116,6 +126,11 @@ public:
 	/// file name. If the new file name exists, additionally a monotonic
 	/// increasing number is appended to the log file name.
 	{
+		FastMutex::ScopedLock l(_rotateMutex);
+
+		while (_compressingCount > 0)
+			_compressingComplete.wait(_rotateMutex, 1000);
+
 		std::string path = pFile->path();
 		delete pFile;
 		std::string archPath = path;
@@ -124,6 +139,11 @@ public:
 
 		if (exists(archPath)) archiveByNumber(archPath);
 		else moveFile(path, archPath);
+
+		// If no compression was started, invoke purge callback now.
+		// Otherwise, it will be invoked when compression completes.
+		if (_compressingCount == 0 && _purgeCallback)
+			_purgeCallback();
 
 		return new LogFile(path);
 	}

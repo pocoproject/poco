@@ -131,7 +131,7 @@ int main(int argc, char **argv)
 
 			Poco::SharedPtr<Poco::Net::InvalidCertificateHandler> ptrCert = new Poco::Net::ConsoleCertificateHandler(false); // ask the user via console
 
-			Poco::Net::SSLManager::instance().initializeClient(NULL, ptrCert, context);
+			Poco::Net::SSLManager::instance().initializeClient(nullptr, ptrCert, context);
 
 			session = new Poco::Net::HTTPSClientSession(uri.getHost(), uri.getPort());
 		}

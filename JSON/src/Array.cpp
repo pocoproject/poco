@@ -23,7 +23,7 @@ using Poco::Dynamic::Var;
 // Explicitly instatiated shared pointer in JSON library is required to
 // have known instance of the pointer to be used with VarHolder when
 // compiling with -fvisibility=hidden
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(JSON_EXPORTS)
 template class JSON_API Poco::SharedPtr<Poco::JSON::Array>;
 #else
 template class Poco::SharedPtr<Poco::JSON::Array>;
@@ -161,7 +161,7 @@ void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 	options |= _escapeUnicode ? Poco::JSON_ESCAPE_UNICODE : 0;
 	options |= _lowercaseHex ? Poco::JSON_LOWERCASE_HEX : 0;
 
-	if (step == -1) step = indent;
+	if (step == -1) step = static_cast<int>(indent);
 
 	out << "[";
 
@@ -169,9 +169,9 @@ void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 
 	for (auto it = _values.begin(); it != _values.end();)
 	{
-		for (int i = 0; i < indent; i++) out << ' ';
+		for (unsigned int i = 0; i < indent; i++) out << ' ';
 
-		Stringifier::stringify(*it, out, indent + step, step, options);
+		Stringifier::stringify(*it, out, indent + static_cast<unsigned int>(step), step, options);
 
 		if (++it != _values.end())
 		{
@@ -182,9 +182,9 @@ void Array::stringify(std::ostream& out, unsigned int indent, int step) const
 
 	if (step > 0) out << '\n';
 
-	if (indent >= step) indent -= step;
+	if (step > 0 && indent >= static_cast<unsigned int>(step)) indent -= static_cast<unsigned int>(step);
 
-	for (int i = 0; i < indent; i++) out << ' ';
+	for (unsigned int i = 0; i < indent; i++) out << ' ';
 
 	out << "]";
 }

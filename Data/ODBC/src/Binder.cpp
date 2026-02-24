@@ -13,12 +13,13 @@
 
 
 #include "Poco/Data/ODBC/Binder.h"
+#include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/ODBC/Utility.h"
-#include "Poco/Data/ODBC/Connector.h"
-#include "Poco/Data/LOB.h"
+#include "Poco/Data/ODBC/Parameter.h"
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/DateTime.h"
 #include "Poco/Exception.h"
+#include <algorithm>
 #include <sql.h>
 
 
@@ -114,7 +115,7 @@ void Binder::freeMemory()
 
 void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 {
-	char* pTCVal = 0;
+	char* pTCVal = nullptr;
 	SQLINTEGER size = 0;
 	if (transcodeRequired())
 	{
@@ -125,7 +126,7 @@ void Binder::bind(std::size_t pos, const std::string& val, Direction dir)
 		std::memcpy(pTCVal, tcVal.data(), size);
 	}
 	else size = static_cast<SQLINTEGER>(val.size());
-	SQLPOINTER pVal = 0;
+	SQLPOINTER pVal = nullptr;
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
 	getColSizeAndPrecision(pos, SQL_C_CHAR, colSize, decDigits, val.size());
@@ -183,7 +184,7 @@ void Binder::bind(std::size_t pos, const UTF16String& val, Direction dir)
 {
 	typedef UTF16String::value_type CharT;
 
-	SQLPOINTER pVal = 0;
+	SQLPOINTER pVal = nullptr;
 	SQLINTEGER size = (SQLINTEGER)(val.size() * sizeof(CharT));
 	SQLINTEGER colSize = 0;
 	SQLSMALLINT decDigits = 0;
@@ -366,7 +367,7 @@ void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 	if (isOutBound(dir) || !isInBound(dir))
 		throw NotImplementedException("NULL parameter type can only be inbound.");
 
-	_inParams.insert(ParamMap::value_type(SQLPOINTER(0), SQLINTEGER(0)));
+	_inParams.insert(ParamMap::value_type(SQLPOINTER(nullptr), SQLINTEGER(0)));
 
 	SQLLEN* pLenIn = new SQLLEN;
 	*pLenIn  = SQL_NULL_DATA;
@@ -384,7 +385,7 @@ void Binder::bind(std::size_t pos, const NullData& val, Direction dir)
 		TypeInfo::sqlDataType<SQL_C_CHAR>(),
 		colSize,
 		decDigits,
-		0,
+		nullptr,
 		0,
 		_lengthIndicator.back())))
 	{
@@ -596,7 +597,7 @@ void Binder::getColSizeAndPrecision(std::size_t pos,
 	}
 
 	// last check, just in case
-	if ((0 != colSize) && (actualSize > colSize))
+	if ((0 != colSize) && (actualSize > static_cast<std::size_t>(colSize)))
 	{
 		throw LengthExceededException(Poco::format("ODBC::Binder::getColSizeAndPrecision();%d: Error binding column %z size=%z, max size=%ld)",
 			__LINE__, pos, actualSize, static_cast<long>(colSize)));
@@ -649,13 +650,13 @@ void Binder::getColumnOrParameterSize(std::size_t pos, SQLINTEGER& size)
 		paramSize = getParamSizeDirect(pos, size);
 
 	if (colSize > 0 && paramSize > 0)
-		size = colSize < paramSize ? static_cast<SQLINTEGER>(colSize) : static_cast<SQLINTEGER>(paramSize);
+		size = static_cast<SQLINTEGER>(std::min(colSize, paramSize));
 	else if (colSize > 0)
 		size = static_cast<SQLINTEGER>(colSize);
 	else if (paramSize > 0)
 		size = static_cast<SQLINTEGER>(paramSize);
 
-	if (size > _maxFieldSize) size = static_cast<SQLINTEGER>(_maxFieldSize);
+	if (static_cast<std::size_t>(size) > _maxFieldSize) size = static_cast<SQLINTEGER>(_maxFieldSize);
 }
 
 
@@ -663,8 +664,8 @@ void Binder::setParamSetSize(std::size_t length)
 {
 	if (0 == _paramSetSize)
 	{
-		if (Utility::isError(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAM_BIND_TYPE, SQL_PARAM_BIND_BY_COLUMN, SQL_IS_UINTEGER)) ||
-			Utility::isError(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAMSET_SIZE, (SQLPOINTER) length, SQL_IS_UINTEGER)))
+		if (Utility::isError(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAM_BIND_TYPE, reinterpret_cast<SQLPOINTER>(SQL_PARAM_BIND_BY_COLUMN), SQL_IS_UINTEGER)) ||
+			Utility::isError(Poco::Data::ODBC::SQLSetStmtAttr(_rStmt, SQL_ATTR_PARAMSET_SIZE, reinterpret_cast<SQLPOINTER>(length), SQL_IS_UINTEGER)))
 				throw StatementException(_rStmt, "ODBC::Binder::setParamSetSize():SQLSetStmtAttr()");
 
 		_paramSetSize = static_cast<SQLINTEGER>(length);

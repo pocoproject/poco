@@ -8,7 +8,7 @@
 // Definition of the AsyncObserver class template.
 //
 // Copyright (c) 2006, Applied Informatics Software Engineering GmbH.
-// Aleph ONE Software Engineering d.o.o.,
+// Aleph ONE Software Engineering LLC,
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -56,7 +56,7 @@ public:
 		NObserver<C, N>(object, handler, matcher),
 		_ra(*this, &AsyncObserver::dequeue),
 		_started(false),
-		_done(false)
+		_done(true)
 	{
 	}
 
@@ -64,7 +64,7 @@ public:
 		NObserver<C, N>(observer),
 		_ra(*this, &AsyncObserver::dequeue),
 		_started(false),
-		_done(false)
+		_done(true)
 	{
 		poco_assert(observer._nq.empty());
 	}
@@ -83,7 +83,7 @@ public:
 			setHandler(observer._handler);
 			setMatcher(observer._matcher);
 			_started = false;
-			_done =false;
+			_done = true;
 		}
 		return *this;
 	}
@@ -100,8 +100,8 @@ public:
 
 	virtual void start()
 	{
-		Poco::ScopedLock l(this->mutex());
-		if (_started)
+		bool expected = false;
+		if (!_started.compare_exchange_strong(expected, true))
 		{
 			throw Poco::InvalidAccessException(
 				Poco::format("thread already started %s", poco_src_loc));
@@ -110,11 +110,14 @@ public:
 		_thread.start(_ra);
 		Poco::Stopwatch sw;
 		sw.start();
-		while (!_started)
+		while (_done)
 		{
 			if (sw.elapsedSeconds() > 5)
+			{
+				_started = false;
 				throw Poco::TimeoutException(poco_src_loc);
-			Thread::sleep(100);
+			}
+			Thread::sleep(10);
 		}
 	}
 
@@ -136,7 +139,6 @@ private:
 	void dequeue()
 	{
 		Notification::Ptr pNf;
-		_started = true;
 		_done = false;
 		while ((pNf = _nq.waitDequeueNotification()))
 		{

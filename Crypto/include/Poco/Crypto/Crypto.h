@@ -45,8 +45,8 @@
 #endif
 
 
-#if OPENSSL_VERSION_NUMBER < 0x10000000L
-#error "OpenSSL version too old. At least OpenSSL 1.0.0 is required."
+#if OPENSSL_VERSION_NUMBER < 0x10101000L
+#error "OpenSSL version too old. At least OpenSSL 1.1.1 is required."
 #endif
 
 
@@ -119,7 +119,7 @@ inline std::string& getError(std::string& msg)
 	while ((err = ERR_get_error()))
 	{
 		if (!msg.empty()) msg.append(1, '\n');
-		msg.append(ERR_error_string(err, 0));
+		msg.append(ERR_error_string(err, nullptr));
 	}
 	return msg;
 }

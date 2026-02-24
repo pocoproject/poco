@@ -19,6 +19,7 @@
 
 
 #include "Poco/PDF/PDF.h"
+#include "Poco/PDF/Declarations.h"
 #include "Poco/PDF/Resource.h"
 
 
@@ -33,7 +34,7 @@ public:
 	Destination(HPDF_Doc* pPDF, const HPDF_Destination& resource, const std::string& name = "");
 		/// Creates the destination.
 
-	~Destination();
+	~Destination() override;
 		/// Destroys the destination.
 
 	void positionAndZoom(float x, float y, float zoom);
@@ -70,58 +71,6 @@ public:
 		/// bounding box of the page within the window and setting the left position
 		/// of the page to the value of the "left" parameter.
 };
-
-
-//
-// inlines
-//
-
-inline void Destination::positionAndZoom(float x, float y, float zoom)
-{
-	HPDF_Destination_SetXYZ(handle(), x, y, zoom);
-}
-
-
-inline void Destination::fit()
-{
-	HPDF_Destination_SetFit(handle());
-}
-
-
-inline void Destination::fitHorizontal(float top)
-{
-	HPDF_Destination_SetFitH(handle(), top);
-}
-
-
-inline void Destination::fitVertical(float left)
-{
-	HPDF_Destination_SetFitV(handle(), left);
-}
-
-
-inline void Destination::fitRectangle(float left, float top, float right, float bottom)
-{
-	HPDF_Destination_SetFitR(handle(), left, bottom, right, top);
-}
-
-
-inline void Destination::fitWindow()
-{
-	HPDF_Destination_SetFitB(handle());
-}
-
-
-inline void Destination::fitWindowHorizontal(float top)
-{
-	HPDF_Destination_SetFitBH(handle(), top);
-}
-
-
-inline void Destination::fitWindowVertical(float left)
-{
-	HPDF_Destination_SetFitBV(handle(), left);
-}
 
 
 } } // namespace Poco::PDF

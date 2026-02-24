@@ -46,56 +46,56 @@ public:
 		///
 		/// consult postgres documentation for other parameters
 
-	~SessionImpl();
+	~SessionImpl() override;
 		/// Destroys the SessionImpl.
 
-	void setConnectionTimeout(std::size_t aTimeout);
+	void setConnectionTimeout(std::size_t aTimeout) override;
 		/// Sets the session connection timeout value.
 
-	std::size_t getConnectionTimeout() const;
+	std::size_t getConnectionTimeout() const override;
 		/// Returns the session connection timeout value.
 
-	void open(const std::string& aConnectionString = std::string());
+	void open(const std::string& aConnectionString = std::string()) override;
 		/// Opens a connection to the database.
 
-	void close();
+	void close() override;
 		/// Closes the connection.
 
-	void reset();
+	void reset() override;
 		/// Do nothing
 
-	bool isConnected() const;
+	bool isConnected() const override;
 		/// Returns true if connected, false otherwise.
 
-	Poco::Data::StatementImpl::Ptr createStatementImpl();
+	Poco::Data::StatementImpl::Ptr createStatementImpl() override;
 		/// Returns an PostgreSQL StatementImpl
 
-	void begin();
+	void begin() override;
 		/// Starts a transaction
 
-	void commit();
+	void commit() override;
 		/// Commits and ends a transaction
 
-	void rollback();
+	void rollback() override;
 		/// Aborts a transaction
 
-	bool canTransact() const;
+	bool canTransact() const override;
 		/// Returns true if session has transaction capabilities.
 
-	bool isTransaction() const;
+	bool isTransaction() const override;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
 
-	void setTransactionIsolation(Poco::UInt32 aTI);
+	void setTransactionIsolation(Poco::UInt32 aTI) override;
 		/// Sets the transaction isolation level.
 
-	Poco::UInt32 getTransactionIsolation() const;
+	Poco::UInt32 getTransactionIsolation() const override;
 		/// Returns the transaction isolation level.
 
-	bool hasTransactionIsolation(Poco::UInt32 aTI) const;
+	bool hasTransactionIsolation(Poco::UInt32 aTI) const override;
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	bool isTransactionIsolation(Poco::UInt32 aTI) const;
+	bool isTransactionIsolation(Poco::UInt32 aTI) const override;
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
@@ -127,7 +127,7 @@ public:
 	SessionHandle& handle();
 		/// Get handle
 
-	const std::string& connectorName() const;
+	const std::string& connectorName() const override;
 		/// Returns the name of the connector.
 
 	void setName();

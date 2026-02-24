@@ -5,7 +5,7 @@
 // Package: Configuration
 // Module:  SystemConfiguration
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -40,124 +40,45 @@ namespace Poco {
 namespace Util {
 
 
-const std::string SystemConfiguration::OSNAME         = "system.osName";
-const std::string SystemConfiguration::OSVERSION      = "system.osVersion";
-const std::string SystemConfiguration::OSARCHITECTURE = "system.osArchitecture";
-const std::string SystemConfiguration::NODENAME       = "system.nodeName";
-const std::string SystemConfiguration::NODEID         = "system.nodeId";
-const std::string SystemConfiguration::CURRENTDIR     = "system.currentDir";
-const std::string SystemConfiguration::HOMEDIR        = "system.homeDir";
-const std::string SystemConfiguration::CONFIGHOMEDIR  = "system.configHomeDir";
-const std::string SystemConfiguration::CACHEHOMEDIR   = "system.cacheHomeDir";
-const std::string SystemConfiguration::DATAHOMEDIR    = "system.dataHomeDir";
-const std::string SystemConfiguration::TEMPHOMEDIR    = "system.tempHomeDir";
-const std::string SystemConfiguration::TEMPDIR        = "system.tempDir";
-const std::string SystemConfiguration::CONFIGDIR      = "system.configDir";
-const std::string SystemConfiguration::DATETIME       = "system.dateTime";
+std::map<std::string, std::function<std::string ()>> SystemConfiguration::_functions = {
+	  { "system.osName", Environment::osName }
+	, { "system.osVersion", Environment::osVersion }
+	, { "system.osArchitecture", Environment::osArchitecture }
+	, { "system.nodeName", Environment::nodeName }
+	, { "system.nodeId", getNodeId }
+	, { "system.currentDir", Path::current }
+	, { "system.homeDir", Path::home }
+	, { "system.configHomeDir", Path::configHome }
+	, { "system.cacheHomeDir", Path::cacheHome }
+	, { "system.dataHomeDir", Path::dataHome }
+	, { "system.tempHomeDir", Path::tempHome }
+	, { "system.tempDir", Path::temp }
+	, { "system.configDir", Path::config }
+	, { "system.dateTime", []() { return Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::ISO8601_FORMAT);} }
 #if !defined(POCO_VXWORKS)
-const std::string SystemConfiguration::PID            = "system.pid";
+	, { "system.pid", []() { return Poco::NumberFormatter::format(Poco::Process::id()); } }
 #endif
-const std::string SystemConfiguration::ENV            = "system.env.";
+};
 
 
-SystemConfiguration::SystemConfiguration()
-{
-}
-
-
-SystemConfiguration::~SystemConfiguration()
-{
+namespace {
+	const std::string ENV = "system.env.";
 }
 
 
 bool SystemConfiguration::getRaw(const std::string& key, std::string& value) const
 {
-	if (key == OSNAME)
+	auto it = _functions.find(key);
+	if (it != _functions.end())
 	{
-		value = Environment::osName();
+		value = it->second();
+		return true;
 	}
-	else if (key == OSVERSION)
-	{
-		value = Environment::osVersion();
-	}
-	else if (key == OSARCHITECTURE)
-	{
-		value = Environment::osArchitecture();
-	}
-	else if (key == NODENAME)
-	{
-		value = Environment::nodeName();
-	}
-	else if (key == NODEID)
-	{
-		try
-		{
-			Poco::Environment::NodeId id;
-			Poco::Environment::nodeId(id);
-			char result[13];
-			std::snprintf(result, sizeof(result), "%02x%02x%02x%02x%02x%02x",
-				id[0],
-				id[1],
-				id[2],
-				id[3],
-				id[4],
-				id[5]);
-			value = result;
-		}
-		catch (...)
-		{
-			value = "000000000000";
-		}
-	}
-	else if (key == CURRENTDIR)
-	{
-		value = Path::current();
-	}
-	else if (key == HOMEDIR)
-	{
-		value = Path::home();
-	}
-	else if (key == CONFIGHOMEDIR)
-	{
-		value = Path::configHome();
-	}
-	else if (key == CACHEHOMEDIR)
-	{
-		value = Path::cacheHome();
-	}
-	else if (key == DATAHOMEDIR)
-	{
-		value = Path::dataHome();
-	}
-	else if (key == TEMPHOMEDIR)
-	{
-		value = Path::tempHome();
-	}
-	else if (key == TEMPDIR)
-	{
-		value = Path::temp();
-	}
-	else if (key == CONFIGDIR)
-	{
-		value = Path::config();
-	}
-	else if (key == DATETIME)
-	{
-		value = Poco::DateTimeFormatter::format(Poco::DateTime(), Poco::DateTimeFormat::ISO8601_FORMAT);
-	}
-#if !defined(POCO_VXWORKS)
-	else if (key == PID)
-	{
-		value = "0";
-		value = Poco::NumberFormatter::format(Poco::Process::id());
-	}
-#endif
 	else if (key.compare(0, ENV.size(), ENV) == 0)
 	{
 		return getEnv(key.substr(ENV.size()), value);
 	}
 	else return false;
-	return true;
 }
 
 
@@ -169,29 +90,18 @@ void SystemConfiguration::setRaw(const std::string& key, const std::string& valu
 
 void SystemConfiguration::enumerate(const std::string& key, Keys& range) const
 {
+	range.clear();
 	if (key.empty())
 	{
 		range.push_back("system"s);
 	}
 	else if (key == "system")
 	{
-		range.push_back("osName"s);
-		range.push_back("osVersion"s);
-		range.push_back("osArchitecture"s);
-		range.push_back("nodeName"s);
-		range.push_back("nodeId"s);
-		range.push_back("currentDir"s);
-		range.push_back("homeDir"s);
-		range.push_back("configHomeDir"s);
-		range.push_back("cacheHomeDir"s);
-		range.push_back("dataHomeDir"s);
-		range.push_back("tempHomeDir"s);
-		range.push_back("tempDir"s);
-		range.push_back("configDir"s);
-		range.push_back("dateTime"s);
-#if !defined(POCO_VXWORKS)
-		range.push_back("pid"s);
-#endif
+		std::size_t sz = key.size() + 1;
+		for (auto& it: _functions)
+		{
+			range.push_back(it.first.substr(sz));
+		}
 		range.push_back("env"s);
 	}
 }
@@ -213,5 +123,27 @@ bool SystemConfiguration::getEnv(const std::string& name, std::string& value)
 	return false;
 }
 
+
+std::string SystemConfiguration::getNodeId()
+{
+    try
+    {
+		Poco::Environment::NodeId id;
+		Poco::Environment::nodeId(id);
+		char result[13];
+		std::snprintf(result, sizeof(result), "%02x%02x%02x%02x%02x%02x",
+			id[0],
+			id[1],
+			id[2],
+			id[3],
+			id[4],
+			id[5]);
+		return result;
+	}
+	catch (...)
+	{
+		return "000000000000";
+	}
+}
 
 } } // namespace Poco::Util

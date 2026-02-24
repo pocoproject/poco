@@ -16,56 +16,40 @@
 
 #include "Poco/Redis/Client.h"
 #include "Poco/Redis/Exception.h"
+#include "Poco/Redis/RedisNotifications.h"
 
 
 namespace Poco {
 namespace Redis {
 
 
-Client::Client():
-	_address(),
-	_socket(),
-	_input(0),
-	_output(0)
+Client::Client()
 {
 }
 
 
 Client::Client(const std::string& hostAndPort):
-	_address(hostAndPort),
-	_socket(),
-	_input(0),
-	_output(0)
+	_address(hostAndPort)
 {
 	connect();
 }
 
 
 Client::Client(const std::string& host, int port):
-	_address(host, port),
-	_socket(),
-	_input(0),
-	_output(0)
+	_address(host, port)
 {
 	connect();
 }
 
 
 Client::Client(const Net::SocketAddress& addrs):
-	_address(addrs),
-	_socket(),
-	_input(0),
-	_output(0)
+	_address(addrs)
 {
 	connect();
 }
 
 
-Client::Client(const Net::StreamSocket& socket):
-	_address(),
-	_socket(),
-	_input(0),
-	_output(0)
+Client::Client(const Net::StreamSocket& socket)
 {
 	connect(socket);
 }
@@ -73,19 +57,35 @@ Client::Client(const Net::StreamSocket& socket):
 
 Client::~Client()
 {
-	delete _input;
-	delete _output;
+#if !POCO_HAVE_ATOMIC_SHARED_PTR
+	delete _pNC.load();
+#endif
 }
 
 
 void Client::connect()
 {
-	poco_assert(! _input);
-	poco_assert(! _output);
+	poco_assert(!_pInput);
+	poco_assert(!_pOutput);
 
-	_socket = Net::StreamSocket(_address);
-	_input = new RedisInputStream(_socket);
-	_output = new RedisOutputStream(_socket);
+	try
+	{
+		_socket = Net::StreamSocket(_address);
+		_pInput = std::make_unique<RedisInputStream>(_socket);
+		_pOutput = std::make_unique<RedisOutputStream>(_socket);
+
+		auto pNC = _pNC.load();
+		if (pNC) pNC->postNotification(new RedisConnectNotification);
+	}
+	catch (const Exception& ex)
+	{
+		_pInput.reset();
+		_pOutput.reset();
+
+		auto pNC = _pNC.load();
+		if (pNC) pNC->postNotification(new RedisErrorNotification(ex));
+		throw;
+	}
 }
 
 
@@ -112,13 +112,28 @@ void Client::connect(const Net::SocketAddress& addrs)
 
 void Client::connect(const Timespan& timeout)
 {
-	poco_assert(! _input);
-	poco_assert(! _output);
+	poco_assert(!_pInput);
+	poco_assert(!_pOutput);
 
-	_socket = Net::StreamSocket();
-	_socket.connect(_address, timeout);
-	_input = new RedisInputStream(_socket);
-	_output = new RedisOutputStream(_socket);
+	try
+	{
+		_socket = Net::StreamSocket();
+		_socket.connect(_address, timeout);
+		_pInput = std::make_unique<RedisInputStream>(_socket);
+		_pOutput = std::make_unique<RedisOutputStream>(_socket);
+
+		auto pNC = _pNC.load();
+		if (pNC) pNC->postNotification(new RedisConnectNotification);
+	}
+	catch (const Exception& ex)
+	{
+		_pInput.reset();
+		_pOutput.reset();
+
+		auto pNC = _pNC.load();
+		if (pNC) pNC->postNotification(new RedisErrorNotification(ex));
+		throw;
+	}
 }
 
 
@@ -145,50 +160,68 @@ void Client::connect(const Net::SocketAddress& addrs, const Timespan& timeout)
 
 void Client::connect(const Poco::Net::StreamSocket& socket)
 {
-	poco_assert(! _input);
-	poco_assert(! _output);
+	poco_assert(!_pInput);
+	poco_assert(!_pOutput);
 
-	_address = socket.peerAddress();
-	_socket = socket;
-	_input = new RedisInputStream(_socket);
-	_output = new RedisOutputStream(_socket);
+	try
+	{
+		_address = socket.peerAddress();
+		_socket = socket;
+		_pInput = std::make_unique<RedisInputStream>(_socket);
+		_pOutput = std::make_unique<RedisOutputStream>(_socket);
+
+		auto pNC = _pNC.load();
+		if (pNC) pNC->postNotification(new RedisConnectNotification);
+	}
+	catch (const Exception& ex)
+	{
+		_pInput.reset();
+		_pOutput.reset();
+
+		auto pNC = _pNC.load();
+		if (pNC) pNC->postNotification(new RedisErrorNotification(ex));
+		throw;
+	}
 }
 
 
 void Client::disconnect()
 {
-	delete _input;
-	_input = 0;
+	if (_pInput || _pOutput)
+	{
+		_pInput.reset();
+		_pOutput.reset();
 
-	delete _output;
-	_output = 0;
+		_socket.close();
 
-	_socket.close();
+		auto pNC = _pNC.load();
+		if (pNC) pNC->postNotification(new RedisDisconnectNotification);
+	}
 }
 
 
 bool Client::isConnected() const
 {
-	return _input != 0;
+	return _pInput != nullptr;
 }
 
 
 void Client::writeCommand(const Array& command, bool doFlush)
 {
-	poco_assert(_output);
+	poco_assert(_pOutput);
 
 	std::string commandStr = command.toString();
 
-	_output->write(commandStr.c_str(), commandStr.length());
-	if (doFlush) _output->flush();
+	_pOutput->write(commandStr.c_str(), commandStr.length());
+	if (doFlush) _pOutput->flush();
 }
 
 
 RedisType::Ptr Client::readReply()
 {
-	poco_assert(_input);
+	poco_assert(_pInput);
 
-	int c = _input->get();
+	int c = _pInput->get();
 	if (c == -1)
 	{
 		disconnect();
@@ -200,7 +233,7 @@ RedisType::Ptr Client::readReply()
 		throw RedisException("Invalid Redis type returned");
 	}
 
-	result->read(*_input);
+	result->read(*_pInput);
 
 	return result;
 }
@@ -221,7 +254,7 @@ Array Client::sendCommands(const std::vector<Array>& commands)
 	{
 		writeCommand(*it, false);
 	}
-	_output->flush();
+	_pOutput->flush();
 
 	for (std::size_t i = 0; i < commands.size(); ++i)
 	{
@@ -229,6 +262,25 @@ Array Client::sendCommands(const std::vector<Array>& commands)
 	}
 
 	return results;
+}
+
+
+Client::NotificationCenterPtr Client::notificationCenter()
+{
+#if POCO_HAVE_ATOMIC_SHARED_PTR
+	std::call_once(_ncInitFlag, [this]()
+	{
+		_pNC.store(std::make_shared<AsyncNotificationCenter>());
+	});
+	return _pNC.load();
+#else
+	std::call_once(_ncInitFlag, [this]()
+	{
+		_pNC.store(new AsyncNotificationCenter);
+	});
+	return NotificationCenterPtr(_pNC.load(), [](AsyncNotificationCenter*) {});
+		// Return shared_ptr with no-op deleter since Client owns the pointer
+#endif
 }
 
 

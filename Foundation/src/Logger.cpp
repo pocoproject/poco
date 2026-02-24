@@ -74,12 +74,25 @@ void Logger::setProperty(const std::string& name, const std::string& value)
 }
 
 
-void Logger::log(const Message& msg)
+template <typename M>
+void Logger::logImpl(M&& msg)
 {
 	if (_level >= msg.getPriority() && _pChannel)
 	{
-		_pChannel->log(msg);
+		_pChannel->log(std::forward<M>(msg));
 	}
+}
+
+
+void Logger::log(const Message& msg)
+{
+	logImpl(msg);
+}
+
+
+void Logger::log(Message&& msg)
+{
+	logImpl(std::move(msg));
 }
 
 
@@ -245,7 +258,7 @@ void Logger::formatDump(std::string& message, const void* buffer, std::size_t le
 	message.reserve(message.size() + length*6);
 	if (!message.empty()) message.append("\n");
 	unsigned char* base = (unsigned char*) buffer;
-	int addr = 0;
+	std::size_t addr = 0;
 	while (addr < length)
 	{
 		if (addr > 0) message.append("\n");
@@ -288,7 +301,7 @@ Logger& Logger::unsafeGet(const std::string& name)
 	{
 		if (name == ROOT)
 		{
-			pLogger = new Logger(name, 0, Message::PRIO_INFORMATION);
+			pLogger = new Logger(name, nullptr, Message::PRIO_INFORMATION);
 		}
 		else
 		{
@@ -343,7 +356,7 @@ Logger::Ptr Logger::find(const std::string& name)
 		LoggerMap::iterator it = _pLoggerMap->find(name);
 		if (it != _pLoggerMap->end()) return it->second;
 	}
-	return 0;
+	return nullptr;
 }
 
 

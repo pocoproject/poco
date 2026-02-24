@@ -95,7 +95,9 @@ public:
 
 	void testNullableInt();
 	void testNullableString();
+	void testOptionalString();
 	void testTupleWithNullable();
+	void testStdTupleWithOptional();
 
 	void testBinarySimpleAccess();
 	void testBinaryComplexType();
@@ -113,7 +115,7 @@ public:
 	void testSessionTransactionNoAutoCommit();
 	void testTransaction();
 	void testReconnect();
-
+    void testTransactionWithReconnect();
 	void testSqlState();
 
 	void setUp();

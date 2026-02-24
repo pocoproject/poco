@@ -101,8 +101,8 @@ public:
 	void addObserver(const AbstractObserver& observer);
 		/// Registers an observer with the NotificationCenter.
 		/// Usage:
-		///     Observer<MyClass, MyNotification> obs(*this, &MyClass::handleNotification);
-		///     notificationCenter.addObserver(obs);
+		///     NObserver<MyClass, MyNotification> obs(*this, &MyClass::handleNotification);
+		///     taskManager.addObserver(obs);
 
 	void removeObserver(const AbstractObserver& observer);
 		/// Unregisters an observer with the NotificationCenter.

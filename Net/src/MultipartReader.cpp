@@ -44,14 +44,14 @@ MultipartStreamBuf::~MultipartStreamBuf()
 }
 
 
-int MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
-	poco_assert (!_boundary.empty() && _boundary.length() < length - 6);
+	poco_assert (!_boundary.empty() && _boundary.length() < static_cast<std::size_t>(length - 6));
 
 	static const int eof = std::char_traits<char>::eof();
 	std::streambuf& buf = *_istr.rdbuf();
 
-	int n  = 0;
+	std::streamsize n  = 0;
 	int ch = buf.sbumpc();
 	if (ch == eof) return -1;
 	*buffer++ = (char) ch; ++n;

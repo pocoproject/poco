@@ -152,7 +152,7 @@ void ZipUtil::sync(std::istream& in)
 			++tempPos;
 		}
 
-		if (tempPos > (BUFFER_SIZE - ZipCommon::HEADER_SIZE))
+		if (tempPos > (static_cast<std::size_t>(BUFFER_SIZE) - ZipCommon::HEADER_SIZE))
 		{
 			std::memcpy(temp, &temp[tempPos - ZipCommon::HEADER_SIZE], ZipCommon::HEADER_SIZE);
 			tempPos = ZipCommon::HEADER_SIZE;
@@ -189,7 +189,7 @@ void ZipUtil::syncDataDescriptor(std::istream & in, bool force64)
 				ZipDataInfo64 nfo(in, true);
 				if (nfo.isValid())
 				{
-					if (end - start == nfo.getCompressedSize() + 4)
+					if (static_cast<Poco::UInt64>(end - start) == nfo.getCompressedSize() + 4)
 					{
 						in.seekg(-static_cast<int>(ZipDataInfo64::getFullHeaderSize()), std::ios::cur);
 						if (!in.good()) throw Poco::IOException("Failed to seek on input stream");

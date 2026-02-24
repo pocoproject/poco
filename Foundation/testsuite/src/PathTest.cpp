@@ -836,6 +836,39 @@ void PathTest::testParseWindows4()
 }
 
 
+void PathTest::testParseWindows5()
+{
+	Path p;
+	p.parse("C:", Path::PATH_WINDOWS);
+	assertTrue (!p.isRelative());
+	assertTrue (p.isAbsolute());
+	assertTrue (p.depth() == 0);
+	assertTrue (p.isDirectory());
+	assertTrue (p.toString(Path::PATH_WINDOWS) == "C:\\");
+
+	p.parse("C:\\", Path::PATH_WINDOWS);
+	assertTrue (!p.isRelative());
+	assertTrue (p.isAbsolute());
+	assertTrue (p.depth() == 0);
+	assertTrue (p.isDirectory());
+	assertTrue (p.toString(Path::PATH_WINDOWS) == "C:\\");
+
+	p.parse("\\\\?\\C:", Path::PATH_WINDOWS);
+	assertTrue (!p.isRelative());
+	assertTrue (p.isAbsolute());
+	assertTrue (p.depth() == 1);
+	assertTrue (p.isDirectory());
+	assertTrue (p.toString(Path::PATH_WINDOWS) == "\\\\?\\C:\\");
+
+	p.parse("\\\\?\\C:\\", Path::PATH_WINDOWS);
+	assertTrue (!p.isRelative());
+	assertTrue (p.isAbsolute());
+	assertTrue (p.depth() == 1);
+	assertTrue (p.isDirectory());
+	assertTrue (p.toString(Path::PATH_WINDOWS) == "\\\\?\\C:\\");
+}
+
+
 void PathTest::testParseVMS1()
 {
 	Path p;
@@ -1545,7 +1578,7 @@ void PathTest::testExpand()
 	std::string s = Path::expand("~/.bashrc");
 	assertTrue (s == Path::expand("$HOME/.bashrc"));
 	assertTrue (s == Environment::get("HOME") + "/.bashrc" ||
-	        s == Environment::get("HOME") + "//.bashrc");
+			s == Environment::get("HOME") + "//.bashrc");
 	Path p(s);
 	s = Path::expand("$HOME/.bashrc");
 	assertTrue (s == Path::expand("~/.bashrc"));
@@ -1655,12 +1688,12 @@ void PathTest::testSelf()
 	std::cout << self << std::endl;
 
 #if POCO_OS == POCO_OS_MAC_OS_X      \
-    || POCO_OS == POCO_OS_FREE_BSD   \
-    || POCO_OS == POCO_OS_NET_BSD	 \
+	|| POCO_OS == POCO_OS_FREE_BSD   \
+	|| POCO_OS == POCO_OS_NET_BSD	 \
 	|| POCO_OS == POCO_OS_SOLARIS    \
 	|| POCO_OS == POCO_OS_LINUX      \
 	|| POCO_OS == POCO_OS_ANDROID    \
-    || POCO_OS == POCO_OS_WINDOWS_NT
+	|| POCO_OS == POCO_OS_WINDOWS_NT
 
 	assertTrue(!self.empty());
 	Path p(self);
@@ -1697,6 +1730,7 @@ CppUnit::Test* PathTest::suite()
 	CppUnit_addTest(pSuite, PathTest, testParseWindows2);
 	CppUnit_addTest(pSuite, PathTest, testParseWindows3);
 	CppUnit_addTest(pSuite, PathTest, testParseWindows4);
+	CppUnit_addTest(pSuite, PathTest, testParseWindows5);
 	CppUnit_addTest(pSuite, PathTest, testParseVMS1);
 	CppUnit_addTest(pSuite, PathTest, testParseVMS2);
 	CppUnit_addTest(pSuite, PathTest, testParseVMS3);

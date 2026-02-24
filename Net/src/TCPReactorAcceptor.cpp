@@ -8,8 +8,10 @@ namespace Net {
 
 TCPReactorAcceptor::TCPReactorAcceptor(
 	Poco::Net::ServerSocket& socket, Poco::Net::SocketReactor& reactor, TCPServerParams::Ptr pParams)
-	: Poco::Net::SocketAcceptor<TCPReactorServerConnection>(socket, reactor), _pParams(pParams), _selfReactor(reactor),
-	  _useSelfReactor(pParams->getUseSelfReactor())
+	: Poco::Net::SocketAcceptor<TCPReactorServerConnection>(socket, reactor),
+	  _selfReactor(reactor),
+	  _useSelfReactor(pParams->getUseSelfReactor()),
+	  _pParams(pParams)
 {
 	int workerThreads = _useSelfReactor ? 0 : _pParams->getMaxThreads();
 	if (workerThreads > 0)

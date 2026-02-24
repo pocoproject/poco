@@ -16,11 +16,7 @@
 #include "Poco/Exception.h"
 #include <cstring>
 #include <memory>
-#if defined(POCO_UNBUNDLED)
 #include <zlib.h>
-#else
-#include "zlib.h"
-#endif
 
 
 namespace Poco {
@@ -29,7 +25,7 @@ namespace Poco {
 InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_eof(false),
 	_check(type != STREAM_ZIP)
 {
@@ -50,7 +46,7 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, StreamType type):
 InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, int windowBits):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::in),
 	_pIstr(&istr),
-	_pOstr(0),
+	_pOstr(nullptr),
 	_eof(false),
 	_check(false)
 {
@@ -70,7 +66,7 @@ InflatingStreamBuf::InflatingStreamBuf(std::istream& istr, int windowBits):
 
 InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_eof(false),
 	_check(type != STREAM_ZIP)
@@ -91,7 +87,7 @@ InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, StreamType type):
 
 InflatingStreamBuf::InflatingStreamBuf(std::ostream& ostr, int windowBits):
 	BufferedStreamBuf(STREAM_BUFFER_SIZE, std::ios::out),
-	_pIstr(0),
+	_pIstr(nullptr),
 	_pOstr(&ostr),
 	_eof(false),
 	_check(false)
@@ -128,8 +124,8 @@ InflatingStreamBuf::~InflatingStreamBuf()
 int InflatingStreamBuf::close()
 {
 	sync();
-	_pIstr = 0;
-	_pOstr = 0;
+	_pIstr = nullptr;
+	_pOstr = nullptr;
 	return 0;
 }
 
@@ -144,7 +140,7 @@ void InflatingStreamBuf::reset()
 }
 
 
-int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
+std::streamsize InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	if (_eof || !_pIstr) return 0;
 
@@ -177,11 +173,11 @@ int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 		if (rc == Z_STREAM_END)
 		{
 			_eof = true;
-			return static_cast<int>(length) - _pZstr->avail_out;
+			return length - _pZstr->avail_out;
 		}
 		if (rc != Z_OK) throw IOException(zError(rc));
 		if (_pZstr->avail_out == 0)
-			return static_cast<int>(length);
+			return length;
 		if (_pZstr->avail_in == 0)
 		{
 			int n = 0;
@@ -195,13 +191,13 @@ int InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 				_pZstr->next_in  = (unsigned char*) _buffer;
 				_pZstr->avail_in = n;
 			}
-			else return static_cast<int>(length) - _pZstr->avail_out;
+			else return length - _pZstr->avail_out;
 		}
 	}
 }
 
 
-int InflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
+std::streamsize InflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length)
 {
 	if (length == 0 || !_pOstr) return 0;
 
@@ -235,7 +231,7 @@ int InflatingStreamBuf::writeToDevice(const char* buffer, std::streamsize length
 			break;
 		}
 	}
-	return static_cast<int>(length);
+	return length;
 }
 
 

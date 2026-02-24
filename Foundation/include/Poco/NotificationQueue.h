@@ -74,7 +74,7 @@ public:
 
 	Notification* dequeueNotification();
 		/// Dequeues the next pending notification.
-		/// Returns 0 (null) if no notification is available.
+		/// Returns nullptr if no notification is available.
 		/// The caller gains ownership of the notification and
 		/// is expected to release it when done with it.
 		///
@@ -88,7 +88,7 @@ public:
 		/// to be enqueued.
 		/// The caller gains ownership of the notification and
 		/// is expected to release it when done with it.
-		/// This method returns 0 (null) if wakeUpWaitingThreads()
+		/// This method returns nullptr if wakeUpWaitingThreads()
 		/// has been called by another thread.
 		///
 		/// It is highly recommended that the result is immediately
@@ -149,6 +149,7 @@ private:
 
 	NfQueue           _nfQueue;
 	WaitQueue         _waitQueue;
+	bool              _wokeUp = false;
 	mutable FastMutex _mutex;
 };
 

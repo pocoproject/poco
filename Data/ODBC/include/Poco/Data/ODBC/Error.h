@@ -19,10 +19,9 @@
 
 
 #include "Poco/Data/ODBC/ODBC.h"
-#include "Poco/Data/ODBC/Utility.h"
 #include "Poco/Data/ODBC/Diagnostics.h"
 #include "Poco/Format.h"
-#include <vector>
+
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include <windows.h>
 #endif
@@ -127,7 +126,7 @@ private:
 // explicit instantiation definition
 #ifndef POCO_DOC
 
-#if defined(POCO_OS_FAMILY_WINDOWS)
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(ODBC_EXPORTS)
 extern template class Error<SQLHENV, SQL_HANDLE_ENV>;
 extern template class Error<SQLHDBC, SQL_HANDLE_DBC>;
 extern template class Error<SQLHSTMT, SQL_HANDLE_STMT>;

@@ -48,8 +48,8 @@ public:
 		/// Flushes all buffers and finishes the encryption.
 
 protected:
-	int readFromDevice(char* buffer, std::streamsize length);
-	int writeToDevice(const char* buffer, std::streamsize length);
+	std::streamsize readFromDevice(char* buffer, std::streamsize length);
+	std::streamsize writeToDevice(const char* buffer, std::streamsize length);
 
 private:
 	CryptoTransform::Ptr _pTransform;

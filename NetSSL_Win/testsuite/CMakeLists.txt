@@ -11,10 +11,12 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
 )
 
 add_executable(NetSSLWin-testrunner ${TEST_SRCS})
+set_target_properties(NetSSLWin-testrunner PROPERTIES DEBUG_POSTFIX "d")
+# NetSSL_Win is Windows-only, so always use cppignore.win
 add_test(
 	NAME NetSSLWin
 	WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-	COMMAND NetSSLWin-testrunner -ignore ${CMAKE_SOURCE_DIR}/cppignore.lnx -all
+	COMMAND NetSSLWin-testrunner -ignore ${CMAKE_SOURCE_DIR}/cppignore.win -all
 )
 set_tests_properties(NetSSLWin PROPERTIES ENVIRONMENT POCO_BASE=${CMAKE_SOURCE_DIR})
 target_link_libraries(NetSSLWin-testrunner PUBLIC Poco::NetSSL Poco::Util Poco::XML CppUnit)

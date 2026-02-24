@@ -12,10 +12,15 @@
 //
 
 #include "Poco/MongoDB/OpMsgMessage.h"
-#include "Poco/MongoDB/MessageHeader.h"
 #include "Poco/MongoDB/Array.h"
-#include "Poco/StreamCopier.h"
-#include "Poco/Logger.h"
+#include "Poco/MongoDB/MessageHeader.h"
+#include "Poco/BinaryReader.h"
+#include "Poco/BinaryWriter.h"
+#include "Poco/Bugcheck.h"
+#include <istream>
+#include <map>
+#include <ostream>
+#include <sstream>
 
 #define POCO_MONGODB_DUMP	false
 
@@ -60,9 +65,13 @@ static const std::string& commandIdentifier(const std::string& command);
 	/// Commands have different names for the payload that is sent in a separate section
 
 
+static const std::string keyDb			{ "$db"s };
+static const std::string keyCollection	{ "collection"s };
 static const std::string keyCursor		{ "cursor"s };
+static const std::string keyOk			{ "ok"s };
 static const std::string keyFirstBatch	{ "firstBatch"s };
 static const std::string keyNextBatch	{ "nextBatch"s };
+static const std::string keyBatchSize	{ "batchSize"s };
 
 constexpr static Poco::UInt8 PAYLOAD_TYPE_0 { 0 };
 constexpr static Poco::UInt8 PAYLOAD_TYPE_1 { 1 };
@@ -114,7 +123,7 @@ void OpMsgMessage::setCommandName(const std::string& command)
 	{
 		_body.add(_commandName, _collectionName);
 	}
-	_body.add("$db"s, _databaseName);
+	_body.add(keyDb, _databaseName);
 }
 
 
@@ -125,11 +134,11 @@ void OpMsgMessage::setCursor(Poco::Int64 cursorID, Poco::Int32 batchSize)
 
 	// IMPORTANT: Command name must be first
 	_body.add(_commandName, cursorID);
-	_body.add("$db"s, _databaseName);
-	_body.add("collection"s, _collectionName);
+	_body.add(keyDb, _databaseName);
+	_body.add(keyCollection, _collectionName);
 	if (batchSize > 0)
 	{
-		_body.add("batchSize"s, batchSize);
+		_body.add(keyBatchSize, batchSize);
 	}
 }
 
@@ -207,9 +216,9 @@ const Document::Vector& OpMsgMessage::documents() const
 bool OpMsgMessage::responseOk() const
 {
 	Poco::Int64 ok {false};
-	if (_body.exists("ok"s))
+	if (_body.exists(keyOk))
 	{
-		ok = _body.getInteger("ok"s);
+		ok = _body.getInteger(keyOk);
 	}
 	return (ok != 0);
 }
@@ -238,8 +247,10 @@ void OpMsgMessage::send(std::ostream& ostr)
 
 	if (!_documents.empty())
 	{
-		// Serialise attached documents
+		// Serialise attached documents directly to main stream to avoid extra buffer copy
+		const std::string& identifier = commandIdentifier(_commandName);
 
+		// Write documents to temporary buffer (still needed to calculate size)
 		std::stringstream ssdoc;
 		BinaryWriter wdoc(ssdoc, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
 		for (auto& doc: _documents)
@@ -248,12 +259,14 @@ void OpMsgMessage::send(std::ostream& ostr)
 		}
 		wdoc.flush();
 
-		const std::string& identifier = commandIdentifier(_commandName);
 		const Poco::Int32 size = static_cast<Poco::Int32>(sizeof(size) + identifier.size() + 1 + ssdoc.tellp());
 		writer << PAYLOAD_TYPE_1;
 		writer << size;
 		writer.writeCString(identifier.c_str());
-		StreamCopier::copyStream(ssdoc, ss);
+
+		// Use writeRaw instead of copyStream for better performance
+		const std::string& docData = ssdoc.str();
+		ss.write(docData.data(), docData.size());
 	}
 	writer.flush();
 
@@ -267,8 +280,10 @@ void OpMsgMessage::send(std::ostream& ostr)
 	messageLength(static_cast<Poco::Int32>(ss.tellp()));
 
 	_header.write(socketWriter);
-	StreamCopier::copyStream(ss, ostr);
 
+	// Write directly instead of using StreamCopier for better performance
+	const std::string& msgData = ss.str();
+	ostr.write(msgData.data(), msgData.size());
 	ostr.flush();
 }
 
@@ -287,8 +302,8 @@ void OpMsgMessage::read(std::istream& istr)
 
 #if POCO_MONGODB_DUMP
 		std::cout
-			<< "Message hdr: " << _header.getMessageLength() << " " << remainingSize << " "
-			<< _header.opCode() << " " << _header.getRequestID() << " " << _header.responseTo()
+			<< "Message hdr: " << _header.getMessageLength() << ' ' << remainingSize << ' '
+			<< _header.opCode() << ' ' << _header.getRequestID() << ' ' << _header.responseTo()
 			<< std::endl;
 #endif
 
@@ -348,7 +363,7 @@ void OpMsgMessage::read(std::istream& istr)
 		while (msgss.tellg() < endOfSection)
 		{
 #if POCO_MONGODB_DUMP
-			std::cout << "section doc: " << msgss.tellg() << " " << endOfSection << std::endl;
+			std::cout << "section doc: " << msgss.tellg() << ' ' << endOfSection << std::endl;
 #endif
 			Document::Ptr doc = new Document();
 			doc->read(reader);
@@ -373,6 +388,9 @@ void OpMsgMessage::read(std::istream& istr)
 	}
 	if (batch)
 	{
+		// Reserve space to avoid reallocations
+		_documents.reserve(_documents.size() + batch->size());
+
 		for(std::size_t i = 0; i < batch->size(); i++)
 		{
 			const auto& d = batch->get<MongoDB::Document::Ptr>(i, nullptr);

@@ -22,7 +22,7 @@ namespace Net {
 
 UDPClient::UDPClient(const std::string& address, Poco::UInt16 port, bool listen):
 	_address(address, port),
-	_pThread(0),
+	_pThread(nullptr),
 	_stop(false)
 {
 	_socket.bind(SocketAddress(address, 0), true, true);
@@ -60,7 +60,7 @@ void UDPClient::run()
 			{
 				char buffer[sizeof(Poco::UInt32)*2];
 				int n = _socket.receiveBytes(buffer, sizeof(buffer));
-				if (n >= sizeof(Poco::Int32)) handleResponse(buffer, n);
+				if (static_cast<std::size_t>(n) >= sizeof(Poco::Int32)) handleResponse(buffer, n);
 			}
 			catch (Exception& exc)
 			{

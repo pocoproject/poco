@@ -25,13 +25,12 @@
 #include "Poco/Data/ODBC/Preparator.h"
 #include "Poco/Data/ODBC/ODBCMetaColumn.h"
 #include "Poco/Data/StatementImpl.h"
-#include "Poco/Data/Column.h"
 #include "Poco/SharedPtr.h"
-#include "Poco/Format.h"
-#include <sstream>
+
 #ifdef POCO_OS_FAMILY_WINDOWS
 #include <windows.h>
 #endif
+
 #include <sqltypes.h>
 
 
@@ -47,51 +46,51 @@ public:
 	ODBCStatementImpl(SessionImpl& rSession);
 		/// Creates the ODBCStatementImpl.
 
-	~ODBCStatementImpl();
+	~ODBCStatementImpl() override;
 		/// Destroys the ODBCStatementImpl.
 
 	std::string nativeSQL();
 		/// Returns the SQL string as modified by the driver.
 
 protected:
-	std::size_t columnsReturned() const;
+	std::size_t columnsReturned() const override;
 		/// Returns number of columns returned by query.
 
-	int affectedRowCount() const;
+	int affectedRowCount() const override;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert or update.
 
-	const MetaColumn& metaColumn(std::size_t pos) const;
+	const MetaColumn& metaColumn(std::size_t pos) const override;
 		/// Returns column meta data.
 
-	bool hasNext();
+	bool hasNext() override;
 		/// Returns true if a call to next() will return data.
 
-	std::size_t next();
+	std::size_t next() override;
 		/// Retrieves the next row or set of rows from the resultset.
 		/// Returns the number of rows retrieved.
 		/// Will throw, if the resultset is empty.
 
-	bool canBind() const;
+	bool canBind() const override;
 		/// Returns true if a valid statement is set and we can bind.
 
-	bool canCompile() const;
+	bool canCompile() const override;
 		/// Returns true if another compile is possible.
 
-	void compileImpl();
+	void compileImpl() override;
 		/// Compiles the statement, doesn't bind yet.
 		/// Does nothing if the statement has already been compiled.
 
-	void bindImpl();
+	void bindImpl() override;
 		/// Binds all parameters and executes the statement.
 
-	AbstractExtraction::ExtractorPtr extractor();
+	AbstractExtraction::ExtractorPtr extractor() override;
 		/// Returns the concrete extractor used by the statement.
 
-	AbstractBinding::BinderPtr binder();
+	AbstractBinding::BinderPtr binder() override;
 		/// Returns the concrete binder used by the statement.
 
-	void execDirectImpl(const std::string& query);
+	void execDirectImpl(const std::string& query) override;
 		/// Execute query directly impl
 
 	void printErrors(std::ostream& os) const;
@@ -119,7 +118,7 @@ private:
 	void makeInternalExtractors();
 		/// Creates internal extractors if none were supplied from the user.
 
-	bool isStoredProcedure() const;
+	bool isStoredProcedure() const override;
 		/// Returns true if SQL is a stored procedure call.
 
 	void doPrepare();

@@ -24,6 +24,8 @@
 #if defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
+#include <unistd.h>
+#include <sys/wait.h>
 #elif defined(POCO_OS_FAMILY_WINDOWS)
 #include "Poco/Thread.h"
 #include "Poco/Process.h"
@@ -102,6 +104,26 @@ public:
 		_terminated.set();
 	}
 
+	int runWithChild(std::string pidPath, const std::string& childPidPath, const std::string& exePath)
+	{
+		_pPIDFile.reset(new PIDFile(pidPath, true));
+		// Launch a child TestApp with its own PID file.
+		// The child auto-joins the Job Object created by ProcessRunner
+		// (PROCESS_KILL_TREE), so closing the Job handle kills both.
+		Process::Args childArgs;
+		childArgs.push_back(std::string("--pidfile=").append(childPidPath));
+		ProcessHandle ph = Process::launch(exePath, childArgs);
+		waitForTerminationRequest();
+		// Child may already be killed by Job Object; ignore errors
+		try
+		{
+			if (Process::isRunning(ph))
+				Process::requestTermination(ph.id());
+		}
+		catch (...) {}
+		return 0;
+	}
+
 #elif defined(POCO_OS_FAMILY_UNIX)
 	void waitForTerminationRequest()
 	{
@@ -113,7 +135,7 @@ public:
 		}
 		sigaddset(&sset, SIGQUIT);
 		sigaddset(&sset, SIGTERM);
-		sigprocmask(SIG_BLOCK, &sset, NULL);
+		sigprocmask(SIG_BLOCK, &sset, nullptr);
 		int sig;
 		sigwait(&sset, &sig);
 	}
@@ -147,6 +169,43 @@ public:
 		thread4.join();
 		return 0;
 	}
+
+	int runWithChild(std::string pidPath, const std::string& childPidPath)
+	{
+		// Fork a child that writes its own PID file and sleeps.
+		// Both parent and child are in the same process group
+		// (set by PROCESS_KILL_TREE via setpgid), so sending a signal
+		// to the process group should terminate both.
+		pid_t child = fork();
+		if (child == 0)
+		{
+			// Child process: write PID file and wait
+			PIDFile childPID(childPidPath, true);
+			sigset_t sset;
+			sigemptyset(&sset);
+			sigaddset(&sset, SIGINT);
+			sigaddset(&sset, SIGQUIT);
+			sigaddset(&sset, SIGTERM);
+			sigprocmask(SIG_BLOCK, &sset, nullptr);
+			int sig;
+			sigwait(&sset, &sig);
+			_exit(0);
+		}
+		else if (child > 0)
+		{
+			// Parent process
+			_pPIDFile.reset(new PIDFile(pidPath, true));
+			waitForTerminationRequest();
+			// Reap child
+			int status = 0;
+			waitpid(child, &status, WNOHANG);
+			return 0;
+		}
+		else
+		{
+			return 1; // fork failed
+		}
+	}
 #endif
 
 	int run(std::string pidPath)
@@ -169,7 +228,7 @@ HANDLE openFileWithRWAccess(const std::string& path)
 	DWORD access = GENERIC_READ | GENERIC_WRITE;
 	DWORD shareMode = FILE_SHARE_READ | FILE_SHARE_WRITE;
 
-	HANDLE handle = CreateFileA(path.c_str(), access, shareMode, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE handle = CreateFileA(path.c_str(), access, shareMode, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 
 	if (handle == INVALID_HANDLE_VALUE)
 		Poco::File::handleLastError(path);
@@ -217,7 +276,7 @@ int main(int argc, char** argv)
 			}
 		}
 #if defined(POCO_OS_FAMILY_UNIX)
-		else if (argc > 2 && arg.find("--pidfile") != std::string::npos && std::string(argv[2]) == "--launch-thread") 
+		else if (argc > 2 && arg.find("--pidfile") != std::string::npos && std::string(argv[2]) == "--launch-thread")
 		{
 			size_t equals_pos = arg.find('=');
 			if (equals_pos != std::string::npos)
@@ -230,6 +289,21 @@ int main(int argc, char** argv)
 		}
 #endif
 #if POCO_OS != POCO_OS_ANDROID
+		else if (argc > 2 && arg.find("--pidfile") != std::string::npos && std::string(argv[2]).find("--spawn-child=") == 0)
+		{
+			size_t equals_pos = arg.find('=');
+			if (equals_pos != std::string::npos)
+			{
+				std::string pidPath = arg.substr(equals_pos + 1);
+				std::string childPidPath = std::string(argv[2]).substr(std::string("--spawn-child=").length());
+				MyApp myApp;
+#if defined(POCO_OS_FAMILY_UNIX)
+				return myApp.runWithChild(pidPath, childPidPath);
+#else
+				return myApp.runWithChild(pidPath, childPidPath, argv[0]);
+#endif
+			}
+		}
 		else if (arg.find("--pidfile") != std::string::npos || arg.find("-p") != std::string::npos)
 		{
 			size_t equals_pos = arg.find('=');
