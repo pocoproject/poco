@@ -36,7 +36,7 @@ target_include_directories(SevenZip
 POCO_INSTALL(SevenZip)
 POCO_GENERATE_PACKAGE(SevenZip)
 
-if(ENABLE_TESTS)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
 endif()
 
