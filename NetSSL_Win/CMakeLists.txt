@@ -33,8 +33,11 @@ POCO_INSTALL(NetSSLWin)
 POCO_GENERATE_PACKAGE(NetSSLWin)
 
 if(ENABLE_SAMPLES)
-	#TODO: Looks like the samples use crypto somehow?
-	#add_subdirectory(samples)
+	if(ENABLE_CRYPTO)
+		add_subdirectory(samples)
+	else()
+		message(STATUS "NetSSL_Win samples require Crypto and are not being built")
+	endif()
 endif()
 
 if(ENABLE_TESTS)
