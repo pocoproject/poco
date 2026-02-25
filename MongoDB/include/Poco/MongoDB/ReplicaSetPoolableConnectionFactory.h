@@ -22,6 +22,7 @@
 #include "Poco/MongoDB/ReplicaSet.h"
 #include "Poco/MongoDB/ReadPreference.h"
 #include "Poco/ObjectPool.h"
+#include "Poco/Timespan.h"
 
 
 namespace Poco {
@@ -33,6 +34,11 @@ class PoolableObjectFactory<MongoDB::ReplicaSetConnection, MongoDB::ReplicaSetCo
 	///
 	/// New connections are created from the given ReplicaSet with the
 	/// specified ReadPreference.
+	///
+	/// By default, timeouts are inherited from the ReplicaSet's configuration
+	/// (ReplicaSet::Config::connectTimeoutSeconds, socketTimeoutSeconds).
+	/// The timeout-aware constructor creates connections with per-connection
+	/// timeouts that override the ReplicaSet's configured values.
 	///
 	/// Usage example:
 	///   Poco::SharedPtr<ReplicaSet> rs(new ReplicaSet(config));
@@ -55,9 +61,22 @@ public:
 	{
 	}
 
+	PoolableObjectFactory(MongoDB::ReplicaSet& replicaSet, const MongoDB::ReadPreference& readPref,
+			Poco::Timespan connectTimeout, Poco::Timespan socketTimeout = 0):
+		_replicaSet(replicaSet),
+		_readPreference(readPref),
+		_connectTimeout(connectTimeout),
+		_socketTimeout(socketTimeout),
+		_hasTimeouts(true)
+	{
+	}
+
 	MongoDB::ReplicaSetConnection::Ptr createObject()
 	{
-		return new MongoDB::ReplicaSetConnection(_replicaSet, _readPreference);
+		if (_hasTimeouts)
+			return new MongoDB::ReplicaSetConnection(_replicaSet, _readPreference, _connectTimeout, _socketTimeout);
+		else
+			return new MongoDB::ReplicaSetConnection(_replicaSet, _readPreference);
 	}
 
 	bool validateObject(MongoDB::ReplicaSetConnection::Ptr pObject)
@@ -95,6 +114,9 @@ public:
 private:
 	MongoDB::ReplicaSet& _replicaSet;
 	MongoDB::ReadPreference _readPreference;
+	Poco::Timespan _connectTimeout;
+	Poco::Timespan _socketTimeout;
+	bool _hasTimeouts = false;
 };
 
 

@@ -23,6 +23,7 @@
 #include "Poco/MongoDB/ReadPreference.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/SharedPtr.h"
+#include "Poco/Timespan.h"
 #include <functional>
 
 
@@ -67,6 +68,15 @@ public:
 
 	ReplicaSetConnection(ReplicaSet& replicaSet, const ReadPreference& readPref);
 		/// Creates a ReplicaSetConnection for the given replica set and read preference.
+		/// Timeouts and retries are inherited from the ReplicaSet's configuration.
+		/// The connection is established lazily on first use.
+
+	ReplicaSetConnection(ReplicaSet& replicaSet, const ReadPreference& readPref,
+		Poco::Timespan connectTimeout, Poco::Timespan socketTimeout = 0);
+		/// Creates a ReplicaSetConnection for the given replica set and read preference,
+		/// with explicit connect and socket timeouts.
+		/// These timeouts override the ReplicaSet's configured timeouts for
+		/// connections created through this ReplicaSetConnection instance.
 		/// The connection is established lazily on first use.
 
 	~ReplicaSetConnection();
@@ -127,6 +137,9 @@ private:
 	ReplicaSet& _replicaSet;
 	ReadPreference _readPreference;
 	Connection::Ptr _connection;
+	Poco::Timespan _connectTimeout;
+	Poco::Timespan _socketTimeout;
+	bool _hasTimeouts = false;
 };
 
 

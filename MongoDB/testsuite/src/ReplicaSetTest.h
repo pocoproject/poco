@@ -72,6 +72,12 @@ public:
 	void testReplicaSetURIModification();
 	void testReplicaSetWithURIObject();
 
+	void testConnectionTimeoutWithUnreachableServer();
+	void testReplicaSetConstructionTimeout();
+	void testReplicaSetMonitoringStopWithUnreachableServers();
+	void testConnectionPoolTimeoutWithUnreachableServers();
+	void testPlainConnectionPoolTimeoutWithUnreachableServer();
+
 	void setUp() override;
 	void tearDown() override;
 

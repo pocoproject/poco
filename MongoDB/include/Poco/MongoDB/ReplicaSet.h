@@ -23,8 +23,10 @@
 #include "Poco/MongoDB/ReadPreference.h"
 #include "Poco/MongoDB/TopologyDescription.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Random.h"
 #include <atomic>
 #include <chrono>
+#include <condition_variable>
 #include <cstddef>
 #include <mutex>
 #include <string>
@@ -93,22 +95,20 @@ public:
 			/// Default read preference for this replica set.
 
 		unsigned int connectTimeoutSeconds{10};
-			/// Connection timeout in seconds (default: 10)
+			/// Connection timeout in seconds (default: 10).
 			///
-			/// NOTE: This value is currently unused by ReplicaSet itself. It is intended
-			/// for use by custom SocketFactory implementations. Custom factories can
-			/// access this value via ReplicaSet::configuration() and use it when creating
-			/// sockets. Use ReplicaSet::setSocketFactory() to set a custom factory that
-			/// utilizes this timeout value.
+			/// Applied when connecting to MongoDB servers during topology monitoring
+			/// and when creating connections via getConnection()/getPrimaryConnection()/
+			/// getSecondaryConnection(). When using a custom SocketFactory, the factory
+			/// is responsible for applying its own connect timeout.
 
 		unsigned int socketTimeoutSeconds{30};
-			/// Socket send/receive timeout in seconds (default: 30)
+			/// Socket send/receive timeout in seconds (default: 30).
 			///
-			/// NOTE: This value is currently unused by ReplicaSet itself. It is intended
-			/// for use by custom SocketFactory implementations. Custom factories can
-			/// access this value via ReplicaSet::configuration() and use it when creating
-			/// sockets. Use ReplicaSet::setSocketFactory() to set a custom factory that
-			/// utilizes this timeout value.
+			/// Applied as the send and receive timeout on sockets after successful
+			/// connection. This affects how long sendRequest()/readResponse() will
+			/// wait before timing out. When using a custom SocketFactory, the factory
+			/// is responsible for applying its own socket timeout.
 
 		unsigned int heartbeatFrequencySeconds{10};
 			/// Topology monitoring interval in seconds (default: 10)
@@ -183,13 +183,30 @@ public:
 
 	Connection::Ptr getConnection(const ReadPreference& readPref);
 		/// Returns a connection to a server matching the read preference.
+		/// Uses timeouts from Config.
+		/// Returns null if no suitable server is available.
+
+	Connection::Ptr getConnection(const ReadPreference& readPref,
+		const Poco::Timespan& connectTimeout, const Poco::Timespan& socketTimeout);
+		/// Returns a connection to a server matching the read preference,
+		/// using the specified connect and socket timeouts instead of
+		/// the values from Config.
 		/// Returns null if no suitable server is available.
 
 	Connection::Ptr waitForServerAvailability(const ReadPreference& readPref);
 		/// Waits for a server to become available for the given read preference.
+		/// Uses timeouts from Config.
 		/// This method coordinates waiting between multiple threads - only one thread
 		/// performs the actual sleep and topology refresh, while others benefit from
 		/// the refresh done by the first thread.
+		/// Returns a connection if a server becomes available, or null if still unavailable.
+		/// Thread-safe: uses internal synchronization to prevent redundant refresh attempts.
+
+	Connection::Ptr waitForServerAvailability(const ReadPreference& readPref,
+		const Poco::Timespan& connectTimeout, const Poco::Timespan& socketTimeout);
+		/// Waits for a server to become available for the given read preference,
+		/// using the specified connect and socket timeouts instead of
+		/// the values from Config.
 		/// Returns a connection if a server becomes available, or null if still unavailable.
 		/// Thread-safe: uses internal synchronization to prevent redundant refresh attempts.
 
@@ -202,7 +219,7 @@ public:
 		/// Returns null if no secondary is available.
 
 	[[nodiscard]] Config configuration() const;
-		// Returns a copy of replica set configuration.
+		/// Returns a copy of replica set configuration.
 
 	[[nodiscard]] TopologyDescription topology() const;
 		/// Returns a copy of the current topology description.
@@ -243,13 +260,22 @@ private:
 	Connection::Ptr selectServer(const ReadPreference& readPref);
 		/// Selects a server based on read preference and creates a connection.
 
+	Connection::Ptr selectServer(const ReadPreference& readPref,
+		const Poco::Timespan& connectTimeout, const Poco::Timespan& socketTimeout);
+		/// Selects a server based on read preference and creates a connection
+		/// using the specified timeouts.
+
 	Connection::Ptr createConnection(const Net::SocketAddress& address);
 		/// Creates a new connection to the specified address.
 
-	void updateTopologyFromHello(const Net::SocketAddress& address) noexcept;
+	Connection::Ptr createConnection(const Net::SocketAddress& address,
+		const Poco::Timespan& connectTimeout, const Poco::Timespan& socketTimeout);
+		/// Creates a new connection to the specified address using the given timeouts.
+
+	void updateTopologyFromHello(const Net::SocketAddress& address);
 		/// Queries a server with 'hello' command and updates topology.
 
-	void updateTopologyFromAllServers() noexcept;
+	void updateTopologyFromAllServers();
 		/// Queries all known servers and updates topology.
 
 	void parseURI(const std::string& uri);
@@ -264,9 +290,13 @@ private:
 	std::thread _monitorThread;
 	std::atomic<bool> _stopMonitoring{false};
 	std::atomic<bool> _monitoringActive{false};
+	std::mutex _monitorMutex;
+	std::condition_variable _monitorCV;
+
+	Poco::Random _random;
 
 	std::mutex _serverAvailabilityRetryMutex;
-	std::chrono::steady_clock::time_point _topologyRefreshTime;
+	std::atomic<std::chrono::steady_clock::time_point> _topologyRefreshTime;
 };
 
 

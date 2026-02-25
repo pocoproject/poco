@@ -92,12 +92,11 @@ private:
 //
 inline Timestamp ObjectId::timestamp() const noexcept
 {
-	int time;
-	char* T = reinterpret_cast<char*>(&time);
-	T[0] = _id[3];
-	T[1] = _id[2];
-	T[2] = _id[1];
-	T[3] = _id[0];
+	const Poco::Int32 time =
+		(static_cast<Poco::Int32>(_id[0]) << 24) |
+		(static_cast<Poco::Int32>(_id[1]) << 16) |
+		(static_cast<Poco::Int32>(_id[2]) <<  8) |
+		 static_cast<Poco::Int32>(_id[3]);
 	return Timestamp::fromEpochTime(static_cast<time_t>(time));
 }
 

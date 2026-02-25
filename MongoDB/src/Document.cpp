@@ -99,6 +99,11 @@ void Document::read(BinaryReader& reader)
 	int size;
 	reader >> size;
 
+	if (size < BSON_MIN_DOCUMENT_SIZE)
+		throw Poco::DataFormatException("Invalid BSON document size: " + std::to_string(size));
+	if (size > BSON_MAX_DOCUMENT_SIZE)
+		throw Poco::DataFormatException("BSON document size exceeds 16 MB limit: " + std::to_string(size));
+
 	unsigned char type;
 	reader >> type;
 
@@ -176,9 +181,6 @@ void Document::read(BinaryReader& reader)
 std::string Document::toString(int indent) const
 {
 	std::ostringstream oss;
-	// Pre-reserve reasonable capacity for small-medium documents to reduce reallocations
-	oss.str().reserve(256);
-
 	oss << '{';
 
 	if (indent > 0) oss << std::endl;

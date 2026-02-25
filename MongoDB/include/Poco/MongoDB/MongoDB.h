@@ -51,6 +51,33 @@
 #endif
 
 
+// MongoDB wire protocol and BSON specification limits.
+// These constants are defined centrally so that all validation
+// code in the library uses the same values.
+
+namespace Poco {
+namespace MongoDB {
+
+/// Maximum BSON document size (16 MB) per MongoDB specification.
+/// Applies to documents, strings, binary data, and cstrings.
+static constexpr Poco::Int32 BSON_MAX_DOCUMENT_SIZE = 16 * 1024 * 1024;
+
+/// Minimum BSON document size (5 bytes): 4-byte size field + 1-byte null terminator.
+static constexpr Poco::Int32 BSON_MIN_DOCUMENT_SIZE = 5;
+
+/// Minimum BSON string size (1 byte for the null terminator).
+static constexpr Poco::Int32 BSON_MIN_STRING_SIZE = 1;
+
+/// Maximum OP_MSG message size (48 MB) per MongoDB specification.
+static constexpr Poco::Int32 OP_MSG_MAX_SIZE = 48 * 1024 * 1024;
+
+/// Default local threshold for "nearest" read preference (15 ms = 15000 µs).
+/// Servers within this threshold of the minimum RTT are eligible for selection.
+static constexpr Poco::Int64 DEFAULT_LOCAL_THRESHOLD_US = 15000;
+
+} } // namespace Poco::MongoDB
+
+
 //
 // Automatically link MongoDB library.
 //
