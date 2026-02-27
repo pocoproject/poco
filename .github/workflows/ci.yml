@@ -193,7 +193,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: sudo apt -y update && sudo apt -y install libssl-dev
       - run: >-
-          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_TRACE=ON -DENABLE_TESTS=ON
+          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_TRACE=ON -DENABLE_TESTS=ON -DENABLE_INSTALL_CPPUNIT=ON
       - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
@@ -530,7 +530,7 @@ jobs:
       - uses: actions/checkout@v4
       - run: brew install openssl@3
       - run: >-
-          cmake -S. -Bcmake-build -DPOCO_MINIMAL_BUILD=ON -DENABLE_TRACE=ON -DENABLE_TESTS=ON
+          cmake -S. -Bcmake-build -DPOCO_MINIMAL_BUILD=ON -DENABLE_TRACE=ON -DENABLE_TESTS=ON -DENABLE_INSTALL_CPPUNIT=ON
           -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF
       - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action

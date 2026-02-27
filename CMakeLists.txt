@@ -219,6 +219,9 @@ endif()
 option(ENABLE_CPPUNIT
 	"Set to OFF|ON (default is OFF) to enable CppUnit library" OFF)
 
+option(ENABLE_INSTALL_CPPUNIT
+	"Set to OFF|ON (default is OFF) to install CppUnit headers and libraries" OFF)
+
 option(ENABLE_TESTS
 	"Set to OFF|ON (default is OFF) to control build of POCO tests" OFF)
 
@@ -439,6 +442,10 @@ if(ENABLE_POCODOC)
 	set(ENABLE_CPPPARSER ON CACHE BOOL "Enable C++ parser" FORCE)
 	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
 	set(ENABLE_DATA_SQLITE ON CACHE BOOL "Enable Data SQLite" FORCE)
+endif()
+
+if(ENABLE_INSTALL_CPPUNIT)
+	set(ENABLE_CPPUNIT ON CACHE BOOL "Enable CppUnit" FORCE)
 endif()
 
 if(ENABLE_TESTS)
