@@ -34,6 +34,7 @@ public:
 	void testBadConfiguration2();
 	void testBadConfiguration3();
 	void testBadConfiguration4();
+	void testAsyncChannelShutdown();
 
 	void setUp();
 	void tearDown();

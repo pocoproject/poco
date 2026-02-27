@@ -29,6 +29,8 @@
 #include "Poco/FastLogger.h"
 #endif
 #include "Poco/NullChannel.h"
+#include "Poco/AsyncChannel.h"
+#include "Poco/Util/LoggingSubsystem.h"
 #include <sstream>
 
 
@@ -463,6 +465,39 @@ void LoggingConfiguratorTest::testBadConfiguration3()
 }
 
 
+void LoggingConfiguratorTest::testAsyncChannelShutdown()
+{
+	// Test that LoggingSubsystem::uninitialize() properly shuts down
+	// AsyncChannel without deadlocking (GitHub issue #5228).
+
+	static const std::string config =
+		"logging.loggers.root.channel = asyncChan\n"
+		"logging.loggers.root.level = debug\n"
+		"logging.channels.asyncChan.class = AsyncChannel\n"
+		"logging.channels.asyncChan.channel = nullChan\n"
+		"logging.channels.nullChan.class = NullChannel\n";
+
+	std::istringstream istr(config);
+	AutoPtr<PropertyFileConfiguration> pConfig = new PropertyFileConfiguration(istr);
+
+	LoggingConfigurator configurator;
+	configurator.configure(pConfig);
+
+	Logger& root = Logger::get("");
+	assertTrue (root.getLevel() == Message::PRIO_DEBUG);
+
+	// Log some messages to ensure the async thread is running
+	root.information("Test message 1");
+	root.information("Test message 2");
+	root.information("Test message 3");
+
+	// Simulate what LoggingSubsystem::uninitialize() does.
+	// This must not deadlock.
+	Logger::shutdown();
+	LoggingRegistry::defaultRegistry().clear();
+}
+
+
 void LoggingConfiguratorTest::testBadConfiguration4()
 {
 	// this is mainly testing for memory leaks in case of
@@ -528,6 +563,7 @@ CppUnit::Test* LoggingConfiguratorTest::suite()
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testFastLoggerWithRegistry);
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testFastLoggerOptions);
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testFastLoggerOptionsWarnings);
+	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testAsyncChannelShutdown);
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testBadConfiguration1);
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testBadConfiguration2);
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testBadConfiguration3);
