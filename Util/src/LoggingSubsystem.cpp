@@ -16,6 +16,7 @@
 #include "Poco/Util/LoggingConfigurator.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Logger.h"
+#include "Poco/LoggingRegistry.h"
 
 
 using Poco::Logger;
@@ -43,6 +44,8 @@ void LoggingSubsystem::initialize(Application& app)
 
 void LoggingSubsystem::uninitialize()
 {
+	Logger::shutdown();
+	LoggingRegistry::defaultRegistry().clear();
 }
 
 
