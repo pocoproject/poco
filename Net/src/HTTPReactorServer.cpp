@@ -99,6 +99,8 @@ void HTTPReactorServer::sendErrorResponse(HTTPSession& session, HTTPResponse::HT
 	response.setVersion(HTTPMessage::HTTP_1_1);
 	response.setStatusAndReason(status);
 	response.setKeepAlive(false);
+	response.setChunkedTransferEncoding(true);
+	response.send();
 
 	session.setKeepAlive(false);
 }

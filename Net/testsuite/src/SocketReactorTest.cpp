@@ -881,6 +881,8 @@ void SocketReactorTest::testConcurrentHandlerRemoval()
 	stop = true;
 	modifyThread.join();
 
+	reactor->stop();
+
 	for (auto* handler : handlers)
 		delete handler;
 
