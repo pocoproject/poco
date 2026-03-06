@@ -46,14 +46,15 @@ On macOS, the easiest way to install OpenSSL is via [Homebrew](https://brew.sh):
 $ brew install openssl
 ```
 
-The easiest way to install OpenSSL on Windows is to use a binary
-(prebuilt) release, for example the one from Shining Light
+On Windows, the easiest way to install OpenSSL is via
+[WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/):
+```
+$ winget install --id -e ShiningLight.OpenSSL.Dev
+```
+One may use a binary (prebuilt) release, for example the one from Shining Light
 Productions that comes with a
 [Windows installer](https://www.slproweb.com/products/Win32OpenSSL.html).
-OpenSSL can also be installed via the `vcpkg` package manager. One may
-also use the
-[WinGet](https://learn.microsoft.com/en-us/windows/package-manager/winget/)
-package.
+OpenSSL can also be installed via the `vcpkg` package manager.
 
 On Windows, POCO can also use the native Windows TLS APIs (SChannel).
 
@@ -210,7 +211,7 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for submitting contributions, bug rep
 
 ### POCO vs. Boost
 
-In regards to Boost, in spite of some functional overlapping,
+In regards to [Boost](https://www.boost.org/), in spite of some functional overlapping,
 POCO is best thought of as a Boost complement (rather than replacement).
 Side-by-side use of Boost and POCO is a very common occurrence.
 
