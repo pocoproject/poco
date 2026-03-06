@@ -71,6 +71,7 @@ else()
 endif()
 
 target_link_libraries(Foundation PRIVATE "$<BUILD_LOCAL_INTERFACE:V8::DoubleConversion>")
+target_link_libraries(Foundation PUBLIC "$<BUILD_LOCAL_INTERFACE:Tessil::OrderedMap>")
 
 # FastLogger support (requires Quill)
 if(ENABLE_FASTLOGGER)

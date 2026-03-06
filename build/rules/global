@@ -330,7 +330,7 @@ OBJPATH_DEBUG_SHARED   = $(OBJPATH)/debug_shared$(OSARCH_POSTFIX)
 #
 # Build Include directory List
 #
-INCLUDE = -Iinclude $(foreach p,$(COMPONENTS),-I$(POCO_BASE)/$(p)/$(INCDIR)) $(foreach p,$(POCO_ADD_INCLUDE),-I$(p))
+INCLUDE = -Iinclude $(foreach p,$(COMPONENTS),-I$(POCO_BASE)/$(p)/$(INCDIR)) $(foreach p,$(POCO_ADD_INCLUDE),-I$(p)) -I$(POCO_BASE)/dependencies/tessil/include
 
 #
 # Build Library Directory List
