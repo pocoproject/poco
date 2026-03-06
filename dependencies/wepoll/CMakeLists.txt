@@ -1,6 +1,6 @@
 # wepoll - epoll wrapper for Windows
-# Version: 1.5.4
-# Source: https://github.com/piscisaureus/wepoll/releases/tag/v1.5.4
+# Version: 1.5.8
+# Source: https://github.com/piscisaureus/wepoll/releases/tag/v1.5.8
 
 # Sources
 file(GLOB SRCS_G "src/*.c")

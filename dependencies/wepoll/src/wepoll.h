@@ -106,7 +106,6 @@ WEPOLL_EXPORT int epoll_wait(HANDLE ephnd,
                              int maxevents,
                              int timeout);
 
-
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
