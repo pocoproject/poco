@@ -1,6 +1,6 @@
 # Google double-conversion library
-# Version: 3.3.1
-# Source: https://github.com/google/double-conversion/releases/tag/v3.3.1
+# Version: 3.4.0
+# Source: https://github.com/google/double-conversion/releases/tag/v3.4.0
 
 # Sources
 file(GLOB SRCS_G "src/*.c" "src/*.cc")
