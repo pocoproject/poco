@@ -73,7 +73,7 @@
 /** The MINOR version number (increased when new functionality is added in a backwards-compatible manner). */
 #define UTF8PROC_VERSION_MINOR 11
 /** The PATCH version (increased for fixes that do not change the API). */
-#define UTF8PROC_VERSION_PATCH 1
+#define UTF8PROC_VERSION_PATCH 3
 /** @} */
 
 #include <stdlib.h>
@@ -121,7 +121,9 @@ typedef bool utf8proc_bool;
 #include <limits.h>
 
 #ifdef UTF8PROC_STATIC
-#  define UTF8PROC_DLLEXPORT
+#  ifndef UTF8PROC_DLLEXPORT
+#    define UTF8PROC_DLLEXPORT
+#  endif
 #else
 #  ifdef _WIN32
 #    ifdef UTF8PROC_EXPORTS
@@ -748,6 +750,10 @@ UTF8PROC_DLLEXPORT const char *utf8proc_category_string(utf8proc_int32_t codepoi
  *
  * @note The memory of the new UTF-8 string will have been allocated
  * with `malloc`, and should therefore be deallocated with `free`.
+ *
+ * @note `utf8proc_map` simply calls `utf8proc_decompose` followed by `utf8proc_reencode`,
+ * and applications requiring greater control over memory allocation should instead call
+ * those two functions directly.
  */
 UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_map(
   const utf8proc_uint8_t *str, utf8proc_ssize_t strlen, utf8proc_uint8_t **dstptr, utf8proc_option_t options
