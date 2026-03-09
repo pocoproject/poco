@@ -1,0 +1,249 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\Cipher.cpp">
+      <Filter>Cipher\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\CipherFactory.cpp">
+      <Filter>Cipher\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\CipherImpl.cpp">
+      <Filter>Cipher\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\CipherKey.cpp">
+      <Filter>Cipher\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\CipherKeyImpl.cpp">
+      <Filter>Cipher\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\CryptoException.cpp">
+      <Filter>Crypto\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\CryptoStream.cpp">
+      <Filter>Cipher\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\CryptoTransform.cpp">
+      <Filter>Cipher\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\DigestEngine.cpp">
+      <Filter>Digest\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\ECDSADigestEngine.cpp">
+      <Filter>ECDSA\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\ECKey.cpp">
+      <Filter>EC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\ECKeyImpl.cpp">
+      <Filter>EC\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\EVPCipherImpl.cpp">
+      <Filter>EVP\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\EVPPKey.cpp">
+      <Filter>CryptoCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\Envelope.cpp">
+      <Filter>Envelope\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\KeyPair.cpp">
+      <Filter>CryptoCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\KeyPairImpl.cpp">
+      <Filter>CryptoCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\OpenSSLInitializer.cpp">
+      <Filter>CryptoCore\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\PKCS12Container.cpp">
+      <Filter>Certificate\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\RSACipherImpl.cpp">
+      <Filter>RSA\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\RSADigestEngine.cpp">
+      <Filter>RSA\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\RSAKey.cpp">
+      <Filter>RSA\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\RSAKeyImpl.cpp">
+      <Filter>RSA\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\src\X509Certificate.cpp">
+      <Filter>Certificate\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\Cipher.h">
+      <Filter>Cipher\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\CipherFactory.h">
+      <Filter>Cipher\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\CipherImpl.h">
+      <Filter>Cipher\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\CipherKey.h">
+      <Filter>Cipher\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\CipherKeyImpl.h">
+      <Filter>Cipher\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\Crypto.h">
+      <Filter>CryptoCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\CryptoException.h">
+      <Filter>Crypto\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\CryptoStream.h">
+      <Filter>Cipher\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\CryptoTransform.h">
+      <Filter>Cipher\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\DigestEngine.h">
+      <Filter>Digest\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\ECDSADigestEngine.h">
+      <Filter>ECDSA\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\ECKey.h">
+      <Filter>EC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\ECKeyImpl.h">
+      <Filter>EC\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\EVPCipherImpl.h">
+      <Filter>EVP\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\EVPPKey.h">
+      <Filter>CryptoCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\Envelope.h">
+      <Filter>Envelope\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\KeyPair.h">
+      <Filter>CryptoCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\KeyPairImpl.h">
+      <Filter>CryptoCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\OpenSSLInitializer.h">
+      <Filter>CryptoCore\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\PKCS12Container.h">
+      <Filter>Certificate\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\RSACipherImpl.h">
+      <Filter>RSA\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\RSADigestEngine.h">
+      <Filter>RSA\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\RSAKey.h">
+      <Filter>RSA\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\RSAKeyImpl.h">
+      <Filter>RSA\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include\Poco\Crypto\X509Certificate.h">
+      <Filter>Certificate\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Certificate">
+      <UniqueIdentifier>{3524B300-97B7-36BB-878E-C443537DB39E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Certificate\Header Files">
+      <UniqueIdentifier>{B489FA12-29B9-36DF-955B-A22915B7A248}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Certificate\Source Files">
+      <UniqueIdentifier>{2E00F090-16B4-3379-92EF-1B935BC22391}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cipher">
+      <UniqueIdentifier>{EE1FC00F-1DC4-3492-8195-82DC445164ED}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cipher\Header Files">
+      <UniqueIdentifier>{EEF2833A-E809-32F5-8485-8F48BD59FDF3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cipher\Source Files">
+      <UniqueIdentifier>{B39EC422-5D6C-3AF6-81CE-F275FC35D4EE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Crypto">
+      <UniqueIdentifier>{493E2830-454F-3861-9AA8-F088F100F3D9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CryptoCore">
+      <UniqueIdentifier>{713813A9-4974-3C1E-BECF-78864CBCE73F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CryptoCore\Header Files">
+      <UniqueIdentifier>{1F435AC2-FAA3-3610-B808-B186C632F467}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CryptoCore\Source Files">
+      <UniqueIdentifier>{D58067DF-8BCA-3F85-BB91-728CF3EE207E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Crypto\Header Files">
+      <UniqueIdentifier>{68B48596-A5BC-30C2-B711-D1103F1129A3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Crypto\Source Files">
+      <UniqueIdentifier>{904D3EC8-021F-35E1-94ED-4ABDAF2D562B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Digest">
+      <UniqueIdentifier>{EEFF67F5-7F76-3B9C-94A2-6246A19F9749}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Digest\Header Files">
+      <UniqueIdentifier>{130FF750-9776-3559-B4A5-138131A622A6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Digest\Source Files">
+      <UniqueIdentifier>{15AE5897-F8A4-3E26-91B5-A9F0EB00D39D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EC">
+      <UniqueIdentifier>{0363C19F-68FE-3209-8EBD-64E0B87BB668}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECDSA">
+      <UniqueIdentifier>{BE25E464-151E-30E1-90BD-FDE3731037C4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECDSA\Header Files">
+      <UniqueIdentifier>{45D7F31A-A0A8-3B53-B04C-308EF6912B3B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ECDSA\Source Files">
+      <UniqueIdentifier>{D407488E-4006-3227-B3B8-A029FDD4BF70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EC\Header Files">
+      <UniqueIdentifier>{D925DD7C-7BD1-3DF5-B598-B247C2921E81}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EC\Source Files">
+      <UniqueIdentifier>{D0F8BB8B-3662-3BBD-8C58-1EFFFB9E86C1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EVP">
+      <UniqueIdentifier>{F03D6196-7CC2-3E4F-AC24-C406AAC1475F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EVP\Header Files">
+      <UniqueIdentifier>{AFD4BEFF-D513-3401-B415-B5E3A715A641}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EVP\Source Files">
+      <UniqueIdentifier>{F1BBEE19-699C-3ED8-B91C-DB6099048131}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Envelope">
+      <UniqueIdentifier>{8C4981EB-4AB1-3DCB-B072-2493CBE340DE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Envelope\Header Files">
+      <UniqueIdentifier>{1B0C9F3C-DE2D-3729-83F9-01C5D1972F50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Envelope\Source Files">
+      <UniqueIdentifier>{FF98044C-086A-399B-BA8C-42CE1278BE87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RSA">
+      <UniqueIdentifier>{913A0999-4B2E-328F-8666-796E9A063A08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RSA\Header Files">
+      <UniqueIdentifier>{EAC62F20-95D6-37FD-B5D4-5A3694B1CE01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="RSA\Source Files">
+      <UniqueIdentifier>{C3ACD00C-5EC0-34C4-88FB-D1BF009060BF}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

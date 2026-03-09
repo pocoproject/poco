@@ -1,0 +1,35 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\MonitoringBinaryStorage.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.MonitoringBinaryStorage.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.MonitoringBinaryStorage",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\monitoringbinarystorage.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.MonitoringConfiguration"
+                },
+                {
+                    "logical-name": "Enet.Core.MonitoringCoreStorage"
+                },
+                {
+                    "logical-name": "Enet.Core.CSV"
+                },
+                {
+                    "logical-name": "Enet.Core.ArrayVector"
+                }
+            ]
+        }
+    ]
+}

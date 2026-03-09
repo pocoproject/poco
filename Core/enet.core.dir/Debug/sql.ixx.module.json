@@ -1,0 +1,44 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\Sql.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.Sql.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.Sql",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\sql.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.MachineSpecifier"
+                },
+                {
+                    "logical-name": "Enet.Core.SqlConfiguration"
+                },
+                {
+                    "logical-name": "Enet.Core.MonitoringShift"
+                },
+                {
+                    "logical-name": "Enet.Core.MachineConfiguration"
+                },
+                {
+                    "logical-name": "Enet.Core.Logging"
+                },
+                {
+                    "logical-name": "Enet.Core.Product"
+                },
+                {
+                    "logical-name": "Enet.Core.SqlCore"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,56 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\DncParser.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.DncParser.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.DncParser",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\dncparser.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.DncParseOptions"
+                },
+                {
+                    "logical-name": "Enet.Core.DncMazakExaminer"
+                },
+                {
+                    "logical-name": "Enet.Core.MachineConfiguration"
+                },
+                {
+                    "logical-name": "Enet.Core.GCode"
+                },
+                {
+                    "logical-name": "Enet.Core.FileFormat"
+                },
+                {
+                    "logical-name": "Enet.Core.FileTransferDescription"
+                },
+                {
+                    "logical-name": "Enet.Core.CommandMatching"
+                },
+                {
+                    "logical-name": "Enet.Core.Regex"
+                },
+                {
+                    "logical-name": "Enet.Core.LegacyFile"
+                },
+                {
+                    "logical-name": "Enet.Core.Sql"
+                },
+                {
+                    "logical-name": "Enet.Core.Product"
+                }
+            ]
+        }
+    ]
+}

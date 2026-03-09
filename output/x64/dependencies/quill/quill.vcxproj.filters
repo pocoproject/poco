@@ -1,0 +1,301 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\BackendManager.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\BackendOptions.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\BackendWorker.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\BackendWorkerLock.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\BacktraceStorage.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\ManualBackendWorker.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\PatternFormatter.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\RdtscClock.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\SignalHandler.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\StringFromTime.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\ThreadUtilities.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\TimestampFormatter.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\TransitEvent.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\TransitEventBuffer.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\BackendUtilities.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\bundled\fmt\args.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\bundled\fmt\base.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\bundled\fmt\chrono.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\bundled\fmt\color.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\bundled\fmt\compile.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\bundled\fmt\format.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\bundled\fmt\format-inl.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\bundled\fmt\os.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\bundled\fmt\ostream.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\bundled\fmt\printf.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\bundled\fmt\ranges.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\bundled\fmt\std.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\bundled\fmt\xchar.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\Attributes.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\BoundedSPSCQueue.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\ChronoTimeUtils.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\Common.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\DynamicFormatArgStore.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\Codec.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\Filesystem.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\FrontendOptions.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\InlinedVector.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\LoggerBase.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\LoggerManager.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\LogLevel.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\MacroMetadata.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\MathUtilities.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\PatternFormatterOptions.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\QuillError.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\Rdtsc.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\SinkManager.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\SourceLocation.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\Spinlock.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\ThreadContextManager.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\TimeUtilities.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\core\UnboundedSPSCQueue.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\backend\Utf8Conv.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\filters\Filter.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\sinks\AndroidSink.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\sinks\ConsoleSink.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\sinks\FileSink.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\sinks\JsonSink.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\sinks\NullSink.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\sinks\RotatingFileSink.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\sinks\RotatingJsonFileSink.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\sinks\RotatingSink.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\sinks\Sink.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\sinks\StreamSink.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\sinks\SyslogSink.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\sinks\SystemdSink.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\std\Array.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\std\Chrono.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\std\Deque.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\std\FilesystemPath.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\std\ForwardList.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\std\List.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\std\Map.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\std\Optional.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\std\Pair.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\std\Set.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\std\Tuple.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\std\UnorderedMap.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\std\UnorderedSet.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\std\Vector.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\std\WideString.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\Backend.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\BackendTscClock.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\BinaryDataDeferredFormatCodec.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\CsvWriter.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\DeferredFormatCodec.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\DirectFormatCodec.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\Frontend.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\HelperMacros.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\LogFunctions.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\Logger.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\LogMacros.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\SimpleSetup.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\StopWatch.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\StringRef.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\UserClockSource.h">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include\quill\Utility.h">
+      <Filter>Header Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{A5A5203F-D5B3-3A37-8424-BDA23C80AB96}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

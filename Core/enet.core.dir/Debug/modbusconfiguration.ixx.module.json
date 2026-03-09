@@ -1,0 +1,26 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\ModbusConfiguration.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.ModbusConfiguration.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.ModbusConfiguration",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\modbusconfiguration.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.IPAddress"
+                }
+            ]
+        }
+    ]
+}

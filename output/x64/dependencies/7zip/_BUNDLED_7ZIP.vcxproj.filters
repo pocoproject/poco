@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zAlloc.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zBuf2.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zBuf.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zCrc.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zCrcOpt.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zDec.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zFile.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zArcIn.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zStream.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Alloc.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Bcj2.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Bra86.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Bra.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\CpuArch.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Delta.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Lzma2Dec.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Lzma86Dec.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\LzmaDec.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Ppmd7.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Ppmd7Dec.c">
+      <Filter>7zip\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7z.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zAlloc.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zBuf.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zCrc.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zFile.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zTypes.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zVersion.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\7zWindows.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Aes.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Alloc.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Bcj2.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Bra.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Compiler.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\CpuArch.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Delta.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\DllSecur.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\LzFind.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\LzFindMt.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\LzHash.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Lzma2Dec.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Lzma2DecMt.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Lzma2Enc.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Lzma86.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\LzmaDec.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\LzmaEnc.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\LzmaLib.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\MtCoder.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\MtDec.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Ppmd.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Ppmd7.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Precomp.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\RotateDefs.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Sha256.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Sort.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\SwapBytes.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Threads.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\Xz.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\XzCrc64.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\src\XzEnc.h">
+      <Filter>7zip\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\7zip\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="7zip">
+      <UniqueIdentifier>{0E1559A7-EA12-38EE-AF57-6E5BF32AC6A5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="7zip\Header Files">
+      <UniqueIdentifier>{5703E640-214D-3259-A3DA-F451A9857DC9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="7zip\Source Files">
+      <UniqueIdentifier>{8BEC37BA-F520-3437-97E7-111CC01F58C0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

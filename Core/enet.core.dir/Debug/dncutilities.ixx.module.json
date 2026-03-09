@@ -1,0 +1,32 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\DncUtilities.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.DncUtilities.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.DncUtilities",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\dncutilities.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.GCode"
+                },
+                {
+                    "logical-name": "Enet.Core.DncTransferConfiguration"
+                },
+                {
+                    "logical-name": "Enet.Core.DncParser"
+                }
+            ]
+        }
+    ]
+}

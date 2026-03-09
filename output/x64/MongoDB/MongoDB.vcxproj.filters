@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\Array.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\Binary.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\Connection.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\Database.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\Document.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\Element.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\JavaScriptCode.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\Message.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\MessageHeader.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\ObjectId.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\OpMsgCursor.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\OpMsgMessage.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\ReadPreference.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\RegularExpression.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\ReplicaSet.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\ReplicaSetConnection.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\ReplicaSetURI.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\ServerDescription.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\src\TopologyDescription.cpp">
+      <Filter>MongoDB\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\Array.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\BSONReader.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\BSONWriter.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\Binary.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\Connection.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\Database.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\Document.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\Element.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\JavaScriptCode.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\Message.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\MessageHeader.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\MongoDB.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\ObjectId.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\OpMsgCursor.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\OpMsgMessage.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\PoolableConnectionFactory.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\ReadPreference.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\RegularExpression.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\ReplicaSet.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\ReplicaSetConnection.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\ReplicaSetPoolableConnectionFactory.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\ReplicaSetURI.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\ServerDescription.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\TopologyChangeNotification.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\include\Poco\MongoDB\TopologyDescription.h">
+      <Filter>MongoDB\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\MongoDB\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="MongoDB">
+      <UniqueIdentifier>{9DDF8707-0D1C-3667-94E6-F6566CE06C45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MongoDB\Header Files">
+      <UniqueIdentifier>{45C1ECD7-4B08-34C6-A71E-B0CD43869328}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MongoDB\Source Files">
+      <UniqueIdentifier>{BEB15D79-161D-33C2-B436-EC92C9286249}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

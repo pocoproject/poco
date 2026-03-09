@@ -1,0 +1,561 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F73AC7FF-CFAE-3785-B874-0B404D855122}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>Net</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Net.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PocoNetmtd</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Net.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PocoNetmt</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Net.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">PocoNetmt</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Net.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">PocoNetmt</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\wepoll\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /Zc:__cplusplus</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;POCO_STATIC;POCO_CMAKE;POCO_HAVE_SENDFILE;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;_DEBUG;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;POCO_STATIC;POCO_CMAKE;POCO_HAVE_SENDFILE;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\wepoll\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\wepoll\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\wepoll\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /Zc:__cplusplus</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;POCO_HAVE_SENDFILE;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;POCO_HAVE_SENDFILE;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\wepoll\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\wepoll\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\wepoll\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /Zc:__cplusplus</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;POCO_HAVE_SENDFILE;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;POCO_HAVE_SENDFILE;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\wepoll\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\wepoll\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\wepoll\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /Zc:__cplusplus</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;POCO_HAVE_SENDFILE;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;POCO_HAVE_SENDFILE;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\wepoll\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\wepoll\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Net/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet/externals/poco -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64 --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64/Net/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Strawberry\c\share\cmake-3.29\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Strawberry\c\share\cmake-3.29\Modules\CMakePackageConfigHelpers.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\cmake\PocoNetConfig.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Net\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Net/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet/externals/poco -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64 --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64/Net/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Strawberry\c\share\cmake-3.29\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Strawberry\c\share\cmake-3.29\Modules\CMakePackageConfigHelpers.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\cmake\PocoNetConfig.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Net\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Net/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet/externals/poco -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64 --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64/Net/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Strawberry\c\share\cmake-3.29\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Strawberry\c\share\cmake-3.29\Modules\CMakePackageConfigHelpers.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\cmake\PocoNetConfig.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Net\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Net/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet/externals/poco -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64 --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64/Net/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Strawberry\c\share\cmake-3.29\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Strawberry\c\share\cmake-3.29\Modules\CMakePackageConfigHelpers.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\cmake\PocoNetConfig.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Net\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\AbstractHTTPRequestHandler.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\DNS.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\DatagramSocket.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\DatagramSocketImpl.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\DialogSocket.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\EscapeHTMLStream.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\FTPClientSession.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\FTPStreamFactory.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\FilePartSource.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTMLForm.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPAuthenticationParams.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPBasicCredentials.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPBufferAllocator.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPChunkedStream.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPClientSession.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPCookie.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPCredentials.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPDigestCredentials.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPFixedLengthStream.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPHeaderStream.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPIOStream.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPMessage.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPNTLMCredentials.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPReactorServer.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPReactorServerSession.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPRequest.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPRequestHandler.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPRequestHandlerFactory.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPResponse.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPServer.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPServerConnection.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPServerConnectionFactory.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPServerParams.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPServerRequest.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPServerRequestImpl.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPServerResponse.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPServerResponseImpl.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPServerSession.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPSession.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPSessionFactory.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPSessionInstantiator.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPStream.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HTTPStreamFactory.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\HostEntry.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\ICMPClient.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\ICMPEventArgs.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\ICMPPacket.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\ICMPPacketImpl.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\ICMPSocket.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\ICMPSocketImpl.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\ICMPv4PacketImpl.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\IPAddress.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\IPAddressImpl.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\MailMessage.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\MailRecipient.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\MailStream.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\MediaType.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\MessageHeader.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\MulticastSocket.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\MultipartReader.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\MultipartWriter.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\NTLMCredentials.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\NTPClient.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\NTPEventArgs.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\NTPPacket.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\NameValueCollection.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\Net.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\NetException.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\NetworkInterface.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\NullPartHandler.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\OAuth10Credentials.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\OAuth20Credentials.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\POP3ClientSession.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\PartHandler.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\PartSource.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\PartStore.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\PollSet.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\QuotedPrintableDecoder.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\QuotedPrintableEncoder.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\RawSocket.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\RawSocketImpl.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\RemoteSyslogChannel.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\RemoteSyslogListener.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\SMTPChannel.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\SMTPClientSession.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\SSPINTLMCredentials.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\ServerSocket.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\ServerSocketImpl.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\Socket.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\SocketAddress.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\SocketAddressImpl.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\SocketImpl.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\SocketNotification.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\SocketNotifier.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\SocketProactor.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\SocketReactor.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\SocketStream.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\StreamSocket.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\StreamSocketImpl.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\StringPartSource.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\TCPReactorAcceptor.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\TCPReactorServer.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\TCPReactorServerConnection.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\TCPServer.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\TCPServerConnection.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\TCPServerConnectionFactory.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\TCPServerDispatcher.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\TCPServerParams.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\UDPClient.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\UDPServerParams.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\WebSocket.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\src\WebSocketImpl.cpp" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\AbstractHTTPRequestHandler.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\DNS.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\DatagramSocket.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\DatagramSocketImpl.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\DialogSocket.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\EscapeHTMLStream.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\FTPClientSession.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\FTPStreamFactory.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\FilePartSource.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTMLForm.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPAuthenticationParams.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPBasicCredentials.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPBasicStreamBuf.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPBufferAllocator.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPChunkedStream.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPClientSession.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPCookie.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPCredentials.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPDigestCredentials.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPFixedLengthStream.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPHeaderStream.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPIOStream.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPMessage.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPNTLMCredentials.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPObserver.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPReactorServer.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPReactorServerSession.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPRequest.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPRequestHandler.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPRequestHandlerFactory.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPResponse.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPServer.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPServerConnection.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPServerConnectionFactory.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPServerParams.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPServerRequest.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPServerRequestImpl.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPServerResponse.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPServerResponseImpl.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPServerSession.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPSession.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPSessionFactory.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPSessionInstantiator.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPStream.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HTTPStreamFactory.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\HostEntry.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\ICMPClient.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\ICMPEventArgs.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\ICMPPacket.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\ICMPPacketImpl.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\ICMPSocket.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\ICMPSocketImpl.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\ICMPv4PacketImpl.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\IPAddress.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\IPAddressImpl.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\MailMessage.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\MailRecipient.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\MailStream.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\MediaType.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\MessageHeader.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\MultiSocketPoller.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\MulticastSocket.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\MultipartReader.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\MultipartWriter.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\NTLMCredentials.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\NTPClient.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\NTPEventArgs.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\NTPPacket.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\NameValueCollection.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\Net.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\NetException.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\NetworkInterface.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\NullPartHandler.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\OAuth10Credentials.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\OAuth20Credentials.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\POP3ClientSession.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\ParallelSocketAcceptor.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\ParallelSocketReactor.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\PartHandler.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\PartSource.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\PartStore.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\PollSet.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\QuotedPrintableDecoder.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\QuotedPrintableEncoder.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\RawSocket.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\RawSocketImpl.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\RemoteSyslogChannel.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\RemoteSyslogListener.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\SMTPChannel.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\SMTPClientSession.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\SSPINTLMCredentials.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\ServerSocket.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\ServerSocketImpl.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\SingleSocketPoller.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\Socket.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\SocketAcceptor.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\SocketAddress.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\SocketAddressImpl.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\SocketConnector.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\SocketDefs.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\SocketImpl.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\SocketNotification.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\SocketNotifier.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\SocketProactor.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\SocketReactor.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\SocketStream.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\StreamSocket.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\StreamSocketImpl.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\StringPartSource.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\TCPReactorAcceptor.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\TCPReactorServer.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\TCPReactorServerConnection.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\TCPServer.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\TCPServerConnection.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\TCPServerConnectionFactory.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\TCPServerDispatcher.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\TCPServerParams.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\UDPClient.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\UDPHandler.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\UDPServer.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\UDPServerParams.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\UDPSocketReader.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\WebSocket.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include\Poco\Net\WebSocketImpl.h" />
+    <Object Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\wepoll\_BUNDLED_WEPOLL.dir\$(Configuration)\wepoll.obj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\ZERO_CHECK.vcxproj">
+      <Project>{5FB7BA55-7F0A-33C2-B233-1916802215CD}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Foundation\Foundation.vcxproj">
+      <Project>{43B732EF-B054-3CA8-9F4F-B30838B51976}</Project>
+      <Name>Foundation</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\pcre2\_BUNDLED_PCRE2.vcxproj">
+      <Project>{3492CDB0-A132-3C5A-A7F6-266BBADD0BA0}</Project>
+      <Name>_BUNDLED_PCRE2</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\utf8proc\_BUNDLED_UTF8PROC.vcxproj">
+      <Project>{2A432750-AA10-3F9A-B739-143473FFD42F}</Project>
+      <Name>_BUNDLED_UTF8PROC</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\v8_double_conversion\_BUNDLED_V8_DOUBLE_CONVERSION.vcxproj">
+      <Project>{74682585-0D88-3FF3-96B1-A7FA483F902D}</Project>
+      <Name>_BUNDLED_V8_DOUBLE_CONVERSION</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\wepoll\_BUNDLED_WEPOLL.vcxproj">
+      <Project>{48AB0C6C-31F7-3D75-A234-A480711C6AA9}</Project>
+      <Name>_BUNDLED_WEPOLL</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\zlib\_BUNDLED_ZLIB.vcxproj">
+      <Project>{9746019B-EF65-3A8D-83D7-8A367A39F60B}</Project>
+      <Name>_BUNDLED_ZLIB</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\quill\quill.vcxproj">
+      <Project>{7C9136E0-BB1C-387B-98A0-6F3BB1F18040}</Project>
+      <Name>quill</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

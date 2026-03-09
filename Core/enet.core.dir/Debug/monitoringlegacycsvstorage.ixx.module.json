@@ -1,0 +1,29 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\MonitoringLegacyCsvStorage.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.MonitoringLegacyCsvStorage.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.MonitoringLegacyCsvStorage",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\monitoringlegacycsvstorage.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.MonitoringConfiguration"
+                },
+                {
+                    "logical-name": "Enet.Core.CSV"
+                }
+            ]
+        }
+    ]
+}

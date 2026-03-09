@@ -1,0 +1,26 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\FocasInterface_30i.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.FocasInterface_30i.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.FocasInterface_30i",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\focasinterface_30i.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.FocasInterface"
+                }
+            ]
+        }
+    ]
+}

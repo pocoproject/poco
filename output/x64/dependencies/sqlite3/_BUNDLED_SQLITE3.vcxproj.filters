@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\sqlite3\src\sqlite3.c">
+      <Filter>sqlite3\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\sqlite3\src\sqlite3.h">
+      <Filter>sqlite3\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\sqlite3\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="sqlite3">
+      <UniqueIdentifier>{37C9657D-7259-3CDB-8299-D3B6642EA352}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sqlite3\Header Files">
+      <UniqueIdentifier>{AF4B7611-52FD-3539-8E6A-930F54AAA172}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sqlite3\Source Files">
+      <UniqueIdentifier>{AA37D390-90C2-305B-B00A-B9CD1DB7F7B4}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

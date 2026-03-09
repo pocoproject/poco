@@ -1,0 +1,44 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\MonitoringEventConfiguration.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.MonitoringEventConfiguration.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.MonitoringEventConfiguration",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\monitoringeventconfiguration.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.Color"
+                },
+                {
+                    "logical-name": "Enet.Core.MonitoringEvent"
+                },
+                {
+                    "logical-name": "Enet.Core.MonitoringStatus"
+                },
+                {
+                    "logical-name": "Enet.Core.MonitoringEmailGroups"
+                },
+                {
+                    "logical-name": "Enet.Core.Formatting"
+                },
+                {
+                    "logical-name": "Enet.Core.Flags"
+                },
+                {
+                    "logical-name": "Enet.Core.JsonHelpers"
+                }
+            ]
+        }
+    ]
+}

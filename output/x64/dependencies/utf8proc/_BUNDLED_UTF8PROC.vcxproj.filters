@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\utf8proc\src\utf8proc.c">
+      <Filter>utf8proc\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\utf8proc\src\utf8proc.h">
+      <Filter>utf8proc\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\utf8proc\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="utf8proc">
+      <UniqueIdentifier>{8DA2FEE5-C357-3D4E-A8CC-985BB9AFDCDA}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utf8proc\Header Files">
+      <UniqueIdentifier>{3F3A41FB-5C0F-3B96-AEB1-C5221F3E0804}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="utf8proc\Source Files">
+      <UniqueIdentifier>{47782885-EF7A-356A-8F66-376B4DFB6253}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

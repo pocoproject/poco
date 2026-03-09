@@ -1,0 +1,15 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\monitoringeventcolors.ixx",
+        "ProvidedModule": "Enet.Core.MonitoringEventColors",
+        "Includes": [],
+        "ImportedModules": [
+            {
+                "Name": "Enet.Core.Color",
+                "BMI": "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\enet.core.dir\\Debug\\Color.ixx.ifc"
+            }
+        ],
+        "ImportedHeaderUnits": []
+    }
+}

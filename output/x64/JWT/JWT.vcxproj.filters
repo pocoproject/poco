@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JWT\src\JWTException.cpp">
+      <Filter>JWT\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JWT\src\Serializer.cpp">
+      <Filter>JWT\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JWT\src\Signer.cpp">
+      <Filter>JWT\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JWT\src\Token.cpp">
+      <Filter>JWT\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JWT\include\Poco\JWT\JWT.h">
+      <Filter>JWT\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JWT\include\Poco\JWT\JWTException.h">
+      <Filter>JWT\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JWT\include\Poco\JWT\Serializer.h">
+      <Filter>JWT\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JWT\include\Poco\JWT\Signer.h">
+      <Filter>JWT\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JWT\include\Poco\JWT\Token.h">
+      <Filter>JWT\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JWT\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="JWT">
+      <UniqueIdentifier>{63018C3C-B10E-3973-820C-7BC8A935A951}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JWT\Header Files">
+      <UniqueIdentifier>{610FEC15-F517-371C-AE26-A55F313EE445}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JWT\Source Files">
+      <UniqueIdentifier>{9E8E99AD-CB42-391D-8B68-5AABE357F665}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

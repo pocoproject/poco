@@ -1,0 +1,38 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\FileTransferDescription.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.FileTransferDescription.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.FileTransferDescription",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\filetransferdescription.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.FileFormat"
+                },
+                {
+                    "logical-name": "Enet.Core.MazakModel"
+                },
+                {
+                    "logical-name": "Enet.Core.DncType"
+                },
+                {
+                    "logical-name": "Enet.Core.TemporaryFile"
+                },
+                {
+                    "logical-name": "Enet.Core.Time"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,35 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\MachineConfiguration.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.MachineConfiguration.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.MachineConfiguration",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\machineconfiguration.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.DncConfiguration"
+                },
+                {
+                    "logical-name": "Enet.Core.MonitoringConfiguration"
+                },
+                {
+                    "logical-name": "Enet.Core.UsbInterop"
+                },
+                {
+                    "logical-name": "Enet.Core.ConfigurationSet"
+                }
+            ]
+        }
+    ]
+}

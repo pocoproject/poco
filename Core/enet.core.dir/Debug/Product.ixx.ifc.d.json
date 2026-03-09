@@ -1,0 +1,10 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\product.ixx",
+        "ProvidedModule": "Enet.Core.Product",
+        "Includes": [],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

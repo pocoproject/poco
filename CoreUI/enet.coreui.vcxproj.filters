@@ -1,0 +1,241 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\HttpSettingsDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\TextWindow.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\TextWindowImpl.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\Toolbar.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\ToolbarPlot.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\Utility.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\App.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\AppImpl.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\BitmapBackground.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\CheckComboBox.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\Clipboard.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\CSharpReporting.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\CrystalReport.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\Dashboard.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\DashboardHelpers.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\DemoDataDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\DemoDataSettingsDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\DemoDataHistoricalDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\DirDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\DirTreeCtrl.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\DirWindow.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\Dialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\EmailSetupDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\EnetCsvReport.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\EnetRemoteConfigDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\EventEditDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\ExplorerFindDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\FastReport.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\GdiPlus.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\IPSelectDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\IPSplashScreenDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\MainWindow.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\MchDispDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\MchSelectDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\MchStatusListDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\MfcDrawingHelpers.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\UIHelpers.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\MonitoringColorsDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\MonitoringDrawing.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\NewPartDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\TextEntryDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\PasswordDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\PowerBIReport.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\PushPin.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\Report.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\RemoteDirectoryDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SecurityDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SerialConfigureDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SerialSelectDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SerialTxReposDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SerialViewRSDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SerialReceiveDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SerialTransmitDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\Settings.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SizeControlBar.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SolverBoltHoleDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SolverDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SolverGenericTableDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SolverHexagonDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SolverHMS2DegreesDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SolverInches2MMDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SolverMillFeedDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SolverMM2InchesDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SolverRPMDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SolverSquareDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SolverSurfaceDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SolverTapDrillSizeDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SolverTaperDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\SolverTriangleDialog.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\StatusBar.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\TextDocument.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\TextDocumentImpl.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\TextPlot3D.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\TextPlot3DImpl.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\TextView.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\TextViewImpl.ixx">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\CoreUI\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{980AED50-EEF6-3C16-BF6B-9A47CE9975AB}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

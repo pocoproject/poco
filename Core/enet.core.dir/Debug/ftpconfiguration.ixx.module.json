@@ -1,0 +1,26 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\FtpConfiguration.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.FtpConfiguration.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.FtpConfiguration",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\ftpconfiguration.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.IPAddress"
+                }
+            ]
+        }
+    ]
+}

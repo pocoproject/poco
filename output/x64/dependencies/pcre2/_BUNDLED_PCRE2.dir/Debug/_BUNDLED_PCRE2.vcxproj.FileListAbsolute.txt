@@ -1,0 +1,1 @@
+C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\pcre2\_BUNDLED_PCRE2.dir\Debug\_BUNDLED_PCRE2.lib

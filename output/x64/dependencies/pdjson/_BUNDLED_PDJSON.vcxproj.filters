@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pdjson\src\pdjson.c">
+      <Filter>pdjson\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pdjson\src\pdjson.h">
+      <Filter>pdjson\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pdjson\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="pdjson">
+      <UniqueIdentifier>{30ED3CA7-85DA-35B2-8F0C-337010B276D7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pdjson\Header Files">
+      <UniqueIdentifier>{39A7EC2D-794C-31FA-8688-BC66697D658C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pdjson\Source Files">
+      <UniqueIdentifier>{6DA94572-E807-3624-965A-45F9108D7533}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

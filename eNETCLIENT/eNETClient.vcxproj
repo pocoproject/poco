@@ -1,0 +1,432 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F8362797-DE00-39B9-830D-501C00E6A4D8}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>eNETClient</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>Static</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>Static</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>Static</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>Static</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\eNETCLIENT\eNETCLIENT\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">eNETClient.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">eNETClient</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\eNETCLIENT\eNETCLIENT\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">eNETClient.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">eNETClient</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\eNETCLIENT\eNETCLIENT\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">eNETClient.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">eNETClient</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\eNETCLIENT\eNETCLIENT\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">eNETClient.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">eNETClient</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\boost;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Zip\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\skate;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Foundation/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Net/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/NetSSL_OpenSSL/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Crypto/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/openssl/build/x64/OpenSSL/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Util/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/XML/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/JSON/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Zip/include" /bigobj</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;ONO8D=1;PRODUCT=PRODUCT_ENETCLIENT;POCO_STATIC;UNICODE;NOMINMAX;_WIN32_WINNT=_WIN32_WINNT_WIN7;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_CMAKE;_DEBUG;POCO_OS_FAMILY_WINDOWS;_UNICODE;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;ONO8D=1;PRODUCT=PRODUCT_ENETCLIENT;POCO_STATIC;UNICODE;NOMINMAX;_WIN32_WINNT=_WIN32_WINNT_WIN7;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_CMAKE;POCO_OS_FAMILY_WINDOWS;_UNICODE;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\boost;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Zip\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\skate;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Util\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\XML\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JSON\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Zip\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\boost;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Zip\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\skate;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Util\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\XML\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JSON\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Zip\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\lib\libcrypto.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\lib\libssl.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\SQLAPI\x86_64\lib\sqlapis.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\kfunc64mt.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\Rockey2\x64\rockey2.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\ProEssentials\pegrp64g.lib;..\Core\Debug\enet.core.lib;..\CoreUI\Debug\enet.coreui.lib;..\output\x64\lib\PocoFoundationmtd.lib;..\output\x64\lib\PocoNetmtd.lib;..\output\x64\lib\PocoNetSSLmtd.lib;..\output\x64\lib\PocoCryptomtd.lib;..\output\x64\lib\PocoZipmtd.lib;wxbase33u.lib;wxmsw33u_core.lib;wxpng.lib;wxjpeg.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;..\Core\Debug\enet.core.lib;..\output\x64\lib\PocoNetmtd.lib;iphlpapi.lib;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\lib\libssl.lib;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\lib\libcrypto.lib;ws2_32.lib;crypt32.lib;ws2_32.lib;..\output\x64\lib\PocoUtilmtd.lib;..\output\x64\lib\PocoXMLmtd.lib;..\output\x64\lib\PocoJSONmtd.lib;Crypt32.lib;..\output\x64\lib\PocoFoundationmtd.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/wxWidgets/out/x64/lib/vc_x64_lib;C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/wxWidgets/out/x64/lib/vc_x64_lib/$(Configuration);C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/boost/stage/lib;C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/boost/stage/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64 /SUBSYSTEM:Windows</AdditionalOptions>
+      <EntryPointSymbol>wWinMainCRTStartup</EntryPointSymbol>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>LIBC.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ImportLibrary>C:/Users/oldte/source/repos/portcnc/enet/externals/poco/eNETCLIENT/Debug/eNETClient.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/oldte/source/repos/portcnc/enet/externals/poco/eNETCLIENT/eNETCLIENT/Debug/eNETClient.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\boost;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Zip\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\skate;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Foundation/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Net/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/NetSSL_OpenSSL/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Crypto/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/openssl/build/x64/OpenSSL/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Util/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/XML/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/JSON/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Zip/include" /bigobj</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ONO8D=1;PRODUCT=PRODUCT_ENETCLIENT;POCO_STATIC;UNICODE;NOMINMAX;_WIN32_WINNT=_WIN32_WINNT_WIN7;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_CMAKE;POCO_OS_FAMILY_WINDOWS;_UNICODE;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ONO8D=1;PRODUCT=PRODUCT_ENETCLIENT;POCO_STATIC;UNICODE;NOMINMAX;_WIN32_WINNT=_WIN32_WINNT_WIN7;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_CMAKE;POCO_OS_FAMILY_WINDOWS;_UNICODE;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\boost;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Zip\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\skate;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Util\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\XML\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JSON\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Zip\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\boost;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Zip\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\skate;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Util\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\XML\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JSON\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Zip\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\lib\libcrypto.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\lib\libssl.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\SQLAPI\x86_64\lib\sqlapis.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\kfunc64mt.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\Rockey2\x64\rockey2.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\ProEssentials\pegrp64g.lib;..\Core\Release\enet.core.lib;..\CoreUI\Release\enet.coreui.lib;..\output\x64\lib\PocoFoundationmt.lib;..\output\x64\lib\PocoNetmt.lib;..\output\x64\lib\PocoNetSSLmt.lib;..\output\x64\lib\PocoCryptomt.lib;..\output\x64\lib\PocoZipmt.lib;wxbase33u.lib;wxmsw33u_core.lib;wxpng.lib;wxjpeg.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;..\Core\Release\enet.core.lib;..\output\x64\lib\PocoNetmt.lib;iphlpapi.lib;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\lib\libssl.lib;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\lib\libcrypto.lib;ws2_32.lib;crypt32.lib;ws2_32.lib;..\output\x64\lib\PocoUtilmt.lib;..\output\x64\lib\PocoXMLmt.lib;..\output\x64\lib\PocoJSONmt.lib;Crypt32.lib;..\output\x64\lib\PocoFoundationmt.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/wxWidgets/out/x64/lib/vc_x64_lib;C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/wxWidgets/out/x64/lib/vc_x64_lib/$(Configuration);C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/boost/stage/lib;C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/boost/stage/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64 /SUBSYSTEM:Windows</AdditionalOptions>
+      <EntryPointSymbol>wWinMainCRTStartup</EntryPointSymbol>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>LIBC.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ImportLibrary>C:/Users/oldte/source/repos/portcnc/enet/externals/poco/eNETCLIENT/Release/eNETClient.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/oldte/source/repos/portcnc/enet/externals/poco/eNETCLIENT/eNETCLIENT/Release/eNETClient.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\boost;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Zip\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\skate;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Foundation/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Net/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/NetSSL_OpenSSL/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Crypto/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/openssl/build/x64/OpenSSL/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Util/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/XML/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/JSON/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Zip/include" /bigobj</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ONO8D=1;PRODUCT=PRODUCT_ENETCLIENT;POCO_STATIC;UNICODE;NOMINMAX;_WIN32_WINNT=_WIN32_WINNT_WIN7;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_CMAKE;POCO_OS_FAMILY_WINDOWS;_UNICODE;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ONO8D=1;PRODUCT=PRODUCT_ENETCLIENT;POCO_STATIC;UNICODE;NOMINMAX;_WIN32_WINNT=_WIN32_WINNT_WIN7;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_CMAKE;POCO_OS_FAMILY_WINDOWS;_UNICODE;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\boost;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Zip\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\skate;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Util\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\XML\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JSON\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Zip\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\boost;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Zip\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\skate;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Util\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\XML\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JSON\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Zip\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\lib\libcrypto.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\lib\libssl.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\SQLAPI\x86_64\lib\sqlapis.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\kfunc64mt.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\Rockey2\x64\rockey2.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\ProEssentials\pegrp64g.lib;..\Core\MinSizeRel\enet.core.lib;..\CoreUI\MinSizeRel\enet.coreui.lib;..\output\x64\lib\PocoFoundationmt.lib;..\output\x64\lib\PocoNetmt.lib;..\output\x64\lib\PocoNetSSLmt.lib;..\output\x64\lib\PocoCryptomt.lib;..\output\x64\lib\PocoZipmt.lib;wxbase33u.lib;wxmsw33u_core.lib;wxpng.lib;wxjpeg.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;..\Core\MinSizeRel\enet.core.lib;..\output\x64\lib\PocoNetmt.lib;iphlpapi.lib;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\lib\libssl.lib;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\lib\libcrypto.lib;ws2_32.lib;crypt32.lib;ws2_32.lib;..\output\x64\lib\PocoUtilmt.lib;..\output\x64\lib\PocoXMLmt.lib;..\output\x64\lib\PocoJSONmt.lib;Crypt32.lib;..\output\x64\lib\PocoFoundationmt.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/wxWidgets/out/x64/lib/vc_x64_lib;C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/wxWidgets/out/x64/lib/vc_x64_lib/$(Configuration);C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/boost/stage/lib;C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/boost/stage/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64 /SUBSYSTEM:Windows</AdditionalOptions>
+      <EntryPointSymbol>wWinMainCRTStartup</EntryPointSymbol>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>LIBC.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ImportLibrary>C:/Users/oldte/source/repos/portcnc/enet/externals/poco/eNETCLIENT/MinSizeRel/eNETClient.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/oldte/source/repos/portcnc/enet/externals/poco/eNETCLIENT/eNETCLIENT/MinSizeRel/eNETClient.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\boost;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Zip\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\skate;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Foundation/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Net/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/NetSSL_OpenSSL/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Crypto/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/openssl/build/x64/OpenSSL/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Util/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/XML/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/JSON/include" /external:I "C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Zip/include" /bigobj</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ONO8D=1;PRODUCT=PRODUCT_ENETCLIENT;POCO_STATIC;UNICODE;NOMINMAX;_WIN32_WINNT=_WIN32_WINNT_WIN7;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_CMAKE;POCO_OS_FAMILY_WINDOWS;_UNICODE;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;ONO8D=1;PRODUCT=PRODUCT_ENETCLIENT;POCO_STATIC;UNICODE;NOMINMAX;_WIN32_WINNT=_WIN32_WINNT_WIN7;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_CMAKE;POCO_OS_FAMILY_WINDOWS;_UNICODE;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\boost;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Zip\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\skate;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Util\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\XML\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JSON\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Zip\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\boost;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\poco\Zip\include;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\skate;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Net\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\NetSSL_OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Crypto\include;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Util\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\XML\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\JSON\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Zip\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalDependencies>C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\lib\libcrypto.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\externals\openssl\build\x64\OpenSSL\lib\libssl.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\SQLAPI\x86_64\lib\sqlapis.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\kfunc64mt.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\Rockey2\x64\rockey2.lib;C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\..\LIB\ProEssentials\pegrp64g.lib;..\Core\RelWithDebInfo\enet.core.lib;..\CoreUI\RelWithDebInfo\enet.coreui.lib;..\output\x64\lib\PocoFoundationmt.lib;..\output\x64\lib\PocoNetmt.lib;..\output\x64\lib\PocoNetSSLmt.lib;..\output\x64\lib\PocoCryptomt.lib;..\output\x64\lib\PocoZipmt.lib;wxbase33u.lib;wxmsw33u_core.lib;wxpng.lib;wxjpeg.lib;wxzlib.lib;wxregexu.lib;wxexpat.lib;..\Core\RelWithDebInfo\enet.core.lib;..\output\x64\lib\PocoNetmt.lib;iphlpapi.lib;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\lib\libssl.lib;C:\Users\oldte\source\repos\portcnc\enet\externals\openssl\build\x64\OpenSSL\lib\libcrypto.lib;ws2_32.lib;crypt32.lib;ws2_32.lib;..\output\x64\lib\PocoUtilmt.lib;..\output\x64\lib\PocoXMLmt.lib;..\output\x64\lib\PocoJSONmt.lib;Crypt32.lib;..\output\x64\lib\PocoFoundationmt.lib;iphlpapi.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/wxWidgets/out/x64/lib/vc_x64_lib;C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/wxWidgets/out/x64/lib/vc_x64_lib/$(Configuration);C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/boost/stage/lib;C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/../externals/boost/stage/lib/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64 /SUBSYSTEM:Windows</AdditionalOptions>
+      <EntryPointSymbol>wWinMainCRTStartup</EntryPointSymbol>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>LIBC.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ImportLibrary>C:/Users/oldte/source/repos/portcnc/enet/externals/poco/eNETCLIENT/RelWithDebInfo/eNETClient.lib</ImportLibrary>
+      <ProgramDataBaseFile>C:/Users/oldte/source/repos/portcnc/enet/externals/poco/eNETCLIENT/eNETCLIENT/RelWithDebInfo/eNETClient.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/eNETCLIENT/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Strawberry\c\share\cmake-3.29\Modules\CMakeFindDependencyMacro.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\FindOpenSSL.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\FindPackageHandleStandardArgs.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\FindPackageMessage.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\SelectLibraryConfigurations.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoCryptoConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoCryptoConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoCryptoTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoFoundationConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoFoundationConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoFoundationTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoJSONConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoJSONConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoJSONTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetSSLConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetSSLConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetSSLTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoUtilConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoUtilConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoUtilTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoXMLConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoXMLConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoXMLTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoZipConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoZipConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoZipTargets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\eNETCLIENT\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/eNETCLIENT/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Strawberry\c\share\cmake-3.29\Modules\CMakeFindDependencyMacro.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\FindOpenSSL.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\FindPackageHandleStandardArgs.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\FindPackageMessage.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\SelectLibraryConfigurations.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoCryptoConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoCryptoConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoCryptoTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoFoundationConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoFoundationConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoFoundationTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoJSONConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoJSONConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoJSONTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetSSLConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetSSLConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetSSLTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoUtilConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoUtilConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoUtilTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoXMLConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoXMLConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoXMLTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoZipConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoZipConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoZipTargets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\eNETCLIENT\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/eNETCLIENT/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Strawberry\c\share\cmake-3.29\Modules\CMakeFindDependencyMacro.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\FindOpenSSL.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\FindPackageHandleStandardArgs.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\FindPackageMessage.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\SelectLibraryConfigurations.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoCryptoConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoCryptoConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoCryptoTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoFoundationConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoFoundationConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoFoundationTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoJSONConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoJSONConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoJSONTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetSSLConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetSSLConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetSSLTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoUtilConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoUtilConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoUtilTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoXMLConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoXMLConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoXMLTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoZipConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoZipConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoZipTargets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\eNETCLIENT\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/eNETCLIENT/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/eNETCLIENT/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Strawberry\c\share\cmake-3.29\Modules\CMakeFindDependencyMacro.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\FindOpenSSL.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\FindPackageHandleStandardArgs.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\FindPackageMessage.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\SelectLibraryConfigurations.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoCryptoConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoCryptoConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoCryptoTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoFoundationConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoFoundationConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoFoundationTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoJSONConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoJSONConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoJSONTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetSSLConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetSSLConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetSSLTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoNetTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoUtilConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoUtilConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoUtilTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoXMLConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoXMLConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoXMLTargets.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoZipConfig.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoZipConfigVersion.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Poco\PocoZipTargets.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\eNETCLIENT\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\eNETCLIENT.cpp">
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\eNETCLIENTsec.cpp">
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\License.cpp">
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\MainFrm.cpp">
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\NativeReport.cpp">
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\Options.cpp">
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\RemoteMchList.cpp">
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\ReportScheduleSelect.cpp">
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\ReportSelect.cpp">
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\STATUS.cpp">
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\StdAfx.cpp">
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\eNETCLIENT\z_eNETRemoteUploadDownload.cpp">
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">true</ScanSourceForModuleDependencies>
+      <ScanSourceForModuleDependencies Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">true</ScanSourceForModuleDependencies>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\ZERO_CHECK.vcxproj">
+      <Project>{9D999C06-2474-3747-8F8B-F51FD3DFDF42}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Core\enet.core.vcxproj">
+      <Project>{EFA6E1FD-8668-3648-A9E5-7187F45A89CF}</Project>
+      <Name>enet.core</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\CoreUI\enet.coreui.vcxproj">
+      <Project>{0879E057-4FD0-3C20-897E-F73BBB7E02F3}</Project>
+      <Name>enet.coreui</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

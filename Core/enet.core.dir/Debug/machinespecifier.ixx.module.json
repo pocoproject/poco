@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\MachineSpecifier.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.MachineSpecifier.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.MachineSpecifier",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\machinespecifier.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

@@ -1,0 +1,59 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\FanucFocas.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.FanucFocas.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.FanucFocas",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\fanucfocas.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.FocasInterface"
+                },
+                {
+                    "logical-name": "Enet.Core.FocasInterface_e1"
+                },
+                {
+                    "logical-name": "Enet.Core.FocasInterface_15i"
+                },
+                {
+                    "logical-name": "Enet.Core.FocasInterface_30i"
+                },
+                {
+                    "logical-name": "Enet.Core.FocasInterface_150"
+                },
+                {
+                    "logical-name": "Enet.Core.FocasInterface_160"
+                },
+                {
+                    "logical-name": "Enet.Core.FocasInterface_16iW"
+                },
+                {
+                    "logical-name": "Enet.Core.FocasInterface_0i"
+                },
+                {
+                    "logical-name": "Enet.Core.FocasInterface_0iB"
+                },
+                {
+                    "logical-name": "Enet.Core.FocasInterface_0iD"
+                },
+                {
+                    "logical-name": "Enet.Core.FocasInterface_PM"
+                },
+                {
+                    "logical-name": "Enet.Core.FocasInterface_PMi"
+                }
+            ]
+        }
+    ]
+}

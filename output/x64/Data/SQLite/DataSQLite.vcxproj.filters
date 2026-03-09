@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\src\Binder.cpp">
+      <Filter>SQLite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\src\Connector.cpp">
+      <Filter>SQLite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\src\Extractor.cpp">
+      <Filter>SQLite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\src\Notifier.cpp">
+      <Filter>SQLite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\src\SQLiteException.cpp">
+      <Filter>SQLite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\src\SQLiteStatementImpl.cpp">
+      <Filter>SQLite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\src\SessionImpl.cpp">
+      <Filter>SQLite\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\src\Utility.cpp">
+      <Filter>SQLite\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\include\Poco\Data\SQLite\Binder.h">
+      <Filter>SQLite\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\include\Poco\Data\SQLite\Connector.h">
+      <Filter>SQLite\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\include\Poco\Data\SQLite\Extractor.h">
+      <Filter>SQLite\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\include\Poco\Data\SQLite\Notifier.h">
+      <Filter>SQLite\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\include\Poco\Data\SQLite\SQLite.h">
+      <Filter>SQLite\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\include\Poco\Data\SQLite\SQLiteException.h">
+      <Filter>SQLite\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\include\Poco\Data\SQLite\SQLiteStatementImpl.h">
+      <Filter>SQLite\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\include\Poco\Data\SQLite\SessionImpl.h">
+      <Filter>SQLite\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\include\Poco\Data\SQLite\Utility.h">
+      <Filter>SQLite\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\SQLite\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\sqlite3\_BUNDLED_SQLITE3.dir\$(Configuration)\sqlite3.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Object Libraries">
+      <UniqueIdentifier>{DD7207A9-9370-3540-9679-5C0B6CE78876}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLite">
+      <UniqueIdentifier>{58F2F6E9-B6E5-3EAD-AA69-171247FD33C0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLite\Header Files">
+      <UniqueIdentifier>{E2B9FCAE-32A4-31BA-88C6-EF4024827697}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLite\Source Files">
+      <UniqueIdentifier>{DC3EF45F-6BAA-35C1-A275-0DE255752017}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

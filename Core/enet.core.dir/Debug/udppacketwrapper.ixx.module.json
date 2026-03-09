@@ -1,0 +1,32 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\UdpPacketWrapper.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.UdpPacketWrapper.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.UdpPacketWrapper",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\udppacketwrapper.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.Time"
+                },
+                {
+                    "logical-name": "Enet.Core.Memory"
+                },
+                {
+                    "logical-name": "Enet.Core.HardwareInfo"
+                }
+            ]
+        }
+    ]
+}

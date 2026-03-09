@@ -1,0 +1,1 @@
+C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\wepoll\_BUNDLED_WEPOLL.dir\Debug\_BUNDLED_WEPOLL.lib

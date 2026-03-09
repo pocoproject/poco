@@ -1,0 +1,350 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6F48E413-F2C5-3D6A-8D61-0366A50BC6DC}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>DataPostgreSQL</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">DataPostgreSQL.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">PocoDataPostgreSQLmtd</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">DataPostgreSQL.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">PocoDataPostgreSQLmt</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">DataPostgreSQL.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">PocoDataPostgreSQLmt</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\lib\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">DataPostgreSQL.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">PocoDataPostgreSQLmt</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Strawberry/c/include" /external:I "C:/Strawberry/c/include/postgresql/server" /Zc:__cplusplus</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;POCO_STATIC;POCO_CMAKE;SQLParser_EXPORTS;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;_DEBUG;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;POCO_STATIC;POCO_CMAKE;SQLParser_EXPORTS;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;C:\Strawberry\c\include;C:\Strawberry\c\include\postgresql\server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;C:\Strawberry\c\include;C:\Strawberry\c\include\postgresql\server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Strawberry/c/include" /external:I "C:/Strawberry/c/include/postgresql/server" /Zc:__cplusplus</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;SQLParser_EXPORTS;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;SQLParser_EXPORTS;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;C:\Strawberry\c\include;C:\Strawberry\c\include\postgresql\server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;C:\Strawberry\c\include;C:\Strawberry\c\include\postgresql\server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Strawberry/c/include" /external:I "C:/Strawberry/c/include/postgresql/server" /Zc:__cplusplus</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;SQLParser_EXPORTS;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;SQLParser_EXPORTS;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;C:\Strawberry\c\include;C:\Strawberry\c\include\postgresql\server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;C:\Strawberry\c\include;C:\Strawberry\c\include\postgresql\server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) /external:I "C:/Strawberry/c/include" /external:I "C:/Strawberry/c/include/postgresql/server" /Zc:__cplusplus</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;SQLParser_EXPORTS;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;SQLParser_EXPORTS;UTF8PROC_STATIC;POCO_ENABLE_FASTLOGGER;POCO_OS_FAMILY_WINDOWS;UNICODE;_UNICODE;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;C:\Strawberry\c\include;C:\Strawberry\c\include\postgresql\server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Foundation\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\tessil\include;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\quill\include;C:\Strawberry\c\include;C:\Strawberry\c\include\postgresql\server;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Data/PostgreSQL/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet/externals/poco -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64 --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64/Data/PostgreSQL/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Strawberry\c\share\cmake-3.29\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Strawberry\c\share\cmake-3.29\Modules\CMakePackageConfigHelpers.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\cmake\PocoDataPostgreSQLConfig.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Data\PostgreSQL\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Data/PostgreSQL/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet/externals/poco -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64 --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64/Data/PostgreSQL/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Strawberry\c\share\cmake-3.29\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Strawberry\c\share\cmake-3.29\Modules\CMakePackageConfigHelpers.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\cmake\PocoDataPostgreSQLConfig.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Data\PostgreSQL\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Data/PostgreSQL/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet/externals/poco -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64 --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64/Data/PostgreSQL/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Strawberry\c\share\cmake-3.29\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Strawberry\c\share\cmake-3.29\Modules\CMakePackageConfigHelpers.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\cmake\PocoDataPostgreSQLConfig.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Data\PostgreSQL\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/externals/poco/Data/PostgreSQL/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet/externals/poco -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64 --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64/Data/PostgreSQL/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Strawberry\c\share\cmake-3.29\Modules\BasicConfigVersion-AnyNewerVersion.cmake.in;C:\Strawberry\c\share\cmake-3.29\Modules\CMakePackageConfigHelpers.cmake;C:\Strawberry\c\share\cmake-3.29\Modules\WriteBasicConfigVersionFile.cmake;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\cmake\PocoDataPostgreSQLConfig.cmake;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Data\PostgreSQL\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\src\BinaryExtractor.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\src\Binder.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\src\Connector.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\src\Extractor.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\src\PostgreSQLException.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\src\PostgreSQLStatementImpl.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\src\PostgreSQLTypes.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\src\SessionHandle.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\src\SessionImpl.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\src\StatementExecutor.cpp" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\src\Utility.cpp" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include\Poco\Data\PostgreSQL\BinaryExtractor.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include\Poco\Data\PostgreSQL\Binder.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include\Poco\Data\PostgreSQL\Connector.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include\Poco\Data\PostgreSQL\Extractor.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include\Poco\Data\PostgreSQL\PostgreSQL.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include\Poco\Data\PostgreSQL\PostgreSQLException.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include\Poco\Data\PostgreSQL\PostgreSQLStatementImpl.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include\Poco\Data\PostgreSQL\PostgreSQLTypes.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include\Poco\Data\PostgreSQL\SessionHandle.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include\Poco\Data\PostgreSQL\SessionImpl.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include\Poco\Data\PostgreSQL\StatementExecutor.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include\Poco\Data\PostgreSQL\Utility.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\Data\PostgreSQL\include\libpq\libpq-fs.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\ZERO_CHECK.vcxproj">
+      <Project>{5FB7BA55-7F0A-33C2-B233-1916802215CD}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Data\Data.vcxproj">
+      <Project>{CB400B8E-2AFD-376E-8B72-B856870167F3}</Project>
+      <Name>Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\Foundation\Foundation.vcxproj">
+      <Project>{43B732EF-B054-3CA8-9F4F-B30838B51976}</Project>
+      <Name>Foundation</Name>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\pcre2\_BUNDLED_PCRE2.vcxproj">
+      <Project>{3492CDB0-A132-3C5A-A7F6-266BBADD0BA0}</Project>
+      <Name>_BUNDLED_PCRE2</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\utf8proc\_BUNDLED_UTF8PROC.vcxproj">
+      <Project>{2A432750-AA10-3F9A-B739-143473FFD42F}</Project>
+      <Name>_BUNDLED_UTF8PROC</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\v8_double_conversion\_BUNDLED_V8_DOUBLE_CONVERSION.vcxproj">
+      <Project>{74682585-0D88-3FF3-96B1-A7FA483F902D}</Project>
+      <Name>_BUNDLED_V8_DOUBLE_CONVERSION</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\zlib\_BUNDLED_ZLIB.vcxproj">
+      <Project>{9746019B-EF65-3A8D-83D7-8A367A39F60B}</Project>
+      <Name>_BUNDLED_ZLIB</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\quill\quill.vcxproj">
+      <Project>{7C9136E0-BB1C-387B-98A0-6F3BB1F18040}</Project>
+      <Name>quill</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

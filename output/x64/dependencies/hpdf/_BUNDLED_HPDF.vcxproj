@@ -1,0 +1,385 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4B78E25E-4E0E-3328-9526-F74916AA0700}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
+    <Platform>x64</Platform>
+    <ProjectName>_BUNDLED_HPDF</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_BUNDLED_HPDF.dir\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_BUNDLED_HPDF.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">_BUNDLED_HPDF</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_BUNDLED_HPDF.dir\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_BUNDLED_HPDF.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">_BUNDLED_HPDF</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">_BUNDLED_HPDF.dir\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">_BUNDLED_HPDF.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">_BUNDLED_HPDF</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">_BUNDLED_HPDF.dir\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">_BUNDLED_HPDF.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">_BUNDLED_HPDF</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\zlib\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\png\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;POCO_STATIC;POCO_CMAKE;CMAKE_INTDIR="Debug"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;POCO_STATIC;POCO_CMAKE;CMAKE_INTDIR=\"Debug\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\zlib\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\png\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\zlib\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\png\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\zlib\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\png\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;CMAKE_INTDIR="Release"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;CMAKE_INTDIR=\"Release\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\zlib\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\png\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\zlib\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\png\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\zlib\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\png\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;CMAKE_INTDIR="MinSizeRel"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;CMAKE_INTDIR=\"MinSizeRel\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\zlib\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\png\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\zlib\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\png\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\zlib\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\png\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <UseFullPaths>false</UseFullPaths>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;CMAKE_INTDIR="RelWithDebInfo"</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);WIN32;_WINDOWS;NDEBUG;POCO_STATIC;POCO_CMAKE;CMAKE_INTDIR=\"RelWithDebInfo\"</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\zlib\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\png\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\zlib\src;C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\png\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\CMakeLists.txt">
+      <UseUtf8Encoding>Always</UseUtf8Encoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/externals/poco/dependencies/hpdf/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet/externals/poco -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64 --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64/dependencies/hpdf/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\hpdf\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/externals/poco/dependencies/hpdf/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet/externals/poco -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64 --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64/dependencies/hpdf/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\hpdf\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/externals/poco/dependencies/hpdf/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet/externals/poco -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64 --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64/dependencies/hpdf/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\hpdf\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/oldte/source/repos/portcnc/enet/externals/poco/dependencies/hpdf/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+C:\Strawberry\c\bin\cmake.exe -SC:/Users/oldte/source/repos/portcnc/enet/externals/poco -BC:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64 --check-stamp-file C:/Users/oldte/source/repos/portcnc/enet/externals/poco/output/x64/dependencies/hpdf/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\hpdf\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_3dmeasure.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_annotation.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_array.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_binary.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_boolean.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_catalog.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_destination.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_dict.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_direct.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_doc.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_doc_png.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_encoder.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_encoder_cns.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_encoder_cnt.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_encoder_jp.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_encoder_kr.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_encoder_utf.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_encrypt.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_encryptdict.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_error.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_exdata.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_ext_gstate.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_font.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_font_cid.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_font_tt.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_font_type1.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_fontdef.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_fontdef_base14.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_fontdef_cid.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_fontdef_cns.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_fontdef_cnt.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_fontdef_jp.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_fontdef_kr.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_fontdef_tt.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_fontdef_type1.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_gstate.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_image.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_image_ccitt.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_image_png.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_info.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_list.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_mmgr.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_name.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_namedict.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_null.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_number.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_objects.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_outline.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_page_label.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_page_operator.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_pages.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_pdfa.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_real.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_shading.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_streams.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_string.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_u3d.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_utils.c" />
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_xref.c" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_3dmeasure.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_annotation.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_catalog.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_conf.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_config.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_consts.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_destination.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_doc.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_encoder.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_encrypt.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_encryptdict.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_error.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_exdata.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_ext_gstate.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_font.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_fontdef.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_gstate.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_image.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_info.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_list.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_mmgr.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_namedict.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_objects.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_outline.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_page_label.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_pages.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_pdfa.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_streams.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_types.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_u3d.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_utils.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\hpdf_version.h" />
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\hpdf\src\t4.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\ZERO_CHECK.vcxproj">
+      <Project>{5FB7BA55-7F0A-33C2-B233-1916802215CD}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\png\_BUNDLED_PNG.vcxproj">
+      <Project>{76DC6A79-2BFF-3B19-8DA8-3F98A9865AF3}</Project>
+      <Name>_BUNDLED_PNG</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+    <ProjectReference Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\zlib\_BUNDLED_ZLIB.vcxproj">
+      <Project>{9746019B-EF65-3A8D-83D7-8A367A39F60B}</Project>
+      <Name>_BUNDLED_ZLIB</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

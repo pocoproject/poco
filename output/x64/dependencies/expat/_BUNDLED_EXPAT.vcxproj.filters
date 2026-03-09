@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\xmlparse.c">
+      <Filter>expat\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\xmlrole.c">
+      <Filter>expat\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\xmltok.c">
+      <Filter>expat\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\xmltok_impl.c">
+      <Filter>expat\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\xmltok_ns.c">
+      <Filter>expat\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\ascii.h">
+      <Filter>expat\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\asciitab.h">
+      <Filter>expat\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\expat.h">
+      <Filter>expat\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\expat_config.h">
+      <Filter>expat\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\expat_external.h">
+      <Filter>expat\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\iasciitab.h">
+      <Filter>expat\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\internal.h">
+      <Filter>expat\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\latin1tab.h">
+      <Filter>expat\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\nametab.h">
+      <Filter>expat\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\siphash.h">
+      <Filter>expat\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\utf8tab.h">
+      <Filter>expat\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\winconfig.h">
+      <Filter>expat\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\xmlrole.h">
+      <Filter>expat\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\xmltok.h">
+      <Filter>expat\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\src\xmltok_impl.h">
+      <Filter>expat\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\expat\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="expat">
+      <UniqueIdentifier>{716AD772-D8AB-3DE0-93AF-1148452AA916}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="expat\Header Files">
+      <UniqueIdentifier>{E828C9CB-6F9B-35F6-8666-6E43C696E11B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="expat\Source Files">
+      <UniqueIdentifier>{BD98755F-2094-332B-986C-0AE21699740B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

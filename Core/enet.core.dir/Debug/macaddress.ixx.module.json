@@ -1,0 +1,26 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\MacAddress.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.MacAddress.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.MacAddress",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\macaddress.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.Formatting"
+                }
+            ]
+        }
+    ]
+}

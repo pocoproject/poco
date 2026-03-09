@@ -1,0 +1,1 @@
+C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\utf8proc\_BUNDLED_UTF8PROC.dir\Debug\_BUNDLED_UTF8PROC.lib

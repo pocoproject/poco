@@ -1,0 +1,62 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\MachineState.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.MachineState.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.MachineState",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\machinestate.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.Logging"
+                },
+                {
+                    "logical-name": "Enet.Core.AppPaths"
+                },
+                {
+                    "logical-name": "Enet.Core.FileTransferDescription"
+                },
+                {
+                    "logical-name": "Enet.Core.MachineCommands"
+                },
+                {
+                    "logical-name": "Enet.Core.MachineResponses"
+                },
+                {
+                    "logical-name": "Enet.Core.MachineConfiguration"
+                },
+                {
+                    "logical-name": "Enet.Core.EmailConfiguration"
+                },
+                {
+                    "logical-name": "Enet.Core.DncFileHistory"
+                },
+                {
+                    "logical-name": "Enet.Core.Product"
+                },
+                {
+                    "logical-name": "Enet.Core.HardwareInfo"
+                },
+                {
+                    "logical-name": "Enet.Core.Consumer"
+                },
+                {
+                    "logical-name": "Enet.Core.MachineTransfer"
+                },
+                {
+                    "logical-name": "Enet.Core.Security"
+                }
+            ]
+        }
+    ]
+}

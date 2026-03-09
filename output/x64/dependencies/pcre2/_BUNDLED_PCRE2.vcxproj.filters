@@ -1,0 +1,153 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_auto_possess.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_chartables.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_chkdint.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_compile.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_compile_cgroup.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_compile_class.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_config.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_context.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_convert.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_dfa_match.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_error.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_extuni.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_find_bracket.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_maketables.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_match.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_match_data.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_match_next.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_newline.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_ord2utf.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_pattern_info.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_script_run.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_serialize.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_string_utils.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_study.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_substitute.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_substring.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_tables.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_ucd.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_valid_utf.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_xclass.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2posix.c">
+      <Filter>pcre2\Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2.h">
+      <Filter>pcre2\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_compile.h">
+      <Filter>pcre2\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_config.h">
+      <Filter>pcre2\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_internal.h">
+      <Filter>pcre2\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_intmodedep.h">
+      <Filter>pcre2\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_jit_char_inc.h">
+      <Filter>pcre2\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_jit_match_inc.h">
+      <Filter>pcre2\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_jit_misc_inc.h">
+      <Filter>pcre2\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_jit_simd_inc.h">
+      <Filter>pcre2\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_ucp.h">
+      <Filter>pcre2\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_ucptables_inc.h">
+      <Filter>pcre2\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2_util.h">
+      <Filter>pcre2\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\src\pcre2posix.h">
+      <Filter>pcre2\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\oldte\source\repos\portcnc\enet\externals\poco\dependencies\pcre2\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="pcre2">
+      <UniqueIdentifier>{EA87E7CA-547D-3BE0-8693-1127E566055D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pcre2\Header Files">
+      <UniqueIdentifier>{B2AB64DE-6A9B-3B5A-9A00-E122393271D3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pcre2\Source Files">
+      <UniqueIdentifier>{6D7A138D-AACC-38BB-BD56-BBD3BBE4D468}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

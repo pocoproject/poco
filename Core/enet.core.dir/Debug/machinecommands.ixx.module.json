@@ -1,0 +1,50 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "enet.core.dir\\Debug\\MachineCommands.obj",
+            "outputs": [
+                "C:\\Users\\oldte\\source\\repos\\portcnc\\enet\\externals\\poco\\Core\\Debug\\enet.core.pdb",
+                "enet.core.dir\\Debug\\",
+                "enet.core.dir\\Debug\\Enet.Core.MachineCommands.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "Enet.Core.MachineCommands",
+                    "source-path": "c:\\users\\oldte\\source\\repos\\portcnc\\enet\\core\\machinecommands.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": [
+                {
+                    "logical-name": "Enet.Core.TemporaryFile"
+                },
+                {
+                    "logical-name": "Enet.Core.HardwareInfo"
+                },
+                {
+                    "logical-name": "Enet.Core.FileFormat"
+                },
+                {
+                    "logical-name": "Enet.Core.MazakModel"
+                },
+                {
+                    "logical-name": "Enet.Core.FileTransferDescription"
+                },
+                {
+                    "logical-name": "Enet.Core.MonitoringStatus"
+                },
+                {
+                    "logical-name": "Enet.Core.MonitoringPartConfiguration"
+                },
+                {
+                    "logical-name": "Enet.Core.MonitoringPartStatistics"
+                },
+                {
+                    "logical-name": "Enet.Core.MonitoringOverride"
+                }
+            ]
+        }
+    ]
+}

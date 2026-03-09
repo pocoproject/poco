@@ -1,0 +1,1 @@
+C:\Users\oldte\source\repos\portcnc\enet\externals\poco\output\x64\dependencies\expat\_BUNDLED_EXPAT.dir\Debug\_BUNDLED_EXPAT.lib
