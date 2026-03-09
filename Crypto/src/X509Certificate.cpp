@@ -297,7 +297,7 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 Poco::DateTime X509Certificate::validFrom() const
 {
 	const ASN1_TIME* certTime = X509_get0_notBefore(_pCert);
-	int certTimeType = ASN1_STRING_type(certTime);
+	auto certTimeType = ASN1_STRING_type(certTime);
 	std::string dateTime(reinterpret_cast<const char*>(ASN1_STRING_get0_data(certTime)));
 	int tzd;
 	if (certTimeType == V_ASN1_UTCTIME)
@@ -318,7 +318,7 @@ Poco::DateTime X509Certificate::validFrom() const
 Poco::DateTime X509Certificate::expiresOn() const
 {
 	const ASN1_TIME* certTime = X509_get0_notAfter(_pCert);
-	int certTimeType = ASN1_STRING_type(certTime);
+	auto certTimeType = ASN1_STRING_type(certTime);
 	std::string dateTime(reinterpret_cast<const char*>(ASN1_STRING_get0_data(certTime)));
 	int tzd;
 	if (certTimeType == V_ASN1_UTCTIME)
