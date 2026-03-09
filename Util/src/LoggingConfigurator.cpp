@@ -42,8 +42,7 @@ using Poco::LoggingFactory;
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 void LoggingConfigurator::configure(AbstractConfiguration::Ptr pConfig)
@@ -252,4 +251,4 @@ void LoggingConfigurator::configure(
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

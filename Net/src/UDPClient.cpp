@@ -16,8 +16,7 @@
 #include "Poco/ErrorHandler.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 UDPClient::UDPClient(const std::string& address, Poco::UInt16 port, bool listen):
@@ -88,4 +87,4 @@ int UDPClient::handleResponse(char* buffer, int length)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

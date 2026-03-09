@@ -144,9 +144,7 @@ namespace
 } // namespace
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 ResultMetadata::~ResultMetadata()
@@ -273,4 +271,4 @@ void ResultMetadata::adjustColumnSizeToFit(std::size_t pos)
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL

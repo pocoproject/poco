@@ -35,8 +35,7 @@ using Poco::UnbufferedStreamBuf;
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPStreamFactory::HTTPStreamFactory():
@@ -185,4 +184,4 @@ void HTTPStreamFactory::unregisterFactory()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

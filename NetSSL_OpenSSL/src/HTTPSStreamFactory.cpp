@@ -34,8 +34,7 @@ using Poco::URIStreamOpener;
 using Poco::UnbufferedStreamBuf;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPSStreamFactory::HTTPSStreamFactory():
@@ -191,4 +190,4 @@ void HTTPSStreamFactory::unregisterFactory()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

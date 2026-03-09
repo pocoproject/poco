@@ -22,8 +22,7 @@
 #include "Poco/JSON/Object.h"
 
 
-namespace Poco {
-namespace JWT {
+namespace Poco::JWT {
 
 
 class JWT_API Serializer
@@ -47,7 +46,7 @@ public:
 };
 
 
-} } // namespace Poco::JWT
+} // namespace Poco::JWT
 
 
 #endif // JWT_Serializer_INCLUDED

@@ -15,8 +15,7 @@
 #include "Poco/Net/UDPServerParams.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 UDPServerParams::UDPServerParams(const Poco::Net::SocketAddress& sa,
@@ -39,4 +38,4 @@ UDPServerParams::~UDPServerParams()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

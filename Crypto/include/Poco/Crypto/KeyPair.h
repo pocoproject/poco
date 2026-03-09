@@ -22,8 +22,7 @@
 #include "Poco/Crypto/KeyPairImpl.h"
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class X509Certificate;
@@ -138,7 +137,7 @@ inline KeyPair::Type KeyPair::type() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_KeyPair_INCLUDED

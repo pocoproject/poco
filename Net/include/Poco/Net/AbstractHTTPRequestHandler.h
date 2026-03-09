@@ -22,8 +22,7 @@
 #include "Poco/Net/HTTPResponse.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTMLForm;
@@ -130,7 +129,7 @@ inline HTTPServerResponse& AbstractHTTPRequestHandler::response()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_AbstractHTTPRequestHandler_INCLUDED

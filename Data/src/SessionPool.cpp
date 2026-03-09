@@ -18,8 +18,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 SessionPool::SessionPool(const std::string& connector, const std::string& connectionString, int minSessions, int maxSessions, int idleTime, int connTimeout):
@@ -342,4 +341,4 @@ void SessionPool::closeAll(SessionList& sessionList)
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

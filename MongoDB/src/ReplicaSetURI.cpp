@@ -21,8 +21,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 ReplicaSetURI::ReplicaSetURI()
@@ -491,4 +490,4 @@ std::string ReplicaSetURI::buildQueryString() const
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

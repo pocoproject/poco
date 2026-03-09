@@ -35,8 +35,7 @@ struct Person
 };
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <>
@@ -76,7 +75,7 @@ public:
 };
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 int main(int argc, char** argv)

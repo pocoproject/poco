@@ -21,8 +21,7 @@
 #endif
 
 CPPTRACE_BEGIN_NAMESPACE
-namespace detail {
-namespace libbacktrace {
+namespace detail::libbacktrace {
     int full_callback(void* data, std::uintptr_t address, const char* file, int line, const char* symbol) {
         stacktrace_frame& frame = *static_cast<stacktrace_frame*>(data);
         frame.raw_address = address;
@@ -100,8 +99,7 @@ namespace libbacktrace {
         }
         return trace;
     }
-}
-}
+} // namespace detail::libbacktrace
 CPPTRACE_END_NAMESPACE
 
 #endif

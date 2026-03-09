@@ -18,8 +18,7 @@
 #include "Poco/Util/OptionException.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 OptionProcessor::OptionProcessor(const OptionSet& options):
@@ -145,4 +144,4 @@ bool OptionProcessor::processCommon(const std::string& optionStr, bool isShort, 
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

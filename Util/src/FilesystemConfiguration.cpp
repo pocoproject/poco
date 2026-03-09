@@ -27,8 +27,7 @@ using Poco::StringTokenizer;
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 FilesystemConfiguration::FilesystemConfiguration(const std::string& path):
@@ -120,4 +119,4 @@ Path FilesystemConfiguration::keyToPath(const std::string& key) const
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

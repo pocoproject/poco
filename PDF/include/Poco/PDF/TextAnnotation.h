@@ -23,8 +23,7 @@
 #include "Poco/PDF/Declarations.h"
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 class PDF_API TextAnnotation: public Resource<HPDF_Annotation>
@@ -60,7 +59,7 @@ public:
 };
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_TextAnnotation_INCLUDED

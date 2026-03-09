@@ -24,8 +24,7 @@
 #include <openssl/err.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 PKCS12Container::PKCS12Container(std::istream& istr, const std::string& password) : _pKey(nullptr)
@@ -202,4 +201,4 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

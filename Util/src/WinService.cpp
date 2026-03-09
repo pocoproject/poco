@@ -25,8 +25,7 @@ using Poco::NotFoundException;
 using Poco::OutOfMemoryException;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 const int WinService::STARTUP_TIMEOUT = 30000;
@@ -417,4 +416,4 @@ POCO_LPQUERY_SERVICE_CONFIG WinService::config() const
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

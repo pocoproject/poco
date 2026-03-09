@@ -24,8 +24,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class Function;
@@ -202,7 +201,7 @@ inline bool Struct::isDerived() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_Struct_INCLUDED

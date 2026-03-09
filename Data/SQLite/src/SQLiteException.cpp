@@ -16,9 +16,7 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 POCO_IMPLEMENT_EXCEPTION(SQLiteException, Poco::Data::DataException, "SQLite exception")
@@ -48,4 +46,4 @@ POCO_IMPLEMENT_EXCEPTION(AuthorizationDeniedException, SQLiteException, "Authori
 POCO_IMPLEMENT_EXCEPTION(TransactionException, SQLiteException, "Transaction exception")
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite

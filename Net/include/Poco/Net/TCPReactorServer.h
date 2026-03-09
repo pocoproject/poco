@@ -8,7 +8,7 @@
 #include "Poco/ThreadPool.h"
 #include <vector>
 
-namespace Poco { namespace Net {
+namespace Poco::Net {
 
 class Net_API TCPReactorServer
 	/// This class implements a TCP server using the Reactor pattern.
@@ -43,7 +43,7 @@ private:
 	int                                              _port;
 };
 
-}} // namespace Poco::Net
+} // namespace Poco::Net
 
 #endif // Net_TCPReactorServer_INCLUDED
 

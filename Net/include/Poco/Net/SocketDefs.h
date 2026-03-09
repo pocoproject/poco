@@ -365,8 +365,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -415,7 +414,7 @@ struct AddressFamily
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SocketDefs_INCLUDED

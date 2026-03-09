@@ -15,8 +15,7 @@
 #include "Poco/Util/OptionCallback.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 AbstractOptionCallback::~AbstractOptionCallback()
@@ -24,4 +23,4 @@ AbstractOptionCallback::~AbstractOptionCallback()
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

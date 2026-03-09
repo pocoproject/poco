@@ -19,8 +19,7 @@
 #include <openssl/err.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 namespace
@@ -215,4 +214,4 @@ CryptoTransform::Ptr CipherImpl::createDecryptor()
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

@@ -21,8 +21,7 @@ using Poco::BufferedBidirectionalStreamBuf;
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 //
@@ -153,4 +152,4 @@ SocketStream::~SocketStream()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

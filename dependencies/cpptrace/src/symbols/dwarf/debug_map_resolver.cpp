@@ -19,8 +19,7 @@
 #include <vector>
 
 CPPTRACE_BEGIN_NAMESPACE
-namespace detail {
-namespace libdwarf {
+namespace detail::libdwarf {
     #if IS_APPLE
     struct target_object {
         std::string object_path;
@@ -201,8 +200,7 @@ namespace libdwarf {
         return detail::make_unique<debug_map_resolver>(object_path);
     }
     #endif
-}
-}
+} // namespace detail::libdwarf
 CPPTRACE_END_NAMESPACE
 
 #endif

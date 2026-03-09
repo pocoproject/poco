@@ -15,8 +15,7 @@
 #include "Poco/SAX/DTDHandler.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 DTDHandler::~DTDHandler()
@@ -24,4 +23,4 @@ DTDHandler::~DTDHandler()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

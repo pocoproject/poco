@@ -21,8 +21,7 @@
 #include "Poco/XML/XML.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API DOMObject
@@ -97,7 +96,7 @@ inline void DOMObject::release() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_DOMObject_INCLUDED

@@ -6,8 +6,7 @@
 #include "Poco/Net/StreamSocket.h"
 #include <cstring>
 #include <string>
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API HTTPReactorServerSession : public HTTPSession
@@ -58,7 +57,7 @@ private:
 	StreamSocket   _realsocket;
 };
 
-}} // namespace Poco::Net
+} // namespace Poco::Net
 
 #endif // Net_HTTPReactorServerSession_INCLUDED
 

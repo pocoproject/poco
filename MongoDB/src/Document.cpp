@@ -23,8 +23,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 Document::Document()
@@ -290,4 +289,4 @@ bool Document::remove(const std::string& name)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

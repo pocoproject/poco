@@ -18,8 +18,7 @@
 #include <iostream>
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 //
@@ -144,4 +143,4 @@ std::string RedisInputStream::getline()
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis

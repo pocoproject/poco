@@ -23,8 +23,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class Parameter;
@@ -187,7 +186,7 @@ inline bool Function::isStatic() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_Function_INCLUDED

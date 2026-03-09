@@ -19,8 +19,7 @@
 #include <cstring>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 ObjectId::ObjectId()
@@ -99,4 +98,4 @@ std::string ObjectId::toString(const std::string& fmt) const
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

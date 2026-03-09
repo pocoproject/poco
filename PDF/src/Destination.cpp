@@ -16,8 +16,7 @@
 
 #include <hpdf.h>
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 Destination::Destination(HPDF_Doc* pPDF,
@@ -78,4 +77,4 @@ void Destination::fitWindowVertical(float left)
 
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF

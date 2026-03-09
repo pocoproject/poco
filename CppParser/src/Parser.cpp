@@ -42,8 +42,7 @@ using Poco::trimInPlace;
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 // Context-sensitive identifiers (not reserved keywords in C++,
@@ -1176,4 +1175,4 @@ const Token* Parser::nextToken()
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

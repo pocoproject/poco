@@ -17,9 +17,7 @@
 #include "Poco/DateTimeFormat.h"
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 Binder::Binder()
@@ -679,4 +677,4 @@ void Binder::bind(std::size_t /*pos*/, const std::list<std::string>& /*val*/, Di
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL

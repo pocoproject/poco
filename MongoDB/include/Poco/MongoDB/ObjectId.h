@@ -23,8 +23,7 @@
 #include "Poco/Timestamp.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API ObjectId
@@ -150,7 +149,7 @@ inline void BSONWriter::write<ObjectId::Ptr>(const ObjectId::Ptr& from)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_ObjectId_INCLUDED

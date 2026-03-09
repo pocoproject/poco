@@ -22,8 +22,7 @@
 #include "Poco/StreamTokenizer.h"
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API Tokenizer: public Poco::StreamTokenizer
@@ -38,7 +37,7 @@ public:
 };
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_Tokenizer_INCLUDED

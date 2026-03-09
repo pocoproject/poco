@@ -28,9 +28,7 @@
 #include "Poco/Thread.h"
 
 
-namespace Poco {
-namespace DNSSD {
-namespace Bonjour {
+namespace Poco::DNSSD::Bonjour {
 
 
 class DNSSD_Bonjour_API BonjourResponderImpl: public Poco::DNSSD::DNSSDResponderImpl
@@ -82,7 +80,7 @@ public:
 };
 
 
-} } } // namespace Poco::DNSSD::Bonjour
+} // namespace Poco::DNSSD::Bonjour
 
 
 #endif // DNSSD_Bonjour_BonjourResponderImpl_INCLUDED

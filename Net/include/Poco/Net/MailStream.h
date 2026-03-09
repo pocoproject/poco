@@ -24,8 +24,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API MailStreamBuf: public Poco::UnbufferedStreamBuf
@@ -141,7 +140,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_MailStream_INCLUDED

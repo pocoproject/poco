@@ -36,8 +36,7 @@
 // https://github.com/ruby/ruby/blob/master/addr2line.c
 
 CPPTRACE_BEGIN_NAMESPACE
-namespace detail {
-namespace libdwarf {
+namespace detail::libdwarf {
     // printbugging as we go
     constexpr bool dump_dwarf = false;
     constexpr bool trace_dwarf = false;
@@ -1023,8 +1022,7 @@ namespace libdwarf {
     std::unique_ptr<symbol_resolver> make_dwarf_resolver(cstring_view object_path) {
         return detail::make_unique<dwarf_resolver>(object_path);
     }
-}
-}
+} // namespace detail::libdwarf
 CPPTRACE_END_NAMESPACE
 
 #endif

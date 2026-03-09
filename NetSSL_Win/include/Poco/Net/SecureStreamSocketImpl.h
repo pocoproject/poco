@@ -26,8 +26,7 @@
 #include "Poco/Net/X509Certificate.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API SecureStreamSocketImpl: public StreamSocketImpl
@@ -311,7 +310,7 @@ inline void SecureStreamSocketImpl::error(int code, const std::string& arg)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_SecureStreamSocketImpl_INCLUDED

@@ -3,8 +3,7 @@
 #include "Poco/String.h"
 #include <cstddef>
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPReactorServerSession::HTTPReactorServerSession(
@@ -221,5 +220,5 @@ int HTTPReactorServerSession::write(const char* buffer, std::streamsize length)
 	}
 }
 
-}} // namespace Poco::Net
+} // namespace Poco::Net
 

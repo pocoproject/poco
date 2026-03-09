@@ -23,8 +23,7 @@
 #include <istream>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Zip_API AutoDetectStreamBuf: public Poco::BufferedStreamBuf
@@ -95,7 +94,7 @@ public:
 };
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_AutoDetectStream_INCLUDED

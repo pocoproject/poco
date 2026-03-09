@@ -24,8 +24,7 @@
 #include "Poco/Mutex.h"
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Prometheus_API GaugeSample
@@ -267,7 +266,7 @@ inline void Gauge::setToCurrentTime()
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_Gauge_INCLUDED

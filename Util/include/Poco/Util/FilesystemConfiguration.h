@@ -23,8 +23,7 @@
 #include "Poco/Path.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API FilesystemConfiguration: public AbstractConfiguration
@@ -89,7 +88,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_FilesystemConfiguration_INCLUDED

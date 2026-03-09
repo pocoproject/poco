@@ -26,8 +26,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class Enum;
@@ -124,7 +123,7 @@ private:
 };
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_Parser_INCLUDED

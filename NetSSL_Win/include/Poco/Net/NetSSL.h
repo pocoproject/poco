@@ -65,8 +65,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 void NetSSL_Win_API initializeSSL();
@@ -83,7 +82,7 @@ void NetSSL_Win_API uninitializeSSL();
 	/// shutting down the SSLManager.
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_NetSSL_INCLUDED

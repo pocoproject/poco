@@ -28,9 +28,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 class SQLite_API Notifier
@@ -208,7 +206,7 @@ inline const Poco::Dynamic::Var& Notifier::getValue() const
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite
 
 
 #endif // SQLite_Notifier_INCLUDED

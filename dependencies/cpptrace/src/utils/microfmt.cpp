@@ -3,13 +3,11 @@
 #include <iostream>
 
 CPPTRACE_BEGIN_NAMESPACE
-namespace microfmt {
-namespace detail {
+namespace microfmt::detail {
 
     std::ostream& get_cout() {
         return std::cout;
     }
 
-}
-}
+} // namespace microfmt::detail
 CPPTRACE_END_NAMESPACE

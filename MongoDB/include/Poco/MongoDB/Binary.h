@@ -24,8 +24,7 @@
 #include "Poco/UUID.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API Binary
@@ -173,7 +172,7 @@ inline void BSONWriter::write<Binary::Ptr>(const Binary::Ptr& from)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_Binary_INCLUDED

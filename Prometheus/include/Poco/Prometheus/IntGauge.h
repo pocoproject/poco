@@ -22,8 +22,7 @@
 #include <atomic>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Registry;
@@ -180,7 +179,7 @@ inline void IntGauge::setToCurrentTime()
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_IntGauge_INCLUDED

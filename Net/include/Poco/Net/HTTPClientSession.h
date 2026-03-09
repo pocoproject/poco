@@ -30,8 +30,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPRequest;
@@ -455,7 +454,7 @@ inline const Poco::Timespan& HTTPClientSession::getKeepAliveTimeout() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPClientSession_INCLUDED

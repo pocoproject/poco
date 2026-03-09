@@ -28,8 +28,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class StatementImpl;
@@ -529,7 +528,7 @@ inline void swap(Session& s1, Session& s2)
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 namespace std

@@ -2,8 +2,7 @@
 #include <atomic>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 TCPReactorAcceptor::TCPReactorAcceptor(
@@ -55,5 +54,5 @@ TCPReactorServerConnection* TCPReactorAcceptor::createServiceHandler(Poco::Net::
 	return tmpConnPtr.get();
 }
 
-}} // namespace Poco::Net
+} // namespace Poco::Net
 

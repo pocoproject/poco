@@ -6,8 +6,7 @@
 #include "Poco/Net/HTTPSession.h"
 #include "Poco/Net/TCPReactorServer.h"
 #include "Poco/ThreadPool.h"
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API HTTPReactorServer
@@ -29,5 +28,5 @@ private:
 	ThreadPool _threadPool;
 };
 
-}} // namespace Poco::Net
+} // namespace Poco::Net
 

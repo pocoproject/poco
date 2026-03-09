@@ -17,8 +17,7 @@
 #include "Poco/Redis/RedisEventArgs.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 RedisEventArgs::RedisEventArgs(RedisType::Ptr pMessage):
@@ -43,4 +42,4 @@ RedisEventArgs::~RedisEventArgs()
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis

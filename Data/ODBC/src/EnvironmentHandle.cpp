@@ -19,9 +19,7 @@
 #include "Poco/Debugger.h"
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 EnvironmentHandle::EnvironmentHandle(): _henv(POCO_ODBC_NULL_HENV)
@@ -61,4 +59,4 @@ EnvironmentHandle::~EnvironmentHandle()
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

@@ -25,8 +25,7 @@ using Poco::IOException;
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 NTPEventArgs::NTPEventArgs(const SocketAddress& address):
@@ -68,4 +67,4 @@ std::string NTPEventArgs::hostAddress() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

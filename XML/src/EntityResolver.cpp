@@ -15,8 +15,7 @@
 #include "Poco/SAX/EntityResolver.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 EntityResolver::~EntityResolver()
@@ -24,4 +23,4 @@ EntityResolver::~EntityResolver()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

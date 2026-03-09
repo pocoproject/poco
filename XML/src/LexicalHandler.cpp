@@ -15,8 +15,7 @@
 #include "Poco/SAX/LexicalHandler.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 LexicalHandler::~LexicalHandler()
@@ -24,4 +23,4 @@ LexicalHandler::~LexicalHandler()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

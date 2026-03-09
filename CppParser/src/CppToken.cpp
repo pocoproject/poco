@@ -23,8 +23,7 @@ using Poco::Token;
 using Poco::SyntaxException;
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 CppToken::CppToken()
@@ -866,5 +865,5 @@ void PreprocessorToken::finish(std::istream& istr)
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 

@@ -24,8 +24,7 @@
 #include "Poco/Net/NameValueCollection.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 class DNSSD_API Service
@@ -241,7 +240,7 @@ inline Service::Properties& Service::properties()
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD
 
 
 #endif // DNSSD_Service_INCLUDED

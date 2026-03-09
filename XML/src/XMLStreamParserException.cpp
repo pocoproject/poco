@@ -16,8 +16,7 @@
 #include "Poco/XML/XMLStreamParser.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 XMLStreamParserException::~XMLStreamParserException() noexcept
@@ -85,4 +84,4 @@ char const* XMLStreamParserException::what() const noexcept
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

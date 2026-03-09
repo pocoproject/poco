@@ -77,8 +77,7 @@
 #endif
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 enum HandleType
@@ -188,7 +187,7 @@ typedef OpaqueHandle<Poco::IntPtr, SD_RECORD_HANDLE, 0> RecordHandle;
 typedef OpaqueHandle<Poco::IntPtr, SD_BROWSE_HANDLE, 0> BrowseHandle;
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD
 
 
 #endif // DNSSD_DNSSD_INCLUDED

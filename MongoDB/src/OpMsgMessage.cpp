@@ -24,8 +24,7 @@
 
 #define POCO_MONGODB_DUMP	false
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 // Query and write
 const std::string OpMsgMessage::CMD_INSERT { "insert"s };
@@ -429,4 +428,4 @@ const std::string& commandIdentifier(const std::string& command)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

@@ -21,9 +21,7 @@
 #include <cmath>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 const TypeInfo Utility::_dataTypes;
@@ -204,4 +202,4 @@ std::string Utility::driverODBCVersion(const ConnectionHandle& db)
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

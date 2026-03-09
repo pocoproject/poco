@@ -29,8 +29,7 @@
 using Poco::icompare;
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 using namespace Keywords;
@@ -502,4 +501,4 @@ void StatementImpl::formatSQL(std::vector<Any>& arguments)
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

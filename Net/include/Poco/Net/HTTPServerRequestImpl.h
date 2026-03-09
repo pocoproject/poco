@@ -27,8 +27,7 @@
 #include <istream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPServerSession;
@@ -137,7 +136,7 @@ inline HTTPSession& HTTPServerRequestImpl::session()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPServerRequestImpl_INCLUDED

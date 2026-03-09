@@ -22,8 +22,7 @@
 #include "Poco/Net/Socket.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API ICMPPacketImpl
@@ -138,7 +137,7 @@ inline int ICMPPacketImpl::maxPacketSize() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_ICMPPacketImpl_INCLUDED

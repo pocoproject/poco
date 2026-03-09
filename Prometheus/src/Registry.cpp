@@ -20,8 +20,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 void Registry::registerCollector(Collector* pCollector)
@@ -96,4 +95,4 @@ Registry& Registry::defaultRegistry()
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

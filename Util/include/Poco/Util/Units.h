@@ -35,18 +35,14 @@
 #include <cmath>
 
 
-namespace Poco {
-namespace Util {
-namespace Units {
+namespace Poco::Util::Units {
 
-
-namespace Internal
-{
+namespace Internal {
 	template <typename T1, typename T2> struct Convert;
 	struct None;
 	template <int Num, int Den, int Div=Num/Den, int Mod=Num%Den>
 	struct FixedPower;
-}
+} // namespace Internal
 
 
 template <typename Unit1, typename Unit2>
@@ -1299,7 +1295,7 @@ V tan(const Value<V, U>& angle)
 }
 
 
-} } } // namespace Poco::Util::Units
+} // namespace Poco::Util::Units
 
 
 #endif // Util_Units_INCLUDED

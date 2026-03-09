@@ -22,8 +22,7 @@
 using Poco::Dynamic::Var;
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 POCO_IMPLEMENT_EXCEPTION(JSONTemplateException, Exception, "Template Exception")
@@ -674,4 +673,4 @@ void Template::render(const Var& data, std::ostream& out) const
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON

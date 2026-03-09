@@ -25,8 +25,7 @@
 using namespace std::literals;
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 // MongoDB error codes that indicate retriable errors
@@ -334,4 +333,4 @@ void ReplicaSetConnection::markServerFailed()
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

@@ -28,8 +28,7 @@
 #endif
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class NamePoolItem;
@@ -77,7 +76,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // XML_NamePool_INCLUDED

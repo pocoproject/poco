@@ -24,8 +24,7 @@
 #include <utility>
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 template <typename K>
@@ -394,10 +393,7 @@ private:
 };
 
 
-} // namespace Dynamic
-
-
-} // namespace Poco
+} // namespace Poco::Dynamic
 
 
 #endif // Foundation_Pair_INCLUDED

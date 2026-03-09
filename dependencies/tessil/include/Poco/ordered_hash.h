@@ -83,9 +83,7 @@
 #endif
 #endif
 
-namespace tsl {
-
-namespace detail_ordered_hash {
+namespace tsl::detail_ordered_hash {
 
 template <typename T>
 struct make_void {
@@ -1694,8 +1692,6 @@ class ordered_hash : private Hash, private KeyEqual {
   bool m_grow_on_next_insert;
 };
 
-}  // end namespace detail_ordered_hash
-
-}  // end namespace tsl
+} // namespace tsl::detail_ordered_hash
 
 #endif

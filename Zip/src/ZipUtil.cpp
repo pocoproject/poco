@@ -21,8 +21,7 @@
 #include <cstring>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 Poco::DateTime ZipUtil::parseDateTime(const char* pVal, const Poco::UInt32 timePos, const Poco::UInt32 datePos)
@@ -246,4 +245,4 @@ std::string ZipUtil::validZipEntryFileName(const Poco::Path& entry)
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

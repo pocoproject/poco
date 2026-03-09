@@ -22,8 +22,7 @@
 using Poco::TimeoutException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 NTPClient::NTPClient(IPAddress::Family family, int timeout):
@@ -92,4 +91,4 @@ int NTPClient::request(SocketAddress& address) const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

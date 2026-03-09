@@ -19,8 +19,7 @@
 #include "Poco/DOM/DOMException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 AttrMap::AttrMap(Element* pElement):
@@ -119,5 +118,5 @@ void AttrMap::autoRelease()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 

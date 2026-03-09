@@ -35,8 +35,7 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class OptionSet;
@@ -572,7 +571,7 @@ inline Poco::Timespan Application::uptime() const
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 //

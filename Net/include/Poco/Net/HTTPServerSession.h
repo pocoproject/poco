@@ -26,8 +26,7 @@
 #include "Poco/Timespan.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API HTTPServerSession: public HTTPSession
@@ -70,7 +69,7 @@ inline bool HTTPServerSession::canKeepAlive() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPServerSession_INCLUDED

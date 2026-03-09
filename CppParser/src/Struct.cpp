@@ -20,8 +20,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 Struct::Struct(const std::string& decl, bool isClass, NameSpace* pNameSpace):
@@ -276,4 +275,4 @@ Symbol* Struct::lookup(const std::string& name) const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

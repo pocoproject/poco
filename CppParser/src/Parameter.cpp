@@ -21,8 +21,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 int Parameter::_count(0);
@@ -147,4 +146,4 @@ std::string Parameter::handleDecl(const std::string& decl)
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

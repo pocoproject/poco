@@ -23,8 +23,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_data);
@@ -36,7 +35,7 @@ POCO_DECLARE_EXCEPTION(PDF_API, PDFException, Poco::RuntimeException)
 POCO_DECLARE_EXCEPTION(PDF_API, PDFCreateException, PDFException)
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_PDFException_INCLUDED

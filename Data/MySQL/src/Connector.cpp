@@ -19,9 +19,7 @@
 #include <mysql/mysql.h>
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 std::string Connector::KEY("mysql");
@@ -68,5 +66,5 @@ void Connector::unregisterConnector()
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL
 

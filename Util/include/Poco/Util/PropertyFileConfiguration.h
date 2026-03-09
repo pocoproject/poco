@@ -24,8 +24,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API PropertyFileConfiguration: public MapConfiguration
@@ -93,7 +92,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_PropertyFileConfiguration_INCLUDED

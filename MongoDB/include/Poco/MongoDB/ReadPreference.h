@@ -24,8 +24,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class TopologyDescription;  // Forward declaration
@@ -199,7 +198,7 @@ inline ReadPreference ReadPreference::nearest()
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_ReadPreference_INCLUDED

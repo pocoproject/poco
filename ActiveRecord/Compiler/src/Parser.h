@@ -17,9 +17,7 @@
 #include <istream>
 
 
-namespace Poco {
-namespace ActiveRecord {
-namespace Compiler {
+namespace Poco::ActiveRecord::Compiler {
 
 
 class Parser: protected Poco::XML::DefaultHandler
@@ -57,7 +55,7 @@ private:
 };
 
 
-} } } // namespace Poco::ActiveRecord::Compiler
+} // namespace Poco::ActiveRecord::Compiler
 
 
 #endif // ActiveRecordCompiler_Parser_INCLUDED

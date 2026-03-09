@@ -16,8 +16,7 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 POCO_IMPLEMENT_EXCEPTION(OptionException, Poco::DataException, "Option exception")
@@ -32,4 +31,4 @@ POCO_IMPLEMENT_EXCEPTION(DuplicateOptionException, OptionException, "Option must
 POCO_IMPLEMENT_EXCEPTION(EmptyOptionException, OptionException, "Empty option specified")
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

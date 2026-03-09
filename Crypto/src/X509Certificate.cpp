@@ -29,8 +29,7 @@
 #include <openssl/bn.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 X509Certificate::X509Certificate(std::istream& istr) : _pCert(nullptr)
@@ -445,4 +444,4 @@ void X509Certificate::print(std::ostream& out) const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

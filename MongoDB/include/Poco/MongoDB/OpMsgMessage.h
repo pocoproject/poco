@@ -24,8 +24,7 @@
 
 #include <string>
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API OpMsgMessage: public Message
@@ -160,7 +159,7 @@ private:
 };
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_OpMsgMessage_INCLUDED

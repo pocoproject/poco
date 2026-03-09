@@ -17,8 +17,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 void OptionSet::addOption(const Option& option)
@@ -83,4 +82,4 @@ const Option& OptionSet::getOption(const std::string& name, bool matchShort) con
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

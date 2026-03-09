@@ -26,8 +26,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API RemoteSyslogChannel: public Poco::Channel
@@ -161,7 +160,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_RemoteSyslogChannel_INCLUDED

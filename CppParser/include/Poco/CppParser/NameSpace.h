@@ -25,8 +25,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API NameSpace: public Symbol
@@ -135,7 +134,7 @@ inline const NameSpace::NameSpaceVec& NameSpace::importedNameSpaces() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_NameSpace_INCLUDED

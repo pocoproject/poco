@@ -17,8 +17,7 @@
 #include "Poco/DNSSD/Domain.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 Domain::Domain():
@@ -41,4 +40,4 @@ Domain::~Domain()
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD

@@ -23,8 +23,7 @@
 #include <istream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API PartSource
@@ -104,7 +103,7 @@ inline const MessageHeader& PartSource::headers() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_PartSource_INCLUDED

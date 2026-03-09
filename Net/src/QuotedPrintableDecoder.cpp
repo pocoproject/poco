@@ -23,8 +23,7 @@ using Poco::NumberParser;
 using Poco::DataFormatException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 QuotedPrintableDecoderBuf::QuotedPrintableDecoderBuf(std::istream& istr):
@@ -99,4 +98,4 @@ QuotedPrintableDecoder::~QuotedPrintableDecoder()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -24,9 +24,7 @@
 #endif
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 const std::string Connector::KEY("ODBC");
@@ -68,4 +66,4 @@ void Connector::bindStringToLongVarChar(bool flag)
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

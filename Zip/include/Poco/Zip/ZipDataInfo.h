@@ -23,8 +23,7 @@
 #include "Poco/Zip/ZipUtil.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Zip_API ZipDataInfo
@@ -242,7 +241,7 @@ inline Poco::UInt32 ZipDataInfo64::getFullHeaderSize()
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_ZipDataInfo_INCLUDED

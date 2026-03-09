@@ -16,8 +16,7 @@
 #include "Poco/JSON/TemplateCache.h"
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 TemplateCache* TemplateCache::_pInstance = nullptr;
@@ -154,4 +153,4 @@ Path TemplateCache::resolvePath(const Path& path) const
 }
 
 
-} } // Poco::JSON
+} // namespace Poco::JSON

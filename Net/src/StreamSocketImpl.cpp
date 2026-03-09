@@ -17,8 +17,7 @@
 #include "Poco/Thread.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 StreamSocketImpl::StreamSocketImpl()
@@ -74,4 +73,4 @@ int StreamSocketImpl::sendBytes(const void* buffer, int length, int flags)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

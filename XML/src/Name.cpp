@@ -16,8 +16,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString Name::EMPTY_NAME;
@@ -185,4 +184,4 @@ XMLString Name::prefix(const XMLString& qname)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

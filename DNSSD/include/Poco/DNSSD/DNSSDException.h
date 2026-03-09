@@ -24,14 +24,13 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 POCO_DECLARE_EXCEPTION(DNSSD_API, DNSSDException, Poco::RuntimeException)
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD
 
 
 #endif // DNSSD_DNSSDException_INCLUDED

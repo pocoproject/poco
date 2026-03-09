@@ -16,8 +16,7 @@
 
 #include <hpdf.h>
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 Font::Font(HPDF_Doc* pPDF, HPDF_Font font):
@@ -96,4 +95,4 @@ int Font::measureText(const std::string& text,
 }
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF

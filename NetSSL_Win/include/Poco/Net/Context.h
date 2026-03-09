@@ -36,8 +36,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API Context: public Poco::RefCountedObject
@@ -306,7 +305,7 @@ inline HCERTSTORE Context::certificateStore() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_Context_INCLUDED

@@ -17,8 +17,7 @@
 #include <cstring>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 PartialStreamBuf::PartialStreamBuf(std::istream& in, std::ios::pos_type start, std::ios::pos_type endPos, const std::string& pre, const std::string& post, bool initStream):
@@ -252,4 +251,4 @@ PartialOutputStream::~PartialOutputStream()
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

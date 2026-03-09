@@ -25,8 +25,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 class JSON_API Parser: private ParserImpl
@@ -205,7 +204,7 @@ inline Dynamic::Var Parser::parse(std::istream& in)
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON
 
 
 #endif // JSON_JSONParser_INCLUDED

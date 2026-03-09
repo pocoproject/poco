@@ -29,8 +29,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 //
@@ -665,4 +664,4 @@ void RemoteSyslogListener::registerChannel()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

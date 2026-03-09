@@ -24,8 +24,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API PrivateKeyFactoryMgr
@@ -58,7 +57,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_PrivateKeyFactoryMgr_INCLUDED

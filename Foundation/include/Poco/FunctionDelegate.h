@@ -24,10 +24,7 @@
 #include <type_traits>
 
 
-namespace Poco {
-
-
-namespace Detail {
+namespace Poco::Detail {
 
 /// Helper to select the correct function pointer type based on template parameters.
 template <class TArgs, bool hasSender, bool senderIsConst>
@@ -69,7 +66,10 @@ struct FunctionDelegateNotifyType<void, false, senderIsConst>
 	using Type = void (*)();
 };
 
-} // namespace Detail
+} // namespace Poco::Detail
+
+
+namespace Poco {
 
 
 template <class TArgs, bool hasSender = true, bool senderIsConst = true>

@@ -15,9 +15,7 @@
 #include "Poco/Data/MySQL/Binder.h"
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 Binder::Binder()
@@ -639,4 +637,4 @@ void Binder::bind(std::size_t pos, const std::list<std::string>& val, Direction 
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL

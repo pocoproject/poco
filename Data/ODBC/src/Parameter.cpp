@@ -18,9 +18,7 @@
 #include "Poco/Data/ODBC/ODBCException.h"
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 Parameter::Parameter(const StatementHandle& rStmt, std::size_t colNum) :
@@ -50,4 +48,4 @@ void Parameter::init()
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

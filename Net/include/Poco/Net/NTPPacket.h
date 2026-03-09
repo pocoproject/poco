@@ -22,8 +22,7 @@
 #include "Poco/Net/Net.h"
 #include "Poco/Timestamp.h"
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API NTPPacket
@@ -201,7 +200,7 @@ inline Poco::Int64 NTPPacket::transmitTimestamp() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_NTPPacket_INCLUDED

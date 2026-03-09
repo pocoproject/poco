@@ -16,9 +16,7 @@
 #include "Poco/Data/ODBC/Utility.h"
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 ODBCMetaColumn::ODBCMetaColumn(const StatementHandle& rStmt, std::size_t position) :
@@ -161,4 +159,4 @@ void ODBCMetaColumn::init()
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

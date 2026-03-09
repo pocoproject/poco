@@ -23,9 +23,7 @@
 #include <sqltypes.h>
 #include <string>
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 inline void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::wstring& target)
@@ -63,7 +61,7 @@ inline void makeUTF8(Poco::Buffer<wchar_t>& buffer, SQLINTEGER length, SQLPOINTE
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif // Data_ODBC_Unicode_WIN32_INCLUDED

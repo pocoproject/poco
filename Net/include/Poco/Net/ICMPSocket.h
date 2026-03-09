@@ -22,8 +22,7 @@
 #include "Poco/Net/Socket.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API ICMPSocket: public Socket
@@ -92,7 +91,7 @@ protected:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_ICMPSocket_INCLUDED

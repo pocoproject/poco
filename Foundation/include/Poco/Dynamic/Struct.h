@@ -28,8 +28,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 template <typename S, typename I = typename S::ConstIterator>
@@ -965,7 +964,10 @@ private:
 };
 
 
-} // namespace Dynamic
+} // namespace Poco::Dynamic
+
+
+namespace Poco {
 
 
 using DynamicStruct = Dynamic::Struct<std::string>;

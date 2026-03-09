@@ -22,8 +22,7 @@
 #include "Poco/Net/MessageHeader.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class MediaType;
@@ -183,7 +182,7 @@ inline bool HTTPMessage::hasContentLength() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPMessage_INCLUDED

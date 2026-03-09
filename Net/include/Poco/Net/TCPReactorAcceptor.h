@@ -10,8 +10,7 @@
 #include <memory>
 #include <vector>
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API TCPReactorAcceptor : public Poco::Net::SocketAcceptor<TCPReactorServerConnection>
@@ -42,7 +41,7 @@ private:
 	TCPServerParams::Ptr                        _pParams;
 };
 
-}} // namespace Poco::Net
+} // namespace Poco::Net
 
 #endif // Net_TCPReactorAcceptor_INCLUDED
 

@@ -28,8 +28,7 @@
 #include <cstring>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, HTTPSession& session, bool mustMaskPayload):
@@ -686,4 +685,4 @@ int WebSocketImpl::available()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

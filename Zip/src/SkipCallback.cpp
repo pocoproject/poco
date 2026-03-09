@@ -18,8 +18,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 SkipCallback::SkipCallback()
@@ -43,4 +42,4 @@ bool SkipCallback::handleZipEntry(std::istream& zipStream, const ZipLocalFileHea
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

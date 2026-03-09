@@ -31,8 +31,7 @@ using Poco::NumberFormatter;
 using Poco::IllegalStateException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPClientSession::ProxyConfig HTTPClientSession::_globalProxyConfig;
@@ -621,4 +620,4 @@ bool HTTPClientSession::bypassProxy() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

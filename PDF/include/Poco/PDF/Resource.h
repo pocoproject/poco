@@ -22,8 +22,7 @@
 #include "Poco/PDF/Declarations.h"
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 template <typename R>
@@ -110,7 +109,7 @@ private:
 using ExtGraphicsState = Resource<HPDF_ExtGState>;
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_Resource_INCLUDED

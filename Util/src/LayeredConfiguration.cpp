@@ -21,8 +21,7 @@ using Poco::AutoPtr;
 using Poco::RuntimeException;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig)
@@ -178,4 +177,4 @@ int LayeredConfiguration::highest() const
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

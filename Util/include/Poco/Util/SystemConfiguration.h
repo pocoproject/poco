@@ -23,8 +23,7 @@
 #include <map>
 #include <functional>
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API SystemConfiguration: public AbstractConfiguration
@@ -80,7 +79,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_SystemConfiguration_INCLUDED

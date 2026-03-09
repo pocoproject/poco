@@ -16,8 +16,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginTimeout):
@@ -56,4 +55,4 @@ bool SessionImpl::isGood() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

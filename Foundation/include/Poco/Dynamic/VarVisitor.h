@@ -23,8 +23,7 @@
 #include <functional>
 
 
-namespace Poco {
-namespace Details {
+namespace Poco::Details {
 
 
 #ifndef POCO_DOC
@@ -61,10 +60,10 @@ using Handler = std::function<void(const T&)>;
 #endif // POCO_DOC
 
 
-} // Details
+} // namespace Poco::Details
 
 
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 class Foundation_API Visitor
@@ -110,7 +109,7 @@ public:
 };
 
 
-} } // namespace Poco::Dynamic
+} // namespace Poco::Dynamic
 
 
 #endif // Foundation_VarVisitor_INCLUDED

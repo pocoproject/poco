@@ -15,8 +15,7 @@
 #include "Poco/MongoDB/JavaScriptCode.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 JavaScriptCode::JavaScriptCode()
@@ -30,4 +29,4 @@ JavaScriptCode::~JavaScriptCode()
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

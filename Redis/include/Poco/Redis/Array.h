@@ -25,8 +25,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 class Redis_API Array
@@ -319,8 +318,7 @@ struct RedisTypeTraits<Array>
 };
 
 
-} // namespace Redis
-} // namespace Poco
+} // namespace Poco::Redis
 
 
 #endif // Redis_Array_INCLUDED

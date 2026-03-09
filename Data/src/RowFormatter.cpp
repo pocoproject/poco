@@ -17,8 +17,7 @@
 #include <iomanip>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 RowFormatter::RowFormatter(const std::string& prefix,
@@ -83,4 +82,4 @@ void RowFormatter::adjustPrefix() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

@@ -23,8 +23,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 class Redis_API RedisNotification: public Notification
@@ -108,7 +107,7 @@ inline const std::string& RedisErrorNotification::message() const
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis
 
 
 #endif // Redis_RedisNotifications_INCLUDED

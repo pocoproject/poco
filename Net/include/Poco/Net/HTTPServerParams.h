@@ -22,8 +22,7 @@
 #include "Poco/Net/TCPServerParams.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API HTTPServerParams: public TCPServerParams
@@ -164,7 +163,7 @@ inline bool HTTPServerParams::getAutoDecodeHeaders() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPServerParams_INCLUDED

@@ -22,8 +22,7 @@ using Poco::ExistsException;
 using Poco::NotFoundException;
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 NameSpace::NameSpace()
@@ -250,4 +249,4 @@ void NameSpace::extract(Symbol::Kind kind, SymbolTable& table) const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

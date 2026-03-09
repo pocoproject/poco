@@ -23,8 +23,7 @@
 #include "Poco/PDF/Destination.h"
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 class PDF_API Outline: public Resource<HPDF_Outline>
@@ -56,7 +55,7 @@ public:
 };
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_Outline_INCLUDED

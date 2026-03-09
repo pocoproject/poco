@@ -34,9 +34,7 @@
 #include <sqltypes.h>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 class ODBC_API ODBCStatementImpl: public Poco::Data::StatementImpl
@@ -212,7 +210,7 @@ inline bool ODBCStatementImpl::canCompile() const
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif // Data_ODBC_ODBCStatementImpl_INCLUDED

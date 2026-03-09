@@ -25,8 +25,7 @@
 #include "Poco/Format.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 Decompress::Decompress(std::istream& in, const Poco::Path& outputDir, bool flattenDirs, bool keepIncompleteFiles):
@@ -188,4 +187,4 @@ void Decompress::onOk(const void*, std::pair<const ZipLocalFileHeader, const Poc
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

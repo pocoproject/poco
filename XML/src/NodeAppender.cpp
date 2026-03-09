@@ -17,8 +17,7 @@
 #include "Poco/DOM/DOMException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 NodeAppender::NodeAppender(Element* parent):
@@ -79,4 +78,4 @@ void NodeAppender::appendChild(Node* newChild)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

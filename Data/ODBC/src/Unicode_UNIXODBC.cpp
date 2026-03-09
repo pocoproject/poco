@@ -32,9 +32,7 @@ using Poco::InvalidArgumentException;
 using Poco::NotImplementedException;
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::string& target)
@@ -850,4 +848,4 @@ SQLRETURN SQLDrivers(SQLHENV henv,
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

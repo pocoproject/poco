@@ -20,8 +20,7 @@
 using Poco::Dynamic::Var;
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 ParseHandler::ParseHandler(bool preserveObjectOrder) : Handler(),
@@ -138,4 +137,4 @@ void ParseHandler::setValue(const Var& value)
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON

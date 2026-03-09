@@ -20,8 +20,7 @@
 #include <limits>
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 const std::size_t VarIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
@@ -179,4 +178,4 @@ VarIterator VarIterator::operator - (std::size_t diff) const
 }
 
 
-} } // namespace Poco::Dynamic
+} // namespace Poco::Dynamic

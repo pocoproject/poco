@@ -20,9 +20,7 @@
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 Preparator::Preparator(const StatementHandle& rStmt,
@@ -208,4 +206,4 @@ void Preparator::prepareBoolArray(std::size_t pos, SQLSMALLINT valueType, std::s
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

@@ -29,8 +29,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 Socket::Socket():
@@ -414,4 +413,4 @@ void Socket::error()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

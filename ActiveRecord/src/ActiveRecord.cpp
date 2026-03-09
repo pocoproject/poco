@@ -21,8 +21,7 @@ using namespace Poco::Data::Keywords;
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace ActiveRecord {
+namespace Poco::ActiveRecord {
 
 
 void ActiveRecordBase::attach(Context::Ptr pContext)
@@ -59,4 +58,4 @@ std::string KeylessActiveRecord::toString() const
 }
 
 
-} } // namespace Poco::ActiveRecord
+} // namespace Poco::ActiveRecord

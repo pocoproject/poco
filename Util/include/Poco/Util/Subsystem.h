@@ -22,8 +22,7 @@
 #include "Poco/RefCountedObject.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Application;
@@ -92,7 +91,7 @@ protected:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_Subsystem_INCLUDED

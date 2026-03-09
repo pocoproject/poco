@@ -22,9 +22,7 @@
 #include <mysql/mysql.h>
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 class SessionHandle
@@ -97,7 +95,7 @@ inline SessionHandle::operator MYSQL* ()
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL
 
 
 #endif // Data_MySQL_SessionHandle_INCLUDED

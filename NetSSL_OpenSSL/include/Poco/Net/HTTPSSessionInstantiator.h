@@ -25,8 +25,7 @@
 #include "Poco/URI.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API HTTPSSessionInstantiator: public HTTPSessionInstantiator
@@ -59,7 +58,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPSSessionInstantiator_INCLUDED

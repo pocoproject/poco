@@ -18,8 +18,7 @@
 #include "Poco/Net/DialogSocket.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 SecureSMTPClientSession::SecureSMTPClientSession(const StreamSocket& socket):
@@ -60,4 +59,4 @@ bool SecureSMTPClientSession::startTLS(Context::Ptr pContext)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

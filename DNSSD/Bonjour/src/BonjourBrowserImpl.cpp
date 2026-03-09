@@ -22,9 +22,7 @@
 #include <dns_sd.h>
 
 
-namespace Poco {
-namespace DNSSD {
-namespace Bonjour {
+namespace Poco::DNSSD::Bonjour {
 
 
 extern "C" void DNSSD_API onBrowseReply(
@@ -483,4 +481,4 @@ void BonjourBrowserImpl::parseTXTRecord(Poco::UInt16 length, const void* data, S
 }
 
 
-} } } // namespace Poco::DNSSD::Bonjour
+} // namespace Poco::DNSSD::Bonjour

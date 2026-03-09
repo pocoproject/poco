@@ -18,12 +18,11 @@
 #include "CppUnit/TestCase.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 class FTPClientSession;
 
-} }
+} // namespace Poco::Net
 
 class DialogServer;
 

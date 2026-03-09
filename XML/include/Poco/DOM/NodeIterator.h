@@ -21,8 +21,7 @@
 #include "Poco/XML/XML.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class Node;
@@ -161,7 +160,7 @@ inline bool NodeIterator::expandEntityReferences() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_NodeIterator_INCLUDED

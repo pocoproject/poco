@@ -48,8 +48,7 @@
 #endif // _MSC_VER && _MT && !POCO_EXTERNAL_OPENSSL && (POCO_MSVS_VERSION < 2013)
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 Poco::AtomicCounter OpenSSLInitializer::_rc;
@@ -122,4 +121,4 @@ void uninitializeCrypto()
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

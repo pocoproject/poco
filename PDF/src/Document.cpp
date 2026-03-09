@@ -24,8 +24,7 @@
 #include <utility>
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 static_assert(static_cast<int>(Document::Info::INFO_CREATION_DATE) == HPDF_INFO_CREATION_DATE, "Document info value mismatch");
 static_assert(static_cast<int>(Document::Info::INFO_KEYWORDS) == HPDF_INFO_KEYWORDS, "Document info value mismatch");
@@ -520,4 +519,4 @@ void Document::reset(bool all)
 }
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF

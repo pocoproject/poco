@@ -23,14 +23,13 @@
 #include "Poco/Net/HTTPBufferAllocator.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 using HTTPBasicStreamBuf = Poco::BasicBufferedStreamBuf<char, std::char_traits<char>, HTTPBufferAllocator>;
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPBasicStreamBuf_INCLUDED

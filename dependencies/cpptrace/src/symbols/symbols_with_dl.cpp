@@ -11,8 +11,7 @@
 #include <dlfcn.h>
 
 CPPTRACE_BEGIN_NAMESPACE
-namespace detail {
-namespace libdl {
+namespace detail::libdl {
     stacktrace_frame resolve_frame(const frame_ptr addr) {
         Dl_info info;
         if(dladdr(reinterpret_cast<void*>(addr), &info)) { // thread-safe
@@ -49,8 +48,7 @@ namespace libdl {
         }
         return trace;
     }
-}
-}
+} // namespace detail::libdl
 CPPTRACE_END_NAMESPACE
 
 #endif

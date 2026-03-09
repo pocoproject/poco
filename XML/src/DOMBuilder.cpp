@@ -31,8 +31,7 @@
 #include "Poco/XML/XMLException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString DOMBuilder::EMPTY_STRING;
@@ -317,4 +316,4 @@ void DOMBuilder::comment(const XMLChar ch[], int start, int length)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

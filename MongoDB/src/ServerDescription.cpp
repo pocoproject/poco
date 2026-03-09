@@ -18,8 +18,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 ServerDescription::ServerDescription() = default;
@@ -251,4 +250,4 @@ std::string ServerDescription::typeToString(ServerType type)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

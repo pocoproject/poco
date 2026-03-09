@@ -24,8 +24,7 @@
 #include <sstream>
 #include <vector>
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 class StackedConfiguration : public Poco::Util::AbstractConfiguration
 {
@@ -868,4 +867,4 @@ void XMLTemplate::create(const std::string& path)
 }
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF

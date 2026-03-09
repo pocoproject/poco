@@ -23,8 +23,7 @@
 #include "Poco/PDF/Resource.h"
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 class PDF_API Destination: public Resource<HPDF_Destination>
@@ -73,7 +72,7 @@ public:
 };
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_Destination_INCLUDED

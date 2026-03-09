@@ -30,8 +30,7 @@
 #include <atomic>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class TCPServerDispatcher;
@@ -253,7 +252,7 @@ inline TCPServerConnectionFilter::Ptr TCPServer::getConnectionFilter() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_TCPServer_INCLUDED

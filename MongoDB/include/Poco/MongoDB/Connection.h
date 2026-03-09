@@ -25,8 +25,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class OpMsgMessage;
@@ -175,7 +174,7 @@ inline Net::SocketAddress Connection::address() const
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_Connection_INCLUDED

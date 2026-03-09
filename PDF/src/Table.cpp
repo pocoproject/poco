@@ -5,8 +5,7 @@
 #include "Poco/PDF/Table.h"
 #include <hpdf.h>
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 Table::Table(int columnCount, int rowCount, const std::string& name, Cell::FontMapPtr pFontMap):
@@ -113,4 +112,4 @@ void Table::draw(Page& page, float x, float y, float width, float height)
 }
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF

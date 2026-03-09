@@ -23,8 +23,7 @@ using Poco::Logger;
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 const char* LoggingSubsystem::name() const
@@ -49,4 +48,4 @@ void LoggingSubsystem::uninitialize()
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

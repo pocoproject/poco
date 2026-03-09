@@ -17,8 +17,7 @@
 #include <utility>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 TopologyDescription::TopologyDescription() = default;
@@ -446,4 +445,4 @@ std::string TopologyDescription::typeToString(TopologyType type)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

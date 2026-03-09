@@ -15,8 +15,7 @@
 #include "Poco/Prometheus/Gauge.h"
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 Gauge::Gauge(const std::string& name):
@@ -79,4 +78,4 @@ void Gauge::writeSample(Exporter& exporter, const std::vector<std::string>& labe
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

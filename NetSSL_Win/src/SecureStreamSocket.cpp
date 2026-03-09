@@ -22,8 +22,7 @@
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 SecureStreamSocket::SecureStreamSocket():
@@ -266,4 +265,4 @@ void SecureStreamSocket::abort()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -15,8 +15,7 @@
 #include "Poco/Net/VerificationErrorArgs.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 VerificationErrorArgs::VerificationErrorArgs(const X509Certificate& cert, int errDepth, int errNum, const std::string& errMsg):
@@ -34,4 +33,4 @@ VerificationErrorArgs::~VerificationErrorArgs()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

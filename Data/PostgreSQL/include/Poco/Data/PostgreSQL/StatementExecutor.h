@@ -27,9 +27,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 class StatementExecutor
@@ -116,7 +114,7 @@ inline StatementExecutor::operator PGresult* ()
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif // SQL_PostgreSQL_StatementExecutor_INCLUDED

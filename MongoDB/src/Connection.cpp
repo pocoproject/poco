@@ -24,8 +24,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 Connection::SocketFactory::SocketFactory() = default;
@@ -237,4 +236,4 @@ void Connection::readResponse(OpMsgMessage& response)
 
 
 
-} } // Poco::MongoDB
+} // namespace Poco::MongoDB

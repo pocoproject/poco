@@ -16,8 +16,7 @@
 #include <openssl/ssl.h>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 Session::Session(SSL_SESSION* pSession):
@@ -42,4 +41,4 @@ bool Session::isResumable() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

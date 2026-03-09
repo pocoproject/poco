@@ -56,8 +56,7 @@
 		poco_src_loc))
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 class Var;
@@ -4649,7 +4648,7 @@ using List = std::list<Var>;
 using Array = Vector;
 
 
-} } // namespace Poco::Dynamic
+} // namespace Poco::Dynamic
 
 
 #endif // Foundation_VarHolder_INCLUDED

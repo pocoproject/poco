@@ -22,8 +22,7 @@
 using Poco::icompare;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 MediaType::MediaType(const std::string& mediaType)
@@ -207,4 +206,4 @@ void MediaType::parse(const std::string& mediaType)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

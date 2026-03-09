@@ -17,8 +17,7 @@
 #include "Poco/Net/SocketNotification.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 SocketNotifier::SocketNotifier(const Socket& socket):
@@ -94,4 +93,4 @@ void SocketNotifier::disableObservers()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

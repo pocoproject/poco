@@ -32,8 +32,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class Locator;
@@ -369,7 +368,7 @@ inline int XMLWriter::depth() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // XML_XMLWriter_INCLUDED

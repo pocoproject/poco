@@ -23,9 +23,7 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 const std::string Extractor::FLD_SIZE_EXCEEDED_FMT = "Specified data size (%z bytes) "
@@ -1575,4 +1573,4 @@ void Extractor::checkDataSize(std::size_t size)
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

@@ -20,8 +20,7 @@
 using Poco::Dynamic::Var;
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 void Stringifier::stringify(const Var& any, std::ostream& out, unsigned int indent, int step, int options)
@@ -89,4 +88,4 @@ void Stringifier::formatString(const std::string& value, std::ostream& out, int 
 }
 
 
-} }  // namespace Poco::JSON
+} // namespace Poco::JSON

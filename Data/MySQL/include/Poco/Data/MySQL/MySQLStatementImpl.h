@@ -29,9 +29,7 @@
 #include "Poco/Format.h"
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 class MySQL_API MySQLStatementImpl: public Poco::Data::StatementImpl
@@ -96,7 +94,7 @@ private:
 };
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL
 
 
 #endif // Data_MySQL_MySQLStatementImpl_INCLUDED

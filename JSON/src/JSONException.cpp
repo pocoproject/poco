@@ -16,11 +16,10 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 POCO_IMPLEMENT_EXCEPTION(JSONException, Exception, "JSON Exception")
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON

@@ -14,8 +14,7 @@
 #include "Poco/Util/LocalConfigurationView.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 LocalConfigurationView::LocalConfigurationView(const std::string& prefix, AbstractConfiguration::Ptr pConfig) :
@@ -31,4 +30,4 @@ bool LocalConfigurationView::getRaw(const std::string& key, std::string& value) 
 }
 
 
-}}  // namespace Poco::Util
+} // namespace Poco::Util

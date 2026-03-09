@@ -21,8 +21,7 @@
 using Poco::TimeoutException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPSession::HTTPSession():
@@ -268,4 +267,4 @@ void HTTPSession::drainBuffer(Poco::Buffer<char>& buffer)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

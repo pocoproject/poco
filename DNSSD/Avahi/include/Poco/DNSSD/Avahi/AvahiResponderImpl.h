@@ -35,9 +35,7 @@
 #include <avahi-common/simple-watch.h>
 
 
-namespace Poco {
-namespace DNSSD {
-namespace Avahi {
+namespace Poco::DNSSD::Avahi {
 
 
 class AvahiBrowserImpl;
@@ -128,7 +126,7 @@ public:
 };
 
 
-} } } // namespace Poco::DNSSD::Avahi
+} // namespace Poco::DNSSD::Avahi
 
 
 #endif // DNSSD_Avahi_AvahiResponderImpl_INCLUDED

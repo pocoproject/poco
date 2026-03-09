@@ -40,9 +40,7 @@
 #include <sqltypes.h>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 class ODBC_API Extractor: public Poco::Data::AbstractExtractor
@@ -857,7 +855,7 @@ inline SQLINTEGER Extractor::columnSize(std::size_t pos) const
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif // Data_ODBC_Extractor_INCLUDED

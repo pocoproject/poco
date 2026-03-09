@@ -3,8 +3,7 @@
 #include "Poco/Net/TCPServerParams.h"
 #include "Poco/ThreadPool.h"
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 
@@ -53,5 +52,5 @@ void TCPReactorServer::stop()
 	_threadPool.joinAll();
 }
 
-}} // namespace Poco::Net
+} // namespace Poco::Net
 

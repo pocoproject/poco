@@ -20,8 +20,7 @@
 #include "Poco/Util/OptionException.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string KeyFileHandler::CFG_PRIV_KEY_FILE("privateKeyPassphraseHandler.options.password");
@@ -58,4 +57,4 @@ void KeyFileHandler::onPrivateKeyRequested(const void* pSender, std::string& pri
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

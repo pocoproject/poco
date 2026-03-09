@@ -26,8 +26,7 @@
 #include <iostream>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class CryptoTransform;
@@ -187,7 +186,7 @@ public:
 };
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_CryptoStream_INCLUDED
