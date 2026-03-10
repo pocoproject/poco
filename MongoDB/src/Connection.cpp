@@ -131,6 +131,22 @@ void Connection::connect(const Poco::Net::SocketAddress& addrs)
 }
 
 
+void Connection::connect(const Poco::Net::SocketAddress& addrs, const Poco::Timespan& connectTimeout, const Poco::Timespan& socketTimeout)
+{
+	_address = addrs;
+	if (connectTimeout > 0)
+		_socket.connect(_address, connectTimeout);
+	else
+		_socket.connect(_address);
+
+	if (socketTimeout > 0)
+	{
+		_socket.setSendTimeout(socketTimeout);
+		_socket.setReceiveTimeout(socketTimeout);
+	}
+}
+
+
 void Connection::connect(const Poco::Net::StreamSocket& socket)
 {
 	_address = socket.peerAddress();
