@@ -18,7 +18,17 @@
 #include "Poco/MongoDB/ReplicaSetURI.h"
 #include "Poco/MongoDB/Document.h"
 #include "Poco/MongoDB/Array.h"
+#include <chrono>
+#include <limits>
+#include "Poco/Exception.h"
+#include "Poco/MongoDB/Connection.h"
+#include "Poco/MongoDB/OpMsgMessage.h"
+#include "Poco/MongoDB/PoolableConnectionFactory.h"
+#include "Poco/MongoDB/ReplicaSetConnection.h"
+#include "Poco/MongoDB/ReplicaSetPoolableConnectionFactory.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/ObjectPool.h"
+#include "Poco/Timespan.h"
 
 using namespace Poco::MongoDB;
 using namespace Poco::Net;
@@ -435,7 +445,7 @@ void ReplicaSetTest::testServerDescriptionReset()
 
 	assertEqual(static_cast<int>(ServerDescription::Unknown), static_cast<int>(server.type()));
 	assertTrue(server.setName().empty());
-	assertEqual(0, server.roundTripTime());
+	assertEqual(std::numeric_limits<Poco::Int64>::max(), server.roundTripTime());
 	assertTrue(server.tags().empty());
 	assertFalse(server.hasError());
 	assertFalse(server.isPrimary());
@@ -1634,6 +1644,240 @@ void ReplicaSetTest::testReplicaSetWithURIObject()
 }
 
 
+// ============================================================================
+// Timeout and Non-Hang Tests
+// ============================================================================
+
+
+void ReplicaSetTest::testConnectionTimeoutWithUnreachableServer()
+{
+	// Use TEST-NET-1 (RFC 5737) — a non-routable IP that will always time out
+	// This verifies that Connection::connect() with a timeout does not hang
+	SocketAddress unreachable("192.0.2.1:27017");
+
+	Connection conn;
+	Poco::Timespan connectTimeout(2, 0);  // 2 seconds
+	Poco::Timespan socketTimeout(2, 0);
+
+	auto start = std::chrono::steady_clock::now();
+
+	bool exceptionThrown = false;
+	try
+	{
+		conn.connect(unreachable, connectTimeout, socketTimeout);
+	}
+	catch (const Poco::Exception&)
+	{
+		exceptionThrown = true;
+	}
+	catch (...)
+	{
+		exceptionThrown = true;
+	}
+
+	auto elapsed = std::chrono::steady_clock::now() - start;
+	auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
+
+	assertTrue(exceptionThrown);
+	// Must complete within a reasonable margin above the timeout (2s timeout + some margin)
+	// If the timeout is not working, this would hang for minutes
+	assertTrue(elapsedSeconds < 10);
+}
+
+
+void ReplicaSetTest::testReplicaSetConstructionTimeout()
+{
+	// Verify that ReplicaSet construction with unreachable servers does not hang.
+	// Uses non-routable IPs with short timeouts and non-zero reconnect retries
+	// to exercise the retry path during initial topology discovery.
+	ReplicaSet::Config config;
+	config.seeds = {
+		SocketAddress("192.0.2.1:27017"),
+		SocketAddress("192.0.2.2:27017")
+	};
+	config.setName = "rs0";
+	config.connectTimeoutSeconds = 1;
+	config.socketTimeoutSeconds = 1;
+	config.heartbeatFrequencySeconds = 10;
+	config.serverReconnectRetries = 2;
+	config.serverReconnectDelaySeconds = 1;
+	config.enableMonitoring = false;  // Don't start monitor thread
+
+	auto start = std::chrono::steady_clock::now();
+
+	// Construction calls updateTopologyFromAllServers() which connects to each
+	// seed sequentially. With 2 unreachable seeds × 1s connect timeout = ~2s
+	// for the initial pass. serverReconnectRetries is not used during construction
+	// itself, but is configured for later getConnection/waitForServerAvailability.
+	ReplicaSet rs(config);
+
+	auto elapsed = std::chrono::steady_clock::now() - start;
+	auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
+
+	// 2 seeds × 1s timeout = ~2s expected; allow margin
+	assertTrue(elapsedSeconds < 15);
+
+	// Topology should show all servers as unknown/errored
+	auto topology = rs.topology();
+	assertFalse(topology.hasPrimary());
+
+	// No connection should be available
+	Connection::Ptr conn = rs.getPrimaryConnection();
+	assertTrue(conn.isNull());
+}
+
+
+void ReplicaSetTest::testReplicaSetMonitoringStopWithUnreachableServers()
+{
+	// Verify that stopping a ReplicaSet with monitoring enabled and unreachable servers
+	// does not hang — the destructor must return promptly.
+	// Non-zero retries verify that the monitor thread's heartbeat cycle (which may
+	// internally retry connections) does not prevent a clean shutdown.
+	ReplicaSet::Config config;
+	config.seeds = {
+		SocketAddress("192.0.2.1:27017")
+	};
+	config.setName = "rs0";
+	config.connectTimeoutSeconds = 1;
+	config.socketTimeoutSeconds = 1;
+	config.heartbeatFrequencySeconds = 60;  // Long heartbeat so monitor is likely sleeping
+	config.serverReconnectRetries = 3;
+	config.serverReconnectDelaySeconds = 1;
+	config.enableMonitoring = true;  // Enable monitoring thread
+
+	auto start = std::chrono::steady_clock::now();
+
+	{
+		ReplicaSet rs(config);
+		// At this point, the monitor thread is running.
+		// The destructor (~ReplicaSet) must stop the monitor thread promptly,
+		// even though serverReconnectRetries > 0.
+	}
+	// ReplicaSet is destroyed here
+
+	auto elapsed = std::chrono::steady_clock::now() - start;
+	auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
+
+	// Construction (1 seed × 1s timeout = ~1s) + destruction (monitor stop)
+	// should complete well within 10 seconds. If stopMonitoring() or the
+	// destructor hangs (e.g. stuck in a reconnect-retry loop), this will fail.
+	assertTrue(elapsedSeconds < 10);
+}
+
+
+void ReplicaSetTest::testConnectionPoolTimeoutWithUnreachableServers()
+{
+	// Verify that PooledReplicaSetConnection with timeouts set on the factory
+	// does not hang when all servers are unreachable.
+	//
+	// The factory passes connectTimeout/socketTimeout to ReplicaSetConnection,
+	// which uses them in ensureConnection() → getConnection(readPref, timeouts).
+	// On failure, executeWithRetry() → waitForServerAvailability() loops through
+	// serverReconnectRetries from the ReplicaSet config.
+	//
+	// Expected worst-case time:
+	//   construction:  2 seeds × 1s = ~2s
+	//   sendRequest:   retries × (delay + seeds × connectTimeout)
+	//                  = 2 × (1 + 2 × 1) = ~6s
+	//   total:         ~8s
+	ReplicaSet::Config config;
+	config.seeds = {
+		SocketAddress("192.0.2.1:27017"),
+		SocketAddress("192.0.2.2:27017")
+	};
+	config.setName = "rs0";
+	config.connectTimeoutSeconds = 1;
+	config.socketTimeoutSeconds = 1;
+	config.heartbeatFrequencySeconds = 60;
+	config.serverReconnectRetries = 2;
+	config.serverReconnectDelaySeconds = 1;
+	config.enableMonitoring = false;
+
+	auto start = std::chrono::steady_clock::now();
+
+	ReplicaSet rs(config);
+
+	// Create pool factory with explicit timeouts — these are passed to
+	// ReplicaSetConnection and used for each connection attempt
+	ReadPreference readPref = ReadPreference::primary();
+	Poco::Timespan connectTimeout(1, 0);
+	Poco::Timespan socketTimeout(1, 0);
+	Poco::PoolableObjectFactory<ReplicaSetConnection, ReplicaSetConnection::Ptr> factory(
+		rs, readPref, connectTimeout, socketTimeout);
+	Poco::ObjectPool<ReplicaSetConnection, ReplicaSetConnection::Ptr> pool(factory, 2, 5);
+
+	// Use PooledReplicaSetConnection (RAII) — borrow is automatic, return on scope exit
+	bool exceptionThrown = false;
+	try
+	{
+		PooledReplicaSetConnection conn(pool);
+
+		OpMsgMessage request("admin"s, ""s);
+		request.setCommandName(OpMsgMessage::CMD_HELLO);
+		OpMsgMessage response;
+		conn->sendRequest(request, response);
+	}
+	catch (const Poco::Exception&)
+	{
+		exceptionThrown = true;
+	}
+	catch (...)
+	{
+		exceptionThrown = true;
+	}
+
+	assertTrue(exceptionThrown);
+
+	auto elapsed = std::chrono::steady_clock::now() - start;
+	auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
+
+	// With 2 retries × (1s delay + 2 seeds × 1s timeout) = ~6s for the retry loop,
+	// plus ~2s for construction. Total ~8s expected. Allow generous margin for
+	// CI variability, but it must not hang (which would be minutes/infinite).
+	assertTrue(elapsedSeconds < 60);
+}
+
+
+void ReplicaSetTest::testPlainConnectionPoolTimeoutWithUnreachableServer()
+{
+	// Verify that PooledConnection with the timeout-aware factory
+	// does not hang when the server is unreachable.
+	SocketAddress unreachable("192.0.2.1:27017");
+	Poco::Timespan connectTimeout(2, 0);  // 2 seconds
+	Poco::Timespan socketTimeout(2, 0);
+
+	Poco::PoolableObjectFactory<Connection, Connection::Ptr> factory(
+		unreachable, connectTimeout, socketTimeout);
+	Poco::ObjectPool<Connection, Connection::Ptr> pool(factory, 2, 5);
+
+	auto start = std::chrono::steady_clock::now();
+
+	// Use PooledConnection (RAII) — borrowObject is called in the constructor.
+	// With an unreachable server, createObject() will throw after ~2 seconds.
+	bool exceptionThrown = false;
+	try
+	{
+		PooledConnection conn(pool);
+	}
+	catch (const Poco::Exception&)
+	{
+		exceptionThrown = true;
+	}
+	catch (...)
+	{
+		exceptionThrown = true;
+	}
+
+	auto elapsed = std::chrono::steady_clock::now() - start;
+	auto elapsedSeconds = std::chrono::duration_cast<std::chrono::seconds>(elapsed).count();
+
+	assertTrue(exceptionThrown);
+	// Must complete within a reasonable margin above the 2s timeout.
+	// Without the timeout, this would hang for minutes (OS default TCP timeout).
+	assertTrue(elapsedSeconds < 10);
+}
+
+
 CppUnit::Test* ReplicaSetTest::suite()
 {
 	auto* pSuite = new CppUnit::TestSuite("ReplicaSetTest");
@@ -1691,6 +1935,13 @@ CppUnit::Test* ReplicaSetTest::suite()
 	CppUnit_addTest(pSuite, ReplicaSetTest, testReplicaSetURIToString);
 	CppUnit_addTest(pSuite, ReplicaSetTest, testReplicaSetURIModification);
 	CppUnit_addTest(pSuite, ReplicaSetTest, testReplicaSetWithURIObject);
+
+	// Timeout and non-hang tests
+	CppUnit_addTest(pSuite, ReplicaSetTest, testConnectionTimeoutWithUnreachableServer);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testReplicaSetConstructionTimeout);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testReplicaSetMonitoringStopWithUnreachableServers);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testConnectionPoolTimeoutWithUnreachableServers);
+	CppUnit_addTest(pSuite, ReplicaSetTest, testPlainConnectionPoolTimeoutWithUnreachableServer);
 
 	return pSuite;
 }
