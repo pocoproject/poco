@@ -209,7 +209,7 @@ void X509Certificate::save(const std::string& path) const
 }
 
 
-std::string _X509_NAME_oneline_utf8(X509_NAME *name)
+std::string _X509_NAME_oneline_utf8(const X509_NAME *name)
 {
 	BIO * bio_out = BIO_new(BIO_s_mem());
 	X509_NAME_print_ex(bio_out, name, 0, (ASN1_STRFLGS_RFC2253 | XN_FLAG_SEP_COMMA_PLUS | XN_FLAG_FN_SN | XN_FLAG_DUMP_UNKNOWN_FIELDS) & ~ASN1_STRFLGS_ESC_MSB);
@@ -247,7 +247,7 @@ std::string X509Certificate::commonName() const
 
 std::string X509Certificate::issuerName(NID nid) const
 {
-	if (X509_NAME* issuer = X509_get_issuer_name(_pCert))
+	if (auto issuer = X509_get_issuer_name(_pCert))
 	{
 		char buffer[NAME_BUFFER_SIZE];
 		if (X509_NAME_get_text_by_NID(issuer, nid, buffer, sizeof(buffer)) >= 0)
@@ -259,7 +259,7 @@ std::string X509Certificate::issuerName(NID nid) const
 
 std::string X509Certificate::subjectName(NID nid) const
 {
-	if (X509_NAME* subj = X509_get_subject_name(_pCert))
+	if (auto subj = X509_get_subject_name(_pCert))
 	{
 		char buffer[NAME_BUFFER_SIZE];
 		if (X509_NAME_get_text_by_NID(subj, nid, buffer, sizeof(buffer)) >= 0)
@@ -297,13 +297,14 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 Poco::DateTime X509Certificate::validFrom() const
 {
 	const ASN1_TIME* certTime = X509_get0_notBefore(_pCert);
-	std::string dateTime(reinterpret_cast<char*>(certTime->data));
+	auto certTimeType = ASN1_STRING_type(certTime);
+	std::string dateTime(reinterpret_cast<const char*>(ASN1_STRING_get0_data(certTime)));
 	int tzd;
-	if (certTime->type == V_ASN1_UTCTIME)
+	if (certTimeType == V_ASN1_UTCTIME)
 	{
 		return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
 	}
-	else if (certTime->type == V_ASN1_GENERALIZEDTIME)
+	else if (certTimeType == V_ASN1_GENERALIZEDTIME)
 	{
 		return DateTimeParser::parse("%Y%m%d%H%M%S", dateTime, tzd);
 	}
@@ -317,13 +318,14 @@ Poco::DateTime X509Certificate::validFrom() const
 Poco::DateTime X509Certificate::expiresOn() const
 {
 	const ASN1_TIME* certTime = X509_get0_notAfter(_pCert);
-	std::string dateTime(reinterpret_cast<char*>(certTime->data));
+	auto certTimeType = ASN1_STRING_type(certTime);
+	std::string dateTime(reinterpret_cast<const char*>(ASN1_STRING_get0_data(certTime)));
 	int tzd;
-	if (certTime->type == V_ASN1_UTCTIME)
+	if (certTimeType == V_ASN1_UTCTIME)
 	{
 		return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
 	}
-	else if (certTime->type == V_ASN1_GENERALIZEDTIME)
+	else if (certTimeType == V_ASN1_GENERALIZEDTIME)
 	{
 		return DateTimeParser::parse("%Y%m%d%H%M%S", dateTime, tzd);
 	}
