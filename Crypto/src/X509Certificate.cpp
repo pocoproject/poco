@@ -298,7 +298,7 @@ Poco::DateTime X509Certificate::validFrom() const
 {
 	const ASN1_TIME* certTime = X509_get0_notBefore(_pCert);
 	auto certTimeType = ASN1_STRING_type(certTime);
-	std::string dateTime(reinterpret_cast<const char*>(ASN1_STRING_get0_data(certTime)));
+	std::string dateTime(reinterpret_cast<const char*>(ASN1_STRING_get0_data(certTime)), ASN1_STRING_length(certTime));
 	int tzd;
 	if (certTimeType == V_ASN1_UTCTIME)
 	{
@@ -319,7 +319,7 @@ Poco::DateTime X509Certificate::expiresOn() const
 {
 	const ASN1_TIME* certTime = X509_get0_notAfter(_pCert);
 	auto certTimeType = ASN1_STRING_type(certTime);
-	std::string dateTime(reinterpret_cast<const char*>(ASN1_STRING_get0_data(certTime)));
+	std::string dateTime(reinterpret_cast<const char*>(ASN1_STRING_get0_data(certTime)), ASN1_STRING_length(certTime));
 	int tzd;
 	if (certTimeType == V_ASN1_UTCTIME)
 	{
