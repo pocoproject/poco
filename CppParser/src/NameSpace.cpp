@@ -27,12 +27,14 @@ namespace Poco::CppParser {
 
 NameSpace::NameSpace()
 {
+	_isInline = false;
 }
 
 
-NameSpace::NameSpace(const std::string& name, NameSpace* pNameSpace):
+NameSpace::NameSpace(const std::string& name, NameSpace* pNameSpace, bool isInline):
 	Symbol(name, pNameSpace)
 {
+	_isInline = isInline;
 }
 
 
@@ -42,6 +44,12 @@ NameSpace::~NameSpace()
 	{
 		delete it->second;
 	}
+}
+
+
+void NameSpace::setInline(bool isInline)
+{
+	_isInline = isInline;
 }
 
 
@@ -207,6 +215,8 @@ Symbol::Kind NameSpace::kind() const
 std::string NameSpace::toString() const
 {
 	std::ostringstream ostr;
+	if (_isInline)
+		ostr << "inline ";
 	ostr << "namespace " << name() << "\n{\n";
 	for (Iterator it = begin(); it != end(); ++it)
 	{

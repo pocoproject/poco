@@ -417,6 +417,87 @@ public:
 }
 
 
+void CppParserTest::testParseNestedNamespace()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(
+namespace A::B::C
+{
+    class Foo
+    {
+    public:
+        void bar();
+    };
+}
+)", st);
+	
+	// Check that namespace A exists
+	assertTrue (st.find("A") != st.end());
+	Symbol* pSymA = st.find("A")->second;
+	NameSpace* pNSA = dynamic_cast<NameSpace*>(pSymA);
+	assertTrue (pNSA != nullptr);
+	
+	// Check that namespace B exists within A
+	Symbol* pSymB = pNSA->lookup("B");
+	assertTrue (pSymB != nullptr);
+	NameSpace* pNSB = dynamic_cast<NameSpace*>(pSymB);
+	assertTrue (pNSB != nullptr);
+	
+	// Check that namespace C exists within B
+	Symbol* pSymC = pNSB->lookup("C");
+	assertTrue (pSymC != nullptr);
+	NameSpace* pNSC = dynamic_cast<NameSpace*>(pSymC);
+	assertTrue (pNSC != nullptr);
+	
+	// Check that class Foo exists within C
+	Symbol* pSymFoo = pNSC->lookup("Foo");
+	assertTrue (pSymFoo != nullptr);
+	Struct* pFoo = dynamic_cast<Struct*>(pSymFoo);
+	assertTrue (pFoo != nullptr);
+	
+	// Check the full name
+	assertTrue (pFoo->fullName() == "A::B::C::Foo");
+}
+
+
+void CppParserTest::testParseInlineNestedNamespace()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(
+namespace A::inline B::C
+{
+    void func();
+}
+)", st);
+	
+	// Check that namespace A exists
+	assertTrue (st.find("A") != st.end());
+	Symbol* pSymA = st.find("A")->second;
+	NameSpace* pNSA = dynamic_cast<NameSpace*>(pSymA);
+	assertTrue (pNSA != nullptr);
+	assertTrue (!pNSA->isInline());
+	
+	// Check that namespace B exists within A and is inline
+	Symbol* pSymB = pNSA->lookup("B");
+	assertTrue (pSymB != nullptr);
+	NameSpace* pNSB = dynamic_cast<NameSpace*>(pSymB);
+	assertTrue (pNSB != nullptr);
+	assertTrue (pNSB->isInline());
+	
+	// Check that namespace C exists within B and is not inline
+	Symbol* pSymC = pNSB->lookup("C");
+	assertTrue (pSymC != nullptr);
+	NameSpace* pNSC = dynamic_cast<NameSpace*>(pSymC);
+	assertTrue (pNSC != nullptr);
+	assertTrue (!pNSC->isInline());
+	
+	// Check that func exists within C
+	Symbol* pSymFunc = pNSC->lookup("func");
+	assertTrue (pSymFunc != nullptr);
+	assertTrue (pSymFunc->fullName() == "A::B::C::func");
+}
+
+
 void CppParserTest::setUp()
 {
 }
@@ -442,6 +523,8 @@ CppUnit::Test* CppParserTest::suite()
 	CppUnit_addTest(pSuite, CppParserTest, testParseDeleteDefault);
 	CppUnit_addTest(pSuite, CppParserTest, testParseAnonymousNamespace);
 	CppUnit_addTest(pSuite, CppParserTest, testParseFriendInline);
+	CppUnit_addTest(pSuite, CppParserTest, testParseNestedNamespace);
+	CppUnit_addTest(pSuite, CppParserTest, testParseInlineNestedNamespace);
 
 	return pSuite;
 }

@@ -222,11 +222,40 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 	if (pNext->is(Token::IDENTIFIER_TOKEN))
 	{
 		_access = Symbol::ACC_PUBLIC;
+		
+		std::vector<std::string> namespaceNames;
+		std::vector<bool> inlineFlags;
+		
+		// First namespace name cannot be inline
 		std::string name = pNext->tokenString();
+		namespaceNames.push_back(name);
+		inlineFlags.push_back(false);
 		pNext = next();
+		
+		while (isOperator(pNext, OperatorToken::OP_DBL_COLON))
+		{
+			pNext = next();
+			bool isInline = false;
+			
+			if (isKeyword(pNext, IdentifierToken::KW_INLINE))
+			{
+				isInline = true;
+				pNext = next();
+			}
+			
+			if (!pNext->is(Token::IDENTIFIER_TOKEN))
+			{
+				syntaxError("namespace name after ::");
+			}
+			
+			namespaceNames.push_back(pNext->tokenString());
+			inlineFlags.push_back(isInline);
+			pNext = next();
+		}
 
 		if (isOperator(pNext, OperatorToken::OP_ASSIGN))
 		{
+			// namespace alias: namespace B = A::C;
 			pNext = next();
 			while (!isOperator(pNext, OperatorToken::OP_SEMICOLON) && !isEOF(pNext))
 			{
@@ -238,14 +267,31 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 
 		expectOperator(pNext, OperatorToken::OP_OPENBRACE, "{");
 
-		std::string fullName = currentNameSpace()->fullName();
-		if (!fullName.empty()) fullName += "::";
-		fullName += name;
-
-		NameSpace* pNS = dynamic_cast<NameSpace*>(currentNameSpace()->lookup(fullName));
-		bool undefined = (pNS == nullptr);
-		if (undefined) pNS = new NameSpace(name, currentNameSpace());
-		pushNameSpace(pNS, -1, undefined);
+		int nestLevel = 0;
+		for (size_t i = 0; i < namespaceNames.size(); ++i)
+		{
+			NameSpace* pNS = dynamic_cast<NameSpace*>(currentNameSpace()->lookup(namespaceNames[i]));
+			bool undefined = (pNS == nullptr);
+			if (undefined) 
+				pNS = new NameSpace(namespaceNames[i], currentNameSpace(), inlineFlags[i]);
+			else if (inlineFlags[i])
+			{
+				// If the namespace already exists but this declaration marks it as inline,
+				// update the inline flag
+				pNS->setInline(inlineFlags[i]);
+			}
+			// Only add the first (outermost) namespace to the global symbol table,
+			// and only if it's not already there
+			bool addToGST = false;
+			if (i == 0)
+			{
+				// Check if this namespace is already in the global symbol table
+				addToGST = (_gst.find(namespaceNames[i]) == _gst.end());
+			}
+			pushNameSpace(pNS, -1, addToGST);
+			nestLevel++;
+		}
+		
 		pNext = next();
 		while (pNext->is(Token::IDENTIFIER_TOKEN) || pNext->is(Token::KEYWORD_TOKEN))
 		{
@@ -280,6 +326,12 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 		}
 		expectOperator(pNext, OperatorToken::OP_CLOSBRACE, "}");
 		pNext = next();
+		
+		// Pop all nested namespaces
+		for (int i = 0; i < nestLevel; ++i)
+		{
+			popNameSpace();
+		}
 	}
 	else if (isOperator(pNext, OperatorToken::OP_OPENBRACE))
 	{
@@ -289,7 +341,6 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 		return pNext;
 	}
 	else syntaxError("namespace name");
-	popNameSpace();
 	return pNext;
 }
 
