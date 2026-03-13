@@ -54,7 +54,8 @@ public:
 		PRIO_NOTICE,      /// A notice, which is an information with just a higher priority.
 		PRIO_INFORMATION, /// An informational message, usually denoting the successful completion of an operation.
 		PRIO_DEBUG,       /// A debugging message.
-		PRIO_TRACE        /// A tracing message. This is the lowest priority.
+		PRIO_TRACE,        /// A tracing message.
+		PRIO_NO_PRIO
 	};
 
 	Message();
