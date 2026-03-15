@@ -29,9 +29,6 @@
 #include "Poco/SharedPtr.h"
 #include "Poco/Mutex.h"
 #include <openssl/ssl.h>
-#if defined(OPENSSL_FIPS) && OPENSSL_VERSION_NUMBER < 0x010001000L
-#include <openssl/fips.h>
-#endif
 
 
 namespace Poco::Net {
