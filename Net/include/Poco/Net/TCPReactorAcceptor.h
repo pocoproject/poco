@@ -41,7 +41,7 @@ private:
 	std::shared_ptr<ThreadPool>                 _threadPool;
 	RecvMessageCallback                         _recvMessageCallback;
 	TCPServerParams::Ptr                        _pParams;
-	std::atomic<bool>                           _stopped;
+	std::atomic<bool>                           _stopped{false};
 };
 
 }} // namespace Poco::Net

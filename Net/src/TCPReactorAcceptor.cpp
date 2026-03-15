@@ -6,8 +6,8 @@ namespace Poco {
 namespace Net {
 
 
-TCPReactorAcceptor::TCPReactorAcceptor(
-	Poco::Net::ServerSocket& socket, Poco::Net::SocketReactor& reactor, TCPServerParams::Ptr pParams)
+TCPReactorAcceptor::TCPReactorAcceptor(Poco::Net::ServerSocket& socket, Poco::Net::SocketReactor& reactor,
+									   TCPServerParams::Ptr pParams)
 	: Poco::Net::SocketAcceptor<TCPReactorServerConnection>(socket, reactor),
 	  _selfReactor(reactor),
 	  _useSelfReactor(pParams->getUseSelfReactor()),
@@ -35,16 +35,17 @@ TCPReactorAcceptor::~TCPReactorAcceptor()
 	stop();
 }
 
-void TCPReactorAcceptor::stop() {
+void TCPReactorAcceptor::stop()
+{
 	if (_stopped.exchange(true))
 	{
 		return;
 	}
-	for(auto& worker: _wokerReactors)
+	for (auto& worker : _wokerReactors)
 	{
 		worker->stop();
 	}
-	if(_threadPool)
+	if (_threadPool)
 	{
 		_threadPool->joinAll();
 	}
