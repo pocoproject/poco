@@ -29,7 +29,6 @@ else()
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMAND Redis-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
-	set_tests_properties(Redis PROPERTIES ENVIRONMENT POCO_BASE=${PROJECT_SOURCE_DIR})
 endif()
 
 target_link_libraries(Redis-testrunner PUBLIC ${CMAKE_THREAD_LIBS_INIT}	 Poco::Redis CppUnit)

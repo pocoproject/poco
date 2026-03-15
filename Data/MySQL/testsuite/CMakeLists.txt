@@ -29,7 +29,6 @@ else()
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMAND DataMySQL-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
-	set_tests_properties(DataMySQL PROPERTIES ENVIRONMENT POCO_BASE=${PROJECT_SOURCE_DIR})
 endif()
 target_link_libraries(DataMySQL-testrunner PUBLIC Poco::DataMySQL Poco::DataTest CppUnit)
 target_include_directories(DataMySQL-testrunner PUBLIC ${PROJECT_SOURCE_DIR}/Data/DataTest/include/)
