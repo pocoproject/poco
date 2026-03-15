@@ -140,7 +140,9 @@ std::string HTTPTestServer::handleRequest() const
 	}
 	else if (_lastRequest.substr(0, 10) == "GET /large" ||
 			 _lastRequest.substr(0, 11) == "HEAD /large" ||
-			 _lastRequest.substr(0, 36) == "GET http://www.somehost.com:80/large")
+			 _lastRequest.substr(0, 36) == "GET http://www.somehost.com:80/large" ||
+			 _lastRequest.substr(0, 33) == "GET http://www.somehost.com/large" ||
+			 _lastRequest.substr(0, 38) == "GET http://www.somehost.com:8080/large")
 	{
 		std::string body(LARGE_BODY);
 		response.append("HTTP/1.0 200 OK\r\n");
