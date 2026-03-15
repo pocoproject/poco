@@ -1451,6 +1451,19 @@ void DataTest::testExternalBindingAndExtraction()
 }
 
 
+void DataTest::testStdTuple()
+{
+    using Row = std::tuple<std::string, std::string, int>;
+
+    Session sess(SessionFactory::instance().create("test", "cs"));
+    Row person = std::make_tuple(std::string("Scott"), std::string("Washington, DC"), 42);
+    sess << "DELETE FROM person", now;
+    sess << "INSERT INTO Person(name, address, age) VALUES (?, ?, ?)", use(person), now;
+    std::vector<Row> rows;
+    sess << "SELECT name, address, age FROM Person", into(rows) , now;
+}
+
+
 void DataTest::testTranscode()
 {
 	Latin1Encoding::Ptr pL2E = new Latin1Encoding();
@@ -1657,6 +1670,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testJSONRowFormatter);
 	CppUnit_addTest(pSuite, DataTest, testDateAndTime);
 	CppUnit_addTest(pSuite, DataTest, testExternalBindingAndExtraction);
+	CppUnit_addTest(pSuite, DataTest, testStdTuple);
 	CppUnit_addTest(pSuite, DataTest, testTranscode);
 	CppUnit_addTest(pSuite, DataTest, testSQLParse);
 	CppUnit_addTest(pSuite, DataTest, testSQLChannel);

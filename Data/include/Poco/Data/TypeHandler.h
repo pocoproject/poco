@@ -28,6 +28,7 @@
 #include "Poco/SharedPtr.h"
 #include <cstddef>
 #include <optional>
+#include <tuple>
 
 #if defined(POCO_COMPILER_GCC) && (__GNUC__ >= 12)
 	#pragma GCC diagnostic push
