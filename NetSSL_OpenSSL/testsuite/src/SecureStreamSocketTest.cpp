@@ -366,6 +366,40 @@ void SecureStreamSocketTest::testSendFileRange()
 }
 
 
+void SecureStreamSocketTest::testShutdownBidirectional()
+{
+	// Test that bidirectional shutdown ensures all data is received
+	// by the peer before closing (regression test for GH #4883).
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<CopyToStringConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", srv.port()));
+
+	const int chunkSize = 1024;
+	const int chunkCount = 100;
+	std::string sentData(chunkSize * chunkCount, 'A');
+	for (int i = 0; i < chunkCount; i++)
+	{
+		ss.sendBytes(sentData.data() + i * chunkSize, chunkSize);
+	}
+
+	// Close immediately after sending — with bidirectional shutdown,
+	// the receiver should still get all data.
+	ss.close();
+
+	Poco::Thread::sleep(200);
+	while (srv.currentConnections() > 0)
+	{
+		Poco::Thread::sleep(100);
+	}
+	srv.stop();
+
+	assertTrue (CopyToStringConnection::data() == sentData);
+}
+
+
 void SecureStreamSocketTest::setUp()
 {
 }
@@ -386,6 +420,7 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFile);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFileLarge);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFileRange);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownBidirectional);
 
 	return pSuite;
 }

@@ -37,7 +37,7 @@ DigestEngine::~DigestEngine()
 
 int DigestEngine::nid() const
 {
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	return EVP_MD_nid(EVP_MD_CTX_get0_md(_pContext));
 #else
 	return EVP_MD_nid(EVP_MD_CTX_md(_pContext));
@@ -52,12 +52,8 @@ std::size_t DigestEngine::digestLength() const
 
 void DigestEngine::reset()
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 	EVP_MD_CTX_free(_pContext);
 	_pContext = EVP_MD_CTX_create();
-#else
-	EVP_MD_CTX_cleanup(_pContext);
-#endif
 	const EVP_MD* md = EVP_get_digestbyname(_name.c_str());
 	if (!md) throw Poco::NotFoundException(_name);
 	EVP_DigestInit_ex(_pContext, md, nullptr);

@@ -21,7 +21,7 @@
 #include "Poco/NumberFormatter.h"
 #include <iostream>
 
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 #include <openssl/param_build.h>
 #endif
 
@@ -68,7 +68,7 @@ EVPPKey::EVPPKey(const PKCS12Container& cont): EVPPKey(cont.getKey())
 	checkType();
 }
 
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
 void pushBuildParamBignum(OSSL_PARAM_BLD* paramBld, const char* key, const std::vector<unsigned char>& bytes, BIGNUM** pBigNum)
 {
@@ -210,7 +210,7 @@ EVPPKey::EVPPKey(int type, int param) : _pEVPPKey(nullptr)
 			throw OpenSSLException(getError(msg));
 		}
 	}
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	ret = EVP_PKEY_generate(pCtx, &_pEVPPKey);
 	if (ret != 1)
 	{
