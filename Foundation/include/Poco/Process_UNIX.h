@@ -20,13 +20,11 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Event.h"
-#include "Poco/Mutex.h"
 #include "Poco/RefCountedObject.h"
 #include <unistd.h>
 #include <vector>
 #include <map>
 #include <atomic>
-#include <optional>
 
 
 namespace Poco {
@@ -51,7 +49,8 @@ private:
 	static int statusToExitCode(int status);
 	const std::atomic<pid_t> _pid;
 	mutable Event _event;
-	mutable std::optional<std::atomic<int>> _status;
+	mutable std::atomic<int> _status{0};
+	mutable std::atomic<bool> _hasStatus{false};
 };
 
 
