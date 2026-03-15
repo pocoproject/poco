@@ -529,8 +529,6 @@ int punycode_encode(size_t input_length_orig, const punycode_uint input[], size_
 			if (max_out - out < 2) return punycode_big_output;
 			output[out++] = (char) input[j];
 		}
-		/* else if (input[j] < n) return punycode_bad_input; */
-		/* (not needed for Punycode with unsigned code points) */
 	}
 
 	h = b = (punycode_uint) out;
@@ -551,8 +549,6 @@ int punycode_encode(size_t input_length_orig, const punycode_uint input[], size_
 
 		for (m = maxint, j = 0;  j < input_length;  ++j)
 		{
-			/* if (basic(input[j])) continue; */
-			/* (not needed for Punycode) */
 			if (input[j] >= n && input[j] < m) m = input[j];
 		}
 
@@ -667,8 +663,6 @@ int punycode_decode(size_t input_length, const char input[], size_t *output_leng
 
 		/* Insert n at position i of the output: */
 
-		/* not needed for Punycode: */
-		/* if (basic(n)) return punycode_bad_input; */
 		if (out >= max_out) return punycode_big_output;
 
 		std::memmove(output + i + 1, output + i, (out - i) * sizeof *output);

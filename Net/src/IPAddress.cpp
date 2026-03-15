@@ -564,6 +564,7 @@ std::string IPAddress::trimIPv6(const std::string& v6Addr)
 	if ((dblColOcc > 1) ||
 		(std::count(v6addr.begin(), v6addr.end(), ':') > 8) ||
 		(v6addr.find(":::") != std::string::npos) ||
+		// CodeQL [cpp/constant-comparison]: intentional IPv6 validation — checks for trailing single colon
 		((len >= 2) && ((v6addr[len-1] == ':') && v6addr[len-2] != ':')))
 	{
 		return v6addr;
@@ -582,6 +583,7 @@ IPAddress IPAddress::parse(const std::string& addr)
 bool IPAddress::tryParse(const std::string& addr, IPAddress& result)
 {
 	IPv4AddressImpl impl4(IPv4AddressImpl::parse(addr));
+	// CodeQL [cpp/auth-bypass]: IP address parsing, not authentication
 	if (impl4 != IPv4AddressImpl() || trim(addr) == "0.0.0.0")
 	{
 		result.newIPv4(impl4.addr());

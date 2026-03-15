@@ -235,7 +235,8 @@ public:
 				}
 #else
 				std::uint64_t val;
-				[[maybe_unused]] auto n = read(_eventfd, &val, sizeof(val));
+				if (read(_eventfd, &val, sizeof(val)) < 0)
+					poco_debugger_msg("eventfd read failed");
 #endif
 			}
 		}
@@ -284,6 +285,7 @@ private:
 	int updateImpl(const Socket& socket, int mode)
 	{
 		SocketImpl* sockImpl = socket.impl();
+		poco_check_ptr(sockImpl);
 		int ret = addFD(static_cast<int>(sockImpl->sockfd()), mode, EPOLL_CTL_MOD, sockImpl);
 		if (ret == 0) socketMapUpdate(socket, mode);
 		return ret;
@@ -292,6 +294,7 @@ private:
 	int addImpl(const Socket& socket, int mode)
 	{
 		SocketImpl* sockImpl = socket.impl();
+		poco_check_ptr(sockImpl);
 		int newMode = getNewMode(sockImpl, mode);
 		int ret = addFD(static_cast<int>(sockImpl->sockfd()), newMode, EPOLL_CTL_ADD, sockImpl);
 		if (ret == 0) socketMapUpdate(socket, newMode);

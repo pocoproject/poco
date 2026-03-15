@@ -542,10 +542,10 @@ std::string AbstractConfiguration::uncheckedExpand(const std::string& value) con
 					else prop += *it++;
 				}
 				if (it != end) ++it;
-				std::string value;
-				if (getRaw(prop, value))
+				std::string propValue;
+				if (getRaw(prop, propValue))
 				{
-					result.append(internalExpand(value));
+					result.append(internalExpand(propValue));
 				}
 				else if (haveDefault)
 				{

@@ -61,7 +61,7 @@ FTPClientSession::FTPClientSession(const StreamSocket& socket,
 	_pControlSocket->setReceiveTimeout(_timeout);
 	if (readWelcomeMessage)
 	{
-		receiveServerReadyReply();
+		FTPClientSession::receiveServerReadyReply();
 	}
 	else
 	{

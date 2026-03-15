@@ -119,10 +119,10 @@ public:
 		/// Returns the Handler.
 
 	Dynamic::Var asVar() const;
-		/// Returns the result of parsing;
+		/// Returns the result of parsing
 
 	Dynamic::Var result() const;
-		/// Returns the result of parsing as Dynamic::Var;
+		/// Returns the result of parsing as Dynamic::Var
 
 private:
 	Parser(const Parser&);

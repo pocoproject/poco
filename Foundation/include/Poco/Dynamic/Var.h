@@ -1859,6 +1859,7 @@ inline bool operator == (const float& other, const Var& da)
 	/// Equality operator for comparing Var with float
 {
 	if (da.isEmpty()) return false;
+	// CodeQL [cpp/float-equality]: intentional exact comparison in dynamic type system
 	return other == da.convert<float>();
 }
 
@@ -1867,6 +1868,7 @@ inline bool operator != (const float& other, const Var& da)
 	/// Inequality operator for comparing Var with float
 {
 	if (da.isEmpty()) return true;
+	// CodeQL [cpp/float-equality]: intentional exact comparison in dynamic type system
 	return other != da.convert<float>();
 }
 
@@ -1963,6 +1965,7 @@ inline bool operator == (const double& other, const Var& da)
 	/// Equality operator for comparing Var with double
 {
 	if (da.isEmpty()) return false;
+	// CodeQL [cpp/float-equality]: intentional exact comparison in dynamic type system
 	return other == da.convert<double>();
 }
 
@@ -1971,6 +1974,7 @@ inline bool operator != (const double& other, const Var& da)
 	/// Inequality operator for comparing Var with double
 {
 	if (da.isEmpty()) return true;
+	// CodeQL [cpp/float-equality]: intentional exact comparison in dynamic type system
 	return other != da.convert<double>();
 }
 

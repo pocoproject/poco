@@ -41,7 +41,7 @@ public:
 		/// Returns raw ICMP packet. ICMP header and data are included in the returned packet.
 
 	int packetSize() const;
-		/// Returns the total length of packet (header + data);
+		/// Returns the total length of packet (header + data)
 
 	Poco::UInt16 sequence() const;
 		/// Returns the most recent sequence number generated.
@@ -53,7 +53,7 @@ public:
 		/// Returns data size.
 
 	int maxPacketSize() const;
-		/// Returns the total length of packet (header + data);
+		/// Returns the total length of packet (header + data)
 
 	struct timeval time(Poco::UInt8* buffer = nullptr, int length = 0) const;
 		/// Returns current epoch time if either buffer or length are equal to zero.

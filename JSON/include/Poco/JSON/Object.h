@@ -607,19 +607,16 @@ public:
 
 	void convert(DateTime& /*val*/) const override
 	{
-		//TODO: val = _val;
 		throw NotImplementedException("Conversion not implemented: JSON:Object => DateTime");
 	}
 
 	void convert(LocalDateTime& /*ldt*/) const override
 	{
-		//TODO: ldt = _val.timestamp();
 		throw NotImplementedException("Conversion not implemented: JSON:Object => LocalDateTime");
 	}
 
 	void convert(Timestamp& /*ts*/) const override
 	{
-		//TODO: ts = _val.timestamp();
 		throw NotImplementedException("Conversion not implemented: JSON:Object => Timestamp");
 	}
 
@@ -747,19 +744,16 @@ public:
 
 	void convert(DateTime& /*val*/) const override
 	{
-		//TODO: val = _val;
 		throw NotImplementedException("Conversion not implemented: JSON:Object => DateTime");
 	}
 
 	void convert(LocalDateTime& /*ldt*/) const override
 	{
-		//TODO: ldt = _val.timestamp();
 		throw NotImplementedException("Conversion not implemented: JSON:Object => LocalDateTime");
 	}
 
 	void convert(Timestamp& /*ts*/) const override
 	{
-		//TODO: ts = _val.timestamp();
 		throw NotImplementedException("Conversion not implemented: JSON:Object => Timestamp");
 	}
 

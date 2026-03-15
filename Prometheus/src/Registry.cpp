@@ -33,6 +33,7 @@ void Registry::registerCollector(Collector* pCollector)
 	const auto it = _collectors.find(pCollector->name());
 	if (it == _collectors.end())
 	{
+		// CodeQL [cpp/local-address-stored]: collector lifetime managed by caller
 		_collectors[pCollector->name()] = pCollector;
 	}
 	else
