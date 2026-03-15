@@ -52,7 +52,7 @@ HTTPClientSession::HTTPClientSession():
 	_responseReceived(false),
 	_ntlmProxyAuthenticated(false)
 {
-        _proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
+	_proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
 }
 
 
@@ -69,7 +69,7 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 	_responseReceived(false),
 	_ntlmProxyAuthenticated(false)
 {
-        _proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
+	_proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
 }
 
 
@@ -86,7 +86,7 @@ HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 	_responseReceived(false),
 	_ntlmProxyAuthenticated(false)
 {
-        _proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
+	_proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
 }
 
 
@@ -103,7 +103,7 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port)
 	_responseReceived(false),
 	_ntlmProxyAuthenticated(false)
 {
-        _proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
+	_proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
 }
 
 
@@ -133,13 +133,13 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket, const ProxyConf
 	_expectResponseBody(false),
 	_responseReceived(false)
 {
-        _proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
+	_proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
 }
 
 
 HTTPClientSession::~HTTPClientSession()
 {
-        _proxySessionFactory.unregisterProtocol("http");
+	_proxySessionFactory.unregisterProtocol("http");
 }
 
 
@@ -196,17 +196,17 @@ const SocketAddress& HTTPClientSession::getSourceAddress6()
 
 void HTTPClientSession::setProxy(const std::string& host, Poco::UInt16 port, const std::string& protocol, bool tunnel)
 {
-        if (protocol != "http" && protocol != "https")
-                throw IllegalStateException("Protocol must be either http or https");
+	if (protocol != "http" && protocol != "https")
+		throw IllegalStateException("Protocol must be either http or https");
 
-        if (!connected())
+	if (!connected())
 	{
 		_proxyConfig.host = host;
 		_proxyConfig.port = port;
 		_proxyConfig.protocol = protocol;
 		_proxyConfig.tunnel = tunnel;
 	}
-        else throw IllegalStateException("Cannot set the proxy host, port and protocol for an already connected session");
+	else throw IllegalStateException("Cannot set the proxy host, port and protocol for an already connected session");
 }
 
 
@@ -230,23 +230,22 @@ void HTTPClientSession::setProxyPort(Poco::UInt16 port)
 
 void HTTPClientSession::setProxyProtocol(const std::string& protocol)
 {
-        if (protocol != "http" && protocol != "https")
-                throw IllegalStateException("Protocol must be either http or https");
+	if (protocol != "http" && protocol != "https")
+		throw IllegalStateException("Protocol must be either http or https");
 
-        if (!connected())
-                _proxyConfig.protocol = protocol;
-        else
-                throw IllegalStateException("Cannot set the proxy port number for an already connected session");
+	if (!connected())
+		_proxyConfig.protocol = protocol;
+	else
+		throw IllegalStateException("Cannot set the proxy protocol for an already connected session");
 }
 
 
 void HTTPClientSession::setProxyTunnel(bool tunnel)
 {
-        if (!connected())
-                _proxyConfig.tunnel = tunnel;
-        else
-                throw IllegalStateException("Cannot set the proxy tunnel for an already connected session");
-
+	if (!connected())
+		_proxyConfig.tunnel = tunnel;
+	else
+		throw IllegalStateException("Cannot set the proxy tunnel for an already connected session");
 }
 
 
@@ -623,9 +622,9 @@ void HTTPClientSession::sendChallengeRequest(const HTTPRequest& request, HTTPRes
 StreamSocket HTTPClientSession::proxyConnect()
 {
 	URI proxyUri;
-        proxyUri.setScheme(getProxyProtocol());
-        proxyUri.setHost(getProxyHost());
-        proxyUri.setPort(getProxyPort());
+	proxyUri.setScheme(getProxyProtocol());
+	proxyUri.setHost(getProxyHost());
+	proxyUri.setPort(getProxyPort());
 
 	SharedPtr<HTTPClientSession> proxySession (_proxySessionFactory.createClientSession(proxyUri));
 
