@@ -37,7 +37,7 @@ HTTPSClientSession::HTTPSClientSession():
 	_pContext(SSLManager::instance().defaultClientContext())
 {
 	setPort(HTTPS_PORT);
-	_proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator);
+	initProxySessionFactory();
 }
 
 
@@ -47,7 +47,7 @@ HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket, const s
 {
 	setHost(host);
 	setPort(port);
-	_proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator);
+	initProxySessionFactory();
 }
 
 
@@ -57,7 +57,7 @@ HTTPSClientSession::HTTPSClientSession(const SecureStreamSocket& socket, Session
 	_pSession(pSession)
 {
 	setPort(HTTPS_PORT);
-	_proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator);
+	initProxySessionFactory();
 }
 
 
@@ -67,7 +67,7 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 {
 	setHost(host);
 	setPort(port);
-	_proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator);
+	initProxySessionFactory();
 }
 
 
@@ -75,7 +75,7 @@ HTTPSClientSession::HTTPSClientSession(Context::Ptr pContext):
 	HTTPClientSession(SecureStreamSocket(pContext)),
 	_pContext(pContext)
 {
-	_proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
+	initProxySessionFactory(pContext);
 }
 
 
@@ -84,7 +84,7 @@ HTTPSClientSession::HTTPSClientSession(Context::Ptr pContext, Session::Ptr pSess
 	_pContext(pContext),
 	_pSession(pSession)
 {
-	_proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
+	initProxySessionFactory(pContext);
 }
 
 
@@ -94,7 +94,7 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 {
 	setHost(host);
 	setPort(port);
-	_proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
+	initProxySessionFactory(pContext);
 }
 
 
@@ -105,13 +105,19 @@ HTTPSClientSession::HTTPSClientSession(const std::string& host, Poco::UInt16 por
 {
 	setHost(host);
 	setPort(port);
-	_proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
+	initProxySessionFactory(pContext);
 }
 
 
 HTTPSClientSession::~HTTPSClientSession()
 {
-	_proxySessionFactory.unregisterProtocol("https");
+	try
+	{
+		_proxySessionFactory.unregisterProtocol("https");
+	}
+	catch (...)
+	{
+	}
 }
 
 
@@ -137,10 +143,13 @@ X509Certificate HTTPSClientSession::serverCertificate()
 
 std::string HTTPSClientSession::proxyRequestPrefix() const
 {
+	if (isProxyTunnel())
+		return std::string();
+
 	std::string result("https://");
 	result.append(getHost());
-	/// Do not append default by default, since this may break some servers.
-	/// One example of such server is GCS (Google Cloud Storage).
+	// Do not append default port, since this may break some servers.
+	// One example of such server is GCS (Google Cloud Storage).
 	if (getPort() != HTTPS_PORT)
 	{
 		result.append(":");
@@ -152,6 +161,10 @@ std::string HTTPSClientSession::proxyRequestPrefix() const
 
 void HTTPSClientSession::proxyAuthenticate(HTTPRequest& request)
 {
+	if (!isProxyTunnel())
+	{
+		proxyAuthenticateImpl(request, getProxyConfig());
+	}
 }
 
 
@@ -205,6 +218,18 @@ int HTTPSClientSession::read(char* buffer, std::streamsize length)
 Session::Ptr HTTPSClientSession::sslSession()
 {
 	return _pSession;
+}
+
+
+void HTTPSClientSession::initProxySessionFactory()
+{
+	_proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator);
+}
+
+
+void HTTPSClientSession::initProxySessionFactory(Context::Ptr pContext)
+{
+	_proxySessionFactory.registerProtocol("https", new HTTPSSessionInstantiator(pContext));
 }
 
 

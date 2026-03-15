@@ -31,6 +31,7 @@
 
 using Poco::NumberFormatter;
 using Poco::IllegalStateException;
+using Poco::InvalidArgumentException;
 
 
 namespace Poco {
@@ -52,7 +53,7 @@ HTTPClientSession::HTTPClientSession():
 	_responseReceived(false),
 	_ntlmProxyAuthenticated(false)
 {
-	_proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
+	initProxySessionFactory();
 }
 
 
@@ -69,7 +70,7 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 	_responseReceived(false),
 	_ntlmProxyAuthenticated(false)
 {
-	_proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
+	initProxySessionFactory();
 }
 
 
@@ -86,7 +87,7 @@ HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 	_responseReceived(false),
 	_ntlmProxyAuthenticated(false)
 {
-	_proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
+	initProxySessionFactory();
 }
 
 
@@ -103,13 +104,15 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port)
 	_responseReceived(false),
 	_ntlmProxyAuthenticated(false)
 {
-	_proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
+	initProxySessionFactory();
 }
 
 
 HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port, const ProxyConfig& proxyConfig):
 	_host(host),
 	_port(port),
+	_sourceAddress4(IPAddress::wildcard(IPAddress::IPv4), 0),
+	_sourceAddress6(IPAddress::wildcard(IPAddress::IPv6), 0),
 	_proxyConfig(proxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
@@ -118,6 +121,7 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port,
 	_responseReceived(false),
 	_ntlmProxyAuthenticated(false)
 {
+	initProxySessionFactory();
 }
 
 
@@ -131,15 +135,28 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket, const ProxyConf
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_ntlmProxyAuthenticated(false)
 {
-	_proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
+	initProxySessionFactory();
 }
 
 
 HTTPClientSession::~HTTPClientSession()
 {
-	_proxySessionFactory.unregisterProtocol("http");
+	try
+	{
+		_proxySessionFactory.unregisterProtocol("http");
+	}
+	catch (...)
+	{
+	}
+}
+
+
+void HTTPClientSession::initProxySessionFactory()
+{
+	_proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
 }
 
 
@@ -197,7 +214,7 @@ const SocketAddress& HTTPClientSession::getSourceAddress6()
 void HTTPClientSession::setProxy(const std::string& host, Poco::UInt16 port, const std::string& protocol, bool tunnel)
 {
 	if (protocol != "http" && protocol != "https")
-		throw IllegalStateException("Protocol must be either http or https");
+		throw InvalidArgumentException("Protocol must be either http or https");
 
 	if (!connected())
 	{
@@ -231,7 +248,7 @@ void HTTPClientSession::setProxyPort(Poco::UInt16 port)
 void HTTPClientSession::setProxyProtocol(const std::string& protocol)
 {
 	if (protocol != "http" && protocol != "https")
-		throw IllegalStateException("Protocol must be either http or https");
+		throw InvalidArgumentException("Protocol must be either http or https");
 
 	if (!connected())
 		_proxyConfig.protocol = protocol;
@@ -270,12 +287,21 @@ void HTTPClientSession::setProxyPassword(const std::string& password)
 
 void HTTPClientSession::setProxyConfig(const ProxyConfig& config)
 {
-	_proxyConfig = config;
+	if (config.protocol != "http" && config.protocol != "https")
+		throw InvalidArgumentException("Protocol must be either http or https");
+
+	if (!connected())
+		_proxyConfig = config;
+	else
+		throw IllegalStateException("Cannot set the proxy configuration for an already connected session");
 }
 
 
 void HTTPClientSession::setGlobalProxyConfig(const ProxyConfig& config)
 {
+	if (config.protocol != "http" && config.protocol != "https")
+		throw InvalidArgumentException("Protocol must be either http or https");
+
 	_globalProxyConfig = config;
 }
 
@@ -509,8 +535,8 @@ std::string HTTPClientSession::proxyRequestPrefix() const
 {
 	std::string result("http://");
 	result.append(_host);
-	/// Do not append default by default, since this may break some servers.
-	/// One example of such server is GCS (Google Cloud Storage).
+	// Do not append default port, since this may break some servers.
+	// One example of such server is GCS (Google Cloud Storage).
 	if (_port != HTTPSession::HTTP_PORT)
 	{
 		result.append(":");
@@ -541,16 +567,16 @@ void HTTPClientSession::proxyAuthenticateImpl(HTTPRequest& request, const ProxyC
 {
 	switch (proxyConfig.authMethod)
 	{
-	case PROXY_AUTH_NONE:
+	case ProxyAuthentication::None:
 		break;
 
-	case PROXY_AUTH_HTTP_BASIC:
+	case ProxyAuthentication::Basic:
 		_proxyBasicCreds.setUsername(proxyConfig.username);
 		_proxyBasicCreds.setPassword(proxyConfig.password);
 		_proxyBasicCreds.proxyAuthenticate(request);
 		break;
 
-	case PROXY_AUTH_HTTP_DIGEST:
+	case ProxyAuthentication::Digest:
 		if (HTTPCredentials::hasDigestCredentials(request))
 		{
 			_proxyDigestCreds.updateProxyAuthInfo(request);
@@ -563,7 +589,7 @@ void HTTPClientSession::proxyAuthenticateImpl(HTTPRequest& request, const ProxyC
 		}
 		break;
 
-	case PROXY_AUTH_NTLM:
+	case ProxyAuthentication::NTLM:
 		if (_ntlmProxyAuthenticated)
 		{
 			_proxyNTLMCreds.updateProxyAuthInfo(request);
@@ -643,7 +669,7 @@ StreamSocket HTTPClientSession::proxyConnect()
 	proxySession->sendRequest(proxyRequest);
 	proxySession->receiveResponse(proxyResponse);
 	if (proxyResponse.getStatus() != HTTPResponse::HTTP_OK)
-		throw HTTPException("Cannot establish proxy connection", proxyResponse.getReason());
+		throw HTTPException("Cannot establish proxy connection (" + std::to_string(proxyResponse.getStatus()) + ")", proxyResponse.getReason());
 	return proxySession->detachSocket();
 }
 
