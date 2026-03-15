@@ -185,6 +185,9 @@ void ServerApplication::ServiceMain(DWORD argc, LPWSTR* argv)
 		// SCM-provided argv, which only contains the service name.
 		// This allows command-line options like --config-file to
 		// reach the application when running as a service.
+		// Since 1.15.1, args[0] is the executable path (from
+		// GetCommandLineW), matching the argv[0] convention on
+		// Unix/daemon startup.
 		std::vector<std::string> args;
 		int nArgs = 0;
 		LPWSTR* pArgv = CommandLineToArgvW(GetCommandLineW(), &nArgs);
