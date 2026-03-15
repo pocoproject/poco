@@ -20,6 +20,7 @@ public:
 	~HTTPReactorServer();
 	void start();
 	void stop();
+	int port() const { return _tcpReactorServer.port(); }
 	void onMessage(const TcpReactorConnectionPtr& conn);
 	void onError(const Poco::Exception& ex);
 	void sendErrorResponse(HTTPSession& session, HTTPResponse::HTTPStatus status);

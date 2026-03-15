@@ -17,12 +17,16 @@ TCPReactorAcceptor::TCPReactorAcceptor(
 	if (workerThreads > 0)
 	{
 		_threadPool = std::make_shared<Poco::ThreadPool>("TCPRW", workerThreads, workerThreads);
+		for (int i = 0; i < workerThreads; i++)
+		{
+			std::shared_ptr<SocketReactor> workerReactor(std::make_shared<SocketReactor>());
+			_wokerReactors.push_back(workerReactor);
+			_threadPool->start(*workerReactor);
+		}
 	}
-	for (int i = 0; i < workerThreads; i++)
+	else
 	{
-		std::shared_ptr<SocketReactor> workerReactor(std::make_shared<SocketReactor>());
-		_wokerReactors.push_back(workerReactor);
-		_threadPool->start(*workerReactor);
+		_useSelfReactor = true;
 	}
 }
 
@@ -32,10 +36,16 @@ TCPReactorAcceptor::~TCPReactorAcceptor()
 }
 
 void TCPReactorAcceptor::stop() {
-	for(auto& worker: _wokerReactors) {
+	if (_stopped.exchange(true))
+	{
+		return;
+	}
+	for(auto& worker: _wokerReactors)
+	{
 		worker->stop();
 	}
-	if(_threadPool) {
+	if(_threadPool)
+	{
 		_threadPool->joinAll();
 	}
 }

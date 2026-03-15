@@ -33,6 +33,8 @@ public:
 
 	void stop();
 
+	int port() const { return _port; }
+
 	void setRecvMessageCallback(const RecvMessageCallback& cb);
 
 private:

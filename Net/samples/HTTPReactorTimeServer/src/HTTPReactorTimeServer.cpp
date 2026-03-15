@@ -95,9 +95,7 @@ class BodyEchoRequestHandler: public HTTPRequestHandler
 	/// Echo the request body back to the client.
 {
 public:
-	BodyEchoRequestHandler()
-	{
-	}
+	BodyEchoRequestHandler() = default;
 
 	void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
 	{

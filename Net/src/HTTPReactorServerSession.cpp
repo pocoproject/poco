@@ -213,9 +213,9 @@ int HTTPReactorServerSession::read(char* buffer, std::streamsize length)
 {
 	if (_idx < _complete)
 	{
-		int n = (int) (_complete - _idx);
-		if (n > length) n = (int) length;
-		std::memcpy(buffer, _buf.c_str() + _idx, n);
+		int n = static_cast<int>(_complete - _idx);
+		if (n > static_cast<int>(length)) n = static_cast<int>(length);
+		std::memcpy(buffer, _buf.data() + _idx, n);
 		_idx += n;
 		return n;
 	}
