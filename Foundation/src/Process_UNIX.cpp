@@ -71,13 +71,13 @@ int ProcessHandleImpl::wait() const
 	if (wait(0) != _pid)
 		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
 
-	return statusToExitCode(_status.value());
+	return statusToExitCode(_status.load());
 }
 
 
 int ProcessHandleImpl::wait(int options) const
 {
-	if (_status.has_value()) return _pid;
+	if (_hasStatus.load()) return _pid;
 	int status;
 	int rc;
 	do
@@ -87,14 +87,15 @@ int ProcessHandleImpl::wait(int options) const
 	while (rc < 0 && errno == EINTR);
 	if (rc == _pid)
 	{
-		_status = status;
+		_status.store(status);
+		_hasStatus.store(true);
 		_event.set();
 	}
 	else if (rc < 0 && errno == ECHILD)
 	{
 		// Another thread reaped the process; wait for it to update the status.
 		// Use a timeout to prevent hanging indefinitely if something goes wrong.
-		if (_event.tryWait(5000) && _status.has_value())
+		if (_event.tryWait(5000) && _hasStatus.load())
 		{
 			rc = _pid;
 		}
@@ -111,13 +112,13 @@ int ProcessHandleImpl::tryWait() const
 		return -1;
 	if (rc != _pid)
 		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
-	return statusToExitCode(_status.value());
+	return statusToExitCode(_status.load());
 }
 
 
 bool ProcessHandleImpl::isRunning() const
 {
-	if (_status.has_value())
+	if (_hasStatus.load())
 		return false;
 	return wait(WNOHANG) == 0;
 }
@@ -352,14 +353,14 @@ bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 
 bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
-	if (::kill(pid, 0) == 0)
-	{
-		return true;
-	}
-	else
-	{
+	int status;
+	int rc = ::waitpid(pid, &status, WNOHANG);
+	if (rc == pid)
 		return false;
-	}
+	if (rc == 0)
+		return true;
+	// Not our child or error; fall back to kill check
+	return ::kill(pid, 0) == 0;
 }
 
 

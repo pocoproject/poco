@@ -19,6 +19,7 @@
 #include "Poco/Environment.h"
 #include "Poco/ProcessOptions.h"
 #include "Poco/Thread.h"
+#include <atomic>
 #include <csignal>
 #include <iostream>
 
@@ -359,19 +360,133 @@ void ProcessTest::testIsRunningAllowsForTermination()
 #if !defined(_WIN32_WCE)
 	std::string name("TestApp");
 	std::string cmd;
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
 
 #if defined(POCO_OS_FAMILY_UNIX)
-	cmd = "./";
 	cmd += name;
 #else
 	cmd = name;
 #endif
 
+	// Launch with pipes to reproduce the original defunct process scenario (issue #1097).
+	// When a process launched with pipes exits, it becomes defunct until reaped.
 	std::vector<std::string> args;
-	ProcessHandle ph = Process::launch(cmd, args, nullptr, nullptr, nullptr);
+	args.push_back("-count");
+	Pipe inPipe;
+	ProcessHandle ph = Process::launch(cmd, args, &inPipe, nullptr, nullptr);
+	PipeOutputStream ostr(inPipe);
+	ostr << std::string(10, 'x');
+	ostr.close();
 	while (Process::isRunning(ph))
 		Thread::sleep(100);
+	// Process should be reaped by now; wait must not hang
+	int rc = ph.wait();
+	assertTrue (rc == 10);
 #endif // !defined(_WIN32_WCE)
+}
+
+
+void ProcessTest::testIsRunningByPidAllowsForTermination()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
+
+	cmd += name;
+
+	// Test the PID-only isRunning overload with a child process
+	std::vector<std::string> args;
+	args.push_back("-count");
+	Pipe inPipe;
+	ProcessHandle ph = Process::launch(cmd, args, &inPipe, nullptr, nullptr);
+	Process::PID pid = ph.id();
+	PipeOutputStream ostr(inPipe);
+	ostr << std::string(10, 'x');
+	ostr.close();
+	while (Process::isRunning(pid))
+		Thread::sleep(100);
+#endif // defined(POCO_OS_FAMILY_UNIX)
+}
+
+
+void ProcessTest::testWaitAfterIsRunning()
+{
+#if !defined(_WIN32_WCE)
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
+
+#if defined(POCO_OS_FAMILY_UNIX)
+	cmd += name;
+#else
+	cmd = name;
+#endif
+
+	// Verify that calling wait() after isRunning() returns false works correctly.
+	// isRunning() reaps the process internally via waitpid; wait() must still succeed.
+	std::vector<std::string> args;
+	args.push_back("-count");
+	Pipe inPipe;
+	ProcessHandle ph = Process::launch(cmd, args, &inPipe, nullptr, nullptr);
+	PipeOutputStream ostr(inPipe);
+	ostr << std::string(42, 'x');
+	ostr.close();
+	while (Process::isRunning(ph))
+		Thread::sleep(100);
+	int rc = ph.wait();
+	assertTrue (rc == 42);
+#endif // !defined(_WIN32_WCE)
+}
+
+
+void ProcessTest::testConcurrentWaitAndIsRunning()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	std::string name("TestApp");
+	std::string cmd;
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
+
+	cmd += name;
+
+	// Test thread safety: one thread polls isRunning while another calls wait.
+	std::vector<std::string> args;
+	args.push_back("-count");
+	Pipe inPipe;
+	ProcessHandle ph = Process::launch(cmd, args, &inPipe, nullptr, nullptr);
+	PipeOutputStream ostr(inPipe);
+
+	std::atomic<int> waitResult{-1};
+	std::atomic<bool> waitDone{false};
+
+	Thread waiter;
+	waiter.startFunc([&ph, &waitResult, &waitDone]()
+	{
+		waitResult = ph.wait();
+		waitDone = true;
+	});
+
+	// Let the waiter thread start, then close the pipe to let the process exit
+	Thread::sleep(100);
+	ostr << std::string(7, 'x');
+	ostr.close();
+
+	// Poll isRunning concurrently with the waiter thread
+	while (Process::isRunning(ph))
+		Thread::sleep(50);
+
+	waiter.join();
+	assertTrue (waitDone);
+	assertTrue (waitResult == 7);
+#endif // defined(POCO_OS_FAMILY_UNIX)
 }
 
 
@@ -380,8 +495,10 @@ void ProcessTest::testSignalExitCode()
 #if defined(POCO_OS_FAMILY_UNIX)
 	std::string name("TestApp");
 	std::string cmd;
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	name += "d";
+#endif
 
-	cmd = "./";
 	cmd += name;
 
 	std::vector<std::string> args;
@@ -417,6 +534,9 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunning);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchCloseHandles);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunningAllowsForTermination);
+	CppUnit_addTest(pSuite, ProcessTest, testIsRunningByPidAllowsForTermination);
+	CppUnit_addTest(pSuite, ProcessTest, testWaitAfterIsRunning);
+	CppUnit_addTest(pSuite, ProcessTest, testConcurrentWaitAndIsRunning);
 	CppUnit_addTest(pSuite, ProcessTest, testSignalExitCode);
 
 	return pSuite;
