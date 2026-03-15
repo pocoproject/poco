@@ -33,6 +33,9 @@ set_target_properties(Util
 )
 
 target_link_libraries(Util PUBLIC Poco::Foundation)
+if(WIN32)
+	target_link_libraries(Util PUBLIC shell32.lib)
+endif()
 if(ENABLE_XML)
 	target_link_libraries(Util PUBLIC Poco::XML)
 else()
