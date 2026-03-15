@@ -182,7 +182,7 @@ public:
 	void setProxyConfig(const ProxyConfig& config);
 		/// Sets the proxy configuration.
 
-	const ProxyConfig& getProxyConfig() const;
+	[[nodiscard]] const ProxyConfig& getProxyConfig() const;
 		/// Returns the proxy configuration.
 
 	static void setGlobalProxyConfig(const ProxyConfig& config);
@@ -195,7 +195,7 @@ public:
 		/// The global proxy configuration should be set at start up, before
 		/// the first HTTPClientSession instance is created.
 
-	static const ProxyConfig& getGlobalProxyConfig();
+	[[nodiscard]] static const ProxyConfig& getGlobalProxyConfig();
 		/// Returns the global proxy configuration.
 
 	void setKeepAliveTimeout(const Poco::Timespan& timeout);
@@ -286,11 +286,11 @@ public:
 		/// the request or response stream changes into
 		/// fail or bad state, but not eof state).
 
-	virtual bool secure() const;
+	[[nodiscard]] virtual bool secure() const;
 		/// Return true iff the session uses SSL or TLS,
 		/// or false otherwise.
 
-	bool bypassProxy() const;
+	[[nodiscard]] bool bypassProxy() const;
 		/// Returns true if the proxy should be bypassed
 		/// for the current host.
 
@@ -372,8 +372,11 @@ private:
 
 	static ProxyConfig _globalProxyConfig;
 
-	HTTPClientSession(const HTTPClientSession&);
-	HTTPClientSession& operator = (const HTTPClientSession&);
+	void initProxySessionFactory();
+		/// Registers the "http" protocol with _proxySessionFactory.
+
+	HTTPClientSession(const HTTPClientSession&) = delete;
+	HTTPClientSession& operator = (const HTTPClientSession&) = delete;
 
 	friend class WebSocket;
 };
@@ -412,7 +415,7 @@ inline const std::string& HTTPClientSession::getProxyProtocol() const
 }
 
 
-inline bool HTTPClientSession::isProxyTunnel() const
+[[nodiscard]] inline bool HTTPClientSession::isProxyTunnel() const
 {
 	return _proxyConfig.tunnel;
 }

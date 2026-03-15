@@ -7,7 +7,7 @@
 //
 // Definition of the ProxyConfig class.
 //
-// Copyright (c) 2005-2026, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2026-2026, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -23,35 +23,33 @@ namespace Poco {
 namespace Net {
 
 
-enum ProxyAuthentication
+enum class ProxyAuthentication
 {
-	PROXY_AUTH_NONE,        /// No proxy authentication
-	PROXY_AUTH_HTTP_BASIC,  /// HTTP Basic proxy authentication (default, if username and password are supplied)
-	PROXY_AUTH_HTTP_DIGEST, /// HTTP Digest proxy authentication
-	PROXY_AUTH_NTLM         /// NTLMv2 proxy authentication
+	None,        /// No proxy authentication
+	Basic,       /// HTTP Basic proxy authentication (default, if username and password are supplied)
+	Digest,      /// HTTP Digest proxy authentication
+	NTLM         /// NTLMv2 proxy authentication
 };
 
 
 struct ProxyConfig
 	/// HTTP proxy server configuration.
 {
-	ProxyConfig():
-		port(HTTPSession::HTTP_PORT),
-		protocol("http"),
-		tunnel(true),
-		authMethod(PROXY_AUTH_HTTP_BASIC)
-	{
-	}
+	ProxyConfig() = default;
 
 	std::string host;
 		/// Proxy server host name or IP address.
-	Poco::UInt16 port;
+	Poco::UInt16 port = HTTPSession::HTTP_PORT;
 		/// Proxy server TCP port.
-	std::string protocol;
+	std::string protocol = "http";
 		/// Protocol to use (http or https).
-	bool tunnel;
+	bool tunnel = true;
 		/// Use proxy as tunnel (establish 2-way communication through CONNECT request).
 		/// If tunnel option is 'false' request will be sent directly to proxy without CONNECT request.
+		///
+		/// Warning: Setting tunnel to false for HTTPS sessions means the TLS connection
+		/// terminates at the proxy, not at the destination server. The proxy will see
+		/// the request in plaintext.
 	std::string username;
 		/// Proxy server username.
 	std::string password;
@@ -61,7 +59,7 @@ struct ProxyConfig
 		/// e.g. "localhost|127\.0\.0\.1|192\.168\.0\.\d+". Can also be an empty
 		/// string to disable proxy bypassing.
 
-	ProxyAuthentication authMethod;
+	ProxyAuthentication authMethod = ProxyAuthentication::Basic;
 		/// The authentication method to use - HTTP Basic or NTLM.
 };
 
