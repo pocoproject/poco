@@ -81,10 +81,10 @@ protected:
 		/// Returns the Handler.
 
 	Dynamic::Var asVarImpl() const;
-		/// Returns the result of parsing;
+		/// Returns the result of parsing
 
 	Dynamic::Var resultImpl() const;
-		/// Returns the result of parsing as Dynamic::Var;
+		/// Returns the result of parsing as Dynamic::Var
 
 private:
 	ParserImpl(const ParserImpl&);

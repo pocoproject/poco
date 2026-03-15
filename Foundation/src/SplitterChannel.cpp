@@ -29,7 +29,7 @@ SplitterChannel::~SplitterChannel()
 {
 	try
 	{
-		close();
+		SplitterChannel::close();
 	}
 	catch (...)
 	{

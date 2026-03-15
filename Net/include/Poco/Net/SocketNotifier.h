@@ -61,7 +61,7 @@ public:
 		/// Returns true if there are subscribers.
 
 	std::size_t countObservers() const;
-		/// Returns the number of subscribers;
+		/// Returns the number of subscribers
 
 	Socket socket() const;
 		/// Returns the socket.
