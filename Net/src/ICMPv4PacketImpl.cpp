@@ -208,13 +208,14 @@ std::string ICMPv4PacketImpl::errorDescription(unsigned char* buffer, int length
 
 	type = icp->type;
 	MessageType msgType = static_cast<MessageType>(type);
-	code = icp->code;
+	code = static_cast<int>(icp->code);
 	std::ostringstream err;
 
 	switch (msgType)
 	{
 	case DESTINATION_UNREACHABLE_TYPE:
-		if (code >= NET_UNREACHABLE && code < DESTINATION_UNREACHABLE_UNKNOWN)
+		// lower-bound check is defensive (enum values may change)
+		if (code >= static_cast<int>(NET_UNREACHABLE) && code < static_cast<int>(DESTINATION_UNREACHABLE_UNKNOWN))
 			err << DESTINATION_UNREACHABLE_CODE[code];
 		else
 			err << DESTINATION_UNREACHABLE_CODE[DESTINATION_UNREACHABLE_UNKNOWN];
@@ -225,22 +226,24 @@ std::string ICMPv4PacketImpl::errorDescription(unsigned char* buffer, int length
 		break;
 
 	case REDIRECT_MESSAGE_TYPE:
-		if (code >= REDIRECT_NETWORK && code < REDIRECT_MESSAGE_UNKNOWN)
+		// lower-bound check is defensive (enum values may change)
+		if (code >= static_cast<int>(REDIRECT_NETWORK) && code < static_cast<int>(REDIRECT_MESSAGE_UNKNOWN))
 			err << REDIRECT_MESSAGE_CODE[code];
 		else
 			err << REDIRECT_MESSAGE_CODE[REDIRECT_MESSAGE_UNKNOWN];
 		break;
 
 	case TIME_EXCEEDED_TYPE:
-		if (code >= TIME_TO_LIVE && code < TIME_EXCEEDED_UNKNOWN)
+		// lower-bound check is defensive (enum values may change)
+		if (code >= static_cast<int>(TIME_TO_LIVE) && code < static_cast<int>(TIME_EXCEEDED_UNKNOWN))
 			err << TIME_EXCEEDED_CODE[code];
 		else
 			err << TIME_EXCEEDED_CODE[TIME_EXCEEDED_UNKNOWN];
 		break;
 
 	case PARAMETER_PROBLEM_TYPE:
-		if (POINTER_INDICATES_THE_ERROR != code)
-			code = PARAMETER_PROBLEM_UNKNOWN;
+		if (static_cast<int>(POINTER_INDICATES_THE_ERROR) != code)
+			code = static_cast<int>(PARAMETER_PROBLEM_UNKNOWN);
 		err << PARAMETER_PROBLEM_CODE[code] << ": error in octet #" << pointer;
 		break;
 

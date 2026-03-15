@@ -74,11 +74,13 @@ void DefaultHandler::endElement(const XMLString& uri, const XMLString& localName
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void DefaultHandler::characters(const XMLChar ch[], int start, int length)
 {
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void DefaultHandler::ignorableWhitespace(const XMLChar ch[], int start, int length)
 {
 }

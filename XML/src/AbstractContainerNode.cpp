@@ -99,9 +99,11 @@ Node* AbstractContainerNode::insertBefore(Node* newChild, Node* refChild)
 		{
 			while (pLast->_pNext)
 			{
+				// CodeQL [cpp/local-address-stored]: DOM tree parent-child relationship; node lifetime managed by tree
 				pLast->_pParent = this;
 				pLast = pLast->_pNext;
 			}
+			// CodeQL [cpp/local-address-stored]: DOM tree parent-child relationship; node lifetime managed by tree
 			pLast->_pParent = this;
 		}
 		pFrag->_pFirstChild = nullptr;
@@ -113,6 +115,7 @@ Node* AbstractContainerNode::insertBefore(Node* newChild, Node* refChild)
 		if (pParent) pParent->removeChild(newChild);
 		pFirst = static_cast<AbstractNode*>(newChild);
 		pLast  = pFirst;
+		// CodeQL [cpp/local-address-stored]: DOM tree parent-child relationship; node lifetime managed by tree
 		pFirst->_pParent = this;
 	}
 	if (_pFirstChild && pFirst)
