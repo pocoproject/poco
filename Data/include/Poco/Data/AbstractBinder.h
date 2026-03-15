@@ -65,7 +65,7 @@ public:
 		PD_IN_OUT
 	};
 
-	AbstractBinder(Poco::TextEncoding::Ptr pFromEncoding = nullptr,
+	explicit AbstractBinder(Poco::TextEncoding::Ptr pFromEncoding = nullptr,
 		Poco::TextEncoding::Ptr pDBEncoding = nullptr);
 		/// Creates the AbstractBinder.
 

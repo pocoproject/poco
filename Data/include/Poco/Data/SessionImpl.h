@@ -61,7 +61,7 @@ public:
 		std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);
 		/// Creates the SessionImpl.
 
-	~SessionImpl() override;
+	~SessionImpl() override = default;
 		/// Destroys the SessionImpl.
 
 	SessionImpl() = delete;

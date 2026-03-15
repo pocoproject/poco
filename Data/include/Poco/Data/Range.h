@@ -33,34 +33,27 @@ public:
 	Range(Limit::SizeT lowValue, Limit::SizeT upValue, bool hardLimit);
 		/// Creates the Range. lowValue must be smaller equal than upValue
 
-	~Range();
+	~Range() = default;
 		/// Destroys the Limit.
 
-	const Limit& lower() const;
+	const Limit& lower() const
 		/// Returns the lower limit
+	{
+		return _lower;
+	}
 
-	const Limit& upper() const;
+	const Limit& upper() const
 		/// Returns the upper limit
+	{
+		return _upper;
+	}
+
 
 private:
 	Limit _lower;
 	Limit _upper;
 };
 
-
-//
-// inlines
-//
-inline const Limit& Range::lower() const
-{
-	return _lower;
-}
-
-
-inline const Limit& Range::upper() const
-{
-	return _upper;
-}
 
 
 namespace Keywords {

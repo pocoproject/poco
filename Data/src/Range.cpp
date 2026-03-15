@@ -32,9 +32,4 @@ Range::Range(Limit::SizeT lowValue, Limit::SizeT upValue, bool hardLimit) :
 }
 
 
-Range::~Range()
-{
-}
-
-
 } } // namespace Poco::Data

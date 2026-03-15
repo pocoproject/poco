@@ -213,6 +213,29 @@ private:
 };
 
 
+inline int SessionPool::capacity() const
+{
+	return _maxSessions;
+}
+
+
+inline int SessionPool::connTimeout() const
+{
+	return _connTimeout;
+}
+
+inline int SessionPool::allocated() const
+{
+	return _nSessions;
+}
+
+
+inline int SessionPool::available() const
+{
+	return _shutdown ? 0 : _maxSessions - used();
+}
+
+
 inline std::string SessionPool::name(const std::string& connector,
 	const std::string& connectionString)
 {

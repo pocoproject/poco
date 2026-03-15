@@ -110,12 +110,6 @@ void SessionPool::purgeDeadSessions()
 }
 
 
-int SessionPool::capacity() const
-{
-	return _maxSessions;
-}
-
-
 int SessionPool::used() const
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
@@ -127,12 +121,6 @@ int SessionPool::idle() const
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
 	return (int) _idleSessions.size();
-}
-
-
-int SessionPool::connTimeout() const
-{
-	return _connTimeout;
 }
 
 
@@ -150,19 +138,6 @@ int SessionPool::dead()
 	}
 
 	return count;
-}
-
-
-int SessionPool::allocated() const
-{
-	return _nSessions;
-}
-
-
-int SessionPool::available() const
-{
-	if (_shutdown) return 0;
-	return _maxSessions - used();
 }
 
 

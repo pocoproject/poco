@@ -30,29 +30,22 @@ class Data_API Position
 	/// indicate the recordset position in batch SQL statements.
 {
 public:
-	Position(Poco::UInt32 value);
+	Position(Poco::UInt32 value)
 		/// Creates the Position.
+		: _value(value)
+	{
+	}
 
-	~Position();
-		/// Destroys the Position.
-
-	Poco::UInt32 value() const;
+	Poco::UInt32 value() const
 		/// Returns the position value.
+	{
+		return _value;
+	}
+
 
 private:
-	Position();
-
 	Poco::UInt32 _value;
 };
-
-
-///
-/// inlines
-///
-inline Poco::UInt32 Position::value() const
-{
-	return _value;
-}
 
 
 namespace Keywords {

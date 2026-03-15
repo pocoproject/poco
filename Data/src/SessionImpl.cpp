@@ -28,11 +28,6 @@ SessionImpl::SessionImpl(const std::string& connectionString, std::size_t loginT
 }
 
 
-SessionImpl::~SessionImpl()
-{
-}
-
-
 void SessionImpl::reconnect()
 {
 	close();

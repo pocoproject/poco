@@ -35,7 +35,7 @@ public:
 	using Ptr = SharedPtr<AbstractPreparation>;
 	using PreparatorPtr = AbstractPreparator::Ptr;
 
-	AbstractPreparation(PreparatorPtr pPreparator);
+	explicit AbstractPreparation(PreparatorPtr pPreparator);
 		/// Creates the AbstractPreparation.
 
 	AbstractPreparation(const AbstractPreparation&) = delete;

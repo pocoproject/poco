@@ -53,7 +53,7 @@ public:
 		/// means that we extract as much data as possible during one execute.
 		/// Otherwise the limit value is used to partition data extracting to a limited amount of rows.
 
-	virtual ~AbstractExtraction();
+	virtual ~AbstractExtraction() = default;
 		/// Destroys the AbstractExtraction.
 
 	void setExtractor(ExtractorPtr pExtractor);
