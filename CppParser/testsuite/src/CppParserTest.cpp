@@ -498,6 +498,104 @@ namespace A::inline B::C
 }
 
 
+void CppParserTest::testParseRepeatedNestedNamespace()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(
+namespace A::B
+{
+	class X {};
+}
+namespace A::B
+{
+	class Y {};
+}
+)", st);
+
+	assertTrue (st.find("A") != st.end());
+	NameSpace* pNSA = dynamic_cast<NameSpace*>(st.find("A")->second);
+	assertTrue (pNSA != nullptr);
+
+	NameSpace* pNSB = dynamic_cast<NameSpace*>(pNSA->lookup("B"));
+	assertTrue (pNSB != nullptr);
+
+	Symbol* pSymX = pNSB->lookup("X");
+	assertTrue (pSymX != nullptr);
+	Struct* pX = dynamic_cast<Struct*>(pSymX);
+	assertTrue (pX != nullptr);
+
+	Symbol* pSymY = pNSB->lookup("Y");
+	assertTrue (pSymY != nullptr);
+	Struct* pY = dynamic_cast<Struct*>(pSymY);
+	assertTrue (pY != nullptr);
+
+	assertTrue (pX->fullName() == "A::B::X");
+	assertTrue (pY->fullName() == "A::B::Y");
+}
+
+
+void CppParserTest::testParseSingleNamespace()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(
+namespace Solo
+{
+	class Only {};
+}
+)", st);
+
+	assertTrue (st.find("Solo") != st.end());
+	NameSpace* pNSSolo = dynamic_cast<NameSpace*>(st.find("Solo")->second);
+	assertTrue (pNSSolo != nullptr);
+
+	Symbol* pSymOnly = pNSSolo->lookup("Only");
+	assertTrue (pSymOnly != nullptr);
+	Struct* pOnly = dynamic_cast<Struct*>(pSymOnly);
+	assertTrue (pOnly != nullptr);
+	assertTrue (pOnly->fullName() == "Solo::Only");
+}
+
+
+void CppParserTest::testParseDeepNestedNamespace()
+{
+	NameSpace::SymbolTable st;
+	parseString(R"(
+namespace A::B::C::D::E
+{
+	class Deep {};
+}
+class GlobalAfter {};
+)", st);
+
+	assertTrue (st.find("A") != st.end());
+	NameSpace* pNSA = dynamic_cast<NameSpace*>(st.find("A")->second);
+	assertTrue (pNSA != nullptr);
+
+	NameSpace* pNSB = dynamic_cast<NameSpace*>(pNSA->lookup("B"));
+	assertTrue (pNSB != nullptr);
+	NameSpace* pNSC = dynamic_cast<NameSpace*>(pNSB->lookup("C"));
+	assertTrue (pNSC != nullptr);
+	NameSpace* pNSD = dynamic_cast<NameSpace*>(pNSC->lookup("D"));
+	assertTrue (pNSD != nullptr);
+	NameSpace* pNSE = dynamic_cast<NameSpace*>(pNSD->lookup("E"));
+	assertTrue (pNSE != nullptr);
+
+	Symbol* pSymDeep = pNSE->lookup("Deep");
+	assertTrue (pSymDeep != nullptr);
+	Struct* pDeep = dynamic_cast<Struct*>(pSymDeep);
+	assertTrue (pDeep != nullptr);
+	assertTrue (pDeep->fullName() == "A::B::C::D::E::Deep");
+
+	// Verify parser state after namespace pop loop by checking a following global symbol.
+	assertTrue (st.find("GlobalAfter") != st.end());
+	Symbol* pSymGlobalAfter = st.find("GlobalAfter")->second;
+	assertTrue (pSymGlobalAfter != nullptr);
+	Struct* pGlobalAfter = dynamic_cast<Struct*>(pSymGlobalAfter);
+	assertTrue (pGlobalAfter != nullptr);
+	assertTrue (pGlobalAfter->fullName() == "GlobalAfter");
+}
+
+
 void CppParserTest::setUp()
 {
 }
@@ -525,6 +623,9 @@ CppUnit::Test* CppParserTest::suite()
 	CppUnit_addTest(pSuite, CppParserTest, testParseFriendInline);
 	CppUnit_addTest(pSuite, CppParserTest, testParseNestedNamespace);
 	CppUnit_addTest(pSuite, CppParserTest, testParseInlineNestedNamespace);
+	CppUnit_addTest(pSuite, CppParserTest, testParseRepeatedNestedNamespace);
+	CppUnit_addTest(pSuite, CppParserTest, testParseSingleNamespace);
+	CppUnit_addTest(pSuite, CppParserTest, testParseDeepNestedNamespace);
 
 	return pSuite;
 }

@@ -27,14 +27,13 @@ namespace Poco::CppParser {
 
 NameSpace::NameSpace()
 {
-	_isInline = false;
 }
 
 
 NameSpace::NameSpace(const std::string& name, NameSpace* pNameSpace, bool isInline):
-	Symbol(name, pNameSpace)
+	Symbol(name, pNameSpace),
+	_isInline(isInline)
 {
-	_isInline = isInline;
 }
 
 

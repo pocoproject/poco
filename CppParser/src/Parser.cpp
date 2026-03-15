@@ -280,15 +280,7 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 				// update the inline flag
 				pNS->setInline(inlineFlags[i]);
 			}
-			// Only add the first (outermost) namespace to the global symbol table,
-			// and only if it's not already there
-			bool addToGST = false;
-			if (i == 0)
-			{
-				// Check if this namespace is already in the global symbol table
-				addToGST = (_gst.find(namespaceNames[i]) == _gst.end());
-			}
-			pushNameSpace(pNS, -1, addToGST);
+			pushNameSpace(pNS, -1, i == 0);
 			nestLevel++;
 		}
 		
