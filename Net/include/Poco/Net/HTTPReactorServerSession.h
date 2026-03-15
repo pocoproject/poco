@@ -43,6 +43,8 @@ private:
 
 	int peek() override;
 
+	int read(char* buffer, std::streamsize length) override;
+
 	int write(const char* buffer, std::streamsize length) override;
 
 	bool parseHeaders(std::size_t pos, std::size_t& bodyStart, std::size_t& contentLength, bool& isChunked);
