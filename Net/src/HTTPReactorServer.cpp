@@ -4,17 +4,19 @@
 #include "Poco/Net/HTTPSession.h"
 #include <cstring>
 
-namespace Poco { namespace Net {
+namespace Poco {
+namespace Net {
 
 HTTPReactorServer::HTTPReactorServer(int port, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory)
 	: _tcpReactorServer(port, pParams)
 {
 	_pParams = pParams;
 	_pFactory = pFactory;
-	_tcpReactorServer.setRecvMessageCallback([this](const TcpReactorConnectionPtr& conn) {
-		// Handle incoming message
-		this->onMessage(conn);
-	});
+	_tcpReactorServer.setRecvMessageCallback(
+		[this](const TcpReactorConnectionPtr& conn)
+		{
+			this->onMessage(conn);
+		});
 }
 
 HTTPReactorServer::~HTTPReactorServer()
@@ -35,16 +37,15 @@ void HTTPReactorServer::onMessage(const TcpReactorConnectionPtr& conn)
 {
 	try
 	{
-		// Handle read event
 		HTTPReactorServerSession session(conn->socket(), conn->buffer(), _pParams);
 		if (!session.checkRequestComplete())
 		{
 			return;
 		}
-		// Create request and response objects
+
 		HTTPServerResponseImpl response(session);
-		HTTPServerRequestImpl  request(response, session, _pParams);
-		// Process request and generate response
+		HTTPServerRequestImpl request(response, session, _pParams);
+
 		Poco::Timestamp now;
 		response.setDate(now);
 		response.setVersion(request.getVersion());
@@ -54,6 +55,7 @@ void HTTPReactorServer::onMessage(const TcpReactorConnectionPtr& conn)
 		{
 			response.set("Server", server);
 		}
+
 		try
 		{
 			session.requestTrailer().clear();
@@ -66,9 +68,13 @@ void HTTPReactorServer::onMessage(const TcpReactorConnectionPtr& conn)
 
 				pHandler->handleRequest(request, response);
 				session.setKeepAlive(_pParams->getKeepAlive() && response.getKeepAlive());
+				session.popCompletedRequest();
 			}
 			else
+			{
 				sendErrorResponse(session, HTTPResponse::HTTP_NOT_IMPLEMENTED);
+				session.popCompletedRequest();
+			}
 		}
 		catch (Poco::Exception& e)
 		{
@@ -76,9 +82,9 @@ void HTTPReactorServer::onMessage(const TcpReactorConnectionPtr& conn)
 			{
 				try
 				{
-					sendErrorResponse(
-						session,
-						e.code() == 0 ? HTTPResponse::HTTP_INTERNAL_SERVER_ERROR : HTTPResponse::HTTPStatus(e.code()));
+					sendErrorResponse(session, e.code() == 0 ? HTTPResponse::HTTP_INTERNAL_SERVER_ERROR
+															 : HTTPResponse::HTTPStatus(e.code()));
+					session.popCompletedRequest();
 				}
 				catch (...)
 				{
@@ -99,13 +105,14 @@ void HTTPReactorServer::sendErrorResponse(HTTPSession& session, HTTPResponse::HT
 	response.setVersion(HTTPMessage::HTTP_1_1);
 	response.setStatusAndReason(status);
 	response.setKeepAlive(false);
+	response.setContentLength(0);
+	response.send();
 
 	session.setKeepAlive(false);
 }
 
 void HTTPReactorServer::onError(const Poco::Exception& ex)
 {
-	// Handle error
 	throw ex;
 }
 

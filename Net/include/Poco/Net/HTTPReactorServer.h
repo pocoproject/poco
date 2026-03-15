@@ -1,3 +1,6 @@
+#ifndef Net_HTTPReactorServer_INCLUDED
+#define Net_HTTPReactorServer_INCLUDED
+
 #include "Poco/Logger.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPServerParams.h"
@@ -17,6 +20,7 @@ public:
 	~HTTPReactorServer();
 	void start();
 	void stop();
+	int port() const { return _tcpReactorServer.port(); }
 	void onMessage(const TcpReactorConnectionPtr& conn);
 	void onError(const Poco::Exception& ex);
 	void sendErrorResponse(HTTPSession& session, HTTPResponse::HTTPStatus status);
@@ -31,3 +35,4 @@ private:
 
 }} // namespace Poco::Net
 
+#endif // Net_HTTPReactorServer_INCLUDED
