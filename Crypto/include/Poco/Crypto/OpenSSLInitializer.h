@@ -55,6 +55,9 @@ public:
 	static void enableFIPSMode(bool enabled);
 		/// Enable or disable FIPS mode. If FIPS is not available, this method doesn't do anything.
 
+	static bool haveDefaultProvider();
+		/// Returns true if the OpenSSL default provider is loaded, otherwise false.
+
 	static bool haveLegacyProvider();
 		/// Returns true if the OpenSSL legacy provider is available, otherwise false.
 
@@ -91,6 +94,16 @@ inline void OpenSSLInitializer::enableFIPSMode(bool /*enabled*/)
 {
 }
 #endif
+
+
+inline bool OpenSSLInitializer::haveDefaultProvider()
+{
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	return _defaultProvider != nullptr;
+#else
+	return false;
+#endif
+}
 
 
 inline bool OpenSSLInitializer::haveLegacyProvider()
