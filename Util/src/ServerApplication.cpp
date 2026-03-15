@@ -37,6 +37,7 @@
 #include "Poco/Util/WinService.h"
 #include "Poco/Util/WinRegistryKey.h"
 #include "Poco/UnWindows.h"
+#include <shellapi.h>
 #include <cstring>
 #endif
 
@@ -180,12 +181,35 @@ void ServerApplication::ServiceMain(DWORD argc, LPWSTR* argv)
 
 	try
 	{
+		// Use the process command line (from binPath) instead of
+		// SCM-provided argv, which only contains the service name.
+		// This allows command-line options like --config-file to
+		// reach the application when running as a service.
+		// Since 1.15.1, args[0] is the executable path (from
+		// GetCommandLineW), matching the argv[0] convention on
+		// Unix/daemon startup.
 		std::vector<std::string> args;
-		for (DWORD i = 0; i < argc; ++i)
+		int nArgs = 0;
+		LPWSTR* pArgv = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+		if (pArgv)
 		{
-			std::string arg;
-			Poco::UnicodeConverter::toUTF8(argv[i], arg);
-			args.push_back(arg);
+			for (int i = 0; i < nArgs; ++i)
+			{
+				std::string arg;
+				Poco::UnicodeConverter::toUTF8(pArgv[i], arg);
+				args.push_back(arg);
+			}
+			LocalFree(pArgv);
+		}
+		if (args.empty())
+		{
+			// fallback to SCM-provided args
+			for (DWORD i = 0; i < argc; ++i)
+			{
+				std::string arg;
+				Poco::UnicodeConverter::toUTF8(argv[i], arg);
+				args.push_back(arg);
+			}
 		}
 		app.init(args);
 		_serviceStatus.dwCurrentState = SERVICE_RUNNING;
