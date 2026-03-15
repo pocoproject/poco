@@ -29,6 +29,5 @@ else()
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMAND PDF-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
-	set_tests_properties(PDF PROPERTIES ENVIRONMENT POCO_BASE=${PROJECT_SOURCE_DIR})
 endif()
 target_link_libraries(PDF-testrunner PUBLIC Poco::PDF CppUnit)

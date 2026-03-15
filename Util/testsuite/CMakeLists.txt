@@ -36,6 +36,5 @@ else()
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMAND Util-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
-	set_tests_properties(Util PROPERTIES ENVIRONMENT POCO_BASE=${PROJECT_SOURCE_DIR})
 endif()
 target_link_libraries(Util-testrunner PUBLIC Poco::Util Poco::JSON Poco::XML CppUnit)

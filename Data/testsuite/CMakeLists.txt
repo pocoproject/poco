@@ -30,7 +30,6 @@ else()
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMAND Data-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
-	set_tests_properties(Data PROPERTIES ENVIRONMENT POCO_BASE=${PROJECT_SOURCE_DIR})
 endif()
 target_link_libraries(Data-testrunner PUBLIC Poco::DataTest Poco::Data CppUnit)
 
