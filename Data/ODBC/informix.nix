@@ -12,7 +12,7 @@
 # ODBC driver (extracted from the container), and configures the Poco build
 # environment. The database starts automatically and stops when the shell exits.
 #
-# Test database: sysmaster (user: informix, password: poco)
+# Test database: poco_test (user: informix, password: poco)
 #
 # Notes:
 # - On first run, you may be prompted for sudo password to configure
