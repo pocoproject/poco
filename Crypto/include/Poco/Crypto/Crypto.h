@@ -34,18 +34,21 @@
 #include <openssl/err.h>
 
 
-#ifndef OPENSSL_VERSION_PREREQ
-	#if defined(OPENSSL_VERSION_MAJOR) && defined(OPENSSL_VERSION_MINOR)
-		#define OPENSSL_VERSION_PREREQ(maj, min) \
-			((OPENSSL_VERSION_MAJOR << 16) + OPENSSL_VERSION_MINOR >= ((maj) << 16) + (min))
-	#else
-		#define OPENSSL_VERSION_PREREQ(maj, min) \
-			(OPENSSL_VERSION_NUMBER >= (((maj) << 28) | ((min) << 20)))
-	#endif
+#ifndef POCO_OPENSSL_VERSION_PREREQ
+	/// Check for OpenSSL >= major.minor.patch using OPENSSL_VERSION_NUMBER.
+	/// OPENSSL_VERSION_NUMBER encodes version as 0xMNNFFPPS
+	/// (M=major, NN=minor, FF=fix/patch, PP=patch letter, S=status).
+	///
+	/// Note on LibreSSL: LibreSSL sets OPENSSL_VERSION_NUMBER to 0x20000000L,
+	/// which means POCO_OPENSSL_VERSION_PREREQ(3, 0, 0) correctly returns false
+	/// for LibreSSL. Where LibreSSL API diverges from OpenSSL 3.x, use explicit
+	/// #if !defined(LIBRESSL_VERSION_NUMBER) guards in addition to this macro.
+	#define POCO_OPENSSL_VERSION_PREREQ(maj, min, pat) \
+		(OPENSSL_VERSION_NUMBER >= (((maj) << 28) | ((min) << 20) | ((pat) << 12)))
 #endif
 
 
-#if OPENSSL_VERSION_NUMBER < 0x10101000L
+#if !POCO_OPENSSL_VERSION_PREREQ(1, 1, 1)
 #error "OpenSSL version too old. At least OpenSSL 1.1.1 is required."
 #endif
 

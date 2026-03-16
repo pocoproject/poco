@@ -650,8 +650,6 @@ void EVPTest::testRSAEVPKeyFromPKCS12()
 }
 
 
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
-
 void EVPTest::testRSAEVPKeyByLength()
 {
 	try
@@ -691,7 +689,7 @@ void EVPTest::testRSAEVPKeyByLength()
 	}
 }
 
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
 void EVPTest::testECEVPKeyByLength()
 {
@@ -765,8 +763,7 @@ void EVPTest::testEVPKeyByModulus()
 	}
 }
 
-#endif // OPENSSL_VERSION_NUMBER >= 0x30000000
-#endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
+#endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
 
 void EVPTest::setUp()
@@ -794,13 +791,11 @@ CppUnit::Test* EVPTest::suite()
 	CppUnit_addTest(pSuite, EVPTest, testECEVPLoadKeyWrongPassword);
 	CppUnit_addTest(pSuite, EVPTest, testRSAEVPKeyFromX509);
 	CppUnit_addTest(pSuite, EVPTest, testRSAEVPKeyFromPKCS12);
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
 	CppUnit_addTest(pSuite, EVPTest, testRSAEVPKeyByLength);
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	CppUnit_addTest(pSuite, EVPTest, testECEVPKeyByLength);
 	CppUnit_addTest(pSuite, EVPTest, testEVPKeyByModulus);
-#endif // OPENSSL_VERSION_NUMBER >= 0x30000000
-#endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
+#endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
 	return pSuite;
 }
