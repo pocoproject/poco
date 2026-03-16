@@ -90,12 +90,11 @@ void OpenSSLInitializerTest::testLegacyProvider()
 }
 
 
-// Note: provider cleanup (GH #4451) is not directly tested here because
-// OpenSSL internally leaks OSSL_LIB_CTX state when providers are unloaded
-// and reloaded in the same process, triggering LeakSanitizer false positives.
-// The cleanup code in uninitialize() is validated indirectly: if
-// OSSL_PROVIDER_unload was missing, ASAN would detect the leak from the
-// initial provider load (since those providers would never be freed at exit).
+// Note: provider lifecycle (GH #4451) is not directly tested here.
+// Provider cleanup is delegated to OpenSSL's atexit handler
+// (OPENSSL_cleanup) because both OSSL_PROVIDER_unload() and nulling
+// the static provider pointers cause LeakSanitizer false positives
+// on Linux (LSAN runs before atexit handlers).
 
 #endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
