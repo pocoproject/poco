@@ -106,21 +106,17 @@ void OpenSSLInitializer::uninitialize()
 	if (--_rc == 0)
 	{
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
-		// Unload providers in reverse order of loading.
-		// Note: OpenSSL internally leaks OSSL_LIB_CTX state if providers
-		// are unloaded and then reloaded in the same process. Applications
-		// should treat initialize/uninitialize as a one-time lifecycle and
-		// avoid cycling them repeatedly.
-		if (_legacyProvider != nullptr)
-		{
-			OSSL_PROVIDER_unload(_legacyProvider);
-			_legacyProvider = nullptr;
-		}
-		if (_defaultProvider != nullptr)
-		{
-			OSSL_PROVIDER_unload(_defaultProvider);
-			_defaultProvider = nullptr;
-		}
+		// Do not call OSSL_PROVIDER_unload() explicitly here.
+		// OpenSSL's internal atexit handler (OPENSSL_cleanup) properly
+		// frees all provider state at process exit. Calling
+		// OSSL_PROVIDER_unload() ourselves causes LeakSanitizer to
+		// report indirect leaks from OSSL_LIB_CTX child contexts
+		// that are not fully freed by the unload path.
+		// We only reset our pointers so haveLegacyProvider() reflects
+		// that we consider the library uninitialized from POCO's
+		// perspective.
+		_legacyProvider = nullptr;
+		_defaultProvider = nullptr;
 		CONF_modules_unload(1);
 #endif
 	}
