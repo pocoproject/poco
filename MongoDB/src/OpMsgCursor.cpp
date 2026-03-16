@@ -105,7 +105,7 @@ Int32 OpMsgCursor::batchSize() const noexcept
 bool OpMsgCursor::isActive() const noexcept
 {
 	const auto& cmd {_query.commandName()};
-	return ( _cursorID > 0 || (!cmd.empty() && cmd != OpMsgMessage::CMD_GET_MORE) );
+	return ( _cursorID != 0 || (!cmd.empty() && cmd != OpMsgMessage::CMD_GET_MORE) );
 }
 
 

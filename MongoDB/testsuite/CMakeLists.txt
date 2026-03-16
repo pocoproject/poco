@@ -29,6 +29,5 @@ else()
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMAND MongoDB-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
-	set_tests_properties(MongoDB PROPERTIES ENVIRONMENT POCO_BASE=${PROJECT_SOURCE_DIR})
 endif()
 target_link_libraries(MongoDB-testrunner PUBLIC Poco::MongoDB CppUnit)

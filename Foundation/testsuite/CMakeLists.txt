@@ -1,5 +1,8 @@
 set(TESTUNIT "Foundation-testrunner")
 
+# Test data
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 file(GLOB SRCS_G_REMOVE
@@ -48,12 +51,6 @@ else()
 	)
 	set_tests_properties(Foundation PROPERTIES ENVIRONMENT "LD_LIBRARY_PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")	# The SharedLibaryTest has to look for shared libraries in the working directory
 	set_property(TEST Foundation APPEND PROPERTY ENVIRONMENT "PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}:$ENV{PATH}") # The ProcessTest has to look for the TestApp in the working directory
-	set_property(TEST Foundation APPEND PROPERTY ENVIRONMENT "POCO_BASE=${PROJECT_SOURCE_DIR}")
-	# The test is run in the runtime directory. So the test data is copied there too
-	add_custom_command(
-		TARGET Foundation-testrunner POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data
-	)
 endif()
 
 target_link_libraries(Foundation-testrunner PUBLIC Poco::Foundation CppUnit)

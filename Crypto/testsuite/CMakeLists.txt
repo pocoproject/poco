@@ -1,3 +1,6 @@
+# Test data
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
@@ -29,7 +32,6 @@ else()
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMAND Crypto-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
-	set_tests_properties(Crypto PROPERTIES ENVIRONMENT POCO_BASE=${PROJECT_SOURCE_DIR})
 endif()
 target_link_libraries(Crypto-testrunner PUBLIC Poco::Crypto CppUnit)
 if(MSVC)

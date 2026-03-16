@@ -6,6 +6,7 @@
 #include "Poco/Net/TCPReactorAcceptor.h"
 #include "Poco/Net/TCPServerParams.h"
 #include "Poco/ThreadPool.h"
+#include <atomic>
 #include <vector>
 
 namespace Poco::Net {
@@ -32,6 +33,8 @@ public:
 
 	void stop();
 
+	int port() const { return _port; }
+
 	void setRecvMessageCallback(const RecvMessageCallback& cb);
 
 private:
@@ -41,6 +44,7 @@ private:
 	std::vector<ServerSocket>                        _sockets;
 	TCPServerParams::Ptr                             _pParams;
 	int                                              _port;
+	std::atomic<bool>                                _stopped;
 };
 
 } // namespace Poco::Net

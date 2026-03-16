@@ -43,3 +43,6 @@ and not practical to extract as separate libraries.
 | SHA-2 algorithm | `Foundation/src/SHA2Engine.cpp` | Apache-2.0 | mbed TLS project (ARM) | FIPS 180-4 (SHA-224/256/384/512) |
 | CMake C++17 detection | `cmake/CXX1x.cmake` | MIT | Nathan Osman (2013) | C++17 compiler feature detection module |
 | PostgreSQL large object header | `Data/PostgreSQL/include/libpq/libpq-fs.h` | PostgreSQL License | PostgreSQL Global Development Group | Minimal header for large object definitions |
+
+## Additional Notes
+* `tessil/ordered-map` is modified so that `tsl::detail_ordered_hash::numeric_cast()` and `tsl::detail_ordered_hash::deserialize_value()` have external linkage. These functions originally have internal linkage (marked `static`), which prevented the `Poco` module from being built as all exported symbols require external linkage. This should remain until [Tessil/ordered-map#54](https://github.com/Tessil/ordered-map/pull/54) is merged.
