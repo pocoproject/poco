@@ -106,6 +106,11 @@ void OpenSSLInitializer::uninitialize()
 	if (--_rc == 0)
 	{
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+		// Unload providers in reverse order of loading.
+		// Note: OpenSSL internally leaks OSSL_LIB_CTX state if providers
+		// are unloaded and then reloaded in the same process. Applications
+		// should treat initialize/uninitialize as a one-time lifecycle and
+		// avoid cycling them repeatedly.
 		if (_legacyProvider != nullptr)
 		{
 			OSSL_PROVIDER_unload(_legacyProvider);
