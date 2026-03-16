@@ -16,7 +16,7 @@ jobs:
   linux-clang-20-cmake-modules:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install Clang 20
         run: |
           sudo apt -y update
@@ -40,8 +40,8 @@ jobs:
   android-arm64-v8a-ndk-latest-cmake:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: nttld/setup-ndk@v1
+      - uses: actions/checkout@v5
+      - uses: nttld/setup-ndk@v1.6.0
         with:
           ndk-version: r25c
           add-to-path: true
@@ -52,8 +52,8 @@ jobs:
   android-arm64-v8a-ndk-cmake:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: nttld/setup-ndk@v1
+      - uses: actions/checkout@v5
+      - uses: nttld/setup-ndk@v1.6.0
         with:
           ndk-version: r25c
           add-to-path: true
@@ -64,8 +64,8 @@ jobs:
   android-armeabi-v7a-ndk-cmake:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: nttld/setup-ndk@v1
+      - uses: actions/checkout@v5
+      - uses: nttld/setup-ndk@v1.6.0
         with:
           ndk-version: r25c
           add-to-path: true
@@ -82,7 +82,7 @@ jobs:
       CFLAGS: "-march=armv7-a -mfloat-abi=hard -mfpu=neon-vfpv4"
       CXXFLAGS: "-march=armv7-a -mfloat-abi=hard -mfpu=neon-vfpv4"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: sudo apt -y update && sudo apt -y install g++-arm-linux-gnueabihf
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build
       - run: >-
@@ -99,7 +99,7 @@ jobs:
       CXXFLAGS: "-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon"
       CFLAGS: "-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: >-
           sudo apt-get -y update &&
           sudo apt-get -y install crossbuild-essential-armhf cmake ninja-build
@@ -111,7 +111,7 @@ jobs:
   linux-gcc-cmake:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: |
           cmake -S. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON
@@ -129,7 +129,7 @@ jobs:
   linux-gcc-cmake-visibility-hidden:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DCMAKE_CXX_VISIBILITY_PRESET=hidden
@@ -148,7 +148,7 @@ jobs:
   linux-gcc-cmake-unbundled:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: >-
           sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev libsqlite3-dev unixodbc-dev
           libmysqlclient-dev redis-server libexpat1-dev zlib1g-dev libpcre3-dev libutf8proc-dev libpng-dev
@@ -169,7 +169,7 @@ jobs:
   linux-gcc-cmake-unbundled-static:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: >-
           sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev libsqlite3-dev unixodbc-dev
           libmysqlclient-dev redis-server libexpat1-dev zlib1g-dev libpcre3-dev libutf8proc-dev libpng-dev
@@ -190,7 +190,7 @@ jobs:
   linux-gcc-cmake-trace:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: sudo apt -y update && sudo apt -y install libssl-dev
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_TRACE=ON -DENABLE_TESTS=ON -DENABLE_INSTALL_CPPUNIT=ON
@@ -208,7 +208,7 @@ jobs:
   linux-gcc-cmake-asan:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
       # causes sanitizer to fail.
       # vm.mmap_rnd_bits needs to be set to 28 to make it work.
@@ -241,7 +241,7 @@ jobs:
   linux-gcc-cmake-asan-no-soo:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
       # causes sanitizer to fail.
       # vm.mmap_rnd_bits needs to be set to 28 to make it work.
@@ -274,7 +274,7 @@ jobs:
   linux-gcc-cmake-ubsan:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: sudo apt -y update && sudo apt -y install libssl-dev libltdl-dev
       # Foundation tests do not link with vptr sanitizer. Disable it.
       # /usr/bin/ld: CMakeFiles/Foundation-testrunner.dir/src/ClassLoaderTest.cpp.o:(.data.rel+0x18): undefined reference to `typeinfo for TestPlugin'
@@ -303,7 +303,7 @@ jobs:
     env:
       TSAN_OPTIONS: "suppressions=${{ github.workspace }}/tsan.suppress,second_deadlock_stack=1"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
       # causes sanitizer to fail.
       # vm.mmap_rnd_bits needs to be set to 28 to make it work.
@@ -336,7 +336,7 @@ jobs:
   linux-emscripten-cmake:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build emscripten
 
 #
@@ -370,7 +370,7 @@ jobs:
   macos-clang-18-cmake-openssl3:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: brew install openssl@3 mysql-client unixodbc libpq
       - run: >-
           CXX=$(brew --prefix llvm@18)/bin/clang++ CC=$(brew --prefix llvm@18)/bin/clang
@@ -393,7 +393,7 @@ jobs:
   macos-clang-cmake-openssl3-visibility-hidden:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: brew install openssl@3 mysql-client unixodbc libpq
       - run: >-
           cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden -DENABLE_TESTS=ON
@@ -418,7 +418,7 @@ jobs:
     runs-on: macos-15-intel
     # macos-15-intel runs on Intel CPU
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: brew install openssl@3 mysql-client unixodbc libpq
       - run: >-
           cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden -DENABLE_TESTS=ON
@@ -444,7 +444,7 @@ jobs:
     env:
       TSAN_OPTIONS: "suppressions=${{ github.workspace }}/tsan.suppress,second_deadlock_stack=1"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: brew install openssl@3
       - run: >-
           cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden
@@ -472,7 +472,7 @@ jobs:
   macos-clang-cmake-openssl3-visibility-hidden-intel-asan:
     runs-on: macos-15-intel
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: brew install openssl@3
       - run: >-
           cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden
@@ -499,7 +499,7 @@ jobs:
   macos-clang-cmake-openssl3-visibility-hidden-intel-ubsan:
     runs-on: macos-15-intel
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: brew install openssl@3
       # Foundation tests do not link with vptr sanitizer. Disable it.
       - run: >-
@@ -527,7 +527,7 @@ jobs:
   macos-clang-cmake-trace:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: brew install openssl@3
       - run: >-
           cmake -S. -Bcmake-build -DPOCO_MINIMAL_BUILD=ON -DENABLE_TRACE=ON -DENABLE_TESTS=ON -DENABLE_INSTALL_CPPUNIT=ON
@@ -549,7 +549,7 @@ jobs:
     env:
       TSAN_OPTIONS: "suppressions=${{ github.workspace }}/tsan.suppress,second_deadlock_stack=1"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: brew install openssl@3
       - run: >-
           cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="-fsanitize=thread" -DENABLE_TESTS=ON
@@ -576,7 +576,7 @@ jobs:
   macos-clang-cmake-openssl3-ubsan:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: brew install openssl@3
       # Foundation tests do not link with vptr sanitizer. Disable it.
       # Undefined symbols for architecture arm64:
@@ -606,7 +606,7 @@ jobs:
   macos-clang-cmake-openssl3-asan:
     runs-on: macos-15-intel
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: brew install openssl@3
       - run: >-
           cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="-fsanitize=address" -DENABLE_TESTS=ON
@@ -643,7 +643,7 @@ jobs:
         class CppUnit::TestCaller<class FileTest>.testExists,
         class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: >-
           cmake -S. -Bcmake-build -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
           -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
@@ -673,8 +673,10 @@ jobs:
         class CppUnit::TestCaller<class FileTest>.testExists,
         class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner
     steps:
-      - uses: actions/checkout@v4
-      - uses: ilammy/msvc-dev-cmd@v1
+      - uses: actions/checkout@v5
+      - uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
       - run: >-
           cmake -S. -Bcmake-build -G Ninja
           -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl
@@ -707,7 +709,7 @@ jobs:
         class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner,
         class CppUnit::TestCaller<class SharedMemoryTest>.testCreateLarge
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: >-
           cmake -G "Visual Studio 17" -A Win32 -S. -Bcmake-build
           -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
@@ -737,7 +739,7 @@ jobs:
         class CppUnit::TestCaller<class FileTest>.testExists,
         class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: >-
           cmake -S. -Bcmake-build -DBUILD_SHARED_LIBS=OFF -DPOCO_MT=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
           -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF
@@ -766,7 +768,7 @@ jobs:
         class CppUnit::TestCaller<class FileTest>.testExists,
         class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: >-
           cmake -S. -Bcmake-build -DBUILD_SHARED_LIBS=OFF -DENABLE_TESTS=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
           -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF
@@ -794,7 +796,7 @@ jobs:
   #        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
   #        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
   #    steps:
-  #      - uses: actions/checkout@v4
+  #      - uses: actions/checkout@v5
   #      - run: cmake -S. -Bcmake-build -DPOCO_SANITIZE_ASAN=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
   #      - run: cmake --build cmake-build --config Debug
   #      - uses: ./.github/actions/retry-action
@@ -819,7 +821,7 @@ jobs:
         ports:
           - 3306:3306
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev mysql-client
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_MYSQL=ON -DENABLE_TESTS=ON
@@ -846,7 +848,7 @@ jobs:
         ports:
           - 5432:5432
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev odbc-postgresql
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_TESTS=ON
@@ -864,7 +866,7 @@ jobs:
   linux-gcc-cmake-redis:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: sudo apt -y update && sudo apt -y install libssl-dev
       - run: |
           curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
@@ -887,7 +889,7 @@ jobs:
   linux-gcc-cmake-mongodb:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: supercharge/mongodb-github-action@1.12.1
       - run: sudo apt -y update && sudo apt -y install libssl-dev
       - run: >-
@@ -914,7 +916,7 @@ jobs:
        ports:
          - 1521:1521
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Pre-check runner disk & cleanup
         run: |
@@ -1006,7 +1008,7 @@ jobs:
         ports:
           - 1433:1433
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Pre-check runner disk & cleanup
         run: |
@@ -1079,7 +1081,7 @@ jobs:
 #        ports:
 #          - 3306:3306
 #    steps:
-#      - uses: actions/checkout@v4
+#      - uses: actions/checkout@v5
 #
 #      - name: Install system dependencies
 #        env:
@@ -1124,7 +1126,7 @@ jobs:
         ports:
           - 5432:5432
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install system dependencies
         env:
@@ -1151,10 +1153,10 @@ jobs:
   nix-gcc-make-odbc-sqlserver:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install Nix
-        uses: cachix/install-nix-action@v27
+        uses: cachix/install-nix-action@v31
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
@@ -1175,10 +1177,10 @@ jobs:
   nix-gcc-make-odbc-oracle:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install Nix
-        uses: cachix/install-nix-action@v27
+        uses: cachix/install-nix-action@v31
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
@@ -1199,7 +1201,7 @@ jobs:
   linux-gcc-cmake-sqlite-no-sqlparser:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: supercharge/mongodb-github-action@1.12.1
       - run: sudo apt -y update
       - run: >-
@@ -1221,7 +1223,7 @@ jobs:
     # Compile as many modules as possible with additional compiler warnings enabled (build tests but don't run them)
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: brew install openssl@3 mysql-client unixodbc libpq
       - run: >-
           cmake -S. -Bcmake-build -DENABLE_COMPILER_WARNINGS=ON -DENABLE_TESTS=ON
@@ -1242,7 +1244,7 @@ jobs:
     # Compile with additional compiler warnings enabled (build tests but don't run them)
     runs-on: windows-2025
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: >-
           cmake -S. -Bcmake-build -DENABLE_COMPILER_WARNINGS=ON -DENABLE_TESTS=ON
           -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
@@ -1261,7 +1263,7 @@ jobs:
     # Run tests for deprecated functionality
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DENABLE_TEST_DEPRECATED=ON
@@ -1280,7 +1282,7 @@ jobs:
     # Build and test without FastLogger to ensure it can be fully disabled
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DENABLE_FASTLOGGER=OFF -DENABLE_TESTS=ON
@@ -1298,7 +1300,7 @@ jobs:
       POCO_BASE: ${{ github.workspace }}
       POCO_NO_FASTLOGGER: 1
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: ./configure --minimal --no-tests --no-samples
       - run: make -s -j4 -C CppUnit
       - run: make -s -j4 -C Foundation
