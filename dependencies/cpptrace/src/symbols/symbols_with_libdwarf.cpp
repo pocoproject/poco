@@ -19,7 +19,8 @@
 #include <vector>
 
 CPPTRACE_BEGIN_NAMESPACE
-namespace detail::libdwarf {
+namespace detail {
+namespace libdwarf {
     std::unique_ptr<symbol_resolver> get_resolver_for_object(const std::string& object_path) {
         #if IS_APPLE
         // Check if dSYM exist, if not fallback to debug map
@@ -176,7 +177,8 @@ namespace detail::libdwarf {
         // flatten and finish
         return flatten_inlines(trace);
     }
-} // namespace detail::libdwarf
+}
+}
 CPPTRACE_END_NAMESPACE
 
 #endif

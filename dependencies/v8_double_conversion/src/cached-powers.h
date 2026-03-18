@@ -30,7 +30,9 @@
 
 #include "diy-fp.h"
 
-namespace double_conversion::PowersOfTenCache {
+namespace double_conversion {
+
+namespace PowersOfTenCache {
 
   // Not all powers of ten are cached. The decimal exponent of two neighboring
   // cached numbers will differ by kDecimalExponentDistance.
@@ -55,6 +57,8 @@ namespace double_conversion::PowersOfTenCache {
                                         DiyFp* power,
                                         int* found_exponent);
 
-} // namespace double_conversion::PowersOfTenCache
+}  // namespace PowersOfTenCache
+
+}  // namespace double_conversion
 
 #endif  // DOUBLE_CONVERSION_CACHED_POWERS_H_

@@ -23,7 +23,8 @@
 #include <psapi.h>
 
 CPPTRACE_BEGIN_NAMESPACE
-namespace detail::dbghelp {
+namespace detail {
+namespace dbghelp {
     // SymFromAddr only returns the function's name. In order to get information about parameters,
     // important for C++ stack traces where functions may be overloaded, we have to manually use
     // Windows DIA to walk debug info structures. Resources:
@@ -445,7 +446,8 @@ namespace detail::dbghelp {
         }
         return trace;
     }
-} // namespace detail::dbghelp
+}
+}
 CPPTRACE_END_NAMESPACE
 
 CPPTRACE_BEGIN_NAMESPACE

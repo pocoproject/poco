@@ -25,7 +25,8 @@
 #include "options.hpp"
 
 CPPTRACE_BEGIN_NAMESPACE
-namespace detail::addr2line {
+namespace detail {
+namespace addr2line {
     #if IS_LINUX || IS_APPLE
     bool has_addr2line() {
         static std::mutex mutex;
@@ -320,7 +321,8 @@ namespace detail::addr2line {
         }
         return trace;
     }
-} // namespace detail::addr2line
+}
+}
 CPPTRACE_END_NAMESPACE
 
 #endif
