@@ -18,6 +18,8 @@
 #include "Poco/FileStream.h"
 #include <sstream>
 #include <algorithm>
+#include <Poco/File.h>
+#include <Poco/Path.h>
 
 
 using Poco::Util::PropertyFileConfiguration;
@@ -216,7 +218,19 @@ void PropertyFileConfigurationTest::testInclude()
 	{
 		Poco::FileOutputStream ostr(mainFile2.path());
 		ostr << "prop = value\n";
-		ostr << "!include /nonexistent/path/to/file.properties\n";
+
+		// Construct a guaranteed-nonexistent include path in the same directory
+		Poco::Path includePath(mainFile2.path());
+		includePath.setFileName("nonexistent_include.properties");
+		Poco::File includeFile(includePath);
+		int counter = 0;
+		while (includeFile.exists())
+		{
+			includePath.setFileName("nonexistent_include_" + std::to_string(++counter) + ".properties");
+			includeFile = Poco::File(includePath);
+		}
+
+		ostr << "!include " << includePath.toString() << "\n";
 	}
 	try
 	{
