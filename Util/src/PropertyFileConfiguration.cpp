@@ -72,10 +72,14 @@ void PropertyFileConfiguration::load(const std::string& path)
 
 void PropertyFileConfiguration::loadStream(std::istream& istr, const std::string& basePath)
 {
-	while (!istr.eof())
+	for (;;)
 	{
-		if (istr.fail())
+		if (!istr.good())
+		{
+			if (istr.eof())
+				break;
 			throw Poco::IOException("Broken input stream");
+		}
 		parseLine(istr, basePath);
 	}
 }
