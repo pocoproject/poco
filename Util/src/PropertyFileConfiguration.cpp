@@ -19,10 +19,16 @@
 #include "Poco/FileStream.h"
 #include "Poco/LineEndingConverter.h"
 #include "Poco/Ascii.h"
-
+#include <set>
 
 using Poco::trim;
 using Poco::Path;
+
+namespace
+{
+	// Tracks currently included property files by absolute, normalized path
+	static std::set<std::string> includeStack;
+}
 
 
 namespace Poco {
@@ -151,10 +157,31 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 				Poco::Path p(includePath);
 				if (p.isRelative() && !basePath.empty())
 					p = Poco::Path(basePath).resolve(p);
-				Poco::FileInputStream includeIstr(p.toString());
-				if (!includeIstr.good())
-					throw Poco::OpenFileException(p.toString());
-				loadStream(includeIstr, p.parent().makeAbsolute().toString());
+
+				Poco::Path absPath(p);
+				absPath.makeAbsolute();
+				const std::string absPathStr = absPath.toString();
+
+				// Detect cyclic includes: do not allow including a file that is already in the include stack.
+				if (includeStack.find(absPathStr) != includeStack.end())
+				{
+					throw Poco::FileException("Cyclic property file include detected", absPathStr);
+				}
+
+				includeStack.insert(absPathStr);
+				try
+				{
+					Poco::FileInputStream includeIstr(p.toString());
+					if (!includeIstr.good())
+						throw Poco::OpenFileException(p.toString());
+					loadStream(includeIstr, p.parent().makeAbsolute().toString());
+				}
+				catch (...)
+				{
+					includeStack.erase(absPathStr);
+					throw;
+				}
+				includeStack.erase(absPathStr);
 			}
 		}
 		else
