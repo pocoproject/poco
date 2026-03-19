@@ -154,6 +154,8 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 				line.compare(0, includeDirective.size(), includeDirective) == 0)
 			{
 				std::string includePath = Poco::trim(line.substr(includeDirective.size()));
+				if (includePath.empty())
+					throw Poco::SyntaxException("Missing path in !include directive");
 				Poco::Path p(includePath);
 				if (p.isRelative() && !basePath.empty())
 					p = Poco::Path(basePath).resolve(p);
