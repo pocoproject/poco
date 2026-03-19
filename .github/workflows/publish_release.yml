@@ -17,7 +17,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
       -
         name: Install packages
         run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev redis-server libmysqlclient-dev libpq-dev
@@ -46,7 +46,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
       -
         name: Install packages
         run: sudo apt-get update && sudo apt-get -y install dos2unix
@@ -76,7 +76,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
       -
         name: Install SSH key
         run: |
@@ -104,7 +104,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
       -
         name: Install SSH key
         run: |
