@@ -50,6 +50,11 @@ class Util_API PropertyFileConfiguration: public MapConfiguration
 	/// A value can spread across multiple lines if the last character in a line (the character
 	/// immediately before the carriage return or line feed character) is a single backslash.
 	///
+	/// A line of the form
+	///   !include <path>
+	/// (where <path> is a relative or absolute file path) includes another properties file.
+	/// Relative paths are resolved relative to the directory of the including file.
+	///
 	/// Property names are case sensitive. Leading and trailing whitespace is
 	/// removed from both keys and values. A property name can neither contain
 	/// a colon ':' nor an equal sign '=' character.
@@ -88,7 +93,8 @@ protected:
 	~PropertyFileConfiguration() = default;
 
 private:
-	void parseLine(std::istream& istr);
+	void loadStream(std::istream& istr, const std::string& basePath);
+	void parseLine(std::istream& istr, const std::string& basePath);
 	static int readChar(std::istream& istr);
 };
 

@@ -46,24 +46,32 @@ void PropertyFileConfiguration::load(std::istream& istr)
 	AbstractConfiguration::ScopedLock lock(*this);
 
 	clear();
-	while (!istr.eof())
-	{
-		if (istr.fail())
-		{
-			throw Poco::IOException("Broken input stream");
-		}
-		parseLine(istr);
-	}
+	loadStream(istr, "");
 }
 
 
 void PropertyFileConfiguration::load(const std::string& path)
 {
+	Poco::Path p(path);
+	p.makeAbsolute();
+	std::string basePath = p.parent().toString();
 	Poco::FileInputStream istr(path);
-	if (istr.good())
-		load(istr);
-	else
+	if (!istr.good())
 		throw Poco::OpenFileException(path);
+	AbstractConfiguration::ScopedLock lock(*this);
+	clear();
+	loadStream(istr, basePath);
+}
+
+
+void PropertyFileConfiguration::loadStream(std::istream& istr, const std::string& basePath)
+{
+	while (!istr.eof())
+	{
+		if (istr.fail())
+			throw Poco::IOException("Broken input stream");
+		parseLine(istr, basePath);
+	}
 }
 
 
@@ -121,7 +129,7 @@ void PropertyFileConfiguration::save(const std::string& path) const
 }
 
 
-void PropertyFileConfiguration::parseLine(std::istream& istr)
+void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string& basePath)
 {
 	static const int eof = std::char_traits<char>::eof();
 
@@ -131,7 +139,23 @@ void PropertyFileConfiguration::parseLine(std::istream& istr)
 	{
 		if (c == '#' || c == '!')
 		{
-			while (c != eof && c != '\n' && c != '\r') c = istr.get();
+			std::string line;
+			line += (char) c;
+			while (c != eof && c != '\n' && c != '\r') { c = istr.get(); if (c != eof && c != '\n' && c != '\r') line += (char) c; }
+
+			static const std::string includeDirective = "!include ";
+			if (line.size() > includeDirective.size() &&
+				line.compare(0, includeDirective.size(), includeDirective) == 0)
+			{
+				std::string includePath = Poco::trim(line.substr(includeDirective.size()));
+				Poco::Path p(includePath);
+				if (p.isRelative() && !basePath.empty())
+					p = Poco::Path(basePath).resolve(p);
+				Poco::FileInputStream includeIstr(p.toString());
+				if (!includeIstr.good())
+					throw Poco::OpenFileException(p.toString());
+				loadStream(includeIstr, p.parent().makeAbsolute().toString());
+			}
 		}
 		else
 		{

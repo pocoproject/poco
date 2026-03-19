@@ -14,6 +14,8 @@
 #include "Poco/Util/PropertyFileConfiguration.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/FileStream.h"
 #include <sstream>
 #include <algorithm>
 
@@ -119,6 +121,50 @@ void PropertyFileConfigurationTest::testSave()
 }
 
 
+void PropertyFileConfigurationTest::testInclude()
+{
+	// Write an included properties file
+	Poco::TemporaryFile includedFile;
+	{
+		Poco::FileOutputStream ostr(includedFile.path());
+		ostr << "included.prop1 = includedValue1\n";
+		ostr << "included.prop2 = includedValue2\n";
+	}
+
+	// Write a main properties file that includes the other
+	Poco::TemporaryFile mainFile;
+	{
+		Poco::FileOutputStream ostr(mainFile.path());
+		ostr << "main.prop = mainValue\n";
+		ostr << "!include " << includedFile.path() << "\n";
+		ostr << "main.prop2 = mainValue2\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(mainFile.path());
+
+	assertTrue (pConf->getString("main.prop") == "mainValue");
+	assertTrue (pConf->getString("main.prop2") == "mainValue2");
+	assertTrue (pConf->getString("included.prop1") == "includedValue1");
+	assertTrue (pConf->getString("included.prop2") == "includedValue2");
+
+	// Non-existent include should throw
+	Poco::TemporaryFile mainFile2;
+	{
+		Poco::FileOutputStream ostr(mainFile2.path());
+		ostr << "prop = value\n";
+		ostr << "!include /nonexistent/path/to/file.properties\n";
+	}
+	try
+	{
+		AutoPtr<PropertyFileConfiguration> pConf2 = new PropertyFileConfiguration(mainFile2.path());
+		fail("must throw");
+	}
+	catch (Poco::FileException&)
+	{
+	}
+}
+
+
 AbstractConfiguration::Ptr PropertyFileConfigurationTest::allocConfiguration() const
 {
 	return new PropertyFileConfiguration;
@@ -142,6 +188,7 @@ CppUnit::Test* PropertyFileConfigurationTest::suite()
 	AbstractConfigurationTest_addTests(pSuite, PropertyFileConfigurationTest);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testLoad);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSave);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testInclude);
 
 	return pSuite;
 }
