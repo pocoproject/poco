@@ -26,6 +26,17 @@ using Poco::AutoPtr;
 using Poco::NotFoundException;
 
 
+namespace
+{
+	std::string getFileName(const std::string& path)
+	{
+		std::string::size_type pos = path.find_last_of("/\\");
+		if (pos == std::string::npos) return path;
+		return path.substr(pos + 1);
+	}
+}
+
+
 PropertyFileConfigurationTest::PropertyFileConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
 {
 }
@@ -131,7 +142,7 @@ void PropertyFileConfigurationTest::testInclude()
 		ostr << "included.prop2 = includedValue2\n";
 	}
 
-	// Write a main properties file that includes the other
+	// Write a main properties file that includes the other using an absolute path
 	Poco::TemporaryFile mainFile;
 	{
 		Poco::FileOutputStream ostr(mainFile.path());
@@ -146,6 +157,59 @@ void PropertyFileConfigurationTest::testInclude()
 	assertTrue (pConf->getString("main.prop2") == "mainValue2");
 	assertTrue (pConf->getString("included.prop1") == "includedValue1");
 	assertTrue (pConf->getString("included.prop2") == "includedValue2");
+
+	// Relative include path (same directory, include by filename only)
+	Poco::TemporaryFile includedFileRel;
+	{
+		Poco::FileOutputStream ostr(includedFileRel.path());
+		ostr << "includedRel.prop1 = includedRelValue1\n";
+		ostr << "includedRel.prop2 = includedRelValue2\n";
+	}
+
+	Poco::TemporaryFile mainFileRel;
+	{
+		Poco::FileOutputStream ostr(mainFileRel.path());
+		ostr << "mainRel.prop = mainRelValue\n";
+		// include by filename only; should be resolved relative to mainFileRel
+		ostr << "!include " << getFileName(includedFileRel.path()) << "\n";
+		ostr << "mainRel.prop2 = mainRelValue2\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConfRel = new PropertyFileConfiguration(mainFileRel.path());
+
+	assertTrue (pConfRel->getString("mainRel.prop") == "mainRelValue");
+	assertTrue (pConfRel->getString("mainRel.prop2") == "mainRelValue2");
+	assertTrue (pConfRel->getString("includedRel.prop1") == "includedRelValue1");
+	assertTrue (pConfRel->getString("includedRel.prop2") == "includedRelValue2");
+
+	// Nested includes: main includes A, A includes B (relative paths)
+	Poco::TemporaryFile fileB;
+	{
+		Poco::FileOutputStream ostr(fileB.path());
+		ostr << "nestedB.prop = nestedBValue\n";
+	}
+
+	Poco::TemporaryFile fileA;
+	{
+		Poco::FileOutputStream ostr(fileA.path());
+		// A includes B by filename
+		ostr << "!include " << getFileName(fileB.path()) << "\n";
+		ostr << "nestedA.prop = nestedAValue\n";
+	}
+
+	Poco::TemporaryFile mainFileNested;
+	{
+		Poco::FileOutputStream ostr(mainFileNested.path());
+		ostr << "mainNested.prop = mainNestedValue\n";
+		// main includes A by filename; A then includes B
+		ostr << "!include " << getFileName(fileA.path()) << "\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConfNested = new PropertyFileConfiguration(mainFileNested.path());
+
+	assertTrue (pConfNested->getString("mainNested.prop") == "mainNestedValue");
+	assertTrue (pConfNested->getString("nestedA.prop") == "nestedAValue");
+	assertTrue (pConfNested->getString("nestedB.prop") == "nestedBValue");
 
 	// Non-existent include should throw
 	Poco::TemporaryFile mainFile2;
