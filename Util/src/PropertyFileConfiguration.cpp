@@ -147,8 +147,13 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 		if (c == '#' || c == '!')
 		{
 			std::string line;
-			line += (char) c;
-			while (c != eof && c != '\n' && c != '\r') { c = istr.get(); if (c != eof && c != '\n' && c != '\r') line += (char) c; }
+			line += static_cast<char>(c);
+			while (c != eof && c != '\n' && c != '\r')
+			{
+				c = istr.get();
+				if (c != eof && c != '\n' && c != '\r')
+					line += static_cast<char>(c);
+			}
 
 			static const std::string includeDirective = "!include";
 			if (line.size() > includeDirective.size() &&
