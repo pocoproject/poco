@@ -1,6 +1,6 @@
 # Expat XML parser library
-# Version: 2.7.4
-# Source: https://github.com/libexpat/libexpat/releases/tag/R_2_7_4
+# Version: 2.7.5
+# Source: https://github.com/libexpat/libexpat/releases/tag/R_2_7_5
 
 if(POCO_UNBUNDLED)
 	if (ENABLE_XML)
