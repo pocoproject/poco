@@ -280,7 +280,7 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 				// update the inline flag
 				pNS->setInline(inlineFlags[i]);
 			}
-			pushNameSpace(pNS, -1, i == 0 && undefined);
+			pushNameSpace(pNS, -1, i == 0);
 			nestLevel++;
 		}
 		
