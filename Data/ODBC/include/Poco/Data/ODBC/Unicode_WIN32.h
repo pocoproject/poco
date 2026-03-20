@@ -47,6 +47,12 @@ inline void makeUTF8(Poco::Buffer<wchar_t>& buffer, SQLINTEGER length, SQLPOINTE
 	// return non-positive lengths. Handle these defensively instead
 	// of throwing, to avoid breaking metadata retrieval for drivers
 	// with non-conformant length reporting.
+	//
+	// Note: this function handles metadata strings (column names,
+	// diagnostics, driver info), not row data. The driver has already
+	// written into the buffer, so clamping to the actual buffer size
+	// converts exactly what is available — this is the only viable
+	// approach when the reported length is unreliable.
 	if (length <= 0)
 	{
 		std::memset(pTarget, 0, targetLength);
