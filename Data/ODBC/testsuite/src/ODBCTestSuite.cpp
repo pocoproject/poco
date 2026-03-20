@@ -10,6 +10,7 @@
 
 #include "ODBCTestSuite.h"
 #include "ODBCDB2Test.h"
+#include "ODBCInformixTest.h"
 #include "ODBCMySQLTest.h"
 #include "ODBCOracleTest.h"
 #include "ODBCPostgreSQLTest.h"
@@ -30,6 +31,7 @@ CppUnit::Test* ODBCTestSuite::suite()
 	addTest(pSuite, ODBCPostgreSQLTest::suite());
 	addTest(pSuite, ODBCSQLiteTest::suite());
 	addTest(pSuite, ODBCDB2Test::suite());
+	addTest(pSuite, ODBCInformixTest::suite());
 // MS Access driver does not support connection status detection
 // disabled for the time being
 #if 0 //defined(POCO_OS_FAMILY_WINDOWS)
