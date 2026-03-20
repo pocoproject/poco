@@ -62,6 +62,7 @@ void PropertyFileConfiguration::load(const std::string& path)
 	AbstractConfiguration::ScopedLock lock(*this);
 	clear();
 	std::set<std::string> includeStack;
+	includeStack.insert(p.toString());
 	loadStream(istr, basePath, includeStack);
 }
 

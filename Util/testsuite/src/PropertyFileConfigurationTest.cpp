@@ -274,6 +274,22 @@ void PropertyFileConfigurationTest::testInclude()
 	AutoPtr<PropertyFileConfiguration> pConf4 = new PropertyFileConfiguration(mainFile4.path());
 	assertTrue (pConf4->getString("prop") == "value");
 	assertTrue (!pConf4->hasProperty("includeSomething"));
+
+	// Self-include should throw (cyclic include detection)
+	Poco::TemporaryFile selfFile;
+	{
+		Poco::FileOutputStream ostr(selfFile.path());
+		ostr << "prop = value\n";
+		ostr << "!include " << selfFile.path() << "\n";
+	}
+	try
+	{
+		AutoPtr<PropertyFileConfiguration> pConf5 = new PropertyFileConfiguration(selfFile.path());
+		fail("must throw");
+	}
+	catch (Poco::FileException&)
+	{
+	}
 }
 
 
