@@ -136,56 +136,9 @@ POLICYJSON
     # Add ODBC dependencies to library path (after poco_env.bash which sets LD_LIBRARY_PATH)
     export LD_LIBRARY_PATH="$INFORMIX_CLIENT_DIR/lib:$INFORMIX_CLIENT_DIR/lib/esql:$INFORMIX_CLIENT_DIR/lib/cli:${pkgs.openssl.out}/lib:${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.unixODBC}/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
-    # Extract Informix ODBC driver from the container if not already done.
-    # The Informix container ships the Client SDK (CSDK) which includes the ODBC driver.
-    extract_informix_client() {
-      if [ -d "$INFORMIX_CLIENT_DIR/lib" ]; then
-        echo "Informix client libraries already extracted."
-        return 0
-      fi
-
-      echo "Extracting Informix ODBC driver from container image..."
-      mkdir -p "$INFORMIX_CLIENT_DIR/lib/esql" "$INFORMIX_CLIENT_DIR/lib/cli"
-
-      # We need a temporary container to copy files from
-      local tmp_container="poco-informix-extract-$$"
-      podman create --name "$tmp_container" --platform=linux/amd64 \
-        icr.io/informix/informix-developer-database:latest /bin/true 2>/dev/null
-
-      # Copy the ODBC/ESQL client libraries
-      # The CSDK libs live under /opt/ibm/informix/lib in the container
-      podman cp "$tmp_container:/opt/ibm/informix/lib/cli" "$INFORMIX_CLIENT_DIR/lib/" 2>/dev/null || true
-      podman cp "$tmp_container:/opt/ibm/informix/lib/esql" "$INFORMIX_CLIENT_DIR/lib/" 2>/dev/null || true
-
-      # Copy key shared libraries
-      for lib in libifcli.so libifasf.so libifdmr.so libifgls.so libifglx.so libifos.so libifgen.so libifixl.so; do
-        podman cp "$tmp_container:/opt/ibm/informix/lib/$lib" "$INFORMIX_CLIENT_DIR/lib/" 2>/dev/null || true
-      done
-
-      # Also copy any versioned .so files
-      for lib in $(podman exec "$tmp_container" sh -c 'ls /opt/ibm/informix/lib/libif*.so* /opt/ibm/informix/lib/cli/libif*.so* 2>/dev/null' 2>/dev/null); do
-        local basename=$(basename "$lib")
-        local dirname=$(dirname "$lib" | sed 's|/opt/ibm/informix/||')
-        podman cp "$tmp_container:$lib" "$INFORMIX_CLIENT_DIR/$dirname/" 2>/dev/null || true
-      done
-
-      podman rm "$tmp_container" > /dev/null 2>&1 || true
-
-      # Check that the ODBC driver was extracted
-      if ls "$INFORMIX_CLIENT_DIR"/lib/cli/libifcli.so* > /dev/null 2>&1; then
-        echo "Informix ODBC driver extracted successfully."
-      elif ls "$INFORMIX_CLIENT_DIR"/lib/libifcli.so* > /dev/null 2>&1; then
-        echo "Informix ODBC driver extracted successfully."
-      else
-        echo "WARNING: Could not find libifcli.so in extracted files."
-        echo "Contents of $INFORMIX_CLIENT_DIR/lib:"
-        ls -laR "$INFORMIX_CLIENT_DIR/lib/" 2>/dev/null || echo "(empty)"
-      fi
-    }
-
-    extract_informix_client
-
-    # Find the ODBC driver library
+    # Find the ODBC driver library.
+    # The CSDK (Client SDK) must be installed separately — it is NOT included
+    # in the Informix Developer Edition container image.
     ODBC_DRIVER_LIB=""
     for candidate in \
       "$INFORMIX_CLIENT_DIR/lib/cli/libifcli.so" \
@@ -199,7 +152,8 @@ POLICYJSON
 
     if [ -z "$ODBC_DRIVER_LIB" ]; then
       echo "WARNING: Informix ODBC driver library (libifcli.so) not found."
-      echo "ODBC configuration may be invalid."
+      echo "Install the IBM Informix Client SDK (CSDK) into $INFORMIX_CLIENT_DIR"
+      echo "See: https://www.ibm.com/support/pages/download-informix-products"
       ODBC_DRIVER_LIB="$INFORMIX_CLIENT_DIR/lib/cli/libifcli.so"
     else
       echo "Using ODBC driver library: $ODBC_DRIVER_LIB"
@@ -265,7 +219,7 @@ EOF
             -e "LICENSE=accept" \
             -e "INFORMIX_PASSWORD=$INFORMIX_PASSWORD" \
             -p "$INFORMIX_PORT:9088" \
-            --privileged \
+            --privileged \ # Required: Informix needs shared memory (IPC) setup
             "$INFORMIX_IMAGE"; then
             echo "ERROR: Failed to create Informix container"
             echo "Container logs:"
