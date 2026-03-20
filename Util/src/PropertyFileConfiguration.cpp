@@ -171,10 +171,8 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 				Poco::Path p(includePath);
 				if (p.isRelative() && !basePath.empty())
 					p = Poco::Path(basePath).resolve(p);
-
-				Poco::Path absPath(p);
-				absPath.makeAbsolute();
-				const std::string absPathStr = absPath.toString();
+				p.makeAbsolute();
+				const std::string absPathStr = p.toString();
 
 				if (includeStack.find(absPathStr) != includeStack.end())
 				{
@@ -187,7 +185,7 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 					Poco::FileInputStream includeIstr(p.toString());
 					if (!includeIstr.good())
 						throw Poco::OpenFileException(p.toString());
-					loadStream(includeIstr, p.parent().makeAbsolute().toString(), includeStack);
+					loadStream(includeIstr, p.parent().toString(), includeStack);
 				}
 				catch (...)
 				{
