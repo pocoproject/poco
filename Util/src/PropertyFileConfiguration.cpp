@@ -24,12 +24,6 @@
 using Poco::trim;
 using Poco::Path;
 
-namespace
-{
-	// Tracks currently included property files by absolute, normalized path
-	static std::set<std::string> includeStack;
-}
-
 
 namespace Poco {
 namespace Util {
@@ -52,7 +46,8 @@ void PropertyFileConfiguration::load(std::istream& istr)
 	AbstractConfiguration::ScopedLock lock(*this);
 
 	clear();
-	loadStream(istr, "");
+	std::set<std::string> includeStack;
+	loadStream(istr, "", includeStack);
 }
 
 
@@ -66,11 +61,12 @@ void PropertyFileConfiguration::load(const std::string& path)
 		throw Poco::OpenFileException(path);
 	AbstractConfiguration::ScopedLock lock(*this);
 	clear();
-	loadStream(istr, basePath);
+	std::set<std::string> includeStack;
+	loadStream(istr, basePath, includeStack);
 }
 
 
-void PropertyFileConfiguration::loadStream(std::istream& istr, const std::string& basePath)
+void PropertyFileConfiguration::loadStream(std::istream& istr, const std::string& basePath, std::set<std::string>& includeStack)
 {
 	for (;;)
 	{
@@ -80,7 +76,7 @@ void PropertyFileConfiguration::loadStream(std::istream& istr, const std::string
 				break;
 			throw Poco::IOException("Broken input stream");
 		}
-		parseLine(istr, basePath);
+		parseLine(istr, basePath, includeStack);
 	}
 }
 
@@ -139,7 +135,7 @@ void PropertyFileConfiguration::save(const std::string& path) const
 }
 
 
-void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string& basePath)
+void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string& basePath, std::set<std::string>& includeStack)
 {
 	static const int eof = std::char_traits<char>::eof();
 
@@ -180,7 +176,7 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 					Poco::FileInputStream includeIstr(p.toString());
 					if (!includeIstr.good())
 						throw Poco::OpenFileException(p.toString());
-					loadStream(includeIstr, p.parent().makeAbsolute().toString());
+					loadStream(includeIstr, p.parent().makeAbsolute().toString(), includeStack);
 				}
 				catch (...)
 				{

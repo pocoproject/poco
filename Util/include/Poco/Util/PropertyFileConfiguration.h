@@ -22,6 +22,7 @@
 #include "Poco/Util/MapConfiguration.h"
 #include <istream>
 #include <ostream>
+#include <set>
 
 
 namespace Poco {
@@ -93,8 +94,8 @@ protected:
 	~PropertyFileConfiguration() = default;
 
 private:
-	void loadStream(std::istream& istr, const std::string& basePath);
-	void parseLine(std::istream& istr, const std::string& basePath);
+	void loadStream(std::istream& istr, const std::string& basePath, std::set<std::string>& includeStack);
+	void parseLine(std::istream& istr, const std::string& basePath, std::set<std::string>& includeStack);
 	static int readChar(std::istream& istr);
 };
 
