@@ -236,6 +236,7 @@ void XMLFilterImpl::endElement(const XMLString& uri, const XMLString& localName,
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void XMLFilterImpl::characters(const XMLChar ch[], int start, int length)
 {
 	if (_pContentHandler)
@@ -243,6 +244,7 @@ void XMLFilterImpl::characters(const XMLChar ch[], int start, int length)
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void XMLFilterImpl::ignorableWhitespace(const XMLChar ch[], int start, int length)
 {
 	if (_pContentHandler)

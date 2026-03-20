@@ -239,27 +239,6 @@ Poco::OrderedDynamicStruct Object::makeOrderedStruct(const Object::Ptr& obj)
 	return makeStructImpl<Poco::OrderedDynamicStruct>(obj);
 }
 
-/*
-void Object::resetOrdDynStruct() const
-{
-	if (!_pOrdStruct)
-		_pOrdStruct = new Poco::OrderedDynamicStruct;
-	else
-		_pOrdStruct->clear();
-}
-*/
-
-
-/*
-void Object::resetDynStruct() const
-{
-	if (!_pStruct)
-		_pStruct = new Poco::DynamicStruct;
-	else
-		_pStruct->clear();
-}*/
-
-
 Object::operator const Poco::DynamicStruct& () const
 {
 	if (_values.empty())

@@ -126,6 +126,7 @@ public:
 		///
 		/// For information on the names, see startElement.
 
+	// CodeQL [cpp/raw-array-interface]: SAX specification API
 	virtual void characters(const XMLChar ch[], int start, int length) = 0;
 		/// Receive notification of character data.
 		///
@@ -158,6 +159,7 @@ public:
 		/// ignorableWhitespace method rather than this one (validating parsers must
 		/// do so).
 
+	// CodeQL [cpp/raw-array-interface]: SAX specification API
 	virtual void ignorableWhitespace(const XMLChar ch[], int start, int length) = 0;
 		/// Receive notification of ignorable whitespace in element content.
 		///

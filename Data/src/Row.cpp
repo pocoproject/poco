@@ -307,6 +307,7 @@ bool Row::operator < (const Row& other) const
 			if (_values[it->get<0>()].convert<double>() <
 				other._values[it->get<0>()].convert<double>())
 				return true;
+			// CodeQL [cpp/float-equality]: intentional exact comparison in dynamic type system
 			else if (_values[it->get<0>()].convert<double>() !=
 				other._values[it->get<0>()].convert<double>())
 				return false;

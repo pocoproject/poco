@@ -348,8 +348,8 @@ void MailMessage::read(std::istream& istr, PartHandler& handler)
 	}
 	else
 	{
-		StringPartHandler handler(_content);
-		readPart(istr, *this, handler);
+		StringPartHandler stringHandler(_content);
+		readPart(istr, *this, stringHandler);
 	}
 }
 

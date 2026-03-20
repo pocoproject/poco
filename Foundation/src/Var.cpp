@@ -622,11 +622,4 @@ std::string Var::toString(const Var& any)
 	return res;
 }
 
-/*
-Var& Var::structIndexOperator(VarHolderImpl<Struct<int>>* pStr, int n) const
-{
-	return pStr->operator[](n);
-}
-*/
-
 } } // namespace Poco::Dynamic

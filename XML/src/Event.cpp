@@ -77,6 +77,7 @@ void Event::initEvent(const XMLString& eventType, bool canBubble, bool isCancela
 
 void Event::setTarget(EventTarget* pTarget)
 {
+	// CodeQL [cpp/local-address-stored]: event target set by caller who manages target lifetime
 	_pTarget = pTarget;
 }
 
@@ -89,6 +90,7 @@ void Event::setCurrentPhase(PhaseType phase)
 
 void Event::setCurrentTarget(EventTarget* pTarget)
 {
+	// CodeQL [cpp/local-address-stored]: event target set by caller who manages target lifetime
 	_pCurrentTarget = pTarget;
 }
 

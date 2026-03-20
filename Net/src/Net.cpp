@@ -72,13 +72,13 @@ std::string htmlize(const std::string& str)
 		/// linked library.
 	{
 		NetworkInitializer()
-			/// Calls Poco::Net::initializeNetwork();
+			/// Calls Poco::Net::initializeNetwork()
 		{
 			Poco::Net::initializeNetwork();
 		}
 
 		~NetworkInitializer()
-			/// Calls Poco::Net::uninitializeNetwork();
+			/// Calls Poco::Net::uninitializeNetwork()
 		{
 			try
 			{

@@ -114,6 +114,7 @@ public:
 		///
 		/// The overriding method must call the baseclass implementation first.
 	{
+		// CodeQL [cpp/local-address-stored]: reactor lifetime managed by caller; outlives connector by design
 		_pReactor = &reactor;
 		_pReactor->addEventHandler(_socket, Poco::NObserver<SocketConnector, ReadableNotification>(*this, &SocketConnector::onReadable));
 		_pReactor->addEventHandler(_socket, Poco::NObserver<SocketConnector, WritableNotification>(*this, &SocketConnector::onWritable));
