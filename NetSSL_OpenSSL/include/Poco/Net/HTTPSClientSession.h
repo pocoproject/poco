@@ -153,8 +153,14 @@ protected:
 	int read(char* buffer, std::streamsize length);
 
 private:
-	HTTPSClientSession(const HTTPSClientSession&);
-	HTTPSClientSession& operator = (const HTTPSClientSession&);
+	void initProxySessionFactory();
+		/// Registers the "https" protocol with _proxySessionFactory using default context.
+
+	void initProxySessionFactory(Context::Ptr pContext);
+		/// Registers the "https" protocol with _proxySessionFactory using given context.
+
+	HTTPSClientSession(const HTTPSClientSession&) = delete;
+	HTTPSClientSession& operator = (const HTTPSClientSession&) = delete;
 
 	Context::Ptr _pContext;
 	Session::Ptr _pSession;
