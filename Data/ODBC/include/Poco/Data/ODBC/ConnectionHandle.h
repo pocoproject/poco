@@ -56,12 +56,14 @@ public:
 	bool disconnect();
 		/// Disconnects the handle from database.
 
+	[[nodiscard]]
 	bool isConnected() const;
 		/// Returns true if connected.
 
 	void setTimeout(int timeout);
 		/// Sets the connection timeout in seconds.
 
+	[[nodiscard]]
 	int getTimeout() const;
 		/// Returns the connection timeout in seconds.
 
@@ -69,27 +71,34 @@ public:
 		/// Sets the login timeout in seconds.
 		/// Must be called before the connection attempt.
 
+	[[nodiscard]]
 	int getLoginTimeout() const;
 		/// Returns the login timeout in seconds.
 		/// Must be called before the connection attempt.
 
+	[[nodiscard]]
 	const SQLHDBC& handle() const;
 		/// Returns const reference to handle;
 
+	[[nodiscard]]
 	const SQLHDBC* pHandle() const;
 		/// Returns const pointer to handle;
 
+	[[nodiscard]]
 	operator const SQLHDBC& () const;
 		/// Const conversion operator into reference to native type.
 
+	[[nodiscard]]
 	operator bool();
 		/// Returns true if handles are not null.
 		/// True value is not a guarantee that the connection is valid.
 
 private:
+	[[nodiscard]]
 	operator SQLHDBC& ();
 		/// Conversion operator into reference to native type.
 
+	[[nodiscard]]
 	SQLHDBC& handle();
 		/// Returns reference to handle;
 
@@ -102,19 +111,23 @@ private:
 	void setTimeoutImpl(SQLULEN timeout, SQLINTEGER attribute);
 		/// Sets the timeout for the attribute.
 
+	[[nodiscard]]
 	int getTimeoutImpl(SQLINTEGER attribute) const;
 		/// Returns the timeout for the attribute.
 
 	void setTimeouts(SQLULEN loginTimeout, SQLULEN timeout);
 
+	[[nodiscard]]
 	bool isUnsupported(const ConnectionError& e) const;
 		/// Returns true if SQLSTATE is "HYC000"
 		/// (Optional feature not implemented)
 
+	[[nodiscard]]
 	bool isGenError(const ConnectionError& e) const;
 		/// Returns true if SQLSTATE is "HY000"
 		/// (General error)
 
+	[[nodiscard]]
 	bool cantSetAttr(const ConnectionError& e) const;
 		/// Returns true if SQLSTATE is "HY011"
 		/// (Can't set attribute)

@@ -97,7 +97,9 @@ public:
 		/// Returns true if verification succeeded, or false otherwise.
 
 protected:
+	[[nodiscard]]
 	static bool containsWildcards(const std::string& commonName);
+	[[nodiscard]]
 	static bool matchWildcard(const std::string& alias, const std::string& hostName);
 
 private:

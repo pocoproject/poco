@@ -102,11 +102,13 @@ public:
 		destruct(true);
 	}
 
+	[[nodiscard]]
 	bool isEmpty() const
 	{
 		return holder[SizeV] == Allocation::POCO_ANY_EMPTY;
 	}
 
+	[[nodiscard]]
 	bool isLocal() const
 	{
 		return holder[SizeV] == Allocation::POCO_ANY_LOCAL;
@@ -132,6 +134,7 @@ public:
 		return pHolder;
 	}
 
+	[[nodiscard]]
 	PlaceholderT* content() const
 	{
 		if (isLocal())
@@ -219,11 +222,13 @@ private:
 		pHolder = nullptr;
 	}
 
+	[[nodiscard]]
 	bool isEmpty() const
 	{
 		return nullptr == pHolder;
 	}
 
+	[[nodiscard]]
 	bool isLocal() const
 	{
 		return false;
@@ -236,6 +241,7 @@ private:
 		return pHolder = new T(value);
 	}
 
+	[[nodiscard]]
 	PlaceholderT* content() const
 	{
 		return pHolder;
@@ -357,12 +363,14 @@ public:
 		return *this;
 	}
 
+	[[nodiscard]]
 	bool empty() const
 		/// Returns true if the Any is empty.
 	{
 		return _valueHolder.isEmpty();
 	}
 
+	[[nodiscard]]
 	const std::type_info& type() const
 		/// Returns the type information of the stored content.
 		/// If the Any is empty typeid(void) is returned.
@@ -372,6 +380,7 @@ public:
 		return empty() ? typeid(void) : content()->type();
 	}
 
+	[[nodiscard]]
 	bool local() const
 		/// Returns true if data is held locally (ie. not allocated on the heap).
 		/// If POCO_NO_SOO is defined, it always return false.
@@ -386,6 +395,7 @@ private:
 	public:
 		virtual ~ValueHolder() = default;
 
+		[[nodiscard]]
 		virtual const std::type_info & type() const = 0;
 		virtual void clone(Placeholder<ValueHolder>*) const = 0;
 	};
@@ -400,6 +410,7 @@ private:
 
 		Holder & operator = (const Holder &) = delete;
 
+		[[nodiscard]]
 		const std::type_info& type() const override
 		{
 			return typeid(ValueType);
@@ -413,12 +424,13 @@ private:
 		ValueType _held;
 	};
 
+	[[nodiscard]]
 	ValueHolder* content() const
 	{
 		return _valueHolder.content();
 	}
 
-	template<typename ValueType>
+	template <typename ValueType>
 	void construct(const ValueType& value)
 	{
 		_valueHolder.assign<Holder<ValueType>, ValueType>(value);
@@ -455,6 +467,7 @@ private:
 
 
 template <typename ValueType>
+[[nodiscard]]
 ValueType* AnyCast(Any* operand)
 	/// AnyCast operator used to extract the ValueType from an Any*. Will return a pointer
 	/// to the stored value.
@@ -470,6 +483,7 @@ ValueType* AnyCast(Any* operand)
 
 
 template <typename ValueType>
+[[nodiscard]]
 const ValueType* AnyCast(const Any* operand)
 	/// AnyCast operator used to extract a const ValueType pointer from an const Any*. Will return a const pointer
 	/// to the stored value.
@@ -485,6 +499,7 @@ const ValueType* AnyCast(const Any* operand)
 
 
 template <typename ValueType>
+[[nodiscard]]
 ValueType AnyCast(Any& operand)
 	/// AnyCast operator used to extract a copy of the ValueType from an Any&.
 	///
@@ -517,6 +532,7 @@ ValueType AnyCast(Any& operand)
 
 
 template <typename ValueType>
+[[nodiscard]]
 ValueType AnyCast(const Any& operand)
 	/// AnyCast operator used to extract a copy of the ValueType from an const Any&.
 	///
@@ -534,6 +550,7 @@ ValueType AnyCast(const Any& operand)
 
 
 template <typename ValueType>
+[[nodiscard]]
 const ValueType& RefAnyCast(const Any & operand)
 	/// AnyCast operator used to return a const reference to the internal data.
 	///
@@ -560,6 +577,7 @@ const ValueType& RefAnyCast(const Any & operand)
 
 
 template <typename ValueType>
+[[nodiscard]]
 ValueType& RefAnyCast(Any& operand)
 	/// AnyCast operator used to return a reference to the internal data.
 	///
@@ -586,6 +604,7 @@ ValueType& RefAnyCast(Any& operand)
 
 
 template <typename ValueType>
+[[nodiscard]]
 ValueType* UnsafeAnyCast(Any* operand)
 	/// The "unsafe" versions of AnyCast are not part of the
 	/// public interface and may be removed at any time. They are
@@ -598,6 +617,7 @@ ValueType* UnsafeAnyCast(Any* operand)
 
 
 template <typename ValueType>
+[[nodiscard]]
 const ValueType* UnsafeAnyCast(const Any* operand)
 	/// The "unsafe" versions of AnyCast are not part of the
 	/// public interface and may be removed at any time. They are
@@ -610,6 +630,7 @@ const ValueType* UnsafeAnyCast(const Any* operand)
 
 
 template <typename ValueType>
+[[nodiscard]]
 bool AnyHoldsNullPtr(const Any& any)
 	/// Returns true if any holds a null pointer.
 	/// Fails to compile if `ValueType` is not a pointer.
@@ -620,6 +641,7 @@ bool AnyHoldsNullPtr(const Any& any)
 
 
 template <typename ValueType>
+[[nodiscard]]
 bool AnyHoldsNullPtr(const Any* pAny)
 	/// Returns true if the Any pointed to holds a null pointer.
 	/// Returns false if `pAny` is a null pointer.

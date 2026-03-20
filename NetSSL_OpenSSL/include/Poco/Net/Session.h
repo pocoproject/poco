@@ -39,9 +39,11 @@ class NetSSL_API Session: public Poco::RefCountedObject
 public:
 	using Ptr = Poco::AutoPtr<Session>;
 
+	[[nodiscard]]
 	SSL_SESSION* sslSession() const;
 		/// Returns the stored OpenSSL SSL_SESSION object.
 
+	[[nodiscard]]
 	bool isResumable() const;
 		/// Returns true if the session is resumable.
 

@@ -56,6 +56,7 @@ public:
 	virtual void clear() = 0;
 		/// Removes all delegates from the strategy.
 
+	[[nodiscard]]
 	virtual bool empty() const = 0;
 		/// Returns false if the strategy contains at least one delegate.
 };
@@ -93,6 +94,7 @@ public:
 	virtual void clear() = 0;
 		/// Removes all delegates from the strategy.
 
+	[[nodiscard]]
 	virtual bool empty() const = 0;
 		/// Returns false if the strategy contains at least one delegate.
 };

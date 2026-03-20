@@ -41,9 +41,11 @@ public:
 	~SocketNotification() override;
 		/// Destroys the SocketNotification.
 
+	[[nodiscard]]
 	SocketReactor& source() const;
 		/// Returns the SocketReactor that generated the notification.
 
+	[[nodiscard]]
 	Socket socket() const;
 		/// Returns the socket that caused the notification.
 
@@ -96,9 +98,11 @@ public:
 	~ErrorNotification() override;
 		/// Destroys the ErrorNotification.
 
+	[[nodiscard]]
 	int code() const;
 		/// Returns the error code.
 
+	[[nodiscard]]
 	const std::string& description() const;
 		/// Returns error description.
 

@@ -44,9 +44,11 @@ public:
 		/// Registers the factory. Class takes ownership of the pointer.
 		/// If a factory with the same name already exists, an exception is thrown.
 
+	[[nodiscard]]
 	bool hasFactory(const std::string& name) const;
 		/// Returns true if for the given name a factory is already registered
 
+	[[nodiscard]]
 	const PrivateKeyFactory* getFactory(const std::string& name) const;
 		/// Returns NULL if for the given name a factory does not exist, otherwise the factory is returned
 

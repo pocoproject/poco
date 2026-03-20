@@ -283,7 +283,7 @@ void ProcessTest::testIsRunning()
 	PipeOutputStream ostr(inPipe);
 	ostr << std::string(100, 'x');
 	ostr.close();
-	int POCO_UNUSED rc = ph.wait();
+	[[maybe_unused]] int rc = ph.wait();
 	assertTrue (!Process::isRunning(ph));
 	assertTrue (!Process::isRunning(id));
 }

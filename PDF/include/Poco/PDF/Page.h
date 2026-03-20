@@ -158,9 +158,11 @@ public:
 	Page& operator = (const Page& page);
 		/// Assignment operator.
 
+	[[nodiscard]]
 	operator const Type& () const;
 		/// Const conversion operator into reference to native type.
 
+	[[nodiscard]]
 	bool operator == (const Page& other) const;
 		/// Equality operator.
 
@@ -170,24 +172,28 @@ public:
 	void setWidth(float value);
 		/// Sets the page width.
 
+	[[nodiscard]]
 	float getWidth() const;
 		/// Gets the page width.
 
 	void setHeight(float value);
 		/// Sets the page height.
 
+	[[nodiscard]]
 	float getHeight() const;
 		/// Gets the page height.
 
 	void setSize(Size size);
 		/// Sets the page size.
 
+	[[nodiscard]]
 	Size getSize() const;
 		/// Returns the page size.
 
 	void setOrientation(Orientation orientation);
 		/// Sets the page orientation.
 
+	[[nodiscard]]
 	Orientation getOrientation() const;
 		/// Returns the page orientation.
 
@@ -211,7 +217,7 @@ public:
 	float textWidth(const std::string& text);
 		/// Returns the width of the supplied text.
 
-	void  beginText();
+	void beginText();
 		/// Begins a text object and sets the current text position to the point (0,0).
 
 	void endText();
@@ -255,28 +261,34 @@ public:
 	void drawImage(Image image, float x, float y, float width, float height);
 		/// Draws an image in one operation.
 
+	[[nodiscard]]
 	const Destination& createDestination(const std::string& name);
-		/// Creates ad returns reference to destination.
+		/// Creates and returns reference to destination.
 
+	[[nodiscard]]
 	const TextAnnotation& createTextAnnotation(const std::string& name,
 		const Rectangle& rect,
 		const std::string& text,
 		const Encoder& encoder);
-		/// Creates ad returns reference to text annotation.
+		/// Creates and returns reference to text annotation.
 
+	[[nodiscard]]
 	const LinkAnnotation& createLinkAnnotation(const std::string& name,
 		const Rectangle& rect,
 		const Destination& dest);
-		/// Creates ad returns reference to destination link annotation.
+		/// Creates and returns reference to destination link annotation.
 
+	[[nodiscard]]
 	const LinkAnnotation& createURILinkAnnotation(const std::string& name,
 		const Rectangle& rect,
 		const std::string& uri);
-		/// Creates ad returns reference to URI annotation.
+		/// Creates and returns reference to URI annotation.
 
+	[[nodiscard]]
 	int getGraphicsMode() const;
 		/// Returns current graphics mode.
 
+	[[nodiscard]]
 	int getGraphicStateDepth() const;
 		/// Returns current graphics mode.
 
@@ -364,9 +376,11 @@ public:
 	void eoClip();
 		///
 
+	[[nodiscard]]
 	Point getPos() const;
 		/// Returns the current position.
 
+	[[nodiscard]]
 	Point getTextPos() const;
 		/// Returns the current position for text showing.
 
@@ -391,126 +405,150 @@ public:
 		/// invoke HPDF_Page_SetTextLeading() before HPDF_Page_MoveTextPos2() to set
 		/// text leading.
 
+	[[nodiscard]]
 	const Font& getFont() const;
 		/// Returns the current font.
 
+	[[nodiscard]]
 	float getFontSize() const;
 		/// Returns the current Font size.
 
+	[[nodiscard]]
 	TransMatrix getTransMatrix() const;
 		/// Returns the current transformation matrix.
 
+	[[nodiscard]]
 	TransMatrix getTextMatrix() const;
 		/// Returns the current text transformation matrix.
 
+	[[nodiscard]]
 	float getLineWidth() const;
 		/// Returns the current line width.
 
 	void setLineWidth(float width);
 		/// Sets the line width.
 
+	[[nodiscard]]
 	LineCap getLineCap() const;
 		/// Returns the current line cap.
 
 	void setLineCap(LineCap cap) const;
 		/// Sets the line cap.
 
+	[[nodiscard]]
 	LineJoin getLineJoin() const;
 		/// Returns the current line join.
 
 	void setLineJoin(LineJoin join) const;
 		/// Returns the current line join.
 
+	[[nodiscard]]
 	float getMiterLimit() const;
 		/// Returns the current miter limit.
 
 	void setMiterLimit(float limit) const;
 		/// Sets the miter limit.
 
+	[[nodiscard]]
 	DashMode getDashMode() const;
 		/// Returns current dash mode.
 
 	void setDashMode(const PatternVec& pattern, int paramNo, int phase) const;
 		/// Sets teh dash mode.
 
+	[[nodiscard]]
 	float getFlatness() const;
 		/// Returns the current flatness.
 
+	[[nodiscard]]
 	float getCharSpace() const;
 		/// Returns the current character space.
 
 	void setCharSpace(float value);
 		/// Sets the current character space.
 
+	[[nodiscard]]
 	float getWordSpace() const;
 		/// Returns the current word space.
 
 	void setWordSpace(float value);
 		/// Sets the current word space.
 
+	[[nodiscard]]
 	float getHorizontalScale() const;
 		/// Returns the current horizontal scaling.
 
 	void setHorizontalScale(float value);
 		/// Sets the current horizontal scaling.
 
+	[[nodiscard]]
 	float getTextLead() const;
 		/// Returns the current text leading.
 
 	void setTextLead(float value);
 		/// Sets the current text leading.
 
+	[[nodiscard]]
 	RenderMode getTextRenderMode() const;
 		/// Returns the current text rendering mode.
 
 	void setTextRenderMode(RenderMode value);
 		/// Sets the current text rendering mode.
 
+	[[nodiscard]]
 	float getTextRise() const;
 		/// Returns the current text leading.
 
 	void setTextRise(float value);
 		/// Sets the current text leading.
 
+	[[nodiscard]]
 	RGBColor getRGBFill() const;
 		/// Returns current RGB fill.
 
 	void setRGBFill(RGBColor value);
 		/// Sets current RGB fill.
 
+	[[nodiscard]]
 	RGBColor getRGBStroke() const;
 		/// Returns current RGB stroke.
 
 	void setRGBStroke(RGBColor value);
 		/// Sets current RGB stroke.
 
+	[[nodiscard]]
 	CMYKColor getCMYKFill() const;
 		/// Returns current CMYK fill.
 
 	void setCMYKFill(CMYKColor value);
 		/// Sets current CMYK fill.
 
+	[[nodiscard]]
 	CMYKColor getCMYKStroke() const;
 		/// Returns current CMYK stroke.
 
 	void setCMYKStroke(CMYKColor value);
 		/// Returns current CMYK stroke.
 
+	[[nodiscard]]
 	float getGreyFill() const;
 		/// Returns current grey fill.
 
 	void setGreyFill(float value);
 		/// Sets current grey fill.
 
+	[[nodiscard]]
 	float getGreyStroke() const;
 		/// Returns current grey stroke.
 
 	void setGreyStroke(float value);
 		/// Sets current grey stroke.
 
+	[[nodiscard]]
 	ColorSpace getStrokeColorSpace() const;
 		/// Returns current stroking color space.
 
+	[[nodiscard]]
 	ColorSpace getFillColorSpace() const;
 		/// Returns current filling color space.
 

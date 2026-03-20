@@ -129,11 +129,13 @@ public:
 		/// character, including the status code. The status code is returned.
 		/// If the response line does not contain a status code, 0 is returned.
 
+	[[nodiscard]]
 	int get();
 		/// Reads one character from the connection.
 		///
 		/// Returns -1 (EOF_CHAR) if no more characters are available.
 
+	[[nodiscard]]
 	int peek();
 		/// Returns the character that would be returned by the next call
 		/// to get(), without actually extracting the character from the

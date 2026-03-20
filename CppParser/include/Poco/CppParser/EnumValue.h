@@ -40,10 +40,13 @@ public:
 	virtual ~EnumValue();
 		/// Destroys the EnumValue.
 
+	[[nodiscard]]
 	const std::string& value() const;
 		/// Returns the value, which may be empty.
 
+	[[nodiscard]]
 	Symbol::Kind kind() const;
+	[[nodiscard]]
 	std::string toString() const;
 
 private:

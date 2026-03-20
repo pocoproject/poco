@@ -40,20 +40,25 @@ public:
 	~Parameter();
 		/// Destroys the Parameter.
 
+	[[nodiscard]]
 	std::size_t number() const;
 		/// Returns the column number.
 
+	[[nodiscard]]
 	std::size_t dataType() const;
 		/// Returns the SQL data type.
 
+	[[nodiscard]]
 	std::size_t columnSize() const;
 		/// Returns the the size of the column or expression of the corresponding
 		/// parameter marker as defined by the data source.
 
+	[[nodiscard]]
 	std::size_t decimalDigits() const;
 		/// Returns the number of decimal digits of the column or expression
 		/// of the corresponding parameter as defined by the data source.
 
+	[[nodiscard]]
 	bool isNullable() const;
 		/// Returns true if column allows null values, false otherwise.
 

@@ -87,6 +87,7 @@ public:
 		_event.set();
 	}
 
+	[[nodiscard]]
 	bool failed() const
 		/// Returns true if the active method failed (and threw an exception).
 		/// Information about the exception can be obtained by calling error().
@@ -94,6 +95,7 @@ public:
 		return _pExc != nullptr;
 	}
 
+	[[nodiscard]]
 	std::string error() const
 		/// If the active method threw an exception, a textual representation
 		/// of the exception is returned. An empty string is returned if the
@@ -105,6 +107,7 @@ public:
 			return std::string();
 	}
 
+	[[nodiscard]]
 	Exception* exception() const
 		/// If the active method threw an exception, a clone of the exception
 		/// object is returned, otherwise null.
@@ -180,6 +183,7 @@ public:
 		_event.set();
 	}
 
+	[[nodiscard]]
 	bool failed() const
 		/// Returns true if the active method failed (and threw an exception).
 		/// Information about the exception can be obtained by calling error().
@@ -187,6 +191,7 @@ public:
 		return _pExc != nullptr;
 	}
 
+	[[nodiscard]]
 	std::string error() const
 		/// If the active method threw an exception, a textual representation
 		/// of the exception is returned. An empty string is returned if the
@@ -198,6 +203,7 @@ public:
 			return std::string();
 	}
 
+	[[nodiscard]]
 	Exception* exception() const
 		/// If the active method threw an exception, a clone of the exception
 		/// object is returned, otherwise null.
@@ -277,6 +283,7 @@ public:
 		swap(_pHolder, result._pHolder);
 	}
 
+	[[nodiscard]]
 	ResultType& data() const
 		/// Returns a reference to the result data.
 	{
@@ -310,12 +317,14 @@ public:
 		_pHolder->wait(milliseconds);
 	}
 
+	[[nodiscard]]
 	bool available() const
 		/// Returns true if a result is available.
 	{
 		return _pHolder->tryWait(0);
 	}
 
+	[[nodiscard]]
 	bool failed() const
 		/// Returns true if the active method failed (and threw an exception).
 		/// Information about the exception can be obtained by calling error().
@@ -323,6 +332,7 @@ public:
 		return _pHolder->failed();
 	}
 
+	[[nodiscard]]
 	std::string error() const
 		/// If the active method threw an exception, a textual representation
 		/// of the exception is returned. An empty string is returned if the
@@ -331,6 +341,7 @@ public:
 		return _pHolder->error();
 	}
 
+	[[nodiscard]]
 	Exception* exception() const
 		/// If the active method threw an exception, a clone of the exception
 		/// object is returned, otherwise null.
@@ -345,6 +356,7 @@ public:
 		_pHolder->notify();
 	}
 
+	[[nodiscard]]
 	ResultType& data()
 		/// Returns a non-const reference to the result data. For internal
 		/// use only.
@@ -437,12 +449,14 @@ public:
 		_pHolder->wait(milliseconds);
 	}
 
+	[[nodiscard]]
 	bool available() const
 		/// Returns true if a result is available.
 	{
 		return _pHolder->tryWait(0);
 	}
 
+	[[nodiscard]]
 	bool failed() const
 		/// Returns true if the active method failed (and threw an exception).
 		/// Information about the exception can be obtained by calling error().
@@ -450,6 +464,7 @@ public:
 		return _pHolder->failed();
 	}
 
+	[[nodiscard]]
 	std::string error() const
 		/// If the active method threw an exception, a textual representation
 		/// of the exception is returned. An empty string is returned if the
@@ -458,6 +473,7 @@ public:
 		return _pHolder->error();
 	}
 
+	[[nodiscard]]
 	Exception* exception() const
 		/// If the active method threw an exception, a clone of the exception
 		/// object is returned, otherwise null.

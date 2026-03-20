@@ -59,16 +59,20 @@ class Net_API SSPINTLMCredentials
 	/// logged in user via SSPI.
 {
 public:
+	[[nodiscard]]
 	static bool available();
 		/// Returns true if SSPI NTLM support is available.
 
+	[[nodiscard]]
 	static Poco::SharedPtr<NTLMContext> createNTLMContext(const std::string& host, const std::string& service);
 		/// Creates an NTLMContext structure for use with negotiate()
 		/// and authenticate().
 
+	[[nodiscard]]
 	static std::vector<unsigned char> negotiate(NTLMContext& context);
 		/// Creates the NTLM Type 1 Negotiate message used for initiating NTLM authentication from the client.
 
+	[[nodiscard]]
 	static std::vector<unsigned char> authenticate(NTLMContext& context, const std::vector<unsigned char>& challenge);
 		/// Creates the NTLM Type 3 Authenticate message used for sending the response to the challenge.
 

@@ -67,7 +67,7 @@ public:
 	virtual ~AbstractPreparator();
 		/// Destroys the AbstractPreparator.
 
-	virtual void prepare(std::size_t pos, const Poco::Int8&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Int8& val) = 0;
 		/// Prepares an Int8.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Int8>& val);
@@ -79,7 +79,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Int8>& val);
 		/// Prepares an Int8 list.
 
-	virtual void prepare(std::size_t pos, const Poco::UInt8&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::UInt8& val) = 0;
 		/// Prepares an UInt8.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::UInt8>& val);
@@ -91,7 +91,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::UInt8>& val);
 		/// Prepares an UInt8 list.
 
-	virtual void prepare(std::size_t pos, const Poco::Int16&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Int16& val) = 0;
 		/// Prepares an Int16.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Int16>& val);
@@ -103,7 +103,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Int16>& val);
 		/// Prepares an Int16 list.
 
-	virtual void prepare(std::size_t pos, const Poco::UInt16&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::UInt16& val) = 0;
 		/// Prepares an UInt16.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::UInt16>& val);
@@ -115,7 +115,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::UInt16>& val);
 		/// Prepares an UInt16 list.
 
-	virtual void prepare(std::size_t pos, const Poco::Int32&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Int32& val) = 0;
 		/// Prepares an Int32.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Int32>& val);
@@ -127,7 +127,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Int32>& val);
 		/// Prepares an Int32 list.
 
-	virtual void prepare(std::size_t pos, const Poco::UInt32&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::UInt32& val) = 0;
 		/// Prepares an UInt32.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::UInt32>& val);
@@ -139,7 +139,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::UInt32>& val);
 		/// Prepares an UInt32 list.
 
-	virtual void prepare(std::size_t pos, const Poco::Int64&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Int64& val) = 0;
 		/// Prepares an Int64.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Int64>& val);
@@ -151,7 +151,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Int64>& val);
 		/// Prepares an Int64 list.
 
-	virtual void prepare(std::size_t pos, const Poco::UInt64&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::UInt64& val) = 0;
 		/// Prepares an UInt64.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::UInt64>& val);
@@ -164,10 +164,10 @@ public:
 		/// Prepares an UInt64 list.
 
 #ifndef POCO_INT64_IS_LONG
-	virtual void prepare(std::size_t pos, const long&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const long& val) = 0;
 		/// Prepares a long.
 
-	virtual void prepare(std::size_t pos, const unsigned long&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const unsigned long& val) = 0;
 		/// Prepares an unsigned long.
 
 	virtual void prepare(std::size_t pos, const std::vector<long>& val);
@@ -189,7 +189,7 @@ public:
 		/// Prepares a unsigned long list.
 #endif
 
-	virtual void prepare(std::size_t pos, const bool&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const bool& val) = 0;
 		/// Prepares a boolean.
 
 	virtual void prepare(std::size_t pos, const std::vector<bool>& val);
@@ -201,7 +201,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<bool>& val);
 		/// Prepares a boolean list.
 
-	virtual void prepare(std::size_t pos, const float&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const float& val) = 0;
 		/// Prepares a float.
 
 	virtual void prepare(std::size_t pos, const std::vector<float>& val);
@@ -213,7 +213,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<float>& val);
 		/// Prepares a float list.
 
-	virtual void prepare(std::size_t pos, const double&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const double& val) = 0;
 		/// Prepares a double.
 
 	virtual void prepare(std::size_t pos, const std::vector<double>& val);
@@ -225,7 +225,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<double>& val);
 		/// Prepares a double list.
 
-	virtual void prepare(std::size_t pos, const char&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const char& val) = 0;
 		/// Prepares a single character.
 
 	virtual void prepare(std::size_t pos, const std::vector<char>& val);
@@ -237,7 +237,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<char>& val);
 		/// Prepares a character list.
 
-	virtual void prepare(std::size_t pos, const std::string&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const std::string& val) = 0;
 		/// Prepares a string.
 
 	virtual void prepare(std::size_t pos, const std::vector<std::string>& val);
@@ -249,7 +249,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<std::string>& val);
 		/// Prepares a character list.
 
-	virtual void prepare(std::size_t pos, const UTF16String&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const UTF16String& val) = 0;
 		/// Prepares a UTF16String.
 
 	virtual void prepare(std::size_t pos, const std::vector<UTF16String>& val);
@@ -261,10 +261,10 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<UTF16String>& val);
 		/// Prepares a UTF16String list.
 
-	virtual void prepare(std::size_t pos, const BLOB&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const BLOB& val) = 0;
 		/// Prepares a BLOB.
 
-	virtual void prepare(std::size_t pos, const CLOB&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const CLOB& val) = 0;
 		/// Prepares a CLOB.
 
 	virtual void prepare(std::size_t pos, const std::vector<BLOB>& val);
@@ -285,7 +285,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<CLOB>& val);
 		/// Prepares a CLOB list.
 
-	virtual void prepare(std::size_t pos, const DateTime&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const DateTime& val) = 0;
 		/// Prepares a DateTime.
 
 	virtual void prepare(std::size_t pos, const std::vector<DateTime>& val);
@@ -297,7 +297,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<DateTime>& val);
 		/// Prepares a DateTime list.
 
-	virtual void prepare(std::size_t pos, const Date&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Date& val) = 0;
 		/// Prepares a Date.
 
 	virtual void prepare(std::size_t pos, const std::vector<Date>& val);
@@ -309,7 +309,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Date>& val);
 		/// Prepares a Date list.
 
-	virtual void prepare(std::size_t pos, const Time&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Time& val) = 0;
 		/// Prepares a Time.
 
 	virtual void prepare(std::size_t pos, const std::vector<Time>& val);
@@ -321,7 +321,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Time>& val);
 		/// Prepares a Time list.
 
-	virtual void prepare(std::size_t pos, const UUID&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const UUID& val) = 0;
 		/// Prepares a UUID.
 
 	virtual void prepare(std::size_t pos, const std::vector<UUID>& val);
@@ -333,7 +333,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<UUID>& val);
 		/// Prepares a UUID list.
 
-	virtual void prepare(std::size_t pos, const Any&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Any& val) = 0;
 		/// Prepares an Any.
 
 	virtual void prepare(std::size_t pos, const std::vector<Any>& val);
@@ -345,7 +345,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Any>& val);
 		/// Prepares an Any list.
 
-	virtual void prepare(std::size_t pos, const Poco::Dynamic::Var&) = 0;
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Dynamic::Var& val) = 0;
 		/// Prepares a Var.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Dynamic::Var>& val);
@@ -357,7 +357,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Dynamic::Var>& val);
 		/// Prepares a Var list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<Poco::Int8>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<Poco::Int8>& val) = 0;
 		/// Prepares an Int8.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<Poco::Int8>>& val);
@@ -369,7 +369,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<Poco::Int8>>& val);
 		/// Prepares an Int8 list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<Poco::UInt8>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<Poco::UInt8>& val) = 0;
 		/// Prepares an UInt8.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<Poco::UInt8>>& val);
@@ -381,7 +381,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<Poco::UInt8>>& val);
 		/// Prepares an UInt8 list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<Poco::Int16>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<Poco::Int16>& val) = 0;
 		/// Prepares an Int16.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<Poco::Int16>>& val);
@@ -393,7 +393,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<Poco::Int16>>& val);
 		/// Prepares an Int16 list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<Poco::UInt16>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<Poco::UInt16>& val) = 0;
 		/// Prepares an UInt16.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<Poco::UInt16>>& val);
@@ -405,7 +405,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<Poco::UInt16>>& val);
 		/// Prepares an UInt16 list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<Poco::Int32>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<Poco::Int32>& val) = 0;
 		/// Prepares an Int32.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<Poco::Int32>>& val);
@@ -417,7 +417,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<Poco::Int32>>& val);
 		/// Prepares an Int32 list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<Poco::UInt32>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<Poco::UInt32>& val) = 0;
 		/// Prepares an UInt32.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<Poco::UInt32>>& val);
@@ -429,7 +429,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<Poco::UInt32>>& val);
 		/// Prepares an UInt32 list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<Poco::Int64>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<Poco::Int64>& val) = 0;
 		/// Prepares an Int64.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<Poco::Int64>>& val);
@@ -441,7 +441,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<Poco::Int64>>& val);
 		/// Prepares an Int64 list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<Poco::UInt64>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<Poco::UInt64>& val) = 0;
 		/// Prepares an UInt64.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<Poco::UInt64>>& val);
@@ -454,10 +454,10 @@ public:
 		/// Prepares an UInt64 list.
 
 #ifndef POCO_INT64_IS_LONG
-	virtual void prepare(std::size_t pos, const Poco::Nullable<long>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<long>& val) = 0;
 		/// Prepares a long.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<unsigned long>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<unsigned long>& val) = 0;
 		/// Prepares an unsigned long.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<long>>& val);
@@ -479,7 +479,7 @@ public:
 		/// Prepares a unsigned long list.
 #endif
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<bool>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<bool>& val) = 0;
 		/// Prepares a boolean.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<bool>>& val);
@@ -491,7 +491,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<bool>>& val);
 		/// Prepares a boolean list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<float>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<float>& val) = 0;
 		/// Prepares a float.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<float>>& val);
@@ -503,7 +503,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<float>>& val);
 		/// Prepares a float list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<double>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<double>& val) = 0;
 		/// Prepares a double.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<double>>& val);
@@ -515,7 +515,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<double>>& val);
 		/// Prepares a double list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<char>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<char>& val) = 0;
 		/// Prepares a single character.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<char>>& val);
@@ -527,7 +527,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<char>>& val);
 		/// Prepares a character list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<std::string>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<std::string>& val) = 0;
 		/// Prepares a string.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<std::string>>& val);
@@ -539,7 +539,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<std::string>>& val);
 		/// Prepares a character list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<UTF16String>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<UTF16String>& val) = 0;
 		/// Prepares a UTF16String.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<UTF16String>>& val);
@@ -551,10 +551,10 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<UTF16String>>& val);
 		/// Prepares a UTF16String list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<BLOB>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<BLOB>& val) = 0;
 		/// Prepares a BLOB.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<CLOB>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<CLOB>& val) = 0;
 		/// Prepares a CLOB.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<BLOB>>& val);
@@ -575,7 +575,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<CLOB>>& val);
 		/// Prepares a CLOB list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<DateTime>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<DateTime>& val) = 0;
 		/// Prepares a DateTime.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<DateTime>>& val);
@@ -587,7 +587,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<DateTime>>& val);
 		/// Prepares a DateTime list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<Date>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<Date>& val) = 0;
 		/// Prepares a Date.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<Date>>& val);
@@ -599,7 +599,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<Date>>& val);
 		/// Prepares a Date list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<Time>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<Time>& val) = 0;
 		/// Prepares a Time.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<Time>>& val);
@@ -611,7 +611,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<Time>>& val);
 		/// Prepares a Time list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<UUID>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<UUID>& val) = 0;
 		/// Prepares a UUID.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<UUID>>& val);
@@ -623,7 +623,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<UUID>>& val);
 		/// Prepares a UUID list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<Any>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<Any>& val) = 0;
 		/// Prepares an Any.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<Any>>& val);
@@ -635,7 +635,7 @@ public:
 	virtual void prepare(std::size_t pos, const std::list<Poco::Nullable<Any>>& val);
 		/// Prepares an Any list.
 
-	virtual void prepare(std::size_t pos, const Poco::Nullable<Poco::Dynamic::Var>&);
+	virtual void prepare(std::size_t pos, [[maybe_unused]] const Poco::Nullable<Poco::Dynamic::Var>& val) = 0;
 		/// Prepares a Var.
 
 	virtual void prepare(std::size_t pos, const std::vector<Poco::Nullable<Poco::Dynamic::Var>>& val);
@@ -652,6 +652,7 @@ public:
 		/// Needed only for data lengths greater than 1 (i.e. for
 		/// bulk operations).
 
+	[[nodiscard]]
 	Poco::UInt32 getLength() const;
 		/// Returns the length of prepared data. Defaults to 1.
 		/// The length is greater than one for bulk operations.
@@ -659,6 +660,7 @@ public:
 	void setBulk(bool bulkPrep = true);
 		/// Sets bulk operation flag (always false at object creation time)
 
+	[[nodiscard]]
 	bool isBulk() const;
 		/// Returns bulk operation flag.
 
