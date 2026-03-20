@@ -20,6 +20,7 @@
 #include "Poco/LineEndingConverter.h"
 #include "Poco/Ascii.h"
 #include <set>
+#include <string_view>
 
 using Poco::trim;
 using Poco::Path;
@@ -155,7 +156,7 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 					line += static_cast<char>(c);
 			}
 
-			static const std::string includeDirective = "!include";
+			constexpr std::string_view includeDirective = "!include";
 			if (line.size() > includeDirective.size() &&
 				line.compare(0, includeDirective.size(), includeDirective) == 0 &&
 				Poco::Ascii::isSpace(line[includeDirective.size()]))
