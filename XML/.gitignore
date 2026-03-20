@@ -11,6 +11,8 @@ src/latin1tab.h
 src/nametab.h
 src/siphash.h
 src/utf8tab.h
+src/winconfig.h
+src/xmlparse.c
 src/xmlparse.cpp
 src/xmlrole.c
 src/xmlrole.h

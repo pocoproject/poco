@@ -19,7 +19,8 @@
 #include "Poco/FileStream.h"
 #include "Poco/LineEndingConverter.h"
 #include "Poco/Ascii.h"
-
+#include <set>
+#include <string_view>
 
 using Poco::trim;
 using Poco::Path;
@@ -46,24 +47,39 @@ void PropertyFileConfiguration::load(std::istream& istr)
 	AbstractConfiguration::ScopedLock lock(*this);
 
 	clear();
-	while (!istr.eof())
-	{
-		if (istr.fail())
-		{
-			throw Poco::IOException("Broken input stream");
-		}
-		parseLine(istr);
-	}
+	std::set<std::string> includeStack;
+	loadStream(istr, "", includeStack);
 }
 
 
 void PropertyFileConfiguration::load(const std::string& path)
 {
+	Poco::Path p(path);
+	p.makeAbsolute();
+	std::string basePath = p.parent().toString();
 	Poco::FileInputStream istr(path);
-	if (istr.good())
-		load(istr);
-	else
+	if (!istr.good())
 		throw Poco::OpenFileException(path);
+	AbstractConfiguration::ScopedLock lock(*this);
+	clear();
+	std::set<std::string> includeStack;
+	includeStack.insert(p.toString());
+	loadStream(istr, basePath, includeStack);
+}
+
+
+void PropertyFileConfiguration::loadStream(std::istream& istr, const std::string& basePath, std::set<std::string>& includeStack)
+{
+	for (;;)
+	{
+		if (!istr.good())
+		{
+			if (istr.eof())
+				break;
+			throw Poco::IOException("Broken input stream");
+		}
+		parseLine(istr, basePath, includeStack);
+	}
 }
 
 
@@ -121,17 +137,61 @@ void PropertyFileConfiguration::save(const std::string& path) const
 }
 
 
-void PropertyFileConfiguration::parseLine(std::istream& istr)
+void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string& basePath, std::set<std::string>& includeStack)
 {
-	static const int eof = std::char_traits<char>::eof();
+	constexpr int eof = std::char_traits<char>::eof();
 
 	int c = istr.get();
 	while (c != eof && Poco::Ascii::isSpace(c)) c = istr.get();
 	if (c != eof)
 	{
-		if (c == '#' || c == '!')
+		if (c == '#')
 		{
 			while (c != eof && c != '\n' && c != '\r') c = istr.get();
+		}
+		else if (c == '!')
+		{
+			std::string line;
+			line += static_cast<char>(c);
+			while (c != eof && c != '\n' && c != '\r')
+			{
+				c = istr.get();
+				if (c != eof && c != '\n' && c != '\r')
+					line += static_cast<char>(c);
+			}
+
+			constexpr std::string_view includeDirective = "!include";
+			if (line.size() > includeDirective.size() &&
+				line.compare(0, includeDirective.size(), includeDirective) == 0 &&
+				Poco::Ascii::isSpace(line[includeDirective.size()]))
+			{
+				std::string includePath = Poco::trim(line.substr(includeDirective.size()));
+				if (includePath.empty())
+					throw Poco::SyntaxException("Missing path in !include directive");
+				Poco::Path p(includePath);
+				if (p.isRelative() && !basePath.empty())
+					p = Poco::Path(basePath).resolve(p);
+				p.makeAbsolute();
+				const std::string absPathStr = p.toString();
+
+				if (includeStack.find(absPathStr) != includeStack.end())
+				{
+					throw Poco::FileException("Cyclic property file include detected", absPathStr);
+				}
+
+				struct StackGuard
+				{
+					std::set<std::string>& stack;
+					const std::string& key;
+					StackGuard(std::set<std::string>& s, const std::string& k): stack(s), key(k) { stack.insert(k); }
+					~StackGuard() { stack.erase(key); }
+				} guard(includeStack, absPathStr);
+
+				Poco::FileInputStream includeIstr(p.toString());
+				if (!includeIstr.good())
+					throw Poco::OpenFileException(p.toString());
+				loadStream(includeIstr, p.parent().toString(), includeStack);
+			}
 		}
 		else
 		{
