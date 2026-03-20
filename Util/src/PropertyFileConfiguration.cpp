@@ -145,7 +145,11 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 	while (c != eof && Poco::Ascii::isSpace(c)) c = istr.get();
 	if (c != eof)
 	{
-		if (c == '#' || c == '!')
+		if (c == '#')
+		{
+			while (c != eof && c != '\n' && c != '\r') c = istr.get();
+		}
+		else if (c == '!')
 		{
 			std::string line;
 			line += static_cast<char>(c);
