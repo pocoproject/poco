@@ -35,6 +35,7 @@ class Util_API PropertyFileConfiguration: public MapConfiguration
 	///
 	/// The file syntax is implemented as follows.
 	///   - a line starting with a hash '#' or exclamation mark '!' is treated as a comment and ignored
+	///     (with the exception of the !include directive described below)
 	///   - every other line denotes a property assignment in the form
 	///     <key> = <value> or
 	///     <key> : <value>

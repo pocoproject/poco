@@ -149,9 +149,10 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 			line += (char) c;
 			while (c != eof && c != '\n' && c != '\r') { c = istr.get(); if (c != eof && c != '\n' && c != '\r') line += (char) c; }
 
-			static const std::string includeDirective = "!include ";
+			static const std::string includeDirective = "!include";
 			if (line.size() > includeDirective.size() &&
-				line.compare(0, includeDirective.size(), includeDirective) == 0)
+				line.compare(0, includeDirective.size(), includeDirective) == 0 &&
+				Poco::Ascii::isSpace(line[includeDirective.size()]))
 			{
 				std::string includePath = Poco::trim(line.substr(includeDirective.size()));
 				if (includePath.empty())
@@ -164,7 +165,6 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 				absPath.makeAbsolute();
 				const std::string absPathStr = absPath.toString();
 
-				// Detect cyclic includes: do not allow including a file that is already in the include stack.
 				if (includeStack.find(absPathStr) != includeStack.end())
 				{
 					throw Poco::FileException("Cyclic property file include detected", absPathStr);

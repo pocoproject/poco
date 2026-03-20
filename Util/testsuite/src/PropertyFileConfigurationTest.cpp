@@ -18,8 +18,8 @@
 #include "Poco/FileStream.h"
 #include <sstream>
 #include <algorithm>
-#include <Poco/File.h>
-#include <Poco/Path.h>
+#include "Poco/File.h"
+#include "Poco/Path.h"
 
 
 using Poco::Util::PropertyFileConfiguration;
@@ -27,16 +27,6 @@ using Poco::Util::AbstractConfiguration;
 using Poco::AutoPtr;
 using Poco::NotFoundException;
 
-
-namespace
-{
-	std::string getFileName(const std::string& path)
-	{
-		std::string::size_type pos = path.find_last_of("/\\");
-		if (pos == std::string::npos) return path;
-		return path.substr(pos + 1);
-	}
-}
 
 
 PropertyFileConfigurationTest::PropertyFileConfigurationTest(const std::string& name): AbstractConfigurationTest(name)
@@ -173,7 +163,7 @@ void PropertyFileConfigurationTest::testInclude()
 		Poco::FileOutputStream ostr(mainFileRel.path());
 		ostr << "mainRel.prop = mainRelValue\n";
 		// include by filename only; should be resolved relative to mainFileRel
-		ostr << "!include " << getFileName(includedFileRel.path()) << "\n";
+		ostr << "!include " << Poco::Path(includedFileRel.path()).getFileName() << "\n";
 		ostr << "mainRel.prop2 = mainRelValue2\n";
 	}
 
@@ -195,7 +185,7 @@ void PropertyFileConfigurationTest::testInclude()
 	{
 		Poco::FileOutputStream ostr(fileA.path());
 		// A includes B by filename
-		ostr << "!include " << getFileName(fileB.path()) << "\n";
+		ostr << "!include " << Poco::Path(fileB.path()).getFileName() << "\n";
 		ostr << "nestedA.prop = nestedAValue\n";
 	}
 
@@ -204,7 +194,7 @@ void PropertyFileConfigurationTest::testInclude()
 		Poco::FileOutputStream ostr(mainFileNested.path());
 		ostr << "mainNested.prop = mainNestedValue\n";
 		// main includes A by filename; A then includes B
-		ostr << "!include " << getFileName(fileA.path()) << "\n";
+		ostr << "!include " << Poco::Path(fileA.path()).getFileName() << "\n";
 	}
 
 	AutoPtr<PropertyFileConfiguration> pConfNested = new PropertyFileConfiguration(mainFileNested.path());
@@ -240,6 +230,50 @@ void PropertyFileConfigurationTest::testInclude()
 	catch (Poco::FileException&)
 	{
 	}
+
+	// !include with no path should throw SyntaxException
+	Poco::TemporaryFile mainFile3;
+	{
+		Poco::FileOutputStream ostr(mainFile3.path());
+		ostr << "prop = value\n";
+		ostr << "!include \n";
+	}
+	try
+	{
+		AutoPtr<PropertyFileConfiguration> pConf3 = new PropertyFileConfiguration(mainFile3.path());
+		fail("must throw");
+	}
+	catch (Poco::SyntaxException&)
+	{
+	}
+
+	// !include with tab separator should work
+	Poco::TemporaryFile includedFileTab;
+	{
+		Poco::FileOutputStream ostr(includedFileTab.path());
+		ostr << "tab.prop = tabValue\n";
+	}
+
+	Poco::TemporaryFile mainFileTab;
+	{
+		Poco::FileOutputStream ostr(mainFileTab.path());
+		ostr << "!include\t" << includedFileTab.path() << "\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConfTab = new PropertyFileConfiguration(mainFileTab.path());
+	assertTrue (pConfTab->getString("tab.prop") == "tabValue");
+
+	// !includeSomething should be treated as a regular comment
+	Poco::TemporaryFile mainFile4;
+	{
+		Poco::FileOutputStream ostr(mainFile4.path());
+		ostr << "!includeSomething\n";
+		ostr << "prop = value\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConf4 = new PropertyFileConfiguration(mainFile4.path());
+	assertTrue (pConf4->getString("prop") == "value");
+	assertTrue (!pConf4->hasProperty("includeSomething"));
 }
 
 
