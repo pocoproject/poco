@@ -179,20 +179,18 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 					throw Poco::FileException("Cyclic property file include detected", absPathStr);
 				}
 
-				includeStack.insert(absPathStr);
-				try
+				struct StackGuard
 				{
-					Poco::FileInputStream includeIstr(p.toString());
-					if (!includeIstr.good())
-						throw Poco::OpenFileException(p.toString());
-					loadStream(includeIstr, p.parent().toString(), includeStack);
-				}
-				catch (...)
-				{
-					includeStack.erase(absPathStr);
-					throw;
-				}
-				includeStack.erase(absPathStr);
+					std::set<std::string>& stack;
+					const std::string& key;
+					StackGuard(std::set<std::string>& s, const std::string& k): stack(s), key(k) { stack.insert(k); }
+					~StackGuard() { stack.erase(key); }
+				} guard(includeStack, absPathStr);
+
+				Poco::FileInputStream includeIstr(p.toString());
+				if (!includeIstr.good())
+					throw Poco::OpenFileException(p.toString());
+				loadStream(includeIstr, p.parent().toString(), includeStack);
 			}
 		}
 		else
