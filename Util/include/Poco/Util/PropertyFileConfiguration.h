@@ -22,6 +22,7 @@
 #include "Poco/Util/MapConfiguration.h"
 #include <istream>
 #include <ostream>
+#include <set>
 
 
 namespace Poco {
@@ -34,6 +35,7 @@ class Util_API PropertyFileConfiguration: public MapConfiguration
 	///
 	/// The file syntax is implemented as follows.
 	///   - a line starting with a hash '#' or exclamation mark '!' is treated as a comment and ignored
+	///     (with the exception of the !include directive described below)
 	///   - every other line denotes a property assignment in the form
 	///     <key> = <value> or
 	///     <key> : <value>
@@ -49,6 +51,11 @@ class Util_API PropertyFileConfiguration: public MapConfiguration
 	///
 	/// A value can spread across multiple lines if the last character in a line (the character
 	/// immediately before the carriage return or line feed character) is a single backslash.
+	///
+	/// A line of the form
+	///   !include <path>
+	/// (where <path> is a relative or absolute file path) includes another properties file.
+	/// Relative paths are resolved relative to the directory of the including file.
 	///
 	/// Property names are case sensitive. Leading and trailing whitespace is
 	/// removed from both keys and values. A property name can neither contain
@@ -88,7 +95,8 @@ protected:
 	~PropertyFileConfiguration() = default;
 
 private:
-	void parseLine(std::istream& istr);
+	void loadStream(std::istream& istr, const std::string& basePath, std::set<std::string>& includeStack);
+	void parseLine(std::istream& istr, const std::string& basePath, std::set<std::string>& includeStack);
 	static int readChar(std::istream& istr);
 };
 

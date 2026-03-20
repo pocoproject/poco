@@ -26,6 +26,7 @@ public:
 
 	void testLoad();
 	void testSave();
+	void testInclude();
 
 	void setUp();
 	void tearDown();
