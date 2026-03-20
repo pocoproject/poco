@@ -138,7 +138,7 @@ void PropertyFileConfiguration::save(const std::string& path) const
 
 void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string& basePath, std::set<std::string>& includeStack)
 {
-	static const int eof = std::char_traits<char>::eof();
+	constexpr int eof = std::char_traits<char>::eof();
 
 	int c = istr.get();
 	while (c != eof && Poco::Ascii::isSpace(c)) c = istr.get();
