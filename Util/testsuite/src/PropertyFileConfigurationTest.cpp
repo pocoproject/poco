@@ -12,6 +12,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Util/PropertyFileConfiguration.h"
+#include "Poco/Util/MapConfiguration.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
 #include "Poco/TemporaryFile.h"
@@ -292,6 +293,8 @@ void PropertyFileConfigurationTest::testInclude()
 	}
 
 	// Variable expansion in !include path
+	// Use forward slashes in paths written to .properties files
+	// to avoid backslash escape and line-continuation issues on Windows.
 	Poco::TemporaryFile includedFileExp;
 	{
 		Poco::FileOutputStream ostr(includedFileExp.path());
@@ -299,7 +302,8 @@ void PropertyFileConfigurationTest::testInclude()
 	}
 
 	Poco::Path includedExpPath(includedFileExp.path());
-	std::string includedExpDir = includedExpPath.parent().toString();
+	std::string includedExpDir = includedExpPath.parent().toString(Poco::Path::PATH_UNIX);
+	if (includedExpDir.back() != '/') includedExpDir += '/';
 	std::string includedExpName = includedExpPath.getFileName();
 
 	Poco::TemporaryFile mainFileExp;
@@ -312,6 +316,32 @@ void PropertyFileConfigurationTest::testInclude()
 	AutoPtr<PropertyFileConfiguration> pConfExp = new PropertyFileConfiguration(mainFileExp.path());
 	assertTrue (pConfExp->getString("myDir") == includedExpDir);
 	assertTrue (pConfExp->getString("expanded.prop") == "expandedValue");
+
+	// Variable expansion in !include path using parent configuration
+	Poco::TemporaryFile includedFileParent;
+	{
+		Poco::FileOutputStream ostr(includedFileParent.path());
+		ostr << "parent.prop = parentValue\n";
+	}
+
+	Poco::Path includedParentPath(includedFileParent.path());
+	std::string includedParentDir = includedParentPath.parent().toString(Poco::Path::PATH_UNIX);
+	if (includedParentDir.back() != '/') includedParentDir += '/';
+	std::string includedParentName = includedParentPath.getFileName();
+
+	Poco::AutoPtr<Poco::Util::MapConfiguration> pParent = new Poco::Util::MapConfiguration;
+	pParent->setString("extDir", includedParentDir);
+
+	Poco::TemporaryFile mainFileParent;
+	{
+		Poco::FileOutputStream ostr(mainFileParent.path());
+		ostr << "main.prop = mainValue\n";
+		ostr << "!include ${extDir}" << includedParentName << "\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConfParent = new PropertyFileConfiguration(mainFileParent.path(), pParent);
+	assertTrue (pConfParent->getString("main.prop") == "mainValue");
+	assertTrue (pConfParent->getString("parent.prop") == "parentValue");
 }
 
 

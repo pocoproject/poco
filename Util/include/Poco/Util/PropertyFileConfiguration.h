@@ -56,23 +56,31 @@ class Util_API PropertyFileConfiguration: public MapConfiguration
 	///   !include <path>
 	/// (where <path> is a relative or absolute file path) includes another properties file.
 	/// Relative paths are resolved relative to the directory of the including file.
-	/// ${variable} references in include paths are expanded.
+	/// ${variable} references in include paths are expanded, either from
+	/// properties already loaded in the same file, or from an optional parent
+	/// configuration passed via the constructor.
 	///
 	/// Property names are case sensitive. Leading and trailing whitespace is
 	/// removed from both keys and values. A property name can neither contain
 	/// a colon ':' nor an equal sign '=' character.
 {
 public:
-	PropertyFileConfiguration() = default;
+	PropertyFileConfiguration(AbstractConfiguration::Ptr pParentConfig = nullptr);
 		/// Creates an empty PropertyFileConfiguration.
+		/// If pParentConfig is not null, it is used to expand ${variable}
+		/// references in !include directive paths.
 
-	PropertyFileConfiguration(std::istream& istr);
+	PropertyFileConfiguration(std::istream& istr, AbstractConfiguration::Ptr pParentConfig = nullptr);
 		/// Creates an PropertyFileConfiguration and loads the configuration data
 		/// from the given stream, which must be in properties file format.
+		/// If pParentConfig is not null, it is used to expand ${variable}
+		/// references in !include directive paths.
 
-	PropertyFileConfiguration(const std::string& path);
+	PropertyFileConfiguration(const std::string& path, AbstractConfiguration::Ptr pParentConfig = nullptr);
 		/// Creates an PropertyFileConfiguration and loads the configuration data
 		/// from the given file, which must be in properties file format.
+		/// If pParentConfig is not null, it is used to expand ${variable}
+		/// references in !include directive paths.
 
 	void load(std::istream& istr);
 		/// Loads the configuration data from the given stream, which
@@ -99,6 +107,8 @@ private:
 	void loadStream(std::istream& istr, const std::string& basePath, std::set<std::string>& includeStack);
 	void parseLine(std::istream& istr, const std::string& basePath, std::set<std::string>& includeStack);
 	static int readChar(std::istream& istr);
+
+	AbstractConfiguration::Ptr _pParentConfig;
 };
 
 
