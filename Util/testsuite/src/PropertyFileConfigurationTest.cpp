@@ -290,6 +290,28 @@ void PropertyFileConfigurationTest::testInclude()
 	catch (Poco::FileException&)
 	{
 	}
+
+	// Variable expansion in !include path
+	Poco::TemporaryFile includedFileExp;
+	{
+		Poco::FileOutputStream ostr(includedFileExp.path());
+		ostr << "expanded.prop = expandedValue\n";
+	}
+
+	Poco::Path includedExpPath(includedFileExp.path());
+	std::string includedExpDir = includedExpPath.parent().toString();
+	std::string includedExpName = includedExpPath.getFileName();
+
+	Poco::TemporaryFile mainFileExp;
+	{
+		Poco::FileOutputStream ostr(mainFileExp.path());
+		ostr << "myDir = " << includedExpDir << "\n";
+		ostr << "!include ${myDir}" << includedExpName << "\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConfExp = new PropertyFileConfiguration(mainFileExp.path());
+	assertTrue (pConfExp->getString("myDir") == includedExpDir);
+	assertTrue (pConfExp->getString("expanded.prop") == "expandedValue");
 }
 
 
