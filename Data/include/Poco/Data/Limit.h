@@ -21,8 +21,7 @@
 #include "Poco/Data/Data.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API Limit
@@ -107,7 +106,7 @@ inline bool Limit::operator != (const Limit& other) const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Limit_INCLUDED

@@ -22,8 +22,7 @@
 #include "Poco/SAX/XMLReader.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API XMLFilter: public XMLReader
@@ -55,7 +54,7 @@ protected:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_XMLFilter_INCLUDED

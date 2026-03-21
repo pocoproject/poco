@@ -32,9 +32,7 @@ using Poco::Util::HelpFormatter;
 using Poco::Util::OptionCallback;
 
 
-namespace Poco {
-namespace ActiveRecord {
-namespace Compiler {
+namespace Poco::ActiveRecord::Compiler {
 
 
 class CompilerApp: public Application
@@ -228,7 +226,7 @@ private:
 };
 
 
-} } } // namespace Poco::ActiveRecord::Compiler
+} // namespace Poco::ActiveRecord::Compiler
 
 
 POCO_APP_MAIN(Poco::ActiveRecord::Compiler::CompilerApp)

@@ -27,8 +27,7 @@
 #include <functional>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class OpMsgMessage;
@@ -143,7 +142,7 @@ private:
 };
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_ReplicaSetConnection_INCLUDED

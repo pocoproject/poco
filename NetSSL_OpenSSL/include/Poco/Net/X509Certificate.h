@@ -26,8 +26,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HostEntry;
@@ -108,7 +107,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_X509Certificate_INCLUDED

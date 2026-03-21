@@ -15,8 +15,7 @@
 #include "Poco/Net/StringPartSource.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 StringPartSource::StringPartSource(const std::string& str):
@@ -64,4 +63,4 @@ std::streamsize StringPartSource::getContentLength() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

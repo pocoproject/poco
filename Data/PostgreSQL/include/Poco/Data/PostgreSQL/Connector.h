@@ -25,9 +25,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 class PostgreSQL_API Connector: public Poco::Data::Connector
@@ -57,7 +55,7 @@ public:
 };
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif // Data_PostgreSQL_Connector_INCLUDED

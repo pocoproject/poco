@@ -23,8 +23,7 @@
 #include "Poco/MongoDB/OpMsgMessage.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class Connection;
@@ -132,7 +131,7 @@ inline Int64 OpMsgCursor::cursorID() const noexcept
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_OpMsgCursor_INCLUDED

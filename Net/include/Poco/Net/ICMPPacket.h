@@ -23,8 +23,7 @@
 #include "Poco/Net/ICMPPacketImpl.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API ICMPPacket
@@ -85,7 +84,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_ICMPPacket_INCLUDED

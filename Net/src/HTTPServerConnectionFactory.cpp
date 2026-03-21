@@ -17,8 +17,7 @@
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPServerConnectionFactory::HTTPServerConnectionFactory(HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory):
@@ -40,4 +39,4 @@ TCPServerConnection* HTTPServerConnectionFactory::createConnection(const StreamS
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

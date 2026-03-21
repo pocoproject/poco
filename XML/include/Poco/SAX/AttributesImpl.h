@@ -23,8 +23,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API AttributesImpl: public Attributes
@@ -301,7 +300,7 @@ inline bool AttributesImpl::isSpecified(const XMLString& namespaceURI, const XML
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_AttributesImpl_INCLUDED

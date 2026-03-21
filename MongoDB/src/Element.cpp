@@ -15,8 +15,7 @@
 #include "Poco/MongoDB/Element.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 Element::Element(const std::string& name) : _name(name)
@@ -34,4 +33,4 @@ Element::~Element()
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

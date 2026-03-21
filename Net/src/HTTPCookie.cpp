@@ -36,8 +36,7 @@ using Poco::icompare;
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPCookie::HTTPCookie():
@@ -390,4 +389,4 @@ std::string HTTPCookie::unescape(const std::string& str)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

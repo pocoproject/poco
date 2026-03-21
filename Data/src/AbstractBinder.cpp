@@ -23,8 +23,7 @@
 #include "Poco/Dynamic/Var.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 AbstractBinder::AbstractBinder(Poco::TextEncoding::Ptr pFromEncoding,
@@ -568,4 +567,4 @@ void AbstractBinder::bind(std::size_t pos, const Poco::Dynamic::Var& val, Direct
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

@@ -24,8 +24,7 @@
 #include "Poco/Buffer.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPSession;
@@ -175,7 +174,7 @@ inline int WebSocketImpl::getMaxPayloadSize() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_WebSocketImpl_INCLUDED

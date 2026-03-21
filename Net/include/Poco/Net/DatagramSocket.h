@@ -23,8 +23,7 @@
 #include "Poco/Buffer.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API DatagramSocket: public Socket
@@ -304,7 +303,7 @@ inline bool DatagramSocket::getBroadcast() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_DatagramSocket_INCLUDED

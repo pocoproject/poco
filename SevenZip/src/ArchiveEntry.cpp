@@ -16,8 +16,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace SevenZip {
+namespace Poco::SevenZip {
 
 
 ArchiveEntry::ArchiveEntry():
@@ -76,4 +75,4 @@ void ArchiveEntry::swap(ArchiveEntry& entry) noexcept
 }
 
 
-} } // namespace Poco::SevenZip
+} // namespace Poco::SevenZip

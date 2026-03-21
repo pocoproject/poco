@@ -25,8 +25,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API Transcoder
@@ -91,7 +90,7 @@ inline std::string Transcoder::toEncoding() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Transcoder_INCLUDED

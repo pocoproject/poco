@@ -17,9 +17,7 @@
 #include "Poco/Data/ODBC/ODBCException.h"
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 const std::string ConnectionHandle::UNSUPPORTED_SQLSTATE = "HYC00";
@@ -273,4 +271,4 @@ bool ConnectionHandle::isConnected() const
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

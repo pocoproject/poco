@@ -26,8 +26,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 class JSON_API TemplateCache
@@ -98,7 +97,7 @@ inline void TemplateCache::setLogger(Logger& logger)
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON
 
 
 #endif // JSON_JSONTemplateCache_INCLUDED

@@ -25,13 +25,11 @@
 #include <sstream>
 
 
-namespace Poco {
-
-namespace JSON {
+namespace Poco::JSON {
 
 class JSON_API Array;
 
-}
+} // namespace Poco::JSON
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(JSON_EXPORTS)
@@ -42,7 +40,7 @@ extern template class Poco::SharedPtr<Poco::JSON::Array>;
 extern template class JSON_API Poco::SharedPtr<Poco::JSON::Array>;
 #endif
 
-namespace JSON {
+namespace Poco::JSON {
 
 class Object;
 
@@ -325,11 +323,10 @@ inline void Array::remove(unsigned int index)
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 template <>
@@ -596,7 +593,7 @@ private:
 };
 
 
-} } // namespace Poco::Dynamic
+} // namespace Poco::Dynamic
 
 
 #endif // JSON_Array_INCLUDED

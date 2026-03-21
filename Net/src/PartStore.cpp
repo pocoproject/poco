@@ -18,8 +18,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 //
@@ -84,4 +83,4 @@ const std::string& FilePartStore::path() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -22,9 +22,7 @@
 #include "Preparator.h"
 
 
-namespace Poco {
-namespace Data {
-namespace Test {
+namespace Poco::Data::Test {
 
 
 class SessionImpl;
@@ -112,7 +110,7 @@ inline bool TestStatementImpl::canCompile() const
 }
 
 
-} } } // namespace Poco::Data::Test
+} // namespace Poco::Data::Test
 
 
 #endif // Data_Test_TestStatementImpl_INCLUDED

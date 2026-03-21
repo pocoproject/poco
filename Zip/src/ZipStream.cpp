@@ -25,8 +25,7 @@
 
 #include <zlib.h>
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 ZipStreamBuf::ZipStreamBuf(std::istream& istr, const ZipLocalFileHeader& fileEntry, bool reposition):
@@ -330,4 +329,4 @@ void ZipOutputStream::close(Poco::UInt64& extraDataSize)
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

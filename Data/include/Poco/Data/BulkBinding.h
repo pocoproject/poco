@@ -29,8 +29,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <class T>
@@ -142,7 +141,7 @@ AbstractBinding::Ptr in(const std::list<T>& t, BulkFnType, const std::string& na
 } // namespace Keywords
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_BulkBinding_INCLUDED

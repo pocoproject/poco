@@ -24,8 +24,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 Poco::Timestamp ProcessCollector::_startTime;
@@ -99,4 +98,4 @@ void ProcessCollector::buildMetrics()
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

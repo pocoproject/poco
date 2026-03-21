@@ -26,8 +26,7 @@ using Poco::Base64Encoder;
 using Poco::icompare;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string HTTPBasicCredentials::SCHEME = "Basic";
@@ -132,4 +131,4 @@ void HTTPBasicCredentials::parseAuthInfo(const std::string& authInfo)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

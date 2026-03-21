@@ -13,9 +13,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Data {
-namespace Test {
+namespace Poco::Data::Test {
 
 
 Binder::Binder()
@@ -155,4 +153,4 @@ void Binder::reset()
 }
 
 
-} } } // namespace Poco::Data::Test
+} // namespace Poco::Data::Test

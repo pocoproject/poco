@@ -16,8 +16,7 @@
 #include "Poco/DOM/Document.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 Event::Event(Document* pOwnerDocument, const XMLString& type):
@@ -99,4 +98,4 @@ void Event::autoRelease()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

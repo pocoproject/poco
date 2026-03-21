@@ -17,8 +17,7 @@
 #include "Poco/Redis/AsyncReader.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 AsyncReader::AsyncReader(Client& client):
@@ -58,4 +57,4 @@ void AsyncReader::runActivity()
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis

@@ -24,8 +24,7 @@
 #include "Poco/Crypto/ECKeyImpl.h"
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class X509Certificate;
@@ -140,7 +139,7 @@ inline bool ECKey::hasCurve(const std::string& name)
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_ECKey_INCLUDED

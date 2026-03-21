@@ -22,8 +22,7 @@
 #include "Poco/SAX/SAXParser.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class NamePool;
@@ -126,7 +125,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_DOMParser_INCLUDED

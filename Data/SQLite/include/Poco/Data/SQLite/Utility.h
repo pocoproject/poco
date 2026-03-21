@@ -34,9 +34,7 @@ extern "C"
 }
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 class SQLite_API Utility
@@ -248,7 +246,7 @@ inline bool Utility::fileToMemory(const Session& session, const std::string& fil
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite
 
 
 #endif // SQLite_Utility_INCLUDED

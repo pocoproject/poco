@@ -24,8 +24,7 @@
 #include "Poco/String.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string RemoteSyslogChannel::BSD_TIMEFORMAT("%b %f %H:%M:%S");
@@ -426,4 +425,4 @@ void RemoteSyslogChannel::registerChannel()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

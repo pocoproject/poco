@@ -23,8 +23,7 @@
 #include "Poco/DNSSD/DNSSD.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 class DNSSDBrowser;
@@ -113,7 +112,7 @@ protected:
 };
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD
 
 
 #endif // DNSSD_DNSSDResponderImpl_INCLUDED

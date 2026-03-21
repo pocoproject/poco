@@ -19,8 +19,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 const std::string ThreadPoolCollector::NAME_PREFIX{"poco_threadpool"s};
@@ -117,4 +116,4 @@ std::string ThreadPoolCollector::collectorName(const std::string& threadPoolName
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

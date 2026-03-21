@@ -28,9 +28,7 @@
 
 using namespace Poco::Data::Keywords;
 
-namespace Poco {
-namespace Data {
-namespace Test {
+namespace Poco::Data::Test {
 
 
 #define poco_data_using_keywords using Poco::Data::Keywords::now; \
@@ -396,7 +394,7 @@ private:
 };
 
 
-} } } // Poco::Data::Test
+} // namespace Poco::Data::Test
 
 
 #endif // DataTest_SQLExecutor_INCLUDED

@@ -25,8 +25,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPCookie;
@@ -303,7 +302,7 @@ inline const std::string& HTTPResponse::getReason() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPResponse_INCLUDED

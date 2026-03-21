@@ -117,7 +117,7 @@ const T& clamp(const T& v, const T& lo, const T& hi) {
 }
 
 template <typename T, typename U>
-static T numeric_cast(U value,
+T numeric_cast(U value,
                       const char* error_message = "numeric_cast() failed.") {
   T ret = static_cast<T>(value);
   if (static_cast<U>(ret) != value) {
@@ -145,7 +145,7 @@ static_assert(std::numeric_limits<slz_size_type>::max() >=
               "slz_size_type must be >= std::size_t");
 
 template <class T, class Deserializer>
-static T deserialize_value(Deserializer& deserializer) {
+T deserialize_value(Deserializer& deserializer) {
   // MSVC < 2017 is not conformant, circumvent the problem by removing the
   // template keyword
 #if defined(_MSC_VER) && _MSC_VER < 1910

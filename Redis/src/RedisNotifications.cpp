@@ -17,8 +17,7 @@
 #include "Poco/Redis/RedisNotifications.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 RedisNotification::RedisNotification()
@@ -71,4 +70,4 @@ RedisErrorNotification::~RedisErrorNotification()
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis

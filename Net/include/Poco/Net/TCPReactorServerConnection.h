@@ -7,8 +7,7 @@
 #include <string>
 #include <functional>
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class TCPReactorServerConnection;
@@ -41,7 +40,7 @@ private:
 	std::string               _buf;
 };
 
-}} // namespace Poco::Net
+} // namespace Poco::Net
 
 #endif // Net_TCPReactorServerConnection_INCLUDED
 

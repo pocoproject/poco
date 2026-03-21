@@ -25,8 +25,7 @@
 #include "Poco/MongoDB/OpMsgCursor.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API Database
@@ -164,7 +163,7 @@ Database::createOpMsgCursor(const std::string& collectionName) const
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_Database_INCLUDED

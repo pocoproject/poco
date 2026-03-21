@@ -31,8 +31,7 @@ using Poco::UInt16;
 using Poco::Int32;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 ICMPPacket::ICMPPacket(IPAddress::Family family, int dataSize):_pImpl(nullptr)
@@ -107,4 +106,4 @@ std::string ICMPPacket::typeDescription(int typeId)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

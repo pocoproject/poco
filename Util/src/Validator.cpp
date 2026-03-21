@@ -15,8 +15,7 @@
 #include "Poco/Util/Validator.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 Validator::~Validator()
@@ -24,4 +23,4 @@ Validator::~Validator()
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

@@ -19,8 +19,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 DNSSDResponderImplFactory* DNSSDResponder::_pImplFactory(nullptr);
@@ -106,4 +105,4 @@ void DNSSDResponder::unregisterImplFactory()
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD

@@ -29,8 +29,7 @@ using Poco::Exception;
 using Poco::ErrorHandler;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 //
@@ -807,4 +806,4 @@ void SocketProactor::deleteHandler(IOHandlerList& handlers, IOHandlerList::itera
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

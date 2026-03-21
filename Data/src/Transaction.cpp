@@ -16,8 +16,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 Transaction::Transaction(Poco::Data::Session& rSession, Poco::Logger* pLogger):
@@ -128,4 +127,4 @@ void Transaction::rollback()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

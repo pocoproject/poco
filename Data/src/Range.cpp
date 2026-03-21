@@ -16,8 +16,7 @@
 #include "Poco/Data/DataException.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 using namespace Keywords;
@@ -37,4 +36,4 @@ Range::~Range()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

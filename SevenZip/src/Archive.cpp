@@ -29,8 +29,7 @@
 #include "7zFile.h"
 
 
-namespace Poco {
-namespace SevenZip {
+namespace Poco::SevenZip {
 
 
 class ArchiveImpl
@@ -374,4 +373,4 @@ std::string Archive::extract(const ArchiveEntry& entry, const std::string& destP
 }
 
 
-} } // namespace Poco::SevenZip
+} // namespace Poco::SevenZip

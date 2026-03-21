@@ -24,8 +24,7 @@
 #include "Poco/Net/HTTPServerParams.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API HTTPServerConnectionFactory: public TCPServerConnectionFactory
@@ -49,7 +48,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPServerConnectionFactory_INCLUDED

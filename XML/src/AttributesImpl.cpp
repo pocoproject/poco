@@ -15,8 +15,7 @@
 #include "Poco/SAX/AttributesImpl.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 AttributesImpl::EmptyAttribute::EmptyAttribute()
@@ -296,4 +295,4 @@ AttributesImpl::Attribute* AttributesImpl::find(const XMLString& namespaceURI, c
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

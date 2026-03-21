@@ -22,8 +22,7 @@
 #include "Poco/Net/SocketImpl.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API DatagramSocketImpl: public SocketImpl
@@ -49,7 +48,7 @@ protected:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_DatagramSocketImpl_INCLUDED

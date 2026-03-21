@@ -28,8 +28,7 @@
 	#define POCO_CHECK_NEW_STATE_ON_MOVE
 #endif
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API Socket
@@ -846,7 +845,7 @@ inline void Socket::init(int af)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_Socket_INCLUDED

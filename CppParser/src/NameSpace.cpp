@@ -22,8 +22,7 @@ using Poco::ExistsException;
 using Poco::NotFoundException;
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 NameSpace::NameSpace()
@@ -31,8 +30,9 @@ NameSpace::NameSpace()
 }
 
 
-NameSpace::NameSpace(const std::string& name, NameSpace* pNameSpace):
-	Symbol(name, pNameSpace)
+NameSpace::NameSpace(const std::string& name, NameSpace* pNameSpace, bool isInline):
+	Symbol(name, pNameSpace),
+	_isInline(isInline)
 {
 }
 
@@ -43,6 +43,12 @@ NameSpace::~NameSpace()
 	{
 		delete it->second;
 	}
+}
+
+
+void NameSpace::setInline(bool isInline)
+{
+	_isInline = isInline;
 }
 
 
@@ -208,6 +214,8 @@ Symbol::Kind NameSpace::kind() const
 std::string NameSpace::toString() const
 {
 	std::ostringstream ostr;
+	if (_isInline)
+		ostr << "inline ";
 	ostr << "namespace " << name() << "\n{\n";
 	for (Iterator it = begin(); it != end(); ++it)
 	{
@@ -250,4 +258,4 @@ void NameSpace::extract(Symbol::Kind kind, SymbolTable& table) const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

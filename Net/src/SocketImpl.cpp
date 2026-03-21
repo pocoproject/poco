@@ -85,8 +85,7 @@ namespace {
 #endif // WEPOLL_H_
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 bool checkIsBrokenTimeout()
@@ -1584,4 +1583,4 @@ std::streamsize SocketImpl::sendFileBlockwise(FileInputStream& fileInputStream, 
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

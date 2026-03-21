@@ -20,8 +20,7 @@
 #endif
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 #if defined(XML_UNICODE_WCHAR_T)
@@ -61,4 +60,4 @@ XMLString toXMLString(const std::string& str)
 #endif // XML_UNICODE_WCHAR_T
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

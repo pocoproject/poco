@@ -27,8 +27,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class InputSource;
@@ -374,7 +373,7 @@ inline bool ParserEngine::getEnablePartialReads() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // XML_ParserEngine_INCLUDED

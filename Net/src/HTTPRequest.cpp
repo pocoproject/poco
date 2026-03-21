@@ -23,8 +23,7 @@
 using Poco::NumberFormatter;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string HTTPRequest::HTTP_GET            = "GET";
@@ -308,4 +307,4 @@ void HTTPRequest::setExpectContinue(bool expectContinue)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

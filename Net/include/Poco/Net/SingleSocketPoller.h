@@ -24,8 +24,7 @@
 #include "Poco/Net/PollSet.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 template <std::size_t S = POCO_UDP_BUF_SIZE>
@@ -98,7 +97,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SingleSocketPoller_INCLUDED

@@ -27,8 +27,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API Cipher: public Poco::RefCountedObject
@@ -129,7 +128,7 @@ private:
 };
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_Cipher_INCLUDED

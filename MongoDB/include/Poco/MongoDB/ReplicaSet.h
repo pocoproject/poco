@@ -34,8 +34,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class ReplicaSetURI;
@@ -300,7 +299,7 @@ private:
 };
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_ReplicaSet_INCLUDED

@@ -31,9 +31,7 @@
 #include <sqltypes.h>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 class ODBC_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
@@ -341,7 +339,7 @@ inline const std::string& SessionImpl::dbEncoding() const
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif // Data_ODBC_SessionImpl_INCLUDED

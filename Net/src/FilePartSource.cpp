@@ -22,8 +22,7 @@ using Poco::Path;
 using Poco::OpenFileException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 FilePartSource::FilePartSource(const std::string& path):
@@ -84,4 +83,4 @@ std::streamsize FilePartSource::getContentLength() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -25,8 +25,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPRequest;
@@ -266,7 +265,7 @@ inline std::size_t HTMLForm::getValueLengthLimit() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTMLForm_INCLUDED

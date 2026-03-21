@@ -27,8 +27,7 @@
 using json_stream = struct json_stream;
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 extern "C"
@@ -303,4 +302,4 @@ bool ParserImpl::checkError()
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON

@@ -22,8 +22,7 @@
 #include "Poco/Data/Limit.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API Range
@@ -98,7 +97,7 @@ Range range(T low, T upp, bool hard = false)
 } // namespace Keywords
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Range_INCLUDED

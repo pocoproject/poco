@@ -18,8 +18,7 @@
 #include "Poco/DOM/DOMException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 NodeIterator::NodeIterator(Node* root, unsigned long whatToShow, NodeFilter* pFilter):
@@ -173,4 +172,4 @@ Node* NodeIterator::last()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

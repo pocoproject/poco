@@ -24,8 +24,7 @@
 #include "Poco/Dynamic/Struct.h"
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 class JSON_API Handler
@@ -100,7 +99,7 @@ public:
 };
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON
 
 
 #endif // JSON_Handler_INCLUDED

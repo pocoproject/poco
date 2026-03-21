@@ -29,8 +29,7 @@
 #include "Poco/Net/DNS.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 X509Certificate::X509Certificate(const std::string& path):
@@ -571,4 +570,4 @@ bool X509Certificate::matchWildcard(const std::string& wildcard, const std::stri
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -22,8 +22,7 @@
 #include "Poco/CppParser/Symbol.h"
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API Decl: public Symbol
@@ -56,7 +55,7 @@ inline const std::string& Decl::declaration() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_Decl_INCLUDED

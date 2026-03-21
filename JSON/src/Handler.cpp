@@ -15,8 +15,7 @@
 #include "Poco/JSON/Handler.h"
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 Handler::Handler() = default;
@@ -37,4 +36,4 @@ Poco::DynamicStruct Handler::asStruct() const
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON

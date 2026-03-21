@@ -64,8 +64,7 @@ using Poco::icompare;
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 Application* Application::_pInstance = nullptr;
@@ -561,4 +560,4 @@ void Application::setLogger(Logger& logger)
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

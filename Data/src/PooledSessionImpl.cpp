@@ -17,8 +17,7 @@
 #include "Poco/Data/SessionPool.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 PooledSessionImpl::PooledSessionImpl(PooledSessionHolder* pHolder):
@@ -213,4 +212,4 @@ SessionImpl* PooledSessionImpl::access() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

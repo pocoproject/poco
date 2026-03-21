@@ -15,8 +15,7 @@
 #include "Poco/MongoDB/Message.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 Message::Message(MessageHeader::OpCode opcode):
@@ -30,4 +29,4 @@ Message::~Message()
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

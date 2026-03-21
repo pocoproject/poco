@@ -24,8 +24,7 @@ using Poco::Timespan;
 using Poco::Exception;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 ICMPSocketImpl::ICMPSocketImpl(IPAddress::Family family, int dataSize, int ttl, int timeout):
@@ -129,4 +128,4 @@ int ICMPSocketImpl::receiveFrom(void*, int, SocketAddress& address, int flags)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

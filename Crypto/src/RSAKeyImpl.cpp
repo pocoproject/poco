@@ -22,8 +22,7 @@
 #include <openssl/bn.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 RSAKeyImpl::RSAKeyImpl(const EVPPKey& key):
@@ -361,4 +360,4 @@ RSAKeyImpl::ByteVec RSAKeyImpl::convertToByteVec(const BIGNUM* bn)
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

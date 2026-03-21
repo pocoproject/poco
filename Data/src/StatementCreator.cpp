@@ -16,8 +16,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 StatementCreator::StatementCreator()
@@ -65,4 +64,4 @@ StatementCreator::~StatementCreator()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

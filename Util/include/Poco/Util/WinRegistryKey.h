@@ -23,8 +23,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API WinRegistryKey
@@ -192,7 +191,7 @@ inline bool WinRegistryKey::isReadOnly() const
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_WinRegistryKey_INCLUDED

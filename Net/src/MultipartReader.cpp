@@ -21,8 +21,7 @@
 using Poco::BufferedStreamBuf;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 //
@@ -302,4 +301,4 @@ bool MultipartReader::readLine(std::string& line, std::string::size_type n)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

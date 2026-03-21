@@ -19,8 +19,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 QName::QName()
@@ -111,4 +110,4 @@ std::ostream& operator << (std::ostream& os, const QName& qn)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

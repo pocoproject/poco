@@ -22,9 +22,7 @@
 #define POCO_POSTGRESQL_VERSION_NUMBER ((NDB_VERSION_MAJOR<<16) | (NDB_VERSION_MINOR<<8) | (NDB_VERSION_BUILD&0xFF))
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 //const std::string SessionHandle::POSTGRESQL_READ_UNCOMMITTED = "READ UNCOMMITTED";
@@ -581,4 +579,4 @@ SessionParametersMap SessionHandle::connectionParameters() const
 }
 
 
-} } } // Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL

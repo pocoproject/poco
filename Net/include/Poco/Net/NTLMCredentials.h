@@ -24,8 +24,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API NTLMCredentials
@@ -175,7 +174,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_NTLMCredentials_INCLUDED

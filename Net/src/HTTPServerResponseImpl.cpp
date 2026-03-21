@@ -44,8 +44,7 @@ using Poco::Error;
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPServerResponseImpl::HTTPServerResponseImpl(HTTPSession& session):
@@ -184,4 +183,4 @@ void HTTPServerResponseImpl::requireAuthentication(const std::string& realm)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -22,8 +22,7 @@
 #include "Poco/Util/Subsystem.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API LoggingSubsystem: public Subsystem
@@ -47,7 +46,7 @@ protected:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_LoggingSubsystem_INCLUDED

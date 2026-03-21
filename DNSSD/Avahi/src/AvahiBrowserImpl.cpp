@@ -24,9 +24,7 @@
 #include <iostream>
 
 
-namespace Poco {
-namespace DNSSD {
-namespace Avahi {
+namespace Poco::DNSSD::Avahi {
 
 
 extern "C" void onBrowseReply(
@@ -593,5 +591,5 @@ void AvahiBrowserImpl::escape(const char* str, std::string& escaped)
 }
 
 
-} } } // namespace Poco::DNSSD::Avahi
+} // namespace Poco::DNSSD::Avahi
 

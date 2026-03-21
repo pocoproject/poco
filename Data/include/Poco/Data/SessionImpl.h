@@ -26,8 +26,7 @@
 #include "Poco/Any.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class StatementImpl;
@@ -278,7 +277,7 @@ inline bool SessionImpl::shouldParse() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_SessionImpl_INCLUDED

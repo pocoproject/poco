@@ -30,9 +30,7 @@
 #include <dns_sd.h>
 
 
-namespace Poco {
-namespace DNSSD {
-namespace Bonjour {
+namespace Poco::DNSSD::Bonjour {
 
 
 class DNSSD_Bonjour_API EventLoop: public Poco::Runnable
@@ -114,7 +112,7 @@ inline void EventLoop::unlock()
 }
 
 
-} } } // namespace Poco::DNSSD::Bonjour
+} // namespace Poco::DNSSD::Bonjour
 
 
 #endif // DNSSD_Bonjour_EventLoop_INCLUDED

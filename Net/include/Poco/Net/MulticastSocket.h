@@ -28,8 +28,7 @@
 #include "Poco/Net/NetworkInterface.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API MulticastSocket: public DatagramSocket
@@ -126,7 +125,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // POCO_NET_HAS_INTERFACE

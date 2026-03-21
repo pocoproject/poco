@@ -23,9 +23,7 @@
 #include <sql.h>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 Binder::Binder(const StatementHandle& rStmt,
@@ -673,4 +671,4 @@ void Binder::setParamSetSize(std::size_t length)
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

@@ -24,8 +24,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API AbstractPreparation
@@ -65,7 +64,7 @@ inline AbstractPreparation::PreparatorPtr AbstractPreparation::preparation()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_AbstractPreparation_INCLUDED

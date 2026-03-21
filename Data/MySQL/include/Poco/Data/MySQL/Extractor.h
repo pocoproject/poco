@@ -27,14 +27,12 @@
 #include "Poco/Nullable.h"
 
 
-namespace Poco {
-
-namespace Dynamic {
+namespace Poco::Dynamic {
 	class Var;
-}
+} // namespace Poco::Dynamic
 
-namespace Data {
-namespace MySQL {
+
+namespace Poco::Data::MySQL {
 
 
 class MySQL_API Extractor: public Poco::Data::AbstractExtractor
@@ -430,7 +428,7 @@ private:
 };
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL
 
 
 #endif // Data_MySQL_Extractor_INCLUDED

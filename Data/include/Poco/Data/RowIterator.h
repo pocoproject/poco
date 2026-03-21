@@ -25,8 +25,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class RecordSet;
@@ -138,7 +137,7 @@ inline bool RowIterator::operator != (const RowIterator& other) const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 namespace std

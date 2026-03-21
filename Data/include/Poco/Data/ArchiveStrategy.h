@@ -26,8 +26,7 @@
 #include "Poco/SharedPtr.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API ArchiveStrategy
@@ -217,7 +216,7 @@ inline const std::string& ArchiveByAgeStrategy::getThreshold() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_ArchiveStrategy_INCLUDED

@@ -28,8 +28,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XMLStreamParser;
@@ -98,7 +97,7 @@ T DefaultValueTraits<T>::parse(std::string s, const XMLStreamParser& p)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // XML_ValueTraits_INCLUDED

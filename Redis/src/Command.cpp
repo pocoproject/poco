@@ -18,8 +18,7 @@
 #include "Poco/NumberFormatter.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 Command::Command(const std::string& command): Array()
@@ -763,4 +762,4 @@ Command Command::auth(const std::string& username, const std::string& password)
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis

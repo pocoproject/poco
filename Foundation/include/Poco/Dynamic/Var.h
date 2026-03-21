@@ -31,8 +31,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 template <typename K, typename M, typename S>
@@ -2285,7 +2284,10 @@ inline bool operator >= (const unsigned long& other, const Var& da)
 #endif // POCO_INT64_IS_LONG
 
 
-} // namespace Dynamic
+} // namespace Poco::Dynamic
+
+
+namespace Poco {
 
 
 using DynamicAny POCO_DEPRECATED("Replace with Poco::Dynamic::Var") = Dynamic::Var;

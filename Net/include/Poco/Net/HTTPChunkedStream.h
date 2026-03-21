@@ -26,8 +26,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPSession;
@@ -101,7 +100,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPChunkedStream_INCLUDED

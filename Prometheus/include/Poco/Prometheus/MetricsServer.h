@@ -24,8 +24,7 @@
 #include "Poco/Net/ServerSocket.h"
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Registry;
@@ -74,7 +73,7 @@ private:
 };
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_MetricsServer_INCLUDED

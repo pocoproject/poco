@@ -26,8 +26,7 @@ using Poco::IOException;
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 ICMPEventArgs::ICMPEventArgs(const SocketAddress& address, int repetitions, int dataSize, int ttl):
@@ -198,4 +197,4 @@ int ICMPEventArgs::maxRTT() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

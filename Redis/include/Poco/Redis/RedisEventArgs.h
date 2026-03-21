@@ -21,8 +21,7 @@
 #include "Poco/Redis/Type.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 class Redis_API RedisEventArgs
@@ -93,7 +92,7 @@ inline void RedisEventArgs::stop()
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis
 
 
 #endif // Redis_RedisEventArgs_INCLUDED

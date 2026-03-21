@@ -22,9 +22,7 @@
 #include <limits>
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 Extractor::Extractor(StatementExecutor& st):
@@ -1090,4 +1088,4 @@ bool Extractor::extract(std::size_t, std::list<Dynamic::Var>&)
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL

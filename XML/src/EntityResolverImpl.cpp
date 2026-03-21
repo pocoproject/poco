@@ -28,8 +28,7 @@ using Poco::IOException;
 using Poco::OpenFileException;
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 EntityResolverImpl::EntityResolverImpl():
@@ -75,4 +74,4 @@ std::istream* EntityResolverImpl::resolveSystemId(const XMLString& systemId)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

@@ -24,8 +24,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 struct StreamExceptionController
@@ -937,4 +936,4 @@ void XMLStreamParser::handleEndNamespaceDecl(void* v, const XMLChar* prefix)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

@@ -23,8 +23,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API BSONReader
@@ -81,7 +80,7 @@ inline std::string BSONReader::readCString()
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_BSONReader_INCLUDED

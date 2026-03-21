@@ -30,8 +30,7 @@ using Poco::NumberFormatter;
 using Poco::icompare;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 AbstractConfiguration::AbstractConfiguration():
@@ -670,4 +669,4 @@ void AbstractConfiguration::setRawWithEvent(const std::string& key, std::string 
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

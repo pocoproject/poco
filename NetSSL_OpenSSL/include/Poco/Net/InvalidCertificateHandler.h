@@ -21,8 +21,7 @@
 #include "Poco/Net/NetSSL.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class VerificationErrorArgs;
@@ -76,7 +75,7 @@ protected:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_InvalidCertificateHandler_INCLUDED

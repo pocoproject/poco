@@ -24,8 +24,7 @@ using Poco::Mutex;
 using Poco::ScopedLock;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 StreamSocket::StreamSocket(): Socket(new StreamSocketImpl)
@@ -220,4 +219,4 @@ std::streamsize StreamSocket::sendFile(Poco::FileInputStream& fileInputStream, s
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

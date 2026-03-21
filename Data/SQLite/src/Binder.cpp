@@ -26,9 +26,7 @@ using Poco::DateTimeFormatter;
 using Poco::DateTimeFormat;
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 Binder::Binder(sqlite3_stmt* pStmt):
@@ -131,4 +129,4 @@ void Binder::checkReturn(int rc)
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite

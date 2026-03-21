@@ -66,8 +66,7 @@ namespace
 }
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string HTTPDigestCredentials::SCHEME = "Digest";
@@ -429,4 +428,4 @@ bool HTTPDigestCredentials::isAlgorithmSupported(const std::string& algorithm) c
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

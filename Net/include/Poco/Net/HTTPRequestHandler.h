@@ -21,8 +21,7 @@
 #include "Poco/Net/Net.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPServerRequest;
@@ -61,7 +60,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPRequestHandler_INCLUDED

@@ -23,8 +23,7 @@
 #include <cstdlib>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API DialogSocket: public StreamSocket
@@ -205,7 +204,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_DialogSocket_INCLUDED

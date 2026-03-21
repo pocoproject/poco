@@ -21,8 +21,7 @@
 #include "Poco/Net/Net.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NameValueCollection;
@@ -297,7 +296,7 @@ inline HTTPCookie::SameSite HTTPCookie::getSameSite() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPCookie_INCLUDED

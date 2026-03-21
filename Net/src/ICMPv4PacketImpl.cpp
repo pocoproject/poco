@@ -32,8 +32,7 @@ using Poco::UInt16;
 using Poco::Int32;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const UInt8 ICMPv4PacketImpl::DESTINATION_UNREACHABLE_TYPE = 3;
@@ -261,4 +260,4 @@ std::string ICMPv4PacketImpl::typeDescription(int typeId)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

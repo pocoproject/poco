@@ -23,8 +23,7 @@
 #include "Poco/XML/XMLString.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API Entity: public AbstractContainerNode
@@ -120,7 +119,7 @@ inline const XMLString& Entity::notationName() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_Entity_INCLUDED

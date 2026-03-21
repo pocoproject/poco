@@ -23,8 +23,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 // The byte input stream is always a narrow stream.
@@ -65,7 +64,7 @@ using XMLByteOutputStream = std::ostream;
 #endif
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // XML_XMLStream_INCLUDED

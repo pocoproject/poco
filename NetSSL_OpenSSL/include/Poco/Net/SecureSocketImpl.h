@@ -28,8 +28,7 @@
 #include <openssl/ssl.h>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HostEntry;
@@ -336,7 +335,7 @@ inline const std::string& SecureSocketImpl::getPeerHostName() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_SecureSocketImpl_INCLUDED

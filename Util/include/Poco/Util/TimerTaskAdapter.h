@@ -22,8 +22,7 @@
 #include "Poco/Util/TimerTask.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 template <class C>
@@ -61,7 +60,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_TimerTaskAdapter_INCLUDED

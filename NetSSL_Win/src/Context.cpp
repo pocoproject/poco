@@ -29,8 +29,7 @@
 #include <stdio.h>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string Context::CERT_STORE_MY("MY");
@@ -557,4 +556,4 @@ void Context::requireMinimumProtocol(Protocols protocol)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

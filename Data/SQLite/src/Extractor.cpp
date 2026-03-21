@@ -28,9 +28,7 @@
 using Poco::DateTimeParser;
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 Extractor::Extractor(sqlite3_stmt* pStmt):
@@ -898,4 +896,4 @@ bool Extractor::extract(std::size_t pos, std::list<Poco::Dynamic::Var>& val)
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite

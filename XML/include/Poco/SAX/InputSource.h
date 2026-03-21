@@ -23,8 +23,7 @@
 #include "Poco/XML/XMLStream.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API InputSource
@@ -163,7 +162,7 @@ inline XMLCharInputStream* InputSource::getCharacterStream() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_InputSource_INCLUDED

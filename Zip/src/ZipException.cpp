@@ -16,12 +16,11 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 POCO_IMPLEMENT_EXCEPTION(ZipException, Poco::RuntimeException, "ZIP Exception")
 POCO_IMPLEMENT_EXCEPTION(ZipManipulationException, ZipException, "ZIP Manipulation Exception")
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

@@ -28,8 +28,7 @@
 #include <memory>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 using namespace Keywords;
@@ -750,4 +749,4 @@ void SQLChannel::registerChannel()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

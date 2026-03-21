@@ -39,8 +39,7 @@ using Poco::Net::Impl::IPv6AddressImpl;
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 #if !defined(_MSC_VER) || defined(__STDC__)
@@ -700,5 +699,5 @@ std::ostream& operator << (std::ostream& ostr, const Poco::Net::IPAddress& addr)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 

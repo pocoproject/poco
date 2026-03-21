@@ -15,8 +15,7 @@
 #include "Poco/DOM/Node.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 Node::~Node()
@@ -24,4 +23,4 @@ Node::~Node()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

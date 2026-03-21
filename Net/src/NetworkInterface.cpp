@@ -62,8 +62,7 @@ std::ostream& operator << (std::ostream& os, const Poco::Net::NetworkInterface::
 }
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 //
@@ -923,7 +922,7 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 //
@@ -941,8 +940,7 @@ NetworkInterface::List NetworkInterface::list(bool ipOnly, bool upOnly)
 #include <iterator>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 namespace {
@@ -1242,7 +1240,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #elif defined(POCO_VXWORKS)
@@ -1253,8 +1251,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #error TODO
 
 /*
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 NetworkInterface::NetworkInterfaceList NetworkInterface::list()
@@ -1297,7 +1294,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 */
 
 #elif defined(POCO_OS_FAMILY_BSD) || (POCO_OS == POCO_OS_QNX) || (POCO_OS == POCO_OS_SOLARIS)
@@ -1314,8 +1311,7 @@ NetworkInterface::NetworkInterfaceList NetworkInterface::list()
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 namespace {
@@ -1476,7 +1472,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #elif POCO_OS == POCO_OS_LINUX || POCO_OS == POCO_OS_ANDROID
@@ -1496,8 +1492,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 #include <net/if_arp.h>
 #include <iostream>
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 namespace {
@@ -1702,7 +1697,7 @@ NetworkInterface::Map NetworkInterface::map(bool ipOnly, bool upOnly)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #else

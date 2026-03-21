@@ -19,8 +19,7 @@
 using Poco::UnbufferedStreamBuf;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPResponseStreamBuf::HTTPResponseStreamBuf(std::istream& istr):
@@ -62,4 +61,4 @@ HTTPResponseStream::~HTTPResponseStream()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

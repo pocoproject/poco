@@ -31,8 +31,7 @@
 #include "Poco/XML/NamePool.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString Document::NODE_NAME = toXMLString("#document");
@@ -323,4 +322,4 @@ Element* Document::getElementByIdNS(const XMLString& elementId, const XMLString&
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

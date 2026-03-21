@@ -23,8 +23,7 @@
 #include "Poco/XML/XMLString.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API ProcessingInstruction: public AbstractNode
@@ -93,7 +92,7 @@ inline const XMLString& ProcessingInstruction::getData() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_ProcessingInstruction_INCLUDED

@@ -19,9 +19,7 @@
 #include "Poco/NumberFormatter.h"
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 std::string Utility::serverInfo(SessionHandle* aHandlePtr)
@@ -84,4 +82,4 @@ std::string Utility::sessionEncoding(Poco::Data::Session& aSession)
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL

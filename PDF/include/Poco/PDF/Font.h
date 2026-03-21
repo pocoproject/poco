@@ -23,8 +23,7 @@
 #include "Poco/PDF/Resource.h"
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 class PDF_API Font: public Resource<HPDF_Font>
@@ -70,7 +69,7 @@ public:
 		/// Calculates the byte length which can be included within the specified width.
 };
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_Font_INCLUDED

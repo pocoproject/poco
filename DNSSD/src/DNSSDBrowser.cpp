@@ -17,8 +17,7 @@
 #include "Poco/DNSSD/DNSSDBrowser.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 DNSSDBrowser::DNSSDBrowser()
@@ -31,4 +30,4 @@ DNSSDBrowser::~DNSSDBrowser()
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD

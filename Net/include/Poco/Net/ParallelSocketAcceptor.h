@@ -26,8 +26,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 template <class ServiceHandler, class SR>
@@ -232,7 +231,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_ParallelSocketAcceptor_INCLUDED

@@ -30,8 +30,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 JSONConfiguration::JSONConfiguration() : _object(new JSON::Object())
@@ -379,7 +378,7 @@ void JSONConfiguration::removeRaw(const std::string& key)
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // POCO_UTIL_NO_JSONCONFIGURATION

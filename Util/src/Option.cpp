@@ -23,8 +23,7 @@
 using Poco::icompare;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 Option::Option(const Option& option):
@@ -259,4 +258,4 @@ void Option::process(const std::string& option, std::string& arg) const
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

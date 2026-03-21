@@ -25,8 +25,7 @@
 #include "Poco/Runnable.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API Timer: protected Poco::Runnable
@@ -210,7 +209,7 @@ inline std::size_t Timer::taskCount() const
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_Timer_INCLUDED

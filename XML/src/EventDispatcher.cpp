@@ -39,8 +39,7 @@ namespace
 }
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 EventDispatcher::EventDispatcher():
@@ -143,4 +142,4 @@ void EventDispatcher::bubbleEvent(Event* evt)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

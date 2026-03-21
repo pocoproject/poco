@@ -24,8 +24,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const std::string XMLWriter::NEWLINE_DEFAULT;
@@ -1067,4 +1066,4 @@ bool XMLWriter::isNamespaceMapped(const XMLString& namespc) const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

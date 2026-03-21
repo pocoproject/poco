@@ -22,8 +22,7 @@
 #include "Poco/Util/AbstractConfiguration.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API AbstractConfigurationView: public AbstractConfiguration
@@ -94,7 +93,7 @@ protected:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_ConfigurationView_INCLUDED

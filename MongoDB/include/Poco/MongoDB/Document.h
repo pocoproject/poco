@@ -30,8 +30,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class Array;
@@ -349,7 +348,7 @@ inline void BSONWriter::write<Document::Ptr>(const Document::Ptr& from)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_Document_INCLUDED

@@ -30,8 +30,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class RowFilter;
@@ -579,7 +578,7 @@ inline void RecordSet::formatNames() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_RecordSet_INCLUDED

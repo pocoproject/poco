@@ -22,8 +22,7 @@
 using Poco::format;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 RegExpValidator::RegExpValidator(const std::string& regexp):
@@ -39,4 +38,4 @@ void RegExpValidator::validate(const Option& option, const std::string& value)
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

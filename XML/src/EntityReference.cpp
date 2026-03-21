@@ -15,8 +15,7 @@
 #include "Poco/DOM/EntityReference.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 EntityReference::EntityReference(Document* pOwnerDocument, const XMLString& name):
@@ -56,4 +55,4 @@ Node* EntityReference::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

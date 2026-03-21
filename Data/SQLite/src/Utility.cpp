@@ -28,9 +28,7 @@
 #endif
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 const std::string Utility::TRANSACTION_TYPE_PROPERTY_KEY = "transactionType";
@@ -352,4 +350,4 @@ void* Utility::eventHookRegister(sqlite3* pDB, RollbackCallbackType callbackFn, 
 // for a discussion.
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite

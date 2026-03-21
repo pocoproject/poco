@@ -47,8 +47,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API SecureSocketImpl
@@ -429,7 +428,7 @@ inline int SecureSocketImpl::lastError()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_SecureSocketImpl_INCLUDED

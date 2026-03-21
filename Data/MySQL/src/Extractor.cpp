@@ -17,9 +17,7 @@
 #include "Poco/Data/Time.h"
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 Extractor::Extractor(StatementExecutor& st, ResultMetadata& md): _stmt(st), _metadata(md)
@@ -865,4 +863,4 @@ bool Extractor::extract(std::size_t , std::list<Dynamic::Var>& )
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL

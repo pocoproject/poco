@@ -21,8 +21,7 @@
 #include "Poco/Redis/Type.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 class Redis_API Error
@@ -85,7 +84,7 @@ struct RedisTypeTraits<Error>
 };
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis
 
 
 #endif // Redis_Error_INCLUDED

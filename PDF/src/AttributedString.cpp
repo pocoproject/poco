@@ -5,8 +5,7 @@
 #include "Poco/PDF/AttributedString.h"
 #include "Poco/Format.h"
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 AttributedString::AttributedString():
@@ -112,4 +111,4 @@ void AttributedString::clearAttribute(int attr)
 }
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF

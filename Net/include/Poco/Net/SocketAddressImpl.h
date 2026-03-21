@@ -24,9 +24,7 @@
 #include "Poco/RefCountedObject.h"
 
 
-namespace Poco {
-namespace Net {
-namespace Impl {
+namespace Poco::Net::Impl {
 
 
 class Net_API SocketAddressImpl : public Poco::RefCountedObject
@@ -252,7 +250,7 @@ inline const char* LocalSocketAddressImpl::path() const
 #endif // POCO_OS_FAMILY_UNIX
 
 
-} } } // namespace Poco::Net::Impl
+} // namespace Poco::Net::Impl
 
 
 #endif // Net_SocketAddressImpl_INCLUDED

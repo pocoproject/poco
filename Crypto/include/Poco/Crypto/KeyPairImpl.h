@@ -27,8 +27,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API KeyPairImpl: public Poco::RefCountedObject
@@ -101,7 +100,7 @@ inline KeyPairImpl::Type KeyPairImpl::type() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_KeyPairImplImpl_INCLUDED

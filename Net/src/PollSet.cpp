@@ -37,8 +37,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 #if defined(POCO_HAVE_FD_EPOLL)
@@ -804,4 +803,4 @@ void PollSet::wakeUp()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

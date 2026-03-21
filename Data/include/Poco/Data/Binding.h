@@ -33,8 +33,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <class T>
@@ -1440,7 +1439,7 @@ inline AbstractBinding::Ptr bind(T t)
 } // namespace Keywords
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Binding_INCLUDED

@@ -25,9 +25,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 class PostgreSQL_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
@@ -181,7 +179,7 @@ inline bool SessionImpl::isBinaryExtraction(const std::string&) const
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif // SQL_PostgreSQL_SessionImpl_INCLUDED

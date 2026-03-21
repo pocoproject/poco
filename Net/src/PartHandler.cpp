@@ -15,8 +15,7 @@
 #include "Poco/Net/PartHandler.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 PartHandler::PartHandler()
@@ -29,4 +28,4 @@ PartHandler::~PartHandler()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

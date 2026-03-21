@@ -15,8 +15,7 @@
 #include "Poco/Data/AbstractBinding.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 AbstractBinding::AbstractBinding(const std::string& name,
@@ -42,4 +41,4 @@ void AbstractBinding::setBinder(BinderPtr pBinder)
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

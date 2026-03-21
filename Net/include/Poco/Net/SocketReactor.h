@@ -33,10 +33,7 @@
 #include <atomic>
 
 
-namespace Poco {
-
-
-namespace Net {
+namespace Poco::Net {
 
 
 class Socket;
@@ -516,7 +513,7 @@ inline Poco::Thread& ScopedSocketReactor::thread()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SocketReactor_INCLUDED

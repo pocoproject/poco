@@ -19,8 +19,7 @@
 #include <limits>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 const std::size_t RowIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
@@ -220,4 +219,4 @@ RowIterator RowIterator::operator - (std::size_t diff) const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

@@ -16,8 +16,7 @@
 #include "Poco/String.h"
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 Decl::Decl(const std::string& decl, NameSpace* pNameSpace):
@@ -38,5 +37,5 @@ std::string Decl::toString() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 

@@ -21,9 +21,7 @@
 #include <sqlite3.h>
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 const int SQLiteStatementImpl::POCO_SQLITE_INV_ROW_CNT = -1;
@@ -309,4 +307,4 @@ int SQLiteStatementImpl::affectedRowCount() const
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite

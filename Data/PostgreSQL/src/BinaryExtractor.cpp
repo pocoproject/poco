@@ -21,9 +21,7 @@
 #include <limits>
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 namespace
@@ -1233,4 +1231,4 @@ bool BinaryExtractor::extract(std::size_t, std::list<Dynamic::Var>&)
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL

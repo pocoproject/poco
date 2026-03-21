@@ -18,12 +18,11 @@
 #include "SQLParser.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 namespace Parser = hsql; // namespace Poco::Data::Parser
 
-}}
+} // namespace Poco::Data
 
 
 using namespace Poco::Data::Parser;

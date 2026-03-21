@@ -28,9 +28,7 @@
 #include <sqltypes.h>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 template <typename H, SQLSMALLINT handleType>
@@ -113,7 +111,7 @@ typedef Handle<SQLHSTMT, SQL_HANDLE_STMT> StatementHandle;
 typedef Handle<SQLHDESC, SQL_HANDLE_DESC> DescriptorHandle;
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif

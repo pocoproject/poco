@@ -27,8 +27,7 @@
 #endif
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API OpenSSLInitializer
@@ -104,7 +103,7 @@ inline bool OpenSSLInitializer::haveLegacyProvider()
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_OpenSSLInitializer_INCLUDED

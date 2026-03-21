@@ -21,8 +21,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class Symbol;
@@ -33,7 +32,7 @@ class Enum;
 class Variable;
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 class DocWriter

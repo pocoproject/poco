@@ -28,9 +28,7 @@
 #include <sqlext.h>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 template <typename H, SQLSMALLINT handleType>
@@ -146,7 +144,7 @@ using StatementError = Error<SQLHSTMT, SQL_HANDLE_STMT>;
 using DescriptorError = Error<SQLHSTMT, SQL_HANDLE_DESC>;
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif

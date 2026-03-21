@@ -22,8 +22,7 @@
 #include "Poco/XML/XMLString.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class Locator;
@@ -234,7 +233,7 @@ protected:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_ContentHandler_INCLUDED

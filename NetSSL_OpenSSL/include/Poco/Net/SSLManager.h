@@ -34,8 +34,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Context;
@@ -417,7 +416,7 @@ inline int SSLManager::socketIndex() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_SSLManager_INCLUDED

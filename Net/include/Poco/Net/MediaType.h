@@ -22,8 +22,7 @@
 #include "Poco/Net/NameValueCollection.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API MediaType
@@ -169,7 +168,7 @@ inline void swap(MediaType& m1, MediaType& m2) noexcept
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_MediaType_INCLUDED

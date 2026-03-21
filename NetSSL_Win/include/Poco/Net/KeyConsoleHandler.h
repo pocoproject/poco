@@ -22,8 +22,7 @@
 #include "Poco/Net/PrivateKeyPassphraseHandler.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API KeyConsoleHandler: public PrivateKeyPassphraseHandler
@@ -41,7 +40,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_KeyConsoleHandler_INCLUDED

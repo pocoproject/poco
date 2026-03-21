@@ -27,8 +27,7 @@
 #include "Poco/Util/OptionException.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string SSLManager::CFG_CERT_NAME("certificateName");
@@ -434,4 +433,4 @@ void uninitializeSSL()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

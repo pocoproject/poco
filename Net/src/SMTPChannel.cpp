@@ -29,8 +29,7 @@
 #include "Poco/Environment.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string SMTPChannel::PROP_MAILHOST("mailhost");
@@ -207,4 +206,4 @@ void SMTPChannel::registerChannel()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -25,8 +25,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API NameSpace: public Symbol
@@ -41,7 +40,7 @@ public:
 	NameSpace();
 		/// Creates the NameSpace.
 
-	NameSpace(const std::string& name, NameSpace* pNameSpace = nullptr);
+	NameSpace(const std::string& name, NameSpace* pNameSpace = nullptr, bool isInline = false);
 		/// Creates the NameSpace.
 
 	~NameSpace();
@@ -61,7 +60,7 @@ public:
 
 	Iterator end() const;
 		/// Returns an iterator for iterating over the NameSpace's Symbol's.
-	
+
 	virtual Symbol* lookup(const std::string& name) const;
 		/// Looks up the given name in the symbol table
 		/// and returns the corresponding symbol, or null
@@ -99,6 +98,13 @@ public:
 	const NameSpaceVec& importedNameSpaces() const;
 		/// Returns a vector containing all imported namespaces.
 
+	[[nodiscard]]
+	bool isInline() const;
+		/// Returns true if this is an inline namespace.
+
+	void setInline(bool isInline);
+		/// Sets the inline flag for this namespace.
+
 	Symbol::Kind kind() const;
 	std::string toString() const;
 
@@ -117,6 +123,7 @@ private:
 	SymbolTable _symbols;
 	AliasMap _importedSymbols;
 	NameSpaceVec _importedNameSpaces;
+	bool _isInline = false;
 };
 
 
@@ -135,7 +142,13 @@ inline const NameSpace::NameSpaceVec& NameSpace::importedNameSpaces() const
 }
 
 
-} } // namespace Poco::CppParser
+inline bool NameSpace::isInline() const
+{
+	return _isInline;
+}
+
+
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_NameSpace_INCLUDED

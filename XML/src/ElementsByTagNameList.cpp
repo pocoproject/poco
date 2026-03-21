@@ -18,8 +18,7 @@
 #include <climits>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 ElementsByTagNameList::ElementsByTagNameList(const Node* pParent, const XMLString& name):
@@ -148,4 +147,4 @@ void ElementsByTagNameListNS::autoRelease()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

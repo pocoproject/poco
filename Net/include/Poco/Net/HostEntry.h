@@ -24,8 +24,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API HostEntry
@@ -109,7 +108,7 @@ inline void swap(HostEntry& h1, HostEntry& h2) noexcept
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HostEntry_INCLUDED

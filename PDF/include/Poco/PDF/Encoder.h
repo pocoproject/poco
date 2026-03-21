@@ -22,8 +22,7 @@
 #include "Poco/PDF/Resource.h"
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 class PDF_API Encoder: public Resource<HPDF_Encoder>
@@ -79,7 +78,7 @@ public:
 };
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_Encoder_INCLUDED

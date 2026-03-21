@@ -22,9 +22,7 @@
 #include "Poco/Data/Connector.h"
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 class MySQL_API Connector: public Poco::Data::Connector
@@ -54,7 +52,7 @@ public:
 };
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL
 
 
 #endif // Data_MySQL_Connector_INCLUDED

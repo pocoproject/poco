@@ -21,8 +21,7 @@
 #include <cstring>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 AutoDetectStreamBuf::AutoDetectStreamBuf(std::istream& in, const std::string& pre, const std::string& post, bool reposition, Poco::UInt32 start, bool needsZip64):
@@ -226,4 +225,4 @@ AutoDetectInputStream::~AutoDetectInputStream()
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

@@ -21,8 +21,7 @@
 #include <atomic>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 template <typename T>
@@ -99,7 +98,7 @@ private:
 };
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_AtomicFloat_INCLUDED

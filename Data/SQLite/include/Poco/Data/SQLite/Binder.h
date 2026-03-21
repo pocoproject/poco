@@ -26,9 +26,7 @@
 #include <sqlite3.h>
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 class SQLite_API Binder: public Poco::Data::AbstractBinder
@@ -222,7 +220,7 @@ inline void Binder::bind(std::size_t pos, const Poco::Data::CLOB& val, Direction
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite
 
 
 #endif // Data_SQLite_Binder_INCLUDED

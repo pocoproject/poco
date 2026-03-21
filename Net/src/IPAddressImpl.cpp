@@ -58,9 +58,7 @@ unsigned maskBits(T val, unsigned size)
 } // namespace
 
 
-namespace Poco {
-namespace Net {
-namespace Impl {
+namespace Poco::Net::Impl {
 
 
 //
@@ -826,4 +824,4 @@ bool IPv6AddressImpl::operator != (const IPv6AddressImpl& addr) const
 #endif // POCO_HAVE_IPv6
 
 
-} } } // namespace Poco::Net::Impl
+} // namespace Poco::Net::Impl

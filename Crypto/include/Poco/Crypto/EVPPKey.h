@@ -31,8 +31,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 //class [[deprecated]] ECKey;
 //class [[deprecated]] RSAKey;
@@ -395,7 +394,7 @@ inline EVPPKey::operator EVP_PKEY*()
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_EVPPKeyImpl_INCLUDED

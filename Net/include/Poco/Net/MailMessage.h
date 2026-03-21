@@ -28,8 +28,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class MediaType;
@@ -352,7 +351,7 @@ inline const MailMessage::PartVec& MailMessage::parts() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_MailMessage_INCLUDED

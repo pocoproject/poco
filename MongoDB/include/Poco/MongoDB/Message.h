@@ -24,8 +24,7 @@
 #include "Poco/Types.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API Message
@@ -68,7 +67,7 @@ inline void Message::messageLength(Poco::Int32 length)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_Message_INCLUDED

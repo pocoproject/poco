@@ -19,8 +19,7 @@
 #include <functional>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 RowFilter::RowFilter(RecordSet* pRecordSet): _pRecordSet(pRecordSet), _not(false)
@@ -222,4 +221,4 @@ void RowFilter::rewindRecordSet()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

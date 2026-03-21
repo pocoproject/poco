@@ -19,8 +19,7 @@
 #include "Poco/Net/NetException.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 FTPSClientSession::FTPSClientSession():
@@ -148,4 +147,4 @@ void FTPSClientSession::receiveServerReadyReply()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

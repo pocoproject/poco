@@ -15,8 +15,7 @@
 #include "Poco/Net/RejectCertificateHandler.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 RejectCertificateHandler::RejectCertificateHandler(bool server): InvalidCertificateHandler(server)
@@ -35,4 +34,4 @@ void RejectCertificateHandler::onInvalidCertificate(const void*, VerificationErr
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
