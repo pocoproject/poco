@@ -57,6 +57,7 @@ class Util_API PropertyFileConfiguration: public MapConfiguration
 	///   !include <path>
 	/// (where <path> is a relative or absolute file path) includes another properties file.
 	/// Relative paths are resolved relative to the directory of the including file.
+	/// ${variable} references in include paths are expanded.
 	///
 	/// Property names are case sensitive. Leading and trailing whitespace is
 	/// removed from both keys and values. A property name can neither contain
