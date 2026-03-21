@@ -139,51 +139,57 @@ void PropertyFileConfiguration::save(std::ostream& ostr) const
 
 void PropertyFileConfiguration::save(const std::string& path) const
 {
-	AbstractConfiguration::ScopedLock lock(*this);
+	// Snapshot state under the lock, then release before file I/O
+	std::map<std::string, std::map<std::string, std::string>> fileValues; // file -> {key -> value}
 
-	if (_sourceMap.empty())
 	{
-		// No provenance — write flat key-value pairs
-		std::set<std::string> allKeys;
-		MapConfiguration::iterator it = begin();
-		MapConfiguration::iterator ed = end();
-		while (it != ed) { allKeys.insert(it->first); ++it; }
-		saveToFile(path, allKeys);
-		return;
-	}
+		AbstractConfiguration::ScopedLock lock(*this);
 
-	// Group keys by source file
-	std::map<std::string, std::set<std::string>> fileKeys;
-	for (const auto& [key, file] : _sourceMap)
-	{
-		fileKeys[file].insert(key);
-	}
+		Poco::Path absPath(path);
+		absPath.makeAbsolute();
+		std::string absPathStr = absPath.toString();
 
-	// Find keys with no provenance (newly added) — assign to root file
-	Poco::Path rootPath(path);
-	rootPath.makeAbsolute();
-	std::string rootFile = _rootFile.empty() ? rootPath.toString() : _rootFile;
+		bool useProvenance = !_sourceMap.empty() && !_rootFile.empty() && absPathStr == _rootFile;
 
-	MapConfiguration::iterator it = begin();
-	MapConfiguration::iterator ed = end();
-	while (it != ed)
-	{
-		if (_sourceMap.find(it->first) == _sourceMap.end())
+		if (useProvenance)
 		{
-			fileKeys[rootFile].insert(it->first);
+			// Group key-values by source file
+			for (const auto& [key, file] : _sourceMap)
+			{
+				std::string rawValue;
+				if (getRaw(key, rawValue))
+					fileValues[file][key] = rawValue;
+			}
+
+			// Assign keys with no provenance (newly added) to root file
+			MapConfiguration::iterator it = begin();
+			MapConfiguration::iterator ed = end();
+			while (it != ed)
+			{
+				if (_sourceMap.find(it->first) == _sourceMap.end())
+					fileValues[_rootFile][it->first] = it->second;
+				++it;
+			}
 		}
-		++it;
+		else
+		{
+			// Flat save — all keys to the provided path
+			auto& values = fileValues[path];
+			MapConfiguration::iterator it = begin();
+			MapConfiguration::iterator ed = end();
+			while (it != ed) { values[it->first] = it->second; ++it; }
+		}
 	}
 
-	// Save each file
-	for (const auto& [file, keys] : fileKeys)
+	// File I/O without holding the lock
+	for (const auto& [file, values] : fileValues)
 	{
-		saveToFile(file, keys);
+		saveToFile(file, values);
 	}
 }
 
 
-void PropertyFileConfiguration::saveToFile(const std::string& path, const std::set<std::string>& keys) const
+void PropertyFileConfiguration::saveToFile(const std::string& path, const std::map<std::string, std::string>& values)
 {
 	std::set<std::string> written;
 	std::ostringstream out;
@@ -226,15 +232,14 @@ void PropertyFileConfiguration::saveToFile(const std::string& path, const std::s
 			if (sep != std::string::npos)
 			{
 				std::string key = Poco::trim(line.substr(0, sep));
-				if (keys.count(key) && has(key))
+				auto it = values.find(key);
+				if (it != values.end())
 				{
-					std::string rawValue;
-					getRaw(key, rawValue);
 					char sepChar = line[sep];
-					out << key << " " << sepChar << " " << escapeValue(rawValue) << "\n";
+					out << key << " " << sepChar << " " << escapeValue(it->second) << "\n";
 					written.insert(key);
 				}
-				// Key not in config (removed) — skip line
+				// Key not in values (removed) — skip line
 			}
 			else
 			{
@@ -245,13 +250,11 @@ void PropertyFileConfiguration::saveToFile(const std::string& path, const std::s
 	}
 
 	// Append new keys not yet written
-	for (const auto& key : keys)
+	for (const auto& [key, value] : values)
 	{
-		if (!written.count(key) && has(key))
+		if (!written.count(key))
 		{
-			std::string rawValue;
-			getRaw(key, rawValue);
-			out << key << ": " << escapeValue(rawValue) << "\n";
+			out << key << ": " << escapeValue(value) << "\n";
 		}
 	}
 
@@ -290,6 +293,14 @@ std::string PropertyFileConfiguration::getSourceFile(const std::string& key) con
 	if (it != _sourceMap.end())
 		return it->second;
 	return "";
+}
+
+
+void PropertyFileConfiguration::setSourceFile(const std::string& key, const std::string& path)
+{
+	Poco::Path p(path);
+	p.makeAbsolute();
+	_sourceMap[key] = p.toString();
 }
 
 

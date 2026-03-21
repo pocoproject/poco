@@ -448,6 +448,59 @@ void PropertyFileConfigurationTest::testSavePreserving()
 		assertTrue (content.find("flat.key") != std::string::npos);
 		assertTrue (content.find("flatValue") != std::string::npos);
 	}
+
+	// 6. setSourceFile directs new keys to a specific file
+	Poco::TemporaryFile extraFile2;
+	{
+		Poco::FileOutputStream ostr(extraFile2.path());
+		ostr << "extra2.existing = existingValue\n";
+	}
+
+	Poco::TemporaryFile rootFile2;
+	{
+		Poco::FileOutputStream ostr(rootFile2.path());
+		ostr << "root2.key = rootValue\n";
+		ostr << "!include " << extraFile2.path() << "\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConf2 = new PropertyFileConfiguration(rootFile2.path());
+	pConf2->setString("extra2.newKey", "newExtraValue");
+	pConf2->setSourceFile("extra2.newKey", extraFile2.path());
+	pConf2->save(rootFile2.path());
+
+	// Verify new key went to extra file, not root
+	{
+		Poco::FileInputStream istr(extraFile2.path());
+		std::string content;
+		std::string line;
+		while (std::getline(istr, line)) { content += line; content += "\n"; }
+		assertTrue (content.find("extra2.newKey") != std::string::npos);
+		assertTrue (content.find("newExtraValue") != std::string::npos);
+	}
+	{
+		Poco::FileInputStream istr(rootFile2.path());
+		std::string content;
+		std::string line;
+		while (std::getline(istr, line)) { content += line; content += "\n"; }
+		assertTrue (content.find("extra2.newKey") == std::string::npos);
+	}
+
+	// 7. Save to a different path falls back to flat save (no multi-file write)
+	Poco::TemporaryFile differentFile;
+	pConf2->save(differentFile.path());
+
+	{
+		Poco::FileInputStream istr(differentFile.path());
+		std::string content;
+		std::string line;
+		while (std::getline(istr, line)) { content += line; content += "\n"; }
+		// All keys should be in this single file
+		assertTrue (content.find("root2.key") != std::string::npos);
+		assertTrue (content.find("extra2.existing") != std::string::npos);
+		assertTrue (content.find("extra2.newKey") != std::string::npos);
+		// No !include — it's a flat dump
+		assertTrue (content.find("!include") == std::string::npos);
+	}
 }
 
 

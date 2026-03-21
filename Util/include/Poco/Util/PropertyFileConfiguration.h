@@ -112,13 +112,17 @@ public:
 		/// Returns the file path the given key was loaded from,
 		/// or an empty string if unknown.
 
+	void setSourceFile(const std::string& key, const std::string& path);
+		/// Sets the source file for the given key. When save() is called
+		/// with provenance-based saving, the key will be written to this file.
+
 protected:
 	~PropertyFileConfiguration() = default;
 
 private:
 	void loadStream(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);
 	void parseLine(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);
-	void saveToFile(const std::string& path, const std::set<std::string>& keys) const;
+	static void saveToFile(const std::string& path, const std::map<std::string, std::string>& values);
 	static int readChar(std::istream& istr);
 	static std::string escapeValue(const std::string& value);
 
