@@ -21,6 +21,7 @@
 #include "Poco/Util/Util.h"
 #include "Poco/Util/MapConfiguration.h"
 #include <istream>
+#include <map>
 #include <ostream>
 #include <set>
 
@@ -99,16 +100,31 @@ public:
 
 	void save(const std::string& path) const;
 		/// Writes the configuration data to the given file.
+		///
+		/// If the configuration was loaded from a file (and possibly
+		/// includes), save preserves comments, blank lines, and
+		/// !include directives. Changed values are written back to the
+		/// file they were originally loaded from. New keys are appended
+		/// to the root file. If no provenance information is available,
+		/// the file is written as a flat list of key-value pairs.
+
+	std::string getSourceFile(const std::string& key) const;
+		/// Returns the file path the given key was loaded from,
+		/// or an empty string if unknown.
 
 protected:
 	~PropertyFileConfiguration() = default;
 
 private:
-	void loadStream(std::istream& istr, const std::string& basePath, std::set<std::string>& includeStack);
-	void parseLine(std::istream& istr, const std::string& basePath, std::set<std::string>& includeStack);
+	void loadStream(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);
+	void parseLine(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);
+	void saveToFile(const std::string& path, const std::set<std::string>& keys) const;
 	static int readChar(std::istream& istr);
+	static std::string escapeValue(const std::string& value);
 
 	AbstractConfiguration::Ptr _pParentConfig;
+	std::map<std::string, std::string> _sourceMap;
+	std::string _rootFile;
 };
 
 

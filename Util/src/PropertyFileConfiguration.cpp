@@ -16,10 +16,12 @@
 #include "Poco/Exception.h"
 #include "Poco/String.h"
 #include "Poco/Path.h"
+#include "Poco/File.h"
 #include "Poco/FileStream.h"
 #include "Poco/LineEndingConverter.h"
 #include "Poco/Ascii.h"
 #include <set>
+#include <sstream>
 #include <string_view>
 
 using Poco::trim;
@@ -55,8 +57,10 @@ void PropertyFileConfiguration::load(std::istream& istr)
 	AbstractConfiguration::ScopedLock lock(*this);
 
 	clear();
+	_sourceMap.clear();
+	_rootFile.clear();
 	std::set<std::string> includeStack;
-	loadStream(istr, "", includeStack);
+	loadStream(istr, "", "", includeStack);
 }
 
 
@@ -64,19 +68,22 @@ void PropertyFileConfiguration::load(const std::string& path)
 {
 	Poco::Path p(path);
 	p.makeAbsolute();
+	std::string absPath = p.toString();
 	std::string basePath = p.parent().toString();
 	Poco::FileInputStream istr(path);
 	if (!istr.good())
 		throw Poco::OpenFileException(path);
 	AbstractConfiguration::ScopedLock lock(*this);
 	clear();
+	_sourceMap.clear();
+	_rootFile = absPath;
 	std::set<std::string> includeStack;
-	includeStack.insert(p.toString());
-	loadStream(istr, basePath, includeStack);
+	includeStack.insert(absPath);
+	loadStream(istr, basePath, absPath, includeStack);
 }
 
 
-void PropertyFileConfiguration::loadStream(std::istream& istr, const std::string& basePath, std::set<std::string>& includeStack)
+void PropertyFileConfiguration::loadStream(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack)
 {
 	for (;;)
 	{
@@ -86,7 +93,7 @@ void PropertyFileConfiguration::loadStream(std::istream& istr, const std::string
 				break;
 			throw Poco::IOException("Broken input stream");
 		}
-		parseLine(istr, basePath, includeStack);
+		parseLine(istr, basePath, currentFile, includeStack);
 	}
 }
 
@@ -132,20 +139,161 @@ void PropertyFileConfiguration::save(std::ostream& ostr) const
 
 void PropertyFileConfiguration::save(const std::string& path) const
 {
-	Poco::FileOutputStream ostr(path);
-	if (ostr.good())
+	AbstractConfiguration::ScopedLock lock(*this);
+
+	if (_sourceMap.empty())
 	{
-		Poco::OutputLineEndingConverter lec(ostr);
-		save(lec);
-		lec.flush();
-		ostr.flush();
-		if (!ostr.good()) throw Poco::WriteFileException(path);
+		// No provenance — write flat key-value pairs
+		std::set<std::string> allKeys;
+		MapConfiguration::iterator it = begin();
+		MapConfiguration::iterator ed = end();
+		while (it != ed) { allKeys.insert(it->first); ++it; }
+		saveToFile(path, allKeys);
+		return;
 	}
-	else throw Poco::CreateFileException(path);
+
+	// Group keys by source file
+	std::map<std::string, std::set<std::string>> fileKeys;
+	for (const auto& [key, file] : _sourceMap)
+	{
+		fileKeys[file].insert(key);
+	}
+
+	// Find keys with no provenance (newly added) — assign to root file
+	Poco::Path rootPath(path);
+	rootPath.makeAbsolute();
+	std::string rootFile = _rootFile.empty() ? rootPath.toString() : _rootFile;
+
+	MapConfiguration::iterator it = begin();
+	MapConfiguration::iterator ed = end();
+	while (it != ed)
+	{
+		if (_sourceMap.find(it->first) == _sourceMap.end())
+		{
+			fileKeys[rootFile].insert(it->first);
+		}
+		++it;
+	}
+
+	// Save each file
+	for (const auto& [file, keys] : fileKeys)
+	{
+		saveToFile(file, keys);
+	}
 }
 
 
-void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string& basePath, std::set<std::string>& includeStack)
+void PropertyFileConfiguration::saveToFile(const std::string& path, const std::set<std::string>& keys) const
+{
+	std::set<std::string> written;
+	std::ostringstream out;
+
+	Poco::File f(path);
+	if (f.exists())
+	{
+		Poco::FileInputStream istr(path);
+		std::string line;
+		while (std::getline(istr, line))
+		{
+			// Remove trailing \r if present
+			if (!line.empty() && line.back() == '\r')
+				line.pop_back();
+
+			// Blank line
+			if (line.empty())
+			{
+				out << "\n";
+				continue;
+			}
+
+			// Skip leading whitespace for detection
+			std::string::size_type pos = 0;
+			while (pos < line.size() && Poco::Ascii::isSpace(line[pos])) ++pos;
+
+			// Comment or !include
+			if (pos < line.size() && (line[pos] == '#' || line[pos] == '!'))
+			{
+				out << line << "\n";
+				continue;
+			}
+
+			// Key-value line: extract key
+			std::string::size_type sep = line.find('=');
+			std::string::size_type sep2 = line.find(':');
+			if (sep2 != std::string::npos && (sep == std::string::npos || sep2 < sep))
+				sep = sep2;
+
+			if (sep != std::string::npos)
+			{
+				std::string key = Poco::trim(line.substr(0, sep));
+				if (keys.count(key) && has(key))
+				{
+					std::string rawValue;
+					getRaw(key, rawValue);
+					char sepChar = line[sep];
+					out << key << " " << sepChar << " " << escapeValue(rawValue) << "\n";
+					written.insert(key);
+				}
+				// Key not in config (removed) — skip line
+			}
+			else
+			{
+				// Line with no separator — preserve as-is
+				out << line << "\n";
+			}
+		}
+	}
+
+	// Append new keys not yet written
+	for (const auto& key : keys)
+	{
+		if (!written.count(key) && has(key))
+		{
+			std::string rawValue;
+			getRaw(key, rawValue);
+			out << key << ": " << escapeValue(rawValue) << "\n";
+		}
+	}
+
+	Poco::FileOutputStream ostr(path);
+	if (!ostr.good()) throw Poco::CreateFileException(path);
+	Poco::OutputLineEndingConverter lec(ostr);
+	lec << out.str();
+	lec.flush();
+	ostr.flush();
+	if (!ostr.good()) throw Poco::WriteFileException(path);
+}
+
+
+std::string PropertyFileConfiguration::escapeValue(const std::string& value)
+{
+	std::string result;
+	for (auto ch : value)
+	{
+		switch (ch)
+		{
+		case '\t': result += "\\t"; break;
+		case '\r': result += "\\r"; break;
+		case '\n': result += "\\n"; break;
+		case '\f': result += "\\f"; break;
+		case '\\': result += "\\\\"; break;
+		default: result += ch; break;
+		}
+	}
+	return result;
+}
+
+
+std::string PropertyFileConfiguration::getSourceFile(const std::string& key) const
+{
+	auto it = _sourceMap.find(key);
+	if (it != _sourceMap.end())
+		return it->second;
+	return "";
+}
+
+
+void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack)
 {
 	constexpr int eof = std::char_traits<char>::eof();
 
@@ -201,7 +349,7 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 				Poco::FileInputStream includeIstr(p.toString());
 				if (!includeIstr.good())
 					throw Poco::OpenFileException(p.toString());
-				loadStream(includeIstr, p.parent().toString(), includeStack);
+				loadStream(includeIstr, p.parent().toString(), absPathStr, includeStack);
 			}
 		}
 		else
@@ -214,7 +362,10 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 				c = readChar(istr);
 				while (c != eof && c) { value += (char) c; c = readChar(istr); }
 			}
-			setRaw(trim(key), trim(value));
+				std::string trimmedKey = trim(key);
+			setRaw(trimmedKey, trim(value));
+			if (!currentFile.empty())
+				_sourceMap[trimmedKey] = currentFile;
 		}
 	}
 }
