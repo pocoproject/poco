@@ -302,8 +302,8 @@ void PropertyFileConfigurationTest::testInclude()
 	}
 
 	Poco::Path includedExpPath(includedFileExp.path());
-	std::string includedExpDir = includedExpPath.parent().toString(Poco::Path::PATH_UNIX);
-	if (includedExpDir.back() != '/') includedExpDir += '/';
+	std::string includedExpDir = includedExpPath.parent().toString();
+	std::replace(includedExpDir.begin(), includedExpDir.end(), '\\', '/');
 	std::string includedExpName = includedExpPath.getFileName();
 
 	Poco::TemporaryFile mainFileExp;
@@ -325,8 +325,8 @@ void PropertyFileConfigurationTest::testInclude()
 	}
 
 	Poco::Path includedParentPath(includedFileParent.path());
-	std::string includedParentDir = includedParentPath.parent().toString(Poco::Path::PATH_UNIX);
-	if (includedParentDir.back() != '/') includedParentDir += '/';
+	std::string includedParentDir = includedParentPath.parent().toString();
+	std::replace(includedParentDir.begin(), includedParentDir.end(), '\\', '/');
 	std::string includedParentName = includedParentPath.getFileName();
 
 	Poco::AutoPtr<Poco::Util::MapConfiguration> pParent = new Poco::Util::MapConfiguration;
