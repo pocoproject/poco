@@ -579,6 +579,71 @@ void PropertyFileConfigurationTest::testClearResetsProvenance()
 }
 
 
+void PropertyFileConfigurationTest::testGetSourceFilesCoversAllKeys()
+{
+	// Create two included files
+	Poco::TemporaryFile includeA;
+	{
+		Poco::FileOutputStream ostr(includeA.path());
+		ostr << "a.key1 = aValue1\n";
+		ostr << "a.key2 = aValue2\n";
+	}
+
+	Poco::TemporaryFile includeB;
+	{
+		Poco::FileOutputStream ostr(includeB.path());
+		ostr << "b.key1 = bValue1\n";
+	}
+
+	// Create root file that includes both
+	Poco::TemporaryFile rootFile;
+	{
+		Poco::FileOutputStream ostr(rootFile.path());
+		ostr << "root.key1 = rootValue1\n";
+		ostr << "!include " << includeA.path() << "\n";
+		ostr << "root.key2 = rootValue2\n";
+		ostr << "!include " << includeB.path() << "\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(rootFile.path());
+
+	std::string rootAbs = Poco::Path(rootFile.path()).makeAbsolute().toString();
+	std::string includeAAbs = Poco::Path(includeA.path()).makeAbsolute().toString();
+	std::string includeBAbs = Poco::Path(includeB.path()).makeAbsolute().toString();
+
+	// getSourceFiles() must have an entry for every loaded key
+	const auto& sourceFiles = pConf->getSourceFiles();
+	assertTrue (sourceFiles.size() == 5);
+
+	assertTrue (sourceFiles.at("root.key1") == rootAbs);
+	assertTrue (sourceFiles.at("root.key2") == rootAbs);
+	assertTrue (sourceFiles.at("a.key1") == includeAAbs);
+	assertTrue (sourceFiles.at("a.key2") == includeAAbs);
+	assertTrue (sourceFiles.at("b.key1") == includeBAbs);
+
+	// Every key in the configuration must appear in the source map
+	AbstractConfiguration::Keys keys;
+	pConf->keys(keys);
+	for (const auto& key : keys)
+	{
+		AbstractConfiguration::Keys subKeys;
+		pConf->keys(key, subKeys);
+		if (subKeys.empty())
+		{
+			assertTrue (sourceFiles.find(key) != sourceFiles.end());
+		}
+		else
+		{
+			for (const auto& sub : subKeys)
+			{
+				std::string fullKey = key + "." + sub;
+				assertTrue (sourceFiles.find(fullKey) != sourceFiles.end());
+			}
+		}
+	}
+}
+
+
 AbstractConfiguration::Ptr PropertyFileConfigurationTest::allocConfiguration() const
 {
 	return new PropertyFileConfiguration;
@@ -606,6 +671,7 @@ CppUnit::Test* PropertyFileConfigurationTest::suite()
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSavePreserving);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSavePreservingMultiLine);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testClearResetsProvenance);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testGetSourceFilesCoversAllKeys);
 
 	return pSuite;
 }

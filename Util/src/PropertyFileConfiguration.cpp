@@ -272,6 +272,12 @@ std::string PropertyFileConfiguration::getSourceFile(const std::string& key) con
 }
 
 
+const std::map<std::string, std::string>& PropertyFileConfiguration::getSourceFiles() const
+{
+	return _sourceMap;
+}
+
+
 void PropertyFileConfiguration::setSourceFile(const std::string& key, const std::string& path)
 {
 	AbstractConfiguration::ScopedLock lock(*this);

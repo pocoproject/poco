@@ -119,6 +119,9 @@ public:
 	void clear();
 		/// Clears the configuration, including provenance information.
 
+	const std::map<std::string, std::string>& getSourceFiles() const;
+		/// Returns the entire source file map (key -> file path).
+
 protected:
 	~PropertyFileConfiguration() = default;
 
