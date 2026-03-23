@@ -28,6 +28,8 @@ public:
 	void testSave();
 	void testInclude();
 	void testSavePreserving();
+	void testSavePreservingMultiLine();
+	void testClearResetsProvenance();
 
 	void setUp();
 	void tearDown();

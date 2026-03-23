@@ -116,8 +116,13 @@ public:
 		/// Sets the source file for the given key. When save() is called
 		/// with provenance-based saving, the key will be written to this file.
 
+	void clear();
+		/// Clears the configuration, including provenance information.
+
 protected:
 	~PropertyFileConfiguration() = default;
+
+	void removeRaw(const std::string& key) override;
 
 private:
 	void loadStream(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);

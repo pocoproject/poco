@@ -57,8 +57,6 @@ void PropertyFileConfiguration::load(std::istream& istr)
 	AbstractConfiguration::ScopedLock lock(*this);
 
 	clear();
-	_sourceMap.clear();
-	_rootFile.clear();
 	std::set<std::string> includeStack;
 	loadStream(istr, "", "", includeStack);
 }
@@ -75,7 +73,6 @@ void PropertyFileConfiguration::load(const std::string& path)
 		throw Poco::OpenFileException(path);
 	AbstractConfiguration::ScopedLock lock(*this);
 	clear();
-	_sourceMap.clear();
 	_rootFile = absPath;
 	std::set<std::string> includeStack;
 	includeStack.insert(absPath);
@@ -102,37 +99,10 @@ void PropertyFileConfiguration::save(std::ostream& ostr) const
 {
 	AbstractConfiguration::ScopedLock lock(*this);
 
-	MapConfiguration::iterator it = begin();
-	MapConfiguration::iterator ed = end();
-	while (it != ed)
+	for (auto it = begin(); it != end(); ++it)
 	{
-		ostr << it->first << ": ";
-		for (auto ch: it->second)
-		{
-			switch (ch)
-			{
-			case '\t':
-				ostr << "\\t";
-				break;
-			case '\r':
-				ostr << "\\r";
-				break;
-			case '\n':
-				ostr << "\\n";
-				break;
-			case '\f':
-				ostr << "\\f";
-				break;
-			case '\\':
-				ostr << "\\\\";
-				break;
-			default:
-				ostr << ch;
-				break;
-			}
-		}
-		ostr << "\n";
-		++it;
+		const auto& [key, value] = *it;
+		ostr << key << ": " << escapeValue(value) << "\n";
 	}
 }
 
@@ -162,22 +132,22 @@ void PropertyFileConfiguration::save(const std::string& path) const
 			}
 
 			// Assign keys with no provenance (newly added) to root file
-			MapConfiguration::iterator it = begin();
-			MapConfiguration::iterator ed = end();
-			while (it != ed)
+			for (auto it = begin(); it != end(); ++it)
 			{
-				if (_sourceMap.find(it->first) == _sourceMap.end())
-					fileValues[_rootFile][it->first] = it->second;
-				++it;
+				const auto& [key, value] = *it;
+				if (_sourceMap.find(key) == _sourceMap.end())
+					fileValues[_rootFile][key] = value;
 			}
 		}
 		else
 		{
 			// Flat save — all keys to the provided path
-			auto& values = fileValues[path];
-			MapConfiguration::iterator it = begin();
-			MapConfiguration::iterator ed = end();
-			while (it != ed) { values[it->first] = it->second; ++it; }
+			auto& vals = fileValues[path];
+			for (auto it = begin(); it != end(); ++it)
+			{
+				const auto& [key, value] = *it;
+				vals[key] = value;
+			}
 		}
 	}
 
@@ -224,10 +194,7 @@ void PropertyFileConfiguration::saveToFile(const std::string& path, const std::m
 			}
 
 			// Key-value line: extract key
-			std::string::size_type sep = line.find('=');
-			std::string::size_type sep2 = line.find(':');
-			if (sep2 != std::string::npos && (sep == std::string::npos || sep2 < sep))
-				sep = sep2;
+			std::string::size_type sep = line.find_first_of("=:");
 
 			if (sep != std::string::npos)
 			{
@@ -240,6 +207,14 @@ void PropertyFileConfiguration::saveToFile(const std::string& path, const std::m
 					written.insert(key);
 				}
 				// Key not in values (removed) — skip line
+
+				// Skip any continuation lines (trailing backslash)
+				while (!line.empty() && line.back() == '\\')
+				{
+					if (!std::getline(istr, line)) break;
+					if (!line.empty() && line.back() == '\r')
+						line.pop_back();
+				}
 			}
 			else
 			{
@@ -289,6 +264,7 @@ std::string PropertyFileConfiguration::escapeValue(const std::string& value)
 
 std::string PropertyFileConfiguration::getSourceFile(const std::string& key) const
 {
+	AbstractConfiguration::ScopedLock lock(*this);
 	auto it = _sourceMap.find(key);
 	if (it != _sourceMap.end())
 		return it->second;
@@ -298,9 +274,32 @@ std::string PropertyFileConfiguration::getSourceFile(const std::string& key) con
 
 void PropertyFileConfiguration::setSourceFile(const std::string& key, const std::string& path)
 {
+	AbstractConfiguration::ScopedLock lock(*this);
 	Poco::Path p(path);
 	p.makeAbsolute();
 	_sourceMap[key] = p.toString();
+}
+
+
+void PropertyFileConfiguration::removeRaw(const std::string& key)
+{
+	MapConfiguration::removeRaw(key);
+	std::string prefix = key + '.';
+	for (auto it = _sourceMap.begin(); it != _sourceMap.end(); )
+	{
+		if (it->first == key || it->first.compare(0, prefix.size(), prefix) == 0)
+			it = _sourceMap.erase(it);
+		else
+			++it;
+	}
+}
+
+
+void PropertyFileConfiguration::clear()
+{
+	MapConfiguration::clear();
+	_sourceMap.clear();
+	_rootFile.clear();
 }
 
 
@@ -373,7 +372,7 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 				c = readChar(istr);
 				while (c != eof && c) { value += (char) c; c = readChar(istr); }
 			}
-				std::string trimmedKey = trim(key);
+			std::string trimmedKey = trim(key);
 			setRaw(trimmedKey, trim(value));
 			if (!currentFile.empty())
 				_sourceMap[trimmedKey] = currentFile;
