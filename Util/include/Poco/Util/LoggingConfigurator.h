@@ -22,6 +22,7 @@
 #include "Poco/Formatter.h"
 #include "Poco/Channel.h"
 #include "Poco/Util/AbstractConfiguration.h"
+#include "Poco/Mutex.h"
 #include <string>
 
 
@@ -182,6 +183,8 @@ private:
 	void configureChannel(Channel::Ptr pChannel, AbstractConfiguration::Ptr pConfig);
 	void configureLogger(AbstractConfiguration::Ptr pConfig);
 	bool validateConfiguration(AbstractConfiguration::Ptr pConfig) const;
+
+	static Poco::Mutex _mutex;
 };
 
 

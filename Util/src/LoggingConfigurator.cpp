@@ -46,6 +46,9 @@ namespace Poco {
 namespace Util {
 
 
+Mutex LoggingConfigurator::_mutex;
+
+
 void LoggingConfigurator::configure(AbstractConfiguration::Ptr pConfig)
 {
 	poco_check_ptr (pConfig);
@@ -255,6 +258,8 @@ void LoggingConfigurator::configure(
 Logger& LoggingConfigurator::getLogger(const std::string& name, AbstractConfiguration::Ptr pConfig)
 {
 	poco_check_ptr(pConfig);
+
+	Mutex::ScopedLock lock(_mutex);
 
 	if (!Logger::has(name))
 	{

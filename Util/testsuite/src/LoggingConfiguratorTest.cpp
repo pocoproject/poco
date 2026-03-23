@@ -618,7 +618,7 @@ void LoggingConfiguratorTest::testGetLoggerCollision()
 	// Now try getLogger with a config that redefines "sharedCh"
 	static const std::string collidingConfig =
 		"logging.channels.sharedCh.class = FileChannel\n"
-		"logging.channels.sharedCh.path = /tmp/collision.log\n"
+		"logging.channels.sharedCh.path = collision.log\n"
 		"logging.loggers.l1.name = collisionLogger\n"
 		"logging.loggers.l1.channel = sharedCh\n"
 		"logging.loggers.l1.level = debug\n";
