@@ -345,6 +345,240 @@ void PropertyFileConfigurationTest::testInclude()
 }
 
 
+void PropertyFileConfigurationTest::testSavePreserving()
+{
+	// Create an included properties file
+	Poco::TemporaryFile extraFile;
+	{
+		Poco::FileOutputStream ostr(extraFile.path());
+		ostr << "extra.key1 = extraValue1\n";
+		ostr << "extra.key2 = extraValue2\n";
+	}
+
+	// Create a root properties file with comments, blank lines, and !include
+	Poco::TemporaryFile rootFile;
+	{
+		Poco::FileOutputStream ostr(rootFile.path());
+		ostr << "# This is a comment\n";
+		ostr << "\n";
+		ostr << "root.key1 = rootValue1\n";
+		ostr << "!include " << extraFile.path() << "\n";
+		ostr << "root.key2 = rootValue2\n";
+	}
+
+	// Load, modify, and save
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(rootFile.path());
+
+	// Verify initial load
+	assertTrue (pConf->getString("root.key1") == "rootValue1");
+	assertTrue (pConf->getString("root.key2") == "rootValue2");
+	assertTrue (pConf->getString("extra.key1") == "extraValue1");
+	assertTrue (pConf->getString("extra.key2") == "extraValue2");
+
+	// Verify provenance
+	assertTrue (pConf->getSourceFile("root.key1") == Poco::Path(rootFile.path()).makeAbsolute().toString());
+	assertTrue (pConf->getSourceFile("extra.key1") == Poco::Path(extraFile.path()).makeAbsolute().toString());
+
+	// 1. Modify a root key and save
+	pConf->setString("root.key1", "modifiedRoot");
+	pConf->save(rootFile.path());
+
+	// Verify root file preserves structure
+	{
+		Poco::FileInputStream istr(rootFile.path());
+		std::string content;
+		std::string line;
+		while (std::getline(istr, line)) { content += line; content += "\n"; }
+		assertTrue (content.find("# This is a comment") != std::string::npos);
+		assertTrue (content.find("!include") != std::string::npos);
+		assertTrue (content.find("modifiedRoot") != std::string::npos);
+	}
+
+	// 2. Modify a key from included file and save
+	pConf->setString("extra.key1", "modifiedExtra");
+	pConf->save(rootFile.path());
+
+	// Verify the change went to the extra file
+	{
+		Poco::FileInputStream istr(extraFile.path());
+		std::string content;
+		std::string line;
+		while (std::getline(istr, line)) { content += line; content += "\n"; }
+		assertTrue (content.find("modifiedExtra") != std::string::npos);
+	}
+
+	// 3. Add a new key and save — should go to root file
+	pConf->setString("new.key", "newValue");
+	pConf->save(rootFile.path());
+
+	{
+		Poco::FileInputStream istr(rootFile.path());
+		std::string content;
+		std::string line;
+		while (std::getline(istr, line)) { content += line; content += "\n"; }
+		assertTrue (content.find("new.key") != std::string::npos);
+		assertTrue (content.find("newValue") != std::string::npos);
+	}
+
+	// 4. Remove a key from included file and save
+	pConf->remove("extra.key2");
+	pConf->save(rootFile.path());
+
+	{
+		Poco::FileInputStream istr(extraFile.path());
+		std::string content;
+		std::string line;
+		while (std::getline(istr, line)) { content += line; content += "\n"; }
+		assertTrue (content.find("extra.key2") == std::string::npos);
+	}
+
+	// 5. Fallback: no provenance, flat save
+	Poco::TemporaryFile flatFile;
+	{
+		AutoPtr<PropertyFileConfiguration> pFlat = new PropertyFileConfiguration;
+		pFlat->setString("flat.key", "flatValue");
+		pFlat->save(flatFile.path());
+	}
+
+	{
+		Poco::FileInputStream istr(flatFile.path());
+		std::string content;
+		std::string line;
+		while (std::getline(istr, line)) { content += line; content += "\n"; }
+		assertTrue (content.find("flat.key") != std::string::npos);
+		assertTrue (content.find("flatValue") != std::string::npos);
+	}
+
+	// 6. setSourceFile directs new keys to a specific file
+	Poco::TemporaryFile extraFile2;
+	{
+		Poco::FileOutputStream ostr(extraFile2.path());
+		ostr << "extra2.existing = existingValue\n";
+	}
+
+	Poco::TemporaryFile rootFile2;
+	{
+		Poco::FileOutputStream ostr(rootFile2.path());
+		ostr << "root2.key = rootValue\n";
+		ostr << "!include " << extraFile2.path() << "\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConf2 = new PropertyFileConfiguration(rootFile2.path());
+	pConf2->setString("extra2.newKey", "newExtraValue");
+	pConf2->setSourceFile("extra2.newKey", extraFile2.path());
+	pConf2->save(rootFile2.path());
+
+	// Verify new key went to extra file, not root
+	{
+		Poco::FileInputStream istr(extraFile2.path());
+		std::string content;
+		std::string line;
+		while (std::getline(istr, line)) { content += line; content += "\n"; }
+		assertTrue (content.find("extra2.newKey") != std::string::npos);
+		assertTrue (content.find("newExtraValue") != std::string::npos);
+	}
+	{
+		Poco::FileInputStream istr(rootFile2.path());
+		std::string content;
+		std::string line;
+		while (std::getline(istr, line)) { content += line; content += "\n"; }
+		assertTrue (content.find("extra2.newKey") == std::string::npos);
+	}
+
+	// 7. Save to a different path falls back to flat save (no multi-file write)
+	Poco::TemporaryFile differentFile;
+	pConf2->save(differentFile.path());
+
+	{
+		Poco::FileInputStream istr(differentFile.path());
+		std::string content;
+		std::string line;
+		while (std::getline(istr, line)) { content += line; content += "\n"; }
+		// All keys should be in this single file
+		assertTrue (content.find("root2.key") != std::string::npos);
+		assertTrue (content.find("extra2.existing") != std::string::npos);
+		assertTrue (content.find("extra2.newKey") != std::string::npos);
+		// No !include — it's a flat dump
+		assertTrue (content.find("!include") == std::string::npos);
+	}
+}
+
+
+void PropertyFileConfigurationTest::testSavePreservingMultiLine()
+{
+	// Create a properties file with multi-line continuation values
+	Poco::TemporaryFile rootFile;
+	{
+		Poco::FileOutputStream ostr(rootFile.path());
+		ostr << "simple.key = simpleValue\n";
+		ostr << "multi.key = value part1 \\\n";
+		ostr << "value part2 \\\n";
+		ostr << "value part3\n";
+		ostr << "after.key = afterValue\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(rootFile.path());
+
+	// Verify the multi-line value was joined correctly on load
+	assertTrue (pConf->getString("multi.key") == "value part1 value part2 value part3");
+	assertTrue (pConf->getString("simple.key") == "simpleValue");
+	assertTrue (pConf->getString("after.key") == "afterValue");
+
+	// Modify the multi-line key and save
+	pConf->setString("multi.key", "newSingleLineValue");
+	pConf->save(rootFile.path());
+
+	// Reload and verify no stale continuation lines
+	AutoPtr<PropertyFileConfiguration> pConf2 = new PropertyFileConfiguration(rootFile.path());
+	assertTrue (pConf2->getString("multi.key") == "newSingleLineValue");
+	assertTrue (pConf2->getString("simple.key") == "simpleValue");
+	assertTrue (pConf2->getString("after.key") == "afterValue");
+
+	// Verify the saved file does not contain continuation leftovers
+	{
+		Poco::FileInputStream istr(rootFile.path());
+		std::string content;
+		std::string line;
+		while (std::getline(istr, line)) { content += line; content += "\n"; }
+		assertTrue (content.find("value part2") == std::string::npos);
+		assertTrue (content.find("value part3") == std::string::npos);
+		assertTrue (content.find("newSingleLineValue") != std::string::npos);
+	}
+}
+
+
+void PropertyFileConfigurationTest::testClearResetsProvenance()
+{
+	// Load from file to establish provenance
+	Poco::TemporaryFile rootFile;
+	{
+		Poco::FileOutputStream ostr(rootFile.path());
+		ostr << "key1 = value1\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(rootFile.path());
+	assertTrue (!pConf->getSourceFile("key1").empty());
+
+	// clear() should reset provenance
+	pConf->clear();
+	assertTrue (pConf->getSourceFile("key1").empty());
+
+	// After clear + manual add + save to a new file, should do flat save
+	pConf->setString("new.key", "newValue");
+	Poco::TemporaryFile outFile;
+	pConf->save(outFile.path());
+
+	{
+		Poco::FileInputStream istr(outFile.path());
+		std::string content;
+		std::string line;
+		while (std::getline(istr, line)) { content += line; content += "\n"; }
+		assertTrue (content.find("new.key") != std::string::npos);
+		assertTrue (content.find("newValue") != std::string::npos);
+	}
+}
+
+
 AbstractConfiguration::Ptr PropertyFileConfigurationTest::allocConfiguration() const
 {
 	return new PropertyFileConfiguration;
@@ -369,6 +603,9 @@ CppUnit::Test* PropertyFileConfigurationTest::suite()
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testLoad);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSave);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testInclude);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSavePreserving);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSavePreservingMultiLine);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testClearResetsProvenance);
 
 	return pSuite;
 }
