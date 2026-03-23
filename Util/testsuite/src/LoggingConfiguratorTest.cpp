@@ -542,6 +542,97 @@ void LoggingConfiguratorTest::testBadConfiguration4()
 }
 
 
+void LoggingConfiguratorTest::testGetLogger()
+{
+	static const std::string config =
+		"logging.channels.gl1ch.class = ConsoleChannel\n"
+		"logging.channels.gl1ch.pattern = %s: [%p] %t\n"
+		"logging.loggers.l1.name = getLoggerTest\n"
+		"logging.loggers.l1.channel = gl1ch\n"
+		"logging.loggers.l1.level = debug\n";
+
+	std::istringstream istr(config);
+	AutoPtr<PropertyFileConfiguration> pConfig = new PropertyFileConfiguration(istr);
+
+	LoggingConfigurator configurator;
+	Logger& logger = configurator.getLogger("getLoggerTest", pConfig);
+	assertTrue (logger.name() == "getLoggerTest");
+	assertTrue (logger.getLevel() == Message::PRIO_DEBUG);
+	FormattingChannel::Ptr pFC = logger.getChannel().cast<FormattingChannel>();
+	assertNotNull (pFC);
+#if defined(_WIN32)
+	assertTrue (!pFC->getChannel().cast<Poco::WindowsConsoleChannel>().isNull());
+#else
+	assertTrue (!pFC->getChannel().cast<Poco::ConsoleChannel>().isNull());
+#endif
+}
+
+
+void LoggingConfiguratorTest::testGetLoggerExisting()
+{
+	// Pre-create the logger via configure()
+	static const std::string initialConfig =
+		"logging.channels.glech.class = ConsoleChannel\n"
+		"logging.channels.glech.pattern = %s: [%p] %t\n"
+		"logging.loggers.l1.name = existingLogger\n"
+		"logging.loggers.l1.channel = glech\n"
+		"logging.loggers.l1.level = warning\n";
+
+	std::istringstream istr1(initialConfig);
+	AutoPtr<PropertyFileConfiguration> pInitialConfig = new PropertyFileConfiguration(istr1);
+
+	LoggingConfigurator configurator;
+	configurator.configure(pInitialConfig);
+
+	Logger& existing = Logger::get("existingLogger");
+	assertTrue (existing.getLevel() == Message::PRIO_WARNING);
+
+	// Now call getLogger with a different config — should be ignored
+	static const std::string newConfig =
+		"logging.loggers.l1.name = existingLogger\n"
+		"logging.loggers.l1.level = debug\n";
+
+	std::istringstream istr2(newConfig);
+	AutoPtr<PropertyFileConfiguration> pNewConfig = new PropertyFileConfiguration(istr2);
+
+	Logger& logger = configurator.getLogger("existingLogger", pNewConfig);
+	assertTrue (&logger == &existing);
+	assertTrue (logger.getLevel() == Message::PRIO_WARNING); // unchanged
+}
+
+
+void LoggingConfiguratorTest::testGetLoggerCollision()
+{
+	// Register a channel in the registry first
+	static const std::string initialConfig =
+		"logging.channels.sharedCh.class = ConsoleChannel\n"
+		"logging.loggers.root.channel = sharedCh\n"
+		"logging.loggers.root.level = warning\n";
+
+	std::istringstream istr1(initialConfig);
+	AutoPtr<PropertyFileConfiguration> pInitialConfig = new PropertyFileConfiguration(istr1);
+
+	LoggingConfigurator configurator;
+	configurator.configure(pInitialConfig);
+
+	// Now try getLogger with a config that redefines "sharedCh"
+	static const std::string collidingConfig =
+		"logging.channels.sharedCh.class = FileChannel\n"
+		"logging.channels.sharedCh.path = /tmp/collision.log\n"
+		"logging.loggers.l1.name = collisionLogger\n"
+		"logging.loggers.l1.channel = sharedCh\n"
+		"logging.loggers.l1.level = debug\n";
+
+	std::istringstream istr2(collidingConfig);
+	AutoPtr<PropertyFileConfiguration> pCollidingConfig = new PropertyFileConfiguration(istr2);
+
+	Logger& logger = configurator.getLogger("collisionLogger", pCollidingConfig);
+	assertTrue (logger.name() == "collisionLogger");
+	// Config was skipped due to collision — logger inherits from parent (root = warning)
+	assertTrue (logger.getLevel() == Message::PRIO_WARNING);
+}
+
+
 void LoggingConfiguratorTest::setUp()
 {
 	LoggingRegistry::defaultRegistry().clear();
@@ -568,6 +659,9 @@ CppUnit::Test* LoggingConfiguratorTest::suite()
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testBadConfiguration2);
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testBadConfiguration3);
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testBadConfiguration4);
+	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testGetLogger);
+	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testGetLoggerExisting);
+	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testGetLoggerCollision);
 
 	return pSuite;
 }

@@ -252,4 +252,53 @@ void LoggingConfigurator::configure(
 }
 
 
+Logger& LoggingConfigurator::getLogger(const std::string& name, AbstractConfiguration::Ptr pConfig)
+{
+	poco_check_ptr(pConfig);
+
+	if (!Logger::has(name))
+	{
+		if (validateConfiguration(pConfig))
+		{
+			configure(pConfig);
+		}
+	}
+	return Logger::get(name);
+}
+
+
+bool LoggingConfigurator::validateConfiguration(AbstractConfiguration::Ptr pConfig) const
+{
+	LoggingRegistry& registry = LoggingRegistry::defaultRegistry();
+
+	AbstractConfiguration::Ptr pFmtConfig(pConfig->createView("logging.formatters"s));
+	for (const auto& f : pFmtConfig->keys())
+	{
+		try
+		{
+			registry.formatterForName(f);
+			return false;
+		}
+		catch (Poco::NotFoundException&)
+		{
+		}
+	}
+
+	AbstractConfiguration::Ptr pChConfig(pConfig->createView("logging.channels"s));
+	for (const auto& c : pChConfig->keys())
+	{
+		try
+		{
+			registry.channelForName(c);
+			return false;
+		}
+		catch (Poco::NotFoundException&)
+		{
+		}
+	}
+
+	return true;
+}
+
+
 } } // namespace Poco::Util
