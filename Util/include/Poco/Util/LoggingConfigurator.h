@@ -22,10 +22,14 @@
 #include "Poco/Formatter.h"
 #include "Poco/Channel.h"
 #include "Poco/Util/AbstractConfiguration.h"
+#include "Poco/Mutex.h"
 #include <string>
 
 
 namespace Poco {
+
+class Logger;
+
 namespace Util {
 
 
@@ -134,6 +138,21 @@ public:
 		/// A ConfigurationView can be used to pass only
 		/// a part of a larger configuration.
 
+	[[nodiscard]] Poco::Logger& getLogger(const std::string& name, AbstractConfiguration::Ptr pConfig);
+		/// Returns a reference to the Logger with the given name.
+		/// If the Logger does not yet exist, it is first configured
+		/// using the given configuration (which follows the standard
+		/// "logging.formatters", "logging.channels", "logging.loggers"
+		/// format), and then returned.
+		/// If the Logger already exists, pConfig is silently ignored
+		/// and the existing Logger is returned.
+		///
+		/// The configuration can reference formatters and channels
+		/// already registered by the initial application configuration.
+		/// If defining new formatters or channels, use unique names -
+		/// if any name collides with an existing registry entry, the
+		/// configuration is skipped and the logger inherits from its parent.
+
 	static void configure(
 		const std::string& level,
 		const std::string& pattern = "%Y-%m-%d %H:%M:%S.%i [%p] %s<%I>: %t",
@@ -163,6 +182,11 @@ private:
 	Poco::Channel::Ptr createChannel(AbstractConfiguration::Ptr pConfig);
 	void configureChannel(Channel::Ptr pChannel, AbstractConfiguration::Ptr pConfig);
 	void configureLogger(AbstractConfiguration::Ptr pConfig);
+	[[nodiscard]] bool validateConfiguration(AbstractConfiguration::Ptr pConfig) const;
+
+	static Poco::Mutex _mutex;
+		/// Static because all instances operate on the same
+		/// global LoggingRegistry and Logger map.
 };
 
 
