@@ -162,6 +162,17 @@ std::size_t Preparator::maxDataSize(std::size_t pos) const
 	}
 	catch (StatementException&) { }
 
+	// Note: some ODBC drivers (notably IBM Informix) report 0 or
+	// unreliable column sizes for string columns. When this happens,
+	// the buffer defaults to maxFieldSize (ODBC_MAX_FIELD_SIZE, 1024
+	// bytes). This is sufficient for most columns, but string data
+	// exceeding maxFieldSize will be truncated in bound extraction
+	// mode, causing a DataException.
+	//
+	// Users working with drivers that misreport column sizes and
+	// have string columns larger than 1024 bytes should increase
+	// maxFieldSize via the session property:
+	//   session.setProperty("maxFieldSize", Poco::Any(8192));
 	if (!sz || sz > maxsz) sz = maxsz;
 
 	return sz;

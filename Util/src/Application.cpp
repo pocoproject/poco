@@ -200,7 +200,7 @@ int Application::loadConfiguration(int priority)
 	Path confPath;
 	if (findAppConfigFile(appPath.getBaseName(), "properties"s, confPath))
 	{
-		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false);
+		_pConfig->add(new PropertyFileConfiguration(confPath.toString(), AbstractConfiguration::Ptr(_pConfig, true)), priority, false);
 		++n;
 	}
 #ifndef POCO_UTIL_NO_INIFILECONFIGURATION
@@ -242,7 +242,7 @@ void Application::loadConfiguration(const std::string& path, int priority)
 	std::string ext = confPath.getExtension();
 	if (icompare(ext, "properties") == 0)
 	{
-		_pConfig->add(new PropertyFileConfiguration(confPath.toString()), priority, false);
+		_pConfig->add(new PropertyFileConfiguration(confPath.toString(), AbstractConfiguration::Ptr(_pConfig, true)), priority, false);
 		++n;
 	}
 #ifndef POCO_UTIL_NO_INIFILECONFIGURATION

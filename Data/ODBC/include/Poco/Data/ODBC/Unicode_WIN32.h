@@ -40,10 +40,26 @@ inline void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::wstring& target
 inline void makeUTF8(Poco::Buffer<wchar_t>& buffer, SQLINTEGER length, SQLPOINTER pTarget, SQLINTEGER targetLength)
 	/// Utility function for conversion from UTF-16 to UTF-8. Length is in bytes.
 {
-	if (buffer.sizeBytes() < length)
-		throw InvalidArgumentException("Specified length exceeds available length.");
-	else if ((length % 2) != 0)
-		throw InvalidArgumentException("Length must be an even number.");
+	// Some ODBC drivers (notably IBM Informix) may report a returned
+	// string length larger than the allocated wide-char buffer, or
+	// return non-positive lengths. Handle these defensively instead
+	// of throwing, to avoid breaking metadata retrieval for drivers
+	// with non-conformant length reporting.
+	//
+	// Note: this function handles metadata strings (column names,
+	// diagnostics, driver info), not row data. The driver has already
+	// written into the buffer, so clamping to the actual buffer size
+	// converts exactly what is available — this is the only viable
+	// approach when the reported length is unreliable.
+	if (length <= 0)
+	{
+		std::memset(pTarget, 0, targetLength);
+		return;
+	}
+	if (length > static_cast<SQLINTEGER>(buffer.sizeBytes()))
+		length = static_cast<SQLINTEGER>(buffer.sizeBytes());
+	// Ensure length is aligned to wchar_t boundary for safe conversion
+	length -= length % sizeof(wchar_t);
 
 	length /= sizeof(wchar_t);
 	std::string result;
