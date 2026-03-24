@@ -16,6 +16,8 @@ process trees on supported platforms.
 
 clang-cl is now supported as a build compiler on Windows.
 
+LoggingConfigurator can now create fully configured loggers at runtime.
+
 All bundled third-party libraries have been upgraded to their latest releases,
 including security fixes for libexpat, libpng, zlib, and utf8proc.
 
@@ -45,6 +47,7 @@ Bundled Third-Party Library Upgrades:
 
 !!Features, Enhancements and Third Party Updates
 
+  - GH #5260 Allow creation of loggers with configuration at runtime
   - GH #5257 Preserve properties file on save
   - GH #5253 Add `!include` directive support to PropertyFileConfiguration
   - PR #5233 Extract tessil into dependencies/
