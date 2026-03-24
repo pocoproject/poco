@@ -22,15 +22,13 @@ using Poco::Util::Units::square;
 using Poco::Util::Units::cube;
 
 
-namespace Poco {
-namespace Util {
-namespace Units {
-namespace Units {
+namespace Poco::Util::Units::Units {
 typedef Compose<Scale<N, 1, 1000>, Power<m, -3> > SpecificWeight;// [kN/m^3]
-} // namespace Units
-namespace Values {
+} // namespace Poco::Util::Units::Units
+
+namespace Poco::Util::Units::Values {
 typedef Value<double, Units::SpecificWeight> SpecificWeight;
-} } } } // namespace Poco::Util::Units
+} // namespace Poco::Util::Units::Values
 
 
 int main()

@@ -17,8 +17,7 @@
 #include "Poco/JWT/JWTException.h"
 
 
-namespace Poco {
-namespace JWT {
+namespace Poco::JWT {
 
 
 const std::string Token::CLAIM_ISSUER("iss");
@@ -195,4 +194,4 @@ void Token::sign(const std::string& signature)
 }
 
 
-} } // namespace Poco::JWT
+} // namespace Poco::JWT

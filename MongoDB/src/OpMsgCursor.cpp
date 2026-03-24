@@ -45,8 +45,7 @@
 
 using namespace std::string_literals;
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 static const std::string keyCursor		{"cursor"s};
@@ -245,4 +244,4 @@ template void OpMsgCursor::killImpl<Connection>(Connection& connection);
 template void OpMsgCursor::killImpl<ReplicaSetConnection>(ReplicaSetConnection& connection);
 
 
-} } // Namespace Poco::MongoDB
+} // namespace Poco::MongoDB

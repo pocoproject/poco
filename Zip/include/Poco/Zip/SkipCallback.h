@@ -22,8 +22,7 @@
 #include "Poco/Zip/ParseCallback.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Zip_API SkipCallback: public ParseCallback
@@ -40,7 +39,7 @@ public:
 };
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_SkipCallback_INCLUDED

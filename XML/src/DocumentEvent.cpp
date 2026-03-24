@@ -15,8 +15,7 @@
 #include "Poco/DOM/DocumentEvent.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 DocumentEvent::~DocumentEvent()
@@ -24,4 +23,4 @@ DocumentEvent::~DocumentEvent()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

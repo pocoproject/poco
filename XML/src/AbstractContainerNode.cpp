@@ -23,8 +23,7 @@
 #include "Poco/UnicodeConverter.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString AbstractContainerNode::WILDCARD(toXMLString("*"));
@@ -651,4 +650,4 @@ bool AbstractContainerNode::namesAreEqual(const Node* pNode, const XMLString& na
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

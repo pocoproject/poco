@@ -24,8 +24,7 @@
 #include "Poco/String.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string HTTPNTLMCredentials::SCHEME = "NTLM";
@@ -184,4 +183,4 @@ std::string HTTPNTLMCredentials::createNTLMMessage(const std::string& responseAu
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

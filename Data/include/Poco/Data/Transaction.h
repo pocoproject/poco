@@ -24,8 +24,7 @@
 #include "Poco/Logger.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API Transaction
@@ -196,7 +195,7 @@ inline void Transaction::setLogger(Poco::Logger* pLogger)
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Transaction_INCLUDED

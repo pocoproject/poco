@@ -25,8 +25,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Zip_API PartialStreamBuf: public Poco::BufferedStreamBuf
@@ -181,7 +180,7 @@ inline Poco::UInt64 PartialOutputStream::bytesWritten() const
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_PartialStream_INCLUDED

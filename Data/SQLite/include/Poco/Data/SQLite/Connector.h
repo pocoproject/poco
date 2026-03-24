@@ -22,9 +22,7 @@
 #include "Poco/Data/Connector.h"
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 class SQLite_API Connector: public Poco::Data::Connector
@@ -73,7 +71,7 @@ inline const std::string& Connector::name() const
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite
 
 
 #endif // Data_SQLite_Connector_INCLUDED

@@ -15,8 +15,7 @@
 #include "Poco/Util/ConfigurationMapper.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 ConfigurationMapper::ConfigurationMapper(const std::string& fromPrefix, const std::string& toPrefix, AbstractConfiguration::Ptr pConfig):
@@ -90,4 +89,4 @@ std::string ConfigurationMapper::translateKey(const std::string& key) const
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

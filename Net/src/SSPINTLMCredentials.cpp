@@ -27,8 +27,7 @@
 #include <security.h>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 struct NTLMContextImpl
@@ -235,14 +234,13 @@ SSPINTLMProvider& SSPINTLMProvider::instance()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // POCO_OS == POCO_OS_WINDOWS_NT
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string SSPINTLMCredentials::SERVICE_HTTP("HTTP");
@@ -311,4 +309,4 @@ std::vector<unsigned char> SSPINTLMCredentials::authenticate(NTLMContext& contex
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

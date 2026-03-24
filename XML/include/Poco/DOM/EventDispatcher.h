@@ -23,8 +23,7 @@
 #include <list>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class Event;
@@ -91,7 +90,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_EventDispatcher_INCLUDED

@@ -28,8 +28,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class RecordSet;
@@ -306,7 +305,7 @@ inline void Row::formatValues() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Row_INCLUDED

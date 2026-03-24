@@ -26,8 +26,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API RSADigestEngine: public Poco::DigestEngine
@@ -105,7 +104,7 @@ private:
 };
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_RSADigestEngine_INCLUDED

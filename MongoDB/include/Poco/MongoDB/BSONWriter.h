@@ -22,8 +22,7 @@
 #include "Poco/BinaryWriter.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API BSONWriter
@@ -68,7 +67,7 @@ inline void BSONWriter::writeCString(const std::string& value)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_BSONWriter_INCLUDED

@@ -16,8 +16,7 @@
 #include <openssl/rsa.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 RSADigestEngine::RSADigestEngine(const RSAKey& key, DigestType digestType):
@@ -93,4 +92,4 @@ void RSADigestEngine::updateImpl(const void* data, std::size_t length)
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

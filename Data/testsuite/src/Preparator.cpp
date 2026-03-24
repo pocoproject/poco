@@ -13,9 +13,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Data {
-namespace Test {
+namespace Poco::Data::Test {
 
 
 Preparator::Preparator()
@@ -150,4 +148,4 @@ void Preparator::prepare(std::size_t pos, const Poco::Dynamic::Var&)
 }
 
 
-} } } // namespace Poco::Data::Test
+} // namespace Poco::Data::Test

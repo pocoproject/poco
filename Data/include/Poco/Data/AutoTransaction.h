@@ -22,14 +22,13 @@
 #include "Poco/Data/Transaction.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 using AutoTransaction = Transaction;
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_AutoTransaction_INCLUDED

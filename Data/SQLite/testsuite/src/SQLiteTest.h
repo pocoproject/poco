@@ -18,12 +18,11 @@
 #include "CppUnit/TestCase.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 class Session;
 
-} }
+} // namespace Poco::Data
 
 
 class SQLiteTest: public CppUnit::TestCase

@@ -16,8 +16,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 DigestEngine::DigestEngine(const std::string& name):
@@ -81,4 +80,4 @@ void DigestEngine::updateImpl(const void* data, std::size_t length)
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

@@ -22,8 +22,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString SAXParser::FEATURE_PARTIAL_READS = toXMLString("http://www.appinf.com/features/enable-partial-reads");
@@ -245,4 +244,4 @@ void SAXParser::setupParse()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

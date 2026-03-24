@@ -36,8 +36,7 @@ using Poco::NumberFormatter;
 using Poco::IOException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 typedef Poco::UInt32 punycode_uint;
@@ -681,4 +680,4 @@ int punycode_decode(size_t input_length, const char input[], size_t *output_leng
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

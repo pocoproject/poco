@@ -5,8 +5,7 @@
 #include "Poco/PDF/Cell.h"
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 Cell::Cell(const AttributedString& content, const std::string& name, FontMapPtr pFontMap):
@@ -248,4 +247,4 @@ void Cell::draw(Page& page, float x, float y, float width, float height)
 }
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF

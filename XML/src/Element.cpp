@@ -21,8 +21,7 @@
 #include "Poco/DOM/AttrMap.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 Element::Element(Document* pOwnerDocument, const XMLString& namespaceURI, const XMLString& localName, const XMLString& qname):
@@ -441,4 +440,4 @@ Element* Element::getElementByIdNS(const XMLString& elementId, const XMLString& 
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

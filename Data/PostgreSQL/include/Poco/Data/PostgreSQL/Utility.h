@@ -23,9 +23,7 @@
 #include "Poco/Data/Session.h"
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 class PostgreSQL_API Utility
@@ -75,7 +73,7 @@ inline SessionHandle* Utility::handle(Session& aSession)
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif // SQL_PostgreSQL_Utility_INCLUDED

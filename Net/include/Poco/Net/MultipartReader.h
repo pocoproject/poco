@@ -24,8 +24,7 @@
 #include <istream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class MessageHeader;
@@ -155,7 +154,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_MultipartReader_INCLUDED

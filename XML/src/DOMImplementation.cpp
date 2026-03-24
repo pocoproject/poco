@@ -19,8 +19,7 @@
 #include "Poco/String.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString DOMImplementation::FEATURE_XML            = toXMLString("xml");
@@ -77,4 +76,4 @@ const DOMImplementation& DOMImplementation::instance()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

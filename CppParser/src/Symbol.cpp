@@ -20,8 +20,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 int Symbol::_nextId = 0;
@@ -286,4 +285,4 @@ const Attributes& Symbol::getAttributes() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

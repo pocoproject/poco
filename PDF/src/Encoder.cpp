@@ -17,8 +17,7 @@
 
 #include <hpdf.h>
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 Encoder::Encoder(HPDF_Doc* pPDF,
@@ -54,4 +53,4 @@ Encoder::WriteMode Encoder::writeMode()
 
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF

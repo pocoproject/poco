@@ -35,8 +35,7 @@
 #endif // OPENSSL_VERSION_NUMBER >= 0x30000000L
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 Context::Params::Params(KeyDHGroup dhBits):
@@ -921,4 +920,4 @@ void Context::initECDH(const std::string& curve)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

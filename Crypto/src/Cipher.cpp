@@ -25,8 +25,7 @@
 #include <memory>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 Cipher::Cipher()
@@ -141,4 +140,4 @@ void Cipher::decrypt(std::istream& source, std::ostream& sink, Encoding encoding
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

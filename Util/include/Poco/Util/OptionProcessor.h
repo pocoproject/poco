@@ -22,8 +22,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class OptionSet;
@@ -130,7 +129,7 @@ private:
 
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_OptionProcessor_INCLUDED

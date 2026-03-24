@@ -23,8 +23,7 @@
 #include "Poco/DNSSD/DNSSD.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 class DNSSD_API Domain
@@ -81,7 +80,7 @@ inline bool Domain::isDefault() const
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD
 
 
 #endif // DNSSD_Domain_INCLUDED

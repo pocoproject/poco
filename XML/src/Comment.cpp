@@ -15,8 +15,7 @@
 #include "Poco/DOM/Comment.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString Comment::NODE_NAME = toXMLString("#comment");
@@ -57,4 +56,4 @@ Node* Comment::copyNode(bool deep, Document* pOwnerDocument) const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

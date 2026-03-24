@@ -29,8 +29,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 class Document;
@@ -531,7 +530,7 @@ private:
 };
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_Page_INCLUDED

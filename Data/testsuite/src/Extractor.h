@@ -17,9 +17,7 @@
 #include "Poco/Data/AbstractExtractor.h"
 
 
-namespace Poco {
-namespace Data {
-namespace Test {
+namespace Poco::Data::Test {
 
 
 class Extractor: public Poco::Data::AbstractExtractor
@@ -445,7 +443,7 @@ inline bool Extractor::isNull(std::size_t col, std::size_t row)
 }
 
 
-} } } // namespace Poco::Data::Test
+} // namespace Poco::Data::Test
 
 
 #endif // Data_Test_Extractor_INCLUDED

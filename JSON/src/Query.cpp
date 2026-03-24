@@ -22,8 +22,7 @@
 using Poco::Dynamic::Var;
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 Query::Query(const Var& source): _source(source)
@@ -171,4 +170,4 @@ Var Query::find(const std::string& path) const
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON

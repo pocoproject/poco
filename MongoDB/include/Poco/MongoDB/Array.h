@@ -23,8 +23,7 @@
 #include "Poco/MongoDB/Document.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API Array: public Document
@@ -129,7 +128,7 @@ inline void BSONWriter::write<Array::Ptr>(const Array::Ptr& from)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_Array_INCLUDED

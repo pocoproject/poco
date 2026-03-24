@@ -15,8 +15,7 @@
 #include "Poco/SAX/DefaultHandler.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 DefaultHandler::DefaultHandler()
@@ -120,4 +119,4 @@ void DefaultHandler::fatalError(const SAXException& exc)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

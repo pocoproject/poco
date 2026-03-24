@@ -24,8 +24,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 struct Prometheus_API HistogramData
@@ -230,7 +229,7 @@ inline const std::vector<double> Histogram::buckets() const
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_Gauge_INCLUDED

@@ -15,8 +15,7 @@
 #include "Poco/Data/Position.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 Position::Position(Poco::UInt32 value): _value(value)
@@ -29,4 +28,4 @@ Position::~Position()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

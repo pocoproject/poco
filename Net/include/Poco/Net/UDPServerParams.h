@@ -23,8 +23,7 @@
 #include "Poco/Timespan.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API UDPServerParams
@@ -116,7 +115,7 @@ inline int UDPServerParams::backlogThreshold() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_UDPServerParams_INCLUDED

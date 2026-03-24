@@ -22,8 +22,7 @@
 #include "Poco/CppParser/Symbol.h"
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class Enum;
@@ -60,7 +59,7 @@ inline const std::string& EnumValue::value() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_EnumValue_INCLUDED

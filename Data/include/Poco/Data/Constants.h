@@ -23,14 +23,13 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 inline const std::size_t POCO_DATA_INVALID_ROW = std::numeric_limits<std::size_t>::max();
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Constants_INCLUDED

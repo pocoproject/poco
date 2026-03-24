@@ -18,8 +18,7 @@
 #include <clocale>
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 Parser::Parser(const Handler::Ptr& pHandler):
@@ -37,4 +36,4 @@ void Parser::setHandler(const Handler::Ptr& pHandler)
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON

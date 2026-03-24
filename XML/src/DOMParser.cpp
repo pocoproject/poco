@@ -20,8 +20,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString DOMParser::FEATURE_FILTER_WHITESPACE = toXMLString("http://www.appinf.com/features/no-whitespace-in-element-content");
@@ -164,4 +163,4 @@ std::size_t DOMParser::getMaxElementDepth() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

@@ -15,8 +15,7 @@
 #include "Poco/Net/ServerSocketImpl.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 ServerSocketImpl::ServerSocketImpl()
@@ -29,4 +28,4 @@ ServerSocketImpl::~ServerSocketImpl()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

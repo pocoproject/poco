@@ -24,8 +24,7 @@
 #include "Poco/SAX/NamespaceSupport.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class NamedNodeMap;
@@ -287,7 +286,7 @@ inline const XMLString& Node::nodeValue() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_Node_INCLUDED

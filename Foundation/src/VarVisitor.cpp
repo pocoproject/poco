@@ -14,8 +14,7 @@
 
 #include "Poco/Dynamic/VarVisitor.h"
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 bool Visitor::visit(const Var &x) const
 {
@@ -29,4 +28,4 @@ bool Visitor::visit(const Var &x) const
 	return wasHandled;
 }
 
-} } // namespace Poco::Dynamic
+} // namespace Poco::Dynamic

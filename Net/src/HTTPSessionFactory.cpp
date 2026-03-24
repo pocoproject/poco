@@ -22,8 +22,7 @@ using Poco::NotFoundException;
 using Poco::ExistsException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPSessionFactory::HTTPSessionFactory()
@@ -149,4 +148,4 @@ HTTPSessionFactory::InstantiatorInfo::InstantiatorInfo(HTTPSessionInstantiator* 
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

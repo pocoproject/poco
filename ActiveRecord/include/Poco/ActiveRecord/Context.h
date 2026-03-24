@@ -23,8 +23,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace ActiveRecord {
+namespace Poco::ActiveRecord {
 
 
 class ActiveRecordLib_API Context: public Poco::RefCountedObject
@@ -68,7 +67,7 @@ inline Poco::Data::Session& Context::session()
 }
 
 
-} } // namespace Poco::ActiveRecord
+} // namespace Poco::ActiveRecord
 
 
 #endif // ActiveRecord_Context_INCLUDED

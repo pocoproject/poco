@@ -24,8 +24,7 @@
 #include "Poco/Timespan.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class MailMessage;
@@ -238,7 +237,7 @@ inline const std::string& SMTPClientSession::host() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SMTPClientSession_INCLUDED

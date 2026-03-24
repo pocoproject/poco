@@ -21,8 +21,7 @@
 #include "Poco/Net/NetSSL.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class InvalidCertificateHandler;
@@ -81,7 +80,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 // DEPRECATED: register the factory directly at the FactoryMgr:

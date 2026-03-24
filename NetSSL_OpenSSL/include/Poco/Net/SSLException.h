@@ -22,8 +22,7 @@
 #include "Poco/Net/NetException.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 POCO_DECLARE_EXCEPTION(NetSSL_API, SSLException, NetException)
@@ -33,7 +32,7 @@ POCO_DECLARE_EXCEPTION(NetSSL_API, CertificateValidationException, SSLException)
 POCO_DECLARE_EXCEPTION(NetSSL_API, SSLConnectionUnexpectedlyClosedException, SSLException)
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_SSLException_INCLUDED

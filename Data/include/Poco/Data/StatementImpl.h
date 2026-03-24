@@ -38,8 +38,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API StatementImpl
@@ -641,7 +640,7 @@ inline bool StatementImpl::hasMoreDataSets() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_StatementImpl_INCLUDED

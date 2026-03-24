@@ -18,8 +18,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 std::ostream& operator << (std::ostream &os, const Row& row)
@@ -366,4 +365,4 @@ void Row::formatNames() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

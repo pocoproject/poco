@@ -23,8 +23,7 @@
 #include "Poco/URI.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API HTTPSessionInstantiator
@@ -74,7 +73,7 @@ inline const HTTPClientSession::ProxyConfig& HTTPSessionInstantiator::getProxyCo
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPSessionInstantiator_INCLUDED

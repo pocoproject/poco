@@ -26,8 +26,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 //
@@ -735,4 +734,4 @@ void ReplicaSet::updateTopologyFromAllServers()
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

@@ -15,9 +15,7 @@
 #include "Poco/Data/ODBC/Diagnostics.h"
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 // explicit instantiation definition
 #ifndef POCO_DOC
@@ -37,4 +35,4 @@ template class Diagnostics<SQLHDESC, SQL_HANDLE_DESC>;
 #endif
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

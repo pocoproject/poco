@@ -16,8 +16,7 @@
 #include "Poco/SAX/SAXException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 XMLFilterImpl::XMLFilterImpl():
@@ -310,4 +309,4 @@ void XMLFilterImpl::setupParse()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

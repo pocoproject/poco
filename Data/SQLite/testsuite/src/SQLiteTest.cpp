@@ -172,8 +172,7 @@ private:
 };
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <>
@@ -237,7 +236,7 @@ private:
 };
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 RecordSet getRecordsetMove(Session& session, const std::string& sql)

@@ -27,8 +27,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 void FastLoggerConfigurator::configure(AbstractConfiguration::Ptr pConfig)
@@ -114,7 +113,7 @@ void FastLoggerConfigurator::configureFastLogger(AbstractConfiguration::Ptr pCon
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // POCO_ENABLE_FASTLOGGER

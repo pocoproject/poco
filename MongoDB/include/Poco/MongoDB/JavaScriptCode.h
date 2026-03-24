@@ -25,8 +25,7 @@
 #include "Poco/SharedPtr.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API JavaScriptCode
@@ -100,7 +99,7 @@ inline void BSONWriter::write<JavaScriptCode::Ptr>(const JavaScriptCode::Ptr& fr
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_JavaScriptCode_INCLUDED

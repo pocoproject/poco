@@ -36,8 +36,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 const std::string Database::AUTH_SCRAM_SHA1("SCRAM-SHA-1");
@@ -378,4 +377,4 @@ Poco::MongoDB::Document::Ptr Database::createIndex(
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

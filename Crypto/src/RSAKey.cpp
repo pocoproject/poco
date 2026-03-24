@@ -16,8 +16,7 @@
 #include <openssl/rsa.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 RSAKey::RSAKey(const EVPPKey& key):
@@ -105,4 +104,4 @@ RSAKeyImpl::ByteVec RSAKey::decryptionExponent() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

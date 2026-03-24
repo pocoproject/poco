@@ -36,6 +36,11 @@ public:
 	void testParseDeleteDefault();
 	void testParseAnonymousNamespace();
 	void testParseFriendInline();
+	void testParseNestedNamespace();
+	void testParseInlineNestedNamespace();
+	void testParseRepeatedNestedNamespace();
+	void testParseSingleNamespace();
+	void testParseDeepNestedNamespace();
 
 	void setUp();
 	void tearDown();

@@ -23,8 +23,7 @@ using Poco::NotFoundException;
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 namespace
@@ -502,4 +501,4 @@ void WinRegistryKey::values(WinRegistryKey::Values& vals)
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

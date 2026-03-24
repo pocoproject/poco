@@ -4,8 +4,7 @@
 #include "Poco/Net/HTTPSession.h"
 #include <cstring>
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 HTTPReactorServer::HTTPReactorServer(int port, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory)
 	: _tcpReactorServer(port, pParams)
@@ -116,5 +115,5 @@ void HTTPReactorServer::onError(const Poco::Exception& ex)
 	throw ex;
 }
 
-}} // namespace Poco::Net
+} // namespace Poco::Net
 

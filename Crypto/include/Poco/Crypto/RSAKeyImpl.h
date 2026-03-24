@@ -35,8 +35,7 @@ typedef struct bignum_st BIGNUM;
 typedef struct rsa_st RSA;
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class X509Certificate;
@@ -135,7 +134,7 @@ inline const RSA* RSAKeyImpl::getRSA() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_RSAKeyImplImpl_INCLUDED

@@ -33,8 +33,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 
@@ -444,7 +443,7 @@ XMLConfiguration::Node* XMLConfiguration::findAttribute(const std::string& name,
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // POCO_UTIL_NO_XMLCONFIGURATION

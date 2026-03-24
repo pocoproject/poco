@@ -16,8 +16,7 @@
 #include <iostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 KeyConsoleHandler::KeyConsoleHandler(bool server):PrivateKeyPassphraseHandler(server)
@@ -37,4 +36,4 @@ void KeyConsoleHandler::onPrivateKeyRequested(const void* pSender, std::string& 
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

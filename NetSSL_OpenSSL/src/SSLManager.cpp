@@ -34,8 +34,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string SSLManager::CFG_PRIV_KEY_FILE("privateKeyFile");
@@ -640,4 +639,4 @@ void uninitializeSSL()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -28,9 +28,7 @@
 using Poco::DataFormatException;
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 const std::string ODBCStatementImpl::INVALID_CURSOR_STATE = "24000";
@@ -527,4 +525,4 @@ int ODBCStatementImpl::affectedRowCount() const
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

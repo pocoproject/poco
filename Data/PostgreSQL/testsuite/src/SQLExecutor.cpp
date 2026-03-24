@@ -82,8 +82,7 @@ struct Person
 };
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <>
@@ -136,7 +135,7 @@ private:
 };
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession):

@@ -21,8 +21,7 @@
 #include "Poco/XML/XML.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class SAXException;
@@ -86,7 +85,7 @@ protected:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_ErrorHandler_INCLUDED

@@ -116,8 +116,7 @@ inline Employee& Employee::managerID(const Poco::UUID& value)
 } // namespace ORM
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <>
@@ -155,7 +154,7 @@ public:
 };
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // ORM_Employee_INCLUDED

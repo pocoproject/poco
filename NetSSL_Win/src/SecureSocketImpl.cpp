@@ -32,8 +32,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class StateMachine
@@ -1820,4 +1819,4 @@ StateMachine::~StateMachine()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

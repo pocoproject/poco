@@ -21,9 +21,7 @@
 #include "Poco/NumberFormatter.h"
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 MySQLException::MySQLException(const std::string& msg) : Poco::Data::DataException(std::string("[MySQL]: ") + msg)
@@ -138,4 +136,4 @@ std::string StatementException::compose(const std::string& text, MYSQL_STMT* h, 
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL

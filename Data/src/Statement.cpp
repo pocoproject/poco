@@ -26,8 +26,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 Statement::Statement(StatementImpl::Ptr pImpl):
@@ -592,4 +591,4 @@ Session Statement::session()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

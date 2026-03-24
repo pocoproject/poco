@@ -27,8 +27,7 @@
 using Poco::icompare;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPCredentials::HTTPCredentials()
@@ -257,4 +256,4 @@ void HTTPCredentials::extractCredentials(const Poco::URI& uri, std::string& user
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

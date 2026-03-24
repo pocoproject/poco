@@ -17,8 +17,7 @@
 #include "Poco/DNSSD/Service.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 Service::Service():
@@ -77,4 +76,4 @@ Service::~Service()
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD

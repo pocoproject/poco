@@ -21,9 +21,7 @@
 #include <dns_sd.h>
 
 
-namespace Poco {
-namespace DNSSD {
-namespace Bonjour {
+namespace Poco::DNSSD::Bonjour {
 
 
 extern "C" void DNSSD_API onRegisterServiceReply(
@@ -321,11 +319,10 @@ void BonjourResponderImpl::onRegisterServiceReply(
 }
 
 
-} } } // namespace Poco::DNSSD::Bonjour
+} // namespace Poco::DNSSD::Bonjour
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 namespace
@@ -346,4 +343,4 @@ void uninitializeDNSSD()
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD

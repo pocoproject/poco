@@ -23,8 +23,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 MessageHeader::MessageHeader():
@@ -489,4 +488,4 @@ std::string MessageHeader::decodeWord(const std::string& text, const std::string
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

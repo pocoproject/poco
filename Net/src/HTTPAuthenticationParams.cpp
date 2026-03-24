@@ -61,8 +61,7 @@ namespace
 }
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string HTTPAuthenticationParams::REALM("realm");
@@ -325,4 +324,4 @@ void HTTPAuthenticationParams::parse(std::string::const_iterator first, std::str
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

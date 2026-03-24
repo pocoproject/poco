@@ -27,8 +27,7 @@
 #include <atomic>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPServerSession;
@@ -60,7 +59,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPServerConnection_INCLUDED

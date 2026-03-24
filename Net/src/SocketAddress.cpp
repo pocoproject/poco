@@ -40,8 +40,7 @@ using Poco::Net::Impl::LocalSocketAddressImpl;
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 struct AFLT
@@ -475,6 +474,6 @@ std::ostream& operator << (std::ostream& ostr, const Poco::Net::SocketAddress& a
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 

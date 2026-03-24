@@ -22,8 +22,7 @@ using Poco::Random;
 using Poco::NumberFormatter;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 MultipartWriter::MultipartWriter(std::ostream& ostr):
@@ -84,4 +83,4 @@ std::string MultipartWriter::createBoundary()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

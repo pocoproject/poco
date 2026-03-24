@@ -27,8 +27,7 @@ using Poco::DateTime;
 using Poco::UTF16String;
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 const std::size_t RecordSet::UNKNOWN_TOTAL_ROW_COUNT = std::numeric_limits<std::size_t>::max();
@@ -689,4 +688,4 @@ void RecordSet::setTotalRowCount(const std::string& sql)
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

@@ -17,8 +17,7 @@
 #include "Poco/Net/HTTPSClientSession.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPSSessionInstantiator::HTTPSSessionInstantiator()
@@ -67,4 +66,4 @@ void HTTPSSessionInstantiator::unregisterInstantiator()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

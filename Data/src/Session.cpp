@@ -19,8 +19,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 Session::Session(Poco::AutoPtr<SessionImpl> pImpl):
@@ -129,4 +128,4 @@ void Session::rollback()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

@@ -67,9 +67,7 @@ namespace
 } // namespace
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 StatementExecutor::StatementExecutor(SessionHandle& sessionHandle, bool binaryExtraction):
@@ -422,4 +420,4 @@ void StatementExecutor::clearResults()
 }
 
 
-} } } // Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL

@@ -28,8 +28,7 @@ using Poco::UnbufferedStreamBuf;
 using Poco::Path;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class FTPSStreamBuf: public UnbufferedStreamBuf
@@ -158,4 +157,4 @@ void FTPSStreamFactory::unregisterFactory()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

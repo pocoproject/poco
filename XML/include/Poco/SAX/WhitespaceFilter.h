@@ -23,8 +23,7 @@
 #include "Poco/SAX/LexicalHandler.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API WhitespaceFilter: public XMLFilterImpl, public LexicalHandler
@@ -75,7 +74,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_WhitespaceFilter_INCLUDED

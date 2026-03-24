@@ -27,8 +27,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API ServerDescription
@@ -253,7 +252,7 @@ inline void ServerDescription::setAddress(const Net::SocketAddress& address)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_ServerDescription_INCLUDED

@@ -15,9 +15,7 @@
 #include "Poco/Data/PostgreSQL/PostgreSQLException.h"
 #include <cstring> 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 PostgreSQLException::PostgreSQLException(const std::string& aMessage):
@@ -89,4 +87,4 @@ StatementException::StatementException(const std::string& aMessage,const char* p
 
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL

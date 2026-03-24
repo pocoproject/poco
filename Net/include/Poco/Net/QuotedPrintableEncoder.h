@@ -23,8 +23,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API QuotedPrintableEncoderBuf: public Poco::UnbufferedStreamBuf
@@ -79,7 +78,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_QuotedPrintableEncoder_INCLUDED

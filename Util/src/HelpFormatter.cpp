@@ -17,8 +17,7 @@
 #include "Poco/Util/Option.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 const int HelpFormatter::TAB_WIDTH  = 4;
@@ -294,4 +293,4 @@ std::string HelpFormatter::longPrefix() const
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

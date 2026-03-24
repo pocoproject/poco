@@ -27,8 +27,7 @@
 #define POCO_LPSERVICE_FAILURE_ACTION LPSERVICE_FAILURE_ACTIONSW
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API WinService
@@ -167,7 +166,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_WinService_INCLUDED

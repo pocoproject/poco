@@ -23,8 +23,7 @@ using Poco::format;
 using Poco::toJSON;
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 const int JSONRowFormatter::JSON_FMT_MODE_SMALL;
@@ -186,4 +185,4 @@ std::string& JSONRowFormatter::formatNames(const NameVecPtr pNames, std::string&
 }
 
 
-} }// namespace Poco::Data
+} // namespace Poco::Data

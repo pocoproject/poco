@@ -15,8 +15,7 @@
 #include "Poco/Data/Connector.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 Connector::Connector()
@@ -29,4 +28,4 @@ Connector::~Connector()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

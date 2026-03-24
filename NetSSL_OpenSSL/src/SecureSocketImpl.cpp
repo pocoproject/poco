@@ -35,8 +35,7 @@ using Poco::NumberFormatter;
 using Poco::Timespan;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Context::Ptr pContext):
@@ -675,4 +674,4 @@ int SecureSocketImpl::onSessionCreated(SSL* pSSL, SSL_SESSION* pSession)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

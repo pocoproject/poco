@@ -26,9 +26,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace DNSSD {
-namespace Avahi {
+namespace Poco::DNSSD::Avahi {
 
 
 class AvahiResponderImpl;
@@ -80,7 +78,7 @@ private:
 };
 
 
-} } } // namespace Poco::DNSSD::Avahi
+} // namespace Poco::DNSSD::Avahi
 
 
 #endif // DNSSD_Avahi_AvahiBrowserImpl_INCLUDED

@@ -20,8 +20,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 const Poco::Int64 ReadPreference::NO_MAX_STALENESS;
@@ -372,4 +371,4 @@ std::vector<ServerDescription> ReadPreference::selectByNearest(const std::vector
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

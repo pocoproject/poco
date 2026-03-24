@@ -23,8 +23,7 @@
 #include "Poco/Net/Context.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API SecureServerSocket: public ServerSocket
@@ -130,7 +129,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_SecureServerSocket_INCLUDED

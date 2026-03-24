@@ -25,8 +25,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template<typename T>
@@ -148,7 +147,7 @@ private:
 };
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Preparation_INCLUDED

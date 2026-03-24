@@ -24,8 +24,7 @@
 #include <openssl/ssl.h>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API Session: public Poco::RefCountedObject
@@ -76,7 +75,7 @@ inline SSL_SESSION* Session::sslSession() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_Session_INCLUDED

@@ -21,8 +21,7 @@
 using Poco::NotFoundException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 NameValueCollection::NameValueCollection()
@@ -171,4 +170,4 @@ void NameValueCollection::secureClear()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

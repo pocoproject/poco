@@ -29,8 +29,7 @@ using Poco::UInt16;
 using Poco::Int32;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const UInt16 ICMPPacketImpl::MAX_PACKET_SIZE  = 65535;
@@ -101,4 +100,4 @@ unsigned short ICMPPacketImpl::checksum(UInt16 *addr, Int32 len)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

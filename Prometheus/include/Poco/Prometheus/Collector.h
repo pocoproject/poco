@@ -22,8 +22,7 @@
 #include "Poco/Prometheus/Registry.h"
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Exporter;
@@ -108,7 +107,7 @@ inline const std::string& Collector::name() const
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_Collector_INCLUDED

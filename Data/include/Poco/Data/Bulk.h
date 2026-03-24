@@ -22,8 +22,7 @@
 #include "Poco/Data/Limit.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API Bulk
@@ -90,7 +89,7 @@ inline void bulk(Void)
 using BulkFnType = void (*)(Void);
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Bulk_INCLUDED

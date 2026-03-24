@@ -24,8 +24,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 class JSON_API Stringifier
@@ -67,7 +66,7 @@ inline void Stringifier::condense(const Dynamic::Var& any, std::ostream& out, in
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON
 
 
 #endif // JSON_JSONStringifier_INCLUDED

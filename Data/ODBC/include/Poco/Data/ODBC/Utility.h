@@ -27,9 +27,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 class ConnectionHandle;
@@ -249,7 +247,7 @@ inline void Utility::timeSync(Time& t, const SQL_TIME_STRUCT& ts)
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif

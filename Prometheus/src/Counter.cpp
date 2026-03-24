@@ -15,8 +15,7 @@
 #include "Poco/Prometheus/Counter.h"
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 Counter::Counter(const std::string& name):
@@ -79,4 +78,4 @@ void Counter::writeSample(Exporter& exporter, const std::vector<std::string>& la
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

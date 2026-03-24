@@ -15,8 +15,7 @@
 #include "Poco/Net/HTTPServerSession.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPServerSession::HTTPServerSession(const StreamSocket& socket, HTTPServerParams::Ptr pParams):
@@ -67,4 +66,4 @@ SocketAddress HTTPServerSession::serverAddress()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

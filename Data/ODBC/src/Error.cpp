@@ -15,9 +15,7 @@
 #include "Poco/Data/ODBC/Error.h"
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 // explicit instantiation definition
 #ifndef POCO_DOC
@@ -37,4 +35,4 @@ template class Error<SQLHDESC, SQL_HANDLE_DESC>;
 #endif
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

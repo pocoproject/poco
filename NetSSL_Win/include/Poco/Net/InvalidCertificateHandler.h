@@ -22,8 +22,7 @@
 #include "Poco/Net/VerificationErrorArgs.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API InvalidCertificateHandler
@@ -74,7 +73,7 @@ protected:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_InvalidCertificateHandler_INCLUDED

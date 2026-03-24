@@ -16,8 +16,7 @@
 #include <openssl/rsa.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 KeyPair::KeyPair(KeyPairImpl::Ptr pKeyPairImpl):
@@ -60,4 +59,4 @@ KeyPair& KeyPair::operator = (KeyPair&& other) noexcept
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

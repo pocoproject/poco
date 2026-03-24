@@ -33,8 +33,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <class T>
@@ -841,7 +840,7 @@ inline AbstractExtractionVec& into(AbstractExtractionVec& ev)
 } // namespace Keywords
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Extraction_INCLUDED

@@ -17,8 +17,7 @@
 #include <iostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 ConsoleCertificateHandler::ConsoleCertificateHandler(bool server): InvalidCertificateHandler(server)
@@ -51,4 +50,4 @@ void ConsoleCertificateHandler::onInvalidCertificate(const void*, VerificationEr
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

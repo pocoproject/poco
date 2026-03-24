@@ -20,8 +20,7 @@
 #include <winerror.h>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 Context::VerificationMode Utility::convertVerificationMode(const std::string& vMode)
@@ -195,4 +194,4 @@ std::string Utility::formatError(long errCode)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

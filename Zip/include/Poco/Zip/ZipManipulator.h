@@ -27,8 +27,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class ZipArchive;
@@ -103,7 +102,7 @@ inline const ZipArchive& ZipManipulator::originalArchive() const
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_ZipManipulator_INCLUDED

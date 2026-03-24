@@ -23,8 +23,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 POCO_DECLARE_EXCEPTION(Crypto_API, CryptoException, Poco::Exception)
@@ -50,7 +49,7 @@ private:
 };
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_CryptoException_INCLUDED

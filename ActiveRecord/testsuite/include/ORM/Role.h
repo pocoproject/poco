@@ -77,8 +77,7 @@ inline Role& Role::description(const std::string& value)
 } // namespace ORM
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <>
@@ -110,7 +109,7 @@ public:
 };
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // ORM_Role_INCLUDED

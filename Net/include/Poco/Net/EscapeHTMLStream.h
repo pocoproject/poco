@@ -23,8 +23,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API EscapeHTMLStreamBuf: public Poco::UnbufferedStreamBuf
@@ -83,7 +82,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_EscapeHTMLStream_INCLUDED

@@ -27,8 +27,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API SessionFactory
@@ -93,7 +92,7 @@ private:
 };
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_SessionFactory_INCLUDED

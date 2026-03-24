@@ -30,7 +30,10 @@ namespace Poco {
 
 class Logger;
 
-namespace Util {
+}
+
+
+namespace Poco::Util {
 
 
 class Util_API LoggingConfigurator
@@ -190,7 +193,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_LoggingConfigurator_INCLUDED

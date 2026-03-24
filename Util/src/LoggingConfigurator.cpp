@@ -42,8 +42,7 @@ using Poco::LoggingFactory;
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 Mutex LoggingConfigurator::_mutex;
@@ -301,4 +300,4 @@ bool LoggingConfigurator::validateConfiguration(AbstractConfiguration::Ptr pConf
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

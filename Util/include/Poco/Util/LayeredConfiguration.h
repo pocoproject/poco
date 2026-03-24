@@ -24,8 +24,7 @@
 #include <list>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API LayeredConfiguration: public AbstractConfiguration
@@ -121,7 +120,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_LayeredConfiguration_INCLUDED

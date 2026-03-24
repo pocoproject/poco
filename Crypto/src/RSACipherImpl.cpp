@@ -20,8 +20,7 @@
 #include <cstring>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 namespace
@@ -338,4 +337,4 @@ CryptoTransform::Ptr RSACipherImpl::createDecryptor()
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

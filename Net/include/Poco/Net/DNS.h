@@ -24,8 +24,7 @@
 #include "Poco/Net/HostEntry.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API DNS
@@ -193,7 +192,7 @@ protected:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_DNS_INCLUDED

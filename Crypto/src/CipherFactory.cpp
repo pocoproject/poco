@@ -27,8 +27,7 @@
 #endif
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 CipherFactory::CipherFactory()
@@ -70,4 +69,4 @@ Cipher* CipherFactory::createCipher(const EVPPKey& key)
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

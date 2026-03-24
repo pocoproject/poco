@@ -28,8 +28,7 @@ using Poco::trim;
 using Poco::Path;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 PropertyFileConfiguration::PropertyFileConfiguration(AbstractConfiguration::Ptr pParentConfig):
@@ -423,4 +422,4 @@ int PropertyFileConfiguration::readChar(std::istream& istr)
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

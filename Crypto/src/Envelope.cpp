@@ -14,8 +14,7 @@
 
 #include "Poco/Crypto/Envelope.h"
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 Envelope::Envelope(int cipherNID): _pCipher(EVP_get_cipherbynid(cipherNID)),
@@ -159,4 +158,4 @@ void Envelope::handleErrors(std::string&& msg)
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

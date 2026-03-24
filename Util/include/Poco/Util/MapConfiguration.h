@@ -23,8 +23,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API MapConfiguration: public AbstractConfiguration
@@ -67,7 +66,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_MapConfiguration_INCLUDED

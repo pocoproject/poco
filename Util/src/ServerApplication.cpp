@@ -50,8 +50,7 @@ using Poco::SystemException;
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -598,4 +597,4 @@ void ServerApplication::handleUMask(const std::string& name, const std::string& 
 #endif // POCO_OS_FAMILY_UNIX
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

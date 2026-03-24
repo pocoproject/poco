@@ -35,8 +35,7 @@ using Poco::URI;
 using Poco::TextEncoding;
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class ContextLocator: public Locator
@@ -941,4 +940,4 @@ int ParserEngine::convert(void* data, const char* s)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

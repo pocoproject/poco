@@ -22,8 +22,7 @@
 #include "Poco/XML/XMLException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API EventException: public XMLException
@@ -75,7 +74,7 @@ inline unsigned short EventException::code() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_EventException_INCLUDED

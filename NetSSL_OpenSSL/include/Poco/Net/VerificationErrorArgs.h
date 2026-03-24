@@ -23,8 +23,7 @@
 #include "Poco/Net/Context.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API VerificationErrorArgs
@@ -113,7 +112,7 @@ inline bool VerificationErrorArgs::getIgnoreError() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_VerificationErrorArgs_INCLUDED

@@ -23,8 +23,7 @@
 #include "Poco/UnbufferedStreamBuf.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPClientSession;
@@ -82,7 +81,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPIOStream_INCLUDED

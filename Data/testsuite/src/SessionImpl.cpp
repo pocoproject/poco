@@ -13,9 +13,7 @@
 #include "Connector.h"
 
 
-namespace Poco {
-namespace Data {
-namespace Test {
+namespace Poco::Data::Test {
 
 
 SessionImpl::SessionImpl(const std::string& init, std::size_t timeout):
@@ -182,4 +180,4 @@ Poco::Any SessionImpl::getP(const std::string& name) const
 }
 
 
-} } } // namespace Poco::Data::Test
+} // namespace Poco::Data::Test

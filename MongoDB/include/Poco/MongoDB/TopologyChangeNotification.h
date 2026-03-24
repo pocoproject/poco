@@ -24,8 +24,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API TopologyChangeNotification : public Notification
@@ -117,7 +116,7 @@ inline std::string TopologyChangeNotification::name() const
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_TopologyChangeNotification_INCLUDED

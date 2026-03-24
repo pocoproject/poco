@@ -21,8 +21,7 @@
 #include "Poco/Net/Net.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API MailRecipient
@@ -114,7 +113,7 @@ inline void swap(MailRecipient& r1, MailRecipient& r2) noexcept
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_MailRecipient_INCLUDED

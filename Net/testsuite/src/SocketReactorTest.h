@@ -18,13 +18,12 @@
 #include "CppUnit/TestCase.h"
 #include "Poco/AutoPtr.h"
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 class ReadableNotification;
 class WritableNotification;
 
-} }
+} // namespace Poco::Net
 
 
 class SocketReactorTest: public CppUnit::TestCase

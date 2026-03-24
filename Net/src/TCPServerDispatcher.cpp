@@ -25,8 +25,7 @@ using Poco::FastMutex;
 using Poco::AutoPtr;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class TCPConnectionNotification: public Notification
@@ -245,4 +244,4 @@ void TCPServerDispatcher::endConnection()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

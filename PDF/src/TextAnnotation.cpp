@@ -16,8 +16,7 @@
 
 #include <hpdf.h>
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 TextAnnotation::TextAnnotation(HPDF_Doc* pPDF,
@@ -53,4 +52,4 @@ void TextAnnotation::icon(IconType iconType)
 }
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF

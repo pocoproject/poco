@@ -26,8 +26,7 @@
 #include <deque>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <class C>
@@ -493,7 +492,7 @@ inline void swap(Column<C>& c1, Column<C>& c2) noexcept
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Column_INCLUDED

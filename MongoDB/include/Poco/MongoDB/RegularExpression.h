@@ -23,8 +23,7 @@
 #include "Poco/MongoDB/Element.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API RegularExpression
@@ -167,7 +166,7 @@ inline void BSONWriter::write<RegularExpression::Ptr>(const RegularExpression::P
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_RegularExpression_INCLUDED

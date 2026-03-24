@@ -16,8 +16,7 @@
 #include "Poco/Bugcheck.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 TCPServerParams::TCPServerParams():
@@ -95,4 +94,4 @@ void TCPServerParams::setUseSelfReactor(bool useSelfReactor)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

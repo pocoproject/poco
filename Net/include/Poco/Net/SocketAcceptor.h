@@ -26,8 +26,7 @@
 #include "Poco/NObserver.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 template <class ServiceHandler>
@@ -185,7 +184,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SocketAcceptor_INCLUDED

@@ -22,8 +22,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Prometheus_API LabeledMetric: public Metric
@@ -89,7 +88,7 @@ inline const std::vector<std::string>& LabeledMetric::labelNames() const
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_Metric_INCLUDED

@@ -29,8 +29,7 @@
 #include "Poco/Util/AbstractConfiguration.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API FastLoggerConfigurator
@@ -89,7 +88,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // POCO_ENABLE_FASTLOGGER

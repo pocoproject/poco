@@ -33,8 +33,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string WebSocket::WEBSOCKET_GUID("258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
@@ -316,4 +315,4 @@ std::string WebSocket::computeAccept(const std::string& key)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

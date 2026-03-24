@@ -19,8 +19,7 @@
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 DatagramSocketImpl::DatagramSocketImpl()
@@ -61,4 +60,4 @@ void DatagramSocketImpl::init(int af)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

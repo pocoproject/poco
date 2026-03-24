@@ -58,8 +58,7 @@
 #endif
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 void DNSSD_Bonjour_API initializeDNSSD();
@@ -70,7 +69,7 @@ void DNSSD_Bonjour_API uninitializeDNSSD();
 	/// Uninitialize the DNSSD subsystem.
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD
 
 
 #endif // DNSSD_Bonjour_Bonjour_INCLUDED

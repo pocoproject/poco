@@ -24,8 +24,7 @@
 #include "Poco/DOM/AutoPtr.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString AbstractNode::NODE_NAME = toXMLString("#node");
@@ -370,4 +369,4 @@ void AbstractNode::setOwnerDocument(Document* pOwnerDocument)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

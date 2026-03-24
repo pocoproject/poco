@@ -16,8 +16,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 Array::Array():
@@ -74,4 +73,4 @@ std::string Array::toString(int indent) const
 }
 
 
-} } // Namespace Poco::Mongo
+} // namespace Poco::MongoDB
