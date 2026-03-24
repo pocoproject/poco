@@ -52,6 +52,20 @@ Formatter::Ptr LoggingRegistry::formatterForName(const std::string& name) const
 }
 
 
+bool LoggingRegistry::hasChannel(const std::string& name) const
+{
+	FastMutex::ScopedLock lock(_mutex);
+	return _channelMap.find(name) != _channelMap.end();
+}
+
+
+bool LoggingRegistry::hasFormatter(const std::string& name) const
+{
+	FastMutex::ScopedLock lock(_mutex);
+	return _formatterMap.find(name) != _formatterMap.end();
+}
+
+
 void LoggingRegistry::registerChannel(const std::string& name, Channel::Ptr pChannel)
 {
 	FastMutex::ScopedLock lock(_mutex);

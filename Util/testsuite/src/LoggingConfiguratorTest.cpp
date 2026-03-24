@@ -630,6 +630,8 @@ void LoggingConfiguratorTest::testGetLoggerCollision()
 	assertTrue (logger.name() == "collisionLogger");
 	// Config was skipped due to collision — logger inherits from parent (root = warning)
 	assertTrue (logger.getLevel() == Message::PRIO_WARNING);
+	// Verify channel is NOT a FileChannel (collision config was skipped)
+	assertTrue (logger.getChannel().cast<FileChannel>().isNull());
 }
 
 

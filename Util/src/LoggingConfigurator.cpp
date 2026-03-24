@@ -261,12 +261,19 @@ Logger& LoggingConfigurator::getLogger(const std::string& name, AbstractConfigur
 
 	Mutex::ScopedLock lock(_mutex);
 
-	if (!Logger::has(name))
+	if (auto pLogger = Logger::has(name))
+		return *pLogger;
+
+	if (validateConfiguration(pConfig))
 	{
-		if (validateConfiguration(pConfig))
-		{
-			configure(pConfig);
-		}
+		configure(pConfig);
+	}
+	else
+	{
+		Logger::get("LoggingConfigurator"s).warning(
+			"Skipping configuration for logger '%s': "
+			"formatter or channel name collision with existing registry entry"s,
+			name);
 	}
 	return Logger::get(name);
 }
@@ -279,27 +286,15 @@ bool LoggingConfigurator::validateConfiguration(AbstractConfiguration::Ptr pConf
 	AbstractConfiguration::Ptr pFmtConfig(pConfig->createView("logging.formatters"s));
 	for (const auto& f : pFmtConfig->keys())
 	{
-		try
-		{
-			registry.formatterForName(f);
+		if (registry.hasFormatter(f))
 			return false;
-		}
-		catch (Poco::NotFoundException&)
-		{
-		}
 	}
 
 	AbstractConfiguration::Ptr pChConfig(pConfig->createView("logging.channels"s));
 	for (const auto& c : pChConfig->keys())
 	{
-		try
-		{
-			registry.channelForName(c);
+		if (registry.hasChannel(c))
 			return false;
-		}
-		catch (Poco::NotFoundException&)
-		{
-		}
 	}
 
 	return true;

@@ -138,7 +138,7 @@ public:
 		/// A ConfigurationView can be used to pass only
 		/// a part of a larger configuration.
 
-	Poco::Logger& getLogger(const std::string& name, AbstractConfiguration::Ptr pConfig);
+	[[nodiscard]] Poco::Logger& getLogger(const std::string& name, AbstractConfiguration::Ptr pConfig);
 		/// Returns a reference to the Logger with the given name.
 		/// If the Logger does not yet exist, it is first configured
 		/// using the given configuration (which follows the standard
@@ -182,9 +182,11 @@ private:
 	Poco::Channel::Ptr createChannel(AbstractConfiguration::Ptr pConfig);
 	void configureChannel(Channel::Ptr pChannel, AbstractConfiguration::Ptr pConfig);
 	void configureLogger(AbstractConfiguration::Ptr pConfig);
-	bool validateConfiguration(AbstractConfiguration::Ptr pConfig) const;
+	[[nodiscard]] bool validateConfiguration(AbstractConfiguration::Ptr pConfig) const;
 
 	static Poco::Mutex _mutex;
+		/// Static because all instances operate on the same
+		/// global LoggingRegistry and Logger map.
 };
 
 
