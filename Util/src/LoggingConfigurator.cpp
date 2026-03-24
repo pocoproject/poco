@@ -46,6 +46,9 @@ namespace Poco {
 namespace Util {
 
 
+Mutex LoggingConfigurator::_mutex;
+
+
 void LoggingConfigurator::configure(AbstractConfiguration::Ptr pConfig)
 {
 	poco_check_ptr (pConfig);
@@ -249,6 +252,52 @@ void LoggingConfigurator::configure(
 
 	LoggingConfigurator configurator;
 	configurator.configure(pConfig);
+}
+
+
+Logger& LoggingConfigurator::getLogger(const std::string& name, AbstractConfiguration::Ptr pConfig)
+{
+	poco_check_ptr(pConfig);
+
+	Mutex::ScopedLock lock(_mutex);
+
+	if (auto pLogger = Logger::has(name))
+		return *pLogger;
+
+	if (validateConfiguration(pConfig))
+	{
+		configure(pConfig);
+	}
+	else
+	{
+		Logger::get("LoggingConfigurator"s).warning(
+			"Skipping configuration for logger '%s': "
+			"formatter or channel name collision with existing registry entry"s,
+			name);
+	}
+	return Logger::get(name);
+}
+
+
+bool LoggingConfigurator::validateConfiguration(AbstractConfiguration::Ptr pConfig) const
+{
+	LoggingRegistry& registry = LoggingRegistry::defaultRegistry();
+
+	AbstractConfiguration::Ptr pFmtConfig(pConfig->createView("logging.formatters"s));
+	for (const auto& f : pFmtConfig->keys())
+	{
+		if (registry.hasFormatter(f))
+			return false;
+	}
+
+	AbstractConfiguration::Ptr pChConfig(pConfig->createView("logging.channels"s));
+	for (const auto& c : pChConfig->keys())
+	{
+		if (registry.hasChannel(c))
+			return false;
+	}
+
+	return true;
 }
 
 
