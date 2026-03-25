@@ -54,6 +54,7 @@ public:
 
 	static const std::string SQLITE_DATE_FORMAT;
 	static const std::string SQLITE_TIME_FORMAT;
+	static const std::string SQLITE_DATETIME_FRAC_FORMAT;
 	typedef std::map<std::string, MetaColumn::ColumnDataType> TypeMap;
 
 	static const int THREAD_MODE_SINGLE;
