@@ -329,6 +329,12 @@ std::vector<std::string> PropertyFileConfiguration::getIncludeFiles(const std::s
 	if (filePath.empty())
 		return {};
 
+	return scanIncludeFiles(filePath);
+}
+
+
+std::vector<std::string> PropertyFileConfiguration::scanIncludeFiles(const std::string& filePath) const
+{
 	std::string basePath = Poco::Path(filePath).parent().toString();
 	std::vector<std::string> result;
 
@@ -366,13 +372,13 @@ void PropertyFileConfiguration::addIncludeFile(const std::string& path)
 	AbstractConfiguration::ScopedLock lock(*this);
 
 	if (_rootFile.empty())
-		throw Poco::IllegalStateException("No root file set — configuration was not loaded from a file");
+		throw Poco::IllegalStateException("No root file set - configuration was not loaded from a file");
 
 	std::string basePath = Poco::Path(_rootFile).parent().toString();
 	std::string absPath = resolveIncludePath(path, basePath);
 
 	// Check for duplicates
-	auto existing = getIncludeFiles(_rootFile);
+	auto existing = scanIncludeFiles(_rootFile);
 	for (const auto& f : existing)
 	{
 		if (f == absPath)
@@ -384,10 +390,32 @@ void PropertyFileConfiguration::addIncludeFile(const std::string& path)
 	if (!target.exists())
 	{
 		Poco::FileOutputStream create(absPath);
+		if (!create.good())
+			throw Poco::CreateFileException(absPath);
 		create.close();
 	}
 
 	// Append !include directive to root file
+	// Ensure file ends with a newline so the directive starts on its own line
+	{
+		Poco::FileInputStream fin(_rootFile);
+		if (fin.good())
+		{
+			fin.seekg(0, std::ios::end);
+			if (fin.tellg() > 0)
+			{
+				fin.seekg(-1, std::ios::end);
+				char last = 0;
+				fin.get(last);
+				if (last != '\n' && last != '\r')
+				{
+					Poco::FileOutputStream pad(_rootFile, std::ios::app);
+					pad << "\n";
+					pad.flush();
+				}
+			}
+		}
+	}
 	Poco::FileOutputStream ostr(_rootFile, std::ios::app);
 	if (!ostr.good())
 		throw Poco::CreateFileException(_rootFile);
@@ -403,13 +431,13 @@ void PropertyFileConfiguration::removeIncludeFile(const std::string& path, bool 
 	AbstractConfiguration::ScopedLock lock(*this);
 
 	if (_rootFile.empty())
-		throw Poco::IllegalStateException("No root file set — configuration was not loaded from a file");
+		throw Poco::IllegalStateException("No root file set - configuration was not loaded from a file");
 
 	std::string basePath = Poco::Path(_rootFile).parent().toString();
 	std::string absPath = resolveIncludePath(path, basePath);
 
 	// Verify include exists
-	auto existing = getIncludeFiles(_rootFile);
+	auto existing = scanIncludeFiles(_rootFile);
 	bool found = false;
 	for (const auto& f : existing)
 	{
@@ -447,6 +475,8 @@ void PropertyFileConfiguration::removeIncludeFile(const std::string& path, bool 
 	std::ostringstream out;
 
 	Poco::FileInputStream istr(_rootFile);
+	if (!istr.good())
+		throw Poco::OpenFileException(_rootFile);
 	std::string line;
 	while (std::getline(istr, line))
 	{
