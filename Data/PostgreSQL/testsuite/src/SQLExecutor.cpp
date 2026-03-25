@@ -823,6 +823,50 @@ void SQLExecutor::time()
 }
 
 
+void SQLExecutor::dateTimeVariants()
+{
+	std::string funct = "dateTimeVariants()";
+
+	// Setup: TIMESTAMP column to test cross-type extraction
+	try { *_pSession << "DROP TABLE IF EXISTS DateTimeVariants", now; } catch (...) {}
+	try { *_pSession << "CREATE TABLE DateTimeVariants (dt0 TIMESTAMP)", now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	DateTime inserted(2023, 3, 5, 8, 35, 1);
+	try { *_pSession << "INSERT INTO DateTimeVariants VALUES ($1)", use(inserted), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+
+	// Extract full DateTime
+	DateTime rdt;
+	try { *_pSession << "SELECT dt0 FROM DateTimeVariants", into(rdt), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (rdt == inserted);
+
+	// Extract as Date (only date part via cast)
+	Date rd;
+	try { *_pSession << "SELECT dt0::DATE FROM DateTimeVariants", into(rd), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (rd.year() == 2023);
+	assertTrue (rd.month() == 3);
+	assertTrue (rd.day() == 5);
+
+	// Extract as Time (only time part via cast)
+	Time rt;
+	try { *_pSession << "SELECT dt0::TIME FROM DateTimeVariants", into(rt), now; }
+	catch(ConnectionException& ce){ std::cout << ce.displayText() << std::endl; fail (funct); }
+	catch(StatementException& se){ std::cout << se.displayText() << std::endl; fail (funct); }
+	assertTrue (rt.hour() == 8);
+	assertTrue (rt.minute() == 35);
+	assertTrue (rt.second() == 1);
+
+	*_pSession << "DROP TABLE DateTimeVariants", now;
+}
+
+
 void SQLExecutor::blob(unsigned int bigSize)
 {
 	std::string funct = "blob()";

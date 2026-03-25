@@ -76,6 +76,7 @@ public:
 	void testSingleSelect();
 	void testEmptyDB();
 	void testDateTime();
+	void testDateTimeVariants();
 	void testBLOB();
 	void testBLOBStmt();
 	void testCLOBStmt();

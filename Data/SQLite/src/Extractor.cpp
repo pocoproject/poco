@@ -19,18 +19,53 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/DataException.h"
 #include "Poco/DateTimeParser.h"
+#include "Poco/DateTimeFormat.h"
 #include "Poco/Exception.h"
 #include "Poco/Debugger.h"
 #include <sqlite3.h>
 #include <cstdlib>
+#include <functional>
+#include <initializer_list>
 
 
 using Poco::DateTimeParser;
+using Poco::DateTimeFormat;
 
 
 namespace Poco {
 namespace Data {
 namespace SQLite {
+
+
+namespace {
+
+
+/// Tries to parse str as a date/time using all SQLite-supported formats
+/// (see https://www.sqlite.org/lang_datefunc.html), in order:
+/// primary format, datetime (space-separated), ISO 8601 datetime,
+/// datetime with fractional seconds (space-separated), ISO 8601 with
+/// fractional seconds.
+inline bool tryParseSQLiteDateTime(
+	const std::string& str,
+	const std::string& primaryFormat,
+	DateTime& dt,
+	int& tzd)
+{
+	for (const auto& fmt : {
+		std::cref(primaryFormat),
+		std::cref(DateTimeFormat::SORTABLE_FORMAT),
+		std::cref(DateTimeFormat::ISO8601_FORMAT),
+		std::cref(Utility::SQLITE_DATETIME_FRAC_FORMAT),
+		std::cref(DateTimeFormat::ISO8601_FRAC_FORMAT)})
+	{
+		if (DateTimeParser::tryParse(fmt.get(), str, dt, tzd))
+			return true;
+	}
+	return false;
+}
+
+
+} // namespace
 
 
 Extractor::Extractor(sqlite3_stmt* pStmt):
@@ -141,9 +176,11 @@ bool Extractor::extract(std::size_t pos, Date& val)
 	if (isNull(pos)) return false;
 	std::string str;
 	extract(pos, str);
-	int tzd;
-	DateTime dt = DateTimeParser::parse(Utility::SQLITE_DATE_FORMAT, str, tzd);
-	val = dt;
+	int tzd = 0;
+	DateTime dt;
+	if (!tryParseSQLiteDateTime(str, Utility::SQLITE_DATE_FORMAT, dt, tzd))
+		throw SyntaxException("Invalid date string: " + str);
+	val.assign(dt.year(), dt.month(), dt.day());
 	return true;
 }
 
@@ -153,9 +190,13 @@ bool Extractor::extract(std::size_t pos, Time& val)
 	if (isNull(pos)) return false;
 	std::string str;
 	extract(pos, str);
-	int tzd;
-	DateTime dt = DateTimeParser::parse(Utility::SQLITE_TIME_FORMAT, str, tzd);
-	val = dt;
+	int tzd = 0;
+	DateTime dt;
+	if (!tryParseSQLiteDateTime(str, Utility::SQLITE_TIME_FORMAT, dt, tzd))
+		throw SyntaxException("Invalid time string: " + str);
+	// Note: Poco::Data::Time does not support fractional seconds;
+	// sub-second precision is lost here.
+	val.assign(dt.hour(), dt.minute(), dt.second());
 	return true;
 }
 
@@ -386,10 +427,9 @@ bool Extractor::extract(std::size_t pos, Nullable<Date>& val)
 	if (isNull(pos)) val.clear();
 	else
 	{
-		std::string str;
-		extract(pos, str);
-		int tzd;
-		val = DateTimeParser::parse(Utility::SQLITE_DATE_FORMAT, str, tzd);
+		Date d;
+		extract(pos, d);
+		val = d;
 	}
 	return true;
 }
@@ -400,10 +440,9 @@ bool Extractor::extract(std::size_t pos, Nullable<Time>& val)
 	if (isNull(pos)) val.clear();
 	else
 	{
-		std::string str;
-		extract(pos, str);
-		int tzd;
-		val = DateTimeParser::parse(Utility::SQLITE_TIME_FORMAT, str, tzd);
+		Time t;
+		extract(pos, t);
+		val = t;
 	}
 	return true;
 }

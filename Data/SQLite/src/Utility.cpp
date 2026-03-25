@@ -58,6 +58,7 @@ const int Utility::OPERATION_UPDATE = SQLITE_UPDATE;
 
 const std::string Utility::SQLITE_DATE_FORMAT = "%Y-%m-%d";
 const std::string Utility::SQLITE_TIME_FORMAT = "%H:%M:%S";
+const std::string Utility::SQLITE_DATETIME_FRAC_FORMAT = "%Y-%m-%d %H:%M:%s";
 Utility::TypeMap Utility::_types;
 Poco::Mutex Utility::_mutex;
 

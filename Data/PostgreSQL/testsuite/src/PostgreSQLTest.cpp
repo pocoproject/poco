@@ -634,6 +634,14 @@ void PostgreSQLTest::testDateTime()
 }
 
 
+void PostgreSQLTest::testDateTimeVariants()
+{
+	if (!_pSession) fail ("Test not available.");
+
+	_pExecutor->dateTimeVariants();
+}
+
+
 void PostgreSQLTest::testBLOB()
 {
 	if (!_pSession) fail ("Test not available.");
@@ -1361,6 +1369,7 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit_addTest(pSuite, PostgreSQLTest, testSingleSelect);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testEmptyDB);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testDateTime);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testDateTimeVariants);
 	//CppUnit_addTest(pSuite, PostgreSQLTest, testBLOB);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testCLOBStmt);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testBLOBStmt);
