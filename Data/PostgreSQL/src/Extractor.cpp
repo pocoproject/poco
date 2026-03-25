@@ -309,12 +309,12 @@ bool Extractor::extract(std::size_t pos, DateTime& val)
 		return false;
 	}
 
-	// PostgreSQL output format varies by DateStyle setting and column type
-	// (TIMESTAMP vs TIMESTAMPTZ), so format-free tryParse is used to
-	// handle all possible server output formats.
+	// Try the primary PostgreSQL TIMESTAMP format first, then fall back
+	// to format-free parsing for other DateStyle output formats.
 	int tzd = 0;
 	DateTime dateTime;
-	if (!DateTimeParser::tryParse(outputParameter.pData(), dateTime, tzd))
+	if (!DateTimeParser::tryParse("%Y-%m-%d %H:%M:%s", outputParameter.pData(), dateTime, tzd) &&
+		!DateTimeParser::tryParse(outputParameter.pData(), dateTime, tzd))
 	{
 		return false;
 	}
@@ -355,11 +355,13 @@ bool Extractor::extract(std::size_t pos, Time& val)
 	{
 		return false;
 	}
-	// Format-free tryParse handles both TIME and TIMETZ output,
-	// with or without fractional seconds.
+	// Try the primary PostgreSQL TIME format first (handles TIME and
+	// TIMETZ with optional fractional seconds), then fall back to
+	// format-free parsing for full datetime strings.
 	int tzd = 0;
 	DateTime dateTime;
-	if (!DateTimeParser::tryParse(outputParameter.pData(), dateTime, tzd))
+	if (!DateTimeParser::tryParse("%H:%M:%s%z", outputParameter.pData(), dateTime, tzd) &&
+		!DateTimeParser::tryParse(outputParameter.pData(), dateTime, tzd))
 	{
 		return false;
 	}
