@@ -23,8 +23,7 @@
 #include "Poco/Foundation.h"
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class NameSpace;
@@ -311,7 +310,7 @@ inline bool Symbol::isPrivate() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_Symbol_INCLUDED

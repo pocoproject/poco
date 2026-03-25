@@ -22,9 +22,7 @@
 #include <avahi-common/error.h>
 
 
-namespace Poco {
-namespace DNSSD {
-namespace Avahi {
+namespace Poco::DNSSD::Avahi {
 
 
 extern "C" int avahiPollFunc(struct pollfd *ufds, unsigned int nfds, int timeout, void *userdata)
@@ -489,11 +487,10 @@ void AvahiResponderImpl::reregisterServices()
 }
 
 
-} } } // namespace Poco::DNSSD::Avahi
+} // namespace Poco::DNSSD::Avahi
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 namespace
@@ -514,5 +511,5 @@ void uninitializeDNSSD()
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD
 

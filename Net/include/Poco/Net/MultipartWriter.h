@@ -22,8 +22,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class MessageHeader;
@@ -106,7 +105,7 @@ inline std::ostream& MultipartWriter::stream()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_MultipartWriter_INCLUDED

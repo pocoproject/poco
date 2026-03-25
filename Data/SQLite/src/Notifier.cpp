@@ -17,9 +17,7 @@
 #include "Poco/Data/SQLite/Notifier.h"
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 Notifier::Notifier(const Session& session, EnabledEventType enabled):
@@ -200,4 +198,4 @@ void Notifier::sqliteRollbackCallbackFn(void* pVal)
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite

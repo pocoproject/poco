@@ -45,8 +45,7 @@ using Poco::StringTokenizer;
 using Poco::icompare;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 namespace
@@ -749,4 +748,4 @@ std::string MultipartSource::contentTypeWithBoundary(const std::string& contentT
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -15,8 +15,7 @@
 #include "Poco/PDF/LinkAnnotation.h"
 #include <hpdf.h>
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 LinkAnnotation::LinkAnnotation(HPDF_Doc* pPDF,
@@ -41,4 +40,4 @@ void LinkAnnotation::setBorderStyle(float width, Poco::UInt32 dashOn, Poco::UInt
 
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF

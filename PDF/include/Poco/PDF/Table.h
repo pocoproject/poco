@@ -14,8 +14,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 class PDF_API Table
@@ -55,7 +54,7 @@ private:
 };
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_Table_INCLUDED

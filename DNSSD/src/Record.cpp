@@ -17,8 +17,7 @@
 #include "Poco/DNSSD/Record.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 Record::Record():
@@ -61,4 +60,4 @@ Record::~Record()
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD

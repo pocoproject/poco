@@ -41,8 +41,7 @@ namespace hsql {
 
 #endif // POCO_DATA_NO_SQL_PARSER
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 #ifndef POCO_DATA_NO_SQL_PARSER
 
@@ -1004,7 +1003,7 @@ inline void swap(Statement& s1, Statement& s2) noexcept
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 namespace std

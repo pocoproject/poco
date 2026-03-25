@@ -27,8 +27,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPSessionInstantiator;
@@ -169,7 +168,7 @@ inline const HTTPClientSession::ProxyConfig& HTTPSessionFactory::getProxyConfig(
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPSessionFactoryMgr_INCLUDED

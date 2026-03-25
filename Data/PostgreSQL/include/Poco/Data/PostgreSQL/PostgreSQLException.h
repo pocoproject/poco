@@ -24,9 +24,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 class PostgreSQL_API PostgreSQLException: public Poco::Data::DataException
@@ -155,7 +153,7 @@ inline const char* PostgreSQLException::sqlState() const noexcept
 
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif //SQL_PostgreSQL_PostgreSQLException_INCLUDED

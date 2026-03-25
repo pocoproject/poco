@@ -25,8 +25,7 @@ using Poco::NumberFormatter;
 using Poco::NumberParser;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 //
@@ -251,4 +250,4 @@ void HTTPChunkedOutputStream::operator delete(void* ptr)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

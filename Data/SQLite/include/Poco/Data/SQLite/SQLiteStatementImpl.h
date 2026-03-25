@@ -33,9 +33,7 @@ extern "C"
 }
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 class SQLite_API SQLiteStatementImpl: public Poco::Data::StatementImpl
@@ -158,7 +156,7 @@ inline bool SQLiteStatementImpl::canCompile() const
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite
 
 
 #endif // Data_SQLite_SQLiteStatementImpl_INCLUDED

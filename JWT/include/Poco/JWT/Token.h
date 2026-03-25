@@ -23,8 +23,7 @@
 #include "Poco/Timestamp.h"
 
 
-namespace Poco {
-namespace JWT {
+namespace Poco::JWT {
 
 
 class JWT_API Token
@@ -351,7 +350,7 @@ inline std::string Token::getContentType() const
 }
 
 
-} } // namespace Poco::JWT
+} // namespace Poco::JWT
 
 
 #endif // JWT_Token_INCLUDED

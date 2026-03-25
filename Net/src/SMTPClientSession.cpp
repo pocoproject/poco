@@ -47,8 +47,7 @@ using Poco::Base64Decoder;
 using Poco::Environment;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 SMTPClientSession::SMTPClientSession(const StreamSocket& socket):
@@ -543,4 +542,4 @@ void SMTPClientSession::sendMessage(std::istream& istr)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

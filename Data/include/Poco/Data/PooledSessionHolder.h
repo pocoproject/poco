@@ -25,8 +25,7 @@
 #include "Poco/Mutex.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class SessionPool;
@@ -96,7 +95,7 @@ inline int PooledSessionHolder::idle() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_PooledSessionHolder_INCLUDED

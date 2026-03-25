@@ -18,9 +18,7 @@
 #include <mysql/mysql.h>
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 std::string Utility::serverInfo(MYSQL* pHandle)
@@ -63,4 +61,4 @@ std::string Utility::hostInfo(Session& session)
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL

@@ -25,8 +25,7 @@
 #include "Poco/Net/X509Certificate.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API SecureStreamSocket: public StreamSocket
@@ -292,7 +291,7 @@ protected:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_SecureStreamSocket_INCLUDED

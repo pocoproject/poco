@@ -23,8 +23,7 @@ using Poco::NumberParser;
 using Poco::format;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 IntValidator::IntValidator(int min, int max):
@@ -46,4 +45,4 @@ void IntValidator::validate(const Option& option, const std::string& value)
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

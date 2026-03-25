@@ -17,8 +17,7 @@
 #include "Poco/Redis/Error.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 Error::Error()
@@ -36,4 +35,4 @@ Error::~Error()
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis

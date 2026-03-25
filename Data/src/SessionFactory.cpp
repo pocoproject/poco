@@ -17,8 +17,7 @@
 #include "Poco/String.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 SessionFactory::SessionFactory()
@@ -90,4 +89,4 @@ SessionFactory::SessionInfo::SessionInfo(Connector* pSI):
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

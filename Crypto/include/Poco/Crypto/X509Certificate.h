@@ -29,8 +29,7 @@
 #include <openssl/ssl.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API X509Certificate
@@ -265,7 +264,7 @@ inline X509* X509Certificate::dup() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_X509Certificate_INCLUDED

@@ -22,8 +22,7 @@
 #include "Poco/Data/RowFormatter.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API SimpleRowFormatter: public RowFormatter
@@ -107,7 +106,7 @@ inline std::streamsize SimpleRowFormatter::getSpacing() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #ifndef POCO_DOC

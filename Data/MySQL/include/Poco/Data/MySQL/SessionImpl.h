@@ -27,9 +27,7 @@
 #include "Poco/Mutex.h"
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 class MySQL_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
@@ -308,7 +306,7 @@ inline std::string& SessionImpl::getValue(MYSQL_BIND* pResult, std::string& val)
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL
 
 
 #endif // Data_MySQL_SessionImpl_INCLUDED

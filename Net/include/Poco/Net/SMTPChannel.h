@@ -24,8 +24,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API SMTPChannel: public Poco::Channel
@@ -107,7 +106,7 @@ inline bool SMTPChannel::isTrue(const std::string& value) const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SMTPChannel_INCLUDED

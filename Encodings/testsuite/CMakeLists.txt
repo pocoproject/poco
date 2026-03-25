@@ -29,7 +29,6 @@ else()
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMAND Encodings-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
-	set_tests_properties(Encodings PROPERTIES ENVIRONMENT POCO_BASE=${CMAKE_SOURCE_DIR})
 endif()
 
 target_link_libraries(Encodings-testrunner PUBLIC Poco::Encodings CppUnit)

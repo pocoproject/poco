@@ -23,8 +23,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 class Var;
@@ -180,7 +179,7 @@ inline bool VarIterator::operator >= (const VarIterator& other) const
 }
 
 
-} } // namespace Poco::Dynamic
+} // namespace Poco::Dynamic
 
 
 namespace std

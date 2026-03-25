@@ -22,8 +22,7 @@
 #include "Poco/Util/Validator.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API RegExpValidator: public Validator
@@ -48,7 +47,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_RegExpValidator_INCLUDED

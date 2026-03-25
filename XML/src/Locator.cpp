@@ -15,8 +15,7 @@
 #include "Poco/SAX/Locator.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 Locator::~Locator()
@@ -24,4 +23,4 @@ Locator::~Locator()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

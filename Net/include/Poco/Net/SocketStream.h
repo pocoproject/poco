@@ -25,8 +25,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class StreamSocketImpl;
@@ -173,7 +172,7 @@ inline StreamSocketImpl* SocketStreamBuf::socketImpl() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SocketStream_INCLUDED

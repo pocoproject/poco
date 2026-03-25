@@ -172,8 +172,7 @@ private:
 };
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <>
@@ -237,7 +236,7 @@ private:
 };
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 RecordSet getRecordsetMove(Session& session, const std::string& sql)
@@ -2086,6 +2085,89 @@ void SQLiteTest::testDateTime()
 	assertTrue (rt != t);
 	tmp << "SELECT * FROM DateTimes", into(rt), now;
 	assertTrue (rt == t);
+}
+
+
+void SQLiteTest::testDateTimeVariants()
+{
+	Session tmp (Poco::Data::SQLite::Connector::KEY, "dummy.db");
+	tmp << "DROP TABLE IF EXISTS DateTimeVariants", now;
+
+	// 1. Extract Date from a column containing a full datetime string
+	tmp << "CREATE TABLE DateTimeVariants (dt0 DATE)", now;
+	tmp << "INSERT INTO DateTimeVariants VALUES ('2023-03-05 08:35:00')", now;
+	Date rd;
+	tmp << "SELECT * FROM DateTimeVariants", into(rd), now;
+	assertTrue (rd.year() == 2023);
+	assertTrue (rd.month() == 3);
+	assertTrue (rd.day() == 5);
+	tmp << "DROP TABLE DateTimeVariants", now;
+
+	// 2. Extract Date from ISO 8601 datetime string
+	tmp << "CREATE TABLE DateTimeVariants (dt0 DATE)", now;
+	tmp << "INSERT INTO DateTimeVariants VALUES ('2023-03-05T08:35:00')", now;
+	rd = Date();
+	tmp << "SELECT * FROM DateTimeVariants", into(rd), now;
+	assertTrue (rd.year() == 2023);
+	assertTrue (rd.month() == 3);
+	assertTrue (rd.day() == 5);
+	tmp << "DROP TABLE DateTimeVariants", now;
+
+	// 3. Extract Date from datetime with fractional seconds
+	tmp << "CREATE TABLE DateTimeVariants (dt0 DATE)", now;
+	tmp << "INSERT INTO DateTimeVariants VALUES ('2023-03-05 08:35:00.123')", now;
+	rd = Date();
+	tmp << "SELECT * FROM DateTimeVariants", into(rd), now;
+	assertTrue (rd.year() == 2023);
+	assertTrue (rd.month() == 3);
+	assertTrue (rd.day() == 5);
+	tmp << "DROP TABLE DateTimeVariants", now;
+
+	// 4. Extract Time from a full datetime string
+	tmp << "CREATE TABLE DateTimeVariants (dt0 TIME)", now;
+	tmp << "INSERT INTO DateTimeVariants VALUES ('2023-03-05 08:35:01')", now;
+	Time rt;
+	tmp << "SELECT * FROM DateTimeVariants", into(rt), now;
+	assertTrue (rt.hour() == 8);
+	assertTrue (rt.minute() == 35);
+	assertTrue (rt.second() == 1);
+	tmp << "DROP TABLE DateTimeVariants", now;
+
+	// 5. Extract Nullable<Date> from datetime string
+	tmp << "CREATE TABLE DateTimeVariants (dt0 DATE)", now;
+	tmp << "INSERT INTO DateTimeVariants VALUES ('2023-03-05 08:35:00')", now;
+	Nullable<Date> nd;
+	tmp << "SELECT * FROM DateTimeVariants", into(nd), now;
+	assertTrue (!nd.isNull());
+	assertTrue (nd.value().year() == 2023);
+	assertTrue (nd.value().month() == 3);
+	assertTrue (nd.value().day() == 5);
+	tmp << "DROP TABLE DateTimeVariants", now;
+
+	// 6. Extract Nullable<Time> from datetime string
+	tmp << "CREATE TABLE DateTimeVariants (dt0 TIME)", now;
+	tmp << "INSERT INTO DateTimeVariants VALUES ('2023-03-05 08:35:01')", now;
+	Nullable<Time> nt;
+	tmp << "SELECT * FROM DateTimeVariants", into(nt), now;
+	assertTrue (!nt.isNull());
+	assertTrue (nt.value().hour() == 8);
+	assertTrue (nt.value().minute() == 35);
+	assertTrue (nt.value().second() == 1);
+	tmp << "DROP TABLE DateTimeVariants", now;
+
+	// 7. Invalid date string must throw SyntaxException
+	tmp << "CREATE TABLE DateTimeVariants (dt0 DATE)", now;
+	tmp << "INSERT INTO DateTimeVariants VALUES ('not-a-date')", now;
+	try { tmp << "SELECT * FROM DateTimeVariants", into(rd), now; fail ("must fail"); }
+	catch (Poco::SyntaxException&) { }
+	tmp << "DROP TABLE DateTimeVariants", now;
+
+	// 8. Invalid time string must throw SyntaxException
+	tmp << "CREATE TABLE DateTimeVariants (dt0 TIME)", now;
+	tmp << "INSERT INTO DateTimeVariants VALUES ('not-a-time')", now;
+	try { tmp << "SELECT * FROM DateTimeVariants", into(rt), now; fail ("must fail"); }
+	catch (Poco::SyntaxException&) { }
+	tmp << "DROP TABLE DateTimeVariants", now;
 }
 
 
@@ -4070,6 +4152,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testTuple1);
 	CppUnit_addTest(pSuite, SQLiteTest, testTupleVector1);
 	CppUnit_addTest(pSuite, SQLiteTest, testDateTime);
+	CppUnit_addTest(pSuite, SQLiteTest, testDateTimeVariants);
 	CppUnit_addTest(pSuite, SQLiteTest, testUUID);
 	CppUnit_addTest(pSuite, SQLiteTest, testInternalExtraction);
 	CppUnit_addTest(pSuite, SQLiteTest, testPrimaryKeyConstraint);

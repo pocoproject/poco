@@ -21,8 +21,7 @@
 #include "Poco/Crypto/Crypto.h"
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Cipher;
@@ -78,7 +77,7 @@ private:
 };
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_CipherFactory_INCLUDED

@@ -17,11 +17,10 @@
 #include "Poco/Redis/Exception.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 POCO_IMPLEMENT_EXCEPTION(RedisException, Exception, "Redis Exception")
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis

@@ -24,8 +24,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 template <typename T, Metric::Type metricType>
@@ -146,7 +145,7 @@ using CallbackCounter = CallbackMetric<double, Metric::Type::COUNTER>;
 using CallbackGauge = CallbackMetric<double, Metric::Type::GAUGE>;
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_CallbackMetric_INCLUDED

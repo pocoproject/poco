@@ -25,8 +25,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class SocketStream;
@@ -446,7 +445,7 @@ inline const std::string& FTPClientSession::getHost() const
 	return _host;
 }
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_FTPClientSession_INCLUDED

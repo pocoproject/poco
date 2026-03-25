@@ -35,8 +35,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 using NullData = NullType;
@@ -406,7 +405,7 @@ inline bool AbstractBinder::transcodeRequired() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_AbstractBinder_INCLUDED

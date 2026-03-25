@@ -23,9 +23,7 @@
 #include <mysql/mysql.h>
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 class MySQL_API Utility
@@ -73,7 +71,7 @@ inline MYSQL* Utility::handle(Session& session)
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL
 
 
 #endif // MySQL_Utility_INCLUDED

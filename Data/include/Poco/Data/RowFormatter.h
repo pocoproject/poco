@@ -26,8 +26,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API RowFormatter
@@ -237,7 +236,7 @@ inline RowFormatter::Ptr format(const T& formatter)
 } // namespace Keywords
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_RowFormatter_INCLUDED

@@ -22,8 +22,7 @@
 #include "Poco/DOM/DOMObject.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class Node;
@@ -57,7 +56,7 @@ protected:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_NodeList_INCLUDED

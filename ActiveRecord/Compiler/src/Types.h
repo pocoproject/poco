@@ -17,9 +17,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace ActiveRecord {
-namespace Compiler {
+namespace Poco::ActiveRecord::Compiler {
 
 
 struct Property
@@ -54,7 +52,7 @@ struct Class
 using ClassMap = std::map<std::string, Class>;
 
 
-} } } // namespace Poco::ActiveRecord::Compiler
+} // namespace Poco::ActiveRecord::Compiler
 
 
 #endif // ActiveRecordCompiler_Types_INCLUDED

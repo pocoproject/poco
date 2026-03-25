@@ -27,8 +27,7 @@
 #include <stack>
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 class MultiPart;
@@ -151,7 +150,7 @@ inline Timestamp Template::parseTime() const
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON
 
 
 #endif // JSON_JSONTemplate_INCLUDED

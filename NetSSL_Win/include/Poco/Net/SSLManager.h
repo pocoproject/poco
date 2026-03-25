@@ -38,8 +38,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Context;
@@ -338,7 +337,7 @@ inline SecurityFunctionTableW& SSLManager::securityFunctions()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_SSLManager_INCLUDED

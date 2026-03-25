@@ -30,8 +30,7 @@
 #include <mutex>
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 class Redis_API Client
@@ -265,7 +264,7 @@ inline void Client::setReceiveTimeout(const Timespan& timeout)
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis
 
 
 #endif // Redis_Client_INCLUDED

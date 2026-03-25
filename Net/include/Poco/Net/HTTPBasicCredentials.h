@@ -21,8 +21,7 @@
 #include "Poco/Net/Net.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPRequest;
@@ -120,7 +119,7 @@ inline bool HTTPBasicCredentials::empty() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPBasicCredentials_INCLUDED

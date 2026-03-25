@@ -21,8 +21,7 @@
 #include <limits>
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 static_assert(static_cast<int>(Page::Size::PAGE_SIZE_LETTER) == HPDF_PAGE_SIZE_LETTER, "Page size value mismatch");
 static_assert(static_cast<int>(Page::Size::PAGE_SIZE_COMM10) == HPDF_PAGE_SIZE_COMM10, "Page size value mismatch");
@@ -823,4 +822,4 @@ const LinkAnnotation& Page::createURILinkAnnotation(const std::string& name,
 }
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF

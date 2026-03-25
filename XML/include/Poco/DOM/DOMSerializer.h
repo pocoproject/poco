@@ -20,8 +20,7 @@
 #include "Poco/SAX/XMLReader.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class Node;
@@ -122,7 +121,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_DOMSerializer_INCLUDED

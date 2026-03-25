@@ -26,8 +26,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class ParseCallback;
@@ -124,7 +123,7 @@ inline ZipArchive::FileHeaders::const_iterator ZipArchive::headerEnd() const
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_ZipArchive_INCLUDED

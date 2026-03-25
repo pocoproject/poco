@@ -75,8 +75,7 @@
 #endif // POCO_NET_NO_UNIX_SOCKET, POCO_HAVE_UNIX_SOCKET
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 void Net_API initializeNetwork();
@@ -94,7 +93,7 @@ std::string Net_API htmlize(const std::string& str);
 	/// characters (<, >, ", &) propery escaped.
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 //

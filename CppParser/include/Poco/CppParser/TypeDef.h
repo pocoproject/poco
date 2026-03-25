@@ -22,8 +22,7 @@
 #include "Poco/CppParser/Decl.h"
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API TypeDef: public Decl
@@ -64,7 +63,7 @@ public:
 };
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_TypeDef_INCLUDED

@@ -31,8 +31,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class AbstractPreparator;
@@ -309,7 +308,7 @@ inline bool AbstractExtraction::isValueNull(const Poco::UTF16String& str, bool d
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_AbstractExtraction_INCLUDED

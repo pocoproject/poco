@@ -22,8 +22,7 @@
 #include "Poco/DOM/AbstractNode.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API AbstractContainerNode: public AbstractNode
@@ -87,7 +86,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_AbstractContainerNode_INCLUDED

@@ -24,8 +24,7 @@
 using Poco::ErrorHandler;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 //
@@ -240,4 +239,4 @@ std::string TCPServer::threadName(const ServerSocket& socket)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

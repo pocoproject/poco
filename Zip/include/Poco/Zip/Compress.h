@@ -26,8 +26,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Zip_API Compress
@@ -147,7 +146,7 @@ inline const std::set<std::string>& Compress::getStoreExtensions() const
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_Compress_INCLUDED

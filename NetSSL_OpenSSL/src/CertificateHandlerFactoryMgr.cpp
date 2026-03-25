@@ -18,8 +18,7 @@
 #include "Poco/Net/RejectCertificateHandler.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 CertificateHandlerFactoryMgr::CertificateHandlerFactoryMgr()
@@ -66,4 +65,4 @@ void CertificateHandlerFactoryMgr::removeFactory(const std::string& name)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

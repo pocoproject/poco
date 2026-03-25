@@ -22,8 +22,7 @@
 #include "Poco/DOM/NamedNodeMap.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class Element;
@@ -66,7 +65,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_AttrMap_INCLUDED

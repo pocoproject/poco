@@ -23,8 +23,7 @@
 #undef max
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 //
@@ -351,4 +350,4 @@ void DecryptingOutputStream::close()
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

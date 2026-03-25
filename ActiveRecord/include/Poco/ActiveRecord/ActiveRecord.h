@@ -26,8 +26,7 @@
 #include <limits>
 
 
-namespace Poco {
-namespace ActiveRecord {
+namespace Poco::ActiveRecord {
 
 
 class ActiveRecordLib_API ActiveRecordBase: public Poco::RefCountedObject
@@ -276,7 +275,7 @@ IDType ActiveRecord<IDType>::lastInsertID(Poco::Data::Session& session)
 }
 
 
-} } // namespace Poco::ActiveRecord
+} // namespace Poco::ActiveRecord
 
 
 #endif // ActiveRecord_ActiveRecord_INCLUDED

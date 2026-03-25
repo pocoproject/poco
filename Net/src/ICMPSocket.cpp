@@ -21,8 +21,7 @@
 using Poco::InvalidArgumentException;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 ICMPSocket::ICMPSocket(IPAddress::Family family, int dataSize, int ttl, int timeout):
@@ -144,4 +143,4 @@ Poco::UInt16 ICMPSocket::mtu(const SocketAddress& address, Poco::UInt16 sz)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

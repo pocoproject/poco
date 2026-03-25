@@ -18,9 +18,7 @@
 #include <cstring>
 
 
-namespace Poco {
-namespace Net {
-namespace Impl {
+namespace Poco::Net::Impl {
 
 
 //
@@ -195,4 +193,4 @@ std::string LocalSocketAddressImpl::toString() const
 #endif // POCO_HAS_UNIX_SOCKET
 
 
-} } } // namespace Poco::Net::Impl
+} // namespace Poco::Net::Impl

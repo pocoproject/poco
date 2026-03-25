@@ -17,9 +17,7 @@
 #include "Poco/Data/Connector.h"
 
 
-namespace Poco {
-namespace Data {
-namespace Test {
+namespace Poco::Data::Test {
 
 
 class Connector: public Poco::Data::Connector
@@ -59,7 +57,7 @@ inline const std::string& Connector::name() const
 }
 
 
-} } } // namespace Poco::Data::Test
+} // namespace Poco::Data::Test
 
 
 #endif // Data_Test_Connector_INCLUDED

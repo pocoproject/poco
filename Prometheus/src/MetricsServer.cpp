@@ -23,8 +23,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class NotFoundRequestHandler: public Poco::Net::HTTPRequestHandler
@@ -115,4 +114,4 @@ Poco::Net::HTTPServerParams::Ptr MetricsServer::defaultParams()
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

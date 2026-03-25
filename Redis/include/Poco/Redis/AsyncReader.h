@@ -24,8 +24,7 @@
 #include "Poco/Activity.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 class Redis_API AsyncReader
@@ -93,7 +92,7 @@ inline void AsyncReader::stop()
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis
 
 
 #endif //Redis_AsyncReader_INCLUDED

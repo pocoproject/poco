@@ -22,8 +22,7 @@
 #include <stack>
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 class JSON_API ParseHandler: public Handler
@@ -164,7 +163,7 @@ inline void ParseHandler::null()
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON
 
 
 #endif // JSON_ParseHandler_INCLUDED

@@ -30,8 +30,7 @@ template class Poco::SharedPtr<Poco::JSON::Array>;
 #endif
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 Array::Array(int options):
@@ -269,4 +268,4 @@ void Array::clear()
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON

@@ -27,8 +27,7 @@
 #include "Poco/Redis/RedisStream.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 class Redis_API RedisType
@@ -295,7 +294,7 @@ private:
 };
 
 
-} } // namespace Poco/Redis
+} // namespace Poco::Redis
 
 
 #endif // Redis_Type_INCLUDED

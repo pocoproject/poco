@@ -17,9 +17,7 @@
 #include <mysql/mysql.h>
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 StatementExecutor::StatementExecutor(MYSQL* mysql)
@@ -151,4 +149,4 @@ int StatementExecutor::getAffectedRowCount() const
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL

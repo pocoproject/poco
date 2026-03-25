@@ -19,8 +19,7 @@
 #include <cstring>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 const char ZipArchiveInfo::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x05', '\x06'};
@@ -187,4 +186,4 @@ std::string ZipArchiveInfo64::createHeader() const
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

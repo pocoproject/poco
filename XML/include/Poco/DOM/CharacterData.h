@@ -23,8 +23,7 @@
 #include "Poco/XML/XMLString.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API CharacterData: public AbstractNode
@@ -123,7 +122,7 @@ inline unsigned long CharacterData::length() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_CharacterData_INCLUDED

@@ -27,8 +27,7 @@
 struct json_stream;
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 class JSON_API ParserImpl
@@ -192,7 +191,7 @@ inline Dynamic::Var ParserImpl::asVarImpl() const
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON
 
 
 #endif // JSON_JSONParserImpl_INCLUDED

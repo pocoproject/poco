@@ -29,8 +29,7 @@
 #include <ios>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API HTTPSession
@@ -370,7 +369,7 @@ inline MessageHeader& HTTPSession::responseTrailer()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPSession_INCLUDED

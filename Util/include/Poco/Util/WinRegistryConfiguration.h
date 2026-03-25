@@ -23,8 +23,7 @@
 #include "Poco/String.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API WinRegistryConfiguration: public AbstractConfiguration
@@ -66,7 +65,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_WinRegistryConfiguration_INCLUDED

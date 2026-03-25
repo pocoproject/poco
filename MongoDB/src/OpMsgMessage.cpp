@@ -24,8 +24,7 @@
 
 #define POCO_MONGODB_DUMP	false
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 // Query and write
 const std::string OpMsgMessage::CMD_INSERT { "insert"s };
@@ -298,6 +297,10 @@ void OpMsgMessage::read(std::istream& istr)
 		poco_assert_dbg(_header.opCode() == _header.OP_MSG);
 
 		const std::streamsize remainingSize { static_cast<std::streamsize>(_header.getMessageLength() - _header.MSG_HEADER_SIZE) };
+		if (remainingSize <= 0)
+			throw Poco::ProtocolException("Invalid MongoDB message: remaining size is " + std::to_string(remainingSize));
+		if (remainingSize > OP_MSG_MAX_SIZE)
+			throw Poco::ProtocolException("MongoDB message exceeds maximum size: " + std::to_string(remainingSize));
 		message.reserve(remainingSize);
 
 #if POCO_MONGODB_DUMP
@@ -368,7 +371,7 @@ void OpMsgMessage::read(std::istream& istr)
 			Document::Ptr doc = new Document();
 			doc->read(reader);
 			_documents.push_back(doc);
-			if (msgss.tellg() < 0)
+			if (!msgss.good())
 			{
 				break;
 			}
@@ -429,4 +432,4 @@ const std::string& commandIdentifier(const std::string& command)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

@@ -29,9 +29,7 @@
 #include "Poco/Dynamic/Var.h"
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 class PostgreSQL_API BinaryExtractor: public Poco::Data::AbstractExtractor
@@ -434,7 +432,7 @@ inline bool BinaryExtractor::isColumnNull(const OutputParameter& anOutputParamet
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif // SQL_PostgreSQL_BinaryExtractor_INCLUDED

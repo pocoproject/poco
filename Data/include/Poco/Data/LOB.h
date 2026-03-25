@@ -26,8 +26,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <typename T>
@@ -251,7 +250,7 @@ inline void swap(LOB<T>& b1, LOB<T>& b2) noexcept
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 namespace std
@@ -277,8 +276,7 @@ namespace std
 //
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 template <>
@@ -363,7 +361,7 @@ private:
 };
 
 
-} } // namespace Poco::Dynamic
+} // namespace Poco::Dynamic
 
 
 #endif // Data_LOB_INCLUDED

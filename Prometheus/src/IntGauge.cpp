@@ -17,8 +17,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 void IntGauge::exportTo(Exporter& exporter) const
@@ -30,4 +29,4 @@ void IntGauge::exportTo(Exporter& exporter) const
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

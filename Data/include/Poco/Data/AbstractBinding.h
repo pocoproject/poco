@@ -29,8 +29,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API AbstractBinding
@@ -146,7 +145,7 @@ inline Poco::UInt32 AbstractBinding::bulkSize() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_AbstractBinding_INCLUDED

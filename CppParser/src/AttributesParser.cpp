@@ -21,8 +21,7 @@ using Poco::Token;
 using Poco::SyntaxException;
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 AttributesParser::AttributesParser(Attributes& attrs, std::istream& istr):
@@ -144,4 +143,4 @@ void AttributesParser::setAttribute(const std::string& name, const std::string& 
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

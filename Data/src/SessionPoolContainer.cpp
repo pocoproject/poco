@@ -24,8 +24,7 @@
 using Poco::FastMutex;
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 SessionPoolContainer::SessionPoolContainer()
@@ -119,4 +118,4 @@ void SessionPoolContainer::shutdown()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

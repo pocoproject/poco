@@ -36,8 +36,7 @@
 #include <atomic>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API SQLChannel: public Poco::Channel, Poco::Runnable
@@ -359,7 +358,7 @@ inline bool SQLChannel::shouldFlush() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_SQLChannel_INCLUDED

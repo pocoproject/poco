@@ -25,8 +25,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <typename T>
@@ -145,7 +144,7 @@ using CLOBOutputStream = LOBOutputStream<char>;
 using BLOBInputStream = LOBInputStream<unsigned char>;
 using CLOBInputStream = LOBInputStream<char>;
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_LOBStream_INCLUDED

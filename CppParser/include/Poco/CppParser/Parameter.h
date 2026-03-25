@@ -22,8 +22,7 @@
 #include "Poco/CppParser/Decl.h"
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class Function;
@@ -144,7 +143,7 @@ inline const std::string& Parameter::defaultDecl() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_Parameter_INCLUDED

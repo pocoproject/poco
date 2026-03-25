@@ -28,9 +28,7 @@ template class JSON_API Poco::SharedPtr<Poco::JSON::Object>;
 template class Poco::SharedPtr<Poco::JSON::Object>;
 #endif
 
-namespace Poco {
-
-namespace JSON {
+namespace Poco::JSON {
 
 
 Object::Object(int options):
@@ -361,4 +359,4 @@ void Object::clear()
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON

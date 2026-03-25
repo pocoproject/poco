@@ -23,8 +23,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPRequest;
@@ -166,7 +165,7 @@ inline bool HTTPNTLMCredentials::empty() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPNTLMCredentials_INCLUDED

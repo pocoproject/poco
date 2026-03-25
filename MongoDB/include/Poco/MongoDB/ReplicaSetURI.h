@@ -25,8 +25,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API ReplicaSetURI
@@ -202,7 +201,7 @@ private:
 };
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_ReplicaSetURI_INCLUDED

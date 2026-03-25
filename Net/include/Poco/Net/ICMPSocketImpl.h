@@ -24,8 +24,7 @@
 #include "Poco/Timestamp.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API ICMPSocketImpl: public RawSocketImpl
@@ -103,7 +102,7 @@ inline int ICMPSocketImpl::timeout() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_ICMPSocketImpl_INCLUDED

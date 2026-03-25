@@ -6,8 +6,7 @@
 #include "Poco/Net/StreamSocket.h"
 #include <cstring>
 #include <string>
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API HTTPReactorServerSession : public HTTPSession
@@ -48,6 +47,8 @@ private:
 	[[nodiscard]]
 	int peek() override;
 
+	int read(char* buffer, std::streamsize length) override;
+
 	int write(const char* buffer, std::streamsize length) override;
 
 	bool parseHeaders(std::size_t pos, std::size_t& bodyStart, std::size_t& contentLength, bool& isChunked);
@@ -63,7 +64,7 @@ private:
 	StreamSocket   _realsocket;
 };
 
-}} // namespace Poco::Net
+} // namespace Poco::Net
 
 #endif // Net_HTTPReactorServerSession_INCLUDED
 

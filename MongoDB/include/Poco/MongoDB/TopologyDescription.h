@@ -29,8 +29,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class Document;
@@ -166,7 +165,7 @@ private:
 };
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_TopologyDescription_INCLUDED

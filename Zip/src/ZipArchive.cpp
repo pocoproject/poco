@@ -19,8 +19,7 @@
 #include <cstring>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 const std::string ZipArchive::EMPTY_COMMENT;
@@ -180,4 +179,4 @@ const std::string& ZipArchive::getZipComment() const
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

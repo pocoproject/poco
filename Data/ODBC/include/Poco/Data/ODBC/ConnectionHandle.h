@@ -27,9 +27,7 @@
 #include <sqltypes.h>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 class SessionImpl;
 
@@ -209,7 +207,7 @@ inline int ConnectionHandle::getLoginTimeout() const
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif

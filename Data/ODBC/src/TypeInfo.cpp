@@ -18,9 +18,7 @@
 #include "Poco/Exception.h"
 #include <iostream>
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 TypeInfo::TypeInfo(SQLHDBC* pHDBC): _pHDBC(pHDBC)
@@ -270,4 +268,4 @@ void TypeInfo::print(std::ostream& ostr)
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

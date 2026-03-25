@@ -27,8 +27,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API X509Certificate
@@ -212,7 +211,7 @@ inline const PCCERT_CONTEXT X509Certificate::system() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_X509Certificate_INCLUDED

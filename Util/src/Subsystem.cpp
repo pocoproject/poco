@@ -15,8 +15,7 @@
 #include "Poco/Util/Subsystem.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 void Subsystem::reinitialize(Application& app)
@@ -31,4 +30,4 @@ void Subsystem::defineOptions(OptionSet& options)
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

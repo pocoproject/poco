@@ -19,8 +19,7 @@
 #include "Poco/Util/ConfigurationView.h"
 #include "Poco/Util/Util.h"
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API LocalConfigurationView : public AbstractConfigurationView
@@ -57,7 +56,7 @@ protected:
 };
 
 
-}} // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif  // Util_LocalConfigurationView_INCLUDED

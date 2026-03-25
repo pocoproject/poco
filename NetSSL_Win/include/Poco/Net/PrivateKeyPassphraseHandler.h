@@ -21,8 +21,7 @@
 #include "Poco/Net/NetSSL.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API PrivateKeyPassphraseHandler
@@ -79,7 +78,7 @@ inline bool PrivateKeyPassphraseHandler::serverSide() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_PrivateKeyPassphraseHandler_INCLUDED

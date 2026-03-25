@@ -32,9 +32,7 @@ using Poco::InvalidArgumentException;
 using Poco::NotImplementedException;
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::string& target)
@@ -54,6 +52,27 @@ void makeUTF16(SQLCHAR* pSQLChar, SQLINTEGER length, std::string& target)
 
 void makeUTF8(Poco::Buffer<SQLWCHAR>& buffer, SQLINTEGER length, SQLPOINTER pTarget, SQLINTEGER targetLength)
 {
+	// Some ODBC drivers (notably IBM Informix) may report a returned
+	// string length larger than the allocated wide-char buffer, or
+	// return non-positive lengths. Handle these defensively instead
+	// of throwing, to avoid breaking metadata retrieval for drivers
+	// with non-conformant length reporting.
+	//
+	// Note: this function handles metadata strings (column names,
+	// diagnostics, driver info), not row data. The driver has already
+	// written into the buffer, so clamping to the actual buffer size
+	// converts exactly what is available — this is the only viable
+	// approach when the reported length is unreliable.
+	if (length <= 0)
+	{
+		std::memset(pTarget, 0, targetLength);
+		return;
+	}
+	if (length > static_cast<SQLINTEGER>(buffer.sizeBytes()))
+		length = static_cast<SQLINTEGER>(buffer.sizeBytes());
+	// Ensure length is aligned to SQLWCHAR boundary for safe conversion
+	length -= length % sizeof(SQLWCHAR);
+
 	UTF8Encoding utf8Encoding;
 	UTF16Encoding utf16Encoding;
 	TextConverter converter(utf16Encoding, utf8Encoding);
@@ -850,4 +869,4 @@ SQLRETURN SQLDrivers(SQLHENV henv,
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

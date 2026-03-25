@@ -23,8 +23,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API OptionSet
@@ -92,7 +91,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_OptionSet_INCLUDED

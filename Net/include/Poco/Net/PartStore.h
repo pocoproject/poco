@@ -23,8 +23,7 @@
 #include "Poco/FileStream.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API PartStore: public PartSource
@@ -107,7 +106,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_PartStore_INCLUDED

@@ -22,8 +22,7 @@
 #include "Poco/DOM/Event.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class Node;
@@ -141,7 +140,7 @@ inline MutationEvent::AttrChangeType MutationEvent::attrChange() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_MutationEvent_INCLUDED

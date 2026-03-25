@@ -23,8 +23,7 @@
 #include "Poco/Net/StreamSocket.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API ServerSocket: public Socket
@@ -229,7 +228,7 @@ protected:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_ServerSocket_INCLUDED

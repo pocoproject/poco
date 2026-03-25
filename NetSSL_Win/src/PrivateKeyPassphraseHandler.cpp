@@ -20,8 +20,7 @@
 using Poco::Delegate;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 PrivateKeyPassphraseHandler::PrivateKeyPassphraseHandler(bool onServerSide): _serverSide(onServerSide)
@@ -43,4 +42,4 @@ PrivateKeyPassphraseHandler::~PrivateKeyPassphraseHandler()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

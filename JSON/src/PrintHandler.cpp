@@ -17,8 +17,7 @@
 #include <iostream>
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 PrintHandler::PrintHandler(unsigned indent, int options):
@@ -210,4 +209,4 @@ void PrintHandler::arrayValue()
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON

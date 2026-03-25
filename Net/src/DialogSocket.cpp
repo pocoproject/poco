@@ -18,8 +18,7 @@
 #include <cstring>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 DialogSocket::DialogSocket():
@@ -292,4 +291,4 @@ int DialogSocket::receiveRawBytes(void* buffer, int length)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

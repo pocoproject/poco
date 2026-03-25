@@ -15,9 +15,7 @@
 #include "Poco/Data/MySQL/MySQLStatementImpl.h"
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 MySQLStatementImpl::MySQLStatementImpl(SessionImpl& h) :
@@ -172,4 +170,4 @@ Poco::Data::AbstractBinder::Ptr MySQLStatementImpl::binder()
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL

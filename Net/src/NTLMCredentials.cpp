@@ -31,8 +31,7 @@
 #include <cstring>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string NTLMCredentials::NTLMSSP("NTLMSSP");
@@ -377,4 +376,4 @@ std::vector<unsigned char> NTLMCredentials::fromBase64(const std::string& base64
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -17,8 +17,7 @@
 #include "Poco/Random.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class NamePoolItem
@@ -129,4 +128,4 @@ unsigned long NamePool::hash(const XMLString& qname, const XMLString& namespaceU
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

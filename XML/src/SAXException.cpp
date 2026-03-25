@@ -18,8 +18,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 POCO_IMPLEMENT_EXCEPTION(SAXException, XMLException, "SAX Exception")
@@ -135,4 +134,4 @@ std::string SAXParseException::buildMessage(const std::string& msg, const XMLStr
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

@@ -21,8 +21,7 @@
 #include "Poco/XML/XMLException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XMLStreamParser;
@@ -57,7 +56,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // XML_XMLStreamParserException_INCLUDED

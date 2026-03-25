@@ -29,9 +29,7 @@
 #include <sqlext.h>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 class ODBC_API TypeInfo
@@ -220,7 +218,7 @@ private:
 };
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif

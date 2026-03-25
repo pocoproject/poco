@@ -21,8 +21,7 @@
 #include <cstring>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 const char ZipLocalFileHeader::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x03', '\x04'};
@@ -259,4 +258,4 @@ std::string ZipLocalFileHeader::createHeader() const
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

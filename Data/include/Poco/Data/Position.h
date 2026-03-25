@@ -21,8 +21,7 @@
 #include "Poco/Data/Limit.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API Position
@@ -70,7 +69,7 @@ inline Position from(const T& value)
 } // namespace Keywords
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Position_INCLUDED

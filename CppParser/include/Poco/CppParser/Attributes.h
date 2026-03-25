@@ -22,8 +22,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API Attributes
@@ -129,7 +128,7 @@ inline Attributes::Iterator Attributes::end() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_Attributes_INCLUDED

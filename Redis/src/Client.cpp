@@ -19,8 +19,7 @@
 #include "Poco/Redis/RedisNotifications.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 Client::Client()
@@ -284,4 +283,4 @@ Client::NotificationCenterPtr Client::notificationCenter()
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis

@@ -22,8 +22,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API MetaColumn
@@ -205,7 +204,7 @@ inline void MetaColumn::setNullable(bool nullable)
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_MetaColumn_INCLUDED

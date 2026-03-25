@@ -14,8 +14,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 class PDF_API Cell
@@ -82,6 +81,6 @@ private:
 
 using TableRow = std::vector<Cell>;
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 #endif // PDF_Cell_INCLUDED

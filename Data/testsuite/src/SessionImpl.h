@@ -20,9 +20,7 @@
 #include "Binder.h"
 
 
-namespace Poco {
-namespace Data {
-namespace Test {
+namespace Poco::Data::Test {
 
 
 class SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
@@ -112,7 +110,7 @@ private:
 };
 
 
-} } } // namespace Poco::Data::Test
+} // namespace Poco::Data::Test
 
 
 #endif // Data_Test_SessionImpl_INCLUDED

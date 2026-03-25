@@ -107,8 +107,7 @@ enum RSAPaddingMode
 #endif
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 inline std::string& getError(std::string& msg)
@@ -146,7 +145,7 @@ void Crypto_API uninitializeCrypto();
 	/// OpenSSLInitializer::uninitialize().
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_Crypto_INCLUDED

@@ -31,8 +31,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetworkInterfaceImpl;
@@ -373,7 +372,7 @@ inline bool NetworkInterface::operator == (const NetworkInterface& other) const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 Net_API std::ostream& operator << (std::ostream& ostr, const Poco::Net::NetworkInterface::MACAddress& addr);

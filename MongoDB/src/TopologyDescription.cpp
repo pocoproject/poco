@@ -17,8 +17,7 @@
 #include <utility>
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 TopologyDescription::TopologyDescription() = default;
@@ -338,7 +337,6 @@ void TopologyDescription::updateTopologyType()
 	int otherRsMembers = 0;  // Non-primary replica set members (secondaries, arbiters, etc.)
 	int mongosCount = 0;
 	int standaloneCount = 0;
-	[[maybe_unused]] int unknownCount = 0;
 
 	for (const auto& [address, server] : _servers)
 	{
@@ -363,8 +361,6 @@ void TopologyDescription::updateTopologyType()
 			break;
 		case ServerDescription::Unknown:
 			// Unknown servers don't affect topology classification
-			// Count them to help with diagnostics
-			unknownCount++;
 			break;
 		}
 	}
@@ -446,4 +442,4 @@ std::string TopologyDescription::typeToString(TopologyType type)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

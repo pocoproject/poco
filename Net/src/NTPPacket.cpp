@@ -18,8 +18,7 @@
 #include "Poco/ByteOrder.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 #if !defined(POCO_COMPILER_SUN)
@@ -156,4 +155,4 @@ Poco::Timestamp NTPPacket::convertTime(Poco::Int64 tm) const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

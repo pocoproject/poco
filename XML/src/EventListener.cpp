@@ -15,8 +15,7 @@
 #include "Poco/DOM/EventListener.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 EventListener::~EventListener()
@@ -24,4 +23,4 @@ EventListener::~EventListener()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

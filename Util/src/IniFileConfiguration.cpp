@@ -31,8 +31,7 @@ using Poco::trim;
 using Poco::Path;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 IniFileConfiguration::IniFileConfiguration(std::istream& istr)
@@ -180,7 +179,7 @@ void IniFileConfiguration::parseLine(std::istream& istr)
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // POCO_UTIL_NO_INIFILECONFIGURATION

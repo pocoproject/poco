@@ -25,8 +25,7 @@
 #include "Poco/NotificationQueue.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class RemoteUDPListener;
@@ -132,7 +131,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_RemoteSyslogListener_INCLUDED

@@ -24,8 +24,7 @@
 #include "Poco/Zip/ZipOperation.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Zip_API Replace: public ZipOperation
@@ -44,7 +43,7 @@ private:
 };
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_Replace_INCLUDED

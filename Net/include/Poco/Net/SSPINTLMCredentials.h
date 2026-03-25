@@ -27,8 +27,7 @@
 #include "Poco/SharedPtr.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 struct NTLMContextImpl;
@@ -81,7 +80,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SSPINTLMCredentials_INCLUDED

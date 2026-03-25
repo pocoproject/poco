@@ -16,8 +16,7 @@
 
 #include <hpdf.h>
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 Image::Image(HPDF_Doc* pPDF, const HPDF_Image& resource, const std::string& name):
@@ -73,4 +72,4 @@ void Image::colorMask(Poco::UInt32 redMin,
 							blueMax);
 }
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF

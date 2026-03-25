@@ -21,8 +21,7 @@
 #include "Poco/Data/RowFormatter.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API JSONRowFormatter: public Poco::Data::RowFormatter
@@ -155,7 +154,7 @@ inline bool JSONRowFormatter::isFull() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_JSONRowFormatter_INCLUDED

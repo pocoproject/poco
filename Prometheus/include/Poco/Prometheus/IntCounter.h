@@ -22,8 +22,7 @@
 #include <atomic>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Registry;
@@ -148,7 +147,7 @@ inline void IntCounter::inc(IntCounter::Sample v)
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_IntCounter_INCLUDED

@@ -15,8 +15,7 @@
 #include "Poco/DOM/NodeFilter.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 NodeFilter::~NodeFilter()
@@ -24,4 +23,4 @@ NodeFilter::~NodeFilter()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

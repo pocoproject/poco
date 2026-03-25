@@ -22,8 +22,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 WinRegistryConfiguration::WinRegistryConfiguration(const std::string& rootPath, REGSAM extraSam): _rootPath(rootPath), _extraSam(extraSam)
@@ -132,4 +131,4 @@ std::string WinRegistryConfiguration::convertToRegFormat(const std::string& key,
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

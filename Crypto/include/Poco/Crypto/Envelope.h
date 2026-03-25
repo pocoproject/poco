@@ -24,8 +24,7 @@
 #include <openssl/evp.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API Envelope
@@ -175,7 +174,7 @@ inline int Envelope::cipherNID() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_Envelope_INCLUDED

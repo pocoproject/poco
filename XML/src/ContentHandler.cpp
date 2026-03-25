@@ -15,8 +15,7 @@
 #include "Poco/SAX/ContentHandler.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 ContentHandler::~ContentHandler()
@@ -24,4 +23,4 @@ ContentHandler::~ContentHandler()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

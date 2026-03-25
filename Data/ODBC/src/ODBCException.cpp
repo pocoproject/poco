@@ -16,9 +16,7 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(ODBC_EXPORTS)
 template class ODBC_API HandleException<SQLHENV, SQL_HANDLE_ENV>;
@@ -38,4 +36,4 @@ POCO_IMPLEMENT_EXCEPTION(UnknownDataLengthException, ODBCException, "Unknown len
 POCO_IMPLEMENT_EXCEPTION(DataTruncatedException, ODBCException, "Variable length character or binary data truncated")
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

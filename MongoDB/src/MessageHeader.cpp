@@ -18,8 +18,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 MessageHeader::MessageHeader(OpCode opCode):
@@ -62,4 +61,4 @@ void MessageHeader::write(BinaryWriter& writer)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

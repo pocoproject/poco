@@ -25,8 +25,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Prometheus_API ProcessCollector: public Collector
@@ -77,7 +76,7 @@ inline Poco::Timestamp ProcessCollector::startTime()
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_ProcessCollector_INCLUDED

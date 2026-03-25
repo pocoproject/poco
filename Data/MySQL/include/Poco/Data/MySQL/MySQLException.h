@@ -25,9 +25,7 @@
 #include <string>
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 // End-user include this file and use in code ConnectionException/StatementException
@@ -151,7 +149,7 @@ inline void MySQLException::rethrow() const
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL
 
 
 #endif //Data_MySQL_MySQLException_INCLUDED

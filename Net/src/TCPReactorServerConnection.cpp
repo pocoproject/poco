@@ -1,8 +1,7 @@
 #include "Poco/Net/TCPReactorServerConnection.h"
 #include "Poco/Net/HTTPObserver.h"
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const int BUFFER_SIZE = 4096;
@@ -80,5 +79,5 @@ void TCPReactorServerConnection::setRecvMessageCallback(const RecvMessageCallbac
 	_rcvCallback = cb;
 }
 
-}} // namespace Poco::Net
+} // namespace Poco::Net
 

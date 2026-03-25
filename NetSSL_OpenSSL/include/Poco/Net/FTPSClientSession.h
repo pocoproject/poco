@@ -23,8 +23,7 @@
 #include "Poco/Net/FTPClientSession.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API FTPSClientSession: public Poco::Net::FTPClientSession
@@ -106,7 +105,7 @@ inline void FTPSClientSession::forceSessionReuse(bool force)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // #define NetSSL_FTPSClientSession_INCLUDED

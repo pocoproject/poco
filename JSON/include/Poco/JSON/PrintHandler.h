@@ -23,8 +23,7 @@
 #include "Poco/JSONString.h"
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 class JSON_API PrintHandler: public Handler
@@ -137,7 +136,7 @@ inline bool PrintHandler::array() const
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON
 
 
 #endif // JSON_PrintHandler_INCLUDED

@@ -51,9 +51,7 @@ namespace
 }
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 SessionImpl::SessionImpl(const std::string& aConnectionString, std::size_t aLoginTimeout):
@@ -269,4 +267,4 @@ void SessionImpl::setBinaryExtraction(const std::string& feature, bool enabled)
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL

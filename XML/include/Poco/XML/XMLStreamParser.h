@@ -41,8 +41,7 @@
 struct XML_ParserStruct;
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API XMLStreamParser
@@ -678,7 +677,7 @@ T XMLStreamParser::element(const QName& qn, const T& dv)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // XML_XMLStreamParser_INCLUDED

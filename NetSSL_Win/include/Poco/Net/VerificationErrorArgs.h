@@ -22,8 +22,7 @@
 #include "Poco/Net/X509Certificate.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_Win_API VerificationErrorArgs
@@ -107,7 +106,7 @@ inline bool VerificationErrorArgs::getIgnoreError() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_VerificationErrorArgs_INCLUDED

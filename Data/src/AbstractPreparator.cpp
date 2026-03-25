@@ -22,8 +22,7 @@
 #include "Poco/Debugger.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 AbstractPreparator::AbstractPreparator(Poco::UInt32 length):
@@ -1056,4 +1055,4 @@ void AbstractPreparator::prepare(std::size_t pos, const std::list<Poco::Nullable
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

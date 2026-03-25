@@ -15,8 +15,7 @@
 #include "Poco/Net/SecureServerSocketImpl.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 SecureServerSocketImpl::SecureServerSocketImpl(Context::Ptr pContext):
@@ -133,4 +132,4 @@ bool SecureServerSocketImpl::secure() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

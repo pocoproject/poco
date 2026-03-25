@@ -15,8 +15,7 @@
 #include "Poco/SAX/DeclHandler.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 DeclHandler::~DeclHandler()
@@ -24,4 +23,4 @@ DeclHandler::~DeclHandler()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

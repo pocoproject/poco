@@ -21,9 +21,7 @@
 #include <dns_sd.h>
 
 
-namespace Poco {
-namespace DNSSD {
-namespace Bonjour {
+namespace Poco::DNSSD::Bonjour {
 
 
 EventLoop::EventLoop():
@@ -146,4 +144,4 @@ void EventLoop::run()
 }
 
 
-} } } // namespace Poco::DNSSD::Bonjour
+} // namespace Poco::DNSSD::Bonjour

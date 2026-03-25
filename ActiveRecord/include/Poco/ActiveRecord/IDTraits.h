@@ -22,8 +22,7 @@
 #include "Poco/NumberFormatter.h"
 
 
-namespace Poco {
-namespace ActiveRecord {
+namespace Poco::ActiveRecord {
 
 
 template <typename T>
@@ -194,7 +193,7 @@ public:
 };
 
 
-} } // namespace Poco::ActiveRecord
+} // namespace Poco::ActiveRecord
 
 
 #endif // ActiveRecord_IDTraits_INCLUDED

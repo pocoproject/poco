@@ -27,8 +27,7 @@
 #include "Poco/AutoReleasePool.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class NamePool;
@@ -308,7 +307,7 @@ inline DocumentType* Document::getDoctype()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_Document_INCLUDED

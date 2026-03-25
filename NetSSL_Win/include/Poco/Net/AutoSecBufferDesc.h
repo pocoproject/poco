@@ -29,8 +29,7 @@
 #endif
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 template <int numBufs>
@@ -165,7 +164,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_AutoSecBufferDesc_INCLUDED

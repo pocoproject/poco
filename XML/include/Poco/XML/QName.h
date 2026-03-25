@@ -26,8 +26,7 @@
 #include <iosfwd>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API QName
@@ -152,7 +151,7 @@ inline bool operator != (const QName& x, const QName& y)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // XML_QName_INCLUDED

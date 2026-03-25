@@ -38,8 +38,7 @@ using Poco::URI;
 using Poco::icompare;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string HTMLForm::ENCODING_URL           = "application/x-www-form-urlencoded";
@@ -463,4 +462,4 @@ void HTMLForm::setValueLengthLimit(std::size_t limit)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

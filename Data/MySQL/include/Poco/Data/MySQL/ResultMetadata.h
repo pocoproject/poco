@@ -31,9 +31,7 @@ typedef my_bool my_boolv;
 #endif
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 class ResultMetadata
@@ -87,7 +85,7 @@ private:
 };
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL
 
 
 #endif //Data_MySQL_ResultMetadata_INCLUDED

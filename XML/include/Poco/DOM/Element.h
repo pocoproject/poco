@@ -23,8 +23,7 @@
 #include "Poco/XML/Name.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class Attr;
@@ -235,7 +234,7 @@ inline const XMLString& Element::tagName() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_Element_INCLUDED

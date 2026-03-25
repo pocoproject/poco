@@ -28,8 +28,7 @@
 #include <openssl/pkcs12.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API PKCS12Container
@@ -153,7 +152,7 @@ inline EVPPKey PKCS12Container::getKey() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_PKCS12Container_INCLUDED

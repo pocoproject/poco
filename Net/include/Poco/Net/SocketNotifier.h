@@ -26,8 +26,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Socket;
@@ -126,7 +125,7 @@ inline std::size_t SocketNotifier::countObservers() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SocketNotifier_INCLUDED

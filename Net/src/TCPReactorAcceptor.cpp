@@ -2,12 +2,11 @@
 #include <atomic>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
-TCPReactorAcceptor::TCPReactorAcceptor(
-	Poco::Net::ServerSocket& socket, Poco::Net::SocketReactor& reactor, TCPServerParams::Ptr pParams)
+TCPReactorAcceptor::TCPReactorAcceptor(Poco::Net::ServerSocket& socket, Poco::Net::SocketReactor& reactor,
+									   TCPServerParams::Ptr pParams)
 	: Poco::Net::SocketAcceptor<TCPReactorServerConnection>(socket, reactor),
 	  _selfReactor(reactor),
 	  _useSelfReactor(pParams->getUseSelfReactor()),
@@ -16,18 +15,39 @@ TCPReactorAcceptor::TCPReactorAcceptor(
 	int workerThreads = _useSelfReactor ? 0 : _pParams->getMaxThreads();
 	if (workerThreads > 0)
 	{
-		_threadPool = std::make_shared<Poco::ThreadPool>("TCPRA", workerThreads, workerThreads);
+		_threadPool = std::make_shared<Poco::ThreadPool>("TCPRW", workerThreads, workerThreads);
+		for (int i = 0; i < workerThreads; i++)
+		{
+			std::shared_ptr<SocketReactor> workerReactor(std::make_shared<SocketReactor>());
+			_wokerReactors.push_back(workerReactor);
+			_threadPool->start(*workerReactor);
+		}
 	}
-	for (int i = 0; i < workerThreads; i++)
+	else
 	{
-		std::shared_ptr<SocketReactor> workerReactor(std::make_shared<SocketReactor>());
-		_wokerReactors.push_back(workerReactor);
-		_threadPool->start(*workerReactor);
+		_useSelfReactor = true;
 	}
 }
 
 TCPReactorAcceptor::~TCPReactorAcceptor()
 {
+	stop();
+}
+
+void TCPReactorAcceptor::stop()
+{
+	if (_stopped.exchange(true))
+	{
+		return;
+	}
+	for (auto& worker : _wokerReactors)
+	{
+		worker->stop();
+	}
+	if (_threadPool)
+	{
+		_threadPool->joinAll();
+	}
 }
 
 SocketReactor& TCPReactorAcceptor::reactor()
@@ -55,5 +75,5 @@ TCPReactorServerConnection* TCPReactorAcceptor::createServiceHandler(Poco::Net::
 	return tmpConnPtr.get();
 }
 
-}} // namespace Poco::Net
+} // namespace Poco::Net
 

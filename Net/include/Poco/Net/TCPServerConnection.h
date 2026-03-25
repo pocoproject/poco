@@ -23,8 +23,7 @@
 #include "Poco/Runnable.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API TCPServerConnection: public Poco::Runnable
@@ -80,7 +79,7 @@ inline StreamSocket& TCPServerConnection::socket()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_TCPServerConnection_INCLUDED

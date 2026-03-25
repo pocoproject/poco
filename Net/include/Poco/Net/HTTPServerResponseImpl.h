@@ -23,8 +23,7 @@
 #include "Poco/Net/HTTPServerResponse.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPServerSession;
@@ -135,7 +134,7 @@ inline void HTTPServerResponseImpl::attachRequest(HTTPServerRequestImpl* pReques
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPServerResponseImpl_INCLUDED

@@ -19,8 +19,7 @@
 #include "Poco/Net/NetException.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 void Net_API initializeNetwork()
@@ -62,7 +61,7 @@ std::string htmlize(const std::string& str)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && !defined(POCO_NO_AUTOMATIC_LIB_INIT)

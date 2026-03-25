@@ -23,8 +23,7 @@
 #include "Poco/Net/FTPStreamFactory.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API FTPSStreamFactory: public Poco::Net::FTPStreamFactory
@@ -68,7 +67,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_FTPSStreamFactory_INCLUDED

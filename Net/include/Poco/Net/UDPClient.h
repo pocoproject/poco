@@ -26,8 +26,7 @@
 #include "Poco/Thread.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API UDPClient : public Poco::Runnable
@@ -157,7 +156,7 @@ inline int UDPClient::errorBacklog()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_UDPClient_INCLUDED

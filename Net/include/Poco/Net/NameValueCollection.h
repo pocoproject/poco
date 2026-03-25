@@ -24,8 +24,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API NameValueCollection
@@ -214,7 +213,7 @@ inline std::size_t NameValueCollection::size() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_NameValueCollection_INCLUDED

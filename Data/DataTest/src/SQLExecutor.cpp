@@ -169,8 +169,7 @@ private:
 } // namespace
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <>
@@ -4769,4 +4768,4 @@ std::string SQLExecutor::formatSQL(const std::string& s) const
 }
 
 
-} } } // Poco::Data::Test
+} } // namespace Poco::Data

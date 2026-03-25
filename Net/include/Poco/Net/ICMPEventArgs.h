@@ -24,8 +24,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API ICMPEventArgs
@@ -158,7 +157,7 @@ inline int ICMPEventArgs::sent() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif

@@ -23,8 +23,7 @@
 #include "Poco/Notification.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class SocketReactor;
@@ -178,7 +177,7 @@ inline Socket SocketNotification::socket() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_SocketNotification_INCLUDED

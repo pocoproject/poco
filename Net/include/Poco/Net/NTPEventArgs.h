@@ -23,8 +23,7 @@
 #include "Poco/Net/NTPPacket.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API NTPEventArgs
@@ -81,7 +80,7 @@ inline void NTPEventArgs::setPacket(NTPPacket &packet)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif

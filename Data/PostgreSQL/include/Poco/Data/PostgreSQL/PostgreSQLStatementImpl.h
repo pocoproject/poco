@@ -28,9 +28,7 @@
 #include "Poco/Format.h"
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 class PostgreSQL_API PostgreSQLStatementImpl: public Poco::Data::StatementImpl
@@ -103,7 +101,7 @@ private:
 };
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif // SQL_PostgreSQL_PostgreSQLStatementImpl_INCLUDED

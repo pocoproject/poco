@@ -23,8 +23,7 @@
 #include "Poco/Crypto/RSAKeyImpl.h"
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class X509Certificate;
@@ -133,7 +132,7 @@ inline RSAKeyImpl::Ptr RSAKey::impl() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_RSAKey_INCLUDED

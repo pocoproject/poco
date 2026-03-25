@@ -19,8 +19,7 @@
 #include <openssl/err.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 POCO_IMPLEMENT_EXCEPTION(CryptoException, Exception, "Crypto Exception")
@@ -105,4 +104,4 @@ void OpenSSLException::rethrow() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

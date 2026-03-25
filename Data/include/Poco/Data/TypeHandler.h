@@ -37,8 +37,7 @@
 #pragma warning(disable : 4624)
 #endif
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class AbstractTypeHandler
@@ -546,7 +545,7 @@ public:
 };
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 #if defined(POCO_COMPILER_GCC) && (__GNUC__ >= 12)
 	#pragma GCC diagnostic pop

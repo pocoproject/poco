@@ -23,8 +23,7 @@
 #include "Poco/BasicEvent.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPServerRequest;
@@ -73,7 +72,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPRequestHandlerFactory_INCLUDED

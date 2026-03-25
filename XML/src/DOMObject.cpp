@@ -15,8 +15,7 @@
 #include "Poco/DOM/DOMObject.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 DOMObject::DOMObject(): _rc(1)
@@ -29,4 +28,4 @@ DOMObject::~DOMObject()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

@@ -21,9 +21,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace ActiveRecord {
-namespace Compiler {
+namespace Poco::ActiveRecord::Compiler {
 
 
 Parser::Parser()
@@ -274,4 +272,4 @@ std::string Parser::toDatabaseName(const std::string& name)
 }
 
 
-} } } // namespace Poco::ActiveRecord::Compiler
+} // namespace Poco::ActiveRecord::Compiler

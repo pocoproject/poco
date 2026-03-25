@@ -28,9 +28,7 @@
 #include <dns_sd.h>
 
 
-namespace Poco {
-namespace DNSSD {
-namespace Bonjour {
+namespace Poco::DNSSD::Bonjour {
 
 
 class EventLoop;
@@ -73,7 +71,7 @@ private:
 };
 
 
-} } } // namespace Poco::DNSSD::Bonjour
+} // namespace Poco::DNSSD::Bonjour
 
 
 #endif // DNSSD_Bonjour_BonjourBrowserImpl_INCLUDED

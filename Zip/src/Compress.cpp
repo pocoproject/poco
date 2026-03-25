@@ -24,8 +24,7 @@
 #include "Poco/String.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 Compress::Compress(std::ostream& out, bool seekableOut, bool forceZip64):
@@ -392,4 +391,4 @@ void Compress::setStoreExtensions(const std::set<std::string>& extensions)
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip

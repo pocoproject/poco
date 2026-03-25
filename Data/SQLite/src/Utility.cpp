@@ -28,9 +28,7 @@
 #endif
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 const std::string Utility::TRANSACTION_TYPE_PROPERTY_KEY = "transactionType";
@@ -58,6 +56,7 @@ const int Utility::OPERATION_UPDATE = SQLITE_UPDATE;
 
 const std::string Utility::SQLITE_DATE_FORMAT = "%Y-%m-%d";
 const std::string Utility::SQLITE_TIME_FORMAT = "%H:%M:%S";
+const std::string Utility::SQLITE_DATETIME_FRAC_FORMAT = "%Y-%m-%d %H:%M:%s";
 Utility::TypeMap Utility::_types;
 Poco::Mutex Utility::_mutex;
 
@@ -352,4 +351,4 @@ void* Utility::eventHookRegister(sqlite3* pDB, RollbackCallbackType callbackFn, 
 // for a discussion.
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite

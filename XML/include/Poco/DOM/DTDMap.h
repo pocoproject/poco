@@ -22,8 +22,7 @@
 #include "Poco/DOM/NamedNodeMap.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class DocumentType;
@@ -65,7 +64,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_DTDMap_INCLUDED

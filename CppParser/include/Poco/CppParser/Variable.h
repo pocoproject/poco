@@ -22,8 +22,7 @@
 #include "Poco/CppParser/Decl.h"
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API Variable: public Decl
@@ -109,7 +108,7 @@ inline const std::string& Variable::declType() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_Variable_INCLUDED

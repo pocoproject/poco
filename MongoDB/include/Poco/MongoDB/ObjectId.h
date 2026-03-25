@@ -23,8 +23,7 @@
 #include "Poco/Timestamp.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 class MongoDB_API ObjectId
@@ -92,12 +91,11 @@ private:
 //
 inline Timestamp ObjectId::timestamp() const noexcept
 {
-	int time;
-	char* T = reinterpret_cast<char*>(&time);
-	T[0] = _id[3];
-	T[1] = _id[2];
-	T[2] = _id[1];
-	T[3] = _id[0];
+	const Poco::Int32 time =
+		(static_cast<Poco::Int32>(_id[0]) << 24) |
+		(static_cast<Poco::Int32>(_id[1]) << 16) |
+		(static_cast<Poco::Int32>(_id[2]) <<  8) |
+		 static_cast<Poco::Int32>(_id[3]);
 	return Timestamp::fromEpochTime(static_cast<time_t>(time));
 }
 
@@ -150,7 +148,7 @@ inline void BSONWriter::write<ObjectId::Ptr>(const ObjectId::Ptr& from)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB
 
 
 #endif // MongoDB_ObjectId_INCLUDED

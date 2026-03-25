@@ -17,9 +17,7 @@
 #include "Poco/Data/AbstractBinder.h"
 
 
-namespace Poco {
-namespace Data {
-namespace Test {
+namespace Poco::Data::Test {
 
 
 class Binder: public Poco::Data::AbstractBinder
@@ -110,7 +108,7 @@ public:
 };
 
 
-} } } // namespace Poco::Data::Test
+} // namespace Poco::Data::Test
 
 
 #endif // Data_Test_Binder_INCLUDED

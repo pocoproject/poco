@@ -16,8 +16,7 @@
 #include "Poco/SAX/SAXException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 WhitespaceFilter::WhitespaceFilter():
@@ -209,4 +208,4 @@ void WhitespaceFilter::setupParse()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

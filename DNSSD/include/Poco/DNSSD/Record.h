@@ -23,8 +23,7 @@
 #include "Poco/DNSSD/DNSSD.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 class DNSSD_API Record
@@ -224,7 +223,7 @@ inline Poco::UInt32 Record::ttl() const
 }
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD
 
 
 #endif // DNSSD_Service_INCLUDED

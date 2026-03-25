@@ -25,8 +25,7 @@
 #include <openssl/evp.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class RSACipherImpl: public Cipher
@@ -74,7 +73,7 @@ inline const std::string& RSACipherImpl::name() const
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_RSACipherImpl_INCLUDED

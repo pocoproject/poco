@@ -17,8 +17,7 @@
 #include "Poco/DOM/NodeFilter.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 TreeWalker::TreeWalker(Node* root, unsigned long whatToShow, NodeFilter* pFilter):
@@ -224,4 +223,4 @@ Node* TreeWalker::previous(Node* pNode) const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

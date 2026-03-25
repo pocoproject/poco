@@ -21,8 +21,7 @@
 #include "Poco/XML/XML.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 //
@@ -85,7 +84,7 @@ namespace XML {
 #endif
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // XML_XMLString_INCLUDED

@@ -21,9 +21,7 @@
 #include <sqlext.h>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 SessionImpl::SessionImpl(const std::string& connect,
@@ -516,4 +514,4 @@ int SessionImpl::maxStatementLength() const
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC

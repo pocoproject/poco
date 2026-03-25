@@ -26,8 +26,7 @@
 #include "Poco/SAX/ErrorHandler.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API XMLFilterImpl: public XMLFilter, public EntityResolver, public DTDHandler, public ContentHandler, public ErrorHandler
@@ -134,7 +133,7 @@ inline XMLReader* XMLFilterImpl::parent() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_XMLFilterImpl_INCLUDED

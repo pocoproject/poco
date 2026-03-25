@@ -15,8 +15,7 @@
 #include "Poco/Net/HTTPServerParams.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPServerParams::HTTPServerParams():
@@ -77,4 +76,4 @@ void HTTPServerParams::setAutoDecodeHeaders(bool autoDecode)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -24,8 +24,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPRequest;
@@ -202,7 +201,7 @@ inline bool HTTPDigestCredentials::empty() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPDigestCredentials_INCLUDED

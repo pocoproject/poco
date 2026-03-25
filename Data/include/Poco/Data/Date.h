@@ -170,8 +170,7 @@ inline bool Date::operator > (const Date& date) const
 //
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 template <>
@@ -233,8 +232,7 @@ private:
 };
 
 
-} // namespace Dynamic
-} // namespace Poco
+} // namespace Poco::Dynamic
 
 
 #endif // Data_Date_INCLUDED

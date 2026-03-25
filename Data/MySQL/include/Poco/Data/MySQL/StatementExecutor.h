@@ -22,9 +22,7 @@
 #include <mysql/mysql.h>
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 class StatementExecutor
@@ -98,7 +96,7 @@ inline StatementExecutor::operator MYSQL_STMT* ()
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL
 
 
 #endif // Data_MySQL_StatementHandle_INCLUDED

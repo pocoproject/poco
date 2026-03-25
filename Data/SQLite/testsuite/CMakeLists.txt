@@ -30,7 +30,6 @@ else()
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMAND DataSQLite-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
-	set_tests_properties(DataSQLite PROPERTIES ENVIRONMENT POCO_BASE=${PROJECT_SOURCE_DIR})
 endif()
 
 target_link_libraries(DataSQLite-testrunner PUBLIC Poco::DataSQLite Poco::DataTest CppUnit)

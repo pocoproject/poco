@@ -45,8 +45,7 @@
 
 using namespace std::string_literals;
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 static const std::string keyCursor		{"cursor"s};
@@ -106,7 +105,7 @@ Int32 OpMsgCursor::batchSize() const noexcept
 bool OpMsgCursor::isActive() const noexcept
 {
 	const auto& cmd {_query.commandName()};
-	return ( _cursorID > 0 || (!cmd.empty() && cmd != OpMsgMessage::CMD_GET_MORE) );
+	return ( _cursorID != 0 || (!cmd.empty() && cmd != OpMsgMessage::CMD_GET_MORE) );
 }
 
 
@@ -245,4 +244,4 @@ template void OpMsgCursor::killImpl<Connection>(Connection& connection);
 template void OpMsgCursor::killImpl<ReplicaSetConnection>(ReplicaSetConnection& connection);
 
 
-} } // Namespace Poco::MongoDB
+} // namespace Poco::MongoDB

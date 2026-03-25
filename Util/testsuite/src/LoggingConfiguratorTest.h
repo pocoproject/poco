@@ -35,6 +35,9 @@ public:
 	void testBadConfiguration3();
 	void testBadConfiguration4();
 	void testAsyncChannelShutdown();
+	void testGetLogger();
+	void testGetLoggerExisting();
+	void testGetLoggerCollision();
 
 	void setUp();
 	void tearDown();

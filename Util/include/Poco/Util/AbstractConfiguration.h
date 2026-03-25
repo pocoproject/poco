@@ -27,8 +27,7 @@
 #include <utility>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API AbstractConfiguration: public Poco::RefCountedObject
@@ -617,7 +616,7 @@ inline Poco::UInt32 AbstractConfiguration::getUInt32(const std::string& key, Poc
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_AbstractConfiguration_INCLUDED

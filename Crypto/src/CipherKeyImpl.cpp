@@ -40,8 +40,7 @@ namespace
 }
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 CipherKeyImpl::CipherKeyImpl(const std::string& name,
@@ -240,4 +239,4 @@ void CipherKeyImpl::setIV(const ByteVec& iv)
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

@@ -25,8 +25,7 @@
 #include <utility>
 
 
-namespace Poco {
-namespace SevenZip {
+namespace Poco::SevenZip {
 
 
 class ArchiveImpl;
@@ -118,7 +117,7 @@ private:
 //
 
 
-} } // namespace Poco::SevenZip
+} // namespace Poco::SevenZip
 
 
 #endif // SevenZip_ArchiveEntry_INCLUDED

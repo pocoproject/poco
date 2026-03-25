@@ -23,8 +23,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class EnumValue;
@@ -112,7 +111,7 @@ inline int Enum::flags() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_Enum_INCLUDED

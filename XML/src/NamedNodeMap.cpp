@@ -15,8 +15,7 @@
 #include "Poco/DOM/NamedNodeMap.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 NamedNodeMap::~NamedNodeMap()
@@ -24,4 +23,4 @@ NamedNodeMap::~NamedNodeMap()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

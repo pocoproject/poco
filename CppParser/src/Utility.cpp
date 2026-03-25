@@ -38,8 +38,7 @@ using Poco::NumberFormatter;
 using Poco::Exception;
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 void Utility::parseDir(const std::vector <std::string>& includePattern, const std::vector <std::string>& excludePattern, NameSpace::SymbolTable& st, const std::string& exec, const std::string& options, const std::string& path)
@@ -297,4 +296,4 @@ std::string replace(const std::string& input, const std::string& oldToken, const
 	return result;
 }
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

@@ -34,9 +34,7 @@ extern "C"
 }
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 class SQLite_API Utility
@@ -56,6 +54,7 @@ public:
 
 	static const std::string SQLITE_DATE_FORMAT;
 	static const std::string SQLITE_TIME_FORMAT;
+	static const std::string SQLITE_DATETIME_FRAC_FORMAT;
 	typedef std::map<std::string, MetaColumn::ColumnDataType> TypeMap;
 
 	static const int THREAD_MODE_SINGLE;
@@ -254,7 +253,7 @@ inline bool Utility::fileToMemory(const Session& session, const std::string& fil
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite
 
 
 #endif // SQLite_Utility_INCLUDED

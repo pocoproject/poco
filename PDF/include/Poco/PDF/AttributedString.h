@@ -11,8 +11,7 @@
 #include "Poco/Dynamic/Var.h"
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 class PDF_API AttributedString
@@ -63,7 +62,7 @@ private:
 };
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_AttributedString_INCLUDED

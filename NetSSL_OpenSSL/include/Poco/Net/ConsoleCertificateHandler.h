@@ -22,8 +22,7 @@
 #include "Poco/Net/InvalidCertificateHandler.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API ConsoleCertificateHandler: public InvalidCertificateHandler
@@ -44,7 +43,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_ConsoleCertificateHandler_INCLUDED

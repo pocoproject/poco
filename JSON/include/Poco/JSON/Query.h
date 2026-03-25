@@ -23,8 +23,7 @@
 #include "Poco/JSON/Array.h"
 
 
-namespace Poco {
-namespace JSON {
+namespace Poco::JSON {
 
 
 class JSON_API Query
@@ -126,7 +125,7 @@ private:
 };
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON
 
 
 #endif // JSON_JSONQuery_INCLUDED

@@ -26,8 +26,7 @@
 #include "Poco/FileStream.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 DOMWriter::DOMWriter():
@@ -98,5 +97,5 @@ void DOMWriter::writeNode(const std::string& systemId, const Node* pNode)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 

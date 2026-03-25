@@ -23,8 +23,7 @@
 #include "Poco/DOM/DOMObject.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class EventTarget;
@@ -212,7 +211,7 @@ inline bool Event::isStopped() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_Event_INCLUDED

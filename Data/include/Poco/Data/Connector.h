@@ -23,8 +23,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API Connector
@@ -52,7 +51,7 @@ public:
 };
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_Connector_INCLUDED

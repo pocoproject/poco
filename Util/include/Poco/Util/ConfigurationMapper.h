@@ -22,8 +22,7 @@
 #include "Poco/Util/AbstractConfiguration.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API ConfigurationMapper: public AbstractConfiguration
@@ -90,7 +89,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_ConfigurationMapper_INCLUDED

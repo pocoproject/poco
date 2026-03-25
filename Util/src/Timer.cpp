@@ -21,8 +21,7 @@
 using Poco::ErrorHandler;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class TimerNotification: public Poco::Notification
@@ -345,4 +344,4 @@ void Timer::validateTask(const TimerTask::Ptr& pTask)
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

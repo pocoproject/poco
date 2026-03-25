@@ -24,8 +24,7 @@
 #include "Poco/Net/Context.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API SecureServerSocketImpl: public ServerSocketImpl
@@ -192,7 +191,7 @@ inline Context::Ptr SecureServerSocketImpl::context() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_SecureServerSocketImpl_INCLUDED

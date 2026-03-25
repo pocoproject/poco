@@ -26,8 +26,7 @@
 #include "Poco/Mutex.h"
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API TimerTask: public Poco::RefCountedObject, public Poco::Runnable
@@ -132,7 +131,7 @@ inline void TimerTask::updateLastExecution()
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // Util_TimerTask_INCLUDED

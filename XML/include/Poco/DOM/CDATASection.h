@@ -22,8 +22,7 @@
 #include "Poco/DOM/Text.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API CDATASection: public Text
@@ -82,7 +81,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_CDATASection_INCLUDED

@@ -26,9 +26,7 @@
 #include <libpq-fe.h>
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 class SessionParameters
@@ -332,7 +330,7 @@ inline bool SessionHandle::isAsynchronousCommit() const
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif // SQL_PostgreSQL_SessionHandle_INCLUDED

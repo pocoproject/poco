@@ -29,8 +29,7 @@
 #include <atomic>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API TCPServerDispatcher: public Poco::Runnable
@@ -133,7 +132,7 @@ inline const TCPServerParams& TCPServerDispatcher::params() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_TCPServerDispatcher_INCLUDED

@@ -22,8 +22,7 @@
 #include "Poco/Data/Statement.h"
 
 
-namespace Poco {
-namespace ActiveRecord {
+namespace Poco::ActiveRecord {
 
 
 template <typename ActRec>
@@ -231,7 +230,7 @@ private:
 };
 
 
-} } // namespace Poco::ActiveRecord
+} // namespace Poco::ActiveRecord
 
 
 #endif // ActiveRecord_select_INCLUDED

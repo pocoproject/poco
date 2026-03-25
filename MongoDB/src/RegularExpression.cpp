@@ -15,8 +15,7 @@
 #include "Poco/MongoDB/RegularExpression.h"
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 RegularExpression::RegularExpression()
@@ -74,4 +73,4 @@ SharedPtr<Poco::RegularExpression> RegularExpression::createRE() const
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

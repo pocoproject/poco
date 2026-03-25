@@ -35,8 +35,7 @@
 #include "Poco/SAX/SAXException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 const XMLString DOMSerializer::CDATA = toXMLString("CDATA");
@@ -320,4 +319,4 @@ void DOMSerializer::handleEntity(const Entity* pEntity) const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

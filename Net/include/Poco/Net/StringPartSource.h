@@ -23,8 +23,7 @@
 #include <sstream>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API StringPartSource: public PartSource
@@ -68,7 +67,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_StringPartSource_INCLUDED

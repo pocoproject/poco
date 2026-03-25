@@ -23,8 +23,7 @@
 #include "Poco/Zip/ZipUtil.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Zip_API ZipArchiveInfo
@@ -425,7 +424,7 @@ inline void ZipArchiveInfo64::setTotalNumberOfDisks(Poco::UInt32 val)
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_ZipArchiveInfo_INCLUDED

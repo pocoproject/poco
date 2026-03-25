@@ -22,8 +22,7 @@
 #include "Poco/Crypto/CipherKeyImpl.h"
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API CipherKey
@@ -215,7 +214,7 @@ inline CipherKeyImpl::Ptr CipherKey::impl()
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_CipherKey_INCLUDED

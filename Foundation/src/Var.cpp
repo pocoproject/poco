@@ -21,8 +21,7 @@
 #include <deque>
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 Var::Var()
@@ -629,4 +628,4 @@ Var& Var::structIndexOperator(VarHolderImpl<Struct<int>>* pStr, int n) const
 }
 */
 
-} } // namespace Poco::Dynamic
+} // namespace Poco::Dynamic

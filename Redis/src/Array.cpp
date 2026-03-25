@@ -17,8 +17,7 @@
 #include "Poco/Redis/Array.h"
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 Array::Array()
@@ -64,4 +63,4 @@ std::string Array::toString() const
 }
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis

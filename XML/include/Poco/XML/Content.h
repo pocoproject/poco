@@ -21,8 +21,7 @@
 #define XML_Content_INCLUDED
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 struct Content
@@ -58,7 +57,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // XML_Content_INCLUDED

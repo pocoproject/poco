@@ -10,8 +10,7 @@
 #include <memory>
 #include <vector>
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API TCPReactorAcceptor : public Poco::Net::SocketAcceptor<TCPReactorServerConnection>
@@ -24,6 +23,7 @@ public:
 	
 	[[nodiscard]]
 	SocketReactor& reactor();
+	void stop();
 
 	void setRecvMessageCallback(const RecvMessageCallback& cb)
 	{
@@ -43,9 +43,10 @@ private:
 	std::shared_ptr<ThreadPool>                 _threadPool;
 	RecvMessageCallback                         _recvMessageCallback;
 	TCPServerParams::Ptr                        _pParams;
+	std::atomic<bool>                           _stopped{false};
 };
 
-}} // namespace Poco::Net
+} // namespace Poco::Net
 
 #endif // Net_TCPReactorAcceptor_INCLUDED
 

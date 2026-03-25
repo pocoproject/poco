@@ -25,8 +25,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API TCPServerParams: public Poco::RefCountedObject
@@ -167,7 +166,7 @@ inline Poco::Thread::Priority TCPServerParams::getThreadPriority() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_TCPServerParams_INCLUDED

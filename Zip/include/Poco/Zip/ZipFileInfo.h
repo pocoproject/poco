@@ -22,8 +22,7 @@
 #include "Poco/Zip/ZipCommon.h"
 #include "Poco/Zip/ZipUtil.h"
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class ZipLocalFileHeader;
@@ -539,7 +538,7 @@ inline void ZipFileInfo::setExternalFileAttributes(Poco::UInt32 attrs)
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_ZipFileInfo_INCLUDED

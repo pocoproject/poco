@@ -22,8 +22,7 @@
 #include "Poco/PDF/Resource.h"
 
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 class PDF_API Image: public Resource<HPDF_Image>
@@ -69,7 +68,7 @@ public:
 
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF
 
 
 #endif // PDF_Image_INCLUDED

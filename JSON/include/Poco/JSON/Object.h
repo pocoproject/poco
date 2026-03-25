@@ -33,13 +33,11 @@
 #include <sstream>
 
 
-namespace Poco {
-
-namespace JSON {
+namespace Poco::JSON {
 
 class JSON_API Object;
 
-}
+} // namespace Poco::JSON
 
 #if defined(POCO_OS_FAMILY_WINDOWS) && defined(JSON_EXPORTS)
 // Explicitly instatiated shared pointer in JSON library
@@ -49,7 +47,7 @@ extern template class Poco::SharedPtr<Poco::JSON::Object>;
 extern template class JSON_API Poco::SharedPtr<Poco::JSON::Object>;
 #endif
 
-namespace JSON {
+namespace Poco::JSON {
 
 class JSON_API Object
 	/// Represents a JSON object. Object provides a representation based on
@@ -541,11 +539,10 @@ inline const Dynamic::Var& Object::getValue(KeyList::const_iterator& it) const
 }
 
 
-} } // namespace Poco::JSON
+} // namespace Poco::JSON
 
 
-namespace Poco {
-namespace Dynamic {
+namespace Poco::Dynamic {
 
 
 template <>
@@ -828,7 +825,7 @@ private:
 };
 
 
-} } // namespace Poco::Dynamic
+} // namespace Poco::Dynamic
 
 
 #endif // JSON_Object_INCLUDED

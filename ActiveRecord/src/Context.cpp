@@ -18,8 +18,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace ActiveRecord {
+namespace Poco::ActiveRecord {
 
 
 Context::Context(const Poco::Data::Session& session):
@@ -43,4 +42,4 @@ StatementPlaceholderProvider::Ptr Context::statementPlaceholderProvider() const
 }
 
 
-} } // namespace Poco::ActiveRecord
+} // namespace Poco::ActiveRecord

@@ -35,8 +35,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 using UDPMsgSizeT = int;
@@ -395,7 +394,7 @@ private:
 using UDPHandler = UDPHandlerImpl<POCO_UDP_BUF_SIZE>;
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_UDPHandler_INCLUDED

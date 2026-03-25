@@ -15,8 +15,7 @@
 #include "Poco/Net/HTTPServerRequest.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPServerRequest::HTTPServerRequest()
@@ -29,4 +28,4 @@ HTTPServerRequest::~HTTPServerRequest()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

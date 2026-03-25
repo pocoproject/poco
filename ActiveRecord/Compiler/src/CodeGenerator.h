@@ -17,9 +17,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace ActiveRecord {
-namespace Compiler {
+namespace Poco::ActiveRecord::Compiler {
 
 
 class CodeGenerator
@@ -65,7 +63,7 @@ inline const std::string& CodeGenerator::source() const
 }
 
 
-} } } // namespace Poco::ActiveRecord::Compiler
+} // namespace Poco::ActiveRecord::Compiler
 
 
 #endif // ActiveRecordCompiler_CodeGenerator_INCLUDED

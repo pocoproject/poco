@@ -26,8 +26,7 @@
 #include "Poco/Net/X509Certificate.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class SecureStreamSocket;
@@ -163,7 +162,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPSClientSession_INCLUDED

@@ -24,8 +24,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 Connection::SocketFactory::SocketFactory() = default;
@@ -128,6 +127,22 @@ void Connection::connect(const Poco::Net::SocketAddress& addrs)
 {
 	_address = addrs;
 	connect();
+}
+
+
+void Connection::connect(const Poco::Net::SocketAddress& addrs, const Poco::Timespan& connectTimeout, const Poco::Timespan& socketTimeout)
+{
+	_address = addrs;
+	if (connectTimeout > 0)
+		_socket.connect(_address, connectTimeout);
+	else
+		_socket.connect(_address);
+
+	if (socketTimeout > 0)
+	{
+		_socket.setSendTimeout(socketTimeout);
+		_socket.setReceiveTimeout(socketTimeout);
+	}
 }
 
 
@@ -237,4 +252,4 @@ void Connection::readResponse(OpMsgMessage& response)
 
 
 
-} } // Poco::MongoDB
+} // namespace Poco::MongoDB

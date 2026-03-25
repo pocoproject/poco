@@ -23,8 +23,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 MetricsRequestHandler::MetricsRequestHandler():
@@ -66,4 +65,4 @@ void MetricsRequestHandler::handleRequest(Poco::Net::HTTPServerRequest& request,
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus

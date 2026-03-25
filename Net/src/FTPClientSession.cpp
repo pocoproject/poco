@@ -24,8 +24,7 @@
 using Poco::NumberFormatter;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 FTPClientSession::FTPClientSession(Poco::UInt16 activeDataPort):
@@ -634,4 +633,4 @@ void FTPClientSession::endTransfer()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

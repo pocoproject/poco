@@ -29,8 +29,7 @@
 #include <utility>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class RecordSet;
@@ -285,7 +284,7 @@ inline bool RowFilter::isNull(const Poco::Dynamic::Var& p1, const Poco::Dynamic:
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_RowFilter_INCLUDED

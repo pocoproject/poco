@@ -29,9 +29,7 @@
 #include "Poco/Dynamic/Var.h"
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 class PostgreSQL_API Extractor: public Poco::Data::AbstractExtractor
@@ -455,7 +453,7 @@ inline bool Extractor::isColumnNull(const OutputParameter& outputParameter) cons
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif // SQL_PostgreSQL_Extractor_INCLUDED

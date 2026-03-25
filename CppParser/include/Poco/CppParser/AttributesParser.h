@@ -23,8 +23,7 @@
 #include "Poco/CppParser/Attributes.h"
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API AttributesParser
@@ -113,7 +112,7 @@ inline bool AttributesParser::isLiteral(const Poco::Token* pToken)
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_AttributesParser_INCLUDED

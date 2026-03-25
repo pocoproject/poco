@@ -25,8 +25,7 @@
 #include "Poco/Mutex.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API SessionPoolContainer
@@ -113,7 +112,7 @@ inline int SessionPoolContainer::count() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_SessionPoolContainer_INCLUDED

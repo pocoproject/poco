@@ -23,8 +23,7 @@
 #include "Poco/XML/XMLString.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 POCO_DECLARE_EXCEPTION(XML_API, SAXException, XMLException)
@@ -177,7 +176,7 @@ inline int SAXParseException::getColumnNumber() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_SAXException_INCLUDED

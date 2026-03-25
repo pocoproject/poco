@@ -17,8 +17,7 @@
 #include "Poco/Thread.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 SecureStreamSocketImpl::SecureStreamSocketImpl(Context::Ptr pContext):
@@ -237,4 +236,4 @@ void SecureStreamSocketImpl::getRawOption(int level, int option, void* value, po
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

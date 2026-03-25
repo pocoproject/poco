@@ -23,8 +23,7 @@
 #include "Poco/SharedPtr.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API TCPServerConnectionFactory
@@ -125,7 +124,7 @@ public:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_TCPServerConnectionFactory_INCLUDED

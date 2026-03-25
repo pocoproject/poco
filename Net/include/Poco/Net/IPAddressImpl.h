@@ -24,9 +24,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace Net {
-namespace Impl {
+namespace Poco::Net::Impl {
 
 
 class IPAddressImpl : public Poco::RefCountedObject
@@ -253,7 +251,7 @@ private:
 #endif // POCO_HAVE_IPv6
 
 
-} } } // namespace Poco::Net::Impl
+} // namespace Poco::Net::Impl
 
 
 #endif // Net_IPAddressImpl_INCLUDED

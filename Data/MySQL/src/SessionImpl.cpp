@@ -34,9 +34,7 @@ namespace
 }
 
 
-namespace Poco {
-namespace Data {
-namespace MySQL {
+namespace Poco::Data::MySQL {
 
 
 const std::string SessionImpl::MYSQL_READ_UNCOMMITTED = "READ UNCOMMITTED";
@@ -382,4 +380,4 @@ void SessionImpl::setConnectionTimeout(std::size_t timeout)
 }
 
 
-} } } // namespace Poco::Data::MySQL
+} // namespace Poco::Data::MySQL

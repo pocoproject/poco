@@ -25,8 +25,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class SessionPool;
@@ -109,7 +108,7 @@ inline SessionImpl* PooledSessionImpl::impl() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_PooledSessionImpl_INCLUDED

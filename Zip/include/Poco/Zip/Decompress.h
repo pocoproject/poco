@@ -25,8 +25,7 @@
 #include "Poco/BasicEvent.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class ZipArchive;
@@ -88,7 +87,7 @@ inline const Decompress::ZipMapping& Decompress::mapping() const
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_Decompress_INCLUDED

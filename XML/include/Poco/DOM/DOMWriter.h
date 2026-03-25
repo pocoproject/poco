@@ -24,8 +24,7 @@
 #include "Poco/TextEncoding.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class Node;
@@ -125,7 +124,7 @@ inline const std::string& DOMWriter::getIndent() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_DOMWriter_INCLUDED

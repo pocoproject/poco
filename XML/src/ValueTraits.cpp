@@ -21,8 +21,7 @@
 #include "Poco/XML/XMLStreamParserException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 bool DefaultValueTraits<bool>::parse(std::string s, const XMLStreamParser& p)
@@ -36,4 +35,4 @@ bool DefaultValueTraits<bool>::parse(std::string s, const XMLStreamParser& p)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

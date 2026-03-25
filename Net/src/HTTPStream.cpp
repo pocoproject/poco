@@ -16,8 +16,7 @@
 #include "Poco/Net/HTTPSession.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 //
@@ -169,4 +168,4 @@ void HTTPOutputStream::operator delete(void* ptr)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

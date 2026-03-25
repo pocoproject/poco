@@ -30,8 +30,7 @@
 #include <openssl/ec.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class X509Certificate;
@@ -174,7 +173,7 @@ inline void ECKeyImpl::save(std::ostream* pPublicKeyStream,
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_ECKeyImplImpl_INCLUDED

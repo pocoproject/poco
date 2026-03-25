@@ -15,8 +15,7 @@
 #include "Poco/SAX/InputSource.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 InputSource::InputSource():
@@ -76,5 +75,5 @@ void InputSource::setCharacterStream(XMLCharInputStream& cistr)
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 

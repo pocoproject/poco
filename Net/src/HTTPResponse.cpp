@@ -32,8 +32,7 @@ using Poco::DateTimeFormat;
 using Poco::DateTimeParser;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string HTTPResponse::HTTP_REASON_CONTINUE                        = "Continue";
@@ -438,4 +437,4 @@ const std::string& HTTPResponse::getReasonForStatus(HTTPStatus status)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

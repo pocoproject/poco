@@ -21,8 +21,7 @@
 #include <memory>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 	
 	
 template <class C, class N>
@@ -173,7 +172,7 @@ private:
 	mutable Poco::Mutex _mutex;
 };
 
-}} // namespace Poco:Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPObserver_INCLUDED

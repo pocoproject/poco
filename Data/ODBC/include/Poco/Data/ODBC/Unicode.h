@@ -44,9 +44,7 @@
 #endif
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 #if defined(POCO_PTR_IS_64_BIT) || defined(POCO_OS_FAMILY_UNIX) // mkrivos - POCO_OS_FAMILY_UNIX doesn't compile with SQLPOINTER & SQLColAttribute()
@@ -1053,7 +1051,7 @@ inline SQLRETURN SQLDrivers(SQLHENV henv,
 #endif // POCO_ODBC_UNICODE
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif // ODBC_Unicode_INCLUDED

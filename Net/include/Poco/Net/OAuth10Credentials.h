@@ -22,8 +22,7 @@
 #include "Poco/URI.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPRequest;
@@ -279,7 +278,7 @@ inline const std::string& OAuth10Credentials::getCallback() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_OAuth10Credentials_INCLUDED

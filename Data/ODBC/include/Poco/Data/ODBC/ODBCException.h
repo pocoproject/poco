@@ -25,9 +25,7 @@
 #include "Poco/Format.h"
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 POCO_DECLARE_EXCEPTION(ODBC_API, ODBCException, Poco::Data::DataException)
@@ -167,7 +165,7 @@ using StatementException = HandleException<SQLHSTMT, SQL_HANDLE_STMT>;
 using DescriptorException = HandleException<SQLHDESC, SQL_HANDLE_DESC>;
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif

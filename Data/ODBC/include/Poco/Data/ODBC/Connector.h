@@ -22,9 +22,7 @@
 #include "Poco/Data/Connector.h"
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 class ODBC_API Connector: public Poco::Data::Connector
@@ -93,7 +91,7 @@ inline bool Connector::stringBoundToLongVarChar()
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif // Data_ODBC_Connector_INCLUDED

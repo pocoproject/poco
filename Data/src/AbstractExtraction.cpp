@@ -15,8 +15,7 @@
 #include "Poco/Data/AbstractExtraction.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 AbstractExtraction::AbstractExtraction(Poco::UInt32 limit,
@@ -37,4 +36,4 @@ AbstractExtraction::~AbstractExtraction()
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

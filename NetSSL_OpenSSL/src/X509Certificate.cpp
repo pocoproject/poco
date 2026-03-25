@@ -27,8 +27,7 @@
 #include <openssl/err.h>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 X509Certificate::X509Certificate(std::istream& istr):
@@ -199,4 +198,4 @@ bool X509Certificate::matchWildcard(const std::string& wildcard, const std::stri
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -33,9 +33,7 @@ extern "C"
 }
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 class SQLite_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
@@ -205,7 +203,7 @@ inline TransactionType SessionImpl::getTransactionType() const
 	return _transactionType;
 }
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite
 
 
 #endif // Data_SQLite_SessionImpl_INCLUDED

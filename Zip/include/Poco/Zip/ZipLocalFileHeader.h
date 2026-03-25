@@ -26,8 +26,7 @@
 #include <istream>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class ParseCallback;
@@ -537,7 +536,7 @@ inline std::streamoff ZipLocalFileHeader::getDataEndPos() const
 }
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_ZipLocalFileHeader_INCLUDED

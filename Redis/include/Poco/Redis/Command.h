@@ -24,8 +24,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 class Redis_API Command: public Array
@@ -358,8 +357,7 @@ public:
 };
 
 
-} // namespace Redis
-} // namespace Poco
+} // namespace Poco::Redis
 
 
 #endif // Redis_Command_INCLUDED

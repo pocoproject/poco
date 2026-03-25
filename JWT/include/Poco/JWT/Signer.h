@@ -26,8 +26,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace JWT {
+namespace Poco::JWT {
 
 
 class JWT_API Signer
@@ -195,7 +194,7 @@ inline Poco::SharedPtr<Poco::Crypto::ECKey> Signer::getECKey() const
 }
 
 
-} } // namespace Poco::JWT
+} // namespace Poco::JWT
 
 
 #endif // JWT_Signer_INCLUDED

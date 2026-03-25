@@ -25,8 +25,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Redis {
+namespace Poco::Redis {
 
 
 class RedisStreamBuf: public BufferedStreamBuf
@@ -111,7 +110,7 @@ public:
 };
 
 
-} } // namespace Poco::Redis
+} // namespace Poco::Redis
 
 
 #endif // Redis_RedisStream_INCLUDED

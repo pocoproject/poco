@@ -23,8 +23,7 @@
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 Binary::Binary():
@@ -116,4 +115,4 @@ UUID Binary::uuid() const
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

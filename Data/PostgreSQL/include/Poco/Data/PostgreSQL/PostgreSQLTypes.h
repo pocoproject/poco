@@ -23,9 +23,7 @@
 #include <libpq-fe.h>
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 /// Oid constants duplicated from PostgreSQL "include/postgresql/server/catalog/pg_type.h"
@@ -432,7 +430,7 @@ inline PGCancelFree::~PGCancelFree()
 }
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif // SQL_PostgreSQL_Types_INCLUDED

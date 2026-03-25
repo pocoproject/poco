@@ -22,8 +22,7 @@
 #include "Poco/Net/HTTPMessage.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API HTTPRequest: public HTTPMessage
@@ -209,7 +208,7 @@ inline const std::string& HTTPRequest::getURI() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPRequest_INCLUDED

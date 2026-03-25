@@ -18,8 +18,7 @@
 #include "Poco/DOM/DOMException.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 DTDMap::DTDMap(const DocumentType* pDocumentType, unsigned short type):
@@ -114,4 +113,4 @@ void DTDMap::autoRelease()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

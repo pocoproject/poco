@@ -36,8 +36,7 @@ using Poco::Path;
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 std::map<std::string, std::function<std::string ()>> SystemConfiguration::_functions = {
@@ -146,4 +145,4 @@ std::string SystemConfiguration::getNodeId()
 	}
 }
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

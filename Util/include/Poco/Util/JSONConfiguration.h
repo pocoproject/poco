@@ -29,8 +29,7 @@
 #include <istream>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API JSONConfiguration : public AbstractConfiguration
@@ -117,7 +116,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 #endif // POCO_UTIL_NO_JSONCONFIGURATION

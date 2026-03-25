@@ -175,13 +175,13 @@ package manager. It needs to be [installed](https://conan.io/downloads.html) fir
 You can install Poco libraries from [Conan Center](https://conan.io/center.html):
 
 ```
-$ conan install --requires=poco/1.15.0
+$ conan install --requires=poco/1.15.1
 ```
 
 Or, you can download Poco recipe and build locally:
 
 ```
-$ conan install --requires=poco/1.15.0 --build=poco
+$ conan install --requires=poco/1.15.1 --build=poco
 ```
 
 The Poco recipe and packages in Conan Center are kept up to date by Conan team members and community contributors.

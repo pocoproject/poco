@@ -17,8 +17,7 @@
 
 #include <hpdf.h>
 
-namespace Poco {
-namespace PDF {
+namespace Poco::PDF {
 
 
 Outline::Outline(HPDF_Doc* pPDF, const HPDF_Outline& outline, const std::string& name):
@@ -57,4 +56,4 @@ void Outline::destination(const Destination& dest)
 }
 
 
-} } // namespace Poco::PDF
+} // namespace Poco::PDF

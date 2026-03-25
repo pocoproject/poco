@@ -23,8 +23,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 Function::Function(const std::string& decl, NameSpace* pNameSpace):
@@ -252,4 +251,4 @@ std::string Function::toString() const
 }
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser

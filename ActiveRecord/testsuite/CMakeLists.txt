@@ -29,7 +29,6 @@ else()
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMAND ActiveRecord-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
-	set_tests_properties(ActiveRecord PROPERTIES ENVIRONMENT POCO_BASE=${PROJECT_SOURCE_DIR})
 endif()
 
 target_link_libraries(ActiveRecord-testrunner PUBLIC Poco::DataSQLite Poco::Data Poco::ActiveRecord CppUnit)

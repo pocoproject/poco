@@ -24,8 +24,7 @@ using Poco::NumberParser;
 using Poco::icompare;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 const std::string HTTPMessage::HTTP_1_0                   = "HTTP/1.0";
@@ -200,4 +199,4 @@ bool HTTPMessage::getKeepAlive() const
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

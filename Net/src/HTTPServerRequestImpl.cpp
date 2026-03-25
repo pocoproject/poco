@@ -28,8 +28,7 @@
 using Poco::icompare;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPServerRequestImpl::HTTPServerRequestImpl(HTTPServerResponseImpl& response, HTTPSession& session, HTTPServerParams* pParams):
@@ -85,4 +84,4 @@ StreamSocket HTTPServerRequestImpl::detachSocket()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

@@ -24,8 +24,7 @@
 #include <cstddef>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class Net_API ICMPv4PacketImpl : public ICMPPacketImpl
@@ -187,7 +186,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_ICMPv4PacketImpl_INCLUDED

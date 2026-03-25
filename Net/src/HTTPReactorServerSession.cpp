@@ -3,8 +3,7 @@
 #include "Poco/String.h"
 #include <cstddef>
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 HTTPReactorServerSession::HTTPReactorServerSession(
@@ -209,6 +208,19 @@ int HTTPReactorServerSession::peek()
 	}
 }
 
+int HTTPReactorServerSession::read(char* buffer, std::streamsize length)
+{
+	if (_idx < _complete)
+	{
+		int n = static_cast<int>(_complete - _idx);
+		if (n > static_cast<int>(length)) n = static_cast<int>(length);
+		std::memcpy(buffer, _buf.data() + _idx, n);
+		_idx += n;
+		return n;
+	}
+	return 0;
+}
+
 int HTTPReactorServerSession::write(const char* buffer, std::streamsize length)
 {
 	try
@@ -221,5 +233,5 @@ int HTTPReactorServerSession::write(const char* buffer, std::streamsize length)
 	}
 }
 
-}} // namespace Poco::Net
+} // namespace Poco::Net
 

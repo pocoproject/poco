@@ -27,8 +27,7 @@
 #include "Poco/BasicEvent.h"
 
 
-namespace Poco {
-namespace DNSSD {
+namespace Poco::DNSSD {
 
 
 class DNSSDBrowser;
@@ -188,7 +187,7 @@ private:
 };
 
 
-} } // namespace Poco::DNSSD
+} // namespace Poco::DNSSD
 
 
 #endif // DNSSD_DNSSDResponder_INCLUDED

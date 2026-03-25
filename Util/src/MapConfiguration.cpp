@@ -16,8 +16,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 void MapConfiguration::copyTo(AbstractConfiguration& config)
@@ -99,4 +98,4 @@ void MapConfiguration::removeRaw(const std::string& key)
 }
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util

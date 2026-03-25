@@ -27,8 +27,7 @@
 #include <ostream>
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class ZipArchive;
@@ -147,7 +146,7 @@ public:
 };
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_ZipStream_INCLUDED

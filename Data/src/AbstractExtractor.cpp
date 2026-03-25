@@ -17,8 +17,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 AbstractExtractor::AbstractExtractor(Poco::TextEncoding::Ptr pDBEncoding,
@@ -235,4 +234,4 @@ bool AbstractExtractor::extract(std::size_t pos, Poco::Nullable<Poco::Dynamic::V
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data

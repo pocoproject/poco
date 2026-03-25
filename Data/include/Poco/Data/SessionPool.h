@@ -29,8 +29,7 @@
 #include <list>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Data_API SessionPool: public RefCountedObject
@@ -247,7 +246,7 @@ inline bool SessionPool::isActive() const
 }
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_SessionPool_INCLUDED

@@ -23,8 +23,7 @@
 #include "Poco/TextEncoding.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class ParserEngine;
@@ -117,7 +116,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_SAXParser_INCLUDED

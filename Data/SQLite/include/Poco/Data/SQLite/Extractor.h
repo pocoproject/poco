@@ -38,9 +38,7 @@
 #include <utility>
 
 
-namespace Poco {
-namespace Data {
-namespace SQLite {
+namespace Poco::Data::SQLite {
 
 
 class SQLite_API Extractor: public Poco::Data::AbstractExtractor
@@ -624,7 +622,7 @@ inline bool Extractor::extract(std::size_t pos, Poco::Data::CLOB& val)
 }
 
 
-} } } // namespace Poco::Data::SQLite
+} // namespace Poco::Data::SQLite
 
 
 #endif // Data_SQLite_Extractor_INCLUDED

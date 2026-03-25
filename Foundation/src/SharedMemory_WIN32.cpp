@@ -19,6 +19,7 @@
 #include "Poco/Format.h"
 #include "Poco/UnicodeConverter.h"
 #include "Poco/UnWindows.h"
+#include <limits>
 
 
 namespace Poco {
@@ -51,7 +52,7 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 #endif
 	_memHandle = CreateFileMappingW(INVALID_HANDLE_VALUE, nullptr, _mode, dwMaxSizeHigh, dwMaxSizeLow, utf16name.c_str());
 
-	if (!_memHandle)
+	if (_memHandle == nullptr)
 	{
 		DWORD dwRetVal = GetLastError();
 		int retVal = static_cast<int>(dwRetVal);
@@ -63,7 +64,7 @@ SharedMemoryImpl::SharedMemoryImpl(const std::string& name, std::size_t size, Sh
 		}
 
 		_memHandle = OpenFileMappingW(PAGE_READONLY, FALSE, utf16name.c_str());
-		if (!_memHandle)
+		if (_memHandle == nullptr)
 		{
 			dwRetVal = GetLastError();
 			throw SystemException(Poco::format("Cannot open shared memory object %s [Error %d: %s]",
@@ -128,7 +129,7 @@ void SharedMemoryImpl::map()
 	if (_mode == PAGE_READWRITE)
 		access = FILE_MAP_WRITE;
 	LPVOID addr = MapViewOfFile(_memHandle, access, 0, 0, _size);
-	if (!addr)
+	if (addr == nullptr)
 	{
 		DWORD dwRetVal = GetLastError();
 		throw SystemException(format("Cannot map shared memory object %s [Error %d: %s]", _name, (int)dwRetVal, Error::getMessage(dwRetVal)));

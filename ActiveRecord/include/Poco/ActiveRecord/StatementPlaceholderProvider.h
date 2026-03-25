@@ -21,8 +21,7 @@
 #include <memory>
 
 
-namespace Poco {
-namespace ActiveRecord {
+namespace Poco::ActiveRecord {
 
 
 class ActiveRecordLib_API StatementPlaceholderProvider
@@ -62,7 +61,7 @@ private:
 };
 
 
-} } // namespace Poco::ActiveRecord
+} // namespace Poco::ActiveRecord
 
 
 #endif // ActiveRecord_StatementPlaceholderProvider_INCLUDED

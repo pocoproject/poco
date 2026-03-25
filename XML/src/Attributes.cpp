@@ -15,8 +15,7 @@
 #include "Poco/SAX/Attributes.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 Attributes::~Attributes()
@@ -24,4 +23,4 @@ Attributes::~Attributes()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

@@ -28,9 +28,7 @@
 #include <libpq-fe.h>
 
 
-namespace Poco {
-namespace Data {
-namespace PostgreSQL {
+namespace Poco::Data::PostgreSQL {
 
 
 class PostgreSQL_API Binder: public Poco::Data::AbstractBinder
@@ -260,7 +258,7 @@ private:
 };
 
 
-} } } // namespace Poco::Data::PostgreSQL
+} // namespace Poco::Data::PostgreSQL
 
 
 #endif // Data_PostgreSQL_Binder_INCLUDED

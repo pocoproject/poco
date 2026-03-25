@@ -15,8 +15,7 @@
 #include "Poco/Net/MailStream.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 MailStreamBuf::MailStreamBuf(std::istream& istr):
@@ -223,4 +222,4 @@ MailOutputStream::~MailOutputStream()
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net

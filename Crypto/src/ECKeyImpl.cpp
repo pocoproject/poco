@@ -25,8 +25,7 @@
 #include <openssl/bn.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 ECKeyImpl::ECKeyImpl(const EVPPKey& key):
@@ -254,4 +253,4 @@ bool ECKeyImpl::hasCurve(const std::string& name)
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

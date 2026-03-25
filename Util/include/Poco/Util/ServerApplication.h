@@ -27,8 +27,7 @@
 #include <functional>
 
 
-namespace Poco {
-namespace Util {
+namespace Poco::Util {
 
 
 class Util_API ServerApplication: public Application
@@ -239,7 +238,7 @@ private:
 };
 
 
-} } // namespace Poco::Util
+} // namespace Poco::Util
 
 
 //

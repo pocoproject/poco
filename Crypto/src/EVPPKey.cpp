@@ -25,8 +25,7 @@
 #include <openssl/param_build.h>
 #endif
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 const std::map<int, std::string> EVPPKey::KNOWN_TYPES =
@@ -607,4 +606,4 @@ int EVPPKey::passCB(char* buf, int size, int, void* pass)
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

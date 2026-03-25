@@ -25,9 +25,7 @@
 #include <sqltypes.h>
 
 
-namespace Poco {
-namespace Data {
-namespace ODBC {
+namespace Poco::Data::ODBC {
 
 
 class ODBC_API EnvironmentHandle
@@ -91,7 +89,7 @@ inline SQLHENV& EnvironmentHandle::handle()
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} // namespace Poco::Data::ODBC
 
 
 #endif

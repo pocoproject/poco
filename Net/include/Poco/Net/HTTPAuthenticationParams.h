@@ -22,8 +22,7 @@
 #include "Poco/Net/NameValueCollection.h"
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class HTTPRequest;
@@ -103,7 +102,7 @@ private:
 };
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // Net_HTTPAuthenticationParams_INCLUDED

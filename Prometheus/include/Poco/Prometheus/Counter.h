@@ -23,8 +23,7 @@
 #include "Poco/Mutex.h"
 
 
-namespace Poco {
-namespace Prometheus {
+namespace Poco::Prometheus {
 
 
 class Prometheus_API CounterSample
@@ -188,7 +187,7 @@ inline void Counter::inc(double v)
 }
 
 
-} } // namespace Poco::Prometheus
+} // namespace Poco::Prometheus
 
 
 #endif // Prometheus_Counter_INCLUDED

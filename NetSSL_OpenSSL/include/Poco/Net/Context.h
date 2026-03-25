@@ -31,8 +31,7 @@
 #include <cstdlib>
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 class NetSSL_API Context: public Poco::RefCountedObject
@@ -561,7 +560,7 @@ inline Context::InvalidCertificateHandlerPtr Context::getInvalidCertificateHandl
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
 
 
 #endif // NetSSL_Context_INCLUDED

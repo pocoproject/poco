@@ -38,8 +38,7 @@
 #include <sqlext.h>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 class Date;
@@ -1289,7 +1288,7 @@ inline Poco::Any& Preparator::at(std::size_t pos)
 }
 
 
-} } } // namespace Poco::Data::ODBC
+} } // namespace Poco::Data
 
 
 #endif // Data_ODBC_Preparator_INCLUDED

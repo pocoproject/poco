@@ -24,8 +24,7 @@
 #include <openssl/err.h>
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 PKCS12Container::PKCS12Container(std::istream& istr, const std::string& password) : _pKey(nullptr)
@@ -128,7 +127,7 @@ std::string PKCS12Container::extractFriendlyName(X509* pCert)
 	if(pCert)
 	{
 		int length = 0;
-		char* pBuffer = reinterpret_cast<char*>(X509_alias_get0(pCert, &length));
+		auto pBuffer = reinterpret_cast<const char*>(X509_alias_get0(pCert, &length));
 		if (pBuffer)
 		{
 			friendlyName.append(pBuffer, length);
@@ -202,4 +201,4 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto

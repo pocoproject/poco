@@ -23,8 +23,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace CppParser {
+namespace Poco::CppParser {
 
 
 class CppParser_API CppToken: public Poco::Token
@@ -300,7 +299,7 @@ public:
 };
 
 
-} } // namespace Poco::CppParser
+} // namespace Poco::CppParser
 
 
 #endif // CppParser_CppToken_INCLUDED

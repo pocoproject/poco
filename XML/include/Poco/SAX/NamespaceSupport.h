@@ -25,8 +25,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API NamespaceSupport
@@ -193,7 +192,7 @@ private:
 };
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // SAX_NamespaceSupport_INCLUDED

@@ -15,8 +15,7 @@
 #include "Poco/SAX/XMLFilter.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 XMLFilter::~XMLFilter()
@@ -24,4 +23,4 @@ XMLFilter::~XMLFilter()
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML

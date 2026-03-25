@@ -21,8 +21,7 @@
 #include "Poco/Zip/Zip.h"
 
 
-namespace Poco {
-namespace Zip {
+namespace Poco::Zip {
 
 
 class Zip_API ZipCommon
@@ -115,7 +114,7 @@ public:
 };
 
 
-} } // namespace Poco::Zip
+} // namespace Poco::Zip
 
 
 #endif // Zip_ZipCommon_INCLUDED

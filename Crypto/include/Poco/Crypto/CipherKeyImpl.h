@@ -29,8 +29,7 @@ struct evp_cipher_st;
 typedef struct evp_cipher_st EVP_CIPHER;
 
 
-namespace Poco {
-namespace Crypto {
+namespace Poco::Crypto {
 
 
 class Crypto_API CipherKeyImpl: public RefCountedObject
@@ -170,7 +169,7 @@ inline const EVP_CIPHER* CipherKeyImpl::cipher()
 }
 
 
-} } // namespace Poco::Crypto
+} // namespace Poco::Crypto
 
 
 #endif // Crypto_CipherKeyImpl_INCLUDED

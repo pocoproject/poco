@@ -24,8 +24,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace Data {
+namespace Poco::Data {
 
 
 template <class C>
@@ -403,7 +402,7 @@ private:
 };
 
 
-} } // namespace Poco::Data
+} // namespace Poco::Data
 
 
 #endif // Data_AbstractSessionImpl_INCLUDED

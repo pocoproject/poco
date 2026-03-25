@@ -24,8 +24,7 @@
 #include "Poco/XML/Name.h"
 
 
-namespace Poco {
-namespace XML {
+namespace Poco::XML {
 
 
 class XML_API Attr: public AbstractNode
@@ -189,7 +188,7 @@ inline Element* Attr::ownerElement() const
 }
 
 
-} } // namespace Poco::XML
+} // namespace Poco::XML
 
 
 #endif // DOM_Attr_INCLUDED

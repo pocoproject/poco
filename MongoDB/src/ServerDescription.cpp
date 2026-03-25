@@ -14,12 +14,12 @@
 
 #include "Poco/MongoDB/ServerDescription.h"
 #include "Poco/MongoDB/Array.h"
+#include <limits>
 
 using namespace std::string_literals;
 
 
-namespace Poco {
-namespace MongoDB {
+namespace Poco::MongoDB {
 
 
 ServerDescription::ServerDescription() = default;
@@ -51,7 +51,9 @@ bool ServerDescription::operator==(const ServerDescription& other) const
 	return _type == other._type &&
 	       _address == other._address &&
 	       _setName == other._setName &&
-	       _hasError == other._hasError;
+	       _hasError == other._hasError &&
+	       _error == other._error &&
+	       _roundTripTime == other._roundTripTime;
 }
 
 
@@ -77,6 +79,21 @@ std::vector<Net::SocketAddress> ServerDescription::updateFromHelloResponse(const
 		_setName = helloResponse.get<std::string>("setName"s);
 	}
 
+	// Parse lastWrite.lastWriteDate for staleness calculation
+	// See: https://www.mongodb.com/docs/manual/reference/command/hello/#std-label-hello-lastWrite
+	// The lastWriteDate is a BSON datetime (ms since epoch) indicating when
+	// the server last received a write operation.
+	_lastWriteDate = 0;
+	if (helloResponse.exists("lastWrite"s))
+	{
+		Document::Ptr lastWrite = helloResponse.get<Document::Ptr>("lastWrite"s);
+		if (!lastWrite.isNull() && lastWrite->exists("lastWriteDate"s))
+		{
+			Timestamp lwDate = lastWrite->get<Timestamp>("lastWriteDate"s);
+			_lastWriteDate = lwDate.epochMicroseconds();
+		}
+	}
+
 	// Parse and return hosts list
 	auto hosts = parseHosts(helloResponse);
 
@@ -100,7 +117,8 @@ void ServerDescription::reset()
 {
 	_type = Unknown;
 	_lastUpdateTime = 0;
-	_roundTripTime = 0;
+	_lastWriteDate = 0;
+	_roundTripTime = std::numeric_limits<Poco::Int64>::max();
 	_setName.clear();
 	_tags.clear();
 	_error.clear();
@@ -251,4 +269,4 @@ std::string ServerDescription::typeToString(ServerType type)
 }
 
 
-} } // namespace Poco::MongoDB
+} // namespace Poco::MongoDB

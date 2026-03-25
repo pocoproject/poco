@@ -22,8 +22,7 @@
 #include "Poco/Timestamp.h"
 
 
-namespace Poco {
-namespace SevenZip {
+namespace Poco::SevenZip {
 
 
 class SevenZip_API ArchiveEntry
@@ -166,7 +165,7 @@ inline bool ArchiveEntry::isDirectory() const
 }
 
 
-} } // namespace Poco::SevenZip
+} // namespace Poco::SevenZip
 
 
 #endif // SevenZip_ArchiveEntry_INCLUDED

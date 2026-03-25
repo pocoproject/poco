@@ -19,8 +19,7 @@
 using Poco::BufferedStreamBuf;
 
 
-namespace Poco {
-namespace Net {
+namespace Poco::Net {
 
 
 //
@@ -178,4 +177,4 @@ void HTTPFixedLengthOutputStream::operator delete(void* ptr)
 }
 
 
-} } // namespace Poco::Net
+} // namespace Poco::Net
