@@ -152,6 +152,8 @@ private:
 	void parseLine(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);
 	static void saveToFile(const std::string& path, const std::map<std::string, std::string>& values);
 	std::string resolveIncludePath(const std::string& rawPath, const std::string& basePath) const;
+	std::vector<std::string> scanIncludeFiles(const std::string& filePath) const;
+		/// Scans the given file for !include directives. Caller must hold the lock.
 	static int readChar(std::istream& istr);
 	static std::string escapeValue(const std::string& value);
 
