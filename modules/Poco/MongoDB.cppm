@@ -39,7 +39,7 @@ module;
 #include "Poco/MongoDB/TopologyDescription.h"
 #endif
 
-export module Poco.MongoDB;
+export module Poco:MongoDB;
 
 export namespace Poco::MongoDB {
 	#ifdef ENABLE_MONGODB

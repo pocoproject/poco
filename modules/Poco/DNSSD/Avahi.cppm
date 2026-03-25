@@ -17,7 +17,7 @@ module;
 #include "Poco/DNSSD/Avahi/AvahiResponderImpl.h"
 #endif
 
-export module Poco.DNSSD:Avahi;
+export module Poco:DNSSD.Avahi;
 
 export namespace Poco::DNSSD {
 	#ifdef ENABLE_DNSSD

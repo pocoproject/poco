@@ -37,7 +37,7 @@ module;
 #include "Poco/Zip/ZipUtil.h"
 #endif
 
-export module Poco.Zip;
+export module Poco:Zip;
 
 export namespace Poco::Zip {
 	#ifdef ENABLE_ZIP

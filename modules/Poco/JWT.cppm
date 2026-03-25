@@ -19,7 +19,7 @@ module;
 #include "Poco/JWT/Token.h"
 #endif
 
-export module Poco.JWT;
+export module Poco:JWT;
 
 export namespace Poco::JWT {
 	#ifdef ENABLE_JWT

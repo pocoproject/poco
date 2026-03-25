@@ -18,7 +18,7 @@ module;
 #include "Poco/DNSSD/Bonjour/EventLoop.h"
 #endif
 
-export module Poco.DNSSD:Bonjour;
+export module Poco:DNSSD.Bonjour;
 
 export namespace Poco::DNSSD {
 	#ifdef ENABLE_DNSSD

@@ -26,7 +26,7 @@ module;
 #include "Poco/Data/PostgreSQL/Utility.h"
 #endif
 
-export module Poco.Data:PostgreSQL;
+export module Poco:Data.PostgreSQL;
 
 export namespace Poco::Data::PostgreSQL {
 	#ifdef ENABLE_DATA_POSTGRESQL

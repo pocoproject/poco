@@ -31,7 +31,7 @@ module;
 #include "Poco/CppParser/Variable.h"
 #endif
 
-export module Poco.CppParser;
+export module Poco:CppParser;
 
 export namespace Poco::CppParser {
 	#ifdef ENABLE_CPPPARSER

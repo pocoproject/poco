@@ -23,14 +23,10 @@ module;
 #include "Poco/DNSSD/Service.h"
 #endif
 
-export module Poco.DNSSD;
+export module Poco:DNSSD;
 
-#ifdef ENABLE_DNSSD_AVAHI
-export import :Avahi;
-#endif
-#ifdef ENABLE_DNSSD_BONJOUR
-export import :Bonjour;
-#endif
+export import :DNSSD.Avahi;
+export import :DNSSD.Bonjour;
 
 export namespace Poco::DNSSD {
 	#ifdef ENABLE_DNSSD
