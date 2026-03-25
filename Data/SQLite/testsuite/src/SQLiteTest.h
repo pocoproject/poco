@@ -102,6 +102,7 @@ public:
 	void testStdTuple();
 
 	void testDateTime();
+	void testDateTimeVariants();
 
 	void testUUID();
 

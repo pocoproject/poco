@@ -309,9 +309,12 @@ bool Extractor::extract(std::size_t pos, DateTime& val)
 		return false;
 	}
 
-	int tzd = -1;
+	// Try the primary PostgreSQL TIMESTAMP format first, then fall back
+	// to format-free parsing for other DateStyle output formats.
+	int tzd = 0;
 	DateTime dateTime;
-	if (!DateTimeParser::tryParse("%Y-%m-%d %H:%M:%s", outputParameter.pData(), dateTime, tzd))
+	if (!DateTimeParser::tryParse("%Y-%m-%d %H:%M:%s", outputParameter.pData(), dateTime, tzd) &&
+		!DateTimeParser::tryParse(outputParameter.pData(), dateTime, tzd))
 	{
 		return false;
 	}
@@ -330,7 +333,8 @@ bool Extractor::extract(std::size_t pos, Date& val)
 	{
 		return false;
 	}
-	int tzd = -1;
+	// Format-free tryParse handles all PostgreSQL DateStyle output formats.
+	int tzd = 0;
 	DateTime dateTime;
 	if (!DateTimeParser::tryParse(outputParameter.pData(), dateTime, tzd))
 	{
@@ -351,16 +355,19 @@ bool Extractor::extract(std::size_t pos, Time& val)
 	{
 		return false;
 	}
-	int tzd = -1;
+	// Try the primary PostgreSQL TIME format first (handles TIME and
+	// TIMETZ with optional fractional seconds), then fall back to
+	// format-free parsing for full datetime strings.
+	int tzd = 0;
 	DateTime dateTime;
-	if (! DateTimeParser::tryParse("%H:%M:%s%z", outputParameter.pData(), dateTime, tzd))
+	if (!DateTimeParser::tryParse("%H:%M:%s%z", outputParameter.pData(), dateTime, tzd) &&
+		!DateTimeParser::tryParse(outputParameter.pData(), dateTime, tzd))
 	{
 		return false;
 	}
-
-	// dateTime.makeUTC(tzd); // TODO
-	// Note: Poco::Data::Time should be extended to support the fractional components of Poco::DateTime
-
+	dateTime.makeUTC(tzd);
+	// Note: Poco::Data::Time does not support fractional seconds;
+	// sub-second precision is lost here.
 	val.assign(dateTime.hour(), dateTime.minute(), dateTime.second());
 
 	return true;
