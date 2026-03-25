@@ -32,6 +32,16 @@
 namespace Poco::Crypto {
 
 
+namespace {
+
+// ASN1 UTCTime format: YYMMDDHHMMSSZ (RFC 5280 Section 4.1.2.5.1)
+const std::string ASN1_UTCTIME_FORMAT("%y%m%d%H%M%S%Z");
+// ASN1 GeneralizedTime format: YYYYMMDDHHMMSSZ (RFC 5280 Section 4.1.2.5.2)
+const std::string ASN1_GENERALIZEDTIME_FORMAT("%Y%m%d%H%M%S%Z");
+
+} // namespace
+
+
 X509Certificate::X509Certificate(std::istream& istr) : _pCert(nullptr)
 {
 	load(istr);
@@ -301,11 +311,11 @@ Poco::DateTime X509Certificate::validFrom() const
 	int tzd;
 	if (certTimeType == V_ASN1_UTCTIME)
 	{
-		return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
+		return DateTimeParser::parse(ASN1_UTCTIME_FORMAT, dateTime, tzd);
 	}
 	else if (certTimeType == V_ASN1_GENERALIZEDTIME)
 	{
-		return DateTimeParser::parse("%Y%m%d%H%M%S", dateTime, tzd);
+		return DateTimeParser::parse(ASN1_GENERALIZEDTIME_FORMAT, dateTime, tzd);
 	}
 	else
 	{
@@ -322,11 +332,11 @@ Poco::DateTime X509Certificate::expiresOn() const
 	int tzd;
 	if (certTimeType == V_ASN1_UTCTIME)
 	{
-		return DateTimeParser::parse("%y%m%d%H%M%S", dateTime, tzd);
+		return DateTimeParser::parse(ASN1_UTCTIME_FORMAT, dateTime, tzd);
 	}
 	else if (certTimeType == V_ASN1_GENERALIZEDTIME)
 	{
-		return DateTimeParser::parse("%Y%m%d%H%M%S", dateTime, tzd);
+		return DateTimeParser::parse(ASN1_GENERALIZEDTIME_FORMAT, dateTime, tzd);
 	}
 	else
 	{

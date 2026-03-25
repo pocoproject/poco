@@ -363,6 +363,17 @@ void CryptoTest::testCertificate()
 	const auto fingerprint = cert.fingerprint();
 	assertTrue (Poco::DigestEngine::digestToHex(fingerprint) == "ac84e4eb72c861ccb20f2900f3f17a9ac11f6579");
 
+	// verify validFrom/expiresOn parse ASN1 timestamps with Z suffix (GH #5263)
+	Poco::DateTime validFrom = cert.validFrom();
+	assertTrue (validFrom.year() == 2009);
+	assertTrue (validFrom.month() == 5);
+	assertTrue (validFrom.day() == 7);
+
+	Poco::DateTime expiresOn = cert.expiresOn();
+	assertTrue (expiresOn.year() == 2029);
+	assertTrue (expiresOn.month() == 5);
+	assertTrue (expiresOn.day() == 2);
+
 	// fails with recent OpenSSL versions:
 	// assert (cert.issuedBy(cert));
 
