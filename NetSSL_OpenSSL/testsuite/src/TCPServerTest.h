@@ -30,6 +30,7 @@ public:
 	void testReuseSocket();
 	void testReuseSession();
 	void testContextInvalidCertificateHandler();
+	void testAddCertificateAuthority();
 
 	void setUp();
 	void tearDown();

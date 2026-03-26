@@ -312,6 +312,16 @@ public:
 	void addCertificateAuthority(const Poco::Crypto::X509Certificate& certificate);
 		/// Add one trusted certification authority to be used by the Context.
 
+	void addCertificateAuthority(const std::string& caLocation);
+		/// Add one or more trusted certification authorities to be used by the Context.
+		///
+		/// The caLocation can refer to a single CA file (containing one or more
+		/// PEM-encoded certificates) or a directory containing certificate files
+		/// looked up by hash values (see OpenSSL c_rehash documentation).
+		///
+		/// Uses SSL_CTX_load_verify_locations() internally, which correctly
+		/// handles certificate trust settings on all OpenSSL versions.
+
 	//POCO_DEPRECATED("")
 	void usePrivateKey(const Poco::Crypto::RSAKey& key);
 		/// Sets the private key to be used by the Context.

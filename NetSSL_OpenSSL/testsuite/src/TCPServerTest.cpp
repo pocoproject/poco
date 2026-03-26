@@ -457,6 +457,55 @@ void TCPServerTest::testContextInvalidCertificateHandler()
 }
 
 
+void TCPServerTest::testAddCertificateAuthority()
+{
+	Context::Ptr pServerContext = new Context(
+		Context::SERVER_USE,
+		Application::instance().config().getString("openSSL.server.privateKeyFile"),
+		Application::instance().config().getString("openSSL.server.privateKeyFile"),
+		Application::instance().config().getString("openSSL.server.caConfig"),
+		Context::VERIFY_NONE,
+		9,
+		false,
+		"ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+
+	SecureServerSocket svs(0, 64, pServerContext);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	// Client context with no CA location and no default CAs
+	Context::Ptr pClientContext = new Context(
+		Context::CLIENT_USE,
+		"",
+		"",
+		"",
+		Context::VERIFY_RELAXED,
+		9,
+		false,
+		"ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+
+	// Add root CA via file-path overload
+	std::string rootCertPath = Application::instance().config().getString("openSSL.server.caConfig");
+	pClientContext->addCertificateAuthority(rootCertPath);
+
+	pClientContext->setInvalidCertificateHandler(new Poco::Net::AcceptCertificateHandler(false));
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
+
+	SecureStreamSocket ss1(sa, pClientContext);
+	std::string data("hello, world");
+	ss1.sendBytes(data.data(), (int) data.size());
+	char buffer[256];
+	int n = ss1.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+	ss1.close();
+	Thread::sleep(300);
+
+	srv.stop();
+}
+
+
 void TCPServerTest::setUp()
 {
 }
@@ -477,6 +526,7 @@ CppUnit::Test* TCPServerTest::suite()
 	CppUnit_addTest(pSuite, TCPServerTest, testReuseSocket);
 	CppUnit_addTest(pSuite, TCPServerTest, testReuseSession);
 	CppUnit_addTest(pSuite, TCPServerTest, testContextInvalidCertificateHandler);
+	CppUnit_addTest(pSuite, TCPServerTest, testAddCertificateAuthority);
 
 	return pSuite;
 }
