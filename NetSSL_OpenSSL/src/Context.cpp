@@ -294,6 +294,22 @@ void Context::addCertificateAuthority(const Crypto::X509Certificate &certificate
 }
 
 
+void Context::addCertificateAuthority(const std::string& caLocation)
+{
+	Poco::File aFile(caLocation);
+	int errCode = 0;
+	if (aFile.isDirectory())
+		errCode = SSL_CTX_load_verify_locations(_pSSLContext, nullptr, Poco::Path::transcode(caLocation).c_str());
+	else
+		errCode = SSL_CTX_load_verify_locations(_pSSLContext, Poco::Path::transcode(caLocation).c_str(), nullptr);
+	if (errCode != 1)
+	{
+		std::string msg = Utility::getLastError();
+		throw SSLContextException(std::string("Cannot add certificate authority from ") + caLocation, msg);
+	}
+}
+
+
 void Context::usePrivateKey(const Poco::Crypto::RSAKey& key)
 {
 	int errCode = SSL_CTX_use_RSAPrivateKey(_pSSLContext, key.impl()->getRSA());
