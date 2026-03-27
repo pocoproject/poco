@@ -40,7 +40,8 @@ namespace Poco {
 // ProcessHandleImpl
 //
 ProcessHandleImpl::ProcessHandleImpl(pid_t pid):
-	_pid(pid)
+	_pid(pid),
+	_event(Event::EVENT_MANUALRESET)
 {
 }
 
@@ -56,42 +57,70 @@ pid_t ProcessHandleImpl::id() const
 }
 
 
+int ProcessHandleImpl::statusToExitCode(int status)
+{
+	if (WIFEXITED(status))
+		return WEXITSTATUS(status);
+	else
+		return -WTERMSIG(status);
+}
+
+
 int ProcessHandleImpl::wait() const
 {
+	if (wait(0) != _pid)
+		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
+
+	return statusToExitCode(_status.load());
+}
+
+
+int ProcessHandleImpl::wait(int options) const
+{
+	if (_hasStatus.load()) return _pid;
 	int status;
 	int rc;
 	do
 	{
-		rc = waitpid(_pid, &status, 0);
+		rc = ::waitpid(_pid, &status, options);
 	}
 	while (rc < 0 && errno == EINTR);
-	if (rc != _pid)
-		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
+	if (rc == _pid)
+	{
+		_status.store(status);
+		_hasStatus.store(true);
+		_event.set();
+	}
+	else if (rc < 0 && errno == ECHILD)
+	{
+		// Another thread reaped the process; wait for it to update the status.
+		// Use a timeout to prevent hanging indefinitely if something goes wrong.
+		if (_event.tryWait(5000) && _hasStatus.load())
+		{
+			rc = _pid;
+		}
+	}
 
-	if (WIFEXITED(status)) // normal termination
-		return WEXITSTATUS(status);
-	else // termination by a signal
-		return 256 + WTERMSIG(status);
+	return rc;
 }
 
 
 int ProcessHandleImpl::tryWait() const
 {
-	int status;
-	int rc;
-	do
-	{
-		rc = waitpid(_pid, &status, WNOHANG);
-	}
-	while (rc < 0 && errno == EINTR);
+	int rc = wait(WNOHANG);
 	if (rc == 0)
 		return -1;
 	if (rc != _pid)
 		throw SystemException("Cannot wait for process", NumberFormatter::format(_pid));
-	if (WIFEXITED(status)) // normal termination
-		return WEXITSTATUS(status);
-	else // termination by a signal
-		return 256 + WTERMSIG(status);
+	return statusToExitCode(_status.load());
+}
+
+
+bool ProcessHandleImpl::isRunning() const
+{
+	if (_hasStatus.load())
+		return false;
+	return wait(WNOHANG) == 0;
 }
 
 
@@ -100,14 +129,14 @@ int ProcessHandleImpl::tryWait() const
 //
 ProcessImpl::PIDImpl ProcessImpl::idImpl()
 {
-	return getpid();
+	return ::getpid();
 }
 
 
 void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 {
 	struct rusage usage;
-	getrusage(RUSAGE_SELF, &usage);
+	::getrusage(RUSAGE_SELF, &usage);
 	userTime   = usage.ru_utime.tv_sec;
 	kernelTime = usage.ru_stime.tv_sec;
 }
@@ -116,7 +145,7 @@ void ProcessImpl::timesImpl(long& userTime, long& kernelTime)
 void ProcessImpl::timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kernelTime)
 {
 	struct rusage usage;
-	getrusage(RUSAGE_SELF, &usage);
+	::getrusage(RUSAGE_SELF, &usage);
 	userTime   = static_cast<Poco::Int64>(usage.ru_utime.tv_sec)*1000000 + usage.ru_utime.tv_usec;
 	kernelTime = static_cast<Poco::Int64>(usage.ru_stime.tv_sec)*1000000 + usage.ru_stime.tv_usec;
 }
@@ -165,17 +194,17 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 			envPtr = &envPtrs[0];
 		}
 
-		int pid = spawn(command.c_str(), 3, fdmap, &inherit, argv, envPtr);
+		int pid = ::spawn(command.c_str(), 3, fdmap, &inherit, argv, envPtr);
 		delete [] argv;
 		if (pid == -1)
 			throw SystemException("cannot spawn", command);
 
 		if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
-		if (options & PROCESS_CLOSE_STDIN) close(STDIN_FILENO);
+		if (options & PROCESS_CLOSE_STDIN) ::close(STDIN_FILENO);
 		if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
-		if (options & PROCESS_CLOSE_STDOUT) close(STDOUT_FILENO);
+		if (options & PROCESS_CLOSE_STDOUT) ::close(STDOUT_FILENO);
 		if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
-		if (options & PROCESS_CLOSE_STDERR) close(STDERR_FILENO);
+		if (options & PROCESS_CLOSE_STDERR) ::close(STDERR_FILENO);
 		return new ProcessHandleImpl(pid);
 	}
 	else
@@ -213,7 +242,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 
 		const char* pInitialDirectory = initialDirectory.empty() ? nullptr : initialDirectory.c_str();
 
-		int pid = fork();
+		int pid = ::fork();
 		if (pid < 0)
 		{
 			throw SystemException("Cannot fork process for", command);
@@ -222,7 +251,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 		{
 			if (pInitialDirectory)
 			{
-				if (chdir(pInitialDirectory) != 0)
+				if (::chdir(pInitialDirectory) != 0)
 				{
 					break;
 				}
@@ -232,7 +261,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 			char* p = &envChars[0];
 			while (*p)
 			{
-				putenv(p);
+				::putenv(p);
 				while (*p) ++p;
 				++p;
 			}
@@ -240,25 +269,25 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 			// setup redirection
 			if (inPipe)
 			{
-				dup2(inPipe->readHandle(), STDIN_FILENO);
+				::dup2(inPipe->readHandle(), STDIN_FILENO);
 				inPipe->close(Pipe::CLOSE_BOTH);
 			}
-			if (options & PROCESS_CLOSE_STDIN) close(STDIN_FILENO);
+			if (options & PROCESS_CLOSE_STDIN) ::close(STDIN_FILENO);
 
 			// outPipe and errPipe may be the same, so we dup first and close later
-			if (outPipe) dup2(outPipe->writeHandle(), STDOUT_FILENO);
-			if (errPipe) dup2(errPipe->writeHandle(), STDERR_FILENO);
+			if (outPipe) ::dup2(outPipe->writeHandle(), STDOUT_FILENO);
+			if (errPipe) ::dup2(errPipe->writeHandle(), STDERR_FILENO);
 			if (outPipe) outPipe->close(Pipe::CLOSE_BOTH);
-			if (options & PROCESS_CLOSE_STDOUT) close(STDOUT_FILENO);
+			if (options & PROCESS_CLOSE_STDOUT) ::close(STDOUT_FILENO);
 			if (errPipe) errPipe->close(Pipe::CLOSE_BOTH);
-			if (options & PROCESS_CLOSE_STDERR) close(STDERR_FILENO);
+			if (options & PROCESS_CLOSE_STDERR) ::close(STDERR_FILENO);
 			// close all open file descriptors other than stdin, stdout, stderr
-			long fdMax = sysconf(_SC_OPEN_MAX);
+			long fdMax = ::sysconf(_SC_OPEN_MAX);
 			// on some systems, sysconf(_SC_OPEN_MAX) returns a ridiculously high number
 			if (fdMax > CLOSE_FD_MAX) fdMax = CLOSE_FD_MAX;
 			for (long j = 3; j < fdMax; ++j)
 			{
-				close(j);
+				::close(j);
 			}
 
 			// Create a new process group so the entire tree can be signaled.
@@ -268,7 +297,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 					_exit(PROCESS_EXIT_SETPGID_FAILED);
 			}
 
-			execvp(argv[0], &argv[0]);
+			::execvp(argv[0], &argv[0]);
 			break;
 		}
 
@@ -301,7 +330,7 @@ void ProcessImpl::killImpl(ProcessHandleImpl& handle)
 
 void ProcessImpl::killImpl(PIDImpl pid)
 {
-	if (kill(pid, SIGKILL) != 0)
+	if (::kill(pid, SIGKILL) != 0)
 	{
 		switch (errno)
 		{
@@ -318,26 +347,26 @@ void ProcessImpl::killImpl(PIDImpl pid)
 
 bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 {
-	return isRunningImpl(handle.id());
+	return handle.isRunning();
 }
 
 
 bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
-	if (kill(pid, 0) == 0)
-	{
-		return true;
-	}
-	else
-	{
+	int status;
+	int rc = ::waitpid(pid, &status, WNOHANG);
+	if (rc == pid)
 		return false;
-	}
+	if (rc == 0)
+		return true;
+	// Not our child or error; fall back to kill check
+	return ::kill(pid, 0) == 0;
 }
 
 
 void ProcessImpl::requestTerminationImpl(PIDImpl pid)
 {
-	if (kill(pid, SIGINT) != 0)
+	if (::kill(pid, SIGINT) != 0)
 	{
 		switch (errno)
 		{
