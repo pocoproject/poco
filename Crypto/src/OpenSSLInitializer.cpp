@@ -53,7 +53,7 @@ namespace Poco::Crypto {
 
 Poco::AtomicCounter OpenSSLInitializer::_rc;
 
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 OSSL_PROVIDER* OpenSSLInitializer::_defaultProvider(nullptr);
 OSSL_PROVIDER* OpenSSLInitializer::_legacyProvider(nullptr);
 #endif
@@ -84,13 +84,13 @@ void OpenSSLInitializer::initialize()
 	{
 		CONF_modules_load(nullptr, nullptr, 0);
 
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
-		if (!_defaultProvider)
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+		if (_defaultProvider == nullptr)
 		{
 			_defaultProvider = OSSL_PROVIDER_load(nullptr, "default");
-			if (!_defaultProvider) throw CryptoException("Failed to load OpenSSL default provider");
+			if (_defaultProvider == nullptr) throw CryptoException("Failed to load OpenSSL default provider");
 		}
-		if (!_legacyProvider)
+		if (_legacyProvider == nullptr)
 		{
 			_legacyProvider = OSSL_PROVIDER_load(nullptr, "legacy");
 			// Note: use haveLegacyProvider() to check if legacy provider has been loaded
@@ -104,7 +104,18 @@ void OpenSSLInitializer::uninitialize()
 {
 	if (--_rc == 0)
 	{
-		// OpenSSL 1.1.0+ handles cleanup automatically
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+		// Provider cleanup is deliberately left to OpenSSL's internal
+		// atexit handler (OPENSSL_cleanup). We must NOT:
+		//  - call OSSL_PROVIDER_unload(): leaks OSSL_LIB_CTX child
+		//    contexts that the unload path does not fully free
+		//  - null the static pointers: makes the provider allocations
+		//    unreachable, causing LeakSanitizer to report them as leaks
+		//    (LSAN runs before atexit handlers on Linux/GCC)
+		// The pointers remain valid and reachable until process exit,
+		// at which point OPENSSL_cleanup frees everything.
+		CONF_modules_unload(1);
+#endif
 	}
 }
 

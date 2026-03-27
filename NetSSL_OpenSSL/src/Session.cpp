@@ -33,11 +33,7 @@ Session::~Session()
 
 bool Session::isResumable() const
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10101000L
 	return SSL_SESSION_is_resumable(_pSession) == 1;
-#else
-	return false;
-#endif
 }
 
 
