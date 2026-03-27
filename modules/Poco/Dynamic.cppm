@@ -20,7 +20,7 @@ module;
 #include "Poco/Dynamic/VarVisitor.h"
 #endif
 
-export module Poco.Dynamic;
+export module Poco:Dynamic;
 
 export namespace Poco::Dynamic {
 	#ifdef ENABLE_FOUNDATION

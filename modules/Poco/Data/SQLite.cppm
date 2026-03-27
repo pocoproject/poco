@@ -23,7 +23,7 @@ module;
 #include "Poco/Data/SQLite/Utility.h"
 #endif
 
-export module Poco.Data:SQLite;
+export module Poco:Data.SQLite;
 
 export namespace Poco::Data::SQLite {
 	#ifdef ENABLE_DATA_SQLITE

@@ -39,7 +39,7 @@ module;
 #include "Poco/Crypto/X509Certificate.h"
 #endif
 
-export module Poco.Crypto;
+export module Poco:Crypto;
 
 export namespace Poco::Crypto {
 	#ifdef ENABLE_CRYPTO

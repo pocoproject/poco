@@ -296,7 +296,7 @@ module;
 #endif
 #endif
 
-export module Poco.Foundation;
+export module Poco:Foundation;
 
 export namespace Poco {
 	#ifdef ENABLE_FOUNDATION

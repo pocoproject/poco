@@ -17,7 +17,7 @@ module;
 #include "Poco/SevenZip/SevenZip.h"
 #endif
 
-export module Poco.SevenZip;
+export module Poco:SevenZip;
 
 export namespace Poco::SevenZip {
 	#ifdef ENABLE_SEVENZIP
