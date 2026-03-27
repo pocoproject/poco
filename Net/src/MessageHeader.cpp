@@ -92,7 +92,7 @@ void MessageHeader::read(std::istream& istr)
 		}
 		if (ch == '\n') { ch = buf.sbumpc(); continue; } // ignore invalid header lines
 		if (ch != ':') throw MessageException("Field name too long/no colon found");
-		if (ch != eof) ch = buf.sbumpc(); // ':'
+		ch = buf.sbumpc(); // skip ':'
 		while (ch != eof && Poco::Ascii::isSpace(ch) && ch != '\r' && ch != '\n') ch = buf.sbumpc();
 		while (ch != eof && ch != '\r' && ch != '\n' && static_cast<int>(value.length()) < _valueLengthLimit)
 		{
@@ -373,18 +373,20 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 				continue;
 			}
 
-			// FIXME: check that we have enought chars-
 			if (c == '=')
 			{
 				// The next two chars are hex representation of the complete byte.
 				std::string hex;
 				for (int i = 0; i < 2; i++)
 				{
-					istr.get(c);
+					if (!istr.get(c)) break;
 					hex += c;
 				}
-				hex = toUpper(hex);
-				tempout += (char)(int)::strtol(hex.c_str(), nullptr, 16);
+				if (hex.length() == 2)
+				{
+					hex = toUpper(hex);
+					tempout += (char)(int)::strtol(hex.c_str(), nullptr, 16);
+				}
 				continue;
 			}
 			tempout += c;
@@ -409,7 +411,7 @@ void MessageHeader::decodeRFC2047(const std::string& ins, std::string& outs, con
 		}
 		catch (...)
 		{
-			// FIXME: Unsuported encoding...
+			// Unsupported or unknown encoding; fall back to raw decoded text
 			outs = tempout;
 		}
 	}

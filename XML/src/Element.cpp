@@ -116,6 +116,7 @@ Attr* Element::setAttributeNode(Attr* newAttr)
 	}
 	else _pFirstAttr = newAttr;
 	newAttr->duplicate();
+	// CodeQL [cpp/local-address-stored]: DOM tree attribute-element relationship
 	newAttr->_pParent = this;
 	if (_pOwner->events())
 		dispatchAttrModified(newAttr, MutationEvent::ADDITION, EMPTY_STRING, newAttr->getValue());

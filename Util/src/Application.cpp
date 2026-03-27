@@ -85,6 +85,7 @@ Application::Application():
 Application::Application(int argc, char** argv):
     Application()
 {
+	// CodeQL [cpp/virtual-call-in-ctor]: init() is not virtual
 	init(argc, argv);
 }
 
@@ -114,6 +115,7 @@ void Application::setup()
 	setUnixOptions(false);
 #endif
 
+	// CodeQL [cpp/local-address-stored]: singleton pattern; instance lifetime is process-scoped
 	_pInstance = this;
 
 	AutoPtr<ConsoleChannel> pCC = new ConsoleChannel;

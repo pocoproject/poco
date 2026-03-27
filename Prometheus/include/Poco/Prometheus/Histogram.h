@@ -64,7 +64,7 @@ public:
 		/// Returns the histogram's data.
 
 	const std::vector<double>& bucketBounds() const;
-		/// Returns the buckets upper bounds;
+		/// Returns the buckets upper bounds
 
 private:
 	const std::vector<double>& _bucketBounds;
