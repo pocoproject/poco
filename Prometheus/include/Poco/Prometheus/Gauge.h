@@ -36,9 +36,11 @@ public:
 	~GaugeSample() = default;
 		/// Destroys the GaugeSample.
 
+	[[nodiscard]]
 	double value() const;
 		/// Returns the Gauge's current value.
 
+	[[nodiscard]]
 	Poco::Timestamp timestamp() const;
 		/// Returns the sample's timestamp, which in this
 		/// implementation is always 0.
@@ -132,6 +134,7 @@ public:
 		/// Must only be set once, immediately after creating
 		/// the Gauge.
 
+	[[nodiscard]]
 	double value() const;
 		/// Returns the Gauge's current value.
 		///

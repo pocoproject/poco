@@ -130,6 +130,7 @@ private:
 	void loadStream(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);
 	void parseLine(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);
 	static void saveToFile(const std::string& path, const std::map<std::string, std::string>& values);
+  [[nodiscard]]
 	static int readChar(std::istream& istr);
 	static std::string escapeValue(const std::string& value);
 

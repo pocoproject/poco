@@ -54,6 +54,7 @@ public:
 		/// Applications may register a new or different resolver in the middle of a
 		/// parse, and the SAX parser must begin using the new resolver immediately.
 
+	[[nodiscard]]
 	virtual EntityResolver* getEntityResolver() const = 0;
 		/// Return the current entity resolver.
 
@@ -66,6 +67,7 @@ public:
 		/// Applications may register a new or different handler in the middle of a parse,
 		/// and the SAX parser must begin using the new handler immediately.
 
+	[[nodiscard]]
 	virtual DTDHandler* getDTDHandler() const = 0;
 		/// Return the current DTD handler.
 
@@ -78,6 +80,7 @@ public:
 		/// Applications may register a new or different handler in the middle of a parse,
 		/// and the SAX parser must begin using the new handler immediately.
 
+	[[nodiscard]]
 	virtual ContentHandler* getContentHandler() const = 0;
 		/// Return the current content handler.
 
@@ -92,6 +95,7 @@ public:
 		/// Applications may register a new or different handler in the middle of a parse, and the
 		/// SAX parser must begin using the new handler immediately.
 
+	[[nodiscard]]
 	virtual ErrorHandler* getErrorHandler() const = 0;
 		/// Return the current error handler.
 
@@ -106,6 +110,7 @@ public:
 		/// All XMLReaders are required to support setting http://xml.org/sax/features/namespaces
 		/// to true and http://xml.org/sax/features/namespace-prefixes to false.
 
+	[[nodiscard]]
 	virtual bool getFeature(const XMLString& featureId) const = 0;
 		/// Look up the value of a feature.
 		///
@@ -140,6 +145,7 @@ public:
 		/// Set the value of a property.
 		/// See also setProperty(const XMLString&, const XMLString&).
 
+	[[nodiscard]]
 	virtual void* getProperty(const XMLString& propertyId) const = 0;
 		/// Look up the value of a property.
 		/// String values are returned as XMLChar*

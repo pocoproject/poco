@@ -100,6 +100,7 @@ public:
 		}
 	}
 
+	[[nodiscard]]
 	bool equals(const AbstractObserver& abstractObserver) const override
 	{
 		const Observer* pObs = dynamic_cast<const Observer*>(&abstractObserver);
@@ -117,7 +118,8 @@ public:
 		return (pNf.cast<N>() != nullptr);
 	}
 
-	AbstractObserver *clone() const override
+	[[nodiscard]]
+	AbstractObserver* clone() const override
 	{
 		return new Observer(*this);
 	}

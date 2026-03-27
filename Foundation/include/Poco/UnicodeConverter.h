@@ -107,6 +107,7 @@ public:
 	}
 
 	template <typename T>
+	[[nodiscard]]
 	static T to(const char* pChar)
 	{
 		T utfStr;
@@ -116,6 +117,7 @@ public:
 
 
 	template <typename T>
+	[[nodiscard]]
 	static T to(const std::string& str)
 	{
 		T utfStr;
@@ -124,6 +126,7 @@ public:
 	}
 
 	template <typename T>
+	[[nodiscard]]
 	static std::size_t UTFStrlen(const T* ptr)
 		/// Returns the length (in characters) of a zero-terminated UTF string.
 	{

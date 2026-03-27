@@ -120,42 +120,50 @@ public:
 	{
 	}
 
+	[[nodiscard]]
 	int subtype() const
 	{
 		return _subtype;
 	}
 
 	template <typename T>
+	[[nodiscard]]
 	T cast() const
 	{
 		return reinterpret_cast<T>(_h);
 	}
 
+	[[nodiscard]]
 	bool operator == (const OpaqueHandle& other) const
 	{
 		return _h == other._h;
 	}
 
+	[[nodiscard]]
 	bool operator != (const OpaqueHandle& other) const
 	{
 		return _h != other._h;
 	}
 
+	[[nodiscard]]
 	bool operator <= (const OpaqueHandle& other) const
 	{
 		return _h <= other._h;
 	}
 
+	[[nodiscard]]
 	bool operator < (const OpaqueHandle& other) const
 	{
 		return _h < other._h;
 	}
 
+	[[nodiscard]]
 	bool operator >= (const OpaqueHandle& other) const
 	{
 		return _h >= other._h;
 	}
 
+	[[nodiscard]]
 	bool operator > (const OpaqueHandle& other) const
 	{
 		return _h > other._h;
@@ -166,11 +174,13 @@ public:
 		_h = Invalid;
 	}
 
+	[[nodiscard]]
 	bool isValid() const
 	{
 		return _h != Invalid;
 	}
 
+	[[nodiscard]]
 	bool isNull() const
 	{
 		return _h == Invalid;

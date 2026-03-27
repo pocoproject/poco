@@ -158,10 +158,11 @@ public:
 	void onConnect()
 	{
 		_socket.setBlocking(true);
-		createServiceHandler();
+		[[maybe_unused]] ServiceHandler* handler = createServiceHandler();
 	}
 
 protected:
+	[[nodiscard]]
 	virtual ServiceHandler* createServiceHandler()
 		/// Create and initialize a new ServiceHandler instance.
 		///
@@ -177,6 +178,7 @@ protected:
 	{
 	}
 
+	[[nodiscard]]
 	SocketReactor* reactor()
 		/// Returns a pointer to the SocketReactor where
 		/// this SocketConnector is registered.
@@ -186,6 +188,7 @@ protected:
 		return _pReactor;
 	}
 
+[[nodiscard]]
 	StreamSocket& socket()
 		/// Returns a reference to the SocketConnector's socket.
 	{

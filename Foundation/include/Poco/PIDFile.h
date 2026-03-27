@@ -47,6 +47,7 @@ public:
 		/// Destroys the PIDFile.
 		/// If fileName is not empty, deletes the PID file.
 
+	[[nodiscard]]
 	const std::string& getName() const;
 		/// Returns the file name.
 
@@ -59,16 +60,20 @@ public:
 	void destroy();
 		/// Deletes the PID file and invalidates the held PID.
 
+	[[nodiscard]]
 	int getPID() const;
 		/// Returns the PID.
 
+	[[nodiscard]]
 	bool exists() const;
 		/// Returns true if PID file exists and its content is
 		/// equal to the held PID.
 
+	[[nodiscard]]
 	static bool contains(const std::string& fileName, int pid);
 		/// Returns true if the `fileName` contains the given `pid`.
 
+	[[nodiscard]]
 	static std::string& getFileName(std::string& pidFile);
 		/// Returns the file name.
 

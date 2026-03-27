@@ -343,16 +343,20 @@ public:
 		/// must have been setup with the SSLManager, or the SSLManager's PrivateKeyPassphraseRequired
 		/// event must be handled.
 
+	[[nodiscard]]
 	SSL_CTX* sslContext() const;
 		/// Returns the underlying OpenSSL SSL Context object.
 
+	[[nodiscard]]
 	Usage usage() const;
 		/// Returns whether the context is for use by a client or by a server
 		/// and whether TLSv1 is required.
 
+	[[nodiscard]]
 	bool isForServerUse() const;
 		/// Returns true iff the context is for use by a server.
 
+	[[nodiscard]]
 	Context::VerificationMode verificationMode() const;
 		/// Returns the verification mode.
 
@@ -384,6 +388,7 @@ public:
 		///
 		/// This method may only be called on SERVER_USE Context objects.
 
+	[[nodiscard]]
 	bool sessionCacheEnabled() const;
 		/// Returns true iff the session cache is enabled.
 
@@ -397,6 +402,7 @@ public:
 		///
 		/// This method may only be called on SERVER_USE Context objects.
 
+	[[nodiscard]]
 	std::size_t getSessionCacheSize() const;
 		/// Returns the current maximum size of the server session cache.
 		///
@@ -409,6 +415,7 @@ public:
 		///
 		/// This method may only be called on SERVER_USE Context objects.
 
+	[[nodiscard]]
 	long getSessionTimeout() const;
 		/// Returns the timeout (in seconds) of cached sessions on the server.
 		///
@@ -425,6 +432,7 @@ public:
 		///
 		/// See X509Certificate::verify() for more information.
 
+	[[nodiscard]]
 	bool extendedCertificateVerificationEnabled() const;
 		/// Returns true iff automatic extended certificate
 		/// verification is enabled.
@@ -455,6 +463,7 @@ public:
 		/// preferences. When called, the SSL/TLS server will choose following its own
 		/// preferences.
 
+	[[nodiscard]]
 	bool ocspStaplingResponseVerificationEnabled() const;
 		/// Returns true if automatic OCSP response
 		/// reception and verification is enabled for client connections
@@ -465,6 +474,7 @@ public:
 		/// If specified, this InvalidCertificateHandler will be used instead of the
 		/// one globally set in the SSLManager.
 
+	[[nodiscard]]
 	InvalidCertificateHandlerPtr getInvalidCertificateHandler() const;
 		/// Returns the InvalidCertificateHandler set for this Context,
 		/// or a null pointer if none has been set.

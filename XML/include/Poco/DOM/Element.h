@@ -42,6 +42,7 @@ class XML_API Element: public AbstractContainerNode
 	/// fairly complex sub-tree representing the attribute value.
 {
 public:
+	[[nodiscard]]
 	const XMLString& tagName() const;
 		/// Returns the name of the element.
 		///
@@ -54,6 +55,7 @@ public:
 		/// tagName has the value "elementExample". Note that this is case-preserving in XML,
 		/// as are all of the operations of the DOM.
 
+	[[nodiscard]]
 	const XMLString& getAttribute(const XMLString& name) const;
 		/// Retrieves an attribute value by name.
 		///
@@ -71,6 +73,7 @@ public:
 	void removeAttribute(const XMLString& name);
 		/// Removes an attribute by name.
 
+	[[nodiscard]]
 	Attr* getAttributeNode(const XMLString& name) const;
 		/// Retrieves an Attr node by name.
 
@@ -88,6 +91,7 @@ public:
 	Attr* removeAttributeNode(Attr* oldAttr);
 		/// Removes the specified attribute.
 
+	[[nodiscard]]
 	NodeList* getElementsByTagName(const XMLString& name) const;
 		/// Returns a NodeList of all descendant elements with a given tag
 		/// name, in the order in which they would be encountered in a
@@ -112,6 +116,7 @@ public:
 		/// between Text nodes and CDATASection nodes.
 
 	// DOM Level 2
+	[[nodiscard]]
 	const XMLString& getAttributeNS(const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Retrieves an attribute value by name.
 		///
@@ -126,6 +131,7 @@ public:
 	void removeAttributeNS(const XMLString& namespaceURI, const XMLString& localName);
 		/// Removes an attribute by name.
 
+	[[nodiscard]]
 	Attr* getAttributeNodeNS(const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Retrieves an Attr node by name.
 
@@ -133,12 +139,15 @@ public:
 		/// Adds a new attribute. If an attribute with that name is already
 		/// present in the element, it is replaced by the new one.
 
+	[[nodiscard]]
 	bool hasAttribute(const XMLString& name) const;
 		/// Returns true if and only if the element has the specified attribute.
 
+	[[nodiscard]]
 	bool hasAttributeNS(const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Returns true if and only if the element has the specified attribute.
 
+	[[nodiscard]]
 	NodeList* getElementsByTagNameNS(const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Returns a NodeList of all the descendant Elements with a given local name and namespace URI
 		/// in the order in which they are encountered in a preorder traversal of this Element tree.
@@ -148,30 +157,39 @@ public:
 		/// The returned NodeList must be released with a call
 		/// to release() when no longer needed.
 
+	[[nodiscard]]
 	const XMLString& namespaceURI() const;
+	[[nodiscard]]
 	XMLString prefix() const;
+	[[nodiscard]]
 	const XMLString& localName() const;
+	[[nodiscard]]
 	bool hasAttributes() const;
+	[[nodiscard]]
 	XMLString innerText() const;
 
+	[[nodiscard]]
 	Element* getChildElement(const XMLString& name) const;
 		/// Returns the first child element with the given name, or null
 		/// if such an element does not exist.
 		///
 		/// This method is an extension to the W3C Document Object Model.
 
+	[[nodiscard]]
 	Element* getChildElementNS(const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Returns the first child element with the given namespaceURI and localName,
 		/// or null if such an element does not exist.
 		///
 		/// This method is an extension to the W3C Document Object Model.
 
+	[[nodiscard]]
 	Element* getElementById(const XMLString& elementId, const XMLString& idAttribute) const;
 		/// Returns the first Element whose ID attribute (given in idAttribute)
 		/// has the given elementId. If no such element exists, returns null.
 		///
 		/// This method is an extension to the W3C Document Object Model.
 
+	[[nodiscard]]
 	Element* getElementByIdNS(const XMLString& elementId, const XMLString& idAttributeURI, const XMLString& idAttributeLocalName) const;
 		/// Returns the first Element whose ID attribute (given in idAttributeURI and idAttributeLocalName)
 		/// has the given elementId. If no such element exists, returns null.
@@ -179,8 +197,11 @@ public:
 		/// This method is an extension to the W3C Document Object Model.
 
 	// Node
+	[[nodiscard]]
 	const XMLString& nodeName() const;
+	[[nodiscard]]
 	NamedNodeMap* attributes() const;
+	[[nodiscard]]
 	unsigned short nodeType() const;
 
 protected:
@@ -188,6 +209,7 @@ protected:
 	Element(Document* pOwnerDocument, const Element& elem);
 	~Element();
 
+	[[nodiscard]]
 	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 	void dispatchNodeRemovedFromDocument();

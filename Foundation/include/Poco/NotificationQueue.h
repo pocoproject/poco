@@ -114,9 +114,11 @@ public:
 	void wakeUpAll();
 		/// Wakes up all threads that wait for a notification.
 
+	[[nodiscard]]
 	bool empty() const;
 		/// Returns true iff the queue is empty.
 
+	[[nodiscard]]
 	int size() const;
 		/// Returns the number of notifications in the queue.
 
@@ -127,10 +129,12 @@ public:
 		/// Removes a notification from the queue.
 		/// Returns true if remove succeeded, false otherwise
 
+	[[nodiscard]]
 	bool hasIdleThreads() const;
 		/// Returns true if the queue has at least one thread waiting
 		/// for a notification.
 
+	[[nodiscard]]
 	static NotificationQueue& defaultQueue();
 		/// Returns a reference to the default
 		/// NotificationQueue.

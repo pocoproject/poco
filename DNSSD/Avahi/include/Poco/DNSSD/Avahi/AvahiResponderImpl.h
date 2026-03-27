@@ -53,6 +53,7 @@ public:
 		/// Destroys the AvahiResponderImpl.
 
 	// DNSSDResponderImpl
+	[[nodiscard]]
 	DNSSDBrowser& browser();
 	ServiceHandle registerService(const Service& service, int options);
 	void unregisterService(ServiceHandle& serviceHandle);
@@ -66,6 +67,7 @@ public:
 	void run();
 
 	// Implementation
+	[[nodiscard]]
 	static const char* describeError(int code);
 		/// Returns a human-readable string describing the error.
 
@@ -97,6 +99,7 @@ protected:
 
 	void reregisterServices();
 	void setupEntryGroup(AvahiEntryGroup* avahiGroup, const Service& service, const RecordVec& records, int options, bool rename);
+	[[nodiscard]]
 	static AvahiStringList* createTXTRecord(const Service::Properties& properties);
 
 private:

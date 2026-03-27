@@ -37,6 +37,7 @@ public:
 	virtual ~Error();
 		/// Destroys the Error.
 
+	[[nodiscard]]
 	const std::string& getMessage() const;
 		/// Returns the error message.
 
@@ -65,7 +66,7 @@ inline void Error::setMessage(const std::string& message)
 }
 
 
-template<>
+template <>
 struct RedisTypeTraits<Error>
 {
 	enum { TypeId = RedisType::REDIS_ERROR };

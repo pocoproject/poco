@@ -41,6 +41,7 @@ public:
 	virtual ~CertificateHandlerFactory();
 		/// Destroys the CertificateHandlerFactory.
 
+	[[nodiscard]]
 	virtual InvalidCertificateHandler* create(bool server) const = 0;
 		/// Creates a new InvalidCertificateHandler. Set server to true if the certificate handler is used on the server side.
 };
@@ -73,6 +74,7 @@ public:
 	{
 	}
 
+	[[nodiscard]]
 	InvalidCertificateHandler* create(bool server) const
 	{
 		return new T(server);
