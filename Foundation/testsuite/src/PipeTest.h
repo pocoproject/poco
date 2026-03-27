@@ -30,6 +30,8 @@ public:
 	void testCloseWrite();
 	void testCopy();
 	void testCloseRace();
+	void testCloseBlockedWrite();
+	void testCloseBlockedRead();
 
 	void setUp();
 	void tearDown();
