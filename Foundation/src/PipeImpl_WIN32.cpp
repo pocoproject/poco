@@ -14,6 +14,7 @@
 
 #include "Poco/PipeImpl_WIN32.h"
 #include "Poco/Exception.h"
+#include <ioapiset.h>  // CancelIoEx
 
 
 namespace Poco {
@@ -36,8 +37,47 @@ PipeImpl::PipeImpl()
 
 PipeImpl::~PipeImpl()
 {
-	closeWrite();  // close write first to send EOF to blocked readers
-	closeRead();
+	close();
+}
+
+
+void PipeImpl::close()
+{
+	// On Windows, CloseHandle while another thread is in ReadFile/WriteFile
+	// is undefined behavior — unlike POSIX where close(2) is safe due to
+	// kernel file-description refcounting. Use CancelIoEx to cancel pending
+	// IO, wait for completion, then safely close handles.
+	//
+	// CancelIoEx causes the blocked call to return FALSE with
+	// ERROR_OPERATION_ABORTED; the IO thread checks isClosed() and returns 0.
+	// Returns FALSE/ERROR_NOT_FOUND if no pending IO — safe to ignore.
+	//
+	// See: https://learn.microsoft.com/en-us/windows/win32/api/ioapiset/nf-ioapiset-cancelioex
+
+	_writeLock.markClosed();
+	_readLock.markClosed();
+
+	// Cancel any pending IO to unblock blocked ReadFile/WriteFile.
+	HANDLE rh = _readHandle.load(std::memory_order_acquire);
+	if (rh != INVALID_HANDLE_VALUE)
+		CancelIoEx(rh, nullptr);
+
+	HANDLE wh = _writeHandle.load(std::memory_order_acquire);
+	if (wh != INVALID_HANDLE_VALUE)
+		CancelIoEx(wh, nullptr);
+
+	// Wait for IO threads to finish (they received ERROR_OPERATION_ABORTED).
+	_readLock.wait();
+	_writeLock.wait();
+
+	// Safe to close handles — no IO is in progress.
+	rh = _readHandle.exchange(INVALID_HANDLE_VALUE, std::memory_order_acq_rel);
+	if (rh != INVALID_HANDLE_VALUE)
+		CloseHandle(rh);
+
+	wh = _writeHandle.exchange(INVALID_HANDLE_VALUE, std::memory_order_acq_rel);
+	if (wh != INVALID_HANDLE_VALUE)
+		CloseHandle(wh);
 }
 
 
@@ -47,10 +87,12 @@ int PipeImpl::writeBytes(const void* buffer, int length)
 	if (!lock)
 		return 0;
 
-	poco_assert (_writeHandle != INVALID_HANDLE_VALUE);
+	HANDLE handle = _writeHandle.load(std::memory_order_relaxed);
+	if (handle == INVALID_HANDLE_VALUE)
+		return 0;  // handle closed concurrently
 
 	DWORD bytesWritten = 0;
-	BOOL ok = WriteFile(_writeHandle.load(std::memory_order_relaxed), buffer, length, &bytesWritten, nullptr);
+	BOOL ok = WriteFile(handle, buffer, length, &bytesWritten, nullptr);
 
 	if (lock.isClosed())
 		return 0;
@@ -67,10 +109,12 @@ int PipeImpl::readBytes(void* buffer, int length)
 	if (!lock)
 		return 0;
 
-	poco_assert (_readHandle != INVALID_HANDLE_VALUE);
+	HANDLE handle = _readHandle.load(std::memory_order_relaxed);
+	if (handle == INVALID_HANDLE_VALUE)
+		return 0;  // handle closed concurrently
 
 	DWORD bytesRead = 0;
-	BOOL ok = ReadFile(_readHandle.load(std::memory_order_relaxed), buffer, length, &bytesRead, nullptr);
+	BOOL ok = ReadFile(handle, buffer, length, &bytesRead, nullptr);
 	DWORD lastError = GetLastError();
 
 	if (lock.isClosed())
@@ -98,7 +142,7 @@ PipeImpl::Handle PipeImpl::writeHandle() const
 void PipeImpl::closeRead()
 {
 	_readLock.markClosed();
-	_readLock.wait();  // wait for any in-progress read to finish
+	_readLock.wait();
 	HANDLE handle = _readHandle.exchange(INVALID_HANDLE_VALUE, std::memory_order_acq_rel);
 	if (handle != INVALID_HANDLE_VALUE)
 		CloseHandle(handle);
@@ -108,7 +152,7 @@ void PipeImpl::closeRead()
 void PipeImpl::closeWrite()
 {
 	_writeLock.markClosed();
-	_writeLock.wait();  // wait for any in-progress write to finish
+	_writeLock.wait();
 	HANDLE handle = _writeHandle.exchange(INVALID_HANDLE_VALUE, std::memory_order_acq_rel);
 	if (handle != INVALID_HANDLE_VALUE)
 		CloseHandle(handle);

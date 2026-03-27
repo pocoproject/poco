@@ -40,6 +40,7 @@ public:
 	int readBytes(void* buffer, int length);
 	Handle readHandle() const;
 	Handle writeHandle() const;
+	void close();
 	void closeRead();
 	void closeWrite();
 

@@ -190,6 +190,53 @@ void PipeTest::testCloseRace()
 }
 
 
+void PipeTest::testCloseBlockedWrite()
+{
+	// Test that close() unblocks a writer that is blocked because the pipe buffer is full.
+	Pipe pipe;
+	std::atomic<bool> writeFinished{false};
+
+	Thread writerThread;
+	writerThread.startFunc([&pipe, &writeFinished]()
+	{
+		// Write enough data to fill the pipe buffer and block.
+		const std::string buffer(100'000, 'A');
+		pipe.writeBytes(buffer.data(), static_cast<int>(buffer.size()));
+		writeFinished.store(true, std::memory_order_release);
+	});
+
+	Thread::sleep(250);  // let the writer block
+
+	pipe.close();  // must not deadlock
+
+	writerThread.join();
+	assertTrue(writeFinished.load(std::memory_order_acquire));
+}
+
+
+void PipeTest::testCloseBlockedRead()
+{
+	// Test that close() unblocks a reader that is blocked waiting for data.
+	Pipe pipe;
+	std::atomic<bool> readFinished{false};
+
+	Thread readerThread;
+	readerThread.startFunc([&pipe, &readFinished]()
+	{
+		char buffer[64];
+		pipe.readBytes(buffer, sizeof(buffer));
+		readFinished.store(true, std::memory_order_release);
+	});
+
+	Thread::sleep(250);  // let the reader block
+
+	pipe.close();  // must not deadlock
+
+	readerThread.join();
+	assertTrue(readFinished.load(std::memory_order_acquire));
+}
+
+
 void PipeTest::setUp()
 {
 }
@@ -210,6 +257,8 @@ CppUnit::Test* PipeTest::suite()
 	CppUnit_addTest(pSuite, PipeTest, testCloseWrite);
 	CppUnit_addTest(pSuite, PipeTest, testCopy);
 	CppUnit_addTest(pSuite, PipeTest, testCloseRace);
+	CppUnit_addTest(pSuite, PipeTest, testCloseBlockedWrite);
+	CppUnit_addTest(pSuite, PipeTest, testCloseBlockedRead);
 
 	return pSuite;
 }
