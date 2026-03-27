@@ -494,6 +494,33 @@ void HTTPSClientSessionTest::testServerAbort()
 }
 
 
+void HTTPSClientSessionTest::testProxyConfig()
+{
+	HTTPSClientSession s("www.example.com");
+	assertTrue (s.isProxyTunnel() == true);
+	assertTrue (s.getProxyProtocol() == "http");
+	assertTrue (s.getProxyHost().empty());
+}
+
+
+void HTTPSClientSessionTest::testProxySetters()
+{
+	HTTPSClientSession s("www.example.com");
+
+	s.setProxy("proxy.example.com", 3128, "https", false);
+	assertTrue (s.getProxyHost() == "proxy.example.com");
+	assertTrue (s.getProxyPort() == 3128);
+	assertTrue (s.getProxyProtocol() == "https");
+	assertTrue (s.isProxyTunnel() == false);
+
+	s.setProxyTunnel(true);
+	assertTrue (s.isProxyTunnel() == true);
+
+	s.setProxyTunnel(false);
+	assertTrue (s.isProxyTunnel() == false);
+}
+
+
 void HTTPSClientSessionTest::setUp()
 {
 }
@@ -524,6 +551,8 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testCachedSession);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testUnknownContentLength);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testServerAbort);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxyConfig);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxySetters);
 
 	return pSuite;
 }
