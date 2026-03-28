@@ -285,18 +285,18 @@ bool LoggingConfigurator::validateConfiguration(AbstractConfiguration::Ptr pConf
 	AbstractConfiguration::Ptr pFmtConfig(pConfig->createView("logging.formatters"s));
 	for (const auto& f : pFmtConfig->keys())
 	{
-		if (registry.hasFormatter(f))
-			return false;
+		if (!registry.hasFormatter(f))
+			return true;
 	}
 
 	AbstractConfiguration::Ptr pChConfig(pConfig->createView("logging.channels"s));
 	for (const auto& c : pChConfig->keys())
 	{
-		if (registry.hasChannel(c))
-			return false;
+		if (!registry.hasChannel(c))
+			return true;
 	}
 
-	return true;
+	return false;
 }
 
 
