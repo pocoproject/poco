@@ -635,6 +635,73 @@ void LoggingConfiguratorTest::testGetLoggerCollision()
 }
 
 
+void LoggingConfiguratorTest::testConfigureLogger()
+{
+	static const std::string config =
+		"logging.formatters.scriptFmt.class = PatternFormatter\n"
+		"logging.formatters.scriptFmt.pattern = %s: [%p] %t\n"
+		"logging.channels.scriptFile.class = ConsoleChannel\n"
+		"logging.channels.scriptSplitter.class = SplitterChannel\n"
+		"logging.channels.scriptSplitter.channels = scriptFile\n"
+		"logging.loggers.script.name = scriptLogger\n"
+		"logging.loggers.script.channel = scriptSplitter\n"
+		"logging.loggers.script.level = debug\n";
+
+	std::istringstream istr(config);
+	AutoPtr<PropertyFileConfiguration> pConfig = new PropertyFileConfiguration(istr);
+
+	LoggingConfigurator configurator;
+	configurator.configure(pConfig, "script");
+
+	Logger& logger = Logger::get("scriptLogger");
+	assertTrue (logger.name() == "scriptLogger");
+	assertTrue (logger.getLevel() == Message::PRIO_DEBUG);
+}
+
+
+void LoggingConfiguratorTest::testReconfigureLogger()
+{
+	// Initial configuration: ConsoleChannel
+	static const std::string config1 =
+		"logging.formatters.myFmt.class = PatternFormatter\n"
+		"logging.formatters.myFmt.pattern = %s: [%p] %t\n"
+		"logging.channels.myFile.class = ConsoleChannel\n"
+		"logging.channels.mySplitter.class = SplitterChannel\n"
+		"logging.channels.mySplitter.channels = myFile\n"
+		"logging.loggers.my.name = myLogger\n"
+		"logging.loggers.my.channel = mySplitter\n"
+		"logging.loggers.my.level = information\n";
+
+	std::istringstream istr1(config1);
+	AutoPtr<PropertyFileConfiguration> pConfig1 = new PropertyFileConfiguration(istr1);
+
+	LoggingConfigurator configurator;
+	configurator.configure(pConfig1, "my");
+
+	Logger& logger = Logger::get("myLogger");
+	assertTrue (logger.getLevel() == Message::PRIO_INFORMATION);
+
+	// Reconfigure: change level to debug
+	static const std::string config2 =
+		"logging.formatters.myFmt.class = PatternFormatter\n"
+		"logging.formatters.myFmt.pattern = %s: [%p] %t (updated)\n"
+		"logging.channels.myFile.class = ConsoleChannel\n"
+		"logging.channels.mySplitter.class = SplitterChannel\n"
+		"logging.channels.mySplitter.channels = myFile\n"
+		"logging.loggers.my.name = myLogger\n"
+		"logging.loggers.my.channel = mySplitter\n"
+		"logging.loggers.my.level = debug\n";
+
+	std::istringstream istr2(config2);
+	AutoPtr<PropertyFileConfiguration> pConfig2 = new PropertyFileConfiguration(istr2);
+
+	configurator.configure(pConfig2, "my");
+
+	// Logger should be reconfigured with new level
+	assertTrue (logger.getLevel() == Message::PRIO_DEBUG);
+}
+
+
 void LoggingConfiguratorTest::setUp()
 {
 	LoggingRegistry::defaultRegistry().clear();
@@ -664,6 +731,8 @@ CppUnit::Test* LoggingConfiguratorTest::suite()
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testGetLogger);
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testGetLoggerExisting);
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testGetLoggerCollision);
+	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testConfigureLogger);
+	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testReconfigureLogger);
 
 	return pSuite;
 }

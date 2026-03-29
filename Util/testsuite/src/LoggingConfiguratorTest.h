@@ -38,6 +38,8 @@ public:
 	void testGetLogger();
 	void testGetLoggerExisting();
 	void testGetLoggerCollision();
+	void testConfigureLogger();
+	void testReconfigureLogger();
 
 	void setUp();
 	void tearDown();
