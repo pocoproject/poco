@@ -17,8 +17,10 @@
 #ifdef POCO_OS_FAMILY_UNIX
 #include <sys/types.h>
 #include <unistd.h>
-#include <dirent.h>
 #include <pwd.h>
+#endif
+#if POCO_OS == POCO_OS_LINUX
+#include <dirent.h>
 #include <cstring>
 #include <fstream>
 #include <sstream>
@@ -55,25 +57,31 @@ void ProcessCollector::exportTo(Exporter& exporter) const
 	{
 		p->exportTo(exporter);
 	}
-#ifdef POCO_OS_FAMILY_UNIX
+#if POCO_OS == POCO_OS_LINUX
 	exportThreadCPU(exporter);
 #endif
 }
 
 
-#ifdef POCO_OS_FAMILY_UNIX
+#if POCO_OS == POCO_OS_LINUX
 namespace {
 
 double readProcStatusKb(const char* field)
 {
 	std::ifstream in("/proc/self/status");
+	if (!in) return 0.0;
 	std::string line;
 	while (std::getline(in, line))
 	{
 		if (line.compare(0, std::strlen(field), field) == 0)
 		{
 			// Line format: "VmRSS:    12345 kB"
-			return std::stod(line.substr(std::strlen(field)));
+			std::size_t fieldLen = std::strlen(field);
+			if (line.size() <= fieldLen) return 0.0;
+			const char* start = line.c_str() + fieldLen;
+			char* end = nullptr;
+			double val = std::strtod(start, &end);
+			return (end != start) ? val : 0.0;
 		}
 	}
 	return 0.0;
@@ -112,7 +120,9 @@ void ProcessCollector::buildMetrics()
 		{
 			return sysconf(_SC_OPEN_MAX);
 		}));
+#endif
 
+#if POCO_OS == POCO_OS_LINUX
 	_metrics.push_back(std::make_unique<CallbackGauge>(
 		name() + "_resident_memory_bytes"s,
 		"Resident memory size in bytes"s,
@@ -160,17 +170,26 @@ void ProcessCollector::buildMetrics()
 }
 
 
-#ifdef POCO_OS_FAMILY_UNIX
+#if POCO_OS == POCO_OS_LINUX
 void ProcessCollector::exportThreadCPU(Exporter& exporter) const
 {
 	if (!_pThreadCPU) return;
 
 	const std::vector<std::string> labelNames{"tid"s, "name"s};
 	const double ticksPerSec = static_cast<double>(clockTicksPerSecond());
+	if (ticksPerSec <= 0.0) return;
 	bool headerWritten = false;
+
+	struct DirGuard
+	{
+		DIR* d;
+		explicit DirGuard(DIR* p): d(p) {}
+		~DirGuard() { if (d) closedir(d); }
+	};
 
 	DIR* dir = opendir("/proc/self/task");
 	if (!dir) return;
+	DirGuard guard(dir);
 
 	struct dirent* entry;
 	while ((entry = readdir(dir)) != nullptr)
@@ -195,15 +214,22 @@ void ProcessCollector::exportThreadCPU(Exporter& exporter) const
 		std::string comm = line.substr(openParen + 1, closeParen - openParen - 1);
 
 		// Fields after ')': state(3) ppid(4) ... utime(14) stime(15)
-		// utime is the 12th token after ')', stime is the 13th
-		std::istringstream fields(line.substr(closeParen + 2));
-		std::string token;
+		// Skip state field (single char), then parse numeric fields.
+		// utime is the 11th numeric token after state, stime is the 12th.
+		const char* rest = line.c_str() + closeParen + 2;
+		while (*rest == ' ') ++rest;
+		if (*rest) ++rest; // skip state character
 		long long utime = 0, stime = 0;
-		for (int i = 1; i <= 13; ++i)
+		char* end = nullptr;
+		for (int i = 1; i <= 12; ++i)
 		{
-			if (!(fields >> token)) break;
-			if (i == 12) utime = std::stoll(token);
-			if (i == 13) stime = std::stoll(token);
+			while (*rest == ' ') ++rest;
+			if (!*rest) break;
+			long long val = std::strtoll(rest, &end, 10);
+			if (end == rest) break;
+			if (i == 11) utime = val;
+			if (i == 12) stime = val;
+			rest = end;
 		}
 
 		double seconds = static_cast<double>(utime + stime) / ticksPerSec;
@@ -215,8 +241,6 @@ void ProcessCollector::exportThreadCPU(Exporter& exporter) const
 		}
 		exporter.writeSample(*_pThreadCPU, labelNames, {tid, comm}, seconds, 0);
 	}
-
-	closedir(dir);
 }
 #endif
 

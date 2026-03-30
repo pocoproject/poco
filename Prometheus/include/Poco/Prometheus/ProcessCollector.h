@@ -37,6 +37,7 @@ class Prometheus_API ProcessCollector: public Collector
 	///     (actually, the time the Prometheus library was loaded).
 	///   - process_up_time_seconds: Up time of the process in seconds
 	///     (actually, time since the Prometheus library was loaded).
+	///   - process_max_fds: Maximum number of open file descriptors (Unix only).
 	///   - process_resident_memory_bytes: Resident memory size in bytes (Linux only).
 	///   - process_virtual_memory_bytes: Virtual memory size in bytes (Linux only).
 	///   - process_thread_cpu_seconds_total: Per-thread CPU time (Linux only).
@@ -68,7 +69,7 @@ private:
 	std::unique_ptr<Gauge> _pThreadCPU;
 	static Poco::Timestamp _startTime;
 
-#ifdef POCO_OS_FAMILY_UNIX
+#if POCO_OS == POCO_OS_LINUX
 	void exportThreadCPU(Exporter& exporter) const;
 #endif
 };
