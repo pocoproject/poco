@@ -17,7 +17,12 @@
 #ifdef POCO_OS_FAMILY_UNIX
 #include <sys/types.h>
 #include <unistd.h>
+#include <dirent.h>
 #include <pwd.h>
+#include <cstring>
+#include <fstream>
+#include <sstream>
+#include <string>
 #endif
 
 
@@ -50,7 +55,38 @@ void ProcessCollector::exportTo(Exporter& exporter) const
 	{
 		p->exportTo(exporter);
 	}
+#ifdef POCO_OS_FAMILY_UNIX
+	exportThreadCPU(exporter);
+#endif
 }
+
+
+#ifdef POCO_OS_FAMILY_UNIX
+namespace {
+
+double readProcStatusKb(const char* field)
+{
+	std::ifstream in("/proc/self/status");
+	std::string line;
+	while (std::getline(in, line))
+	{
+		if (line.compare(0, std::strlen(field), field) == 0)
+		{
+			// Line format: "VmRSS:    12345 kB"
+			return std::stod(line.substr(std::strlen(field)));
+		}
+	}
+	return 0.0;
+}
+
+long clockTicksPerSecond()
+{
+	static long ticks = sysconf(_SC_CLK_TCK);
+	return ticks;
+}
+
+} // anonymous namespace
+#endif
 
 
 void ProcessCollector::buildMetrics()
@@ -76,6 +112,32 @@ void ProcessCollector::buildMetrics()
 		{
 			return sysconf(_SC_OPEN_MAX);
 		}));
+
+	_metrics.push_back(std::make_unique<CallbackGauge>(
+		name() + "_resident_memory_bytes"s,
+		"Resident memory size in bytes"s,
+		nullptr,
+		[]()
+		{
+			return readProcStatusKb("VmRSS:") * 1024.0;
+		}));
+
+	_metrics.push_back(std::make_unique<CallbackGauge>(
+		name() + "_virtual_memory_bytes"s,
+		"Virtual memory size in bytes"s,
+		nullptr,
+		[]()
+		{
+			return readProcStatusKb("VmSize:") * 1024.0;
+		}));
+
+	_pThreadCPU = std::make_unique<Gauge>(
+		name() + "_thread_cpu_seconds_total"s,
+		Gauge::Params{
+			"Per-thread total CPU time in seconds (user + system)"s,
+			{"tid"s, "name"s}
+		},
+		nullptr);
 #endif
 
 	_metrics.push_back(std::make_unique<CallbackGauge>(
@@ -96,6 +158,67 @@ void ProcessCollector::buildMetrics()
 			return static_cast<double>(ProcessCollector::startTime().elapsed()/1000)/1000.0;
 		}));
 }
+
+
+#ifdef POCO_OS_FAMILY_UNIX
+void ProcessCollector::exportThreadCPU(Exporter& exporter) const
+{
+	if (!_pThreadCPU) return;
+
+	const std::vector<std::string> labelNames{"tid"s, "name"s};
+	const double ticksPerSec = static_cast<double>(clockTicksPerSecond());
+	bool headerWritten = false;
+
+	DIR* dir = opendir("/proc/self/task");
+	if (!dir) return;
+
+	struct dirent* entry;
+	while ((entry = readdir(dir)) != nullptr)
+	{
+		if (entry->d_name[0] < '0' || entry->d_name[0] > '9')
+			continue;
+
+		std::string tid(entry->d_name);
+		std::string path = "/proc/self/task/"s + tid + "/stat"s;
+		std::ifstream in(path);
+		if (!in) continue;
+
+		std::string line;
+		if (!std::getline(in, line)) continue;
+
+		// Parse comm: find first '(' and last ')' to handle spaces/parens in name
+		auto openParen = line.find('(');
+		auto closeParen = line.rfind(')');
+		if (openParen == std::string::npos || closeParen == std::string::npos)
+			continue;
+
+		std::string comm = line.substr(openParen + 1, closeParen - openParen - 1);
+
+		// Fields after ')': state(3) ppid(4) ... utime(14) stime(15)
+		// utime is the 12th token after ')', stime is the 13th
+		std::istringstream fields(line.substr(closeParen + 2));
+		std::string token;
+		long long utime = 0, stime = 0;
+		for (int i = 1; i <= 13; ++i)
+		{
+			if (!(fields >> token)) break;
+			if (i == 12) utime = std::stoll(token);
+			if (i == 13) stime = std::stoll(token);
+		}
+
+		double seconds = static_cast<double>(utime + stime) / ticksPerSec;
+
+		if (!headerWritten)
+		{
+			exporter.writeHeader(*_pThreadCPU);
+			headerWritten = true;
+		}
+		exporter.writeSample(*_pThreadCPU, labelNames, {tid, comm}, seconds, 0);
+	}
+
+	closedir(dir);
+}
+#endif
 
 
 } // namespace Poco::Prometheus
