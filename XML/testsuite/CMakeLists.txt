@@ -6,10 +6,6 @@ POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "src/*.h")
 POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_G})
 
-POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
-	src/WinDriver.cpp
-)
-
 add_executable(XML-testrunner ${TEST_SRCS})
 set_target_properties(XML-testrunner PROPERTIES DEBUG_POSTFIX "d")
 if(ANDROID)
