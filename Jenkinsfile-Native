@@ -1,6 +1,7 @@
 import java.util.regex.Pattern
 
 def OPENSSL_VERSION = "3.3.1"
+MUSL_GCC_VERSION = "15.1"
 
 def agents = [
   deb11_64bit:   [ label: 'native-deb11-64', ccache: true ],
@@ -10,8 +11,8 @@ def agents = [
 ]
 
 def builds = [
-  'linux-x86_64-static-musl':   [ agent: agents.deb11_64bit, openssl: "static-x86_64-musl", toolchain: 'static-musl-x86_64-linux-musl-gcc-11.4.0' ],
-  'linux-aarch64-static-musl':  [ agent: agents.deb11_64bit, openssl: "static-aarch64-musl", toolchain: 'static-musl-aarch64-linux-musl-gcc-11.4.0' ],
+  'linux-x86_64-static-musl':   [ agent: agents.deb11_64bit, openssl: "static-x86_64-musl", toolchain: 'static-musl-x86_64-linux-musl' ],
+  'linux-aarch64-static-musl':  [ agent: agents.deb11_64bit, openssl: "static-aarch64-musl", toolchain: 'static-musl-aarch64-linux-musl' ],
   'macosx':         [ agent: agents.macos, openssl: 'macos', toolchain: "none" ],
   'windows32':      [ agent: agents.win32, winPlatform:'x86', openssl: 'win32', toolchain: "none" ],
   'windows64':      [ agent: agents.win64, winPlatform:'x64', openssl: 'win64', toolchain: "none" ],
@@ -39,6 +40,7 @@ def createBuildStage(name, definition) {
           withEnv([
             "PLATFORM=${definition.platform ?: name}",
             "TOOLCHAIN_NAME=${definition.toolchain ?: name}",
+            "MUSL_GCC_VERSION=${MUSL_GCC_VERSION}",
             "CCACHE_FILE=${ccacheFile}",
           ]) {
             if (definition.agent.injectGHKey) {
@@ -59,8 +61,9 @@ def createBuildStage(name, definition) {
                       rm openssl.tgz
                     """
               if(definition.toolchain != 'none') {
+                def s3prefix = definition.toolchain?.startsWith('static-musl-') ? "musl-gcc-${MUSL_GCC_VERSION}/" : ""
                 sh """
-                      aws s3 cp --no-progress s3://ookla-native-toolchains/${definition.toolchain}.tgz toolchain.tgz
+                      aws s3 cp --no-progress s3://ookla-native-toolchains/${s3prefix}${definition.toolchain}.tgz toolchain.tgz
                       tar xzf toolchain.tgz -C /home/jenkins/toolchains
                       rm toolchain.tgz
                     """

@@ -5,10 +5,10 @@ env
 
 
 : "${TOOLCHAINS:=}"
+: "${MUSL_GCC_VERSION:=15.1}"
 JENKINS_PLATFORM=${PLATFORM}
 
-rm -rf shared
-git clone --depth 1 git@github.com:teamookla/speedtest-sharedsuite.git shared
+git submodule update --init shared
 
 . ./shared/build/ccache.sh
 
@@ -54,39 +54,7 @@ case "$PLATFORM" in
         )
         ;;
     win*)
-        if [[ -z $CMAKE_GENERATOR ]]; then
-            case $VS_VERSION in
-                vs90)
-                    CMAKE_GENERATOR="Visual Studio 9 2008"
-                    ;;
-                vs100)
-                    CMAKE_GENERATOR="Visual Studio 10 2010"
-                    ;;
-                vs110)
-                    CMAKE_GENERATOR="Visual Studio 11 2012"
-                    ;;
-                vs120)
-                    CMAKE_GENERATOR="Visual Studio 12 2013"
-                    ;;
-                vs140)
-                    CMAKE_GENERATOR="Visual Studio 14 2015"
-                    ;;
-                vs150)
-                    CMAKE_GENERATOR="Visual Studio 15 2017"
-                    ;;
-                vs150sa)
-                    CMAKE_GENERATOR="Visual Studio 15 2017"
-                    ;;
-                *)
-                    echo "Error: VS_VERSION not set"
-                    exit 1
-            esac
-            if [[ $WIN_PLATFORM = x64 ]]; then
-                set CMAKE_GENERATOR="$CMAKE_GENERATOR Win64"
-            fi
-        fi
         CMAKE_FLAGS=(
-            -G "$CMAKE_GENERATOR"
             -DBUILD_SHARED_LIBS=off
             -DOPENSSL_ROOT_DIR=$(pwd)/openssl-${OPENSSL_VERSION}/OpenSSL
             -DPOCO_MT=ON
@@ -123,14 +91,23 @@ PACKAGES=(
 PACKAGES_RE=$(echo "^(${PACKAGES[@]})\$" | perl -pe 's/ /|/g')
 
 # Check for cross-compiler toolchain.
-if [[ ${TOOLCHAIN_NAME} != none ]]; then 
+if [[ ${TOOLCHAIN_NAME} != none ]]; then
         JENKINS_PLATFORM="${TOOLCHAIN_NAME}"
         CMAKE_FLAGS+=(
             -DCMAKE_TOOLCHAIN_FILE=../shared/cmake/select-toolchain.cmake
             -DTOOLCHAINS=${TOOLCHAINS}
+            -DMUSL_GCC_VERSION=${MUSL_GCC_VERSION}
             -DJENKINS_PLATFORM=${JENKINS_PLATFORM}
             -DOOKLA_DISABLE_THREAD_NAME=1 # Disable thread naming for musl builds
         )
+fi
+
+# Size optimization flags for non-MSVC builds
+if [[ ${TOOLCHAIN_NAME} != none ]] || [[ ${PLATFORM} == linux* ]] || [[ ${PLATFORM} == mac* ]]; then
+    CMAKE_FLAGS+=(
+        "-DCMAKE_C_FLAGS_RELEASE=-O2 -DNDEBUG -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables"
+        "-DCMAKE_CXX_FLAGS_RELEASE=-O2 -DNDEBUG -ffunction-sections -fdata-sections -fno-asynchronous-unwind-tables"
+    )
 fi
 
 for build_type in Debug Release; do
