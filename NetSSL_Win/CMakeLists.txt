@@ -33,14 +33,9 @@ POCO_INSTALL(NetSSLWin)
 POCO_GENERATE_PACKAGE(NetSSLWin)
 
 if(ENABLE_SAMPLES)
-	if(ENABLE_CRYPTO)
-		add_subdirectory(samples)
-	else()
-		message(STATUS "NetSSL_Win samples require Crypto and are not being built")
-	endif()
+	add_subdirectory(samples)
 endif()
 
 if(ENABLE_TESTS)
-	#add_subdirectory(testsuite)
+	add_subdirectory(testsuite)
 endif()
-

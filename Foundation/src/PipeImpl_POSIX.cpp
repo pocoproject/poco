@@ -37,8 +37,47 @@ PipeImpl::PipeImpl()
 
 PipeImpl::~PipeImpl()
 {
-	closeWrite();  // close write first to send EOF to blocked readers
-	closeRead();
+	close();
+}
+
+
+void PipeImpl::close()
+{
+	// Coordinated close of both pipe ends to unblock any blocked IO.
+	//
+	// On POSIX, a blocked write unblocks with EPIPE when the read end
+	// is closed, and a blocked read returns 0 (EOF) when the write end
+	// is closed. We must close both ends before waiting, because we
+	// don't know which end (if any) has blocked IO.
+	//
+	// This creates a benign race between close(fd) and a concurrent
+	// read(fd)/write(fd) on the same fd: the blocked syscall holds a
+	// kernel reference to the underlying file description, so it
+	// completes safely even after close() removes the fd from the
+	// table (see close(2) on Linux). The fd is cached in a local
+	// variable by readBytes/writeBytes, so fd recycling after close
+	// does not affect the in-progress syscall.
+	//
+	// TSan reports this as a data race (suppressed in tsan.suppress).
+
+	_writeLock.markClosed();
+	_readLock.markClosed();
+
+	// Close write fd — sends EOF to blocked readers.
+	int wfd = _writefd.exchange(-1, std::memory_order_acq_rel);
+	if (wfd != -1)
+		::close(wfd);
+
+	// Wait for reader to finish (it received EOF from closing write end).
+	_readLock.wait();
+
+	// Close read fd — sends EPIPE to blocked writers.
+	int rfd = _readfd.exchange(-1, std::memory_order_acq_rel);
+	if (rfd != -1)
+		::close(rfd);
+
+	// Wait for writer to finish (it received EPIPE from closing read end).
+	_writeLock.wait();
 }
 
 
@@ -48,12 +87,14 @@ int PipeImpl::writeBytes(const void* buffer, int length)
 	if (!lock)
 		return 0;
 
-	poco_assert (_writefd != -1);
+	int fd = _writefd.load(std::memory_order_relaxed);
+	if (fd == -1)
+		return 0;  // fd closed concurrently
 
 	int n;
 	do
 	{
-		n = write(_writefd.load(std::memory_order_relaxed), buffer, length);
+		n = write(fd, buffer, length);
 	}
 	while (n < 0 && errno == EINTR && !lock.isClosed());
 
@@ -73,12 +114,14 @@ int PipeImpl::readBytes(void* buffer, int length)
 	if (!lock)
 		return 0;
 
-	poco_assert (_readfd != -1);
+	int fd = _readfd.load(std::memory_order_relaxed);
+	if (fd == -1)
+		return 0;  // fd closed concurrently
 
 	int n;
 	do
 	{
-		n = read(_readfd.load(std::memory_order_relaxed), buffer, length);
+		n = read(fd, buffer, length);
 	}
 	while (n < 0 && errno == EINTR && !lock.isClosed());
 
@@ -107,20 +150,20 @@ PipeImpl::Handle PipeImpl::writeHandle() const
 void PipeImpl::closeRead()
 {
 	_readLock.markClosed();
-	_readLock.wait();  // wait for any in-progress read to finish
+	_readLock.wait();
 	int fd = _readfd.exchange(-1, std::memory_order_acq_rel);
 	if (fd != -1)
-		close(fd);
+		::close(fd);
 }
 
 
 void PipeImpl::closeWrite()
 {
 	_writeLock.markClosed();
-	_writeLock.wait();  // wait for any in-progress write to finish
+	_writeLock.wait();
 	int fd = _writefd.exchange(-1, std::memory_order_acq_rel);
 	if (fd != -1)
-		close(fd);
+		::close(fd);
 }
 
 
