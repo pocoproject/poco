@@ -217,6 +217,12 @@ private:
 		/// call readReply as many times as you called writeCommand, even when
 		/// an error occurred on a command.
 
+	NotificationCenterPtr loadNC() const;
+		/// Thread-safe load of the notification center pointer.
+
+	void storeNC(NotificationCenterPtr pNC);
+		/// Thread-safe store of the notification center pointer.
+
 	Net::SocketAddress _address;
 	Net::StreamSocket _socket;
 	std::unique_ptr<RedisInputStream> _pInput{};
@@ -225,7 +231,8 @@ private:
 #if POCO_HAVE_ATOMIC_SHARED_PTR
 	std::atomic<NotificationCenterPtr> _pNC{};
 #else
-	std::atomic<AsyncNotificationCenter*> _pNC{nullptr};
+	NotificationCenterPtr _pNC;
+	mutable std::mutex _ncMutex;
 #endif
 	mutable std::once_flag _ncInitFlag{};
 };
