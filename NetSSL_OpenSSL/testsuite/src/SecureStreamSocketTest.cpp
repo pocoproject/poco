@@ -25,6 +25,7 @@
 #include "Poco/Util/Application.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Thread.h"
+#include "Poco/Timestamp.h"
 #include "Poco/File.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/FileStream.h"
@@ -275,10 +276,12 @@ void SecureStreamSocketTest::testSendFile()
 	ss.close();
 
 	Poco::Thread::sleep(200);
-	while (srv.currentConnections() > 0) 
+	Poco::Timestamp waitStart;
+	while (srv.currentConnections() > 0 && !waitStart.isElapsed(10000000)) // 10s
 	{
 		Poco::Thread::sleep(100);
 	}
+	assertTrue(srv.currentConnections() == 0);
 	srv.stop();
 
 	assertTrue (CopyToStringConnection::data() == sentData);
@@ -314,10 +317,12 @@ void SecureStreamSocketTest::testSendFileLarge()
 	ss.close();
 
 	Poco::Thread::sleep(200);
-	while (srv.currentConnections() > 0) 
+	Poco::Timestamp waitStart;
+	while (srv.currentConnections() > 0 && !waitStart.isElapsed(10000000)) // 10s
 	{
 		Poco::Thread::sleep(100);
 	}
+	assertTrue(srv.currentConnections() == 0);
 	srv.stop();
 
 	assertTrue (CopyToStringConnection::data() == sentData);
@@ -356,10 +361,12 @@ void SecureStreamSocketTest::testSendFileRange()
 	ss.close();
 
 	Poco::Thread::sleep(200);
-	while (srv.currentConnections() > 0) 
+	Poco::Timestamp waitStart;
+	while (srv.currentConnections() > 0 && !waitStart.isElapsed(10000000)) // 10s
 	{
 		Poco::Thread::sleep(100);
 	}
+	assertTrue(srv.currentConnections() == 0);
 	srv.stop();
 
 	assertTrue (CopyToStringConnection::data() == fileData.substr(offset, count));
@@ -382,7 +389,15 @@ void SecureStreamSocketTest::testShutdownBidirectional()
 	std::string sentData(chunkSize * chunkCount, 'A');
 	for (int i = 0; i < chunkCount; i++)
 	{
-		ss.sendBytes(sentData.data() + i * chunkSize, chunkSize);
+		const char* p = sentData.data() + i * chunkSize;
+		int remaining = chunkSize;
+		while (remaining > 0)
+		{
+			int n = ss.sendBytes(p, remaining);
+			if (n <= 0) break;
+			p += n;
+			remaining -= n;
+		}
 	}
 
 	// Close immediately after sending — with bidirectional shutdown,
@@ -390,10 +405,12 @@ void SecureStreamSocketTest::testShutdownBidirectional()
 	ss.close();
 
 	Poco::Thread::sleep(200);
-	while (srv.currentConnections() > 0)
+	Poco::Timestamp waitStart;
+	while (srv.currentConnections() > 0 && !waitStart.isElapsed(10000000)) // 10s
 	{
 		Poco::Thread::sleep(100);
 	}
+	assertTrue(srv.currentConnections() == 0);
 	srv.stop();
 
 	assertTrue (CopyToStringConnection::data() == sentData);

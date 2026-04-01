@@ -285,6 +285,10 @@ int SecureSocketImpl::shutdown()
 						_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
 					}
 				} while (!tsStart.isElapsed(recvTimeout.totalMicroseconds()));
+				if (rc < 0)
+				{
+					rc = handleError(rc);
+				}
 			}
 			else
 			{
