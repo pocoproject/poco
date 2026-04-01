@@ -36,41 +36,30 @@ jobs:
           cmake -S . -B build -G Ninja -DENABLE_MODULES=ON -DENABLE_TESTS=ON
       - name: Build
         run: cmake --build build --parallel 4
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd build &&
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
-  android-arm64-v8a-ndk-latest-cmake:
-    runs-on: ubuntu-22.04
+  android-ndk-cmake:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        include:
+          - abi: arm64-v8a
+          - abi: armeabi-v7a
     steps:
       - uses: actions/checkout@v5
       - uses: nttld/setup-ndk@v1.6.0
         with:
-          ndk-version: r25c
+          ndk-version: r27d
           add-to-path: true
       - run: |
-          cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_LATEST_HOME/build/cmake/android.toolchain.cmake
-          cmake --build $HOME/android-build --target all --parallel 4
-
-  android-arm64-v8a-ndk-cmake:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v5
-      - uses: nttld/setup-ndk@v1.6.0
-        with:
-          ndk-version: r25c
-          add-to-path: true
-      - run: |
-          cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DANDROID_ABI=arm64-v8a -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake
-          cmake --build $HOME/android-build --target all --parallel 4
-
-  android-armeabi-v7a-ndk-cmake:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v5
-      - uses: nttld/setup-ndk@v1.6.0
-        with:
-          ndk-version: r25c
-          add-to-path: true
-      - run: |
-          cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DANDROID_ABI=armeabi-v7a -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake
+          cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DANDROID_ABI=${{ matrix.abi }} -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake
           cmake --build $HOME/android-build --target all --parallel 4
 
   linux-gcc-cmake-armv7l:
@@ -92,7 +81,7 @@ jobs:
 
   linux-gcc-cmake-cross-armhf:
     # Converted from a make job, what is essentially different from the above?
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       CC  : "arm-linux-gnueabihf-gcc"
       CXX : "arm-linux-gnueabihf-g++"
@@ -191,9 +180,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
-      - run: sudo apt -y update && sudo apt -y install libssl-dev
+      - run: sudo apt -y update && sudo apt -y install libssl-dev libbenchmark-dev
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_TRACE=ON -DENABLE_TESTS=ON -DENABLE_INSTALL_CPPUNIT=ON
+          -DENABLE_BENCHMARK=ON
       - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
@@ -205,8 +195,19 @@ jobs:
             PWD=`pwd`
             ctest --output-on-failure
 
-  linux-gcc-cmake-asan:
+  linux-gcc-cmake-sanitizers:
     runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        include:
+          - name: asan
+            sanitize_flags: "-fsanitize=address"
+          - name: ubsan
+            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
+          - name: tsan
+            sanitize_flags: "-fsanitize=thread"
+    env:
+      TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
     steps:
       - uses: actions/checkout@v5
       # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
@@ -217,14 +218,15 @@ jobs:
       - run: sysctl kernel.randomize_va_space
       - run: sudo sysctl vm.mmap_rnd_bits
       - run: sudo sysctl -w vm.mmap_rnd_bits=28
-      - run: sudo apt -y update && sudo apt -y install libltdl-dev libssl-dev
+      - run: sudo apt -y update && sudo apt -y install libssl-dev libltdl-dev apache2-dev libapr1-dev libaprutil1-dev libavahi-client-dev
       - run: >-
-          cmake -S. -Bcmake-build -GNinja -DPOCO_SANITIZEFLAGS="-fsanitize=address" -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
+          cmake -S. -Bcmake-build -GNinja -DPOCO_SANITIZEFLAGS="${{ matrix.sanitize_flags }}" -DENABLE_TESTS=ON
+          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=ON
           -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
           -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
           -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON
           -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
+          -DENABLE_DNSSD=ON -DENABLE_DNSSD_DEFAULT=ON
           -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
           -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
       - run: cmake --build cmake-build --target all --parallel 4
@@ -250,76 +252,15 @@ jobs:
       - run: sysctl kernel.randomize_va_space
       - run: sudo sysctl vm.mmap_rnd_bits
       - run: sudo sysctl -w vm.mmap_rnd_bits=28
-      - run: sudo apt -y update && sudo apt -y install libltdl-dev libssl-dev
+      - run: sudo apt -y update && sudo apt -y install libltdl-dev libssl-dev apache2-dev libapr1-dev libaprutil1-dev libavahi-client-dev
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DPOCO_SANITIZEFLAGS="-fsanitize=address" -DPOCO_SOO=OFF -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
+          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=ON
           -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
           -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
           -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON
           -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
-          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
-          -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest -V
-
-  linux-gcc-cmake-ubsan:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v5
-      - run: sudo apt -y update && sudo apt -y install libssl-dev libltdl-dev
-      # Foundation tests do not link with vptr sanitizer. Disable it.
-      # /usr/bin/ld: CMakeFiles/Foundation-testrunner.dir/src/ClassLoaderTest.cpp.o:(.data.rel+0x18): undefined reference to `typeinfo for TestPlugin'
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DPOCO_SANITIZEFLAGS="-fsanitize=undefined;-fno-sanitize=vptr" -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
-          -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
-          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON
-          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
-          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
-          -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest -V
-
-  linux-gcc-cmake-tsan:
-    runs-on: ubuntu-24.04
-    env:
-      TSAN_OPTIONS: "suppressions=${{ github.workspace }}/tsan.suppress,second_deadlock_stack=1"
-    steps:
-      - uses: actions/checkout@v5
-      # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
-      # causes sanitizer to fail.
-      # vm.mmap_rnd_bits needs to be set to 28 to make it work.
-      # (https://github.com/google/sanitizers/issues/1716)
-      - run: sysctl vm.legacy_va_layout
-      - run: sysctl kernel.randomize_va_space
-      - run: sudo sysctl vm.mmap_rnd_bits
-      - run: sudo sysctl -w vm.mmap_rnd_bits=28
-      - run: sudo apt -y update && sudo apt -y install libssl-dev libltdl-dev
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DPOCO_SANITIZEFLAGS="-fsanitize=thread" -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
-          -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
-          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON
-          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
+          -DENABLE_DNSSD=ON -DENABLE_DNSSD_DEFAULT=ON
           -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
           -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
       - run: cmake --build cmake-build --target all --parallel 4
@@ -399,6 +340,7 @@ jobs:
           cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden -DENABLE_TESTS=ON
           -DENABLE_PDF=ON -DENABLE_ENCODINGS_COMPILER=ON
           -DENABLE_SEVENZIP=ON -DENABLE_CPPPARSER=ON
+          -DENABLE_DNSSD=ON -DENABLE_DNSSD_DEFAULT=ON
           -DENABLE_DATA_ODBC=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON
           -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/opt/homebrew/opt/mysql-client/
           -DPostgreSQL_ROOT=/opt/homebrew/opt/libpq
@@ -424,6 +366,7 @@ jobs:
           cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden -DENABLE_TESTS=ON
           -DENABLE_PDF=ON -DENABLE_ENCODINGS_COMPILER=ON
           -DENABLE_SEVENZIP=ON -DENABLE_CPPPARSER=ON
+          -DENABLE_DNSSD=ON -DENABLE_DNSSD_DEFAULT=ON
           -DENABLE_DATA_ODBC=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON
           -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client/
           -DPostgreSQL_ROOT=/usr/local/opt/libpq
@@ -439,16 +382,25 @@ jobs:
             PWD=`pwd`
             ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
 
-  macos-clang-cmake-openssl3-visibility-hidden-intel-tsan:
+  macos-clang-cmake-openssl3-visibility-hidden-intel-sanitizers:
     runs-on: macos-15-intel
+    strategy:
+      matrix:
+        include:
+          - name: asan
+            sanitize_flags: "-fsanitize=address"
+          - name: ubsan
+            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
+          - name: tsan
+            sanitize_flags: "-fsanitize=thread"
     env:
-      TSAN_OPTIONS: "suppressions=${{ github.workspace }}/tsan.suppress,second_deadlock_stack=1"
+      TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
     steps:
       - uses: actions/checkout@v5
       - run: brew install openssl@3
       - run: >-
           cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden
-          -DPOCO_SANITIZEFLAGS="-fsanitize=thread" -DENABLE_TESTS=ON
+          -DPOCO_SANITIZEFLAGS="${{ matrix.sanitize_flags }}" -DENABLE_TESTS=ON
           -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
           -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
           -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
@@ -469,69 +421,15 @@ jobs:
             PWD=`pwd`
             ctest -V
 
-  macos-clang-cmake-openssl3-visibility-hidden-intel-asan:
-    runs-on: macos-15-intel
-    steps:
-      - uses: actions/checkout@v5
-      - run: brew install openssl@3
-      - run: >-
-          cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden
-          -DPOCO_SANITIZEFLAGS="-fsanitize=address" -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
-          -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
-          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON
-          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
-          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
-          -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            sudo -s
-            PWD=`pwd`
-            ctest -V
-
-  macos-clang-cmake-openssl3-visibility-hidden-intel-ubsan:
-    runs-on: macos-15-intel
-    steps:
-      - uses: actions/checkout@v5
-      - run: brew install openssl@3
-      # Foundation tests do not link with vptr sanitizer. Disable it.
-      - run: >-
-          cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden
-          -DPOCO_SANITIZEFLAGS="-fsanitize=undefined;-fno-sanitize=vptr" -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
-          -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
-          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON
-          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
-          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
-          -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            sudo -s
-            PWD=`pwd`
-            ctest -V
-
   macos-clang-cmake-trace:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v5
-      - run: brew install openssl@3
+      - run: brew install openssl@3 google-benchmark
       - run: >-
           cmake -S. -Bcmake-build -DPOCO_MINIMAL_BUILD=ON -DENABLE_TRACE=ON -DENABLE_TESTS=ON -DENABLE_INSTALL_CPPUNIT=ON
           -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF
+          -DENABLE_BENCHMARK=ON
       - run: cmake --build cmake-build --target all --parallel 4
       - uses: ./.github/actions/retry-action
         with:
@@ -544,15 +442,36 @@ jobs:
             PWD=`pwd`
             ctest --output-on-failure
 
-  macos-clang-cmake-openssl3-tsan:
-    runs-on: macos-latest
+  macos-clang-cmake-openssl3-sanitizers:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - name: asan
+            sanitize_flags: "-fsanitize=address"
+            runner: macos-latest
+          - name: asan
+            sanitize_flags: "-fsanitize=address"
+            runner: macos-15-intel
+          - name: ubsan
+            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
+            runner: macos-latest
+          - name: ubsan
+            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
+            runner: macos-15-intel
+          - name: tsan
+            sanitize_flags: "-fsanitize=thread"
+            runner: macos-latest
+          - name: tsan
+            sanitize_flags: "-fsanitize=thread"
+            runner: macos-15-intel
     env:
-      TSAN_OPTIONS: "suppressions=${{ github.workspace }}/tsan.suppress,second_deadlock_stack=1"
+      TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
     steps:
       - uses: actions/checkout@v5
       - run: brew install openssl@3
       - run: >-
-          cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="-fsanitize=thread" -DENABLE_TESTS=ON
+          cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="${{ matrix.sanitize_flags }}" -DENABLE_TESTS=ON
           -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
           -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
           -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
@@ -570,62 +489,6 @@ jobs:
             cd cmake-build &&
             sudo -s
             TSAN_OPTIONS=${TSAN_OPTIONS}
-            PWD=`pwd`
-            ctest -V
-
-  macos-clang-cmake-openssl3-ubsan:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v5
-      - run: brew install openssl@3
-      # Foundation tests do not link with vptr sanitizer. Disable it.
-      # Undefined symbols for architecture arm64:
-      #   "typeinfo for TestPlugin", referenced from:
-      #     l___unnamed_346 in ClassLoaderTest.cpp.o
-      - run: >-
-          cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="-fsanitize=undefined;-fno-sanitize=vptr" -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
-          -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
-          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON
-          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
-          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
-          -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            sudo -s
-            PWD=`pwd`
-            ctest -V
-
-  macos-clang-cmake-openssl3-asan:
-    runs-on: macos-15-intel
-    steps:
-      - uses: actions/checkout@v5
-      - run: brew install openssl@3
-      - run: >-
-          cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="-fsanitize=address" -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
-          -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
-          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON
-          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
-          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
-          -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            sudo -s
             PWD=`pwd`
             ctest -V
 
@@ -644,12 +507,16 @@ jobs:
         class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner
     steps:
       - uses: actions/checkout@v5
+      - uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
       - run: >-
-          cmake -S. -Bcmake-build -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
           -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
           -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON
           -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --config Release --parallel 4
+      - run: cmake --build cmake-build --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -657,7 +524,7 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build;
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(MongoDB)" -C Release
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(MongoDB)"
 
   windows-2025-clang-cmake:
     runs-on: windows-2025
@@ -710,12 +577,15 @@ jobs:
         class CppUnit::TestCaller<class SharedMemoryTest>.testCreateLarge
     steps:
       - uses: actions/checkout@v5
+      - uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x86
       - run: >-
-          cmake -G "Visual Studio 17" -A Win32 -S. -Bcmake-build
+          cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
           -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
           -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON
           -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --config Release --parallel 4
+      - run: cmake --build cmake-build --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -723,10 +593,10 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build;
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)"
 
-  windows-2022-msvc-cmake-static-mt:
-    runs-on: windows-2022
+  windows-2025-msvc-cmake-static-mt:
+    runs-on: windows-2025
     env:
       CPPUNIT_IGNORE: >-
         class CppUnit::TestCaller<class PathTest>.testFind,
@@ -740,11 +610,15 @@ jobs:
         class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner
     steps:
       - uses: actions/checkout@v5
+      - uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
       - run: >-
-          cmake -S. -Bcmake-build -DBUILD_SHARED_LIBS=OFF -DPOCO_MT=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
+          cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          -DBUILD_SHARED_LIBS=OFF -DPOCO_MT=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
           -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF
           -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --config Release --parallel 4
+      - run: cmake --build cmake-build --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -752,7 +626,7 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build;
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)"
 
   windows-2025-msvc-cmake-static:
     runs-on: windows-2025
@@ -769,11 +643,15 @@ jobs:
         class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner
     steps:
       - uses: actions/checkout@v5
+      - uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
       - run: >-
-          cmake -S. -Bcmake-build -DBUILD_SHARED_LIBS=OFF -DENABLE_TESTS=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
+          cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          -DBUILD_SHARED_LIBS=OFF -DENABLE_TESTS=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
           -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF
           -DENABLE_DATA_POSTGRESQL=OFF
-      - run: cmake --build cmake-build --config Release --parallel 4
+      - run: cmake --build cmake-build --parallel 4
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -781,7 +659,7 @@ jobs:
           retry_on: any
           command: >-
             cd cmake-build;
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Release
+            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)"
 
   # missing asan dll path
   #  windows-2022-msvc-cmake-asan:
@@ -839,7 +717,7 @@ jobs:
 
   # TODO tests sometimes failing on testTransaction and testReconnect
   linux-gcc-cmake-postgres:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:16.0
@@ -907,7 +785,7 @@ jobs:
             ctest --output-on-failure
 
   linux-gcc-cmake-odbc-oracle:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     services:
       oracle:
        image: container-registry.oracle.com/database/free:23.5.0.0-lite
@@ -997,7 +875,7 @@ jobs:
             ctest --output-on-failure
 
   linux-gcc-cmake-odbc-sqlserver:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     services:
       sqlserver:
         image: mcr.microsoft.com/mssql/server:2022-latest
@@ -1069,7 +947,7 @@ jobs:
             ctest --output-on-failure
 
 #  linux-gcc-cmake-odbc-mysql:
-#    runs-on: ubuntu-22.04
+#    runs-on: ubuntu-24.04
 #    services:
 #      mysql:
 #        image: mysql:8.1.0
@@ -1117,7 +995,7 @@ jobs:
 #            ctest --output-on-failure
 
   linux-gcc-cmake-odbc-postgres:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     services:
       postgres:
         image: postgres:16.0
@@ -1245,8 +1123,12 @@ jobs:
     runs-on: windows-2025
     steps:
       - uses: actions/checkout@v5
+      - uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
       - run: >-
-          cmake -S. -Bcmake-build -DENABLE_COMPILER_WARNINGS=ON -DENABLE_TESTS=ON
+          cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          -DENABLE_COMPILER_WARNINGS=ON -DENABLE_TESTS=ON
           -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
           -DENABLE_CPPPARSER=ON -DENABLE_PDF=ON
           -DENABLE_ENCODINGS=ON -DENABLE_ENCODINGS_COMPILER=ON
@@ -1257,7 +1139,7 @@ jobs:
           -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_ODBC=ON
           -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF
           -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF
-      - run: cmake --build cmake-build --config Release --parallel 4
+      - run: cmake --build cmake-build --parallel 4
 
   linux-gcc-cmake-deprecated-tests:
     # Run tests for deprecated functionality
