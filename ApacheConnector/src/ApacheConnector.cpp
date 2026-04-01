@@ -166,7 +166,7 @@ void ApacheConnector::log(const char* file, int line, int level, int status, con
 #if AP_SERVER_MAJORVERSION_NUMBER == 2 && AP_SERVER_MINORVERSION_NUMBER < 4
 		ap_log_error(file, line, level, 0, nullptr, "%s", text);
 #else
-	ap_log_error(file, line, level, 0, 0, 0, text);
+	ap_log_error(file, line, level, 0, 0, 0, "%s", text);
 #endif
 }
 
