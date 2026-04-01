@@ -12,6 +12,9 @@
 //
 
 
+#define SCHANNEL_USE_BLACKLISTS // Required for SCH_CREDENTIALS which is required for TLS 1.3 on Windows 11
+
+
 #include "Poco/Net/Context.h"
 #include "Poco/Net/SSLManager.h"
 #include "Poco/Net/SSLException.h"
@@ -26,7 +29,6 @@
 #include <sstream>
 #include <algorithm>
 #include <cctype>
-#include <stdio.h>
 
 
 namespace Poco::Net {
@@ -292,13 +294,89 @@ CredHandle& Context::credentials()
 
 	if (_hCreds.dwLower == 0 && _hCreds.dwUpper == 0)
 	{
-		acquireSchannelCredentials(_hCreds);
+		SECURITY_STATUS status = acquireSchannelCredentials(_hCreds);
+		if (status == SEC_E_UNKNOWN_CREDENTIALS || status == SEC_E_UNSUPPORTED_FUNCTION)
+		{
+			status = acquireSchannelCredentialsLegacy(_hCreds);
+		}
+		if (status != SEC_E_OK)
+		{
+			throw SSLException("Failed to acquire Schannel credentials", Utility::formatError(status));
+		}
 	}
 	return _hCreds;
 }
 
 
-void Context::acquireSchannelCredentials(CredHandle& credHandle) const
+SECURITY_STATUS Context::acquireSchannelCredentials(CredHandle& credHandle) const
+{
+	SCH_CREDENTIALS schannelCred;
+	ZeroMemory(&schannelCred, sizeof(schannelCred));
+	schannelCred.dwVersion  = SCH_CREDENTIALS_VERSION;
+
+	if (_pCert)
+	{
+		schannelCred.cCreds = 1; // how many cred are stored in &pCertContext
+		schannelCred.paCred = const_cast<PCCERT_CONTEXT*>(&_pCert);
+	}
+
+	TLS_PARAMETERS tlsParams;
+	ZeroMemory(&tlsParams, sizeof(tlsParams));
+	tlsParams.grbitDisabledProtocols = disabledProtocols();
+	schannelCred.cTlsParameters = 1;
+	schannelCred.pTlsParameters = &tlsParams;
+
+	if (_options & Context::OPT_PERFORM_REVOCATION_CHECK)
+		schannelCred.dwFlags |= SCH_CRED_REVOCATION_CHECK_CHAIN;
+	else
+		schannelCred.dwFlags |= SCH_CRED_IGNORE_NO_REVOCATION_CHECK | SCH_CRED_IGNORE_REVOCATION_OFFLINE;
+
+	if (isForServerUse())
+	{
+		if (_mode >= Context::VERIFY_STRICT)
+			schannelCred.dwFlags |= SCH_CRED_NO_SYSTEM_MAPPER;
+
+		if (_mode == Context::VERIFY_NONE)
+			schannelCred.dwFlags |= SCH_CRED_MANUAL_CRED_VALIDATION;
+	}
+	else
+	{
+		if (_mode >= Context::VERIFY_STRICT)
+			schannelCred.dwFlags |= SCH_CRED_NO_DEFAULT_CREDS;
+		else
+			schannelCred.dwFlags |= SCH_CRED_USE_DEFAULT_CREDS;
+
+		if (_mode == Context::VERIFY_NONE)
+			schannelCred.dwFlags |= SCH_CRED_MANUAL_CRED_VALIDATION | SCH_CRED_NO_SERVERNAME_CHECK;
+
+		if (!_extendedCertificateVerification)
+			schannelCred.dwFlags |= SCH_CRED_NO_SERVERNAME_CHECK;
+	}
+
+#if defined(SCH_USE_STRONG_CRYPTO)
+	if (_options & Context::OPT_USE_STRONG_CRYPTO)
+		schannelCred.dwFlags |= SCH_USE_STRONG_CRYPTO;
+#endif
+
+	schannelCred.hRootStore = schannelCred.hRootStore = isForServerUse() ? _hCollectionCertStore : NULL;
+
+	TimeStamp tsExpiry;
+	tsExpiry.LowPart = tsExpiry.HighPart = 0;
+	::SEC_WCHAR name[] = UNISP_NAME_W;
+	return _securityFunctions.AcquireCredentialsHandleW(
+		NULL,
+		name,
+		isForServerUse() ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND,
+		NULL,
+		&schannelCred,
+		NULL,
+		NULL,
+		&credHandle,
+		&tsExpiry);
+}
+
+
+SECURITY_STATUS Context::acquireSchannelCredentialsLegacy(CredHandle& credHandle) const
 {
 	SCHANNEL_CRED schannelCred;
 	ZeroMemory(&schannelCred, sizeof(schannelCred));
@@ -350,7 +428,7 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 	TimeStamp tsExpiry;
 	tsExpiry.LowPart = tsExpiry.HighPart = 0;
 	::SEC_WCHAR name[] = UNISP_NAME_W;
-	SECURITY_STATUS status = _securityFunctions.AcquireCredentialsHandleW(
+	return _securityFunctions.AcquireCredentialsHandleW(
 		nullptr,
 		name,
 		isForServerUse() ? SECPKG_CRED_INBOUND : SECPKG_CRED_OUTBOUND,
@@ -360,11 +438,6 @@ void Context::acquireSchannelCredentials(CredHandle& credHandle) const
 		nullptr,
 		&credHandle,
 		&tsExpiry);
-
-	if (status != SEC_E_OK)
-	{
-		throw SSLException("Failed to acquire Schannel credentials", Utility::formatError(status));
-	}
 }
 
 
@@ -517,6 +590,39 @@ DWORD Context::enabledProtocols() const
 #endif
 	}
 	if (!(_disabledProtocols & PROTO_TLSV1_3))
+	{
+#ifdef SP_PROT_TLS1_3_CLIENT
+		result |= SP_PROT_TLS1_3_CLIENT | SP_PROT_TLS1_3_SERVER;
+#endif
+	}
+	return result;
+}
+
+
+DWORD Context::disabledProtocols() const
+{
+	DWORD result = 0;
+	if (_disabledProtocols & PROTO_SSLV3)
+	{
+		result |= SP_PROT_SSL3_CLIENT | SP_PROT_SSL3_SERVER;
+	}
+	if (_disabledProtocols & PROTO_TLSV1)
+	{
+		result |= SP_PROT_TLS1_CLIENT | SP_PROT_TLS1_SERVER;
+	}
+	if (_disabledProtocols & PROTO_TLSV1_1)
+	{
+#ifdef SP_PROT_TLS1_1_CLIENT
+		result |= SP_PROT_TLS1_1_CLIENT | SP_PROT_TLS1_1_SERVER;
+#endif
+	}
+	if (_disabledProtocols & PROTO_TLSV1_2)
+	{
+#ifdef SP_PROT_TLS1_2_CLIENT
+		result |= SP_PROT_TLS1_2_CLIENT | SP_PROT_TLS1_2_SERVER;
+#endif
+	}
+	if (_disabledProtocols & PROTO_TLSV1_3)
 	{
 #ifdef SP_PROT_TLS1_3_CLIENT
 		result |= SP_PROT_TLS1_3_CLIENT | SP_PROT_TLS1_3_SERVER;

@@ -14,9 +14,8 @@ add_test(
 	WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 	COMMAND NetSSLWin-testrunner -ignore ${CMAKE_SOURCE_DIR}/cppignore.win -all
 )
-target_link_libraries(NetSSLWin-testrunner PUBLIC Poco::NetSSL Poco::Util Poco::XML CppUnit)
+target_link_libraries(NetSSLWin-testrunner PUBLIC Poco::NetSSLWin Poco::Util Poco::XML CppUnit)
 
 # Test data
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/any.pem ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/any.pem COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/rootcert.pem ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/rootcert.pem COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetSSLWin.xml COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/any.pfx ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/any.pfx COPYONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetSSLWin-testrunner.xml COPYONLY)
