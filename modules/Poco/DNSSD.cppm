@@ -25,8 +25,12 @@ module;
 
 export module Poco:DNSSD;
 
+#ifdef ENABLE_DNSSD_AVAHI
 export import :DNSSD.Avahi;
+#endif
+#ifdef ENABLE_DNSSD_BONJOUR
 export import :DNSSD.Bonjour;
+#endif
 
 export namespace Poco::DNSSD {
 	#ifdef ENABLE_DNSSD

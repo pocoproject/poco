@@ -67,10 +67,18 @@ module;
 
 export module Poco:Data;
 
+#ifdef ENABLE_DATA_MYSQL
 export import :Data.MySQL;
+#endif
+#ifdef ENABLE_DATA_ODBC
 export import :Data.ODBC;
+#endif
+#ifdef ENABLE_DATA_POSTGRESQL
 export import :Data.PostgreSQL;
+#endif
+#ifdef ENABLE_DATA_SQLITE
 export import :Data.SQLite;
+#endif
 
 export namespace Poco::Data {
 	#ifdef ENABLE_DATA
