@@ -54,12 +54,7 @@ Client::Client(const Net::StreamSocket& socket)
 }
 
 
-Client::~Client()
-{
-#if !POCO_HAVE_ATOMIC_SHARED_PTR
-	delete _pNC.load();
-#endif
-}
+Client::~Client() = default;
 
 
 void Client::connect()
@@ -73,7 +68,7 @@ void Client::connect()
 		_pInput = std::make_unique<RedisInputStream>(_socket);
 		_pOutput = std::make_unique<RedisOutputStream>(_socket);
 
-		auto pNC = _pNC.load();
+		auto pNC = loadNC();
 		if (pNC) pNC->postNotification(new RedisConnectNotification);
 	}
 	catch (const Exception& ex)
@@ -81,7 +76,7 @@ void Client::connect()
 		_pInput.reset();
 		_pOutput.reset();
 
-		auto pNC = _pNC.load();
+		auto pNC = loadNC();
 		if (pNC) pNC->postNotification(new RedisErrorNotification(ex));
 		throw;
 	}
@@ -121,7 +116,7 @@ void Client::connect(const Timespan& timeout)
 		_pInput = std::make_unique<RedisInputStream>(_socket);
 		_pOutput = std::make_unique<RedisOutputStream>(_socket);
 
-		auto pNC = _pNC.load();
+		auto pNC = loadNC();
 		if (pNC) pNC->postNotification(new RedisConnectNotification);
 	}
 	catch (const Exception& ex)
@@ -129,7 +124,7 @@ void Client::connect(const Timespan& timeout)
 		_pInput.reset();
 		_pOutput.reset();
 
-		auto pNC = _pNC.load();
+		auto pNC = loadNC();
 		if (pNC) pNC->postNotification(new RedisErrorNotification(ex));
 		throw;
 	}
@@ -169,7 +164,7 @@ void Client::connect(const Poco::Net::StreamSocket& socket)
 		_pInput = std::make_unique<RedisInputStream>(_socket);
 		_pOutput = std::make_unique<RedisOutputStream>(_socket);
 
-		auto pNC = _pNC.load();
+		auto pNC = loadNC();
 		if (pNC) pNC->postNotification(new RedisConnectNotification);
 	}
 	catch (const Exception& ex)
@@ -177,7 +172,7 @@ void Client::connect(const Poco::Net::StreamSocket& socket)
 		_pInput.reset();
 		_pOutput.reset();
 
-		auto pNC = _pNC.load();
+		auto pNC = loadNC();
 		if (pNC) pNC->postNotification(new RedisErrorNotification(ex));
 		throw;
 	}
@@ -193,7 +188,7 @@ void Client::disconnect()
 
 		_socket.close();
 
-		auto pNC = _pNC.load();
+		auto pNC = loadNC();
 		if (pNC) pNC->postNotification(new RedisDisconnectNotification);
 	}
 }
@@ -266,19 +261,32 @@ Array Client::sendCommands(const std::vector<Array>& commands)
 
 Client::NotificationCenterPtr Client::notificationCenter()
 {
-#if POCO_HAVE_ATOMIC_SHARED_PTR
 	std::call_once(_ncInitFlag, [this]()
 	{
-		_pNC.store(std::make_shared<AsyncNotificationCenter>());
+		storeNC(std::make_shared<AsyncNotificationCenter>());
 	});
+	return loadNC();
+}
+
+
+Client::NotificationCenterPtr Client::loadNC() const
+{
+#if POCO_HAVE_ATOMIC_SHARED_PTR
 	return _pNC.load();
 #else
-	std::call_once(_ncInitFlag, [this]()
-	{
-		_pNC.store(new AsyncNotificationCenter);
-	});
-	return NotificationCenterPtr(_pNC.load(), [](AsyncNotificationCenter*) {});
-		// Return shared_ptr with no-op deleter since Client owns the pointer
+	std::lock_guard<std::mutex> lock(_ncMutex);
+	return _pNC;
+#endif
+}
+
+
+void Client::storeNC(NotificationCenterPtr pNC)
+{
+#if POCO_HAVE_ATOMIC_SHARED_PTR
+	_pNC.store(std::move(pNC));
+#else
+	std::lock_guard<std::mutex> lock(_ncMutex);
+	_pNC = std::move(pNC);
 #endif
 }
 

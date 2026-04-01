@@ -2908,6 +2908,12 @@ void RedisTest::testRPUSH()
 
 void RedisTest::testPool()
 {
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
 	Poco::Net::SocketAddress sa(_host, _port);
 	Poco::PoolableObjectFactory<Client, Client::Ptr> factory(sa);
 	Poco::ObjectPool<Client, Client::Ptr> pool(factory, 10, 15);

@@ -203,9 +203,16 @@ void AsyncNotificationCenter::stop()
 		{
 			_nq.enqueueUrgentNotification(new ShutdownNotification);
 			_nq.wakeUpAll();
-			while (!_enqueueThreadDone) Thread::sleep(100);
-			_enqueueThread.join();
 		}
+		// Wait and join unconditionally: dequeue() sets _enqueueThreadStarted
+		// to false on exit, so a second call to stop() (or a call after the
+		// thread has already finished) would skip the shutdown signal above.
+		// Joining outside the guard ensures the thread is fully stopped
+		// before the object is destroyed in all cases.
+		// Poco::Thread::join() is safe to call on a never-started or
+		// already-joined thread.
+		while (!_enqueueThreadDone) Thread::sleep(100);
+		_enqueueThread.join();
 	}
 
 #if (POCO_HAVE_JTHREAD)
