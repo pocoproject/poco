@@ -25,6 +25,7 @@
 #include "Poco/Util/Application.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Thread.h"
+#include "Poco/Timestamp.h"
 #include "Poco/File.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/FileStream.h"
@@ -275,10 +276,12 @@ void SecureStreamSocketTest::testSendFile()
 	ss.close();
 
 	Poco::Thread::sleep(200);
-	while (srv.currentConnections() > 0) 
+	Poco::Timestamp waitStart;
+	while (srv.currentConnections() > 0 && !waitStart.isElapsed(10000000)) // 10s
 	{
 		Poco::Thread::sleep(100);
 	}
+	assertTrue(srv.currentConnections() == 0);
 	srv.stop();
 
 	assertTrue (CopyToStringConnection::data() == sentData);
@@ -314,10 +317,12 @@ void SecureStreamSocketTest::testSendFileLarge()
 	ss.close();
 
 	Poco::Thread::sleep(200);
-	while (srv.currentConnections() > 0) 
+	Poco::Timestamp waitStart;
+	while (srv.currentConnections() > 0 && !waitStart.isElapsed(10000000)) // 10s
 	{
 		Poco::Thread::sleep(100);
 	}
+	assertTrue(srv.currentConnections() == 0);
 	srv.stop();
 
 	assertTrue (CopyToStringConnection::data() == sentData);
@@ -356,13 +361,59 @@ void SecureStreamSocketTest::testSendFileRange()
 	ss.close();
 
 	Poco::Thread::sleep(200);
-	while (srv.currentConnections() > 0) 
+	Poco::Timestamp waitStart;
+	while (srv.currentConnections() > 0 && !waitStart.isElapsed(10000000)) // 10s
 	{
 		Poco::Thread::sleep(100);
 	}
+	assertTrue(srv.currentConnections() == 0);
 	srv.stop();
 
 	assertTrue (CopyToStringConnection::data() == fileData.substr(offset, count));
+}
+
+
+void SecureStreamSocketTest::testShutdownBidirectional()
+{
+	// Test that bidirectional shutdown ensures all data is received
+	// by the peer before closing (regression test for GH #4883).
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<CopyToStringConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", srv.port()));
+
+	const int chunkSize = 1024;
+	const int chunkCount = 100;
+	std::string sentData(chunkSize * chunkCount, 'A');
+	for (int i = 0; i < chunkCount; i++)
+	{
+		const char* p = sentData.data() + i * chunkSize;
+		int remaining = chunkSize;
+		while (remaining > 0)
+		{
+			int n = ss.sendBytes(p, remaining);
+			if (n <= 0) break;
+			p += n;
+			remaining -= n;
+		}
+	}
+
+	// Close immediately after sending — with bidirectional shutdown,
+	// the receiver should still get all data.
+	ss.close();
+
+	Poco::Thread::sleep(200);
+	Poco::Timestamp waitStart;
+	while (srv.currentConnections() > 0 && !waitStart.isElapsed(10000000)) // 10s
+	{
+		Poco::Thread::sleep(100);
+	}
+	assertTrue(srv.currentConnections() == 0);
+	srv.stop();
+
+	assertTrue (CopyToStringConnection::data() == sentData);
 }
 
 
@@ -386,6 +437,7 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFile);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFileLarge);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFileRange);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownBidirectional);
 
 	return pSuite;
 }

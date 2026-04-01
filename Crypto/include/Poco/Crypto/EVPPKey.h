@@ -78,7 +78,7 @@ public:
 		///   - for EVP_PKEY_RSA: key length in bits
 		///   - for EVP_PKEY_EC: curve NID
 
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	explicit EVPPKey(const std::vector<unsigned char>* publicKey, const std::vector<unsigned char>* privateKey, unsigned long exponent, int type);
 #endif
 	
@@ -171,7 +171,7 @@ public:
 
 private:
 	EVPPKey();
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L	
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)	
 	void setKeyFromParameters(OSSL_PARAM* parameters);
 #endif
 	static int type(const EVP_PKEY* pEVPPKey);
@@ -345,7 +345,7 @@ inline bool EVPPKey::operator == (const EVPPKey& other) const
 {
 	poco_check_ptr (other._pEVPPKey);
 	poco_check_ptr (_pEVPPKey);
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	return (1 == EVP_PKEY_eq(_pEVPPKey, other._pEVPPKey));
 #else
 	return (1 == EVP_PKEY_cmp(_pEVPPKey, other._pEVPPKey));

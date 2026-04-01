@@ -37,7 +37,7 @@ DigestEngine::~DigestEngine()
 
 int DigestEngine::nid() const
 {
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	return EVP_MD_nid(EVP_MD_CTX_get0_md(_pContext));
 #else
 	return EVP_MD_nid(EVP_MD_CTX_md(_pContext));

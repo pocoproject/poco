@@ -171,7 +171,6 @@ ECDSASignature::ECDSASignature(const ByteVec& rawR, const ByteVec& rawS):
 
 	try
 	{
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L
 		ECDSA_SIG_set0(_pSig,
 			BN_bin2bn(&rawR[0], static_cast<long>(rawR.size()), nullptr),
 			BN_bin2bn(&rawS[0], static_cast<long>(rawS.size()), nullptr));
@@ -180,12 +179,6 @@ ECDSASignature::ECDSASignature(const ByteVec& rawR, const ByteVec& rawS):
 		ECDSA_SIG_get0(_pSig, &pR, &pS);
 		if (pR == nullptr || pS == nullptr)
 			throw Poco::Crypto::CryptoException("failed to decode R and S values");
-#else
-		if (!BN_bin2bn(&rawR[0], rawR.size(), _pSig->r))
-			 throw Poco::Crypto::OpenSSLException();
-		if (!BN_bin2bn(&rawS[0], rawS.size(), _pSig->s))
-			 throw Poco::Crypto::OpenSSLException();
-#endif
 	}
 	catch (...)
 	{
@@ -218,14 +211,7 @@ ECDSASignature::ByteVec ECDSASignature::toDER() const
 ECDSASignature::ByteVec ECDSASignature::rawR() const
 {
 	ByteVec buffer;
-#if OPENSSL_VERSION_NUMBER >= 0x10101000L
 	const BIGNUM* pR = ECDSA_SIG_get0_r(_pSig);
-#elif OPENSSL_VERSION_NUMBER >= 0x10100000L
-	const BIGNUM* pR = 0;
-	ECDSA_SIG_get0(_pSig, &pR, 0);
-#else
-	const BIGNUM* pR = _pSig->r;
-#endif
 	if (pR)
 	{
 		buffer.resize(BN_num_bytes(pR));
@@ -238,14 +224,7 @@ ECDSASignature::ByteVec ECDSASignature::rawR() const
 ECDSASignature::ByteVec ECDSASignature::rawS() const
 {
 	ByteVec buffer;
-#if OPENSSL_VERSION_NUMBER >= 0x10101000L
 	const BIGNUM* pS = ECDSA_SIG_get0_s(_pSig);
-#elif OPENSSL_VERSION_NUMBER >= 0x10100000L
-	const BIGNUM* pS = 0;
-	ECDSA_SIG_get0(_pSig, 0, &pS);
-#else
-	const BIGNUM* pS = _pSig->s;
-#endif
 	if (pS)
 	{
 		buffer.resize(BN_num_bytes(pS));

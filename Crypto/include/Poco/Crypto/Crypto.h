@@ -26,17 +26,6 @@
 #include <openssl/err.h>
 
 
-#ifndef OPENSSL_VERSION_PREREQ
-	#if defined(OPENSSL_VERSION_MAJOR) && defined(OPENSSL_VERSION_MINOR)
-		#define OPENSSL_VERSION_PREREQ(maj, min) \
-			((OPENSSL_VERSION_MAJOR << 16) + OPENSSL_VERSION_MINOR >= ((maj) << 16) + (min))
-	#else
-		#define OPENSSL_VERSION_PREREQ(maj, min) \
-			(OPENSSL_VERSION_NUMBER >= (((maj) << 28) | ((min) << 20)))
-	#endif
-#endif
-
-
 #ifndef POCO_OPENSSL_VERSION_PREREQ
 	/// Check for OpenSSL >= major.minor.patch using OPENSSL_VERSION_NUMBER.
 	/// OPENSSL_VERSION_NUMBER encodes version as 0xMNNFFPPS
