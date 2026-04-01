@@ -7,10 +7,6 @@ file(GLOB_RECURSE HDRS_G "src/*.h")
 file(GLOB HDRS_E ${PROJECT_SOURCE_DIR}/Data/DataTest/include/*.h)
 POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_E})
 
-POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
-	src/WinDriver.cpp
-)
-
 add_executable(DataSQLite-testrunner ${TEST_SRCS})
 set_target_properties(DataSQLite-testrunner PROPERTIES DEBUG_POSTFIX "d")
 if(ANDROID)
