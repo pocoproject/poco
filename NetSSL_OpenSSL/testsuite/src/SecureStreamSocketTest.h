@@ -30,6 +30,7 @@ public:
 	void testSendFile();
 	void testSendFileLarge();
 	void testSendFileRange();
+	void testShutdownBidirectional();
 
 	void setUp();
 	void tearDown();
