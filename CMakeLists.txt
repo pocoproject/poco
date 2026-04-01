@@ -734,6 +734,8 @@ install(
 		Devel
 )
 
+math(EXPR POCO_ARCH "${CMAKE_SIZEOF_VOID_P} * 8")
+
 message(STATUS "CMake '${CMAKE_VERSION}' successfully configured '${PROJECT_NAME}'")
 message(STATUS "${PROJECT_NAME} package version: '${PROJECT_VERSION}'")
 if(BUILD_SHARED_LIBS)
@@ -761,7 +763,7 @@ if (ENABLE_MODULES)
 endif()
 message(STATUS "[cmake] Build for OS type:      ${CMAKE_SYSTEM_NAME}")
 message(STATUS "[cmake] Build for OS version:   ${CMAKE_SYSTEM_VERSION}")
-message(STATUS "[cmake] Build for CPU type:     ${CMAKE_SYSTEM_PROCESSOR}")
+message(STATUS "[cmake] Build for CPU type:     ${CMAKE_SYSTEM_PROCESSOR} (${POCO_ARCH}-bit)")
 message(STATUS "[cmake] Generator:              ${CMAKE_GENERATOR}")
 message(STATUS "[cmake] Generator platorm:      ${CMAKE_GENERATOR_PLATFORM}")
 message(STATUS "[cmake] Build type:             ${CMAKE_BUILD_TYPE}")
