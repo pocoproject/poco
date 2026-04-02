@@ -193,7 +193,11 @@ option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ${_enable_default})
 option(ENABLE_ACTIVERECORD "Enable ActiveRecord" ${_enable_default})
 option(ENABLE_ACTIVERECORD_COMPILER "Enable ActiveRecord Compiler" ${_enable_default})
 
-option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
+if(WIN32)
+	option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
+else()
+	set(ENABLE_NETSSL_WIN OFF CACHE BOOL "Enable NetSSL Windows (Windows only)" FORCE)
+endif()
 
 option(ENABLE_ENCODINGS_COMPILER "Enable Encodings Compiler" OFF)
 option(ENABLE_DNSSD "Enable DNSSD" OFF)
