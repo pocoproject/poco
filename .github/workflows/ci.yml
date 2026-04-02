@@ -835,6 +835,12 @@ jobs:
             }
             break
           done
+          # Oracle Instant Client requires libaio.so.1 but Ubuntu 24.04
+          # only provides libaio.so.1t64 (64-bit time_t transition)
+          if [ ! -e /usr/lib/x86_64-linux-gnu/libaio.so.1 ]; then
+            sudo ln -s libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1
+            sudo ldconfig
+          fi
 
       - name: Setup Oracle Instant Client ODBC driver
         env:
@@ -842,12 +848,12 @@ jobs:
         run: |
           set -euxo pipefail
           # Download Oracle Instant Client 23 Basic and ODBC packages
-          wget https://download.oracle.com/otn_software/linux/instantclient/2326000/instantclient-basic-linux.x64-23.26.0.0.0.zip
-          wget https://download.oracle.com/otn_software/linux/instantclient/2326000/instantclient-odbc-linux.x64-23.26.0.0.0.zip
+          wget https://download.oracle.com/otn_software/linux/instantclient/2326100/instantclient-basic-linux.x64-23.26.1.0.0.zip
+          wget https://download.oracle.com/otn_software/linux/instantclient/2326100/instantclient-odbc-linux.x64-23.26.1.0.0.zip
           # Extract to /opt/oracle
           sudo mkdir -p /opt/oracle
-          sudo unzip -o instantclient-basic-linux.x64-23.26.0.0.0.zip -d /opt/oracle
-          sudo unzip -o instantclient-odbc-linux.x64-23.26.0.0.0.zip -d /opt/oracle
+          sudo unzip -o instantclient-basic-linux.x64-23.26.1.0.0.zip -d /opt/oracle
+          sudo unzip -o instantclient-odbc-linux.x64-23.26.1.0.0.zip -d /opt/oracle
           # Configure library path
           echo /opt/oracle/instantclient_23_26 | sudo tee /etc/ld.so.conf.d/oracle-instantclient.conf
           sudo ldconfig
