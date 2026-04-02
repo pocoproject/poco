@@ -30,7 +30,6 @@
 #endif
 #include <map>
 #include <set>
-#include <functional>
 #include <sstream>
 
 
@@ -49,6 +48,20 @@ namespace Poco::Util {
 
 
 Mutex LoggingConfigurator::_mutex;
+
+
+void LoggingConfigurator::collectChannelNames(const std::string& name, AbstractConfiguration::Ptr pChConfig, std::set<std::string>& channelNames)
+{
+	if (name.empty() || channelNames.count(name)) return;
+	channelNames.insert(name);
+	std::string subChannels = pChConfig->getString(name + ".channels"s, ""s);
+	if (!subChannels.empty())
+	{
+		Poco::StringTokenizer tok(subChannels, ","s, Poco::StringTokenizer::TOK_TRIM);
+		for (const auto& sub : tok)
+			collectChannelNames(sub, pChConfig, channelNames);
+	}
+}
 
 
 void LoggingConfigurator::configure(AbstractConfiguration::Ptr pConfig)
@@ -81,23 +94,10 @@ void LoggingConfigurator::configure(AbstractConfiguration::Ptr pConfig, const st
 	// Collect channel names referenced by this logger's channel chain.
 	AbstractConfiguration::Ptr pChConfig(pConfig->createView("logging.channels"s));
 	std::set<std::string> channelNames;
-	std::function<void(const std::string&)> collectChannels =
-		[&](const std::string& name)
-	{
-		if (name.empty() || channelNames.count(name)) return;
-		channelNames.insert(name);
-		std::string subChannels = pChConfig->getString(name + ".channels"s, ""s);
-		if (!subChannels.empty())
-		{
-			Poco::StringTokenizer tok(subChannels, ","s, Poco::StringTokenizer::TOK_TRIM);
-			for (const auto& sub : tok)
-				collectChannels(sub);
-		}
-	};
 
 	std::string rootChannel = pLoggerConfig->getString("channel"s, ""s);
 	if (!pLoggerConfig->hasProperty("channel.class"s))
-		collectChannels(rootChannel);
+		collectChannelNames(rootChannel, pChConfig, channelNames);
 
 	// Collect formatter names referenced by the collected channels.
 	std::set<std::string> formatterNames;
@@ -365,19 +365,28 @@ bool LoggingConfigurator::validateConfiguration(AbstractConfiguration::Ptr pConf
 	LoggingRegistry& registry = LoggingRegistry::defaultRegistry();
 
 	AbstractConfiguration::Ptr pFmtConfig(pConfig->createView("logging.formatters"s));
-	for (const auto& f : pFmtConfig->keys())
+	auto fmtKeys = pFmtConfig->keys();
+	AbstractConfiguration::Ptr pChConfig(pConfig->createView("logging.channels"s));
+	auto chKeys = pChConfig->keys();
+
+	// No formatters or channels to validate — accept (logger-only config).
+	if (fmtKeys.empty() && chKeys.empty())
+		return true;
+
+	// Accept as soon as any unregistered formatter or channel is found.
+	for (const auto& f : fmtKeys)
 	{
 		if (!registry.hasFormatter(f))
 			return true;
 	}
 
-	AbstractConfiguration::Ptr pChConfig(pConfig->createView("logging.channels"s));
-	for (const auto& c : pChConfig->keys())
+	for (const auto& c : chKeys)
 	{
 		if (!registry.hasChannel(c))
 			return true;
 	}
 
+	// All entries already exist — collision.
 	return false;
 }
 

@@ -38,7 +38,9 @@ public:
 	void testGetLogger();
 	void testGetLoggerExisting();
 	void testGetLoggerCollision();
+	void testGetLoggerNoFormattersNoChannels();
 	void testConfigureLogger();
+	void testConfigureLoggerNestedSplitter();
 	void testReconfigureLogger();
 
 	void setUp();

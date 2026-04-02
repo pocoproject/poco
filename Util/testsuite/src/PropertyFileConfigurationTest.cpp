@@ -786,6 +786,22 @@ void PropertyFileConfigurationTest::testIncludeManagement()
 	}
 	catch (Poco::NotFoundException&) {}
 
+	// addIncludeFile loads keys into memory immediately (no reload needed)
+	{
+		Poco::TemporaryFile liveFile;
+		liveFile.keepUntilExit();
+		{
+			Poco::FileOutputStream ostr(liveFile.path());
+			ostr << "live.key1 = liveValue1\n";
+			ostr << "live.key2 = liveValue2\n";
+		}
+		pConf->addIncludeFile(liveFile.path());
+		// Keys should be visible without reloading
+		assertTrue (pConf->getString("live.key1") == "liveValue1");
+		assertTrue (pConf->getString("live.key2") == "liveValue2");
+		assertTrue (pConf->getSourceFile("live.key1") == Poco::Path(liveFile.path()).makeAbsolute().toString());
+	}
+
 	// Save round-trip after modifications
 	pConf->setString("new.key", "newValue");
 	pConf->save(rootFile.path());

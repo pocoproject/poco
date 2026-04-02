@@ -637,15 +637,16 @@ void LoggingConfiguratorTest::testGetLoggerCollision()
 
 void LoggingConfiguratorTest::testConfigureLogger()
 {
-	static const std::string config =
-		"logging.formatters.scriptFmt.class = PatternFormatter\n"
-		"logging.formatters.scriptFmt.pattern = %s: [%p] %t\n"
-		"logging.channels.scriptFile.class = ConsoleChannel\n"
-		"logging.channels.scriptSplitter.class = SplitterChannel\n"
-		"logging.channels.scriptSplitter.channels = scriptFile\n"
-		"logging.loggers.script.name = scriptLogger\n"
-		"logging.loggers.script.channel = scriptSplitter\n"
-		"logging.loggers.script.level = debug\n";
+	static const std::string config = R"(
+logging.formatters.scriptFmt.class = PatternFormatter
+logging.formatters.scriptFmt.pattern = %s: [%p] %t
+logging.channels.scriptFile.class = ConsoleChannel
+logging.channels.scriptSplitter.class = SplitterChannel
+logging.channels.scriptSplitter.channels = scriptFile
+logging.loggers.script.name = scriptLogger
+logging.loggers.script.channel = scriptSplitter
+logging.loggers.script.level = debug
+)";
 
 	std::istringstream istr(config);
 	AutoPtr<PropertyFileConfiguration> pConfig = new PropertyFileConfiguration(istr);
@@ -662,15 +663,16 @@ void LoggingConfiguratorTest::testConfigureLogger()
 void LoggingConfiguratorTest::testReconfigureLogger()
 {
 	// Initial configuration: ConsoleChannel
-	static const std::string config1 =
-		"logging.formatters.myFmt.class = PatternFormatter\n"
-		"logging.formatters.myFmt.pattern = %s: [%p] %t\n"
-		"logging.channels.myFile.class = ConsoleChannel\n"
-		"logging.channels.mySplitter.class = SplitterChannel\n"
-		"logging.channels.mySplitter.channels = myFile\n"
-		"logging.loggers.my.name = myLogger\n"
-		"logging.loggers.my.channel = mySplitter\n"
-		"logging.loggers.my.level = information\n";
+	static const std::string config1 = R"(
+logging.formatters.myFmt.class = PatternFormatter
+logging.formatters.myFmt.pattern = %s: [%p] %t
+logging.channels.myFile.class = ConsoleChannel
+logging.channels.mySplitter.class = SplitterChannel
+logging.channels.mySplitter.channels = myFile
+logging.loggers.my.name = myLogger
+logging.loggers.my.channel = mySplitter
+logging.loggers.my.level = information
+)";
 
 	std::istringstream istr1(config1);
 	AutoPtr<PropertyFileConfiguration> pConfig1 = new PropertyFileConfiguration(istr1);
@@ -682,15 +684,16 @@ void LoggingConfiguratorTest::testReconfigureLogger()
 	assertTrue (logger.getLevel() == Message::PRIO_INFORMATION);
 
 	// Reconfigure: change level to debug
-	static const std::string config2 =
-		"logging.formatters.myFmt.class = PatternFormatter\n"
-		"logging.formatters.myFmt.pattern = %s: [%p] %t (updated)\n"
-		"logging.channels.myFile.class = ConsoleChannel\n"
-		"logging.channels.mySplitter.class = SplitterChannel\n"
-		"logging.channels.mySplitter.channels = myFile\n"
-		"logging.loggers.my.name = myLogger\n"
-		"logging.loggers.my.channel = mySplitter\n"
-		"logging.loggers.my.level = debug\n";
+	static const std::string config2 = R"(
+logging.formatters.myFmt.class = PatternFormatter
+logging.formatters.myFmt.pattern = %s: [%p] %t (updated)
+logging.channels.myFile.class = ConsoleChannel
+logging.channels.mySplitter.class = SplitterChannel
+logging.channels.mySplitter.channels = myFile
+logging.loggers.my.name = myLogger
+logging.loggers.my.channel = mySplitter
+logging.loggers.my.level = debug
+)";
 
 	std::istringstream istr2(config2);
 	AutoPtr<PropertyFileConfiguration> pConfig2 = new PropertyFileConfiguration(istr2);
@@ -699,6 +702,55 @@ void LoggingConfiguratorTest::testReconfigureLogger()
 
 	// Logger should be reconfigured with new level
 	assertTrue (logger.getLevel() == Message::PRIO_DEBUG);
+}
+
+
+void LoggingConfiguratorTest::testGetLoggerNoFormattersNoChannels()
+{
+	// Config with only loggers, no formatters or channels.
+	// validateConfiguration() must accept this (return true).
+	static const std::string config = R"(
+logging.loggers.l1.name = loggerOnlyTest
+logging.loggers.l1.level = debug
+)";
+
+	std::istringstream istr(config);
+	AutoPtr<PropertyFileConfiguration> pConfig = new PropertyFileConfiguration(istr);
+
+	LoggingConfigurator configurator;
+	Logger& logger = configurator.getLogger("loggerOnlyTest", pConfig);
+	assertTrue (logger.name() == "loggerOnlyTest");
+	assertTrue (logger.getLevel() == Message::PRIO_DEBUG);
+}
+
+
+void LoggingConfiguratorTest::testConfigureLoggerNestedSplitter()
+{
+	// Test deeply nested SplitterChannel traversal via collectChannelNames.
+	static const std::string config = R"(
+logging.formatters.nestedFmt.class = PatternFormatter
+logging.formatters.nestedFmt.pattern = %s: [%p] %t
+logging.channels.leaf1.class = ConsoleChannel
+logging.channels.leaf2.class = ConsoleChannel
+logging.channels.innerSplit.class = SplitterChannel
+logging.channels.innerSplit.channels = leaf1, leaf2
+logging.channels.outerSplit.class = SplitterChannel
+logging.channels.outerSplit.channels = innerSplit
+logging.channels.outerSplit.formatter = nestedFmt
+logging.loggers.nested.name = nestedSplitLogger
+logging.loggers.nested.channel = outerSplit
+logging.loggers.nested.level = trace
+)";
+
+	std::istringstream istr(config);
+	AutoPtr<PropertyFileConfiguration> pConfig = new PropertyFileConfiguration(istr);
+
+	LoggingConfigurator configurator;
+	configurator.configure(pConfig, "nested");
+
+	Logger& logger = Logger::get("nestedSplitLogger");
+	assertTrue (logger.name() == "nestedSplitLogger");
+	assertTrue (logger.getLevel() == Message::PRIO_TRACE);
 }
 
 
@@ -731,7 +783,9 @@ CppUnit::Test* LoggingConfiguratorTest::suite()
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testGetLogger);
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testGetLoggerExisting);
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testGetLoggerCollision);
+	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testGetLoggerNoFormattersNoChannels);
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testConfigureLogger);
+	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testConfigureLoggerNestedSplitter);
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testReconfigureLogger);
 
 	return pSuite;
