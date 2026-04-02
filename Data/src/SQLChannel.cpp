@@ -257,7 +257,6 @@ void SQLChannel::run()
 	{
 		try
 		{
-			sleepTime = 100;
 			if (_reconnect)
 			{
 				close();

@@ -98,14 +98,6 @@ HTTPAuthenticationParams::~HTTPAuthenticationParams()
 }
 
 
-HTTPAuthenticationParams& HTTPAuthenticationParams::operator = (const HTTPAuthenticationParams& authParams)
-{
-	NameValueCollection::operator = (authParams);
-
-	return *this;
-}
-
-
 void HTTPAuthenticationParams::fromAuthInfo(const std::string& authInfo)
 {
 	parse(authInfo.begin(), authInfo.end());

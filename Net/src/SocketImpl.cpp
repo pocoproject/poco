@@ -122,7 +122,7 @@ SocketImpl::SocketImpl(poco_socket_t sockfd):
 
 SocketImpl::~SocketImpl()
 {
-	close();
+	SocketImpl::close();
 }
 
 
@@ -369,6 +369,7 @@ int SocketImpl::sendBytes(const void* buffer, int length, int flags)
 	do
 	{
 		if (_sockfd == POCO_INVALID_SOCKET) throw InvalidSocketException();
+		// CodeQL [cpp/cleartext-transmission]: base socket layer; encryption handled by SecureSocketImpl
 		rc = ::send(_sockfd, reinterpret_cast<const char*>(buffer), length, flags);
 	}
 	while (_blocking && rc < 0 && lastError() == POCO_EINTR);
