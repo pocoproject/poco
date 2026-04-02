@@ -467,6 +467,10 @@ jobs:
             runner: macos-15-intel
     env:
       TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
+      # Suppress false positive: dyld4 on Apple Silicon registers ASan globals twice
+      # for dlopen'd libraries, causing a spurious ODR violation on vtable for TestPlugin.
+      # The symbol exists only once in TestLibrary.dylib (confirmed via nm).
+      ASAN_OPTIONS: ${{ matrix.name == 'asan' && 'detect_odr_violation=0' || '' }}
     steps:
       - uses: actions/checkout@v5
       - run: brew install openssl@3
@@ -488,6 +492,7 @@ jobs:
           command: >-
             cd cmake-build &&
             sudo -s
+            ASAN_OPTIONS=${ASAN_OPTIONS}
             TSAN_OPTIONS=${TSAN_OPTIONS}
             PWD=`pwd`
             ctest -V
