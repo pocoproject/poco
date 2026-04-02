@@ -271,8 +271,9 @@ std::string PropertyFileConfiguration::getSourceFile(const std::string& key) con
 }
 
 
-const std::map<std::string, std::string>& PropertyFileConfiguration::getSourceFiles() const
+std::map<std::string, std::string> PropertyFileConfiguration::getSourceFiles() const
 {
+	AbstractConfiguration::ScopedLock lock(*this);
 	return _sourceMap;
 }
 
@@ -310,6 +311,9 @@ void PropertyFileConfiguration::clear()
 
 std::string PropertyFileConfiguration::extractIncludePath(const std::string& line)
 {
+	// Per .properties spec, lines starting with '!' are comments.
+	// Only "!include " (with a trailing space/tab) is treated as an include directive.
+	// Bare "!include" without a space is treated as a comment, same as "!includeSomething".
 	constexpr std::string_view includeDirective = "!include";
 
 	std::string_view sv(line);
@@ -407,6 +411,21 @@ void PropertyFileConfiguration::addIncludeFile(const std::string& path)
 		create.close();
 	}
 
+	// Load the included file's properties into memory FIRST.
+	// If the file has invalid syntax or cyclic includes, the exception
+	// propagates and the root file is left untouched.
+	if (target.getSize() > 0)
+	{
+		Poco::FileInputStream istr(absPath);
+		if (!istr.good())
+			throw Poco::OpenFileException(absPath);
+		std::string includeBasePath = Poco::Path(absPath).parent().toString();
+		std::set<std::string> includeStack;
+		includeStack.insert(_rootFile);
+		includeStack.insert(absPath);
+		loadStream(istr, includeBasePath, absPath, includeStack);
+	}
+
 	// Append !include directive to root file.
 	// Check whether a preceding newline is needed, then write in one open.
 	bool needNewline = false;
@@ -435,21 +454,6 @@ void PropertyFileConfiguration::addIncludeFile(const std::string& path)
 	ostr.flush();
 	if (!ostr.good())
 		throw Poco::WriteFileException(_rootFile);
-
-	// Load the included file's properties into memory
-	Poco::File includeFile(absPath);
-	if (includeFile.exists() && includeFile.getSize() > 0)
-	{
-		Poco::FileInputStream istr(absPath);
-		if (istr.good())
-		{
-			std::string includeBasePath = Poco::Path(absPath).parent().toString();
-			std::set<std::string> includeStack;
-			includeStack.insert(_rootFile);
-			includeStack.insert(absPath);
-			loadStream(istr, includeBasePath, absPath, includeStack);
-		}
-	}
 }
 
 
@@ -473,7 +477,48 @@ void PropertyFileConfiguration::removeIncludeFile(const std::string& path, bool 
 	if (!found)
 		throw Poco::NotFoundException("Include not found", path);
 
-	// Remove keys if requested
+	// Rewrite root file FIRST, before modifying in-memory state.
+	// If the file rewrite fails, the in-memory state is untouched.
+	{
+		std::ostringstream out;
+
+		Poco::FileInputStream istr(_rootFile);
+		if (!istr.good())
+			throw Poco::OpenFileException(_rootFile);
+		std::string line;
+		while (std::getline(istr, line))
+		{
+			if (!line.empty() && line.back() == '\r')
+				line.pop_back();
+
+			bool skip = false;
+			std::string rawPath = extractIncludePath(line);
+			if (!rawPath.empty())
+			{
+				std::string resolved = resolveIncludePath(rawPath, basePath);
+				if (resolved == absPath)
+					skip = true;
+			}
+
+			if (!skip)
+				out << line << "\n";
+		}
+
+		// Write to temp file, then atomic rename
+		std::string tmpPath = _rootFile + ".tmp";
+		{
+			Poco::FileOutputStream ostr(tmpPath);
+			if (!ostr.good()) throw Poco::CreateFileException(tmpPath);
+			Poco::OutputLineEndingConverter lec(ostr);
+			lec << out.str();
+			lec.flush();
+			ostr.flush();
+			if (!ostr.good()) throw Poco::WriteFileException(tmpPath);
+		}
+		Poco::File(tmpPath).renameTo(_rootFile);
+	}
+
+	// Now modify in-memory state (file rewrite succeeded)
 	if (removeKeys)
 	{
 		std::vector<std::string> keysToRemove;
@@ -496,39 +541,6 @@ void PropertyFileConfiguration::removeIncludeFile(const std::string& path, bool 
 				++it;
 		}
 	}
-
-	// Rewrite root file without the matching !include line
-	std::ostringstream out;
-
-	Poco::FileInputStream istr(_rootFile);
-	if (!istr.good())
-		throw Poco::OpenFileException(_rootFile);
-	std::string line;
-	while (std::getline(istr, line))
-	{
-		if (!line.empty() && line.back() == '\r')
-			line.pop_back();
-
-		bool skip = false;
-		std::string rawPath = extractIncludePath(line);
-		if (!rawPath.empty())
-		{
-			std::string resolved = resolveIncludePath(rawPath, basePath);
-			if (resolved == absPath)
-				skip = true;
-		}
-
-		if (!skip)
-			out << line << "\n";
-	}
-
-	Poco::FileOutputStream ostr(_rootFile);
-	if (!ostr.good()) throw Poco::CreateFileException(_rootFile);
-	Poco::OutputLineEndingConverter lec(ostr);
-	lec << out.str();
-	lec.flush();
-	ostr.flush();
-	if (!ostr.good()) throw Poco::WriteFileException(_rootFile);
 }
 
 

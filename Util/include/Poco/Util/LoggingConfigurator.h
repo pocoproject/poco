@@ -199,7 +199,7 @@ private:
 	void configureChannel(Channel::Ptr pChannel, AbstractConfiguration::Ptr pConfig);
 	void configureLogger(AbstractConfiguration::Ptr pConfig);
 	[[nodiscard]] bool validateConfiguration(AbstractConfiguration::Ptr pConfig) const;
-	static void collectChannelNames(const std::string& name, AbstractConfiguration::Ptr pChConfig, std::set<std::string>& channelNames);
+	static void collectChannelNames(const std::string& name, AbstractConfiguration::Ptr pChConfig, std::set<std::string>& channelNames, int depth = 0);
 
 	static Poco::Mutex _mutex;
 		/// Static because all instances operate on the same

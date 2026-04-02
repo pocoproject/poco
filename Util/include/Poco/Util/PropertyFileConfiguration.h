@@ -119,12 +119,13 @@ public:
 	void clear();
 		/// Clears the configuration, including provenance information.
 
-	const std::map<std::string, std::string>& getSourceFiles() const;
-		/// Returns the entire source file map (key -> file path).
+	std::map<std::string, std::string> getSourceFiles() const;
+		/// Returns a snapshot of the source file map (key -> file path).
 
 	std::vector<std::string> getIncludeFiles(const std::string& path = "") const;
 		/// Returns the list of !include file paths (absolute) found in the
-		/// given file. If path is empty, the root file (_rootFile) is scanned.
+		/// given file. If path is empty, the file from which the configuration
+		/// was originally loaded is scanned.
 		/// Returns an empty vector if no root file is set.
 
 	void addIncludeFile(const std::string& path);
@@ -133,17 +134,25 @@ public:
 		/// to absolute for duplicate detection. If the target file does not
 		/// exist, it is created as an empty file.
 		/// Any properties in the included file are loaded into memory
-		/// immediately (no reload required).
+		/// immediately (no reload required). If the included file has
+		/// invalid syntax or cyclic includes, the exception propagates
+		/// and the root file is left untouched.
+		/// This method performs file I/O while holding the configuration lock.
 		/// Throws Poco::IllegalStateException if no root file is set.
-		/// Throws Poco::FileExistsException if the include already exists.
+		/// Throws Poco::FileExistsException if an !include directive for
+		///   this file already exists in the root file.
 
 	void removeIncludeFile(const std::string& path, bool removeKeys = false);
 		/// Removes the !include directive for the given file path from the root file.
+		/// Only removes the directive from the root file; nested includes
+		/// within the removed file are not affected. The included file
+		/// itself is not deleted from disk.
 		/// If removeKeys is true, all keys whose provenance matches this file
 		/// are also removed from the configuration.
 		/// If removeKeys is false (default), keys remain in memory but their
 		/// provenance is cleared. A subsequent save() will write those keys
 		/// to the root file.
+		/// This method performs file I/O while holding the configuration lock.
 		/// Throws Poco::IllegalStateException if no root file is set.
 		/// Throws Poco::NotFoundException if no matching !include directive exists.
 

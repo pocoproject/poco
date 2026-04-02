@@ -50,16 +50,21 @@ namespace Poco::Util {
 Mutex LoggingConfigurator::_mutex;
 
 
-void LoggingConfigurator::collectChannelNames(const std::string& name, AbstractConfiguration::Ptr pChConfig, std::set<std::string>& channelNames)
+constexpr int MaxChannelNestingDepth = 64;
+
+
+void LoggingConfigurator::collectChannelNames(const std::string& name, AbstractConfiguration::Ptr pChConfig, std::set<std::string>& channelNames, int depth)
 {
 	if (name.empty() || channelNames.count(name)) return;
+	if (depth > MaxChannelNestingDepth)
+		throw Poco::InvalidArgumentException("Channel nesting too deep", name);
 	channelNames.insert(name);
 	std::string subChannels = pChConfig->getString(name + ".channels"s, ""s);
 	if (!subChannels.empty())
 	{
 		Poco::StringTokenizer tok(subChannels, ","s, Poco::StringTokenizer::TOK_TRIM);
 		for (const auto& sub : tok)
-			collectChannelNames(sub, pChConfig, channelNames);
+			collectChannelNames(sub, pChConfig, channelNames, depth + 1);
 	}
 }
 
@@ -67,6 +72,8 @@ void LoggingConfigurator::collectChannelNames(const std::string& name, AbstractC
 void LoggingConfigurator::configure(AbstractConfiguration::Ptr pConfig)
 {
 	poco_check_ptr (pConfig);
+
+	Mutex::ScopedLock lock(_mutex);
 
 	AbstractConfiguration::Ptr pFormattersConfig(pConfig->createView("logging.formatters"s));
 	configureFormatters(pFormattersConfig);
@@ -87,7 +94,13 @@ void LoggingConfigurator::configure(AbstractConfiguration::Ptr pConfig, const st
 
 	AbstractConfiguration::Ptr pLoggersConfig(pConfig->createView("logging.loggers"s));
 	if (!pLoggersConfig->hasProperty(loggerKey + ".name"s) && !pLoggersConfig->hasProperty(loggerKey + ".channel"s))
+	{
+		Logger::get("LoggingConfigurator"s).warning(
+			"No configuration found for logger key '%s' — "
+			"neither 'name' nor 'channel' property exists under logging.loggers.%s"s,
+			loggerKey, loggerKey);
 		return;
+	}
 
 	AutoPtr<AbstractConfiguration> pLoggerConfig(pLoggersConfig->createView(loggerKey));
 
@@ -373,7 +386,10 @@ bool LoggingConfigurator::validateConfiguration(AbstractConfiguration::Ptr pConf
 	if (fmtKeys.empty() && chKeys.empty())
 		return true;
 
-	// Accept as soon as any unregistered formatter or channel is found.
+	// Accept if at least one formatter or channel is new (not yet registered).
+	// This allows configs that reference some existing entries alongside new ones,
+	// which is the common case when a parent config has already registered shared
+	// entries. Only reject when ALL entries already exist (full collision).
 	for (const auto& f : fmtKeys)
 	{
 		if (!registry.hasFormatter(f))
