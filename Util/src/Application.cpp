@@ -85,7 +85,8 @@ Application::Application():
 Application::Application(int argc, char** argv):
     Application()
 {
-	// CodeQL [cpp/virtual-call-in-ctor]: init() is not virtual
+	// CodeQL [cpp/virtual-call-in-ctor]: init() chain calls virtual defineOptions(),
+	// but only Application::defineOptions() runs here (derived vtable not yet constructed)
 	init(argc, argv);
 }
 

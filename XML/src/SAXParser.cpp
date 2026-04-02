@@ -194,7 +194,7 @@ void SAXParser::parse(InputSource* pInputSource)
 		setupParse();
 		_engine->parse(pInputSource);
 	}
-	// CodeQL [cpp/xxe]: XXE prevention available via FEATURE_EXTERNAL_GENERAL_ENTITIES; default-enabled for backward compat
+	// CodeQL [cpp/xxe]: external general entities disabled by default; user must explicitly enable via FEATURE_EXTERNAL_GENERAL_ENTITIES
 	else parse(pInputSource->getSystemId());
 }
 
