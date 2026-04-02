@@ -20,11 +20,10 @@
 #include <pwd.h>
 #endif
 #if POCO_OS == POCO_OS_LINUX
-#include <dirent.h>
-#include <cstring>
+#include "Poco/DirectoryIterator.h"
 #include <fstream>
-#include <sstream>
 #include <string>
+#include <string_view>
 #endif
 
 
@@ -66,19 +65,18 @@ void ProcessCollector::exportTo(Exporter& exporter) const
 #if POCO_OS == POCO_OS_LINUX
 namespace {
 
-double readProcStatusKb(const char* field)
+double readProcStatusKb(std::string_view field)
 {
 	std::ifstream in("/proc/self/status");
 	if (!in) return 0.0;
 	std::string line;
 	while (std::getline(in, line))
 	{
-		if (line.compare(0, std::strlen(field), field) == 0)
+		if (line.compare(0, field.size(), field.data()) == 0)
 		{
 			// Line format: "VmRSS:    12345 kB"
-			std::size_t fieldLen = std::strlen(field);
-			if (line.size() <= fieldLen) return 0.0;
-			const char* start = line.c_str() + fieldLen;
+			if (line.size() <= field.size()) return 0.0;
+			const char* start = line.c_str() + field.size();
 			char* end = nullptr;
 			double val = std::strtod(start, &end);
 			return (end != start) ? val : 0.0;
@@ -142,7 +140,7 @@ void ProcessCollector::buildMetrics()
 		}));
 
 	_pThreadCPU = std::make_unique<Gauge>(
-		name() + "_thread_cpu_seconds_total"s,
+		name() + "_thread_cpu_seconds"s,
 		Gauge::Params{
 			"Per-thread total CPU time in seconds (user + system)"s,
 			{"tid"s, "name"s}
@@ -173,73 +171,77 @@ void ProcessCollector::buildMetrics()
 #if POCO_OS == POCO_OS_LINUX
 void ProcessCollector::exportThreadCPU(Exporter& exporter) const
 {
-	if (!_pThreadCPU) return;
+	if (_pThreadCPU == nullptr) return;
 
-	const std::vector<std::string> labelNames{"tid"s, "name"s};
+	const auto& labelNames = _pThreadCPU->labelNames();
 	const double ticksPerSec = static_cast<double>(clockTicksPerSecond());
 	if (ticksPerSec <= 0.0) return;
 	bool headerWritten = false;
 
-	struct DirGuard
+	try
 	{
-		DIR* d;
-		explicit DirGuard(DIR* p): d(p) {}
-		~DirGuard() { if (d) closedir(d); }
-	};
-
-	DIR* dir = opendir("/proc/self/task");
-	if (!dir) return;
-	DirGuard guard(dir);
-
-	struct dirent* entry;
-	while ((entry = readdir(dir)) != nullptr)
-	{
-		if (entry->d_name[0] < '0' || entry->d_name[0] > '9')
-			continue;
-
-		std::string tid(entry->d_name);
-		std::string path = "/proc/self/task/"s + tid + "/stat"s;
-		std::ifstream in(path);
-		if (!in) continue;
-
-		std::string line;
-		if (!std::getline(in, line)) continue;
-
-		// Parse comm: find first '(' and last ')' to handle spaces/parens in name
-		auto openParen = line.find('(');
-		auto closeParen = line.rfind(')');
-		if (openParen == std::string::npos || closeParen == std::string::npos)
-			continue;
-
-		std::string comm = line.substr(openParen + 1, closeParen - openParen - 1);
-
-		// Fields after ')': state(3) ppid(4) ... utime(14) stime(15)
-		// Skip state field (single char), then parse numeric fields.
-		// utime is the 11th numeric token after state, stime is the 12th.
-		const char* rest = line.c_str() + closeParen + 2;
-		while (*rest == ' ') ++rest;
-		if (*rest) ++rest; // skip state character
-		long long utime = 0, stime = 0;
-		char* end = nullptr;
-		for (int i = 1; i <= 12; ++i)
+		Poco::DirectoryIterator it("/proc/self/task"s);
+		Poco::DirectoryIterator end;
+		for (; it != end; ++it)
 		{
+			const std::string& tid = it.name();
+			if (tid.empty() || tid[0] < '0' || tid[0] > '9')
+				continue;
+
+			std::string path = "/proc/self/task/"s + tid + "/stat"s;
+			std::ifstream in(path);
+			if (!in) continue;
+
+			std::string line;
+			if (!std::getline(in, line)) continue;
+
+			// Parse comm: find first '(' and last ')' to handle spaces/parens in name
+			auto openParen = line.find('(');
+			auto closeParen = line.rfind(')');
+			if (openParen == std::string::npos || closeParen == std::string::npos)
+				continue;
+
+			std::string comm = line.substr(openParen + 1, closeParen - openParen - 1);
+
+			// Fields after ')': state(3) ppid(4) ... utime(14) stime(15)
+			// Skip state field (single char), then parse numeric fields.
+			// utime is the 11th numeric token after state, stime is the 12th.
+			if (closeParen + 2 >= line.size()) continue;
+			const char* rest = line.c_str() + closeParen + 2;
 			while (*rest == ' ') ++rest;
-			if (!*rest) break;
-			long long val = std::strtoll(rest, &end, 10);
-			if (end == rest) break;
-			if (i == 11) utime = val;
-			if (i == 12) stime = val;
-			rest = end;
-		}
+			if (*rest) ++rest; // skip state character
+			long long utime = 0, stime = 0;
+			bool parsed = false;
+			char* parseEnd = nullptr;
+			for (int i = 1; i <= 12; ++i)
+			{
+				while (*rest == ' ') ++rest;
+				if (!*rest) break;
+				long long val = std::strtoll(rest, &parseEnd, 10);
+				if (parseEnd == rest) break;
+				if (i == 11) utime = val;
+				if (i == 12) { stime = val; parsed = true; }
+				rest = parseEnd;
+			}
+			if (!parsed) continue;
 
-		double seconds = static_cast<double>(utime + stime) / ticksPerSec;
+			double seconds = static_cast<double>(utime + stime) / ticksPerSec;
 
-		if (!headerWritten)
-		{
-			exporter.writeHeader(*_pThreadCPU);
-			headerWritten = true;
+			if (!headerWritten)
+			{
+				exporter.writeHeader(*_pThreadCPU);
+				headerWritten = true;
+			}
+			exporter.writeSample(*_pThreadCPU, labelNames, {tid, comm}, seconds, 0);
 		}
-		exporter.writeSample(*_pThreadCPU, labelNames, {tid, comm}, seconds, 0);
+	}
+	catch (const Poco::Exception&)
+	{
+		// /proc/self/task may not be accessible
+	}
+	catch (const std::exception&)
+	{
+		// guard against allocation or I/O exceptions
 	}
 }
 #endif
