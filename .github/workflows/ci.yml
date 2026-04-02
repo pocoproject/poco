@@ -450,6 +450,10 @@ jobs:
           - name: asan
             sanitize_flags: "-fsanitize=address"
             runner: macos-latest
+            # Suppress false positive: dyld4 on Apple Silicon registers ASan globals twice
+            # for dlopen'd libraries, causing a spurious ODR violation on vtable for TestPlugin.
+            # The symbol exists only once in TestLibrary.dylib (confirmed via nm).
+            asan_options: detect_odr_violation=0
           - name: asan
             sanitize_flags: "-fsanitize=address"
             runner: macos-15-intel
@@ -467,10 +471,7 @@ jobs:
             runner: macos-15-intel
     env:
       TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
-      # Suppress false positive: dyld4 on Apple Silicon registers ASan globals twice
-      # for dlopen'd libraries, causing a spurious ODR violation on vtable for TestPlugin.
-      # The symbol exists only once in TestLibrary.dylib (confirmed via nm).
-      ASAN_OPTIONS: ${{ matrix.name == 'asan' && 'detect_odr_violation=0' || '' }}
+      ASAN_OPTIONS: ${{ matrix.asan_options }}
     steps:
       - uses: actions/checkout@v5
       - run: brew install openssl@3
