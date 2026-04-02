@@ -482,27 +482,31 @@ void PropertyFileConfiguration::removeIncludeFile(const std::string& path, bool 
 	{
 		std::ostringstream out;
 
-		Poco::FileInputStream istr(_rootFile);
-		if (!istr.good())
-			throw Poco::OpenFileException(_rootFile);
-		std::string line;
-		while (std::getline(istr, line))
+		// Read root file into memory, then close it before writing.
+		// On Windows, open file handles prevent rename operations.
 		{
-			if (!line.empty() && line.back() == '\r')
-				line.pop_back();
-
-			bool skip = false;
-			std::string rawPath = extractIncludePath(line);
-			if (!rawPath.empty())
+			Poco::FileInputStream istr(_rootFile);
+			if (!istr.good())
+				throw Poco::OpenFileException(_rootFile);
+			std::string line;
+			while (std::getline(istr, line))
 			{
-				std::string resolved = resolveIncludePath(rawPath, basePath);
-				if (resolved == absPath)
-					skip = true;
-			}
+				if (!line.empty() && line.back() == '\r')
+					line.pop_back();
 
-			if (!skip)
-				out << line << "\n";
-		}
+				bool skip = false;
+				std::string rawPath = extractIncludePath(line);
+				if (!rawPath.empty())
+				{
+					std::string resolved = resolveIncludePath(rawPath, basePath);
+					if (resolved == absPath)
+						skip = true;
+				}
+
+				if (!skip)
+					out << line << "\n";
+			}
+		} // istr closed here
 
 		// Write to temp file, then atomic rename
 		std::string tmpPath = _rootFile + ".tmp";
