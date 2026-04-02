@@ -13,26 +13,26 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  linux-clang-20-cmake-modules:
+  linux-clang-21-cmake-modules:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
-      - name: Install Clang 20
+      - name: Install Clang 21
         run: |
           sudo apt -y update
           sudo apt -y install wget lsb-release software-properties-common gnupg
           wget https://apt.llvm.org/llvm.sh
           chmod +x llvm.sh
-          sudo ./llvm.sh 20
-          sudo apt -y install clang-20 libc++-20-dev libc++abi-20-dev
-          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-20 100
-          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-20 100
+          sudo ./llvm.sh 21
+          sudo apt -y install clang-21 libc++-21-dev libc++abi-21-dev
+          sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-21 100
+          sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-21 100
       - name: Install dependencies
         run: sudo apt -y install cmake ninja-build
-      - name: Configure with Clang 20 and modules
+      - name: Configure with Clang 21 and modules
         run: |
-          export CC=clang-20
-          export CXX=clang++-20
+          export CC=clang-21
+          export CXX=clang++-21
           cmake -S . -B build -G Ninja -DENABLE_MODULES=ON -DENABLE_TESTS=ON
       - name: Build
         run: cmake --build build --parallel 4
@@ -308,13 +308,13 @@ jobs:
   #            PWD=`pwd`
   #            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
 
-  macos-clang-18-cmake-openssl3:
+  macos-clang-21-cmake-openssl3:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v5
-      - run: brew install openssl@3 mysql-client unixodbc libpq
+      - run: brew install llvm@21 openssl@3 mysql-client unixodbc libpq
       - run: >-
-          CXX=$(brew --prefix llvm@18)/bin/clang++ CC=$(brew --prefix llvm@18)/bin/clang
+          CXX=$(brew --prefix llvm@21)/bin/clang++ CC=$(brew --prefix llvm@21)/bin/clang
           cmake -S. -Bcmake-build -DENABLE_TESTS=ON
           -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON -DENABLE_PDF=OFF
           -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/opt/homebrew/opt/mysql-client/
