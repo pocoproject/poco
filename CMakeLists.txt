@@ -428,6 +428,7 @@ if(ENABLE_NETSSL)
 endif()
 
 if(ENABLE_NETSSL_WIN)
+	set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 endif()
 
