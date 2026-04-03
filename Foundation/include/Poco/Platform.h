@@ -39,6 +39,7 @@
 #define POCO_OS_CYGWIN        0x000d
 #define POCO_OS_NACL	      0x000e
 #define POCO_OS_ANDROID       0x000f
+#define POCO_OS_GNU_HURD      0x0010
 #define POCO_OS_UNKNOWN_UNIX  0x00ff
 #define POCO_OS_WINDOWS_NT    0x1001
 #define POCO_OS_VMS           0x2001
@@ -97,6 +98,9 @@
 #elif defined(POCO_VXWORKS)
 	#define POCO_OS_FAMILY_UNIX 1
 	#define POCO_OS POCO_OS_VXWORKS
+#elif defined(__gnu_hurd__)
+	#define POCO_OS_FAMILY_UNIX 1
+	#define POCO_OS POCO_OS_GNU_HURD
 #elif defined(unix) || defined(__unix) || defined(__unix__)
 	#define POCO_OS_FAMILY_UNIX 1
 	#define POCO_OS POCO_OS_UNKNOWN_UNIX
