@@ -56,7 +56,7 @@
 #endif
 
 
-#if POCO_OS == POCO_OS_LINUX && defined(POCO_HAVE_SENDFILE) && !defined(POCO_EMSCRIPTEN)
+#if (POCO_OS == POCO_OS_LINUX && defined(POCO_HAVE_SENDFILE) && !defined(POCO_EMSCRIPTEN)) || POCO_OS == POCO_OS_GNU_HURD
 #include <sys/sendfile.h>
 #endif
 
