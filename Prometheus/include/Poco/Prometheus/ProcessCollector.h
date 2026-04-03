@@ -20,6 +20,9 @@
 
 #include "Poco/Prometheus/Collector.h"
 #include "Poco/Prometheus/CallbackMetric.h"
+#if POCO_OS == POCO_OS_LINUX
+#include "Poco/Prometheus/Gauge.h"
+#endif
 #include "Poco/Timestamp.h"
 #include <memory>
 #include <vector>
@@ -31,11 +34,14 @@ namespace Poco::Prometheus {
 class Prometheus_API ProcessCollector: public Collector
 	/// This Collector provides process-specific metrics:
 	///   - process_cpu_seconds_total: Total user and system CPU time spent in seconds.
-	///   - process_max_fds: Maximum number of open file descriptors.
+	///   - process_max_fds: Maximum number of open file descriptors (Unix only).
 	///   - process_start_time_seconds: Start time of the process since unix epoch in seconds
 	///     (actually, the time the Prometheus library was loaded).
 	///   - process_up_time_seconds: Up time of the process in seconds
 	///     (actually, time since the Prometheus library was loaded).
+	///   - process_resident_memory_bytes: Resident memory size in bytes (Linux only).
+	///   - process_virtual_memory_bytes: Virtual memory size in bytes (Linux only).
+	///   - process_thread_cpu_seconds: Per-thread CPU time (Linux only).
 {
 public:
 	ProcessCollector();
@@ -62,6 +68,11 @@ private:
 	using MetricPtr = std::unique_ptr<Metric>;
 	std::vector<MetricPtr> _metrics;
 	static Poco::Timestamp _startTime;
+
+#if POCO_OS == POCO_OS_LINUX
+	std::unique_ptr<Gauge> _pThreadCPU;
+	void exportThreadCPU(Exporter& exporter) const;
+#endif
 };
 
 
