@@ -31,8 +31,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 		DateTimeFormatter::format(dt.timestamp(), format, tzd);
 	}
 
-	dt.makeLocal(tzd);
-	dt.makeUTC(tzd);
+	try { dt.makeLocal(tzd); } catch (const std::exception&) {}
+	try { dt.makeUTC(tzd); } catch (const std::exception&) {}
 
 	try
 	{
