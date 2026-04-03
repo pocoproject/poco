@@ -23,6 +23,7 @@
 #include "Poco/Channel.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Mutex.h"
+#include <set>
 #include <string>
 
 
@@ -138,6 +139,18 @@ public:
 		/// A ConfigurationView can be used to pass only
 		/// a part of a larger configuration.
 
+	void configure(AbstractConfiguration::Ptr pConfig, const std::string& loggerKey);
+		/// Configures or reconfigures a single logger identified by loggerKey.
+		/// The loggerKey is the key under "logging.loggers" in the configuration
+		/// (e.g., "l1" for "logging.loggers.l1.name = myLogger").
+		///
+		/// Only formatters, channels, and the logger matching loggerKey are
+		/// processed. Existing entries in the LoggingRegistry are overwritten,
+		/// and the logger's channel is updated if it changed.
+		///
+		/// This method can be called multiple times to reconfigure a logger
+		/// at runtime (e.g., to change its log file path).
+
 	[[nodiscard]] Poco::Logger& getLogger(const std::string& name, AbstractConfiguration::Ptr pConfig);
 		/// Returns a reference to the Logger with the given name.
 		/// If the Logger does not yet exist, it is first configured
@@ -183,6 +196,7 @@ private:
 	void configureChannel(Channel::Ptr pChannel, AbstractConfiguration::Ptr pConfig);
 	void configureLogger(AbstractConfiguration::Ptr pConfig);
 	[[nodiscard]] bool validateConfiguration(AbstractConfiguration::Ptr pConfig) const;
+	static void collectChannelNames(const std::string& name, AbstractConfiguration::Ptr pChConfig, std::set<std::string>& channelNames, int depth = 0);
 
 	static Poco::Mutex _mutex;
 		/// Static because all instances operate on the same

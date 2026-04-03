@@ -30,6 +30,8 @@ public:
 	void testSavePreserving();
 	void testSavePreservingMultiLine();
 	void testClearResetsProvenance();
+	void testGetSourceFilesCoversAllKeys();
+	void testIncludeManagement();
 
 	void setUp();
 	void tearDown();
