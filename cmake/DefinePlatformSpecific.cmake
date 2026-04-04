@@ -148,4 +148,5 @@ endif()
 
 # OS Detection
 include(CheckTypeSize)
+include(CheckAtomic)
 find_package(Cygwin)
