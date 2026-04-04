@@ -56,8 +56,8 @@ if(UNIX AND NOT ANDROID)
 	target_link_libraries(Foundation-testrunner PUBLIC pthread)
 endif(UNIX AND NOT ANDROID)
 
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-	target_link_libraries(Foundation-testrunner PUBLIC atomic)
+if(Poco_ATOMIC_LIBRARIES)
+	target_link_libraries(Foundation-testrunner PUBLIC ${Poco_ATOMIC_LIBRARIES})
 endif()
 
 # TestApp
