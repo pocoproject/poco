@@ -741,7 +741,7 @@ install(
 	DESTINATION
 		"${PocoConfigPackageLocation}"
 	COMPONENT
-		Devel
+		Sdk
 )
 
 math(EXPR POCO_ARCH "${CMAKE_SIZEOF_VOID_P} * 8")

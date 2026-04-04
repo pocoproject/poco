@@ -255,6 +255,7 @@ macro(POCO_GENERATE_PACKAGE target_name)
 		FILE "${PROJECT_NAME}${target_name}Targets.cmake"
 		NAMESPACE "${PROJECT_NAME}::"
 		DESTINATION "${PocoConfigPackageLocation}"
+		COMPONENT Sdk
 	)
 
 	install(
@@ -262,7 +263,7 @@ macro(POCO_GENERATE_PACKAGE target_name)
 			"${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}Config.cmake"
 			"${CMAKE_BINARY_DIR}/${PROJECT_NAME}/${PROJECT_NAME}${target_name}ConfigVersion.cmake"
 		DESTINATION "${PocoConfigPackageLocation}"
-		COMPONENT Devel
+		COMPONENT Sdk
 	)
 
 endmacro()
@@ -294,14 +295,22 @@ macro(POCO_INSTALL target_name)
 		install(
 			DIRECTORY include/Poco
 			DESTINATION include
-			COMPONENT Devel
+			COMPONENT Sdk
 		)
+		# Runtime: shared library for deployment
 		install(
-			TARGETS "${target_name}" EXPORT "${target_name}Targets"
-			LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-			ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-			RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-			BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR}
+			TARGETS "${target_name}"
+			LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
+			RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
+			BUNDLE   DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
+		)
+
+		# Sdk: import lib + cmake export + shared lib for self-contained SDK
+		install(
+			TARGETS "${target_name}"
+			EXPORT "${target_name}Targets"
+			ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Sdk
+			RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Sdk
 			INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 		)
 	endif()
@@ -327,7 +336,7 @@ macro(POCO_INSTALL_PDB target_name)
 		install(
 			FILES $<TARGET_PDB_FILE:${target_name}>
 			DESTINATION ${CMAKE_INSTALL_BINDIR}
-			COMPONENT Devel
+			COMPONENT Sdk
 			OPTIONAL
 		)
 	endif()
