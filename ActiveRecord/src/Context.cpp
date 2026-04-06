@@ -33,6 +33,9 @@ Context::Context(const std::string& connector, const std::string& connectionStri
 }
 
 
+Context::~Context() = default;
+
+
 StatementPlaceholderProvider::Ptr Context::statementPlaceholderProvider() const
 {
 	if (Poco::icompare(_session.connector(), "postgresql"s) == 0)

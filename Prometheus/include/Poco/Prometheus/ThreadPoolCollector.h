@@ -50,7 +50,7 @@ public:
 		/// Creates a custom ThreadPoolCollector with the given name
 		/// and registers it with the given Registry.
 
-	~ThreadPoolCollector() = default;
+	~ThreadPoolCollector();
 		/// Destroys the ThreadPoolCollector.
 
 	// Collector

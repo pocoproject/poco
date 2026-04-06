@@ -35,7 +35,7 @@ public:
 	RegExpValidator(const std::string& regexp);
 		/// Creates the RegExpValidator, using the given regular expression.
 
-	~RegExpValidator() = default;
+	~RegExpValidator();
 		/// Destroys the RegExpValidator.
 
 	void validate(const Option& option, const std::string& value) override;

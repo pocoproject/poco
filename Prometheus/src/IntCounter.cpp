@@ -20,6 +20,9 @@
 namespace Poco::Prometheus {
 
 
+IntCounter::~IntCounter() = default;
+
+
 void IntCounter::exportTo(Exporter& exporter) const
 {
 	const std::vector<std::string> EMPTY_VEC;

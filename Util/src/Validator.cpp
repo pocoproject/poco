@@ -18,6 +18,9 @@
 namespace Poco::Util {
 
 
+Validator::Validator() = default;
+
+
 Validator::~Validator()
 {
 }

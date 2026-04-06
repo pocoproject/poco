@@ -30,6 +30,9 @@ using namespace std::string_literals;
 namespace Poco::Util {
 
 
+FilesystemConfiguration::~FilesystemConfiguration() = default;
+
+
 FilesystemConfiguration::FilesystemConfiguration(const std::string& path):
 	_path(path)
 {

@@ -59,7 +59,7 @@ class Util_API SystemConfiguration: public AbstractConfiguration
 	/// in a NotImplementedException being thrown.
 {
 public:
-	SystemConfiguration() = default;
+	SystemConfiguration();
 		/// Creates the SystemConfiguration.
 
 protected:
@@ -68,7 +68,7 @@ protected:
 	void enumerate(const std::string& key, Keys& range) const override;
 	void removeRaw(const std::string& key) override;
 
-	~SystemConfiguration() = default;
+	~SystemConfiguration();
 
 private:
 	static bool getEnv(const std::string& name, std::string& value);

@@ -18,6 +18,12 @@
 namespace Poco::Prometheus {
 
 
+GaugeSample::GaugeSample() = default;
+
+
+GaugeSample::~GaugeSample() = default;
+
+
 Gauge::Gauge(const std::string& name):
 	LabeledMetricImpl<GaugeSample>(Metric::Type::GAUGE, name)
 {
@@ -44,6 +50,9 @@ Gauge::Gauge(const std::string& name, const Params& params, Registry* pRegistry)
 	setHelp(params.help);
 	setLabelNames(params.labelNames);
 }
+
+
+Gauge::~Gauge() = default;
 
 
 double Gauge::value() const

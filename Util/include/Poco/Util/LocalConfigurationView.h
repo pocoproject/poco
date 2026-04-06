@@ -48,7 +48,7 @@ public:
 		/// Creates the LocalConfigurationView. The LocalConfigurationView
 		/// retains (shared) ownership of the passed configuration.
 
-	~LocalConfigurationView() = default;
+	~LocalConfigurationView();
 
 protected:
 	bool getRaw(const std::string& key, std::string& value) const override;

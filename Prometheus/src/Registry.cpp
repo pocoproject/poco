@@ -23,6 +23,12 @@ using namespace std::string_literals;
 namespace Poco::Prometheus {
 
 
+Registry::Registry() = default;
+
+
+Registry::~Registry() = default;
+
+
 void Registry::registerCollector(Collector* pCollector)
 {
 	poco_check_ptr (pCollector);

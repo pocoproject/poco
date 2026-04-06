@@ -34,6 +34,12 @@ using Poco::Path;
 namespace Poco::Util {
 
 
+IniFileConfiguration::IniFileConfiguration() = default;
+
+
+IniFileConfiguration::~IniFileConfiguration() = default;
+
+
 IniFileConfiguration::IniFileConfiguration(std::istream& istr)
 {
 	load(istr);

@@ -33,16 +33,16 @@ public:
 	using OptionVec = std::vector<Option>;
 	using Iterator = OptionVec::const_iterator;
 
-	OptionSet() = default;
+	OptionSet();
 		/// Creates the OptionSet.
 
-	OptionSet(const OptionSet& options) = default;
+	OptionSet(const OptionSet& options);
 		/// Creates an option set from another one.
 
-	~OptionSet() = default;
+	~OptionSet();
 		/// Destroys the OptionSet.
 
-	OptionSet& operator = (const OptionSet& options) = default;
+	OptionSet& operator = (const OptionSet& options);
 		/// Assignment operator.
 
 	void addOption(const Option& option);

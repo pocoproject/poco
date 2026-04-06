@@ -30,6 +30,9 @@ HistogramSample::HistogramSample(const std::vector<double>& bucketBounds):
 }
 
 
+HistogramSample::~HistogramSample() = default;
+
+
 void HistogramSample::observe(double value)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
@@ -81,6 +84,9 @@ Histogram::Histogram(const std::string& name, const Params& params, Registry* pR
 	setHelp(params.help);
 	setLabelNames(params.labelNames);
 }
+
+
+Histogram::~Histogram() = default;
 
 
 Histogram& Histogram::buckets(const std::vector<double>& bucketBounds)

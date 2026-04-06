@@ -98,6 +98,9 @@ HTTPAuthenticationParams::~HTTPAuthenticationParams()
 }
 
 
+HTTPAuthenticationParams& HTTPAuthenticationParams::operator = (const HTTPAuthenticationParams& authParams) = default;
+
+
 void HTTPAuthenticationParams::fromAuthInfo(const std::string& authInfo)
 {
 	parse(authInfo.begin(), authInfo.end());

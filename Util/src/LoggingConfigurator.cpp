@@ -47,6 +47,12 @@ using namespace std::string_literals;
 namespace Poco::Util {
 
 
+LoggingConfigurator::LoggingConfigurator() = default;
+
+
+LoggingConfigurator::~LoggingConfigurator() = default;
+
+
 Mutex LoggingConfigurator::_mutex;
 
 

@@ -45,7 +45,7 @@ protected:
 
 	std::string translateKey(const std::string& key) const;
 
-	~AbstractConfigurationView() = default;
+	~AbstractConfigurationView();
 
 	const AbstractConfiguration::Ptr& pConfig() const { return _pConfig; }
 
@@ -86,7 +86,7 @@ public:
 		/// Creates the ConfigurationView. The ConfigurationView
 		/// retains (shared) ownership of the passed configuration.
 
-	~ConfigurationView() = default;
+	~ConfigurationView();
 
 protected:
 	bool getRaw(const std::string& key, std::string& value) const override;

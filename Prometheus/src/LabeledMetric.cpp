@@ -23,6 +23,9 @@ using namespace std::string_literals;
 namespace Poco::Prometheus {
 
 
+LabeledMetric::~LabeledMetric() = default;
+
+
 const std::vector<std::string> LabeledMetric::EMPTY_LABEL;
 
 

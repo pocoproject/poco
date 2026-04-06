@@ -52,7 +52,7 @@ public:
 	virtual ~HTTPAuthenticationParams();
 		/// Destroys the HTTPAuthenticationParams.
 
-	HTTPAuthenticationParams& operator = (const HTTPAuthenticationParams& authParams) = default;
+	HTTPAuthenticationParams& operator = (const HTTPAuthenticationParams& authParams);
 		/// Assigns the content of another HTTPAuthenticationParams.
 
 	void fromAuthInfo(const std::string& authInfo);
