@@ -62,7 +62,7 @@ int ProcessHandleImpl::statusToExitCode(int status)
 	if (WIFEXITED(status))
 		return WEXITSTATUS(status);
 	else
-		return -WTERMSIG(status);
+		return 256 + WTERMSIG(status);
 }
 
 
@@ -93,11 +93,22 @@ int ProcessHandleImpl::wait(int options) const
 	}
 	else if (rc < 0 && errno == ECHILD)
 	{
-		// Another thread reaped the process; wait for it to update the status.
-		// Use a timeout to prevent hanging indefinitely if something goes wrong.
-		if (_event.tryWait(5000) && _hasStatus.load())
+		// Another thread reaped the process; synchronize with its status update.
+		// Preserve the requested wait semantics:
+		//  - blocking waits block until the status has been published
+		//  - WNOHANG waits remain non-blocking
+		if (options & WNOHANG)
 		{
-			rc = _pid;
+			if (_event.tryWait(0) && _hasStatus.load())
+				rc = _pid;
+			else
+				rc = 0;
+		}
+		else
+		{
+			_event.wait();
+			if (_hasStatus.load())
+				rc = _pid;
 		}
 	}
 
@@ -354,13 +365,20 @@ bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
 	int status;
-	int rc = ::waitpid(pid, &status, WNOHANG);
+	int rc;
+	do
+	{
+		rc = ::waitpid(pid, &status, WNOHANG);
+	}
+	while (rc < 0 && errno == EINTR);
 	if (rc == pid)
 		return false;
 	if (rc == 0)
 		return true;
 	// Not our child or error; fall back to kill check
-	return ::kill(pid, 0) == 0;
+	rc = ::kill(pid, 0);
+	if (rc == 0) return true;
+	return errno == EPERM;
 }
 
 

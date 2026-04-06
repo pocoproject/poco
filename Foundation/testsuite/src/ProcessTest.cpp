@@ -19,6 +19,7 @@
 #include "Poco/Environment.h"
 #include "Poco/ProcessOptions.h"
 #include "Poco/Thread.h"
+#include "Poco/Timestamp.h"
 #include <atomic>
 #include <csignal>
 #include <iostream>
@@ -379,8 +380,12 @@ void ProcessTest::testIsRunningAllowsForTermination()
 	PipeOutputStream ostr(inPipe);
 	ostr << std::string(10, 'x');
 	ostr.close();
+	Poco::Timestamp waitStart;
 	while (Process::isRunning(ph))
+	{
+		if (waitStart.isElapsed(30 * Poco::Timestamp::resolution())) fail("Process did not terminate within 30 seconds");
 		Thread::sleep(100);
+	}
 	// Process should be reaped by now; wait must not hang
 	int rc = ph.wait();
 	assertTrue (rc == 10);
@@ -408,8 +413,12 @@ void ProcessTest::testIsRunningByPidAllowsForTermination()
 	PipeOutputStream ostr(inPipe);
 	ostr << std::string(10, 'x');
 	ostr.close();
+	Poco::Timestamp waitStart;
 	while (Process::isRunning(pid))
+	{
+		if (waitStart.isElapsed(30 * Poco::Timestamp::resolution())) fail("Process did not terminate within 30 seconds");
 		Thread::sleep(100);
+	}
 #endif // defined(POCO_OS_FAMILY_UNIX)
 }
 
@@ -438,8 +447,12 @@ void ProcessTest::testWaitAfterIsRunning()
 	PipeOutputStream ostr(inPipe);
 	ostr << std::string(42, 'x');
 	ostr.close();
+	Poco::Timestamp waitStart;
 	while (Process::isRunning(ph))
+	{
+		if (waitStart.isElapsed(30 * Poco::Timestamp::resolution())) fail("Process did not terminate within 30 seconds");
 		Thread::sleep(100);
+	}
 	int rc = ph.wait();
 	assertTrue (rc == 42);
 #endif // !defined(_WIN32_WCE)
@@ -480,8 +493,12 @@ void ProcessTest::testConcurrentWaitAndIsRunning()
 	ostr.close();
 
 	// Poll isRunning concurrently with the waiter thread
+	Poco::Timestamp waitStart;
 	while (Process::isRunning(ph))
+	{
+		if (waitStart.isElapsed(30 * Poco::Timestamp::resolution())) fail("Process did not terminate within 30 seconds");
 		Thread::sleep(50);
+	}
 
 	waiter.join();
 	assertTrue (waitDone);
@@ -505,7 +522,7 @@ void ProcessTest::testSignalExitCode()
 	args.push_back("-raise-int");
 	ProcessHandle ph = Process::launch(cmd, args, nullptr, nullptr, nullptr);
 	int rc = ph.wait();
-	assertEqual (-SIGINT, rc);
+	assertEqual (256 + SIGINT, rc);
 #endif // defined(POCO_OS_FAMILY_UNIX)
 }
 
