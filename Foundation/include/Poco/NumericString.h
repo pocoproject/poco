@@ -24,7 +24,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "Poco/Buffer.h"
+#include "Poco/Exception.h"
 #include "Poco/FPEnvironment.h"
 #ifdef min
 	#undef min
@@ -32,38 +32,34 @@
 #ifdef max
 	#undef max
 #endif
-#include <limits>
-#include <cmath>
+#include <algorithm>
 #include <cctype>
+#include <charconv>
+#include <cmath>
+#include <cstdint>
+#include <cstring>
+#include <limits>
 #if !defined(POCO_NO_LOCALE)
 	#include <locale>
 #endif
-#include <algorithm>
-#include <charconv>
-#include <cstdint>
-#include <cstring>
 #include <string>
 #include <type_traits>
-#if defined(POCO_NOINTMAX)
-typedef Poco::UInt64 uintmax_t;
-typedef Poco::Int64 intmax_t;
-#endif
-#if !defined (INTMAX_MAX)
-#define INTMAX_MAX std::numeric_limits<intmax_t>::max()
-#endif
 #ifdef POCO_COMPILER_MSVC
 #pragma warning(push)
-#pragma warning(disable : 4146)
-#endif // POCO_COMPILER_MSVC
+#pragma warning(disable : 4146) // unsigned negation in intToStr for T_MIN handling
+#endif
 
-// binary numbers are supported, thus 64 (bits) + 1 (string terminating zero) + 2 (hex prefix)
-#define POCO_MAX_INT_STRING_LEN (67)
-// value from strtod.cc (double_conversion::kMaxSignificantDecimalDigits)
-#define POCO_MAX_FLT_STRING_LEN 780
+/// Maximum length of an integer formatted as a string.
+/// 64 binary digits + NUL terminator + "0x" prefix = 67.
+inline constexpr int POCO_MAX_INT_STRING_LEN = 67;
 
-#define POCO_FLT_INF "inf"
-#define POCO_FLT_NAN "nan"
-#define POCO_FLT_EXP 'e'
+/// Maximum length of a floating-point formatted string.
+/// Matches double_conversion::kMaxSignificantDecimalDigits.
+inline constexpr int POCO_MAX_FLT_STRING_LEN = 780;
+
+inline constexpr char POCO_FLT_INF[] = "inf";
+inline constexpr char POCO_FLT_NAN[] = "nan";
+inline constexpr char POCO_FLT_EXP = 'e';
 
 
 namespace Poco {
@@ -196,8 +192,9 @@ inline char thousandSeparator()
 //
 
 template <typename I>
-bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
-	/// Converts zero-terminated character array to integer number;
+bool strToInt(const char* begin, const char* end, I& outResult, short base, char thSep = ',')
+	/// Converts character range [begin, end) to integer number;
+	/// begin must point past any leading whitespace.
 	/// Thousand separators are recognized for base10 and current locale;
 	/// they are silently skipped and not verified for correct positioning.
 	/// It is not allowed to convert a negative number to anything except
@@ -209,20 +206,16 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 {
 	poco_assert_dbg (base == 2 || base == 8 || base == 10 || base == 16);
 
-	if (!pStr) return false;
-	while (std::isspace(static_cast<unsigned char>(*pStr))) ++pStr;
-	if (*pStr == '\0') return false;
-	if ((*pStr == '-') && ((base != 10) || std::is_unsigned_v<I>))
+	if (begin >= end) return false;
+	if ((*begin == '-') && ((base != 10) || std::is_unsigned_v<I>))
 		return false;
 
 	// Skip '+' sign (std::from_chars doesn't accept it)
-	const char* start = pStr;
+	const char* start = begin;
 	if (*start == '+') ++start;
-	if (*start == '\0') return false; // reject bare sign without digits
+	if (start >= end) return false; // reject bare sign without digits
 
 	// Try std::from_chars — handles sign, overflow, and all bases.
-	// If it consumes the entire string, we're done.
-	const char* end = start + std::strlen(start);
 	auto [ptr, ec] = std::from_chars(start, end, outResult, base);
 	if (ec == std::errc() && ptr == end)
 		return true;
@@ -236,7 +229,7 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 	// The input may contain thousand separators — strip them and retry.
 	char cleaned[POCO_MAX_INT_STRING_LEN];
 	char* dst = cleaned;
-	for (const char* src = start; *src != '\0'; ++src)
+	for (const char* src = start; src < end; ++src)
 	{
 		if (*src != thSep)
 		{
@@ -245,7 +238,6 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 			*dst++ = *src;
 		}
 	}
-	*dst = '\0';
 
 	if (dst == cleaned) return false; // nothing left after stripping
 
@@ -255,12 +247,25 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 
 
 template <typename I>
-bool strToInt(const std::string& str, I& result, short base, char thSep = ',')
-	/// Converts string to integer number;
-	/// This is a wrapper function, for details see see the
-	/// bool strToInt(const char*, I&, short, char) implementation.
+bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
+	/// Converts zero-terminated character array to integer number.
+	/// Skips leading whitespace, then delegates to the range-based overload.
 {
-	return strToInt(str.c_str(), result, base, thSep);
+	if (!pStr) return false;
+	while (std::isspace(static_cast<unsigned char>(*pStr))) ++pStr;
+	return strToInt(pStr, pStr + std::strlen(pStr), outResult, base, thSep);
+}
+
+
+template <typename I>
+bool strToInt(const std::string& str, I& result, short base, char thSep = ',')
+	/// Converts string to integer number.
+	/// Avoids strlen by using the known string length directly.
+{
+	const char* begin = str.data();
+	const char* end = begin + str.size();
+	while (begin < end && std::isspace(static_cast<unsigned char>(*begin))) ++begin;
+	return strToInt(begin, end, result, base, thSep);
 }
 
 

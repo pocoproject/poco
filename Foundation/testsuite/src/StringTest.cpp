@@ -1443,63 +1443,89 @@ void StringTest::benchmarkFloatToStr()
 
 void StringTest::benchmarkStrToInt()
 {
+	constexpr int N = 1000000;
 	Poco::Stopwatch sw;
-	std::string num = "123456789";
-	int res[4] = {};
-	sw.start();
-	for (int i = 0; i < 1000000; ++i) parseStream(num, res[0]);
-	sw.stop();
-	std::cout << "parseStream Number: " << res[0] << std::endl;
-	double timeStream = sw.elapsed() / 1000.0;
 
-	char* pC = nullptr;
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) res[1] = std::strtol(num.c_str(), &pC, 10);
-	sw.stop();
-	std::cout << "std::strtol Number: " << res[1] << std::endl;
-	double timeStrtol = sw.elapsed() / 1000.0;
+	auto benchParse = [&](const char* label, auto fn) {
+		for (int i = 0; i < 1000; ++i) fn();
+		sw.restart();
+		for (int i = 0; i < N; ++i) fn();
+		sw.stop();
+		double ms = sw.elapsed() / 1000.0;
+		std::cout << std::setw(40) << std::setfill(' ') << label
+		          << std::setw(10) << std::fixed << std::setprecision(2) << ms << " ms" << std::endl;
+	};
 
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) strToInt(num.c_str(), res[2], 10);
-	sw.stop();
-	std::cout << "strToInt Number: " << res[2] << std::endl;
-	double timeStrToInt = sw.elapsed() / 1000.0;
+	// Pre-generate string test data
+	std::vector<std::string> decStrs(N), hexStrs(N), negStrs(N), bigStrs(N);
+	{
+		std::mt19937 rng(42);
+		for (int i = 0; i < N; ++i)
+		{
+			unsigned v = rng();
+			decStrs[i] = std::to_string(v);
+			char hbuf[32]; std::snprintf(hbuf, sizeof(hbuf), "%X", v);
+			hexStrs[i] = hbuf;
+			negStrs[i] = std::to_string(-static_cast<int>(v));
+			auto big = (static_cast<Poco::UInt64>(rng()) << 32) | rng();
+			bigStrs[i] = std::to_string(big);
+		}
+	}
 
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%d", &res[3]);
-	sw.stop();
-	std::cout << "sscanf Number: " << res[3] << std::endl;
-	double timeScanf = sw.elapsed() / 1000.0;
+	std::cout << std::endl << "strToInt parsing benchmark (" << N << " iterations)" << std::endl;
+	std::cout << std::string(55, '-') << std::endl;
 
-	assertEqual (res[0], res[1]);
-	assertEqual (res[1], res[2]);
-	assertEqual (res[2], res[3]);
+	// Per-case with constant strings
+	std::cout << std::endl << "Constant strings:" << std::endl;
+	{
+		int r; unsigned ur; Poco::Int64 r64; Poco::UInt64 ur64;
+		benchParse("strToInt(\"42\", int, 10)", [&]{ strToInt("42", r, 10); });
+		benchParse("strToInt(\"1234567890\", int, 10)", [&]{ strToInt("1234567890", r, 10); });
+		benchParse("strToInt(\"-1234567890\", int, 10)", [&]{ strToInt("-1234567890", r, 10); });
+		benchParse("strToInt(\"DEADBEEF\", uint, 16)", [&]{ strToInt("DEADBEEF", ur, 16); });
+		benchParse("strToInt(\"1,234,567\", int, 10, ',')", [&]{ strToInt("1,234,567", r, 10, ','); });
+		benchParse("strToInt(int64_max, int64, 10)", [&]{ strToInt("9223372036854775807", r64, 10); });
+		benchParse("strToInt(uint64_max, uint64, 10)", [&]{ strToInt("18446744073709551615", ur64, 10); });
+		benchParse("strToInt(\"0\", int, 10)", [&]{ strToInt("0", r, 10); });
+		benchParse("strToInt(\"10101010\", int, 2)", [&]{ strToInt("10101010", r, 2); });
+		benchParse("strToInt(\"777\", uint, 8)", [&]{ strToInt("777", ur, 8); });
+	}
 
-	int graph;
-	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
-	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << timeStream << "[ms]" << std::endl;
+	// Random data
+	std::cout << std::endl << "Random strings:" << std::endl;
+	{
+		int r; unsigned ur; Poco::UInt64 ur64;
+		benchParse("strToInt(random_dec, int, 10)", [&]{ static int idx = 0; strToInt(decStrs[idx++ % N].c_str(), ur, 10); });
+		benchParse("strToInt(random_neg, int, 10)", [&]{ static int idx = 0; strToInt(negStrs[idx++ % N].c_str(), r, 10); });
+		benchParse("strToInt(random_hex, uint, 16)", [&]{ static int idx = 0; strToInt(hexStrs[idx++ % N].c_str(), ur, 16); });
+		benchParse("strToInt(random_uint64, uint64, 10)", [&]{ static int idx = 0; strToInt(bigStrs[idx++ % N].c_str(), ur64, 10); });
+	}
 
-	std::cout << std::setw(14) << "std::strtol:\t" << std::setw(10) << std::setfill(' ') << timeStrtol << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrtol) << '\t' ;
-	graph = (int) (timeStream / timeStrtol); for (int i = 0; i < graph; ++i) std::cout << '|';
-
-	std::cout << std::endl << std::setw(14) << "strToInt:\t" << std::setw(10) << std::setfill(' ') << timeStrToInt << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrToInt) << '\t' ;
-	graph = (int) (timeStream / timeStrToInt); for (int i = 0; i < graph; ++i) std::cout << '|';
-
-	std::cout << std::endl << std::setw(14) << "std::sscanf:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeScanf) << '\t' ;
-	graph = (int) (timeStream / timeScanf); for (int i = 0; i < graph; ++i) std::cout << '|';
-	std::cout << std::endl;
+	// Comparison with std::strtol and std::from_chars
+	std::cout << std::endl << "Comparison (\"1234567890\"):" << std::endl;
+	{
+		static volatile int sink = 0;
+		int r;
+		const char* s = "1234567890";
+		char* pEnd;
+		benchParse("strToInt", [&]{ strToInt(s, r, 10); sink = r; });
+		benchParse("std::strtol", [&]{ r = static_cast<int>(std::strtol(s, &pEnd, 10)); sink = r; });
+		benchParse("std::from_chars", [&]{
+			std::from_chars(s, s + 10, r, 10); sink = r;
+		});
+	}
 }
 
 
 void StringTest::benchmarkIntToStr()
 {
 	using Poco::NumberFormatter;
+	using Poco::intToStr;
+
 	constexpr int N = 1000000;
 	Poco::Stopwatch sw;
 	std::string str;
+	static volatile int gSink = 0;
 
 	// Pre-generate random test data to avoid constant-folding
 	std::vector<int> ivals(N);
@@ -1517,8 +1543,9 @@ void StringTest::benchmarkIntToStr()
 		}
 	}
 
+	// Benchmark helper for random-data tests (indexed access)
 	auto bench = [&](const char* label, auto fn) -> double {
-		for (int i = 0; i < 1000; ++i) fn(i % N);  // warmup
+		for (int i = 0; i < 1000; ++i) fn(i % N);
 		sw.restart();
 		for (int i = 0; i < N; ++i) fn(i);
 		sw.stop();
@@ -1528,103 +1555,60 @@ void StringTest::benchmarkIntToStr()
 		return ms;
 	};
 
-	std::cout << std::endl << "NumberFormatter/intToStr benchmark (" << N << " iterations)" << std::endl;
+	// ====================================================================
+	// Part 1: intToStr(char*) with random data across formatting options
+	// ====================================================================
+
+	std::cout << std::endl << "intToStr(char*) with random data (" << N << " values)" << std::endl;
 	std::cout << std::string(62, '-') << std::endl;
 
-	// ---- int ----
+	std::cout << std::endl << "int (random):" << std::endl;
+	bench("dec", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(ivals[i], 10, b, s); gSink += b[0]; });
+	bench("dec, width=15", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(ivals[i], 10, b, s, false, 15); gSink += b[0]; });
+	bench("dec, width=15, '0'", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(ivals[i], 10, b, s, false, 15, '0'); gSink += b[0]; });
+	bench("hex", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(static_cast<unsigned>(ivals[i]), 0x10, b, s); gSink += b[0]; });
+	bench("hex, prefix", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(static_cast<unsigned>(ivals[i]), 0x10, b, s, true); gSink += b[0]; });
+	bench("hex, prefix, width=10, '0'", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(static_cast<unsigned>(ivals[i]), 0x10, b, s, true, 10, '0'); gSink += b[0]; });
+
+#ifdef POCO_HAVE_INT64
+	std::cout << std::endl << "Int64 (random):" << std::endl;
+	bench("dec", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(i64vals[i], 10, b, s); gSink += b[0]; });
+	bench("dec, width=25, '0'", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(i64vals[i], 10, b, s, false, 25, '0'); gSink += b[0]; });
+	bench("hex", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(static_cast<Poco::UInt64>(i64vals[i]), 0x10, b, s); gSink += b[0]; });
+	bench("hex, prefix, width=20, '0'", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(static_cast<Poco::UInt64>(i64vals[i]), 0x10, b, s, true, 20, '0'); gSink += b[0]; });
+#endif
+
+	// ====================================================================
+	// Part 2: NumberFormatter throughput with random data
+	// ====================================================================
+
+	std::cout << std::endl << "NumberFormatter throughput (" << N << " random values)" << std::endl;
+	std::cout << std::string(62, '-') << std::endl;
+
 	std::cout << std::endl << "int:" << std::endl;
 	bench("format(int)", [&](int i){ str = NumberFormatter::format(ivals[i]); });
 	bench("format(int, width)", [&](int i){ str = NumberFormatter::format(ivals[i], 15); });
 	bench("format0(int, width)", [&](int i){ str = NumberFormatter::format0(ivals[i], 15); });
 	bench("formatHex(int)", [&](int i){ str = NumberFormatter::formatHex(ivals[i]); });
-	bench("formatHex(int, lower)", [&](int i){ str = NumberFormatter::formatHex(ivals[i], NumberFormatter::Options::HEX_LOWERCASE); });
-	bench("formatHex(int, lower, width)", [&](int i){ str = NumberFormatter::formatHex(ivals[i], 10, NumberFormatter::Options::HEX_LOWERCASE); });
 	bench("formatHex(int, width)", [&](int i){ str = NumberFormatter::formatHex(ivals[i], 10); });
 	bench("format(-int)", [&](int i){ str = NumberFormatter::format(-std::abs(ivals[i])); });
 	bench("format0(-int, width)", [&](int i){ str = NumberFormatter::format0(-std::abs(ivals[i]), 15); });
 
-	// ---- unsigned ----
 	std::cout << std::endl << "unsigned:" << std::endl;
 	bench("format(unsigned)", [&](int i){ str = NumberFormatter::format(uvals[i]); });
-	bench("format(unsigned, width)", [&](int i){ str = NumberFormatter::format(uvals[i], 15); });
-	bench("format0(unsigned, width)", [&](int i){ str = NumberFormatter::format0(uvals[i], 15); });
 	bench("formatHex(unsigned)", [&](int i){ str = NumberFormatter::formatHex(uvals[i]); });
-	bench("formatHex(unsigned, width)", [&](int i){ str = NumberFormatter::formatHex(uvals[i], 10); });
-
-	// ---- long ----
-	std::cout << std::endl << "long:" << std::endl;
-	bench("format(long)", [&](int i){ str = NumberFormatter::format(static_cast<long>(ivals[i])); });
-	bench("formatHex(long)", [&](int i){ str = NumberFormatter::formatHex(static_cast<long>(ivals[i])); });
-
-	// ---- unsigned long ----
-	std::cout << std::endl << "unsigned long:" << std::endl;
-	bench("format(unsigned long)", [&](int i){ str = NumberFormatter::format(static_cast<unsigned long>(uvals[i])); });
-	bench("formatHex(unsigned long)", [&](int i){ str = NumberFormatter::formatHex(static_cast<unsigned long>(uvals[i])); });
-
-	// ---- hex deep-dive ----
-	std::cout << std::endl << "hex formatting approaches (int):" << std::endl;
-	bench("formatHex(int)", [&](int i){ str = NumberFormatter::formatHex(ivals[i]); });
-	bench("appendHex(str, int)", [&](int i){ str.clear(); NumberFormatter::appendHex(str, ivals[i]); });
-	bench("intToStr(int, 16, string)", [&](int i){ intToStr(uvals[i], 0x10, str); });
-	bench("intToStr(int, 16, char*)", [&](int i){
-		char buf[POCO_MAX_INT_STRING_LEN]; std::size_t sz = POCO_MAX_INT_STRING_LEN;
-		intToStr(uvals[i], 0x10, buf, sz);
-	});
-	{
-		char buf[32];
-		bench("std::to_chars hex", [&](int i){
-			auto [p, ec] = std::to_chars(buf, buf + sizeof(buf), uvals[i], 16);
-			static volatile char sink; sink = *buf;
-		});
-	}
-
-	std::cout << std::endl << "hex formatting approaches (UInt64):" << std::endl;
-	bench("formatHex(UInt64)", [&](int i){ str = NumberFormatter::formatHex(u64vals[i]); });
-	bench("appendHex(str, UInt64)", [&](int i){ str.clear(); NumberFormatter::appendHex(str, u64vals[i]); });
-	bench("intToStr(UInt64, 16, char*)", [&](int i){
-		char buf[POCO_MAX_INT_STRING_LEN]; std::size_t sz = POCO_MAX_INT_STRING_LEN;
-		intToStr(u64vals[i], 0x10, buf, sz);
-	});
-	{
-		char buf[32];
-		bench("std::to_chars hex UInt64", [&](int i){
-			auto [p, ec] = std::to_chars(buf, buf + sizeof(buf), u64vals[i], 16);
-			static volatile char sink; sink = *buf;
-		});
-	}
-
-	std::cout << std::endl << "decimal formatting approaches (int):" << std::endl;
-	bench("format(int)", [&](int i){ str = NumberFormatter::format(ivals[i]); });
-	bench("append(str, int)", [&](int i){ str.clear(); NumberFormatter::append(str, ivals[i]); });
-	bench("intToStr(int, 10, char*)", [&](int i){
-		char buf[POCO_MAX_INT_STRING_LEN]; std::size_t sz = POCO_MAX_INT_STRING_LEN;
-		intToStr(ivals[i], 10, buf, sz);
-	});
-	{
-		char buf[32];
-		bench("std::to_chars dec", [&](int i){
-			auto [p, ec] = std::to_chars(buf, buf + sizeof(buf), ivals[i]);
-			static volatile char sink; sink = *buf;
-		});
-	}
 
 #ifdef POCO_HAVE_INT64
-
-	// ---- Int64 ----
 	std::cout << std::endl << "Int64:" << std::endl;
 	bench("format(Int64)", [&](int i){ str = NumberFormatter::format(i64vals[i]); });
-	bench("format(Int64, width)", [&](int i){ str = NumberFormatter::format(i64vals[i], 25); });
-	bench("format0(Int64, width)", [&](int i){ str = NumberFormatter::format0(i64vals[i], 25); });
 	bench("formatHex(Int64)", [&](int i){ str = NumberFormatter::formatHex(i64vals[i]); });
 	bench("format(-Int64)", [&](int i){ str = NumberFormatter::format(-std::abs(i64vals[i])); });
 
-	// ---- UInt64 ----
 	std::cout << std::endl << "UInt64:" << std::endl;
 	bench("format(UInt64)", [&](int i){ str = NumberFormatter::format(u64vals[i]); });
 	bench("formatHex(UInt64)", [&](int i){ str = NumberFormatter::formatHex(u64vals[i]); });
 	bench("formatHex(UInt64, width)", [&](int i){ str = NumberFormatter::formatHex(u64vals[i], 20); });
-
-#endif // POCO_HAVE_INT64
+#endif
 }
 
 
