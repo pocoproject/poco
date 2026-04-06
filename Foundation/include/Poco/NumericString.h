@@ -146,12 +146,11 @@ bool safeMultiply(R& result, F f, S s)
 
 
 template <typename F, typename T>
-inline T& isSafeIntCast(F from)
+[[nodiscard]] inline bool isSafeIntCast(F from)
 	/// Returns true if it is safe to cast
 	/// integer from F to T.
 {
-	if (!isIntOverflow<T, F>(from)) return true;
-	return false;
+	return !isIntOverflow<T, F>(from);
 }
 
 
@@ -224,6 +223,8 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 		++pStr;
 	}
 	else if (*pStr == '+') ++pStr;
+
+	if (*pStr == '\0') return false; // reject bare sign without digits
 
 	// numbers are parsed as unsigned, for negative numbers the sign is applied after parsing
 	// overflow is checked in every parse step
