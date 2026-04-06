@@ -16,7 +16,6 @@
 
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#include "Poco/NumericString.h"
 #include "Poco/MemoryStream.h"
 #include "Poco/NumberFormatter.h"
 #include <limits>
@@ -62,6 +61,7 @@ public:
 	void benchmarkFloatToStr();
 	void benchmarkStrToFloat();
 	void benchmarkStrToInt();
+	void benchmarkIntToStr();
 
 	void testJSONString();
 

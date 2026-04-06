@@ -13,7 +13,9 @@
 
 
 #include "Poco/Bugcheck.h"
+#define POCO_NUMERIC_STRING_PRIVATE
 #include "Poco/NumericString.h"
+#undef POCO_NUMERIC_STRING_PRIVATE
 
 // +++ double conversion +++
 // don't collide with standalone double_conversion library

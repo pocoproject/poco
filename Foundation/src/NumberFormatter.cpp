@@ -204,7 +204,7 @@ void NumberFormatter::append(std::string& str, unsigned long value, int width)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 10, result, sz, false, width, '0');
+	intToStr(value, 10, result, sz, false, width);
 	str.append(result, sz);
 }
 
@@ -253,7 +253,7 @@ void NumberFormatter::append(std::string& str, long long value, int width)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 10, result, sz, false, width, '0');
+	intToStr(value, 10, result, sz, false, width);
 	str.append(result, sz);
 }
 
@@ -298,7 +298,7 @@ void NumberFormatter::append(std::string& str, unsigned long long value, int wid
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 10, result, sz, false, width, '0');
+	intToStr(value, 10, result, sz, false, width);
 	str.append(result, sz);
 }
 
@@ -346,7 +346,7 @@ void NumberFormatter::append(std::string& str, Int64 value, int width)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 10, result, sz, false, width, '0');
+	intToStr(value, 10, result, sz, false, width);
 	str.append(result, sz);
 }
 
@@ -391,7 +391,7 @@ void NumberFormatter::append(std::string& str, UInt64 value, int width)
 {
 	char result[NF_MAX_INT_STRING_LEN];
 	std::size_t sz = NF_MAX_INT_STRING_LEN;
-	intToStr(value, 10, result, sz, false, width, '0');
+	intToStr(value, 10, result, sz, false, width);
 	str.append(result, sz);
 }
 

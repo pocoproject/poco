@@ -14,7 +14,6 @@
 #include "Poco/Exception.h"
 #include "Poco/Types.h"
 #include "Poco/Format.h"
-#include "Poco/NumericString.h"
 #include "Poco/MemoryStream.h"
 #include "Poco/Stopwatch.h"
 #include <iostream>

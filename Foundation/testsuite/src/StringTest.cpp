@@ -23,9 +23,14 @@
 #include "Poco/Stopwatch.h"
 #include "Poco/FPEnvironment.h"
 #include "Poco/Exception.h"
+#include "Poco/NumberFormatter.h"
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <charconv>
+#include <cstdint>
+#include <random>
+#include <vector>
 #include <cstdio>
 #include <climits>
 #include <map>
@@ -1373,6 +1378,9 @@ void StringTest::conversionBenchmarks()
 	std::cout << "===================" << std::endl;
 	benchmarkStrToInt();
 	std::cout << "===================" << std::endl << std::endl;
+	std::cout << "===================" << std::endl;
+	benchmarkIntToStr();
+	std::cout << "===================" << std::endl << std::endl;
 }
 
 
@@ -1483,6 +1491,140 @@ void StringTest::benchmarkStrToInt()
 	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeScanf) << '\t' ;
 	graph = (int) (timeStream / timeScanf); for (int i = 0; i < graph; ++i) std::cout << '|';
 	std::cout << std::endl;
+}
+
+
+void StringTest::benchmarkIntToStr()
+{
+	using Poco::NumberFormatter;
+	constexpr int N = 1000000;
+	Poco::Stopwatch sw;
+	std::string str;
+
+	// Pre-generate random test data to avoid constant-folding
+	std::vector<int> ivals(N);
+	std::vector<unsigned> uvals(N);
+	std::vector<Poco::Int64> i64vals(N);
+	std::vector<Poco::UInt64> u64vals(N);
+	{
+		std::mt19937 rng(42); // fixed seed for reproducibility
+		for (int i = 0; i < N; ++i)
+		{
+			ivals[i] = static_cast<int>(rng());
+			uvals[i] = static_cast<unsigned>(rng());
+			i64vals[i] = (static_cast<Poco::Int64>(rng()) << 32) | rng();
+			u64vals[i] = (static_cast<Poco::UInt64>(rng()) << 32) | rng();
+		}
+	}
+
+	auto bench = [&](const char* label, auto fn) -> double {
+		for (int i = 0; i < 1000; ++i) fn(i % N);  // warmup
+		sw.restart();
+		for (int i = 0; i < N; ++i) fn(i);
+		sw.stop();
+		double ms = sw.elapsed() / 1000.0;
+		std::cout << std::setw(46) << std::setfill(' ') << label
+		          << std::setw(10) << std::fixed << std::setprecision(2) << ms << " ms" << std::endl;
+		return ms;
+	};
+
+	std::cout << std::endl << "NumberFormatter/intToStr benchmark (" << N << " iterations)" << std::endl;
+	std::cout << std::string(62, '-') << std::endl;
+
+	// ---- int ----
+	std::cout << std::endl << "int:" << std::endl;
+	bench("format(int)", [&](int i){ str = NumberFormatter::format(ivals[i]); });
+	bench("format(int, width)", [&](int i){ str = NumberFormatter::format(ivals[i], 15); });
+	bench("format0(int, width)", [&](int i){ str = NumberFormatter::format0(ivals[i], 15); });
+	bench("formatHex(int)", [&](int i){ str = NumberFormatter::formatHex(ivals[i]); });
+	bench("formatHex(int, lower)", [&](int i){ str = NumberFormatter::formatHex(ivals[i], NumberFormatter::Options::HEX_LOWERCASE); });
+	bench("formatHex(int, lower, width)", [&](int i){ str = NumberFormatter::formatHex(ivals[i], 10, NumberFormatter::Options::HEX_LOWERCASE); });
+	bench("formatHex(int, width)", [&](int i){ str = NumberFormatter::formatHex(ivals[i], 10); });
+	bench("format(-int)", [&](int i){ str = NumberFormatter::format(-std::abs(ivals[i])); });
+	bench("format0(-int, width)", [&](int i){ str = NumberFormatter::format0(-std::abs(ivals[i]), 15); });
+
+	// ---- unsigned ----
+	std::cout << std::endl << "unsigned:" << std::endl;
+	bench("format(unsigned)", [&](int i){ str = NumberFormatter::format(uvals[i]); });
+	bench("format(unsigned, width)", [&](int i){ str = NumberFormatter::format(uvals[i], 15); });
+	bench("format0(unsigned, width)", [&](int i){ str = NumberFormatter::format0(uvals[i], 15); });
+	bench("formatHex(unsigned)", [&](int i){ str = NumberFormatter::formatHex(uvals[i]); });
+	bench("formatHex(unsigned, width)", [&](int i){ str = NumberFormatter::formatHex(uvals[i], 10); });
+
+	// ---- long ----
+	std::cout << std::endl << "long:" << std::endl;
+	bench("format(long)", [&](int i){ str = NumberFormatter::format(static_cast<long>(ivals[i])); });
+	bench("formatHex(long)", [&](int i){ str = NumberFormatter::formatHex(static_cast<long>(ivals[i])); });
+
+	// ---- unsigned long ----
+	std::cout << std::endl << "unsigned long:" << std::endl;
+	bench("format(unsigned long)", [&](int i){ str = NumberFormatter::format(static_cast<unsigned long>(uvals[i])); });
+	bench("formatHex(unsigned long)", [&](int i){ str = NumberFormatter::formatHex(static_cast<unsigned long>(uvals[i])); });
+
+	// ---- hex deep-dive ----
+	std::cout << std::endl << "hex formatting approaches (int):" << std::endl;
+	bench("formatHex(int)", [&](int i){ str = NumberFormatter::formatHex(ivals[i]); });
+	bench("appendHex(str, int)", [&](int i){ str.clear(); NumberFormatter::appendHex(str, ivals[i]); });
+	bench("intToStr(int, 16, string)", [&](int i){ intToStr(uvals[i], 0x10, str); });
+	bench("intToStr(int, 16, char*)", [&](int i){
+		char buf[POCO_MAX_INT_STRING_LEN]; std::size_t sz = POCO_MAX_INT_STRING_LEN;
+		intToStr(uvals[i], 0x10, buf, sz);
+	});
+	{
+		char buf[32];
+		bench("std::to_chars hex", [&](int i){
+			auto [p, ec] = std::to_chars(buf, buf + sizeof(buf), uvals[i], 16);
+			static volatile char sink; sink = *buf;
+		});
+	}
+
+	std::cout << std::endl << "hex formatting approaches (UInt64):" << std::endl;
+	bench("formatHex(UInt64)", [&](int i){ str = NumberFormatter::formatHex(u64vals[i]); });
+	bench("appendHex(str, UInt64)", [&](int i){ str.clear(); NumberFormatter::appendHex(str, u64vals[i]); });
+	bench("intToStr(UInt64, 16, char*)", [&](int i){
+		char buf[POCO_MAX_INT_STRING_LEN]; std::size_t sz = POCO_MAX_INT_STRING_LEN;
+		intToStr(u64vals[i], 0x10, buf, sz);
+	});
+	{
+		char buf[32];
+		bench("std::to_chars hex UInt64", [&](int i){
+			auto [p, ec] = std::to_chars(buf, buf + sizeof(buf), u64vals[i], 16);
+			static volatile char sink; sink = *buf;
+		});
+	}
+
+	std::cout << std::endl << "decimal formatting approaches (int):" << std::endl;
+	bench("format(int)", [&](int i){ str = NumberFormatter::format(ivals[i]); });
+	bench("append(str, int)", [&](int i){ str.clear(); NumberFormatter::append(str, ivals[i]); });
+	bench("intToStr(int, 10, char*)", [&](int i){
+		char buf[POCO_MAX_INT_STRING_LEN]; std::size_t sz = POCO_MAX_INT_STRING_LEN;
+		intToStr(ivals[i], 10, buf, sz);
+	});
+	{
+		char buf[32];
+		bench("std::to_chars dec", [&](int i){
+			auto [p, ec] = std::to_chars(buf, buf + sizeof(buf), ivals[i]);
+			static volatile char sink; sink = *buf;
+		});
+	}
+
+#ifdef POCO_HAVE_INT64
+
+	// ---- Int64 ----
+	std::cout << std::endl << "Int64:" << std::endl;
+	bench("format(Int64)", [&](int i){ str = NumberFormatter::format(i64vals[i]); });
+	bench("format(Int64, width)", [&](int i){ str = NumberFormatter::format(i64vals[i], 25); });
+	bench("format0(Int64, width)", [&](int i){ str = NumberFormatter::format0(i64vals[i], 25); });
+	bench("formatHex(Int64)", [&](int i){ str = NumberFormatter::formatHex(i64vals[i]); });
+	bench("format(-Int64)", [&](int i){ str = NumberFormatter::format(-std::abs(i64vals[i])); });
+
+	// ---- UInt64 ----
+	std::cout << std::endl << "UInt64:" << std::endl;
+	bench("format(UInt64)", [&](int i){ str = NumberFormatter::format(u64vals[i]); });
+	bench("formatHex(UInt64)", [&](int i){ str = NumberFormatter::formatHex(u64vals[i]); });
+	bench("formatHex(UInt64, width)", [&](int i){ str = NumberFormatter::formatHex(u64vals[i], 20); });
+
+#endif // POCO_HAVE_INT64
 }
 
 

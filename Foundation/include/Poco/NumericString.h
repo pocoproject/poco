@@ -18,6 +18,11 @@
 #define Foundation_NumericString_INCLUDED
 
 
+#ifndef POCO_NUMERIC_STRING_PRIVATE
+	#error "Do not include Poco/NumericString.h directly. Use Poco/NumberFormatter.h or Poco/NumberParser.h instead."
+#endif
+
+
 #include "Poco/Foundation.h"
 #include "Poco/Buffer.h"
 #include "Poco/FPEnvironment.h"
@@ -33,6 +38,12 @@
 #if !defined(POCO_NO_LOCALE)
 	#include <locale>
 #endif
+#include <algorithm>
+#include <charconv>
+#include <cstdint>
+#include <cstring>
+#include <string>
+#include <string_view>
 #include <type_traits>
 #if defined(POCO_NOINTMAX)
 typedef Poco::UInt64 uintmax_t;
@@ -350,7 +361,66 @@ namespace Impl {
 		const char* _beg;
 		char*       _cur;
 		const char* _end;
-};
+	};
+
+} // namespace Impl
+
+
+
+
+namespace Impl {
+
+
+inline constexpr std::string_view kHexLower = "0123456789abcdef";
+inline constexpr std::string_view kHexUpper = "0123456789ABCDEF";
+
+
+/// Hex conversion using shift-and-mask. Writes digits in forward order
+/// with the requested case. Returns pointer past last digit written.
+template <typename U>
+char* uintToHexBuf(char* buf, U value, bool lowercase)
+{
+	static_assert(std::is_unsigned_v<U>);
+	const auto hex = lowercase ? kHexLower : kHexUpper;
+
+	if (value == 0)
+		return (*buf++ = '0', buf);
+
+	constexpr int maxShift = (sizeof(U) * 2 - 1) * 4;
+	int shift = maxShift;
+	while (((value >> shift) & 0xF) == 0) shift -= 4;
+
+	for (; shift >= 0; shift -= 4)
+		*buf++ = hex[(value >> shift) & 0xF];
+	return buf;
+}
+
+
+/// Convert an integer to a digit string using std::to_chars.
+/// Writes sign + digits into buf. Returns {pointer past last char, negative flag},
+/// or {nullptr, _} on conversion failure.
+template <typename T>
+std::pair<char*, bool> intToDecBuf(char* buf, std::size_t bufSize, T value, int base)
+{
+	using U = std::make_unsigned_t<T>;
+	char* out = buf;
+	bool negative = false;
+
+	if constexpr (std::is_signed_v<T>)
+	{
+		if (value < 0)
+		{
+			negative = true;
+			*out++ = '-';
+			U uval = static_cast<U>(0) - static_cast<U>(value);
+			auto [p, ec] = std::to_chars(out, buf + bufSize, uval, base);
+			return {(ec == std::errc()) ? p : nullptr, true};
+		}
+	}
+	auto [p, ec] = std::to_chars(out, buf + bufSize, value, base);
+	return {(ec == std::errc()) ? p : nullptr, false};
+}
+
 
 } // namespace Impl
 
@@ -385,63 +455,102 @@ bool intToStr(T value,
 		return false;
 	}
 
-	Impl::Ptr ptr(result, size);
-	int thCount = 0;
-	T tmpVal;
-	do
-	{
-		tmpVal = value;
-		value /= base;
-		*ptr++ = (lowercase ? "fedcba9876543210123456789abcdef" : "FEDCBA9876543210123456789ABCDEF")[15 + (tmpVal - value * base)];
-		if (thSep && (base == 10) && (++thCount == 3))
-		{
-			*ptr++ = thSep;
-			thCount = 0;
-		}
-	} while (value);
+	using U = std::make_unsigned_t<T>;
 
-	if ('0' == fill)
+	// Step 1: Convert value to digit string in temporary buffer.
+	char buf[POCO_MAX_INT_STRING_LEN];
+	char* digitsBegin = buf;
+	char* digitsEnd = buf;
+	bool negative = false;
+
+	if (base == 0x10)
 	{
+		U uval;
 		if constexpr (std::is_signed_v<T>)
+			uval = static_cast<U>(value);
+		else
+			uval = value;
+		digitsEnd = Impl::uintToHexBuf(buf, uval, lowercase);
+	}
+	else
+	{
+		auto [p, neg] = Impl::intToDecBuf<T>(buf, sizeof(buf), value, base);
+		if (p == nullptr) { *result = '\0'; return false; }
+		digitsEnd = p;
+		negative = neg;
+		// intToDecBuf writes '-' + digits; strip sign for formatting below
+		if (negative) ++digitsBegin;
+
+		// std::to_chars uses lowercase; convert to uppercase if needed
+		if (!lowercase && base > 10)
+			std::transform(digitsBegin, digitsEnd, digitsBegin, [](char c) {
+				return (c >= 'a' && c <= 'f') ? static_cast<char>(c - ('a' - 'A')) : c;
+			});
+
+		// Insert thousand separators (rare path, base 10 only)
+		if (thSep && base == 10) [[unlikely]]
 		{
-			if (tmpVal < 0) --width;
+			constexpr int kDigitsPerGroup = 3;
+			const auto len = digitsEnd - digitsBegin;
+			if (len > kDigitsPerGroup)
+			{
+				const int nSeps = static_cast<int>((len - 1) / kDigitsPerGroup);
+				char* dst = digitsEnd + nSeps;
+				const char* src = digitsEnd;
+				digitsEnd = dst;
+				int count = 0;
+				while (src > digitsBegin)
+				{
+					*--dst = *--src;
+					if (++count == kDigitsPerGroup && src > digitsBegin)
+					{
+						*--dst = thSep;
+						count = 0;
+					}
+				}
+			}
 		}
-		if (prefix && base == 010) --width;
-		if (prefix && base == 0x10) width -= 2;
-		while ((ptr - result) < width) *ptr++ = fill;
 	}
 
-	if (prefix && base == 010) *ptr++ = '0';
-	else if (prefix && base == 0x10)
+	const auto numLen = digitsEnd - digitsBegin;
+
+	// Step 2: Format into result buffer with sign, prefix, and padding.
+	int prefixLen = 0;
+	if (negative) prefixLen += 1;
+	if (prefix && base == 010) prefixLen += 1;
+	if (prefix && base == 0x10) prefixLen += 2;
+
+	const int contentLen = prefixLen + static_cast<int>(numLen);
+	const int totalLen = (width > contentLen) ? width : contentLen;
+
+	if (static_cast<std::size_t>(totalLen) >= size)
+		throw RangeException();
+
+	char* out = result;
+	const int padLen = totalLen - contentLen;
+
+	if (fill == '0')
 	{
-		*ptr++ = 'x';
-		*ptr++ = '0';
+		if (negative) *out++ = '-';
+		if (prefix && base == 010) *out++ = '0';
+		if (prefix && base == 0x10) { *out++ = '0'; *out++ = 'x'; }
+		std::memset(out, '0', padLen);
+		out += padLen;
 	}
-
-	if constexpr (std::is_signed_v<T>)
+	else
 	{
-		if (tmpVal < 0) *ptr++ = '-';
+		std::memset(out, fill, padLen);
+		out += padLen;
+		if (negative) *out++ = '-';
+		if (prefix && base == 010) *out++ = '0';
+		if (prefix && base == 0x10) { *out++ = '0'; *out++ = 'x'; }
 	}
 
-	if ('0' != fill)
-	{
-		while ((ptr - result) < width) *ptr++ = fill;
-	}
+	std::memcpy(out, digitsBegin, numLen);
+	out += numLen;
 
-	size = ptr - result;
-	poco_assert_dbg (size <= ptr.span());
-	poco_assert_dbg ((-1 == width) || (size >= size_t(width)));
-	*ptr-- = '\0';
-
-	char* ptrr = result;
-	char tmp;
-	while(ptrr < ptr)
-	{
-		tmp    = *ptr;
-		*ptr--  = *ptrr;
-		*ptrr++ = tmp;
-	}
-
+	size = out - result;
+	*out = '\0';
 	return true;
 }
 
@@ -464,15 +573,14 @@ bool uIntToStr(T value,
 	/// If prefix is true and base is octal or hexadecimal, respective prefix ('0' for octal,
 	/// "0x" for hexadecimal) is prepended. For all other bases, prefix argument is ignored.
 	/// Formatted string has at least [width] total length.
-	///
-	/// This function is deprecated; use intToStr instead.
+	/// @deprecated Use intToStr instead.
 {
 	return intToStr(value, base, result, size, prefix, width, fill, thSep, lowercase);
 }
 
 
 template <typename T>
-bool intToStr (T number,
+bool intToStr(T number,
 	unsigned short base,
 	std::string& result,
 	bool prefix = false,
@@ -493,7 +601,7 @@ bool intToStr (T number,
 
 template <typename T>
 POCO_DEPRECATED("use intToStr instead")
-bool uIntToStr (T number,
+bool uIntToStr(T number,
 	unsigned short base,
 	std::string& result,
 	bool prefix = false,
@@ -503,8 +611,7 @@ bool uIntToStr (T number,
 	bool lowercase = false)
 	/// Converts unsigned integer to string; This is a wrapper function, for details see the
 	/// bool uIntToStr(T, unsigned short, char*, int, int, char, char) implementation.
-	///
-	/// This function is deprecated; use intToStr instead.
+	/// @deprecated Use intToStr instead.
 {
 	return intToStr(number, base, result, prefix, width, fill, thSep, lowercase);
 }
