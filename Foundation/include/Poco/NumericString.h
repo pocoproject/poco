@@ -43,7 +43,6 @@
 #include <cstdint>
 #include <cstring>
 #include <string>
-#include <string_view>
 #include <type_traits>
 #if defined(POCO_NOINTMAX)
 typedef Poco::UInt64 uintmax_t;
@@ -211,72 +210,47 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 	poco_assert_dbg (base == 2 || base == 8 || base == 10 || base == 16);
 
 	if (!pStr) return false;
-	while (std::isspace(*pStr)) ++pStr;
-	if ((*pStr == '\0') || ((*pStr == '-') && ((base != 10) || (std::is_unsigned<I>::value))))
+	while (std::isspace(static_cast<unsigned char>(*pStr))) ++pStr;
+	if (*pStr == '\0') return false;
+	if ((*pStr == '-') && ((base != 10) || std::is_unsigned_v<I>))
 		return false;
 
-	bool negative = false;
-	if ((base == 10) && (*pStr == '-'))
+	// Skip '+' sign (std::from_chars doesn't accept it)
+	const char* start = pStr;
+	if (*start == '+') ++start;
+	if (*start == '\0') return false; // reject bare sign without digits
+
+	// Try std::from_chars — handles sign, overflow, and all bases.
+	// If it consumes the entire string, we're done.
+	const char* end = start + std::strlen(start);
+	auto [ptr, ec] = std::from_chars(start, end, outResult, base);
+	if (ec == std::errc() && ptr == end)
+		return true;
+
+	// If from_chars reported overflow, invalid input, or no thSep is configured,
+	// there's nothing the slow path can do differently.
+	if (ec != std::errc() || !thSep || base != 10)
+		return false;
+
+	// from_chars consumed some digits then stopped at a non-digit character.
+	// The input may contain thousand separators — strip them and retry.
+	char cleaned[POCO_MAX_INT_STRING_LEN];
+	char* dst = cleaned;
+	for (const char* src = start; *src != '\0'; ++src)
 	{
-		if (!std::numeric_limits<I>::is_signed) return false;
-		negative = true;
-		++pStr;
-	}
-	else if (*pStr == '+') ++pStr;
-
-	if (*pStr == '\0') return false; // reject bare sign without digits
-
-	// numbers are parsed as unsigned, for negative numbers the sign is applied after parsing
-	// overflow is checked in every parse step
-	uintmax_t limitCheck = std::numeric_limits<I>::max();
-	if (negative) ++limitCheck;
-	uintmax_t result = 0;
-	unsigned char add = 0;
-	for (; *pStr != '\0'; ++pStr)
-	{
-		if (*pStr == thSep)
+		if (*src != thSep)
 		{
-			if (base == 10) continue;
-			// thousand separators only allowed for base 10
-			return false;
+			if (static_cast<std::size_t>(dst - cleaned) >= sizeof(cleaned) - 1)
+				return false; // input too long
+			*dst++ = *src;
 		}
-		if (result > (limitCheck / base)) return false;
-		if (!safeMultiply(result, result, base)) return false;
-		switch (*pStr)
-		{
-		case '0': case '1': case '2': case '3':
-		case '4': case '5': case '6': case '7':
-			add = (*pStr - '0');
-			break;
-
-		case '8': case '9':
-			if ((base == 10) || (base == 0x10)) add = (*pStr - '0');
-			else return false;
-			break;
-
-		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-			if (base != 0x10) return false;
-			add = (*pStr - 'a') + 10;
-			break;
-
-		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-			if (base != 0x10) return false;
-			add = (*pStr - 'A') + 10;
-			break;
-
-		default:
-			return false;
-		}
-		if ((limitCheck - static_cast<uintmax_t>(result)) < add) return false;
-		result += add;
 	}
+	*dst = '\0';
 
-	if (negative && (base == 10))
-		outResult = static_cast<I>(-result);
-	else
-		outResult = static_cast<I>(result);
+	if (dst == cleaned) return false; // nothing left after stripping
 
-	return true;
+	auto [ptr2, ec2] = std::from_chars(cleaned, dst, outResult, base);
+	return ec2 == std::errc() && ptr2 == dst;
 }
 
 
@@ -372,8 +346,8 @@ namespace Impl {
 namespace Impl {
 
 
-inline constexpr std::string_view kHexLower = "0123456789abcdef";
-inline constexpr std::string_view kHexUpper = "0123456789ABCDEF";
+inline constexpr char kHexLower[] = "0123456789abcdef";
+inline constexpr char kHexUpper[] = "0123456789ABCDEF";
 
 
 /// Hex conversion using shift-and-mask. Writes digits in forward order
@@ -382,7 +356,7 @@ template <typename U>
 char* uintToHexBuf(char* buf, U value, bool lowercase)
 {
 	static_assert(std::is_unsigned_v<U>);
-	const auto hex = lowercase ? kHexLower : kHexUpper;
+	const char* hex = lowercase ? kHexLower : kHexUpper;
 
 	if (value == 0)
 		return (*buf++ = '0', buf);
