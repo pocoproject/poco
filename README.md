@@ -128,6 +128,31 @@ Other common ways of building with CMake (e.g., `cmake-gui`) will also work.
 There are also a number of project-specific CMake variables that can be changed.
 
 
+#### Reducing Binary Size
+
+The default build includes all components and features. For size-constrained
+deployments, consider the following options:
+
+  - **Build only needed components** (`-DPOCO_MINIMAL_BUILD=ON
+    -DENABLE_<COMPONENT>=ON`): Only build the specific libraries you need.
+
+  - **Disable FastLogger** (`-DENABLE_FASTLOGGER=OFF`): The Quill-based
+    high-performance logger adds ~290 KB to Foundation. Disable it if
+    you don't need sub-microsecond logging.
+
+  - **Enable hidden visibility** (`-DCMAKE_CXX_VISIBILITY_PRESET=hidden
+    -DCMAKE_VISIBILITY_INLINES_HIDDEN=ON`): Allows the linker to discard
+    unreferenced internal symbols from shared libraries.
+
+Example combining all options:
+
+```
+$ cmake .. -DPOCO_MINIMAL_BUILD=ON -DENABLE_FOUNDATION=ON -DENABLE_NET=ON \
+  -DENABLE_UTIL=ON -DENABLE_FASTLOGGER=OFF \
+  -DCMAKE_CXX_VISIBILITY_PRESET=hidden -DCMAKE_VISIBILITY_INLINES_HIDDEN=ON
+```
+
+
 #### Cross-Compiling
 
 With a proper CMake toolchain file (specified via the `CMAKE_TOOLCHAIN_FILE` CMake variable),
