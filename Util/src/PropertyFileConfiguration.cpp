@@ -101,7 +101,7 @@ void PropertyFileConfiguration::save(std::ostream& ostr) const
 	for (auto it = begin(); it != end(); ++it)
 	{
 		const auto& [key, value] = *it;
-		ostr << key << ": " << escapeValue(value) << "\n";
+		ostr << key << " = " << escapeValue(value) << "\n";
 	}
 }
 
@@ -228,7 +228,7 @@ void PropertyFileConfiguration::saveToFile(const std::string& path, const std::m
 	{
 		if (!written.count(key))
 		{
-			out << key << ": " << escapeValue(value) << "\n";
+			out << key << " = " << escapeValue(value) << "\n";
 		}
 	}
 
