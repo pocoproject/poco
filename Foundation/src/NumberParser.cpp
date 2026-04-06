@@ -52,7 +52,7 @@ int NumberParser::parse(const std::string& s, char thSep)
 
 bool NumberParser::tryParse(const std::string& s, int& value, char thSep)
 {
-	return strToInt(s.c_str(), value, NUM_BASE_DEC, thSep);
+	return strToInt(s, value, NUM_BASE_DEC, thSep);
 }
 
 
@@ -68,7 +68,7 @@ unsigned NumberParser::parseUnsigned(const std::string& s, char thSep)
 
 bool NumberParser::tryParseUnsigned(const std::string& s, unsigned& value, char thSep)
 {
-	return strToInt(s.c_str(), value, NUM_BASE_DEC, thSep);
+	return strToInt(s, value, NUM_BASE_DEC, thSep);
 }
 
 
@@ -86,7 +86,9 @@ bool NumberParser::tryParseHex(const std::string& s, unsigned& value)
 {
 	int offset = 0;
 	if (s.size() > 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) offset = 2;
-	return strToInt(s.c_str() + offset, value, NUM_BASE_HEX);
+	const char* begin = s.data() + offset;
+	const char* end = s.data() + s.size();
+	return strToInt(begin, end, value, NUM_BASE_HEX);
 }
 
 
@@ -102,7 +104,7 @@ unsigned NumberParser::parseOct(const std::string& s)
 
 bool NumberParser::tryParseOct(const std::string& s, unsigned& value)
 {
-	return strToInt(s.c_str(), value, NUM_BASE_OCT);
+	return strToInt(s, value, NUM_BASE_OCT);
 }
 
 
@@ -121,7 +123,7 @@ Int64 NumberParser::parse64(const std::string& s, char thSep)
 
 bool NumberParser::tryParse64(const std::string& s, Int64& value, char thSep)
 {
-	return strToInt(s.c_str(), value, NUM_BASE_DEC, thSep);
+	return strToInt(s, value, NUM_BASE_DEC, thSep);
 }
 
 
@@ -137,7 +139,7 @@ UInt64 NumberParser::parseUnsigned64(const std::string& s, char thSep)
 
 bool NumberParser::tryParseUnsigned64(const std::string& s, UInt64& value, char thSep)
 {
-	return strToInt(s.c_str(), value, NUM_BASE_DEC, thSep);
+	return strToInt(s, value, NUM_BASE_DEC, thSep);
 }
 
 
@@ -155,7 +157,9 @@ bool NumberParser::tryParseHex64(const std::string& s, UInt64& value)
 {
 	int offset = 0;
 	if (s.size() > 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) offset = 2;
-	return strToInt(s.c_str() + offset, value, NUM_BASE_HEX);
+	const char* begin = s.data() + offset;
+	const char* end = s.data() + s.size();
+	return strToInt(begin, end, value, NUM_BASE_HEX);
 }
 
 
@@ -171,7 +175,7 @@ UInt64 NumberParser::parseOct64(const std::string& s)
 
 bool NumberParser::tryParseOct64(const std::string& s, UInt64& value)
 {
-	return strToInt(s.c_str(), value, NUM_BASE_OCT);
+	return strToInt(s, value, NUM_BASE_OCT);
 }
 
 
