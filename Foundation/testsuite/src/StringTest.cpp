@@ -1457,12 +1457,13 @@ void StringTest::benchmarkStrToInt()
 	};
 
 	// Pre-generate string test data
-	std::vector<std::string> decStrs(N), hexStrs(N), negStrs(N), bigStrs(N);
+	std::vector<std::string> smallStrs(N), decStrs(N), hexStrs(N), negStrs(N), bigStrs(N);
 	{
 		std::mt19937 rng(42);
 		for (int i = 0; i < N; ++i)
 		{
 			unsigned v = rng();
+			smallStrs[i] = std::to_string(v % 1000);
 			decStrs[i] = std::to_string(v);
 			char hbuf[32]; std::snprintf(hbuf, sizeof(hbuf), "%X", v);
 			hexStrs[i] = hbuf;
@@ -1475,44 +1476,17 @@ void StringTest::benchmarkStrToInt()
 	std::cout << std::endl << "strToInt parsing benchmark (" << N << " iterations)" << std::endl;
 	std::cout << std::string(55, '-') << std::endl;
 
-	// Per-case with constant strings
-	std::cout << std::endl << "Constant strings:" << std::endl;
-	{
-		int r; unsigned ur; Poco::Int64 r64; Poco::UInt64 ur64;
-		benchParse("strToInt(\"42\", int, 10)", [&]{ strToInt("42", r, 10); });
-		benchParse("strToInt(\"1234567890\", int, 10)", [&]{ strToInt("1234567890", r, 10); });
-		benchParse("strToInt(\"-1234567890\", int, 10)", [&]{ strToInt("-1234567890", r, 10); });
-		benchParse("strToInt(\"DEADBEEF\", uint, 16)", [&]{ strToInt("DEADBEEF", ur, 16); });
-		benchParse("strToInt(\"1,234,567\", int, 10, ',')", [&]{ strToInt("1,234,567", r, 10, ','); });
-		benchParse("strToInt(int64_max, int64, 10)", [&]{ strToInt("9223372036854775807", r64, 10); });
-		benchParse("strToInt(uint64_max, uint64, 10)", [&]{ strToInt("18446744073709551615", ur64, 10); });
-		benchParse("strToInt(\"0\", int, 10)", [&]{ strToInt("0", r, 10); });
-		benchParse("strToInt(\"10101010\", int, 2)", [&]{ strToInt("10101010", r, 2); });
-		benchParse("strToInt(\"777\", uint, 8)", [&]{ strToInt("777", ur, 8); });
-	}
-
-	// Random data
-	std::cout << std::endl << "Random strings:" << std::endl;
 	{
 		int r; unsigned ur; Poco::UInt64 ur64;
-		benchParse("strToInt(random_dec, int, 10)", [&]{ static int idx = 0; strToInt(decStrs[idx++ % N].c_str(), ur, 10); });
-		benchParse("strToInt(random_neg, int, 10)", [&]{ static int idx = 0; strToInt(negStrs[idx++ % N].c_str(), r, 10); });
-		benchParse("strToInt(random_hex, uint, 16)", [&]{ static int idx = 0; strToInt(hexStrs[idx++ % N].c_str(), ur, 16); });
-		benchParse("strToInt(random_uint64, uint64, 10)", [&]{ static int idx = 0; strToInt(bigStrs[idx++ % N].c_str(), ur64, 10); });
-	}
 
-	// Comparison with std::strtol and std::from_chars
-	std::cout << std::endl << "Comparison (\"1234567890\"):" << std::endl;
-	{
-		static volatile int sink = 0;
-		int r;
-		const char* s = "1234567890";
-		char* pEnd;
-		benchParse("strToInt", [&]{ strToInt(s, r, 10); sink = r; });
-		benchParse("std::strtol", [&]{ r = static_cast<int>(std::strtol(s, &pEnd, 10)); sink = r; });
-		benchParse("std::from_chars", [&]{
-			std::from_chars(s, s + 10, r, 10); sink = r;
-		});
+		std::cout << std::endl << "Small strings (0-999, random):" << std::endl;
+		benchParse("strToInt(small, uint, 10)", [&]{ static int idx = 0; strToInt(smallStrs[idx++ % N], ur, 10); });
+
+		std::cout << std::endl << "Random strings:" << std::endl;
+		benchParse("strToInt(dec, uint, 10)", [&]{ static int idx = 0; strToInt(decStrs[idx++ % N], ur, 10); });
+		benchParse("strToInt(neg, int, 10)", [&]{ static int idx = 0; strToInt(negStrs[idx++ % N], r, 10); });
+		benchParse("strToInt(hex, uint, 16)", [&]{ static int idx = 0; strToInt(hexStrs[idx++ % N], ur, 16); });
+		benchParse("strToInt(uint64, uint64, 10)", [&]{ static int idx = 0; strToInt(bigStrs[idx++ % N], ur64, 10); });
 	}
 }
 
@@ -1528,10 +1502,12 @@ void StringTest::benchmarkIntToStr()
 	static volatile int gSink = 0;
 
 	// Pre-generate random test data to avoid constant-folding
-	std::vector<int> ivals(N);
-	std::vector<unsigned> uvals(N);
+	std::vector<int> ivals(N);        // full-range int
+	std::vector<unsigned> uvals(N);   // full-range unsigned
 	std::vector<Poco::Int64> i64vals(N);
 	std::vector<Poco::UInt64> u64vals(N);
+	std::vector<int> ismall(N);       // small values 0-999
+	std::vector<unsigned> usmall(N);  // small unsigned 0-999
 	{
 		std::mt19937 rng(42); // fixed seed for reproducibility
 		for (int i = 0; i < N; ++i)
@@ -1540,6 +1516,8 @@ void StringTest::benchmarkIntToStr()
 			uvals[i] = static_cast<unsigned>(rng());
 			i64vals[i] = (static_cast<Poco::Int64>(rng()) << 32) | rng();
 			u64vals[i] = (static_cast<Poco::UInt64>(rng()) << 32) | rng();
+			ismall[i] = static_cast<int>(rng() % 1000);
+			usmall[i] = static_cast<unsigned>(rng() % 1000);
 		}
 	}
 
@@ -1561,6 +1539,10 @@ void StringTest::benchmarkIntToStr()
 
 	std::cout << std::endl << "intToStr(char*) with random data (" << N << " values)" << std::endl;
 	std::cout << std::string(62, '-') << std::endl;
+
+	std::cout << std::endl << "small int (0-999, random):" << std::endl;
+	bench("dec", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(ismall[i], 10, b, s); gSink += b[0]; });
+	bench("hex", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(usmall[i], 0x10, b, s); gSink += b[0]; });
 
 	std::cout << std::endl << "int (random):" << std::endl;
 	bench("dec", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(ivals[i], 10, b, s); gSink += b[0]; });
@@ -1584,6 +1566,10 @@ void StringTest::benchmarkIntToStr()
 
 	std::cout << std::endl << "NumberFormatter throughput (" << N << " random values)" << std::endl;
 	std::cout << std::string(62, '-') << std::endl;
+
+	std::cout << std::endl << "small int (0-999):" << std::endl;
+	bench("format(small)", [&](int i){ str = NumberFormatter::format(ismall[i]); });
+	bench("formatHex(small)", [&](int i){ str = NumberFormatter::formatHex(static_cast<unsigned>(usmall[i])); });
 
 	std::cout << std::endl << "int:" << std::endl;
 	bench("format(int)", [&](int i){ str = NumberFormatter::format(ivals[i]); });
