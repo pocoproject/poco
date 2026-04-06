@@ -214,7 +214,7 @@ QUILL_NODISCARD QUILL_EXPORT QUILL_ATTRIBUTE_USED inline uint32_t get_thread_id(
 #elif defined(__OpenBSD__)
   return static_cast<uint32_t>(getthrid());
 #else
-  return reinterpret_cast<uintptr_t>(pthread_self()); // (Ab)use pthread_self as a last resort option
+  return static_cast<uintptr_t>(pthread_self()); // (Ab)use pthread_self as a last resort option
 #endif
 }
 

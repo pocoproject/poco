@@ -78,7 +78,7 @@ public:
     // Open or create the named semaphore.
     // O_CREAT will create the semaphore if it doesn't exist, and if it does exist it will simply open the same semaphore.
     _sem = sem_open(name.data(), O_CREAT, 0644, 1);
-    if (_sem == SEM_FAILED)
+    if (_sem == (sem_t*)SEM_FAILED)
     {
       QUILL_THROW(QuillError{"Failed to create semaphore - errno: " + std::to_string(errno) +
                              " error: " + std::strerror(errno)});
@@ -114,11 +114,11 @@ public:
       _handle = nullptr;
     }
 #else
-    if (_sem != SEM_FAILED)
+    if (_sem != (sem_t*)SEM_FAILED)
     {
       sem_post(_sem);
       sem_close(_sem);
-      _sem = SEM_FAILED;
+      _sem = (sem_t*)SEM_FAILED;
     }
 #endif
   }
@@ -131,7 +131,7 @@ private:
 #if defined(_WIN32)
   HANDLE _handle{nullptr};
 #else
-  sem_t* _sem{SEM_FAILED};
+  sem_t* _sem{(sem_t*)SEM_FAILED};
 #endif
 };
 } // namespace detail
