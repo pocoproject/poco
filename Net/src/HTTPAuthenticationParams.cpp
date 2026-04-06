@@ -93,6 +93,9 @@ HTTPAuthenticationParams::HTTPAuthenticationParams(const HTTPResponse& response,
 }
 
 
+HTTPAuthenticationParams::HTTPAuthenticationParams(const HTTPAuthenticationParams& other) = default;
+
+
 HTTPAuthenticationParams::~HTTPAuthenticationParams()
 {
 }
