@@ -69,7 +69,7 @@ int StreamConverterBuf::readFromDevice()
 
 	while (-1 > n)
 	{
-		poco_assert_dbg(-n <= sizeof(_buffer));
+		poco_assert_dbg(static_cast<std::size_t>(-n) <= sizeof(_buffer));
 		_pIstr->read((char*) _buffer + read, -n - read);
 		read = -n;
 		n = _inEncoding.queryConvert(_buffer, -n);
@@ -113,7 +113,7 @@ int StreamConverterBuf::writeToDevice(char c)
 			}
 			int written = _outEncoding.convert(uc, _buffer, sizeof(_buffer));
 			if (written == 0) written = _outEncoding.convert(_defaultChar, _buffer, sizeof(_buffer));
-			poco_assert_dbg (written <= sizeof(_buffer));
+			poco_assert_dbg (static_cast<std::size_t>(written) <= sizeof(_buffer));
 			_pOstr->write((char*) _buffer, written);
 			_sequenceLength = 0;
 			_pos = 0;
