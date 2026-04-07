@@ -305,13 +305,7 @@ void NumberFormatterTest::testFormatFloat()
 	assertTrue (NumberFormatter::format(-12.25, 4) == "-12.2500");
 	assertTrue (NumberFormatter::format(-12.25, 10, 4) == "  -12.2500");
 	assertTrue (NumberFormatter::format(-12.25, 10, 2) == "    -12.25");
-#ifdef POCO_HAS_FLOAT_CHARCONV
-	// std::to_chars uses round-half-to-even (IEEE 754)
-	assertTrue (NumberFormatter::format(-12.25, 10, 1) == "     -12.2");
-#else
-	// double-conversion uses round-half-up
 	assertTrue (NumberFormatter::format(-12.25, 10, 1) == "     -12.3");
-#endif
 
 	assertTrue (NumberFormatter::format(50.0, 3) == "50.000");
 	assertTrue (NumberFormatter::format(50.0f, 3) == "50.000");

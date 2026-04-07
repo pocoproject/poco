@@ -16,7 +16,6 @@
 
 #include "Poco/Foundation.h"
 #include "CppUnit/TestCase.h"
-#include "Poco/MemoryStream.h"
 #include "Poco/NumberFormatter.h"
 #include <limits>
 
@@ -165,16 +164,6 @@ private:
 		assertFalse (Poco::safeMultiply(t, f, m));
 	}
 
-	template <typename T>
-	bool parseStream(const std::string& s, T& value)
-	{
-		Poco::MemoryInputStream istr(s.data(), s.size());
-#if !defined(POCO_NO_LOCALE)
-		istr.imbue(std::locale::classic());
-#endif
-		istr >> value;
-		return istr.eof() && !istr.fail();
-	}
 };
 
 

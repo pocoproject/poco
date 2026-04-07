@@ -19,11 +19,12 @@
 #include "Poco/String.h"
 #include "Poco/JSONString.h"
 #include "Poco/Format.h"
-#include "Poco/MemoryStream.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/MemoryStream.h"
 #include "Poco/FPEnvironment.h"
 #include "Poco/Exception.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/NumberParser.h"
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -71,7 +72,6 @@ using Poco::decimalSeparator;
 using Poco::format;
 using Poco::toJSON;
 using Poco::CILess;
-using Poco::MemoryInputStream;
 using Poco::Stopwatch;
 using Poco::RangeException;
 using Poco::isIntOverflow;
@@ -1257,6 +1257,7 @@ void StringTest::testNumericStringLimit()
 }
 
 
+
 void formatStream(double value, std::string& str)
 {
 	char buffer[128];
@@ -1369,124 +1370,140 @@ void StringTest::testJSONString()
 
 void StringTest::conversionBenchmarks()
 {
-	std::cout << std::endl << "===================" << std::endl;
-	benchmarkFloatToStr();
-	std::cout << "===================" << std::endl << std::endl;
-	std::cout << "===================" << std::endl;
-	benchmarkStrToFloat();
-	std::cout << "===================" << std::endl << std::endl;
-	std::cout << "===================" << std::endl;
-	benchmarkStrToInt();
-	std::cout << "===================" << std::endl << std::endl;
-	std::cout << "===================" << std::endl;
 	benchmarkIntToStr();
-	std::cout << "===================" << std::endl << std::endl;
+	benchmarkFloatToStr();
+	benchmarkStrToInt();
+	benchmarkStrToFloat();
 }
 
 
 void StringTest::benchmarkFloatToStr()
 {
+	using Poco::NumberFormatter;
+
+	constexpr int N = 1000000;
 	Poco::Stopwatch sw;
-	double val = 1.0372157551632929e-112;
-	std::cout << "The Number: " << std::setprecision(std::numeric_limits<double>::digits10) << val << std::endl;
 	std::string str;
-	sw.start();
-	for (int i = 0; i < 1000000; ++i) formatStream(val, str);
-	sw.stop();
-	std::cout << "formatStream Number: " << str << std::endl;
-	double timeStream = sw.elapsed() / 1000.0;
 
-	// standard sprintf
-	str = "";
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) formatSprintf(val, str);
-	sw.stop();
-	std::cout << "std::sprintf Number: " << str << std::endl;
-	double timeSprintf = sw.elapsed() / 1000.0;
+	std::mt19937 rng(42);
+	std::vector<double> dvals(N);
+	std::vector<float> fvals(N);
+	for (int i = 0; i < N; ++i)
+	{
+		const double d = static_cast<double>(static_cast<int>(rng())) / 1000.0;
+		dvals[i] = d;
+		fvals[i] = static_cast<float>(d);
+	}
 
-	// POCO Way (via double-conversion)
-	// no padding
-	sw.restart();
-	char buffer[POCO_MAX_FLT_STRING_LEN];
-	for (int i = 0; i < 1000000; ++i) doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, val);
-	sw.stop();
-	std::cout << "doubleToStr(char) Number: " << buffer << std::endl;
-	double timeDoubleToStrChar = sw.elapsed() / 1000.0;
+	auto bench = [&](const char* label, auto fn) {
+		for (int i = 0; i < 1000; ++i) fn(i % N);
+		sw.restart();
+		for (int i = 0; i < N; ++i) fn(i);
+		sw.stop();
+		const double ms = sw.elapsed() / 1000.0;
+		std::cout << std::setw(40) << std::setfill(' ') << label
+		          << std::setw(10) << std::fixed << std::setprecision(2) << ms << " ms" << std::endl;
+	};
 
-	// with padding
-	str = "";
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) doubleToStr(str, val);
-	sw.stop();
-	std::cout << "doubleToStr(std::string) Number: " << str << std::endl;
-	double timeDoubleToStrString = sw.elapsed() / 1000.0;
+	// Validate that format() round-trips: format → parse must recover the original value
+	for (int i = 0; i < N; ++i)
+	{
+		const std::string formatted = NumberFormatter::format(dvals[i]);
+		const double parsed = std::strtod(formatted.c_str(), nullptr);
+		assertEqualDelta(dvals[i], parsed, std::abs(dvals[i]) * 1e-10);
+	}
 
-	int graph;
-	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
-	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << std::setprecision(4) << timeStream << "[ms]" << std::endl;
+	std::cout << std::endl << "NumberFormatter float/double (" << N << " random values)" << std::endl;
+	std::cout << std::string(55, '-') << std::endl;
 
-	std::cout << std::setw(14) << "sprintf:\t" << std::setw(10) << std::setfill(' ') << timeSprintf << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeSprintf) << '\t' ;
-	graph = (int) (timeStream / timeSprintf); for (int i = 0; i < graph; ++i) std::cout << '#';
+	bench("format(double)", [&](int i){ str = NumberFormatter::format(dvals[i]); });
+	bench("format(double, prec=2)", [&](int i){ str = NumberFormatter::format(dvals[i], 2); });
+	bench("format(double, prec=6)", [&](int i){ str = NumberFormatter::format(dvals[i], 6); });
+	bench("format(double, w=15, prec=4)", [&](int i){ str = NumberFormatter::format(dvals[i], 15, 4); });
+	bench("format(float)", [&](int i){ str = NumberFormatter::format(fvals[i]); });
+	bench("format(float, prec=2)", [&](int i){ str = NumberFormatter::format(fvals[i], 2); });
 
-	std::cout << std::endl << std::setw(14) << "doubleToChar:\t" << std::setw(10) << std::setfill(' ') << timeDoubleToStrChar << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeDoubleToStrChar) << '\t' ;
-	graph = (int) (timeStream / timeDoubleToStrChar); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl << std::setw(14) << "doubleToString:\t" << std::setw(10) << std::setfill(' ') << timeDoubleToStrString << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeDoubleToStrString) << '\t' ;
-	graph = (int) (timeStream / timeDoubleToStrString); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl;
+	std::cout << std::endl << "  baselines:" << std::endl;
+	bench("std::to_string(double)", [&](int i){ str = std::to_string(dvals[i]); });
+	{
+		char buf[64];
+		bench("snprintf(%g, double)", [&](int i){ std::snprintf(buf, sizeof(buf), "%g", dvals[i]); str = buf; });
+		bench("snprintf(%.2f, double)", [&](int i){ std::snprintf(buf, sizeof(buf), "%.2f", dvals[i]); str = buf; });
+		bench("snprintf(%.6f, double)", [&](int i){ std::snprintf(buf, sizeof(buf), "%.6f", dvals[i]); str = buf; });
+		bench("snprintf(%15.4f, double)", [&](int i){ std::snprintf(buf, sizeof(buf), "%15.4f", dvals[i]); str = buf; });
+		bench("snprintf(%g, float)", [&](int i){ std::snprintf(buf, sizeof(buf), "%g", static_cast<double>(fvals[i])); str = buf; });
+	}
+	bench("stream(double)", [&](int i){ formatStream(dvals[i], str); });
 }
 
 
 void StringTest::benchmarkStrToInt()
 {
+	using Poco::NumberParser;
+
 	constexpr int N = 1000000;
 	Poco::Stopwatch sw;
+	static volatile int gSink = 0;
 
-	auto benchParse = [&](const char* label, auto fn) {
-		for (int i = 0; i < 1000; ++i) fn();
+	std::mt19937 rng(42);
+	std::vector<std::string> smallStrs(N), decStrs(N), hexStrs(N), hexPrefStrs(N);
+	std::vector<std::string> negStrs(N), bigStrs(N);
+	for (int i = 0; i < N; ++i)
+	{
+		const unsigned v = rng();
+		smallStrs[i] = std::to_string(v % 1000);
+		decStrs[i] = std::to_string(v);
+		char hbuf[32]; std::snprintf(hbuf, sizeof(hbuf), "%X", v);
+		hexStrs[i] = hbuf;
+		hexPrefStrs[i] = std::string("0x") + hbuf;
+		negStrs[i] = std::to_string(-static_cast<int>(v));
+		const auto big = (static_cast<Poco::UInt64>(rng()) << 32) | rng();
+		bigStrs[i] = std::to_string(big);
+	}
+
+	auto bench = [&](const char* label, auto fn) {
+		for (int i = 0; i < 1000; ++i) fn(i % N);
 		sw.restart();
-		for (int i = 0; i < N; ++i) fn();
+		for (int i = 0; i < N; ++i) fn(i);
 		sw.stop();
-		double ms = sw.elapsed() / 1000.0;
+		const double ms = sw.elapsed() / 1000.0;
 		std::cout << std::setw(40) << std::setfill(' ') << label
 		          << std::setw(10) << std::fixed << std::setprecision(2) << ms << " ms" << std::endl;
 	};
 
-	// Pre-generate string test data
-	std::vector<std::string> smallStrs(N), decStrs(N), hexStrs(N), negStrs(N), bigStrs(N);
+	// Validate that parse() agrees with strtol/strtoul for all test data
+	for (int i = 0; i < N; ++i)
 	{
-		std::mt19937 rng(42);
-		for (int i = 0; i < N; ++i)
-		{
-			unsigned v = rng();
-			smallStrs[i] = std::to_string(v % 1000);
-			decStrs[i] = std::to_string(v);
-			char hbuf[32]; std::snprintf(hbuf, sizeof(hbuf), "%X", v);
-			hexStrs[i] = hbuf;
-			negStrs[i] = std::to_string(-static_cast<int>(v));
-			auto big = (static_cast<Poco::UInt64>(rng()) << 32) | rng();
-			bigStrs[i] = std::to_string(big);
-		}
+		assertEqual(static_cast<int>(std::strtol(decStrs[i].c_str(), nullptr, 10)),
+			static_cast<int>(NumberParser::parseUnsigned(decStrs[i])));
+		assertEqual(static_cast<int>(std::strtol(negStrs[i].c_str(), nullptr, 10)),
+			NumberParser::parse(negStrs[i]));
 	}
 
-	std::cout << std::endl << "strToInt parsing benchmark (" << N << " iterations)" << std::endl;
+	std::cout << std::endl << "NumberParser integer (" << N << " random values)" << std::endl;
 	std::cout << std::string(55, '-') << std::endl;
 
 	{
 		int r; unsigned ur; Poco::UInt64 ur64;
 
-		std::cout << std::endl << "Small strings (0-999, random):" << std::endl;
-		benchParse("strToInt(small, uint, 10)", [&]{ static int idx = 0; strToInt(smallStrs[idx++ % N], ur, 10); });
+		bench("parse(small dec)", [&](int i){ r = NumberParser::parse(smallStrs[i % N]); gSink += r; });
+		bench("parse(uint dec)", [&](int i){ ur = NumberParser::parseUnsigned(decStrs[i % N]); gSink += ur; });
+		bench("parse(int neg)", [&](int i){ r = NumberParser::parse(negStrs[i % N]); gSink += r; });
+		bench("parseHex(uint)", [&](int i){ ur = NumberParser::parseHex(hexStrs[i % N]); gSink += ur; });
+		bench("parseHex(0x-prefixed)", [&](int i){ ur = NumberParser::parseHex(hexPrefStrs[i % N]); gSink += ur; });
+		bench("parseUnsigned64(uint64)", [&](int i){ ur64 = NumberParser::parseUnsigned64(bigStrs[i % N]); gSink += static_cast<int>(ur64); });
 
-		std::cout << std::endl << "Random strings:" << std::endl;
-		benchParse("strToInt(dec, uint, 10)", [&]{ static int idx = 0; strToInt(decStrs[idx++ % N], ur, 10); });
-		benchParse("strToInt(neg, int, 10)", [&]{ static int idx = 0; strToInt(negStrs[idx++ % N], r, 10); });
-		benchParse("strToInt(hex, uint, 16)", [&]{ static int idx = 0; strToInt(hexStrs[idx++ % N], ur, 16); });
-		benchParse("strToInt(uint64, uint64, 10)", [&]{ static int idx = 0; strToInt(bigStrs[idx++ % N], ur64, 10); });
+		std::cout << std::endl << "  baselines:" << std::endl;
+		bench("std::strtol(small dec)", [&](int i){ gSink += static_cast<int>(std::strtol(smallStrs[i % N].c_str(), nullptr, 10)); });
+		bench("std::strtol(dec)", [&](int i){ gSink += static_cast<int>(std::strtol(decStrs[i % N].c_str(), nullptr, 10)); });
+		bench("std::strtol(neg)", [&](int i){ gSink += static_cast<int>(std::strtol(negStrs[i % N].c_str(), nullptr, 10)); });
+		bench("std::strtoul(hex)", [&](int i){ gSink += static_cast<int>(std::strtoul(hexStrs[i % N].c_str(), nullptr, 16)); });
+		bench("std::strtoull(uint64)", [&](int i){ gSink += static_cast<int>(std::strtoull(bigStrs[i % N].c_str(), nullptr, 10)); });
+		{
+			int v; double d;
+			bench("sscanf(%d)", [&](int i){ std::sscanf(decStrs[i % N].c_str(), "%d", &v); gSink += v; });
+			bench("sscanf(%x)", [&](int i){ std::sscanf(hexStrs[i % N].c_str(), "%x", reinterpret_cast<unsigned*>(&v)); gSink += v; });
+		}
 	}
 }
 
@@ -1494,177 +1511,149 @@ void StringTest::benchmarkStrToInt()
 void StringTest::benchmarkIntToStr()
 {
 	using Poco::NumberFormatter;
-	using Poco::intToStr;
 
 	constexpr int N = 1000000;
 	Poco::Stopwatch sw;
 	std::string str;
-	static volatile int gSink = 0;
 
-	// Pre-generate random test data to avoid constant-folding
-	std::vector<int> ivals(N);        // full-range int
-	std::vector<unsigned> uvals(N);   // full-range unsigned
+	std::mt19937 rng(42);
+	std::vector<int> ivals(N);
+	std::vector<unsigned> uvals(N);
 	std::vector<Poco::Int64> i64vals(N);
 	std::vector<Poco::UInt64> u64vals(N);
-	std::vector<int> ismall(N);       // small values 0-999
-	std::vector<unsigned> usmall(N);  // small unsigned 0-999
+	std::vector<int> ismall(N);
+	std::vector<unsigned> usmall(N);
+	for (int i = 0; i < N; ++i)
 	{
-		std::mt19937 rng(42); // fixed seed for reproducibility
-		for (int i = 0; i < N; ++i)
-		{
-			ivals[i] = static_cast<int>(rng());
-			uvals[i] = static_cast<unsigned>(rng());
-			i64vals[i] = (static_cast<Poco::Int64>(rng()) << 32) | rng();
-			u64vals[i] = (static_cast<Poco::UInt64>(rng()) << 32) | rng();
-			ismall[i] = static_cast<int>(rng() % 1000);
-			usmall[i] = static_cast<unsigned>(rng() % 1000);
-		}
+		ivals[i] = static_cast<int>(rng());
+		uvals[i] = static_cast<unsigned>(rng());
+		i64vals[i] = (static_cast<Poco::Int64>(rng()) << 32) | rng();
+		u64vals[i] = (static_cast<Poco::UInt64>(rng()) << 32) | rng();
+		ismall[i] = static_cast<int>(rng() % 1000);
+		usmall[i] = static_cast<unsigned>(rng() % 1000);
 	}
 
-	// Benchmark helper for random-data tests (indexed access)
-	auto bench = [&](const char* label, auto fn) -> double {
+	auto bench = [&](const char* label, auto fn) {
 		for (int i = 0; i < 1000; ++i) fn(i % N);
 		sw.restart();
 		for (int i = 0; i < N; ++i) fn(i);
 		sw.stop();
-		double ms = sw.elapsed() / 1000.0;
-		std::cout << std::setw(46) << std::setfill(' ') << label
+		const double ms = sw.elapsed() / 1000.0;
+		std::cout << std::setw(40) << std::setfill(' ') << label
 		          << std::setw(10) << std::fixed << std::setprecision(2) << ms << " ms" << std::endl;
-		return ms;
 	};
 
-	// ====================================================================
-	// Part 1: intToStr(char*) with random data across formatting options
-	// ====================================================================
+	// Validate format() round-trip: format → strtol must recover the original value
+	for (int i = 0; i < N; ++i)
+	{
+		const std::string formatted = NumberFormatter::format(ivals[i]);
+		const long parsed = std::strtol(formatted.c_str(), nullptr, 10);
+		assertEqual(static_cast<long>(ivals[i]), parsed);
+	}
 
-	std::cout << std::endl << "intToStr(char*) with random data (" << N << " values)" << std::endl;
-	std::cout << std::string(62, '-') << std::endl;
+	std::cout << std::endl << "NumberFormatter integer (" << N << " random values)" << std::endl;
+	std::cout << std::string(55, '-') << std::endl;
 
-	std::cout << std::endl << "small int (0-999, random):" << std::endl;
-	bench("dec", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(ismall[i], 10, b, s); gSink += b[0]; });
-	bench("hex", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(usmall[i], 0x10, b, s); gSink += b[0]; });
-
-	std::cout << std::endl << "int (random):" << std::endl;
-	bench("dec", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(ivals[i], 10, b, s); gSink += b[0]; });
-	bench("dec, width=15", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(ivals[i], 10, b, s, false, 15); gSink += b[0]; });
-	bench("dec, width=15, '0'", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(ivals[i], 10, b, s, false, 15, '0'); gSink += b[0]; });
-	bench("hex", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(static_cast<unsigned>(ivals[i]), 0x10, b, s); gSink += b[0]; });
-	bench("hex, prefix", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(static_cast<unsigned>(ivals[i]), 0x10, b, s, true); gSink += b[0]; });
-	bench("hex, prefix, width=10, '0'", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(static_cast<unsigned>(ivals[i]), 0x10, b, s, true, 10, '0'); gSink += b[0]; });
-
-#ifdef POCO_HAVE_INT64
-	std::cout << std::endl << "Int64 (random):" << std::endl;
-	bench("dec", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(i64vals[i], 10, b, s); gSink += b[0]; });
-	bench("dec, width=25, '0'", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(i64vals[i], 10, b, s, false, 25, '0'); gSink += b[0]; });
-	bench("hex", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(static_cast<Poco::UInt64>(i64vals[i]), 0x10, b, s); gSink += b[0]; });
-	bench("hex, prefix, width=20, '0'", [&](int i){ char b[POCO_MAX_INT_STRING_LEN]; std::size_t s = sizeof(b); intToStr(static_cast<Poco::UInt64>(i64vals[i]), 0x10, b, s, true, 20, '0'); gSink += b[0]; });
-#endif
-
-	// ====================================================================
-	// Part 2: NumberFormatter throughput with random data
-	// ====================================================================
-
-	std::cout << std::endl << "NumberFormatter throughput (" << N << " random values)" << std::endl;
-	std::cout << std::string(62, '-') << std::endl;
-
-	std::cout << std::endl << "small int (0-999):" << std::endl;
+	std::cout << std::endl << "  small int (0-999):" << std::endl;
 	bench("format(small)", [&](int i){ str = NumberFormatter::format(ismall[i]); });
 	bench("formatHex(small)", [&](int i){ str = NumberFormatter::formatHex(static_cast<unsigned>(usmall[i])); });
 
-	std::cout << std::endl << "int:" << std::endl;
+	std::cout << std::endl << "  int:" << std::endl;
 	bench("format(int)", [&](int i){ str = NumberFormatter::format(ivals[i]); });
-	bench("format(int, width)", [&](int i){ str = NumberFormatter::format(ivals[i], 15); });
-	bench("format0(int, width)", [&](int i){ str = NumberFormatter::format0(ivals[i], 15); });
-	bench("formatHex(int)", [&](int i){ str = NumberFormatter::formatHex(ivals[i]); });
-	bench("formatHex(int, width)", [&](int i){ str = NumberFormatter::formatHex(ivals[i], 10); });
+	bench("format(int, width=15)", [&](int i){ str = NumberFormatter::format(ivals[i], 15); });
+	bench("format0(int, width=15)", [&](int i){ str = NumberFormatter::format0(ivals[i], 15); });
 	bench("format(-int)", [&](int i){ str = NumberFormatter::format(-std::abs(ivals[i])); });
-	bench("format0(-int, width)", [&](int i){ str = NumberFormatter::format0(-std::abs(ivals[i]), 15); });
+	bench("formatHex(int)", [&](int i){ str = NumberFormatter::formatHex(ivals[i]); });
+	bench("formatHex(int, width=10)", [&](int i){ str = NumberFormatter::formatHex(ivals[i], 10); });
+	bench("formatHex(int, prefix)", [&](int i){ str = NumberFormatter::formatHex(ivals[i], true); });
 
-	std::cout << std::endl << "unsigned:" << std::endl;
+	std::cout << std::endl << "  unsigned:" << std::endl;
 	bench("format(unsigned)", [&](int i){ str = NumberFormatter::format(uvals[i]); });
 	bench("formatHex(unsigned)", [&](int i){ str = NumberFormatter::formatHex(uvals[i]); });
 
 #ifdef POCO_HAVE_INT64
-	std::cout << std::endl << "Int64:" << std::endl;
+	std::cout << std::endl << "  Int64 / UInt64:" << std::endl;
 	bench("format(Int64)", [&](int i){ str = NumberFormatter::format(i64vals[i]); });
-	bench("formatHex(Int64)", [&](int i){ str = NumberFormatter::formatHex(i64vals[i]); });
-	bench("format(-Int64)", [&](int i){ str = NumberFormatter::format(-std::abs(i64vals[i])); });
-
-	std::cout << std::endl << "UInt64:" << std::endl;
 	bench("format(UInt64)", [&](int i){ str = NumberFormatter::format(u64vals[i]); });
-	bench("formatHex(UInt64)", [&](int i){ str = NumberFormatter::formatHex(u64vals[i]); });
-	bench("formatHex(UInt64, width)", [&](int i){ str = NumberFormatter::formatHex(u64vals[i], 20); });
+	bench("formatHex(Int64)", [&](int i){ str = NumberFormatter::formatHex(i64vals[i]); });
+	bench("formatHex(UInt64, w=20)", [&](int i){ str = NumberFormatter::formatHex(u64vals[i], 20); });
 #endif
+
+	std::cout << std::endl << "  baselines:" << std::endl;
+	bench("std::to_string(int)", [&](int i){ str = std::to_string(ivals[i]); });
+	bench("std::to_string(unsigned)", [&](int i){ str = std::to_string(uvals[i]); });
+#ifdef POCO_HAVE_INT64
+	bench("std::to_string(Int64)", [&](int i){ str = std::to_string(i64vals[i]); });
+#endif
+	{
+		char buf[32];
+		bench("snprintf(%d, int)", [&](int i){ std::snprintf(buf, sizeof(buf), "%d", ivals[i]); str = buf; });
+		bench("snprintf(%15d, int)", [&](int i){ std::snprintf(buf, sizeof(buf), "%15d", ivals[i]); str = buf; });
+		bench("snprintf(%015d, int)", [&](int i){ std::snprintf(buf, sizeof(buf), "%015d", ivals[i]); str = buf; });
+		bench("snprintf(%X, int)", [&](int i){ std::snprintf(buf, sizeof(buf), "%X", uvals[i]); str = buf; });
+	}
 }
 
 
 void StringTest::benchmarkStrToFloat()
 {
-	double res[5] = {};
+	using Poco::NumberParser;
+	using Poco::NumberFormatter;
+
+	constexpr int N = 1000000;
 	Poco::Stopwatch sw;
-	std::string num = "1.0372157551632929e-112";
-	std::cout << "The Number: " << num << std::endl;
-	sw.start();
-	for (int i = 0; i < 1000000; ++i) parseStream(num, res[0]);
-	sw.stop();
-	std::cout << "parseStream Number: " << std::setprecision(std::numeric_limits<double>::digits10) << res[0] << std::endl;
-	double timeStream = sw.elapsed() / 1000.0;
+	static volatile int gSink = 0;
 
-	// standard strtod
-	char* pC = nullptr;
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) res[1] = std::strtod(num.c_str(), &pC);
-	sw.stop();
-	std::cout << "std::strtod Number: " << res[1] << std::endl;
-	double timeStdStrtod = sw.elapsed() / 1000.0;
+	std::mt19937 rng(42);
+	std::vector<double> dvals(N);
+	std::vector<float> fvals(N);
+	std::vector<std::string> dblStrs(N), fltStrs(N), dblFixedStrs(N);
+	for (int i = 0; i < N; ++i)
+	{
+		const double d = static_cast<double>(static_cast<int>(rng())) / 1000.0;
+		dvals[i] = d;
+		fvals[i] = static_cast<float>(d);
+		dblStrs[i] = NumberFormatter::format(dvals[i]);
+		fltStrs[i] = NumberFormatter::format(fvals[i]);
+		dblFixedStrs[i] = NumberFormatter::format(dvals[i], 4);
+	}
 
-	// POCO Way
-	sw.restart();
-	char ou = 0;
-	for (int i = 0; i < 1000000; ++i) strToDouble(num, res[2], ou);
-	sw.stop();
-	std::cout << "Poco::strToDouble(const string&, double&) Number: " << res[2] << std::endl;
-	double timeStrToDouble = sw.elapsed() / 1000.0;
+	auto bench = [&](const char* label, auto fn) {
+		for (int i = 0; i < 1000; ++i) fn(i % N);
+		sw.restart();
+		for (int i = 0; i < N; ++i) fn(i);
+		sw.stop();
+		const double ms = sw.elapsed() / 1000.0;
+		std::cout << std::setw(40) << std::setfill(' ') << label
+		          << std::setw(10) << std::fixed << std::setprecision(2) << ms << " ms" << std::endl;
+	};
 
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) res[3] = strToDouble(num.c_str());
-	sw.stop();
-	std::cout << "Poco::strToDouble(const char*) Number: " << res[3] << std::endl;
-	double timeStrtoD = sw.elapsed() / 1000.0;
+	// Validate that POCO parsing agrees with strtod/strtof for all test data
+	for (int i = 0; i < N; ++i)
+	{
+		double pocoD;
+		const double strtodD = std::strtod(dblStrs[i].c_str(), nullptr);
+		assertTrue(NumberParser::tryParseFloat(dblStrs[i], pocoD));
+		assertEqualDelta(strtodD, pocoD, std::abs(strtodD) * 1e-10);
+	}
 
-	// standard sscanf
-	sw.restart();
-	for (int i = 0; i < 1000000; ++i) std::sscanf(num.c_str(), "%lf", &res[4]);
-	sw.stop();
-	std::cout << "sscanf Number: " << res[4] << std::endl;
-	double timeScanf = sw.elapsed() / 1000.0;
+	std::cout << std::endl << "NumberParser float/double (" << N << " random values)" << std::endl;
+	std::cout << std::string(55, '-') << std::endl;
 
-	assertEqual (res[0], res[1]);
-	assertEqual (res[1], res[2]);
-	assertEqual (res[2], res[3]);
-	assertEqual (res[3], res[4]);
+	{
+		double d;
+		bench("tryParseFloat(float str)", [&](int i){ NumberParser::tryParseFloat(fltStrs[i % N], d); gSink += static_cast<int>(d); });
+		bench("tryParseFloat(double str)", [&](int i){ NumberParser::tryParseFloat(dblStrs[i % N], d); gSink += static_cast<int>(d); });
+		bench("tryParseFloat(fixed str)", [&](int i){ NumberParser::tryParseFloat(dblFixedStrs[i % N], d); gSink += static_cast<int>(d); });
 
-	int graph;
-	std::cout << std::endl << "Timing and speedup relative to I/O stream:" << std::endl << std::endl;
-	std::cout << std::setw(14) << "Stream:\t" << std::setw(10) << std::setfill(' ') << std::setprecision(4) << timeStream << "[ms]" << std::endl;
-
-	std::cout << std::setw(14) << "std::strtod:\t" << std::setw(10) << std::setfill(' ') << timeStdStrtod << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStdStrtod) << '\t' ;
-	graph = (int) (timeStream / timeStdStrtod); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl << std::setw(14) << "strToDouble:\t" << std::setw(10) << std::setfill(' ') << timeStrToDouble << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrToDouble) << '\t' ;
-	graph = (int) (timeStream / timeStrToDouble); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl << std::setw(14) << "strToDouble:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeStrtoD) << '\t' ;
-	graph = (int) (timeStream / timeStrtoD); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl << std::setw(14) << "std::sscanf:\t" << std::setw(10) << std::setfill(' ')  << timeScanf << "[ms]" <<
-	std::setw(10) << std::setfill(' ')  << "Speedup: " << (timeStream / timeScanf) << '\t' ;
-	graph = (int) (timeStream / timeScanf); for (int i = 0; i < graph; ++i) std::cout << '#';
-
-	std::cout << std::endl;
+		std::cout << std::endl << "  baselines:" << std::endl;
+		bench("std::strtod", [&](int i){ gSink += static_cast<int>(std::strtod(dblStrs[i % N].c_str(), nullptr)); });
+		bench("std::strtof", [&](int i){ gSink += static_cast<int>(std::strtof(fltStrs[i % N].c_str(), nullptr)); });
+		{
+			double v;
+			bench("sscanf(%lf)", [&](int i){ std::sscanf(dblStrs[i % N].c_str(), "%lf", &v); gSink += static_cast<int>(v); });
+		}
+	}
 }
 
 

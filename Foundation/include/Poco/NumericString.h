@@ -217,7 +217,7 @@ template <typename I>
 	if (start >= end) return false; // reject bare sign without digits
 
 	// Try std::from_chars — handles sign, overflow, and all bases.
-	auto [ptr, ec] = std::from_chars(start, end, outResult, base);
+	const auto [ptr, ec] = std::from_chars(start, end, outResult, base);
 	if (ec == std::errc() && ptr == end)
 		return true;
 
@@ -242,7 +242,7 @@ template <typename I>
 
 	if (dst == cleaned) return false; // nothing left after stripping
 
-	auto [ptr2, ec2] = std::from_chars(cleaned, dst, outResult, base);
+	const auto [ptr2, ec2] = std::from_chars(cleaned, dst, outResult, base);
 	return ec2 == std::errc() && ptr2 == dst;
 }
 
@@ -263,8 +263,8 @@ template <typename I>
 	/// Converts string to integer number.
 	/// Avoids strlen by using the known string length directly.
 {
+	const char* const end = str.data() + str.size();
 	const char* begin = str.data();
-	const char* end = begin + str.size();
 	while (begin < end && std::isspace(static_cast<unsigned char>(*begin))) ++begin;
 	return strToInt(begin, end, result, base, thSep);
 }
@@ -446,8 +446,8 @@ template <typename T>
 
 			while (uval >= 100)
 			{
-				U q = uval / 100;
-				unsigned r = static_cast<unsigned>(uval - q * 100);
+				const U q = uval / 100;
+				const unsigned r = static_cast<unsigned>(uval - q * 100);
 				uval = q;
 
 				// Lower digit (ones place of the pair)
@@ -469,7 +469,7 @@ template <typename T>
 			// Remaining 1 or 2 digits
 			if (uval >= 10)
 			{
-				unsigned r = static_cast<unsigned>(uval);
+				const unsigned r = static_cast<unsigned>(uval);
 				*ptr++ = Impl::kDigitPairs[r * 2 + 1];
 				if (++thCount == 3)
 				{
@@ -488,15 +488,15 @@ template <typename T>
 			// No thousand separators: pure speed path.
 			while (uval >= 100)
 			{
-				U q = uval / 100;
-				unsigned r = static_cast<unsigned>(uval - q * 100);
+				const U q = uval / 100;
+				const unsigned r = static_cast<unsigned>(uval - q * 100);
 				uval = q;
 				*ptr++ = Impl::kDigitPairs[r * 2 + 1];
 				*ptr++ = Impl::kDigitPairs[r * 2];
 			}
 			if (uval >= 10)
 			{
-				unsigned r = static_cast<unsigned>(uval);
+				const unsigned r = static_cast<unsigned>(uval);
 				*ptr++ = Impl::kDigitPairs[r * 2 + 1];
 				*ptr++ = Impl::kDigitPairs[r * 2];
 			}
@@ -523,7 +523,7 @@ template <typename T>
 				case 16: shift = 4; break;
 				default: poco_bugcheck(); shift = 0; break; // unreachable for valid power-of-2 bases
 			}
-			U mask = (static_cast<U>(1) << shift) - 1;
+			const U mask = (static_cast<U>(1) << shift) - 1;
 			do
 			{
 				*ptr++ = digits[uval & mask];
@@ -535,7 +535,7 @@ template <typename T>
 			// Non-power-of-two: base 3, 5, 6, 7, 9, 11..15
 			do
 			{
-				U q = uval / base;
+				const U q = uval / base;
 				*ptr++ = digits[uval - q * base];
 				uval = q;
 			} while (uval);
@@ -627,7 +627,7 @@ template <typename T>
 {
 	char res[POCO_MAX_INT_STRING_LEN] = {0};
 	std::size_t size = POCO_MAX_INT_STRING_LEN;
-	bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep, lowercase);
+	const bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep, lowercase);
 	result.assign(res, size);
 	return ret;
 }
