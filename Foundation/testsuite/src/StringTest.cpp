@@ -1500,7 +1500,7 @@ void StringTest::benchmarkStrToInt()
 		bench("std::strtoul(hex)", [&](int i){ gSink += static_cast<int>(std::strtoul(hexStrs[i % N].c_str(), nullptr, 16)); });
 		bench("std::strtoull(uint64)", [&](int i){ gSink += static_cast<int>(std::strtoull(bigStrs[i % N].c_str(), nullptr, 10)); });
 		{
-			int v; double d;
+			int v;
 			bench("sscanf(%d)", [&](int i){ std::sscanf(decStrs[i % N].c_str(), "%d", &v); gSink += v; });
 			bench("sscanf(%x)", [&](int i){ std::sscanf(hexStrs[i % N].c_str(), "%x", reinterpret_cast<unsigned*>(&v)); gSink += v; });
 		}
