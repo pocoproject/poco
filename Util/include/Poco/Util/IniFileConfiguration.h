@@ -50,7 +50,7 @@ class Util_API IniFileConfiguration: public AbstractConfiguration
 	/// removed from both keys and values.
 {
 public:
-	IniFileConfiguration() = default;
+	IniFileConfiguration();
 		/// Creates an empty IniFileConfiguration.
 
 	IniFileConfiguration(std::istream& istr);
@@ -75,7 +75,7 @@ protected:
 	void enumerate(const std::string& key, Keys& range) const override;
 	void removeRaw(const std::string& key) override;
 
-	~IniFileConfiguration() = default;
+	~IniFileConfiguration();
 
 private:
 	void parseLine(std::istream& istr);

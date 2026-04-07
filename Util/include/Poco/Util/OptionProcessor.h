@@ -75,7 +75,7 @@ public:
 	OptionProcessor(const OptionSet& options);
 		/// Creates the OptionProcessor, using the given OptionSet.
 
-	~OptionProcessor() = default;
+	~OptionProcessor();
 		/// Destroys the OptionProcessor.
 
 	void setUnixStyle(bool flag)

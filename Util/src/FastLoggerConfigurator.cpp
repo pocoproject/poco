@@ -31,6 +31,12 @@ namespace Poco {
 namespace Util {
 
 
+FastLoggerConfigurator::FastLoggerConfigurator() = default;
+
+
+FastLoggerConfigurator::~FastLoggerConfigurator() = default;
+
+
 void FastLoggerConfigurator::configure(AbstractConfiguration::Ptr pConfig)
 {
 	poco_check_ptr(pConfig);

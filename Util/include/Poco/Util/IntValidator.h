@@ -36,7 +36,7 @@ public:
 	IntValidator(int min, int max);
 		/// Creates the IntValidator.
 
-	~IntValidator() = default;
+	~IntValidator();
 		/// Destroys the IntValidator.
 
 	void validate(const Option& option, const std::string& value) override;

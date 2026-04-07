@@ -40,6 +40,12 @@ namespace Poco {
 namespace Util {
 
 
+SystemConfiguration::SystemConfiguration() = default;
+
+
+SystemConfiguration::~SystemConfiguration() = default;
+
+
 std::map<std::string, std::function<std::string ()>> SystemConfiguration::_functions = {
 	  { "system.osName", Environment::osName }
 	, { "system.osVersion", Environment::osVersion }

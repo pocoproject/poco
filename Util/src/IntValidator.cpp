@@ -27,6 +27,9 @@ namespace Poco {
 namespace Util {
 
 
+IntValidator::~IntValidator() = default;
+
+
 IntValidator::IntValidator(int min, int max):
 	_min(min),
 	_max(max)

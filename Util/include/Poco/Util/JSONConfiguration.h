@@ -73,7 +73,7 @@ public:
 	JSONConfiguration(const JSON::Object::Ptr& object);
 		/// Creates a configuration from the given JSON object
 
-	~JSONConfiguration() = default;
+	~JSONConfiguration();
 		/// Destructor
 
 	void load(const std::string& path);

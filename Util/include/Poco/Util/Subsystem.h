@@ -48,7 +48,7 @@ class Util_API Subsystem: public Poco::RefCountedObject
 	/// the performance, to a complete reinitialization.
 {
 public:
-	Subsystem() = default;
+	Subsystem();
 		/// Creates the Subsystem.
 
 	Subsystem(const Subsystem&) = delete;
@@ -85,7 +85,7 @@ protected:
 		/// the option to a configuration property or specify a callback
 		/// to handle the option.
 
-	~Subsystem() = default;
+	~Subsystem();
 		/// Destroys the Subsystem.
 
 	friend class Application;

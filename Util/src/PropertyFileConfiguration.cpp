@@ -32,6 +32,9 @@ namespace Poco {
 namespace Util {
 
 
+PropertyFileConfiguration::~PropertyFileConfiguration() = default;
+
+
 PropertyFileConfiguration::PropertyFileConfiguration(AbstractConfiguration::Ptr pParentConfig):
 	_pParentConfig(std::move(pParentConfig))
 {

@@ -49,7 +49,7 @@ class Util_API LayeredConfiguration: public AbstractConfiguration
 public:
 	using Ptr = Poco::AutoPtr<LayeredConfiguration>;
 
-	LayeredConfiguration() = default;
+	LayeredConfiguration();
 		/// Creates the LayeredConfiguration.
 
 	void add(AbstractConfiguration::Ptr pConfig);
@@ -112,7 +112,7 @@ protected:
 	int highest() const;
 	void insert(const ConfigItem& item);
 
-	~LayeredConfiguration() = default;
+	~LayeredConfiguration();
 
 private:
 	using ConfigList = std::list<ConfigItem>;

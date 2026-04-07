@@ -37,6 +37,12 @@ Array::~Array()
 }
 
 
+Array& Array::operator=(const Array&) = default;
+
+
+Array& Array::operator=(Array&&) = default;
+
+
 Array& Array::addRedisType(RedisType::Ptr value)
 {
 	checkNull();

@@ -47,8 +47,8 @@ public:
 	virtual ~Array();
 		/// Destroys the Array.
 
-	Array& operator=(const Array&) = default;
-	Array& operator=(Array&&) = default;
+	Array& operator=(const Array&);
+	Array& operator=(Array&&);
 
 	template<typename T>
 	Array& operator<<(const T& arg)

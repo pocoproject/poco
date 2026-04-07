@@ -65,14 +65,14 @@ class Util_API FastLoggerConfigurator
 	/// LoggingConfigurator - they configure separate logger hierarchies.
 {
 public:
-	FastLoggerConfigurator() = default;
+	FastLoggerConfigurator();
 		/// Creates the FastLoggerConfigurator.
 
 	FastLoggerConfigurator(const FastLoggerConfigurator&) = delete;
 
 	FastLoggerConfigurator& operator = (const FastLoggerConfigurator&) = delete;
 
-	~FastLoggerConfigurator() = default;
+	~FastLoggerConfigurator();
 		/// Destroys the FastLoggerConfigurator.
 
 	void configure(AbstractConfiguration::Ptr pConfig);

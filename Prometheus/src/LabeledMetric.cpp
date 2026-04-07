@@ -24,6 +24,9 @@ namespace Poco {
 namespace Prometheus {
 
 
+LabeledMetric::~LabeledMetric() = default;
+
+
 const std::vector<std::string> LabeledMetric::EMPTY_LABEL;
 
 

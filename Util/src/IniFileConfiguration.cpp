@@ -35,6 +35,12 @@ namespace Poco {
 namespace Util {
 
 
+IniFileConfiguration::IniFileConfiguration() = default;
+
+
+IniFileConfiguration::~IniFileConfiguration() = default;
+
+
 IniFileConfiguration::IniFileConfiguration(std::istream& istr)
 {
 	load(istr);

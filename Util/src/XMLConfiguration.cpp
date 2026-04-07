@@ -38,6 +38,9 @@ namespace Util {
 
 
 
+XMLConfiguration::~XMLConfiguration() = default;
+
+
 XMLConfiguration::XMLConfiguration(char delim):
 	_delim(delim)
 {

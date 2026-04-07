@@ -21,6 +21,9 @@ namespace Poco {
 namespace Prometheus {
 
 
+IntGauge::~IntGauge() = default;
+
+
 void IntGauge::exportTo(Exporter& exporter) const
 {
 	const std::vector<std::string> EMPTY_VEC;

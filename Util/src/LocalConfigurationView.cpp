@@ -18,6 +18,9 @@ namespace Poco {
 namespace Util {
 
 
+LocalConfigurationView::~LocalConfigurationView() = default;
+
+
 LocalConfigurationView::LocalConfigurationView(const std::string& prefix, AbstractConfiguration::Ptr pConfig) :
     AbstractConfigurationView(prefix, pConfig)
 {

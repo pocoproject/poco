@@ -90,6 +90,9 @@ TextExporter::TextExporter(std::ostream& ostr):
 }
 
 
+TextExporter::~TextExporter() = default;
+
+
 void TextExporter::writeHeader(const Metric& metric)
 {
 	const std::string& help = metric.help();

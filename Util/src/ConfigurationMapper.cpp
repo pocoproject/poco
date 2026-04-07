@@ -19,6 +19,9 @@ namespace Poco {
 namespace Util {
 
 
+ConfigurationMapper::~ConfigurationMapper() = default;
+
+
 ConfigurationMapper::ConfigurationMapper(const std::string& fromPrefix, const std::string& toPrefix, AbstractConfiguration::Ptr pConfig):
 	_fromPrefix(fromPrefix),
 	_toPrefix(toPrefix),

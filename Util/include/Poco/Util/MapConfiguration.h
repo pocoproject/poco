@@ -31,10 +31,10 @@ class Util_API MapConfiguration: public AbstractConfiguration
 	/// An implementation of AbstractConfiguration that stores configuration data in a map.
 {
 public:
-	MapConfiguration() = default;
+	MapConfiguration();
 		/// Creates an empty MapConfiguration.
 
-	~MapConfiguration() = default;
+	~MapConfiguration();
 		/// Destroyes the MapConfiguration.
 
 	void copyTo(AbstractConfiguration& config);

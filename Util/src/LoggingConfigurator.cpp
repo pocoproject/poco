@@ -46,6 +46,12 @@ namespace Poco {
 namespace Util {
 
 
+LoggingConfigurator::LoggingConfigurator() = default;
+
+
+LoggingConfigurator::~LoggingConfigurator() = default;
+
+
 Mutex LoggingConfigurator::_mutex;
 
 

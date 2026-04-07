@@ -60,8 +60,8 @@ public:
 	~Command() override;
 		/// Destroys the command.
 
-	Command& operator=(const Command&) = default;
-	Command& operator=(Command&&) = default;
+	Command& operator=(const Command&);
+	Command& operator=(Command&&);
 
 	static Command append(const std::string& key, const std::string& value);
 		/// Creates and returns an APPEND command.

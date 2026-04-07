@@ -34,6 +34,9 @@ namespace Poco {
 namespace Util {
 
 
+JSONConfiguration::~JSONConfiguration() = default;
+
+
 JSONConfiguration::JSONConfiguration() : _object(new JSON::Object())
 {
 }

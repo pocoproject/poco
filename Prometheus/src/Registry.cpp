@@ -24,6 +24,12 @@ namespace Poco {
 namespace Prometheus {
 
 
+Registry::Registry() = default;
+
+
+Registry::~Registry() = default;
+
+
 void Registry::registerCollector(Collector* pCollector)
 {
 	poco_check_ptr (pCollector);

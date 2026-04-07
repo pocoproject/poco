@@ -53,6 +53,9 @@ ThreadPoolCollector::ThreadPoolCollector(const std::string& name, const Poco::Th
 }
 
 
+ThreadPoolCollector::~ThreadPoolCollector() = default;
+
+
 void ThreadPoolCollector::exportTo(Exporter& exporter) const
 {
 	const std::vector<std::string> labelNames{"name"s};

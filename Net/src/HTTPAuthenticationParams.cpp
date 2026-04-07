@@ -94,17 +94,15 @@ HTTPAuthenticationParams::HTTPAuthenticationParams(const HTTPResponse& response,
 }
 
 
+HTTPAuthenticationParams::HTTPAuthenticationParams(const HTTPAuthenticationParams& other) = default;
+
+
 HTTPAuthenticationParams::~HTTPAuthenticationParams()
 {
 }
 
 
-HTTPAuthenticationParams& HTTPAuthenticationParams::operator = (const HTTPAuthenticationParams& authParams)
-{
-	NameValueCollection::operator = (authParams);
-
-	return *this;
-}
+HTTPAuthenticationParams& HTTPAuthenticationParams::operator = (const HTTPAuthenticationParams& authParams) = default;
 
 
 void HTTPAuthenticationParams::fromAuthInfo(const std::string& authInfo)

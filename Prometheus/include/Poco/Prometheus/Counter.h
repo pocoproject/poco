@@ -30,10 +30,10 @@ namespace Prometheus {
 class Prometheus_API CounterSample
 {
 public:
-	CounterSample() = default;
+	CounterSample();
 		/// Creates the CounterSample.
 
-	~CounterSample() = default;
+	~CounterSample();
 		/// Destroys the CounterSample.
 
 	double value() const;
@@ -100,7 +100,7 @@ public:
 		/// Creates a Counter with the given name and params, and
 		/// registers it with the given registry (if not nullptr).
 
-	~Counter() = default;
+	~Counter();
 		/// Destroys the Counter.
 
 	using LabeledMetric::help;

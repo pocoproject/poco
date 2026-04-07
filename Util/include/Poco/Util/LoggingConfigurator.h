@@ -121,12 +121,12 @@ class Util_API LoggingConfigurator
 	///     logging.loggers.l2.level = debug
 {
 public:
-	LoggingConfigurator() = default;
+	LoggingConfigurator();
 		/// Creates the LoggingConfigurator.
 
 	LoggingConfigurator(const LoggingConfigurator&) = delete;
 
-	~LoggingConfigurator() = default;
+	~LoggingConfigurator();
 		/// Destroys the LoggingConfigurator.
 
 	LoggingConfigurator& operator = (const LoggingConfigurator&) = delete;

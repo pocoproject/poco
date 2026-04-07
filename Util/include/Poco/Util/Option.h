@@ -70,7 +70,7 @@ class Util_API Option
 	///        .argument("directory");
 {
 public:
-	Option() = default;
+	Option();
 		/// Creates an empty Option.
 
 	Option(const Option& option);

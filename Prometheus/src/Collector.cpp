@@ -24,6 +24,9 @@ namespace Poco {
 namespace Prometheus {
 
 
+Collector::~Collector() = default;
+
+
 const std::string& Collector::validateName(const std::string& name)
 {
 	static Poco::RegularExpression nameExpr{"^[a-zA-Z_:][a-zA-Z0-9_:]*$"s};

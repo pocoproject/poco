@@ -151,8 +151,8 @@ public:
 	PooledConnection& operator=(const PooledConnection&) = delete;
 
 	// Enable move semantics
-	PooledConnection(PooledConnection&& other) = default;
-	PooledConnection& operator=(PooledConnection&&) = default;
+	PooledConnection(PooledConnection&& other);
+	PooledConnection& operator=(PooledConnection&&);
 
 private:
 	Poco::ObjectPool<Connection, Connection::Ptr>* _pool;

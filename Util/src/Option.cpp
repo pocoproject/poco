@@ -27,6 +27,9 @@ namespace Poco {
 namespace Util {
 
 
+Option::Option() = default;
+
+
 Option::Option(const Option& option):
 	_shortName(option._shortName),
 	_fullName(option._fullName),

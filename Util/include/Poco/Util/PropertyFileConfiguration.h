@@ -120,7 +120,7 @@ public:
 		/// Clears the configuration, including provenance information.
 
 protected:
-	~PropertyFileConfiguration() = default;
+	~PropertyFileConfiguration();
 
 	void removeRaw(const std::string& key) override;
 

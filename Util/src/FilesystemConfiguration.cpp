@@ -31,6 +31,9 @@ namespace Poco {
 namespace Util {
 
 
+FilesystemConfiguration::~FilesystemConfiguration() = default;
+
+
 FilesystemConfiguration::FilesystemConfiguration(const std::string& path):
 	_path(path)
 {

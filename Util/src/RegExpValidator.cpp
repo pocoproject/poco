@@ -26,6 +26,9 @@ namespace Poco {
 namespace Util {
 
 
+RegExpValidator::~RegExpValidator() = default;
+
+
 RegExpValidator::RegExpValidator(const std::string& regexp):
 	_regexp(regexp)
 {

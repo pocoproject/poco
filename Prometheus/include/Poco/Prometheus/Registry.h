@@ -48,10 +48,10 @@ class Prometheus_API Registry
 	/// during the run time of the process.
 {
 public:
-	Registry() = default;
+	Registry();
 		/// Creates the Registry.
 
-	~Registry() = default;
+	~Registry();
 		/// Destroys the Registry.
 
 	void registerCollector(Collector* pCollector);

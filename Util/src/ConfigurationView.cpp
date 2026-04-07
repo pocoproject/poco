@@ -19,6 +19,9 @@ namespace Poco {
 namespace Util {
 
 
+AbstractConfigurationView::~AbstractConfigurationView() = default;
+
+
 AbstractConfigurationView::AbstractConfigurationView(const std::string& prefix, AbstractConfiguration::Ptr pConfig):
 	_prefix(prefix),
 	_pConfig(pConfig)
@@ -55,6 +58,9 @@ std::string AbstractConfigurationView::translateKey(const std::string& key) cons
 	result += key;
 	return result;
 }
+
+
+ConfigurationView::~ConfigurationView() = default;
 
 
 ConfigurationView::ConfigurationView(const std::string& prefix, AbstractConfiguration::Ptr pConfig)
