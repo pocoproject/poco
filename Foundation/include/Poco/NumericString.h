@@ -652,9 +652,11 @@ bool uIntToStr(T number,
 
 
 //
-// Wrappers for double-conversion library (http://code.google.com/p/double-conversion/).
-//
-// Library is the implementation of the algorithm described in Florian Loitsch's paper:
+// Floating-point to/from string conversions.
+// Uses std::to_chars/from_chars when available (POCO_HAS_FLOAT_CHARCONV),
+// otherwise falls back to the bundled double-conversion library
+// (http://code.google.com/p/double-conversion/), which implements the
+// algorithm described in Florian Loitsch's paper:
 // http://florian.loitsch.com/publications/dtoa-pldi2010.pdf
 //
 
