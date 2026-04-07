@@ -346,61 +346,32 @@ namespace Impl {
 } // namespace Impl
 
 
-
-
 namespace Impl {
 
+/// Digit-pairs lookup table for the "two-digits-at-a-time" integer-to-string
+/// technique. Instead of extracting one digit per iteration (value / 10),
+/// this approach extracts two digits at once (value / 100) and uses the
+/// remainder (0-99) as an index into this 200-byte table, halving the
+/// number of expensive integer divisions.
+///
+/// The technique is widely used in high-performance formatting libraries
+/// including {fmt}, jemalloc, and Facebook Folly.
+/// See also: https://github.com/miloyip/itoa-benchmark
+inline constexpr char kDigitPairs[201] =
+	"00010203040506070809"
+	"10111213141516171819"
+	"20212223242526272829"
+	"30313233343536373839"
+	"40414243444546474849"
+	"50515253545556575859"
+	"60616263646566676869"
+	"70717273747576777879"
+	"80818283848586878889"
+	"90919293949596979899";
 
-inline constexpr char kHexLower[] = "0123456789abcdef";
-inline constexpr char kHexUpper[] = "0123456789ABCDEF";
-
-
-/// Hex conversion using shift-and-mask. Writes digits in forward order
-/// with the requested case. Returns pointer past last digit written.
-template <typename U>
-char* uintToHexBuf(char* buf, U value, bool lowercase)
-{
-	static_assert(std::is_unsigned_v<U>);
-	const char* hex = lowercase ? kHexLower : kHexUpper;
-
-	if (value == 0)
-		return (*buf++ = '0', buf);
-
-	constexpr int maxShift = (sizeof(U) * 2 - 1) * 4;
-	int shift = maxShift;
-	while (((value >> shift) & 0xF) == 0) shift -= 4;
-
-	for (; shift >= 0; shift -= 4)
-		*buf++ = hex[(value >> shift) & 0xF];
-	return buf;
-}
-
-
-/// Convert an integer to a digit string using std::to_chars.
-/// Writes sign + digits into buf. Returns {pointer past last char, negative flag},
-/// or {nullptr, _} on conversion failure.
-template <typename T>
-std::pair<char*, bool> intToDecBuf(char* buf, std::size_t bufSize, T value, int base)
-{
-	using U = std::make_unsigned_t<T>;
-	char* out = buf;
-	bool negative = false;
-
-	if constexpr (std::is_signed_v<T>)
-	{
-		if (value < 0)
-		{
-			negative = true;
-			*out++ = '-';
-			U uval = static_cast<U>(0) - static_cast<U>(value);
-			auto [p, ec] = std::to_chars(out, buf + bufSize, uval, base);
-			return {(ec == std::errc()) ? p : nullptr, true};
-		}
-	}
-	auto [p, ec] = std::to_chars(out, buf + bufSize, value, base);
-	return {(ec == std::errc()) ? p : nullptr, false};
-}
-
+/// Direct digit tables for non-base-10 paths
+inline constexpr char kDigitsUpper[] = "0123456789ABCDEF";
+inline constexpr char kDigitsLower[] = "0123456789abcdef";
 
 } // namespace Impl
 
@@ -426,7 +397,7 @@ bool intToStr(T value,
 {
 	if constexpr (std::is_signed_v<T>)
 	{
-		poco_assert_dbg (((value < 0) && (base == 10)) || (value >= 0));
+		poco_assert_dbg(((value < 0) && (base == 10)) || (value >= 0));
 	}
 
 	if (base < 2 || base > 0x10)
@@ -435,102 +406,185 @@ bool intToStr(T value,
 		return false;
 	}
 
+	// --- Phase 1: extract sign, convert to unsigned ---
+	// This avoids UB for T_MIN (e.g. -2^63) where -value overflows signed.
 	using U = std::make_unsigned_t<T>;
 
-	// Step 1: Convert value to digit string in temporary buffer.
-	char buf[POCO_MAX_INT_STRING_LEN];
-	char* digitsBegin = buf;
-	char* digitsEnd = buf;
 	bool negative = false;
-
-	if (base == 0x10)
+	U uval;
+	if constexpr (std::is_signed_v<T>)
 	{
-		U uval;
-		if constexpr (std::is_signed_v<T>)
-			uval = static_cast<U>(value);
+		if (value < 0)
+		{
+			negative = true;
+			// Two-step cast avoids signed overflow UB for T_MIN:
+			// cast to unsigned first, then negate in unsigned arithmetic.
+			uval = static_cast<U>(0) - static_cast<U>(value);
+		}
 		else
-			uval = value;
-		digitsEnd = Impl::uintToHexBuf(buf, uval, lowercase);
+		{
+			uval = static_cast<U>(value);
+		}
 	}
 	else
 	{
-		auto [p, neg] = Impl::intToDecBuf<T>(buf, sizeof(buf), value, base);
-		if (p == nullptr) { *result = '\0'; return false; }
-		digitsEnd = p;
-		negative = neg;
-		// intToDecBuf writes '-' + digits; strip sign for formatting below
-		if (negative) ++digitsBegin;
+		uval = value;
+	}
 
-		// std::to_chars uses lowercase; convert to uppercase if needed
-		if (!lowercase && base > 10)
-			std::transform(digitsBegin, digitsEnd, digitsBegin, [](char c) {
-				return (c >= 'a' && c <= 'f') ? static_cast<char>(c - ('a' - 'A')) : c;
-			});
+	// --- Phase 2: extract digits backwards into result buffer ---
+	// We write directly into 'result' (backwards), then reverse at the end.
+	char* ptr = result;
 
-		// Insert thousand separators (rare path, base 10 only)
-		if (thSep && base == 10) [[unlikely]]
+	if (base == 10)
+	{
+		// ---- Fast path: base 10, two digits at a time ----
+		// This halves the number of expensive divisions.
+		if (thSep) [[unlikely]]
 		{
-			constexpr int kDigitsPerGroup = 3;
-			const auto len = digitsEnd - digitsBegin;
-			if (len > kDigitsPerGroup)
+			// With thousand separators: track digit count for separator insertion.
+			int thCount = 0;
+
+			while (uval >= 100)
 			{
-				const int nSeps = static_cast<int>((len - 1) / kDigitsPerGroup);
-				char* dst = digitsEnd + nSeps;
-				const char* src = digitsEnd;
-				digitsEnd = dst;
-				int count = 0;
-				while (src > digitsBegin)
+				U q = uval / 100;
+				unsigned r = static_cast<unsigned>(uval - q * 100);
+				uval = q;
+
+				// Lower digit (ones place of the pair)
+				*ptr++ = Impl::kDigitPairs[r * 2 + 1];
+				if (++thCount == 3)
 				{
-					*--dst = *--src;
-					if (++count == kDigitsPerGroup && src > digitsBegin)
-					{
-						*--dst = thSep;
-						count = 0;
-					}
+					*ptr++ = thSep;
+					thCount = 0;
 				}
+
+				// Upper digit (tens place of the pair)
+				*ptr++ = Impl::kDigitPairs[r * 2];
+				if (++thCount == 3 && uval != 0)
+				{
+					*ptr++ = thSep;
+					thCount = 0;
+				}
+			}
+			// Remaining 1 or 2 digits
+			if (uval >= 10)
+			{
+				unsigned r = static_cast<unsigned>(uval);
+				*ptr++ = Impl::kDigitPairs[r * 2 + 1];
+				if (++thCount == 3)
+				{
+					*ptr++ = thSep;
+					thCount = 0;
+				}
+				*ptr++ = Impl::kDigitPairs[r * 2];
+			}
+			else
+			{
+				*ptr++ = static_cast<char>('0' + uval);
+			}
+		}
+		else
+		{
+			// No thousand separators: pure speed path.
+			while (uval >= 100)
+			{
+				U q = uval / 100;
+				unsigned r = static_cast<unsigned>(uval - q * 100);
+				uval = q;
+				*ptr++ = Impl::kDigitPairs[r * 2 + 1];
+				*ptr++ = Impl::kDigitPairs[r * 2];
+			}
+			if (uval >= 10)
+			{
+				unsigned r = static_cast<unsigned>(uval);
+				*ptr++ = Impl::kDigitPairs[r * 2 + 1];
+				*ptr++ = Impl::kDigitPairs[r * 2];
+			}
+			else
+			{
+				*ptr++ = static_cast<char>('0' + uval);
 			}
 		}
 	}
-
-	const auto numLen = digitsEnd - digitsBegin;
-
-	// Step 2: Format into result buffer with sign, prefix, and padding.
-	int prefixLen = 0;
-	if (negative) prefixLen += 1;
-	if (prefix && base == 010) prefixLen += 1;
-	if (prefix && base == 0x10) prefixLen += 2;
-
-	const int contentLen = prefixLen + static_cast<int>(numLen);
-	const int totalLen = (width > contentLen) ? width : contentLen;
-
-	if (static_cast<std::size_t>(totalLen) >= size)
-		throw RangeException();
-
-	char* out = result;
-	const int padLen = totalLen - contentLen;
-
-	if (fill == '0')
-	{
-		if (negative) *out++ = '-';
-		if (prefix && base == 010) *out++ = '0';
-		if (prefix && base == 0x10) { *out++ = '0'; *out++ = 'x'; }
-		std::memset(out, '0', padLen);
-		out += padLen;
-	}
 	else
 	{
-		std::memset(out, fill, padLen);
-		out += padLen;
-		if (negative) *out++ = '-';
-		if (prefix && base == 010) *out++ = '0';
-		if (prefix && base == 0x10) { *out++ = '0'; *out++ = 'x'; }
+		// ---- Generic path: base 2..9, 11..16 ----
+		const char* digits = lowercase ? Impl::kDigitsLower : Impl::kDigitsUpper;
+
+		// For power-of-two bases, use shift+mask instead of division.
+		if ((base & (base - 1)) == 0)
+		{
+			unsigned shift;
+			switch (base)
+			{
+				case 2:  shift = 1; break;
+				case 4:  shift = 2; break;
+				case 8:  shift = 3; break;
+				case 16: shift = 4; break;
+				default: shift = 0; break; // unreachable for valid power-of-2 bases
+			}
+			U mask = (static_cast<U>(1) << shift) - 1;
+			do
+			{
+				*ptr++ = digits[uval & mask];
+				uval >>= shift;
+			} while (uval);
+		}
+		else [[unlikely]]
+		{
+			// Non-power-of-two: base 3, 5, 6, 7, 9, 11..15
+			do
+			{
+				U q = uval / base;
+				*ptr++ = digits[uval - q * base];
+				uval = q;
+			} while (uval);
+		}
 	}
 
-	std::memcpy(out, digitsBegin, numLen);
-	out += numLen;
+	// --- Phase 3: zero-fill padding (inserted backwards, gets reversed) ---
+	if (fill == '0')
+	{
+		int w = width;
+		if (negative) --w;
+		if (prefix && base == 010) --w;
+		if (prefix && base == 0x10) w -= 2;
+		while (static_cast<int>(ptr - result) < w) *ptr++ = '0';
+	}
 
-	size = out - result;
-	*out = '\0';
+	// --- Phase 4: prefix and sign (appended backwards, reversed later) ---
+	if (prefix && base == 010)
+	{
+		*ptr++ = '0';
+	}
+	else if (prefix && base == 0x10)
+	{
+		*ptr++ = 'x';
+		*ptr++ = '0';
+	}
+
+	if (negative) *ptr++ = '-';
+
+	// --- Phase 5: non-zero-fill padding ---
+	if (fill != '0')
+	{
+		while (static_cast<int>(ptr - result) < width) *ptr++ = fill;
+	}
+
+	// --- Phase 6: finalize and reverse ---
+	size = static_cast<std::size_t>(ptr - result);
+	if (size >= static_cast<std::size_t>(POCO_MAX_INT_STRING_LEN))
+		throw RangeException();
+	*ptr-- = '\0';
+
+	char* lo = result;
+	while (lo < ptr)
+	{
+		char tmp = *ptr;
+		*ptr-- = *lo;
+		*lo++ = tmp;
+	}
+
 	return true;
 }
 
