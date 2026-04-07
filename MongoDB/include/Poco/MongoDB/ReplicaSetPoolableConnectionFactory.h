@@ -180,8 +180,8 @@ public:
 	PooledReplicaSetConnection& operator=(const PooledReplicaSetConnection&) = delete;
 
 	// Enable move semantics
-	PooledReplicaSetConnection(PooledReplicaSetConnection&& other) noexcept = default;
-	PooledReplicaSetConnection& operator=(PooledReplicaSetConnection&& other) noexcept = default;
+	PooledReplicaSetConnection(PooledReplicaSetConnection&& other) noexcept;
+	PooledReplicaSetConnection& operator=(PooledReplicaSetConnection&& other) noexcept;
 
 private:
 	Poco::ObjectPool<ReplicaSetConnection, ReplicaSetConnection::Ptr>* _pool;

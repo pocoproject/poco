@@ -50,6 +50,9 @@ ProcessCollector::ProcessCollector(const std::string& name, Registry* pRegistry)
 }
 
 
+ProcessCollector::~ProcessCollector() = default;
+
+
 void ProcessCollector::exportTo(Exporter& exporter) const
 {
 	for (const auto& p: _metrics)

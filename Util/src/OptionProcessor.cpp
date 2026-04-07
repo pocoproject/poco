@@ -21,6 +21,9 @@
 namespace Poco::Util {
 
 
+OptionProcessor::~OptionProcessor() = default;
+
+
 OptionProcessor::OptionProcessor(const OptionSet& options):
 	_options(options),
 	_unixStyle(true),

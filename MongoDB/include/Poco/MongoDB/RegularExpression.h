@@ -41,16 +41,16 @@ public:
 	RegularExpression(std::string&& pattern, std::string&& options);
 		/// Creates a RegularExpression using the given pattern and options (move semantics).
 
-	RegularExpression(const RegularExpression& copy) = default;
+	RegularExpression(const RegularExpression& copy);
 		/// Creates a RegularExpression by copying another one.
 
-	RegularExpression(RegularExpression&& other) noexcept = default;
+	RegularExpression(RegularExpression&& other) noexcept;
 		/// Creates a RegularExpression by moving another one.
 
-	RegularExpression& operator=(const RegularExpression& copy) = default;
+	RegularExpression& operator=(const RegularExpression& copy);
 		/// Assigns another RegularExpression.
 
-	RegularExpression& operator=(RegularExpression&& other) noexcept = default;
+	RegularExpression& operator=(RegularExpression&& other) noexcept;
 		/// Move-assigns another RegularExpression.
 
 	virtual ~RegularExpression();

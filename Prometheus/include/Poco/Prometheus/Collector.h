@@ -51,7 +51,7 @@ public:
 	virtual void exportTo(Exporter& exporter) const = 0;
 		/// Writes the given Metric to the Exporter.
 
-	virtual ~Collector() = default;
+	virtual ~Collector();
 		/// Destroys the Collector.
 
 protected:

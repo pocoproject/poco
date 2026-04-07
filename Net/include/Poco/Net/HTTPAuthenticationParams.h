@@ -49,10 +49,13 @@ public:
 	HTTPAuthenticationParams(const HTTPResponse& response, const std::string& header = WWW_AUTHENTICATE);
 		/// See fromResponse() documentation.
 
+	HTTPAuthenticationParams(const HTTPAuthenticationParams& authParams);
+		/// Creates a HTTPAuthenticationParams by copying another one.
+
 	virtual ~HTTPAuthenticationParams();
 		/// Destroys the HTTPAuthenticationParams.
 
-	HTTPAuthenticationParams& operator = (const HTTPAuthenticationParams& authParams) = default;
+	HTTPAuthenticationParams& operator = (const HTTPAuthenticationParams& authParams);
 		/// Assigns the content of another HTTPAuthenticationParams.
 
 	void fromAuthInfo(const std::string& authInfo);

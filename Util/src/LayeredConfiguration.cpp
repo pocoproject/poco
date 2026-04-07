@@ -24,6 +24,12 @@ using Poco::RuntimeException;
 namespace Poco::Util {
 
 
+LayeredConfiguration::LayeredConfiguration() = default;
+
+
+LayeredConfiguration::~LayeredConfiguration() = default;
+
+
 void LayeredConfiguration::add(AbstractConfiguration::Ptr pConfig)
 {
 	add(pConfig, highest(), false);

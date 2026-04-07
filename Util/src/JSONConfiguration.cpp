@@ -33,6 +33,9 @@ using namespace std::string_literals;
 namespace Poco::Util {
 
 
+JSONConfiguration::~JSONConfiguration() = default;
+
+
 JSONConfiguration::JSONConfiguration() : _object(new JSON::Object())
 {
 }

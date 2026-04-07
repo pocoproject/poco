@@ -54,6 +54,35 @@ else(MSVC)
 	# NOTE: CMAKE_BUILD_TYPE must be set to Release for this to take effect
 	#       e.g., cmake -B build -DCMAKE_BUILD_TYPE=Release
 	add_link_options($<$<CONFIG:Release>:-s>)
+
+	# Dead-code stripping for macOS: Apple's -dead_strip works on Mach-O
+	# atoms without needing -ffunction-sections/-fdata-sections.
+	# Skipped in Debug builds to preserve symbols for debugging.
+	if(APPLE)
+		add_link_options($<$<NOT:$<CONFIG:Debug>>:-Wl,-dead_strip>)
+	endif()
+
+	# When hidden visibility is enabled, non-exported symbols are no longer
+	# linker roots. This allows the linker to discard unreferenced hidden
+	# symbols from shared libraries. Enable -ffunction-sections/-fdata-sections
+	# so each function gets its own section for fine-grained gc.
+	# Without hidden visibility this is net negative on ELF (section metadata
+	# overhead exceeds zero savings since all symbols are roots).
+	if(CMAKE_CXX_VISIBILITY_PRESET STREQUAL "hidden")
+		add_compile_options(-ffunction-sections -fdata-sections)
+		if(APPLE)
+			# -dead_strip already added above; section flags improve its
+			# granularity for hidden symbols.
+		else()
+			add_link_options($<$<NOT:$<CONFIG:Debug>>:-Wl,--gc-sections>)
+			# Identical Code Folding: merge functions with identical bodies.
+			# Requires gold or lld (not supported by BFD ld).
+			execute_process(COMMAND ${CMAKE_LINKER} --version OUTPUT_VARIABLE _linker_version ERROR_VARIABLE _linker_version)
+			if(_linker_version MATCHES "gold|LLD")
+				add_link_options($<$<NOT:$<CONFIG:Debug>>:-Wl,--icf=safe>)
+			endif()
+		endif()
+	endif()
 endif(MSVC)
 
 if (DEFINED POCO_SANITIZEFLAGS AND NOT "${POCO_SANITIZEFLAGS}" STREQUAL "")

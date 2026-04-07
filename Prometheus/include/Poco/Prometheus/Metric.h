@@ -45,7 +45,7 @@ public:
 	const std::string& help() const;
 		/// Returns the metric's help text.
 
-	~Metric() = default;
+	~Metric();
 		/// Destroys the Metric.
 
 protected:

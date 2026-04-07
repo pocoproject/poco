@@ -157,7 +157,7 @@ public:
 		/// Throws Poco::NotFoundException if no matching !include directive exists.
 
 protected:
-	~PropertyFileConfiguration() = default;
+	~PropertyFileConfiguration();
 
 	void removeRaw(const std::string& key) override;
 
