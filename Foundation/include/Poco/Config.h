@@ -205,6 +205,24 @@
 	#define POCO_HAVE_ATOMIC_SHARED_PTR false
 #endif
 
+// Float std::to_chars/from_chars support detection.
+// Available in GCC 11+, MSVC 19.24+, non-Apple libc++ 17+.
+// Apple Clang requires macOS 26.0+ deployment target due to availability annotations.
+#if defined(__apple_build_version__)
+#include <AvailabilityMacros.h>
+#endif
+#if defined(__cpp_lib_to_chars) && __cpp_lib_to_chars >= 202306L
+	#define POCO_HAS_FLOAT_CHARCONV 1
+#elif defined(_MSC_VER) && _MSC_VER >= 1924
+	#define POCO_HAS_FLOAT_CHARCONV 1
+#elif defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 11
+	#define POCO_HAS_FLOAT_CHARCONV 1
+#elif defined(__apple_build_version__) && defined(MAC_OS_X_VERSION_MIN_REQUIRED) && MAC_OS_X_VERSION_MIN_REQUIRED >= 260000
+	#define POCO_HAS_FLOAT_CHARCONV 1
+#elif defined(_LIBCPP_VERSION) && _LIBCPP_VERSION >= 170000 && !defined(__apple_build_version__)
+	#define POCO_HAS_FLOAT_CHARCONV 1
+#endif
+
 // Option to silence deprecation warnings.
 #ifndef POCO_SILENCE_DEPRECATED
 	#define POCO_DEPRECATED(reason) [[deprecated(reason)]]

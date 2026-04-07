@@ -17,6 +17,7 @@
 #include "Poco/NumericString.h"
 #undef POCO_NUMERIC_STRING_PRIVATE
 
+#ifndef POCO_HAS_FLOAT_CHARCONV
 // +++ double conversion +++
 // don't collide with standalone double_conversion library
 #define double_conversion poco_double_conversion
@@ -31,8 +32,9 @@
 #include "double-to-string.cc"
 #include "string-to-double.cc"
 // --- double conversion ---
-
 poco_static_assert(POCO_MAX_FLT_STRING_LEN == double_conversion::kMaxSignificantDecimalDigits);
+#endif // !POCO_HAS_FLOAT_CHARCONV
+
 #include "Poco/String.h"
 #include <memory>
 #include <cctype>
@@ -165,6 +167,63 @@ void insertThousandSep(std::string& str, char thSep, char decSep = '.')
 namespace Poco {
 
 
+#ifdef POCO_HAS_FLOAT_CHARCONV
+
+namespace {
+
+/// Format a floating-point value using std::to_chars with shortest representation.
+/// Chooses fixed or scientific notation based on the value's exponent and the
+/// [lowDec, highDec] range, matching double-conversion's ToShortest behavior.
+template <typename T>
+void toShortestStr(char* buffer, int bufferSize, T value, int lowDec, int highDec)
+{
+	// Determine the exponent to choose the right notation upfront,
+	// avoiding a format-then-check-then-reformat round trip.
+	T absVal = value < 0 ? -value : value;
+	bool useFixed = (absVal == 0) ||
+		(absVal >= 1 ? static_cast<int>(std::floor(std::log10(absVal))) <= highDec
+		             : static_cast<int>(std::floor(std::log10(absVal))) >= lowDec);
+
+	if (useFixed)
+	{
+		// Fixed notation with trailing-zero trimming for shortest output
+		auto [ptr, ec] = std::to_chars(buffer, buffer + bufferSize, value, std::chars_format::fixed);
+		if (ec != std::errc()) { buffer[0] = '\0'; return; }
+		*ptr = '\0';
+
+		char* dot = static_cast<char*>(std::memchr(buffer, '.', ptr - buffer));
+		if (dot != nullptr)
+		{
+			char* last = ptr - 1;
+			while (last > dot && *last == '0') --last;
+			*(last == dot ? last : last + 1) = '\0';
+		}
+	}
+	else
+	{
+		auto [ptr, ec] = std::to_chars(buffer, buffer + bufferSize, value);
+		if (ec != std::errc()) { buffer[0] = '\0'; return; }
+		*ptr = '\0';
+	}
+}
+
+} // namespace
+
+void floatToStr(char* buffer, int bufferSize, float value, int lowDec, int highDec)
+{
+	toShortestStr(buffer, bufferSize, value, lowDec, highDec);
+}
+
+
+void floatToFixedStr(char* buffer, int bufferSize, float value, int precision)
+{
+	auto [ptr, ec] = std::to_chars(buffer, buffer + bufferSize, value, std::chars_format::fixed, precision);
+	if (ec != std::errc()) { buffer[0] = '\0'; return; }
+	*ptr = '\0';
+}
+
+#else // !POCO_HAS_FLOAT_CHARCONV
+
 void floatToStr(char* buffer, int bufferSize, float value, int lowDec, int highDec)
 {
 	using namespace double_conversion;
@@ -189,6 +248,8 @@ void floatToFixedStr(char* buffer, int bufferSize, float value, int precision)
 	dc.ToFixed(value, precision, &builder);
 	builder.Finalize();
 }
+
+#endif // POCO_HAS_FLOAT_CHARCONV
 
 
 std::string& floatToStr(std::string& str, float value, int precision, int width, char thSep, char decSep)
@@ -227,6 +288,23 @@ std::string& floatToFixedStr(std::string& str, float value, int precision, int w
 }
 
 
+#ifdef POCO_HAS_FLOAT_CHARCONV
+
+void doubleToStr(char* buffer, int bufferSize, double value, int lowDec, int highDec)
+{
+	toShortestStr(buffer, bufferSize, value, lowDec, highDec);
+}
+
+
+void doubleToFixedStr(char* buffer, int bufferSize, double value, int precision)
+{
+	auto [ptr, ec] = std::to_chars(buffer, buffer + bufferSize, value, std::chars_format::fixed, precision);
+	if (ec != std::errc()) { buffer[0] = '\0'; return; }
+	*ptr = '\0';
+}
+
+#else // !POCO_HAS_FLOAT_CHARCONV
+
 void doubleToStr(char* buffer, int bufferSize, double value, int lowDec, int highDec)
 {
 	using namespace double_conversion;
@@ -252,6 +330,8 @@ void doubleToFixedStr(char* buffer, int bufferSize, double value, int precision)
 	dc.ToFixed(value, precision, &builder);
 	builder.Finalize();
 }
+
+#endif // POCO_HAS_FLOAT_CHARCONV
 
 
 std::string& doubleToStr(std::string& str, double value, int precision, int width, char thSep, char decSep)
@@ -292,6 +372,64 @@ std::string& doubleToFixedStr(std::string& str, double value, int precision, int
 }
 
 
+#ifdef POCO_HAS_FLOAT_CHARCONV
+
+namespace {
+
+/// Helper: skip whitespace and check for inf/nan strings.
+/// std::from_chars recognizes "inf"/"infinity"/"nan" on its own, but
+/// double-conversion only matches the exact strings passed as parameters.
+/// We replicate double-conversion behavior: only the exact inf/nan parameter
+/// strings are recognized; everything else that isn't numeric returns NaN.
+template <typename T>
+T strToFloatImpl(const char* str, const char* inf, const char* nan)
+{
+	while (std::isspace(static_cast<unsigned char>(*str))) ++str;
+	const char* end = str + std::strlen(str);
+	while (end > str && std::isspace(static_cast<unsigned char>(*(end - 1)))) --end;
+
+	if (str == end) return std::numeric_limits<T>::quiet_NaN();
+
+	bool negative = (*str == '-');
+	const char* p = negative ? str + 1 : str;
+	const std::size_t plen = static_cast<std::size_t>(end - p);
+
+	// Check for exact inf/nan match (must consume entire remaining string).
+	// This must be done before from_chars because from_chars accepts
+	// "inf", "infinity", and "nan" which may not match the caller's strings.
+	const std::size_t infLen = std::strlen(inf);
+	const std::size_t nanLen = std::strlen(nan);
+	if (plen == infLen && std::strncmp(p, inf, infLen) == 0)
+		return negative ? -std::numeric_limits<T>::infinity() : std::numeric_limits<T>::infinity();
+	if (plen == nanLen && std::strncmp(p, nan, nanLen) == 0)
+		return std::numeric_limits<T>::quiet_NaN();
+
+	// Reject strings that start with letters (from_chars would parse "inf"/"nan")
+	if (plen > 0 && std::isalpha(static_cast<unsigned char>(*p)))
+		return std::numeric_limits<T>::quiet_NaN();
+
+	T result = std::numeric_limits<T>::quiet_NaN();
+	auto [ptr, ec] = std::from_chars(str, end, result);
+	if (ec != std::errc() || ptr != end)
+		return std::numeric_limits<T>::quiet_NaN();
+	return result;
+}
+
+} // namespace
+
+float strToFloat(const char* str, const char* inf, const char* nan)
+{
+	return strToFloatImpl<float>(str, inf, nan);
+}
+
+
+double strToDouble(const char* str, const char* inf, const char* nan)
+{
+	return strToFloatImpl<double>(str, inf, nan);
+}
+
+#else // !POCO_HAS_FLOAT_CHARCONV
+
 float strToFloat(const char* str, const char* inf, const char* nan)
 {
 	using namespace double_conversion;
@@ -316,11 +454,11 @@ double strToDouble(const char* str, const char* inf, const char* nan)
 	return result;
 }
 
+#endif // POCO_HAS_FLOAT_CHARCONV
+
 
 bool strToFloat(const std::string& str, float& result, char decSep, char thSep, const char* inf, const char* nan)
 {
-	using namespace double_conversion;
-
 	std::string tmp(str);
 	trimInPlace(tmp);
 	removeInPlace(tmp, thSep);
@@ -335,8 +473,6 @@ bool strToFloat(const std::string& str, float& result, char decSep, char thSep, 
 bool strToDouble(const std::string& str, double& result, char decSep, char thSep, const char* inf, const char* nan)
 {
 	if (str.empty()) return false;
-
-	using namespace double_conversion;
 
 	std::string tmp(str);
 	trimInPlace(tmp);
