@@ -231,12 +231,12 @@ void NumberParserTest::testParseError()
 		failmsg("must throw SyntaxException");
 	} catch (SyntaxException&) { }
 
-	try
+	// Leading whitespace is accepted (stripped before parsing)
 	{
-		NumberParser::parse(" 123");
-		NumberParser::parseBool("");
-		failmsg("must throw SyntaxException");
-	} catch (SyntaxException&) { }
+		int ws = 0;
+		assertTrue(NumberParser::tryParse(" 123", ws));
+		assertEqual(123, ws);
+	}
 
 	try
 	{

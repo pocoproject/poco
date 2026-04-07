@@ -32,7 +32,6 @@
 #ifdef max
 	#undef max
 #endif
-#include <algorithm>
 #include <cctype>
 #include <charconv>
 #include <cmath>
@@ -80,20 +79,18 @@ inline bool isIntOverflow(From val)
 {
 	poco_assert_dbg (std::numeric_limits<From>::is_integer);
 	poco_assert_dbg (std::numeric_limits<To>::is_integer);
-	bool ret;
-	if (std::numeric_limits<To>::is_signed)
+	if constexpr (std::numeric_limits<To>::is_signed)
 	{
-		ret = (!std::numeric_limits<From>::is_signed &&
+		return (!std::numeric_limits<From>::is_signed &&
 			  (uintmax_t)val > (uintmax_t)INTMAX_MAX) ||
 			  (intmax_t)val  < (intmax_t)std::numeric_limits<To>::min() ||
 			  (intmax_t)val  > (intmax_t)std::numeric_limits<To>::max();
 	}
 	else
 	{
-		ret = isNegative(val) ||
+		return isNegative(val) ||
 				(uintmax_t)val > (uintmax_t)std::numeric_limits<To>::max();
 	}
-	return ret;
 }
 
 
@@ -109,31 +106,40 @@ bool safeMultiply(R& result, F f, S s)
 		return true;
 	}
 
-	if (f > 0)
+	if constexpr (std::is_signed_v<F> || std::is_signed_v<S>)
 	{
-		if (s > 0)
+		if (f > 0)
 		{
-			if (cast(f) > (cast(std::numeric_limits<R>::max()) / cast(s)))
-				return false;
+			if (s > 0)
+			{
+				if (cast(f) > (cast(std::numeric_limits<R>::max()) / cast(s)))
+					return false;
+			}
+			else
+			{
+				if (cast(s) < (cast(std::numeric_limits<R>::min()) / cast(f)))
+					return false;
+			}
 		}
 		else
 		{
-			if (cast(s) < (cast(std::numeric_limits<R>::min()) / cast(f)))
-				return false;
+			if (s > 0)
+			{
+				if (cast(f) < (cast(std::numeric_limits<R>::min()) / cast(s)))
+					return false;
+			}
+			else
+			{
+				if (cast(s) < (cast(std::numeric_limits<R>::max()) / cast(f)))
+					return false;
+			}
 		}
 	}
 	else
 	{
-		if (s > 0)
-		{
-			if (cast(f) < (cast(std::numeric_limits<R>::min()) / cast(s)))
-				return false;
-		}
-		else
-		{
-			if (cast(s) < (cast(std::numeric_limits<R>::max()) / cast(f)))
-				return false;
-		}
+		// Both f and s are unsigned (and non-zero at this point)
+		if (cast(f) > (cast(std::numeric_limits<R>::max()) / cast(s)))
+			return false;
 	}
 	result = f * s;
 	return true;
@@ -343,11 +349,6 @@ namespace Impl {
 		const char* _end;
 	};
 
-} // namespace Impl
-
-
-namespace Impl {
-
 /// Digit-pairs lookup table for the "two-digits-at-a-time" integer-to-string
 /// technique. Instead of extracting one digit per iteration (value / 10),
 /// this approach extracts two digits at once (value / 100) and uses the
@@ -405,6 +406,10 @@ bool intToStr(T value,
 		*result = '\0';
 		return false;
 	}
+
+	// Guard against buffer overflow in padding loops (phases 3-5).
+	if (width >= static_cast<int>(POCO_MAX_INT_STRING_LEN))
+		throw RangeException();
 
 	// --- Phase 1: extract sign, convert to unsigned ---
 	// This avoids UB for T_MIN (e.g. -2^63) where -value overflows signed.
@@ -521,7 +526,7 @@ bool intToStr(T value,
 				case 4:  shift = 2; break;
 				case 8:  shift = 3; break;
 				case 16: shift = 4; break;
-				default: shift = 0; break; // unreachable for valid power-of-2 bases
+				default: poco_bugcheck(); shift = 0; break; // unreachable for valid power-of-2 bases
 			}
 			U mask = (static_cast<U>(1) << shift) - 1;
 			do
