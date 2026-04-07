@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.26.0)
 
-# MacOS version that has support for C++20
+# Minimum macOS version.
 # Must be set before the project.
-set(CMAKE_OSX_DEPLOYMENT_TARGET "13.3" CACHE STRING "macOS minimum supported target")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "15.0" CACHE STRING "macOS minimum supported target")
 
 # Compiler selection (must be processed before project())
 # Provides POCO_COMPILER and POCO_CROSS_COMPILE cache variables.
