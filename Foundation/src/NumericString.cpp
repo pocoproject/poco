@@ -36,8 +36,8 @@ poco_static_assert(POCO_MAX_FLT_STRING_LEN == double_conversion::kMaxSignificant
 #endif // !POCO_HAS_FLOAT_CHARCONV
 
 #include "Poco/String.h"
-#include <memory>
 #include <cctype>
+#include <cmath>
 
 
 namespace {
@@ -62,12 +62,12 @@ void pad(std::string& str, std::string::size_type precision, std::string::size_t
 	std::string::size_type frac = str.length() - decSepPos - 1;
 
 	std::string::size_type ePos = str.find_first_of("eE");
-	std::unique_ptr<std::string> eStr;
+	std::string eStr;
 	if (ePos != std::string::npos)
 	{
-		eStr.reset(new std::string(str.substr(ePos, std::string::npos)));
-		frac -= eStr->length();
-		str = str.substr(0, str.length() - eStr->length());
+		eStr = str.substr(ePos);
+		frac -= eStr.length();
+		str.erase(ePos);
 	}
 
 	if (frac != precision)
@@ -115,7 +115,7 @@ void pad(std::string& str, std::string::size_type precision, std::string::size_t
 		}
 	}
 
-	if (eStr.get()) str += *eStr;
+	if (!eStr.empty()) str += eStr;
 
 	if (width && (str.length() < width)) str.insert(str.begin(), width - str.length(), prefix);
 }
@@ -177,12 +177,27 @@ namespace {
 template <typename T>
 void toShortestStr(char* buffer, int bufferSize, T value, int lowDec, int highDec)
 {
-	// Determine the exponent to choose the right notation upfront,
-	// avoiding a format-then-check-then-reformat round trip.
+	// Handle NaN, infinity, and -0 directly — log10 is undefined for these.
+	if (!std::isfinite(value) || value == T(0))
+	{
+		auto [ptr, ec] = std::to_chars(buffer, buffer + bufferSize, value);
+		if (ec != std::errc()) { buffer[0] = '\0'; return; }
+		*ptr = '\0';
+		return;
+	}
+
+	// Compute the base-10 exponent robustly. std::floor(std::log10(x)) can
+	// be off by one near exact powers of 10 due to floating-point rounding
+	// (e.g. log10(1000.0) may return 2.999... → floor = 2 instead of 3).
+	// Verify with a power-of-10 multiplication to correct off-by-one.
 	T absVal = value < 0 ? -value : value;
-	bool useFixed = (absVal == 0) ||
-		(absVal >= 1 ? static_cast<int>(std::floor(std::log10(absVal))) <= highDec
-		             : static_cast<int>(std::floor(std::log10(absVal))) >= lowDec);
+	int exp10 = static_cast<int>(std::floor(std::log10(absVal)));
+	// Correct off-by-one: if 10^(exp10+1) <= absVal, we underestimated
+	T threshold = 1;
+	for (int i = 0; i < exp10 + 1 && i < 20; ++i) threshold *= 10;
+	if (threshold <= absVal) ++exp10;
+
+	bool useFixed = (exp10 >= lowDec && exp10 <= highDec);
 
 	if (useFixed)
 	{
@@ -252,13 +267,20 @@ void floatToFixedStr(char* buffer, int bufferSize, float value, int precision)
 #endif // POCO_HAS_FLOAT_CHARCONV
 
 
-std::string& floatToStr(std::string& str, float value, int precision, int width, char thSep, char decSep)
+namespace {
+
+/// Common implementation for float/double-to-string overloads.
+/// Calls charConvFn to fill a char buffer, then applies formatting
+/// (decimal separator, thousand separator, precision padding).
+template <typename T, typename CharConvFn>
+std::string& floatToStrImpl(std::string& str, T value, int precision, int width,
+	char thSep, char decSep, CharConvFn charConvFn)
 {
 	if (!decSep) decSep = '.';
 	if (precision == 0) value = std::floor(value);
 
 	char buffer[POCO_MAX_FLT_STRING_LEN];
-	floatToStr(buffer, POCO_MAX_FLT_STRING_LEN, value);
+	charConvFn(buffer, POCO_MAX_FLT_STRING_LEN, value);
 	str = buffer;
 
 	if (decSep && (decSep != '.') && (str.find('.') != std::string::npos))
@@ -269,22 +291,20 @@ std::string& floatToStr(std::string& str, float value, int precision, int width,
 	return str;
 }
 
+} // namespace
+
+
+std::string& floatToStr(std::string& str, float value, int precision, int width, char thSep, char decSep)
+{
+	return floatToStrImpl(str, value, precision, width, thSep, decSep,
+		[](char* buf, int sz, float v) { floatToStr(buf, sz, v); });
+}
+
 
 std::string& floatToFixedStr(std::string& str, float value, int precision, int width, char thSep, char decSep)
 {
-	if (!decSep) decSep = '.';
-	if (precision == 0) value = std::floor(value);
-
-	char buffer[POCO_MAX_FLT_STRING_LEN];
-	floatToFixedStr(buffer, POCO_MAX_FLT_STRING_LEN, value, precision);
-	str = buffer;
-
-	if (decSep && (decSep != '.') && (str.find('.') != std::string::npos))
-		replaceInPlace(str, '.', decSep);
-
-	if (thSep) insertThousandSep(str, thSep, decSep);
-	if (precision > 0 || width) pad(str, precision, width, ' ', decSep ? decSep : '.');
-	return str;
+	return floatToStrImpl(str, value, precision, width, thSep, decSep,
+		[precision](char* buf, int sz, float v) { floatToFixedStr(buf, sz, v, precision); });
 }
 
 
@@ -336,39 +356,15 @@ void doubleToFixedStr(char* buffer, int bufferSize, double value, int precision)
 
 std::string& doubleToStr(std::string& str, double value, int precision, int width, char thSep, char decSep)
 {
-	if (!decSep) decSep = '.';
-	if (precision == 0) value = std::floor(value);
-
-	char buffer[POCO_MAX_FLT_STRING_LEN];
-	doubleToStr(buffer, POCO_MAX_FLT_STRING_LEN, value);
-
-	str = buffer;
-
-	if (decSep && (decSep != '.') && (str.find('.') != std::string::npos))
-		replaceInPlace(str, '.', decSep);
-
-	if (thSep) insertThousandSep(str, thSep, decSep);
-	if (precision > 0 || width) pad(str, precision, width, ' ', decSep ? decSep : '.');
-	return str;
+	return floatToStrImpl(str, value, precision, width, thSep, decSep,
+		[](char* buf, int sz, double v) { doubleToStr(buf, sz, v); });
 }
 
 
 std::string& doubleToFixedStr(std::string& str, double value, int precision, int width, char thSep, char decSep)
 {
-	if (!decSep) decSep = '.';
-	if (precision == 0) value = std::floor(value);
-
-	char buffer[POCO_MAX_FLT_STRING_LEN];
-	doubleToFixedStr(buffer, POCO_MAX_FLT_STRING_LEN, value, precision);
-
-	str = buffer;
-
-	if (decSep && (decSep != '.') && (str.find('.') != std::string::npos))
-		replaceInPlace(str, '.', decSep);
-
-	if (thSep) insertThousandSep(str, thSep, decSep);
-	if (precision > 0 || width) pad(str, precision, width, ' ', decSep ? decSep : '.');
-	return str;
+	return floatToStrImpl(str, value, precision, width, thSep, decSep,
+		[precision](char* buf, int sz, double v) { doubleToFixedStr(buf, sz, v, precision); });
 }
 
 
@@ -457,31 +453,43 @@ double strToDouble(const char* str, const char* inf, const char* nan)
 #endif // POCO_HAS_FLOAT_CHARCONV
 
 
-bool strToFloat(const std::string& str, float& result, char decSep, char thSep, const char* inf, const char* nan)
-{
-	std::string tmp(str);
-	trimInPlace(tmp);
-	removeInPlace(tmp, thSep);
-	removeInPlace(tmp, 'f');
-	replaceInPlace(tmp, decSep, '.');
-	result = strToFloat(tmp.c_str(), inf, nan);
-	return !FPEnvironment::isInfinite(result) &&
-		!FPEnvironment::isNaN(result);
-}
+namespace {
 
-
-bool strToDouble(const std::string& str, double& result, char decSep, char thSep, const char* inf, const char* nan)
+/// Common implementation for string-to-float/double overloads.
+/// Strips whitespace, thousand separators, and the 'f' suffix, replaces
+/// the decimal separator, then delegates to the char* parsing overload.
+/// The 'f' suffix stripping allows C/C++ float literals ("1.23f") to be
+/// parsed. It is also applied for double parsing for backward compatibility.
+template <typename T, typename ParseFn>
+bool strToFloatImpl(const std::string& str, T& result, char decSep, char thSep,
+	const char* inf, const char* nan, ParseFn parseFn)
 {
 	if (str.empty()) return false;
 
 	std::string tmp(str);
 	trimInPlace(tmp);
 	removeInPlace(tmp, thSep);
-	replaceInPlace(tmp, decSep, '.');
 	removeInPlace(tmp, 'f');
-	result = strToDouble(tmp.c_str(), inf, nan);
+	replaceInPlace(tmp, decSep, '.');
+	result = parseFn(tmp.c_str(), inf, nan);
 	return !FPEnvironment::isInfinite(result) &&
 		!FPEnvironment::isNaN(result);
+}
+
+} // namespace
+
+
+bool strToFloat(const std::string& str, float& result, char decSep, char thSep, const char* inf, const char* nan)
+{
+	return strToFloatImpl(str, result, decSep, thSep, inf, nan,
+		[](const char* s, const char* i, const char* n) -> float { return strToFloat(s, i, n); });
+}
+
+
+bool strToDouble(const std::string& str, double& result, char decSep, char thSep, const char* inf, const char* nan)
+{
+	return strToFloatImpl(str, result, decSep, thSep, inf, nan,
+		[](const char* s, const char* i, const char* n) -> double { return strToDouble(s, i, n); });
 }
 
 

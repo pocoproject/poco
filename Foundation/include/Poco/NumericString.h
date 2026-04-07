@@ -34,7 +34,6 @@
 #endif
 #include <cctype>
 #include <charconv>
-#include <cmath>
 #include <cstdint>
 #include <cstring>
 #include <limits>
@@ -43,13 +42,9 @@
 #endif
 #include <string>
 #include <type_traits>
-#ifdef POCO_COMPILER_MSVC
-#pragma warning(push)
-#pragma warning(disable : 4146) // unsigned negation in intToStr for T_MIN handling
-#endif
 
 /// Maximum length of an integer formatted as a string.
-/// 64 binary digits + NUL terminator + "0x" prefix = 67.
+/// 64 binary digits + sign + NUL + padding margin = 67.
 inline constexpr int POCO_MAX_INT_STRING_LEN = 67;
 
 /// Maximum length of a floating-point formatted string.
@@ -95,7 +90,7 @@ inline bool isIntOverflow(From val)
 
 
 template<typename R, typename F, typename S>
-bool safeMultiply(R& result, F f, S s)
+[[nodiscard]] bool safeMultiply(R& result, F f, S s)
 {
 	using CT = std::common_type_t<R, F, S>;
 	auto cast = [](auto v) { return static_cast<CT>(v); };
@@ -198,7 +193,7 @@ inline char thousandSeparator()
 //
 
 template <typename I>
-bool strToInt(const char* begin, const char* end, I& outResult, short base, char thSep = ',')
+[[nodiscard]] bool strToInt(const char* begin, const char* end, I& outResult, short base, char thSep = ',')
 	/// Converts character range [begin, end) to integer number;
 	/// begin must point past any leading whitespace.
 	/// Thousand separators are recognized for base10 and current locale;
@@ -253,7 +248,7 @@ bool strToInt(const char* begin, const char* end, I& outResult, short base, char
 
 
 template <typename I>
-bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
+[[nodiscard]] bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 	/// Converts zero-terminated character array to integer number.
 	/// Skips leading whitespace, then delegates to the range-based overload.
 {
@@ -264,7 +259,7 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 
 
 template <typename I>
-bool strToInt(const std::string& str, I& result, short base, char thSep = ',')
+[[nodiscard]] bool strToInt(const std::string& str, I& result, short base, char thSep = ',')
 	/// Converts string to integer number.
 	/// Avoids strlen by using the known string length directly.
 {
@@ -378,7 +373,7 @@ inline constexpr char kDigitsLower[] = "0123456789abcdef";
 
 
 template <typename T>
-bool intToStr(T value,
+[[nodiscard]] bool intToStr(T value,
 	unsigned short base,
 	char* result,
 	std::size_t& size,
@@ -619,7 +614,7 @@ bool uIntToStr(T value,
 
 
 template <typename T>
-bool intToStr(T number,
+[[nodiscard]] bool intToStr(T number,
 	unsigned short base,
 	std::string& result,
 	bool prefix = false,
@@ -783,11 +778,6 @@ Foundation_API bool strToDouble(const std::string& str, double& result,
 
 
 } // namespace Poco
-
-
-#ifdef POCO_COMPILER_MSVC
-#pragma warning(pop)
-#endif // POCO_COMPILER_MSVC
 
 
 #endif // Foundation_NumericString_INCLUDED
