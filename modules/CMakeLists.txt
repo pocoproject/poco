@@ -7,20 +7,17 @@ set(POCO_MODULES
 	Poco.cppm
 )
 
-if(ENABLE_FOUNDATION)
-	list(APPEND POCO_MODULES
-		Poco/Foundation.cppm
-		Poco/Dynamic.cppm
-	)
+list(APPEND POCO_MODULES
+	Poco/Foundation.cppm
+)
 
-	target_compile_definitions(Modules PUBLIC ENABLE_FOUNDATION)
+target_compile_definitions(Modules PUBLIC ENABLE_FOUNDATION)
 
-	target_link_libraries(Modules PUBLIC Poco::Foundation)
-	if(ENABLE_ENCODINGS)
-		target_compile_definitions(Modules PUBLIC ENABLE_ENCODINGS)
+target_link_libraries(Modules PUBLIC Poco::Foundation)
+if(ENABLE_ENCODINGS)
+	target_compile_definitions(Modules PUBLIC ENABLE_ENCODINGS)
 
-		target_link_libraries(Modules PUBLIC Poco::Encodings)
-	endif()
+	target_link_libraries(Modules PUBLIC Poco::Encodings)
 endif()
 
 if(ENABLE_ACTIVERECORD)

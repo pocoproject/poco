@@ -11,9 +11,8 @@
 
 export module Poco;
 
-#ifdef ENABLE_FOUNDATION
 export import :Foundation;
-#endif
+
 #ifdef ENABLE_ACTIVERECORD
 export import :ActiveRecord;
 #endif
@@ -28,9 +27,6 @@ export import :DNSSD;
 #endif
 #ifdef ENABLE_DATA
 export import :Data;
-#endif
-#ifdef ENABLE_DYNAMIC
-export import :Dynamic;
 #endif
 #ifdef ENABLE_JSON
 export import :JSON;
