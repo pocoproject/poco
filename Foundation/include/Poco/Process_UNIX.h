@@ -47,7 +47,7 @@ public:
 
 private:
 	static int statusToExitCode(int status);
-	const std::atomic<pid_t> _pid;
+	const pid_t _pid;
 	mutable Event _event;
 	mutable std::atomic<int> _status{0};
 	mutable std::atomic<bool> _hasStatus{false};

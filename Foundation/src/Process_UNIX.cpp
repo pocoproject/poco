@@ -57,6 +57,9 @@ pid_t ProcessHandleImpl::id() const
 }
 
 
+// Converts a raw waitpid status to a Poco exit code.
+// Normal exit: WEXITSTATUS (0-255).
+// Signal death: 256 + signal_number.
 int ProcessHandleImpl::statusToExitCode(int status)
 {
 	if (WIFEXITED(status))
@@ -89,6 +92,8 @@ int ProcessHandleImpl::wait(int options) const
 	{
 		_status.store(status);
 		_hasStatus.store(true);
+		// N.B. _hasStatus must be stored before _event.set()
+		// because the ECHILD/WNOHANG path checks tryWait(0) && _hasStatus
 		_event.set();
 	}
 	else if (rc < 0 && errno == ECHILD)
@@ -109,6 +114,8 @@ int ProcessHandleImpl::wait(int options) const
 			_event.wait();
 			if (_hasStatus.load())
 				rc = _pid;
+			else
+				throw SystemException("Lost process status (internal error)", NumberFormatter::format(_pid));
 		}
 	}
 
@@ -131,6 +138,9 @@ bool ProcessHandleImpl::isRunning() const
 {
 	if (_hasStatus.load())
 		return false;
+	// Note: concurrent calls may briefly return true after the process
+	// exits (transient false-positive) until the reaping thread publishes
+	// status. Self-correcting on the next call.
 	return wait(WNOHANG) == 0;
 }
 

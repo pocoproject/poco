@@ -38,6 +38,7 @@ public:
 	void testWaitAfterIsRunning();
 	void testConcurrentWaitAndIsRunning();
 	void testSignalExitCode();
+	void testIsRunningAfterWait();
 
 	void setUp();
 	void tearDown();

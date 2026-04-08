@@ -527,6 +527,28 @@ void ProcessTest::testSignalExitCode()
 }
 
 
+void ProcessTest::testIsRunningAfterWait()
+{
+	std::string cmd = ProcessTest::getFullName("TestApp");
+
+	// Verify that isRunning() returns false after wait() has completed.
+	std::vector<std::string> args;
+	args.push_back("-count");
+	Pipe inPipe;
+	ProcessHandle ph = Process::launch(cmd, args, &inPipe, nullptr, nullptr);
+	Process::PID pid = ph.id();
+	PipeOutputStream ostr(inPipe);
+	ostr << std::string(5, 'x');
+	ostr.close();
+	int rc = ph.wait();
+	assertTrue (rc == 5);
+	assertTrue (!Process::isRunning(ph));
+#if defined(POCO_OS_FAMILY_UNIX)
+	assertTrue (!Process::isRunning(pid));
+#endif
+}
+
+
 void ProcessTest::setUp()
 {
 }
@@ -534,6 +556,16 @@ void ProcessTest::setUp()
 
 void ProcessTest::tearDown()
 {
+}
+
+
+std::string ProcessTest::getFullName(const std::string& name)
+{
+	std::string fullName(name);
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	fullName += "d";
+#endif
+	return fullName;
 }
 
 
@@ -555,6 +587,7 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testWaitAfterIsRunning);
 	CppUnit_addTest(pSuite, ProcessTest, testConcurrentWaitAndIsRunning);
 	CppUnit_addTest(pSuite, ProcessTest, testSignalExitCode);
+	CppUnit_addTest(pSuite, ProcessTest, testIsRunningAfterWait);
 
 	return pSuite;
 }
