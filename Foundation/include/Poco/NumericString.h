@@ -216,7 +216,7 @@ template <typename I>
 	if (*start == '+') ++start;
 	if (start >= end) return false; // reject bare sign without digits
 
-	// Try std::from_chars — handles sign, overflow, and all bases.
+	// Try std::from_chars -- handles sign, overflow, and all bases.
 	const auto [ptr, ec] = std::from_chars(start, end, outResult, base);
 	if (ec == std::errc() && ptr == end)
 		return true;
@@ -227,7 +227,7 @@ template <typename I>
 		return false;
 
 	// from_chars consumed some digits then stopped at a non-digit character.
-	// The input may contain thousand separators — strip them and retry.
+	// The input may contain thousand separators -- strip them and retry.
 	char cleaned[POCO_MAX_INT_STRING_LEN];
 	char* dst = cleaned;
 	for (const char* src = start; src < end; ++src)

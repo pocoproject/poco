@@ -1471,11 +1471,11 @@ void StringTest::benchmarkStrToInt()
 		          << std::setw(10) << std::fixed << std::setprecision(2) << ms << " ms" << std::endl;
 	};
 
-	// Validate that parse() agrees with strtol/strtoul for all test data
+	// Validate that parse() agrees with strtoul/strtol for all test data
 	for (int i = 0; i < N; ++i)
 	{
-		assertEqual(static_cast<int>(std::strtol(decStrs[i].c_str(), nullptr, 10)),
-			static_cast<int>(NumberParser::parseUnsigned(decStrs[i])));
+		assertEqual(static_cast<unsigned>(std::strtoul(decStrs[i].c_str(), nullptr, 10)),
+			NumberParser::parseUnsigned(decStrs[i]));
 		assertEqual(static_cast<int>(std::strtol(negStrs[i].c_str(), nullptr, 10)),
 			NumberParser::parse(negStrs[i]));
 	}

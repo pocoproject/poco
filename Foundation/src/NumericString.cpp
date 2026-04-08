@@ -179,7 +179,7 @@ namespace {
 template <typename T>
 void toShortestStr(char* buffer, int bufferSize, T value, int lowDec, int highDec)
 {
-	// Handle NaN, infinity, and -0 directly — log10 is undefined for these.
+	// Handle NaN, infinity, and -0 directly -- log10 is undefined for these.
 	if (!std::isfinite(value) || value == T(0))
 	{
 		auto [ptr, ec] = std::to_chars(buffer, buffer + bufferSize, value);
@@ -190,7 +190,7 @@ void toShortestStr(char* buffer, int bufferSize, T value, int lowDec, int highDe
 
 	// Compute the base-10 exponent robustly. std::floor(std::log10(x)) can
 	// be off by one near exact powers of 10 due to floating-point rounding
-	// (e.g. log10(1000.0) may return 2.999... → floor = 2 instead of 3).
+	// (e.g. log10(1000.0) may return 2.999..., floor gives 2 instead of 3).
 	// Verify with a power-of-10 multiplication to correct off-by-one.
 	const T absVal = value < 0 ? -value : value;
 	int exp10 = static_cast<int>(std::floor(std::log10(absVal)));
@@ -329,8 +329,7 @@ void floatToStr(char* buffer, int bufferSize, float value, int lowDec, int highD
 	using namespace double_conversion;
 
 	StringBuilder builder(buffer, bufferSize);
-	int flags = DoubleToStringConverter::UNIQUE_ZERO |
-		DoubleToStringConverter::EMIT_POSITIVE_EXPONENT_SIGN;
+	int flags = DoubleToStringConverter::UNIQUE_ZERO | DoubleToStringConverter::EMIT_POSITIVE_EXPONENT_SIGN;
 	DoubleToStringConverter dc(flags, POCO_FLT_INF, POCO_FLT_NAN, POCO_FLT_EXP, lowDec, highDec, 0, 0);
 	dc.ToShortestSingle(value, &builder);
 	builder.Finalize();
@@ -342,8 +341,7 @@ void floatToFixedStr(char* buffer, int bufferSize, float value, int precision)
 	using namespace double_conversion;
 
 	StringBuilder builder(buffer, bufferSize);
-	int flags = DoubleToStringConverter::UNIQUE_ZERO |
-		DoubleToStringConverter::EMIT_POSITIVE_EXPONENT_SIGN;
+	int flags = DoubleToStringConverter::UNIQUE_ZERO | DoubleToStringConverter::EMIT_POSITIVE_EXPONENT_SIGN;
 	DoubleToStringConverter dc(flags, POCO_FLT_INF, POCO_FLT_NAN, POCO_FLT_EXP, -std::numeric_limits<float>::digits10, std::numeric_limits<float>::digits10, 0, 0);
 	dc.ToFixed(value, precision, &builder);
 	builder.Finalize();
@@ -427,8 +425,7 @@ void doubleToStr(char* buffer, int bufferSize, double value, int lowDec, int hig
 	using namespace double_conversion;
 
 	StringBuilder builder(buffer, bufferSize);
-	int flags = DoubleToStringConverter::UNIQUE_ZERO |
-		DoubleToStringConverter::EMIT_POSITIVE_EXPONENT_SIGN;
+	int flags = DoubleToStringConverter::UNIQUE_ZERO | DoubleToStringConverter::EMIT_POSITIVE_EXPONENT_SIGN;
 	DoubleToStringConverter dc(flags, POCO_FLT_INF, POCO_FLT_NAN, POCO_FLT_EXP, lowDec, highDec, 0, 0);
 	dc.ToShortest(value, &builder);
 	builder.Finalize();
@@ -440,8 +437,7 @@ void doubleToFixedStr(char* buffer, int bufferSize, double value, int precision)
 	using namespace double_conversion;
 
 	StringBuilder builder(buffer, bufferSize);
-	int flags = DoubleToStringConverter::UNIQUE_ZERO |
-		DoubleToStringConverter::EMIT_POSITIVE_EXPONENT_SIGN;
+	int flags = DoubleToStringConverter::UNIQUE_ZERO | DoubleToStringConverter::EMIT_POSITIVE_EXPONENT_SIGN;
 	DoubleToStringConverter dc(flags, POCO_FLT_INF, POCO_FLT_NAN, POCO_FLT_EXP,
 			-std::numeric_limits<double>::digits10, std::numeric_limits<double>::digits10, 0, 0);
 	dc.ToFixed(value, precision, &builder);
@@ -501,11 +497,18 @@ T strToFloatImpl(const char* str, const char* inf, const char* nan)
 	if (plen > 0 && std::isalpha(static_cast<unsigned char>(*p)))
 		return std::numeric_limits<T>::quiet_NaN();
 
-	T result = std::numeric_limits<T>::quiet_NaN();
+	T result{};
 	const auto [ptr, ec] = std::from_chars(str, end, result);
-	if (ec != std::errc() || ptr != end)
+	if (ptr != end)
 		return std::numeric_limits<T>::quiet_NaN();
-	return result;
+	if (ec == std::errc())
+		return result;
+	// errc::result_out_of_range means underflow or overflow.
+	// from_chars may leave result unmodified on range error (GCC behavior),
+	// so fall back to strtod which correctly returns 0 or +/-HUGE_VAL.
+	if (ec == std::errc::result_out_of_range)
+		return static_cast<T>(std::strtod(str, nullptr));
+	return std::numeric_limits<T>::quiet_NaN();
 }
 
 } // namespace
