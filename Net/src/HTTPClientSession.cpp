@@ -280,6 +280,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 		if (!_proxyConfig.host.empty() && !bypassProxy())
 		{
 			std::string prefix = proxyRequestPrefix();
+			// CodeQL [cpp/auth-bypass]: proxy prefix rewriting, not authentication logic
 			if (!prefix.empty() && request.getURI().compare(0, 7, "http://") != 0 && request.getURI().compare(0, 8, "https://") != 0)
 				request.setURI(prefix + request.getURI());
 			if (keepAlive) request.set(HTTPMessage::PROXY_CONNECTION, HTTPMessage::CONNECTION_KEEP_ALIVE);

@@ -59,8 +59,8 @@ public:
 		/// Writes a sample for the given metric and the given labels.
 
 protected:
-	Exporter() = default;
-	virtual ~Exporter() = default;
+	Exporter();
+	virtual ~Exporter();
 
 	Exporter(const Exporter&) = delete;
 	Exporter(Exporter&&) = delete;

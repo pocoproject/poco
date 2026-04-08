@@ -120,7 +120,21 @@ public:
 		///     nc.addNObserver(*this, &MyClass::onEvent);
 		///     void MyClass::onEvent(const AutoPtr<MyNotification>& pNf) { /* no release needed */ }
 	{
+		// Suppress deprecation warning for Observer<C, N> construction;
+		// this deprecated method necessarily references the deprecated class.
+#ifdef POCO_COMPILER_MSVC
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#else
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 		addObserver(Observer<C, N>(object, method));
+#ifdef POCO_COMPILER_MSVC
+#pragma warning(pop)
+#else
+#pragma GCC diagnostic pop
+#endif
 	}
 
 	template <class C, class N>
@@ -130,7 +144,21 @@ public:
 		/// Observer<C, N> class template. See addObserver() deprecation note
 		/// for migration details.
 	{
+		// Suppress deprecation warning for Observer<C, N> construction;
+		// this deprecated method necessarily references the deprecated class.
+#ifdef POCO_COMPILER_MSVC
+#pragma warning(push)
+#pragma warning(disable: 4996)
+#else
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 		removeObserver(Observer<C, N>(object, method));
+#ifdef POCO_COMPILER_MSVC
+#pragma warning(pop)
+#else
+#pragma GCC diagnostic pop
+#endif
 	}
 
 	template <class C, class N>

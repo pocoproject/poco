@@ -17,6 +17,7 @@
 #include "DigestEngineTest.h"
 #include "PKCS12ContainerTest.h"
 #include "EnvelopeTest.h"
+#include "OpenSSLInitializerTest.h"
 
 
 CppUnit::Test* CryptoTestSuite::suite()
@@ -30,5 +31,6 @@ CppUnit::Test* CryptoTestSuite::suite()
 	pSuite->addTest(DigestEngineTest::suite());
 	pSuite->addTest(PKCS12ContainerTest::suite());
 	pSuite->addTest(EnvelopeTest::suite());
+	pSuite->addTest(OpenSSLInitializerTest::suite());
 	return pSuite;
 }

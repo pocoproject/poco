@@ -26,6 +26,9 @@ using Poco::format;
 namespace Poco::Util {
 
 
+IntValidator::~IntValidator() = default;
+
+
 IntValidator::IntValidator(int min, int max):
 	_min(min),
 	_max(max)

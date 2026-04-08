@@ -524,28 +524,33 @@ XMLStreamParser::EventType XMLStreamParser::nextBody()
 	{
 		// Based on the previous event determine what's the next one must be.
 		//
-		switch (_currentEvent)
-		{
-		case EV_END_NAMESPACE_DECL:
+		if (_currentEvent == EV_END_NAMESPACE_DECL)
 		{
 			if (++_endNamespaceIndex == _endNamespace.size())
 			{
 				_endNamespaceIndex = 0;
 				_endNamespace.clear();
 				_qualifiedName = &_qname;
-				break; // No more declarations.
+				// No more declarations.
 			}
-			[[fallthrough]];
+			else
+			{
+				// The end namespace declaration comes before the end element
+				// which means it can follow pretty much any other event.
+				//
+				_currentEvent = EV_END_NAMESPACE_DECL;
+				_qualifiedName = &_endNamespace[_endNamespaceIndex];
+				return _currentEvent;
+			}
 		}
+		else
+		{
 			// The end namespace declaration comes before the end element
 			// which means it can follow pretty much any other event.
 			//
-		default:
-		{
 			_currentEvent = EV_END_NAMESPACE_DECL;
 			_qualifiedName = &_endNamespace[_endNamespaceIndex];
 			return _currentEvent;
-		}
 		}
 	}
 
@@ -767,10 +772,10 @@ void XMLStreamParser::handleStartElement(void* v, const XMLChar* name, const XML
 				{
 					QName qn;
 					splitName(*atts, qn);
-					AttributeMapType::value_type v(qn, AttributeValueType());
-					v.second.value = *(atts + 1);
-					v.second.handled = false;
-					pe->attributeMap.insert(v);
+					AttributeMapType::value_type attrEntry(qn, AttributeValueType());
+					attrEntry.second.value = *(atts + 1);
+					attrEntry.second.handled = false;
+					pe->attributeMap.insert(attrEntry);
 				}
 				else
 				{

@@ -37,6 +37,9 @@ namespace Poco::Util {
 
 
 
+XMLConfiguration::~XMLConfiguration() = default;
+
+
 XMLConfiguration::XMLConfiguration(char delim):
 	_delim(delim)
 {

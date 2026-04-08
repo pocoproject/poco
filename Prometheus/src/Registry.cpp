@@ -23,6 +23,12 @@ using namespace std::string_literals;
 namespace Poco::Prometheus {
 
 
+Registry::Registry() = default;
+
+
+Registry::~Registry() = default;
+
+
 void Registry::registerCollector(Collector* pCollector)
 {
 	poco_check_ptr (pCollector);
@@ -32,6 +38,7 @@ void Registry::registerCollector(Collector* pCollector)
 	const auto it = _collectors.find(pCollector->name());
 	if (it == _collectors.end())
 	{
+		// CodeQL [cpp/local-address-stored]: collector lifetime managed by caller
 		_collectors[pCollector->name()] = pCollector;
 	}
 	else

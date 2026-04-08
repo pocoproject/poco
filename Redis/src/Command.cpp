@@ -37,6 +37,12 @@ Command::~Command()
 }
 
 
+Command& Command::operator=(const Command&) = default;
+
+
+Command& Command::operator=(Command&&) = default;
+
+
 Command Command::append(const std::string& key, const std::string& value)
 {
 	Command cmd("APPEND");

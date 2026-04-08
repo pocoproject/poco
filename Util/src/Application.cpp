@@ -85,6 +85,8 @@ Application::Application():
 Application::Application(int argc, char** argv):
     Application()
 {
+	// CodeQL [cpp/virtual-call-in-ctor]: init() chain calls virtual defineOptions(),
+	// but only Application::defineOptions() runs here (derived vtable not yet constructed)
 	init(argc, argv);
 }
 
@@ -114,6 +116,7 @@ void Application::setup()
 	setUnixOptions(false);
 #endif
 
+	// CodeQL [cpp/local-address-stored]: singleton pattern; instance lifetime is process-scoped
 	_pInstance = this;
 
 	AutoPtr<ConsoleChannel> pCC = new ConsoleChannel;

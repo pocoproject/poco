@@ -81,7 +81,7 @@ protected:
 
 	Poco::Path keyToPath(const std::string& key) const;
 
-	~FilesystemConfiguration() = default;
+	~FilesystemConfiguration();
 
 private:
 	Poco::Path _path;

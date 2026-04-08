@@ -37,6 +37,18 @@ RegularExpression::RegularExpression(std::string&& pattern, std::string&& option
 }
 
 
+RegularExpression::RegularExpression(const RegularExpression& copy) = default;
+
+
+RegularExpression::RegularExpression(RegularExpression&& other) noexcept = default;
+
+
+RegularExpression& RegularExpression::operator=(const RegularExpression& copy) = default;
+
+
+RegularExpression& RegularExpression::operator=(RegularExpression&& other) noexcept = default;
+
+
 RegularExpression::~RegularExpression()
 {
 }

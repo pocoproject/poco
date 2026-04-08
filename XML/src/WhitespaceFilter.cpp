@@ -99,6 +99,7 @@ void WhitespaceFilter::endElement(const XMLString& uri, const XMLString& localNa
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void WhitespaceFilter::characters(const XMLChar ch[], int start, int length)
 {
 	if (_filter)
@@ -127,6 +128,7 @@ void WhitespaceFilter::characters(const XMLChar ch[], int start, int length)
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void WhitespaceFilter::ignorableWhitespace(const XMLChar ch[], int start, int length)
 {
 	// the handler name already says that this data can be ignored
@@ -191,6 +193,7 @@ void WhitespaceFilter::endCDATA()
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void WhitespaceFilter::comment(const XMLChar ch[], int start, int length)
 {
 	if (_pLexicalHandler)

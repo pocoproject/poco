@@ -310,6 +310,7 @@ void XMLWriter::emptyElement(const XMLString& namespaceURI, const XMLString& loc
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void XMLWriter::characters(const XMLChar ch[], int start, int length)
 {
 	if (length == 0) return;
@@ -360,6 +361,7 @@ void XMLWriter::rawCharacters(const XMLString& str)
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void XMLWriter::ignorableWhitespace(const XMLChar ch[], int start, int length)
 {
 	characters(ch, start, length);
@@ -454,6 +456,7 @@ void XMLWriter::endCDATA()
 }
 
 
+// CodeQL [cpp/raw-array-interface]: SAX specification API
 void XMLWriter::comment(const XMLChar ch[], int start, int length)
 {
 	if (_unclosedStartTag) closeStartTag();

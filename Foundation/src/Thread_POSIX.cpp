@@ -384,7 +384,7 @@ namespace
 void ThreadImpl::setCurrentNameImpl(const std::string& threadName)
 {
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
-	#if (POCO_OS == POCO_OS_FREE_BSD)
+	#if (POCO_OS == POCO_OS_FREE_BSD || POCO_OS == POCO_OS_GNU_HURD)
 		pthread_setname_np(pthread_self(), truncateName(threadName).c_str());
 	#elif (POCO_OS == POCO_OS_MAC_OS_X)
 		#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED
@@ -411,7 +411,7 @@ std::string ThreadImpl::getCurrentNameImpl()
 		POCO_MAX_THREAD_NAME_LEN;
 	#endif
 	char name[nameSize + 1]{'\0'};
-	#if (POCO_OS == POCO_OS_FREE_BSD)
+	#if (POCO_OS == POCO_OS_FREE_BSD || POCO_OS == POCO_OS_GNU_HURD)
 		pthread_getname_np(pthread_self(), name, nameSize + 1);
 	#elif (POCO_OS == POCO_OS_MAC_OS_X)
 		#ifdef __MAC_OS_X_VERSION_MIN_REQUIRED

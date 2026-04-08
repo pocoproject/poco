@@ -31,6 +31,9 @@ using Poco::Path;
 namespace Poco::Util {
 
 
+PropertyFileConfiguration::~PropertyFileConfiguration() = default;
+
+
 PropertyFileConfiguration::PropertyFileConfiguration(AbstractConfiguration::Ptr pParentConfig):
 	_pParentConfig(std::move(pParentConfig))
 {
@@ -271,8 +274,9 @@ std::string PropertyFileConfiguration::getSourceFile(const std::string& key) con
 }
 
 
-const std::map<std::string, std::string>& PropertyFileConfiguration::getSourceFiles() const
+std::map<std::string, std::string> PropertyFileConfiguration::getSourceFiles() const
 {
+	AbstractConfiguration::ScopedLock lock(*this);
 	return _sourceMap;
 }
 
@@ -308,6 +312,245 @@ void PropertyFileConfiguration::clear()
 }
 
 
+std::string PropertyFileConfiguration::extractIncludePath(const std::string& line)
+{
+	// Per .properties spec, lines starting with '!' are comments.
+	// Only "!include " (with a trailing space/tab) is treated as an include directive.
+	// Bare "!include" without a space is treated as a comment, same as "!includeSomething".
+	constexpr std::string_view includeDirective = "!include";
+
+	std::string_view sv(line);
+	std::string_view::size_type pos = 0;
+	while (pos < sv.size() && Poco::Ascii::isSpace(sv[pos])) ++pos;
+	sv.remove_prefix(pos);
+
+	if (sv.size() > includeDirective.size() &&
+		sv.compare(0, includeDirective.size(), includeDirective) == 0 &&
+		Poco::Ascii::isSpace(sv[includeDirective.size()]))
+	{
+		std::string path = Poco::trim(std::string(sv.substr(includeDirective.size())));
+		if (path.empty())
+			throw Poco::SyntaxException("Missing path in !include directive");
+		return path;
+	}
+	return {};
+}
+
+
+std::string PropertyFileConfiguration::resolveIncludePath(const std::string& rawPath, const std::string& basePath) const
+{
+	std::string includePath = expand(rawPath);
+	if (_pParentConfig)
+		includePath = _pParentConfig->expand(includePath);
+	Poco::Path p(includePath);
+	if (p.isRelative() && !basePath.empty())
+		p = Poco::Path(basePath).resolve(p);
+	p.makeAbsolute();
+	return p.toString();
+}
+
+
+std::vector<std::string> PropertyFileConfiguration::getIncludeFiles(const std::string& path) const
+{
+	AbstractConfiguration::ScopedLock lock(*this);
+
+	const std::string& filePath = path.empty() ? _rootFile : path;
+	if (filePath.empty())
+		return {};
+
+	return scanIncludeFiles(filePath);
+}
+
+
+std::vector<std::string> PropertyFileConfiguration::scanIncludeFiles(const std::string& filePath) const
+{
+	std::string basePath = Poco::Path(filePath).parent().toString();
+	std::vector<std::string> result;
+
+	Poco::FileInputStream istr(filePath);
+	if (!istr.good())
+		return {};
+
+	std::string line;
+	while (std::getline(istr, line))
+	{
+		if (!line.empty() && line.back() == '\r')
+			line.pop_back();
+
+		std::string rawPath = extractIncludePath(line);
+		if (!rawPath.empty())
+			result.push_back(resolveIncludePath(rawPath, basePath));
+	}
+
+	return result;
+}
+
+
+void PropertyFileConfiguration::addIncludeFile(const std::string& path)
+{
+	AbstractConfiguration::ScopedLock lock(*this);
+
+	if (_rootFile.empty())
+		throw Poco::IllegalStateException("No root file set - configuration was not loaded from a file");
+
+	std::string basePath = Poco::Path(_rootFile).parent().toString();
+	std::string absPath = resolveIncludePath(path, basePath);
+
+	// Check for duplicates
+	auto existing = scanIncludeFiles(_rootFile);
+	for (const auto& f : existing)
+	{
+		if (f == absPath)
+			throw Poco::FileExistsException("Include already exists", path);
+	}
+
+	// Create target file if it doesn't exist
+	Poco::File target(absPath);
+	if (!target.exists())
+	{
+		Poco::FileOutputStream create(absPath);
+		if (!create.good())
+			throw Poco::CreateFileException(absPath);
+		create.close();
+	}
+
+	// Load the included file's properties into memory FIRST.
+	// If the file has invalid syntax or cyclic includes, the exception
+	// propagates and the root file is left untouched.
+	if (target.getSize() > 0)
+	{
+		Poco::FileInputStream istr(absPath);
+		if (!istr.good())
+			throw Poco::OpenFileException(absPath);
+		std::string includeBasePath = Poco::Path(absPath).parent().toString();
+		std::set<std::string> includeStack;
+		includeStack.insert(_rootFile);
+		includeStack.insert(absPath);
+		loadStream(istr, includeBasePath, absPath, includeStack);
+	}
+
+	// Append !include directive to root file.
+	// Check whether a preceding newline is needed, then write in one open.
+	bool needNewline = false;
+	{
+		Poco::FileInputStream fin(_rootFile);
+		if (fin.good())
+		{
+			fin.seekg(0, std::ios::end);
+			if (fin.tellg() > 0)
+			{
+				fin.seekg(-1, std::ios::end);
+				char last = 0;
+				fin.get(last);
+				needNewline = (last != '\n' && last != '\r');
+			}
+		}
+	}
+	Poco::FileOutputStream ostr(_rootFile, std::ios::app);
+	if (!ostr.good())
+		throw Poco::CreateFileException(_rootFile);
+	Poco::OutputLineEndingConverter lec(ostr);
+	if (needNewline)
+		lec << "\n";
+	lec << "!include " << path << "\n";
+	lec.flush();
+	ostr.flush();
+	if (!ostr.good())
+		throw Poco::WriteFileException(_rootFile);
+}
+
+
+void PropertyFileConfiguration::removeIncludeFile(const std::string& path, bool removeKeys)
+{
+	AbstractConfiguration::ScopedLock lock(*this);
+
+	if (_rootFile.empty())
+		throw Poco::IllegalStateException("No root file set - configuration was not loaded from a file");
+
+	std::string basePath = Poco::Path(_rootFile).parent().toString();
+	std::string absPath = resolveIncludePath(path, basePath);
+
+	// Verify include exists
+	auto existing = scanIncludeFiles(_rootFile);
+	bool found = false;
+	for (const auto& f : existing)
+	{
+		if (f == absPath) { found = true; break; }
+	}
+	if (!found)
+		throw Poco::NotFoundException("Include not found", path);
+
+	// Rewrite root file FIRST, before modifying in-memory state.
+	// If the file rewrite fails, the in-memory state is untouched.
+	{
+		std::ostringstream out;
+
+		// Read root file into memory, then close it before writing.
+		// On Windows, open file handles prevent rename operations.
+		{
+			Poco::FileInputStream istr(_rootFile);
+			if (!istr.good())
+				throw Poco::OpenFileException(_rootFile);
+			std::string line;
+			while (std::getline(istr, line))
+			{
+				if (!line.empty() && line.back() == '\r')
+					line.pop_back();
+
+				bool skip = false;
+				std::string rawPath = extractIncludePath(line);
+				if (!rawPath.empty())
+				{
+					std::string resolved = resolveIncludePath(rawPath, basePath);
+					if (resolved == absPath)
+						skip = true;
+				}
+
+				if (!skip)
+					out << line << "\n";
+			}
+		} // istr closed here
+
+		// Write to temp file, then atomic rename
+		std::string tmpPath = _rootFile + ".tmp";
+		{
+			Poco::FileOutputStream ostr(tmpPath);
+			if (!ostr.good()) throw Poco::CreateFileException(tmpPath);
+			Poco::OutputLineEndingConverter lec(ostr);
+			lec << out.str();
+			lec.flush();
+			ostr.flush();
+			if (!ostr.good()) throw Poco::WriteFileException(tmpPath);
+		}
+		Poco::File(tmpPath).renameTo(_rootFile);
+	}
+
+	// Now modify in-memory state (file rewrite succeeded)
+	if (removeKeys)
+	{
+		std::vector<std::string> keysToRemove;
+		for (const auto& [key, file] : _sourceMap)
+		{
+			if (file == absPath)
+				keysToRemove.push_back(key);
+		}
+		for (const auto& key : keysToRemove)
+			removeRaw(key);
+	}
+	else
+	{
+		// Just clear provenance for keys from this file
+		for (auto it = _sourceMap.begin(); it != _sourceMap.end(); )
+		{
+			if (it->second == absPath)
+				it = _sourceMap.erase(it);
+			else
+				++it;
+		}
+	}
+}
+
+
 void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack)
 {
 	constexpr int eof = std::char_traits<char>::eof();
@@ -331,22 +574,10 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 					line += static_cast<char>(c);
 			}
 
-			constexpr std::string_view includeDirective = "!include";
-			if (line.size() > includeDirective.size() &&
-				line.compare(0, includeDirective.size(), includeDirective) == 0 &&
-				Poco::Ascii::isSpace(line[includeDirective.size()]))
+			std::string includePath = extractIncludePath(line);
+			if (!includePath.empty())
 			{
-				std::string includePath = Poco::trim(line.substr(includeDirective.size()));
-				if (includePath.empty())
-					throw Poco::SyntaxException("Missing path in !include directive");
-				includePath = expand(includePath);
-				if (_pParentConfig)
-					includePath = _pParentConfig->expand(includePath);
-				Poco::Path p(includePath);
-				if (p.isRelative() && !basePath.empty())
-					p = Poco::Path(basePath).resolve(p);
-				p.makeAbsolute();
-				const std::string absPathStr = p.toString();
+				const std::string absPathStr = resolveIncludePath(includePath, basePath);
 
 				if (includeStack.find(absPathStr) != includeStack.end())
 				{
@@ -361,10 +592,10 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 					~StackGuard() { stack.erase(key); }
 				} guard(includeStack, absPathStr);
 
-				Poco::FileInputStream includeIstr(p.toString());
+				Poco::FileInputStream includeIstr(absPathStr);
 				if (!includeIstr.good())
-					throw Poco::OpenFileException(p.toString());
-				loadStream(includeIstr, p.parent().toString(), absPathStr, includeStack);
+					throw Poco::OpenFileException(absPathStr);
+				loadStream(includeIstr, Poco::Path(absPathStr).parent().toString(), absPathStr, includeStack);
 			}
 		}
 		else

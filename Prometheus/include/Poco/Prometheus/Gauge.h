@@ -30,10 +30,10 @@ namespace Poco::Prometheus {
 class Prometheus_API GaugeSample
 {
 public:
-	GaugeSample() = default;
+	GaugeSample();
 		/// Creates the GaugeSample.
 
-	~GaugeSample() = default;
+	~GaugeSample();
 		/// Destroys the GaugeSample.
 
 	double value() const;
@@ -115,7 +115,7 @@ public:
 		/// Creates a Gauge with the given name and params, and
 		/// registers it with the given registry (if not nullptr).
 
-	~Gauge() = default;
+	~Gauge();
 		/// Destroys the Gauge.
 
 	using LabeledMetric::help;

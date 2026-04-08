@@ -150,7 +150,7 @@ void SPSCQueueTest::testFull()
 	assertTrue(queue.size() == 3);
 
 	// Pop one, then push should succeed
-	int value;
+	int value = 0;
 	assertTrue(queue.tryPop(value));
 	assertTrue(value == 1);
 	assertTrue(queue.tryPush(4));

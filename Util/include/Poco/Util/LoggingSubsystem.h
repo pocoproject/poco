@@ -35,14 +35,14 @@ class Util_API LoggingSubsystem: public Subsystem
 	/// is not specified.
 {
 public:
-	LoggingSubsystem() = default;
+	LoggingSubsystem();
 
 	const char* name() const override;
 
 protected:
 	void initialize(Application& self) override;
 	void uninitialize() override;
-	~LoggingSubsystem() = default;
+	~LoggingSubsystem();
 };
 
 

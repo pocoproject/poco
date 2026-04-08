@@ -635,6 +635,125 @@ void LoggingConfiguratorTest::testGetLoggerCollision()
 }
 
 
+void LoggingConfiguratorTest::testConfigureLogger()
+{
+	static const std::string config = R"(
+logging.formatters.scriptFmt.class = PatternFormatter
+logging.formatters.scriptFmt.pattern = %s: [%p] %t
+logging.channels.scriptFile.class = ConsoleChannel
+logging.channels.scriptSplitter.class = SplitterChannel
+logging.channels.scriptSplitter.channels = scriptFile
+logging.loggers.script.name = scriptLogger
+logging.loggers.script.channel = scriptSplitter
+logging.loggers.script.level = debug
+)";
+
+	std::istringstream istr(config);
+	AutoPtr<PropertyFileConfiguration> pConfig = new PropertyFileConfiguration(istr);
+
+	LoggingConfigurator configurator;
+	configurator.configure(pConfig, "script");
+
+	Logger& logger = Logger::get("scriptLogger");
+	assertTrue (logger.name() == "scriptLogger");
+	assertTrue (logger.getLevel() == Message::PRIO_DEBUG);
+}
+
+
+void LoggingConfiguratorTest::testReconfigureLogger()
+{
+	// Initial configuration: ConsoleChannel
+	static const std::string config1 = R"(
+logging.formatters.myFmt.class = PatternFormatter
+logging.formatters.myFmt.pattern = %s: [%p] %t
+logging.channels.myFile.class = ConsoleChannel
+logging.channels.mySplitter.class = SplitterChannel
+logging.channels.mySplitter.channels = myFile
+logging.loggers.my.name = myLogger
+logging.loggers.my.channel = mySplitter
+logging.loggers.my.level = information
+)";
+
+	std::istringstream istr1(config1);
+	AutoPtr<PropertyFileConfiguration> pConfig1 = new PropertyFileConfiguration(istr1);
+
+	LoggingConfigurator configurator;
+	configurator.configure(pConfig1, "my");
+
+	Logger& logger = Logger::get("myLogger");
+	assertTrue (logger.getLevel() == Message::PRIO_INFORMATION);
+
+	// Reconfigure: change level to debug
+	static const std::string config2 = R"(
+logging.formatters.myFmt.class = PatternFormatter
+logging.formatters.myFmt.pattern = %s: [%p] %t (updated)
+logging.channels.myFile.class = ConsoleChannel
+logging.channels.mySplitter.class = SplitterChannel
+logging.channels.mySplitter.channels = myFile
+logging.loggers.my.name = myLogger
+logging.loggers.my.channel = mySplitter
+logging.loggers.my.level = debug
+)";
+
+	std::istringstream istr2(config2);
+	AutoPtr<PropertyFileConfiguration> pConfig2 = new PropertyFileConfiguration(istr2);
+
+	configurator.configure(pConfig2, "my");
+
+	// Logger should be reconfigured with new level
+	assertTrue (logger.getLevel() == Message::PRIO_DEBUG);
+}
+
+
+void LoggingConfiguratorTest::testGetLoggerNoFormattersNoChannels()
+{
+	// Config with only loggers, no formatters or channels.
+	// validateConfiguration() must accept this (return true).
+	static const std::string config = R"(
+logging.loggers.l1.name = loggerOnlyTest
+logging.loggers.l1.level = debug
+)";
+
+	std::istringstream istr(config);
+	AutoPtr<PropertyFileConfiguration> pConfig = new PropertyFileConfiguration(istr);
+
+	LoggingConfigurator configurator;
+	Logger& logger = configurator.getLogger("loggerOnlyTest", pConfig);
+	assertTrue (logger.name() == "loggerOnlyTest");
+	assertTrue (logger.getLevel() == Message::PRIO_DEBUG);
+}
+
+
+void LoggingConfiguratorTest::testConfigureLoggerNestedSplitter()
+{
+	// Test deeply nested SplitterChannel traversal via collectChannelNames.
+	static const std::string config = R"(
+logging.formatters.nestedFmt.class = PatternFormatter
+logging.formatters.nestedFmt.pattern = %s: [%p] %t
+logging.channels.leaf1.class = ConsoleChannel
+logging.channels.leaf2.class = ConsoleChannel
+logging.channels.innerSplit.class = SplitterChannel
+logging.channels.innerSplit.channels = leaf1, leaf2
+logging.channels.outerSplit.class = SplitterChannel
+logging.channels.outerSplit.channels = innerSplit
+logging.channels.outerSplit.formatter = nestedFmt
+logging.loggers.nested.name = nestedSplitLogger
+logging.loggers.nested.channel = outerSplit
+logging.loggers.nested.level = trace
+)";
+
+	std::istringstream istr(config);
+	AutoPtr<PropertyFileConfiguration> pConfig = new PropertyFileConfiguration(istr);
+
+	LoggingConfigurator configurator;
+	configurator.configure(pConfig, "nested");
+
+	Logger& logger = Logger::get("nestedSplitLogger");
+	assertTrue (logger.name() == "nestedSplitLogger");
+	assertTrue (logger.getLevel() == Message::PRIO_TRACE);
+}
+
+
 void LoggingConfiguratorTest::setUp()
 {
 	LoggingRegistry::defaultRegistry().clear();
@@ -664,6 +783,10 @@ CppUnit::Test* LoggingConfiguratorTest::suite()
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testGetLogger);
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testGetLoggerExisting);
 	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testGetLoggerCollision);
+	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testGetLoggerNoFormattersNoChannels);
+	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testConfigureLogger);
+	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testConfigureLoggerNestedSplitter);
+	CppUnit_addTest(pSuite, LoggingConfiguratorTest, testReconfigureLogger);
 
 	return pSuite;
 }

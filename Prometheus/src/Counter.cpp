@@ -18,6 +18,12 @@
 namespace Poco::Prometheus {
 
 
+CounterSample::CounterSample() = default;
+
+
+CounterSample::~CounterSample() = default;
+
+
 Counter::Counter(const std::string& name):
 	LabeledMetricImpl<CounterSample>(Metric::Type::COUNTER, name)
 {
@@ -44,6 +50,9 @@ Counter::Counter(const std::string& name, const Params& params, Registry* pRegis
 	setHelp(params.help);
 	setLabelNames(params.labelNames);
 }
+
+
+Counter::~Counter() = default;
 
 
 double Counter::value() const

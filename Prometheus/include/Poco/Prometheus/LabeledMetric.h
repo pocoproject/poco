@@ -51,7 +51,7 @@ protected:
 	void setLabelNames(const std::vector<std::string>& labelNames);
 		/// Sets the metric's label names.
 
-	virtual ~LabeledMetric() = default;
+	virtual ~LabeledMetric();
 		/// Destroys the LabeledMetric.
 
 	static const std::string& validateLabelName(const std::string& name);

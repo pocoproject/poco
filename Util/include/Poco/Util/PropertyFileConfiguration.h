@@ -24,6 +24,7 @@
 #include <map>
 #include <ostream>
 #include <set>
+#include <vector>
 
 
 namespace Poco::Util {
@@ -118,11 +119,45 @@ public:
 	void clear();
 		/// Clears the configuration, including provenance information.
 
-	const std::map<std::string, std::string>& getSourceFiles() const;
-		/// Returns the entire source file map (key -> file path).
+	std::map<std::string, std::string> getSourceFiles() const;
+		/// Returns a snapshot of the source file map (key -> file path).
+
+	std::vector<std::string> getIncludeFiles(const std::string& path = "") const;
+		/// Returns the list of !include file paths (absolute) found in the
+		/// given file. If path is empty, the file from which the configuration
+		/// was originally loaded is scanned.
+		/// Returns an empty vector if no root file is set.
+
+	void addIncludeFile(const std::string& path);
+		/// Adds an !include directive for the given file path to the root file.
+		/// The path is written as-is to the file; internally it is resolved
+		/// to absolute for duplicate detection. If the target file does not
+		/// exist, it is created as an empty file.
+		/// Any properties in the included file are loaded into memory
+		/// immediately (no reload required). If the included file has
+		/// invalid syntax or cyclic includes, the exception propagates
+		/// and the root file is left untouched.
+		/// This method performs file I/O while holding the configuration lock.
+		/// Throws Poco::IllegalStateException if no root file is set.
+		/// Throws Poco::FileExistsException if an !include directive for
+		///   this file already exists in the root file.
+
+	void removeIncludeFile(const std::string& path, bool removeKeys = false);
+		/// Removes the !include directive for the given file path from the root file.
+		/// Only removes the directive from the root file; nested includes
+		/// within the removed file are not affected. The included file
+		/// itself is not deleted from disk.
+		/// If removeKeys is true, all keys whose provenance matches this file
+		/// are also removed from the configuration.
+		/// If removeKeys is false (default), keys remain in memory but their
+		/// provenance is cleared. A subsequent save() will write those keys
+		/// to the root file.
+		/// This method performs file I/O while holding the configuration lock.
+		/// Throws Poco::IllegalStateException if no root file is set.
+		/// Throws Poco::NotFoundException if no matching !include directive exists.
 
 protected:
-	~PropertyFileConfiguration() = default;
+	~PropertyFileConfiguration();
 
 	void removeRaw(const std::string& key) override;
 
@@ -130,6 +165,11 @@ private:
 	void loadStream(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);
 	void parseLine(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);
 	static void saveToFile(const std::string& path, const std::map<std::string, std::string>& values);
+	std::string resolveIncludePath(const std::string& rawPath, const std::string& basePath) const;
+	static std::string extractIncludePath(const std::string& line);
+		/// If line is an !include directive, returns the raw path; otherwise returns empty.
+	std::vector<std::string> scanIncludeFiles(const std::string& filePath) const;
+		/// Scans the given file for !include directives. Caller must hold the lock.
 	static int readChar(std::istream& istr);
 	static std::string escapeValue(const std::string& value);
 

@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.26.0)
 
-# MacOS version that has support for C++20
+# Minimum macOS version.
 # Must be set before the project.
-set(CMAKE_OSX_DEPLOYMENT_TARGET "13.3" CACHE STRING "macOS minimum supported target")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "15.0" CACHE STRING "macOS minimum supported target")
 
 # Compiler selection (must be processed before project())
 # Provides POCO_COMPILER and POCO_CROSS_COMPILE cache variables.
@@ -193,7 +193,11 @@ option(ENABLE_PAGECOMPILER_FILE2PAGE "Enable File2Page" ${_enable_default})
 option(ENABLE_ACTIVERECORD "Enable ActiveRecord" ${_enable_default})
 option(ENABLE_ACTIVERECORD_COMPILER "Enable ActiveRecord Compiler" ${_enable_default})
 
-option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
+if(WIN32)
+	option(ENABLE_NETSSL_WIN "Enable NetSSL Windows" OFF)
+else()
+	set(ENABLE_NETSSL_WIN OFF CACHE BOOL "Enable NetSSL Windows (Windows only)" FORCE)
+endif()
 
 option(ENABLE_ENCODINGS_COMPILER "Enable Encodings Compiler" OFF)
 option(ENABLE_DNSSD "Enable DNSSD" OFF)
@@ -428,6 +432,11 @@ if(ENABLE_NETSSL)
 endif()
 
 if(ENABLE_NETSSL_WIN)
+	set(ENABLE_NET ON CACHE BOOL "Enable Net" FORCE)
+	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
+endif()
+
+if(ENABLE_BENCHMARK)
 	set(ENABLE_UTIL ON CACHE BOOL "Enable Util" FORCE)
 endif()
 
@@ -671,6 +680,7 @@ if(ENABLE_BENCHMARK)
 	if(benchmark_FOUND)
 		message(STATUS "Google Benchmark found - building Benchmark application")
 		add_subdirectory(Benchmark)
+		list(APPEND Poco_COMPONENTS "Benchmark")
 	else()
 		message(STATUS "Google Benchmark not found - skipping Benchmark application")
 		message(STATUS "Install with: brew install google-benchmark (macOS) or apt install libbenchmark-dev (Linux)")
@@ -734,6 +744,8 @@ install(
 		Devel
 )
 
+math(EXPR POCO_ARCH "${CMAKE_SIZEOF_VOID_P} * 8")
+
 message(STATUS "CMake '${CMAKE_VERSION}' successfully configured '${PROJECT_NAME}'")
 message(STATUS "${PROJECT_NAME} package version: '${PROJECT_VERSION}'")
 if(BUILD_SHARED_LIBS)
@@ -761,7 +773,7 @@ if (ENABLE_MODULES)
 endif()
 message(STATUS "[cmake] Build for OS type:      ${CMAKE_SYSTEM_NAME}")
 message(STATUS "[cmake] Build for OS version:   ${CMAKE_SYSTEM_VERSION}")
-message(STATUS "[cmake] Build for CPU type:     ${CMAKE_SYSTEM_PROCESSOR}")
+message(STATUS "[cmake] Build for CPU type:     ${CMAKE_SYSTEM_PROCESSOR} (${POCO_ARCH}-bit)")
 message(STATUS "[cmake] Generator:              ${CMAKE_GENERATOR}")
 message(STATUS "[cmake] Generator platorm:      ${CMAKE_GENERATOR_PLATFORM}")
 message(STATUS "[cmake] Build type:             ${CMAKE_BUILD_TYPE}")
@@ -773,3 +785,10 @@ message(STATUS "[cmake] C++ symbol visibility:  ${CMAKE_CXX_VISIBILITY_PRESET}")
 foreach(component ${Poco_COMPONENTS})
 	message(STATUS "Building: ${component}")
 endforeach()
+
+if(ENABLE_TRACE)
+	message(STATUS "Feature: stack tracing enabled")
+endif()
+if(ENABLE_FASTLOGGER)
+	message(STATUS "Feature: FastLogger enabled")
+endif()

@@ -30,6 +30,12 @@ using namespace std::string_literals;
 namespace Poco::Util {
 
 
+FastLoggerConfigurator::FastLoggerConfigurator() = default;
+
+
+FastLoggerConfigurator::~FastLoggerConfigurator() = default;
+
+
 void FastLoggerConfigurator::configure(AbstractConfiguration::Ptr pConfig)
 {
 	poco_check_ptr(pConfig);
