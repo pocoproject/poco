@@ -127,7 +127,16 @@ public:
 		std::streamsize copied = 0;
 		while (count > 0)
 		{
-			int_type c = uflow();
+			int_type c;
+			try
+			{
+				c = uflow();
+			}
+			catch (...)
+			{
+				if (copied > 0) return copied;
+				throw;
+			}
 			if (c == char_traits::eof()) break;
 			*p++ = char_traits::to_char_type(c);
 			++copied;
