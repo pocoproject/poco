@@ -527,6 +527,35 @@ void ProcessTest::testSignalExitCode()
 }
 
 
+void ProcessTest::testIsRunningByPidThenWaitOnHandle()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	std::string cmd = ProcessTest::getFullName("TestApp");
+
+	// Verify that polling isRunning(pid) does NOT prevent a subsequent
+	// handle.wait() from succeeding. The PID-based overload must not
+	// reap the child (uses waitid with WNOWAIT).
+	std::vector<std::string> args;
+	args.push_back("-count");
+	Pipe inPipe;
+	ProcessHandle ph = Process::launch(cmd, args, &inPipe, nullptr, nullptr);
+	Process::PID pid = ph.id();
+	PipeOutputStream ostr(inPipe);
+	ostr << std::string(13, 'x');
+	ostr.close();
+	Poco::Timestamp waitStart;
+	while (Process::isRunning(pid))
+	{
+		if (waitStart.isElapsed(30 * Poco::Timestamp::resolution())) fail("Process did not terminate within 30 seconds");
+		Thread::sleep(100);
+	}
+	// The critical part: wait() must not hang or throw after PID-based isRunning() returned false
+	int rc = ph.wait();
+	assertTrue (rc == 13);
+#endif // defined(POCO_OS_FAMILY_UNIX)
+}
+
+
 void ProcessTest::testIsRunningAfterWait()
 {
 	std::string cmd = ProcessTest::getFullName("TestApp");
@@ -587,6 +616,7 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testWaitAfterIsRunning);
 	CppUnit_addTest(pSuite, ProcessTest, testConcurrentWaitAndIsRunning);
 	CppUnit_addTest(pSuite, ProcessTest, testSignalExitCode);
+	CppUnit_addTest(pSuite, ProcessTest, testIsRunningByPidThenWaitOnHandle);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunningAfterWait);
 
 	return pSuite;

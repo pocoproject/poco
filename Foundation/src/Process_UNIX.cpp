@@ -374,20 +374,17 @@ bool ProcessImpl::isRunningImpl(const ProcessHandleImpl& handle)
 
 bool ProcessImpl::isRunningImpl(PIDImpl pid)
 {
-	int status;
-	int rc;
-	do
-	{
-		rc = ::waitpid(pid, &status, WNOHANG);
-	}
-	while (rc < 0 && errno == EINTR);
-	if (rc == pid)
-		return false;
-	if (rc == 0)
-		return true;
-	// Not our child or error; fall back to kill check
-	rc = ::kill(pid, 0);
-	if (rc == 0) return true;
+	// Use waitid with WNOWAIT to check zombie status without reaping.
+	// This avoids consuming the waitable state, so a subsequent
+	// ProcessHandle::wait() on the same child still works.
+	siginfo_t info{};
+	int rc = ::waitid(P_PID, pid, &info, WEXITED | WNOHANG | WNOWAIT);
+	if (rc == 0 && info.si_pid == pid)
+		return false; // exited/zombie, but NOT reaped
+	if (rc == 0 && info.si_pid == 0)
+		return true; // still running
+	// Not our child or error (ECHILD); fall back to kill check
+	if (::kill(pid, 0) == 0) return true;
 	return errno == EPERM;
 }
 
