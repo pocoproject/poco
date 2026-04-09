@@ -18,14 +18,10 @@
 namespace Poco::Net {
 
 
-PartHandler::PartHandler()
-{
-}
+PartHandler::PartHandler() = default;
 
 
-PartHandler::~PartHandler()
-{
-}
+PartHandler::~PartHandler() = default;
 
 
 } // namespace Poco::Net
