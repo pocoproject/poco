@@ -211,8 +211,29 @@ option(ENABLE_PDF "Enable PDF" OFF)
 option(ENABLE_TRACE "Enable stack tracing" OFF)
 option(ENABLE_FASTLOGGER "Enable FastLogger (Quill-based high-performance logger)" ON)
 
-# FastLogger uses Quill which requires x86/ARM intrinsics not available in WebAssembly
-if(EMSCRIPTEN)
+# FastLogger uses Quill which only supports specific platforms.
+# Auto-disable on unsupported OS or CPU architecture.
+# Supported platforms are derived from quill source code:
+#   OS:   ThreadUtilities.h (get_thread_id), BackendWorkerLock.h
+#   Arch: Rdtsc.h
+set(_FASTLOGGER_SUPPORTED_OS FALSE)
+set(_FASTLOGGER_SUPPORTED_ARCH FALSE)
+
+if(CMAKE_SYSTEM_NAME MATCHES "^(Windows|Linux|Darwin|FreeBSD|NetBSD|OpenBSD|DragonFly|Android)$")
+	set(_FASTLOGGER_SUPPORTED_OS TRUE)
+endif()
+
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^([xX]86_64|[aA][mM][dD]64|[xX]86|i[3-6]86|aarch64|[aA][rR][mM]64|[aA][rR][mM]|riscv|loongarch64|s390x)")
+	set(_FASTLOGGER_SUPPORTED_ARCH TRUE)
+endif()
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(ppc64|powerpc64)")
+	set(_FASTLOGGER_SUPPORTED_ARCH TRUE)
+endif()
+
+if(NOT _FASTLOGGER_SUPPORTED_OS OR NOT _FASTLOGGER_SUPPORTED_ARCH OR EMSCRIPTEN)
+	if(ENABLE_FASTLOGGER)
+		message(STATUS "FastLogger disabled: unsupported platform (${CMAKE_SYSTEM_NAME}/${CMAKE_SYSTEM_PROCESSOR})")
+	endif()
 	set(ENABLE_FASTLOGGER OFF CACHE BOOL "Enable FastLogger" FORCE)
 endif()
 
