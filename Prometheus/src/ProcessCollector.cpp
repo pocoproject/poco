@@ -251,4 +251,4 @@ void ProcessCollector::exportThreadCPU(Exporter& exporter) const
 #endif
 
 
-} // namespace Poco::Prometheus
+} } // namespace Poco::Prometheus

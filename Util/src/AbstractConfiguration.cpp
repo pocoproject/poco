@@ -673,7 +673,7 @@ void AbstractConfiguration::setRawWithEvent(const std::string& key, std::string 
 AbstractConfiguration::~AbstractConfiguration() = default;
 
 
-} // namespace Poco::Util
+} } // namespace Poco::Util
 
 
 template class Poco::BasicEvent<Poco::Util::AbstractConfiguration::KeyValue, Poco::FastMutex>;
