@@ -18,10 +18,13 @@
 #include "Poco/Net/StringPartSource.h"
 #include "Poco/Net/PartStore.h"
 #include "Poco/Net/MediaType.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/Timestamp.h"
 #include "Poco/FileStream.h"
+#include "Poco/StreamCopier.h"
 #include "Poco/String.h"
 #include "Poco/TemporaryFile.h"
+#include "Poco/Stopwatch.h"
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -51,35 +54,28 @@ namespace
 	class StringPartHandler: public PartHandler
 	{
 	public:
-		StringPartHandler()
-		{
-		}
+		StringPartHandler() = default;
 
-		void handlePart(const MessageHeader& header, std::istream& stream)
+		void handlePart(const MessageHeader& header, std::istream& stream) override
 		{
 			_disp.push_back(header["Content-Disposition"]);
 			_type.push_back(header["Content-Type"]);
 			std::string data;
-			int ch = stream.get();
-			while (ch > 0)
-			{
-				data += (char) ch;
-				ch = stream.get();
-			}
-			_data.push_back(data);
+			Poco::StreamCopier::copyToString(stream, data);
+			_data.push_back(std::move(data));
 		}
 
-		const std::vector<std::string>& data() const
+		[[nodiscard]] const std::vector<std::string>& data() const
 		{
 			return _data;
 		}
 
-		const std::vector<std::string>& disp() const
+		[[nodiscard]] const std::vector<std::string>& disp() const
 		{
 			return _disp;
 		}
 
-		const std::vector<std::string>& type() const
+		[[nodiscard]] const std::vector<std::string>& type() const
 		{
 			return _type;
 		}
@@ -770,6 +766,233 @@ void MailMessageTest::testEncodeWord()
 }
 
 
+void MailMessageTest::testReadMultiPartEmptyBoundary()
+{
+	// Empty boundary should throw MultipartException (#5288)
+	std::istringstream istr(
+		"Content-Type: multipart/mixed; boundary\r\n"
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"\r\n"
+		"\r\n"
+		"--\r\n"
+		"Content-Disposition: inline\r\n"
+		"\r\n"
+		"Hello\r\n"
+		"----\r\n"
+	);
+
+	MailMessage message;
+	try
+	{
+		message.read(istr);
+		fail("must throw on empty boundary");
+	}
+	catch (const Poco::Net::MultipartException&)
+	{
+	}
+}
+
+
+void MailMessageTest::testReadMultiPartWithContentLength()
+{
+	// Content-Length in part headers enables bulk-read fast path (#4118)
+	std::istringstream istr(
+		"Content-Type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Mime-Version: 1.0\r\n"
+		"Subject: Content-Length Test\r\n"
+		"To: John Doe <john.doe@no.where>\r\n"
+		"\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: inline\r\n"
+		"Content-Transfer-Encoding: 8bit\r\n"
+		"Content-Type: text/plain\r\n"
+		"Content-Length: 14\r\n"
+		"\r\n"
+		"Hello World!\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: attachment; filename=sample.dat\r\n"
+		"Content-Transfer-Encoding: base64\r\n"
+		"Content-Type: application/octet-stream; name=sample\r\n"
+		"Content-Length: 44\r\n"
+		"\r\n"
+		"VGhpcyBpcyBzb21lIGJpbmFyeSBkYXRhLiBSZWFsbHku\r\n"
+		"--MIME_boundary_01234567--\r\n"
+	);
+
+	StringPartHandler handler;
+	MailMessage message;
+	message.read(istr, handler);
+
+	assertTrue (handler.data().size() == 2);
+	assertTrue (handler.data()[0] == "Hello World!\r\n");
+	assertTrue (handler.type()[0] == "text/plain");
+	assertTrue (handler.disp()[0] == "inline");
+
+	assertTrue (handler.data()[1] == "This is some binary data. Really.");
+	assertTrue (handler.type()[1] == "application/octet-stream; name=sample");
+	assertTrue (handler.disp()[1] == "attachment; filename=sample.dat");
+}
+
+
+void MailMessageTest::testReadMultiPartWithZeroContentLength()
+{
+	// Content-Length: 0 for an empty part body — exercises readBulk edge case
+	std::istringstream istr(
+		"Content-Type: multipart/mixed; boundary=MIME_boundary_01234567\r\n"
+		"Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n"
+		"From: poco@appinf.com\r\n"
+		"Mime-Version: 1.0\r\n"
+		"\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: inline\r\n"
+		"Content-Type: text/plain\r\n"
+		"Content-Length: 0\r\n"
+		"\r\n"
+		"\r\n"
+		"--MIME_boundary_01234567\r\n"
+		"Content-Disposition: inline\r\n"
+		"Content-Type: text/plain\r\n"
+		"Content-Length: 6\r\n"
+		"\r\n"
+		"Hello!\r\n"
+		"--MIME_boundary_01234567--\r\n"
+	);
+
+	StringPartHandler handler;
+	MailMessage message;
+	message.read(istr, handler);
+
+	assertTrue (handler.data().size() == 2);
+	assertTrue (handler.data()[0].empty());
+	assertTrue (handler.data()[1] == "Hello!");
+}
+
+
+namespace
+{
+	std::string buildMultiPartMessage(int partCount, int partBodySize = 0, bool includeContentLength = false)
+	{
+		const std::string boundary = "MIME_boundary_parts_test";
+		std::string body(partBodySize > 0 ? partBodySize : 0, 'X');
+		std::string msg;
+		msg.reserve(partCount * (120 + partBodySize) + 200);
+		msg += "Content-Type: multipart/mixed; boundary=" + boundary + "\r\n";
+		msg += "Date: Thu, 1 Jan 1970 00:00:00 GMT\r\n";
+		msg += "From: poco@appinf.com\r\n";
+		msg += "Mime-Version: 1.0\r\n";
+		msg += "\r\n";
+		for (int i = 0; i < partCount; ++i)
+		{
+			msg += "\r\n--" + boundary + "\r\n";
+			msg += "Content-Disposition: inline\r\n";
+			msg += "Content-Transfer-Encoding: 8bit\r\n";
+			msg += "Content-Type: text/plain\r\n";
+			std::string partContent = partBodySize > 0 ? body : "Part " + std::to_string(i);
+			partContent += "\r\n";
+			if (includeContentLength)
+				msg += "Content-Length: " + std::to_string(partContent.size()) + "\r\n";
+			msg += "\r\n";
+			msg += partContent;
+		}
+		msg += "\r\n--" + boundary + "--\r\n";
+		return msg;
+	}
+}
+
+
+void MailMessageTest::testReadMultiPartManyParts()
+{
+	// 60000 parts — well within the 100000 limit
+	std::string raw = buildMultiPartMessage(60000);
+	std::istringstream istr(raw);
+
+	StringPartHandler handler;
+	MailMessage message;
+
+	Poco::Stopwatch sw;
+	sw.start();
+	message.read(istr, handler);
+	sw.stop();
+	std::cout << "60000 parts (" << raw.size() << " bytes): " << sw.elapsed() / 1000 << " ms" << std::endl;
+
+	assertTrue (handler.data().size() == 60000);
+	assertTrue (handler.data()[0] == "Part 0\r\n");
+	assertTrue (handler.data()[59999] == "Part 59999\r\n");
+}
+
+
+void MailMessageTest::testReadMultiPartTooManyParts()
+{
+	const int count = MailMessage::MAX_PARTS + 1;
+	std::string raw = buildMultiPartMessage(count);
+	std::istringstream istr(raw);
+
+	MailMessage message;
+
+	Poco::Stopwatch sw;
+	sw.start();
+	try
+	{
+		message.read(istr);
+		fail("must throw on too many parts");
+	}
+	catch (const Poco::Net::MultipartException&)
+	{
+	}
+	sw.stop();
+	std::cout << count << " parts (" << raw.size() << " bytes), rejected at "
+	          << MailMessage::MAX_PARTS << ": " << sw.elapsed() / 1000 << " ms" << std::endl;
+}
+
+
+void MailMessageTest::testReadMultiPartLargeWithContentLength()
+{
+	// 200 parts with 500KB body each, Content-Length present — bulk-read fast path
+	std::string raw = buildMultiPartMessage(200, 500000, true);
+	std::istringstream istr(raw);
+
+	StringPartHandler handler;
+	MailMessage message;
+
+	Poco::Stopwatch sw;
+	sw.start();
+	message.read(istr, handler);
+	sw.stop();
+	std::cout << "200 x 500KB parts with Content-Length (" << raw.size() / 1024 << " KB): "
+	          << sw.elapsed() / 1000 << " ms" << std::endl;
+
+	assertTrue (handler.data().size() == 200);
+	assertTrue (handler.data()[0].size() == 500002); // 500000 'X' + "\r\n"
+}
+
+
+void MailMessageTest::testReadMultiPartLargeWithoutContentLength()
+{
+	// 200 parts with 500KB body each, no Content-Length — boundary-scanning slow path
+	std::string raw = buildMultiPartMessage(200, 500000, false);
+	std::istringstream istr(raw);
+
+	StringPartHandler handler;
+	MailMessage message;
+
+	Poco::Stopwatch sw;
+	sw.start();
+	message.read(istr, handler);
+	sw.stop();
+	std::cout << "200 x 500KB parts without Content-Length (" << raw.size() / 1024 << " KB): "
+	          << sw.elapsed() / 1000 << " ms" << std::endl;
+
+	assertTrue (handler.data().size() == 200);
+	assertTrue (handler.data()[0].size() == 500002); // 500000 'X' + "\r\n"
+}
+
+
 void MailMessageTest::setUp()
 {
 }
@@ -800,6 +1023,13 @@ CppUnit::Test* MailMessageTest::suite()
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPart);
 	CppUnit_addTest(pSuite, MailMessageTest, testReadWriteMultiPartStore);
 	CppUnit_addTest(pSuite, MailMessageTest, testEncodeWord);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartEmptyBoundary);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartWithContentLength);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartWithZeroContentLength);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartManyParts);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartTooManyParts);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartLargeWithContentLength);
+	CppUnit_addTest(pSuite, MailMessageTest, testReadMultiPartLargeWithoutContentLength);
 
 	return pSuite;
 }

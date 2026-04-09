@@ -15,6 +15,7 @@
 #include "Poco/Net/MailMessage.h"
 #include "Poco/Net/MediaType.h"
 #include "Poco/Net/MultipartReader.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/Net/MultipartWriter.h"
 #include "Poco/Net/PartSource.h"
 #include "Poco/Net/PartHandler.h"
@@ -32,6 +33,8 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/NumberFormatter.h"
+#include <algorithm>
+#include <limits>
 #include <sstream>
 
 
@@ -66,10 +69,8 @@ namespace
 		{
 		}
 
-		~MultiPartHandler()
-			/// Destroys string part handler.
-		{
-		}
+		~MultiPartHandler() = default;
+			/// Destroys multi part handler.
 
 		void handlePart(const MessageHeader& header, std::istream& stream)
 			/// Handles a part. If message pointer was provided at construction time,
@@ -101,8 +102,6 @@ namespace
 					filename = getParamFromHeader(contentType, "name");
 				PartSource* pPS = _pMsg->createPartStore(tmp, contentType, filename);
 				poco_check_ptr (pPS);
-				NameValueCollection::ConstIterator it = header.begin();
-				NameValueCollection::ConstIterator end = header.end();
 				bool added = false;
 
 				if (contentDisp.empty())
@@ -113,19 +112,19 @@ namespace
 
 				static const auto lcContentDisposition = Poco::toLower(MailMessage::HEADER_CONTENT_DISPOSITION);
 
-				for (; it != end; ++it)
+				for (const auto& [key, value] : header)
 				{
-					const auto lcHdr = Poco::toLower(it->first);
+					const auto lcHdr = Poco::toLower(key);
 					if (!added && lcContentDisposition == lcHdr)
 					{
-						if (it->second == "inline")
+						if (value == "inline")
 							_pMsg->addContent(pPS, cte);
 						else
 							_pMsg->addAttachment("", pPS, cte);
 						added = true;
 					}
 
-					pPS->headers().set(it->first, it->second);
+					pPS->headers().set(key, value);
 				}
 
 				if (!added) delete pPS;
@@ -164,10 +163,8 @@ namespace
 		{
 		}
 
-		~StringPartHandler()
+		~StringPartHandler() = default;
 			/// Destroys string part handler.
-		{
-		}
 
 		void handlePart(const MessageHeader& header, std::istream& stream)
 			/// Handles a part.
@@ -389,11 +386,14 @@ void MailMessage::write(std::ostream& ostr) const
 
 void MailMessage::makeMultipart()
 {
+	if (_isMultipart) return;
+
 	if (!isMultipart())
 	{
 		MediaType mediaType("multipart", "mixed");
 		setContentType(mediaType);
 	}
+	_isMultipart = true;
 }
 
 
@@ -487,9 +487,15 @@ void MailMessage::readMultipart(std::istream& istr, PartHandler& handler)
 {
 	MediaType contentType(getContentType());
 	_boundary = contentType.getParameter("boundary");
+	if (_boundary.empty())
+		throw MultipartException("Missing multipart boundary");
+
 	MultipartReader reader(istr, _boundary);
+	int partCount = 0;
 	while (reader.hasNextPart())
 	{
+		if (++partCount > MAX_PARTS)
+			throw MultipartException("Too many MIME parts");
 		MessageHeader partHeader;
 		reader.nextPart(partHeader);
 		readPart(reader.stream(), partHeader, handler);
@@ -504,8 +510,7 @@ void MailMessage::readPart(std::istream& istr, const MessageHeader& header, Part
 	{
 		encoding = header.get(HEADER_CONTENT_TRANSFER_ENCODING);
 		// get rid of a parameter if one is set
-		std::string::size_type pos = encoding.find(';');
-		if (pos != std::string::npos)
+		if (auto pos = encoding.find(';'); pos != std::string::npos)
 			encoding.resize(pos);
 	}
 	if (icompare(encoding, CTE_QUOTED_PRINTABLE) == 0)
@@ -537,7 +542,7 @@ void MailMessage::handlePart(std::istream& istr, const MessageHeader& header, Pa
 	handler.handlePart(header, istr);
 	// Read remaining characters from stream in case
 	// the handler failed to read the complete stream.
-	while (istr.good()) istr.get();
+	istr.ignore(std::numeric_limits<std::streamsize>::max());
 }
 
 
@@ -616,16 +621,9 @@ void MailMessage::appendRecipient(const MailRecipient& recipient, std::string& s
 
 std::string MailMessage::encodeWord(const std::string& text, const std::string& charset)
 {
-	bool containsNonASCII = false;
-	for (auto ch: text)
-	{
-		if (static_cast<unsigned char>(ch) > 127)
-		{
-			containsNonASCII = true;
-			break;
-		}
-	}
-	if (!containsNonASCII) return text;
+	if (std::none_of(text.begin(), text.end(),
+		[](char ch) { return static_cast<unsigned char>(ch) > 127; }))
+		return text;
 
 	std::string encodedText;
 	std::string::size_type lineLength = 0;
