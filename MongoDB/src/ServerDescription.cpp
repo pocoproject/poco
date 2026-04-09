@@ -52,8 +52,7 @@ bool ServerDescription::operator==(const ServerDescription& other) const
 	       _address == other._address &&
 	       _setName == other._setName &&
 	       _hasError == other._hasError &&
-	       _error == other._error &&
-	       _roundTripTime == other._roundTripTime;
+	       _error == other._error;
 }
 
 
