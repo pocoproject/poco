@@ -95,7 +95,7 @@ public:
 		/// Writes the configuration data to the given stream.
 		///
 		/// The data is written as a sequence of statements in the form
-		/// <key>: <value>
+		/// <key> = <value>
 		/// separated by a newline character.
 
 	void save(const std::string& path) const;
