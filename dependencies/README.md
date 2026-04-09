@@ -46,3 +46,4 @@ and not practical to extract as separate libraries.
 
 ## Additional Notes
 * `tessil/ordered-map` is modified so that `tsl::detail_ordered_hash::numeric_cast()` and `tsl::detail_ordered_hash::deserialize_value()` have external linkage. These functions originally have internal linkage (marked `static`), which prevented the `Poco` module from being built as all exported symbols require external linkage. This should remain until [Tessil/ordered-map#54](https://github.com/Tessil/ordered-map/pull/54) is merged.
+* `quill` only supports specific OS and CPU architecture combinations. `ENABLE_FASTLOGGER` is auto-disabled on unsupported platforms via a whitelist in the top-level `CMakeLists.txt` (derived from `ThreadUtilities.h`, `BackendWorkerLock.h`, and `Rdtsc.h`). When updating quill from upstream, re-assess the whitelist against the new version's platform support.
