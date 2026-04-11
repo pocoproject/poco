@@ -178,7 +178,7 @@ HPDF_Type1FontDef_SetWidths  (HPDF_FontDef         fontdef,
 
 HPDF_INT16
 HPDF_Type1FontDef_GetWidthByName  (HPDF_FontDef     fontdef,
-                                   const char  *gryph_name);
+                                   const char  *glyph_name);
 
 
 HPDF_INT16
@@ -233,11 +233,11 @@ typedef struct _HPDF_TTF_CmapRange {
 } HPDF_TTF_CmapRange;
 
 
-typedef struct _HPDF_TTF_GryphOffsets {
+typedef struct _HPDF_TTF_GlyphOffsets {
         HPDF_UINT32   base_offset;
         HPDF_UINT32  *offsets;
         HPDF_BYTE    *flgs;   /* 0: unused, 1: used */
-} HPDF_TTF_GryphOffsets;
+} HPDF_TTF_GlyphOffsets;
 
 
 typedef struct _HPDF_TTF_LongHorMetric {
@@ -295,7 +295,7 @@ typedef struct _HPDF_TTFontDefAttr_Rec {
     char                tag_name[HPDF_TTF_FONT_TAG_LEN + 1];
     char                tag_name2[(HPDF_TTF_FONT_TAG_LEN + 1) * 2];
     HPDF_TTF_FontHeader      header;
-    HPDF_TTF_GryphOffsets    glyph_tbl;
+    HPDF_TTF_GlyphOffsets    glyph_tbl;
     HPDF_UINT16              num_glyphs;
     HPDF_TTF_NamingTable     name_tbl;
     HPDF_TTF_LongHorMetric  *h_metric;

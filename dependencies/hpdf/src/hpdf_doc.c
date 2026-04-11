@@ -177,7 +177,7 @@ HPDF_NewEx  (HPDF_Error_Handler    user_error_fn,
     HPDF_MemSet (pdf, 0, sizeof (HPDF_Doc_Rec));
     pdf->sig_bytes = HPDF_SIG_BYTES;
     pdf->mmgr = mmgr;
-    pdf->pdf_version = HPDF_VER_13;
+    pdf->pdf_version = HPDF_VER_DEFAULT;
     pdf->compression_mode = HPDF_COMP_NONE;
 
     /* copy the data of temporary-error object to the one which is
@@ -305,7 +305,7 @@ HPDF_FreeDoc  (HPDF_Doc  pdf)
 
         HPDF_MemSet(pdf->ttfont_tag, 0, 6);
 
-        pdf->pdf_version = HPDF_VER_13;
+        pdf->pdf_version = HPDF_VER_DEFAULT;
         pdf->outlines = NULL;
         pdf->catalog = NULL;
         pdf->root_pages = NULL;

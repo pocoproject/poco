@@ -308,12 +308,12 @@ ARC4CryptBuf (HPDF_ARC4_Ctx_Rec   *ctx,
 /*---------------------------------------------------------------------------*/
 
 void
-HPDF_PadOrTrancatePasswd  (const char  *pwd,
+HPDF_PadOrTruncatePasswd  (const char  *pwd,
                            HPDF_BYTE        *new_pwd)
 {
     HPDF_UINT len = HPDF_StrLen (pwd, HPDF_PASSWD_LEN + 1);
 
-    HPDF_PTRACE((" HPDF_PadOrTrancatePasswd\n"));
+    HPDF_PTRACE((" HPDF_PadOrTruncatePasswd\n"));
 
     HPDF_MemSet (new_pwd, 0x00, HPDF_PASSWD_LEN);
 
