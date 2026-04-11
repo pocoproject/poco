@@ -1,8 +1,8 @@
 # Third-Party Dependencies
 
 The Poco C++ Libraries include third-party code in two forms:
-1. **Bundled dependencies** in this `dependencies/` directory — self-contained libraries that can be updated independently
-2. **Embedded code** in the main source tree — algorithms and small components integrated directly into Poco source files
+1. **Bundled dependencies** in this `dependencies/` directory -- self-contained libraries that can be updated independently
+2. **Embedded code** in the main source tree -- algorithms and small components integrated directly into Poco source files
 
 When `POCO_UNBUNDLED` is enabled (CMake) or set in the environment (GNU Make), marked libraries
 are replaced with system-installed versions via `find_package()` or `-l` flags.
@@ -14,12 +14,12 @@ are replaced with system-installed versions via `find_package()` or `-l` flags.
 | [zlib](zlib/) | 1.3.2 | Zlib | Foundation (compression/decompression streams) | Yes | https://github.com/madler/zlib |
 | [pcre2](pcre2/) | 10.47 | BSD-3-Clause | Foundation (regular expressions) | Yes | https://github.com/PCRE2Project/pcre2 |
 | [utf8proc](utf8proc/) | 2.11.3 | MIT | Foundation (Unicode normalization) | Yes | https://github.com/JuliaStrings/utf8proc |
-| [expat](expat/) | 2.7.4 | MIT | XML (SAX/DOM parser) | Yes | https://github.com/libexpat/libexpat |
+| [expat](expat/) | 2.7.5 | MIT | XML (SAX/DOM parser) | Yes | https://github.com/libexpat/libexpat |
 | [sqlite3](sqlite3/) | 3.53.0 | Public Domain | Data/SQLite (embedded database) | Yes | https://www.sqlite.org |
 | [png](png/) | 1.6.56 | libpng License | PDF (PNG image support) | Yes | https://github.com/pnggroup/libpng |
 | [v8_double_conversion](v8_double_conversion/) | 3.4.0 | BSD-3-Clause | Foundation (float-to-string conversion) | No | https://github.com/google/double-conversion |
-| [pdjson](pdjson/) | — | Public Domain | JSON (streaming parser) | No | https://github.com/skeeto/pdjson |
-| [tessil](tessil/) | — | MIT | Foundation (insertion-order-preserving hash containers) | No | https://github.com/Tessil/ordered-map |
+| [pdjson](pdjson/) | n/a | Public Domain | JSON (streaming parser) | No | https://github.com/skeeto/pdjson |
+| [tessil](tessil/) | n/a | MIT | Foundation (insertion-order-preserving hash containers) | No | https://github.com/Tessil/ordered-map |
 | [hpdf](hpdf/) (libharu) | 2.4.6 | Zlib-like | PDF (PDF document generation) | No | https://github.com/libharu/libharu |
 | [7zip](7zip/) (LZMA SDK) | 26.00 | Public Domain | SevenZip (7z archive support) | No | https://github.com/ip7z/7zip |
 | [cpptrace](cpptrace/) | 1.0.4 | MIT | Foundation (stack trace support, optional) | No | https://github.com/jeremy-rifkin/cpptrace |
