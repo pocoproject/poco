@@ -18,6 +18,20 @@ target_compile_definitions(_BUNDLED_CPPTRACE PUBLIC CPPTRACE_STATIC_DEFINE)
 
 set_property(TARGET _BUNDLED_CPPTRACE PROPERTY POSITION_INDEPENDENT_CODE ON)
 
+# Match upstream cpptrace's own CMakeLists.txt, which always sets both hidden
+# visibility properties together. Setting only CXX_VISIBILITY_PRESET (as POCO
+# does on its hidden-visibility sanitizer matrix rows) leaves inline functions
+# and template instantiations at default visibility, creating a hybrid ABI
+# across DSO boundaries. That hybrid manifested as a SEGV at a small address
+# inside cpptrace::generate_trace when Foundation's hidden-asan build threw a
+# Poco::Exception under ENABLE_TRACE=ON (RedisTest::testError). Pinning both
+# properties on the bundled target makes cpptrace build the same way in every
+# POCO configuration and keeps its internal state self-consistent.
+set_target_properties(_BUNDLED_CPPTRACE PROPERTIES
+	CXX_VISIBILITY_PRESET hidden
+	VISIBILITY_INLINES_HIDDEN YES
+)
+
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
 
 	if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
