@@ -336,7 +336,6 @@ HPDF_EmbeddedFile_SetAFRelationship  (HPDF_EmbeddedFile    emfile,
         "Schema",
         "Unspecified"
       };
-    const char *str_relationship = NULL;
 
     if (relationship < 0 || relationship > HPDF_AFRELATIONSHIP_UNSPECIFIED) {
         return HPDF_INVALID_PARAMETER;

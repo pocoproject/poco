@@ -46,6 +46,7 @@ extern "C" {
 #define HPDF_ERR_UNKNOWN_CLASS                    0x1013
 #define HPDF_EXCEED_GSTATE_LIMIT                  0x1014
 #define HPDF_FAILED_TO_ALLOC_MEM                   0x1015
+#define HPDF_FAILD_TO_ALLOC_MEM HPDF_FAILED_TO_ALLOC_MEM /* For compatibility with previous versions */
 #define HPDF_FILE_IO_ERROR                        0x1016
 #define HPDF_FILE_OPEN_ERROR                      0x1017
 /*                                                0x1018 */

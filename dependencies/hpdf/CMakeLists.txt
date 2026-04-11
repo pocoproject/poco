@@ -1,6 +1,6 @@
 # libharu (HPDF) - PDF creation library
-# Version: 2.4.5
-# Source: https://github.com/libharu/libharu/releases/tag/v2.4.5
+# Version: 2.4.6
+# Source: https://github.com/libharu/libharu/releases/tag/v2.4.6
 
 # Sources
 file(GLOB SRCS_G "src/*.c")

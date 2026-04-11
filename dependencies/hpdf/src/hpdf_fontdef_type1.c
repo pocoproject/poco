@@ -287,7 +287,7 @@ LoadAfm (HPDF_FontDef  fontdef,
 
         GetKeyword (s, buf2, HPDF_LIMIT_MAX_NAME_LEN + 1);
 
-        cdata->unicode = HPDF_GryphNameToUnicode (buf2);
+        cdata->unicode = HPDF_GlyphNameToUnicode (buf2);
 
     }
 
@@ -474,9 +474,9 @@ HPDF_Type1FontDef_SetWidths  (HPDF_FontDef          fontdef,
 
 HPDF_INT16
 HPDF_Type1FontDef_GetWidthByName  (HPDF_FontDef      fontdef,
-                                   const char*  gryph_name)
+                                   const char*  glyph_name)
 {
-    HPDF_UNICODE unicode = HPDF_GryphNameToUnicode (gryph_name);
+    HPDF_UNICODE unicode = HPDF_GlyphNameToUnicode (glyph_name);
 
     HPDF_PTRACE ((" HPDF_Type1FontDef_GetWidthByName\n"));
 

@@ -304,11 +304,11 @@ HPDF_Encoder_CheckJWWLineHead  (HPDF_Encoder        encoder,
 /*-- utility functions ----------------------------------*/
 
 const char*
-HPDF_UnicodeToGryphName  (HPDF_UNICODE  unicode);
+HPDF_UnicodeToGlyphName  (HPDF_UNICODE  unicode);
 
 
 HPDF_UNICODE
-HPDF_GryphNameToUnicode  (const char  *gryph_name);
+HPDF_GlyphNameToUnicode  (const char  *glyph_name);
 
 #ifdef __cplusplus
 }

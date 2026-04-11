@@ -144,7 +144,7 @@ HPDF_STATUS ConvertDateToXMDate(HPDF_Stream stream, const char *pDate)
 }
 
 /* Set PDF/A conformance */
-HPDF_STATUS
+HPDF_EXPORT(HPDF_STATUS)
 HPDF_PDFA_SetPDFAConformance (HPDF_Doc pdf, HPDF_PDFAType pdfatype)
 {
     pdf->pdfa_type = pdfatype;
@@ -172,8 +172,6 @@ HPDF_PDFA_AddXmpMetadata(HPDF_Doc pdf)
 
     const char *pdf_Keywords    = NULL;
     const char *pdf_Producer    = NULL;
-
-    const char *info = NULL;
 
     if (!HPDF_HasDoc(pdf)) {
       return HPDF_INVALID_DOCUMENT;
@@ -297,7 +295,7 @@ HPDF_PDFA_AddXmpMetadata(HPDF_Doc pdf)
         }
 
         /* Add the pdfaid block */
-        conformanceVersion = -1;
+        conformanceVersion = HPDF_PDFA_NON_PDFA;
         switch(pdf->pdfa_type) {
           case HPDF_PDFA_1A:
             ret += HPDF_Stream_WriteStr(xmp->stream, PDFAID_PDFA1A);
@@ -343,12 +341,14 @@ HPDF_PDFA_AddXmpMetadata(HPDF_Doc pdf)
             ret += HPDF_Stream_WriteStr(xmp->stream, PDFAID_PDFA4F);
             conformanceVersion = HPDF_VER_20;
             break;
+          default:
+            break;
         }
 
         /* Update the PDF number version */
         pdf->pdf_version = (pdf->pdf_version > conformanceVersion ? pdf->pdf_version : conformanceVersion);
 
-        /* Append additionnal specific XMP extensions */
+        /* Append additional specific XMP extensions */
         {
             HPDF_UINT i;
             HPDF_List list;

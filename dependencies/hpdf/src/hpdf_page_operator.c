@@ -300,7 +300,7 @@ HPDF_Page_SetExtGState  (HPDF_Page        page,
     if (HPDF_Stream_WriteStr (attr->stream, " gs\012") != HPDF_OK)
         return HPDF_CheckError (page->error);
 
-    /* change objct class to read only. */
+    /* change object class to read only. */
     ext_gstate->header.obj_class = (HPDF_OSUBCLASS_EXT_GSTATE_R | HPDF_OCLASS_DICT);
 
     return ret;
