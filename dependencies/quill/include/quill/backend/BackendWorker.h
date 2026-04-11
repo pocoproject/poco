@@ -70,8 +70,8 @@ namespace detail
 {
 
 #if defined(_WIN32) && defined(_MSC_VER) && !defined(__GNUC__)
-#pragma warning(push)
-#pragma warning(disable : 4324)
+  #pragma warning(push)
+  #pragma warning(disable : 4324)
 #endif
 
 class BackendWorker
@@ -184,10 +184,7 @@ public:
           QUILL_TRY { _poll(); }
 #if !defined(QUILL_NO_EXCEPTIONS)
           QUILL_CATCH(std::exception const& e) { _options.error_notifier(e.what()); }
-          QUILL_CATCH_ALL()
-          {
-            _options.error_notifier(std::string{"Caught unhandled exception."});
-          } // clang-format on
+          QUILL_CATCH_ALL() { _options.error_notifier(std::string{"Caught unhandled exception."}); }
 #endif
         }
 
@@ -195,10 +192,7 @@ public:
         QUILL_TRY { _exit(); }
 #if !defined(QUILL_NO_EXCEPTIONS)
         QUILL_CATCH(std::exception const& e) { _options.error_notifier(e.what()); }
-        QUILL_CATCH_ALL()
-        {
-          _options.error_notifier(std::string{"Caught unhandled exception."});
-        } // clang-format on
+        QUILL_CATCH_ALL() { _options.error_notifier(std::string{"Caught unhandled exception."}); }
 #endif
       });
 
@@ -262,6 +256,28 @@ public:
   }
 
 private:
+  /***/
+  QUILL_ATTRIBUTE_HOT void _invoke_poll_hook(std::function<void()> const& hook) const
+  {
+    QUILL_TRY { hook(); }
+#if !defined(QUILL_NO_EXCEPTIONS)
+    QUILL_CATCH(std::exception const& e) { _options.error_notifier(e.what()); }
+    QUILL_CATCH_ALL() { _options.error_notifier(std::string{"Caught unhandled exception."}); }
+#endif
+  }
+
+  /***/
+  QUILL_ATTRIBUTE_HOT void _invoke_poll_end_once(bool& poll_end_called) const
+  {
+    if (poll_end_called)
+    {
+      return;
+    }
+
+    poll_end_called = true;
+    _invoke_poll_hook(_options.backend_worker_on_poll_end);
+  }
+
   /**
    * Calls some functions that we forward declare on the backend and tries to ensure the linker
    * includes the necessary symbols
@@ -288,6 +304,13 @@ private:
    */
   QUILL_ATTRIBUTE_HOT void _poll()
   {
+    // poll hook
+    bool poll_end_called = false;
+    if (QUILL_UNLIKELY(static_cast<bool>(_options.backend_worker_on_poll_begin)))
+    {
+      _invoke_poll_hook(_options.backend_worker_on_poll_begin);
+    }
+
     // load all contexts locally
     _update_active_thread_contexts_cache();
 
@@ -336,6 +359,12 @@ private:
         _cleanup_invalidated_loggers();
         _try_shrink_empty_transit_event_buffers();
 
+        // poll hook
+        if (QUILL_UNLIKELY(static_cast<bool>(_options.backend_worker_on_poll_end)))
+        {
+          _invoke_poll_end_once(poll_end_called);
+        }
+
         // There is nothing left to do, and we can let this thread sleep for a while
         // buffer events are 0 here and also all the producer queues are empty
         if (_options.sleep_duration.count() != 0)
@@ -356,6 +385,12 @@ private:
           std::this_thread::yield();
         }
       }
+    }
+
+    // poll hook
+    if (QUILL_UNLIKELY(static_cast<bool>(_options.backend_worker_on_poll_end)))
+    {
+      _invoke_poll_end_once(poll_end_called);
     }
   }
 
@@ -795,10 +830,7 @@ private:
     QUILL_TRY { _process_transit_event(*thread_context, *transit_event, flush_flag); }
 #if !defined(QUILL_NO_EXCEPTIONS)
     QUILL_CATCH(std::exception const& e) { _options.error_notifier(e.what()); }
-    QUILL_CATCH_ALL()
-    {
-      _options.error_notifier(std::string{"Caught unhandled exception."});
-    } // clang-format on
+    QUILL_CATCH_ALL() { _options.error_notifier(std::string{"Caught unhandled exception."}); }
 #endif
 
     // Finally, clean up any remaining fields in the transit event
@@ -1433,7 +1465,8 @@ private:
         // check the queues are empty each time before removing a logger to avoid
         // potential race condition of the logger* still being in the queue
         return _check_frontend_queues_and_cached_transit_events_empty();
-      }, _removed_loggers);
+      },
+      _removed_loggers);
 
     if (!_removed_loggers.empty())
     {
@@ -1724,7 +1757,7 @@ private:
 };
 
 #if defined(_WIN32) && defined(_MSC_VER) && !defined(__GNUC__)
-#pragma warning(pop)
+  #pragma warning(pop)
 #endif
 
 } // namespace detail

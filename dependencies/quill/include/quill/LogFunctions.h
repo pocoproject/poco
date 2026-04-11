@@ -325,6 +325,11 @@ template <typename TLogger, typename... Args>
 QUILL_ATTRIBUTE_HOT void log(TLogger* logger, char const* tags, LogLevel log_level, char const* fmt,
                              SourceLocation const& location, Args&&... args)
 {
+  if (QUILL_UNLIKELY(!logger))
+  {
+    return;
+  }
+
   static constexpr MacroMetadata macro_metadata{
     "[placeholder]", "[placeholder]", "[placeholder]",
     nullptr,         LogLevel::None,  MacroMetadata::Event::LogWithRuntimeMetadataHybridCopy};
