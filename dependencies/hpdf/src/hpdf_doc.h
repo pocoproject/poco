@@ -31,7 +31,7 @@
 extern "C" {
 #endif
 
-#define HPDF_VER_DEFAULT  HPDF_VER_12
+#define HPDF_VER_DEFAULT  HPDF_VER_13
 
 typedef struct _HPDF_Doc_Rec {
     HPDF_UINT32     sig_bytes;

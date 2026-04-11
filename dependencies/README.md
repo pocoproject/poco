@@ -20,7 +20,7 @@ are replaced with system-installed versions via `find_package()` or `-l` flags.
 | [v8_double_conversion](v8_double_conversion/) | 3.4.0 | BSD-3-Clause | Foundation (float-to-string conversion) | No | https://github.com/google/double-conversion |
 | [pdjson](pdjson/) | — | Public Domain | JSON (streaming parser) | No | https://github.com/skeeto/pdjson |
 | [tessil](tessil/) | — | MIT | Foundation (insertion-order-preserving hash containers) | No | https://github.com/Tessil/ordered-map |
-| [hpdf](hpdf/) (libharu) | 2.4.5 | Zlib-like | PDF (PDF document generation) | No | https://github.com/libharu/libharu |
+| [hpdf](hpdf/) (libharu) | 2.4.6 | Zlib-like | PDF (PDF document generation) | No | https://github.com/libharu/libharu |
 | [7zip](7zip/) (LZMA SDK) | 26.00 | Public Domain | SevenZip (7z archive support) | No | https://github.com/ip7z/7zip |
 | [cpptrace](cpptrace/) | 1.0.4 | MIT | Foundation (stack trace support, optional) | No | https://github.com/jeremy-rifkin/cpptrace |
 | [quill](quill/) | 11.0.2 | MIT | Foundation (high-performance async logging, optional) | No | https://github.com/odygrd/quill |

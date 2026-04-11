@@ -68,7 +68,7 @@ HPDF_List_New  (HPDF_MMgr  mmgr,
  *  item :  Pointer to a object to be added.
  *
  *  return:  If HPDF_List_Add success, it returns HPDF_OK.
- *           HPDF_FAILD_TO_ALLOC_MEM is returned when the expansion of the
+ *           HPDF_FAILED_TO_ALLOC_MEM is returned when the expansion of the
  *           object list is failed.
  *
  */
@@ -103,7 +103,7 @@ HPDF_List_Add  (HPDF_List  list,
  *  insert the item before the target.
  *
  *  return:  If HPDF_List_Add success, it returns HPDF_OK.
- *           HPDF_FAILD_TO_ALLOC_MEM is returned when the expansion of the
+ *           HPDF_FAILED_TO_ALLOC_MEM is returned when the expansion of the
  *           object list is failed.
  *           HPDF_ITEM_NOT_FOUND is returned where the target object is not
  *           found.
@@ -333,4 +333,3 @@ HPDF_List_Find  (HPDF_List  list,
 
     return -1;
 }
-

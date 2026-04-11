@@ -1,6 +1,6 @@
 #define HPDF_MAJOR_VERSION 2
 #define HPDF_MINOR_VERSION 4
-#define HPDF_BUGFIX_VERSION 5
+#define HPDF_BUGFIX_VERSION 6
 #define HPDF_EXTRA_VERSION ""
 
 #define hpdf_vquote(x) #x

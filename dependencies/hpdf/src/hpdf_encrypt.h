@@ -114,7 +114,7 @@ HPDF_MD5Final  (HPDF_BYTE              digest[16],
                 struct HPDF_MD5Context *ctx);
 
 void
-HPDF_PadOrTrancatePasswd  (const char  *pwd,
+HPDF_PadOrTruncatePasswd  (const char  *pwd,
                            HPDF_BYTE        *new_pwd);
 
 
@@ -154,6 +154,4 @@ HPDF_Encrypt_CryptBuf  (HPDF_Encrypt  attr,
 }
 #endif /* __cplusplus */
 
-#endif /* _HPDF_ENCRYPT_H */
-
-
+#endif /* HPDF_ENCRYPT_H */
