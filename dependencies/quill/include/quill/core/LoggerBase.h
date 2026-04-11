@@ -117,7 +117,15 @@ public:
    */
   QUILL_NODISCARD LogLevel get_log_level() const noexcept
   {
-    return _log_level.load(std::memory_order_relaxed);
+    auto const* self = this;
+
+#if defined(__GNUC__) && !defined(__clang__)
+    // GCC warns about potential null pointer access when logger might be
+    // uninitialized during LTO analysis
+    asm volatile("" : "+r"(self) : : "memory");
+#endif
+    
+    return self->_log_level.load(std::memory_order_relaxed);
   }
 
   /**

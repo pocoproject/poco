@@ -9,6 +9,7 @@
 #include "quill/core/Attributes.h"
 #include "quill/core/QuillError.h"
 
+#include <atomic>
 #include <cstdint>
 #include <cstring>
 #include <string>
@@ -186,13 +187,19 @@ QUILL_NODISCARD QUILL_EXPORT QUILL_ATTRIBUTE_USED inline std::string get_thread_
 #endif
 }
 
+#if defined(QUILL_USE_SEQUENTIAL_THREAD_ID)
+extern std::atomic<uint32_t> g_next_thread_id;
+#endif
+
 /**
  * Returns the os assigned ID of the thread
  * @return the thread ID of the calling thread
  */
 QUILL_NODISCARD QUILL_EXPORT QUILL_ATTRIBUTE_USED inline uint32_t get_thread_id() noexcept
 {
-#if defined(__CYGWIN__)
+#if defined(QUILL_USE_SEQUENTIAL_THREAD_ID)
+  return g_next_thread_id.fetch_add(1u) + 1u;
+#elif defined(__CYGWIN__)
   // get thread id on cygwin not supported
   return 0;
 #elif defined(_WIN32)
