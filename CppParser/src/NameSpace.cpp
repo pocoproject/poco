@@ -31,18 +31,25 @@ NameSpace::NameSpace()
 }
 
 
-NameSpace::NameSpace(const std::string& name, NameSpace* pNameSpace):
-	Symbol(name, pNameSpace)
+NameSpace::NameSpace(const std::string& name, NameSpace* pNameSpace, bool isInline):
+	Symbol(name, pNameSpace),
+	_isInline(isInline)
 {
 }
 
 
 NameSpace::~NameSpace()
 {
-	for (SymbolTable::iterator it = _symbols.begin(); it != _symbols.end(); ++it)
+	for (const auto& [name, pSym] : _symbols)
 	{
-		delete it->second;
+		delete pSym;
 	}
+}
+
+
+void NameSpace::setInline(bool isInline)
+{
+	_isInline = isInline;
 }
 
 
@@ -57,10 +64,10 @@ void NameSpace::addSymbol(Symbol* pSymbol)
 
 void NameSpace::importSymbol(const std::string& fullName)
 {
-	std::string localName;
-	std::string::size_type pos = fullName.find_last_of(':');
+	const auto pos = fullName.find_last_of(':');
 	if (pos != std::string::npos && pos < fullName.size() - 1)
 	{
+		std::string localName;
 		localName.assign(fullName, pos + 1, fullName.size() - pos - 1);
 		_importedSymbols[localName] = fullName;
 	}
@@ -114,15 +121,16 @@ Symbol* NameSpace::lookup(const std::string& name, std::set<const NameSpace*>& a
 		alreadyVisited.insert(this);
 		return root()->lookup(tail, alreadyVisited);
 	}
-	SymbolTable::const_iterator it = _symbols.find(head);
+	const auto it = _symbols.find(head);
 	if (it != _symbols.end())
 	{
 		pSymbol = it->second;
 		if (!tail.empty())
 		{
 			alreadyVisited.insert(this);
-			NameSpace* pNS = dynamic_cast<NameSpace*>(pSymbol);
-			if (pNS)
+			// kind() discriminator: SYM_NAMESPACE and SYM_STRUCT both derive
+			// from NameSpace, so accept either for nested lookup.
+			if (pSymbol->kind() == Symbol::SYM_NAMESPACE || pSymbol->kind() == Symbol::SYM_STRUCT)
 				pSymbol = static_cast<NameSpace*>(pSymbol)->lookup(tail, alreadyVisited);
 			else
 				pSymbol = nullptr;
@@ -130,14 +138,15 @@ Symbol* NameSpace::lookup(const std::string& name, std::set<const NameSpace*>& a
 	}
 	else if (tail.empty())
 	{
-		AliasMap::const_iterator itAlias = _importedSymbols.find(head);
+		const auto itAlias = _importedSymbols.find(head);
 		if (itAlias != _importedSymbols.end())
 			pSymbol = lookup(itAlias->second, alreadyVisited);
 		else
 		{
-			for (NameSpaceVec::const_iterator itns = _importedNameSpaces.begin(); !pSymbol && itns != _importedNameSpaces.end(); ++itns)
+			for (const auto& ns : _importedNameSpaces)
 			{
-				Symbol* pNS = lookup(*itns, alreadyVisited);
+				if (pSymbol) break;
+				auto* pNS = lookup(ns, alreadyVisited);
 				if (pNS && pNS->kind() == Symbol::SYM_NAMESPACE)
 				{
 					pSymbol = static_cast<NameSpace*>(pNS)->lookup(name, alreadyVisited);
@@ -145,7 +154,7 @@ Symbol* NameSpace::lookup(const std::string& name, std::set<const NameSpace*>& a
 			}
 		}
 	}
-	NameSpace* pNS = nameSpace();
+	auto* pNS = nameSpace();
 	if (!pSymbol && pNS && (alreadyVisited.find(pNS) == alreadyVisited.end()))
 	{
 		// if we have to go up, never push the NS!
@@ -208,11 +217,13 @@ Symbol::Kind NameSpace::kind() const
 std::string NameSpace::toString() const
 {
 	std::ostringstream ostr;
+	if (_isInline)
+		ostr << "inline ";
 	ostr << "namespace " << name() << "\n{\n";
-	for (Iterator it = begin(); it != end(); ++it)
+	for (const auto& [symName, pSym] : *this)
 	{
-		ostr << it->second->fullName() << "\n";
-		ostr << it->second->toString() << "\n";
+		ostr << pSym->fullName() << "\n";
+		ostr << pSym->toString() << "\n";
 	}
 	ostr << "}\n";
 	return ostr.str();
@@ -221,13 +232,13 @@ std::string NameSpace::toString() const
 
 void NameSpace::splitName(const std::string& name, std::string& head, std::string& tail)
 {
-	std::string::size_type pos = name.find(':');
+	const auto pos = name.find(':');
 	if (pos != std::string::npos)
 	{
 		head.assign(name, 0, pos);
-		pos += 2;
-		poco_assert (pos < name.length());
-		tail.assign(name, pos, name.length() - pos); 
+		const auto tailPos = pos + 2;
+		poco_assert (tailPos < name.length());
+		tail.assign(name, tailPos, name.length() - tailPos);
 	}
 	else head = name;
 }
@@ -242,10 +253,10 @@ NameSpace* NameSpace::root()
 
 void NameSpace::extract(Symbol::Kind kind, SymbolTable& table) const
 {
-	for (SymbolTable::const_iterator it = _symbols.begin(); it != _symbols.end(); ++it)
+	for (const auto& entry : _symbols)
 	{
-		if (it->second->kind() == kind)
-			table.insert(*it);
+		if (entry.second->kind() == kind)
+			table.insert(entry);
 	}
 }
 

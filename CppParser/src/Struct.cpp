@@ -85,11 +85,12 @@ void Struct::addDerived(Struct* pClass)
 
 void Struct::fixupBases()
 {
-	for (BaseClasses::iterator it = _bases.begin(); it != _bases.end(); ++it)
+	for (auto& base : _bases)
 	{
-		it->pClass = dynamic_cast<Struct*>(lookup(it->name));
-		if (it->pClass)
-			it->pClass->addDerived(this);
+		auto* pSym = lookup(base.name);
+		base.pClass = (pSym && pSym->kind() == Symbol::SYM_STRUCT) ? static_cast<Struct*>(pSym) : nullptr;
+		if (base.pClass)
+			base.pClass->addDerived(this);
 	}
 }
 
@@ -122,11 +123,14 @@ namespace
 
 void Struct::constructors(Functions& functions) const
 {
-	for (NameSpace::Iterator it = begin(); it != end(); ++it)
+	for (const auto& [name, pSym] : *this)
 	{
-		Function* pFunc = dynamic_cast<Function*>(it->second);
-		if (pFunc && pFunc->isConstructor())
-			functions.push_back(pFunc);
+		if (pSym->kind() == Symbol::SYM_FUNCTION)
+		{
+			auto* pFunc = static_cast<Function*>(pSym);
+			if (pFunc->isConstructor())
+				functions.push_back(pFunc);
+		}
 	}
 	std::sort(functions.begin(), functions.end(), CPLT());
 }
@@ -134,25 +138,28 @@ void Struct::constructors(Functions& functions) const
 
 void Struct::bases(std::set<std::string>& bases) const
 {
-	for (BaseIterator it = baseBegin(); it != baseEnd(); ++it)
+	for (const auto& base : _bases)
 	{
-		if (it->pClass)
+		if (base.pClass)
 		{
-			bases.insert(it->pClass->fullName());
-			it->pClass->bases(bases);
+			bases.insert(base.pClass->fullName());
+			base.pClass->bases(bases);
 		}
-		else bases.insert(it->name);
+		else bases.insert(base.name);
 	}
 }
 
 
 Function* Struct::destructor() const
 {
-	for (NameSpace::Iterator it = begin(); it != end(); ++it)
+	for (const auto& [name, pSym] : *this)
 	{
-		Function* pFunc = dynamic_cast<Function*>(it->second);
-		if (pFunc && pFunc->isDestructor())
-			return pFunc;
+		if (pSym->kind() == Symbol::SYM_FUNCTION)
+		{
+			auto* pFunc = static_cast<Function*>(pSym);
+			if (pFunc->isDestructor())
+				return pFunc;
+		}
 	}
 	return nullptr;
 }
@@ -160,27 +167,33 @@ Function* Struct::destructor() const
 
 void Struct::methods(Symbol::Access access, Functions& functions) const
 {
-	for (NameSpace::Iterator it = begin(); it != end(); ++it)
+	for (const auto& [name, pSym] : *this)
 	{
-		Function* pFunc = dynamic_cast<Function*>(it->second);
-		if (pFunc && pFunc->getAccess() == access && pFunc->isMethod())
-			functions.push_back(pFunc);
+		if (pSym->kind() == Symbol::SYM_FUNCTION)
+		{
+			auto* pFunc = static_cast<Function*>(pSym);
+			if (pFunc->getAccess() == access && pFunc->isMethod())
+				functions.push_back(pFunc);
+		}
 	}
 }
 
 
 void Struct::inheritedMethods(FunctionSet& functions) const
 {
-	for (BaseIterator it = baseBegin(); it != baseEnd(); ++it)
+	for (const auto& base : _bases)
 	{
-		Struct* pBase = it->pClass;
+		const auto* pBase = base.pClass;
 		if (pBase)
 		{
-			for (NameSpace::Iterator itm = pBase->begin(); itm != pBase->end(); ++itm)
+			for (const auto& [name, pSym] : *pBase)
 			{
-				Function* pFunc = dynamic_cast<Function*>(itm->second);
-				if (pFunc && pFunc->getAccess() != Symbol::ACC_PRIVATE && pFunc->isMethod())
-					functions.insert(pFunc);
+				if (pSym->kind() == Symbol::SYM_FUNCTION)
+				{
+					auto* pFunc = static_cast<Function*>(pSym);
+					if (pFunc->getAccess() != Symbol::ACC_PRIVATE && pFunc->isMethod())
+						functions.insert(pFunc);
+				}
 			}
 			pBase->inheritedMethods(functions);
 		}
@@ -190,10 +203,10 @@ void Struct::inheritedMethods(FunctionSet& functions) const
 
 void Struct::derived(StructSet& derived) const
 {
-	for (DerivedIterator it = derivedBegin(); it != derivedEnd(); ++it)
+	for (auto* pDerived : _derived)
 	{
-		derived.insert(*it);
-		(*it)->derived(derived);
+		derived.insert(pDerived);
+		pDerived->derived(derived);
 	}
 }
 
@@ -206,17 +219,20 @@ Symbol::Kind Struct::kind() const
 
 Function* Struct::findFunction(const std::string& signature) const
 {
-	for (NameSpace::Iterator it = begin(); it != end(); ++it)
+	for (const auto& [name, pSym] : *this)
 	{
-		Function* pFunc = dynamic_cast<Function*>(it->second);
-		if (pFunc && pFunc->signature() == signature)
-			return pFunc;
-	}
-	for (BaseIterator it = baseBegin(); it != baseEnd(); ++it)
-	{
-		if (it->pClass)
+		if (pSym->kind() == Symbol::SYM_FUNCTION)
 		{
-			Function* pFunc = it->pClass->findFunction(signature);
+			auto* pFunc = static_cast<Function*>(pSym);
+			if (pFunc->signature() == signature)
+				return pFunc;
+		}
+	}
+	for (const auto& base : _bases)
+	{
+		if (base.pClass)
+		{
+			auto* pFunc = base.pClass->findFunction(signature);
 			if (pFunc) return pFunc;
 		}
 	}
@@ -226,12 +242,12 @@ Function* Struct::findFunction(const std::string& signature) const
 
 bool Struct::hasVirtualDestructor() const
 {
-	Function* pFunc = destructor();
+	const auto* pFunc = destructor();
 	if (pFunc && (pFunc->flags() & Function::FN_VIRTUAL))
 		return true;
-	for (BaseIterator it = baseBegin(); it != baseEnd(); ++it)
+	for (const auto& base : _bases)
 	{
-		if (it->pClass && it->pClass->hasVirtualDestructor())
+		if (base.pClass && base.pClass->hasVirtualDestructor())
 			return true;
 	}
 	return false;
@@ -242,10 +258,10 @@ std::string Struct::toString() const
 {
 	std::ostringstream ostr;
 	ostr << declaration() << "\n{\n";
-	for (Iterator it = begin(); it != end(); ++it)
+	for (const auto& [name, pSym] : *this)
 	{
-		ostr << it->second->fullName() << "\n";
-		ostr << it->second->toString() << "\n";
+		ostr << pSym->fullName() << "\n";
+		ostr << pSym->toString() << "\n";
 	}
 	ostr << "};\n";
 	return ostr.str();
@@ -254,16 +270,16 @@ std::string Struct::toString() const
 
 Symbol* Struct::lookup(const std::string& name) const
 {
-	Symbol* pSymbol = NameSpace::lookup(name);
+	auto* pSymbol = NameSpace::lookup(name);
 	if (!pSymbol)
 	{
-		for (BaseIterator it = baseBegin(); it != baseEnd(); ++it)
+		for (const auto& base : _bases)
 		{
-			if (it->access != Symbol::ACC_PRIVATE)
+			if (base.access != Symbol::ACC_PRIVATE)
 			{
-				if (it->pClass)
+				if (base.pClass)
 				{
-					pSymbol = it->pClass->lookup(name);
+					pSymbol = base.pClass->lookup(name);
 					if (pSymbol)
 					{
 						return pSymbol;

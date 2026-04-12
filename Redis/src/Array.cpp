@@ -1,5 +1,5 @@
 //
-// Array.h
+// Array.cpp
 //
 // Library: Redis
 // Package: Redis
@@ -59,7 +59,7 @@ int Array::getType(size_t pos) const
 
 	if (pos >= _elements.value().size()) throw InvalidArgumentException();
 
-	RedisType::Ptr element = _elements.value().at(pos);
+	const RedisType::Ptr element = _elements.value().at(pos);
 	return element->type();
 }
 

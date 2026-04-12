@@ -40,12 +40,14 @@ void AsyncReader::runActivity()
 	{
 		try
 		{
+			// readReply() blocks on the socket read, so no sleep is needed
+			// between iterations -- the blocking read yields the CPU naturally.
 			RedisType::Ptr reply = _client.readReply();
 
 			RedisEventArgs args(reply);
 			redisResponse.notify(this, args);
 
-			if ( args.isStopped() ) stop();
+			if (args.isStopped()) stop();
 		}
 		catch (Exception& e)
 		{
@@ -53,7 +55,6 @@ void AsyncReader::runActivity()
 			redisException.notify(this, args);
 			stop();
 		}
-		if (!_activity.isStopped()) Thread::trySleep(100);
 	}
 }
 

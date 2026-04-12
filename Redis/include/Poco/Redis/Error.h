@@ -35,7 +35,7 @@ public:
 	Error(const std::string& message);
 		/// Creates an Error with the given message.
 
-	virtual ~Error();
+	~Error();
 		/// Destroys the Error.
 
 	const std::string& getMessage() const;

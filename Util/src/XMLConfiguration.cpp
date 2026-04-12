@@ -278,7 +278,7 @@ void XMLConfiguration::removeRaw(const std::string& key)
 		}
 		else if (pNode->nodeType() == Node::ATTRIBUTE_NODE)
 		{
-			auto pAttr = dynamic_cast<Attr*>(pNode);
+			auto* pAttr = static_cast<Attr*>(pNode);
 			Element* pOwner = pAttr->ownerElement();
 			if (pOwner)
 			{
@@ -292,7 +292,7 @@ void XMLConfiguration::removeRaw(const std::string& key)
 const XMLConfiguration::Node* XMLConfiguration::findNode(const std::string& key) const
 {
 	auto it = key.begin();
-	auto pRoot = const_cast<Node*>(_pRoot.get());
+	auto* const pRoot = const_cast<Node*>(_pRoot.get());
 	return findNode(it, key.end(), pRoot);
 }
 
@@ -300,7 +300,7 @@ const XMLConfiguration::Node* XMLConfiguration::findNode(const std::string& key)
 XMLConfiguration::Node* XMLConfiguration::findNode(const std::string& key)
 {
 	auto it = key.begin();
-	auto pRoot = _pRoot.get();
+	auto* const pRoot = _pRoot.get();
 	return findNode(it, key.end(), pRoot);
 }
 
@@ -381,7 +381,7 @@ XMLConfiguration::Node* XMLConfiguration::findElement(const std::string& name, N
 
 XMLConfiguration::Node* XMLConfiguration::findElement(int index, Node* pNode, bool create)
 {
-	auto pRefNode = pNode;
+	const auto* pRefNode = pNode;
 	if (index > 0)
 	{
 		pNode = pNode->nextSibling();
@@ -410,8 +410,8 @@ XMLConfiguration::Node* XMLConfiguration::findElement(int index, Node* pNode, bo
 
 XMLConfiguration::Node* XMLConfiguration::findElement(const std::string& attr, const std::string& value, Node* pNode)
 {
-	auto pRefNode = pNode;
-	auto pElem = dynamic_cast<Element*>(pNode);
+	const auto* pRefNode = pNode;
+	auto* pElem = pNode->nodeType() == Node::ELEMENT_NODE ? static_cast<Element*>(pNode) : nullptr;
 	if (!(pElem && pElem->getAttribute(attr) == value))
 	{
 		pNode = pNode->nextSibling();
@@ -419,7 +419,7 @@ XMLConfiguration::Node* XMLConfiguration::findElement(const std::string& attr, c
 		{
 			if (pNode->nodeName() == pRefNode->nodeName())
 			{
-				pElem = dynamic_cast<Element*>(pNode);
+				pElem = pNode->nodeType() == Node::ELEMENT_NODE ? static_cast<Element*>(pNode) : nullptr;
 				if (pElem && pElem->getAttribute(attr) == value) break;
 			}
 			pNode = pNode->nextSibling();
@@ -432,7 +432,7 @@ XMLConfiguration::Node* XMLConfiguration::findElement(const std::string& attr, c
 XMLConfiguration::Node* XMLConfiguration::findAttribute(const std::string& name, Node* pNode, bool create)
 {
 	Node* pResult(nullptr);
-	auto pElem = dynamic_cast<Element*>(pNode);
+	auto* pElem = pNode->nodeType() == Node::ELEMENT_NODE ? static_cast<Element*>(pNode) : nullptr;
 	if (pElem)
 	{
 		pResult = pElem->getAttributeNode(name);

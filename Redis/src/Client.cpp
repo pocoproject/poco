@@ -205,7 +205,7 @@ void Client::writeCommand(const Array& command, bool doFlush)
 {
 	poco_assert(_pOutput);
 
-	std::string commandStr = command.toString();
+	const std::string commandStr = command.toString();
 
 	_pOutput->write(commandStr.c_str(), commandStr.length());
 	if (doFlush) _pOutput->flush();
@@ -216,7 +216,7 @@ RedisType::Ptr Client::readReply()
 {
 	poco_assert(_pInput);
 
-	int c = _pInput->get();
+	const int c = _pInput->get();
 	if (c == -1)
 	{
 		disconnect();
@@ -245,9 +245,9 @@ Array Client::sendCommands(const std::vector<Array>& commands)
 {
 	Array results;
 
-	for (std::vector<Array>::const_iterator it = commands.begin(); it != commands.end(); ++it)
+	for (const auto& cmd : commands)
 	{
-		writeCommand(*it, false);
+		writeCommand(cmd, false);
 	}
 	_pOutput->flush();
 

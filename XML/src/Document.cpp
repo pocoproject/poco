@@ -145,7 +145,7 @@ Element* Document::documentElement() const
 	Node* pCur = firstChild();
 	while (pCur)
 	{
-		if (dynamic_cast<Element*>(pCur))
+		if (pCur->nodeType() == Node::ELEMENT_NODE)
 			return static_cast<Element*>(pCur);
 		pCur = pCur->nextSibling();
 	}

@@ -42,13 +42,13 @@ namespace Poco {
 namespace CppParser {
 
 
-void Utility::parseDir(const std::vector <std::string>& includePattern, const std::vector <std::string>& excludePattern, NameSpace::SymbolTable& st, const std::string& exec, const std::string& options, const std::string& path)
+void Utility::parseDir(const std::vector<std::string>& includePattern, const std::vector<std::string>& excludePattern, NameSpace::SymbolTable& st, const std::string& exec, const std::string& options, const std::string& path)
 {
 	std::set<std::string> files;
 	Utility::buildFileList(files, includePattern, excludePattern);
-	for (std::set<std::string>::const_iterator it = files.begin(); it != files.end(); ++it)
+	for (const auto& file : files)
 	{
-		Utility::parse(*it, st, exec, options, path);
+		Utility::parse(file, st, exec, options, path);
 	}
 	Utility::fixup(st);
 }
@@ -63,12 +63,11 @@ void Utility::parse(const std::string& file, NameSpace::SymbolTable& st, const s
 
 void Utility::fixup(NameSpace::SymbolTable& st)
 {
-	for (NameSpace::SymbolTable::iterator it = st.begin(); it != st.end(); ++it)
+	for (auto& [name, pSym] : st)
 	{
-		Struct* pStruct = dynamic_cast<Struct*>(it->second);
-		if (pStruct)
+		if (pSym->kind() == Symbol::SYM_STRUCT)
 		{
-			pStruct->fixupBases();
+			static_cast<Struct*>(pSym)->fixupBases();
 		}
 	}
 }
@@ -171,12 +170,12 @@ std::string Utility::preprocessFile(const std::string& file, const std::string& 
 	pp.setExtension("i");
 
 	std::string popts;
-	for (std::string::const_iterator it = options.begin(); it != options.end(); ++it)
+	for (const auto ch : options)
 	{
-		if (*it == '%')
+		if (ch == '%')
 			popts += pp.getBaseName();
 		else
-			popts += *it;
+			popts += ch;
 	}
 	StringTokenizer tokenizer(popts, ",;\n", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
 	std::vector<std::string> args(tokenizer.begin(), tokenizer.end());
@@ -196,8 +195,8 @@ std::string Utility::preprocessFile(const std::string& file, const std::string& 
 		Environment::set("PATH", path);
 	}
 
-	ProcessHandle proc = Process::launch(exec, args);
-	int rc = Process::wait(proc);
+	auto proc = Process::launch(exec, args);
+	const int rc = Process::wait(proc);
 	if (rc != 0)
 	{
 		throw Poco::RuntimeException("Failed to process file");
@@ -248,33 +247,29 @@ void Utility::removeFile(const std::string& preprocessedfile)
 void Utility::buildFileList(std::set<std::string>& files, const std::vector<std::string>& includePattern, const std::vector<std::string>& excludePattern)
 {
 	std::set<std::string> temp;
-	std::vector <std::string>::const_iterator itInc = includePattern.begin();
-	std::vector <std::string>::const_iterator itIncEnd = includePattern.end();
 
-	int options(0);
+	int options = 0;
 #if defined(_WIN32)
 	options |= Glob::GLOB_CASELESS;
 #endif
 
-	for (; itInc != itIncEnd; ++itInc)
+	for (const auto& pattern : includePattern)
 	{
-		Glob::glob(*itInc, temp, options);
+		Glob::glob(pattern, temp, options);
 	}
 
-	for (std::set<std::string>::const_iterator it = temp.begin(); it != temp.end(); ++it)
+	for (const auto& file : temp)
 	{
-		Path p(*it);
+		const Path p(file);
 		bool include = true;
-		std::vector <std::string>::const_iterator itExc = excludePattern.begin();
-		std::vector <std::string>::const_iterator itExcEnd = excludePattern.end();
-		for (; itExc != itExcEnd; ++itExc)
+		for (const auto& excPattern : excludePattern)
 		{
-			Glob glob(*itExc, options);
+			Glob glob(excPattern, options);
 			if (glob.match(p.toString()))
 				include = false;
 		}
 		if (include)
-			files.insert(*it);
+			files.insert(file);
 	}
 }
 
