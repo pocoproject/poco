@@ -1,5 +1,5 @@
 //
-// Array.h
+// Array.cpp
 //
 // Library: Redis
 // Package: Redis
