@@ -15,6 +15,7 @@
 
 
 #include "Poco/Redis/RedisStream.h"
+#include "Poco/Exception.h"
 #include <iostream>
 
 
@@ -96,7 +97,8 @@ RedisStreamBuf* RedisIOS::rdbuf()
 
 void RedisIOS::close()
 {
-	_buf.sync();
+	if (_buf.sync() == -1)
+		throw Poco::IOException("Failed to flush Redis stream buffer");
 }
 
 
@@ -138,7 +140,7 @@ std::string RedisInputStream::getline()
 {
 	std::string line;
 	std::getline(*this, line);
-	if ( line.size() > 0 ) line.erase(line.end() - 1);
+	if (!line.empty() && line.back() == '\r') line.pop_back();
 	return line;
 }
 

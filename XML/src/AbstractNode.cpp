@@ -58,7 +58,8 @@ AbstractNode::~AbstractNode()
 
 void AbstractNode::autoRelease()
 {
-	_pOwner->autoReleasePool().add(this);
+	if (_pOwner != nullptr)
+		_pOwner->autoReleasePool().add(this);
 }
 
 

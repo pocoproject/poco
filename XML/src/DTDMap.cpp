@@ -109,7 +109,9 @@ Node* DTDMap::removeNamedItemNS(const XMLString& namespaceURI, const XMLString& 
 
 void DTDMap::autoRelease()
 {
-	_pDocumentType->ownerDocument()->autoReleasePool().add(this);
+	auto* pOwner = _pDocumentType->ownerDocument();
+	if (pOwner != nullptr)
+		pOwner->autoReleasePool().add(this);
 }
 
 

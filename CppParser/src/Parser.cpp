@@ -270,8 +270,10 @@ const Token* Parser::parseNameSpace(const Token* pNext)
 		int nestLevel = 0;
 		for (size_t i = 0; i < namespaceNames.size(); ++i)
 		{
-			NameSpace* pNS = dynamic_cast<NameSpace*>(currentNameSpace()->lookup(namespaceNames[i]));
-			bool undefined = (pNS == nullptr);
+			auto* pSym = currentNameSpace()->lookup(namespaceNames[i]);
+			auto* pNS = (pSym && (pSym->kind() == Symbol::SYM_NAMESPACE || pSym->kind() == Symbol::SYM_STRUCT))
+				? static_cast<NameSpace*>(pSym) : nullptr;
+			const bool undefined = (pNS == nullptr);
 			if (undefined) 
 				pNS = new NameSpace(namespaceNames[i], currentNameSpace(), inlineFlags[i]);
 			else if (inlineFlags[i])
@@ -835,7 +837,11 @@ const Token* Parser::parseFunc(const Token* pNext, const std::string& attrs, std
 
 		pNext = parseBlock(pNext);
 		if (!pFunc)
-			pFunc = dynamic_cast<Function*>(currentNameSpace()->lookup(name));
+		{
+			auto* pSym = currentNameSpace()->lookup(name);
+			if (pSym && pSym->kind() == Symbol::SYM_FUNCTION)
+				pFunc = static_cast<Function*>(pSym);
+		}
 		if (pFunc)
 			pFunc->makeInline();
 	}
@@ -859,7 +865,11 @@ const Token* Parser::parseFunc(const Token* pNext, const std::string& attrs, std
 			else syntaxError("expected catch block");
 
 			if (!pFunc)
-				pFunc = dynamic_cast<Function*>(currentNameSpace()->lookup(name));
+			{
+				auto* pSym = currentNameSpace()->lookup(name);
+				if (pSym && pSym->kind() == Symbol::SYM_FUNCTION)
+					pFunc = static_cast<Function*>(pSym);
+			}
 			if (pFunc)
 				pFunc->makeInline();
 		}

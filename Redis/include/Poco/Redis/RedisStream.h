@@ -46,10 +46,7 @@ protected:
 	std::streamsize writeToDevice(const char* buffer, std::streamsize length);
 
 private:
-	enum
-	{
-		STREAM_BUFFER_SIZE = 1024
-	};
+	static constexpr int STREAM_BUFFER_SIZE = 1024;
 
 	Net::StreamSocket& _redis;
 };

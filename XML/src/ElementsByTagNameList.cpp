@@ -76,13 +76,15 @@ Node* ElementsByTagNameList::find(const Node* pParent, unsigned long index) cons
 		if (pNode) return pNode;
 		pCur = pCur->nextSibling();
 	}
-	return pCur;
+	return nullptr;
 }
 
 
 void ElementsByTagNameList::autoRelease()
 {
-	_pParent->ownerDocument()->autoReleasePool().add(this);
+	auto* pOwner = _pParent->ownerDocument();
+	if (pOwner != nullptr)
+		pOwner->autoReleasePool().add(this);
 }
 
 
@@ -137,13 +139,15 @@ Node* ElementsByTagNameListNS::find(const Node* pParent, unsigned long index) co
 		if (pNode) return pNode;
 		pCur = pCur->nextSibling();
 	}
-	return pCur;
+	return nullptr;
 }
 
 
 void ElementsByTagNameListNS::autoRelease()
 {
-	_pParent->ownerDocument()->autoReleasePool().add(this);
+	auto* pOwner = _pParent->ownerDocument();
+	if (pOwner != nullptr)
+		pOwner->autoReleasePool().add(this);
 }
 
 

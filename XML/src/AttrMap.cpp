@@ -114,7 +114,9 @@ Node* AttrMap::removeNamedItemNS(const XMLString& namespaceURI, const XMLString&
 
 void AttrMap::autoRelease()
 {
-	_pElement->ownerDocument()->autoReleasePool().add(this);
+	auto* pOwner = _pElement->ownerDocument();
+	if (pOwner != nullptr)
+		pOwner->autoReleasePool().add(this);
 }
 
 
