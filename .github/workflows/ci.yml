@@ -1,20 +1,325 @@
-# To enable retrying a job on failure or a specific timeout, instead of the run step, use uses: nick-fields/retry@v2.9.0(see the linux-gcc-make-tsan jsob)
-# To retry only on timeout set retry_on: timeout
-# To retry only on error set retry_on: error
-# For more information on the retry action see https://github.com/nick-fields/retry
+# Retry wrapper: .github/actions/retry-action (wraps nick-fields/retry).
+# Set retry_on to `timeout`, `error`, or `any` as needed.
 
 name: Compile and Testrun
 
 on:
+  workflow_dispatch:
   pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - 'doc/**'
+      - 'CHANGELOG'
+      - 'CONTRIBUTORS'
+      - 'LICENSE'
+      - 'NEWS'
   push:
+    branches:
+      - main
+      - devel
+      - 'poco-*'
+    paths-ignore:
+      - '**/*.md'
+      - 'doc/**'
+      - 'CHANGELOG'
+      - 'CONTRIBUTORS'
+      - 'LICENSE'
+      - 'NEWS'
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Reusable cmake flag blocks. Data_ODBC/MYSQL/POSTGRESQL stay OFF here -- they
+# need backends only the Data-env jobs set up.
+env:
+  # Full functional set (Linux + macOS sanitizer matrix).
+  POCO_CMAKE_FULL_COMMON: >-
+    -DPOCO_MINIMAL_BUILD=ON -DENABLE_TESTS=ON
+    -DENABLE_XML=ON -DENABLE_JSON=ON -DENABLE_NET=ON -DENABLE_UTIL=ON
+    -DENABLE_CRYPTO=ON -DENABLE_NETSSL=ON -DENABLE_JWT=ON
+    -DENABLE_ENCODINGS=ON -DENABLE_PDF=ON
+    -DENABLE_ZIP=ON -DENABLE_SEVENZIP=ON
+    -DENABLE_REDIS=ON -DENABLE_MONGODB=ON
+    -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON
+    -DENABLE_PROMETHEUS=ON
+    -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON
+    -DENABLE_CPPPARSER=ON
+    -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
+  POCO_CMAKE_FULL_LINUX_EXTRA: >-
+    -DENABLE_APACHECONNECTOR=ON
+    -DENABLE_DNSSD=ON -DENABLE_DNSSD_DEFAULT=ON
+  POCO_CMAKE_FOUNDATION_ONLY: >-
+    -DPOCO_MINIMAL_BUILD=ON -DENABLE_TESTS=ON
+  POCO_CMAKE_FOUNDATION_UTIL: >-
+    -DPOCO_MINIMAL_BUILD=ON -DENABLE_UTIL=ON -DENABLE_JSON=ON -DENABLE_XML=ON -DENABLE_TESTS=ON
+  # Windows x64 primary signal: OpenSSL-backed Crypto/NetSSL/JWT + SChannel
+  # (NETSSL_WIN) + Data/ODBC + TRACE + PDF/Prometheus/ActiveRecord/CppParser.
+  POCO_CMAKE_WINDOWS_FULL: >-
+    -DPOCO_MINIMAL_BUILD=ON -DENABLE_TESTS=ON -DENABLE_TRACE=ON
+    -DENABLE_XML=ON -DENABLE_JSON=ON -DENABLE_NET=ON -DENABLE_UTIL=ON
+    -DENABLE_CRYPTO=ON -DENABLE_NETSSL=ON -DENABLE_NETSSL_WIN=ON -DENABLE_JWT=ON
+    -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_ODBC=ON
+    -DENABLE_ZIP=ON -DENABLE_ENCODINGS=ON
+    -DENABLE_PDF=ON -DENABLE_PROMETHEUS=ON
+    -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON
+    -DENABLE_CPPPARSER=ON
+  # Windows reduced scope (static, Win32, clang-cl): SChannel only, no OpenSSL.
+  POCO_CMAKE_WINDOWS_MINIMAL: >-
+    -DPOCO_MINIMAL_BUILD=ON -DENABLE_TESTS=ON
+    -DENABLE_XML=ON -DENABLE_JSON=ON -DENABLE_NET=ON -DENABLE_UTIL=ON
+    -DENABLE_NETSSL_WIN=ON
+    -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_ODBC=ON
+  POCO_CMAKE_WARNINGS_EXTRA: >-
+    -DENABLE_COMPILER_WARNINGS=ON
+    -DENABLE_ENCODINGS_COMPILER=ON
+    -DENABLE_DATA_ODBC=ON
+  POCO_WIN_CPPUNIT_IGNORE: >-
+    class CppUnit::TestCaller<class PathTest>.testFind,
+    class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
+    class CppUnit::TestCaller<class ICMPClientTest>.testPing,
+    class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
+    class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
+    class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
+    class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy,
+    class CppUnit::TestCaller<class FileTest>.testExists,
+    class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner
+  # Shared ctest options: dump failing output, fail on zero-match filter, JUnit report.
+  POCO_CTEST_COMMON: "--output-on-failure --no-tests=error --output-junit test-report.xml"
+  # Sanitizer extra: lift the 300KB output cap so long stack traces survive.
+  POCO_CTEST_SANITIZER_EXTRA: "--test-output-size-failed 0 --test-output-truncation tail"
+
 jobs:
+  # Change detection. Narrow-scope jobs gate on
+  # `<output> || ci_core || push`; primary sanitizer jobs always run.
+  changes:
+    runs-on: ubuntu-24.04
+    outputs:
+      ci_core: ${{ steps.filter.outputs.ci_core }}
+      foundation: ${{ steps.filter.outputs.foundation }}
+      foundation_util: ${{ steps.filter.outputs.foundation_util }}
+      arm_cross: ${{ steps.filter.outputs.arm_cross }}
+      data: ${{ steps.filter.outputs.data }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: .github/path-filters.yml
+
+  # data-build runs without `needs: changes` to land in the first scheduling
+  # batch; it paths-filters inline and exposes `run` for data-test-* gating.
+  data-build:
+    runs-on: ubuntu-24.04
+    outputs:
+      run: ${{ steps.decide.outputs.run }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: .github/path-filters.yml
+      - id: decide
+        run: echo "run=${{ steps.filter.outputs.data == 'true' || steps.filter.outputs.ci_core == 'true' || github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}" >> $GITHUB_OUTPUT
+      - name: Install build dependencies
+        if: steps.decide.outputs.run == 'true'
+        run: |
+          sudo apt -y update
+          sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev
+      - name: Configure
+        if: steps.decide.outputs.run == 'true'
+        run: >-
+          cmake -S. -Bcmake-build -GNinja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          ${{ env.POCO_CMAKE_FOUNDATION_ONLY }}
+          -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON
+          -DENABLE_DATA_MYSQL=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_ODBC=ON
+          -DENABLE_REDIS=ON -DENABLE_MONGODB=ON
+      - name: Build test runners
+        if: steps.decide.outputs.run == 'true'
+        run: >-
+          cmake --build cmake-build --parallel $(nproc) --target
+          DataMySQL-testrunner DataPostgreSQL-testrunner DataODBC-testrunner
+          Redis-testrunner MongoDB-testrunner
+      - name: Upload build artifacts
+        if: steps.decide.outputs.run == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: data-build-artifacts
+          path: |
+            cmake-build/bin
+            cmake-build/lib
+          retention-days: 1
+          if-no-files-found: error
+
+  # ------------------------------------------------------------------------
+  # Linux x64
+  # ------------------------------------------------------------------------
+
+  # Primary Linux signal: 3 non-hidden sanitizers + 1 hidden+asan. TRACE on.
+  linux-gcc-cmake-sanitizers:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: asan
+            visibility: default
+            sanitize_flags: "-fsanitize=address"
+          - name: ubsan
+            visibility: default
+            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
+          - name: tsan
+            visibility: default
+            sanitize_flags: "-fsanitize=thread"
+          - name: hidden-asan
+            visibility: hidden
+            sanitize_flags: "-fsanitize=address"
+    env:
+      TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
+      ASAN_OPTIONS: ${{ matrix.name == 'hidden-asan' && 'detect_odr_violation=2' || '' }}
+    steps:
+      - uses: actions/checkout@v5
+      - run: sysctl vm.legacy_va_layout
+      - run: sysctl kernel.randomize_va_space
+      - run: sudo sysctl vm.mmap_rnd_bits
+      - run: sudo sysctl -w vm.mmap_rnd_bits=28
+      - run: >-
+          sudo apt -y update && sudo apt -y install libssl-dev libltdl-dev apache2-dev libapr1-dev libaprutil1-dev libavahi-client-dev
+          libsqlite3-dev redis-server
+      - uses: supercharge/mongodb-github-action@1.12.1
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja
+          ${{ matrix.visibility == 'hidden' && '-DCMAKE_CXX_VISIBILITY_PRESET=hidden' || '' }}
+          -DPOCO_SANITIZEFLAGS="${{ matrix.sanitize_flags }}"
+          -DENABLE_TRACE=ON
+          ${{ env.POCO_CMAKE_FULL_COMMON }}
+          ${{ env.POCO_CMAKE_FULL_LINUX_EXTRA }}
+      - run: cmake --build cmake-build --target all --parallel $(nproc)
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            PWD=`pwd`
+            ctest ${{ env.POCO_CTEST_COMMON }} ${{ env.POCO_CTEST_SANITIZER_EXTRA }} --parallel $(nproc)
+      - uses: ./.github/actions/upload-test-report
+        with:
+          suffix: ${{ matrix.name }}
+
+  # Linux deprecated-API probe: runs only the deprecated-API test suites.
+  linux-gcc-cmake-deprecated-tests:
+    runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.foundation_util == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DENABLE_TEST_DEPRECATED=ON
+      - run: cmake --build cmake-build --target all --parallel $(nproc)
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            PWD=`pwd`
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Net|Crypto|Util|XML|JSON|Data|DataSQLite)$"
+      - uses: ./.github/actions/upload-test-report
+
+  # POCO_SOO=OFF probe: Foundation only.
+  linux-gcc-cmake-poco-soo-off:
+    runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.foundation == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          ${{ env.POCO_CMAKE_FOUNDATION_ONLY }} -DPOCO_SOO=OFF
+      - run: cmake --build cmake-build --target Foundation-testrunner --parallel $(nproc)
+      - name: Run Foundation tests
+        run: >-
+          cd cmake-build &&
+          PWD=`pwd`
+          ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^Foundation$"
+      - uses: ./.github/actions/upload-test-report
+
+  # FASTLOGGER=OFF probe: Foundation + Util.
+  linux-gcc-cmake-no-fastlogger:
+    runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.foundation_util == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          -DENABLE_FASTLOGGER=OFF
+          ${{ env.POCO_CMAKE_FOUNDATION_UTIL }}
+      - run: cmake --build cmake-build --target all --parallel $(nproc)
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            PWD=`pwd`
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Util)$"
+      - uses: ./.github/actions/upload-test-report
+
+  # Linkage + unbundled probe: full static build against system third-party
+  # libs; tests Foundation/Util plus XML/expat, JSON/pdjson, Zip/zlib.
+  linux-gcc-cmake-unbundled-static:
+    runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.foundation_util == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - run: >-
+          sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev libsqlite3-dev unixodbc-dev
+          libmysqlclient-dev redis-server libexpat1-dev zlib1g-dev libpcre3-dev libutf8proc-dev libpng-dev
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          -DENABLE_TESTS=ON -DPOCO_UNBUNDLED=ON -DBUILD_SHARED_LIBS=OFF
+          -DENABLE_DATA_MYSQL=ON -DENABLE_PDF=ON -DENABLE_XML=ON
+      - run: cmake --build cmake-build --target all --parallel $(nproc)
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            PWD=`pwd`
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Util|XML|JSON|Zip)$"
+      - uses: ./.github/actions/upload-test-report
+
+  # Clang toolchain exception + C++ modules probe: Foundation + Util smoke.
   linux-clang-21-cmake-modules:
     runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.foundation_util == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v5
       - name: Install Clang 21
@@ -33,9 +338,9 @@ jobs:
         run: |
           export CC=clang-21
           export CXX=clang++-21
-          cmake -S . -B build -G Ninja -DENABLE_MODULES=ON -DENABLE_TESTS=ON
+          cmake -S . -B build -G Ninja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON -DENABLE_MODULES=ON -DENABLE_TESTS=ON
       - name: Build
-        run: cmake --build build --parallel 4
+        run: cmake --build build --parallel $(nproc)
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -43,7 +348,14 @@ jobs:
           retry_on: any
           command: >-
             cd build &&
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Util)$"
+      - uses: ./.github/actions/upload-test-report
+        with:
+          build-dir: build
+
+  # ------------------------------------------------------------------------
+  # Linux cross-compile and other arch build-only probes
+  # ------------------------------------------------------------------------
 
   android-ndk-cmake:
     runs-on: ubuntu-24.04
@@ -60,16 +372,31 @@ jobs:
           add-to-path: true
       - run: |
           cmake -S$GITHUB_WORKSPACE -B$HOME/android-build -DANDROID_ABI=${{ matrix.abi }} -DANDROID_PLATFORM=android-21 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake
-          cmake --build $HOME/android-build --target all --parallel 4
+          cmake --build $HOME/android-build --target all --parallel $(nproc)
 
+  # ARM cross-compile: two codegen flag sets (generic armv7-a NEON VFPv4 and
+  # older Cortex-A8 NEON) catch regressions specific to one.
   linux-gcc-cmake-armv7l:
-    # Converted from a make job, is it OK?
     runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.arm_cross == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: armv7l-neon-vfpv4
+            cflags: "-march=armv7-a -mfloat-abi=hard -mfpu=neon-vfpv4"
+          - name: cortex-a8-neon
+            cflags: "-mcpu=cortex-a8 -mfpu=neon"
+    name: linux-gcc-cmake-armv7l (${{ matrix.name }})
     env:
       CC  : "arm-linux-gnueabihf-gcc"
       CXX : "arm-linux-gnueabihf-g++"
-      CFLAGS: "-march=armv7-a -mfloat-abi=hard -mfpu=neon-vfpv4"
-      CXXFLAGS: "-march=armv7-a -mfloat-abi=hard -mfpu=neon-vfpv4"
+      CFLAGS: ${{ matrix.cflags }}
+      CXXFLAGS: ${{ matrix.cflags }}
     steps:
       - uses: actions/checkout@v5
       - run: sudo apt -y update && sudo apt -y install g++-arm-linux-gnueabihf
@@ -77,414 +404,69 @@ jobs:
       - run: >-
           cmake -S. -Bcmake-build -GNinja -DENABLE_TESTS=ON -DPOCO_MINIMAL_BUILD=TRUE
           -DENABLE_NET=ON -DENABLE_JSON=ON -DENABLE_XML=ON -DENABLE_ZIP=ON
-      - run: cmake --build cmake-build --target all --parallel 4
-
-  linux-gcc-cmake-cross-armhf:
-    # Converted from a make job, what is essentially different from the above?
-    runs-on: ubuntu-24.04
-    env:
-      CC  : "arm-linux-gnueabihf-gcc"
-      CXX : "arm-linux-gnueabihf-g++"
-      CXXFLAGS: "-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon"
-      CFLAGS: "-mcpu=cortex-a8 -mfloat-abi=hard -mfpu=neon"
-    steps:
-      - uses: actions/checkout@v5
-      - run: >-
-          sudo apt-get -y update &&
-          sudo apt-get -y install crossbuild-essential-armhf cmake ninja-build
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DENABLE_TESTS=ON -DPOCO_MINIMAL_BUILD=TRUE
-          -DENABLE_NET=ON -DENABLE_JSON=ON -DENABLE_XML=ON -DENABLE_ZIP=ON
-      - run: cmake --build cmake-build --target all  --parallel 4
-
-  linux-gcc-cmake:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v5
-      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
-      - run: |
-          cmake -S. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON
-          cmake --build cmake-build --target all  --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
-
-  linux-gcc-cmake-visibility-hidden:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v5
-      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DCMAKE_CXX_VISIBILITY_PRESET=hidden
-          -DENABLE_PDF=ON -DENABLE_TESTS=ON -DENABLE_DATA_MYSQL=ON -DENABLE_DATA_ODBC=ON
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
-
-  linux-gcc-cmake-unbundled:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v5
-      - run: >-
-          sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev libsqlite3-dev unixodbc-dev
-          libmysqlclient-dev redis-server libexpat1-dev zlib1g-dev libpcre3-dev libutf8proc-dev libpng-dev
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DENABLE_TESTS=ON -DPOCO_UNBUNDLED=ON
-          -DENABLE_DATA_MYSQL=ON -DENABLE_PDF=ON -DENABLE_XML=ON
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
-
-  linux-gcc-cmake-unbundled-static:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v5
-      - run: >-
-          sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev libsqlite3-dev unixodbc-dev
-          libmysqlclient-dev redis-server libexpat1-dev zlib1g-dev libpcre3-dev libutf8proc-dev libpng-dev
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DENABLE_TESTS=ON -DPOCO_UNBUNDLED=ON -DBUILD_SHARED_LIBS=OFF
-          -DENABLE_DATA_MYSQL=ON -DENABLE_PDF=ON -DENABLE_XML=ON
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
-
-  linux-gcc-cmake-trace:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v5
-      - run: sudo apt -y update && sudo apt -y install libssl-dev libbenchmark-dev
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_TRACE=ON -DENABLE_TESTS=ON -DENABLE_INSTALL_CPPUNIT=ON
-          -DENABLE_BENCHMARK=ON
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest --output-on-failure
-
-  linux-gcc-cmake-sanitizers:
-    runs-on: ubuntu-24.04
-    strategy:
-      matrix:
-        include:
-          - name: asan
-            sanitize_flags: "-fsanitize=address"
-          - name: ubsan
-            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
-          - name: tsan
-            sanitize_flags: "-fsanitize=thread"
-    env:
-      TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
-    steps:
-      - uses: actions/checkout@v5
-      # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
-      # causes sanitizer to fail.
-      # vm.mmap_rnd_bits needs to be set to 28 to make it work.
-      # (https://github.com/google/sanitizers/issues/1716)
-      - run: sysctl vm.legacy_va_layout
-      - run: sysctl kernel.randomize_va_space
-      - run: sudo sysctl vm.mmap_rnd_bits
-      - run: sudo sysctl -w vm.mmap_rnd_bits=28
-      - run: sudo apt -y update && sudo apt -y install libssl-dev libltdl-dev apache2-dev libapr1-dev libaprutil1-dev libavahi-client-dev
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DPOCO_SANITIZEFLAGS="${{ matrix.sanitize_flags }}" -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=ON
-          -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
-          -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
-          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON
-          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
-          -DENABLE_DNSSD=ON -DENABLE_DNSSD_DEFAULT=ON
-          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
-          -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest -V
-
-  linux-gcc-cmake-asan-no-soo:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v5
-      # ASLR (https://en.wikipedia.org/wiki/Address_space_layout_randomization)
-      # causes sanitizer to fail.
-      # vm.mmap_rnd_bits needs to be set to 28 to make it work.
-      # (https://github.com/google/sanitizers/issues/1716)
-      - run: sysctl vm.legacy_va_layout
-      - run: sysctl kernel.randomize_va_space
-      - run: sudo sysctl vm.mmap_rnd_bits
-      - run: sudo sysctl -w vm.mmap_rnd_bits=28
-      - run: sudo apt -y update && sudo apt -y install libltdl-dev libssl-dev apache2-dev libapr1-dev libaprutil1-dev libavahi-client-dev
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DPOCO_SANITIZEFLAGS="-fsanitize=address" -DPOCO_SOO=OFF -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=ON
-          -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
-          -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
-          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON
-          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
-          -DENABLE_DNSSD=ON -DENABLE_DNSSD_DEFAULT=ON
-          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
-          -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest -V
+      - run: cmake --build cmake-build --target all --parallel $(nproc)
 
   linux-emscripten-cmake:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build emscripten
-
-#
-# Option "-DCMAKE_POLICY_VERSION_MINIMUM=3.5" is added to resolve the following issue.
-#
-# CMake Error at /usr/share/emscripten/cmake/Modules/CheckTypeSize.cmake:85 (cmake_policy):
-#  Compatibility with CMake < 3.5 has been removed from CMake.
-#
-#  Update the VERSION argument <min> value.  Or, use the <min>...<max> syntax
-#  to tell CMake that the project requires at least <min> but has been updated
-#  to work with policies introduced by <max> or earlier.
-#
-#  Or, add -DCMAKE_POLICY_VERSION_MINIMUM=3.5 to try configuring anyway.
-
+      # CMAKE_POLICY_VERSION_MINIMUM=3.5: emscripten's CheckTypeSize.cmake
+      # needs a pre-3.5 policy that CMake 4 removed.
       - run: >-
           emcmake cmake -H. -B cmake-build -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DENABLE_ACTIVERECORD_COMPILER=OFF
           -DENABLE_PAGECOMPILER=OFF -DENABLE_PAGECOMPILER_FILE2PAGE=off
-      - run: emmake cmake --build cmake-build --target all --parallel 4
-  # TODO: How to run unit tests in emscripten?
-  #      - uses: ./.github/actions/retry-action
-  #        with:
-  #          timeout_minutes: 90
-  #          max_attempts: 3
-  #          retry_on: any
-  #          command: >-
-  #            cd cmake-build &&
-  #            sudo -s
-  #            PWD=`pwd`
-  #            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
+      - run: emmake cmake --build cmake-build --target all --parallel $(nproc)
 
-  macos-clang-21-cmake-openssl3:
+  # ------------------------------------------------------------------------
+  # macOS arm64 (macos-latest)
+  # ------------------------------------------------------------------------
+
+  # Primary macos-arm64 signal: 3 non-hidden sanitizers + 1 hidden+asan. TRACE on.
+  macos-clang-cmake-sanitizers:
     runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v5
-      - run: brew install llvm@21 openssl@3 mysql-client unixodbc libpq
-      - run: >-
-          CXX=$(brew --prefix llvm@21)/bin/clang++ CC=$(brew --prefix llvm@21)/bin/clang
-          cmake -S. -Bcmake-build -DENABLE_TESTS=ON
-          -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON -DENABLE_PDF=OFF
-          -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/opt/homebrew/opt/mysql-client/
-          -DPostgreSQL_ROOT=/opt/homebrew/opt/libpq
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            sudo -s
-            PWD=`pwd`
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
-
-  macos-clang-cmake-openssl3-visibility-hidden:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v5
-      - run: brew install openssl@3 mysql-client unixodbc libpq
-      - run: >-
-          cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden -DENABLE_TESTS=ON
-          -DENABLE_PDF=ON -DENABLE_ENCODINGS_COMPILER=ON
-          -DENABLE_SEVENZIP=ON -DENABLE_CPPPARSER=ON
-          -DENABLE_DNSSD=ON -DENABLE_DNSSD_DEFAULT=ON
-          -DENABLE_DATA_ODBC=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON
-          -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/opt/homebrew/opt/mysql-client/
-          -DPostgreSQL_ROOT=/opt/homebrew/opt/libpq
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            sudo -s
-            PWD=`pwd`
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
-
-  macos-clang-cmake-openssl3-visibility-hidden-intel:
-    runs-on: macos-15-intel
-    # macos-15-intel runs on Intel CPU
-    steps:
-      - uses: actions/checkout@v5
-      - run: brew install openssl@3 mysql-client unixodbc libpq
-      - run: >-
-          cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden -DENABLE_TESTS=ON
-          -DENABLE_PDF=ON -DENABLE_ENCODINGS_COMPILER=ON
-          -DENABLE_SEVENZIP=ON -DENABLE_CPPPARSER=ON
-          -DENABLE_DNSSD=ON -DENABLE_DNSSD_DEFAULT=ON
-          -DENABLE_DATA_ODBC=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON
-          -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/usr/local/opt/mysql-client/
-          -DPostgreSQL_ROOT=/usr/local/opt/libpq
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            sudo -s
-            PWD=`pwd`
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)|(Redis)"
-
-  macos-clang-cmake-openssl3-visibility-hidden-intel-sanitizers:
-    runs-on: macos-15-intel
     strategy:
+      fail-fast: false
       matrix:
         include:
           - name: asan
+            visibility: default
             sanitize_flags: "-fsanitize=address"
-          - name: ubsan
-            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
-          - name: tsan
-            sanitize_flags: "-fsanitize=thread"
-    env:
-      TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
-    steps:
-      - uses: actions/checkout@v5
-      - run: brew install openssl@3
-      - run: >-
-          cmake -S. -Bcmake-build -DCMAKE_CXX_VISIBILITY_PRESET=hidden
-          -DPOCO_SANITIZEFLAGS="${{ matrix.sanitize_flags }}" -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
-          -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
-          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON
-          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
-          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
-          -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            sudo -s
-            TSAN_OPTIONS=${TSAN_OPTIONS}
-            PWD=`pwd`
-            ctest -V
-
-  macos-clang-cmake-trace:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v5
-      - run: brew install openssl@3 google-benchmark
-      - run: >-
-          cmake -S. -Bcmake-build -DPOCO_MINIMAL_BUILD=ON -DENABLE_TRACE=ON -DENABLE_TESTS=ON -DENABLE_INSTALL_CPPUNIT=ON
-          -DENABLE_ACTIVERECORD=OFF -DENABLE_ACTIVERECORD_COMPILER=OFF -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_BENCHMARK=ON
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            sudo -s
-            PWD=`pwd`
-            ctest --output-on-failure
-
-  macos-clang-cmake-openssl3-sanitizers:
-    runs-on: ${{ matrix.runner }}
-    strategy:
-      matrix:
-        include:
-          - name: asan
-            sanitize_flags: "-fsanitize=address"
-            runner: macos-latest
-            # Suppress false positive: dyld4 on Apple Silicon registers ASan globals twice
-            # for dlopen'd libraries, causing a spurious ODR violation on vtable for TestPlugin.
-            # The symbol exists only once in TestLibrary.dylib (confirmed via nm).
+            # dyld4 registers ASan globals twice for dlopen'd libs -> spurious
+            # ODR violation on TestPlugin vtable. Suppress.
             asan_options: detect_odr_violation=0
-          - name: asan
+          - name: ubsan
+            visibility: default
+            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
+          - name: tsan
+            visibility: default
+            sanitize_flags: "-fsanitize=thread"
+          - name: hidden-asan
+            visibility: hidden
             sanitize_flags: "-fsanitize=address"
-            runner: macos-15-intel
-          - name: ubsan
-            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
-            runner: macos-latest
-          - name: ubsan
-            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
-            runner: macos-15-intel
-          - name: tsan
-            sanitize_flags: "-fsanitize=thread"
-            runner: macos-latest
-          - name: tsan
-            sanitize_flags: "-fsanitize=thread"
-            runner: macos-15-intel
+            asan_options: detect_odr_violation=0
     env:
       TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
       ASAN_OPTIONS: ${{ matrix.asan_options }}
     steps:
       - uses: actions/checkout@v5
-      - run: brew install openssl@3
+      - name: Install OpenSSL, Redis, MongoDB
+        run: |
+          brew install openssl@3 redis
+          brew tap mongodb/brew
+          brew install mongodb-community
+      - name: Start Redis and MongoDB
+        run: |
+          brew services start redis
+          brew services start mongodb-community
       - run: >-
-          cmake -S. -Bcmake-build -DPOCO_SANITIZEFLAGS="${{ matrix.sanitize_flags }}" -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
-          -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
-          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON
-          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
-          -DENABLE_REDIS=OFF -DENABLE_MONGODB=OFF
-          -DENABLE_DATA=OFF -DENABLE_DATA_ODBC=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_DATA_MYSQL=OFF
-      - run: cmake --build cmake-build --target all --parallel 4
+          cmake -S. -Bcmake-build
+          ${{ matrix.visibility == 'hidden' && '-DCMAKE_CXX_VISIBILITY_PRESET=hidden' || '' }}
+          -DPOCO_SANITIZEFLAGS="${{ matrix.sanitize_flags }}"
+          -DENABLE_TRACE=ON
+          ${{ env.POCO_CMAKE_FULL_COMMON }}
+          -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
+      - run: cmake --build cmake-build --target all --parallel $(sysctl -n hw.ncpu)
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -496,55 +478,188 @@ jobs:
             ASAN_OPTIONS=${ASAN_OPTIONS}
             TSAN_OPTIONS=${TSAN_OPTIONS}
             PWD=`pwd`
-            ctest -V
+            ctest ${{ env.POCO_CTEST_COMMON }} ${{ env.POCO_CTEST_SANITIZER_EXTRA }} --parallel $(sysctl -n hw.ncpu) ${{ matrix.ctest_exclude && format('-E "{0}"', matrix.ctest_exclude) || '' }}
+      - uses: ./.github/actions/upload-test-report
+        with:
+          suffix: ${{ matrix.name }}
 
-  windows-2025-msvc-cmake:
-    runs-on: windows-2025
-    env:
-      CPPUNIT_IGNORE: >-
-        class CppUnit::TestCaller<class PathTest>.testFind,
-        class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
-        class CppUnit::TestCaller<class ICMPClientTest>.testPing,
-        class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
-        class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
-        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
-        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy,
-        class CppUnit::TestCaller<class FileTest>.testExists,
-        class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner
+  # POCO_SOO=OFF probe on macos-arm64: Foundation only.
+  macos-clang-cmake-poco-soo-off:
+    runs-on: macos-latest
+    needs: changes
+    if: |
+      needs.changes.outputs.foundation == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v5
-      - uses: TheMrMilchmann/setup-msvc-dev@v4
-        with:
-          arch: x64
       - run: >-
-          cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
-          -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
-          -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
-          -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON
-          -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --parallel 4
+          cmake -S. -Bcmake-build -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          ${{ env.POCO_CMAKE_FOUNDATION_ONLY }} -DPOCO_SOO=OFF
+      - run: cmake --build cmake-build --target Foundation-testrunner --parallel $(sysctl -n hw.ncpu)
+      - name: Run Foundation tests
+        run: >-
+          cd cmake-build &&
+          PWD=`pwd`
+          ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(sysctl -n hw.ncpu) -R "^Foundation$"
+      - uses: ./.github/actions/upload-test-report
+
+  # Newer non-Apple compiler probe (brew clang-21). Scope: Foundation + Util
+  # + Crypto (exercises the OpenSSL link path implied by the -openssl3 name).
+  macos-clang-21-cmake-openssl3:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: brew install llvm@21 openssl@3
+      - run: >-
+          CXX=$(brew --prefix llvm@21)/bin/clang++ CC=$(brew --prefix llvm@21)/bin/clang
+          cmake -S. -Bcmake-build -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          ${{ env.POCO_CMAKE_FOUNDATION_UTIL }}
+          -DENABLE_CRYPTO=ON
+          -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
+      - run: >-
+          cmake --build cmake-build --parallel $(sysctl -n hw.ncpu) --target
+          Foundation Util Crypto Foundation-testrunner Util-testrunner Crypto-testrunner
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
           command: >-
-            cd cmake-build;
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(MongoDB)"
+            cd cmake-build &&
+            PWD=`pwd`
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(sysctl -n hw.ncpu) -R "^(Foundation|Util|Crypto)$"
+      - uses: ./.github/actions/upload-test-report
 
+  # Build-only: compile-warnings-as-signal across as many modules as possible.
+  macos-clang-cmake-warnings:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v5
+      - run: brew install openssl@3 mysql-client unixodbc libpq
+      - run: >-
+          cmake -S. -Bcmake-build
+          ${{ env.POCO_CMAKE_FULL_COMMON }}
+          ${{ env.POCO_CMAKE_WARNINGS_EXTRA }}
+          -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON
+          -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
+          -DMYSQL_ROOT_DIR=$(brew --prefix mysql-client)
+          -DPostgreSQL_ROOT=$(brew --prefix libpq)
+      - run: cmake --build cmake-build --target all --parallel $(sysctl -n hw.ncpu)
+
+  # ------------------------------------------------------------------------
+  # macOS x64 (macos-15-intel) -- de-prioritized, sanitizer-only
+  # ------------------------------------------------------------------------
+
+  macos-x64-clang-cmake-sanitizers:
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: asan
+            sanitize_flags: "-fsanitize=address"
+          - name: ubsan
+            sanitize_flags: "-fsanitize=undefined;-fno-sanitize=vptr"
+          - name: tsan
+            sanitize_flags: "-fsanitize=thread"
+    env:
+      TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install OpenSSL, Redis, MongoDB
+        run: |
+          brew install openssl@3 redis
+          brew tap mongodb/brew
+          brew install mongodb-community
+      - name: Start Redis and MongoDB
+        run: |
+          brew services start redis
+          brew services start mongodb-community
+      - run: >-
+          cmake -S. -Bcmake-build
+          -DPOCO_SANITIZEFLAGS="${{ matrix.sanitize_flags }}"
+          -DENABLE_TRACE=ON
+          ${{ env.POCO_CMAKE_FULL_COMMON }}
+          -DOPENSSL_ROOT_DIR=$(brew --prefix openssl@3)
+      - run: cmake --build cmake-build --target all --parallel $(sysctl -n hw.ncpu)
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            sudo -s
+            TSAN_OPTIONS=${TSAN_OPTIONS}
+            PWD=`pwd`
+            ctest ${{ env.POCO_CTEST_COMMON }} ${{ env.POCO_CTEST_SANITIZER_EXTRA }} --parallel $(sysctl -n hw.ncpu)
+      - uses: ./.github/actions/upload-test-report
+        with:
+          suffix: ${{ matrix.name }}
+
+  # ------------------------------------------------------------------------
+  # Windows
+  # ------------------------------------------------------------------------
+
+  # Primary Windows signal: msvc x64 shared, OpenSSL Crypto/NetSSL/JWT +
+  # SChannel (NETSSL_WIN), TRACE on, LTO on. Full non-env test scope.
+  windows-2025-msvc-cmake:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v5
+      - uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
+      - name: Install OpenSSL (ShiningLight Win64 Dev via winget)
+        shell: pwsh
+        # --location pins the install dir so cmake can reference a stable
+        # OPENSSL_ROOT_DIR. winget output is captured to keep the log quiet on
+        # success and surfaced on failure.
+        run: |
+          $ProgressPreference = 'SilentlyContinue'
+          $log = winget install --id ShiningLight.OpenSSL.Dev --exact --source winget `
+            --silent --accept-package-agreements --accept-source-agreements --disable-interactivity `
+            --location "C:\OpenSSL-Win64" 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            $log | Out-Host
+            exit $LASTEXITCODE
+          }
+          # Prepend our OpenSSL bin dir so the loader picks up our libssl/libcrypto
+          # instead of the runner image's OpenSSL (mismatch -> STATUS_ENTRYPOINT_NOT_FOUND).
+          Add-Content $env:GITHUB_PATH "C:\OpenSSL-Win64\bin"
+          # Point OPENSSL_MODULES at legacy.dll so PKCS12 (RC2/3DES PBE) and DES-ECB
+          # tests can load the legacy provider. ShiningLight's baked-in OPENSSLDIR
+          # does not match our --location override.
+          $legacy = Get-ChildItem -Path "C:\OpenSSL-Win64" -Filter legacy.dll -Recurse -ErrorAction SilentlyContinue |
+                    Select-Object -First 1
+          if ($null -eq $legacy) {
+            Write-Error "legacy.dll not found under C:\OpenSSL-Win64 -- OpenSSL providers missing from install"
+            exit 1
+          }
+          "OPENSSL_MODULES=$($legacy.DirectoryName)" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Write-Host "OPENSSL_MODULES=$($legacy.DirectoryName)"
+      - run: >-
+          cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          ${{ env.POCO_CMAKE_WINDOWS_FULL }}
+          -DOPENSSL_ROOT_DIR="C:/OpenSSL-Win64"
+      - run: cmake --build cmake-build --parallel $env:NUMBER_OF_PROCESSORS
+      - uses: ./.github/actions/retry-action
+        env:
+          CPPUNIT_IGNORE: ${{ env.POCO_WIN_CPPUNIT_IGNORE }}
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build;
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $env:NUMBER_OF_PROCESSORS -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)"
+      - uses: ./.github/actions/upload-test-report
+
+  # clang-cl toolchain exception: reduced scope (Foundation + Util smoke).
   windows-2025-clang-cmake:
     runs-on: windows-2025
-    env:
-      CPPUNIT_IGNORE: >-
-        class CppUnit::TestCaller<class PathTest>.testFind,
-        class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
-        class CppUnit::TestCaller<class ICMPClientTest>.testPing,
-        class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
-        class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
-        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
-        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy,
-        class CppUnit::TestCaller<class FileTest>.testExists,
-        class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner
     steps:
       - uses: actions/checkout@v5
       - uses: TheMrMilchmann/setup-msvc-dev@v4
@@ -554,33 +669,24 @@ jobs:
           cmake -S. -Bcmake-build -G Ninja
           -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl
           -DCMAKE_BUILD_TYPE=Release
-          -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
-          -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON
-          -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --parallel 4
+          -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          ${{ env.POCO_CMAKE_WINDOWS_MINIMAL }}
+      - run: cmake --build cmake-build --parallel $env:NUMBER_OF_PROCESSORS
       - uses: ./.github/actions/retry-action
+        env:
+          CPPUNIT_IGNORE: ${{ env.POCO_WIN_CPPUNIT_IGNORE }}
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
           command: >-
             cd cmake-build;
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)"
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $env:NUMBER_OF_PROCESSORS -R "^(Foundation|Util)$"
+      - uses: ./.github/actions/upload-test-report
 
+  # 32-bit Win32: minimal scope (Foundation + Util) like static/static+MT.
   windows-2025-msvc-cmake-Win32:
     runs-on: windows-2025
-    env:
-      CPPUNIT_IGNORE: >-
-        class CppUnit::TestCaller<class PathTest>.testFind,
-        class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
-        class CppUnit::TestCaller<class ICMPClientTest>.testPing,
-        class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
-        class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
-        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
-        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy,
-        class CppUnit::TestCaller<class FileTest>.testExists,
-        class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner,
-        class CppUnit::TestCaller<class SharedMemoryTest>.testCreateLarge
     steps:
       - uses: actions/checkout@v5
       - uses: TheMrMilchmann/setup-msvc-dev@v4
@@ -588,65 +694,33 @@ jobs:
           arch: x86
       - run: >-
           cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
-          -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
-          -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON
-          -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --parallel 4
+          -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          ${{ env.POCO_CMAKE_WINDOWS_MINIMAL }}
+      - run: cmake --build cmake-build --parallel $env:NUMBER_OF_PROCESSORS
       - uses: ./.github/actions/retry-action
+        # Win32 appends one extra exclusion (SharedMemoryTest.testCreateLarge).
+        env:
+          CPPUNIT_IGNORE: ${{ format('{0},class CppUnit::TestCaller<class SharedMemoryTest>.testCreateLarge', env.POCO_WIN_CPPUNIT_IGNORE) }}
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
           command: >-
             cd cmake-build;
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)"
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $env:NUMBER_OF_PROCESSORS -R "^(Foundation|Util)$"
+      - uses: ./.github/actions/upload-test-report
 
-  windows-2025-msvc-cmake-static-mt:
-    runs-on: windows-2025
-    env:
-      CPPUNIT_IGNORE: >-
-        class CppUnit::TestCaller<class PathTest>.testFind,
-        class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
-        class CppUnit::TestCaller<class ICMPClientTest>.testPing,
-        class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
-        class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
-        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
-        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy,
-        class CppUnit::TestCaller<class FileTest>.testExists,
-        class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner
-    steps:
-      - uses: actions/checkout@v5
-      - uses: TheMrMilchmann/setup-msvc-dev@v4
-        with:
-          arch: x64
-      - run: >-
-          cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
-          -DBUILD_SHARED_LIBS=OFF -DPOCO_MT=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
-          -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF
-          -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build;
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)"
-
+  # Static linkage probes on Windows x64: minimal scope (Foundation + Util).
   windows-2025-msvc-cmake-static:
     runs-on: windows-2025
-    env:
-      CPPUNIT_IGNORE: >-
-        class CppUnit::TestCaller<class PathTest>.testFind,
-        class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
-        class CppUnit::TestCaller<class ICMPClientTest>.testPing,
-        class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
-        class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
-        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
-        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy,
-        class CppUnit::TestCaller<class FileTest>.testExists,
-        class CppUnit::TestCaller<class ProcessRunnerTest>.testProcessRunner
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: static
+            poco_mt: "OFF"
+          - name: static-mt
+            poco_mt: "ON"
     steps:
       - uses: actions/checkout@v5
       - uses: TheMrMilchmann/setup-msvc-dev@v4
@@ -654,46 +728,53 @@ jobs:
           arch: x64
       - run: >-
           cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
-          -DBUILD_SHARED_LIBS=OFF -DENABLE_TESTS=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
-          -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF
-          -DENABLE_DATA_POSTGRESQL=OFF
-      - run: cmake --build cmake-build --parallel 4
+          -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          -DBUILD_SHARED_LIBS=OFF -DPOCO_MT=${{ matrix.poco_mt }}
+          ${{ env.POCO_CMAKE_WINDOWS_MINIMAL }}
+      - run: cmake --build cmake-build --parallel $env:NUMBER_OF_PROCESSORS
       - uses: ./.github/actions/retry-action
+        env:
+          CPPUNIT_IGNORE: ${{ env.POCO_WIN_CPPUNIT_IGNORE }}
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
           command: >-
             cd cmake-build;
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)"
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $env:NUMBER_OF_PROCESSORS -R "^(Foundation|Util)$"
+      - uses: ./.github/actions/upload-test-report
+        with:
+          suffix: ${{ matrix.name }}
 
-  # missing asan dll path
-  #  windows-2022-msvc-cmake-asan:
-  #    runs-on: windows-2022
-  #    env:
-  #      CPPUNIT_IGNORE: >-
-  #        class CppUnit::TestCaller<class PathTest>.testFind,
-  #        class CppUnit::TestCaller<class ICMPSocketTest>.testSendToReceiveFrom,
-  #        class CppUnit::TestCaller<class ICMPClientTest>.testPing,
-  #        class CppUnit::TestCaller<class ICMPClientTest>.testBigPing,
-  #        class CppUnit::TestCaller<class ICMPSocketTest>.testMTU,
-  #        class CppUnit::TestCaller<class HTTPSClientSessionTest>.testProxy,
-  #        class CppUnit::TestCaller<class HTTPSStreamFactoryTest>.testProxy
-  #    steps:
-  #      - uses: actions/checkout@v5
-  #      - run: cmake -S. -Bcmake-build -DPOCO_SANITIZE_ASAN=ON -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF -DENABLE_DATA=ON -DENABLE_DATA_ODBC=ON -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF -DENABLE_TESTS=ON
-  #      - run: cmake --build cmake-build --config Debug
-  #      - uses: ./.github/actions/retry-action
-  #        with:
-  #          timeout_minutes: 90
-  #          max_attempts: 3
-  #          retry_on: any
-  #          command: >-
-  #          cd cmake-build;
-  #          ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)" -C Debug
+  # Build-only warnings probe: extra compiler warnings enabled.
+  windows-msvc-cmake-warnings:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v5
+      - uses: TheMrMilchmann/setup-msvc-dev@v4
+        with:
+          arch: x64
+      - run: >-
+          cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          ${{ env.POCO_CMAKE_FULL_COMMON }}
+          ${{ env.POCO_CMAKE_WARNINGS_EXTRA }}
+          -DENABLE_NETSSL_WIN=ON -DENABLE_NETSSL=OFF
+          -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF
+      - run: cmake --build cmake-build --parallel $env:NUMBER_OF_PROCESSORS
 
-  linux-gcc-cmake-mysql:
+  # ------------------------------------------------------------------------
+  # Data-env: build-once / test-many. `data-build` compiles every Data/Redis/
+  # MongoDB testrunner once and uploads the binaries; each data-test-* job
+  # downloads them and runs only its own driver against a real backend.
+  # ------------------------------------------------------------------------
+
+  data-test-mysql:
     runs-on: ubuntu-24.04
+    needs: data-build
+    if: needs.data-build.outputs.run == 'true'
+    env:
+      POCO_BASE: ${{ github.workspace }}
+      LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
     services:
       mysql:
         image: mysql:8.1.0
@@ -706,24 +787,27 @@ jobs:
           - 3306:3306
     steps:
       - uses: actions/checkout@v5
-      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev mysql-client
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_MYSQL=ON -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --target all --parallel 4
+      - run: sudo apt -y update && sudo apt -y install libmysqlclient21 mysql-client
+      - uses: actions/download-artifact@v8
+        with:
+          name: data-build-artifacts
+          path: cmake-build
+      - run: chmod +x cmake-build/bin/*-testrunner
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest --output-on-failure
-
+          command: cd cmake-build/bin && ./DataMySQL-testrunner -all
 
   # TODO tests sometimes failing on testTransaction and testReconnect
-  linux-gcc-cmake-postgres:
+  data-test-postgres:
     runs-on: ubuntu-24.04
+    needs: data-build
+    if: needs.data-build.outputs.run == 'true'
+    env:
+      POCO_BASE: ${{ github.workspace }}
+      LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
     services:
       postgres:
         image: postgres:16.0
@@ -733,65 +817,75 @@ jobs:
           - 5432:5432
     steps:
       - uses: actions/checkout@v5
-      - run: sudo apt -y update && sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev odbc-postgresql
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --target all --parallel 4
+      - run: sudo apt -y update && sudo apt -y install libpq5
+      - uses: actions/download-artifact@v8
+        with:
+          name: data-build-artifacts
+          path: cmake-build
+      - run: chmod +x cmake-build/bin/*-testrunner
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest --output-on-failure
+          command: cd cmake-build/bin && ./DataPostgreSQL-testrunner -all
 
-  linux-gcc-cmake-redis:
+  data-test-redis:
     runs-on: ubuntu-24.04
+    needs: data-build
+    if: needs.data-build.outputs.run == 'true'
+    env:
+      POCO_BASE: ${{ github.workspace }}
+      LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
     steps:
       - uses: actions/checkout@v5
-      - run: sudo apt -y update && sudo apt -y install libssl-dev
-      - run: |
+      - name: Install Redis server
+        run: |
           curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg
           echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/redis.list
           sudo apt-get -y update
           sudo apt-get -y install redis
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_REDIS=ON -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --target all --parallel 4
+      - uses: actions/download-artifact@v8
+        with:
+          name: data-build-artifacts
+          path: cmake-build
+      - run: chmod +x cmake-build/bin/*-testrunner
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest --output-on-failure
+          command: cd cmake-build/bin && ./Redis-testrunner -all
 
-  linux-gcc-cmake-mongodb:
+  data-test-mongodb:
     runs-on: ubuntu-24.04
+    needs: data-build
+    if: needs.data-build.outputs.run == 'true'
+    env:
+      POCO_BASE: ${{ github.workspace }}
+      LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
     steps:
       - uses: actions/checkout@v5
       - uses: supercharge/mongodb-github-action@1.12.1
-      - run: sudo apt -y update && sudo apt -y install libssl-dev
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_MONGODB=ON -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --target all --parallel 4
-
+      - uses: actions/download-artifact@v8
+        with:
+          name: data-build-artifacts
+          path: cmake-build
+      - run: chmod +x cmake-build/bin/*-testrunner
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest --output-on-failure
+          command: cd cmake-build/bin && ./MongoDB-testrunner -all
 
-  linux-gcc-cmake-odbc-oracle:
+  data-test-odbc-oracle:
     runs-on: ubuntu-24.04
+    needs: data-build
+    if: needs.data-build.outputs.run == 'true'
+    env:
+      POCO_BASE: ${{ github.workspace }}
+      LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
     services:
       oracle:
        image: container-registry.oracle.com/database/free:23.5.0.0-lite
@@ -816,7 +910,7 @@ jobs:
           echo "Disk usage after cleanup:"
           df -h .
 
-      - name: Install basic system dependencies
+      - name: Install ODBC runtime dependencies
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
@@ -827,7 +921,7 @@ jobs:
             sudo apt-get install -y --no-install-recommends \
               -o Dpkg::Options::="--force-confdef" \
               -o Dpkg::Options::="--force-confold" \
-              libssl-dev unixodbc-dev alien libaio1t64 gnupg2 curl \
+              alien libaio1t64 gnupg2 curl unzip \
               libodbcinst2 libodbc2 odbcinst || {
               echo "apt-get install attempt $i failed; retrying in 10s..."
               sleep 10
@@ -835,8 +929,7 @@ jobs:
             }
             break
           done
-          # Oracle Instant Client requires libaio.so.1 but Ubuntu 24.04
-          # only provides libaio.so.1t64 (64-bit time_t transition)
+          # Oracle Instant Client needs libaio.so.1; Ubuntu 24.04 ships libaio.so.1t64.
           if [ ! -e /usr/lib/x86_64-linux-gnu/libaio.so.1 ]; then
             sudo ln -s libaio.so.1t64 /usr/lib/x86_64-linux-gnu/libaio.so.1
             sudo ldconfig
@@ -847,26 +940,24 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           set -euxo pipefail
-          # Download Oracle Instant Client 23 Basic and ODBC packages
           wget https://download.oracle.com/otn_software/linux/instantclient/2326100/instantclient-basic-linux.x64-23.26.1.0.0.zip
           wget https://download.oracle.com/otn_software/linux/instantclient/2326100/instantclient-odbc-linux.x64-23.26.1.0.0.zip
-          # Extract to /opt/oracle
           sudo mkdir -p /opt/oracle
           sudo unzip -o instantclient-basic-linux.x64-23.26.1.0.0.zip -d /opt/oracle
           sudo unzip -o instantclient-odbc-linux.x64-23.26.1.0.0.zip -d /opt/oracle
-          # Configure library path
           echo /opt/oracle/instantclient_23_26 | sudo tee /etc/ld.so.conf.d/oracle-instantclient.conf
           sudo ldconfig
-          # Run ODBC configuration script
           cd /opt/oracle/instantclient_23_26
           sudo ./odbc_update_ini.sh /
-          # Verify installation
           cat /etc/odbcinst.ini || true
           odbcinst -q -d || true
 
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_ODBC=ON -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --target all --parallel 4
+      - uses: actions/download-artifact@v8
+        with:
+          name: data-build-artifacts
+          path: cmake-build
+      - run: chmod +x cmake-build/bin/*-testrunner
+
       - name: Create Oracle test user
         run: |
           set -euxo pipefail
@@ -881,13 +972,15 @@ jobs:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest --output-on-failure
+          command: cd cmake-build/bin && ./DataODBC-testrunner -all
 
-  linux-gcc-cmake-odbc-sqlserver:
+  data-test-odbc-sqlserver:
     runs-on: ubuntu-24.04
+    needs: data-build
+    if: needs.data-build.outputs.run == 'true'
+    env:
+      POCO_BASE: ${{ github.workspace }}
+      LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
     services:
       sqlserver:
         image: mcr.microsoft.com/mssql/server:2022-latest
@@ -914,7 +1007,7 @@ jobs:
           echo "Disk usage after cleanup:"
           df -h .
 
-      - name: Install basic system dependencies
+      - name: Install ODBC runtime dependencies
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
@@ -925,8 +1018,7 @@ jobs:
             sudo apt-get install -y --no-install-recommends \
               -o Dpkg::Options::="--force-confdef" \
               -o Dpkg::Options::="--force-confold" \
-              libssl-dev unixodbc-dev alien libaio1t64 gnupg2 curl \
-              libodbcinst2 libodbc2 odbcinst || {
+              gnupg2 curl libodbcinst2 libodbc2 odbcinst || {
               echo "apt-get install attempt $i failed; retrying in 10s..."
               sleep 10
               continue
@@ -945,69 +1037,25 @@ jobs:
           sudo apt-get update -o Acquire::Retries=3
           sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18
 
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_ODBC=ON -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --target all --parallel 4
+      - uses: actions/download-artifact@v8
+        with:
+          name: data-build-artifacts
+          path: cmake-build
+      - run: chmod +x cmake-build/bin/*-testrunner
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest --output-on-failure
+          command: cd cmake-build/bin && ./DataODBC-testrunner -all
 
-#  linux-gcc-cmake-odbc-mysql:
-#    runs-on: ubuntu-24.04
-#    services:
-#      mysql:
-#        image: mysql:8.1.0
-#        env:
-#          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-#          MYSQL_USER: pocotest
-#          MYSQL_PASSWORD: pocotest
-#          MYSQL_DATABASE: pocotest
-#        ports:
-#          - 3306:3306
-#    steps:
-#      - uses: actions/checkout@v5
-#
-#      - name: Install system dependencies
-#        env:
-#          DEBIAN_FRONTEND: noninteractive
-#        run: |
-#          set -euxo pipefail
-#          sudo apt-get update -o Acquire::Retries=3
-#          sudo apt-get install -y --no-install-recommends \
-#            libssl-dev unixodbc-dev odbcinst1debian2 libodbc1 odbcinst
-#
-#      - name: Setup MySQL ODBC driver
-#        env:
-#          DEBIAN_FRONTEND: noninteractive
-#        run: |
-#          set -euxo pipefail
-#          wget https://dev.mysql.com/get/Downloads/Connector-ODBC/8.2/mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb
-#          sudo dpkg -i mysql-connector-odbc_8.2.0-1ubuntu22.04_amd64.deb || true
-#          sudo apt-get install -y -f
-#          # Verify installation
-#          odbcinst -q -d || true
-#
-#      - run: >-
-#          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_ODBC=ON -DENABLE_TESTS=ON
-#      - run: cmake --build cmake-build --target all --parallel 4
-#      - uses: ./.github/actions/retry-action
-#        with:
-#          timeout_minutes: 90
-#          max_attempts: 3
-#          retry_on: any
-#          command: >-
-#            cd cmake-build &&
-#            PWD=`pwd`
-#            ctest --output-on-failure
-
-  linux-gcc-cmake-odbc-postgres:
+  data-test-odbc-postgres:
     runs-on: ubuntu-24.04
+    needs: data-build
+    if: needs.data-build.outputs.run == 'true'
+    env:
+      POCO_BASE: ${{ github.workspace }}
+      LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
     services:
       postgres:
         image: postgres:16.0
@@ -1018,30 +1066,34 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Install system dependencies
+      - name: Install ODBC runtime dependencies
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
           set -euxo pipefail
           sudo apt-get update -o Acquire::Retries=3
           sudo apt-get install -y --no-install-recommends \
-            libssl-dev unixodbc-dev libodbcinst2 libodbc2 odbcinst odbc-postgresql
+            libodbcinst2 libodbc2 odbcinst odbc-postgresql
 
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_ODBC=ON -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --target all --parallel 4
+      - uses: actions/download-artifact@v8
+        with:
+          name: data-build-artifacts
+          path: cmake-build
+      - run: chmod +x cmake-build/bin/*-testrunner
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
           max_attempts: 3
           retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest --output-on-failure
+          command: cd cmake-build/bin && ./DataODBC-testrunner -all
 
   nix-gcc-make-odbc-sqlserver:
     runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.data == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v5
 
@@ -1066,6 +1118,11 @@ jobs:
 
   nix-gcc-make-odbc-oracle:
     runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.data == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v5
 
@@ -1090,15 +1147,19 @@ jobs:
 
   linux-gcc-cmake-sqlite-no-sqlparser:
     runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.data == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v5
-      - uses: supercharge/mongodb-github-action@1.12.1
       - run: sudo apt -y update
       - run: >-
-          cmake -S. -Bcmake-build -GNinja -DPOCO_MINIMAL_BUILD=ON -DENABLE_DATA_SQLITE=ON
-          -DPOCO_DATA_NO_SQL_PARSER=ON -DENABLE_TESTS=ON
-      - run: cmake --build cmake-build --target all --parallel 4
-
+          cmake -S. -Bcmake-build -GNinja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          ${{ env.POCO_CMAKE_FOUNDATION_ONLY }}
+          -DENABLE_DATA_SQLITE=ON -DPOCO_DATA_NO_SQL_PARSER=ON
+      - run: cmake --build cmake-build --target DataSQLite-testrunner --parallel $(nproc)
       - uses: ./.github/actions/retry-action
         with:
           timeout_minutes: 90
@@ -1107,105 +1168,11 @@ jobs:
           command: >-
             cd cmake-build &&
             PWD=`pwd`
-            ctest --output-on-failure
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^DataSQLite$"
+      - uses: ./.github/actions/upload-test-report
 
-  macos-clang-cmake-warnings:
-    # Compile as many modules as possible with additional compiler warnings enabled (build tests but don't run them)
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v5
-      - run: brew install openssl@3 mysql-client unixodbc libpq
-      - run: >-
-          cmake -S. -Bcmake-build -DENABLE_COMPILER_WARNINGS=ON -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=ON -DENABLE_CRYPTO=ON -DENABLE_PDF=ON
-          -DENABLE_ENCODINGS=ON -DENABLE_ENCODINGS_COMPILER=ON
-          -DENABLE_JSON=ON -DENABLE_JWT=ON -DENABLE_NETSSL=ON -DENABLE_PROMETHEUS=ON
-          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON -DENABLE_XML=ON
-          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
-          -DENABLE_REDIS=ON -DENABLE_MONGODB=ON
-          -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON
-          -DENABLE_DATA_ODBC=ON -DENABLE_DATA_POSTGRESQL=ON -DENABLE_DATA_MYSQL=ON
-          -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DMYSQL_ROOT_DIR=/opt/homebrew/opt/mysql-client/
-          -DPostgreSQL_ROOT=/opt/homebrew/opt/libpq
-      - run: cmake --build cmake-build --target all --parallel 4
-
-  windows-msvc-cmake-warnings:
-    # Compile with additional compiler warnings enabled (build tests but don't run them)
-    runs-on: windows-2025
-    steps:
-      - uses: actions/checkout@v5
-      - uses: TheMrMilchmann/setup-msvc-dev@v4
-        with:
-          arch: x64
-      - run: >-
-          cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
-          -DENABLE_COMPILER_WARNINGS=ON -DENABLE_TESTS=ON
-          -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON -DENABLE_APACHECONNECTOR=OFF
-          -DENABLE_CPPPARSER=ON -DENABLE_PDF=ON
-          -DENABLE_ENCODINGS=ON -DENABLE_ENCODINGS_COMPILER=ON
-          -DENABLE_JSON=ON -DENABLE_NETSSL_WIN=ON -DENABLE_PROMETHEUS=ON
-          -DENABLE_SEVENZIP=ON -DENABLE_ZIP=ON -DENABLE_XML=ON
-          -DENABLE_PAGECOMPILER=ON -DENABLE_POCODOC=ON -DENABLE_PAGECOMPILER_FILE2PAGE=ON
-          -DENABLE_REDIS=ON -DENABLE_MONGODB=ON
-          -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_ODBC=ON
-          -DENABLE_NETSSL=OFF -DENABLE_CRYPTO=OFF -DENABLE_JWT=OFF
-          -DENABLE_DATA_MYSQL=OFF -DENABLE_DATA_POSTGRESQL=OFF
-      - run: cmake --build cmake-build --parallel 4
-
-  linux-gcc-cmake-deprecated-tests:
-    # Run tests for deprecated functionality
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v5
-      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev redis-server
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DENABLE_PDF=OFF -DENABLE_TESTS=ON -DENABLE_TEST_DEPRECATED=ON
-      - run: cmake --build cmake-build --target all --parallel 4
-      - uses: ./.github/actions/retry-action
-        with:
-          timeout_minutes: 90
-          max_attempts: 3
-          retry_on: any
-          command: >-
-            cd cmake-build &&
-            PWD=`pwd`
-            ctest --output-on-failure -E "(DataMySQL)|(DataODBC)|(PostgreSQL)|(MongoDB)"
-
-  linux-gcc-cmake-no-fastlogger:
-    # Build and test without FastLogger to ensure it can be fully disabled
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v5
-      - run: sudo apt -y update && sudo apt -y install cmake ninja-build
-      - run: >-
-          cmake -S. -Bcmake-build -GNinja -DENABLE_FASTLOGGER=OFF -DENABLE_TESTS=ON
-          -DPOCO_MINIMAL_BUILD=ON -DENABLE_UTIL=ON -DENABLE_JSON=ON -DENABLE_XML=ON
-      - run: cmake --build cmake-build --target Foundation Util Foundation-testrunner Util-testrunner --parallel 4
-      - name: Run Foundation LoggingTestSuite
-        run: ./cmake-build/bin/Foundation-testrunner LoggingTestSuite
-      - name: Run Util LoggingConfiguratorTest
-        run: ./cmake-build/bin/Util-testrunner LoggingConfiguratorTest
-
-  linux-gcc-make-no-fastlogger:
-    # Build and test without FastLogger using Make build system
-    runs-on: ubuntu-24.04
-    env:
-      POCO_BASE: ${{ github.workspace }}
-      POCO_NO_FASTLOGGER: 1
-    steps:
-      - uses: actions/checkout@v5
-      - run: ./configure --minimal --no-tests --no-samples
-      - run: make -s -j4 -C CppUnit
-      - run: make -s -j4 -C Foundation
-      - run: make -s -j4 -C Foundation/testsuite
-      - run: make -s -j4 -C XML
-      - run: make -s -j4 -C JSON
-      - run: make -s -j4 -C Util
-      - run: make -s -j4 -C Util/testsuite
-      - name: Run Foundation LoggingTestSuite
-        working-directory: Foundation/testsuite
-        run: . $POCO_BASE/poco_env.bash && ./bin/Linux/x86_64/testrunner LoggingTestSuite
-      - name: Run Util LoggingConfiguratorTest
-        working-directory: Util/testsuite
-        run: . $POCO_BASE/poco_env.bash && ./bin/Linux/x86_64/testrunner LoggingConfiguratorTest
+  # Disabled: Windows MSVC asan -- unreliable asan dll path on GitHub-hosted
+  # runners. Revisit when MSVC asan tooling on windows-2025 stabilizes.
+  #  windows-2022-msvc-cmake-asan:
+  #    runs-on: windows-2022
+  #    ...

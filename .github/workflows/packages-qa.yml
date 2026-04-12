@@ -42,7 +42,7 @@ jobs:
           mkrel -c unix2dos all
       -
         name: Copy artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: windows-archives
           path: releases/poco*.zip
@@ -64,7 +64,7 @@ jobs:
           mkrel all
       -
         name: Copy artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: posix-archives
           path: releases/poco*.tar.gz
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs: mkrelease
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: posix-archives
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev
@@ -89,7 +89,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs: mkrelease
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: posix-archives
       - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev unixodbc-dev libmysqlclient-dev
@@ -102,7 +102,7 @@ jobs:
     runs-on: windows-2022
     needs: mkrelease_win
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: windows-archives
       - run: |
@@ -115,7 +115,7 @@ jobs:
     runs-on: windows-2022
     needs: mkrelease_win
     steps:
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v8
         with:
           name: windows-archives
       - run: |
