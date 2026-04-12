@@ -62,9 +62,9 @@ Function::Function(const std::string& decl, NameSpace* pNameSpace):
 
 Function::~Function()
 {
-	for (Parameters::iterator it = _params.begin(); it != _params.end(); ++it)
+	for (const auto* pParam : _params)
 	{
-		delete *it;
+		delete pParam;
 	}
 }
 
@@ -173,31 +173,31 @@ Symbol::Kind Function::kind() const
 
 std::string Function::signature() const
 {
-	std::string signature(declaration());
-	if (signature.compare(0, 8, "virtual ") == 0)
-		signature.erase(0, 8);
-	else if (signature.compare(0, 7, "static ") == 0)
-		signature.erase(0, 8);
-	if (signature.compare(0, 7, "inline ") == 0)
-		signature.erase(0, 7);
-	signature += "(";
+	std::string sig(declaration());
+	if (sig.compare(0, 8, "virtual ") == 0)
+		sig.erase(0, 8);
+	else if (sig.compare(0, 7, "static ") == 0)
+		sig.erase(0, 8);
+	if (sig.compare(0, 7, "inline ") == 0)
+		sig.erase(0, 7);
+	sig += "(";
 	bool isFirst = true;
-	for (Iterator it = begin(); it != end(); ++it)
+	for (const auto* pParam : _params)
 	{
 		if (isFirst)
 			isFirst = false;
 		else
-			signature += ", ";
-		std::string arg = (*it)->declaration();
-		std::string::size_type pos = arg.size() - 1;
+			sig += ", ";
+		const auto arg = pParam->declaration();
+		auto pos = arg.size() - 1;
 		while (pos > 0 && !std::isspace(arg[pos])) --pos;
 		while (pos > 0 && std::isspace(arg[pos])) --pos;
-		signature.append(arg, 0, pos + 1);
+		sig.append(arg, 0, pos + 1);
 	}
-	signature += ")";
+	sig += ")";
 	if (_flags & FN_CONST)
-		signature += " const";
-	return signature;
+		sig += " const";
+	return sig;
 }
 
 
@@ -209,8 +209,9 @@ bool Function::isVirtual() const
 	}
 	else if (isDestructor())
 	{
-		Struct* pClass = dynamic_cast<Struct*>(nameSpace());
-		return pClass && pClass->hasVirtualDestructor();
+		// isDestructor() implies nameSpace()->kind() == SYM_STRUCT
+		const auto* pClass = static_cast<const Struct*>(nameSpace());
+		return pClass->hasVirtualDestructor();
 	}
 	else return getOverridden() != nullptr;
 }
@@ -220,17 +221,15 @@ Function* Function::getOverridden() const
 {
 	if (isMethod() && !(_flags & FN_STATIC))
 	{
-		Struct* pClass = dynamic_cast<Struct*>(nameSpace());
-		if (pClass)
+		// isMethod() guarantees nameSpace()->kind() == SYM_STRUCT
+		const auto* pClass = static_cast<const Struct*>(nameSpace());
+		for (auto it = pClass->baseBegin(); it != pClass->baseEnd(); ++it)
 		{
-			for (Struct::BaseIterator it = pClass->baseBegin(); it != pClass->baseEnd(); ++it)
+			if (it->pClass)
 			{
-				if (it->pClass)
-				{
-					Function* pOverridden = it->pClass->findFunction(signature());
-					if (pOverridden && pOverridden->isVirtual())
-						return pOverridden;
-				}
+				auto* pOverridden = it->pClass->findFunction(signature());
+				if (pOverridden && pOverridden->isVirtual())
+					return pOverridden;
 			}
 		}
 	}
@@ -242,9 +241,9 @@ std::string Function::toString() const
 {
 	std::ostringstream ostr;
 	ostr << Decl::toString() << "(\n";
-	for (Iterator it = begin(); it != end(); ++it)
+	for (const auto* pParam : _params)
 	{
-		ostr << "\t" << (*it)->toString() << "\n";
+		ostr << "\t" << pParam->toString() << "\n";
 	}
 	ostr << ");";
 	return ostr.str();
