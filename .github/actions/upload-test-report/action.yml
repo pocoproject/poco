@@ -1,0 +1,29 @@
+name: Upload test report
+description: >-
+  Uploads the ctest JUnit XML report (written by --output-junit in
+  POCO_CTEST_COMMON) as a workflow artifact so failing runs can be
+  inspected post-mortem. Runs unconditionally via if: always() so reports
+  are preserved even when the retry-action step exits non-zero.
+inputs:
+  suffix:
+    description: >-
+      Optional suffix appended to the artifact name. Required for matrix
+      jobs, where github.job alone is not unique across matrix cells.
+    required: false
+    default: ''
+  build-dir:
+    description: >-
+      Build directory where ctest wrote test-report.xml. Defaults to
+      cmake-build, which matches every job except the clang-21 modules
+      probe (which uses "build").
+    required: false
+    default: cmake-build
+runs:
+  using: composite
+  steps:
+    - uses: actions/upload-artifact@v7
+      if: always()
+      with:
+        name: test-report-${{ github.job }}${{ inputs.suffix != '' && format('-{0}', inputs.suffix) || '' }}
+        path: ${{ inputs.build-dir }}/test-report.xml
+        if-no-files-found: ignore

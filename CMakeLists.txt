@@ -807,9 +807,39 @@ foreach(component ${Poco_COMPONENTS})
 	message(STATUS "Building: ${component}")
 endforeach()
 
-if(ENABLE_TRACE)
-	message(STATUS "Feature: stack tracing enabled")
+# Uniform feature status summary. Every feature is printed as
+#     Feature: <name> <enabled|disabled>
+# so the state of each option is explicit regardless of its default.
+# Features are phrased in the positive form; options that carry a
+# negated name (POCO_NO_*, POCO_DATA_NO_*) are inverted before printing.
+function(poco_feature_status name value)
+	if(value)
+		message(STATUS "Feature: ${name} enabled")
+	else()
+		message(STATUS "Feature: ${name} disabled")
+	endif()
+endfunction()
+
+if(POCO_DATA_NO_SQL_PARSER)
+	set(_poco_data_sql_parser OFF)
+else()
+	set(_poco_data_sql_parser ON)
 endif()
-if(ENABLE_FASTLOGGER)
-	message(STATUS "Feature: FastLogger enabled")
+if(POCO_NO_FORK_EXEC)
+	set(_poco_fork_exec OFF)
+else()
+	set(_poco_fork_exec ON)
 endif()
+
+poco_feature_status("minimal build"              ${POCO_MINIMAL_BUILD})
+poco_feature_status("small object optimization"  ${POCO_SOO})
+poco_feature_status("stack tracing"              ${ENABLE_TRACE})
+poco_feature_status("FastLogger"                 ${ENABLE_FASTLOGGER})
+poco_feature_status("Data SQL parser"            ${_poco_data_sql_parser})
+poco_feature_status("Process uses fork()/exec*()" ${_poco_fork_exec})
+poco_feature_status("Poco::Mutex on std::mutex"  ${POCO_ENABLE_STD_MUTEX})
+poco_feature_status("compiler warnings"          ${ENABLE_COMPILER_WARNINGS})
+poco_feature_status("deprecated tests"           ${ENABLE_TEST_DEPRECATED})
+poco_feature_status("CppUnit build"              ${ENABLE_CPPUNIT})
+poco_feature_status("CppUnit install"            ${ENABLE_INSTALL_CPPUNIT})
+poco_feature_status("Encodings Compiler"         ${ENABLE_ENCODINGS_COMPILER})
