@@ -224,14 +224,14 @@ Command Command::hmget(const std::string& hash, const StringVec& fields)
 }
 
 
-Command Command::hmset(const std::string& hash, std::map<std::string, std::string>& fields)
+Command Command::hmset(const std::string& hash, const std::map<std::string, std::string>& fields)
 {
 	Command cmd("HMSET");
 
 	cmd << hash;
-	for(std::map<std::string, std::string>::const_iterator it = fields.begin(); it != fields.end(); ++it)
+	for (const auto& [key, value] : fields)
 	{
-		cmd << it->first << it->second;
+		cmd << key << value;
 	}
 
 	return cmd;
@@ -408,9 +408,9 @@ Command Command::mset(const std::map<std::string, std::string>& keyvalues, bool 
 {
 	Command cmd(create ? "MSET" : "MSETNX");
 
-	for(std::map<std::string, std::string>::const_iterator it = keyvalues.begin(); it != keyvalues.end(); ++it)
+	for (const auto& [key, value] : keyvalues)
 	{
-		cmd << it->first << it->second;
+		cmd << key << value;
 	}
 
 	return cmd;

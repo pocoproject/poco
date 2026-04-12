@@ -178,14 +178,16 @@ public:
 		RedisType::Ptr redisResult = readReply();
 		if (redisResult->type() == RedisTypeTraits<Error>::TypeId)
 		{
-			Type<Error>* error = dynamic_cast<Type<Error>*>(redisResult.get());
+			// TypeId check guarantees runtime type; static_cast avoids
+			// hidden-visibility RTTI mismatch across DSOs on macOS.
+			const auto* error = static_cast<const Type<Error>*>(redisResult.get());
 			throw RedisException(error->value().getMessage());
 		}
 
 		if (redisResult->type() == RedisTypeTraits<T>::TypeId)
 		{
-			Type<T>* type = dynamic_cast<Type<T>*>(redisResult.get());
-			if (type != nullptr) result = type->value();
+			const auto* type = static_cast<const Type<T>*>(redisResult.get());
+			result = type->value();
 		}
 		else throw BadCastException();
 	}

@@ -125,11 +125,13 @@ public:
 
 		if ( pos >= _elements.value().size() ) throw InvalidArgumentException();
 
-		RedisType::Ptr element = _elements.value().at(pos);
+		const RedisType::Ptr element = _elements.value().at(pos);
 		if ( RedisTypeTraits<T>::TypeId == element->type() )
 		{
-			auto* concrete = dynamic_cast<Type<T>* >(element.get());
-			if ( concrete != nullptr ) return concrete->value();
+			// TypeId check guarantees runtime type; static_cast avoids
+			// hidden-visibility RTTI mismatch across DSOs on macOS.
+			const auto* concrete = static_cast<const Type<T>*>(element.get());
+			return concrete->value();
 		}
 		throw BadCastException();
 	}
@@ -205,9 +207,9 @@ inline Array& Array::add(const char* s)
 
 inline Array& Array::add(const std::vector<std::string>& strings)
 {
-	for(std::vector<std::string>::const_iterator it = strings.begin(); it != strings.end(); ++it)
+	for (const auto& s : strings)
 	{
-		add(*it);
+		add(s);
 	}
 	return *this;
 }
@@ -285,10 +287,9 @@ struct RedisTypeTraits<Array>
 		else
 		{
 			result << value.size() << LineEnding::NEWLINE_CRLF;
-			for(std::vector<RedisType::Ptr>::const_iterator it = value.begin();
-				it != value.end(); ++it)
+			for (const auto& element : value)
 			{
-				result << (*it)->toString();
+				result << element->toString();
 			}
 		}
 		return result.str();
@@ -304,7 +305,7 @@ struct RedisTypeTraits<Array>
 		{
 			for(int i = 0; i < length; ++i)
 			{
-				char marker = input.get();
+				const char marker = input.get();
 				RedisType::Ptr element = RedisType::createRedisType(marker);
 
 				if ( element.isNull() )
