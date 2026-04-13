@@ -6,6 +6,7 @@ JSON
 Util
 Net
 Crypto
+SSH
 NetSSL_OpenSSL
 NetSSL_Win
 Data
