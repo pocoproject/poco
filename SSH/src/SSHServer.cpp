@@ -17,6 +17,13 @@
 #include "Poco/SSH/SSHException.h"
 #include <libssh/server.h>
 
+#ifndef POCO_OS_FAMILY_WINDOWS
+#include <poll.h>
+#include <unistd.h>
+#else
+#include <winsock2.h>
+#endif
+
 
 namespace Poco {
 namespace SSH {
@@ -76,11 +83,17 @@ void SSHServer::stop()
 
 	_logger.information("SSH server stopping");
 
-	// 1. Close the listening socket to unblock ssh_bind_accept
+	// 1. Close the listening socket to unblock poll()/accept()
 	ssh_socket_t fd = _listenFd.exchange(SSH_INVALID_FD);
 	if (fd != SSH_INVALID_FD)
 	{
-		::shutdown(fd, 2);
+#ifdef POCO_OS_FAMILY_WINDOWS
+		::closesocket(fd);
+#else
+		::close(fd);
+#endif
+		// Prevent ssh_bind_free from double-closing the fd
+		ssh_bind_set_fd(_sshBind, SSH_INVALID_SOCKET);
 	}
 
 	// 2. Wait for the accept loop thread to exit
@@ -158,6 +171,32 @@ void SSHServer::acceptLoop()
 
 	while (!_stopped)
 	{
+		// Poll the listening socket so we can check _stopped periodically
+		ssh_socket_t fd = _listenFd.load();
+		if (fd == SSH_INVALID_FD)
+			break;
+
+#ifdef POCO_OS_FAMILY_WINDOWS
+		WSAPOLLFD pfd;
+#else
+		struct pollfd pfd;
+#endif
+		pfd.fd = fd;
+		pfd.events = POLLIN;
+		pfd.revents = 0;
+
+#ifdef POCO_OS_FAMILY_WINDOWS
+		int pollRc = WSAPoll(&pfd, 1, 500);
+#else
+		int pollRc = ::poll(&pfd, 1, 500);
+#endif
+		if (pollRc == 0) // timeout
+			continue;
+		if (pollRc < 0 || _stopped)
+			break;
+		if (pfd.revents & (POLLERR | POLLHUP | POLLNVAL))
+			break;
+
 		ssh_session session = ssh_new();
 		if (!session)
 		{

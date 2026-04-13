@@ -6,7 +6,12 @@
 
 include $(POCO_BASE)/build/rules/global
 
-SYSLIBS += -lssh
+ifeq ($(OSNAME),Darwin)
+SYSFLAGS += $(shell pkg-config --cflags libssh 2>/dev/null)
+SYSLIBS  += $(shell pkg-config --libs libssh 2>/dev/null || echo -lssh)
+else
+SYSLIBS  += -lssh
+endif
 
 objects = SSHChannelStream SSHClient SSHException SSHHostKeyManager SSHServer SSHSession
 

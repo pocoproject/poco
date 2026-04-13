@@ -17,6 +17,7 @@
 #include "Poco/Path.h"
 #include "Poco/File.h"
 #include <libssh/libssh.h>
+#include <libssh/libssh_version.h>
 
 #ifndef POCO_OS_FAMILY_WINDOWS
 #include <sys/stat.h>
@@ -66,7 +67,11 @@ void SSHHostKeyManager::generateKey(const std::string& path)
 #endif
 
 	ssh_key key = nullptr;
+#if LIBSSH_VERSION_INT >= SSH_VERSION_INT(0, 11, 0)
+	int rc = ssh_pki_generate_key(SSH_KEYTYPE_ED25519, nullptr, &key);
+#else
 	int rc = ssh_pki_generate(SSH_KEYTYPE_ED25519, 0, &key);
+#endif
 	if (rc != SSH_OK || !key)
 	{
 #ifndef POCO_OS_FAMILY_WINDOWS
