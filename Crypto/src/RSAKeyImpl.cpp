@@ -42,7 +42,7 @@ RSAKeyImpl::RSAKeyImpl(const EVPPKey& key):
 	_pEVPPKey(nullptr)
 {
 	EVPPKey::duplicate(const_cast<EVP_PKEY*>((const EVP_PKEY*)key), &_pEVPPKey);
-	if (!_pEVPPKey) throw OpenSSLException();
+	if (_pEVPPKey == nullptr) throw OpenSSLException();
 }
 
 
@@ -52,7 +52,7 @@ RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
 {
 	const X509* pCert = cert.certificate();
 	_pEVPPKey = X509_get_pubkey(const_cast<X509*>(pCert));
-	if (!_pEVPPKey)
+	if (_pEVPPKey == nullptr)
 		throw OpenSSLException("RSAKeyImpl(const X509Certificate&)");
 }
 
@@ -63,7 +63,7 @@ RSAKeyImpl::RSAKeyImpl(const PKCS12Container& cont):
 {
 	EVPPKey key = cont.getKey();
 	EVPPKey::duplicate(static_cast<EVP_PKEY*>(key), &_pEVPPKey);
-	if (!_pEVPPKey) throw OpenSSLException();
+	if (_pEVPPKey == nullptr) throw OpenSSLException();
 }
 
 
@@ -72,7 +72,7 @@ RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent):
 	_pEVPPKey(nullptr)
 {
 	EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, nullptr);
-	if (!pCtx)
+	if (pCtx == nullptr)
 		throw OpenSSLException("RSAKeyImpl: EVP_PKEY_CTX_new_id()");
 	if (EVP_PKEY_keygen_init(pCtx) != 1)
 	{
@@ -112,14 +112,14 @@ RSAKeyImpl::RSAKeyImpl(const std::string& publicKeyFile, const std::string& priv
 	if (!privateKeyFile.empty())
 	{
 		BIO* bio = BIO_new(BIO_s_file());
-		if (!bio) throw Poco::IOException("Cannot create BIO for reading private key", privateKeyFile);
+		if (bio == nullptr) throw Poco::IOException("Cannot create BIO for reading private key", privateKeyFile);
 		int rc = BIO_read_filename(bio, privateKeyFile.c_str());
 		if (rc)
 		{
 			EVP_PKEY* pKey = PEM_read_bio_PrivateKey(bio, nullptr, nullptr,
 				privateKeyPassphrase.empty() ? nullptr : const_cast<char*>(privateKeyPassphrase.c_str()));
 			BIO_free(bio);
-			if (!pKey)
+			if (pKey == nullptr)
 				throw Poco::FileException("Failed to load private key", privateKeyFile);
 			_pEVPPKey = pKey;
 		}
@@ -133,13 +133,13 @@ RSAKeyImpl::RSAKeyImpl(const std::string& publicKeyFile, const std::string& priv
 	if (!publicKeyFile.empty() && _pEVPPKey == nullptr)
 	{
 		BIO* bio = BIO_new(BIO_s_file());
-		if (!bio) throw Poco::IOException("Cannot create BIO for reading public key", publicKeyFile);
+		if (bio == nullptr) throw Poco::IOException("Cannot create BIO for reading public key", publicKeyFile);
 		int rc = BIO_read_filename(bio, publicKeyFile.c_str());
 		if (rc)
 		{
 			EVP_PKEY* pKey = PEM_read_bio_PUBKEY(bio, nullptr, nullptr, nullptr);
 			BIO_free(bio);
-			if (!pKey)
+			if (pKey == nullptr)
 				throw Poco::FileException("Failed to load public key", publicKeyFile);
 			_pEVPPKey = pKey;
 		}
@@ -161,24 +161,24 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKey
 		std::string privateKeyData;
 		Poco::StreamCopier::copyToString(*pPrivateKeyStream, privateKeyData);
 		BIO* bio = BIO_new_mem_buf(const_cast<char*>(privateKeyData.data()), static_cast<int>(privateKeyData.size()));
-		if (!bio) throw Poco::IOException("Cannot create BIO for reading private key");
+		if (bio == nullptr) throw Poco::IOException("Cannot create BIO for reading private key");
 		EVP_PKEY* pKey = PEM_read_bio_PrivateKey(bio, nullptr, nullptr,
 			privateKeyPassphrase.empty() ? nullptr : const_cast<char*>(privateKeyPassphrase.c_str()));
 		BIO_free(bio);
-		if (!pKey)
+		if (pKey == nullptr)
 			throw Poco::FileException("Failed to load private key");
 		_pEVPPKey = pKey;
 	}
 
-	if (pPublicKeyStream && _pEVPPKey == nullptr)
+	if (pPublicKeyStream != nullptr && _pEVPPKey == nullptr)
 	{
 		std::string publicKeyData;
 		Poco::StreamCopier::copyToString(*pPublicKeyStream, publicKeyData);
 		BIO* bio = BIO_new_mem_buf(const_cast<char*>(publicKeyData.data()), static_cast<int>(publicKeyData.size()));
-		if (!bio) throw Poco::IOException("Cannot create BIO for reading public key");
+		if (bio == nullptr) throw Poco::IOException("Cannot create BIO for reading public key");
 		EVP_PKEY* pKey = PEM_read_bio_PUBKEY(bio, nullptr, nullptr, nullptr);
 		BIO_free(bio);
-		if (!pKey)
+		if (pKey == nullptr)
 			throw Poco::FileException("Failed to load public key");
 		_pEVPPKey = pKey;
 	}
@@ -193,7 +193,7 @@ RSAKeyImpl::~RSAKeyImpl()
 
 void RSAKeyImpl::freeRSA()
 {
-	if (_pEVPPKey) EVP_PKEY_free(_pEVPPKey);
+	if (_pEVPPKey != nullptr) EVP_PKEY_free(_pEVPPKey);
 	_pEVPPKey = nullptr;
 }
 

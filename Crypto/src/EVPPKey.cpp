@@ -311,7 +311,7 @@ EVPPKey& EVPPKey::operator = (EVPPKey&& other) noexcept
 
 EVPPKey::~EVPPKey()
 {
-	if (_pEVPPKey) EVP_PKEY_free(_pEVPPKey);
+	if (_pEVPPKey != nullptr) EVP_PKEY_free(_pEVPPKey);
 }
 
 
@@ -327,7 +327,7 @@ const std::string& EVPPKey::name() const
 
 void EVPPKey::checkType()
 {
-	if (_pEVPPKey)
+	if (_pEVPPKey != nullptr)
 	{
 		int t = type(_pEVPPKey);
 		if (KNOWN_TYPES.find(t) == KNOWN_TYPES.end())
@@ -474,12 +474,12 @@ void EVPPKey::save(std::ostream* pPublicKeyStream, std::ostream* pPrivateKeyStre
 
 EVP_PKEY* EVPPKey::duplicate(const EVP_PKEY* pFromKey, EVP_PKEY** pToKey)
 {
-	if (!pFromKey) throw NullPointerException("EVPPKey::duplicate(): "
+	if (pFromKey == nullptr) throw NullPointerException("EVPPKey::duplicate(): "
 		"provided key pointer is null.");
 
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	*pToKey = EVP_PKEY_dup(const_cast<EVP_PKEY*>(pFromKey));
-	if (!*pToKey)
+	if (*pToKey == nullptr)
 	{
 		std::string msg = "EVPPKey::duplicate():EVP_PKEY_dup()\n";
 		throw OpenSSLException(getError(msg));

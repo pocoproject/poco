@@ -409,7 +409,7 @@ void Context::flushSessionCache()
 	poco_assert (isForServerUse());
 
 	Poco::Timestamp now;
-#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+#if POCO_OPENSSL_VERSION_PREREQ(3, 4, 0)
 	SSL_CTX_flush_sessions_ex(_pSSLContext, static_cast<time_t>(now.epochTime()));
 #else
 	SSL_CTX_flush_sessions(_pSSLContext, static_cast<long>(now.epochTime()));

@@ -83,6 +83,7 @@ namespace
 
 	private:
 		EVP_PKEY*       _pKey;
+		EVP_PKEY_CTX*   _pCtx;
 		RSAPaddingMode  _paddingMode;
 		std::streamsize _pos;
 		unsigned char*  _pBuf;
@@ -91,10 +92,14 @@ namespace
 
 	RSAEncryptImpl::RSAEncryptImpl(EVP_PKEY* pKey, RSAPaddingMode paddingMode):
 			_pKey(pKey),
+			_pCtx(EVP_PKEY_CTX_new(pKey, nullptr)),
 			_paddingMode(paddingMode),
 			_pos(0),
 			_pBuf(nullptr)
 	{
+		if (_pCtx == nullptr) throwError();
+		if (EVP_PKEY_encrypt_init(_pCtx) != 1) { EVP_PKEY_CTX_free(_pCtx); _pCtx = nullptr; throwError(); }
+		if (EVP_PKEY_CTX_set_rsa_padding(_pCtx, mapPaddingMode(_paddingMode)) != 1) { EVP_PKEY_CTX_free(_pCtx); _pCtx = nullptr; throwError(); }
 		_pBuf = new unsigned char[blockSize()];
 	}
 
@@ -102,6 +107,7 @@ namespace
 	RSAEncryptImpl::~RSAEncryptImpl()
 	{
 		delete [] _pBuf;
+		if (_pCtx != nullptr) EVP_PKEY_CTX_free(_pCtx);
 	}
 
 
@@ -158,17 +164,9 @@ namespace
 			if (missing == 0)
 			{
 				poco_assert (outputLength >= rsaSize);
-				EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new(_pKey, nullptr);
-				if (!pCtx) throwError();
-				if (EVP_PKEY_encrypt_init(pCtx) != 1) { EVP_PKEY_CTX_free(pCtx); throwError(); }
-				if (EVP_PKEY_CTX_set_rsa_padding(pCtx, mapPaddingMode(_paddingMode)) != 1) { EVP_PKEY_CTX_free(pCtx); throwError(); }
 				size_t outLen = static_cast<size_t>(rsaSize);
-				if (EVP_PKEY_encrypt(pCtx, output, &outLen, _pBuf, static_cast<size_t>(maxSize)) != 1)
-				{
-					EVP_PKEY_CTX_free(pCtx);
+				if (EVP_PKEY_encrypt(_pCtx, output, &outLen, _pBuf, static_cast<size_t>(maxSize)) != 1)
 					throwError();
-				}
-				EVP_PKEY_CTX_free(pCtx);
 				rc += static_cast<int>(outLen);
 				output += outLen;
 				outputLength -= outLen;
@@ -196,17 +194,9 @@ namespace
 		int rc = 0;
 		if (_pos > 0)
 		{
-			EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new(_pKey, nullptr);
-			if (!pCtx) throwError();
-			if (EVP_PKEY_encrypt_init(pCtx) != 1) { EVP_PKEY_CTX_free(pCtx); throwError(); }
-			if (EVP_PKEY_CTX_set_rsa_padding(pCtx, mapPaddingMode(_paddingMode)) != 1) { EVP_PKEY_CTX_free(pCtx); throwError(); }
 			size_t outLen = static_cast<size_t>(length);
-			if (EVP_PKEY_encrypt(pCtx, output, &outLen, _pBuf, static_cast<size_t>(_pos)) != 1)
-			{
-				EVP_PKEY_CTX_free(pCtx);
+			if (EVP_PKEY_encrypt(_pCtx, output, &outLen, _pBuf, static_cast<size_t>(_pos)) != 1)
 				throwError();
-			}
-			EVP_PKEY_CTX_free(pCtx);
 			rc = static_cast<int>(outLen);
 		}
 		return rc;
@@ -235,6 +225,7 @@ namespace
 
 	private:
 		EVP_PKEY*       _pKey;
+		EVP_PKEY_CTX*   _pCtx;
 		RSAPaddingMode  _paddingMode;
 		std::streamsize _pos;
 		unsigned char*  _pBuf;
@@ -243,10 +234,14 @@ namespace
 
 	RSADecryptImpl::RSADecryptImpl(EVP_PKEY* pKey, RSAPaddingMode paddingMode):
 			_pKey(pKey),
+			_pCtx(EVP_PKEY_CTX_new(pKey, nullptr)),
 			_paddingMode(paddingMode),
 			_pos(0),
 			_pBuf(nullptr)
 	{
+		if (_pCtx == nullptr) throwError();
+		if (EVP_PKEY_decrypt_init(_pCtx) != 1) { EVP_PKEY_CTX_free(_pCtx); _pCtx = nullptr; throwError(); }
+		if (EVP_PKEY_CTX_set_rsa_padding(_pCtx, mapPaddingMode(_paddingMode)) != 1) { EVP_PKEY_CTX_free(_pCtx); _pCtx = nullptr; throwError(); }
 		_pBuf = new unsigned char[blockSize()];
 	}
 
@@ -254,6 +249,7 @@ namespace
 	RSADecryptImpl::~RSADecryptImpl()
 	{
 		delete [] _pBuf;
+		if (_pCtx != nullptr) EVP_PKEY_CTX_free(_pCtx);
 	}
 
 
@@ -290,14 +286,9 @@ namespace
 			std::streamsize missing = rsaSize - _pos;
 			if (missing == 0)
 			{
-				EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new(_pKey, nullptr);
-				if (!pCtx) throwError();
-				if (EVP_PKEY_decrypt_init(pCtx) != 1) { EVP_PKEY_CTX_free(pCtx); throwError(); }
-				if (EVP_PKEY_CTX_set_rsa_padding(pCtx, mapPaddingMode(_paddingMode)) != 1) { EVP_PKEY_CTX_free(pCtx); throwError(); }
 				size_t outLen = static_cast<size_t>(rsaSize);
-				int tmp = EVP_PKEY_decrypt(pCtx, output, &outLen, _pBuf, static_cast<size_t>(rsaSize));
-				EVP_PKEY_CTX_free(pCtx);
-				if (tmp != 1) throwError();
+				if (EVP_PKEY_decrypt(_pCtx, output, &outLen, _pBuf, static_cast<size_t>(rsaSize)) != 1)
+					throwError();
 				rc += static_cast<int>(outLen);
 				output += outLen;
 				outputLength -= outLen;
@@ -324,14 +315,9 @@ namespace
 		int rc = 0;
 		if (_pos > 0)
 		{
-			EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new(_pKey, nullptr);
-			if (!pCtx) throwError();
-			if (EVP_PKEY_decrypt_init(pCtx) != 1) { EVP_PKEY_CTX_free(pCtx); throwError(); }
-			if (EVP_PKEY_CTX_set_rsa_padding(pCtx, mapPaddingMode(_paddingMode)) != 1) { EVP_PKEY_CTX_free(pCtx); throwError(); }
 			size_t outLen = static_cast<size_t>(length);
-			int tmp = EVP_PKEY_decrypt(pCtx, output, &outLen, _pBuf, static_cast<size_t>(_pos));
-			EVP_PKEY_CTX_free(pCtx);
-			if (tmp != 1) throwError();
+			if (EVP_PKEY_decrypt(_pCtx, output, &outLen, _pBuf, static_cast<size_t>(_pos)) != 1)
+				throwError();
 			rc = static_cast<int>(outLen);
 		}
 		return rc;

@@ -52,10 +52,10 @@ ECKeyImpl::ECKeyImpl(const X509Certificate& cert):
 	_pEVPPKey(nullptr)
 {
 	const X509* pCert = cert.certificate();
-	if (pCert)
+	if (pCert != nullptr)
 	{
 		_pEVPPKey = X509_get_pubkey(const_cast<X509*>(pCert));
-		if (_pEVPPKey)
+		if (_pEVPPKey != nullptr)
 		{
 			checkEC("ECKeyImpl(const X509Certificate&)", "X509_get_pubkey()");
 			return;
@@ -80,7 +80,7 @@ ECKeyImpl::ECKeyImpl(int curve):
 	_pEVPPKey(nullptr)
 {
 	EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new_id(EVP_PKEY_EC, nullptr);
-	if (!pCtx)
+	if (pCtx == nullptr)
 		throw OpenSSLException("ECKeyImpl: EVP_PKEY_CTX_new_id()");
 	if (EVP_PKEY_keygen_init(pCtx) != 1)
 	{
@@ -160,9 +160,9 @@ ECKeyImpl::~ECKeyImpl()
 
 void ECKeyImpl::checkEC(const std::string& method, const std::string& func) const
 {
-	if (!_pEVPPKey) throw OpenSSLException(Poco::format("%s: %s", method, func));
+	if (_pEVPPKey == nullptr) throw OpenSSLException(Poco::format("%s: %s", method, func));
 	EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new(_pEVPPKey, nullptr);
-	if (!pCtx) throw OpenSSLException(Poco::format("%s: EVP_PKEY_CTX_new()", method));
+	if (pCtx == nullptr) throw OpenSSLException(Poco::format("%s: EVP_PKEY_CTX_new()", method));
 	int rc = EVP_PKEY_check(pCtx);
 	if (rc != 1)
 	{
@@ -177,7 +177,7 @@ void ECKeyImpl::checkEC(const std::string& method, const std::string& func) cons
 
 void ECKeyImpl::freeEC()
 {
-	if (_pEVPPKey)
+	if (_pEVPPKey != nullptr)
 	{
 		EVP_PKEY_free(_pEVPPKey);
 		_pEVPPKey = nullptr;
@@ -193,7 +193,7 @@ int ECKeyImpl::size() const
 
 int ECKeyImpl::groupId() const
 {
-	if (_pEVPPKey)
+	if (_pEVPPKey != nullptr)
 	{
 		char groupName[80];
 		size_t len = 0;
