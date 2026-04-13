@@ -141,24 +141,24 @@ template<typename R, typename F, typename S>
 }
 
 
-template <typename F, typename T>
-[[nodiscard]] inline bool isSafeIntCast(F from)
+template <typename To, typename From>
+[[nodiscard]] inline bool isSafeIntCast(From from)
 	/// Returns true if it is safe to cast
-	/// integer from F to T.
+	/// integer from From to To.
 {
-	return !isIntOverflow<T, F>(from);
+	return !isIntOverflow<To, From>(from);
 }
 
 
-template <typename F, typename T>
-inline T& safeIntCast(F from, T& to)
+template <typename To, typename From>
+inline To& safeIntCast(From from, To& to)
 	/// Returns cast value if it is safe
-	/// to cast integer from F to T,
+	/// to cast integer from From to To,
 	/// otherwise throws BadCastException.
 {
-	if (!isIntOverflow<T, F>(from))
+	if (!isIntOverflow<To, From>(from))
 	{
-		to = static_cast<T>(from);
+		to = static_cast<To>(from);
 		return to;
 	}
 	throw BadCastException("safeIntCast: Integer overflow");
@@ -402,15 +402,17 @@ template <typename T>
 		return false;
 	}
 
+	// size is used as buffer capacity (in) and written length (out).
+	const std::size_t capacity = size;
 	// Guard against buffer overflow in padding loops (phases 3-5).
-	if (width >= static_cast<int>(POCO_MAX_INT_STRING_LEN))
+	if (width >= static_cast<int>(capacity))
 		throw RangeException();
 
 	// --- Phase 1: extract sign, convert to unsigned ---
 	// This avoids UB for T_MIN (e.g. -2^63) where -value overflows signed.
 	using U = std::make_unsigned_t<T>;
 
-	bool negative = false;
+	[[maybe_unused]] bool negative = false;
 	U uval;
 	if constexpr (std::is_signed_v<T>)
 	{
@@ -573,7 +575,7 @@ template <typename T>
 
 	// --- Phase 6: finalize and reverse ---
 	size = static_cast<std::size_t>(ptr - result);
-	if (size >= static_cast<std::size_t>(POCO_MAX_INT_STRING_LEN))
+	if (size >= capacity)
 		throw RangeException();
 	*ptr-- = '\0';
 

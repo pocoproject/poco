@@ -76,7 +76,6 @@ using Poco::Stopwatch;
 using Poco::RangeException;
 using Poco::isIntOverflow;
 using Poco::safeMultiply;
-using Poco::isSafeIntCast;
 using Poco::safeIntCast;
 using Poco::FPEnvironment;
 
@@ -1100,9 +1099,10 @@ void StringTest::testNumericStringLimit()
 	catch(Poco::BadCastException&){}
 
 	signed char sc = 0, st = -1;
+	char ct = -1;
 	assertTrue(!isIntOverflow<signed char>(sc));
-	assertTrue(safeIntCast<char>(sc, st) == sc);
-	assertTrue(st == sc);
+	assertTrue(safeIntCast<char>(sc, ct) == sc);
+	assertTrue(ct == sc);
 
 	short ss = SHRT_MAX;
 	assertTrue(isIntOverflow<signed char>(ss));
@@ -1127,10 +1127,11 @@ void StringTest::testNumericStringLimit()
 	assertTrue(safeIntCast<signed char>(sc, st) == c);
 	assertTrue(st == sc);
 
-	unsigned char uc = 0, ut = -1;
+	unsigned char uc = 0;
+	ct = -1;
 	assertTrue(!isIntOverflow<unsigned char>(uc));
-	assertTrue(safeIntCast<char>(uc, ut) == uc);
-	assertTrue(ut == uc);
+	assertTrue(safeIntCast<char>(uc, ct) == uc);
+	assertTrue(ct == static_cast<char>(uc));
 
 	ss = SHRT_MAX;
 	assertTrue(isIntOverflow<unsigned char>(ss));
@@ -1456,7 +1457,7 @@ void StringTest::benchmarkStrToInt()
 		char hbuf[32]; std::snprintf(hbuf, sizeof(hbuf), "%X", v);
 		hexStrs[i] = hbuf;
 		hexPrefStrs[i] = std::string("0x") + hbuf;
-		negStrs[i] = std::to_string(-static_cast<int>(v));
+		negStrs[i] = std::to_string(static_cast<int>(-(static_cast<long long>(v) % INT_MAX)));
 		const auto big = (static_cast<Poco::UInt64>(rng()) << 32) | rng();
 		bigStrs[i] = std::to_string(big);
 	}
@@ -1527,7 +1528,7 @@ void StringTest::benchmarkIntToStr()
 	{
 		ivals[i] = static_cast<int>(rng());
 		uvals[i] = static_cast<unsigned>(rng());
-		i64vals[i] = (static_cast<Poco::Int64>(rng()) << 32) | rng();
+		i64vals[i] = static_cast<Poco::Int64>((static_cast<Poco::UInt64>(rng()) << 32) | rng());
 		u64vals[i] = (static_cast<Poco::UInt64>(rng()) << 32) | rng();
 		ismall[i] = static_cast<int>(rng() % 1000);
 		usmall[i] = static_cast<unsigned>(rng() % 1000);
@@ -1562,7 +1563,7 @@ void StringTest::benchmarkIntToStr()
 	bench("format(int)", [&](int i){ str = NumberFormatter::format(ivals[i]); });
 	bench("format(int, width=15)", [&](int i){ str = NumberFormatter::format(ivals[i], 15); });
 	bench("format0(int, width=15)", [&](int i){ str = NumberFormatter::format0(ivals[i], 15); });
-	bench("format(-int)", [&](int i){ str = NumberFormatter::format(-std::abs(ivals[i])); });
+	bench("format(-int)", [&](int i){ str = NumberFormatter::format(ivals[i] > 0 ? -ivals[i] : ivals[i]); });
 	bench("formatHex(int)", [&](int i){ str = NumberFormatter::formatHex(ivals[i]); });
 	bench("formatHex(int, width=10)", [&](int i){ str = NumberFormatter::formatHex(ivals[i], 10); });
 	bench("formatHex(int, prefix)", [&](int i){ str = NumberFormatter::formatHex(ivals[i], true); });

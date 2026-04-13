@@ -84,10 +84,10 @@ unsigned NumberParser::parseHex(const std::string& s)
 
 bool NumberParser::tryParseHex(const std::string& s, unsigned& value)
 {
-	int offset = 0;
-	if (s.size() > 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) offset = 2;
-	const char* begin = s.data() + offset;
+	const char* begin = s.data();
 	const char* end = s.data() + s.size();
+	while (begin < end && std::isspace(static_cast<unsigned char>(*begin))) ++begin;
+	if (end - begin > 2 && begin[0] == '0' && (begin[1] == 'x' || begin[1] == 'X')) begin += 2;
 	return strToInt(begin, end, value, NUM_BASE_HEX);
 }
 
@@ -155,10 +155,10 @@ UInt64 NumberParser::parseHex64(const std::string& s)
 
 bool NumberParser::tryParseHex64(const std::string& s, UInt64& value)
 {
-	int offset = 0;
-	if (s.size() > 2 && s[0] == '0' && (s[1] == 'x' || s[1] == 'X')) offset = 2;
-	const char* begin = s.data() + offset;
+	const char* begin = s.data();
 	const char* end = s.data() + s.size();
+	while (begin < end && std::isspace(static_cast<unsigned char>(*begin))) ++begin;
+	if (end - begin > 2 && begin[0] == '0' && (begin[1] == 'x' || begin[1] == 'X')) begin += 2;
 	return strToInt(begin, end, value, NUM_BASE_HEX);
 }
 
