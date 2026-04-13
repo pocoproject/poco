@@ -51,6 +51,8 @@ RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
 	_pEVPPKey(nullptr)
 {
 	const X509* pCert = cert.certificate();
+	if (pCert == nullptr)
+		throw OpenSSLException("RSAKeyImpl(const X509Certificate&): null certificate");
 	_pEVPPKey = X509_get_pubkey(const_cast<X509*>(pCert));
 	ensureRSAKey(_pEVPPKey, "X509Certificate");
 }

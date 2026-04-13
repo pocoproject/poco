@@ -43,7 +43,7 @@ ECKeyImpl::ECKeyImpl(const EVPPKey& key):
 	_pEVPPKey(nullptr)
 {
 	EVPPKey::duplicate(const_cast<EVP_PKEY*>((const EVP_PKEY*)key), &_pEVPPKey);
-	checkEC("ECKeyImpl(const EVPPKey&)", "EVP_PKEY_dup()");
+	safeCheckEC("ECKeyImpl(const EVPPKey&)", "EVP_PKEY_dup()");
 }
 
 
@@ -57,7 +57,7 @@ ECKeyImpl::ECKeyImpl(const X509Certificate& cert):
 		_pEVPPKey = X509_get_pubkey(const_cast<X509*>(pCert));
 		if (_pEVPPKey != nullptr)
 		{
-			checkEC("ECKeyImpl(const X509Certificate&)", "X509_get_pubkey()");
+			safeCheckEC("ECKeyImpl(const X509Certificate&)", "X509_get_pubkey()");
 			return;
 		}
 	}
@@ -71,7 +71,7 @@ ECKeyImpl::ECKeyImpl(const PKCS12Container& cont):
 {
 	EVPPKey key = cont.getKey();
 	EVPPKey::duplicate(static_cast<EVP_PKEY*>(key), &_pEVPPKey);
-	checkEC("ECKeyImpl(const PKCS12Container&)", "EVP_PKEY_dup()");
+	safeCheckEC("ECKeyImpl(const PKCS12Container&)", "EVP_PKEY_dup()");
 }
 
 
@@ -98,7 +98,7 @@ ECKeyImpl::ECKeyImpl(int curve):
 		throw OpenSSLException("ECKeyImpl(int curve): EVP_PKEY_generate()");
 	}
 	EVP_PKEY_CTX_free(pCtx);
-	checkEC("ECKeyImpl(int curve)", "EVP_PKEY_generate()");
+	safeCheckEC("ECKeyImpl(int curve)", "EVP_PKEY_generate()");
 }
 
 
@@ -110,7 +110,7 @@ ECKeyImpl::ECKeyImpl(const std::string& publicKeyFile,
 	if (EVPPKey::loadKey(&pKey, PEM_read_PrivateKey, (EVPPKey::EVP_PKEY_get_Key_fn) nullptr, privateKeyFile, privateKeyPassphrase))
 	{
 		_pEVPPKey = pKey;
-		checkEC(Poco::format("ECKeyImpl(%s, %s, %s)",
+		safeCheckEC(Poco::format("ECKeyImpl(%s, %s, %s)",
 			publicKeyFile, privateKeyFile, privateKeyPassphrase.empty() ? privateKeyPassphrase : std::string("***")),
 			"PEM_read_PrivateKey()");
 		return;
@@ -121,7 +121,7 @@ ECKeyImpl::ECKeyImpl(const std::string& publicKeyFile,
 		throw OpenSSLException("ECKeyImpl(const string&, const string&, const string&");
 	}
 	_pEVPPKey = pKey;
-	checkEC(Poco::format("ECKeyImpl(%s, %s, %s)",
+	safeCheckEC(Poco::format("ECKeyImpl(%s, %s, %s)",
 		publicKeyFile, privateKeyFile, privateKeyPassphrase.empty() ? privateKeyPassphrase : std::string("***")),
 		"PEM_read_PUBKEY()");
 }
@@ -135,7 +135,7 @@ ECKeyImpl::ECKeyImpl(std::istream* pPublicKeyStream,
 	if (EVPPKey::loadKey(&pKey, PEM_read_bio_PrivateKey, (EVPPKey::EVP_PKEY_get_Key_fn) nullptr, pPrivateKeyStream, privateKeyPassphrase))
 	{
 		_pEVPPKey = pKey;
-		checkEC(Poco::format("ECKeyImpl(stream, stream, %s)",
+		safeCheckEC(Poco::format("ECKeyImpl(stream, stream, %s)",
 			privateKeyPassphrase.empty() ? privateKeyPassphrase : std::string("***")),
 			"PEM_read_bio_PrivateKey()");
 		return;
@@ -146,7 +146,7 @@ ECKeyImpl::ECKeyImpl(std::istream* pPublicKeyStream,
 		throw OpenSSLException("ECKeyImpl(istream*, istream*, const string&");
 	}
 	_pEVPPKey = pKey;
-	checkEC(Poco::format("ECKeyImpl(stream, stream, %s)",
+	safeCheckEC(Poco::format("ECKeyImpl(stream, stream, %s)",
 		privateKeyPassphrase.empty() ? privateKeyPassphrase : std::string("***")),
 		"PEM_read_bio_PUBKEY()");
 }
@@ -172,6 +172,20 @@ void ECKeyImpl::checkEC(const std::string& method, const std::string& func) cons
 	EVP_PKEY_CTX_free(pCtx);
 	if (rc != 1)
 		throw OpenSSLException(Poco::format("%s: EVP_PKEY_check()", method));
+}
+
+
+void ECKeyImpl::safeCheckEC(const std::string& method, const std::string& func)
+{
+	try
+	{
+		checkEC(method, func);
+	}
+	catch (...)
+	{
+		freeEC();
+		throw;
+	}
 }
 
 

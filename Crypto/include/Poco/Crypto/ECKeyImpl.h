@@ -141,6 +141,9 @@ private:
 	void freeEC();
 
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	void safeCheckEC(const std::string& method, const std::string& func);
+		/// Calls checkEC(); frees _pEVPPKey and rethrows on failure.
+		/// Use in constructors where destructor will not run.
 	EVP_PKEY* _pEVPPKey;
 #else
 	EC_KEY* _pEC;

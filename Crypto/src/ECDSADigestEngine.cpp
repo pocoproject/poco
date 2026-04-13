@@ -121,7 +121,9 @@ bool ECDSADigestEngine::verify(const DigestEngine::Digest& sig)
 	}
 	int ret = EVP_PKEY_verify(pCtx, sig.data(), sig.size(), _digest.data(), _digest.size());
 	EVP_PKEY_CTX_free(pCtx);
-	return ret == 1;
+	if (ret == 1) return true;
+	if (ret == 0) return false;
+	throw OpenSSLException("ECDSADigestEngine::verify(): EVP_PKEY_verify()");
 #else
 	EC_KEY* pKey = _key.impl()->getECKey();
 	if (pKey)

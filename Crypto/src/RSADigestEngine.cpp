@@ -150,11 +150,15 @@ bool RSADigestEngine::verify(const DigestEngine::Digest& sig)
 	}
 	int ret = EVP_PKEY_verify(pCtx, sig.data(), sig.size(), _digest.data(), _digest.size());
 	EVP_PKEY_CTX_free(pCtx);
-	return ret == 1;
+	if (ret == 1) return true;
+	if (ret == 0) return false;
+	throw OpenSSLException("RSADigestEngine::verify(): EVP_PKEY_verify()");
 #else
 	DigestEngine::Digest sigCpy = sig; // copy because RSA_verify can modify sigCpy
 	int ret = RSA_verify(_engine.nid(), &_digest[0], static_cast<unsigned>(_digest.size()), &sigCpy[0], static_cast<unsigned>(sigCpy.size()), _key.impl()->getRSA());
-	return ret != 0;
+	if (ret == 1) return true;
+	if (ret == 0) return false;
+	throw OpenSSLException("RSADigestEngine::verify(): RSA_verify()");
 #endif
 }
 
