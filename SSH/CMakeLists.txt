@@ -23,6 +23,9 @@ set_target_properties(SSH
 
 target_link_libraries(SSH PUBLIC Poco::Foundation)
 target_link_libraries(SSH PUBLIC ${LIBSSH_LIBRARIES})
+if(WIN32)
+	target_link_libraries(SSH PUBLIC ws2_32)
+endif()
 target_include_directories(SSH
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
