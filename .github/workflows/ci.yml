@@ -59,7 +59,7 @@ env:
     -DENABLE_XML=ON -DENABLE_JSON=ON -DENABLE_NET=ON -DENABLE_UTIL=ON
     -DENABLE_CRYPTO=ON -DENABLE_NETSSL=ON -DENABLE_NETSSL_WIN=ON -DENABLE_JWT=ON
     -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_ODBC=ON
-    -DENABLE_ZIP=ON -DENABLE_ENCODINGS=ON
+    -DENABLE_ZIP=ON -DENABLE_ENCODINGS=ON -DENABLE_SSH=ON
     -DENABLE_PDF=ON -DENABLE_PROMETHEUS=ON
     -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON
     -DENABLE_CPPPARSER=ON
@@ -450,9 +450,9 @@ jobs:
       ASAN_OPTIONS: ${{ matrix.asan_options }}
     steps:
       - uses: actions/checkout@v5
-      - name: Install OpenSSL, Redis, MongoDB
+      - name: Install OpenSSL, libssh, Redis, MongoDB
         run: |
-          brew install openssl@3 redis
+          brew install openssl@3 libssh redis
           brew tap mongodb/brew
           brew install mongodb-community
       - name: Start Redis and MongoDB
@@ -567,9 +567,9 @@ jobs:
       TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
     steps:
       - uses: actions/checkout@v5
-      - name: Install OpenSSL, Redis, MongoDB
+      - name: Install OpenSSL, libssh, Redis, MongoDB
         run: |
-          brew install openssl@3 redis
+          brew install openssl@3 libssh redis
           brew tap mongodb/brew
           brew install mongodb-community
       - name: Start Redis and MongoDB
@@ -664,11 +664,19 @@ jobs:
           Add-Content $env:GITHUB_PATH "$root\bin"
           "OPENSSL_MODULES=$root\lib\ossl-modules" | Out-File -FilePath $env:GITHUB_ENV -Append
           Write-Host "OPENSSL_ROOT_DIR=$root"
+      - name: Install libssh (vcpkg)
+        shell: pwsh
+        run: |
+          vcpkg install libssh:x64-windows
+          $root = "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows"
+          "LIBSSH_ROOT_DIR=$root" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Add-Content $env:GITHUB_PATH "$root\bin"
       - run: >-
           cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
           ${{ env.POCO_CMAKE_WINDOWS_FULL }}
           -DOPENSSL_ROOT_DIR="${{ env.OPENSSL_ROOT_DIR }}"
+          -DLIBSSH_ROOT_DIR="${{ env.LIBSSH_ROOT_DIR }}"
       - run: cmake --build cmake-build --parallel $env:NUMBER_OF_PROCESSORS
       - uses: ./.github/actions/retry-action
         env:

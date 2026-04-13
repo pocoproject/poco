@@ -448,8 +448,11 @@ if(ENABLE_MONGODB OR ENABLE_REDIS OR ENABLE_PROMETHEUS)
 endif()
 
 if(ENABLE_SSH)
-	find_package(PkgConfig REQUIRED)
-	pkg_check_modules(LIBSSH REQUIRED libssh)
+	find_package(LibSSH)
+	if(NOT LIBSSH_FOUND)
+		message(STATUS "libssh not found - disabling SSH")
+		set(ENABLE_SSH OFF CACHE BOOL "Enable SSH" FORCE)
+	endif()
 endif()
 
 if(ENABLE_NETSSL)
