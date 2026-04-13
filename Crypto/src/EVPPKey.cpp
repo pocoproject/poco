@@ -78,7 +78,11 @@ void pushBuildParamBignum(OSSL_PARAM_BLD* paramBld, const char* key, const std::
 		throw OpenSSLException(getError(msg));
 	}
 
-	OSSL_PARAM_BLD_push_BN(paramBld, key, *pBigNum);
+	if (!OSSL_PARAM_BLD_push_BN(paramBld, key, *pBigNum))
+	{
+		std::string msg = "pushBuildParamBignum(): OSSL_PARAM_BLD_push_BN()\n";
+		throw OpenSSLException(getError(msg));
+	}
 }
 
 
@@ -103,18 +107,24 @@ OSSL_PARAM* getKeyParameters(const std::vector<unsigned char>* publicKey, const 
 			pushBuildParamBignum(paramBld, "d", *privateKey, &pBigNum2);
 
 		// default rsa exponent
-		OSSL_PARAM_BLD_push_ulong(paramBld, "e", RSA_F4);
+		if (!OSSL_PARAM_BLD_push_ulong(paramBld, "e", RSA_F4))
+		{
+			std::string msg = "getKeyParameters(): OSSL_PARAM_BLD_push_ulong()\n";
+			throw OpenSSLException(getError(msg));
+		}
 
 		parameters = OSSL_PARAM_BLD_to_param(paramBld);
-		if (!parameters)
+		if (parameters == nullptr)
 		{
 			std::string msg = "getKeyParameters(): OSSL_PARAM_BLD_to_param()\n";
 			throw OpenSSLException(getError(msg));
 		}
 	}
-	catch(OpenSSLException&)
+	catch(...)
 	{
 		OSSL_PARAM_BLD_free(paramBld);
+		BN_clear_free(pBigNum1);
+		BN_clear_free(pBigNum2);
 		throw;
 	}
 
@@ -129,6 +139,11 @@ OSSL_PARAM* getKeyParameters(const std::vector<unsigned char>* publicKey, const 
 void EVPPKey::setKeyFromParameters(OSSL_PARAM* parameters)
 {
 	auto ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, nullptr);
+	if (ctx == nullptr)
+	{
+		OSSL_PARAM_free(parameters);
+		throw OpenSSLException("EVPPKey::setKeyFromParameters(): EVP_PKEY_CTX_new_id()");
+	}
 	if (EVP_PKEY_fromdata_init(ctx) <= 0)
 	{
 		OSSL_PARAM_free(parameters);
@@ -184,6 +199,7 @@ EVPPKey::EVPPKey(int type, int param) : _pEVPPKey(nullptr)
 	int ret = EVP_PKEY_keygen_init(pCtx);
 	if (ret != 1)
 	{
+		EVP_PKEY_CTX_free(pCtx);
 		std::string msg = Poco::format(
 			"EVPPKey(%d, %d):EVP_PKEY_keygen_init()\n", type, param);
 		throw OpenSSLException(getError(msg));
@@ -194,6 +210,7 @@ EVPPKey::EVPPKey(int type, int param) : _pEVPPKey(nullptr)
 		ret = EVP_PKEY_CTX_set_rsa_keygen_bits(pCtx, param);
 		if (ret != 1)
 		{
+			EVP_PKEY_CTX_free(pCtx);
 			std::string msg = Poco::format(
 				"EVPPKey(%d, %d):EVP_PKEY_CTX_set_rsa_keygen_bits()\n", type, param);
 			throw OpenSSLException(getError(msg));
@@ -204,6 +221,7 @@ EVPPKey::EVPPKey(int type, int param) : _pEVPPKey(nullptr)
 		ret = EVP_PKEY_CTX_set_ec_paramgen_curve_nid(pCtx, param);
 		if (ret != 1)
 		{
+			EVP_PKEY_CTX_free(pCtx);
 			std::string msg = Poco::format(
 				"EVPPKey(%d, %d):EVP_PKEY_CTX_set_ec_paramgen_curve_nid()\n", type, param);
 			throw OpenSSLException(getError(msg));
@@ -213,6 +231,7 @@ EVPPKey::EVPPKey(int type, int param) : _pEVPPKey(nullptr)
 	ret = EVP_PKEY_generate(pCtx, &_pEVPPKey);
 	if (ret != 1)
 	{
+		EVP_PKEY_CTX_free(pCtx);
 		std::string msg = Poco::format(
 			"EVPPKey(%d, %d):EVP_PKEY_generate()\n", type, param);
 		throw OpenSSLException(getError(msg));
@@ -221,6 +240,7 @@ EVPPKey::EVPPKey(int type, int param) : _pEVPPKey(nullptr)
 	ret = EVP_PKEY_keygen(pCtx, &_pEVPPKey);
 	if (ret != 1)
 	{
+		EVP_PKEY_CTX_free(pCtx);
 		std::string msg = Poco::format(
 			"EVPPKey(%d, %d):EVP_PKEY_keygen()\n", type, param);
 		throw OpenSSLException(getError(msg));
@@ -581,14 +601,15 @@ void EVPPKey::newECKey(const char* ecCurveName)
 #else
 	int curveID = OBJ_txt2nid(ecCurveName);
 	EC_KEY* pEC = EC_KEY_new_by_curve_name(curveID);
-	if (!pEC) goto err;
+	if (pEC == nullptr) goto err;
 	if (!EC_KEY_generate_key(pEC)) goto err;
 	_pEVPPKey = EVP_PKEY_new();
-	if (!_pEVPPKey) goto err;
+	if (_pEVPPKey == nullptr) goto err;
 	if (!EVP_PKEY_set1_EC_KEY(_pEVPPKey, pEC)) goto err;
 	EC_KEY_free(pEC);
 	return;
 err:
+	if (pEC != nullptr) EC_KEY_free(pEC);
 	std::string msg = "EVPPKey::newECKey()\n";
 	throw OpenSSLException(getError(msg));
 #endif

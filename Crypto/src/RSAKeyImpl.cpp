@@ -42,7 +42,7 @@ RSAKeyImpl::RSAKeyImpl(const EVPPKey& key):
 	_pEVPPKey(nullptr)
 {
 	EVPPKey::duplicate(const_cast<EVP_PKEY*>((const EVP_PKEY*)key), &_pEVPPKey);
-	if (_pEVPPKey == nullptr) throw OpenSSLException();
+	ensureRSAKey(_pEVPPKey, "EVPPKey");
 }
 
 
@@ -52,8 +52,7 @@ RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
 {
 	const X509* pCert = cert.certificate();
 	_pEVPPKey = X509_get_pubkey(const_cast<X509*>(pCert));
-	if (_pEVPPKey == nullptr)
-		throw OpenSSLException("RSAKeyImpl(const X509Certificate&)");
+	ensureRSAKey(_pEVPPKey, "X509Certificate");
 }
 
 
@@ -63,7 +62,7 @@ RSAKeyImpl::RSAKeyImpl(const PKCS12Container& cont):
 {
 	EVPPKey key = cont.getKey();
 	EVPPKey::duplicate(static_cast<EVP_PKEY*>(key), &_pEVPPKey);
-	if (_pEVPPKey == nullptr) throw OpenSSLException();
+	ensureRSAKey(_pEVPPKey, "PKCS12Container");
 }
 
 
@@ -87,6 +86,11 @@ RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent):
 	if (exponent != RSA_F4)
 	{
 		BIGNUM* bn = BN_new();
+		if (bn == nullptr)
+		{
+			EVP_PKEY_CTX_free(pCtx);
+			throw OpenSSLException("RSAKeyImpl: BN_new()");
+		}
 		BN_set_word(bn, exponent);
 		if (EVP_PKEY_CTX_set1_rsa_keygen_pubexp(pCtx, bn) != 1)
 		{
@@ -99,7 +103,7 @@ RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent):
 	if (EVP_PKEY_generate(pCtx, &_pEVPPKey) != 1)
 	{
 		EVP_PKEY_CTX_free(pCtx);
-		throw Poco::InvalidArgumentException("Failed to create RSA context");
+		throw OpenSSLException("RSAKeyImpl: EVP_PKEY_generate()");
 	}
 	EVP_PKEY_CTX_free(pCtx);
 }
@@ -109,46 +113,17 @@ RSAKeyImpl::RSAKeyImpl(const std::string& publicKeyFile, const std::string& priv
 	KeyPairImpl("rsa", KT_RSA_IMPL),
 	_pEVPPKey(nullptr)
 {
-	if (!privateKeyFile.empty())
+	if (EVPPKey::loadKey(&_pEVPPKey, PEM_read_PrivateKey, (EVPPKey::EVP_PKEY_get_Key_fn) nullptr, privateKeyFile, privateKeyPassphrase))
 	{
-		BIO* bio = BIO_new(BIO_s_file());
-		if (bio == nullptr) throw Poco::IOException("Cannot create BIO for reading private key", privateKeyFile);
-		int rc = BIO_read_filename(bio, privateKeyFile.c_str());
-		if (rc)
-		{
-			EVP_PKEY* pKey = PEM_read_bio_PrivateKey(bio, nullptr, nullptr,
-				privateKeyPassphrase.empty() ? nullptr : const_cast<char*>(privateKeyPassphrase.c_str()));
-			BIO_free(bio);
-			if (pKey == nullptr)
-				throw Poco::FileException("Failed to load private key", privateKeyFile);
-			_pEVPPKey = pKey;
-		}
-		else
-		{
-			BIO_free(bio);
-			throw Poco::FileNotFoundException("Private key file", privateKeyFile);
-		}
+		ensureRSAKey(_pEVPPKey, "file");
+		return;
 	}
 
-	if (!publicKeyFile.empty() && _pEVPPKey == nullptr)
+	if (!EVPPKey::loadKey(&_pEVPPKey, PEM_read_PUBKEY, (EVPPKey::EVP_PKEY_get_Key_fn) nullptr, publicKeyFile))
 	{
-		BIO* bio = BIO_new(BIO_s_file());
-		if (bio == nullptr) throw Poco::IOException("Cannot create BIO for reading public key", publicKeyFile);
-		int rc = BIO_read_filename(bio, publicKeyFile.c_str());
-		if (rc)
-		{
-			EVP_PKEY* pKey = PEM_read_bio_PUBKEY(bio, nullptr, nullptr, nullptr);
-			BIO_free(bio);
-			if (pKey == nullptr)
-				throw Poco::FileException("Failed to load public key", publicKeyFile);
-			_pEVPPKey = pKey;
-		}
-		else
-		{
-			BIO_free(bio);
-			throw Poco::FileNotFoundException("Public key file", publicKeyFile);
-		}
+		throw OpenSSLException("RSAKeyImpl(const string&, const string&, const string&)");
 	}
+	ensureRSAKey(_pEVPPKey, "file");
 }
 
 
@@ -156,32 +131,17 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKey
 	KeyPairImpl("rsa", KT_RSA_IMPL),
 	_pEVPPKey(nullptr)
 {
-	if (pPrivateKeyStream)
+	if (EVPPKey::loadKey(&_pEVPPKey, PEM_read_bio_PrivateKey, (EVPPKey::EVP_PKEY_get_Key_fn) nullptr, pPrivateKeyStream, privateKeyPassphrase))
 	{
-		std::string privateKeyData;
-		Poco::StreamCopier::copyToString(*pPrivateKeyStream, privateKeyData);
-		BIO* bio = BIO_new_mem_buf(const_cast<char*>(privateKeyData.data()), static_cast<int>(privateKeyData.size()));
-		if (bio == nullptr) throw Poco::IOException("Cannot create BIO for reading private key");
-		EVP_PKEY* pKey = PEM_read_bio_PrivateKey(bio, nullptr, nullptr,
-			privateKeyPassphrase.empty() ? nullptr : const_cast<char*>(privateKeyPassphrase.c_str()));
-		BIO_free(bio);
-		if (pKey == nullptr)
-			throw Poco::FileException("Failed to load private key");
-		_pEVPPKey = pKey;
+		ensureRSAKey(_pEVPPKey, "stream");
+		return;
 	}
 
-	if (pPublicKeyStream != nullptr && _pEVPPKey == nullptr)
+	if (!EVPPKey::loadKey(&_pEVPPKey, PEM_read_bio_PUBKEY, (EVPPKey::EVP_PKEY_get_Key_fn) nullptr, pPublicKeyStream))
 	{
-		std::string publicKeyData;
-		Poco::StreamCopier::copyToString(*pPublicKeyStream, publicKeyData);
-		BIO* bio = BIO_new_mem_buf(const_cast<char*>(publicKeyData.data()), static_cast<int>(publicKeyData.size()));
-		if (bio == nullptr) throw Poco::IOException("Cannot create BIO for reading public key");
-		EVP_PKEY* pKey = PEM_read_bio_PUBKEY(bio, nullptr, nullptr, nullptr);
-		BIO_free(bio);
-		if (pKey == nullptr)
-			throw Poco::FileException("Failed to load public key");
-		_pEVPPKey = pKey;
+		throw OpenSSLException("RSAKeyImpl(istream*, istream*, const string&)");
 	}
+	ensureRSAKey(_pEVPPKey, "stream");
 }
 
 
@@ -220,42 +180,55 @@ int RSAKeyImpl::size() const
 }
 
 
-RSAKeyImpl::ByteVec RSAKeyImpl::modulus() const
+void RSAKeyImpl::ensureRSAKey(EVP_PKEY* pKey, const std::string& context)
+{
+	if (pKey == nullptr)
+		throw OpenSSLException("RSAKeyImpl(" + context + ")");
+	if (EVP_PKEY_base_id(pKey) != EVP_PKEY_RSA)
+	{
+		EVP_PKEY_free(pKey);
+		throw OpenSSLException("RSAKeyImpl(" + context + "): not an RSA key");
+	}
+}
+
+
+RSAKeyImpl::ByteVec RSAKeyImpl::keyParam(const char* name, bool clearFree) const
 {
 	BIGNUM* bn = nullptr;
-	if (!EVP_PKEY_get_bn_param(_pEVPPKey, OSSL_PKEY_PARAM_RSA_N, &bn))
-		throw OpenSSLException("RSAKeyImpl::modulus()");
+	if (!EVP_PKEY_get_bn_param(_pEVPPKey, name, &bn))
+		return ByteVec();
 	int numBytes = BN_num_bytes(bn);
 	ByteVec byteVector(numBytes);
 	BN_bn2bin(bn, byteVector.data());
-	BN_free(bn);
+	if (clearFree)
+		BN_clear_free(bn);
+	else
+		BN_free(bn);
 	return byteVector;
+}
+
+
+RSAKeyImpl::ByteVec RSAKeyImpl::modulus() const
+{
+	ByteVec result = keyParam(OSSL_PKEY_PARAM_RSA_N);
+	if (result.empty())
+		throw OpenSSLException("RSAKeyImpl::modulus()");
+	return result;
 }
 
 
 RSAKeyImpl::ByteVec RSAKeyImpl::encryptionExponent() const
 {
-	BIGNUM* bn = nullptr;
-	if (!EVP_PKEY_get_bn_param(_pEVPPKey, OSSL_PKEY_PARAM_RSA_E, &bn))
+	ByteVec result = keyParam(OSSL_PKEY_PARAM_RSA_E);
+	if (result.empty())
 		throw OpenSSLException("RSAKeyImpl::encryptionExponent()");
-	int numBytes = BN_num_bytes(bn);
-	ByteVec byteVector(numBytes);
-	BN_bn2bin(bn, byteVector.data());
-	BN_free(bn);
-	return byteVector;
+	return result;
 }
 
 
 RSAKeyImpl::ByteVec RSAKeyImpl::decryptionExponent() const
 {
-	BIGNUM* bn = nullptr;
-	if (!EVP_PKEY_get_bn_param(_pEVPPKey, OSSL_PKEY_PARAM_RSA_D, &bn))
-		return ByteVec();
-	int numBytes = BN_num_bytes(bn);
-	ByteVec byteVector(numBytes);
-	BN_bn2bin(bn, byteVector.data());
-	BN_free(bn);
-	return byteVector;
+	return keyParam(OSSL_PKEY_PARAM_RSA_D, true);
 }
 
 

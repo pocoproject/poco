@@ -70,22 +70,48 @@ const DigestEngine::Digest& RSADigestEngine::signature()
 		digest();
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 		EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new(_key.impl()->getEVPPKey(), nullptr);
-		if (pCtx == nullptr) throw OpenSSLException("RSADigestEngine::signature(): EVP_PKEY_CTX_new()");
-		if (EVP_PKEY_sign_init(pCtx) != 1) { EVP_PKEY_CTX_free(pCtx); throw OpenSSLException("EVP_PKEY_sign_init()"); }
-		if (EVP_PKEY_CTX_set_rsa_padding(pCtx, RSA_PKCS1_PADDING) != 1) { EVP_PKEY_CTX_free(pCtx); throw OpenSSLException("EVP_PKEY_CTX_set_rsa_padding()"); }
+		if (pCtx == nullptr)
+			throw OpenSSLException("RSADigestEngine::signature(): EVP_PKEY_CTX_new()");
+		if (EVP_PKEY_sign_init(pCtx) != 1)
+		{
+			EVP_PKEY_CTX_free(pCtx);
+			throw OpenSSLException("EVP_PKEY_sign_init()");
+		}
+		if (EVP_PKEY_CTX_set_rsa_padding(pCtx, RSA_PKCS1_PADDING) != 1)
+		{
+			EVP_PKEY_CTX_free(pCtx);
+			throw OpenSSLException("EVP_PKEY_CTX_set_rsa_padding()");
+		}
 		const EVP_MD* md = EVP_get_digestbyname(_engine.algorithm().c_str());
-		if (md != nullptr && EVP_PKEY_CTX_set_signature_md(pCtx, md) != 1) { EVP_PKEY_CTX_free(pCtx); throw OpenSSLException("EVP_PKEY_CTX_set_signature_md()"); }
+		if (md == nullptr)
+		{
+			EVP_PKEY_CTX_free(pCtx);
+			throw OpenSSLException("RSADigestEngine: unknown digest: " + _engine.algorithm());
+		}
+		if (EVP_PKEY_CTX_set_signature_md(pCtx, md) != 1)
+		{
+			EVP_PKEY_CTX_free(pCtx);
+			throw OpenSSLException("EVP_PKEY_CTX_set_signature_md()");
+		}
 		size_t sigLen = 0;
-		if (EVP_PKEY_sign(pCtx, nullptr, &sigLen, _digest.data(), _digest.size()) != 1) { EVP_PKEY_CTX_free(pCtx); throw OpenSSLException("EVP_PKEY_sign()"); }
+		if (EVP_PKEY_sign(pCtx, nullptr, &sigLen, _digest.data(), _digest.size()) != 1)
+		{
+			EVP_PKEY_CTX_free(pCtx);
+			throw OpenSSLException("EVP_PKEY_sign()");
+		}
 		_signature.resize(sigLen);
-		if (EVP_PKEY_sign(pCtx, _signature.data(), &sigLen, _digest.data(), _digest.size()) != 1) { EVP_PKEY_CTX_free(pCtx); throw OpenSSLException("EVP_PKEY_sign()"); }
+		if (EVP_PKEY_sign(pCtx, _signature.data(), &sigLen, _digest.data(), _digest.size()) != 1)
+		{
+			EVP_PKEY_CTX_free(pCtx);
+			throw OpenSSLException("EVP_PKEY_sign()");
+		}
 		_signature.resize(sigLen);
 		EVP_PKEY_CTX_free(pCtx);
 #else
 		_signature.resize(_key.size());
 		unsigned sigLen = static_cast<unsigned>(_signature.size());
-		RSA_sign(_engine.nid(), &_digest[0], static_cast<unsigned>(_digest.size()), &_signature[0], &sigLen, _key.impl()->getRSA());
-		// truncate _sig to sigLen
+		if (!RSA_sign(_engine.nid(), &_digest[0], static_cast<unsigned>(_digest.size()), &_signature[0], &sigLen, _key.impl()->getRSA()))
+			throw OpenSSLException("RSADigestEngine::signature(): RSA_sign()");
 		if (sigLen < _signature.size())
 			_signature.resize(sigLen);
 #endif
@@ -99,11 +125,29 @@ bool RSADigestEngine::verify(const DigestEngine::Digest& sig)
 	digest();
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new(_key.impl()->getEVPPKey(), nullptr);
-	if (pCtx == nullptr) throw OpenSSLException("RSADigestEngine::verify(): EVP_PKEY_CTX_new()");
-	if (EVP_PKEY_verify_init(pCtx) != 1) { EVP_PKEY_CTX_free(pCtx); throw OpenSSLException("EVP_PKEY_verify_init()"); }
-	if (EVP_PKEY_CTX_set_rsa_padding(pCtx, RSA_PKCS1_PADDING) != 1) { EVP_PKEY_CTX_free(pCtx); throw OpenSSLException("EVP_PKEY_CTX_set_rsa_padding()"); }
+	if (pCtx == nullptr)
+		throw OpenSSLException("RSADigestEngine::verify(): EVP_PKEY_CTX_new()");
+	if (EVP_PKEY_verify_init(pCtx) != 1)
+	{
+		EVP_PKEY_CTX_free(pCtx);
+		throw OpenSSLException("EVP_PKEY_verify_init()");
+	}
+	if (EVP_PKEY_CTX_set_rsa_padding(pCtx, RSA_PKCS1_PADDING) != 1)
+	{
+		EVP_PKEY_CTX_free(pCtx);
+		throw OpenSSLException("EVP_PKEY_CTX_set_rsa_padding()");
+	}
 	const EVP_MD* md = EVP_get_digestbyname(_engine.algorithm().c_str());
-	if (md != nullptr && EVP_PKEY_CTX_set_signature_md(pCtx, md) != 1) { EVP_PKEY_CTX_free(pCtx); throw OpenSSLException("EVP_PKEY_CTX_set_signature_md()"); }
+	if (md == nullptr)
+	{
+		EVP_PKEY_CTX_free(pCtx);
+		throw OpenSSLException("RSADigestEngine: unknown digest: " + _engine.algorithm());
+	}
+	if (EVP_PKEY_CTX_set_signature_md(pCtx, md) != 1)
+	{
+		EVP_PKEY_CTX_free(pCtx);
+		throw OpenSSLException("EVP_PKEY_CTX_set_signature_md()");
+	}
 	int ret = EVP_PKEY_verify(pCtx, sig.data(), sig.size(), _digest.data(), _digest.size());
 	EVP_PKEY_CTX_free(pCtx);
 	return ret == 1;

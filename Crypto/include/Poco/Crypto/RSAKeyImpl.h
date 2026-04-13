@@ -133,6 +133,12 @@ private:
 	void freeRSA();
 
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	static void ensureRSAKey(EVP_PKEY* pKey, const std::string& context);
+		/// Verifies pKey is an RSA key; frees pKey and throws if not.
+
+	ByteVec keyParam(const char* name, bool clearFree = false) const;
+		/// Extracts a BIGNUM parameter from _pEVPPKey and returns it as ByteVec.
+
 	EVP_PKEY* _pEVPPKey;
 #else
 	static ByteVec convertToByteVec(const BIGNUM* bn);

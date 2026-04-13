@@ -71,12 +71,25 @@ const DigestEngine::Digest& ECDSADigestEngine::signature()
 		digest();
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 		EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new(_key.impl()->getEVPPKey(), nullptr);
-		if (pCtx == nullptr) throw OpenSSLException("ECDSADigestEngine::signature(): EVP_PKEY_CTX_new()");
-		if (EVP_PKEY_sign_init(pCtx) != 1) { EVP_PKEY_CTX_free(pCtx); throw OpenSSLException("EVP_PKEY_sign_init()"); }
+		if (pCtx == nullptr)
+			throw OpenSSLException("ECDSADigestEngine::signature(): EVP_PKEY_CTX_new()");
+		if (EVP_PKEY_sign_init(pCtx) != 1)
+		{
+			EVP_PKEY_CTX_free(pCtx);
+			throw OpenSSLException("EVP_PKEY_sign_init()");
+		}
 		size_t sigLen = 0;
-		if (EVP_PKEY_sign(pCtx, nullptr, &sigLen, _digest.data(), _digest.size()) != 1) { EVP_PKEY_CTX_free(pCtx); throw OpenSSLException("EVP_PKEY_sign()"); }
+		if (EVP_PKEY_sign(pCtx, nullptr, &sigLen, _digest.data(), _digest.size()) != 1)
+		{
+			EVP_PKEY_CTX_free(pCtx);
+			throw OpenSSLException("EVP_PKEY_sign()");
+		}
 		_signature.resize(sigLen);
-		if (EVP_PKEY_sign(pCtx, _signature.data(), &sigLen, _digest.data(), _digest.size()) != 1) { EVP_PKEY_CTX_free(pCtx); throw OpenSSLException("EVP_PKEY_sign()"); }
+		if (EVP_PKEY_sign(pCtx, _signature.data(), &sigLen, _digest.data(), _digest.size()) != 1)
+		{
+			EVP_PKEY_CTX_free(pCtx);
+			throw OpenSSLException("EVP_PKEY_sign()");
+		}
 		_signature.resize(sigLen);
 		EVP_PKEY_CTX_free(pCtx);
 #else
@@ -99,8 +112,13 @@ bool ECDSADigestEngine::verify(const DigestEngine::Digest& sig)
 	digest();
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new(_key.impl()->getEVPPKey(), nullptr);
-	if (pCtx == nullptr) throw OpenSSLException("ECDSADigestEngine::verify(): EVP_PKEY_CTX_new()");
-	if (EVP_PKEY_verify_init(pCtx) != 1) { EVP_PKEY_CTX_free(pCtx); throw OpenSSLException("EVP_PKEY_verify_init()"); }
+	if (pCtx == nullptr)
+		throw OpenSSLException("ECDSADigestEngine::verify(): EVP_PKEY_CTX_new()");
+	if (EVP_PKEY_verify_init(pCtx) != 1)
+	{
+		EVP_PKEY_CTX_free(pCtx);
+		throw OpenSSLException("EVP_PKEY_verify_init()");
+	}
 	int ret = EVP_PKEY_verify(pCtx, sig.data(), sig.size(), _digest.data(), _digest.size());
 	EVP_PKEY_CTX_free(pCtx);
 	return ret == 1;

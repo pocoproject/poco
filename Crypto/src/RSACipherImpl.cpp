@@ -98,9 +98,18 @@ namespace
 			_pBuf(nullptr)
 	{
 		if (_pCtx == nullptr) throwError();
-		if (EVP_PKEY_encrypt_init(_pCtx) != 1) { EVP_PKEY_CTX_free(_pCtx); _pCtx = nullptr; throwError(); }
-		if (EVP_PKEY_CTX_set_rsa_padding(_pCtx, mapPaddingMode(_paddingMode)) != 1) { EVP_PKEY_CTX_free(_pCtx); _pCtx = nullptr; throwError(); }
-		_pBuf = new unsigned char[blockSize()];
+		try
+		{
+			if (EVP_PKEY_encrypt_init(_pCtx) != 1) throwError();
+			if (EVP_PKEY_CTX_set_rsa_padding(_pCtx, mapPaddingMode(_paddingMode)) != 1) throwError();
+			_pBuf = new unsigned char[blockSize()];
+		}
+		catch (...)
+		{
+			EVP_PKEY_CTX_free(_pCtx);
+			_pCtx = nullptr;
+			throw;
+		}
 	}
 
 
@@ -240,9 +249,18 @@ namespace
 			_pBuf(nullptr)
 	{
 		if (_pCtx == nullptr) throwError();
-		if (EVP_PKEY_decrypt_init(_pCtx) != 1) { EVP_PKEY_CTX_free(_pCtx); _pCtx = nullptr; throwError(); }
-		if (EVP_PKEY_CTX_set_rsa_padding(_pCtx, mapPaddingMode(_paddingMode)) != 1) { EVP_PKEY_CTX_free(_pCtx); _pCtx = nullptr; throwError(); }
-		_pBuf = new unsigned char[blockSize()];
+		try
+		{
+			if (EVP_PKEY_decrypt_init(_pCtx) != 1) throwError();
+			if (EVP_PKEY_CTX_set_rsa_padding(_pCtx, mapPaddingMode(_paddingMode)) != 1) throwError();
+			_pBuf = new unsigned char[blockSize()];
+		}
+		catch (...)
+		{
+			EVP_PKEY_CTX_free(_pCtx);
+			_pCtx = nullptr;
+			throw;
+		}
 	}
 
 
