@@ -5,8 +5,8 @@
 // Package: SSH
 // Module:  SSHSession
 //
-// Copyright (c) 2024, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2026, Aleph ONE Software Engineering LLC
+// and Contributors.
 //
 // SPDX-License-Identifier: BSL-1.0
 //
@@ -100,8 +100,17 @@ void SSHSession::run()
 				_logger.trace("Key exchange failed: %s", std::string(ssh_get_error(_session)));
 		}
 	}
+	catch (Poco::Exception& exc)
+	{
+		_logger.error("SSH session error: %s", exc.displayText());
+	}
+	catch (std::exception& exc)
+	{
+		_logger.error("SSH session error: %s", std::string(exc.what()));
+	}
 	catch (...)
 	{
+		_logger.error("SSH session: unknown exception");
 	}
 
 	if (_logger.trace())

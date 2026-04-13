@@ -39,7 +39,7 @@ env:
     -DENABLE_CRYPTO=ON -DENABLE_NETSSL=ON -DENABLE_JWT=ON
     -DENABLE_ENCODINGS=ON -DENABLE_PDF=ON
     -DENABLE_ZIP=ON -DENABLE_SEVENZIP=ON
-    -DENABLE_REDIS=ON -DENABLE_MONGODB=ON
+    -DENABLE_REDIS=ON -DENABLE_MONGODB=ON -DENABLE_SSH=ON
     -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON
     -DENABLE_PROMETHEUS=ON
     -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON
@@ -183,7 +183,7 @@ jobs:
       - run: sudo sysctl vm.mmap_rnd_bits
       - run: sudo sysctl -w vm.mmap_rnd_bits=28
       - run: >-
-          sudo apt -y update && sudo apt -y install libssl-dev libltdl-dev apache2-dev libapr1-dev libaprutil1-dev libavahi-client-dev
+          sudo apt -y update && sudo apt -y install libssl-dev libssh-dev libltdl-dev apache2-dev libapr1-dev libaprutil1-dev libavahi-client-dev
           libsqlite3-dev redis-server
       - uses: supercharge/mongodb-github-action@1.12.1
       - run: >-

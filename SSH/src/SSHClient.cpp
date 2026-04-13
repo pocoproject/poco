@@ -5,8 +5,8 @@
 // Package: SSH
 // Module:  SSHClient
 //
-// Copyright (c) 2024, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2026, Aleph ONE Software Engineering LLC
+// and Contributors.
 //
 // SPDX-License-Identifier: BSL-1.0
 //

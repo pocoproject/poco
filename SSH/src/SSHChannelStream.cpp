@@ -5,8 +5,8 @@
 // Package: SSH
 // Module:  SSHChannelStream
 //
-// Copyright (c) 2024, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2026, Aleph ONE Software Engineering LLC
+// and Contributors.
 //
 // SPDX-License-Identifier: BSL-1.0
 //
@@ -45,8 +45,19 @@ int SSHChannelStreamBuf::overflow(int c)
 std::streamsize SSHChannelStreamBuf::xsputn(const char* s, std::streamsize n)
 {
 	if (n <= 0) return 0;
-	int written = ssh_channel_write(_channel, s, static_cast<uint32_t>(n));
-	return (written >= 0) ? written : 0;
+
+	static const uint32_t MAX_CHUNK = 0x7FFFFFFF; // max safe size for ssh_channel_write
+	std::streamsize totalWritten = 0;
+	while (totalWritten < n)
+	{
+		std::streamsize remaining = n - totalWritten;
+		uint32_t chunk = (remaining > MAX_CHUNK) ? MAX_CHUNK : static_cast<uint32_t>(remaining);
+		int written = ssh_channel_write(_channel, s + totalWritten, chunk);
+		if (written <= 0)
+			break;
+		totalWritten += written;
+	}
+	return totalWritten;
 }
 
 

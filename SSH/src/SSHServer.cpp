@@ -5,8 +5,8 @@
 // Package: SSH
 // Module:  SSHServer
 //
-// Copyright (c) 2024, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2026, Aleph ONE Software Engineering LLC
+// and Contributors.
 //
 // SPDX-License-Identifier: BSL-1.0
 //
@@ -181,19 +181,22 @@ void SSHServer::acceptLoop()
 		if (_logger.trace())
 			_logger.trace("Connection accepted");
 
+		SSHSession* pSession = nullptr;
 		try
 		{
-			SSHSession* pSession = _sessionFactory(session, _config, *this);
+			pSession = _sessionFactory(session, _config, *this);
 			_threadPool.start(*pSession);
 		}
 		catch (Poco::NoThreadAvailableException&)
 		{
 			_logger.warning("SSH connection rejected: max connections reached");
+			delete pSession; // SSHSession destructor does not free ssh_session (run() does)
 			ssh_disconnect(session);
 			ssh_free(session);
 		}
 		catch (...)
 		{
+			delete pSession;
 			ssh_disconnect(session);
 			ssh_free(session);
 		}

@@ -1,8 +1,8 @@
 //
 // SSHTest.cpp
 //
-// Copyright (c) 2024, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2026, Aleph ONE Software Engineering LLC
+// and Contributors.
 //
 // SPDX-License-Identifier: BSL-1.0
 //
@@ -362,31 +362,41 @@ void SSHTest::testMaxConnections()
 	});
 	server.start();
 
+	SSHClient client1;
+	client1.connect("127.0.0.1", port);
+	assertTrue(client1.authenticatePassword("testuser", "testpass"));
+
+	ssh_channel ch1 = client1.openShellChannel();
+	assertTrue(ch1 != nullptr);
+
+	// Read greeting to fully establish session
+	char buf[256];
+	ssh_channel_read(ch1, buf, sizeof(buf), 0);
+
+	// Second connection: server has maxConnections=1, thread pool is full.
+	// The TCP connection succeeds but no thread is available to handle
+	// the SSH session, so key exchange will not complete.
+	// Set a timeout so the client doesn't block forever.
+	SSHClient client2;
+	long timeout2 = 3;
+	ssh_options_set(client2.session(), SSH_OPTIONS_TIMEOUT, &timeout2);
+	bool connected2 = false;
 	try
 	{
-		SSHClient client1;
-		client1.connect("127.0.0.1", port);
-		assertTrue(client1.authenticatePassword("testuser", "testpass"));
-
-		ssh_channel ch1 = client1.openShellChannel();
-		assertTrue(ch1 != nullptr);
-
-		// Read greeting to fully establish session
-		char buf[256];
-		ssh_channel_read(ch1, buf, sizeof(buf), 0);
-
-		// Second connection should either fail to get a session or timeout
-		// (server has maxConnections=1, thread pool is full)
-		Poco::Thread::sleep(200);
-
-		ssh_channel_free(ch1);
-		client1.disconnect();
+		client2.connect("127.0.0.1", port);
+		connected2 = true;
+		// Key exchange should timeout since server can't handle the session
+		bool auth2 = client2.authenticatePassword("testuser", "testpass");
+		assertTrue(!auth2);
 	}
-	catch (...)
+	catch (Poco::Exception&)
 	{
-		server.stop();
-		throw;
+		// Connection or auth timeout/failure is expected
 	}
+	if (connected2) client2.disconnect();
+
+	ssh_channel_free(ch1);
+	client1.disconnect();
 
 	server.stop();
 }

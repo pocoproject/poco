@@ -5,8 +5,8 @@
 // Package: SSH
 // Module:  SSHHostKeyManager
 //
-// Copyright (c) 2024, Applied Informatics Software Engineering GmbH.
-// All rights reserved.
+// Copyright (c) 2026, Aleph ONE Software Engineering LLC
+// and Contributors.
 //
 // SPDX-License-Identifier: BSL-1.0
 //
@@ -59,19 +59,31 @@ std::string SSHHostKeyManager::ensureHostKey(const std::string& keyDir, const st
 
 void SSHHostKeyManager::generateKey(const std::string& path)
 {
+#ifndef POCO_OS_FAMILY_WINDOWS
+	// Set restrictive umask before writing private key to ensure
+	// the file is never accessible by group/others, even briefly.
+	mode_t oldMask = umask(0077);
+#endif
+
 	ssh_key key = nullptr;
 	int rc = ssh_pki_generate(SSH_KEYTYPE_ED25519, 0, &key);
 	if (rc != SSH_OK || !key)
+	{
+#ifndef POCO_OS_FAMILY_WINDOWS
+		umask(oldMask);
+#endif
 		throw SSHException("Failed to generate SSH host key");
+	}
 
 	rc = ssh_pki_export_privkey_file(key, nullptr, nullptr, nullptr, path.c_str());
 	ssh_key_free(key);
-	if (rc != SSH_OK)
-		throw SSHException("Failed to write SSH host key to " + path);
 
 #ifndef POCO_OS_FAMILY_WINDOWS
-	chmod(path.c_str(), 0600);
+	umask(oldMask);
 #endif
+
+	if (rc != SSH_OK)
+		throw SSHException("Failed to write SSH host key to " + path);
 }
 
 
