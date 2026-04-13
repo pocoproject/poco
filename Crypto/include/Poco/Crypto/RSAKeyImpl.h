@@ -29,10 +29,12 @@
 #include <vector>
 
 
+#ifndef OPENSSL_NO_DEPRECATED_3_0
 struct bignum_st;
 struct rsa_st;
 typedef struct bignum_st BIGNUM;
 typedef struct rsa_st RSA;
+#endif
 
 
 namespace Poco::Crypto {
@@ -75,11 +77,27 @@ public:
 	~RSAKeyImpl();
 		/// Destroys the RSAKeyImpl.
 
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	EVP_PKEY* getEVPPKey();
+		/// Returns the OpenSSL EVP_PKEY object.
+
+	const EVP_PKEY* getEVPPKey() const;
+		/// Returns the OpenSSL EVP_PKEY object.
+#endif
+
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	POCO_DEPRECATED("use getEVPPKey() instead")
+#endif
 	RSA* getRSA();
 		/// Returns the OpenSSL RSA object.
 
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	POCO_DEPRECATED("use getEVPPKey() instead")
+#endif
 	const RSA* getRSA() const;
 		/// Returns the OpenSSL RSA object.
+#endif
 
 	int size() const;
 		/// Returns the RSA modulus size.
@@ -113,25 +131,35 @@ private:
 	RSAKeyImpl();
 
 	void freeRSA();
+
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	EVP_PKEY* _pEVPPKey;
+#else
 	static ByteVec convertToByteVec(const BIGNUM* bn);
 
 	RSA* _pRSA;
+#endif
 };
 
 
 //
 // inlines
 //
-inline RSA* RSAKeyImpl::getRSA()
+
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+
+inline EVP_PKEY* RSAKeyImpl::getEVPPKey()
 {
-	return _pRSA;
+	return _pEVPPKey;
 }
 
 
-inline const RSA* RSAKeyImpl::getRSA() const
+inline const EVP_PKEY* RSAKeyImpl::getEVPPKey() const
 {
-	return _pRSA;
+	return _pEVPPKey;
 }
+
+#endif
 
 
 } // namespace Poco::Crypto
