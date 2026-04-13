@@ -165,6 +165,19 @@ inline const EVP_PKEY* RSAKeyImpl::getEVPPKey() const
 	return _pEVPPKey;
 }
 
+#else
+
+inline RSA* RSAKeyImpl::getRSA()
+{
+	return _pRSA;
+}
+
+
+inline const RSA* RSAKeyImpl::getRSA() const
+{
+	return _pRSA;
+}
+
 #endif
 
 
