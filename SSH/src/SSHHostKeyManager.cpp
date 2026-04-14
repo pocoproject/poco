@@ -67,7 +67,7 @@ void SSHHostKeyManager::generateKey(const std::string& path)
 #endif
 
 	ssh_key key = nullptr;
-#if LIBSSH_VERSION_INT >= SSH_VERSION_INT(0, 11, 0)
+#if LIBSSH_VERSION_INT >= SSH_VERSION_INT(0, 12, 0)
 	int rc = ssh_pki_generate_key(SSH_KEYTYPE_ED25519, nullptr, &key);
 #else
 	int rc = ssh_pki_generate(SSH_KEYTYPE_ED25519, 0, &key);

@@ -159,6 +159,9 @@ void SSHServer::disconnectAllSessions()
 		if (fd != SSH_INVALID_SOCKET)
 		{
 			::shutdown(fd, 2);
+#ifdef POCO_OS_FAMILY_WINDOWS
+			::closesocket(fd);
+#endif
 		}
 	}
 }
