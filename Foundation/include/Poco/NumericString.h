@@ -18,11 +18,6 @@
 #define Foundation_NumericString_INCLUDED
 
 
-#ifndef POCO_NUMERIC_STRING_PRIVATE
-	#error "Do not include Poco/NumericString.h directly. Use Poco/NumberFormatter.h or Poco/NumberParser.h instead."
-#endif
-
-
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
 #include "Poco/FPEnvironment.h"

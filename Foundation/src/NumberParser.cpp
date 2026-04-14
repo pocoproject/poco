@@ -15,9 +15,7 @@
 #include "Poco/NumberParser.h"
 #include "Poco/Exception.h"
 #include "Poco/String.h"
-#define POCO_NUMERIC_STRING_PRIVATE
 #include "Poco/NumericString.h"
-#undef POCO_NUMERIC_STRING_PRIVATE
 #include <cstdio>
 #include <cctype>
 #include <stdlib.h>

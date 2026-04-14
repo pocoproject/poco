@@ -19,9 +19,7 @@
 
 
 #include "Poco/Foundation.h"
-#define POCO_NUMERIC_STRING_PRIVATE
 #include "Poco/NumericString.h"
-#undef POCO_NUMERIC_STRING_PRIVATE
 
 
 namespace Poco {

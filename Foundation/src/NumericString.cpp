@@ -13,9 +13,7 @@
 
 
 #include "Poco/Bugcheck.h"
-#define POCO_NUMERIC_STRING_PRIVATE
 #include "Poco/NumericString.h"
-#undef POCO_NUMERIC_STRING_PRIVATE
 
 #ifndef POCO_HAS_FLOAT_CHARCONV
 // +++ double conversion +++
