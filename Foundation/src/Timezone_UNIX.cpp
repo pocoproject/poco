@@ -17,7 +17,9 @@
 #include <mutex>
 #include <ctime>
 #include <cstdlib>
+#include <cstring>
 #include <string>
+#include <sys/stat.h>
 
 
 namespace Poco {
@@ -66,13 +68,52 @@ private:
 	{
 		const char* tz = std::getenv("TZ");
 		_cachedTZ = tz ? tz : "";
+		cacheLocaltimeStat();
 	}
 
 	bool tzChanged() const
 	{
 		const char* tz = std::getenv("TZ");
 		std::string currentTZ = tz ? tz : "";
-		return currentTZ != _cachedTZ;
+		if (currentTZ != _cachedTZ) return true;
+		return localtimeStatChanged();
+	}
+
+	void cacheLocaltimeStat()
+	{
+		struct stat st{};
+		if (::stat("/etc/localtime", &st) == 0)
+		{
+			_localtime_ino = st.st_ino;
+			_localtime_mtime = st.st_mtime;
+		}
+		else
+		{
+			_localtime_ino = 0;
+			_localtime_mtime = 0;
+		}
+	}
+
+	bool localtimeStatChanged() const
+	{
+		struct stat st{};
+		if (::stat("/etc/localtime", &st) == 0)
+		{
+			if (st.st_ino != _localtime_ino || st.st_mtime != _localtime_mtime)
+			{
+				_localtime_ino = st.st_ino;
+				_localtime_mtime = st.st_mtime;
+				return true;
+			}
+			return false;
+		}
+		// /etc/localtime not accessible: treat as changed only if we had it before
+		if (_localtime_ino != 0) {
+			_localtime_ino = 0;
+			_localtime_mtime = 0;
+			return true;
+		}
+		return false;
 	}
 
 	static int computeTimeZone()
@@ -112,6 +153,8 @@ private:
 	std::mutex _mutex;
 	int _tzOffset;
 	std::string _cachedTZ;
+	mutable ino_t _localtime_ino = 0;
+	mutable time_t _localtime_mtime = 0;
 };
 
 
