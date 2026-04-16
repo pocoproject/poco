@@ -20,14 +20,6 @@
 #define Crypto_Crypto_INCLUDED
 
 
-//
-// Temporarily suppress deprecation warnings coming
-// from OpenSSL 3.0, until we have updated our code.
-//
-#if !defined(POCO_DONT_SUPPRESS_OPENSSL_DEPRECATED)
-#define OPENSSL_SUPPRESS_DEPRECATED
-#endif
-
 
 #include "Poco/Foundation.h"
 #include <openssl/opensslv.h>

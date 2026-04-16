@@ -16,6 +16,7 @@
 #include "Poco/Crypto/ECDSADigestEngine.h"
 #include "Poco/Crypto/CryptoException.h"
 #include <openssl/ecdsa.h>
+#include <openssl/evp.h>
 #include <openssl/bn.h>
 
 
@@ -69,6 +70,30 @@ const DigestEngine::Digest& ECDSADigestEngine::signature()
 	if (_signature.empty())
 	{
 		digest();
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+		EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new(_key.impl()->getEVPPKey(), nullptr);
+		if (pCtx == nullptr)
+			throw OpenSSLException("ECDSADigestEngine::signature(): EVP_PKEY_CTX_new()");
+		if (EVP_PKEY_sign_init(pCtx) != 1)
+		{
+			EVP_PKEY_CTX_free(pCtx);
+			throw OpenSSLException("EVP_PKEY_sign_init()");
+		}
+		size_t sigLen = 0;
+		if (EVP_PKEY_sign(pCtx, nullptr, &sigLen, _digest.data(), _digest.size()) != 1)
+		{
+			EVP_PKEY_CTX_free(pCtx);
+			throw OpenSSLException("EVP_PKEY_sign()");
+		}
+		_signature.resize(sigLen);
+		if (EVP_PKEY_sign(pCtx, _signature.data(), &sigLen, _digest.data(), _digest.size()) != 1)
+		{
+			EVP_PKEY_CTX_free(pCtx);
+			throw OpenSSLException("EVP_PKEY_sign()");
+		}
+		_signature.resize(sigLen);
+		EVP_PKEY_CTX_free(pCtx);
+#else
 		_signature.resize(_key.size());
 		unsigned sigLen = static_cast<unsigned>(_signature.size());
 		if (!ECDSA_sign(0, &_digest[0], static_cast<unsigned>(_digest.size()),
@@ -77,6 +102,7 @@ const DigestEngine::Digest& ECDSADigestEngine::signature()
 			throw OpenSSLException();
 		}
 		if (sigLen < _signature.size()) _signature.resize(sigLen);
+#endif
 	}
 	return _signature;
 }
@@ -85,6 +111,21 @@ const DigestEngine::Digest& ECDSADigestEngine::signature()
 bool ECDSADigestEngine::verify(const DigestEngine::Digest& sig)
 {
 	digest();
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new(_key.impl()->getEVPPKey(), nullptr);
+	if (pCtx == nullptr)
+		throw OpenSSLException("ECDSADigestEngine::verify(): EVP_PKEY_CTX_new()");
+	if (EVP_PKEY_verify_init(pCtx) != 1)
+	{
+		EVP_PKEY_CTX_free(pCtx);
+		throw OpenSSLException("EVP_PKEY_verify_init()");
+	}
+	int ret = EVP_PKEY_verify(pCtx, sig.data(), sig.size(), _digest.data(), _digest.size());
+	EVP_PKEY_CTX_free(pCtx);
+	if (ret == 1) return true;
+	if (ret == 0) return false;
+	throw OpenSSLException("ECDSADigestEngine::verify(): EVP_PKEY_verify()");
+#else
 	EC_KEY* pKey = _key.impl()->getECKey();
 	if (pKey)
 	{
@@ -95,6 +136,7 @@ bool ECDSADigestEngine::verify(const DigestEngine::Digest& sig)
 		else if (0 == ret) return false;
 	}
 	throw OpenSSLException();
+#endif
 }
 
 

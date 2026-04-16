@@ -86,8 +86,8 @@ public:
 		/// Constructs EVPPKey from EVP_PKEY pointer.
 		/// The content behind the supplied pointer is internally duplicated.
 
+#if !POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	template<typename K>
-	//[[deprecated]] explicit EVPPKey(K* pKey): _pEVPPKey(EVP_PKEY_new())
 	explicit EVPPKey(K* pKey): _pEVPPKey(EVP_PKEY_new())
 		/// Constructs EVPPKey from a "native" OpenSSL (RSA or EC_KEY),
 		/// or a Poco wrapper (RSAKey, ECKey) key pointer.
@@ -95,6 +95,7 @@ public:
 		if (!_pEVPPKey) throw OpenSSLException();
 		setKey(pKey);
 	}
+#endif
 
 	EVPPKey(const std::string& publicKeyFile, const std::string& privateKeyFile, const std::string& privateKeyPassphrase = "");
 		/// Creates the EVPPKey, by reading public and private key from the given files and
@@ -178,17 +179,12 @@ private:
 	void newECKey(const char* group);
 	void duplicate(EVP_PKEY* pEVPPKey);
 
-	//[[deprecated]]
+#if !POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	void setKey(ECKey* pKey);
-
-	//[[deprecated]]
 	void setKey(RSAKey* pKey);
-
-	//[[deprecated]]
 	void setKey(EC_KEY* pKey);
-
-	//[[deprecated]]
 	void setKey(RSA* pKey);
+#endif
 
 	static int passCB(char* buf, int size, int, void* pass);
 
