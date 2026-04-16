@@ -611,42 +611,59 @@ jobs:
       - uses: TheMrMilchmann/setup-msvc-dev@v4
         with:
           arch: x64
-      - name: Install OpenSSL (ShiningLight Win64 Dev via winget)
+      - name: Install OpenSSL (FireDaemon portable zip)
         shell: pwsh
+        env:
+          # Major.minor track. 3.6 = latest, 3.5 = LTS. Latest patch is scraped
+          # from the KB page; falls back to OPENSSL_ZIP_FALLBACK if scrape fails.
+          OPENSSL_TRACK: "3.6"
+          OPENSSL_ZIP_FALLBACK: openssl-3.6.2.zip
         run: |
           $ProgressPreference = 'SilentlyContinue'
-          $log = winget install --id ShiningLight.OpenSSL.Dev --exact --source winget `
-            --silent --accept-package-agreements --accept-source-agreements `
-            --disable-interactivity --no-upgrade 2>&1
-          if ($LASTEXITCODE -ne 0) {
-            $text = $log | Out-String
-            # winget returns non-zero even when the package is already installed
-            # (https://github.com/microsoft/winget-cli/issues/4262).
-            if ($text -notmatch 'already installed') {
-              $log | Out-Host
-              exit $LASTEXITCODE
+          # FireDaemon ships a portable OpenSSL zip with the legacy provider
+          # included (ossl-modules/legacy.dll) -- needed for DES-ECB and PKCS12
+          # tests that exercise RC2/3DES PBE. No winget, no registry, no admin.
+          # Detect latest patch version from the KB page.
+          $kb = "https://kb.firedaemon.com/support/solutions/articles/4000121705-openssl-binary-distributions-for-microsoft-windows"
+          $zipName = $env:OPENSSL_ZIP_FALLBACK
+          try {
+            $html = Invoke-WebRequest -Uri $kb -UseBasicParsing -TimeoutSec 30
+            $pattern = "openssl-" + [regex]::Escape($env:OPENSSL_TRACK) + "\.(\d+)([a-z]?)\.zip"
+            $found = [regex]::Matches($html.Content, $pattern) |
+              ForEach-Object { $_.Value } | Select-Object -Unique
+            if ($found.Count -gt 0) {
+              $zipName = $found | Sort-Object {
+                if ($_ -match "openssl-[\d\.]+\.(\d+)([a-z]?)\.zip") {
+                  $patch = [int]$Matches[1]
+                  $suffix = if ($Matches[2]) { [int][char]$Matches[2] } else { 0 }
+                  $patch * 100 + $suffix
+                } else { 0 }
+              } -Descending | Select-Object -First 1
             }
+          } catch {
+            Write-Host "Version scrape failed ($_); using fallback $zipName"
           }
-          # Detect OpenSSL root from libssl on PATH -- no hardcoded paths.
-          $sslDll = Get-Command libssl-3-x64.dll -ErrorAction SilentlyContinue
-          if ($null -eq $sslDll) {
-            Write-Error "libssl-3-x64.dll not found on PATH -- OpenSSL install broken"
+          Write-Host "Selected: $zipName"
+          # Install into the job sandbox so every job gets a clean copy.
+          $url = "https://download.firedaemon.com/FireDaemon-OpenSSL/$zipName"
+          $zip = Join-Path $env:RUNNER_TEMP $zipName
+          $installDir = Join-Path $env:RUNNER_TEMP "openssl"
+          Write-Host "Downloading $url"
+          Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing
+          Expand-Archive -Path $zip -DestinationPath $installDir -Force
+          $root = Join-Path $installDir "x64"
+          if (-not (Test-Path "$root\bin\libssl-3-x64.dll")) {
+            Write-Error "libssl-3-x64.dll missing under $root"
             exit 1
           }
-          $opensslRoot = Split-Path (Split-Path $sslDll.Source)
-          Write-Host "OpenSSL root: $opensslRoot"
-          "OPENSSL_ROOT_DIR=$opensslRoot" | Out-File -FilePath $env:GITHUB_ENV -Append
-          Add-Content $env:GITHUB_PATH "$opensslRoot\bin"
-          # Point OPENSSL_MODULES at legacy.dll so PKCS12 (RC2/3DES PBE) and
-          # DES-ECB tests can load the legacy provider.
-          $legacy = Get-ChildItem -Path $opensslRoot -Filter legacy.dll -Recurse `
-                    -ErrorAction SilentlyContinue | Select-Object -First 1
-          if ($null -eq $legacy) {
-            Write-Error "legacy.dll not found under $opensslRoot -- legacy provider missing"
+          if (-not (Test-Path "$root\lib\ossl-modules\legacy.dll")) {
+            Write-Error "legacy.dll missing under $root\lib\ossl-modules"
             exit 1
           }
-          "OPENSSL_MODULES=$($legacy.DirectoryName)" | Out-File -FilePath $env:GITHUB_ENV -Append
-          Write-Host "OPENSSL_MODULES=$($legacy.DirectoryName)"
+          "OPENSSL_ROOT_DIR=$root" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Add-Content $env:GITHUB_PATH "$root\bin"
+          "OPENSSL_MODULES=$root\lib\ossl-modules" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Write-Host "OPENSSL_ROOT_DIR=$root"
       - run: >-
           cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
