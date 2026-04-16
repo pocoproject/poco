@@ -1,6 +1,6 @@
 # libpng - PNG reference library
-# Version: 1.6.56
-# Source: https://github.com/pnggroup/libpng/releases/tag/v1.6.56
+# Version: 1.6.57
+# Source: https://github.com/pnggroup/libpng/releases/tag/v1.6.57
 
 if(POCO_UNBUNDLED)
 	if (ENABLE_PDF)
