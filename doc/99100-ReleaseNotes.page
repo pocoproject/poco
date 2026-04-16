@@ -1,6 +1,68 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.15.2
+
+!!Summary of Changes
+
+This release focuses on security hardening and bug fixes. Key changes include
+TLS 1.3 support for NetSSL_Win, building Crypto and NetSSL with
+OPENSSL_NO_DEPRECATED, removal of deprecated non-EVP OpenSSL code (breaking
+change), significant multipart parsing performance improvements, Prometheus
+thread/CPU metrics, GNU Hurd platform support, and numerous bug fixes across
+networking, cryptography, and data handling. All bundled third-party libraries
+have been updated to their latest releases.
+
+!!Breaking Changes
+
+  - GH #4602 OpenSSL: Remove deprecated non EVP code
+
+!!Security Fixes
+
+  - PR #5306 chore(dependencies): refresh bundled third-party libraries
+  - GH #5296 Crypto and NetSSL_OpenSSL should build with OPENSSL_NO_DEPRECATED defined
+  - GH #5278 NetSSL_Win does not support TLS 1.3
+
+Bundled Third-Party Library Upgrades:
+  - libpng 1.6.55 -> 1.6.57 - security fixes
+  - libharu (hpdf) 2.4.5 -> 2.4.6 - security (TTF fixes) + memory alloc / Windows build fixes
+  - SQLite 3.51.2 -> 3.53.0 - WAL-reset database corruption fix, query planner improvements
+  - Quill 11.0.2 -> 11.1.0 - thread-local context fix, nullptr checks, backend poll hooks
+
+!!Features and Enhancements
+
+  - PR #5305 enh(Foundation): auto-disable FastLogger on unsupported platforms
+  - PR #5303 enh: bump macOS deployment target to 15.0 (Sequoia)
+  - PR #5300 chore(PropertyConfigurationFile): use '=' as default separator
+  - PR #5298 Foundation: Fix sign-compare warnings in StreamConverter
+  - PR #5294 Link with atomic library on architectures that need it
+  - GH #5292 enh: reduce binary size growth since 1.14.2
+  - GH #5291 Component Install Support
+  - PR #5286 fix(cmake,DNSSD): build fixes and cmake dependency resolution
+  - GH #5280 Remove WinDriver.cpp files
+  - GH #5275 Prometheus: add memory and thread metrics
+  - GH #5266 PropertyFileConfiguration: add include file capability
+  - GH #5250 Poco::Net::Context::addCertificateAuthority() could include a call to SSL_CTX_load_verify_locations()
+  - GH #4846 NetSSL/Crypto: Replace deprecated OpenSSL features
+
+!!Bug Fixes and Improvements
+
+  - PR #5309 fix(Redis,XML,CppParser): replace dynamic_cast with static_cast for hidden visibility
+  - GH #5308 Net: SocketProactor reports success on TCP write after non-blocking connect refusal
+  - PR #5304 fix(MongoDB): suppress false topology change notifications on heartbeat
+  - PR #5293 Port library to GNU Hurd
+  - GH #5288 Fuzzing Issue in MailMessage
+  - GH #5287 Fuzzing Issue in DateTime
+  - PR #5284 fix(Redis): use shared_ptr for NotificationCenter, harden AsyncNotificationCenter::stop()
+  - PR #5283 fix(ApacheConnector,Foundation): fix compile warnings with GCC 15
+  - GH #5269 Pipe close deadlocks on
+  - PR #5264 fix(Data): Robust date/time parsing in SQLite/PostgreSQL extractor
+  - GH #5263 X509Certificate validFrom method throws exception for timestamps ending with Z
+  - GH #4883 SecureSocketImpl::shutdown() regression since 1.14.0
+  - GH #4772 InvalidCertificateHandler onInvalidCertificate wrong exception
+  - GH #4118 Poco Multipart parsing is 10x slower than its Boost/beat or restinio equivalent
+  - GH #1097 Process::isRunning returns true for defunct tagged process
+
 !!!Release 1.15.1
 
 !!Summary of Changes
