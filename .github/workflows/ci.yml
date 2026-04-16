@@ -618,30 +618,45 @@ jobs:
         # success and surfaced on failure.
         run: |
           $ProgressPreference = 'SilentlyContinue'
+          $opensslRoot = "C:\OpenSSL-Win64"
           $log = winget install --id ShiningLight.OpenSSL.Dev --exact --source winget `
             --silent --accept-package-agreements --accept-source-agreements --disable-interactivity `
-            --no-upgrade --location "C:\OpenSSL-Win64" 2>&1
+            --no-upgrade --location $opensslRoot 2>&1
           if ($LASTEXITCODE -ne 0) {
             # winget returns non-zero even when the package is already installed
             # (https://github.com/microsoft/winget-cli/issues/4262).
             $text = $log | Out-String
             if ($text -match 'already installed') {
-              Write-Host "OpenSSL already installed -- continuing"
+              Write-Host "OpenSSL already installed -- detecting location"
+              # The runner image may have OpenSSL at a different path.
+              $sslDll = Get-Command libssl-3-x64.dll -ErrorAction SilentlyContinue
+              if ($null -ne $sslDll) {
+                $opensslRoot = Split-Path (Split-Path $sslDll.Source)
+                Write-Host "Detected OpenSSL at $opensslRoot"
+              } elseif (Test-Path "C:\Program Files\OpenSSL") {
+                $opensslRoot = "C:\Program Files\OpenSSL"
+                Write-Host "Using default OpenSSL at $opensslRoot"
+              } else {
+                Write-Error "OpenSSL already installed but cannot find location"
+                exit 1
+              }
             } else {
               $log | Out-Host
               exit $LASTEXITCODE
             }
           }
+          # Export root dir so the cmake step can reference it.
+          "OPENSSL_ROOT_DIR=$opensslRoot" | Out-File -FilePath $env:GITHUB_ENV -Append
           # Prepend our OpenSSL bin dir so the loader picks up our libssl/libcrypto
           # instead of the runner image's OpenSSL (mismatch -> STATUS_ENTRYPOINT_NOT_FOUND).
-          Add-Content $env:GITHUB_PATH "C:\OpenSSL-Win64\bin"
+          Add-Content $env:GITHUB_PATH "$opensslRoot\bin"
           # Point OPENSSL_MODULES at legacy.dll so PKCS12 (RC2/3DES PBE) and DES-ECB
           # tests can load the legacy provider. ShiningLight's baked-in OPENSSLDIR
           # does not match our --location override.
-          $legacy = Get-ChildItem -Path "C:\OpenSSL-Win64" -Filter legacy.dll -Recurse -ErrorAction SilentlyContinue |
+          $legacy = Get-ChildItem -Path $opensslRoot -Filter legacy.dll -Recurse -ErrorAction SilentlyContinue |
                     Select-Object -First 1
           if ($null -eq $legacy) {
-            Write-Error "legacy.dll not found under C:\OpenSSL-Win64 -- OpenSSL providers missing from install"
+            Write-Error "legacy.dll not found under $opensslRoot -- OpenSSL providers missing from install"
             exit 1
           }
           "OPENSSL_MODULES=$($legacy.DirectoryName)" | Out-File -FilePath $env:GITHUB_ENV -Append
@@ -650,7 +665,7 @@ jobs:
           cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
           ${{ env.POCO_CMAKE_WINDOWS_FULL }}
-          -DOPENSSL_ROOT_DIR="C:/OpenSSL-Win64"
+          -DOPENSSL_ROOT_DIR="${{ env.OPENSSL_ROOT_DIR }}"
       - run: cmake --build cmake-build --parallel $env:NUMBER_OF_PROCESSORS
       - uses: ./.github/actions/retry-action
         env:
