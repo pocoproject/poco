@@ -24,8 +24,207 @@
 #include <openssl/evp.h>
 #include <openssl/bn.h>
 
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+#include <openssl/core_names.h>
+#endif
+
 
 namespace Poco::Crypto {
+
+
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+
+
+// OpenSSL 3.0+ implementation using EVP_PKEY
+
+
+ECKeyImpl::ECKeyImpl(const EVPPKey& key):
+	KeyPairImpl("ec", KT_EC_IMPL),
+	_pEVPPKey(nullptr)
+{
+	EVPPKey::duplicate(const_cast<EVP_PKEY*>((const EVP_PKEY*)key), &_pEVPPKey);
+	safeCheckEC("ECKeyImpl(const EVPPKey&)", "EVP_PKEY_dup()");
+}
+
+
+ECKeyImpl::ECKeyImpl(const X509Certificate& cert):
+	KeyPairImpl("ec", KT_EC_IMPL),
+	_pEVPPKey(nullptr)
+{
+	const X509* pCert = cert.certificate();
+	if (pCert != nullptr)
+	{
+		_pEVPPKey = X509_get_pubkey(const_cast<X509*>(pCert));
+		if (_pEVPPKey != nullptr)
+		{
+			safeCheckEC("ECKeyImpl(const X509Certificate&)", "X509_get_pubkey()");
+			return;
+		}
+	}
+	throw OpenSSLException("ECKeyImpl(const X509Certificate&)");
+}
+
+
+ECKeyImpl::ECKeyImpl(const PKCS12Container& cont):
+	KeyPairImpl("ec", KT_EC_IMPL),
+	_pEVPPKey(nullptr)
+{
+	EVPPKey key = cont.getKey();
+	EVPPKey::duplicate(static_cast<EVP_PKEY*>(key), &_pEVPPKey);
+	safeCheckEC("ECKeyImpl(const PKCS12Container&)", "EVP_PKEY_dup()");
+}
+
+
+ECKeyImpl::ECKeyImpl(int curve):
+	KeyPairImpl("ec", KT_EC_IMPL),
+	_pEVPPKey(nullptr)
+{
+	EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new_id(EVP_PKEY_EC, nullptr);
+	if (pCtx == nullptr)
+		throw OpenSSLException("ECKeyImpl: EVP_PKEY_CTX_new_id()");
+	if (EVP_PKEY_keygen_init(pCtx) != 1)
+	{
+		EVP_PKEY_CTX_free(pCtx);
+		throw OpenSSLException("ECKeyImpl: EVP_PKEY_keygen_init()");
+	}
+	if (EVP_PKEY_CTX_set_ec_paramgen_curve_nid(pCtx, curve) != 1)
+	{
+		EVP_PKEY_CTX_free(pCtx);
+		throw OpenSSLException("ECKeyImpl: EVP_PKEY_CTX_set_ec_paramgen_curve_nid()");
+	}
+	if (EVP_PKEY_generate(pCtx, &_pEVPPKey) != 1)
+	{
+		EVP_PKEY_CTX_free(pCtx);
+		throw OpenSSLException("ECKeyImpl(int curve): EVP_PKEY_generate()");
+	}
+	EVP_PKEY_CTX_free(pCtx);
+	safeCheckEC("ECKeyImpl(int curve)", "EVP_PKEY_generate()");
+}
+
+
+ECKeyImpl::ECKeyImpl(const std::string& publicKeyFile,
+	const std::string& privateKeyFile,
+	const std::string& privateKeyPassphrase): KeyPairImpl("ec", KT_EC_IMPL), _pEVPPKey(nullptr)
+{
+	EVP_PKEY* pKey = nullptr;
+	if (EVPPKey::loadKey(&pKey, PEM_read_PrivateKey, (EVPPKey::EVP_PKEY_get_Key_fn) nullptr, privateKeyFile, privateKeyPassphrase))
+	{
+		_pEVPPKey = pKey;
+		safeCheckEC(Poco::format("ECKeyImpl(%s, %s, %s)",
+			publicKeyFile, privateKeyFile, privateKeyPassphrase.empty() ? privateKeyPassphrase : std::string("***")),
+			"PEM_read_PrivateKey()");
+		return;
+	}
+
+	if (!EVPPKey::loadKey(&pKey, PEM_read_PUBKEY, (EVPPKey::EVP_PKEY_get_Key_fn) nullptr, publicKeyFile))
+	{
+		throw OpenSSLException("ECKeyImpl(const string&, const string&, const string&");
+	}
+	_pEVPPKey = pKey;
+	safeCheckEC(Poco::format("ECKeyImpl(%s, %s, %s)",
+		publicKeyFile, privateKeyFile, privateKeyPassphrase.empty() ? privateKeyPassphrase : std::string("***")),
+		"PEM_read_PUBKEY()");
+}
+
+
+ECKeyImpl::ECKeyImpl(std::istream* pPublicKeyStream,
+	std::istream* pPrivateKeyStream,
+	const std::string& privateKeyPassphrase): KeyPairImpl("ec", KT_EC_IMPL), _pEVPPKey(nullptr)
+{
+	EVP_PKEY* pKey = nullptr;
+	if (EVPPKey::loadKey(&pKey, PEM_read_bio_PrivateKey, (EVPPKey::EVP_PKEY_get_Key_fn) nullptr, pPrivateKeyStream, privateKeyPassphrase))
+	{
+		_pEVPPKey = pKey;
+		safeCheckEC(Poco::format("ECKeyImpl(stream, stream, %s)",
+			privateKeyPassphrase.empty() ? privateKeyPassphrase : std::string("***")),
+			"PEM_read_bio_PrivateKey()");
+		return;
+	}
+
+	if (!EVPPKey::loadKey(&pKey, PEM_read_bio_PUBKEY, (EVPPKey::EVP_PKEY_get_Key_fn) nullptr, pPublicKeyStream))
+	{
+		throw OpenSSLException("ECKeyImpl(istream*, istream*, const string&");
+	}
+	_pEVPPKey = pKey;
+	safeCheckEC(Poco::format("ECKeyImpl(stream, stream, %s)",
+		privateKeyPassphrase.empty() ? privateKeyPassphrase : std::string("***")),
+		"PEM_read_bio_PUBKEY()");
+}
+
+
+ECKeyImpl::~ECKeyImpl()
+{
+	freeEC();
+}
+
+
+void ECKeyImpl::checkEC(const std::string& method, const std::string& func) const
+{
+	if (_pEVPPKey == nullptr) throw OpenSSLException(Poco::format("%s: %s", method, func));
+	EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new(_pEVPPKey, nullptr);
+	if (pCtx == nullptr) throw OpenSSLException(Poco::format("%s: EVP_PKEY_CTX_new()", method));
+	int rc = EVP_PKEY_check(pCtx);
+	if (rc != 1)
+	{
+		// public-key-only: EVP_PKEY_check may fail, try EVP_PKEY_public_check
+		rc = EVP_PKEY_public_check(pCtx);
+	}
+	EVP_PKEY_CTX_free(pCtx);
+	if (rc != 1)
+		throw OpenSSLException(Poco::format("%s: EVP_PKEY_check()", method));
+}
+
+
+void ECKeyImpl::safeCheckEC(const std::string& method, const std::string& func)
+{
+	try
+	{
+		checkEC(method, func);
+	}
+	catch (...)
+	{
+		freeEC();
+		throw;
+	}
+}
+
+
+void ECKeyImpl::freeEC()
+{
+	if (_pEVPPKey != nullptr)
+	{
+		EVP_PKEY_free(_pEVPPKey);
+		_pEVPPKey = nullptr;
+	}
+}
+
+
+int ECKeyImpl::size() const
+{
+	return EVP_PKEY_bits(_pEVPPKey);
+}
+
+
+int ECKeyImpl::groupId() const
+{
+	if (_pEVPPKey != nullptr)
+	{
+		char groupName[80];
+		size_t len = 0;
+		if (EVP_PKEY_get_utf8_string_param(_pEVPPKey, OSSL_PKEY_PARAM_GROUP_NAME, groupName, sizeof(groupName), &len))
+		{
+			return OBJ_sn2nid(groupName);
+		}
+		throw OpenSSLException("ECKeyImpl::groupId(): EVP_PKEY_get_utf8_string_param()");
+	}
+	throw NullPointerException("ECKeyImpl::groupId() => _pEVPPKey");
+}
+
+
+#else // !POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+
+
+// OpenSSL 1.1.x implementation using EC_KEY
 
 
 ECKeyImpl::ECKeyImpl(const EVPPKey& key):
@@ -176,6 +375,12 @@ int ECKeyImpl::groupId() const
 	}
 	throw NullPointerException("ECKeyImpl::groupName() => _pEC");
 }
+
+
+#endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+
+
+// Static methods (shared between versions -- EC_get_builtin_curves is not deprecated)
 
 
 std::string ECKeyImpl::getCurveName(int nid)

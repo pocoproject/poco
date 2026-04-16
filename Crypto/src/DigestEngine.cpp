@@ -21,7 +21,7 @@ namespace Poco::Crypto {
 
 DigestEngine::DigestEngine(const std::string& name):
 	_name(name),
-	_pContext(EVP_MD_CTX_create())
+	_pContext(EVP_MD_CTX_new())
 {
 	const EVP_MD* md = EVP_get_digestbyname(_name.c_str());
 	if (!md) throw Poco::NotFoundException(_name);
@@ -31,7 +31,7 @@ DigestEngine::DigestEngine(const std::string& name):
 
 DigestEngine::~DigestEngine()
 {
-	EVP_MD_CTX_destroy(_pContext);
+	EVP_MD_CTX_free(_pContext);
 }
 
 int DigestEngine::nid() const
@@ -52,7 +52,7 @@ std::size_t DigestEngine::digestLength() const
 void DigestEngine::reset()
 {
 	EVP_MD_CTX_free(_pContext);
-	_pContext = EVP_MD_CTX_create();
+	_pContext = EVP_MD_CTX_new();
 	const EVP_MD* md = EVP_get_digestbyname(_name.c_str());
 	if (!md) throw Poco::NotFoundException(_name);
 	EVP_DigestInit_ex(_pContext, md, nullptr);

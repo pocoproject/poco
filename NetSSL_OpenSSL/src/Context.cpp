@@ -309,7 +309,11 @@ void Context::addCertificateAuthority(const std::string& caLocation)
 
 void Context::usePrivateKey(const Poco::Crypto::RSAKey& key)
 {
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	int errCode = SSL_CTX_use_PrivateKey(_pSSLContext, key.impl()->getEVPPKey());
+#else
 	int errCode = SSL_CTX_use_RSAPrivateKey(_pSSLContext, key.impl()->getRSA());
+#endif
 	if (errCode != 1)
 	{
 		std::string msg = Utility::getLastError();
@@ -405,7 +409,11 @@ void Context::flushSessionCache()
 	poco_assert (isForServerUse());
 
 	Poco::Timestamp now;
+#if POCO_OPENSSL_VERSION_PREREQ(3, 4, 0)
+	SSL_CTX_flush_sessions_ex(_pSSLContext, static_cast<time_t>(now.epochTime()));
+#else
 	SSL_CTX_flush_sessions(_pSSLContext, static_cast<long>(now.epochTime()));
+#endif
 }
 
 
