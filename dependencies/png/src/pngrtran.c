@@ -2379,7 +2379,7 @@ png_do_unpack(png_row_infop row_info, png_bytep row)
       }
       row_info->bit_depth = 8;
       row_info->pixel_depth = (png_byte)(8 * row_info->channels);
-      row_info->rowbytes = row_width * row_info->channels;
+      row_info->rowbytes = (size_t)row_width * row_info->channels;
    }
 }
 #endif
@@ -2581,7 +2581,7 @@ png_do_scale_16_to_8(png_row_infop row_info, png_bytep row)
 
       row_info->bit_depth = 8;
       row_info->pixel_depth = (png_byte)(8 * row_info->channels);
-      row_info->rowbytes = row_info->width * row_info->channels;
+      row_info->rowbytes = (size_t)row_info->width * row_info->channels;
    }
 }
 #endif
@@ -2609,7 +2609,7 @@ png_do_chop(png_row_infop row_info, png_bytep row)
 
       row_info->bit_depth = 8;
       row_info->pixel_depth = (png_byte)(8 * row_info->channels);
-      row_info->rowbytes = row_info->width * row_info->channels;
+      row_info->rowbytes = (size_t)row_info->width * row_info->channels;
    }
 }
 #endif
@@ -2845,7 +2845,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             *(--dp) = lo_filler;
             row_info->channels = 2;
             row_info->pixel_depth = 16;
-            row_info->rowbytes = row_width * 2;
+            row_info->rowbytes = (size_t)row_width * 2;
          }
 
          else
@@ -2860,7 +2860,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             }
             row_info->channels = 2;
             row_info->pixel_depth = 16;
-            row_info->rowbytes = row_width * 2;
+            row_info->rowbytes = (size_t)row_width * 2;
          }
       }
 
@@ -2883,7 +2883,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             *(--dp) = hi_filler;
             row_info->channels = 2;
             row_info->pixel_depth = 32;
-            row_info->rowbytes = row_width * 4;
+            row_info->rowbytes = (size_t)row_width * 4;
          }
 
          else
@@ -2900,7 +2900,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             }
             row_info->channels = 2;
             row_info->pixel_depth = 32;
-            row_info->rowbytes = row_width * 4;
+            row_info->rowbytes = (size_t)row_width * 4;
          }
       }
 #endif
@@ -2924,7 +2924,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             *(--dp) = lo_filler;
             row_info->channels = 4;
             row_info->pixel_depth = 32;
-            row_info->rowbytes = row_width * 4;
+            row_info->rowbytes = (size_t)row_width * 4;
          }
 
          else
@@ -2941,7 +2941,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             }
             row_info->channels = 4;
             row_info->pixel_depth = 32;
-            row_info->rowbytes = row_width * 4;
+            row_info->rowbytes = (size_t)row_width * 4;
          }
       }
 
@@ -2968,7 +2968,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             *(--dp) = hi_filler;
             row_info->channels = 4;
             row_info->pixel_depth = 64;
-            row_info->rowbytes = row_width * 8;
+            row_info->rowbytes = (size_t)row_width * 8;
          }
 
          else
@@ -2990,7 +2990,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
 
             row_info->channels = 4;
             row_info->pixel_depth = 64;
-            row_info->rowbytes = row_width * 8;
+            row_info->rowbytes = (size_t)row_width * 8;
          }
       }
 #endif
@@ -4484,7 +4484,7 @@ png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
                }
                row_info->bit_depth = 8;
                row_info->pixel_depth = 32;
-               row_info->rowbytes = row_width * 4;
+               row_info->rowbytes = (size_t)row_width * 4;
                row_info->color_type = 6;
                row_info->channels = 4;
             }
@@ -4492,7 +4492,7 @@ png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
             else
             {
                sp = row + (size_t)row_width - 1;
-               dp = row + (size_t)(row_width * 3) - 1;
+               dp = row + (size_t)row_width * 3 - 1;
                i = 0;
 #ifdef PNG_ARM_NEON_INTRINSICS_AVAILABLE
                i = png_do_expand_palette_rgb8_neon(png_ptr, row_info, row,
@@ -4511,7 +4511,7 @@ png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
 
                row_info->bit_depth = 8;
                row_info->pixel_depth = 24;
-               row_info->rowbytes = row_width * 3;
+               row_info->rowbytes = (size_t)row_width * 3;
                row_info->color_type = 2;
                row_info->channels = 3;
             }
