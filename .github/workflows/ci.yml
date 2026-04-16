@@ -620,7 +620,7 @@ jobs:
           $ProgressPreference = 'SilentlyContinue'
           $log = winget install --id ShiningLight.OpenSSL.Dev --exact --source winget `
             --silent --accept-package-agreements --accept-source-agreements --disable-interactivity `
-            --location "C:\OpenSSL-Win64" 2>&1
+            --no-upgrade --location "C:\OpenSSL-Win64" 2>&1
           if ($LASTEXITCODE -ne 0) {
             $log | Out-Host
             exit $LASTEXITCODE
