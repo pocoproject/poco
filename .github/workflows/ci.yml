@@ -622,8 +622,15 @@ jobs:
             --silent --accept-package-agreements --accept-source-agreements --disable-interactivity `
             --no-upgrade --location "C:\OpenSSL-Win64" 2>&1
           if ($LASTEXITCODE -ne 0) {
-            $log | Out-Host
-            exit $LASTEXITCODE
+            # winget returns non-zero even when the package is already installed
+            # (https://github.com/microsoft/winget-cli/issues/4262).
+            $text = $log | Out-String
+            if ($text -match 'already installed') {
+              Write-Host "OpenSSL already installed -- continuing"
+            } else {
+              $log | Out-Host
+              exit $LASTEXITCODE
+            }
           }
           # Prepend our OpenSSL bin dir so the loader picks up our libssl/libcrypto
           # instead of the runner image's OpenSSL (mismatch -> STATUS_ENTRYPOINT_NOT_FOUND).
