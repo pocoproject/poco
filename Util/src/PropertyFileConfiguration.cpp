@@ -34,21 +34,21 @@ namespace Poco::Util {
 PropertyFileConfiguration::~PropertyFileConfiguration() = default;
 
 
-PropertyFileConfiguration::PropertyFileConfiguration(AbstractConfiguration::Ptr pParentConfig):
-	_pParentConfig(pParentConfig.get())
+PropertyFileConfiguration::PropertyFileConfiguration(AbstractConfiguration* pParentConfig):
+	_pParentConfig(pParentConfig)
 {
 }
 
 
-PropertyFileConfiguration::PropertyFileConfiguration(std::istream& istr, AbstractConfiguration::Ptr pParentConfig):
-	_pParentConfig(pParentConfig.get())
+PropertyFileConfiguration::PropertyFileConfiguration(std::istream& istr, AbstractConfiguration* pParentConfig):
+	_pParentConfig(pParentConfig)
 {
 	load(istr);
 }
 
 
-PropertyFileConfiguration::PropertyFileConfiguration(const std::string& path, AbstractConfiguration::Ptr pParentConfig):
-	_pParentConfig(pParentConfig.get())
+PropertyFileConfiguration::PropertyFileConfiguration(const std::string& path, AbstractConfiguration* pParentConfig):
+	_pParentConfig(pParentConfig)
 {
 	load(path);
 }
