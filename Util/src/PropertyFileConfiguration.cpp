@@ -35,20 +35,20 @@ PropertyFileConfiguration::~PropertyFileConfiguration() = default;
 
 
 PropertyFileConfiguration::PropertyFileConfiguration(AbstractConfiguration::Ptr pParentConfig):
-	_pParentConfig(std::move(pParentConfig))
+	_pParentConfig(pParentConfig.get())
 {
 }
 
 
 PropertyFileConfiguration::PropertyFileConfiguration(std::istream& istr, AbstractConfiguration::Ptr pParentConfig):
-	_pParentConfig(std::move(pParentConfig))
+	_pParentConfig(pParentConfig.get())
 {
 	load(istr);
 }
 
 
 PropertyFileConfiguration::PropertyFileConfiguration(const std::string& path, AbstractConfiguration::Ptr pParentConfig):
-	_pParentConfig(std::move(pParentConfig))
+	_pParentConfig(pParentConfig.get())
 {
 	load(path);
 }

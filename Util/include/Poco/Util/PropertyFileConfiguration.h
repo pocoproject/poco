@@ -173,7 +173,12 @@ private:
 	static int readChar(std::istream& istr);
 	static std::string escapeValue(const std::string& value);
 
-	AbstractConfiguration::Ptr _pParentConfig;
+	AbstractConfiguration* _pParentConfig = nullptr;
+		/// Non-owning back-pointer to the parent configuration used for
+		/// ${variable} expansion in !include directive paths.
+		/// This is intentionally a raw pointer to avoid a circular reference:
+		/// the parent (typically LayeredConfiguration) owns this
+		/// PropertyFileConfiguration, so the parent always outlives the child.
 	std::map<std::string, std::string> _sourceMap;
 	std::string _rootFile;
 };
