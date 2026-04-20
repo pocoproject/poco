@@ -423,25 +423,42 @@ void ThreadTest::testTrySleep()
 	assertTrue (!thread.isRunning());
 	assertTrue (r.counter() == 0);
 	thread.start(r);
-	assertTrue (thread.isRunning());
-	assertTrue (r.counter() == 0);
-	assertTrue (r.isSleepy());
-	Thread::sleep(100);
-	assertTrue (r.counter() == 0);
-	assertTrue (r.isSleepy());
-	thread.wakeUp(); Thread::sleep(10);
-	assertTrue (r.counter() == 1);
-	assertTrue (r.isSleepy());
-	Thread::sleep(100);
-	assertTrue (r.counter() == 1);
-	thread.wakeUp(); Thread::sleep(10);
-	assertTrue (r.counter() == 2);
-	assertTrue (r.isSleepy());
-	Thread::sleep(200);
-	assertTrue (r.counter() == 3);
-	assertTrue (!r.isSleepy());
-	assertTrue (!thread.isRunning());
+	auto waitForCounter = [&](int expected)
+	{
+		for (int i = 0; i < 500 && r.counter() < expected; ++i)
+			Thread::sleep(10);
+	};
+	try
+	{
+		assertTrue (thread.isRunning());
+		assertTrue (r.counter() == 0);
+		assertTrue (r.isSleepy());
+		Thread::sleep(100);
+		assertTrue (r.counter() == 0);
+		assertTrue (r.isSleepy());
+		thread.wakeUp();
+		waitForCounter(1);
+		assertTrue (r.counter() == 1);
+		assertTrue (r.isSleepy());
+		Thread::sleep(100);
+		assertTrue (r.counter() == 1);
+		thread.wakeUp();
+		waitForCounter(2);
+		assertTrue (r.counter() == 2);
+		assertTrue (r.isSleepy());
+		waitForCounter(3);
+		assertTrue (r.counter() == 3);
+		assertTrue (!r.isSleepy());
+		assertTrue (!thread.isRunning());
+	}
+	catch (...)
+	{
+		thread.wakeUp();
+		thread.join();
+		throw;
+	}
 	thread.wakeUp();
+	assertTrue (thread.tryJoin(5000));
 	assertTrue (!thread.isRunning());
 }
 
