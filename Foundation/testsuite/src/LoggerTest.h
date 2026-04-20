@@ -30,6 +30,7 @@ public:
 	void testDump();
 	void testFormatThreadName();
 	void testFormatStdThreadName();
+	void testLoggerRefSurvivesShutdown();
 
 	void setUp();
 	void tearDown();
