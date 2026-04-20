@@ -1,6 +1,25 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
+Release 1.15.3 (Unreleased)
+===========================
+
+API Changes:
+
+- GH #5322 PropertyFileConfiguration: the optional parent-configuration
+  parameter (added in 1.15.1 via #5253) is now an AbstractConfiguration*
+  raw non-owning pointer instead of AbstractConfiguration::Ptr. Callers
+  must keep the parent alive for the child's lifetime. This fixes a
+  circular reference between LayeredConfiguration and child
+  PropertyFileConfiguration instances in Application::loadConfiguration().
+  The Ptr-taking overloads are retained as deprecated forwarders to
+  surface the lifetime contract at compile time; they will be removed
+  in a future release. Passing a temporary Ptr would leave _pParentConfig
+  dangling and should be replaced with a named variable whose lifetime
+  outlives the child. All three PropertyFileConfiguration constructors
+  are now explicit to prevent accidental implicit conversions.
+
+
 Release 1.15.2 (2026-04-16)
 ===========================
 

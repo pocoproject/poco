@@ -54,6 +54,24 @@ PropertyFileConfiguration::PropertyFileConfiguration(const std::string& path, Ab
 }
 
 
+PropertyFileConfiguration::PropertyFileConfiguration(AbstractConfiguration::Ptr pParentConfig):
+	PropertyFileConfiguration(pParentConfig.get())
+{
+}
+
+
+PropertyFileConfiguration::PropertyFileConfiguration(std::istream& istr, AbstractConfiguration::Ptr pParentConfig):
+	PropertyFileConfiguration(istr, pParentConfig.get())
+{
+}
+
+
+PropertyFileConfiguration::PropertyFileConfiguration(const std::string& path, AbstractConfiguration::Ptr pParentConfig):
+	PropertyFileConfiguration(path, pParentConfig.get())
+{
+}
+
+
 void PropertyFileConfiguration::load(std::istream& istr)
 {
 	AbstractConfiguration::ScopedLock lock(*this);
