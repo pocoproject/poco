@@ -345,7 +345,24 @@ void Logger::shutdown()
 {
 	Mutex::ScopedLock lock(_mapMtx);
 
-	_pLoggerMap.reset();
+	if (_pLoggerMap)
+	{
+		// Detach the channel from every Logger instead of destroying the
+		// map. Long-lived objects frequently cache a Logger& obtained via
+		// Logger::get() during construction and may still dereference it
+		// from static destructors that run after LoggingSubsystem has
+		// called shutdown(); tearing the map down there would leave those
+		// references dangling (heap-use-after-free).
+		//
+		// logImpl() already guards channel writes with `if (_pChannel)`, so
+		// a Logger with a null channel is a safe no-op. The map (and the
+		// Logger objects it keeps alive) are released when the static
+		// _pLoggerMap is destroyed at process exit.
+		for (auto& p: *_pLoggerMap)
+		{
+			p.second->setChannel(nullptr);
+		}
+	}
 }
 
 
