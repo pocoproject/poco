@@ -611,21 +611,25 @@ jobs:
       - uses: TheMrMilchmann/setup-msvc-dev@v4
         with:
           arch: x64
-      - name: Cache vcpkg binary archives
-        # vcpkg's default file-based binary cache at %LOCALAPPDATA%\vcpkg\archives
-        # stores each built port as a content-addressed .zip keyed by ABI hash.
-        # Caching that directory via actions/cache persists the archives across
-        # runner VMs. New builds add new archives; the key rotates on run_id
-        # so every run writes a fresh cache entry, and restore-keys picks up
-        # the most recent prefix match. ABI hash changes (e.g. vcpkg port
-        # update for libssh or openssl) naturally miss and trigger rebuild.
-        # Replaces the removed x-gha provider from VCPKG_BINARY_SOURCES.
+      - name: Cache vcpkg binary archives and downloads
+        # Two disjoint caches rolled into one step:
+        #  1. %LOCALAPPDATA%\vcpkg\archives -- file-based binary cache of built
+        #     ports, keyed by ABI hash. Reused across runs; invalidates when a
+        #     port's ABI changes (new version, new patch, new transitive dep).
+        #  2. C:\vcpkg\downloads -- source tarballs (openssl, libssh, ...) and
+        #     tool installs (cmake, ninja, perl, powershell-core). vcpkg re-
+        #     downloads these on every cache miss in (1); persisting them
+        #     avoids the ~30-60s cmake/powershell/perl zip download each run.
+        # Key rotates on run_id so each run writes a fresh entry; restore-keys
+        # picks the most recent prefix match. GHA LRU handles eviction.
         uses: actions/cache@v5
         with:
-          path: ~\AppData\Local\vcpkg\archives
-          key: vcpkg-archives-${{ runner.os }}-${{ github.run_id }}
+          path: |
+            ~\AppData\Local\vcpkg\archives
+            C:\vcpkg\downloads
+          key: vcpkg-${{ runner.os }}-${{ github.run_id }}
           restore-keys: |
-            vcpkg-archives-${{ runner.os }}-
+            vcpkg-${{ runner.os }}-
       - name: Uninstall pre-existing OpenSSL / libssh
         shell: pwsh
         # Runner images carry preinstalled OpenSSL/OpenSSH and cached vcpkg
