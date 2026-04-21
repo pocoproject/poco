@@ -221,6 +221,36 @@ int ECKeyImpl::groupId() const
 }
 
 
+#ifndef OPENSSL_NO_DEPRECATED_3_0
+
+#if defined(__GNUC__) || defined(__clang__)
+#	pragma GCC diagnostic push
+#	pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#	pragma warning(push)
+#	pragma warning(disable:4996)
+#endif
+
+EC_KEY* ECKeyImpl::getECKey()
+{
+	return const_cast<EC_KEY*>(EVP_PKEY_get0_EC_KEY(_pEVPPKey));
+}
+
+
+const EC_KEY* ECKeyImpl::getECKey() const
+{
+	return EVP_PKEY_get0_EC_KEY(_pEVPPKey);
+}
+
+#if defined(__GNUC__) || defined(__clang__)
+#	pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#	pragma warning(pop)
+#endif
+
+#endif // !OPENSSL_NO_DEPRECATED_3_0
+
+
 #else // !POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
 
