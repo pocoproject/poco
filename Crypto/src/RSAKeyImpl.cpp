@@ -162,6 +162,14 @@ void RSAKeyImpl::freeRSA()
 
 #ifndef OPENSSL_NO_DEPRECATED_3_0
 
+#if defined(__GNUC__) || defined(__clang__)
+#	pragma GCC diagnostic push
+#	pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#	pragma warning(push)
+#	pragma warning(disable:4996)
+#endif
+
 RSA* RSAKeyImpl::getRSA()
 {
 	return const_cast<RSA*>(EVP_PKEY_get0_RSA(_pEVPPKey));
@@ -172,6 +180,12 @@ const RSA* RSAKeyImpl::getRSA() const
 {
 	return EVP_PKEY_get0_RSA(_pEVPPKey);
 }
+
+#if defined(__GNUC__) || defined(__clang__)
+#	pragma GCC diagnostic pop
+#elif defined(_MSC_VER)
+#	pragma warning(pop)
+#endif
 
 #endif
 
