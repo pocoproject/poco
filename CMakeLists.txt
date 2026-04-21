@@ -111,6 +111,56 @@ if (WIN32 AND CMAKE_VERSION VERSION_LESS  "4.1.0")
 	endif()
 endif()
 
+# -- Resolve bundled/unbundled dependencies before any find_package() for
+# packages that transitively depend on them (notably OpenSSL -> ZLIB in
+# static builds). Keeping this block ahead of find_package(OpenSSL ...) lets
+# dependencies/zlib/CMakeLists.txt create (and IMPORTED_GLOBAL-promote)
+# ZLIB::ZLIB in its own directory scope. See issue #5330.
+
+option(POCO_UNBUNDLED
+	"Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
+
+option(POCO_SQLITE_UNBUNDLED
+	"Set to OFF|ON (default is OFF) to control linking sqlite dependency as external" OFF)
+
+if (POCO_UNBUNDLED)
+	set(POCO_SQLITE_UNBUNDLED ON CACHE BOOL "Enable Unbundled SQLite" FORCE)
+endif()
+
+option(ENABLE_TRACE "Enable stack tracing" OFF)
+option(ENABLE_FASTLOGGER "Enable FastLogger (Quill-based high-performance logger)" ON)
+
+# FastLogger uses Quill which only supports specific platforms.
+# Auto-disable on unsupported OS or CPU architecture.
+# Supported platforms are derived from quill source code:
+#   OS:   ThreadUtilities.h (get_thread_id), BackendWorkerLock.h
+#   Arch: Rdtsc.h
+set(_FASTLOGGER_SUPPORTED_OS FALSE)
+set(_FASTLOGGER_SUPPORTED_ARCH FALSE)
+
+if(CMAKE_SYSTEM_NAME MATCHES "^(Windows|Linux|Darwin|FreeBSD|NetBSD|OpenBSD|DragonFly|Android)$")
+	set(_FASTLOGGER_SUPPORTED_OS TRUE)
+endif()
+
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^([xX]86_64|[aA][mM][dD]64|[xX]86|i[3-6]86|aarch64|[aA][rR][mM]64|[aA][rR][mM]|riscv|loongarch64|s390x)")
+	set(_FASTLOGGER_SUPPORTED_ARCH TRUE)
+endif()
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(ppc64|powerpc64)")
+	set(_FASTLOGGER_SUPPORTED_ARCH TRUE)
+endif()
+
+if(NOT _FASTLOGGER_SUPPORTED_OS OR NOT _FASTLOGGER_SUPPORTED_ARCH OR EMSCRIPTEN)
+	if(ENABLE_FASTLOGGER)
+		message(STATUS "FastLogger disabled: unsupported platform (${CMAKE_SYSTEM_NAME}/${CMAKE_SYSTEM_PROCESSOR})")
+	endif()
+	set(ENABLE_FASTLOGGER OFF CACHE BOOL "Enable FastLogger" FORCE)
+endif()
+
+include(DefinePlatformSpecific)
+add_compile_definitions(POCO_CMAKE)
+
+add_subdirectory(dependencies)
+
 if (NOT POCO_MINIMAL_BUILD)
 	find_package(OpenSSL 1.1.1)
 	find_package(MySQL)
@@ -209,38 +259,13 @@ option(ENABLE_SEVENZIP "Enable SevenZip" OFF)
 option(ENABLE_CPPPARSER "Enable C++ parser" OFF)
 option(ENABLE_POCODOC "Enable Poco Documentation Generator" OFF)
 option(ENABLE_PDF "Enable PDF" OFF)
-option(ENABLE_TRACE "Enable stack tracing" OFF)
-option(ENABLE_FASTLOGGER "Enable FastLogger (Quill-based high-performance logger)" ON)
-
-# FastLogger uses Quill which only supports specific platforms.
-# Auto-disable on unsupported OS or CPU architecture.
-# Supported platforms are derived from quill source code:
-#   OS:   ThreadUtilities.h (get_thread_id), BackendWorkerLock.h
-#   Arch: Rdtsc.h
-set(_FASTLOGGER_SUPPORTED_OS FALSE)
-set(_FASTLOGGER_SUPPORTED_ARCH FALSE)
-
-if(CMAKE_SYSTEM_NAME MATCHES "^(Windows|Linux|Darwin|FreeBSD|NetBSD|OpenBSD|DragonFly|Android)$")
-	set(_FASTLOGGER_SUPPORTED_OS TRUE)
-endif()
-
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^([xX]86_64|[aA][mM][dD]64|[xX]86|i[3-6]86|aarch64|[aA][rR][mM]64|[aA][rR][mM]|riscv|loongarch64|s390x)")
-	set(_FASTLOGGER_SUPPORTED_ARCH TRUE)
-endif()
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(ppc64|powerpc64)")
-	set(_FASTLOGGER_SUPPORTED_ARCH TRUE)
-endif()
-
-if(NOT _FASTLOGGER_SUPPORTED_OS OR NOT _FASTLOGGER_SUPPORTED_ARCH OR EMSCRIPTEN)
-	if(ENABLE_FASTLOGGER)
-		message(STATUS "FastLogger disabled: unsupported platform (${CMAKE_SYSTEM_NAME}/${CMAKE_SYSTEM_PROCESSOR})")
-	endif()
-	set(ENABLE_FASTLOGGER OFF CACHE BOOL "Enable FastLogger" FORCE)
-endif()
 
 if(POCO_ENABLE_CPP20)
 	option(ENABLE_MODULES "Build Poco.* C++ modules" OFF)
 endif()
+
+option(ENABLE_BENCHMARK
+	"Set to OFF|ON (default is OFF) to enable Benchmark application (requires Google Benchmark library)" OFF)
 
 option(ENABLE_CPPUNIT
 	"Set to OFF|ON (default is OFF) to enable CppUnit library" OFF)
@@ -265,18 +290,8 @@ option(ENABLE_SAMPLES
 option(ENABLE_FUZZING
 	"Set to OFF|ON (default is OFF) to control build of fuzzing targets for oss-fuzz (Clang compiler is required)" OFF)
 
-option(POCO_UNBUNDLED
-	"Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
-
-option(POCO_SQLITE_UNBUNDLED
-	"Set to OFF|ON (default is OFF) to control linking sqlite dependency as external" OFF)
-
 option(POCO_SOO
 	"Set to OFF|ON (default is ON) to control small object optimization in Poco::Foundation" ON)
-
-if (POCO_UNBUNDLED)
-	set(POCO_SQLITE_UNBUNDLED ON CACHE BOOL "Enable Unbundled SQLite" FORCE)
-endif()
 
 if(ENABLE_TESTS)
 	include(CTest)
@@ -303,67 +318,6 @@ if(ENABLE_FUZZING)
 	endif()
 endif()
 
-# -- Dependency status summary --
-# Report which third-party libraries are bundled (internal) vs system (external).
-# Always present: zlib, pcre2, utf8proc.
-# Feature-gated: expat (XML), sqlite (Data/SQLite), libpng (PDF).
-set(_opt_deps "")
-if(ENABLE_XML)
-	string(APPEND _opt_deps ", expat")
-endif()
-if(ENABLE_DATA_SQLITE)
-	string(APPEND _opt_deps ", sqlite")
-endif()
-if(ENABLE_PDF)
-	string(APPEND _opt_deps ", libpng")
-endif()
-if(ENABLE_TRACE)
-	string(APPEND _opt_deps ", cpptrace")
-endif()
-
-if(POCO_UNBUNDLED)
-	# All bundled deps become external
-	message(STATUS "Using external zlib, pcre2, utf8proc${_opt_deps}")
-elseif(POCO_SQLITE_UNBUNDLED)
-	# Only sqlite is external; rebuild the internal list without it
-	if(ENABLE_DATA_SQLITE)
-		message(STATUS "Using external sqlite")
-	endif()
-	set(_int_deps "")
-	if(ENABLE_XML)
-		string(APPEND _int_deps ", expat")
-	endif()
-	if(ENABLE_PDF)
-		string(APPEND _int_deps ", libpng")
-	endif()
-	message(STATUS "Using internal zlib, pcre2, utf8proc${_int_deps}")
-else()
-	# Fully bundled
-	message(STATUS "Using internal zlib, pcre2, utf8proc${_opt_deps}")
-endif()
-
-# Always-external dependencies: these are never bundled, only report when enabled
-set(_ext_deps "")
-if(ENABLE_NETSSL OR ENABLE_CRYPTO OR ENABLE_JWT)
-	list(APPEND _ext_deps "OpenSSL")
-endif()
-if(ENABLE_DATA_MYSQL)
-	list(APPEND _ext_deps "MySQL")
-endif()
-if(ENABLE_DATA_POSTGRESQL)
-	list(APPEND _ext_deps "PostgreSQL")
-endif()
-if(ENABLE_DATA_ODBC)
-	list(APPEND _ext_deps "ODBC")
-endif()
-if(ENABLE_APACHECONNECTOR)
-	list(APPEND _ext_deps "APR" "Apache")
-endif()
-if(_ext_deps)
-	list(JOIN _ext_deps ", " _ext_deps_str)
-	message(STATUS "Using external ${_ext_deps_str}")
-endif()
-
 # Disable fork exec
 option(POCO_NO_FORK_EXEC "Set to OFF|ON (default is OFF) to disable use of fork() and exec*() which are not allowed on some Apple platforms (iOS, watchOS, iPadOS, tvOS)." OFF)
 
@@ -380,9 +334,6 @@ endif ()
 if(ENABLE_TRACE)
 	add_compile_definitions(POCO_ENABLE_TRACE)
 endif()
-
-include(DefinePlatformSpecific)
-add_compile_definitions(POCO_CMAKE)
 
 # Collect the built libraries and include dirs, the will be used to create the PocoConfig.cmake file
 set(Poco_COMPONENTS "")
@@ -527,10 +478,6 @@ endif()
 if(ENABLE_DATA_ODBC)
 	find_package(ODBC REQUIRED)
 endif()
-
-# - add required subdirectories
-
-add_subdirectory(dependencies)
 
 # Enable detailed compiler warnings for Poco code only (after dependencies to exclude them)
 poco_enable_detailed_compiler_warnings()
@@ -707,9 +654,6 @@ endif()
 #############################################################
 # Benchmark application (optional, requires Google Benchmark)
 
-option(ENABLE_BENCHMARK
-	"Set to OFF|ON (default is OFF) to enable Benchmark application (requires Google Benchmark library)" OFF)
-
 if(ENABLE_BENCHMARK)
 	find_package(benchmark QUIET)
 	if(benchmark_FOUND)
@@ -779,10 +723,75 @@ install(
 		Devel
 )
 
+message(STATUS " * CMake '${CMAKE_VERSION}' successfully configured '${PROJECT_NAME}'")
+message(STATUS " * ${PROJECT_NAME} package version: '${PROJECT_VERSION}'")
+
+# -- Dependency status summary --
+# Report which third-party libraries are bundled (internal) vs system (external).
+# Always present: zlib, pcre2, utf8proc.
+# Feature-gated: expat (XML), sqlite (Data/SQLite), libpng (PDF).
+# Printed after the enablement cascade and find_package() calls above so the
+# status reflects the final resolved state.
+set(_opt_deps "")
+if(ENABLE_XML)
+	string(APPEND _opt_deps ", expat")
+endif()
+if(ENABLE_DATA_SQLITE)
+	string(APPEND _opt_deps ", sqlite")
+endif()
+if(ENABLE_PDF)
+	string(APPEND _opt_deps ", libpng")
+endif()
+if(ENABLE_TRACE)
+	string(APPEND _opt_deps ", cpptrace")
+endif()
+
+if(POCO_UNBUNDLED)
+	# All bundled deps become external
+	message(STATUS "Using external zlib, pcre2, utf8proc${_opt_deps}")
+elseif(POCO_SQLITE_UNBUNDLED)
+	# Only sqlite is external; rebuild the internal list without it
+	if(ENABLE_DATA_SQLITE)
+		message(STATUS "Using external sqlite")
+	endif()
+	set(_int_deps "")
+	if(ENABLE_XML)
+		string(APPEND _int_deps ", expat")
+	endif()
+	if(ENABLE_PDF)
+		string(APPEND _int_deps ", libpng")
+	endif()
+	message(STATUS "Using internal zlib, pcre2, utf8proc${_int_deps}")
+else()
+	# Fully bundled
+	message(STATUS "Using internal zlib, pcre2, utf8proc${_opt_deps}")
+endif()
+
+# Always-external dependencies: these are never bundled, only report when enabled
+set(_ext_deps "")
+if(ENABLE_NETSSL OR ENABLE_CRYPTO OR ENABLE_JWT)
+	list(APPEND _ext_deps "OpenSSL")
+endif()
+if(ENABLE_DATA_MYSQL)
+	list(APPEND _ext_deps "MySQL")
+endif()
+if(ENABLE_DATA_POSTGRESQL)
+	list(APPEND _ext_deps "PostgreSQL")
+endif()
+if(ENABLE_DATA_ODBC)
+	list(APPEND _ext_deps "ODBC")
+endif()
+if(ENABLE_APACHECONNECTOR)
+	list(APPEND _ext_deps "APR" "Apache")
+endif()
+if(_ext_deps)
+	list(JOIN _ext_deps ", " _ext_deps_str)
+	message(STATUS "Using external ${_ext_deps_str}")
+endif()
+
+
 math(EXPR POCO_ARCH "${CMAKE_SIZEOF_VOID_P} * 8")
 
-message(STATUS "CMake '${CMAKE_VERSION}' successfully configured '${PROJECT_NAME}'")
-message(STATUS "${PROJECT_NAME} package version: '${PROJECT_VERSION}'")
 if(BUILD_SHARED_LIBS)
 	message(STATUS "Building dynamic libraries")
 else()
