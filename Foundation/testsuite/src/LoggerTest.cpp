@@ -385,6 +385,32 @@ void LoggerTest::testFormatStdThreadName()
 #endif
 }
 
+void LoggerTest::testLoggerRefSurvivesShutdown()
+{
+	// Simulate a singleton caching a Logger& obtained before shutdown.
+	Logger& cached = Logger::get("TestLogger.Cached");
+	AutoPtr<TestChannel> pChannel = new TestChannel;
+	cached.setChannel(pChannel);
+	cached.setLevel(Message::PRIO_INFORMATION);
+	cached.information("before shutdown");
+	assertTrue (pChannel->list().size() == 1);
+
+	Logger::shutdown();
+
+	// The cached reference must still be valid; logging through it
+	// must be a safe no-op (channel detached).
+	cached.information("post-shutdown message");
+	cached.log(Message("x", "y", Message::PRIO_ERROR));
+	assertTrue (cached.getChannel().isNull());
+	assertTrue (pChannel->list().size() == 1);
+
+	// get() with the same name returns the same (muted) instance.
+	Logger& again = Logger::get("TestLogger.Cached");
+	assertTrue (&again == &cached);
+	assertTrue (again.getChannel().isNull());
+}
+
+
 void LoggerTest::setUp()
 {
 	Logger::shutdown();
@@ -406,6 +432,7 @@ CppUnit::Test* LoggerTest::suite()
 	CppUnit_addTest(pSuite, LoggerTest, testDump);
 	CppUnit_addTest(pSuite, LoggerTest, testFormatThreadName);
 	CppUnit_addTest(pSuite, LoggerTest, testFormatStdThreadName);
+	CppUnit_addTest(pSuite, LoggerTest, testLoggerRefSurvivesShutdown);
 
 	return pSuite;
 }
