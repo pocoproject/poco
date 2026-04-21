@@ -111,11 +111,16 @@ if (WIN32 AND CMAKE_VERSION VERSION_LESS  "4.1.0")
 	endif()
 endif()
 
-# -- Resolve bundled/unbundled dependencies before any find_package() for
-# packages that transitively depend on them (notably OpenSSL -> ZLIB in
-# static builds). Keeping this block ahead of find_package(OpenSSL ...) lets
-# dependencies/zlib/CMakeLists.txt create (and IMPORTED_GLOBAL-promote)
-# ZLIB::ZLIB in its own directory scope. See issue #5330.
+# Resolve zlib before find_package(OpenSSL ...): in static builds FindOpenSSL
+# transitively imports ZLIB::ZLIB non-globally at this scope, which would then
+# block dependencies/zlib from promoting it to IMPORTED_GLOBAL. The other dep
+# subdirs are feature-gated on ENABLE_XML / ENABLE_DATA_SQLITE / ENABLE_PDF
+# and stay at their original post-cascade position.
+#
+# POCO_UNBUNDLED / POCO_SQLITE_UNBUNDLED are declared here because
+# dependencies/zlib reads them. ENABLE_TRACE / ENABLE_FASTLOGGER and
+# DefinePlatformSpecific are pulled up so their directory-scope compile
+# definitions reach a bundled zlib object library.
 
 option(POCO_UNBUNDLED
 	"Set to OFF|ON (default is OFF) to control linking dependencies as external" OFF)
@@ -159,7 +164,9 @@ endif()
 include(DefinePlatformSpecific)
 add_compile_definitions(POCO_CMAKE)
 
-add_subdirectory(dependencies)
+if (POCO_UNBUNDLED)
+	add_subdirectory(dependencies/zlib)
+endif()
 
 if (NOT POCO_MINIMAL_BUILD)
 	find_package(OpenSSL 1.1.1)
@@ -478,6 +485,12 @@ endif()
 if(ENABLE_DATA_ODBC)
 	find_package(ODBC REQUIRED)
 endif()
+
+# Feature-gated dep subdirs must run after the enablement cascade so
+# ENABLE_XML / ENABLE_DATA_SQLITE / ENABLE_PDF etc. are finalised. zlib may
+# already have been added early; dependencies/CMakeLists.txt skips it in that
+# case.
+add_subdirectory(dependencies)
 
 # Enable detailed compiler warnings for Poco code only (after dependencies to exclude them)
 poco_enable_detailed_compiler_warnings()
