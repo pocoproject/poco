@@ -345,7 +345,18 @@ void Logger::shutdown()
 {
 	Mutex::ScopedLock lock(_mapMtx);
 
-	_pLoggerMap.reset();
+	// Detach channels from all loggers instead of destroying the logger
+	// objects. Singletons and other components may still hold Logger
+	// references obtained via Logger::get() during their lifetime.
+	// Destroying the loggers would leave those references dangling,
+	// causing use-after-free during static destruction.
+	if (_pLoggerMap)
+	{
+		for (auto& [name, pLogger] : *_pLoggerMap)
+		{
+			if (pLogger) pLogger->setChannel(nullptr);
+		}
+	}
 }
 
 

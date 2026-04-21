@@ -434,8 +434,15 @@ public:
 		/// become invalid.
 
 	static void shutdown();
-		/// Shuts down the logging framework and releases all
-		/// Loggers.
+		/// Shuts down the logging framework: detaches and releases the
+		/// channels of all existing Loggers, so that channel resources
+		/// (open files, sockets, ...) are freed. The Logger instances
+		/// themselves remain alive, so any cached Logger references held
+		/// by singletons stay valid; logging through them becomes a
+		/// silent no-op.
+		///
+		/// Intended to be called once, as the last logging-related action
+		/// before the process exits.
 
 	static void names(std::vector<std::string>& names);
 		/// Fills the given vector with the names
