@@ -58,6 +58,21 @@ namespace
 		}
 	};
 
+	// Restrict the client to classical key exchange algorithms. libssh 0.12+
+	// advertises ML-KEM hybrid KEX (mlkem768x25519-sha256 etc.) by default,
+	// and the in-process client+server pair picks it. ML-KEM through OpenSSL
+	// 3.6.x has been observed to fail ("Failed to construct client init
+	// buffer") on Windows vcpkg builds. Pinning classical KEX keeps the test
+	// deterministic across libssh upgrades until upstream stabilizes.
+	void setClassicalKex(ssh_session session)
+	{
+		const char* kex =
+			"curve25519-sha256,curve25519-sha256@libssh.org,"
+			"ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,"
+			"diffie-hellman-group16-sha512,diffie-hellman-group14-sha256";
+		ssh_options_set(session, SSH_OPTIONS_KEY_EXCHANGE, kex);
+	}
+
 	SSHServerConfig makeTestConfig(const std::string& keyDir, int port)
 	{
 		SSHServerConfig cfg;
@@ -97,9 +112,7 @@ SSHTest::SSHTest(const std::string& name):
 }
 
 
-SSHTest::~SSHTest()
-{
-}
+SSHTest::~SSHTest() = default;
 
 
 void SSHTest::setUp()
@@ -117,6 +130,7 @@ void SSHTest::tearDown()
 	}
 	catch (...)
 	{
+		// Best-effort cleanup; log nothing in tests to avoid spurious output.
 	}
 }
 
@@ -184,6 +198,7 @@ void SSHTest::testClientConnect()
 
 	{
 		SSHClient client;
+		setClassicalKex(client.session());
 		client.connect("127.0.0.1", port);
 		assertTrue(client.isConnected());
 		client.disconnect();
@@ -207,6 +222,7 @@ void SSHTest::testPasswordAuth()
 	try
 	{
 		SSHClient client;
+		setClassicalKex(client.session());
 		client.connect("127.0.0.1", port);
 		bool ok = client.authenticatePassword("testuser", "testpass");
 		assertTrue(ok);
@@ -236,6 +252,7 @@ void SSHTest::testPasswordAuthFail()
 	try
 	{
 		SSHClient client;
+		setClassicalKex(client.session());
 		client.connect("127.0.0.1", port);
 		bool ok = client.authenticatePassword("testuser", "wrongpass");
 		assertTrue(!ok);
@@ -265,6 +282,7 @@ void SSHTest::testSessionHandling()
 	try
 	{
 		SSHClient client;
+		setClassicalKex(client.session());
 		client.connect("127.0.0.1", port);
 		assertTrue(client.authenticatePassword("testuser", "testpass"));
 
@@ -309,6 +327,7 @@ void SSHTest::testServerShutdownWithActiveSession()
 	server.start();
 
 	SSHClient client;
+	setClassicalKex(client.session());
 	client.connect("127.0.0.1", port);
 	assertTrue(client.authenticatePassword("testuser", "testpass"));
 
@@ -340,9 +359,10 @@ void SSHTest::testClientDisconnect()
 
 	{
 		SSHClient client;
+		setClassicalKex(client.session());
 		client.connect("127.0.0.1", port);
 		assertTrue(client.authenticatePassword("testuser", "testpass"));
-		// Client goes out of scope — destructor disconnects
+		// Client goes out of scope -- destructor disconnects
 	}
 
 	Poco::Thread::sleep(200);
@@ -363,6 +383,7 @@ void SSHTest::testMaxConnections()
 	server.start();
 
 	SSHClient client1;
+	setClassicalKex(client1.session());
 	client1.connect("127.0.0.1", port);
 	assertTrue(client1.authenticatePassword("testuser", "testpass"));
 
@@ -378,6 +399,7 @@ void SSHTest::testMaxConnections()
 	// the SSH session, so key exchange will not complete.
 	// Set a timeout so the client doesn't block forever.
 	SSHClient client2;
+	setClassicalKex(client2.session());
 	long timeout2 = 3;
 	ssh_options_set(client2.session(), SSH_OPTIONS_TIMEOUT, &timeout2);
 	bool connected2 = false;

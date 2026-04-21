@@ -19,8 +19,9 @@
 int main(int ac, char **av)
 {
 	std::vector<std::string> args;
+	args.reserve(ac);
 	for (int i = 0; i < ac; ++i)
-		args.push_back(std::string(av[i]));
+		args.emplace_back(av[i]);
 	CppUnit::TestRunner runner;
 	runner.addTest("SSHTestSuite", SSHTestSuite::suite());
 	CppUnitPocoExceptionText (exc);

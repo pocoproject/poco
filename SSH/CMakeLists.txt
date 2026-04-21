@@ -22,7 +22,7 @@ set_target_properties(SSH
 )
 
 target_link_libraries(SSH PUBLIC Poco::Foundation)
-target_link_libraries(SSH PUBLIC ${LIBSSH_LIBRARIES})
+target_link_libraries(SSH PRIVATE ssh)
 if(WIN32)
 	target_link_libraries(SSH PUBLIC ws2_32)
 endif()
@@ -32,7 +32,6 @@ target_include_directories(SSH
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/src
-		${LIBSSH_INCLUDE_DIRS}
 )
 
 POCO_INSTALL(SSH)

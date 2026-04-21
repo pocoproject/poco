@@ -8,7 +8,7 @@ add_executable(SSH-testrunner ${TEST_SRCS})
 set_target_properties(SSH-testrunner PROPERTIES DEBUG_POSTFIX "d")
 
 target_link_libraries(SSH-testrunner PUBLIC Poco::SSH Poco::Foundation CppUnit)
-target_include_directories(SSH-testrunner PRIVATE ${LIBSSH_INCLUDE_DIRS})
+target_link_libraries(SSH-testrunner PRIVATE ssh)
 
 add_test(
 	NAME SSH

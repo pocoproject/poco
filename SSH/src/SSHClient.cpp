@@ -77,7 +77,7 @@ bool SSHClient::authenticatePublicKey(const std::string& user, const std::string
 	if (!_connected)
 		throw SSHConnectionException("Not connected");
 
-	int rc;
+	int rc = SSH_AUTH_ERROR;
 	if (keyFile.empty())
 	{
 		rc = ssh_userauth_publickey_auto(_session, user.c_str(), nullptr);
@@ -85,8 +85,11 @@ bool SSHClient::authenticatePublicKey(const std::string& user, const std::string
 	else
 	{
 		ssh_key key = nullptr;
-		rc = ssh_pki_import_privkey_file(keyFile.c_str(), nullptr, nullptr, nullptr, &key);
-		if (rc != SSH_OK)
+		// Passphrase-protected keys are not supported here: the passphrase
+		// callback is nullptr, so ssh_pki_import_privkey_file fails fast
+		// rather than blocking on interactive prompting.
+		const int importRc = ssh_pki_import_privkey_file(keyFile.c_str(), nullptr, nullptr, nullptr, &key);
+		if (importRc != SSH_OK)
 			return false;
 		rc = ssh_userauth_publickey(_session, user.c_str(), key);
 		ssh_key_free(key);

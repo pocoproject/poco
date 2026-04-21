@@ -17,9 +17,11 @@
 #include "Poco/SSH/SSHException.h"
 #include <libssh/server.h>
 
-#ifndef POCO_OS_FAMILY_WINDOWS
+#if !defined(POCO_OS_FAMILY_WINDOWS)
 #include <poll.h>
 #include <unistd.h>
+#include <sys/socket.h>
+#include <cerrno>
 #else
 #include <winsock2.h>
 #endif
@@ -87,7 +89,7 @@ void SSHServer::stop()
 	ssh_socket_t fd = _listenFd.exchange(SSH_INVALID_FD);
 	if (fd != SSH_INVALID_FD)
 	{
-#ifdef POCO_OS_FAMILY_WINDOWS
+#if defined(POCO_OS_FAMILY_WINDOWS)
 		::closesocket(fd);
 #else
 		::close(fd);
@@ -155,12 +157,14 @@ void SSHServer::disconnectAllSessions()
 		_logger.information("Disconnecting %z active SSH session(s)", _activeSessions.size());
 	for (ssh_session session : _activeSessions)
 	{
-		socket_t fd = ssh_get_fd(session);
+		const socket_t fd = ssh_get_fd(session);
 		if (fd != SSH_INVALID_SOCKET)
 		{
-			::shutdown(fd, 2);
-#ifdef POCO_OS_FAMILY_WINDOWS
+#if defined(POCO_OS_FAMILY_WINDOWS)
+			::shutdown(fd, SD_BOTH);
 			::closesocket(fd);
+#else
+			::shutdown(fd, SHUT_RDWR);
 #endif
 		}
 	}
@@ -179,25 +183,31 @@ void SSHServer::acceptLoop()
 		if (fd == SSH_INVALID_FD)
 			break;
 
-#ifdef POCO_OS_FAMILY_WINDOWS
-		WSAPOLLFD pfd;
+#if defined(POCO_OS_FAMILY_WINDOWS)
+		WSAPOLLFD pfd{};
 #else
-		struct pollfd pfd;
+		struct pollfd pfd{};
 #endif
 		pfd.fd = fd;
 		pfd.events = POLLIN;
-		pfd.revents = 0;
 
-#ifdef POCO_OS_FAMILY_WINDOWS
+#if defined(POCO_OS_FAMILY_WINDOWS)
 		int pollRc = WSAPoll(&pfd, 1, 500);
 #else
 		int pollRc = ::poll(&pfd, 1, 500);
 #endif
 		if (pollRc == 0) // timeout
 			continue;
-		if (pollRc < 0 || _stopped)
+		if (pollRc < 0)
+		{
+#if !defined(POCO_OS_FAMILY_WINDOWS)
+			if (errno == EINTR) continue; // restart on signal
+#endif
 			break;
-		if (pfd.revents & (POLLERR | POLLHUP | POLLNVAL))
+		}
+		if (_stopped)
+			break;
+		if ((pfd.revents & (POLLERR | POLLHUP | POLLNVAL)) != 0)
 			break;
 
 		ssh_session session = ssh_new();

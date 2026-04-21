@@ -19,7 +19,7 @@
 #include <libssh/libssh.h>
 #include <libssh/libssh_version.h>
 
-#ifndef POCO_OS_FAMILY_WINDOWS
+#if !defined(POCO_OS_FAMILY_WINDOWS)
 #include <sys/stat.h>
 #endif
 
@@ -58,12 +58,31 @@ std::string SSHHostKeyManager::ensureHostKey(const std::string& keyDir, const st
 }
 
 
+namespace
+{
+#if !defined(POCO_OS_FAMILY_WINDOWS)
+	/// RAII guard that restores the process umask on scope exit.
+	/// Ensures the umask is restored even if ssh_pki_* throws or exits early.
+	class UmaskGuard
+	{
+	public:
+		explicit UmaskGuard(mode_t newMask): _oldMask(umask(newMask)) {}
+		~UmaskGuard() { umask(_oldMask); }
+		UmaskGuard(const UmaskGuard&) = delete;
+		UmaskGuard& operator=(const UmaskGuard&) = delete;
+	private:
+		mode_t _oldMask;
+	};
+#endif
+}
+
+
 void SSHHostKeyManager::generateKey(const std::string& path)
 {
-#ifndef POCO_OS_FAMILY_WINDOWS
+#if !defined(POCO_OS_FAMILY_WINDOWS)
 	// Set restrictive umask before writing private key to ensure
 	// the file is never accessible by group/others, even briefly.
-	mode_t oldMask = umask(0077);
+	UmaskGuard umaskGuard(0077);
 #endif
 
 	ssh_key key = nullptr;
@@ -72,20 +91,11 @@ void SSHHostKeyManager::generateKey(const std::string& path)
 #else
 	int rc = ssh_pki_generate(SSH_KEYTYPE_ED25519, 0, &key);
 #endif
-	if (rc != SSH_OK || !key)
-	{
-#ifndef POCO_OS_FAMILY_WINDOWS
-		umask(oldMask);
-#endif
+	if (rc != SSH_OK || key == nullptr)
 		throw SSHException("Failed to generate SSH host key");
-	}
 
 	rc = ssh_pki_export_privkey_file(key, nullptr, nullptr, nullptr, path.c_str());
 	ssh_key_free(key);
-
-#ifndef POCO_OS_FAMILY_WINDOWS
-	umask(oldMask);
-#endif
 
 	if (rc != SSH_OK)
 		throw SSHException("Failed to write SSH host key to " + path);

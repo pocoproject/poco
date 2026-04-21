@@ -25,6 +25,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <poll.h>
+#include <sys/types.h>
 #endif
 
 
@@ -140,7 +141,8 @@ int main(int argc, char* argv[])
 			{
 				std::cerr << "Password: " << std::flush;
 #if !defined(POCO_OS_FAMILY_WINDOWS)
-				struct termios oldt, newt;
+				struct termios oldt{};
+				struct termios newt{};
 				tcgetattr(STDIN_FILENO, &oldt);
 				newt = oldt;
 				newt.c_lflag &= ~ECHO;
@@ -169,23 +171,24 @@ int main(int argc, char* argv[])
 			return 1;
 		}
 
-		// Interactive loop: stdin → channel, channel → stdout
+		// Interactive loop: stdin -> channel, channel -> stdout
 		TerminalRawMode rawMode;
 		rawMode.enable();
 
 #if !defined(POCO_OS_FAMILY_WINDOWS)
-		struct pollfd fds[1];
+		struct pollfd fds[1]{};
 		fds[0].fd = STDIN_FILENO;
 		fds[0].events = POLLIN;
 
-		while (!ssh_channel_is_eof(channel) && !ssh_channel_is_closed(channel))
+		while (ssh_channel_is_eof(channel) == 0 && ssh_channel_is_closed(channel) == 0)
 		{
 			// Read from channel (non-blocking)
 			char buf[4096];
 			int nbytes = ssh_channel_read_nonblocking(channel, buf, sizeof(buf), 0);
 			if (nbytes > 0)
 			{
-				write(STDOUT_FILENO, buf, nbytes);
+				const ssize_t written = write(STDOUT_FILENO, buf, nbytes);
+				(void)written; // best-effort echo; channel may disappear next loop
 			}
 			else if (nbytes < 0)
 			{
@@ -193,12 +196,12 @@ int main(int argc, char* argv[])
 			}
 
 			// Read from stdin
-			if (poll(fds, 1, 50) > 0 && (fds[0].revents & POLLIN))
+			if (poll(fds, 1, 50) > 0 && (fds[0].revents & POLLIN) != 0)
 			{
-				int n = read(STDIN_FILENO, buf, sizeof(buf));
+				const ssize_t n = read(STDIN_FILENO, buf, sizeof(buf));
 				if (n > 0)
 				{
-					ssh_channel_write(channel, buf, n);
+					ssh_channel_write(channel, buf, static_cast<uint32_t>(n));
 				}
 				else if (n == 0)
 				{
@@ -206,6 +209,8 @@ int main(int argc, char* argv[])
 				}
 			}
 		}
+#else
+		std::cerr << "Interactive mode not supported on Windows in this sample." << std::endl;
 #endif
 
 		rawMode.disable();

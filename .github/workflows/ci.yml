@@ -611,72 +611,101 @@ jobs:
       - uses: TheMrMilchmann/setup-msvc-dev@v4
         with:
           arch: x64
-      - name: Install OpenSSL (FireDaemon portable zip)
+      - name: Cache vcpkg binary archives
+        # vcpkg's default file-based binary cache at %LOCALAPPDATA%\vcpkg\archives
+        # stores each built port as a content-addressed .zip keyed by ABI hash.
+        # Caching that directory via actions/cache persists the archives across
+        # runner VMs. New builds add new archives; the key rotates on run_id
+        # so every run writes a fresh cache entry, and restore-keys picks up
+        # the most recent prefix match. ABI hash changes (e.g. vcpkg port
+        # update for libssh or openssl) naturally miss and trigger rebuild.
+        # Replaces the removed x-gha provider from VCPKG_BINARY_SOURCES.
+        uses: actions/cache@v5
+        with:
+          path: ~\AppData\Local\vcpkg\archives
+          key: vcpkg-archives-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            vcpkg-archives-${{ runner.os }}-
+      - name: Uninstall pre-existing OpenSSL / libssh
         shell: pwsh
-        env:
-          # Major.minor track. 3.6 = latest, 3.5 = LTS. Latest patch is scraped
-          # from the KB page; falls back to OPENSSL_ZIP_FALLBACK if scrape fails.
-          OPENSSL_TRACK: "3.6"
-          OPENSSL_ZIP_FALLBACK: openssl-3.6.2.zip
+        # Runner images carry preinstalled OpenSSL/OpenSSH and cached vcpkg
+        # ports. Scrub all three so only our vcpkg install remains. vcpkg is
+        # the single source of OpenSSL (pulled in as a transitive dep of
+        # libssh), matching the rule: no second OpenSSL in CI.
         run: |
           $ProgressPreference = 'SilentlyContinue'
-          # FireDaemon ships a portable OpenSSL zip with the legacy provider
-          # included (ossl-modules/legacy.dll) -- needed for DES-ECB and PKCS12
-          # tests that exercise RC2/3DES PBE. No winget, no registry, no admin.
-          # Detect latest patch version from the KB page.
-          $kb = "https://kb.firedaemon.com/support/solutions/articles/4000121705-openssl-binary-distributions-for-microsoft-windows"
-          $zipName = $env:OPENSSL_ZIP_FALLBACK
-          try {
-            $html = Invoke-WebRequest -Uri $kb -UseBasicParsing -TimeoutSec 30
-            $pattern = "openssl-" + [regex]::Escape($env:OPENSSL_TRACK) + "\.(\d+)([a-z]?)\.zip"
-            $found = [regex]::Matches($html.Content, $pattern) |
-              ForEach-Object { $_.Value } | Select-Object -Unique
-            if ($found.Count -gt 0) {
-              $zipName = $found | Sort-Object {
-                if ($_ -match "openssl-[\d\.]+\.(\d+)([a-z]?)\.zip") {
-                  $patch = [int]$Matches[1]
-                  $suffix = if ($Matches[2]) { [int][char]$Matches[2] } else { 0 }
-                  $patch * 100 + $suffix
-                } else { 0 }
-              } -Descending | Select-Object -First 1
-            }
-          } catch {
-            Write-Host "Version scrape failed ($_); using fallback $zipName"
+          vcpkg --vcpkg-root="$env:VCPKG_INSTALLATION_ROOT" remove libssh:x64-windows openssl:x64-windows --recurse 2>&1 | Out-Host
+          $drop = @(
+            'C:\Program Files\OpenSSL\bin',
+            'C:\Program Files\OpenSSL-Win64\bin',
+            'C:\OpenSSL-Win64\bin',
+            'C:\Windows\System32\OpenSSH'
+          )
+          $clean = ($env:PATH -split ';' | Where-Object {
+            $p = $_.TrimEnd('\'); $drop -notcontains $p
+          }) -join ';'
+          "PATH=$clean" | Out-File -FilePath $env:GITHUB_ENV -Append
+          foreach ($d in 'C:\OpenSSL-Win64','C:\Program Files\OpenSSL','C:\Program Files\OpenSSL-Win64') {
+            if (Test-Path $d) { Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $d }
           }
-          Write-Host "Selected: $zipName"
-          # Install into the job sandbox so every job gets a clean copy.
-          $url = "https://download.firedaemon.com/FireDaemon-OpenSSL/$zipName"
-          $zip = Join-Path $env:RUNNER_TEMP $zipName
-          $installDir = Join-Path $env:RUNNER_TEMP "openssl"
-          Write-Host "Downloading $url"
-          Invoke-WebRequest -Uri $url -OutFile $zip -UseBasicParsing
-          Expand-Archive -Path $zip -DestinationPath $installDir -Force
-          $root = Join-Path $installDir "x64"
-          if (-not (Test-Path "$root\bin\libssl-3-x64.dll")) {
-            Write-Error "libssl-3-x64.dll missing under $root"
-            exit 1
-          }
-          if (-not (Test-Path "$root\lib\ossl-modules\legacy.dll")) {
-            Write-Error "legacy.dll missing under $root\lib\ossl-modules"
-            exit 1
-          }
-          "OPENSSL_ROOT_DIR=$root" | Out-File -FilePath $env:GITHUB_ENV -Append
-          Add-Content $env:GITHUB_PATH "$root\bin"
-          "OPENSSL_MODULES=$root\lib\ossl-modules" | Out-File -FilePath $env:GITHUB_ENV -Append
-          Write-Host "OPENSSL_ROOT_DIR=$root"
-      - name: Install libssh (vcpkg)
+      - name: Install OpenSSL + libssh (vcpkg)
         shell: pwsh
+        # libssh drags in openssl as a transitive dep -- we deliberately use
+        # that single copy for the whole build. Explicit Test-Path assertions
+        # fail fast on missing files.
         run: |
-          vcpkg install libssh:x64-windows
+          $ProgressPreference = 'SilentlyContinue'
+          vcpkg --vcpkg-root="$env:VCPKG_INSTALLATION_ROOT" install libssh:x64-windows
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $root = "$env:VCPKG_INSTALLATION_ROOT\installed\x64-windows"
-          "LIBSSH_ROOT_DIR=$root" | Out-File -FilePath $env:GITHUB_ENV -Append
+          # Fixed paths -- no recursive globbing. vcpkg's x64-windows triplet
+          # places runtime DLLs flat under $root\bin\, including OpenSSL
+          # provider modules (legacy.dll, default.dll). If this ever diverges,
+          # we want a hard fail, not a silent pick of a wrong copy.
+          $providerDir = "$root\bin"
+          $required = @(
+            "$root\bin\libcrypto-3-x64.dll",
+            "$root\bin\libssl-3-x64.dll",
+            "$root\bin\ssh.dll",
+            "$root\lib\libcrypto.lib",
+            "$root\lib\libssl.lib",
+            "$root\lib\ssh.lib",
+            "$root\include\openssl\ssl.h",
+            "$root\include\libssh\libssh.h",
+            "$providerDir\legacy.dll"
+          )
+          foreach ($p in $required) {
+            if (-not (Test-Path $p)) { Write-Error "Missing: $p"; exit 1 }
+          }
+          "OPENSSL_ROOT_DIR=$root"          | Out-File -FilePath $env:GITHUB_ENV -Append
+          "LIBSSH_ROOT_DIR=$root"           | Out-File -FilePath $env:GITHUB_ENV -Append
+          "OPENSSL_MODULES=$providerDir"    | Out-File -FilePath $env:GITHUB_ENV -Append
           Add-Content $env:GITHUB_PATH "$root\bin"
+          Write-Host "OPENSSL_ROOT_DIR=$root"
+          Write-Host "LIBSSH_ROOT_DIR=$root"
+          Write-Host "OPENSSL_MODULES=$providerDir"
+      - name: Verify OpenSSL / libssh DLL resolution
+        shell: pwsh
+        # Prove the loader will pick DLLs from the vcpkg tree, not from
+        # residue elsewhere on the runner. Fails the job on any mismatch.
+        run: |
+          foreach ($dll in 'libcrypto-3-x64.dll','libssl-3-x64.dll','ssh.dll','legacy.dll') {
+            $cmd = Get-Command $dll -ErrorAction SilentlyContinue
+            if ($null -eq $cmd) { Write-Error "$dll not resolvable on PATH"; exit 1 }
+            $resolved = [System.IO.Path]::GetFullPath($cmd.Source)
+            $expected = [System.IO.Path]::GetFullPath("$env:LIBSSH_ROOT_DIR\bin\$dll")
+            Write-Host "$dll -> $resolved"
+            if ($resolved -ne $expected) {
+              Write-Error "$dll resolves to $resolved, expected $expected"
+              exit 1
+            }
+          }
       - run: >-
           cmake -S. -Bcmake-build -G Ninja -DCMAKE_BUILD_TYPE=Release
           -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
           ${{ env.POCO_CMAKE_WINDOWS_FULL }}
           -DOPENSSL_ROOT_DIR="${{ env.OPENSSL_ROOT_DIR }}"
-          -DLIBSSH_ROOT_DIR="${{ env.LIBSSH_ROOT_DIR }}"
+          -DCMAKE_PREFIX_PATH="${{ env.LIBSSH_ROOT_DIR }}"
       - run: cmake --build cmake-build --parallel $env:NUMBER_OF_PROCESSORS
       - uses: ./.github/actions/retry-action
         env:
@@ -689,6 +718,11 @@ jobs:
             cd cmake-build;
             ctest ${{ env.POCO_CTEST_COMMON }} --parallel $env:NUMBER_OF_PROCESSORS -E "(DataMySQL)|(DataODBC)|(Redis)|(MongoDB)"
       - uses: ./.github/actions/upload-test-report
+      - name: Uninstall OpenSSL / libssh
+        if: always()
+        shell: pwsh
+        run: |
+          vcpkg --vcpkg-root="$env:VCPKG_INSTALLATION_ROOT" remove libssh:x64-windows openssl:x64-windows --recurse 2>&1 | Out-Host
 
   # clang-cl toolchain exception: reduced scope (Foundation + Util smoke).
   windows-2025-clang-cmake:

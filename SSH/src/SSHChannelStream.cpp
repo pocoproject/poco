@@ -25,9 +25,7 @@ SSHChannelStreamBuf::SSHChannelStreamBuf(ssh_channel channel):
 }
 
 
-SSHChannelStreamBuf::~SSHChannelStreamBuf()
-{
-}
+SSHChannelStreamBuf::~SSHChannelStreamBuf() = default;
 
 
 int SSHChannelStreamBuf::overflow(int c)
@@ -68,18 +66,16 @@ SSHChannelStream::SSHChannelStream(ssh_channel channel):
 }
 
 
-SSHChannelStream::~SSHChannelStream()
-{
-}
+SSHChannelStream::~SSHChannelStream() = default;
 
 
 bool sshReadLine(ssh_channel channel, std::string& line)
 {
 	line.clear();
-	char ch;
+	char ch = 0;
 	while (true)
 	{
-		int nbytes = ssh_channel_read(channel, &ch, 1, 0);
+		const int nbytes = ssh_channel_read(channel, &ch, 1, 0);
 		if (nbytes <= 0)
 			return false; // EOF or error
 
@@ -92,9 +88,9 @@ bool sshReadLine(ssh_channel channel, std::string& line)
 				line.pop_back();
 			return true;
 		}
-		else if (ch == '\x7f' || ch == '\b')
+		if (ch == '\x7f' || ch == '\b')
 		{
-			// Backspace — erase last character
+			// Backspace: erase last character
 			if (!line.empty())
 			{
 				line.pop_back();
@@ -103,7 +99,7 @@ bool sshReadLine(ssh_channel channel, std::string& line)
 		}
 		else if (ch == '\x03')
 		{
-			// Ctrl+C — discard line
+			// Ctrl+C: discard line
 			ssh_channel_write(channel, "^C\r\n", 4);
 			line.clear();
 			return true;

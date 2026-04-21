@@ -48,9 +48,7 @@ SSHSession::SSHSession(
 }
 
 
-SSHSession::~SSHSession()
-{
-}
+SSHSession::~SSHSession() = default;
 
 
 void SSHSession::run()
@@ -133,8 +131,16 @@ bool SSHSession::authenticate()
 	if (_config.enablePubkeyAuth && !_config.authorizedKeysDir.empty())
 		authMethods |= SSH_AUTH_METHOD_PUBLICKEY;
 
-	while (authAttempts < _config.maxAuthAttempts)
+	// Cap total messages received to bound loop work even when a misbehaving
+	// client sends non-AUTH messages (which otherwise do not increment
+	// authAttempts). 10x maxAuthAttempts is a generous multiplier that still
+	// denies indefinite loops.
+	const int maxMessages = _config.maxAuthAttempts * 10;
+	int messagesSeen = 0;
+
+	while (authAttempts < _config.maxAuthAttempts && messagesSeen < maxMessages)
 	{
+		++messagesSeen;
 		ssh_message msg = ssh_message_get(_session);
 		if (!msg)
 			return false;
