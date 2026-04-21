@@ -339,7 +339,7 @@ void PropertyFileConfigurationTest::testInclude()
 		ostr << "!include ${extDir}" << includedParentName << "\n";
 	}
 
-	AutoPtr<PropertyFileConfiguration> pConfParent = new PropertyFileConfiguration(mainFileParent.path(), pParent);
+	AutoPtr<PropertyFileConfiguration> pConfParent = new PropertyFileConfiguration(mainFileParent.path(), pParent.get());
 	assertTrue (pConfParent->getString("main.prop") == "mainValue");
 	assertTrue (pConfParent->getString("parent.prop") == "parentValue");
 }
@@ -812,6 +812,23 @@ void PropertyFileConfigurationTest::testIncludeManagement()
 }
 
 
+void PropertyFileConfigurationTest::testNoCircularReference()
+{
+	using Poco::Util::MapConfiguration;
+
+	AutoPtr<MapConfiguration> pParent = new MapConfiguration;
+	pParent->setString("base.dir", "/tmp/poco-test");
+	assertTrue (pParent->referenceCount() == 1);
+
+	{
+		AutoPtr<PropertyFileConfiguration> pChild = new PropertyFileConfiguration(pParent.get());
+		assertTrue (pParent->referenceCount() == 1);
+		(void) pChild;
+	}
+	assertTrue (pParent->referenceCount() == 1);
+}
+
+
 AbstractConfiguration::Ptr PropertyFileConfigurationTest::allocConfiguration() const
 {
 	return new PropertyFileConfiguration;
@@ -841,6 +858,7 @@ CppUnit::Test* PropertyFileConfigurationTest::suite()
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testClearResetsProvenance);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testGetSourceFilesCoversAllKeys);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testIncludeManagement);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testNoCircularReference);
 
 	return pSuite;
 }

@@ -66,22 +66,41 @@ class Util_API PropertyFileConfiguration: public MapConfiguration
 	/// a colon ':' nor an equal sign '=' character.
 {
 public:
-	PropertyFileConfiguration(AbstractConfiguration::Ptr pParentConfig = nullptr);
+	explicit PropertyFileConfiguration(AbstractConfiguration* pParentConfig = nullptr);
 		/// Creates an empty PropertyFileConfiguration.
 		/// If pParentConfig is not null, it is used to expand ${variable}
 		/// references in !include directive paths.
+		/// The parent configuration is not owned by this object;
+		/// the caller must ensure it outlives this configuration.
 
-	PropertyFileConfiguration(std::istream& istr, AbstractConfiguration::Ptr pParentConfig = nullptr);
+	explicit PropertyFileConfiguration(std::istream& istr, AbstractConfiguration* pParentConfig = nullptr);
 		/// Creates an PropertyFileConfiguration and loads the configuration data
 		/// from the given stream, which must be in properties file format.
 		/// If pParentConfig is not null, it is used to expand ${variable}
 		/// references in !include directive paths.
+		/// The parent configuration is not owned by this object;
+		/// the caller must ensure it outlives this configuration.
 
-	PropertyFileConfiguration(const std::string& path, AbstractConfiguration::Ptr pParentConfig = nullptr);
+	explicit PropertyFileConfiguration(const std::string& path, AbstractConfiguration* pParentConfig = nullptr);
 		/// Creates an PropertyFileConfiguration and loads the configuration data
 		/// from the given file, which must be in properties file format.
 		/// If pParentConfig is not null, it is used to expand ${variable}
 		/// references in !include directive paths.
+		/// The parent configuration is not owned by this object;
+		/// the caller must ensure it outlives this configuration.
+
+	POCO_DEPRECATED("Pass a raw AbstractConfiguration*; PropertyFileConfiguration does not take ownership of the parent")
+	explicit PropertyFileConfiguration(AbstractConfiguration::Ptr pParentConfig);
+		/// Deprecated. Use the AbstractConfiguration* overload instead.
+		/// Forwards to the raw-pointer constructor.
+
+	POCO_DEPRECATED("Pass a raw AbstractConfiguration*; PropertyFileConfiguration does not take ownership of the parent")
+	PropertyFileConfiguration(std::istream& istr, AbstractConfiguration::Ptr pParentConfig);
+		/// Deprecated. Use the AbstractConfiguration* overload instead.
+
+	POCO_DEPRECATED("Pass a raw AbstractConfiguration*; PropertyFileConfiguration does not take ownership of the parent")
+	PropertyFileConfiguration(const std::string& path, AbstractConfiguration::Ptr pParentConfig);
+		/// Deprecated. Use the AbstractConfiguration* overload instead.
 
 	void load(std::istream& istr);
 		/// Loads the configuration data from the given stream, which
@@ -173,7 +192,12 @@ private:
 	static int readChar(std::istream& istr);
 	static std::string escapeValue(const std::string& value);
 
-	AbstractConfiguration::Ptr _pParentConfig;
+	AbstractConfiguration* _pParentConfig = nullptr;
+		/// Non-owning back-pointer to the parent configuration used for
+		/// ${variable} expansion in !include directive paths.
+		/// This is intentionally a raw pointer to avoid a circular reference:
+		/// the parent (typically LayeredConfiguration) owns this
+		/// PropertyFileConfiguration, so the parent always outlives the child.
 	std::map<std::string, std::string> _sourceMap;
 	std::string _rootFile;
 };
