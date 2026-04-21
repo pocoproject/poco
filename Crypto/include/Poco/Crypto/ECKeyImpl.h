@@ -170,22 +170,6 @@ inline const EVP_PKEY* ECKeyImpl::getEVPPKey() const
 }
 
 
-#ifndef OPENSSL_NO_DEPRECATED_3_0
-
-inline EC_KEY* ECKeyImpl::getECKey()
-{
-	return const_cast<EC_KEY*>(EVP_PKEY_get0_EC_KEY(_pEVPPKey));
-}
-
-
-inline const EC_KEY* ECKeyImpl::getECKey() const
-{
-	return EVP_PKEY_get0_EC_KEY(_pEVPPKey);
-}
-
-#endif // !OPENSSL_NO_DEPRECATED_3_0
-
-
 inline std::string ECKeyImpl::groupName() const
 {
 	return OBJ_nid2sn(groupId());
