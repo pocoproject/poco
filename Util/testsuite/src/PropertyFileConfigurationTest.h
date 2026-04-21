@@ -32,6 +32,7 @@ public:
 	void testClearResetsProvenance();
 	void testGetSourceFilesCoversAllKeys();
 	void testIncludeManagement();
+	void testNoCircularReference();
 
 	void setUp();
 	void tearDown();
