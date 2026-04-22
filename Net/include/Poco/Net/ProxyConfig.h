@@ -60,7 +60,7 @@ struct ProxyConfig
 		/// string to disable proxy bypassing.
 
 	ProxyAuthentication authMethod = ProxyAuthentication::Basic;
-		/// The authentication method to use - HTTP Basic or NTLM.
+		/// The authentication method to use - HTTP Basic, HTTP Digest or NTLM.
 };
 
 

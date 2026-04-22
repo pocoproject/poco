@@ -214,6 +214,8 @@ void HTTPClientSession::setProxy(const std::string& host, Poco::UInt16 port, con
 {
 	if (protocol != "http" && protocol != "https")
 		throw InvalidArgumentException("Protocol must be either http or https");
+	if (protocol == "https" && !secure())
+		throw InvalidArgumentException("HTTPS proxy requires HTTPSClientSession");
 
 	if (!connected())
 	{
@@ -248,6 +250,8 @@ void HTTPClientSession::setProxyProtocol(const std::string& protocol)
 {
 	if (protocol != "http" && protocol != "https")
 		throw InvalidArgumentException("Protocol must be either http or https");
+	if (protocol == "https" && !secure())
+		throw InvalidArgumentException("HTTPS proxy requires HTTPSClientSession");
 
 	if (!connected())
 		_proxyConfig.protocol = protocol;
@@ -288,6 +292,8 @@ void HTTPClientSession::setProxyConfig(const ProxyConfig& config)
 {
 	if (config.protocol != "http" && config.protocol != "https")
 		throw InvalidArgumentException("Protocol must be either http or https");
+	if (config.protocol == "https" && !secure())
+		throw InvalidArgumentException("HTTPS proxy requires HTTPSClientSession");
 
 	if (!connected())
 		_proxyConfig = config;
@@ -520,7 +526,11 @@ void HTTPClientSession::reconnect()
 			addr = SocketAddress(_host, _port);
 	}
 	else
+	{
+		if (_proxyConfig.protocol == "https" && !secure())
+			throw Poco::NotImplementedException("HTTPS proxy requires HTTPSClientSession");
 		addr = SocketAddress(_proxyConfig.host, _proxyConfig.port);
+	}
 
 	if ((!_sourceAddress4.host().isWildcard()) || (_sourceAddress4.port() != 0))
 		connect(addr, _sourceAddress4);
@@ -647,6 +657,9 @@ void HTTPClientSession::sendChallengeRequest(const HTTPRequest& request, HTTPRes
 
 StreamSocket HTTPClientSession::proxyConnect()
 {
+	if (getProxyProtocol() == "https" && !secure())
+		throw Poco::NotImplementedException("HTTPS proxy requires HTTPSClientSession");
+
 	URI proxyUri;
 	proxyUri.setScheme(getProxyProtocol());
 	proxyUri.setHost(getProxyHost());
@@ -655,7 +668,13 @@ StreamSocket HTTPClientSession::proxyConnect()
 	SharedPtr<HTTPClientSession> proxySession (_proxySessionFactory.createClientSession(proxyUri));
 
 	proxySession->setTimeout(getTimeout());
-	std::string targetAddress(_host);
+	// RFC 3986 requires IPv6 literal hosts to be bracketed in the authority form
+	// used as the CONNECT request-target and in the Host header.
+	std::string targetAddress;
+	if (_host.find(':') != std::string::npos)
+		targetAddress.append("[").append(_host).append("]");
+	else
+		targetAddress.append(_host);
 	targetAddress.append(":");
 	NumberFormatter::append(targetAddress, _port);
 	HTTPRequest proxyRequest(HTTPRequest::HTTP_CONNECT, targetAddress, HTTPMessage::HTTP_1_1);

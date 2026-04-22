@@ -407,8 +407,25 @@ void HTTPClientSessionTest::testSetProxyProtocolValidation()
 	s.setProxy("proxy", 80, "http", true);
 	assertTrue (s.getProxyProtocol() == "http");
 
-	s.setProxy("proxy", 80, "https", true);
-	assertTrue (s.getProxyProtocol() == "https");
+	// HTTPS proxy is only supported by HTTPSClientSession; plain
+	// HTTPClientSession must reject protocol "https".
+	try
+	{
+		s.setProxy("proxy", 443, "https", true);
+		fail("must throw InvalidArgumentException");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	try
+	{
+		s.setProxyProtocol("https");
+		fail("must throw InvalidArgumentException");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
 }
 
 
@@ -435,9 +452,20 @@ void HTTPClientSessionTest::testSetProxyConfigValidation()
 	s.setProxyConfig(goodConfig);
 	assertTrue (s.getProxyHost() == "proxy");
 
-	goodConfig.protocol = "https";
-	s.setProxyConfig(goodConfig);
-	assertTrue (s.getProxyProtocol() == "https");
+	// HTTPS proxy is only supported by HTTPSClientSession; plain
+	// HTTPClientSession must reject a ProxyConfig with protocol "https".
+	ProxyConfig httpsConfig;
+	httpsConfig.host = "proxy";
+	httpsConfig.port = 443;
+	httpsConfig.protocol = "https";
+	try
+	{
+		s.setProxyConfig(httpsConfig);
+		fail("must throw InvalidArgumentException");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
 }
 
 
@@ -451,8 +479,8 @@ void HTTPClientSessionTest::testProxySetters()
 	s.setProxyPort(8080);
 	assertTrue (s.getProxyPort() == 8080);
 
-	s.setProxyProtocol("https");
-	assertTrue (s.getProxyProtocol() == "https");
+	s.setProxyProtocol("http");
+	assertTrue (s.getProxyProtocol() == "http");
 
 	s.setProxyTunnel(false);
 	assertTrue (s.isProxyTunnel() == false);
@@ -564,7 +592,7 @@ void HTTPClientSessionTest::testBypassProxyExtended()
 	ProxyConfig config;
 	config.host = "proxy.domain.com";
 	config.port = 80;
-	config.protocol = "https";
+	config.protocol = "http";
 	config.tunnel = false;
 	config.nonProxyHosts = "localhost|127\\.0\\.0\\.1";
 

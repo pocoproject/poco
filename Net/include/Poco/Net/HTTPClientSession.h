@@ -136,6 +136,12 @@ public:
 
 	void setProxy(const std::string& host, Poco::UInt16 port = HTTPSession::HTTP_PORT, const std::string& protocol = "http", bool tunnel = true);
 		/// Sets the proxy host name, port number, protocol (http or https) and tunnel behaviour.
+		///
+		/// Note: protocol "https" (i.e. connecting to the proxy itself over TLS) is only
+		/// supported by HTTPSClientSession. Calling this with protocol "https" on a
+		/// plain HTTPClientSession throws InvalidArgumentException. When using an
+		/// HTTPS proxy, the port usually needs to be set explicitly (commonly 443)
+		/// since the default is HTTPSession::HTTP_PORT (80).
 
 	void setProxyHost(const std::string& host);
 		/// Sets the host name of the proxy server.
@@ -145,6 +151,10 @@ public:
 
 	void setProxyProtocol(const std::string& protocol);
 		/// Sets the proxy protocol (http or https).
+		///
+		/// Note: protocol "https" is only supported by HTTPSClientSession.
+		/// Calling this with protocol "https" on a plain HTTPClientSession
+		/// throws InvalidArgumentException.
 
 	void setProxyTunnel(bool tunnel);
 		/// If 'true' proxy will be used as tunnel.
@@ -181,6 +191,10 @@ public:
 
 	void setProxyConfig(const ProxyConfig& config);
 		/// Sets the proxy configuration.
+		///
+		/// Note: a configuration with protocol "https" is only supported by
+		/// HTTPSClientSession. Applying it to a plain HTTPClientSession throws
+		/// InvalidArgumentException.
 
 	[[nodiscard]] const ProxyConfig& getProxyConfig() const;
 		/// Returns the proxy configuration.
@@ -190,6 +204,11 @@ public:
 		///
 		/// The global proxy configuration is used by all HTTPClientSession
 		/// instances, unless a different proxy configuration is explicitly set.
+		///
+		/// Note: protocol "https" is only honored by HTTPSClientSession
+		/// instances. A plain HTTPClientSession that inherits a global
+		/// configuration with protocol "https" will throw when it tries
+		/// to connect.
 		///
 		/// Warning: Setting the global proxy configuration is not thread safe.
 		/// The global proxy configuration should be set at start up, before
