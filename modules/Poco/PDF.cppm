@@ -29,7 +29,7 @@ module;
 #include "Poco/PDF/XMLTemplate.h"
 #endif
 
-export module Poco.PDF;
+export module Poco:PDF;
 
 export namespace Poco::PDF {
 	#ifdef ENABLE_PDF

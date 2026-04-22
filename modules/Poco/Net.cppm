@@ -193,7 +193,7 @@ module;
 #endif
 #endif
 
-export module Poco.Net;
+export module Poco:Net;
 
 export namespace Poco::Net {
 	#ifdef ENABLE_NET

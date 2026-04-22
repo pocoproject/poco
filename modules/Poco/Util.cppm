@@ -50,7 +50,7 @@ module;
 #include "Poco/Util/XMLConfiguration.h"
 #endif
 
-export module Poco.Util;
+export module Poco:Util;
 
 export namespace Poco::Util {
 	#ifdef ENABLE_UTIL

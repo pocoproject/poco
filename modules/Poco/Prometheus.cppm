@@ -33,7 +33,7 @@ module;
 #include "Poco/Prometheus/ThreadPoolCollector.h"
 #endif
 
-export module Poco.Prometheus;
+export module Poco:Prometheus;
 
 export namespace Poco::Prometheus {
 	#ifdef ENABLE_PROMETHEUS

@@ -25,7 +25,7 @@ module;
 #include "Poco/Data/MySQL/Utility.h"
 #endif
 
-export module Poco.Data:MySQL;
+export module Poco:Data.MySQL;
 
 export namespace Poco::Data::MySQL {
 	#ifdef ENABLE_DATA_MYSQL

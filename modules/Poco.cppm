@@ -11,57 +11,53 @@
 
 export module Poco;
 
-#ifdef ENABLE_FOUNDATION
-export import Poco.Foundation;
-#endif
+export import :Foundation;
+
 #ifdef ENABLE_ACTIVERECORD
-export import Poco.ActiveRecord;
+export import :ActiveRecord;
 #endif
 #ifdef ENABLE_CPPPARSER
-export import Poco.CppParser;
+export import :CppParser;
 #endif
 #ifdef ENABLE_CRYPTO
-export import Poco.Crypto;
+export import :Crypto;
 #endif
 #ifdef ENABLE_DNSSD
-export import Poco.DNSSD;
+export import :DNSSD;
 #endif
 #ifdef ENABLE_DATA
-export import Poco.Data;
-#endif
-#ifdef ENABLE_DYNAMIC
-export import Poco.Dynamic;
+export import :Data;
 #endif
 #ifdef ENABLE_JSON
-export import Poco.JSON;
+export import :JSON;
 #endif
 #ifdef ENABLE_JWT
-export import Poco.JWT;
+export import :JWT;
 #endif
 #ifdef ENABLE_MONGODB
-export import Poco.MongoDB;
+export import :MongoDB;
 #endif
 #ifdef ENABLE_NET
-export import Poco.Net;
+export import :Net;
 #endif
 #ifdef ENABLE_PDF
-export import Poco.PDF;
+export import :PDF;
 #endif
 #ifdef ENABLE_PROMETHEUS
-export import Poco.Prometheus;
+export import :Prometheus;
 #endif
 #ifdef ENABLE_REDIS
-export import Poco.Redis;
+export import :Redis;
 #endif
 #ifdef ENABLE_SEVENZIP
-export import Poco.SevenZip;
+export import :SevenZip;
 #endif
 #ifdef ENABLE_UTIL
-export import Poco.Util;
+export import :Util;
 #endif
 #ifdef ENABLE_XML
-export import Poco.XML;
+export import :XML;
 #endif
 #ifdef ENABLE_ZIP
-export import Poco.Zip;
+export import :Zip;
 #endif

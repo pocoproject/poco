@@ -34,7 +34,7 @@ module;
 #include "Poco/Data/ODBC/Utility.h"
 #endif
 
-export module Poco.Data:ODBC;
+export module Poco:Data.ODBC;
 
 export namespace Poco::Data::ODBC {
 	#ifdef ENABLE_DATA_ODBC

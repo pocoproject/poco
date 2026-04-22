@@ -27,7 +27,7 @@ module;
 #include "Poco/JSON/Template.h"
 #endif
 
-export module Poco.JSON;
+export module Poco:JSON;
 
 export namespace Poco::JSON {
 	#ifdef ENABLE_JSON

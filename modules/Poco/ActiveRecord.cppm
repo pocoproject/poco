@@ -20,7 +20,7 @@ module;
 #include "Poco/ActiveRecord/StatementPlaceholderProvider.h"
 #endif
 
-export module Poco.ActiveRecord;
+export module Poco:ActiveRecord;
 
 export namespace Poco::ActiveRecord {
 	#ifdef ENABLE_ACTIVERECORD
