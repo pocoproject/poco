@@ -121,7 +121,14 @@ public:
 		VER_51		= 14, ///< First wire version that supports *only* OP_MSG
 		VER_52		= 15,
 		VER_53		= 16,
-		VER_60		= 17
+		VER_60		= 17,
+		VER_61		= 18,
+		VER_62		= 19,
+		VER_70		= 21,
+		VER_71		= 22,
+		VER_72		= 23,
+		VER_73		= 24,
+		VER_80		= 25
 	};
 
 protected:
