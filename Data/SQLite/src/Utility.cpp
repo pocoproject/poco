@@ -40,7 +40,7 @@ const int Utility::THREAD_MODE_MULTI = SQLITE_CONFIG_MULTITHREAD;
 const int Utility::THREAD_MODE_SERIAL = SQLITE_CONFIG_SERIALIZED;
 
 #if defined(POCO_SQLITE_UNBUNDLED)
-	#warning "Utility::_threadMode is set based on SQLITE_THREADSAFE, which may not reflect the actual threading mode used by unbundled SQLite"
+	#pragma message("WARNING: Utility::_threadMode is set based on SQLITE_THREADSAFE, which may not reflect the actual threading mode used by unbundled SQLite")
 #endif
 
 int Utility::_threadMode =
