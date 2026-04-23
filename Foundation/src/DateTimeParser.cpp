@@ -243,6 +243,13 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 				case 'S':
 					it = skipNonDigits(it, end);
 					second = parseNumberN(dtStr, it, end, 2);
+					// Consume optional fractional seconds ('.NNN' or ',NNN') so that a
+					// subsequent %z specifier can reach the timezone designator.
+					if (it != end && (*it == '.' || *it == ','))
+					{
+						++it;
+						it = skipDigits(it, end);
+					}
 					break;
 				case 's':
 					it = skipNonDigits(it, end);
