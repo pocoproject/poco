@@ -19,8 +19,8 @@
 
 
 #include "Poco/SSH/SSH.h"
+#include "Poco/SSH/SSHTypes.h"
 #include "Poco/Types.h"
-#include <libssh/libssh.h>
 #include <string>
 
 

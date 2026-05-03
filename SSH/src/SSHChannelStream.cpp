@@ -13,6 +13,7 @@
 
 
 #include "Poco/SSH/SSHChannelStream.h"
+#include <libssh/libssh.h>
 
 
 namespace Poco {

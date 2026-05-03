@@ -15,6 +15,7 @@
 #include "Poco/SSH/SSHServer.h"
 #include "Poco/SSH/SSHSession.h"
 #include "Poco/SSH/SSHException.h"
+#include <libssh/libssh.h>
 #include <libssh/server.h>
 
 #if !defined(POCO_OS_FAMILY_WINDOWS)
