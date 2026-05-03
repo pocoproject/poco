@@ -27,6 +27,7 @@
 #include "Poco/SSH/SSHException.h"
 #include "Poco/Path.h"
 #include "Poco/File.h"
+#include <libssh/libssh.h>
 #include <libssh/server.h>
 #include <fstream>
 #include <sstream>

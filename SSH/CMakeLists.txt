@@ -12,6 +12,8 @@ if(MSVC AND BUILD_SHARED_LIBS)
 	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
+find_package(libssh CONFIG REQUIRED)
+
 add_library(SSH ${SRCS})
 add_library(Poco::SSH ALIAS SSH)
 set_target_properties(SSH

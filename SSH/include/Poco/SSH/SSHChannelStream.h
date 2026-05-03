@@ -19,7 +19,7 @@
 
 
 #include "Poco/SSH/SSH.h"
-#include <libssh/libssh.h>
+#include "Poco/SSH/SSHTypes.h"
 #include <streambuf>
 #include <ostream>
 #include <string>

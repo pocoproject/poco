@@ -22,6 +22,7 @@
 #include "Poco/TemporaryFile.h"
 #include "Poco/Thread.h"
 #include <libssh/libssh.h>
+#include <libssh/server.h>
 
 
 using namespace Poco::SSH;
