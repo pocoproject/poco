@@ -14,6 +14,7 @@
 
 #include "Poco/SSH/SSHClient.h"
 #include "Poco/SSH/SSHException.h"
+#include <libssh/libssh.h>
 
 
 namespace Poco {

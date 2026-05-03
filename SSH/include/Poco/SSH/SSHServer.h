@@ -20,14 +20,13 @@
 
 #include "Poco/SSH/SSH.h"
 #include "Poco/SSH/SSHServerConfig.h"
+#include "Poco/SSH/SSHTypes.h"
 #include "Poco/Logger.h"
 #include "Poco/Thread.h"
 #include "Poco/ThreadPool.h"
 #include "Poco/RunnableAdapter.h"
 #include "Poco/Mutex.h"
 #include "Poco/Event.h"
-#include <libssh/libssh.h>
-#include <libssh/server.h>
 #include <atomic>
 #include <set>
 #include <functional>
