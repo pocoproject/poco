@@ -28,6 +28,7 @@ public:
 	void testSave();
 	void testInclude();
 	void testSavePreserving();
+	void testSaveRemovesLastIncludedKey();
 	void testSavePreservingMultiLine();
 	void testClearResetsProvenance();
 	void testGetSourceFilesCoversAllKeys();

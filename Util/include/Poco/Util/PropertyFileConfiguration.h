@@ -199,6 +199,7 @@ private:
 		/// the parent (typically LayeredConfiguration) owns this
 		/// PropertyFileConfiguration, so the parent always outlives the child.
 	std::map<std::string, std::string> _sourceMap;
+	mutable std::set<std::string> _removedSourceFiles;
 	std::string _rootFile;
 };
 

@@ -139,10 +139,15 @@ void PropertyFileConfiguration::save(const std::string& path) const
 		absPath.makeAbsolute();
 		std::string absPathStr = absPath.toString();
 
-		bool useProvenance = !_sourceMap.empty() && !_rootFile.empty() && absPathStr == _rootFile;
+		bool useProvenance = (!_sourceMap.empty() || !_removedSourceFiles.empty())
+			&& !_rootFile.empty()
+			&& absPathStr == _rootFile;
 
 		if (useProvenance)
 		{
+			for (const auto& file : _removedSourceFiles)
+				fileValues[file];
+
 			// Group key-values by source file
 			for (const auto& [key, file] : _sourceMap)
 			{
@@ -175,6 +180,12 @@ void PropertyFileConfiguration::save(const std::string& path) const
 	for (const auto& [file, values] : fileValues)
 	{
 		saveToFile(file, values);
+	}
+
+	{
+		AbstractConfiguration::ScopedLock lock(*this);
+		for (const auto& fileAndValues : fileValues)
+			_removedSourceFiles.erase(fileAndValues.first);
 	}
 }
 
@@ -310,11 +321,19 @@ void PropertyFileConfiguration::setSourceFile(const std::string& key, const std:
 
 void PropertyFileConfiguration::removeRaw(const std::string& key)
 {
+	bool removeAll = key.empty();
+	std::string prefix = removeAll ? std::string() : key + '.';
+	for (const auto& [sourceKey, file] : _sourceMap)
+	{
+		if (removeAll || sourceKey == key || sourceKey.compare(0, prefix.size(), prefix) == 0)
+			_removedSourceFiles.insert(file);
+	}
+
 	MapConfiguration::removeRaw(key);
-	std::string prefix = key + '.';
+
 	for (auto it = _sourceMap.begin(); it != _sourceMap.end(); )
 	{
-		if (it->first == key || it->first.compare(0, prefix.size(), prefix) == 0)
+		if (removeAll || it->first == key || it->first.compare(0, prefix.size(), prefix) == 0)
 			it = _sourceMap.erase(it);
 		else
 			++it;
@@ -326,6 +345,7 @@ void PropertyFileConfiguration::clear()
 {
 	MapConfiguration::clear();
 	_sourceMap.clear();
+	_removedSourceFiles.clear();
 	_rootFile.clear();
 }
 

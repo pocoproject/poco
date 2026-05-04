@@ -504,6 +504,68 @@ void PropertyFileConfigurationTest::testSavePreserving()
 }
 
 
+void PropertyFileConfigurationTest::testSaveRemovesLastIncludedKey()
+{
+	Poco::TemporaryFile extraFile;
+	{
+		Poco::FileOutputStream ostr(extraFile.path());
+		ostr << "extra.prop1 = true\n";
+	}
+
+	Poco::TemporaryFile rootFile;
+	{
+		Poco::FileOutputStream ostr(rootFile.path());
+		ostr << "root.key = rootValue\n";
+		ostr << "!include " << extraFile.path() << "\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(rootFile.path());
+	assertTrue (pConf->getString("extra.prop1") == "true");
+
+	pConf->remove("extra.prop1");
+	pConf->save(rootFile.path());
+
+	{
+		Poco::FileInputStream istr(extraFile.path());
+		std::string content((std::istreambuf_iterator<char>(istr)), std::istreambuf_iterator<char>());
+		assertTrue (content.find("extra.prop1") == std::string::npos);
+	}
+
+	AutoPtr<PropertyFileConfiguration> pReloaded = new PropertyFileConfiguration(rootFile.path());
+	try
+	{
+		pReloaded->getString("extra.prop1");
+		fail("Expected NotFoundException");
+	}
+	catch (Poco::NotFoundException&) {}
+
+	Poco::TemporaryFile groupFile;
+	{
+		Poco::FileOutputStream ostr(groupFile.path());
+		ostr << "group.item.name = item1\n";
+		ostr << "group.item.channel = channel1\n";
+	}
+
+	Poco::TemporaryFile groupRootFile;
+	{
+		Poco::FileOutputStream ostr(groupRootFile.path());
+		ostr << "root.key = rootValue\n";
+		ostr << "!include " << groupFile.path() << "\n";
+	}
+
+	pConf = new PropertyFileConfiguration(groupRootFile.path());
+	pConf->remove("group");
+	pConf->save(groupRootFile.path());
+
+	{
+		Poco::FileInputStream istr(groupFile.path());
+		std::string content((std::istreambuf_iterator<char>(istr)), std::istreambuf_iterator<char>());
+		assertTrue (content.find("group.item.name") == std::string::npos);
+		assertTrue (content.find("group.item.channel") == std::string::npos);
+	}
+}
+
+
 void PropertyFileConfigurationTest::testSavePreservingMultiLine()
 {
 	// Create a properties file with multi-line continuation values
@@ -854,6 +916,7 @@ CppUnit::Test* PropertyFileConfigurationTest::suite()
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSave);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testInclude);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSavePreserving);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSaveRemovesLastIncludedKey);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSavePreservingMultiLine);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testClearResetsProvenance);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testGetSourceFilesCoversAllKeys);
