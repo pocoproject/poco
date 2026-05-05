@@ -131,6 +131,7 @@ void PropertyFileConfiguration::save(const std::string& path) const
 {
 	// Snapshot state under the lock, then release before file I/O
 	std::map<std::string, std::map<std::string, std::string>> fileValues; // file -> {key -> value}
+	std::set<std::string> snapshotRemovedFiles;
 
 	{
 		AbstractConfiguration::ScopedLock lock(*this);
@@ -145,6 +146,8 @@ void PropertyFileConfiguration::save(const std::string& path) const
 
 		if (useProvenance)
 		{
+			snapshotRemovedFiles = _removedSourceFiles;
+
 			for (const auto& file : _removedSourceFiles)
 				fileValues[file];
 
@@ -184,8 +187,8 @@ void PropertyFileConfiguration::save(const std::string& path) const
 
 	{
 		AbstractConfiguration::ScopedLock lock(*this);
-		for (const auto& fileAndValues : fileValues)
-			_removedSourceFiles.erase(fileAndValues.first);
+		for (const auto& file : snapshotRemovedFiles)
+			_removedSourceFiles.erase(file);
 	}
 }
 
