@@ -42,8 +42,8 @@ let
   # SHA256 checksums for Oracle Instant Client packages.
   # To update: run with placeholders first — the script will compute and print
   # the actual hashes, then paste them back here.
-  instantClientBasicSha256_x64 = "placeholder-update-after-first-download";
-  instantClientOdbcSha256_x64 = "placeholder-update-after-first-download";
+  instantClientBasicSha256_x64 = "d6715e404a35b3a538280b78df6f7ee59da83a9d36b596218fd264051db977f3";
+  instantClientOdbcSha256_x64 = "7bc45a01648dbc8d10400055eedeeb3b9f159f6ea39f07ba22c6b14a93c066d3";
   instantClientBasicSha256_arm64 = "1acbebf8b7e708171fefc6612a6a668455e7e89ec7565a2a723a6cf754060af2";
   instantClientOdbcSha256_arm64 = "7d1a38ea168ae48553f98fe40b3bcfd2118223d9bffd14ca1dc179fc67f3d84a";
 in
@@ -157,6 +157,23 @@ pkgs.mkShell {
 }
 POLICYJSON
     fi
+
+    # Avoid podman's default systemd integration on hosts where the host's
+    # systemd-run is unusable from inside the Nix shell:
+    #   * GitHub Actions runners: host /usr/bin/systemd-run inherits the
+    #     Nix LD_LIBRARY_PATH and dies on a missing GLIBC_ABI_DT_X86_64_PLT
+    #     symbol when loading Nix's libdl.so.2 against host glibc.
+    #   * Headless dev VMs (no logind session): "systemctl --user" calls
+    #     prompt for polkit auth and fail with "Interactive authentication
+    #     required".
+    # cgroup_manager = "cgroupfs" tells podman to write cgroups directly
+    # instead of going through systemd-run; events_logger = "file" avoids
+    # journald (also a systemd dependency).
+    cat > "$HOME/.config/containers/containers.conf" << 'CONTAINERSCONF'
+[engine]
+cgroup_manager = "cgroupfs"
+events_logger = "file"
+CONTAINERSCONF
 
     # Download Oracle Instant Client if not present.
     # Test for the actual driver library, not just the directory: a previous
@@ -394,16 +411,17 @@ EOF
         if ! podman ps --format '{{.Names}}' | grep -q "^${containerName}$"; then
           echo "Creating and starting Oracle container (this may take a while on first run)..."
           # Oracle requires at least 1GB of shared memory.
-          # --health-cmd=none disables the image's HEALTHCHECK so podman does
-          # not invoke host systemd-run, which fails under Nix-pure shells when
-          # the host glibc is older than the Nix glibc on LD_LIBRARY_PATH.
-          # Readiness is polled below via sqlplus, so we don't need it.
+          # --network=host avoids rootless podman's user-mode networking
+          # helper (pasta), which fails on some kernels with "Failed to get
+          # netlink socket". Oracle binds to 0.0.0.0:1521 on the host and
+          # the test connects via 127.0.0.1:1521, so port mapping is not
+          # needed. Healthcheck systemd-timer issues are handled by switching
+          # podman to the cgroupfs manager in containers.conf above.
           if ! podman run -d --replace \
             --name "$CONTAINER_NAME" \
             --shm-size=1g \
-            --health-cmd=none \
+            --network=host \
             -e "ORACLE_PWD=$ORACLE_PASSWORD" \
-            -p "$ORACLE_PORT:1521" \
             container-registry.oracle.com/database/free:23.5.0.0-lite; then
             echo "ERROR: Failed to create Oracle container"
             echo "Container logs:"
