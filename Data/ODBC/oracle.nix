@@ -175,6 +175,14 @@ cgroup_manager = "cgroupfs"
 events_logger = "file"
 CONTAINERSCONF
 
+    # Healthcheck timer registration is a separate code path in podman that
+    # always invokes systemd-run, independent of cgroup_manager and not
+    # reliably suppressed by --no-healthcheck or --health-cmd=none in 5.8.x.
+    # DISABLE_HC_SYSTEMD=true is podman's escape hatch that skips
+    # createTimer entirely. The Oracle image ships a HEALTHCHECK we do not
+    # need; readiness is polled below via sqlplus.
+    export DISABLE_HC_SYSTEMD=true
+
     # Download Oracle Instant Client if not present.
     # Test for the actual driver library, not just the directory: a previous
     # broken run may have left a stale dir or self-referential symlink without
