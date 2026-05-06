@@ -566,6 +566,85 @@ void PropertyFileConfigurationTest::testSaveRemovesLastIncludedKey()
 }
 
 
+void PropertyFileConfigurationTest::testSaveRemovesRootKey()
+{
+	Poco::TemporaryFile rootFile;
+	{
+		Poco::FileOutputStream ostr(rootFile.path());
+		ostr << "root.keep = keepValue\n";
+		ostr << "root.drop = dropValue\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(rootFile.path());
+	pConf->remove("root.drop");
+	pConf->save(rootFile.path());
+
+	{
+		Poco::FileInputStream istr(rootFile.path());
+		std::string content((std::istreambuf_iterator<char>(istr)), std::istreambuf_iterator<char>());
+		assertTrue (content.find("root.drop") == std::string::npos);
+		assertTrue (content.find("root.keep") != std::string::npos);
+	}
+
+	AutoPtr<PropertyFileConfiguration> pReloaded = new PropertyFileConfiguration(rootFile.path());
+	assertTrue (pReloaded->getString("root.keep") == "keepValue");
+	try
+	{
+		pReloaded->getString("root.drop");
+		fail("Expected NotFoundException");
+	}
+	catch (Poco::NotFoundException&) {}
+}
+
+
+void PropertyFileConfigurationTest::testSaveRemovedFilesRetryAfterFailure()
+{
+	Poco::TemporaryFile extraFile;
+	{
+		Poco::FileOutputStream ostr(extraFile.path());
+		ostr << "extra.prop = extraValue\n";
+	}
+
+	Poco::TemporaryFile rootFile;
+	{
+		Poco::FileOutputStream ostr(rootFile.path());
+		ostr << "root.key = rootValue\n";
+		ostr << "!include " << extraFile.path() << "\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(rootFile.path());
+	pConf->remove("extra.prop");
+
+	Poco::File extra(extraFile.path());
+	extra.setWriteable(false);
+
+	bool threw = false;
+	try
+	{
+		pConf->save(rootFile.path());
+	}
+	catch (Poco::Exception&)
+	{
+		threw = true;
+	}
+	extra.setWriteable(true);
+
+	// If the I/O layer didn't enforce read-only (e.g. running as root),
+	// skip the retry portion — the failure path can't be exercised.
+	if (!threw) return;
+
+	// Removed-file provenance must survive a failed save so the retry
+	// rewrites the included file and strips the removed key.
+	pConf->save(rootFile.path());
+
+	{
+		Poco::FileInputStream istr(extraFile.path());
+		std::string content((std::istreambuf_iterator<char>(istr)), std::istreambuf_iterator<char>());
+		assertTrue (content.find("extra.prop") == std::string::npos);
+	}
+}
+
+
 void PropertyFileConfigurationTest::testSavePreservingMultiLine()
 {
 	// Create a properties file with multi-line continuation values
@@ -917,6 +996,8 @@ CppUnit::Test* PropertyFileConfigurationTest::suite()
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testInclude);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSavePreserving);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSaveRemovesLastIncludedKey);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSaveRemovesRootKey);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSaveRemovedFilesRetryAfterFailure);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSavePreservingMultiLine);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testClearResetsProvenance);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testGetSourceFilesCoversAllKeys);

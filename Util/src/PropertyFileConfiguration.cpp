@@ -324,22 +324,18 @@ void PropertyFileConfiguration::setSourceFile(const std::string& key, const std:
 
 void PropertyFileConfiguration::removeRaw(const std::string& key)
 {
-	bool removeAll = key.empty();
-	std::string prefix = removeAll ? std::string() : key + '.';
-	for (const auto& [sourceKey, file] : _sourceMap)
-	{
-		if (removeAll || sourceKey == key || sourceKey.compare(0, prefix.size(), prefix) == 0)
-			_removedSourceFiles.insert(file);
-	}
-
 	MapConfiguration::removeRaw(key);
 
+	bool removeAll = key.empty();
+	std::string prefix = removeAll ? std::string() : key + '.';
 	for (auto it = _sourceMap.begin(); it != _sourceMap.end(); )
 	{
 		if (removeAll || it->first == key || it->first.compare(0, prefix.size(), prefix) == 0)
+		{
+			_removedSourceFiles.insert(it->second);
 			it = _sourceMap.erase(it);
-		else
-			++it;
+		}
+		else ++it;
 	}
 }
 
