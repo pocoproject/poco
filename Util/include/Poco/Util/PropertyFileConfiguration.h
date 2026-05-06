@@ -125,8 +125,11 @@ public:
 		/// includes), save preserves comments, blank lines, and
 		/// !include directives. Changed values are written back to the
 		/// file they were originally loaded from. New keys are appended
-		/// to the root file. If no provenance information is available,
-		/// the file is written as a flat list of key-value pairs.
+		/// to the root file. Source files of removed keys are also
+		/// rewritten so deleted properties do not linger on disk, even
+		/// when the removal empties an included file. If no provenance
+		/// information is available, the file is written as a flat list
+		/// of key-value pairs.
 
 	std::string getSourceFile(const std::string& key) const;
 		/// Returns the file path the given key was loaded from,
@@ -200,6 +203,7 @@ private:
 		/// the parent (typically LayeredConfiguration) owns this
 		/// PropertyFileConfiguration, so the parent always outlives the child.
 	std::map<std::string, std::string> _sourceMap;
+	mutable std::set<std::string> _removedSourceFiles;
 	std::string _rootFile;
 };
 

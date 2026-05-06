@@ -132,6 +132,7 @@ void PropertyFileConfiguration::save(const std::string& path) const
 {
 	// Snapshot state under the lock, then release before file I/O
 	std::map<std::string, std::map<std::string, std::string>> fileValues; // file -> {key -> value}
+	std::set<std::string> snapshotRemovedFiles;
 
 	{
 		AbstractConfiguration::ScopedLock lock(*this);
@@ -140,10 +141,17 @@ void PropertyFileConfiguration::save(const std::string& path) const
 		absPath.makeAbsolute();
 		std::string absPathStr = absPath.toString();
 
-		bool useProvenance = !_sourceMap.empty() && !_rootFile.empty() && absPathStr == _rootFile;
+		bool useProvenance = (!_sourceMap.empty() || !_removedSourceFiles.empty())
+			&& !_rootFile.empty()
+			&& absPathStr == _rootFile;
 
 		if (useProvenance)
 		{
+			snapshotRemovedFiles = _removedSourceFiles;
+
+			for (const auto& file : _removedSourceFiles)
+				fileValues[file];
+
 			// Group key-values by source file
 			for (const auto& [key, file] : _sourceMap)
 			{
@@ -176,6 +184,12 @@ void PropertyFileConfiguration::save(const std::string& path) const
 	for (const auto& [file, values] : fileValues)
 	{
 		saveToFile(file, values);
+	}
+
+	{
+		AbstractConfiguration::ScopedLock lock(*this);
+		for (const auto& file : snapshotRemovedFiles)
+			_removedSourceFiles.erase(file);
 	}
 }
 
@@ -313,13 +327,17 @@ void PropertyFileConfiguration::setSourceFile(const std::string& key, const std:
 void PropertyFileConfiguration::removeRaw(const std::string& key)
 {
 	MapConfiguration::removeRaw(key);
-	std::string prefix = key + '.';
+
+	bool removeAll = key.empty();
+	std::string prefix = removeAll ? std::string() : key + '.';
 	for (auto it = _sourceMap.begin(); it != _sourceMap.end(); )
 	{
-		if (it->first == key || it->first.compare(0, prefix.size(), prefix) == 0)
+		if (removeAll || it->first == key || it->first.compare(0, prefix.size(), prefix) == 0)
+		{
+			_removedSourceFiles.insert(it->second);
 			it = _sourceMap.erase(it);
-		else
-			++it;
+		}
+		else ++it;
 	}
 }
 
@@ -328,6 +346,7 @@ void PropertyFileConfiguration::clear()
 {
 	MapConfiguration::clear();
 	_sourceMap.clear();
+	_removedSourceFiles.clear();
 	_rootFile.clear();
 }
 
