@@ -1566,7 +1566,7 @@ void StringTest::benchmarkIntToStr()
 	bench("format(-int)", [&](int i){ str = NumberFormatter::format(ivals[i] > 0 ? -ivals[i] : ivals[i]); });
 	bench("formatHex(int)", [&](int i){ str = NumberFormatter::formatHex(ivals[i]); });
 	bench("formatHex(int, width=10)", [&](int i){ str = NumberFormatter::formatHex(ivals[i], 10); });
-	bench("formatHex(int, prefix)", [&](int i){ str = NumberFormatter::formatHex(ivals[i], true); });
+	bench("formatHex(int, prefix)", [&](int i){ str = NumberFormatter::formatHex(ivals[i], NumberFormatter::Options::HEX_PREFIX); });
 
 	std::cout << std::endl << "  unsigned:" << std::endl;
 	bench("format(unsigned)", [&](int i){ str = NumberFormatter::format(uvals[i]); });
