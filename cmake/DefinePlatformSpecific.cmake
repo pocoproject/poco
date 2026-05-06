@@ -49,11 +49,14 @@ else(MSVC)
 	# Other compilers then MSVC don't have a static STATIC_POSTFIX at the moment
 	set(STATIC_POSTFIX "" CACHE STRING "Set static library postfix" FORCE)
 
-	# Strip debug symbols from Release binaries (reduces binary size significantly)
-	# On Windows, debug symbols go to separate .pdb files, so this is not needed
-	# NOTE: CMAKE_BUILD_TYPE must be set to Release for this to take effect
-	#       e.g., cmake -B build -DCMAKE_BUILD_TYPE=Release
-	add_link_options($<$<CONFIG:Release>:-s>)
+	# Strip symbols from Release binaries. Apple's ld deprecated `-s`;
+	# `-Wl,-x` is its documented replacement and keeps dynamic exports.
+	# MSVC has no equivalent — symbols live in the .pdb, not the binary.
+	if(APPLE)
+		add_link_options($<$<CONFIG:Release>:-Wl,-x>)
+	else()
+		add_link_options($<$<CONFIG:Release>:-s>)
+	endif()
 
 	# Dead-code stripping for macOS: Apple's -dead_strip works on Mach-O
 	# atoms without needing -ffunction-sections/-fdata-sections.
