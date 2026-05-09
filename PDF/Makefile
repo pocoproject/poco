@@ -11,7 +11,7 @@ INCLUDE += -I $(POCO_BASE)/PDF/include/Poco/PDF
 objects = AttributedString Cell Destination Document Encoder Font Image Outline \
 	LinkAnnotation Page PDFException Table TextAnnotation XMLTemplate \
 	hpdf_3dmeasure hpdf_annotation hpdf_array hpdf_binary hpdf_boolean \
-	hpdf_catalog hpdf_destination hpdf_dict hpdf_doc hpdf_doc_png \
+	hpdf_catalog hpdf_destination hpdf_dict hpdf_direct hpdf_doc hpdf_doc_png \
 	hpdf_encoder hpdf_encoder_cns hpdf_encoder_cnt hpdf_encoder_jp \
 	hpdf_encoder_kr hpdf_encoder_utf hpdf_encrypt hpdf_encryptdict hpdf_error \
 	hpdf_exdata hpdf_ext_gstate hpdf_font hpdf_font_cid hpdf_font_tt \
@@ -23,9 +23,17 @@ objects = AttributedString Cell Destination Document Encoder Font Image Outline 
 	hpdf_pages hpdf_pdfa hpdf_real hpdf_streams hpdf_string hpdf_u3d hpdf_utils hpdf_xref \
 	adler32 compress crc32 deflate \
 	infback inffast inflate inftrees trees zutil \
-	png pngerror pnggccrd pngget pngmem pngpread \
+	png pngerror pngget pngmem pngpread \
 	pngread pngrio pngrtran pngrutil pngset pngtest \
-	pngtrans pngvcrd pngwio pngwrite pngwtran pngwutil
+	pngtrans pngwio pngwrite pngwtran pngwutil
+
+# arm/*.c sources that provide png_init_filter_functions_neon and the
+# palette neon helpers were stripped from dependencies/png/src/, so the
+# default PNG_ARM_NEON_OPT=2 (auto-enable on aarch64) leaves dangling
+# references at link time. Force-disable until the arm sources are
+# restored.
+CXXFLAGS += -DPNG_ARM_NEON_OPT=0
+CFLAGS   += -DPNG_ARM_NEON_OPT=0
 
 target         = PocoPDF
 target_version = $(LIBVERSION)
