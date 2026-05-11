@@ -19,7 +19,7 @@ are replaced with system-installed versions via `find_package()` or `-l` flags.
 | [png](png/) | 1.6.57 | libpng License | PDF (PNG image support) | Yes | https://github.com/pnggroup/libpng |
 | [v8_double_conversion](v8_double_conversion/) | 3.4.0 | BSD-3-Clause | Foundation (float-to-string conversion) | No | https://github.com/google/double-conversion |
 | [pdjson](pdjson/) | n/a | Public Domain | JSON (streaming parser) | No | https://github.com/skeeto/pdjson |
-| [tessil](tessil/) | n/a | MIT | Foundation (insertion-order-preserving hash containers) | No | https://github.com/Tessil/ordered-map |
+| [tessil](tessil/) | 1.2.0 | MIT | Foundation (insertion-order-preserving hash containers) | No | https://github.com/Tessil/ordered-map |
 | [hpdf](hpdf/) (libharu) | 2.4.6 | Zlib-like | PDF (PDF document generation) | No | https://github.com/libharu/libharu |
 | [7zip](7zip/) (LZMA SDK) | 26.00 | Public Domain | SevenZip (7z archive support) | No | https://github.com/ip7z/7zip |
 | [cpptrace](cpptrace/) | 1.0.4 | MIT | Foundation (stack trace support, optional) | No | https://github.com/jeremy-rifkin/cpptrace |
