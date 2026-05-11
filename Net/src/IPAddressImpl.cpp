@@ -566,7 +566,12 @@ bool IPv6AddressImpl::isBroadcast() const
 bool IPv6AddressImpl::isLoopback() const
 {
 	if (isIPv4Mapped())
-		return (ByteOrder::fromNetwork(_addr.s6_addr[6]) & 0xFF000000) == 0x7F000000;
+	{
+		// IPv4-mapped IPv6 address: ::ffff:a.b.c.d
+		// The IPv4 octets occupy s6_addr32[3] (the last 32 bits of the address).
+		// Loopback in IPv4 is 127.0.0.0/8, so the high byte must be 0x7F.
+		return (ByteOrder::fromNetwork(_addr.s6_addr32[3]) & 0xFF000000) == 0x7F000000;
+	}
 
 	const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
 	return words[0] == 0 && words[1] == 0 && words[2] == 0 && words[3] == 0 &&
