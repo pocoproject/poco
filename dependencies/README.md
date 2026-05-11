@@ -14,7 +14,7 @@ are replaced with system-installed versions via `find_package()` or `-l` flags.
 | [zlib](zlib/) | 1.3.2 | Zlib | Foundation (compression/decompression streams) | Yes | https://github.com/madler/zlib |
 | [pcre2](pcre2/) | 10.47 | BSD-3-Clause | Foundation (regular expressions) | Yes | https://github.com/PCRE2Project/pcre2 |
 | [utf8proc](utf8proc/) | 2.11.3 | MIT | Foundation (Unicode normalization) | Yes | https://github.com/JuliaStrings/utf8proc |
-| [expat](expat/) | 2.7.5 | MIT | XML (SAX/DOM parser) | Yes | https://github.com/libexpat/libexpat |
+| [expat](expat/) | 2.8.1 | MIT | XML (SAX/DOM parser) | Yes | https://github.com/libexpat/libexpat |
 | [sqlite3](sqlite3/) | 3.53.0 | Public Domain | Data/SQLite (embedded database) | Yes | https://www.sqlite.org |
 | [png](png/) | 1.6.57 | libpng License | PDF (PNG image support) | Yes | https://github.com/pnggroup/libpng |
 | [v8_double_conversion](v8_double_conversion/) | 3.4.0 | BSD-3-Clause | Foundation (float-to-string conversion) | No | https://github.com/google/double-conversion |
