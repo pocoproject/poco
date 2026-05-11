@@ -171,6 +171,23 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 	std::string::const_iterator itf  = fmt.begin();
 	std::string::const_iterator endf = fmt.end();
 
+	// %S optionally swallows '.NNN'/',NNN' so a trailing %z can still reach
+	// the timezone designator, but only when the format does not capture the
+	// fractional itself via %c/%i/%F/%s.
+	bool fmtHasFracSpec = false;
+	for (auto p = fmt.begin(); p + 1 < fmt.end(); ++p)
+	{
+		if (*p == '%')
+		{
+			char n = *(p + 1);
+			if (n == 'c' || n == 'i' || n == 'F' || n == 's')
+			{
+				fmtHasFracSpec = true;
+				break;
+			}
+		}
+	}
+
 	while (itf != endf && it != end)
 	{
 		if (*itf == '%')
@@ -246,7 +263,9 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 					// Consume optional fractional seconds ('.NNN' or ',NNN') so that a
 					// subsequent %z specifier can reach the timezone designator.
 					// A decimal point/comma not followed by a digit is an error.
-					if (it != end && (*it == '.' || *it == ','))
+					// Skipped when the format captures the fractional itself via
+					// %c/%i/%F/%s -- those specifiers must see the digits.
+					if (!fmtHasFracSpec && it != end && (*it == '.' || *it == ','))
 					{
 						++it;
 						if (it == end || !Ascii::isDigit(*it))
@@ -280,8 +299,8 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 					break;
 				case 'c':
 					it = skipNonDigits(it, end);
-					millis = parseNumberN(dtStr, it, end, 1);
-					millis *= 100;
+					millis = parseNumberN(dtStr, it, end, 2);
+					millis *= 10;
 					break;
 				case 'F':
 					it = skipNonDigits(it, end);
