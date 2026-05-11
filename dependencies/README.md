@@ -15,7 +15,7 @@ are replaced with system-installed versions via `find_package()` or `-l` flags.
 | [pcre2](pcre2/) | 10.47 | BSD-3-Clause | Foundation (regular expressions) | Yes | https://github.com/PCRE2Project/pcre2 |
 | [utf8proc](utf8proc/) | 2.11.3 | MIT | Foundation (Unicode normalization) | Yes | https://github.com/JuliaStrings/utf8proc |
 | [expat](expat/) | 2.8.1 | MIT | XML (SAX/DOM parser) | Yes | https://github.com/libexpat/libexpat |
-| [sqlite3](sqlite3/) | 3.53.0 | Public Domain | Data/SQLite (embedded database) | Yes | https://www.sqlite.org |
+| [sqlite3](sqlite3/) | 3.53.1 | Public Domain | Data/SQLite (embedded database) | Yes | https://www.sqlite.org |
 | [png](png/) | 1.6.57 | libpng License | PDF (PNG image support) | Yes | https://github.com/pnggroup/libpng |
 | [v8_double_conversion](v8_double_conversion/) | 3.4.0 | BSD-3-Clause | Foundation (float-to-string conversion) | No | https://github.com/google/double-conversion |
 | [pdjson](pdjson/) | n/a | Public Domain | JSON (streaming parser) | No | https://github.com/skeeto/pdjson |
