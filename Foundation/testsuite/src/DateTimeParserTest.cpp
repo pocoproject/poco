@@ -12,6 +12,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/DateTimeParser.h"
+#include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTime.h"
 #include "Poco/Timestamp.h"
@@ -20,6 +21,7 @@
 
 using Poco::DateTime;
 using Poco::DateTimeFormat;
+using Poco::DateTimeFormatter;
 using Poco::DateTimeParser;
 using Poco::Timestamp;
 using Poco::SyntaxException;
@@ -669,6 +671,36 @@ void DateTimeParserTest::testISO8601FracSeconds()
 }
 
 
+void DateTimeParserTest::testFractionalSpecifiers()
+{
+	// %c is now a two-digit centisecond (millisecond / 10) rather than a
+	// single-digit decisecond (millisecond / 100). Round-trip every value
+	// against DateTimeFormatter to ensure parser and formatter agree --
+	// see issue #3949.
+	int tzd = 0;
+
+	// Parse "00" -> 0 ms, "25" -> 250 ms, "99" -> 990 ms.
+	DateTime dt = DateTimeParser::parse("%H:%M:%S.%c", "12:30:00.00", tzd);
+	assertTrue (dt.millisecond() == 0);
+
+	dt = DateTimeParser::parse("%H:%M:%S.%c", "12:30:00.25", tzd);
+	assertTrue (dt.millisecond() == 250);
+
+	dt = DateTimeParser::parse("%H:%M:%S.%c", "12:30:00.99", tzd);
+	assertTrue (dt.millisecond() == 990);
+
+	// Format-then-parse round trip.
+	DateTime original(2005, 1, 8, 12, 30, 0, 250);
+	std::string formatted = DateTimeFormatter::format(original, "%H:%M:%S.%c");
+	assertTrue (formatted == "12:30:00.25");
+	dt = DateTimeParser::parse("%H:%M:%S.%c", formatted, tzd);
+	assertTrue (dt.hour() == 12);
+	assertTrue (dt.minute() == 30);
+	assertTrue (dt.second() == 0);
+	assertTrue (dt.millisecond() == 250);
+}
+
+
 void DateTimeParserTest::testGuess()
 {
 	int tzd;
@@ -949,6 +981,7 @@ CppUnit::Test* DateTimeParserTest::suite()
 	CppUnit_addTest(pSuite, DateTimeParserTest, testSORTABLE);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testCustom);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testISO8601FracSeconds);
+	CppUnit_addTest(pSuite, DateTimeParserTest, testFractionalSpecifiers);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testGuess);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testCleanup);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testParseMonth);

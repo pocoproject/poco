@@ -62,7 +62,7 @@ void DateTimeFormatter::append(std::string& str, const DateTime& dateTime, const
 						  NumberFormatter::append0(str, dateTime.millisecond()*1000 + dateTime.microsecond(), 6);
 						  break;
 				case 'i': NumberFormatter::append0(str, dateTime.millisecond(), 3); break;
-				case 'c': NumberFormatter::append(str, dateTime.millisecond()/100); break;
+				case 'c': NumberFormatter::append0(str, dateTime.millisecond()/10, 2); break;
 				case 'F': NumberFormatter::append0(str, dateTime.millisecond()*1000 + dateTime.microsecond(), 6); break;
 				case 'z': tzdISO(str, timeZoneDifferential); break;
 				case 'Z': tzdRFC(str, timeZoneDifferential); break;
@@ -96,7 +96,7 @@ void DateTimeFormatter::append(std::string& str, const Timespan& timespan, const
 				case 'S': NumberFormatter::append0(str, timespan.seconds(), 2); break;
 				case 's': NumberFormatter::append(str, timespan.totalSeconds()); break;
 				case 'i': NumberFormatter::append0(str, timespan.milliseconds(), 3); break;
-				case 'c': NumberFormatter::append(str, timespan.milliseconds()/100); break;
+				case 'c': NumberFormatter::append0(str, timespan.milliseconds()/10, 2); break;
 				case 'F': NumberFormatter::append0(str, timespan.milliseconds()*1000 + timespan.microseconds(), 6); break;
 				default:  str += *it;
 				}
