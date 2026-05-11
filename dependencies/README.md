@@ -21,7 +21,7 @@ are replaced with system-installed versions via `find_package()` or `-l` flags.
 | [pdjson](pdjson/) | n/a | Public Domain | JSON (streaming parser) | No | https://github.com/skeeto/pdjson |
 | [tessil](tessil/) | 1.2.0 | MIT | Foundation (insertion-order-preserving hash containers) | No | https://github.com/Tessil/ordered-map |
 | [hpdf](hpdf/) (libharu) | 2.4.6 | Zlib-like | PDF (PDF document generation) | No | https://github.com/libharu/libharu |
-| [7zip](7zip/) (LZMA SDK) | 26.00 | Public Domain | SevenZip (7z archive support) | No | https://github.com/ip7z/7zip |
+| [7zip](7zip/) (LZMA SDK) | 26.01 | Public Domain | SevenZip (7z archive support) | No | https://github.com/ip7z/7zip |
 | [cpptrace](cpptrace/) | 1.0.4 | MIT | Foundation (stack trace support, optional) | No | https://github.com/jeremy-rifkin/cpptrace |
 | [quill](quill/) | 11.1.0 | MIT | Foundation (high-performance async logging, optional) | No | https://github.com/odygrd/quill |
 | [wepoll](wepoll/) | 1.5.8 | BSD-2-Clause | Net (epoll emulation, Windows only) | No | https://github.com/piscisaureus/wepoll |
