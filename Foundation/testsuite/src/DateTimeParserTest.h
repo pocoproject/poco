@@ -35,6 +35,7 @@ public:
 	void testSORTABLE();
 	void testCustom();
 	void testISO8601FracSeconds();
+	void testFractionalSpecifiers();
 	void testGuess();
 	void testCleanup();
 	void testParseMonth();

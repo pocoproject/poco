@@ -110,7 +110,7 @@ void PatternFormatter::format(const Message& msg, std::string& text)
 		case 'M': NumberFormatter::append0(text, dateTime.minute(), 2); break;
 		case 'S': NumberFormatter::append0(text, dateTime.second(), 2); break;
 		case 'i': NumberFormatter::append0(text, dateTime.millisecond(), 3); break;
-		case 'c': NumberFormatter::append(text, dateTime.millisecond()/100); break;
+		case 'c': NumberFormatter::append0(text, dateTime.millisecond()/10, 2); break;
 		case 'F': NumberFormatter::append0(text, dateTime.millisecond()*1000 + dateTime.microsecond(), 6); break;
 		case 'z': text.append(DateTimeFormatter::tzdISO(localTime ? Timezone::tzd() : DateTimeFormatter::UTC)); break;
 		case 'Z': text.append(DateTimeFormatter::tzdRFC(localTime ? Timezone::tzd() : DateTimeFormatter::UTC)); break;
