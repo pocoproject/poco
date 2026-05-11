@@ -565,15 +565,20 @@ bool IPv6AddressImpl::isBroadcast() const
 
 bool IPv6AddressImpl::isLoopback() const
 {
+	const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
+
 	if (isIPv4Mapped())
 	{
 		// IPv4-mapped IPv6 address: ::ffff:a.b.c.d
-		// The IPv4 octets occupy s6_addr32[3] (the last 32 bits of the address).
-		// Loopback in IPv4 is 127.0.0.0/8, so the high byte must be 0x7F.
-		return (ByteOrder::fromNetwork(_addr.s6_addr32[3]) & 0xFF000000) == 0x7F000000;
+		// The IPv4 octets occupy the last 32 bits of the address; words[6]
+		// holds the (a, b) pair in network order. Loopback in IPv4 is
+		// 127.0.0.0/8, so the high byte (a) must be 0x7F.
+		// Note: s6_addr16 is non-portable (missing on Windows in6_addr),
+		// so reinterpret_cast over the whole struct, like the rest of
+		// this file does.
+		return (ByteOrder::fromNetwork(words[6]) & 0xFF00) == 0x7F00;
 	}
 
-	const UInt16* words = reinterpret_cast<const UInt16*>(&_addr);
 	return words[0] == 0 && words[1] == 0 && words[2] == 0 && words[3] == 0 &&
 		words[4] == 0 && words[5] == 0 && words[6] == 0 && ByteOrder::fromNetwork(words[7]) == 0x0001;
 }
