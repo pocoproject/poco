@@ -638,6 +638,37 @@ void DateTimeParserTest::testCustom()
 }
 
 
+void DateTimeParserTest::testISO8601FracSeconds()
+{
+	// ISO8601_FORMAT uses %S which silently discards a well-formed fractional-second
+	// suffix so that the trailing %z can still reach the timezone designator.
+	int tzd;
+
+	// Dot-separated fractional seconds with negative timezone offset
+	DateTime dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FORMAT, "2013-10-07T08:23:19.120-04:00", tzd);
+	assertTrue (dt.year()   == 2013);
+	assertTrue (dt.month()  == 10);
+	assertTrue (dt.day()    == 7);
+	assertTrue (dt.hour()   == 8);
+	assertTrue (dt.minute() == 23);
+	assertTrue (dt.second() == 19);
+	assertTrue (tzd == -4*3600);
+
+	// Comma-separated fractional seconds (ISO 8601 allows ',' as the decimal sign)
+	dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FORMAT, "2013-10-07T08:23:19,120-04:00", tzd);
+	assertTrue (dt.year()   == 2013);
+	assertTrue (dt.month()  == 10);
+	assertTrue (dt.day()    == 7);
+	assertTrue (dt.hour()   == 8);
+	assertTrue (dt.minute() == 23);
+	assertTrue (dt.second() == 19);
+	assertTrue (tzd == -4*3600);
+
+	// A bare decimal point not followed by any digit must be rejected
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2013-10-07T08:23:19.-04:00", tzd);
+}
+
+
 void DateTimeParserTest::testGuess()
 {
 	int tzd;
@@ -917,6 +948,7 @@ CppUnit::Test* DateTimeParserTest::suite()
 	CppUnit_addTest(pSuite, DateTimeParserTest, testASCTIME);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testSORTABLE);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testCustom);
+	CppUnit_addTest(pSuite, DateTimeParserTest, testISO8601FracSeconds);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testGuess);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testCleanup);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testParseMonth);

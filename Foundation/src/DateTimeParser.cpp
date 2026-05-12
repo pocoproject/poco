@@ -243,6 +243,18 @@ void DateTimeParser::parse(const std::string& fmt, const std::string& dtStr, Dat
 				case 'S':
 					it = skipNonDigits(it, end);
 					second = parseNumberN(dtStr, it, end, 2);
+					// Consume optional fractional seconds ('.NNN' or ',NNN') so that a
+					// subsequent %z specifier can reach the timezone designator.
+					// A decimal point/comma not followed by a digit is an error.
+					if (it != end && (*it == '.' || *it == ','))
+					{
+						++it;
+						if (it == end || !Ascii::isDigit(*it))
+						{
+							throw SyntaxException("Invalid DateTimeString: " + dtStr + ", missing fractional digits");
+						}
+						it = skipDigits(it, end);
+					}
 					break;
 				case 's':
 					it = skipNonDigits(it, end);
