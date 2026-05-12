@@ -34,6 +34,7 @@ public:
 	void testASCTIME();
 	void testSORTABLE();
 	void testCustom();
+	void testISO8601FracSeconds();
 	void testGuess();
 	void testCleanup();
 	void testParseMonth();
