@@ -142,12 +142,12 @@ void PostgreSQLTest::testConnectNoDB()
 }
 
 
-void PostgreSQLTest::testFailedConnect()
+void PostgreSQLTest::testFailedConnectParams()
 {
 	std::string dbConnString;
 	dbConnString +=  "host=" + getHost();
-	dbConnString += " user=invalid";
-	dbConnString +=	" password=invalid";
+	dbConnString += " user='invalid user'";
+	dbConnString +=	" password='invalid password'";
 	dbConnString += " port=" + getPort();
 
 	try
@@ -157,6 +157,23 @@ void PostgreSQLTest::testFailedConnect()
 	}
 	catch (ConnectionFailedException& ex) {}
 	catch (ConnectionException& ex) {}
+}
+
+
+void PostgreSQLTest::testFailedConnectURI()
+{
+	for (const std::string prefix : {"postgresql://", "postgres://"})
+	{
+		std::string dbConnString = prefix + "invalid%20user:invalid%20password@" + getHost() + ":" + getPort();
+
+		try
+		{
+			Session session(PostgreSQL::Connector::KEY, dbConnString);
+			failmsg ("must fail");
+		}
+		catch (ConnectionFailedException& ex) {}
+		catch (ConnectionException& ex) {}
+	}
 }
 
 
@@ -1333,7 +1350,8 @@ CppUnit::Test* PostgreSQLTest::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("PostgreSQLTest");
 
 	CppUnit_addTest(pSuite, PostgreSQLTest, testConnectNoDB);
-	CppUnit_addTest(pSuite, PostgreSQLTest, testFailedConnect);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testFailedConnectParams);
+	CppUnit_addTest(pSuite, PostgreSQLTest, testFailedConnectURI);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testPostgreSQLOIDs);
 	//CppUnit_addTest(pSuite, PostgreSQLTest, testBarebonePostgreSQL);
 	CppUnit_addTest(pSuite, PostgreSQLTest, testSimpleAccess);
