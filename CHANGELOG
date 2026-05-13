@@ -1,8 +1,27 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
-Release 1.15.3 (Unreleased)
+Release 1.15.3 (2026-05-13)
 ===========================
+
+Summary of Changes:
+
+A patch release focused on bug fixes, security updates in bundled
+third-party libraries (including two expat CVEs), and a small set of
+enhancements. Notable changes include PostgreSQL connection-string
+URI syntax support, a fix for the WAL-reset database corruption in
+SQLite, and a behaviour correction to the %c date/time format
+specifier so it actually emits centiseconds as documented (this is a
+breaking change for code that relied on the previous single-digit
+decisecond output).
+
+Breaking Changes:
+
+- GH #3949 Poco::DateTimeFormatter: %c now formats and parses a
+  zero-padded two-digit centisecond (00..99), matching the
+  documentation. Previously it emitted a single-digit decisecond
+  (millisecond/100). Callers using "%H:%M:%S.%c" will see one extra
+  character in the output. Closed by PR #5350.
 
 API Changes:
 
@@ -18,6 +37,42 @@ API Changes:
   dangling and should be replaced with a named variable whose lifetime
   outlives the child. All three PropertyFileConfiguration constructors
   are now explicit to prevent accidental implicit conversions.
+
+Security Fixes:
+
+- PR #5351 chore(deps): bundled third-party library updates -- includes
+  expat 2.8.1 with CVE-2026-41080 (hash flooding salt entropy) and
+  CVE-2026-45186 (quadratic runtime on attribute name collisions, DoS).
+- GH #5050 CodeQL: Net: IPv6 isLoopback IPv4-mapped check was always
+  false. Closed by PR #5349.
+
+Bundled Third-Party Library Upgrades:
+
+- expat 2.7.5 -> 2.8.1 - security (CVE-2026-41080, CVE-2026-45186), new entropy sources
+- SQLite 3.53.0 -> 3.53.1 - WAL-reset database corruption fix
+- libpng 1.6.57 -> 1.6.58 - fix png_get_PLTE returning stale palette data (1.6.56 regression)
+- 7zip (LZMA SDK) 26.00 -> 26.01 - bug fixes, Linux huge pages
+
+Features, Enhancements and Third Party Updates:
+
+- PR #5346 enh(PostgreSQL): let libpq parse the connection string itself, support URI syntax
+- GH #5344 POCO::JWT issue with OPENSSL_NO_DEPRECATED -- addressed by silencing OpenSSL 3.x deprecation warnings on legacy key accessors (PR #5332)
+- PR #5334 enh(MongoDB): add wire version constants for MongoDB 6.1-8.0
+- GH #5337 ProcessRunner error message format
+
+Bug Fixes and Improvements:
+
+- GH #5347 PDF does not build with make
+- GH #5342 Oracle ODBC CI fail
+- GH #5340 PropertyFileConfiguration does not persist deletion of last key from included property files
+- GH #5330 POCO_UNBUNDLED=ON build fails when ZLIB is a transitive dependency of another found package
+- GH #5327 UnbufferedStreamBuf::xsgetn silently swallows decoder errors after partial read (regression from #5290)
+- GH #5324 Logger::shutdown() use-after-free
+- GH #5316 ThreadTest::testTrySleep flaky on macOS, causes segfault
+- PR #5345 fix(cmake): replace obsolete -s with -Wl,-x on Apple linker
+- PR #5336 Fix C1021 fatal error when building DataSQLite with POCO_SQLITE_UNBUNDLED on MSVC
+- PR #5333 fix(Foundation): handle INTERFACE_LIBRARY Pcre2::Pcre2 from CONFIG-mode packages
+- PR #5318 Fix: DateTimeParser trailing timezone designators & Timezone UTC offset cache invalidation
 
 
 Release 1.15.2 (2026-04-16)
