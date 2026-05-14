@@ -428,6 +428,15 @@ void ThreadTest::testTrySleep()
 		for (int i = 0; i < 500 && r.counter() < expected; ++i)
 			Thread::sleep(10);
 	};
+	auto waitNotRunning = [&]()
+	{
+		// run() returns immediately after the third counter increment,
+		// but Thread's internal state machine takes a few cycles to
+		// catch up; on Windows static-mt the gap is observable. Poll
+		// up to 5 s before reporting the thread as still running.
+		for (int i = 0; i < 500 && thread.isRunning(); ++i)
+			Thread::sleep(10);
+	};
 	try
 	{
 		assertTrue (thread.isRunning());
@@ -449,6 +458,7 @@ void ThreadTest::testTrySleep()
 		waitForCounter(3);
 		assertTrue (r.counter() == 3);
 		assertTrue (!r.isSleepy());
+		waitNotRunning();
 		assertTrue (!thread.isRunning());
 	}
 	catch (...)
