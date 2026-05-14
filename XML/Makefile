@@ -24,11 +24,24 @@ objects = AbstractContainerNode AbstractNode Attr AttrMap Attributes \
 
 expat_objects = xmlparse xmlrole xmltok xmltok_impl xmltok_ns
 
+# Per-platform entropy source object for Expat 2.8+. Each random_*.c file
+# is only valid when its corresponding HAVE_* macro is defined; mirror
+# the gating in dependencies/expat/CMakeLists.txt.
+ifeq ($(findstring BSD,$(OSNAME)),BSD)
+	expat_random_object = random_arc4random_buf
+else ifeq ($(OSNAME),Darwin)
+	expat_random_object = random_arc4random_buf
+else ifeq ($(OSNAME),Linux)
+	expat_random_object = random_getrandom
+else
+	expat_random_object = random_dev_urandom
+endif
+
 # poco build system looks for sources in src/
 ifdef POCO_UNBUNDLED
 	SYSLIBS += -lexpat
 else
-	objects += $(expat_objects)
+	objects += $(expat_objects) $(expat_random_object)
 	prebuild = $(shell \
 		ln -sf $(POCO_BASE)/dependencies/expat/src/*.c src/ && \
 		ln -sf $(POCO_BASE)/dependencies/expat/src/*.h src/ \
