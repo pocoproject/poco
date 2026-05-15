@@ -14,11 +14,18 @@ set_target_properties(CppUnit
 	OUTPUT_NAME CppUnit
 	DEFINE_SYMBOL CppUnit_EXPORTS
 )
-target_link_libraries(CppUnit PUBLIC Poco::Foundation)
 target_include_directories(CppUnit
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+		# Pull Foundation's include dirs in *without* linking Foundation:
+		# TestRunner.h needs Poco/Exception.h visible (consumed by the
+		# CppUnitMain / CppUnitPocoExceptionText macros), and CppUnit's own
+		# sources include TestRunner.h transitively. The macro expansions
+		# live at consumer call sites, so libCppUnit.so itself never
+		# references Poco::Exception symbols and doesn't need to link
+		# Foundation; each consumer brings its own Poco link line.
+		$<TARGET_PROPERTY:Poco::Foundation,INTERFACE_INCLUDE_DIRECTORIES>
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
