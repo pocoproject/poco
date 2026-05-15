@@ -12,6 +12,9 @@
 #include <vector>
 #include <string>
 #include <ostream>
+#include <cstdlib>
+#include <exception>
+#include <iostream>
 #if defined(POCO_VXWORKS)
 #include <cstdarg>
 #endif
@@ -96,9 +99,29 @@ private:
 		return text; \
 	}
 
+// Installs a std::set_terminate handler that prints the in-flight
+// exception's displayText() (for Poco::Exception) or what() (for any
+// other std::exception) before std::abort() — so an unhandled throw
+// from a destructor, fixture-static dtor, or worker thread surfaces
+// its message instead of just the default
+// "terminate called after throwing an instance of '...'" line.
+//
+// Expands at the consumer's main() (via CppUnitMain), so the
+// reference to Poco::Exception lives in the consumer's TU, not in
+// CppUnit's own translation units.
+#define CppUnitInstallTerminateHandler() \
+	std::set_terminate([] { \
+		try { if (auto e = std::current_exception()) std::rethrow_exception(e); } \
+		catch (const Poco::Exception& ex) { std::cerr << "terminate: " << ex.displayText() << std::endl; } \
+		catch (const std::exception& ex) { std::cerr << "terminate: " << ex.what() << std::endl; } \
+		catch (...) { std::cerr << "terminate: unknown exception" << std::endl; } \
+		std::abort(); \
+	})
+
 #define CppUnitMain(testCase) \
 	int main(int ac, char **av)							\
 	{													\
+		CppUnitInstallTerminateHandler();				\
 		std::vector<std::string> args;					\
 		for (int i = 0; i < ac; ++i)					\
 			args.push_back(std::string(av[i]));			\
