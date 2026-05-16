@@ -45,10 +45,12 @@ namespace Poco::XML {
 	using XMLChar = wchar_t;
 	using XMLString = std::wstring;
 
+	[[nodiscard]]
 	std::string fromXMLString(const XMLString& str);
 		/// Converts an XMLString into an UTF-8 encoded
 		/// string.
 
+	[[nodiscard]]
 	XMLString toXMLString(const std::string& str);
 		/// Converts an UTF-8 encoded string into an
 		/// XMLString
@@ -65,11 +67,13 @@ namespace Poco::XML {
 	using XMLChar = char;
 	using XMLString = std::string;
 
+	[[nodiscard]]
 	inline const std::string& fromXMLString(const XMLString& str)
 	{
 		return str;
 	}
 
+	[[nodiscard]]
 	inline const XMLString& toXMLString(const std::string& str)
 	{
 		return str;

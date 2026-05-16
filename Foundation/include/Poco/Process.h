@@ -55,6 +55,7 @@ public:
 	ProcessHandle& operator = (const ProcessHandle& handle);
 		/// Assigns another handle.
 
+	[[nodiscard]]
 	PID id() const;
 		/// Returns the process ID.
 
@@ -87,6 +88,7 @@ public:
 	using Args = ArgsImpl;
 	using Env = EnvImpl;
 
+	[[nodiscard]]
 	static PID id();
 		/// Returns the process ID of the current process.
 
@@ -225,12 +227,14 @@ public:
 		/// Checks that process is finished and returns the exit code of the
 		/// process. If the process is still running, returns -1.
 
+	[[nodiscard]]
 	static bool isRunning(const ProcessHandle& handle);
 		/// check if the process specified by handle is running or not
 		///
 		/// This is preferable on Windows where process IDs
 		/// may be reused.
 
+	[[nodiscard]]
 	static bool isRunning(PID pid);
 		/// Check if the process specified by given pid is running or not.
 

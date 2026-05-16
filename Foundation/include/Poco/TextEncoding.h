@@ -60,17 +60,20 @@ public:
 	virtual ~TextEncoding();
 		/// Destroys the encoding.
 
+	[[nodiscard]]
 	virtual const char* canonicalName() const = 0;
 		/// Returns the canonical name of this encoding,
 		/// e.g. "ISO-8859-1". Encoding name comparisons are case
 		/// insensitive.
 
+	[[nodiscard]]
 	virtual bool isA(const std::string& encodingName) const = 0;
 		/// Returns true if the given name is one of the names of this encoding.
 		/// For example, the "ISO-8859-1" encoding is also known as "Latin-1".
 		///
 		/// Encoding name comparisons are case insensitive.
 
+	[[nodiscard]]
 	virtual const CharacterMap& characterMap() const = 0;
 		/// Returns the CharacterMap for the encoding.
 		/// The CharacterMap should be kept in a static member. As
@@ -134,11 +137,13 @@ public:
 		/// the byte sequence remains unchanged.
 		/// The default implementation simply returns 0.
 
+	[[nodiscard]]
 	static TextEncoding& byName(const std::string& encodingName);
 		/// Returns the TextEncoding object for the given encoding name.
 		///
 		/// Throws a NotFoundException if the encoding with given name is not available.
 
+	[[nodiscard]]
 	static TextEncoding::Ptr find(const std::string& encodingName);
 		/// Returns a pointer to the TextEncoding object for the given encodingName,
 		/// or nullptr if no such TextEncoding object exists.
@@ -161,12 +166,14 @@ public:
 		/// Removes the encoding with the given name from the table
 		/// of text encodings.
 
+	[[nodiscard]]
 	static TextEncoding::Ptr global(TextEncoding::Ptr encoding);
 		/// Sets global TextEncoding object.
 		///
 		/// This function sets the global encoding to the argument and returns a
 		/// reference of the previous global encoding.
 
+	[[nodiscard]]
 	static TextEncoding& global();
 		/// Return the current global TextEncoding object
 
@@ -174,6 +181,7 @@ public:
 		/// Name of the global TextEncoding, which is the empty string.
 
 protected:
+	[[nodiscard]]
 	static TextEncodingManager& manager();
 		/// Returns the TextEncodingManager.
 };

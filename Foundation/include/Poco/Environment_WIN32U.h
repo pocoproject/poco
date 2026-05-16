@@ -29,16 +29,24 @@ class Foundation_API EnvironmentImpl
 public:
 	using NodeId = UInt8[6]; /// Ethernet address.
 
+	[[nodiscard]]
 	static std::string getImpl(const std::string& name);
+	[[nodiscard]]
 	static bool hasImpl(const std::string& name);
 	static void setImpl(const std::string& name, const std::string& value);
+	[[nodiscard]]
 	static std::string osNameImpl();
+	[[nodiscard]]
 	static std::string osDisplayNameImpl();
+	[[nodiscard]]
 	static std::string osVersionImpl();
+	[[nodiscard]]
 	static std::string osArchitectureImpl();
+	[[nodiscard]]
 	static std::string nodeNameImpl();
 	static void nodeIdImpl(NodeId& id);
-	static unsigned processorCountImpl();
+	[[nodiscard]]
+	static unsigned int processorCountImpl();
 };
 
 

@@ -52,11 +52,13 @@ struct HashMapEntry
 	{
 	}
 
+	[[nodiscard]]
 	bool operator == (const HashMapEntry& entry) const
 	{
 		return first == entry.first;
 	}
 
+	[[nodiscard]]
 	bool operator != (const HashMapEntry& entry) const
 	{
 		return first != entry.first;
@@ -68,6 +70,7 @@ template <class HME, class KeyHashFunc>
 struct HashMapEntryHash
 	/// This class template is used internally by HashMap.
 {
+	[[nodiscard]]
 	std::size_t operator () (const HME& entry) const
 	{
 		return _func(entry.first);
@@ -123,38 +126,45 @@ public:
 		_table.swap(map._table);
 	}
 
+	[[nodiscard]]
 	ConstIterator begin() const
 	{
 		return _table.begin();
 	}
 
+	[[nodiscard]]
 	ConstIterator end() const
 	{
 		return _table.end();
 	}
 
+	[[nodiscard]]
 	Iterator begin()
 	{
 		return _table.begin();
 	}
 
+	[[nodiscard]]
 	Iterator end()
 	{
 		return _table.end();
 	}
 
+	[[nodiscard]]
 	ConstIterator find(const KeyType& key) const
 	{
 		ValueType value(key);
 		return _table.find(value);
 	}
 
+	[[nodiscard]]
 	Iterator find(const KeyType& key)
 	{
 		ValueType value(key);
 		return _table.find(value);
 	}
 
+	[[nodiscard]]
 	std::size_t count(const KeyType& key) const
 	{
 		ValueType value(key);
@@ -188,16 +198,19 @@ public:
 		_table.clear();
 	}
 
+	[[nodiscard]]
 	std::size_t size() const
 	{
 		return _table.size();
 	}
 
+	[[nodiscard]]
 	bool empty() const
 	{
 		return _table.empty();
 	}
 
+	[[nodiscard]]
 	ConstReference operator [] (const KeyType& key) const
 	{
 		ConstIterator it = _table.find(key);
@@ -207,6 +220,7 @@ public:
 			throw NotFoundException();
 	}
 
+	[[nodiscard]]
 	Reference operator [] (const KeyType& key)
 	{
 		ValueType value(key);

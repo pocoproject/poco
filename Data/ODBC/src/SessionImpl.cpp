@@ -167,7 +167,7 @@ void SessionImpl::open(const std::string& connect)
 			&SessionImpl::setDataTypeInfo,
 			&SessionImpl::dataTypeInfo);
 
-		Poco::Data::ODBC::SQLSetConnectAttr(_db, SQL_ATTR_QUIET_MODE, nullptr, 0);
+		(void)Poco::Data::ODBC::SQLSetConnectAttr(_db, SQL_ATTR_QUIET_MODE, nullptr, 0);
 
 		if (!canTransact()) autoCommit("", true);
 	}
@@ -182,7 +182,7 @@ void SessionImpl::open(const std::string& connect)
 void SessionImpl::setDBEncoding(const std::string&, const Poco::Any& value)
 {
 	const std::string& enc = Poco::RefAnyCast<std::string>(value);
-	Poco::TextEncoding::byName(enc); // throws if not found
+	(void)Poco::TextEncoding::byName(enc); // throws if not found
 	_dbEncoding = enc;
 }
 
@@ -224,7 +224,7 @@ inline Poco::Any SessionImpl::getCursorUse(const std::string&) const
 #pragma warning (disable : 4995) // ignore marked as deprecated
 #endif
 	SQLUINTEGER curUse = 0;
-	Poco::Data::ODBC::SQLGetConnectAttr(_db, SQL_ATTR_ODBC_CURSORS, &curUse, SQL_IS_UINTEGER, nullptr);
+	(void)Poco::Data::ODBC::SQLGetConnectAttr(_db, SQL_ATTR_ODBC_CURSORS, &curUse, SQL_IS_UINTEGER, nullptr);
 	switch (curUse)
 	{
 	case SQL_CUR_USE_ODBC:
@@ -315,7 +315,7 @@ bool SessionImpl::getMultiActiveResultset(const std::string&) const
 {
 #ifdef POCO_DATA_ODBC_HAVE_SQL_SERVER_EXT
 	SQLINTEGER mars;
-	Poco::Data::ODBC::SQLGetConnectAttr(_db, SQL_COPT_SS_MARS_ENABLED, &mars, SQL_IS_INTEGER, nullptr);
+	(void)Poco::Data::ODBC::SQLGetConnectAttr(_db, SQL_COPT_SS_MARS_ENABLED, &mars, SQL_IS_INTEGER, nullptr);
 	return mars == SQL_MARS_ENABLED_YES;
 #else
 	return false;

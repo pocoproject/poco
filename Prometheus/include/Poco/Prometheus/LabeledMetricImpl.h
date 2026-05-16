@@ -55,6 +55,7 @@ public:
 	{
 	}
 
+	[[nodiscard]]
 	Sample& labels(const std::vector<std::string>& labelValues)
 		/// Returns the Sample associated with the given label values.
 		///
@@ -86,6 +87,7 @@ public:
 		}
 	}
 
+	[[nodiscard]]
 	const Sample& labels(const std::vector<std::string>& labelValues) const
 		/// Returns the Sample associated with the given label values.
 		///
@@ -131,6 +133,7 @@ public:
 		_samples.clear();
 	}
 
+	[[nodiscard]]
 	std::size_t sampleCount() const
 		/// Returns the number of samples.
 	{
@@ -164,6 +167,7 @@ public:
 	}
 
 protected:
+	[[nodiscard]]
 	virtual std::unique_ptr<Sample> createSample() const = 0;
 		/// Creates a new Sample. Must be overridden by subclasses.
 

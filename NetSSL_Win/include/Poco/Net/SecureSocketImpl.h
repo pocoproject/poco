@@ -195,6 +195,7 @@ public:
 	void setPeerHostName(const std::string& hostName);
 		/// Sets the peer host name for certificate validation purposes.
 
+	[[nodiscard]]
 	const std::string& getPeerHostName() const;
 		/// Returns the peer host name.
 
@@ -207,21 +208,27 @@ public:
 		/// Performs post-connect (or post-accept) peer certificate validation
 		/// using the given peer host name.
 
+	[[nodiscard]]
 	Context::Ptr context() const;
 		/// Returns the Context.
 
+	[[nodiscard]]
 	PCCERT_CONTEXT peerCertificate() const;
 		/// Returns the peer certificate.
 
+	[[nodiscard]]
 	poco_socket_t sockfd();
 		/// Returns the underlying socket descriptor.
 
+	[[nodiscard]]
 	int available() const;
 		/// Returns the number of bytes available in the buffer.
 
+	[[nodiscard]]
 	SocketImpl* socket();
 		/// Returns the underlying SocketImpl.
 		
+	[[nodiscard]]
 	const SocketImpl* socket() const;
 		/// Returns the underlying SocketImpl.
 
@@ -306,7 +313,9 @@ protected:
 
 	void sendOutSecBufferAndAdvanceState(State state);
 	void drainExtraBuffer();
+	[[nodiscard]]
 	static int recordLength(const BYTE* pBuffer, int length);
+	[[nodiscard]]
 	static bool bufferHasCompleteRecords(const BYTE* pBuffer, int length);
 
 	void initClientCredentials();
@@ -319,11 +328,15 @@ protected:
 
 	void acceptSSL();
 	void connectSSL(bool completeHandshake);
+	[[nodiscard]]
 	static int lastError();
+	[[nodiscard]]
 	bool stateMachine();
 	State getState() const;
 	void setState(State st);
+	[[nodiscard]]
 	static int stateToReturnValue(State state);
+	[[nodiscard]]
 	static bool isLocalHost(const std::string& hostName);
 
 #ifdef ENABLE_PRINT_STATE

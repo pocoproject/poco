@@ -54,7 +54,8 @@ inline constexpr char POCO_FLT_EXP = 'e';
 namespace Poco {
 
 
-template<typename T>
+template <typename T>
+[[nodiscard]]
 inline bool isNegative(T x)
 {
 	if constexpr (std::is_signed_v<T>)
@@ -64,7 +65,8 @@ inline bool isNegative(T x)
 }
 
 
-template<typename To, typename From>
+template <typename To, typename From>
+[[nodiscard]]
 inline bool isIntOverflow(From val)
 {
 	poco_assert_dbg (std::numeric_limits<From>::is_integer);
@@ -84,8 +86,9 @@ inline bool isIntOverflow(From val)
 }
 
 
-template<typename R, typename F, typename S>
-[[nodiscard]] bool safeMultiply(R& result, F f, S s)
+template <typename R, typename F, typename S>
+[[nodiscard]]
+bool safeMultiply(R& result, F f, S s)
 {
 	using CT = std::common_type_t<R, F, S>;
 	auto cast = [](auto v) { return static_cast<CT>(v); };
@@ -137,7 +140,8 @@ template<typename R, typename F, typename S>
 
 
 template <typename To, typename From>
-[[nodiscard]] inline bool isSafeIntCast(From from)
+[[nodiscard]]
+inline bool isSafeIntCast(From from)
 	/// Returns true if it is safe to cast
 	/// integer from From to To.
 {
@@ -146,6 +150,7 @@ template <typename To, typename From>
 
 
 template <typename To, typename From>
+[[nodiscard]]
 inline To& safeIntCast(From from, To& to)
 	/// Returns cast value if it is safe
 	/// to cast integer from From to To,
@@ -159,6 +164,7 @@ inline To& safeIntCast(From from, To& to)
 	throw BadCastException("safeIntCast: Integer overflow");
 }
 
+[[nodiscard]]
 inline char decimalSeparator()
 	/// Returns decimal separator from global locale or
 	/// default '.' for platforms where locale is unavailable.
@@ -171,6 +177,7 @@ inline char decimalSeparator()
 }
 
 
+[[nodiscard]]
 inline char thousandSeparator()
 	/// Returns thousand separator from global locale or
 	/// default ',' for platforms where locale is unavailable.
@@ -318,11 +325,13 @@ namespace Impl {
 			return _cur -= decr;
 		}
 
+		[[nodiscard]]
 		operator char* () const
 		{
 			return _cur;
 		}
 
+		[[nodiscard]]
 		std::size_t span() const
 		{
 			return _end - _beg;

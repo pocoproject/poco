@@ -189,7 +189,7 @@ void HashMapTest::testIndex()
 	try
 	{
 		const IntMap& im = hm;
-		int POCO_UNUSED x = im[4];
+		[[maybe_unused]] int x = im[4];
 		fail("no such key - must throw");
 	}
 	catch (Poco::NotFoundException&)

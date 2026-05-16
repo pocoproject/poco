@@ -1448,7 +1448,7 @@ bool ODBCTest::canConnect(const std::string& driver,
 	}
 
 	Utility::DSNMap dataSources;
-	Utility::dataSources(dataSources);
+	[[maybe_unused]] Utility::DSNMap m = Utility::dataSources(dataSources);
 	if (dataSources.size() > 0)
 	{
 		Utility::DSNMap::iterator itDSN = dataSources.begin();
