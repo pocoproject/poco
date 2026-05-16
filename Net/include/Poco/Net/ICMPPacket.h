@@ -42,7 +42,7 @@ public:
 
 	[[nodiscard]]
 	int packetSize() const;
-		/// Returns the total length of packet (header + data);
+		/// Returns the total length of packet (header + data)
 
 	[[nodiscard]]
 	Poco::UInt16 sequence() const;
@@ -57,7 +57,7 @@ public:
 
 	[[nodiscard]]
 	int maxPacketSize() const;
-		/// Returns the total length of packet (header + data);
+		/// Returns the total length of packet (header + data)
 
 	[[nodiscard]]
 	struct timeval time(Poco::UInt8* buffer = nullptr, int length = 0) const;

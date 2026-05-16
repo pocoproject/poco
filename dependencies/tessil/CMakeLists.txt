@@ -1,4 +1,5 @@
 # Tessil ordered-map - header-only ordered hash map/set
+# Version: 1.2.0
 # Source: https://github.com/Tessil/ordered-map
 
 add_library(_BUNDLED_TESSIL INTERFACE)

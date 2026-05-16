@@ -110,6 +110,8 @@ static void
 PngWarnFunc  (png_structp  png_ptr,
               const char  *msg)
 {
+    (void) png_ptr;
+    (void) msg;
     // Warning does not prevent the job to be done
     // So it can be safely ignored.
     // printf("WARNING: %s\n", msg);

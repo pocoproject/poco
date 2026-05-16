@@ -180,14 +180,16 @@ public:
 		RedisType::Ptr redisResult = readReply();
 		if (redisResult->type() == RedisTypeTraits<Error>::TypeId)
 		{
-			Type<Error>* error = dynamic_cast<Type<Error>*>(redisResult.get());
+			// TypeId check guarantees runtime type; static_cast avoids
+			// hidden-visibility RTTI mismatch across DSOs on macOS.
+			const auto* error = static_cast<const Type<Error>*>(redisResult.get());
 			throw RedisException(error->value().getMessage());
 		}
 
 		if (redisResult->type() == RedisTypeTraits<T>::TypeId)
 		{
-			Type<T>* type = dynamic_cast<Type<T>*>(redisResult.get());
-			if (type != nullptr) result = type->value();
+			const auto* type = static_cast<const Type<T>*>(redisResult.get());
+			result = type->value();
 		}
 		else throw BadCastException();
 	}
@@ -219,6 +221,12 @@ private:
 		/// call readReply as many times as you called writeCommand, even when
 		/// an error occurred on a command.
 
+	NotificationCenterPtr loadNC() const;
+		/// Thread-safe load of the notification center pointer.
+
+	void storeNC(NotificationCenterPtr pNC);
+		/// Thread-safe store of the notification center pointer.
+
 	Net::SocketAddress _address;
 	Net::StreamSocket _socket;
 	std::unique_ptr<RedisInputStream> _pInput{};
@@ -227,7 +235,8 @@ private:
 #if POCO_HAVE_ATOMIC_SHARED_PTR
 	std::atomic<NotificationCenterPtr> _pNC{};
 #else
-	std::atomic<AsyncNotificationCenter*> _pNC{nullptr};
+	NotificationCenterPtr _pNC;
+	mutable std::mutex _ncMutex;
 #endif
 	mutable std::once_flag _ncInitFlag{};
 };

@@ -85,6 +85,8 @@ Application::Application():
 Application::Application(int argc, char** argv):
     Application()
 {
+	// CodeQL [cpp/virtual-call-in-ctor]: init() chain calls virtual defineOptions(),
+	// but only Application::defineOptions() runs here (derived vtable not yet constructed)
 	init(argc, argv);
 }
 
@@ -114,6 +116,7 @@ void Application::setup()
 	setUnixOptions(false);
 #endif
 
+	// CodeQL [cpp/local-address-stored]: singleton pattern; instance lifetime is process-scoped
 	_pInstance = this;
 
 	AutoPtr<ConsoleChannel> pCC = new ConsoleChannel;
@@ -200,7 +203,7 @@ int Application::loadConfiguration(int priority)
 	Path confPath;
 	if (findAppConfigFile(appPath.getBaseName(), "properties"s, confPath))
 	{
-		_pConfig->add(new PropertyFileConfiguration(confPath.toString(), AbstractConfiguration::Ptr(_pConfig, true)), priority, false);
+		_pConfig->add(new PropertyFileConfiguration(confPath.toString(), _pConfig.get()), priority, false);
 		++n;
 	}
 #ifndef POCO_UTIL_NO_INIFILECONFIGURATION
@@ -242,7 +245,7 @@ void Application::loadConfiguration(const std::string& path, int priority)
 	std::string ext = confPath.getExtension();
 	if (icompare(ext, "properties") == 0)
 	{
-		_pConfig->add(new PropertyFileConfiguration(confPath.toString(), AbstractConfiguration::Ptr(_pConfig, true)), priority, false);
+		_pConfig->add(new PropertyFileConfiguration(confPath.toString(), _pConfig.get()), priority, false);
 		++n;
 	}
 #ifndef POCO_UTIL_NO_INIFILECONFIGURATION

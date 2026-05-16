@@ -1,8 +1,8 @@
 # Third-Party Dependencies
 
 The Poco C++ Libraries include third-party code in two forms:
-1. **Bundled dependencies** in this `dependencies/` directory — self-contained libraries that can be updated independently
-2. **Embedded code** in the main source tree — algorithms and small components integrated directly into Poco source files
+1. **Bundled dependencies** in this `dependencies/` directory -- self-contained libraries that can be updated independently
+2. **Embedded code** in the main source tree -- algorithms and small components integrated directly into Poco source files
 
 When `POCO_UNBUNDLED` is enabled (CMake) or set in the environment (GNU Make), marked libraries
 are replaced with system-installed versions via `find_package()` or `-l` flags.
@@ -14,16 +14,16 @@ are replaced with system-installed versions via `find_package()` or `-l` flags.
 | [zlib](zlib/) | 1.3.2 | Zlib | Foundation (compression/decompression streams) | Yes | https://github.com/madler/zlib |
 | [pcre2](pcre2/) | 10.47 | BSD-3-Clause | Foundation (regular expressions) | Yes | https://github.com/PCRE2Project/pcre2 |
 | [utf8proc](utf8proc/) | 2.11.3 | MIT | Foundation (Unicode normalization) | Yes | https://github.com/JuliaStrings/utf8proc |
-| [expat](expat/) | 2.7.4 | MIT | XML (SAX/DOM parser) | Yes | https://github.com/libexpat/libexpat |
-| [sqlite3](sqlite3/) | 3.51.2 | Public Domain | Data/SQLite (embedded database) | Yes | https://www.sqlite.org |
-| [png](png/) | 1.6.55 | libpng License | PDF (PNG image support) | Yes | https://github.com/pnggroup/libpng |
+| [expat](expat/) | 2.8.1 | MIT | XML (SAX/DOM parser) | Yes | https://github.com/libexpat/libexpat |
+| [sqlite3](sqlite3/) | 3.53.1 | Public Domain | Data/SQLite (embedded database) | Yes | https://www.sqlite.org |
+| [png](png/) | 1.6.58 | libpng License | PDF (PNG image support) | Yes | https://github.com/pnggroup/libpng |
 | [v8_double_conversion](v8_double_conversion/) | 3.4.0 | BSD-3-Clause | Foundation (float-to-string conversion) | No | https://github.com/google/double-conversion |
-| [pdjson](pdjson/) | — | Public Domain | JSON (streaming parser) | No | https://github.com/skeeto/pdjson |
-| [tessil](tessil/) | — | MIT | Foundation (insertion-order-preserving hash containers) | No | https://github.com/Tessil/ordered-map |
-| [hpdf](hpdf/) (libharu) | 2.4.5 | Zlib-like | PDF (PDF document generation) | No | https://github.com/libharu/libharu |
-| [7zip](7zip/) (LZMA SDK) | 26.00 | Public Domain | SevenZip (7z archive support) | No | https://github.com/ip7z/7zip |
+| [pdjson](pdjson/) | n/a | Public Domain | JSON (streaming parser) | No | https://github.com/skeeto/pdjson |
+| [tessil](tessil/) | 1.2.0 | MIT | Foundation (insertion-order-preserving hash containers) | No | https://github.com/Tessil/ordered-map |
+| [hpdf](hpdf/) (libharu) | 2.4.6 | Zlib-like | PDF (PDF document generation) | No | https://github.com/libharu/libharu |
+| [7zip](7zip/) (LZMA SDK) | 26.01 | Public Domain | SevenZip (7z archive support) | No | https://github.com/ip7z/7zip |
 | [cpptrace](cpptrace/) | 1.0.4 | MIT | Foundation (stack trace support, optional) | No | https://github.com/jeremy-rifkin/cpptrace |
-| [quill](quill/) | 11.0.2 | MIT | Foundation (high-performance async logging, optional) | No | https://github.com/odygrd/quill |
+| [quill](quill/) | 11.1.0 | MIT | Foundation (high-performance async logging, optional) | No | https://github.com/odygrd/quill |
 | [wepoll](wepoll/) | 1.5.8 | BSD-2-Clause | Net (epoll emulation, Windows only) | No | https://github.com/piscisaureus/wepoll |
 
 ## Embedded Third-Party Code
@@ -46,3 +46,4 @@ and not practical to extract as separate libraries.
 
 ## Additional Notes
 * `tessil/ordered-map` is modified so that `tsl::detail_ordered_hash::numeric_cast()` and `tsl::detail_ordered_hash::deserialize_value()` have external linkage. These functions originally have internal linkage (marked `static`), which prevented the `Poco` module from being built as all exported symbols require external linkage. This should remain until [Tessil/ordered-map#54](https://github.com/Tessil/ordered-map/pull/54) is merged.
+* `quill` only supports specific OS and CPU architecture combinations. `ENABLE_FASTLOGGER` is auto-disabled on unsupported platforms via a whitelist in the top-level `CMakeLists.txt` (derived from `ThreadUtilities.h`, `BackendWorkerLock.h`, and `Rdtsc.h`). When updating quill from upstream, re-assess the whitelist against the new version's platform support.

@@ -459,7 +459,7 @@ AddResource  (HPDF_Page  page)
     if (!resource)
         return HPDF_Error_GetCode (page->error);
 
-    /* althoth ProcSet-entry is obsolete, add it to resource for
+    /* Although ProcSet-entry is obsolete, add it to resource for
      * compatibility
      */
 
@@ -587,7 +587,6 @@ HPDF_Page_CreateXObjectFromImage(HPDF_Doc       pdf,
     HPDF_Dict resource;
     HPDF_Dict fromxobject;
     HPDF_Dict xobject;
-    HPDF_STATUS ret = HPDF_OK;
     HPDF_Array procset;
     HPDF_REAL tmp;
     HPDF_Array array1;
@@ -608,18 +607,19 @@ HPDF_Page_CreateXObjectFromImage(HPDF_Doc       pdf,
    if (!resource)
       return NULL;
 
-   /* althoth ProcSet-entry is obsolete, add it to resource for
-    * compatibility*/
+   /* Although ProcSet-entry is obsolete, add it to resource for
+    * compatibility
+    */
 
-   ret += HPDF_Dict_Add (fromxobject, "Resources", resource);
+   HPDF_Dict_Add (fromxobject, "Resources", resource);
 
    procset = HPDF_Array_New (page->mmgr);
    if (!procset)
       return NULL;
 
-   ret += HPDF_Dict_Add (resource, "ProcSet", procset);
-   ret += HPDF_Array_Add (procset, HPDF_Name_New (page->mmgr, "PDF"));
-   ret += HPDF_Array_Add (procset, HPDF_Name_New (page->mmgr, "ImageC"));
+   HPDF_Dict_Add (resource, "ProcSet", procset);
+   HPDF_Array_Add (procset, HPDF_Name_New (page->mmgr, "PDF"));
+   HPDF_Array_Add (procset, HPDF_Name_New (page->mmgr, "ImageC"));
 
     xobject = HPDF_Dict_New (page->mmgr);
     if (!xobject)
@@ -644,10 +644,10 @@ HPDF_Page_CreateXObjectFromImage(HPDF_Doc       pdf,
       rect.bottom = tmp;
    }
 
-   ret += HPDF_Array_AddReal (array1, rect.left);
-   ret += HPDF_Array_AddReal (array1, rect.bottom);
-   ret += HPDF_Array_AddReal (array1, rect.right);
-   ret += HPDF_Array_AddReal (array1, rect.top);
+   HPDF_Array_AddReal (array1, rect.left);
+   HPDF_Array_AddReal (array1, rect.bottom);
+   HPDF_Array_AddReal (array1, rect.right);
+   HPDF_Array_AddReal (array1, rect.top);
 
     array2 = HPDF_Array_New (page->mmgr);
     if (!array2)
@@ -656,12 +656,12 @@ HPDF_Page_CreateXObjectFromImage(HPDF_Doc       pdf,
    if (HPDF_Dict_Add (fromxobject, "Matrix", array2) != HPDF_OK)
       return NULL;
 
-   ret += HPDF_Array_AddReal (array2, 1.0);
-   ret += HPDF_Array_AddReal (array2, 0.0);
-   ret += HPDF_Array_AddReal (array2, 0.0);
-   ret += HPDF_Array_AddReal (array2, 1.0);
-   ret += HPDF_Array_AddReal (array2, 0.0);
-   ret += HPDF_Array_AddReal (array2, 0.0);
+   HPDF_Array_AddReal (array2, 1.0);
+   HPDF_Array_AddReal (array2, 0.0);
+   HPDF_Array_AddReal (array2, 0.0);
+   HPDF_Array_AddReal (array2, 1.0);
+   HPDF_Array_AddReal (array2, 0.0);
+   HPDF_Array_AddReal (array2, 0.0);
 
    if (HPDF_Dict_AddNumber (fromxobject, "FormType", 1) != HPDF_OK)
       return NULL;
@@ -716,7 +716,6 @@ HPDF_Page_CreateXObjectAsWhiteRect  (HPDF_Doc   pdf,
     HPDF_Dict resource;
     HPDF_Dict fromxobject;
     HPDF_Dict xobject;
-    HPDF_STATUS ret = HPDF_OK;
     HPDF_Array procset;
     HPDF_REAL tmp;
     HPDF_Array array1;
@@ -740,15 +739,15 @@ HPDF_Page_CreateXObjectAsWhiteRect  (HPDF_Doc   pdf,
    /* althoth ProcSet-entry is obsolete, add it to resource for
     * compatibility*/
 
-   ret += HPDF_Dict_Add (fromxobject, "Resources", resource);
+   HPDF_Dict_Add (fromxobject, "Resources", resource);
 
    procset = HPDF_Array_New (page->mmgr);
    if (!procset)
       return NULL;
 
-   ret += HPDF_Dict_Add (resource, "ProcSet", procset);
-   ret += HPDF_Array_Add (procset, HPDF_Name_New (page->mmgr, "PDF"));
-   ret += HPDF_Array_Add (procset, HPDF_Name_New (page->mmgr, "ImageC"));
+   HPDF_Dict_Add (resource, "ProcSet", procset);
+   HPDF_Array_Add (procset, HPDF_Name_New (page->mmgr, "PDF"));
+   HPDF_Array_Add (procset, HPDF_Name_New (page->mmgr, "ImageC"));
 
     xobject = HPDF_Dict_New (page->mmgr);
     if (!xobject)
@@ -770,10 +769,10 @@ HPDF_Page_CreateXObjectAsWhiteRect  (HPDF_Doc   pdf,
       rect.bottom = tmp;
    }
 
-   ret += HPDF_Array_AddReal (array1, 0.0);
-   ret += HPDF_Array_AddReal (array1, 0.0);
-   ret += HPDF_Array_AddReal (array1, rect.right-rect.left);
-   ret += HPDF_Array_AddReal (array1, rect.top-rect.bottom);
+   HPDF_Array_AddReal (array1, 0.0);
+   HPDF_Array_AddReal (array1, 0.0);
+   HPDF_Array_AddReal (array1, rect.right-rect.left);
+   HPDF_Array_AddReal (array1, rect.top-rect.bottom);
 
     array2 = HPDF_Array_New (page->mmgr);
     if (!array2)
@@ -782,12 +781,12 @@ HPDF_Page_CreateXObjectAsWhiteRect  (HPDF_Doc   pdf,
    if (HPDF_Dict_Add (fromxobject, "Matrix", array2) != HPDF_OK)
       return NULL;
 
-   ret += HPDF_Array_AddReal (array2, 1.0);
-   ret += HPDF_Array_AddReal (array2, 0.0);
-   ret += HPDF_Array_AddReal (array2, 0.0);
-   ret += HPDF_Array_AddReal (array2, 1.0);
-   ret += HPDF_Array_AddReal (array2, 0.0);
-   ret += HPDF_Array_AddReal (array2, 0.0);
+   HPDF_Array_AddReal (array2, 1.0);
+   HPDF_Array_AddReal (array2, 0.0);
+   HPDF_Array_AddReal (array2, 0.0);
+   HPDF_Array_AddReal (array2, 1.0);
+   HPDF_Array_AddReal (array2, 0.0);
+   HPDF_Array_AddReal (array2, 0.0);
 
    if (HPDF_Dict_AddNumber (fromxobject, "FormType", 1) != HPDF_OK)
       return NULL;

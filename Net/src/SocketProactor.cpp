@@ -296,6 +296,11 @@ int SocketProactor::poll(int* pHandled)
 		auto end = sm.end();
 		for (; it != end; ++it)
 		{
+			if (it->second & PollSet::POLL_ERROR)
+			{
+				Socket sock = it->first;
+				handled += error(sock);
+			}
 			if (it->second & PollSet::POLL_READ)
 			{
 				Socket sock = it->first;
@@ -307,11 +312,6 @@ int SocketProactor::poll(int* pHandled)
 				Socket sock = it->first;
 				if (hasHandlers(_writeHandlers, static_cast<int>(sock.impl()->sockfd())))
 					handled += send(sock);
-			}
-			if (it->second & PollSet::POLL_ERROR)
-			{
-				Socket sock = it->first;
-				handled += error(sock);
 			}
 		}
 	}
@@ -531,6 +531,15 @@ void SocketProactor::send(SocketImpl& sock, IOHandlerIt& it)
 		catch(std::exception&)
 		{
 			err = Socket::lastError();
+		}
+		if (n == 0 && err == 0)
+		{
+			// TCP never completes a non-empty send with zero bytes;
+			// this means the socket is in an error state (e.g. refused
+			// non-blocking connect) -- read SO_ERROR for the real code.
+			unsigned soErr = 0;
+			sock.getOption(SOL_SOCKET, SO_ERROR, soErr);
+			err = soErr;
 		}
 		enqueueIONotification(std::move((*it)->_onCompletion), n, err);
 	}

@@ -19,7 +19,7 @@
 
 
 #include "Poco/Foundation.h"
-#include "Poco/Buffer.h"
+#include "Poco/Exception.h"
 #include "Poco/FPEnvironment.h"
 #ifdef min
 	#undef min
@@ -27,33 +27,28 @@
 #ifdef max
 	#undef max
 #endif
-#include <limits>
-#include <cmath>
 #include <cctype>
+#include <charconv>
+#include <cstdint>
+#include <cstring>
+#include <limits>
 #if !defined(POCO_NO_LOCALE)
 	#include <locale>
 #endif
+#include <string>
 #include <type_traits>
-#if defined(POCO_NOINTMAX)
-typedef Poco::UInt64 uintmax_t;
-typedef Poco::Int64 intmax_t;
-#endif
-#if !defined (INTMAX_MAX)
-#define INTMAX_MAX std::numeric_limits<intmax_t>::max()
-#endif
-#ifdef POCO_COMPILER_MSVC
-#pragma warning(push)
-#pragma warning(disable : 4146)
-#endif // POCO_COMPILER_MSVC
 
-// binary numbers are supported, thus 64 (bits) + 1 (string terminating zero) + 2 (hex prefix)
-#define POCO_MAX_INT_STRING_LEN (67)
-// value from strtod.cc (double_conversion::kMaxSignificantDecimalDigits)
-#define POCO_MAX_FLT_STRING_LEN 780
+/// Maximum length of an integer formatted as a string.
+/// 64 binary digits + sign + NUL + padding margin = 67.
+inline constexpr int POCO_MAX_INT_STRING_LEN = 67;
 
-#define POCO_FLT_INF "inf"
-#define POCO_FLT_NAN "nan"
-#define POCO_FLT_EXP 'e'
+/// Maximum length of a floating-point formatted string.
+/// Matches double_conversion::kMaxSignificantDecimalDigits.
+inline constexpr int POCO_MAX_FLT_STRING_LEN = 780;
+
+inline constexpr char POCO_FLT_INF[] = "inf";
+inline constexpr char POCO_FLT_NAN[] = "nan";
+inline constexpr char POCO_FLT_EXP = 'e';
 
 
 namespace Poco {
@@ -76,20 +71,18 @@ inline bool isIntOverflow(From val)
 {
 	poco_assert_dbg (std::numeric_limits<From>::is_integer);
 	poco_assert_dbg (std::numeric_limits<To>::is_integer);
-	bool ret;
-	if (std::numeric_limits<To>::is_signed)
+	if constexpr (std::numeric_limits<To>::is_signed)
 	{
-		ret = (!std::numeric_limits<From>::is_signed &&
+		return (!std::numeric_limits<From>::is_signed &&
 			  (uintmax_t)val > (uintmax_t)INTMAX_MAX) ||
 			  (intmax_t)val  < (intmax_t)std::numeric_limits<To>::min() ||
 			  (intmax_t)val  > (intmax_t)std::numeric_limits<To>::max();
 	}
 	else
 	{
-		ret = isNegative(val) ||
+		return isNegative(val) ||
 				(uintmax_t)val > (uintmax_t)std::numeric_limits<To>::max();
 	}
-	return ret;
 }
 
 
@@ -106,58 +99,66 @@ bool safeMultiply(R& result, F f, S s)
 		return true;
 	}
 
-	if (f > 0)
+	if constexpr (std::is_signed_v<F> || std::is_signed_v<S>)
 	{
-		if (s > 0)
+		if (f > 0)
 		{
-			if (cast(f) > (cast(std::numeric_limits<R>::max()) / cast(s)))
-				return false;
+			if (s > 0)
+			{
+				if (cast(f) > (cast(std::numeric_limits<R>::max()) / cast(s)))
+					return false;
+			}
+			else
+			{
+				if (cast(s) < (cast(std::numeric_limits<R>::min()) / cast(f)))
+					return false;
+			}
 		}
 		else
 		{
-			if (cast(s) < (cast(std::numeric_limits<R>::min()) / cast(f)))
-				return false;
+			if (s > 0)
+			{
+				if (cast(f) < (cast(std::numeric_limits<R>::min()) / cast(s)))
+					return false;
+			}
+			else
+			{
+				if (cast(s) < (cast(std::numeric_limits<R>::max()) / cast(f)))
+					return false;
+			}
 		}
 	}
 	else
 	{
-		if (s > 0)
-		{
-			if (cast(f) < (cast(std::numeric_limits<R>::min()) / cast(s)))
-				return false;
-		}
-		else
-		{
-			if (cast(s) < (cast(std::numeric_limits<R>::max()) / cast(f)))
-				return false;
-		}
+		// Both f and s are unsigned (and non-zero at this point)
+		if (cast(f) > (cast(std::numeric_limits<R>::max()) / cast(s)))
+			return false;
 	}
 	result = f * s;
 	return true;
 }
 
 
-template <typename F, typename T>
+template <typename To, typename From>
 [[nodiscard]]
-inline T& isSafeIntCast(F from)
+inline bool isSafeIntCast(From from)
 	/// Returns true if it is safe to cast
-	/// integer from F to T.
+	/// integer from From to To.
 {
-	if (!isIntOverflow<T, F>(from)) return true;
-	return false;
+	return !isIntOverflow<To, From>(from);
 }
 
 
-template <typename F, typename T>
+template <typename To, typename From>
 [[nodiscard]]
-inline T& safeIntCast(F from, T& to)
+inline To& safeIntCast(From from, To& to)
 	/// Returns cast value if it is safe
-	/// to cast integer from F to T,
+	/// to cast integer from From to To,
 	/// otherwise throws BadCastException.
 {
-	if (!isIntOverflow<T, F>(from))
+	if (!isIntOverflow<To, From>(from))
 	{
-		to = static_cast<T>(from);
+		to = static_cast<To>(from);
 		return to;
 	}
 	throw BadCastException("safeIntCast: Integer overflow");
@@ -194,8 +195,9 @@ inline char thousandSeparator()
 //
 
 template <typename I>
-bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
-	/// Converts zero-terminated character array to integer number;
+[[nodiscard]] bool strToInt(const char* begin, const char* end, I& outResult, short base, char thSep = ',')
+	/// Converts character range [begin, end) to integer number;
+	/// begin must point past any leading whitespace.
 	/// Thousand separators are recognized for base10 and current locale;
 	/// they are silently skipped and not verified for correct positioning.
 	/// It is not allowed to convert a negative number to anything except
@@ -207,81 +209,66 @@ bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
 {
 	poco_assert_dbg (base == 2 || base == 8 || base == 10 || base == 16);
 
-	if (!pStr) return false;
-	while (std::isspace(*pStr)) ++pStr;
-	if ((*pStr == '\0') || ((*pStr == '-') && ((base != 10) || (std::is_unsigned<I>::value))))
+	if (begin >= end) return false;
+	if ((*begin == '-') && ((base != 10) || std::is_unsigned_v<I>))
 		return false;
 
-	bool negative = false;
-	if ((base == 10) && (*pStr == '-'))
+	// Skip '+' sign (std::from_chars doesn't accept it)
+	const char* start = begin;
+	if (*start == '+') ++start;
+	if (start >= end) return false; // reject bare sign without digits
+
+	// Try std::from_chars -- handles sign, overflow, and all bases.
+	const auto [ptr, ec] = std::from_chars(start, end, outResult, base);
+	if (ec == std::errc() && ptr == end)
+		return true;
+
+	// If from_chars reported overflow, invalid input, or no thSep is configured,
+	// there's nothing the slow path can do differently.
+	if (ec != std::errc() || !thSep || base != 10)
+		return false;
+
+	// from_chars consumed some digits then stopped at a non-digit character.
+	// The input may contain thousand separators -- strip them and retry.
+	char cleaned[POCO_MAX_INT_STRING_LEN];
+	char* dst = cleaned;
+	for (const char* src = start; src < end; ++src)
 	{
-		if (!std::numeric_limits<I>::is_signed) return false;
-		negative = true;
-		++pStr;
-	}
-	else if (*pStr == '+') ++pStr;
-
-	// numbers are parsed as unsigned, for negative numbers the sign is applied after parsing
-	// overflow is checked in every parse step
-	uintmax_t limitCheck = std::numeric_limits<I>::max();
-	if (negative) ++limitCheck;
-	uintmax_t result = 0;
-	unsigned char add = 0;
-	for (; *pStr != '\0'; ++pStr)
-	{
-		if (*pStr == thSep)
+		if (*src != thSep)
 		{
-			if (base == 10) continue;
-			// thousand separators only allowed for base 10
-			return false;
+			if (static_cast<std::size_t>(dst - cleaned) >= sizeof(cleaned) - 1)
+				return false; // input too long
+			*dst++ = *src;
 		}
-		if (result > (limitCheck / base)) return false;
-		if (!safeMultiply(result, result, base)) return false;
-		switch (*pStr)
-		{
-		case '0': case '1': case '2': case '3':
-		case '4': case '5': case '6': case '7':
-			add = (*pStr - '0');
-			break;
-
-		case '8': case '9':
-			if ((base == 10) || (base == 0x10)) add = (*pStr - '0');
-			else return false;
-			break;
-
-		case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-			if (base != 0x10) return false;
-			add = (*pStr - 'a') + 10;
-			break;
-
-		case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-			if (base != 0x10) return false;
-			add = (*pStr - 'A') + 10;
-			break;
-
-		default:
-			return false;
-		}
-		if ((limitCheck - static_cast<uintmax_t>(result)) < add) return false;
-		result += add;
 	}
 
-	if (negative && (base == 10))
-		outResult = static_cast<I>(-result);
-	else
-		outResult = static_cast<I>(result);
+	if (dst == cleaned) return false; // nothing left after stripping
 
-	return true;
+	const auto [ptr2, ec2] = std::from_chars(cleaned, dst, outResult, base);
+	return ec2 == std::errc() && ptr2 == dst;
 }
 
 
 template <typename I>
-bool strToInt(const std::string& str, I& result, short base, char thSep = ',')
-	/// Converts string to integer number;
-	/// This is a wrapper function, for details see see the
-	/// bool strToInt(const char*, I&, short, char) implementation.
+[[nodiscard]] bool strToInt(const char* pStr, I& outResult, short base, char thSep = ',')
+	/// Converts zero-terminated character array to integer number.
+	/// Skips leading whitespace, then delegates to the range-based overload.
 {
-	return strToInt(str.c_str(), result, base, thSep);
+	if (!pStr) return false;
+	while (std::isspace(static_cast<unsigned char>(*pStr))) ++pStr;
+	return strToInt(pStr, pStr + std::strlen(pStr), outResult, base, thSep);
+}
+
+
+template <typename I>
+[[nodiscard]] bool strToInt(const std::string& str, I& result, short base, char thSep = ',')
+	/// Converts string to integer number.
+	/// Avoids strlen by using the known string length directly.
+{
+	const char* const end = str.data() + str.size();
+	const char* begin = str.data();
+	while (begin < end && std::isspace(static_cast<unsigned char>(*begin))) ++begin;
+	return strToInt(begin, end, result, base, thSep);
 }
 
 
@@ -359,13 +346,38 @@ namespace Impl {
 		const char* _beg;
 		char*       _cur;
 		const char* _end;
-};
+	};
+
+/// Digit-pairs lookup table for the "two-digits-at-a-time" integer-to-string
+/// technique. Instead of extracting one digit per iteration (value / 10),
+/// this approach extracts two digits at once (value / 100) and uses the
+/// remainder (0-99) as an index into this 200-byte table, halving the
+/// number of expensive integer divisions.
+///
+/// The technique is widely used in high-performance formatting libraries
+/// including {fmt}, jemalloc, and Facebook Folly.
+/// See also: https://github.com/miloyip/itoa-benchmark
+inline constexpr char kDigitPairs[201] =
+	"00010203040506070809"
+	"10111213141516171819"
+	"20212223242526272829"
+	"30313233343536373839"
+	"40414243444546474849"
+	"50515253545556575859"
+	"60616263646566676869"
+	"70717273747576777879"
+	"80818283848586878889"
+	"90919293949596979899";
+
+/// Direct digit tables for non-base-10 paths
+inline constexpr char kDigitsUpper[] = "0123456789ABCDEF";
+inline constexpr char kDigitsLower[] = "0123456789abcdef";
 
 } // namespace Impl
 
 
 template <typename T>
-bool intToStr(T value,
+[[nodiscard]] bool intToStr(T value,
 	unsigned short base,
 	char* result,
 	std::size_t& size,
@@ -385,7 +397,7 @@ bool intToStr(T value,
 {
 	if constexpr (std::is_signed_v<T>)
 	{
-		poco_assert_dbg (((value < 0) && (base == 10)) || (value >= 0));
+		poco_assert_dbg(((value < 0) && (base == 10)) || (value >= 0));
 	}
 
 	if (base < 2 || base > 0x10)
@@ -394,61 +406,189 @@ bool intToStr(T value,
 		return false;
 	}
 
-	Impl::Ptr ptr(result, size);
-	int thCount = 0;
-	T tmpVal;
-	do
-	{
-		tmpVal = value;
-		value /= base;
-		*ptr++ = (lowercase ? "fedcba9876543210123456789abcdef" : "FEDCBA9876543210123456789ABCDEF")[15 + (tmpVal - value * base)];
-		if (thSep && (base == 10) && (++thCount == 3))
-		{
-			*ptr++ = thSep;
-			thCount = 0;
-		}
-	} while (value);
+	// size is used as buffer capacity (in) and written length (out).
+	const std::size_t capacity = size;
+	// Guard against buffer overflow in padding loops (phases 3-5).
+	if (width >= static_cast<int>(capacity))
+		throw RangeException();
 
-	if ('0' == fill)
+	// --- Phase 1: extract sign, convert to unsigned ---
+	// This avoids UB for T_MIN (e.g. -2^63) where -value overflows signed.
+	using U = std::make_unsigned_t<T>;
+
+	[[maybe_unused]] bool negative = false;
+	U uval;
+	if constexpr (std::is_signed_v<T>)
 	{
-		if constexpr (std::is_signed_v<T>)
+		if (value < 0)
 		{
-			if (tmpVal < 0) --width;
+			negative = true;
+			// Two-step cast avoids signed overflow UB for T_MIN:
+			// cast to unsigned first, then negate in unsigned arithmetic.
+			uval = static_cast<U>(0) - static_cast<U>(value);
 		}
-		if (prefix && base == 010) --width;
-		if (prefix && base == 0x10) width -= 2;
-		while ((ptr - result) < width) *ptr++ = fill;
+		else
+		{
+			uval = static_cast<U>(value);
+		}
+	}
+	else
+	{
+		uval = value;
 	}
 
-	if (prefix && base == 010) *ptr++ = '0';
+	// --- Phase 2: extract digits backwards into result buffer ---
+	// We write directly into 'result' (backwards), then reverse at the end.
+	char* ptr = result;
+
+	if (base == 10)
+	{
+		// ---- Fast path: base 10, two digits at a time ----
+		// This halves the number of expensive divisions.
+		if (thSep) [[unlikely]]
+		{
+			// With thousand separators: track digit count for separator insertion.
+			int thCount = 0;
+
+			while (uval >= 100)
+			{
+				const U q = uval / 100;
+				const unsigned r = static_cast<unsigned>(uval - q * 100);
+				uval = q;
+
+				// Lower digit (ones place of the pair)
+				*ptr++ = Impl::kDigitPairs[r * 2 + 1];
+				if (++thCount == 3)
+				{
+					*ptr++ = thSep;
+					thCount = 0;
+				}
+
+				// Upper digit (tens place of the pair)
+				*ptr++ = Impl::kDigitPairs[r * 2];
+				if (++thCount == 3 && uval != 0)
+				{
+					*ptr++ = thSep;
+					thCount = 0;
+				}
+			}
+			// Remaining 1 or 2 digits
+			if (uval >= 10)
+			{
+				const unsigned r = static_cast<unsigned>(uval);
+				*ptr++ = Impl::kDigitPairs[r * 2 + 1];
+				if (++thCount == 3)
+				{
+					*ptr++ = thSep;
+					thCount = 0;
+				}
+				*ptr++ = Impl::kDigitPairs[r * 2];
+			}
+			else
+			{
+				*ptr++ = static_cast<char>('0' + uval);
+			}
+		}
+		else
+		{
+			// No thousand separators: pure speed path.
+			while (uval >= 100)
+			{
+				const U q = uval / 100;
+				const unsigned r = static_cast<unsigned>(uval - q * 100);
+				uval = q;
+				*ptr++ = Impl::kDigitPairs[r * 2 + 1];
+				*ptr++ = Impl::kDigitPairs[r * 2];
+			}
+			if (uval >= 10)
+			{
+				const unsigned r = static_cast<unsigned>(uval);
+				*ptr++ = Impl::kDigitPairs[r * 2 + 1];
+				*ptr++ = Impl::kDigitPairs[r * 2];
+			}
+			else
+			{
+				*ptr++ = static_cast<char>('0' + uval);
+			}
+		}
+	}
+	else
+	{
+		// ---- Generic path: base 2..9, 11..16 ----
+		const char* digits = lowercase ? Impl::kDigitsLower : Impl::kDigitsUpper;
+
+		// For power-of-two bases, use shift+mask instead of division.
+		if ((base & (base - 1)) == 0)
+		{
+			unsigned shift;
+			switch (base)
+			{
+				case 2:  shift = 1; break;
+				case 4:  shift = 2; break;
+				case 8:  shift = 3; break;
+				case 16: shift = 4; break;
+				default: poco_bugcheck(); shift = 0; break; // unreachable for valid power-of-2 bases
+			}
+			const U mask = (static_cast<U>(1) << shift) - 1;
+			do
+			{
+				*ptr++ = digits[uval & mask];
+				uval >>= shift;
+			} while (uval);
+		}
+		else [[unlikely]]
+		{
+			// Non-power-of-two: base 3, 5, 6, 7, 9, 11..15
+			do
+			{
+				const U q = uval / base;
+				*ptr++ = digits[uval - q * base];
+				uval = q;
+			} while (uval);
+		}
+	}
+
+	// --- Phase 3: zero-fill padding (inserted backwards, gets reversed) ---
+	if (fill == '0')
+	{
+		int w = width;
+		if (negative) --w;
+		if (prefix && base == 010) --w;
+		if (prefix && base == 0x10) w -= 2;
+		while (static_cast<int>(ptr - result) < w) *ptr++ = '0';
+	}
+
+	// --- Phase 4: prefix and sign (appended backwards, reversed later) ---
+	if (prefix && base == 010)
+	{
+		*ptr++ = '0';
+	}
 	else if (prefix && base == 0x10)
 	{
 		*ptr++ = 'x';
 		*ptr++ = '0';
 	}
 
-	if constexpr (std::is_signed_v<T>)
+	if (negative) *ptr++ = '-';
+
+	// --- Phase 5: non-zero-fill padding ---
+	if (fill != '0')
 	{
-		if (tmpVal < 0) *ptr++ = '-';
+		while (static_cast<int>(ptr - result) < width) *ptr++ = fill;
 	}
 
-	if ('0' != fill)
-	{
-		while ((ptr - result) < width) *ptr++ = fill;
-	}
-
-	size = ptr - result;
-	poco_assert_dbg (size <= ptr.span());
-	poco_assert_dbg ((-1 == width) || (size >= size_t(width)));
+	// --- Phase 6: finalize and reverse ---
+	size = static_cast<std::size_t>(ptr - result);
+	if (size >= capacity)
+		throw RangeException();
 	*ptr-- = '\0';
 
-	char* ptrr = result;
-	char tmp;
-	while(ptrr < ptr)
+	char* lo = result;
+	while (lo < ptr)
 	{
-		tmp    = *ptr;
-		*ptr--  = *ptrr;
-		*ptrr++ = tmp;
+		char tmp = *ptr;
+		*ptr-- = *lo;
+		*lo++ = tmp;
 	}
 
 	return true;
@@ -473,15 +613,14 @@ bool uIntToStr(T value,
 	/// If prefix is true and base is octal or hexadecimal, respective prefix ('0' for octal,
 	/// "0x" for hexadecimal) is prepended. For all other bases, prefix argument is ignored.
 	/// Formatted string has at least [width] total length.
-	///
-	/// This function is deprecated; use intToStr instead.
+	/// @deprecated Use intToStr instead.
 {
 	return intToStr(value, base, result, size, prefix, width, fill, thSep, lowercase);
 }
 
 
 template <typename T>
-bool intToStr (T number,
+[[nodiscard]] bool intToStr(T number,
 	unsigned short base,
 	std::string& result,
 	bool prefix = false,
@@ -494,7 +633,7 @@ bool intToStr (T number,
 {
 	char res[POCO_MAX_INT_STRING_LEN] = {0};
 	std::size_t size = POCO_MAX_INT_STRING_LEN;
-	bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep, lowercase);
+	const bool ret = intToStr(number, base, res, size, prefix, width, fill, thSep, lowercase);
 	result.assign(res, size);
 	return ret;
 }
@@ -502,7 +641,7 @@ bool intToStr (T number,
 
 template <typename T>
 POCO_DEPRECATED("use intToStr instead")
-bool uIntToStr (T number,
+bool uIntToStr(T number,
 	unsigned short base,
 	std::string& result,
 	bool prefix = false,
@@ -512,17 +651,18 @@ bool uIntToStr (T number,
 	bool lowercase = false)
 	/// Converts unsigned integer to string; This is a wrapper function, for details see the
 	/// bool uIntToStr(T, unsigned short, char*, int, int, char, char) implementation.
-	///
-	/// This function is deprecated; use intToStr instead.
+	/// @deprecated Use intToStr instead.
 {
 	return intToStr(number, base, result, prefix, width, fill, thSep, lowercase);
 }
 
 
 //
-// Wrappers for double-conversion library (http://code.google.com/p/double-conversion/).
-//
-// Library is the implementation of the algorithm described in Florian Loitsch's paper:
+// Floating-point to/from string conversions.
+// Uses std::to_chars/from_chars when available (POCO_HAS_FLOAT_CHARCONV),
+// otherwise falls back to the bundled double-conversion library
+// (http://code.google.com/p/double-conversion/), which implements the
+// algorithm described in Florian Loitsch's paper:
 // http://florian.loitsch.com/publications/dtoa-pldi2010.pdf
 //
 
@@ -646,11 +786,6 @@ Foundation_API bool strToDouble(const std::string& str, double& result,
 
 
 } // namespace Poco
-
-
-#ifdef POCO_COMPILER_MSVC
-#pragma warning(pop)
-#endif // POCO_COMPILER_MSVC
 
 
 #endif // Foundation_NumericString_INCLUDED

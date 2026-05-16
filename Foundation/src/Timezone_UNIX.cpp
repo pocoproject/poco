@@ -18,6 +18,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <string>
+#include <sys/stat.h>
 
 
 namespace Poco {
@@ -66,13 +67,44 @@ private:
 	{
 		const char* tz = std::getenv("TZ");
 		_cachedTZ = tz ? tz : "";
+		// /etc/localtime is the system-wide zone source (updated by timedatectl etc.).
+		// Stat'ing it lets us detect zone changes that don't touch the TZ env var; we
+		// don't read its contents — tzset()/libc still resolves the actual zone data.
+		cacheLocaltimeStat();
 	}
 
 	bool tzChanged() const
 	{
 		const char* tz = std::getenv("TZ");
 		std::string currentTZ = tz ? tz : "";
-		return currentTZ != _cachedTZ;
+		if (currentTZ != _cachedTZ) return true;
+		return localtimeStatChanged();
+	}
+
+	void cacheLocaltimeStat()
+	{
+		struct stat st{};
+		if (::stat("/etc/localtime", &st) == 0)
+		{
+			_localtimeIno = st.st_ino;
+			_localtimeMtime = st.st_mtime;
+		}
+		else
+		{
+			_localtimeIno = 0;
+			_localtimeMtime = 0;
+		}
+	}
+
+	bool localtimeStatChanged() const
+	{
+		struct stat st{};
+		if (::stat("/etc/localtime", &st) == 0)
+		{
+			return st.st_ino != _localtimeIno || st.st_mtime != _localtimeMtime;
+		}
+		// /etc/localtime not accessible: treat as changed only if we had it before
+		return _localtimeIno != 0;
 	}
 
 	static int computeTimeZone()
@@ -112,6 +144,8 @@ private:
 	std::mutex _mutex;
 	int _tzOffset;
 	std::string _cachedTZ;
+	ino_t _localtimeIno = 0;
+	time_t _localtimeMtime = 0;
 };
 
 

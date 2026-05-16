@@ -65,19 +65,19 @@ module;
 #include "Poco/Data/TypeHandler.h"
 #endif
 
-export module Poco.Data;
+export module Poco:Data;
 
 #ifdef ENABLE_DATA_MYSQL
-export import :MySQL;
+export import :Data.MySQL;
 #endif
 #ifdef ENABLE_DATA_ODBC
-export import :ODBC;
+export import :Data.ODBC;
 #endif
 #ifdef ENABLE_DATA_POSTGRESQL
-export import :PostgreSQL;
+export import :Data.PostgreSQL;
 #endif
 #ifdef ENABLE_DATA_SQLITE
-export import :SQLite;
+export import :Data.SQLite;
 #endif
 
 export namespace Poco::Data {

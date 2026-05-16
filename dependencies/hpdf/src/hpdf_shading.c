@@ -17,6 +17,7 @@
  */
 
 #include "hpdf.h"
+#include "hpdf_conf.h"
 #include "hpdf_utils.h"
 
 #include "assert.h"
@@ -29,9 +30,10 @@ typedef struct _RGBVertex
   HPDF_UINT8 RGB[3];
 } RGBVertex;
 
-static const char *COL_CMYK = "DeviceCMYK";
 static const char *COL_RGB = "DeviceRGB";
-static const char *COL_GRAY = "DeviceGray";
+// TODO Add shading for these color spaces
+//static const char *COL_CMYK = "DeviceCMYK";
+//static const char *COL_GRAY = "DeviceGray";
 
 /* bbox is filled with xMin, xMax, yMin, yMax */
 static HPDF_BOOL _GetDecodeArrayVertexValues(HPDF_Shading shading,

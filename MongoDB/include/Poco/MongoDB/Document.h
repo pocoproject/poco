@@ -170,11 +170,16 @@ public:
 
 		if (ElementTraits<T>::TypeId == element->type())
 		{
-			const auto* concrete = dynamic_cast<const ConcreteElement<T>* >(element.get());
-			if (concrete != nullptr)
-			{
-				return concrete->value();
-			}
+			// TypeId check already guarantees the runtime type; static_cast
+			// matches Document::getInteger and is ~10x faster than dynamic_cast.
+			// It also avoids a hidden-visibility RTTI mismatch on macOS: when
+			// ConcreteElement<T> is instantiated in one dylib (e.g. addNewArray
+			// creates ConcreteElement<Array::Ptr> inside libPocoMongoDB.dylib)
+			// and Document::get<T> is instantiated in another TU, dyld does not
+			// coalesce the two type_info objects under hidden visibility, so
+			// dynamic_cast returns nullptr and get<T> wrongly throws.
+			const auto* concrete = static_cast<const ConcreteElement<T>*>(element.get());
+			return concrete->value();
 		}
 
 		throw BadCastException("Invalid type mismatch!");
@@ -194,11 +199,10 @@ public:
 
 		if (ElementTraits<T>::TypeId == element->type())
 		{
-			auto* concrete = dynamic_cast<ConcreteElement<T>* >(element.get());
-			if (concrete != nullptr)
-			{
-				return concrete->value();
-			}
+			// See note in get<T>(name) above: TypeId check is the type guard,
+			// static_cast avoids hidden-visibility RTTI mismatches across DSOs.
+			auto* concrete = static_cast<ConcreteElement<T>*>(element.get());
+			return concrete->value();
 		}
 
 		return def;

@@ -195,7 +195,7 @@ void DOMBuilder::startElement(const XMLString& uri, const XMLString& localName, 
 
 	AutoPtr<Element> pElem = _namespaces ? _pDocument->createElementNS(uri, qname.empty() ? localName : qname) : _pDocument->createElement(qname);
 
-	const AttributesImpl& attrs = dynamic_cast<const AttributesImpl&>(attributes);
+	const auto& attrs = static_cast<const AttributesImpl&>(attributes);
 	Attr* pPrevAttr = nullptr;
 	for (const auto& attr: attrs)
 	{
@@ -212,6 +212,7 @@ void DOMBuilder::endElement(const XMLString& uri, const XMLString& localName, co
 	--_depth;
 
 	_pPrevious = _pParent;
+	poco_assert_dbg (_pParent->parentNode() != nullptr);
 	_pParent   = static_cast<AbstractContainerNode*>(_pParent->parentNode());
 }
 

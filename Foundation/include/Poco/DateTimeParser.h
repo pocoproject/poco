@@ -63,6 +63,12 @@ public:
 		/// Throws a SyntaxException if the string cannot be successfully parsed.
 		/// Please see DateTimeFormatter::format() for a description of the format string.
 		/// Class DateTimeFormat defines format strings for various standard date/time formats.
+		///
+		/// Note: The %S specifier parses whole seconds and then silently discards any
+		/// fractional-second suffix of the form '.DDD' or ',DDD' (including a bare decimal
+		/// point that is immediately followed by a non-digit is treated as a parse error).
+		/// Callers that need the fractional digits captured must use %s (millis+micros),
+		/// %i (milliseconds only), %c (centiseconds), or %F (six-digit fractional seconds).
 
 	[[nodiscard]]
 	static DateTime parse(const std::string& fmt, const std::string& str, int& timeZoneDifferential);

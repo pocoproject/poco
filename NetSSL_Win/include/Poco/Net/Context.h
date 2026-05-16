@@ -27,6 +27,7 @@
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include <windows.h>
 #include <wincrypt.h>
+#include <subauth.h>
 #include <schannel.h>
 #ifndef SECURITY_WIN32
 #define SECURITY_WIN32
@@ -237,11 +238,14 @@ protected:
 	void loadCertificate();
 	void importCertificate();
 	void importCertificate(const char* pBuffer, std::size_t size);
-	void acquireSchannelCredentials(CredHandle& credHandle) const;
-	[[nodiscard]]
+	SECURITY_STATUS acquireSchannelCredentials(CredHandle& credHandle) const;
+	SECURITY_STATUS acquireSchannelCredentialsLegacy(CredHandle& credHandle) const;
+  [[nodiscard]]
 	DWORD proto() const;
 	[[nodiscard]]
 	DWORD enabledProtocols() const;
+  [[nodiscard]]
+	DWORD disabledProtocols() const;
 
 private:
 	Context(const Context&);

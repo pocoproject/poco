@@ -30,6 +30,35 @@
 #include <cstring>
 
 
+namespace {
+
+// Helper to construct EVPPKey from RSAKey or ECKey.
+// On OpenSSL 3.0+, uses getEVPPKey() to avoid deprecated template constructor.
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+inline Poco::Crypto::EVPPKey evpPKeyFromKey(const Poco::Crypto::RSAKey& key)
+{
+	return Poco::Crypto::EVPPKey(key.impl()->getEVPPKey());
+}
+
+inline Poco::Crypto::EVPPKey evpPKeyFromKey(const Poco::Crypto::ECKey& key)
+{
+	return Poco::Crypto::EVPPKey(key.impl()->getEVPPKey());
+}
+#else
+inline Poco::Crypto::EVPPKey evpPKeyFromKey(Poco::Crypto::RSAKey& key)
+{
+	return Poco::Crypto::EVPPKey(&key);
+}
+
+inline Poco::Crypto::EVPPKey evpPKeyFromKey(Poco::Crypto::ECKey& key)
+{
+	return Poco::Crypto::EVPPKey(&key);
+}
+#endif
+
+} // namespace
+
+
 using namespace Poco::Crypto;
 using Poco::TemporaryFile;
 using Poco::StreamCopier;
@@ -103,8 +132,8 @@ void EVPTest::testRSAEVPPKey()
 	{
 		std::unique_ptr<RSAKey> key(new RSAKey(RSAKey::KL_1024, RSAKey::EXP_SMALL));
 		assertTrue(key->type() == Poco::Crypto::KeyPair::KT_RSA);
-		// construct EVPPKey from RSAKey*
-		EVPPKey* pKey = new EVPPKey(key.get());
+		// construct EVPPKey from RSAKey
+		EVPPKey* pKey = new EVPPKey(evpPKeyFromKey(*key));
 		// EVPPKey increments reference count, so freeing the original must be ok
 		key.reset();
 
@@ -117,8 +146,8 @@ void EVPTest::testRSAEVPPKey()
 		key.reset(new RSAKey(*pKey));
 		delete pKey;
 		assertTrue(key->type() == Poco::Crypto::KeyPair::KT_RSA);
-		// construct EVPPKey from RSAKey*
-		pKey = new EVPPKey(key.get());
+		// construct EVPPKey from RSAKey
+		pKey = new EVPPKey(evpPKeyFromKey(*key));
 		assertTrue (pKey->type() == EVP_PKEY_RSA);
 
 		BIO* bioPriv1 = BIO_new(BIO_s_mem());
@@ -202,7 +231,7 @@ void EVPTest::testRSAEVPPKey()
 void EVPTest::testRSAEVPSaveLoadStream()
 {
 	RSAKey rsaKey(RSAKey::KL_1024, RSAKey::EXP_SMALL);
-	EVPPKey key(&rsaKey);
+	EVPPKey key(evpPKeyFromKey(rsaKey));
 	std::ostringstream strPub;
 	std::ostringstream strPriv;
 	key.save(&strPub, &strPriv, "testpwd");
@@ -217,7 +246,7 @@ void EVPTest::testRSAEVPSaveLoadStream()
 	assertTrue (key == key2);
 	assertTrue (!(key != key2));
 	RSAKey rsaKeyNE(RSAKey::KL_1024, RSAKey::EXP_LARGE);
-	EVPPKey keyNE(&rsaKeyNE);
+	EVPPKey keyNE(evpPKeyFromKey(rsaKeyNE));
 	assertTrue (key != keyNE);
 	assertTrue (!(key == keyNE));
 	assertTrue (key2 != keyNE);;
@@ -239,7 +268,7 @@ void EVPTest::testRSAEVPSaveLoadStream()
 void EVPTest::testRSAEVPSaveLoadStreamNoPass()
 {
 	RSAKey rsaKey(RSAKey::KL_1024, RSAKey::EXP_SMALL);
-	EVPPKey key(&rsaKey);
+	EVPPKey key(evpPKeyFromKey(rsaKey));
 	std::ostringstream strPub;
 	std::ostringstream strPriv;
 	key.save(&strPub, &strPriv);
@@ -254,7 +283,7 @@ void EVPTest::testRSAEVPSaveLoadStreamNoPass()
 	assertTrue (key == key2);
 	assertTrue (!(key != key2));
 	RSAKey rsaKeyNE(RSAKey::KL_1024, RSAKey::EXP_LARGE);
-	EVPPKey keyNE(&rsaKeyNE);
+	EVPPKey keyNE(evpPKeyFromKey(rsaKeyNE));
 	assertTrue (key != keyNE);
 	assertTrue (!(key == keyNE));
 	assertTrue (key2 != keyNE);;
@@ -390,7 +419,7 @@ void EVPTest::testECEVPSaveLoadStream()
 			assertTrue (key == key2);
 			assertTrue (!(key != key2));
 			ECKey ecKeyNE(curveName);
-			EVPPKey keyNE(&ecKeyNE);
+			EVPPKey keyNE(evpPKeyFromKey(ecKeyNE));
 			assertTrue (key != keyNE);
 			assertTrue (!(key == keyNE));
 			assertTrue (key2 != keyNE);
@@ -445,7 +474,7 @@ void EVPTest::testECEVPSaveLoadStreamNoPass()
 			assertTrue (key == key2);
 			assertTrue (!(key != key2));
 			ECKey ecKeyNE(curveName);
-			EVPPKey keyNE(&ecKeyNE);
+			EVPPKey keyNE(evpPKeyFromKey(ecKeyNE));
 			assertTrue (key != keyNE);
 			assertTrue (!(key == keyNE));
 			assertTrue (key2 != keyNE);
@@ -502,7 +531,7 @@ void EVPTest::testECEVPSaveLoadFile()
 			assertTrue (key == key2);
 			assertTrue (!(key != key2));
 			ECKey ecKeyNE(curveName);
-			EVPPKey keyNE(&ecKeyNE);
+			EVPPKey keyNE(evpPKeyFromKey(ecKeyNE));
 			assertTrue (key != keyNE);
 			assertTrue (!(key == keyNE));
 			assertTrue (key2 != keyNE);
@@ -650,8 +679,6 @@ void EVPTest::testRSAEVPKeyFromPKCS12()
 }
 
 
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
-
 void EVPTest::testRSAEVPKeyByLength()
 {
 	try
@@ -691,7 +718,7 @@ void EVPTest::testRSAEVPKeyByLength()
 	}
 }
 
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
 void EVPTest::testECEVPKeyByLength()
 {
@@ -765,8 +792,7 @@ void EVPTest::testEVPKeyByModulus()
 	}
 }
 
-#endif // OPENSSL_VERSION_NUMBER >= 0x30000000
-#endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
+#endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
 
 void EVPTest::setUp()
@@ -794,13 +820,11 @@ CppUnit::Test* EVPTest::suite()
 	CppUnit_addTest(pSuite, EVPTest, testECEVPLoadKeyWrongPassword);
 	CppUnit_addTest(pSuite, EVPTest, testRSAEVPKeyFromX509);
 	CppUnit_addTest(pSuite, EVPTest, testRSAEVPKeyFromPKCS12);
-#if OPENSSL_VERSION_NUMBER >= 0x10000000L
 	CppUnit_addTest(pSuite, EVPTest, testRSAEVPKeyByLength);
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	CppUnit_addTest(pSuite, EVPTest, testECEVPKeyByLength);
 	CppUnit_addTest(pSuite, EVPTest, testEVPKeyByModulus);
-#endif // OPENSSL_VERSION_NUMBER >= 0x30000000
-#endif // OPENSSL_VERSION_NUMBER >= 0x10000000L
+#endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
 	return pSuite;
 }

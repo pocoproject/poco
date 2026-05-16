@@ -75,7 +75,7 @@ public:
     QUILL_CATCH_ALL()
     {
       _backend_worker->_options.error_notifier(std::string{"Caught unhandled exception."});
-    } // clang-format on
+    }
 #endif
   }
 

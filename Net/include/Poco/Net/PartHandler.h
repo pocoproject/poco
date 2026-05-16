@@ -48,16 +48,15 @@ public:
 		///
 		/// The content of the part can be read from stream.
 
+	PartHandler(const PartHandler&) = delete;
+	PartHandler& operator = (const PartHandler&) = delete;
+
 protected:
 	PartHandler();
 		/// Creates the PartHandler.
 
 	virtual ~PartHandler();
 		/// Destroys the PartHandler.
-
-private:
-	PartHandler(const PartHandler&);
-	PartHandler& operator = (const PartHandler&);
 };
 
 

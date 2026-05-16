@@ -51,7 +51,7 @@ public:
 	[[nodiscard]]
 	bool validateObject(Redis::Client::Ptr pObject)
 	{
-		return true;
+		return pObject->isConnected();
 	}
 
 	void activateObject(Redis::Client::Ptr pObject)

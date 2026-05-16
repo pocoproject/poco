@@ -1,4 +1,8 @@
-add_subdirectory(zlib)
+# zlib may already have been added early at the top level to provide a global
+# ZLIB::ZLIB for FindOpenSSL's transitive find_dependency(ZLIB).
+if(NOT TARGET ZLIB::ZLIB)
+	add_subdirectory(zlib)
+endif()
 add_subdirectory(pcre2)
 add_subdirectory(v8_double_conversion)
 add_subdirectory(utf8proc)

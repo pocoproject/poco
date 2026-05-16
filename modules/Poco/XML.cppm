@@ -88,7 +88,7 @@ module;
 #include "Poco/XML/XMLWriter.h"
 #endif
 
-export module Poco.XML;
+export module Poco:XML;
 
 export namespace Poco::XML {
 	#ifdef ENABLE_XML

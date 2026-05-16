@@ -124,6 +124,36 @@ public:
 		return 0;
 	}
 
+	std::streamsize xsgetn(char_type* buffer, std::streamsize length) override
+		/// Bulk read override. The default streambuf::xsgetn calls
+		/// sbumpc() per byte; this override copies directly from the
+		/// internal buffer and refills via readFromDevice() as needed.
+	{
+		if (!(_mode & IOS::in)) return 0;
+
+		std::streamsize total = 0;
+		while (length > 0)
+		{
+			// First try to use data already in the buffer
+			std::streamsize avail = this->egptr() - this->gptr();
+			if (avail > 0)
+			{
+				std::streamsize toCopy = (avail < length) ? avail : length;
+				char_traits::copy(buffer, this->gptr(), toCopy);
+				this->setg(this->eback(), this->gptr() + toCopy, this->egptr());
+				buffer += toCopy;
+				length -= toCopy;
+				total += toCopy;
+				continue;
+			}
+			// Buffer empty -- trigger underflow to refill
+			if (char_traits::eq_int_type(underflow(), char_traits::eof()))
+				break;
+			// underflow filled the buffer; loop back to copy from it
+		}
+		return total;
+	}
+
 protected:
 	void setMode(openmode mode)
 	{

@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -118,3 +119,12 @@ QUILL_NODISCARD std::string to_hex(T const* buffer, size_t size, bool uppercase 
 } // namespace utility
 
 QUILL_END_NAMESPACE
+
+#ifndef QUILL_DEFINE_SEQUENTIAL_THREAD_ID
+  #if defined(QUILL_USE_SEQUENTIAL_THREAD_ID)
+    #define QUILL_DEFINE_SEQUENTIAL_THREAD_ID                                                      \
+      std::atomic<uint32_t> quill::detail::g_next_thread_id{0};
+  #else
+    #define QUILL_DEFINE_SEQUENTIAL_THREAD_ID
+  #endif
+#endif

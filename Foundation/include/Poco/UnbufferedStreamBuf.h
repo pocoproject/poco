@@ -78,7 +78,7 @@ public:
 		}
 		else
 		{
-			int_type c = readFromDevice();
+			const int_type c = readFromDevice();
 			if (c != char_traits::eof())
 			{
 				_ispb = true;
@@ -98,7 +98,7 @@ public:
 		}
 		else
 		{
-			int_type c = readFromDevice();
+			const int_type c = readFromDevice();
 			if (c != char_traits::eof())
 			{
 				_pb = c;
@@ -132,7 +132,7 @@ public:
 		std::streamsize copied = 0;
 		while (count > 0)
 		{
-			int_type c = uflow();
+			const int_type c = uflow();
 			if (c == char_traits::eof()) break;
 			*p++ = char_traits::to_char_type(c);
 			++copied;

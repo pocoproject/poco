@@ -57,7 +57,7 @@ void HTTPSessionInstantiator::unregisterInstantiator()
 }
 
 
-void HTTPSessionInstantiator::setProxyConfig(const HTTPClientSession::ProxyConfig& proxyConfig)
+void HTTPSessionInstantiator::setProxyConfig(const ProxyConfig& proxyConfig)
 {
 	_proxyConfig = proxyConfig;
 }

@@ -36,20 +36,16 @@ let
   oraclePassword = "poco";
   oraclePort = "1521";
   instantClientVersion = "23_26";
-  instantClientFullVersion = "23.26.0.0.0";
-  instantClientPathVersion = "2326000";
+  instantClientFullVersion = "23.26.1.0.0";
+  instantClientPathVersion = "2326100";
 
-  # SHA256 checksums for Oracle Instant Client packages
-  # To update: download the files manually and run `sha256sum <filename>`
-  # Or run with placeholders first - the script will compute and print the actual hashes.
-  #
-  # x64 checksums for version 23.26.0.0.0:
-  # (Set to "placeholder-update-after-first-download" to compute on first run)
-  instantClientBasicSha256_x64 = "placeholder-update-after-first-download";
-  instantClientOdbcSha256_x64 = "placeholder-update-after-first-download";
-  # ARM64 uses "latest" URLs without version numbers - hashes may change when Oracle updates
-  instantClientBasicSha256_arm64 = "9c9a32051e97f087016fb334b7ad5c0aea8511ca8363afd8e0dc6ec4fc515c32";
-  instantClientOdbcSha256_arm64 = "11b2d0d53b15145a79b00837bbd6556314486f28e734ba909695c6f051c5d279";
+  # SHA256 checksums for Oracle Instant Client packages.
+  # To update: run with placeholders first — the script will compute and print
+  # the actual hashes, then paste them back here.
+  instantClientBasicSha256_x64 = "d6715e404a35b3a538280b78df6f7ee59da83a9d36b596218fd264051db977f3";
+  instantClientOdbcSha256_x64 = "7bc45a01648dbc8d10400055eedeeb3b9f159f6ea39f07ba22c6b14a93c066d3";
+  instantClientBasicSha256_arm64 = "1acbebf8b7e708171fefc6612a6a668455e7e89ec7565a2a723a6cf754060af2";
+  instantClientOdbcSha256_arm64 = "7d1a38ea168ae48553f98fe40b3bcfd2118223d9bffd14ca1dc179fc67f3d84a";
 in
 pkgs.mkShell {
   buildInputs = with pkgs; [
@@ -162,8 +158,51 @@ pkgs.mkShell {
 POLICYJSON
     fi
 
-    # Download Oracle Instant Client if not present
-    if [ ! -d "$INSTANT_CLIENT_DIR" ]; then
+    # Avoid podman's default systemd integration on hosts where the host's
+    # systemd-run is unusable from inside the Nix shell:
+    #   * GitHub Actions runners: host /usr/bin/systemd-run inherits the
+    #     Nix LD_LIBRARY_PATH and dies on a missing GLIBC_ABI_DT_X86_64_PLT
+    #     symbol when loading Nix's libdl.so.2 against host glibc.
+    #   * Headless dev VMs (no logind session): "systemctl --user" calls
+    #     prompt for polkit auth and fail with "Interactive authentication
+    #     required".
+    # cgroup_manager = "cgroupfs" tells podman to write cgroups directly
+    # instead of going through systemd-run; events_logger = "file" avoids
+    # journald (also a systemd dependency).
+    cat > "$HOME/.config/containers/containers.conf" << 'CONTAINERSCONF'
+[engine]
+cgroup_manager = "cgroupfs"
+events_logger = "file"
+CONTAINERSCONF
+
+    # Healthcheck timer registration is a separate code path in podman that
+    # always invokes systemd-run, independent of cgroup_manager and not
+    # reliably suppressed by --no-healthcheck or --health-cmd=none in 5.8.x.
+    # DISABLE_HC_SYSTEMD=true is podman's escape hatch that skips
+    # createTimer entirely. The Oracle image ships a HEALTHCHECK we do not
+    # need; readiness is polled below via sqlplus.
+    export DISABLE_HC_SYSTEMD=true
+
+    # Download Oracle Instant Client if not present.
+    # Test for the actual driver library, not just the directory: a previous
+    # broken run may have left a stale dir or self-referential symlink without
+    # the real files, and skipping re-download would yield an invalid
+    # odbcinst.ini with an empty Driver= line.
+    instant_client_ok=0
+    if [ -d "$INSTANT_CLIENT_DIR" ] && \
+       find "$INSTANT_CLIENT_DIR/" -maxdepth 1 -name 'libsqora.so*' 2>/dev/null | grep -q .; then
+      instant_client_ok=1
+    fi
+    if [ "$instant_client_ok" -eq 0 ]; then
+      # Remove any stale $INSTANT_CLIENT_DIR (symlink or empty dir) so the
+      # extract path below can place the freshly extracted contents there.
+      if [ -L "$INSTANT_CLIENT_DIR" ]; then
+        echo "Removing stale symlink: $INSTANT_CLIENT_DIR -> $(readlink "$INSTANT_CLIENT_DIR")"
+        rm -f "$INSTANT_CLIENT_DIR"
+      elif [ -d "$INSTANT_CLIENT_DIR" ]; then
+        echo "Removing incomplete directory: $INSTANT_CLIENT_DIR"
+        rm -rf "$INSTANT_CLIENT_DIR"
+      fi
       (
         set -e  # Exit subshell on any error
         echo "Downloading Oracle Instant Client..."
@@ -181,11 +220,13 @@ POLICYJSON
           EXPECTED_BASIC_SHA256="${instantClientBasicSha256_x64}"
           EXPECTED_ODBC_SHA256="${instantClientOdbcSha256_x64}"
         elif [ "$ARCH" = "aarch64" ]; then
-          # ARM64 uses simplified URLs without version numbers
-          BASIC_URL="https://download.oracle.com/otn_software/linux/instantclient/instantclient-basic-linux-arm64.zip"
-          ODBC_URL="https://download.oracle.com/otn_software/linux/instantclient/instantclient-odbc-linux-arm64.zip"
-          BASIC_ZIP="instantclient-basic-linux-arm64.zip"
-          ODBC_ZIP="instantclient-odbc-linux-arm64.zip"
+          # ARM64 follows the same versioned URL pattern as x86_64, with
+          # "arm64" in place of "x64". Oracle removed the unversioned
+          # "instantclient-basic-linux-arm64.zip" alias used previously.
+          BASIC_URL="https://download.oracle.com/otn_software/linux/instantclient/${instantClientPathVersion}/instantclient-basic-linux.arm64-${instantClientFullVersion}.zip"
+          ODBC_URL="https://download.oracle.com/otn_software/linux/instantclient/${instantClientPathVersion}/instantclient-odbc-linux.arm64-${instantClientFullVersion}.zip"
+          BASIC_ZIP="instantclient-basic-linux.arm64-${instantClientFullVersion}.zip"
+          ODBC_ZIP="instantclient-odbc-linux.arm64-${instantClientFullVersion}.zip"
           EXPECTED_BASIC_SHA256="${instantClientBasicSha256_arm64}"
           EXPECTED_ODBC_SHA256="${instantClientOdbcSha256_arm64}"
         else
@@ -291,8 +332,11 @@ POLICYJSON
         fi
       fi
 
-      # Find the actual extracted directory (version may differ)
-      EXTRACTED_DIR=$(ls -d "$DATA_DIR"/instantclient_* 2>/dev/null | head -1)
+      # Find the actual extracted directory (version may differ, e.g. on ARM64
+      # the "latest" zip may extract to a different instantclient_X_Y dir).
+      # Use `find` rather than `ls`+glob: with shopt -s nullglob (which some
+      # user shells enable) an unmatched glob makes ls list CWD instead.
+      EXTRACTED_DIR=$(find "$DATA_DIR" -maxdepth 1 -type d -name 'instantclient_*' 2>/dev/null | sort | head -1)
       if [ -n "$EXTRACTED_DIR" ] && [ "$EXTRACTED_DIR" != "$INSTANT_CLIENT_DIR" ]; then
         echo "Linking $EXTRACTED_DIR to $INSTANT_CLIENT_DIR"
         ln -sfn "$(basename "$EXTRACTED_DIR")" "$INSTANT_CLIENT_DIR"
@@ -307,15 +351,26 @@ POLICYJSON
     # Add Oracle Instant Client and ODBC dependencies to library path
     export LD_LIBRARY_PATH="$INSTANT_CLIENT_DIR:${pkgs.libaio}/lib:${pkgs.openssl.out}/lib:${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.unixODBC}/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
-    # Find the ODBC driver library
+    # Find the ODBC driver library.
+    # Use `find` rather than `ls`+glob: with shopt -s nullglob (which some user
+    # shells enable) an unmatched glob makes ls list the current directory and
+    # silently inject a bogus value (e.g. the first entry in $PWD) into
+    # $ODBC_DRIVER_LIB. The symptom is a Driver= line in odbcinst.ini pointing
+    # at something like "ActiveRecord" instead of libsqora.so.*.
     echo "Looking for Oracle ODBC driver in: $INSTANT_CLIENT_DIR"
-    ls -la "$INSTANT_CLIENT_DIR"/libsqora* 2>/dev/null || echo "No libsqora files found"
-    ODBC_DRIVER_LIB=$(ls "$INSTANT_CLIENT_DIR"/libsqora.so* 2>/dev/null | head -1)
+    ODBC_DRIVER_LIB=""
+    if [ -d "$INSTANT_CLIENT_DIR" ]; then
+      ODBC_DRIVER_LIB=$(find "$INSTANT_CLIENT_DIR/" -maxdepth 1 -name 'libsqora.so*' 2>/dev/null | sort | head -1)
+    fi
     if [ -z "$ODBC_DRIVER_LIB" ]; then
-      echo "WARNING: Oracle ODBC driver library not found in $INSTANT_CLIENT_DIR"
+      echo "ERROR: Oracle ODBC driver library (libsqora.so*) not found in $INSTANT_CLIENT_DIR"
       echo "Contents of $INSTANT_CLIENT_DIR:"
       ls -la "$INSTANT_CLIENT_DIR/" 2>/dev/null || echo "(failed to list directory)"
-      echo "No Oracle ODBC driver will be configured; odbcinst.ini may be invalid."
+      echo "Contents of $DATA_DIR:"
+      ls -la "$DATA_DIR/" 2>/dev/null || true
+      echo "Tip: remove $DATA_DIR and re-enter the nix-shell to re-download:"
+      echo "  rm -rf $DATA_DIR"
+      echo "No Oracle ODBC driver will be configured; odbcinst.ini will be invalid."
     else
       echo "Using ODBC driver library: $ODBC_DRIVER_LIB"
     fi
@@ -363,12 +418,18 @@ EOF
         # Check if we need to create a new container
         if ! podman ps --format '{{.Names}}' | grep -q "^${containerName}$"; then
           echo "Creating and starting Oracle container (this may take a while on first run)..."
-          # Oracle requires at least 1GB of shared memory
+          # Oracle requires at least 1GB of shared memory.
+          # --network=host avoids rootless podman's user-mode networking
+          # helper (pasta), which fails on some kernels with "Failed to get
+          # netlink socket". Oracle binds to 0.0.0.0:1521 on the host and
+          # the test connects via 127.0.0.1:1521, so port mapping is not
+          # needed. Healthcheck systemd-timer issues are handled by switching
+          # podman to the cgroupfs manager in containers.conf above.
           if ! podman run -d --replace \
             --name "$CONTAINER_NAME" \
             --shm-size=1g \
+            --network=host \
             -e "ORACLE_PWD=$ORACLE_PASSWORD" \
-            -p "$ORACLE_PORT:1521" \
             container-registry.oracle.com/database/free:23.5.0.0-lite; then
             echo "ERROR: Failed to create Oracle container"
             echo "Container logs:"
@@ -520,8 +581,14 @@ EOSQL'
       ls -la /etc/odbc.ini 2>/dev/null || echo "/etc/odbc.ini not found"
       echo ""
       echo "--- Verifying driver library exists ---"
-      ls -la "$INSTANT_CLIENT_DIR"/libsqora* 2>/dev/null || echo "No libsqora files found"
-      ldd "$INSTANT_CLIENT_DIR"/libsqora.so* 2>&1 | head -20 || echo "(ldd failed)"
+      _libsqora_files=$(find "$INSTANT_CLIENT_DIR/" -maxdepth 1 -name 'libsqora*' 2>/dev/null | sort)
+      if [ -n "$_libsqora_files" ]; then
+        echo "$_libsqora_files" | while IFS= read -r f; do ls -la "$f"; done
+        _first_so=$(echo "$_libsqora_files" | grep -E '/libsqora\.so(\.|$)' | head -1)
+        [ -n "$_first_so" ] && (ldd "$_first_so" 2>&1 | head -20 || echo "(ldd failed)")
+      else
+        echo "No libsqora files found"
+      fi
       echo "================================"
       echo ""
 

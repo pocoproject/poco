@@ -47,7 +47,7 @@ protected:
 	[[nodiscard]]
 	std::string translateKey(const std::string& key) const;
 
-	~AbstractConfigurationView() = default;
+	~AbstractConfigurationView();
 
 	[[nodiscard]]
 	const AbstractConfiguration::Ptr& pConfig() const { return _pConfig; }
@@ -89,7 +89,7 @@ public:
 		/// Creates the ConfigurationView. The ConfigurationView
 		/// retains (shared) ownership of the passed configuration.
 
-	~ConfigurationView() = default;
+	~ConfigurationView();
 
 protected:
 	[[nodiscard]]

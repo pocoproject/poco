@@ -94,7 +94,7 @@ public:
 		/// Suspends all events until resumeEvents() is called.
 
 	void resumeEvents();
-		/// Resumes all events suspended with suspendEvent();
+		/// Resumes all events suspended with suspendEvent()
 
 	[[nodiscard]]
 	bool eventsSuspended() const;

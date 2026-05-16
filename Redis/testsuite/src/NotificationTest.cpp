@@ -51,7 +51,10 @@ void NotificationTest::testRedisNotifications()
 		Exception ex("Test error");
 		RedisErrorNotification errorNotif(ex);
 		assertTrue (errorNotif.name().length() > 0);
-		assertTrue (errorNotif.error().message() == "Test error");
+		// Use substring match: when POCO_ENABLE_TRACE is defined, the Exception
+		// constructor appends a stack trace to _msg, so a strict equality
+		// check would fail.
+		assertTrue (errorNotif.error().message().find("Test error") != std::string::npos);
 		assertTrue (errorNotif.message().find("Test error") != std::string::npos);
 	}
 

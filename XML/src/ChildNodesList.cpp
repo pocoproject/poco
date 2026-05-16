@@ -62,7 +62,9 @@ unsigned long ChildNodesList::length() const
 
 void ChildNodesList::autoRelease()
 {
-	_pParent->ownerDocument()->autoReleasePool().add(this);
+	auto* pOwner = _pParent->ownerDocument();
+	if (pOwner != nullptr)
+		pOwner->autoReleasePool().add(this);
 }
 
 

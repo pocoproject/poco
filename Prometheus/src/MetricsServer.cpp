@@ -92,6 +92,9 @@ MetricsServer::MetricsServer(const Registry& registry, Poco::Net::ServerSocket& 
 }
 
 
+MetricsServer::~MetricsServer() = default;
+
+
 void MetricsServer::start()
 {
 	_httpServer.start();

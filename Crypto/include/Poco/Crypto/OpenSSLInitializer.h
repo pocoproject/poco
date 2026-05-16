@@ -21,7 +21,7 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/AtomicCounter.h"
 #include <openssl/crypto.h>
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 #include <openssl/provider.h>
 #include <atomic>
 #endif
@@ -63,7 +63,7 @@ public:
 private:
 	static Poco::AtomicCounter _rc;
 
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	static OSSL_PROVIDER* _defaultProvider;
 	static OSSL_PROVIDER* _legacyProvider;
 #endif
@@ -97,7 +97,7 @@ inline void OpenSSLInitializer::enableFIPSMode(bool /*enabled*/)
 
 inline bool OpenSSLInitializer::haveLegacyProvider()
 {
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	return _legacyProvider != nullptr;
 #else
 	return false;

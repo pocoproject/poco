@@ -1587,9 +1587,11 @@ public:
 	{
 		if (!args.message().isNull())
 		{
-			Type<Array>* arrayType = dynamic_cast<Type<Array>*>(args.message().get());
-			if (arrayType != nullptr)
+			// Use TypeId check + static_cast (not dynamic_cast) to avoid
+			// hidden-visibility RTTI mismatch across DSOs on macOS.
+			if (args.message()->type() == RedisTypeTraits<Array>::TypeId)
 			{
+				auto* arrayType = static_cast<Type<Array>*>(args.message().get());
 				Array& array = arrayType->value();
 				if (array.size() == 3)
 				{
@@ -2908,6 +2910,12 @@ void RedisTest::testRPUSH()
 
 void RedisTest::testPool()
 {
+	if (!_connected)
+	{
+		std::cout << "Not connected, test skipped." << std::endl;
+		return;
+	}
+
 	Poco::Net::SocketAddress sa(_host, _port);
 	Poco::PoolableObjectFactory<Client, Client::Ptr> factory(sa);
 	Poco::ObjectPool<Client, Client::Ptr> pool(factory, 10, 15);

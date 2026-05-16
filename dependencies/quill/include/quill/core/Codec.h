@@ -99,6 +99,9 @@ QUILL_NODISCARD inline size_t safe_strnlen(char const* str, size_t maxlen) noexc
   #if __GNUC__ >= 13
     #pragma GCC diagnostic ignored "-Wstringop-overread"
   #endif
+
+  // Suppress during LTO analysis
+  asm volatile("" : "+r"(maxlen) : : "memory");
 #endif
 
   auto end = static_cast<char const*>(std::memchr(str, '\0', maxlen));

@@ -15,6 +15,7 @@
 #include "IntGaugeTest.h"
 #include "CallbackMetricTest.h"
 #include "HistogramTest.h"
+#include "ProcessCollectorTest.h"
 
 
 CppUnit::Test* PrometheusTestSuite::suite()
@@ -27,6 +28,7 @@ CppUnit::Test* PrometheusTestSuite::suite()
 	pSuite->addTest(IntGaugeTest::suite());
 	pSuite->addTest(CallbackMetricTest::suite());
 	pSuite->addTest(HistogramTest::suite());
+	pSuite->addTest(ProcessCollectorTest::suite());
 
 	return pSuite;
 }

@@ -398,15 +398,27 @@ private:
   std::shared_ptr<ThreadContext> _thread_context;
 };
 
+/**
+ * Non-template implementation that owns the thread local context. This ensures that when building
+ * with shared libraries, the thread-local context is shared accross all shared libraries
+ */
+QUILL_NODISCARD QUILL_ATTRIBUTE_HOT QUILL_EXPORT inline ThreadContext* get_scoped_thread_context_impl(
+  QueueType queue_type, size_t initial_queue_capacity, size_t unbounded_queue_max_capacity,
+  HugePagesPolicy huge_pages_policy) noexcept
+{
+  thread_local ScopedThreadContext scoped_thread_context{
+    queue_type, initial_queue_capacity, unbounded_queue_max_capacity, huge_pages_policy};
+  
+  return scoped_thread_context.get_thread_context();
+}
+
 /***/
 template <typename TFrontendOptions>
 QUILL_NODISCARD QUILL_ATTRIBUTE_HOT ThreadContext* get_local_thread_context() noexcept
 {
-  thread_local ScopedThreadContext scoped_thread_context{
+  return get_scoped_thread_context_impl(
     TFrontendOptions::queue_type, TFrontendOptions::initial_queue_capacity,
-    TFrontendOptions::unbounded_queue_max_capacity, TFrontendOptions::huge_pages_policy};
-
-  return scoped_thread_context.get_thread_context();
+    TFrontendOptions::unbounded_queue_max_capacity, TFrontendOptions::huge_pages_policy);
 }
 
 #if defined(_WIN32) && defined(_MSC_VER) && !defined(__GNUC__)

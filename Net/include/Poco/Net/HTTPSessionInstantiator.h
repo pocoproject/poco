@@ -52,15 +52,15 @@ public:
 		/// Unregisters the factory with the global HTTPSessionFactory.
 
 protected:
-	void setProxyConfig(const HTTPClientSession::ProxyConfig& proxyConfig);
+	void setProxyConfig(const ProxyConfig& proxyConfig);
 		/// Sets the proxy configuration.
 
-	[[nodiscard]]
-	const HTTPClientSession::ProxyConfig& getProxyConfig() const;
+  [[nodiscard]]
+	const ProxyConfig& getProxyConfig() const;
 		/// Returns the proxy configuration.
 
 private:
-	HTTPClientSession::ProxyConfig _proxyConfig;
+	ProxyConfig _proxyConfig;
 
 	friend class HTTPSessionFactory;
 };
@@ -69,7 +69,7 @@ private:
 //
 // inlines
 //
-inline const HTTPClientSession::ProxyConfig& HTTPSessionInstantiator::getProxyConfig() const
+inline const ProxyConfig& HTTPSessionInstantiator::getProxyConfig() const
 {
 	return _proxyConfig;
 }

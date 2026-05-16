@@ -43,6 +43,7 @@ public:
 	Handle readHandle() const;
 	[[nodiscard]]
 	Handle writeHandle() const;
+	void close();
 	void closeRead();
 	void closeWrite();
 

@@ -12,6 +12,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/DateTimeParser.h"
+#include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/DateTime.h"
 #include "Poco/Timestamp.h"
@@ -20,6 +21,7 @@
 
 using Poco::DateTime;
 using Poco::DateTimeFormat;
+using Poco::DateTimeFormatter;
 using Poco::DateTimeParser;
 using Poco::Timestamp;
 using Poco::SyntaxException;
@@ -638,6 +640,67 @@ void DateTimeParserTest::testCustom()
 }
 
 
+void DateTimeParserTest::testISO8601FracSeconds()
+{
+	// ISO8601_FORMAT uses %S which silently discards a well-formed fractional-second
+	// suffix so that the trailing %z can still reach the timezone designator.
+	int tzd;
+
+	// Dot-separated fractional seconds with negative timezone offset
+	DateTime dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FORMAT, "2013-10-07T08:23:19.120-04:00", tzd);
+	assertTrue (dt.year()   == 2013);
+	assertTrue (dt.month()  == 10);
+	assertTrue (dt.day()    == 7);
+	assertTrue (dt.hour()   == 8);
+	assertTrue (dt.minute() == 23);
+	assertTrue (dt.second() == 19);
+	assertTrue (tzd == -4*3600);
+
+	// Comma-separated fractional seconds (ISO 8601 allows ',' as the decimal sign)
+	dt = DateTimeParser::parse(DateTimeFormat::ISO8601_FORMAT, "2013-10-07T08:23:19,120-04:00", tzd);
+	assertTrue (dt.year()   == 2013);
+	assertTrue (dt.month()  == 10);
+	assertTrue (dt.day()    == 7);
+	assertTrue (dt.hour()   == 8);
+	assertTrue (dt.minute() == 23);
+	assertTrue (dt.second() == 19);
+	assertTrue (tzd == -4*3600);
+
+	// A bare decimal point not followed by any digit must be rejected
+	testBad(DateTimeFormat::ISO8601_FORMAT, "2013-10-07T08:23:19.-04:00", tzd);
+}
+
+
+void DateTimeParserTest::testFractionalSpecifiers()
+{
+	// %c is now a two-digit centisecond (millisecond / 10) rather than a
+	// single-digit decisecond (millisecond / 100). Round-trip every value
+	// against DateTimeFormatter to ensure parser and formatter agree --
+	// see issue #3949.
+	int tzd = 0;
+
+	// Parse "00" -> 0 ms, "25" -> 250 ms, "99" -> 990 ms.
+	DateTime dt = DateTimeParser::parse("%H:%M:%S.%c", "12:30:00.00", tzd);
+	assertTrue (dt.millisecond() == 0);
+
+	dt = DateTimeParser::parse("%H:%M:%S.%c", "12:30:00.25", tzd);
+	assertTrue (dt.millisecond() == 250);
+
+	dt = DateTimeParser::parse("%H:%M:%S.%c", "12:30:00.99", tzd);
+	assertTrue (dt.millisecond() == 990);
+
+	// Format-then-parse round trip.
+	DateTime original(2005, 1, 8, 12, 30, 0, 250);
+	std::string formatted = DateTimeFormatter::format(original, "%H:%M:%S.%c");
+	assertTrue (formatted == "12:30:00.25");
+	dt = DateTimeParser::parse("%H:%M:%S.%c", formatted, tzd);
+	assertTrue (dt.hour() == 12);
+	assertTrue (dt.minute() == 30);
+	assertTrue (dt.second() == 0);
+	assertTrue (dt.millisecond() == 250);
+}
+
+
 void DateTimeParserTest::testGuess()
 {
 	int tzd;
@@ -917,6 +980,8 @@ CppUnit::Test* DateTimeParserTest::suite()
 	CppUnit_addTest(pSuite, DateTimeParserTest, testASCTIME);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testSORTABLE);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testCustom);
+	CppUnit_addTest(pSuite, DateTimeParserTest, testISO8601FracSeconds);
+	CppUnit_addTest(pSuite, DateTimeParserTest, testFractionalSpecifiers);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testGuess);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testCleanup);
 	CppUnit_addTest(pSuite, DateTimeParserTest, testParseMonth);

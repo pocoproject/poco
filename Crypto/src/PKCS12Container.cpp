@@ -162,7 +162,7 @@ void PKCS12Container::load(PKCS12* pPKCS12, const std::string& password)
 				int certCount = sk_X509_num(pCA);
 				for (int i = 0; i < certCount; ++i)
 				{
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 					X509* pX509 = sk_X509_value(pCA, i);
 #else
 					// Cert order is reversed on OpenSSL < 3.

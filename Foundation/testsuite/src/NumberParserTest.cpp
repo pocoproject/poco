@@ -14,7 +14,6 @@
 #include "Poco/Exception.h"
 #include "Poco/Types.h"
 #include "Poco/Format.h"
-#include "Poco/NumericString.h"
 #include "Poco/MemoryStream.h"
 #include "Poco/Stopwatch.h"
 #include <iostream>
@@ -232,12 +231,12 @@ void NumberParserTest::testParseError()
 		failmsg("must throw SyntaxException");
 	} catch ([[maybe_unused]] SyntaxException& e) { }
 
-	try
+	// Leading whitespace is accepted (stripped before parsing)
 	{
-		[[maybe_unused]] int i = NumberParser::parse(" 123");
-		[[maybe_unused]] bool b = NumberParser::parseBool("");
-		failmsg("must throw SyntaxException");
-	} catch ([[maybe_unused]] SyntaxException& e) { }
+		int ws = 0;
+		assertTrue(NumberParser::tryParse(" 123", ws));
+		assertEqual(123, ws);
+	}
 
 	try
 	{

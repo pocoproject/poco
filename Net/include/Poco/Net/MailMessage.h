@@ -242,7 +242,7 @@ public:
 	void write(std::ostream& ostr) const;
 		/// Writes the mail message to the given output stream.
 
-	static std::string encodeWord(const std::string& text, const std::string& charset = "UTF-8");
+	[[nodiscard]] static std::string encodeWord(const std::string& text, const std::string& charset = "UTF-8");
 		/// If the given string contains non-ASCII characters,
 		/// encodes the given string using RFC 2047 "Q" word encoding.
 		///
@@ -265,6 +265,10 @@ public:
 	static const std::string HEADER_MIME_VERSION;
 	static const std::string EMPTY_HEADER;
 	static const std::string TEXT_PLAIN;
+	static constexpr int MAX_PARTS = 100000;
+		/// Maximum number of MIME parts allowed when reading
+		/// a multipart message. Exceeding this limit throws
+		/// a MultipartException.
 	static const std::string CTE_7BIT;
 	static const std::string CTE_8BIT;
 	static const std::string CTE_QUOTED_PRINTABLE;
@@ -287,16 +291,17 @@ protected:
 	static int lineLength(const std::string& str);
 	static void appendRecipient(const MailRecipient& recipient, std::string& str);
 
-private:
-	MailMessage(const MailMessage&);
-	MailMessage& operator = (const MailMessage&);
+	MailMessage(const MailMessage&) = delete;
+	MailMessage& operator = (const MailMessage&) = delete;
 
+private:
 	Recipients              _recipients;
 	PartVec                 _parts;
 	std::string             _content;
 	ContentTransferEncoding _encoding;
 	mutable std::string     _boundary;
 	PartStoreFactory*       _pStoreFactory;
+	bool                    _isMultipart = false;
 
 	friend class MultipartSource;
 };

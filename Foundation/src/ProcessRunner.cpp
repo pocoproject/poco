@@ -201,7 +201,7 @@ void ProcessRunner::run()
 			else
 #endif
 			Poco::format(_error, "ProcessRunner::run() error; "
-				"handle=%d (%d:%s); pid=%d (%d:%s); return=%d (%d:%s)",
+				"handle=%?d (%?d:%s); pid=%?d (%?d:%s); return=%?d (%?d:%s)",
 				(pPH ? pPH->id() : 0), errHandle, Error::getMessage(errHandle),
 				_pid.load(), errPID, Error::getMessage(errPID),
 				_rc.load(), errRC, Error::getMessage(errRC));

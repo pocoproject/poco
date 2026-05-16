@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/Event.h"
 #include "Poco/RefCountedObject.h"
 #include <unistd.h>
 #include <vector>
@@ -41,10 +42,16 @@ public:
 	[[nodiscard]]
 	pid_t id() const;
 	int wait() const;
+	int wait(int options) const;
 	int tryWait() const;
+	bool isRunning() const;
 
 private:
-	std::atomic<pid_t> _pid;
+	static int statusToExitCode(int status);
+	const pid_t _pid;
+	mutable Event _event;
+	mutable std::atomic<int> _status{0};
+	mutable std::atomic<bool> _hasStatus{false};
 };
 
 

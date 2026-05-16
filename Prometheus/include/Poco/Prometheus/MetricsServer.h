@@ -51,7 +51,7 @@ public:
 		/// on the server socket (which can be a properly configured Poco::Net::SecureServerSocket
 		/// to enable HTTPS), and the given path.
 
-	~MetricsServer() = default;
+	~MetricsServer();
 		/// Destroys the HTTPServer.
 
 	void start();

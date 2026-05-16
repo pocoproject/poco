@@ -20,6 +20,18 @@
 namespace Poco::Util {
 
 
+OptionSet::OptionSet() = default;
+
+
+OptionSet::OptionSet(const OptionSet& options) = default;
+
+
+OptionSet::~OptionSet() = default;
+
+
+OptionSet& OptionSet::operator = (const OptionSet& options) = default;
+
+
 void OptionSet::addOption(const Option& option)
 {
 	poco_assert (!option.fullName().empty());

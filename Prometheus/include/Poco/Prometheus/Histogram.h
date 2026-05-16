@@ -46,7 +46,7 @@ public:
 	explicit HistogramSample(const std::vector<double>& bucketBounds);
 		/// Creates the HistogramSample.
 
-	~HistogramSample() = default;
+	~HistogramSample();
 		/// Destroys the HistogramSample.
 
 	void observe(double value);
@@ -66,7 +66,7 @@ public:
 
 	[[nodiscard]]
 	const std::vector<double>& bucketBounds() const;
-		/// Returns the buckets upper bounds;
+		/// Returns the buckets upper bounds
 
 private:
 	const std::vector<double>& _bucketBounds;
@@ -131,7 +131,7 @@ public:
 		/// Creates a Histogram with the given name and params, and
 		/// registers it with the given registry (if not nullptr).
 
-	~Histogram() = default;
+	~Histogram();
 		/// Destroys the Histogram.
 
 	using Metric::help;

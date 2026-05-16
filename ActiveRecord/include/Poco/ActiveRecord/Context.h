@@ -38,7 +38,7 @@ public:
 	Context(const std::string& connector, const std::string& connectionString);
 		/// Creates the Context from a connector name and connection string.
 
-	~Context() = default;
+	~Context();
 		/// Destroys the Context.
 
 	[[nodiscard]]

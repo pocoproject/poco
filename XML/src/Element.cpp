@@ -116,6 +116,7 @@ Attr* Element::setAttributeNode(Attr* newAttr)
 	}
 	else _pFirstAttr = newAttr;
 	newAttr->duplicate();
+	// CodeQL [cpp/local-address-stored]: DOM tree attribute-element relationship
 	newAttr->_pParent = this;
 	if (_pOwner->events())
 		dispatchAttrModified(newAttr, MutationEvent::ADDITION, EMPTY_STRING, newAttr->getValue());
@@ -134,8 +135,8 @@ Attr* Element::removeAttributeNode(Attr* oldAttr)
 	if (oldAttr != _pFirstAttr)
 	{
 		Attr* pCur = _pFirstAttr;
-		while (pCur->_pNext != oldAttr) pCur = static_cast<Attr*>(pCur->_pNext);
-		if (pCur)
+		while (pCur != nullptr && pCur->_pNext != oldAttr) pCur = static_cast<Attr*>(pCur->_pNext);
+		if (pCur != nullptr)
 		{
 			pCur->_pNext = static_cast<Attr*>(pCur->_pNext->_pNext);
 		}

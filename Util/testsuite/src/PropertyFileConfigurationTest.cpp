@@ -119,9 +119,9 @@ void PropertyFileConfigurationTest::testSave()
 	std::ostringstream ostr;
 	pConf->save(ostr);
 	std::string propFile = ostr.str();
-	assertTrue (propFile == "prop1: value1\n"
-						"prop2: 42\n"
-						"prop3: value\\\\1\\txxx\n");
+	assertTrue (propFile == "prop1 = value1\n"
+						"prop2 = 42\n"
+						"prop3 = value\\\\1\\txxx\n");
 }
 
 
@@ -339,7 +339,7 @@ void PropertyFileConfigurationTest::testInclude()
 		ostr << "!include ${extDir}" << includedParentName << "\n";
 	}
 
-	AutoPtr<PropertyFileConfiguration> pConfParent = new PropertyFileConfiguration(mainFileParent.path(), pParent);
+	AutoPtr<PropertyFileConfiguration> pConfParent = new PropertyFileConfiguration(mainFileParent.path(), pParent.get());
 	assertTrue (pConfParent->getString("main.prop") == "mainValue");
 	assertTrue (pConfParent->getString("parent.prop") == "parentValue");
 }
@@ -504,6 +504,147 @@ void PropertyFileConfigurationTest::testSavePreserving()
 }
 
 
+void PropertyFileConfigurationTest::testSaveRemovesLastIncludedKey()
+{
+	Poco::TemporaryFile extraFile;
+	{
+		Poco::FileOutputStream ostr(extraFile.path());
+		ostr << "extra.prop1 = true\n";
+	}
+
+	Poco::TemporaryFile rootFile;
+	{
+		Poco::FileOutputStream ostr(rootFile.path());
+		ostr << "root.key = rootValue\n";
+		ostr << "!include " << extraFile.path() << "\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(rootFile.path());
+	assertTrue (pConf->getString("extra.prop1") == "true");
+
+	pConf->remove("extra.prop1");
+	pConf->save(rootFile.path());
+
+	{
+		Poco::FileInputStream istr(extraFile.path());
+		std::string content((std::istreambuf_iterator<char>(istr)), std::istreambuf_iterator<char>());
+		assertTrue (content.find("extra.prop1") == std::string::npos);
+	}
+
+	AutoPtr<PropertyFileConfiguration> pReloaded = new PropertyFileConfiguration(rootFile.path());
+	try
+	{
+		pReloaded->getString("extra.prop1");
+		fail("Expected NotFoundException");
+	}
+	catch (Poco::NotFoundException&) {}
+
+	Poco::TemporaryFile groupFile;
+	{
+		Poco::FileOutputStream ostr(groupFile.path());
+		ostr << "group.item.name = item1\n";
+		ostr << "group.item.channel = channel1\n";
+	}
+
+	Poco::TemporaryFile groupRootFile;
+	{
+		Poco::FileOutputStream ostr(groupRootFile.path());
+		ostr << "root.key = rootValue\n";
+		ostr << "!include " << groupFile.path() << "\n";
+	}
+
+	pConf = new PropertyFileConfiguration(groupRootFile.path());
+	pConf->remove("group");
+	pConf->save(groupRootFile.path());
+
+	{
+		Poco::FileInputStream istr(groupFile.path());
+		std::string content((std::istreambuf_iterator<char>(istr)), std::istreambuf_iterator<char>());
+		assertTrue (content.find("group.item.name") == std::string::npos);
+		assertTrue (content.find("group.item.channel") == std::string::npos);
+	}
+}
+
+
+void PropertyFileConfigurationTest::testSaveRemovesRootKey()
+{
+	Poco::TemporaryFile rootFile;
+	{
+		Poco::FileOutputStream ostr(rootFile.path());
+		ostr << "root.keep = keepValue\n";
+		ostr << "root.drop = dropValue\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(rootFile.path());
+	pConf->remove("root.drop");
+	pConf->save(rootFile.path());
+
+	{
+		Poco::FileInputStream istr(rootFile.path());
+		std::string content((std::istreambuf_iterator<char>(istr)), std::istreambuf_iterator<char>());
+		assertTrue (content.find("root.drop") == std::string::npos);
+		assertTrue (content.find("root.keep") != std::string::npos);
+	}
+
+	AutoPtr<PropertyFileConfiguration> pReloaded = new PropertyFileConfiguration(rootFile.path());
+	assertTrue (pReloaded->getString("root.keep") == "keepValue");
+	try
+	{
+		pReloaded->getString("root.drop");
+		fail("Expected NotFoundException");
+	}
+	catch (Poco::NotFoundException&) {}
+}
+
+
+void PropertyFileConfigurationTest::testSaveRemovedFilesRetryAfterFailure()
+{
+	Poco::TemporaryFile extraFile;
+	{
+		Poco::FileOutputStream ostr(extraFile.path());
+		ostr << "extra.prop = extraValue\n";
+	}
+
+	Poco::TemporaryFile rootFile;
+	{
+		Poco::FileOutputStream ostr(rootFile.path());
+		ostr << "root.key = rootValue\n";
+		ostr << "!include " << extraFile.path() << "\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(rootFile.path());
+	pConf->remove("extra.prop");
+
+	Poco::File extra(extraFile.path());
+	extra.setWriteable(false);
+
+	bool threw = false;
+	try
+	{
+		pConf->save(rootFile.path());
+	}
+	catch (Poco::Exception&)
+	{
+		threw = true;
+	}
+	extra.setWriteable(true);
+
+	// If the I/O layer didn't enforce read-only (e.g. running as root),
+	// skip the retry portion — the failure path can't be exercised.
+	if (!threw) return;
+
+	// Removed-file provenance must survive a failed save so the retry
+	// rewrites the included file and strips the removed key.
+	pConf->save(rootFile.path());
+
+	{
+		Poco::FileInputStream istr(extraFile.path());
+		std::string content((std::istreambuf_iterator<char>(istr)), std::istreambuf_iterator<char>());
+		assertTrue (content.find("extra.prop") == std::string::npos);
+	}
+}
+
+
 void PropertyFileConfigurationTest::testSavePreservingMultiLine()
 {
 	// Create a properties file with multi-line continuation values
@@ -644,6 +785,191 @@ void PropertyFileConfigurationTest::testGetSourceFilesCoversAllKeys()
 }
 
 
+void PropertyFileConfigurationTest::testIncludeManagement()
+{
+	// Set up: root file with one include and some keys
+	Poco::TemporaryFile rootFile;
+	rootFile.keepUntilExit();
+	Poco::TemporaryFile extraFile;
+	extraFile.keepUntilExit();
+
+	{
+		Poco::FileOutputStream ostr(extraFile.path());
+		ostr << "extra.key1 = extraValue1\n";
+		ostr << "extra.key2 = extraValue2\n";
+	}
+	{
+		Poco::FileOutputStream ostr(rootFile.path());
+		ostr << "# Comment\n";
+		ostr << "root.key1 = rootValue1\n";
+		ostr << "!include " << extraFile.path() << "\n";
+		ostr << "root.key2 = rootValue2\n";
+	}
+
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(rootFile.path());
+
+	// getIncludeFiles returns the include
+	auto includes = pConf->getIncludeFiles();
+	assertTrue (includes.size() == 1);
+	Poco::Path expectedPath(extraFile.path());
+	expectedPath.makeAbsolute();
+	assertTrue (includes[0] == expectedPath.toString());
+
+	// addIncludeFile — add a new include
+	Poco::TemporaryFile newFile;
+	newFile.keepUntilExit();
+	std::string newRelPath = Poco::Path(newFile.path()).getFileName();
+
+	// The new file doesn't exist yet — addIncludeFile should create it
+	assertFalse (Poco::File(newFile.path()).exists());
+
+	// Need to use absolute path since temp files may be in different directory than root
+	pConf->addIncludeFile(newFile.path());
+
+	assertTrue (Poco::File(newFile.path()).exists());
+
+	includes = pConf->getIncludeFiles();
+	assertTrue (includes.size() == 2);
+
+	// Verify root file text contains the new !include
+	{
+		Poco::FileInputStream istr(rootFile.path());
+		std::string content((std::istreambuf_iterator<char>(istr)), std::istreambuf_iterator<char>());
+		assertTrue (content.find("!include " + newFile.path()) != std::string::npos);
+		// Original include still present
+		assertTrue (content.find("!include " + extraFile.path()) != std::string::npos);
+	}
+
+	// Duplicate add should throw FileExistsException
+	try
+	{
+		pConf->addIncludeFile(newFile.path());
+		fail("Expected FileExistsException");
+	}
+	catch (Poco::FileExistsException&) {}
+
+	// Reload and verify includes survive
+	AutoPtr<PropertyFileConfiguration> pConf2 = new PropertyFileConfiguration(rootFile.path());
+	includes = pConf2->getIncludeFiles();
+	assertTrue (includes.size() == 2);
+
+	// No root file — should throw IllegalStateException
+	{
+		std::istringstream iss("key = value\n");
+		AutoPtr<PropertyFileConfiguration> pStream = new PropertyFileConfiguration(iss);
+		try
+		{
+			pStream->addIncludeFile("some.properties");
+			fail("Expected IllegalStateException");
+		}
+		catch (Poco::IllegalStateException&) {}
+
+		try
+		{
+			pStream->removeIncludeFile("some.properties");
+			fail("Expected IllegalStateException");
+		}
+		catch (Poco::IllegalStateException&) {}
+
+		auto empty = pStream->getIncludeFiles();
+		assertTrue (empty.empty());
+	}
+
+	// removeIncludeFile with removeKeys=false — keys remain, provenance cleared
+	pConf->removeIncludeFile(extraFile.path(), false);
+
+	includes = pConf->getIncludeFiles();
+	assertTrue (includes.size() == 1); // only newFile remains
+
+	// Keys from extraFile still accessible (unprovenanced)
+	assertTrue (pConf->getString("extra.key1") == "extraValue1");
+	assertTrue (pConf->getSourceFile("extra.key1").empty());
+
+	// Verify root file text no longer has the removed !include
+	{
+		Poco::FileInputStream istr(rootFile.path());
+		std::string content((std::istreambuf_iterator<char>(istr)), std::istreambuf_iterator<char>());
+		assertTrue (content.find(extraFile.path()) == std::string::npos);
+		// Other content preserved
+		assertTrue (content.find("# Comment") != std::string::npos);
+		assertTrue (content.find("root.key1") != std::string::npos);
+		assertTrue (content.find("root.key2") != std::string::npos);
+		assertTrue (content.find(newFile.path()) != std::string::npos);
+	}
+
+	// Remove non-existent should throw NotFoundException
+	try
+	{
+		pConf->removeIncludeFile("nonexistent.properties");
+		fail("Expected NotFoundException");
+	}
+	catch (Poco::NotFoundException&) {}
+
+	// Add extraFile back, add some keys, then remove with removeKeys=true
+	{
+		Poco::FileOutputStream ostr(extraFile.path());
+		ostr << "extra.key3 = extraValue3\n";
+	}
+	// Reload to pick up fresh state
+	pConf = new PropertyFileConfiguration(rootFile.path());
+	pConf->addIncludeFile(extraFile.path());
+	// Reload again so keys from extraFile get proper provenance
+	pConf = new PropertyFileConfiguration(rootFile.path());
+
+	assertTrue (pConf->getString("extra.key3") == "extraValue3");
+	pConf->removeIncludeFile(extraFile.path(), true);
+
+	// Keys should be removed
+	try
+	{
+		pConf->getString("extra.key3");
+		fail("Expected NotFoundException");
+	}
+	catch (Poco::NotFoundException&) {}
+
+	// addIncludeFile loads keys into memory immediately (no reload needed)
+	{
+		Poco::TemporaryFile liveFile;
+		liveFile.keepUntilExit();
+		{
+			Poco::FileOutputStream ostr(liveFile.path());
+			ostr << "live.key1 = liveValue1\n";
+			ostr << "live.key2 = liveValue2\n";
+		}
+		pConf->addIncludeFile(liveFile.path());
+		// Keys should be visible without reloading
+		assertTrue (pConf->getString("live.key1") == "liveValue1");
+		assertTrue (pConf->getString("live.key2") == "liveValue2");
+		assertTrue (pConf->getSourceFile("live.key1") == Poco::Path(liveFile.path()).makeAbsolute().toString());
+	}
+
+	// Save round-trip after modifications
+	pConf->setString("new.key", "newValue");
+	pConf->save(rootFile.path());
+	AutoPtr<PropertyFileConfiguration> pConf3 = new PropertyFileConfiguration(rootFile.path());
+	assertTrue (pConf3->getString("root.key1") == "rootValue1");
+	assertTrue (pConf3->getString("root.key2") == "rootValue2");
+	assertTrue (pConf3->getString("new.key") == "newValue");
+}
+
+
+void PropertyFileConfigurationTest::testNoCircularReference()
+{
+	using Poco::Util::MapConfiguration;
+
+	AutoPtr<MapConfiguration> pParent = new MapConfiguration;
+	pParent->setString("base.dir", "/tmp/poco-test");
+	assertTrue (pParent->referenceCount() == 1);
+
+	{
+		AutoPtr<PropertyFileConfiguration> pChild = new PropertyFileConfiguration(pParent.get());
+		assertTrue (pParent->referenceCount() == 1);
+		(void) pChild;
+	}
+	assertTrue (pParent->referenceCount() == 1);
+}
+
+
 AbstractConfiguration::Ptr PropertyFileConfigurationTest::allocConfiguration() const
 {
 	return new PropertyFileConfiguration;
@@ -669,9 +995,14 @@ CppUnit::Test* PropertyFileConfigurationTest::suite()
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSave);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testInclude);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSavePreserving);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSaveRemovesLastIncludedKey);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSaveRemovesRootKey);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSaveRemovedFilesRetryAfterFailure);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSavePreservingMultiLine);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testClearResetsProvenance);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testGetSourceFilesCoversAllKeys);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testIncludeManagement);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testNoCircularReference);
 
 	return pSuite;
 }

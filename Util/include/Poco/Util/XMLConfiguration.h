@@ -160,7 +160,7 @@ protected:
 	void enumerate(const std::string& key, Keys& range) const override;
 	void removeRaw(const std::string& key) override;
 
-	~XMLConfiguration() = default;
+	~XMLConfiguration();
 
 private:
 	using Document = Poco::XML::Document;

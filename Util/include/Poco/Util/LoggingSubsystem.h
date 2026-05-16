@@ -35,7 +35,7 @@ class Util_API LoggingSubsystem: public Subsystem
 	/// is not specified.
 {
 public:
-	LoggingSubsystem() = default;
+	LoggingSubsystem();
 
 	[[nodiscard]]
 	const char* name() const override;
@@ -43,7 +43,7 @@ public:
 protected:
 	void initialize(Application& self) override;
 	void uninitialize() override;
-	~LoggingSubsystem() = default;
+	~LoggingSubsystem();
 };
 
 

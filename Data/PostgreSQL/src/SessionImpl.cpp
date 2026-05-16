@@ -19,36 +19,9 @@
 #include "Poco/Data/Session.h"
 #include "Poco/NumberParser.h"
 #include "Poco/String.h"
+#include "libpq-fe.h"
 #include <map>
-
-
-namespace
-{
-	std::string copyStripped(std::string::const_iterator aFromStringCItr, std::string::const_iterator aToStringCItr)
-	{
-		// skip leading spaces
-		while ((aFromStringCItr != aToStringCItr) && isspace(*aFromStringCItr)) aFromStringCItr++;
-		// skip trailing spaces
-		while ((aFromStringCItr != aToStringCItr) && isspace(*(aToStringCItr - 1))) aToStringCItr--;
-
-		return std::string(aFromStringCItr, aToStringCItr);
-	}
-
-	std::string createConnectionStringFromOptionsMap(const std::map <std::string, std::string> anOptionsMap)
-	{
-		std::string connectionString;
-
-		for (auto citr = anOptionsMap.begin(); citr != anOptionsMap.end(); ++citr)
-		{
-			connectionString.append(citr->first);
-			connectionString.append("=");
-			connectionString.append(citr->second);
-			connectionString.append(" ");
-		}
-
-		return connectionString;
-	}
-}
+#include <memory>
 
 
 namespace Poco::Data::PostgreSQL {
@@ -116,27 +89,60 @@ void SessionImpl::open(const std::string& aConnectionString)
 	// Default values
 	optionsMap["connect_timeout"] = Poco::NumberFormatter::format(timeout);
 
-	const std::string& connString = connectionString();
+	std::string connString = connectionString();
 
-	for (std::string::const_iterator start = connString.begin();;)
+	// Parse the connection string using libpq's parser
+	char* errMsg = nullptr;
+	const std::unique_ptr<PQconninfoOption, decltype(&PQconninfoFree)> opts(
+		PQconninfoParse(connString.c_str(), &errMsg), &PQconninfoFree);
+	std::string errorMsg;
+	if (errMsg)
 	{
-		std::string::const_iterator finish = std::find(start, connString.end(), ' '); // space is the separator between keyword=value pairs
-		std::string::const_iterator middle = std::find(start, finish, '=');
-
-		if (middle == finish)
+		errorMsg = errMsg;
+		PQfreemem(errMsg);
+	}
+	if (!opts)
+	{
+		if (errorMsg.empty())
 		{
-			throw PostgreSQLException("create session: bad connection string format, cannot find '='");
+			errorMsg = "Unknown error parsing connection string";
 		}
+		throw PostgreSQLException("create session: bad connection string format: " + errorMsg);
+	}
 
-		optionsMap[ copyStripped(start, middle) ] = copyStripped(middle + 1, finish);
+	// Drop defaults already specified by the caller's connection string
+	// so we don't override user-provided values when we re-serialize below.
+	for (PQconninfoOption* opt = opts.get(); opt->keyword != nullptr; ++opt)
+	{
+		if (auto it = optionsMap.find(opt->keyword); it != optionsMap.end() && opt->val != nullptr)
+		{
+			optionsMap.erase(it);
+		}
+	}
 
-		if ((finish == connString.end()) || (finish + 1 == connString.end())) break;
+	char delimiter = ' ';
+	const bool isUri = connString.find("postgresql://") == 0
+					|| connString.find("postgres://") == 0;
+	if (isUri)
+	{
+		delimiter = (connString.find('?') == std::string::npos)? '?': '&';
+	}
 
-		start = finish + 1;
+	for (const auto& opt : optionsMap)
+	{
+		connString += delimiter;
+		connString += opt.first;
+		connString += '=';
+		connString += opt.second;
+
+		if (delimiter == '?')
+		{
+			delimiter = '&';
+		}
 	}
 
 	// Real connect
-	_sessionHandle.connect(createConnectionStringFromOptionsMap(optionsMap));
+	_sessionHandle.connect(connString);
 
 	addFeature("autoCommit",
 		&SessionImpl::autoCommit,

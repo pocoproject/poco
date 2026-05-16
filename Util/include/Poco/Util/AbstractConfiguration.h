@@ -568,7 +568,7 @@ protected:
 	static bool parseBool(const std::string& value);
 	void setRawWithEvent(const std::string& key, std::string value);
 
-	~AbstractConfiguration() override = default;
+	~AbstractConfiguration() override;
 
 private:
 	std::string internalExpand(const std::string& value) const;
@@ -617,6 +617,11 @@ inline Poco::UInt32 AbstractConfiguration::getUInt32(const std::string& key, Poc
 
 
 } // namespace Poco::Util
+
+
+extern template class Poco::BasicEvent<Poco::Util::AbstractConfiguration::KeyValue, Poco::FastMutex>;
+extern template class Poco::BasicEvent<const Poco::Util::AbstractConfiguration::KeyValue, Poco::FastMutex>;
+extern template class Poco::BasicEvent<const std::string, Poco::FastMutex>;
 
 
 #endif // Util_AbstractConfiguration_INCLUDED

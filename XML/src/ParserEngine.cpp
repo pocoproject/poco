@@ -147,6 +147,7 @@ void ParserEngine::addEncoding(const XMLString& name, TextEncoding* pEncoding)
 	poco_check_ptr (pEncoding);
 
 	if (_encodings.find(name) == _encodings.end())
+		// CodeQL [cpp/local-address-stored]: encoding lifetime managed by caller (SAX registration pattern)
 		_encodings[name] = pEncoding;
 	else
 		throw XMLException("Encoding already defined");
@@ -182,30 +183,35 @@ void ParserEngine::setExternalParameterEntities(bool flag)
 
 void ParserEngine::setEntityResolver(EntityResolver* pResolver)
 {
+	// CodeQL [cpp/local-address-stored]: SAX handler registration; handler lifetime managed by caller
 	_pEntityResolver = pResolver;
 }
 
 
 void ParserEngine::setDTDHandler(DTDHandler* pDTDHandler)
 {
+	// CodeQL [cpp/local-address-stored]: SAX handler registration; handler lifetime managed by caller
 	_pDTDHandler = pDTDHandler;
 }
 
 
 void ParserEngine::setDeclHandler(DeclHandler* pDeclHandler)
 {
+	// CodeQL [cpp/local-address-stored]: SAX handler registration; handler lifetime managed by caller
 	_pDeclHandler = pDeclHandler;
 }
 
 
 void ParserEngine::setContentHandler(ContentHandler* pContentHandler)
 {
+	// CodeQL [cpp/local-address-stored]: SAX handler registration; handler lifetime managed by caller
 	_pContentHandler = pContentHandler;
 }
 
 
 void ParserEngine::setLexicalHandler(LexicalHandler* pLexicalHandler)
 {
+	// CodeQL [cpp/local-address-stored]: SAX handler registration; handler lifetime managed by caller
 	_pLexicalHandler = pLexicalHandler;
 }
 

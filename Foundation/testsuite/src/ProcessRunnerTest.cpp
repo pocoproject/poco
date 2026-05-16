@@ -237,11 +237,9 @@ void ProcessRunnerTest::testProcessRunner()
 
 			[[maybe_unused]] std::string s = PIDFile::getFileName(pidFile);
 			Stopwatch sw; sw.start();
-			while (!File(pidFile).exists())
-				checkTimeout(sw, "Waiting for PID file", 1000, __LINE__);
+			while (!PIDFile::contains(pidFile, pr.pid()))
+				checkTimeout(sw, "Waiting for PID file to contain expected PID", 5000, __LINE__);
 
-			// PID file exists and is valid
-			assertTrue (File(pidFile).exists());
 			assertTrue (PIDFile::contains(pidFile, pr.pid()));
 		}
 		assertTrue (!File(pidFile).exists());
@@ -259,11 +257,9 @@ void ProcessRunnerTest::testProcessRunner()
 
 			[[maybe_unused]] std::string s = PIDFile::getFileName(pidFile);
 			Stopwatch sw; sw.start();
-			while (!File(pidFile).exists())
-				checkTimeout(sw, "Waiting for PID file", 1000, __LINE__);
+			while (!PIDFile::contains(pidFile, pr.pid()))
+				checkTimeout(sw, "Waiting for PID file to contain expected PID", 5000, __LINE__);
 
-			// PID file exists and is valid
-			assertTrue (File(pidFile).exists());
 			assertTrue (PIDFile::contains(pidFile, pr.pid()));
 		}
 		assertTrue (!File(pidFile).exists());

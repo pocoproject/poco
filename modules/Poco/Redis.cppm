@@ -25,7 +25,7 @@ module;
 #include "Poco/Redis/Type.h"
 #endif
 
-export module Poco.Redis;
+export module Poco:Redis;
 
 export namespace Poco::Redis {
 	#ifdef ENABLE_REDIS

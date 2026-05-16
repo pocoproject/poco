@@ -25,11 +25,6 @@ POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "src/*.h")
 POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_G})
 
-# WinDriver depends on WinTestRunner which depends on MFC, and we don't want that
-POCO_SOURCES_AUTO_PLAT(TEST_SRCS OFF
-	src/WinDriver.cpp
-)
-
 add_executable(Foundation-testrunner ${TEST_SRCS})
 set_target_properties(Foundation-testrunner PROPERTIES DEBUG_POSTFIX "d")
 if(ANDROID)
@@ -58,8 +53,8 @@ if(UNIX AND NOT ANDROID)
 	target_link_libraries(Foundation-testrunner PUBLIC pthread)
 endif(UNIX AND NOT ANDROID)
 
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-	target_link_libraries(Foundation-testrunner PUBLIC atomic)
+if(Poco_ATOMIC_LIBRARIES)
+	target_link_libraries(Foundation-testrunner PUBLIC ${Poco_ATOMIC_LIBRARIES})
 endif()
 
 # TestApp

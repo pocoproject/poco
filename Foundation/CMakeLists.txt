@@ -35,6 +35,9 @@ if(POCO_UNBUNDLED)
 
 	# pcre2 source files are linked with Foundation when shared library pcre2 is linked.
 	# When linking pcre2 as static library the symbols are accessible.
+	# CONFIG-mode packages (e.g. Conan, vcpkg) may expose Pcre2::Pcre2 as an
+	# INTERFACE_LIBRARY aggregator; the PCRE2_STATIC compile definition is the
+	# canonical marker that the underlying build is static.
 	get_target_property(_PCRE2TYPE Pcre2::Pcre2 TYPE)
 	if("${_PCRE2TYPE}" STREQUAL "SHARED_LIBRARY")
 		# HACK: Unicode.cpp requires functions from these files.
@@ -42,6 +45,15 @@ if(POCO_UNBUNDLED)
 		POCO_SOURCES(SRCS RegExp ${EMBEDDED_PCRE2_SOURCES} )
 	elseif ("${_PCRE2TYPE}" STREQUAL "STATIC_LIBRARY")
 		message(STATUS "PCRE2: linking static library.")
+	elseif("${_PCRE2TYPE}" STREQUAL "INTERFACE_LIBRARY" OR "${_PCRE2TYPE}" STREQUAL "UNKNOWN_LIBRARY")
+		get_target_property(_PCRE2DEFS Pcre2::Pcre2 INTERFACE_COMPILE_DEFINITIONS)
+		if(_PCRE2DEFS MATCHES "PCRE2_STATIC")
+			message(STATUS "PCRE2: linking ${_PCRE2TYPE} (PCRE2_STATIC set).")
+		else()
+			message(STATUS "PCRE2: ${_PCRE2TYPE} without PCRE2_STATIC; embedding internal sources.")
+			POCO_SOURCES(SRCS RegExp ${EMBEDDED_PCRE2_SOURCES})
+		endif()
+		unset(_PCRE2DEFS)
 	else()
 		message(WARNING "PCRE2: unknown library type: ${_PCRE2TYPE}")
 	endif()
@@ -174,7 +186,7 @@ else()
 				target_link_libraries(Foundation PUBLIC ${CMAKE_DL_LIBS} rt Threads::Threads)
 			else()
 				target_compile_definitions(Foundation PUBLIC _XOPEN_SOURCE=500 POCO_HAVE_FD_EPOLL)
-				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt)
+				target_link_libraries(Foundation PUBLIC pthread ${CMAKE_DL_LIBS} rt ${Poco_ATOMIC_LIBRARIES})
 			endif()
 		endif(APPLE)
 	endif(UNIX AND NOT ANDROID)

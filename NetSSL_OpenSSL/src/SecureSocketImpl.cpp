@@ -258,13 +258,49 @@ int SecureSocketImpl::shutdown()
 		bool shutdownSent = (shutdownState & SSL_SENT_SHUTDOWN) == SSL_SENT_SHUTDOWN;
 		if (!shutdownSent)
 		{
-			int rc = ::SSL_shutdown(_pSSL);
-			if (rc < 0) 
+			int rc = 0;
+			if (_pSocket->getBlocking())
 			{
-				if (SocketImpl::lastError() == POCO_EWOULDBLOCK)
-					rc = SecureStreamSocket::ERR_SSL_WOULD_BLOCK;
-				else
+				// For blocking sockets, perform bidirectional shutdown
+				// to ensure all data is received by the peer before closing.
+				Poco::Timespan recvTimeout = _pSocket->getReceiveTimeout();
+				Poco::Timespan pollTimeout(0, 100000);
+				Poco::Timestamp tsStart;
+				do
+				{
+					rc = ::SSL_shutdown(_pSSL);
+					if (rc == 1) break;
+					if (rc < 0)
+					{
+						int err = ::SSL_get_error(_pSSL, rc);
+						if (err == SSL_ERROR_WANT_READ)
+							_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
+						else if (err == SSL_ERROR_WANT_WRITE)
+							_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
+						else
+							break;
+					}
+					else
+					{
+						_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
+					}
+				} while (!tsStart.isElapsed(recvTimeout.totalMicroseconds()));
+				if (rc < 0)
+				{
 					rc = handleError(rc);
+				}
+			}
+			else
+			{
+				// For non-blocking sockets, call SSL_shutdown() once.
+				rc = ::SSL_shutdown(_pSSL);
+				if (rc < 0)
+				{
+					if (SocketImpl::lastError() == POCO_EWOULDBLOCK)
+						rc = SecureStreamSocket::ERR_SSL_WOULD_BLOCK;
+					else
+						rc = handleError(rc);
+				}
 			}
 
 			l.unlock();
@@ -275,7 +311,7 @@ int SecureSocketImpl::shutdown()
 			}
 			return rc;
 		}
-		else 
+		else
 		{
 			return (shutdownState & SSL_RECEIVED_SHUTDOWN) == SSL_RECEIVED_SHUTDOWN;
 		}
@@ -354,6 +390,11 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 			return rc;
 	}
 
+	// The timeout check below prevents an infinite retry loop when
+	// the socket becomes invalid (e.g. closed by the OS during app
+	// backgrounding on mobile platforms). See GH #3557.
+	// With default (unset) receive timeout, isElapsed(0) returns
+	// true immediately, breaking the loop on the first failed retry.
 	const auto recvTimeout = _pSocket->getReceiveTimeout();
 	Poco::Timestamp tsStart;
 	while (true)
@@ -542,7 +583,7 @@ int SecureSocketImpl::handleError(int rc)
 	// SSL_ERROR_SSL with a meaningful error on the error stack.
 	// However, we still need to check for socket errors in both
 	// cases with OpenSSL 3.0 or later.
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	case SSL_ERROR_SSL:
 		// fallthrough to handle socket errors first
 #endif
@@ -557,7 +598,8 @@ int SecureSocketImpl::handleError(int rc)
 		// fallthrough
 	default:
 		{
-		long lastError = ::ERR_get_error();
+			long lastError = ::ERR_peek_last_error();
+			::ERR_clear_error();
 			std::string msg;
 			if (lastError)
 			{
@@ -570,7 +612,7 @@ int SecureSocketImpl::handleError(int rc)
 			// SSL_ERROR_SYSCALL, nothing was added to the error stack, and
 			// errno was 0.  Since OpenSSL 3.0 the returned error is
 			// SSL_ERROR_SSL with a meaningful error on the error stack.
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 			if (sslError == SSL_ERROR_SSL)
 #else
 			if (lastError == 0)

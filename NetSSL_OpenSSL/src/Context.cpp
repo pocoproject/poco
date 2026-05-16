@@ -29,10 +29,10 @@
 #include <openssl/err.h>
 #include <openssl/ssl.h>
 #include <openssl/x509v3.h>
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 #include <openssl/core_names.h>
 #include <openssl/decoder.h>
-#endif // OPENSSL_VERSION_NUMBER >= 0x30000000L
+#endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
 
 namespace Poco::Net {
@@ -188,12 +188,10 @@ void Context::init(const Params& params)
 		else
 			SSL_CTX_set_verify(_pSSLContext, params.verificationMode, &SSLManager::verifyClientCallback);
 
-#if OPENSSL_VERSION_NUMBER >= 0x10101000L
 		if (!params.cipherSuites.empty())
 		{
 			SSL_CTX_set_ciphersuites(_pSSLContext, params.cipherSuites.c_str());
 		}
-#endif
 		SSL_CTX_set_cipher_list(_pSSLContext, params.cipherList.c_str());
 
 		SSL_CTX_set_verify_depth(_pSSLContext, params.verificationDepth);
@@ -293,9 +291,29 @@ void Context::addCertificateAuthority(const Crypto::X509Certificate &certificate
 }
 
 
+void Context::addCertificateAuthority(const std::string& caLocation)
+{
+	Poco::File aFile(caLocation);
+	int errCode = 0;
+	if (aFile.isDirectory())
+		errCode = SSL_CTX_load_verify_locations(_pSSLContext, nullptr, Poco::Path::transcode(caLocation).c_str());
+	else
+		errCode = SSL_CTX_load_verify_locations(_pSSLContext, Poco::Path::transcode(caLocation).c_str(), nullptr);
+	if (errCode != 1)
+	{
+		std::string msg = Utility::getLastError();
+		throw SSLContextException(std::string("Cannot add certificate authority from ") + caLocation, msg);
+	}
+}
+
+
 void Context::usePrivateKey(const Poco::Crypto::RSAKey& key)
 {
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	int errCode = SSL_CTX_use_PrivateKey(_pSSLContext, key.impl()->getEVPPKey());
+#else
 	int errCode = SSL_CTX_use_RSAPrivateKey(_pSSLContext, key.impl()->getRSA());
+#endif
 	if (errCode != 1)
 	{
 		std::string msg = Utility::getLastError();
@@ -391,7 +409,11 @@ void Context::flushSessionCache()
 	poco_assert (isForServerUse());
 
 	Poco::Timestamp now;
+#if POCO_OPENSSL_VERSION_PREREQ(3, 4, 0)
+	SSL_CTX_flush_sessions_ex(_pSSLContext, static_cast<time_t>(now.epochTime()));
+#else
 	SSL_CTX_flush_sessions(_pSSLContext, static_cast<long>(now.epochTime()));
+#endif
 }
 
 
@@ -673,7 +695,7 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 		0x6C,0xC4,0x16,0x59,
 	};
 
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
 	EVP_PKEY_CTX* pKeyCtx = nullptr;
 	OSSL_DECODER_CTX* pOSSLDecodeCtx = nullptr;
@@ -806,7 +828,7 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 	}
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);
 
-#else // OPENSSL_VERSION_NUMBER >= 0x30000000L
+#else // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
 	DH* dh = 0;
 	if (!dhParamsFile.empty())
@@ -834,7 +856,7 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 			throw SSLContextException("Error creating Diffie-Hellman parameters", msg);
 		}
 
-#if OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#if !defined(LIBRESSL_VERSION_NUMBER)
 
 		BIGNUM* p = nullptr;
 		BIGNUM* g = nullptr;
@@ -863,7 +885,7 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 			throw SSLContextException("Error creating Diffie-Hellman parameters");
 		}
 
-#else // OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#else // LIBRESSL_VERSION_NUMBER
 
 		if (keyDHGroup == KEY_DH_GROUP_2048)
 		{
@@ -888,14 +910,14 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 			throw SSLContextException("Error creating Diffie-Hellman parameters");
 		}
 
-#endif // OPENSSL_VERSION_NUMBER >= 0x10100000L && !defined(LIBRESSL_VERSION_NUMBER)
+#endif // !defined(LIBRESSL_VERSION_NUMBER)
 
 	}
 	SSL_CTX_set_tmp_dh(_pSSLContext, dh);
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);
 	DH_free(dh);
 
-#endif // OPENSSL_VERSION_NUMBER >= 0x30000000L
+#endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
 #else // OPENSSL_NO_DH
 

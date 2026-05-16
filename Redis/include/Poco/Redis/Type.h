@@ -217,17 +217,17 @@ struct RedisTypeTraits<BulkString>
 	{
 		value.clear();
 
-		std::string line = input.getline();
-		int length = NumberParser::parse(line);
+		const std::string line = input.getline();
+		const Int64 length = NumberParser::parse64(line);
 
-		if ( length >= 0 )
+		if (length >= 0)
 		{
 			std::string s;
-			s.resize(length, ' ');
-			input.read(&*s.begin(), length);
+			s.resize(static_cast<std::size_t>(length), ' ');
+			input.read(s.data(), static_cast<std::streamsize>(length));
 			value.assign(s);
 
-			[[maybe_unused]] std::string ignored = input.getline(); // Read and ignore /r/n
+			[[maybe_unused]] std::string ignored = input.getline(); // Read and ignore \r\n
 		}
 	}
 };

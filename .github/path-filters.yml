@@ -1,0 +1,33 @@
+# Shared path filters for dorny/paths-filter, referenced from .github/workflows/ci.yml.
+#
+# Single source of truth for "does this PR touch <component>?" questions.
+# The workflow's top-level `changes` job uses it to gate most jobs; the
+# `data-build` job uses it inline (so it can start at T=0 instead of
+# waiting behind `changes`) to decide whether to actually compile.
+
+ci_core:
+  - 'CMakeLists.txt'
+  - 'cmake/**'
+  - '.github/workflows/ci.yml'
+  - '.github/actions/**'
+
+foundation:
+  - 'Foundation/**'
+
+foundation_util:
+  - 'Foundation/**'
+  - 'Util/**'
+  - 'JSON/**'
+  - 'XML/**'
+
+arm_cross:
+  - 'Foundation/**'
+  - 'Net/**'
+  - 'JSON/**'
+  - 'XML/**'
+  - 'Zip/**'
+
+data:
+  - 'Data/**'
+  - 'Redis/**'
+  - 'MongoDB/**'

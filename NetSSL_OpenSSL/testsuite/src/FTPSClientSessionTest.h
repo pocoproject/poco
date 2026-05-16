@@ -10,8 +10,8 @@
 //
 
 
-#ifndef FTPClientSessionTest_INCLUDED
-#define FTPClientSessionTest_INCLUDED
+#ifndef FTPSClientSessionTest_INCLUDED
+#define FTPSClientSessionTest_INCLUDED
 
 
 #include "Poco/Net/Net.h"
@@ -58,4 +58,4 @@ private:
 };
 
 
-#endif // FTPClientSessionTest_INCLUDED
+#endif // FTPSClientSessionTest_INCLUDED

@@ -40,7 +40,8 @@ public:
 	void testCachedSession();
 	void testUnknownContentLength();
 	void testServerAbort();
-
+	void testProxyConfig();
+	void testProxySetters();
 
 	void setUp();
 	void tearDown();

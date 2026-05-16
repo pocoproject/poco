@@ -26,6 +26,12 @@ using namespace std::string_literals;
 namespace Poco::Util {
 
 
+LoggingSubsystem::LoggingSubsystem() = default;
+
+
+LoggingSubsystem::~LoggingSubsystem() = default;
+
+
 const char* LoggingSubsystem::name() const
 {
 	return "Logging Subsystem";

@@ -541,10 +541,10 @@ std::string AbstractConfiguration::uncheckedExpand(const std::string& value) con
 					else prop += *it++;
 				}
 				if (it != end) ++it;
-				std::string value;
-				if (getRaw(prop, value))
+				std::string propValue;
+				if (getRaw(prop, propValue))
 				{
-					result.append(internalExpand(value));
+					result.append(internalExpand(propValue));
 				}
 				else if (haveDefault)
 				{
@@ -669,4 +669,12 @@ void AbstractConfiguration::setRawWithEvent(const std::string& key, std::string 
 }
 
 
+AbstractConfiguration::~AbstractConfiguration() = default;
+
+
 } // namespace Poco::Util
+
+
+template class Poco::BasicEvent<Poco::Util::AbstractConfiguration::KeyValue, Poco::FastMutex>;
+template class Poco::BasicEvent<const Poco::Util::AbstractConfiguration::KeyValue, Poco::FastMutex>;
+template class Poco::BasicEvent<const std::string, Poco::FastMutex>;

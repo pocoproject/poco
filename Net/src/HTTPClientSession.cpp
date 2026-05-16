@@ -13,6 +13,8 @@
 
 
 #include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/HTTPSessionFactory.h"
+#include "Poco/Net/HTTPSessionInstantiator.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPHeaderStream.h"
@@ -29,12 +31,13 @@
 
 using Poco::NumberFormatter;
 using Poco::IllegalStateException;
+using Poco::InvalidArgumentException;
 
 
 namespace Poco::Net {
 
 
-HTTPClientSession::ProxyConfig HTTPClientSession::_globalProxyConfig;
+ProxyConfig HTTPClientSession::_globalProxyConfig;
 
 
 HTTPClientSession::HTTPClientSession():
@@ -49,6 +52,7 @@ HTTPClientSession::HTTPClientSession():
 	_responseReceived(false),
 	_ntlmProxyAuthenticated(false)
 {
+	initProxySessionFactory();
 }
 
 
@@ -65,6 +69,7 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket):
 	_responseReceived(false),
 	_ntlmProxyAuthenticated(false)
 {
+	initProxySessionFactory();
 }
 
 
@@ -81,6 +86,7 @@ HTTPClientSession::HTTPClientSession(const SocketAddress& address):
 	_responseReceived(false),
 	_ntlmProxyAuthenticated(false)
 {
+	initProxySessionFactory();
 }
 
 
@@ -97,12 +103,15 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port)
 	_responseReceived(false),
 	_ntlmProxyAuthenticated(false)
 {
+	initProxySessionFactory();
 }
 
 
 HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port, const ProxyConfig& proxyConfig):
 	_host(host),
 	_port(port),
+	_sourceAddress4(IPAddress::wildcard(IPAddress::IPv4), 0),
+	_sourceAddress6(IPAddress::wildcard(IPAddress::IPv6), 0),
 	_proxyConfig(proxyConfig),
 	_keepAliveTimeout(DEFAULT_KEEP_ALIVE_TIMEOUT, 0),
 	_reconnect(false),
@@ -111,6 +120,7 @@ HTTPClientSession::HTTPClientSession(const std::string& host, Poco::UInt16 port,
 	_responseReceived(false),
 	_ntlmProxyAuthenticated(false)
 {
+	initProxySessionFactory();
 }
 
 
@@ -124,13 +134,28 @@ HTTPClientSession::HTTPClientSession(const StreamSocket& socket, const ProxyConf
 	_reconnect(false),
 	_mustReconnect(false),
 	_expectResponseBody(false),
-	_responseReceived(false)
+	_responseReceived(false),
+	_ntlmProxyAuthenticated(false)
 {
+	initProxySessionFactory();
 }
 
 
 HTTPClientSession::~HTTPClientSession()
 {
+	try
+	{
+		_proxySessionFactory.unregisterProtocol("http");
+	}
+	catch (...)
+	{
+	}
+}
+
+
+void HTTPClientSession::initProxySessionFactory()
+{
+	_proxySessionFactory.registerProtocol("http", new HTTPSessionInstantiator);
 }
 
 
@@ -185,14 +210,21 @@ const SocketAddress& HTTPClientSession::getSourceAddress6()
 }
 
 
-void HTTPClientSession::setProxy(const std::string& host, Poco::UInt16 port)
+void HTTPClientSession::setProxy(const std::string& host, Poco::UInt16 port, const std::string& protocol, bool tunnel)
 {
+	if (protocol != "http" && protocol != "https")
+		throw InvalidArgumentException("Protocol must be either http or https");
+	if (protocol == "https" && !secure())
+		throw InvalidArgumentException("HTTPS proxy requires HTTPSClientSession");
+
 	if (!connected())
 	{
 		_proxyConfig.host = host;
 		_proxyConfig.port = port;
+		_proxyConfig.protocol = protocol;
+		_proxyConfig.tunnel = tunnel;
 	}
-	else throw IllegalStateException("Cannot set the proxy host and port for an already connected session");
+	else throw IllegalStateException("Cannot set the proxy host, port and protocol for an already connected session");
 }
 
 
@@ -211,6 +243,29 @@ void HTTPClientSession::setProxyPort(Poco::UInt16 port)
 		_proxyConfig.port = port;
 	else
 		throw IllegalStateException("Cannot set the proxy port number for an already connected session");
+}
+
+
+void HTTPClientSession::setProxyProtocol(const std::string& protocol)
+{
+	if (protocol != "http" && protocol != "https")
+		throw InvalidArgumentException("Protocol must be either http or https");
+	if (protocol == "https" && !secure())
+		throw InvalidArgumentException("HTTPS proxy requires HTTPSClientSession");
+
+	if (!connected())
+		_proxyConfig.protocol = protocol;
+	else
+		throw IllegalStateException("Cannot set the proxy protocol for an already connected session");
+}
+
+
+void HTTPClientSession::setProxyTunnel(bool tunnel)
+{
+	if (!connected())
+		_proxyConfig.tunnel = tunnel;
+	else
+		throw IllegalStateException("Cannot set the proxy tunnel for an already connected session");
 }
 
 
@@ -235,12 +290,23 @@ void HTTPClientSession::setProxyPassword(const std::string& password)
 
 void HTTPClientSession::setProxyConfig(const ProxyConfig& config)
 {
-	_proxyConfig = config;
+	if (config.protocol != "http" && config.protocol != "https")
+		throw InvalidArgumentException("Protocol must be either http or https");
+	if (config.protocol == "https" && !secure())
+		throw InvalidArgumentException("HTTPS proxy requires HTTPSClientSession");
+
+	if (!connected())
+		_proxyConfig = config;
+	else
+		throw IllegalStateException("Cannot set the proxy configuration for an already connected session");
 }
 
 
 void HTTPClientSession::setGlobalProxyConfig(const ProxyConfig& config)
 {
+	if (config.protocol != "http" && config.protocol != "https")
+		throw InvalidArgumentException("Protocol must be either http or https");
+
 	_globalProxyConfig = config;
 }
 
@@ -280,6 +346,7 @@ std::ostream& HTTPClientSession::sendRequest(HTTPRequest& request)
 		if (!_proxyConfig.host.empty() && !bypassProxy())
 		{
 			std::string prefix = proxyRequestPrefix();
+			// CodeQL [cpp/auth-bypass]: proxy prefix rewriting, not authentication logic
 			if (!prefix.empty() && request.getURI().compare(0, 7, "http://") != 0 && request.getURI().compare(0, 8, "https://") != 0)
 				request.setURI(prefix + request.getURI());
 			if (keepAlive) request.set(HTTPMessage::PROXY_CONNECTION, HTTPMessage::CONNECTION_KEEP_ALIVE);
@@ -459,7 +526,11 @@ void HTTPClientSession::reconnect()
 			addr = SocketAddress(_host, _port);
 	}
 	else
+	{
+		if (_proxyConfig.protocol == "https" && !secure())
+			throw Poco::NotImplementedException("HTTPS proxy requires HTTPSClientSession");
 		addr = SocketAddress(_proxyConfig.host, _proxyConfig.port);
+	}
 
 	if ((!_sourceAddress4.host().isWildcard()) || (_sourceAddress4.port() != 0))
 		connect(addr, _sourceAddress4);
@@ -474,8 +545,13 @@ std::string HTTPClientSession::proxyRequestPrefix() const
 {
 	std::string result("http://");
 	result.append(_host);
-	result.append(":");
-	NumberFormatter::append(result, _port);
+	// Do not append default port, since this may break some servers.
+	// One example of such server is GCS (Google Cloud Storage).
+	if (_port != HTTPSession::HTTP_PORT)
+	{
+		result.append(":");
+		NumberFormatter::append(result, _port);
+	}
 	return result;
 }
 
@@ -501,16 +577,16 @@ void HTTPClientSession::proxyAuthenticateImpl(HTTPRequest& request, const ProxyC
 {
 	switch (proxyConfig.authMethod)
 	{
-	case PROXY_AUTH_NONE:
+	case ProxyAuthentication::None:
 		break;
 
-	case PROXY_AUTH_HTTP_BASIC:
+	case ProxyAuthentication::Basic:
 		_proxyBasicCreds.setUsername(proxyConfig.username);
 		_proxyBasicCreds.setPassword(proxyConfig.password);
 		_proxyBasicCreds.proxyAuthenticate(request);
 		break;
 
-	case PROXY_AUTH_HTTP_DIGEST:
+	case ProxyAuthentication::Digest:
 		if (HTTPCredentials::hasDigestCredentials(request))
 		{
 			_proxyDigestCreds.updateProxyAuthInfo(request);
@@ -523,7 +599,7 @@ void HTTPClientSession::proxyAuthenticateImpl(HTTPRequest& request, const ProxyC
 		}
 		break;
 
-	case PROXY_AUTH_NTLM:
+	case ProxyAuthentication::NTLM:
 		if (_ntlmProxyAuthenticated)
 		{
 			_proxyNTLMCreds.updateProxyAuthInfo(request);
@@ -581,25 +657,39 @@ void HTTPClientSession::sendChallengeRequest(const HTTPRequest& request, HTTPRes
 
 StreamSocket HTTPClientSession::proxyConnect()
 {
-	ProxyConfig emptyProxyConfig;
-	HTTPClientSession proxySession(getProxyHost(), getProxyPort(), emptyProxyConfig);
-	proxySession.setTimeout(getTimeout());
-	std::string targetAddress(_host);
+	if (getProxyProtocol() == "https" && !secure())
+		throw Poco::NotImplementedException("HTTPS proxy requires HTTPSClientSession");
+
+	URI proxyUri;
+	proxyUri.setScheme(getProxyProtocol());
+	proxyUri.setHost(getProxyHost());
+	proxyUri.setPort(getProxyPort());
+
+	SharedPtr<HTTPClientSession> proxySession (_proxySessionFactory.createClientSession(proxyUri));
+
+	proxySession->setTimeout(getTimeout());
+	// RFC 3986 requires IPv6 literal hosts to be bracketed in the authority form
+	// used as the CONNECT request-target and in the Host header.
+	std::string targetAddress;
+	if (_host.find(':') != std::string::npos)
+		targetAddress.append("[").append(_host).append("]");
+	else
+		targetAddress.append(_host);
 	targetAddress.append(":");
 	NumberFormatter::append(targetAddress, _port);
 	HTTPRequest proxyRequest(HTTPRequest::HTTP_CONNECT, targetAddress, HTTPMessage::HTTP_1_1);
 	HTTPResponse proxyResponse;
 	proxyRequest.set(HTTPMessage::PROXY_CONNECTION, HTTPMessage::CONNECTION_KEEP_ALIVE);
-	proxyRequest.set(HTTPRequest::HOST, getHost());
-	proxySession.proxyAuthenticateImpl(proxyRequest, _proxyConfig);
-	proxySession.setKeepAlive(true);
-	proxySession.setSourceAddress(_sourceAddress4);
-	proxySession.setSourceAddress(_sourceAddress6);
-	proxySession.sendRequest(proxyRequest);
-	proxySession.receiveResponse(proxyResponse);
+	proxyRequest.set(HTTPRequest::HOST, targetAddress);
+	proxySession->proxyAuthenticateImpl(proxyRequest, _proxyConfig);
+	proxySession->setKeepAlive(true);
+	proxySession->setSourceAddress(_sourceAddress4);
+	proxySession->setSourceAddress(_sourceAddress6);
+	proxySession->sendRequest(proxyRequest);
+	proxySession->receiveResponse(proxyResponse);
 	if (proxyResponse.getStatus() != HTTPResponse::HTTP_OK)
-		throw HTTPException("Cannot establish proxy connection", proxyResponse.getReason());
-	return proxySession.detachSocket();
+		throw HTTPException("Cannot establish proxy connection (" + std::to_string(proxyResponse.getStatus()) + ")", proxyResponse.getReason());
+	return proxySession->detachSocket();
 }
 
 
@@ -618,6 +708,5 @@ bool HTTPClientSession::bypassProxy() const
 	}
 	else return false;
 }
-
 
 } // namespace Poco::Net

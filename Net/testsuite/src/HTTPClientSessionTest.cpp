@@ -24,10 +24,15 @@
 
 
 using Poco::Net::HTTPClientSession;
+using Poco::Net::HTTPSession;
+using Poco::Net::ProxyConfig;
+using Poco::Net::ProxyAuthentication;
 using Poco::Net::HTTPRequest;
 using Poco::Net::HTTPResponse;
 using Poco::Net::HTTPMessage;
 using Poco::StreamCopier;
+using Poco::InvalidArgumentException;
+using Poco::IllegalStateException;
 using Poco::File;
 using Poco::Path;
 
@@ -294,7 +299,7 @@ void HTTPClientSessionTest::testProxyAuth()
 
 void HTTPClientSessionTest::testBypassProxy()
 {
-	HTTPClientSession::ProxyConfig proxyConfig;
+	ProxyConfig proxyConfig;
 	proxyConfig.host = "proxy.domain.com";
 	proxyConfig.port = 80;
 	proxyConfig.nonProxyHosts = "localhost|127\\.0\\.0\\.1";
@@ -354,6 +359,259 @@ void HTTPClientSessionTest::testExpectContinueFail()
 }
 
 
+void HTTPClientSessionTest::testProxyConfig()
+{
+	ProxyConfig config;
+	assertTrue (config.host.empty());
+	assertTrue (config.port == HTTPSession::HTTP_PORT);
+	assertTrue (config.protocol == "http");
+	assertTrue (config.tunnel == true);
+	assertTrue (config.username.empty());
+	assertTrue (config.password.empty());
+	assertTrue (config.nonProxyHosts.empty());
+	assertTrue (config.authMethod == ProxyAuthentication::Basic);
+}
+
+
+void HTTPClientSessionTest::testSetProxyProtocolValidation()
+{
+	HTTPClientSession s("www.example.com");
+
+	try
+	{
+		s.setProxy("proxy", 80, "ftp", true);
+		fail("must throw InvalidArgumentException");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	try
+	{
+		s.setProxy("proxy", 80, "", true);
+		fail("must throw InvalidArgumentException");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	try
+	{
+		s.setProxyProtocol("socks");
+		fail("must throw InvalidArgumentException");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	s.setProxy("proxy", 80, "http", true);
+	assertTrue (s.getProxyProtocol() == "http");
+
+	// HTTPS proxy is only supported by HTTPSClientSession; plain
+	// HTTPClientSession must reject protocol "https".
+	try
+	{
+		s.setProxy("proxy", 443, "https", true);
+		fail("must throw InvalidArgumentException");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	try
+	{
+		s.setProxyProtocol("https");
+		fail("must throw InvalidArgumentException");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+}
+
+
+void HTTPClientSessionTest::testSetProxyConfigValidation()
+{
+	HTTPClientSession s("www.example.com");
+
+	ProxyConfig badConfig;
+	badConfig.host = "proxy";
+	badConfig.protocol = "ftp";
+
+	try
+	{
+		s.setProxyConfig(badConfig);
+		fail("must throw InvalidArgumentException");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+
+	ProxyConfig goodConfig;
+	goodConfig.host = "proxy";
+	goodConfig.protocol = "http";
+	s.setProxyConfig(goodConfig);
+	assertTrue (s.getProxyHost() == "proxy");
+
+	// HTTPS proxy is only supported by HTTPSClientSession; plain
+	// HTTPClientSession must reject a ProxyConfig with protocol "https".
+	ProxyConfig httpsConfig;
+	httpsConfig.host = "proxy";
+	httpsConfig.port = 443;
+	httpsConfig.protocol = "https";
+	try
+	{
+		s.setProxyConfig(httpsConfig);
+		fail("must throw InvalidArgumentException");
+	}
+	catch (InvalidArgumentException&)
+	{
+	}
+}
+
+
+void HTTPClientSessionTest::testProxySetters()
+{
+	HTTPClientSession s("www.example.com");
+
+	s.setProxyHost("proxy.example.com");
+	assertTrue (s.getProxyHost() == "proxy.example.com");
+
+	s.setProxyPort(8080);
+	assertTrue (s.getProxyPort() == 8080);
+
+	s.setProxyProtocol("http");
+	assertTrue (s.getProxyProtocol() == "http");
+
+	s.setProxyTunnel(false);
+	assertTrue (s.isProxyTunnel() == false);
+
+	s.setProxyCredentials("user", "pass");
+	assertTrue (s.getProxyUsername() == "user");
+	assertTrue (s.getProxyPassword() == "pass");
+
+	ProxyConfig config;
+	config.host = "other-proxy.com";
+	config.port = 3128;
+	config.protocol = "http";
+	config.tunnel = true;
+	config.username = "admin";
+	config.password = "secret";
+	s.setProxyConfig(config);
+	assertTrue (s.getProxyHost() == "other-proxy.com");
+	assertTrue (s.getProxyPort() == 3128);
+	assertTrue (s.getProxyProtocol() == "http");
+	assertTrue (s.isProxyTunnel() == true);
+	assertTrue (s.getProxyUsername() == "admin");
+	assertTrue (s.getProxyPassword() == "secret");
+}
+
+
+void HTTPClientSessionTest::testProxyRequestPrefix()
+{
+	HTTPTestServer srv;
+
+	HTTPClientSession s1("www.somehost.com", 80);
+	s1.setProxy("127.0.0.1", srv.port());
+	HTTPRequest request1(HTTPRequest::HTTP_GET, "/large");
+	s1.sendRequest(request1);
+	HTTPResponse response1;
+	std::istream& rs1 = s1.receiveResponse(response1);
+	std::ostringstream ostr1;
+	StreamCopier::copyStream(rs1, ostr1);
+	std::string r1 = srv.lastRequest();
+	// Port 80 should NOT appear in the prefix
+	assertTrue (r1.find("GET http://www.somehost.com/large") != std::string::npos);
+	assertTrue (r1.find(":80") == std::string::npos);
+
+	HTTPTestServer srv2;
+	HTTPClientSession s2("www.somehost.com", 8080);
+	s2.setProxy("127.0.0.1", srv2.port());
+	HTTPRequest request2(HTTPRequest::HTTP_GET, "/large");
+	s2.sendRequest(request2);
+	HTTPResponse response2;
+	std::istream& rs2 = s2.receiveResponse(response2);
+	std::ostringstream ostr2;
+	StreamCopier::copyStream(rs2, ostr2);
+	std::string r2 = srv2.lastRequest();
+	// Non-default port should appear in the prefix
+	assertTrue (r2.find("GET http://www.somehost.com:8080/large") != std::string::npos);
+}
+
+
+void HTTPClientSessionTest::testProxyNonTunnel()
+{
+	HTTPTestServer srv;
+	HTTPClientSession s("www.somehost.com");
+	s.setProxy("127.0.0.1", srv.port(), "http", false);
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/large");
+	s.sendRequest(request);
+	HTTPResponse response;
+	std::istream& rs = s.receiveResponse(response);
+	assertTrue (response.getContentLength() == HTTPTestServer::LARGE_BODY.length());
+	assertTrue (response.getContentType() == "text/plain");
+	std::ostringstream ostr;
+	StreamCopier::copyStream(rs, ostr);
+	assertTrue (ostr.str() == HTTPTestServer::LARGE_BODY);
+	std::string r = srv.lastRequest();
+	assertTrue (r.find("GET http://www.somehost.com/large") != std::string::npos);
+}
+
+
+void HTTPClientSessionTest::testGlobalProxyConfig()
+{
+	ProxyConfig globalConfig;
+	globalConfig.host = "global-proxy.example.com";
+	globalConfig.port = 3128;
+	globalConfig.protocol = "http";
+	HTTPClientSession::setGlobalProxyConfig(globalConfig);
+
+	HTTPClientSession s1("www.example.com");
+	assertTrue (s1.getProxyHost() == "global-proxy.example.com");
+	assertTrue (s1.getProxyPort() == 3128);
+
+	// Per-session config overrides global
+	ProxyConfig localConfig;
+	localConfig.host = "local-proxy.example.com";
+	localConfig.port = 8080;
+	localConfig.protocol = "http";
+	s1.setProxyConfig(localConfig);
+	assertTrue (s1.getProxyHost() == "local-proxy.example.com");
+	assertTrue (s1.getProxyPort() == 8080);
+
+	// Reset global config
+	ProxyConfig emptyConfig;
+	HTTPClientSession::setGlobalProxyConfig(emptyConfig);
+
+	HTTPClientSession s2("www.example.com");
+	assertTrue (s2.getProxyHost().empty());
+}
+
+
+void HTTPClientSessionTest::testBypassProxyExtended()
+{
+	ProxyConfig config;
+	config.host = "proxy.domain.com";
+	config.port = 80;
+	config.protocol = "http";
+	config.tunnel = false;
+	config.nonProxyHosts = "localhost|127\\.0\\.0\\.1";
+
+	HTTPClientSession s1("127.0.0.1", 80);
+	s1.setProxyConfig(config);
+	assertTrue (s1.bypassProxy());
+
+	HTTPClientSession s2("www.appinf.com", 80);
+	s2.setProxyConfig(config);
+	assertTrue (!s2.bypassProxy());
+
+	// Empty nonProxyHosts disables bypass
+	config.nonProxyHosts = "";
+	HTTPClientSession s3("127.0.0.1", 80);
+	s3.setProxyConfig(config);
+	assertTrue (!s3.bypassProxy());
+}
+
+
 void HTTPClientSessionTest::setUp()
 {
 }
@@ -383,6 +641,14 @@ CppUnit::Test* HTTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testBypassProxy);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testExpectContinue);
 	CppUnit_addTest(pSuite, HTTPClientSessionTest, testExpectContinueFail);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxyConfig);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testSetProxyProtocolValidation);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testSetProxyConfigValidation);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxySetters);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxyRequestPrefix);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testProxyNonTunnel);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testGlobalProxyConfig);
+	CppUnit_addTest(pSuite, HTTPClientSessionTest, testBypassProxyExtended);
 
 	return pSuite;
 }

@@ -677,7 +677,7 @@ MeasureText  (HPDF_Font          font,
     HPDF_UINT tmp_len = 0;
     HPDF_UINT i;
     HPDF_FontAttr attr = (HPDF_FontAttr)font->attr;
-    HPDF_ByteType last_btype = HPDF_BYTE_TYPE_TRAIL;
+    //HPDF_ByteType last_btype = HPDF_BYTE_TYPE_TRAIL;
     HPDF_Encoder encoder = attr->encoder;
     HPDF_ParseText_Rec  parse_state;
     HPDF_INT dw2;
@@ -767,10 +767,13 @@ MeasureText  (HPDF_Font          font,
         if (w > width || b == 0x0A)
             return tmp_len;
 
+        /*
         if (HPDF_IS_WHITE_SPACE(b))
             last_btype = HPDF_BYTE_TYPE_TRAIL;
         else
             last_btype = btype;
+        */
+
     }
 
     /* all of text can be put in the specified width */

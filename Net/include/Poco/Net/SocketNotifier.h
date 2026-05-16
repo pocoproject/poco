@@ -65,7 +65,7 @@ public:
 
 	[[nodiscard]]
 	std::size_t countObservers() const;
-		/// Returns the number of subscribers;
+		/// Returns the number of subscribers
 
 	[[nodiscard]]
 	Socket socket() const;

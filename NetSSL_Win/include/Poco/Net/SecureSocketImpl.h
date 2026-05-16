@@ -252,6 +252,7 @@ protected:
 		ST_CLIENT_HSK_LOOP_DONE,
 		ST_CLIENT_HSK_SEND_FINAL,
 		ST_CLIENT_HSK_SEND_ERROR,
+		ST_CLIENT_HSK_END,
 		ST_CLIENT_VERIFY,
 		ST_ACCEPTING,
 		ST_SERVER_HSK_START,
@@ -260,6 +261,7 @@ protected:
 		ST_SERVER_HSK_LOOP_PROCESS,
 		ST_SERVER_HSK_LOOP_SEND,
 		ST_SERVER_HSK_LOOP_DONE,
+		ST_SERVER_HSK_END,
 		ST_SERVER_VERIFY,
 		ST_DONE,
 		ST_ERROR,
@@ -296,6 +298,7 @@ protected:
 	void stateClientHandshakeLoopDone();
 	void stateClientHandshakeSendFinal();
 	void stateClientHandshakeSendError();
+	void stateClientHandshakeEnd();
 	void stateClientVerify();
 
 	void stateServerAccepted();
@@ -305,12 +308,13 @@ protected:
 	void stateServerHandshakeLoopProcess();
 	void stateServerHandshakeLoopSend();
 	void stateServerHandshakeLoopDone();
-	void stateServerHandshakeVerify();
+	void stateServerHandshakeEnd();
+	void stateServerVerify();
 
 	void sendOutSecBufferAndAdvanceState(State state);
 	void drainExtraBuffer();
 	[[nodiscard]]
-	static int getRecordLength(const BYTE* pBuffer, int length);
+	static int recordLength(const BYTE* pBuffer, int length);
 	[[nodiscard]]
 	static bool bufferHasCompleteRecords(const BYTE* pBuffer, int length);
 
@@ -366,6 +370,8 @@ private:
 	DWORD _sendBufferPending;
 	Poco::Buffer<BYTE> _recvBuffer;
 	DWORD _recvBufferOffset;
+	Poco::Buffer<BYTE> _extraBuffer;
+	DWORD _extraBufferOffset;
 	DWORD _ioBufferSize;
 
 	SecPkgContext_StreamSizes _streamSizes;
@@ -374,8 +380,6 @@ private:
 	SecBuffer _extraSecBuffer;
 	SECURITY_STATUS _securityStatus;
 	State _state;
-	bool _needData;
-	bool _needHandshake;
 	bool _initServerContext = false;
 
 	friend class SecureStreamSocketImpl;

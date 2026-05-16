@@ -28,10 +28,8 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/OptionException.h"
-#if OPENSSL_VERSION_NUMBER >= 0x10001000L
 #include <openssl/ocsp.h>
 #include <openssl/tls1.h>
-#endif
 
 
 namespace Poco::Net {
@@ -272,7 +270,6 @@ int SSLManager::privateKeyPassphraseCallback(char* pBuf, int size, int flag, voi
 
 int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 {
-#if OPENSSL_VERSION_NUMBER >= 0x10001000L
 	const long OCSP_VALIDITY_LEEWAY = 5*60;
 
 	Poco::Net::Context* pContext = static_cast<Poco::Net::Context*>(arg);
@@ -403,7 +400,6 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 
 	OCSP_BASICRESP_free(pBasicResp);
 	OCSP_RESPONSE_free(pOcspResp);
-#endif
 
 	return 1;
 }

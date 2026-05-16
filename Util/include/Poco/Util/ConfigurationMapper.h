@@ -80,7 +80,7 @@ protected:
 	[[nodiscard]]
 	std::string translateKey(const std::string& key) const;
 
-	~ConfigurationMapper() = default;
+	~ConfigurationMapper();
 
 private:
 	std::string _fromPrefix;
