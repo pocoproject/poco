@@ -62,6 +62,7 @@ Features, Enhancements and Third Party Updates:
 
 Bug Fixes and Improvements:
 
+- GH #5352 C++20 does not guarantee atomic_flag::test (PR #5353)
 - GH #5347 PDF does not build with make
 - GH #5342 Oracle ODBC CI fail
 - GH #5340 PropertyFileConfiguration does not persist deletion of last key from included property files
