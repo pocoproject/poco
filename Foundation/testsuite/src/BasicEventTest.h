@@ -44,6 +44,7 @@ public:
 	void testOverwriteDelegate();
 	void testAsyncNotify();
 	void testNullMutex();
+	void testRemoveDelegateFromNotify();
 
 	void setUp();
 	void tearDown();

@@ -25,6 +25,45 @@ using namespace Poco;
 #define LARGEINC 100
 
 
+namespace
+{
+	// Subscriber whose handler removes another delegate from the event during
+	// notify. Used by testRemoveDelegateFromNotify to exercise the lock-order
+	// pattern in AbstractEvent::operator -=.
+	//
+	// Note: a SELF-removing handler does not trigger the cycle reliably,
+	// because the back-edge (Delegate::disable inside operator -=) re-acquires
+	// the same Delegate mutex that Delegate::notify is already holding. tsan
+	// treats that as a recursive same-mutex re-acquire and does not add a
+	// lock-order graph edge. Cross-removal sidesteps the recursion: the
+	// disable inside the target operator -= touches a *different* delegate's
+	// mutex, so the back-edge `M_event -> M_delegate` only materialises on
+	// the same mutex pair as the forward edge when the surviving delegate
+	// is later removed from outside the notify.
+	class CrossRemover
+	{
+	public:
+		CrossRemover(Poco::BasicEvent<int>& ev): _ev(ev), _pTarget(nullptr), _fired(0) {}
+
+		void setTarget(CrossRemover* pTarget) { _pTarget = pTarget; }
+
+		void onNotify(const void*, int&)
+		{
+			++_fired;
+			if (_pTarget)
+				_ev -= delegate(_pTarget, &CrossRemover::onNotify);
+		}
+
+		int fired() const { return _fired; }
+
+	private:
+		Poco::BasicEvent<int>& _ev;
+		CrossRemover* _pTarget;
+		int _fired;
+	};
+}
+
+
 BasicEventTest::BasicEventTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -436,6 +475,65 @@ void BasicEventTest::tearDown()
 }
 
 
+void BasicEventTest::testRemoveDelegateFromNotify()
+{
+	// Removing a delegate from an event during notify() is documented as
+	// supported by AbstractEvent::notify's doc comment:
+	//
+	//   "If a delegate is removed during a notify(), the delegate will no
+	//    longer be invoked (unless it has already been invoked prior to
+	//    removal)."
+	//
+	// The implementation closes a lock-order cycle between Delegate::_mutex
+	// (M_delegate) and AbstractEvent::_mutex (M_event):
+	//
+	//   Forward edge M_delegate -> M_event:
+	//     Delegate::notify holds M_delegate around the target callback;
+	//     the callback does ev -= other_delegate, which acquires M_event
+	//     inside AbstractEvent::operator -=.
+	//
+	//   Back edge M_event -> M_delegate:
+	//     A separate operator -= holds M_event and calls
+	//     DefaultStrategy::remove -> Delegate::disable, which acquires
+	//     that delegate's M_delegate.
+	//
+	// Both orders observed on the same (M_delegate, M_event) pair forms a
+	// cycle in the lock-order graph. ThreadSanitizer reports it as a
+	// potential deadlock. Poco::Delegate uses recursive Poco::Mutex, so
+	// single-threaded sequential code does not actually deadlock today,
+	// but the multi-thread analogue is a real deadlock (one thread in
+	// notify, another in operator -= on a delegate registered on the
+	// same event).
+	//
+	// To exhibit the cycle we set up two cross-removing delegates:
+	//   - A's target does ev -= B, which records M_A -> M_event during
+	//     A's notify (B's disable acquires M_B, not M_A, so no recursion
+	//     masks the forward edge on M_A).
+	//   - Then external ev -= A records M_event -> M_A: M_event acquired
+	//     by operator -=, then A's disable acquires M_A fresh.
+	//
+	// Both edges sit on the same (M_A, M_event) pair; tsan reports the
+	// cycle. After the proposed fix (disable outside the event mutex),
+	// the back edge disappears and the test passes cleanly.
+
+	Poco::BasicEvent<int> ev;
+	CrossRemover a(ev), b(ev);
+	a.setTarget(&b);   // a's target removes b during a's notify
+
+	ev += delegate(&a, &CrossRemover::onNotify);
+	ev += delegate(&b, &CrossRemover::onNotify);
+
+	int v = 0;
+	ev.notify(this, v);
+	// Forward edge M_A -> M_event recorded during a's notify.
+	assertEqual(1, a.fired());
+
+	// External remove of a: back edge M_event -> M_A recorded.
+	// Cycle on (M_A, M_event) now visible in the lock-order graph.
+	ev -= delegate(&a, &CrossRemover::onNotify);
+}
+
+
 CppUnit::Test* BasicEventTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("BasicEventTest");
@@ -451,5 +549,6 @@ CppUnit::Test* BasicEventTest::suite()
 	CppUnit_addTest(pSuite, BasicEventTest, testOverwriteDelegate);
 	CppUnit_addTest(pSuite, BasicEventTest, testAsyncNotify);
 	CppUnit_addTest(pSuite, BasicEventTest, testNullMutex);
+	CppUnit_addTest(pSuite, BasicEventTest, testRemoveDelegateFromNotify);
 	return pSuite;
 }
