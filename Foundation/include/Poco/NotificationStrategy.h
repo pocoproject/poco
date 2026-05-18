@@ -19,6 +19,8 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/SharedPtr.h"
+#include <vector>
 
 
 namespace Poco {
@@ -34,6 +36,8 @@ class NotificationStrategy
 {
 public:
 	using DelegateHandle = TDelegate*;
+	using DelegatePtr    = SharedPtr<TDelegate>;
+	using Delegates      = std::vector<DelegatePtr>;
 
 	NotificationStrategy() = default;
 
@@ -53,6 +57,23 @@ public:
 		/// Removes a delegate from the strategy, if found.
 		/// Does nothing if the delegate has not been added.
 
+	virtual DelegatePtr detach(const TDelegate& delegate) = 0;
+		/// Removes a matching delegate from the strategy without disabling
+		/// it, and returns the detached delegate (or an empty DelegatePtr
+		/// if no match). The caller is responsible for calling disable()
+		/// on the returned delegate. AbstractEvent uses this to avoid
+		/// holding the event mutex across Delegate::disable() — see
+		/// AbstractEvent::operator -= for the lock-order rationale.
+
+	virtual DelegatePtr detach(DelegateHandle delegateHandle) = 0;
+		/// Same as detach(const TDelegate&), keyed by handle.
+
+	virtual Delegates detachAll() = 0;
+		/// Removes all delegates from the strategy without disabling them
+		/// and returns them, so the caller can disable() each outside its
+		/// own mutex. AbstractEvent::clear() uses this for the same reason
+		/// detach() exists.
+
 	virtual void clear() = 0;
 		/// Removes all delegates from the strategy.
 
@@ -71,6 +92,8 @@ class NotificationStrategy<void, TDelegate>
 {
 public:
 	using DelegateHandle = TDelegate*;
+	using DelegatePtr    = SharedPtr<TDelegate>;
+	using Delegates      = std::vector<DelegatePtr>;
 
 	NotificationStrategy() = default;
 
@@ -89,6 +112,15 @@ public:
 	virtual void remove(DelegateHandle delegateHandle) = 0;
 		/// Removes a delegate from the strategy, if found.
 		/// Does nothing if the delegate has not been added.
+
+	virtual DelegatePtr detach(const TDelegate& delegate) = 0;
+		/// See the TArgs specialization above.
+
+	virtual DelegatePtr detach(DelegateHandle delegateHandle) = 0;
+		/// See the TArgs specialization above.
+
+	virtual Delegates detachAll() = 0;
+		/// See the TArgs specialization above.
 
 	virtual void clear() = 0;
 		/// Removes all delegates from the strategy.

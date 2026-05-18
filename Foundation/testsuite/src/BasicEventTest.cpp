@@ -527,6 +527,9 @@ void BasicEventTest::testRemoveDelegateFromNotify()
 	ev.notify(this, v);
 	// Forward edge M_A -> M_event recorded during a's notify.
 	assertEqual(1, a.fired());
+	// Functional contract: b was removed by a's callback before b's turn
+	// in the same notify() sequence, so b must not have been invoked.
+	assertEqual(0, b.fired());
 
 	// External remove of a: back edge M_event -> M_A recorded.
 	// Cycle on (M_A, M_event) now visible in the lock-order graph.
