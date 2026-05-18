@@ -251,7 +251,7 @@
 
 #if defined(__APPLE__) && __has_include(<Availability.h>)
 	#include <Availability.h>
-	#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 110000
+	#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 110000 && POCO_HAVE_CPP20_COMPILER
 		 #define POCO_HAVE_ATOMIC_WAIT 1
 	#endif
 #elif defined(__cpp_lib_atomic_wait)
