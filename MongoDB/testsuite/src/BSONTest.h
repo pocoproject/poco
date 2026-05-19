@@ -67,6 +67,13 @@ public:
 	// JavaScriptCode tests
 	void testJavaScriptCode();
 
+	// Decimal128 / MinKey / MaxKey tests
+	void testDecimal128Specials();
+	void testDecimal128FromString();
+	void testDecimal128RoundTrip();
+	void testDecimal128SerializeDocument();
+	void testMinKeyMaxKeySerializeDocument();
+
 	// Serialization/Deserialization tests
 	void testDocumentSerialization();
 	void testDocumentDeserialization();

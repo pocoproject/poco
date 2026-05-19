@@ -14,9 +14,14 @@
 #include "Poco/MongoDB/Document.h"
 #include "Poco/MongoDB/Array.h"
 #include "Poco/MongoDB/Binary.h"
+#include "Poco/MongoDB/Decimal128.h"
+#include "Poco/MongoDB/MaxKey.h"
+#include "Poco/MongoDB/MinKey.h"
 #include "Poco/MongoDB/ObjectId.h"
 #include "Poco/MongoDB/RegularExpression.h"
 #include "Poco/MongoDB/JavaScriptCode.h"
+#include "Poco/BinaryReader.h"
+#include "Poco/BinaryWriter.h"
 #include "Poco/DateTime.h"
 #include "Poco/UUIDGenerator.h"
 #include <sstream>
@@ -759,6 +764,141 @@ void BSONTest::testJavaScriptCode()
 }
 
 
+void BSONTest::testDecimal128Specials()
+{
+	Decimal128 zero;
+	assertFalse(zero.isNaN());
+	assertFalse(zero.isInfinite());
+	assertFalse(zero.isNegative());
+	assertEqual(std::string("0"), zero.toString());
+
+	Decimal128 negZero = Decimal128::negativeZero();
+	assertTrue(negZero.isNegative());
+	assertEqual(std::string("-0"), negZero.toString());
+
+	Decimal128 nan = Decimal128::nan();
+	assertTrue(nan.isNaN());
+	assertEqual(std::string("NaN"), nan.toString());
+
+	Decimal128 posInf = Decimal128::positiveInfinity();
+	assertTrue(posInf.isInfinite());
+	assertFalse(posInf.isNegative());
+	assertEqual(std::string("Infinity"), posInf.toString());
+
+	Decimal128 negInf = Decimal128::negativeInfinity();
+	assertTrue(negInf.isInfinite());
+	assertTrue(negInf.isNegative());
+	assertEqual(std::string("-Infinity"), negInf.toString());
+}
+
+
+void BSONTest::testDecimal128FromString()
+{
+	struct Case
+	{
+		const char* in;
+		const char* out;
+	};
+	const Case cases[] = {
+		{"0",         "0"},
+		{"-0",        "-0"},
+		{"1",         "1"},
+		{"-1",        "-1"},
+		{"123",       "123"},
+		{"-456",      "-456"},
+		{"1.5",       "1.5"},
+		{"-1.5",      "-1.5"},
+		{"0.1",       "0.1"},
+		{"0.0001",    "0.0001"},
+		{"1E+5",      "1E+5"},
+		{"1.234E+10", "1.234E+10"},
+		{"-1E-3",     "-0.001"},
+		{"NaN",       "NaN"},
+		{"Infinity",  "Infinity"},
+		{"-Infinity", "-Infinity"},
+		{"inf",       "Infinity"},
+		{"-inf",      "-Infinity"}
+	};
+
+	for (const Case& c: cases)
+	{
+		Decimal128 v = Decimal128::fromString(c.in);
+		assertEqual(std::string(c.out), v.toString());
+	}
+
+	try
+	{
+		Decimal128::fromString("not a number");
+		failmsg("expected SyntaxException on malformed input");
+	}
+	catch (const Poco::SyntaxException&)
+	{
+	}
+}
+
+
+void BSONTest::testDecimal128RoundTrip()
+{
+	// Round-trip via toString -> fromString -> toString.
+	Decimal128 a = Decimal128::fromString("3.14159265358979323846");
+	Decimal128 b = Decimal128::fromString(a.toString());
+	assertTrue(a == b);
+	assertEqual(a.toString(), b.toString());
+
+	// Raw construction round-trips the bits.
+	Decimal128 raw(0x0102030405060708ULL, 0x3040000000000000ULL);
+	Decimal128 raw2(raw.low(), raw.high());
+	assertTrue(raw == raw2);
+}
+
+
+void BSONTest::testDecimal128SerializeDocument()
+{
+	// Serialize a Document containing a Decimal128 to BSON, then read it
+	// back and verify the value survives the round trip.
+	Document::Ptr doc = new Document();
+	Decimal128::Ptr value = new Decimal128(Decimal128::fromString("3.14159265358979"));
+	doc->add("pi"s, value);
+
+	std::stringstream stream;
+	Poco::BinaryWriter writer(stream, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
+	doc->write(writer);
+	writer.flush();
+
+	Document::Ptr restored = new Document();
+	Poco::BinaryReader reader(stream, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	restored->read(reader);
+
+	assertTrue(restored->exists("pi"));
+	Decimal128::Ptr round = restored->get<Decimal128::Ptr>("pi");
+	assertFalse(round.isNull());
+	assertEqual(value->toString(), round->toString());
+	assertTrue(*value == *round);
+}
+
+
+void BSONTest::testMinKeyMaxKeySerializeDocument()
+{
+	Document::Ptr doc = new Document();
+	doc->add("min"s, MinKey{});
+	doc->add("max"s, MaxKey{});
+
+	std::stringstream stream;
+	Poco::BinaryWriter writer(stream, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
+	doc->write(writer);
+	writer.flush();
+
+	Document::Ptr restored = new Document();
+	Poco::BinaryReader reader(stream, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	restored->read(reader);
+
+	assertTrue(restored->exists("min"));
+	assertTrue(restored->exists("max"));
+	assertTrue(restored->isType<MinKey>("min"));
+	assertTrue(restored->isType<MaxKey>("max"));
+}
+
+
 void BSONTest::testDocumentSerialization()
 {
 	Document::Ptr doc = new Document();
@@ -1318,6 +1458,12 @@ CppUnit::Test* BSONTest::suite()
 
 	// JavaScriptCode tests
 	CppUnit_addTest(pSuite, BSONTest, testJavaScriptCode);
+
+	CppUnit_addTest(pSuite, BSONTest, testDecimal128Specials);
+	CppUnit_addTest(pSuite, BSONTest, testDecimal128FromString);
+	CppUnit_addTest(pSuite, BSONTest, testDecimal128RoundTrip);
+	CppUnit_addTest(pSuite, BSONTest, testDecimal128SerializeDocument);
+	CppUnit_addTest(pSuite, BSONTest, testMinKeyMaxKeySerializeDocument);
 
 	// Serialization/Deserialization tests
 	CppUnit_addTest(pSuite, BSONTest, testDocumentSerialization);
