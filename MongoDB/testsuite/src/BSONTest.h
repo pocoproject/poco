@@ -74,6 +74,10 @@ public:
 	void testDecimal128SerializeDocument();
 	void testMinKeyMaxKeySerializeDocument();
 
+	// Authentication constants and SASLprep guard
+	void testAuthMechanismConstants();
+	void testAuthSCRAM256RejectsNonAscii();
+
 	// Serialization/Deserialization tests
 	void testDocumentSerialization();
 	void testDocumentDeserialization();

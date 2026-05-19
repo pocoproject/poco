@@ -67,18 +67,27 @@ public:
 	[[nodiscard]] const std::string& name() const;
 		/// Database name
 
-	bool authenticate(Connection& connection, const std::string& username, const std::string& password, const std::string& method = AUTH_SCRAM_SHA1);
+	bool authenticate(Connection& connection, const std::string& username, const std::string& password, const std::string& method = AUTH_SCRAM_SHA256);
 		/// Authenticates against the database using the given connection,
 		/// username and password, as well as authentication method.
 		///
-		/// "SCRAM-SHA-1" (default starting in MongoDB 3.0) is the only supported
-		/// authentication method. "MONGODB-CR" is no longer supported as it
-		/// requires the legacy wire protocol.
+		/// Supported methods:
+		///   - "SCRAM-SHA-256" (default, MongoDB 4.0+ default for new users)
+		///   - "SCRAM-SHA-1"   (MongoDB 3.0+; pass AUTH_SCRAM_SHA1 explicitly)
+		///
+		/// "MONGODB-CR" is no longer supported as it requires the legacy wire
+		/// protocol.
+		///
+		/// For SCRAM-SHA-256 the password is used directly after SASLprep
+		/// (RFC 4013). Currently only ASCII passwords are accepted on the
+		/// SCRAM-SHA-256 path; passing a password containing non-ASCII bytes
+		/// throws Poco::NotImplementedException. Use SCRAM-SHA-1 for non-ASCII
+		/// passwords until full SASLprep support is implemented.
 		///
 		/// Returns true if authentication was successful, otherwise false.
 		///
-		/// May throw a Poco::ProtocolException if authentication fails for a reason other than
-		/// invalid credentials.
+		/// May throw a Poco::ProtocolException if authentication fails for a
+		/// reason other than invalid credentials.
 
 	[[nodiscard]] Document::Ptr queryBuildInfo(Connection& connection) const;
 		/// Queries server build info using OP_MSG protocol.
@@ -144,7 +153,12 @@ public:
 		/// The document returned is the createIndexes response body.
 
 	static const std::string AUTH_SCRAM_SHA1;
-		/// Default authentication mechanism for MongoDB 3.0 and later.
+		/// SCRAM-SHA-1 authentication mechanism (MongoDB 3.0 and later).
+
+	static const std::string AUTH_SCRAM_SHA256;
+		/// SCRAM-SHA-256 authentication mechanism. MongoDB 4.0 and later;
+		/// also the default mechanism for users created in 4.0+ without an
+		/// explicit mechanism specification. Default for Database::authenticate.
 
 	enum WireVersion
 		/// Wire version as reported by the command hello.
@@ -176,6 +190,10 @@ public:
 
 protected:
 	bool authSCRAM(Connection& connection, const std::string& username, const std::string& password);
+		/// Performs SCRAM-SHA-1 authentication.
+
+	bool authSCRAM256(Connection& connection, const std::string& username, const std::string& password);
+		/// Performs SCRAM-SHA-256 authentication. ASCII-only password fast path.
 
 private:
 	std::string _dbname;

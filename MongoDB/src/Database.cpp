@@ -28,6 +28,7 @@
 #include "Poco/Random.h"
 #include "Poco/RandomStream.h"
 #include "Poco/SHA1Engine.h"
+#include "Poco/SHA2Engine.h"
 #include "Poco/StreamCopier.h"
 #include <map>
 #include <sstream>
@@ -40,6 +41,7 @@ namespace Poco::MongoDB {
 
 
 const std::string Database::AUTH_SCRAM_SHA1("SCRAM-SHA-1");
+const std::string Database::AUTH_SCRAM_SHA256("SCRAM-SHA-256");
 
 
 namespace
@@ -126,6 +128,135 @@ namespace
 		}
 		return digestToHexString(md5);
 	}
+
+	bool isAsciiOnly(const std::string& s) noexcept
+	{
+		for (char c: s)
+		{
+			if (static_cast<unsigned char>(c) > 0x7F) return false;
+		}
+		return true;
+	}
+
+	template <class HashEngine>
+	bool runScramAuth(
+		Database& db,
+		Connection& connection,
+		const std::string& username,
+		const std::string& password,
+		const std::string& mechanism,
+		bool legacyMongoCrPasswordHash,
+		Poco::UInt32 dkLen)
+	{
+		std::string clientNonce(createNonce());
+		std::string clientFirstMsg = Poco::format("n=%s,r=%s", username, clientNonce);
+
+		Poco::SharedPtr<OpMsgMessage> pCommand = db.createOpMsgMessage("$cmd");
+		pCommand->setCommandName("saslStart");
+		pCommand->body()
+			.add<std::string>("mechanism", mechanism)
+			.add<Binary::Ptr>("payload", new Binary(Poco::format("n,,%s", clientFirstMsg)))
+			.add<bool>("autoAuthorize", true);
+
+		OpMsgMessage response;
+		connection.sendRequest(*pCommand, response);
+
+		Int32 conversationId = 0;
+		std::string serverFirstMsg;
+
+		if (!response.responseOk())
+		{
+			return false;
+		}
+		{
+			Document::Ptr pDoc = new Document(response.body());
+			Binary::Ptr pPayload = pDoc->get<Binary::Ptr>("payload");
+			serverFirstMsg = pPayload->toRawString();
+			conversationId = pDoc->get<Int32>("conversationId");
+		}
+
+		std::map<std::string, std::string> kvm = parseKeyValueList(serverFirstMsg);
+		const std::string serverNonce = kvm["r"];
+		const std::string salt = decodeBase64(kvm["s"]);
+		const unsigned iterations = Poco::NumberParser::parseUnsigned(kvm["i"]);
+
+		// SCRAM-SHA-1 path (MongoDB legacy): hash the credential as MD5 hex
+		//   of "username:mongo:password" before passing to PBKDF2. SCRAM-SHA-256
+		//   uses the password directly (after SASLprep, which is a no-op for
+		//   ASCII input).
+		std::string preprocessedPassword = legacyMongoCrPasswordHash
+			? hashCredentials(username, password)
+			: password;
+
+		Poco::PBKDF2Engine<Poco::HMACEngine<HashEngine>> pbkdf2(salt, iterations, dkLen);
+		pbkdf2.update(preprocessedPassword);
+		std::string saltedPassword = digestToBinaryString(pbkdf2);
+
+		std::string clientFinalNoProof = Poco::format("c=biws,r=%s", serverNonce);
+		std::string authMessage = Poco::format("%s,%s,%s", clientFirstMsg, serverFirstMsg, clientFinalNoProof);
+
+		Poco::HMACEngine<HashEngine> hmacKey(saltedPassword);
+		hmacKey.update(std::string("Client Key"));
+		std::string clientKey = digestToBinaryString(hmacKey);
+
+		HashEngine h;
+		h.update(clientKey);
+		std::string storedKey = digestToBinaryString(h);
+
+		Poco::HMACEngine<HashEngine> hmacSig(storedKey);
+		hmacSig.update(authMessage);
+		std::string clientSignature = digestToBinaryString(hmacSig);
+
+		std::string clientProof(clientKey);
+		for (std::size_t i = 0; i < clientProof.size(); i++)
+		{
+			clientProof[i] ^= clientSignature[i];
+		}
+
+		std::string clientFinal = Poco::format("%s,p=%s", clientFinalNoProof, encodeBase64(clientProof));
+
+		pCommand = db.createOpMsgMessage("$cmd");
+		pCommand->setCommandName("saslContinue");
+		pCommand->body()
+			.add<Poco::Int32>("conversationId", conversationId)
+			.add<Binary::Ptr>("payload", new Binary(clientFinal));
+
+		std::string serverSecondMsg;
+		connection.sendRequest(*pCommand, response);
+
+		if (!response.responseOk())
+		{
+			return false;
+		}
+		{
+			Document::Ptr pDoc = new Document(response.body());
+			Binary::Ptr pPayload = pDoc->get<Binary::Ptr>("payload");
+			serverSecondMsg = pPayload->toRawString();
+		}
+
+		Poco::HMACEngine<HashEngine> hmacSKey(saltedPassword);
+		hmacSKey.update(std::string("Server Key"));
+		std::string serverKey = digestToBinaryString(hmacSKey);
+
+		Poco::HMACEngine<HashEngine> hmacSSig(serverKey);
+		hmacSSig.update(authMessage);
+		std::string serverSignature = digestToBase64(hmacSSig);
+
+		kvm = parseKeyValueList(serverSecondMsg);
+		std::string serverSignatureReceived = kvm["v"];
+
+		if (serverSignature != serverSignatureReceived)
+			throw Poco::ProtocolException("server signature verification failed");
+
+		pCommand = db.createOpMsgMessage("$cmd");
+		pCommand->setCommandName("saslContinue");
+		pCommand->body()
+			.add<Poco::Int32>("conversationId", conversationId)
+			.add<Binary::Ptr>("payload", new Binary);
+
+		connection.sendRequest(*pCommand, response);
+		return response.responseOk();
+	}
 } // namespace
 
 
@@ -147,6 +278,8 @@ bool Database::authenticate(Connection& connection, const std::string& username,
 
 	if (method == AUTH_SCRAM_SHA1)
 		return authSCRAM(connection, username, password);
+	else if (method == AUTH_SCRAM_SHA256)
+		return authSCRAM256(connection, username, password);
 	else
 		throw Poco::InvalidArgumentException("authentication method", method);
 }
@@ -154,109 +287,24 @@ bool Database::authenticate(Connection& connection, const std::string& username,
 
 bool Database::authSCRAM(Connection& connection, const std::string& username, const std::string& password)
 {
-	std::string clientNonce(createNonce());
-	std::string clientFirstMsg = Poco::format("n=%s,r=%s", username, clientNonce);
+	return runScramAuth<Poco::SHA1Engine>(
+		*this, connection, username, password, AUTH_SCRAM_SHA1,
+		true,  // legacy MongoDB-CR style MD5 password preprocessing
+		20);
+}
 
-	Poco::SharedPtr<OpMsgMessage> pCommand = createOpMsgMessage("$cmd");
-	pCommand->setCommandName("saslStart");
-	pCommand->body()
-		.add<std::string>("mechanism", AUTH_SCRAM_SHA1)
-		.add<Binary::Ptr>("payload", new Binary(Poco::format("n,,%s", clientFirstMsg)))
-		.add<bool>("autoAuthorize", true);
 
-	OpMsgMessage response;
-	connection.sendRequest(*pCommand, response);
+bool Database::authSCRAM256(Connection& connection, const std::string& username, const std::string& password)
+{
+	if (!isAsciiOnly(password))
+		throw Poco::NotImplementedException(
+			"SCRAM-SHA-256 with non-ASCII passwords requires SASLprep (RFC 4013), "
+			"which is not yet implemented. Use SCRAM-SHA-1 or an ASCII password.");
 
-	Int32 conversationId = 0;
-	std::string serverFirstMsg;
-
-	if (!response.responseOk())
-	{
-		return false;
-	}
-	{
-		Document::Ptr pDoc = new Document(response.body());
-		Binary::Ptr pPayload = pDoc->get<Binary::Ptr>("payload");
-		serverFirstMsg = pPayload->toRawString();
-		conversationId = pDoc->get<Int32>("conversationId");
-	}
-
-	std::map<std::string, std::string> kvm = parseKeyValueList(serverFirstMsg);
-	const std::string serverNonce = kvm["r"];
-	const std::string salt = decodeBase64(kvm["s"]);
-	const unsigned iterations = Poco::NumberParser::parseUnsigned(kvm["i"]);
-	const Poco::UInt32 dkLen = 20;
-
-	std::string hashedPassword = hashCredentials(username, password);
-
-	Poco::PBKDF2Engine<Poco::HMACEngine<Poco::SHA1Engine> > pbkdf2(salt, iterations, dkLen);
-	pbkdf2.update(hashedPassword);
-	std::string saltedPassword = digestToBinaryString(pbkdf2);
-
-	std::string clientFinalNoProof = Poco::format("c=biws,r=%s", serverNonce);
-	std::string authMessage = Poco::format("%s,%s,%s", clientFirstMsg, serverFirstMsg, clientFinalNoProof);
-
-	Poco::HMACEngine<Poco::SHA1Engine> hmacKey(saltedPassword);
-	hmacKey.update(std::string("Client Key"));
-	std::string clientKey = digestToBinaryString(hmacKey);
-
-	Poco::SHA1Engine sha1;
-	sha1.update(clientKey);
-	std::string storedKey = digestToBinaryString(sha1);
-
-	Poco::HMACEngine<Poco::SHA1Engine> hmacSig(storedKey);
-	hmacSig.update(authMessage);
-	std::string clientSignature = digestToBinaryString(hmacSig);
-
-	std::string clientProof(clientKey);
-	for (std::size_t i = 0; i < clientProof.size(); i++)
-	{
-		clientProof[i] ^= clientSignature[i];
-	}
-
-	std::string clientFinal = Poco::format("%s,p=%s", clientFinalNoProof, encodeBase64(clientProof));
-
-	pCommand = createOpMsgMessage("$cmd");
-	pCommand->setCommandName("saslContinue");
-	pCommand->body()
-		.add<Poco::Int32>("conversationId", conversationId)
-		.add<Binary::Ptr>("payload", new Binary(clientFinal));
-
-	std::string serverSecondMsg;
-	connection.sendRequest(*pCommand, response);
-
-	if (!response.responseOk())
-	{
-		return false;
-	}
-	{
-		Document::Ptr pDoc = new Document(response.body());
-		Binary::Ptr pPayload = pDoc->get<Binary::Ptr>("payload");
-		serverSecondMsg = pPayload->toRawString();
-	}
-
-	Poco::HMACEngine<Poco::SHA1Engine> hmacSKey(saltedPassword);
-	hmacSKey.update(std::string("Server Key"));
-	std::string serverKey = digestToBinaryString(hmacSKey);
-
-	Poco::HMACEngine<Poco::SHA1Engine> hmacSSig(serverKey);
-	hmacSSig.update(authMessage);
-	std::string serverSignature = digestToBase64(hmacSSig);
-
-	kvm = parseKeyValueList(serverSecondMsg);
-	std::string serverSignatureReceived = kvm["v"];
-
-	if (serverSignature != serverSignatureReceived)
-		throw Poco::ProtocolException("server signature verification failed");
-
-	pCommand = createOpMsgMessage("$cmd");
-	pCommand->setCommandName("saslContinue");
-	pCommand->body()
-		.add<Poco::Int32>("conversationId", conversationId)
-		.add<Binary::Ptr>("payload", new Binary);
-
-	connection.sendRequest(*pCommand, response);
-	return response.responseOk();
+	return runScramAuth<Poco::SHA2Engine256>(
+		*this, connection, username, password, AUTH_SCRAM_SHA256,
+		false, // SCRAM-SHA-256 uses the password directly (after SASLprep, no-op for ASCII)
+		32);
 }
 
 

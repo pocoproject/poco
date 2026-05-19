@@ -14,6 +14,8 @@
 #include "Poco/MongoDB/Document.h"
 #include "Poco/MongoDB/Array.h"
 #include "Poco/MongoDB/Binary.h"
+#include "Poco/MongoDB/Connection.h"
+#include "Poco/MongoDB/Database.h"
 #include "Poco/MongoDB/Decimal128.h"
 #include "Poco/MongoDB/MaxKey.h"
 #include "Poco/MongoDB/MinKey.h"
@@ -22,6 +24,7 @@
 #include "Poco/MongoDB/JavaScriptCode.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
+#include "Poco/Exception.h"
 #include "Poco/DateTime.h"
 #include "Poco/UUIDGenerator.h"
 #include <sstream>
@@ -899,6 +902,39 @@ void BSONTest::testMinKeyMaxKeySerializeDocument()
 }
 
 
+void BSONTest::testAuthMechanismConstants()
+{
+	// SCRAM-SHA-1 was the only mechanism in 1.14.x; SCRAM-SHA-256 was
+	// added alongside this change and is now the default. Lock both
+	// constant values in to catch accidental string changes.
+	assertEqual(std::string("SCRAM-SHA-1"), Database::AUTH_SCRAM_SHA1);
+	assertEqual(std::string("SCRAM-SHA-256"), Database::AUTH_SCRAM_SHA256);
+}
+
+
+void BSONTest::testAuthSCRAM256RejectsNonAscii()
+{
+	// SCRAM-SHA-256 requires SASLprep on the password. Until full RFC 4013
+	// support lands, the ASCII-only fast path is enforced by throwing
+	// NotImplementedException *before* any network I/O. Verify the throw
+	// happens by passing a UTF-8 password containing a non-ASCII byte and
+	// a never-connected Connection (the ASCII check is reached first).
+	Poco::MongoDB::Database db("test");
+	Poco::MongoDB::Connection conn;
+	const std::string nonAsciiPassword = "p\xC3\xA9ncil"; // "pencil" with e-acute
+
+	try
+	{
+		db.authenticate(conn, "alice", nonAsciiPassword,
+			Poco::MongoDB::Database::AUTH_SCRAM_SHA256);
+		failmsg("expected NotImplementedException on non-ASCII password");
+	}
+	catch (const Poco::NotImplementedException&)
+	{
+	}
+}
+
+
 void BSONTest::testDocumentSerialization()
 {
 	Document::Ptr doc = new Document();
@@ -1464,6 +1500,9 @@ CppUnit::Test* BSONTest::suite()
 	CppUnit_addTest(pSuite, BSONTest, testDecimal128RoundTrip);
 	CppUnit_addTest(pSuite, BSONTest, testDecimal128SerializeDocument);
 	CppUnit_addTest(pSuite, BSONTest, testMinKeyMaxKeySerializeDocument);
+
+	CppUnit_addTest(pSuite, BSONTest, testAuthMechanismConstants);
+	CppUnit_addTest(pSuite, BSONTest, testAuthSCRAM256RejectsNonAscii);
 
 	// Serialization/Deserialization tests
 	CppUnit_addTest(pSuite, BSONTest, testDocumentSerialization);
