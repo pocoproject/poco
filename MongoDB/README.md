@@ -22,17 +22,23 @@ change notifications) is documented in [README-ReplicaSet.md](README-ReplicaSet.
 
 using namespace Poco::MongoDB;
 
-Connection connection;
-connection.connect("mongodb://localhost:27017/test");
-
+Connection connection("localhost", 27017);
 Database db("test");
-Poco::SharedPtr<OpMsgMessage> insert = db.createOpMsgMessage("users");
-insert->setCommandName(OpMsgMessage::CMD_INSERT);
-insert->documents().push_back(
-    db.createDocument().add("name", std::string("Alice")).add("age", 30));
+
+auto request = db.createOpMsgMessage("users");
+request->setCommandName(OpMsgMessage::CMD_INSERT);
+
+Document::Ptr user = new Document;
+user->add("name", "Alice").add("age", 30);
+request->documents().push_back(user);
+
 OpMsgMessage response;
-connection.sendRequest(*insert, response);
+connection.sendRequest(*request, response);
 ```
+
+For `mongodb://` URI connections (including authentication), use the
+`Connection::connect(uri, socketFactory)` overload with a user-provided
+`SocketFactory`.
 
 ## Server feature compatibility
 
@@ -45,10 +51,8 @@ status in Poco::MongoDB:
 - **Missing**: no API and no helper; out of reach without library changes.
 - **Added 1.15.x**: introduced by the patch series that ships this document.
 
-`OpMsgMessage` is the universal escape hatch: any command can be issued by
-constructing its body manually, so "Missing" never means "impossible" -- it
-means there is no typed helper and the caller must read the server-side
-command reference.
+Any command can be sent via `OpMsgMessage` with a hand-built body, so
+"Missing" means "no typed helper", not "unreachable".
 
 ### A. Driver baseline (pre-6.0 specs)
 
@@ -56,7 +60,7 @@ Capabilities expected of any modern MongoDB driver.
 
 | Capability | Status | Notes |
 |---|---|---|
-| Stable API (`apiVersion: "1"`, MongoDB 5.0+) | Missing | Set `apiVersion` manually on each command. |
+| Stable API (`apiVersion: "1"`, since 5.0) | Missing | Set `apiVersion` manually on each command. |
 | SCRAM-SHA-256 (server default since 4.0) | Added 1.15.x | New `AUTH_SCRAM_SHA256`; default for `authenticate()`. |
 | SCRAM-SHA-1 | Supported | Pass `AUTH_SCRAM_SHA1` explicitly. |
 | x.509 / PLAIN / GSSAPI / MONGODB-AWS / MONGODB-OIDC | Missing | |
@@ -77,8 +81,8 @@ Capabilities expected of any modern MongoDB driver.
 | Change streams (`$changeStream`) with `fullDocumentBeforeChange` and DDL events | Missing | No `watch()`, no resume tokens. |
 | Clustered collections (`clusteredIndex`) | Partial | Raw `create` command. |
 | Time-series collections; secondary / compound indexes on them | Partial | Raw `create` command; new `createIndex(extraOptions)` covers the index side. |
-| **Partial indexes (`partialFilterExpression`, 3.2+)** | Added 1.15.x | Pass `partialFilterExpression` in the new `extraOptions` overload. |
-| Hidden indexes (4.4+) | Added 1.15.x | New `INDEX_HIDDEN` flag. |
+| **Partial indexes (`partialFilterExpression`, since 3.2)** | Added 1.15.x | Pass `partialFilterExpression` in the new `extraOptions` overload. |
+| Hidden indexes (since 4.4) | Added 1.15.x | New `INDEX_HIDDEN` flag. |
 | Text / 2dsphere / hashed / wildcard indexes | Partial | Reachable via `extraOptions`; wildcard via `"$**"` field name. |
 | Collation on indexes | Added 1.15.x | Pass `collation` in `extraOptions`. |
 | Queryable Encryption (preview) | Missing | No `ClientEncryption` class. |
@@ -138,12 +142,12 @@ Nothing has been removed.
 
 | Surface | Status | Replacement |
 |---|---|---|
-| `OpMsgMessage::CMD_MAP_REDUCE` | `POCO_DEPRECATED` (server deprecated in 5.0) | Aggregation pipeline with `$accumulator`, `$function`, `$out`, `$merge`. |
-| `OpMsgMessage::CMD_COUNT` | Outside Stable API v1; `Database::count()` no longer issues it directly | Aggregation `$count` (used internally by `Database::count()`). |
-| `Database::INDEX_BACKGROUND` | `POCO_DEPRECATED` (server no-op since 4.2) | Drop the flag; index builds are online by default. |
-| `Database::INDEX_SPARSE` | Superseded by `partialFilterExpression` since 3.2 | Pass `partialFilterExpression` in `createIndex(extraOptions)`. |
-| `Database::createIndex(..., int version)` | Explicit `v=1` is incompatible with several modern index types | Leave at 0; server picks v=2 (default since 3.4). |
-| URI option `ssl=true` | Replaced by `tls=true` (canonical since 4.2) | Either accepted. |
+| `OpMsgMessage::CMD_MAP_REDUCE` | `POCO_DEPRECATED` (server-deprecated since 5.0). | Aggregation pipeline with `$accumulator`, `$function`, `$out`, `$merge`. |
+| `OpMsgMessage::CMD_COUNT` | Outside Stable API v1; `Database::count()` no longer issues it directly. | Aggregation `$count` (used internally by `Database::count()`). |
+| `Database::INDEX_BACKGROUND` | `POCO_DEPRECATED` (server no-op since 4.2). | Drop the flag; index builds are online by default. |
+| `Database::INDEX_SPARSE` | Superseded by `partialFilterExpression` since 3.2. | Pass `partialFilterExpression` in `createIndex(extraOptions)`. |
+| `Database::createIndex(..., int version)` | Explicit `v=1` is incompatible with several modern index types. | Leave at 0; server picks v=2 (default since 3.4). |
+| Connection URI option `ssl=true` | Replaced by `tls=true` (canonical since 4.2). | Either accepted. |
 
 ### Top blockers
 

@@ -75,19 +75,12 @@ public:
 	~Decimal128() = default;
 
 	[[nodiscard]] Poco::UInt64 low() const noexcept;
-		/// Returns the low 64 bits.
-
 	[[nodiscard]] Poco::UInt64 high() const noexcept;
-		/// Returns the high 64 bits.
 
 	[[nodiscard]] bool isNaN() const noexcept;
-		/// True if the value is NaN (any payload).
-
 	[[nodiscard]] bool isInfinite() const noexcept;
-		/// True if the value is +Infinity or -Infinity.
-
 	[[nodiscard]] bool isNegative() const noexcept;
-		/// True if the sign bit is set, including -0, -Inf and -NaN.
+		/// Includes -0, -Inf and -NaN.
 
 	[[nodiscard]] std::string toString() const;
 		/// Returns the canonical decimal string per IEEE 754-2008 Section
@@ -112,7 +105,6 @@ public:
 	static Decimal128 positiveInfinity();
 	static Decimal128 negativeInfinity();
 	static Decimal128 nan();
-		/// Convenience constructors for the standard special values.
 
 private:
 	Poco::UInt64 _low;

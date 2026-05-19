@@ -30,6 +30,7 @@
 #include "Poco/SHA1Engine.h"
 #include "Poco/SHA2Engine.h"
 #include "Poco/StreamCopier.h"
+#include <algorithm>
 #include <map>
 #include <sstream>
 #include <utility>
@@ -131,11 +132,8 @@ namespace
 
 	bool isAsciiOnly(const std::string& s) noexcept
 	{
-		for (char c: s)
-		{
-			if (static_cast<unsigned char>(c) > 0x7F) return false;
-		}
-		return true;
+		return std::all_of(s.begin(), s.end(),
+			[](char c) { return static_cast<unsigned char>(c) <= 0x7F; });
 	}
 
 	template <class HashEngine>
@@ -287,10 +285,11 @@ bool Database::authenticate(Connection& connection, const std::string& username,
 
 bool Database::authSCRAM(Connection& connection, const std::string& username, const std::string& password)
 {
+	constexpr bool kLegacyMongoCrPasswordHash = true;
+	constexpr Poco::UInt32 kSHA1DigestLen = 20;
 	return runScramAuth<Poco::SHA1Engine>(
 		*this, connection, username, password, AUTH_SCRAM_SHA1,
-		true,  // legacy MongoDB-CR style MD5 password preprocessing
-		20);
+		kLegacyMongoCrPasswordHash, kSHA1DigestLen);
 }
 
 
@@ -301,10 +300,11 @@ bool Database::authSCRAM256(Connection& connection, const std::string& username,
 			"SCRAM-SHA-256 with non-ASCII passwords requires SASLprep (RFC 4013), "
 			"which is not yet implemented. Use SCRAM-SHA-1 or an ASCII password.");
 
+	constexpr bool kLegacyMongoCrPasswordHash = false;
+	constexpr Poco::UInt32 kSHA256DigestLen = 32;
 	return runScramAuth<Poco::SHA2Engine256>(
 		*this, connection, username, password, AUTH_SCRAM_SHA256,
-		false, // SCRAM-SHA-256 uses the password directly (after SASLprep, no-op for ASCII)
-		32);
+		kLegacyMongoCrPasswordHash, kSHA256DigestLen);
 }
 
 
@@ -352,11 +352,6 @@ Document::Ptr Database::queryServerHello(Connection& connection) const
 
 Int64 Database::count(Connection& connection, const std::string& collectionName) const
 {
-	// Use aggregation [{$count: "n"}] rather than the legacy "count" command.
-	// Aggregation $count is in the MongoDB Stable API v1, is accurate on
-	// sharded clusters (the legacy count over-reports because of orphaned
-	// documents that haven't been cleaned up by the balancer), and is
-	// permitted in multi-document transactions.
 	Poco::SharedPtr<OpMsgMessage> request = createOpMsgMessage(collectionName);
 	request->setCommandName(OpMsgMessage::CMD_AGGREGATE);
 
@@ -372,8 +367,7 @@ Int64 Database::count(Connection& connection, const std::string& collectionName)
 
 	if (!response.responseOk()) return -1;
 
-	// aggregate returns a cursor; the first batch contains the single
-	// result document { n: <Int64> }.
+	// aggregate returns a cursor; the first batch holds { n: <Int64> }.
 	const auto& body = response.body();
 	Document::Ptr cursor = body.get<Document::Ptr>("cursor", Document::Ptr());
 	if (!cursor) return -1;

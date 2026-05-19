@@ -122,9 +122,7 @@ public:
 		///     accepted as a synonym.
 		///   - connectTimeoutMS: Socket connection timeout in milliseconds.
 		///   - socketTimeoutMS: Socket send/receive timeout in milliseconds.
-		///   - authMechanism: Authentication mechanism. Accepts "SCRAM-SHA-256"
-		///     (default since 4.0) and "SCRAM-SHA-1". Other mechanisms are
-		///     not yet implemented.
+		///   - authMechanism: "SCRAM-SHA-256" (default) or "SCRAM-SHA-1".
 		///
 		/// Unknown options are silently ignored.
 		///

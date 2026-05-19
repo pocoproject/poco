@@ -30,11 +30,11 @@ namespace
 	constexpr Poco::Int32  DECIMAL128_MAX_DIGITS          = 34;
 
 	constexpr Poco::UInt64 SIGN_MASK                      = 0x8000000000000000ULL;
-	constexpr Poco::UInt64 COMBINATION_MASK               = 0x7800000000000000ULL;
-	constexpr Poco::UInt64 SPECIAL_COMBINATION            = 0x7800000000000000ULL;
-	constexpr Poco::UInt64 NAN_BIT                        = 0x0400000000000000ULL;
-	constexpr Poco::UInt64 LARGE_COEFF_COMBINATION_MASK   = 0x6000000000000000ULL;
-	constexpr Poco::UInt64 LARGE_COEFF_COMBINATION_VALUE  = 0x6000000000000000ULL;
+	constexpr Poco::UInt64 SPECIAL_MASK                   = 0x7C00000000000000ULL;
+	constexpr Poco::UInt64 INF_VALUE                      = 0x7800000000000000ULL;
+	constexpr Poco::UInt64 NAN_VALUE                      = 0x7C00000000000000ULL;
+	constexpr Poco::UInt64 LARGE_COEFF_MASK               = 0x6000000000000000ULL;
+	constexpr Poco::UInt64 LARGE_COEFF_VALUE              = 0x6000000000000000ULL;
 
 	struct Coefficient
 		/// 113-bit unsigned integer stored as four little-endian UInt32 limbs.
@@ -108,13 +108,13 @@ Decimal128::Decimal128(Poco::UInt64 low, Poco::UInt64 high):
 
 bool Decimal128::isNaN() const noexcept
 {
-	return (_high & 0x7C00000000000000ULL) == 0x7C00000000000000ULL;
+	return (_high & SPECIAL_MASK) == NAN_VALUE;
 }
 
 
 bool Decimal128::isInfinite() const noexcept
 {
-	return (_high & 0x7C00000000000000ULL) == SPECIAL_COMBINATION;
+	return (_high & SPECIAL_MASK) == INF_VALUE;
 }
 
 
@@ -158,117 +158,86 @@ std::string Decimal128::toString() const
 {
 	const bool negative = isNegative();
 
-	if (isNaN())
-	{
-		return "NaN";
-	}
-	if (isInfinite())
-	{
-		return negative ? "-Infinity" : "Infinity";
-	}
+	if (isNaN()) return "NaN";
+	if (isInfinite()) return negative ? "-Infinity" : "Infinity";
 
 	Poco::Int32 biasedExponent;
 	Coefficient coeff;
 	coeff.clear();
 
-	if ((_high & LARGE_COEFF_COMBINATION_MASK) == LARGE_COEFF_COMBINATION_VALUE)
+	if ((_high & LARGE_COEFF_MASK) == LARGE_COEFF_VALUE)
 	{
 		// Large-coefficient encoding: implicit leading "100" makes the
 		// coefficient >= 10^33 and therefore representable, but the
 		// resulting value is non-canonical. Per the BSON spec the value
-		// must be treated as zero.
+		// renders as zero with the encoded exponent.
 		biasedExponent = static_cast<Poco::Int32>((_high >> 47) & 0x3FFF);
-		(void)biasedExponent; // ignored
-		// Coefficient renders as "0".
-		std::string out;
-		out.reserve(8);
-		if (negative) out += '-';
-		out += '0';
-		Poco::Int32 exponent = static_cast<Poco::Int32>((_high >> 47) & 0x3FFF) - DECIMAL128_BIAS;
-		if (exponent != 0)
-		{
-			out += 'E';
-			if (exponent > 0) out += '+';
-			out += std::to_string(exponent);
-		}
-		return out;
 	}
-
-	// Standard encoding: bits 126..113 are the biased exponent; bits 112..0
-	// are the coefficient. The 14-bit exponent field occupies the top 14
-	// bits of the high word after the sign bit, i.e. (_high >> 49) & 0x3FFF.
-	biasedExponent = static_cast<Poco::Int32>((_high >> 49) & 0x3FFF);
-	Poco::UInt64 coeffHigh = _high & 0x0001FFFFFFFFFFFFULL; // bottom 49 bits
-	coeff.fromHighLow(coeffHigh, _low);
+	else
+	{
+		// Standard encoding: bits 126..113 = biased exponent, bits 112..0 =
+		// coefficient.
+		biasedExponent = static_cast<Poco::Int32>((_high >> 49) & 0x3FFF);
+		const Poco::UInt64 coeffHigh = _high & 0x0001FFFFFFFFFFFFULL;
+		coeff.fromHighLow(coeffHigh, _low);
+	}
 
 	const Poco::Int32 exponent = biasedExponent - DECIMAL128_BIAS;
 
-	// Extract decimal digits (least significant first) by repeated divmod10.
-	char digits[DECIMAL128_MAX_DIGITS + 4];
-	int digitCount = 0;
+	std::string mantissa;
+	mantissa.reserve(DECIMAL128_MAX_DIGITS);
 	if (coeff.isZero())
 	{
-		digits[digitCount++] = '0';
+		mantissa.push_back('0');
 	}
 	else
 	{
 		while (!coeff.isZero())
 		{
-			unsigned d = coeff.divmod10();
-			digits[digitCount++] = static_cast<char>('0' + d);
+			mantissa.push_back(static_cast<char>('0' + coeff.divmod10()));
 		}
+		std::reverse(mantissa.begin(), mantissa.end());
 	}
 
-	// digits[] currently holds digits in reverse (least significant first).
-	const int significantDigits = digitCount;
+	const int significantDigits = static_cast<int>(mantissa.size());
 	const Poco::Int32 adjusted = exponent + significantDigits - 1;
 
 	std::string out;
 	out.reserve(48);
 	if (negative) out += '-';
 
-	// Canonical form (IEEE 754-2008 Section 5.12.4):
-	//   - If exponent <= 0 AND adjusted >= -6:
-	//     render without 'E' notation.
-	//   - Otherwise: scientific notation (one digit before the decimal
-	//     point, then optional fraction, then 'E' followed by adjusted).
+	// Canonical form (IEEE 754-2008 Section 5.12.4): non-scientific notation
+	// when exponent <= 0 AND adjusted >= -6, otherwise one-digit-then-E.
 	if (exponent <= 0 && adjusted >= -6)
 	{
 		if (exponent == 0)
 		{
-			for (int i = significantDigits - 1; i >= 0; --i)
-				out += digits[i];
+			out += mantissa;
 		}
 		else
 		{
-			// Need to insert a decimal point.
 			const int integerDigits = significantDigits + exponent; // exponent < 0
 			if (integerDigits <= 0)
 			{
 				out += "0.";
-				for (int i = 0; i < -integerDigits; ++i) out += '0';
-				for (int i = significantDigits - 1; i >= 0; --i)
-					out += digits[i];
+				out.append(-integerDigits, '0');
+				out += mantissa;
 			}
 			else
 			{
-				for (int i = significantDigits - 1; i >= significantDigits - integerDigits; --i)
-					out += digits[i];
+				out.append(mantissa, 0, integerDigits);
 				out += '.';
-				for (int i = significantDigits - integerDigits - 1; i >= 0; --i)
-					out += digits[i];
+				out.append(mantissa, integerDigits, std::string::npos);
 			}
 		}
 	}
 	else
 	{
-		// Scientific notation.
-		out += digits[significantDigits - 1];
+		out += mantissa[0];
 		if (significantDigits > 1)
 		{
 			out += '.';
-			for (int i = significantDigits - 2; i >= 0; --i)
-				out += digits[i];
+			out.append(mantissa, 1, std::string::npos);
 		}
 		out += 'E';
 		if (adjusted >= 0) out += '+';
@@ -336,6 +305,7 @@ Decimal128 Decimal128::fromString(const std::string& s)
 	Poco::Int32 implicitExponent = 0;
 	bool sawDigit = false;
 	bool sawDecimalPoint = false;
+	bool sawExponent = false;
 
 	for (; i < s.size(); ++i)
 	{
@@ -354,7 +324,7 @@ Decimal128 Decimal128::fromString(const std::string& s)
 		}
 		else if (c == 'E' || c == 'e')
 		{
-			++i;
+			sawExponent = true;
 			break;
 		}
 		else
@@ -367,53 +337,39 @@ Decimal128 Decimal128::fromString(const std::string& s)
 		throw Poco::SyntaxException("Decimal128::fromString: no digits in '" + s + "'");
 
 	Poco::Int32 explicitExponent = 0;
-	if (i <= s.size())
+	if (sawExponent)
 	{
-		// We may have consumed past the 'E' indicator. Check whether the loop
-		// exited because of 'E' (i was advanced) or end-of-string.
-		std::size_t expStart = i;
-		if (expStart < s.size())
+		std::size_t expStart = i + 1; // skip past 'E' or 'e'
+		bool expNegative = false;
+		if (expStart < s.size() && (s[expStart] == '+' || s[expStart] == '-'))
 		{
-			bool expNegative = false;
-			if (s[expStart] == '+' || s[expStart] == '-')
-			{
-				expNegative = (s[expStart] == '-');
-				++expStart;
-			}
-			if (expStart >= s.size())
-				throw Poco::SyntaxException("Decimal128::fromString: missing exponent digits in '" + s + "'");
-
-			Poco::Int64 acc = 0;
-			for (std::size_t k = expStart; k < s.size(); ++k)
-			{
-				char c = s[k];
-				if (c < '0' || c > '9')
-					throw Poco::SyntaxException("Decimal128::fromString: invalid exponent in '" + s + "'");
-				acc = acc * 10 + (c - '0');
-				if (acc > 1000000000LL)
-					throw Poco::RangeException("Decimal128::fromString: exponent out of range in '" + s + "'");
-			}
-			explicitExponent = static_cast<Poco::Int32>(expNegative ? -acc : acc);
+			expNegative = (s[expStart] == '-');
+			++expStart;
 		}
+		if (expStart >= s.size())
+			throw Poco::SyntaxException("Decimal128::fromString: missing exponent digits in '" + s + "'");
+
+		Poco::Int64 acc = 0;
+		for (std::size_t k = expStart; k < s.size(); ++k)
+		{
+			char c = s[k];
+			if (c < '0' || c > '9')
+				throw Poco::SyntaxException("Decimal128::fromString: invalid exponent in '" + s + "'");
+			acc = acc * 10 + (c - '0');
+			if (acc > 1000000000LL)
+				throw Poco::RangeException("Decimal128::fromString: exponent out of range in '" + s + "'");
+		}
+		explicitExponent = static_cast<Poco::Int32>(expNegative ? -acc : acc);
 	}
 
 	Poco::Int32 exponent = implicitExponent + explicitExponent;
 
-	// Strip leading zeros from digits.
+	// Strip leading zeros; trailing zeros are part of the canonical
+	// (coefficient, exponent) pair and must be preserved.
 	std::size_t firstNonZero = 0;
 	while (firstNonZero + 1 < digits.size() && digits[firstNonZero] == '0')
 		++firstNonZero;
 	digits.erase(0, firstNonZero);
-
-	// Drop trailing zeros only if doing so won't violate the exponent
-	// bounds; we want the canonical form when possible but we must not
-	// adjust the exponent above DECIMAL128_EXPONENT_MAX or below
-	// DECIMAL128_EXPONENT_MIN.
-	while (digits.size() > 1 && digits.back() == '0' && exponent < DECIMAL128_EXPONENT_MAX)
-	{
-		digits.pop_back();
-		++exponent;
-	}
 
 	if (digits.size() > static_cast<std::size_t>(DECIMAL128_MAX_DIGITS))
 		throw Poco::RangeException("Decimal128::fromString: more than 34 significant digits in '" + s + "'");
@@ -421,7 +377,6 @@ Decimal128 Decimal128::fromString(const std::string& s)
 	if (exponent > DECIMAL128_EXPONENT_MAX || exponent < DECIMAL128_EXPONENT_MIN)
 		throw Poco::RangeException("Decimal128::fromString: exponent out of range in '" + s + "'");
 
-	// Build the coefficient by mul10/add for each digit.
 	Coefficient coeff;
 	coeff.clear();
 	for (char c: digits)

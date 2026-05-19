@@ -241,9 +241,8 @@ void BSONTest::testDuplicateDocumentMembers()
 
 void BSONTest::testDocumentAddElementMerge()
 {
-	// Mirrors how Database::createIndex(extraOptions) merges caller-supplied
-	// elements into the per-index spec: build a "base" document, then iterate
-	// a second document's elements() and addElement() each into the base.
+	// Copy every element from a source Document into a destination via
+	// elementNames() + get() + addElement().
 	Document::Ptr base = new Document();
 	base->add("name"s, "idx_age"s);
 	base->add("unique"s, true);
@@ -816,6 +815,11 @@ void BSONTest::testDecimal128FromString()
 		{"1E+5",      "1E+5"},
 		{"1.234E+10", "1.234E+10"},
 		{"-1E-3",     "-0.001"},
+		// Trailing zeros are part of the canonical (coefficient, exponent)
+		// pair per the BSON Decimal128 spec and must round-trip.
+		{"100",       "100"},
+		{"1.10",      "1.10"},
+		{"0.10",      "0.10"},
 		{"NaN",       "NaN"},
 		{"Infinity",  "Infinity"},
 		{"-Infinity", "-Infinity"},
@@ -829,13 +833,35 @@ void BSONTest::testDecimal128FromString()
 		assertEqual(std::string(c.out), v.toString());
 	}
 
-	try
+	const char* syntaxErrors[] = {
+		"not a number",
+		"1E",        // exponent indicator with no digits
+		"1E+",       // exponent sign with no digits
+		"1e-",
+		"1.2.3"      // multiple decimal points
+	};
+	for (const char* bad: syntaxErrors)
 	{
-		Decimal128::fromString("not a number");
-		failmsg("expected SyntaxException on malformed input");
+		try
+		{
+			Decimal128::fromString(bad);
+			failmsg(std::string("expected SyntaxException for '") + bad + "'");
+		}
+		catch (const Poco::SyntaxException&) {}
 	}
-	catch (const Poco::SyntaxException&)
+
+	const char* rangeErrors[] = {
+		"12345678901234567890123456789012345",  // 35 digits, > 34 max
+		"1E10000"                                // exponent above EXPONENT_MAX (6144)
+	};
+	for (const char* bad: rangeErrors)
 	{
+		try
+		{
+			Decimal128::fromString(bad);
+			failmsg(std::string("expected RangeException for '") + bad + "'");
+		}
+		catch (const Poco::RangeException&) {}
 	}
 }
 
@@ -904,9 +930,7 @@ void BSONTest::testMinKeyMaxKeySerializeDocument()
 
 void BSONTest::testAuthMechanismConstants()
 {
-	// SCRAM-SHA-1 was the only mechanism in 1.14.x; SCRAM-SHA-256 was
-	// added alongside this change and is now the default. Lock both
-	// constant values in to catch accidental string changes.
+	// Lock wire strings; these are part of the public API.
 	assertEqual(std::string("SCRAM-SHA-1"), Database::AUTH_SCRAM_SHA1);
 	assertEqual(std::string("SCRAM-SHA-256"), Database::AUTH_SCRAM_SHA256);
 }
@@ -914,11 +938,8 @@ void BSONTest::testAuthMechanismConstants()
 
 void BSONTest::testAuthSCRAM256RejectsNonAscii()
 {
-	// SCRAM-SHA-256 requires SASLprep on the password. Until full RFC 4013
-	// support lands, the ASCII-only fast path is enforced by throwing
-	// NotImplementedException *before* any network I/O. Verify the throw
-	// happens by passing a UTF-8 password containing a non-ASCII byte and
-	// a never-connected Connection (the ASCII check is reached first).
+	// Non-ASCII password must throw NotImplementedException before any
+	// network I/O (SASLprep is not implemented).
 	Poco::MongoDB::Database db("test");
 	Poco::MongoDB::Connection conn;
 	const std::string nonAsciiPassword = "p\xC3\xA9ncil"; // "pencil" with e-acute
@@ -958,60 +979,20 @@ namespace
 
 void BSONTest::testConnectionURITlsAlias()
 {
-	// Verify that "tls=true" in the URI flips the same internal flag as
-	// "ssl=true". RecordingSocketFactory captures the `secure` argument the
-	// Connection passes in, then aborts the call.
+	// "tls=" and "ssl=" must flip the same internal secure flag.
+	auto check = [this](const std::string& uri, bool expectSecure)
 	{
 		Poco::MongoDB::Connection conn;
 		RecordingSocketFactory factory;
-		try
-		{
-			conn.connect("mongodb://localhost:27017/admin?tls=true", factory);
-		}
-		catch (const Poco::NotImplementedException&)
-		{
-		}
+		try { conn.connect(uri, factory); }
+		catch (const Poco::NotImplementedException&) {}
 		assertTrue(factory.called);
-		assertTrue(factory.secureRequested);
-	}
+		assertEqual(expectSecure, factory.secureRequested);
+	};
 
-	{
-		Poco::MongoDB::Connection conn;
-		RecordingSocketFactory factory;
-		try
-		{
-			conn.connect("mongodb://localhost:27017/admin?ssl=true", factory);
-		}
-		catch (const Poco::NotImplementedException&)
-		{
-		}
-		assertTrue(factory.called);
-		assertTrue(factory.secureRequested);
-	}
-
-	{
-		// No tls/ssl: secure flag must be false.
-		Poco::MongoDB::Connection conn;
-		RecordingSocketFactory factory;
-		try
-		{
-			conn.connect("mongodb://localhost:27017/admin", factory);
-		}
-		catch (const Poco::NotImplementedException&)
-		{
-			// Default factory does not throw for non-secure; ours doesn't
-			// either, but its base may attempt a real connect. We tolerate
-			// either path.
-		}
-		catch (const Poco::Exception&)
-		{
-		}
-		// secureRequested defaults to false; verify it stayed false.
-		if (factory.called)
-		{
-			assertFalse(factory.secureRequested);
-		}
-	}
+	check("mongodb://localhost:27017/admin?tls=true", true);
+	check("mongodb://localhost:27017/admin?ssl=true", true);
+	check("mongodb://localhost:27017/admin",          false);
 }
 
 

@@ -37,19 +37,14 @@ public:
 
 	enum IndexOptions {
 		INDEX_UNIQUE        = 1 << 0,
+			///< For new indexes with conditional-inclusion semantics, prefer
+			///< partialFilterExpression (see createIndex with extraOptions)
+			///< over INDEX_SPARSE.
 		INDEX_SPARSE        = 1 << 1,
-			/// Not deprecated, but for new code partialFilterExpression
-			/// (see the createIndex() overload taking extraOptions) is preferred
-			/// over INDEX_SPARSE for indexes with conditional inclusion semantics.
-			/// Partial indexes are available since MongoDB 3.2.
 		INDEX_BACKGROUND POCO_DEPRECATED("Deprecated since MongoDB 4.2; index builds are online by default") = 1 << 2,
-			/// Background index builds were deprecated in MongoDB 4.2. The option
-			/// is a server-side no-op on 4.2+ deployments since all index builds
-			/// became hybrid (online) by default.
+			///< Hybrid online index builds since 4.2; no longer forwarded to the server.
 		INDEX_HIDDEN        = 1 << 3
-			/// Marks the index hidden from the query planner. Available since
-			/// MongoDB 4.4. The index is still maintained on writes and can be
-			/// unhidden without rebuilding.
+			///< Hide the index from the query planner (since MongoDB 4.4).
 	};
 
 	using FieldIndex = std::tuple<std::string, bool>;
@@ -69,25 +64,18 @@ public:
 
 	bool authenticate(Connection& connection, const std::string& username, const std::string& password, const std::string& method = AUTH_SCRAM_SHA256);
 		/// Authenticates against the database using the given connection,
-		/// username and password, as well as authentication method.
+		/// username and password, and authentication method:
 		///
-		/// Supported methods:
-		///   - "SCRAM-SHA-256" (default, MongoDB 4.0+ default for new users)
-		///   - "SCRAM-SHA-1"   (MongoDB 3.0+; pass AUTH_SCRAM_SHA1 explicitly)
+		///   - "SCRAM-SHA-256" (MongoDB 4.0+)
+		///   - "SCRAM-SHA-1"   (MongoDB 3.0+)
 		///
-		/// "MONGODB-CR" is no longer supported as it requires the legacy wire
-		/// protocol.
+		/// MONGODB-CR is not supported (requires the legacy wire protocol).
 		///
-		/// For SCRAM-SHA-256 the password is used directly after SASLprep
-		/// (RFC 4013). Currently only ASCII passwords are accepted on the
-		/// SCRAM-SHA-256 path; passing a password containing non-ASCII bytes
-		/// throws Poco::NotImplementedException. Use SCRAM-SHA-1 for non-ASCII
-		/// passwords until full SASLprep support is implemented.
+		/// SCRAM-SHA-256 accepts ASCII passwords only; SASLprep (RFC 4013)
+		/// is not implemented. Non-ASCII throws Poco::NotImplementedException.
 		///
-		/// Returns true if authentication was successful, otherwise false.
-		///
-		/// May throw a Poco::ProtocolException if authentication fails for a
-		/// reason other than invalid credentials.
+		/// Returns true on success, false on invalid credentials. Throws
+		/// Poco::ProtocolException on other failures.
 
 	[[nodiscard]] Document::Ptr queryBuildInfo(Connection& connection) const;
 		/// Queries server build info using OP_MSG protocol.
@@ -158,12 +146,10 @@ public:
 		/// The document returned is the createIndexes response body.
 
 	static const std::string AUTH_SCRAM_SHA1;
-		/// SCRAM-SHA-1 authentication mechanism (MongoDB 3.0 and later).
+		/// SCRAM-SHA-1 authentication mechanism (MongoDB 3.0+).
 
 	static const std::string AUTH_SCRAM_SHA256;
-		/// SCRAM-SHA-256 authentication mechanism. MongoDB 4.0 and later;
-		/// also the default mechanism for users created in 4.0+ without an
-		/// explicit mechanism specification. Default for Database::authenticate.
+		/// SCRAM-SHA-256 authentication mechanism (MongoDB 4.0+).
 
 	enum WireVersion
 		/// Wire version as reported by the command hello.
@@ -198,7 +184,7 @@ protected:
 		/// Performs SCRAM-SHA-1 authentication.
 
 	bool authSCRAM256(Connection& connection, const std::string& username, const std::string& password);
-		/// Performs SCRAM-SHA-256 authentication. ASCII-only password fast path.
+		/// Performs SCRAM-SHA-256 authentication. ASCII passwords only.
 
 private:
 	std::string _dbname;

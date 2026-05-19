@@ -50,13 +50,8 @@ public:
 	// Aggregation
 	static const std::string CMD_AGGREGATE;
 	static const std::string CMD_COUNT;
-		/// The legacy "count" command is supported by the server but is
-		/// outside the MongoDB Stable API v1 (since MongoDB 5.0), can be
-		/// inaccurate on sharded clusters (orphaned documents inflate the
-		/// count until balancer cleanup), and may not be permitted inside
-		/// multi-document transactions on older server versions. Use the
-		/// aggregation framework ($count stage) for new code; the
-		/// Database::count() helper does this internally.
+		/// Legacy command; outside Stable API v1 since MongoDB 5.0.
+		/// Prefer aggregation $count (see Database::count).
 	static const std::string CMD_DISTINCT;
 	POCO_DEPRECATED("Deprecated since MongoDB 5.0; use the aggregation pipeline with $accumulator / $function / $out / $merge instead.")
 	static const std::string CMD_MAP_REDUCE;
