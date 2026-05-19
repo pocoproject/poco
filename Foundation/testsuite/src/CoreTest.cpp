@@ -269,7 +269,7 @@ void CoreTest::testEnvironmentMultiThread()
 	// Writer threads - use Poco::Environment::set()
 	for (int id = 0; id < numWriters; ++id)
 	{
-		threads.emplace_back([id, iterations, &failed, &stop]()
+		threads.emplace_back([id, &failed, &stop]()
 		{
 			std::string name = "POCO_MT_TEST_" + std::to_string(id);
 			for (int i = 0; i < iterations && !failed && !stop; ++i)
@@ -293,7 +293,7 @@ void CoreTest::testEnvironmentMultiThread()
 	// library level.
 	for (int id = 0; id < numReaders; ++id)
 	{
-		threads.emplace_back([id, numWriters, iterations, &failed, &readCount, &stop]()
+		threads.emplace_back([&failed, &readCount, &stop]()
 		{
 			for (int i = 0; i < iterations && !failed && !stop; ++i)
 			{
