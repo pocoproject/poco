@@ -175,8 +175,10 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
 	Poco::URI::QueryParameters params = theURI.getQueryParameters();
 	for (Poco::URI::QueryParameters::const_iterator it = params.begin(); it != params.end(); ++it)
 	{
-		if (it->first == "ssl"s)
+		if (it->first == "ssl"s || it->first == "tls"s)
 		{
+			// Both "ssl=" (historical) and "tls=" (canonical since MongoDB 4.2)
+			// are accepted; they mean the same thing.
 			ssl = (it->second == "true"s);
 		}
 		else if (it->first == "connectTimeoutMS"s)

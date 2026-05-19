@@ -78,6 +78,9 @@ public:
 	void testAuthMechanismConstants();
 	void testAuthSCRAM256RejectsNonAscii();
 
+	// Connection URI parsing: tls alias
+	void testConnectionURITlsAlias();
+
 	// Serialization/Deserialization tests
 	void testDocumentSerialization();
 	void testDocumentDeserialization();

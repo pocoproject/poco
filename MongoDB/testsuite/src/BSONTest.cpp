@@ -935,6 +935,86 @@ void BSONTest::testAuthSCRAM256RejectsNonAscii()
 }
 
 
+namespace
+{
+	class RecordingSocketFactory: public Poco::MongoDB::Connection::SocketFactory
+	{
+	public:
+		bool secureRequested = false;
+		bool called = false;
+
+		Poco::Net::StreamSocket createSocket(const std::string& /*host*/,
+			int /*port*/, Poco::Timespan /*connectTimeout*/, bool secure) override
+		{
+			called = true;
+			secureRequested = secure;
+			// We don't actually want to open a socket; throw to abort the
+			// connect() call after the URI options have been parsed.
+			throw Poco::NotImplementedException("Test factory does not connect");
+		}
+	};
+}
+
+
+void BSONTest::testConnectionURITlsAlias()
+{
+	// Verify that "tls=true" in the URI flips the same internal flag as
+	// "ssl=true". RecordingSocketFactory captures the `secure` argument the
+	// Connection passes in, then aborts the call.
+	{
+		Poco::MongoDB::Connection conn;
+		RecordingSocketFactory factory;
+		try
+		{
+			conn.connect("mongodb://localhost:27017/admin?tls=true", factory);
+		}
+		catch (const Poco::NotImplementedException&)
+		{
+		}
+		assertTrue(factory.called);
+		assertTrue(factory.secureRequested);
+	}
+
+	{
+		Poco::MongoDB::Connection conn;
+		RecordingSocketFactory factory;
+		try
+		{
+			conn.connect("mongodb://localhost:27017/admin?ssl=true", factory);
+		}
+		catch (const Poco::NotImplementedException&)
+		{
+		}
+		assertTrue(factory.called);
+		assertTrue(factory.secureRequested);
+	}
+
+	{
+		// No tls/ssl: secure flag must be false.
+		Poco::MongoDB::Connection conn;
+		RecordingSocketFactory factory;
+		try
+		{
+			conn.connect("mongodb://localhost:27017/admin", factory);
+		}
+		catch (const Poco::NotImplementedException&)
+		{
+			// Default factory does not throw for non-secure; ours doesn't
+			// either, but its base may attempt a real connect. We tolerate
+			// either path.
+		}
+		catch (const Poco::Exception&)
+		{
+		}
+		// secureRequested defaults to false; verify it stayed false.
+		if (factory.called)
+		{
+			assertFalse(factory.secureRequested);
+		}
+	}
+}
+
+
 void BSONTest::testDocumentSerialization()
 {
 	Document::Ptr doc = new Document();
@@ -1503,6 +1583,8 @@ CppUnit::Test* BSONTest::suite()
 
 	CppUnit_addTest(pSuite, BSONTest, testAuthMechanismConstants);
 	CppUnit_addTest(pSuite, BSONTest, testAuthSCRAM256RejectsNonAscii);
+
+	CppUnit_addTest(pSuite, BSONTest, testConnectionURITlsAlias);
 
 	// Serialization/Deserialization tests
 	CppUnit_addTest(pSuite, BSONTest, testDocumentSerialization);

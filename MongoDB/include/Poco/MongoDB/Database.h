@@ -96,7 +96,12 @@ public:
 		/// Queries hello response from server using OP_MSG protocol.
 
 	[[nodiscard]] Int64 count(Connection& connection, const std::string& collectionName) const;
-		/// Sends a count request for the given collection to MongoDB using OP_MSG protocol.
+		/// Counts documents in the given collection using the aggregation
+		/// framework ([{$count: "n"}]) over OP_MSG. Aggregation-based counting
+		/// is preferred over the legacy "count" command because it is part of
+		/// the Stable API v1 (since MongoDB 5.0), is accurate on sharded
+		/// clusters (the legacy command can over-report due to orphaned
+		/// documents), and is permitted in multi-document transactions.
 		///
 		/// If the command fails, -1 is returned.
 

@@ -352,19 +352,38 @@ Document::Ptr Database::queryServerHello(Connection& connection) const
 
 Int64 Database::count(Connection& connection, const std::string& collectionName) const
 {
-	Poco::SharedPtr<Poco::MongoDB::OpMsgMessage> request = createOpMsgMessage(collectionName);
-	request->setCommandName(OpMsgMessage::CMD_COUNT);
+	// Use aggregation [{$count: "n"}] rather than the legacy "count" command.
+	// Aggregation $count is in the MongoDB Stable API v1, is accurate on
+	// sharded clusters (the legacy count over-reports because of orphaned
+	// documents that haven't been cleaned up by the balancer), and is
+	// permitted in multi-document transactions.
+	Poco::SharedPtr<OpMsgMessage> request = createOpMsgMessage(collectionName);
+	request->setCommandName(OpMsgMessage::CMD_AGGREGATE);
 
-	Poco::MongoDB::OpMsgMessage response;
+	Array::Ptr pipeline = new Array();
+	Document::Ptr countStage = new Document();
+	countStage->add("$count"s, "n"s);
+	pipeline->add(countStage);
+	request->body().add("pipeline"s, pipeline);
+	request->body().addNewDocument("cursor"s);
+
+	OpMsgMessage response;
 	connection.sendRequest(*request, response);
 
-	if (response.responseOk())
-	{
-		const auto& body = response.body();
-		return body.getInteger("n");
-	}
+	if (!response.responseOk()) return -1;
 
-	return -1;
+	// aggregate returns a cursor; the first batch contains the single
+	// result document { n: <Int64> }.
+	const auto& body = response.body();
+	Document::Ptr cursor = body.get<Document::Ptr>("cursor", Document::Ptr());
+	if (!cursor) return -1;
+
+	Array::Ptr firstBatch = cursor->get<Array::Ptr>("firstBatch", Array::Ptr());
+	if (!firstBatch || firstBatch->size() == 0) return 0;
+
+	Document::Ptr first = firstBatch->get<Document::Ptr>(0, Document::Ptr());
+	if (!first || !first->exists("n")) return 0;
+	return first->getInteger("n");
 }
 
 
