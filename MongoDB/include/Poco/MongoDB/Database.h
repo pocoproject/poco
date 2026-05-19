@@ -38,7 +38,18 @@ public:
 	enum IndexOptions {
 		INDEX_UNIQUE        = 1 << 0,
 		INDEX_SPARSE        = 1 << 1,
-		INDEX_BACKGROUND    = 1 << 2
+			/// Not deprecated, but for new code partialFilterExpression
+			/// (see the createIndex() overload taking extraOptions) is preferred
+			/// over INDEX_SPARSE for indexes with conditional inclusion semantics.
+			/// Partial indexes are available since MongoDB 3.2.
+		INDEX_BACKGROUND POCO_DEPRECATED("Deprecated since MongoDB 4.2; index builds are online by default") = 1 << 2,
+			/// Background index builds were deprecated in MongoDB 4.2. The option
+			/// is a server-side no-op on 4.2+ deployments since all index builds
+			/// became hybrid (online) by default.
+		INDEX_HIDDEN        = 1 << 3
+			/// Marks the index hidden from the query planner. Available since
+			/// MongoDB 4.4. The index is still maintained on writes and can be
+			/// unhidden without rebuilding.
 	};
 
 	using FieldIndex = std::tuple<std::string, bool>;
@@ -97,8 +108,40 @@ public:
 		unsigned long options = 0,
 		int expirationSeconds = 0,
 		int version = 0);
-		/// Creates an index. The document returned is the response body..
-		/// For more info look at the createIndex information on the MongoDB website. (new wire protocol)
+		/// Creates an index. The document returned is the response body.
+		/// For more info look at the createIndex information on the MongoDB
+		/// website. (new wire protocol)
+		///
+		/// Leave version at 0 to use the server default (v=2 since MongoDB 3.4).
+		/// Setting v=1 is only for compatibility with pre-3.4 servers and is
+		/// incompatible with text, wildcard, and several other modern index
+		/// types.
+
+	Document::Ptr createIndex(
+		Connection& connection,
+		const std::string& collection,
+		const IndexedFields& indexedFields,
+		const std::string& indexName,
+		Document::Ptr extraOptions,
+		unsigned long options = 0,
+		int expirationSeconds = 0,
+		int version = 0);
+		/// Creates an index, allowing arbitrary additional fields in the
+		/// per-index spec via extraOptions. Every element of extraOptions
+		/// is added to the index spec document on top of the fields derived
+		/// from indexedFields, indexName, options, expirationSeconds and
+		/// version. Typical keys to pass in extraOptions include:
+		///
+		///   - "partialFilterExpression" (Document): partial indexes,
+		///     MongoDB 3.2+. Preferred over INDEX_SPARSE for new code.
+		///   - "collation" (Document): per-index collation, MongoDB 3.4+.
+		///   - "wildcardProjection" (Document): wildcard / compound-wildcard
+		///     indexes (the wildcard field itself is specified as "$**" or
+		///     "path.$**" in indexedFields).
+		///   - "weights", "default_language", "language_override" (text indexes).
+		///   - "2dsphereIndexVersion", "bits", "min", "max" (geo indexes).
+		///
+		/// The document returned is the createIndexes response body.
 
 	static const std::string AUTH_SCRAM_SHA1;
 		/// Default authentication mechanism for MongoDB 3.0 and later.

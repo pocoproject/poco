@@ -231,6 +231,44 @@ void BSONTest::testDuplicateDocumentMembers()
 }
 
 
+void BSONTest::testDocumentAddElementMerge()
+{
+	// Mirrors how Database::createIndex(extraOptions) merges caller-supplied
+	// elements into the per-index spec: build a "base" document, then iterate
+	// a second document's elements() and addElement() each into the base.
+	Document::Ptr base = new Document();
+	base->add("name"s, "idx_age"s);
+	base->add("unique"s, true);
+
+	Document::Ptr filter = new Document();
+	filter->add("age"s, static_cast<Poco::Int32>(18));
+
+	Document::Ptr extras = new Document();
+	extras->add("partialFilterExpression"s, filter);
+	extras->add("hidden"s, true);
+
+	std::vector<std::string> names;
+	extras->elementNames(names);
+	for (const auto& name: names)
+	{
+		Element::Ptr element = extras->get(name);
+		assertFalse(element.isNull());
+		base->addElement(element);
+	}
+
+	assertEqual(static_cast<std::size_t>(4), base->size());
+	assertTrue(base->exists("name"));
+	assertTrue(base->exists("unique"));
+	assertTrue(base->exists("partialFilterExpression"));
+	assertTrue(base->exists("hidden"));
+
+	Document::Ptr partial = base->get<Document::Ptr>("partialFilterExpression");
+	assertFalse(partial.isNull());
+	assertEqual(static_cast<Poco::Int32>(18), partial->get<Poco::Int32>("age"));
+	assertEqual(true, base->get<bool>("hidden"));
+}
+
+
 void BSONTest::testArray()
 {
 	Array::Ptr arr = new Array();
@@ -1249,6 +1287,7 @@ CppUnit::Test* BSONTest::suite()
 	CppUnit_addTest(pSuite, BSONTest, testDocumentElementNames);
 	CppUnit_addTest(pSuite, BSONTest, testNestedDocuments);
 	CppUnit_addTest(pSuite, BSONTest, testDuplicateDocumentMembers);
+	CppUnit_addTest(pSuite, BSONTest, testDocumentAddElementMerge);
 
 	// Array tests
 	CppUnit_addTest(pSuite, BSONTest, testArray);

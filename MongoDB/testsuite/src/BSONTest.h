@@ -35,6 +35,7 @@ public:
 	void testDocumentElementNames();
 	void testNestedDocuments();
 	void testDuplicateDocumentMembers();
+	void testDocumentAddElementMerge();
 
 	// Array tests
 	void testArray();

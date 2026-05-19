@@ -329,6 +329,21 @@ Poco::MongoDB::Document::Ptr Database::createIndex(
 	int expirationSeconds,
 	int version)
 {
+	return createIndex(connection, collection, indexedFields, indexName,
+		Document::Ptr(), options, expirationSeconds, version);
+}
+
+
+Poco::MongoDB::Document::Ptr Database::createIndex(
+	Connection& connection,
+	const std::string& collection,
+	const IndexedFields& indexedFields,
+	const std::string& indexName,
+	Document::Ptr extraOptions,
+	unsigned long options,
+	int expirationSeconds,
+	int version)
+{
 // https://www.mongodb.com/docs/manual/reference/command/createIndexes/
 
 	MongoDB::Document::Ptr keys = new MongoDB::Document();
@@ -348,17 +363,31 @@ Poco::MongoDB::Document::Ptr Database::createIndex(
 	if (options & INDEX_UNIQUE) {
 		index->add("unique"s, true);
 	}
-	if (options & INDEX_BACKGROUND) {
-		index->add("background"s, true);
-	}
 	if (options & INDEX_SPARSE) {
 		index->add("sparse"s, true);
 	}
+	if (options & INDEX_HIDDEN) {
+		index->add("hidden"s, true);
+	}
+	// INDEX_BACKGROUND is deprecated (MongoDB 4.2 made all index builds online);
+	// the option is left in the enum for source compatibility but is not
+	// forwarded to the server.
 	if (expirationSeconds > 0) {
 		index->add("expireAfterSeconds"s, static_cast<Poco::Int32>(expirationSeconds));
 	}
 	if (version > 0) {
 		index->add("version"s, static_cast<Poco::Int32>(version));
+	}
+
+	if (extraOptions)
+	{
+		std::vector<std::string> names;
+		extraOptions->elementNames(names);
+		for (const auto& name: names)
+		{
+			Element::Ptr element = extraOptions->get(name);
+			if (element) index->addElement(element);
+		}
 	}
 
 	MongoDB::Array::Ptr indexes = new MongoDB::Array();
