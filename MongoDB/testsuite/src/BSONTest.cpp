@@ -14,9 +14,17 @@
 #include "Poco/MongoDB/Document.h"
 #include "Poco/MongoDB/Array.h"
 #include "Poco/MongoDB/Binary.h"
+#include "Poco/MongoDB/Connection.h"
+#include "Poco/MongoDB/Database.h"
+#include "Poco/MongoDB/Decimal128.h"
+#include "Poco/MongoDB/MaxKey.h"
+#include "Poco/MongoDB/MinKey.h"
 #include "Poco/MongoDB/ObjectId.h"
 #include "Poco/MongoDB/RegularExpression.h"
 #include "Poco/MongoDB/JavaScriptCode.h"
+#include "Poco/BinaryReader.h"
+#include "Poco/BinaryWriter.h"
+#include "Poco/Exception.h"
 #include "Poco/DateTime.h"
 #include "Poco/UUIDGenerator.h"
 #include <sstream>
@@ -228,6 +236,43 @@ void BSONTest::testDuplicateDocumentMembers()
 
 	// Size should be 0 (the only element was removed)
 	assertEqual(0, doc->size());
+}
+
+
+void BSONTest::testDocumentAddElementMerge()
+{
+	// Copy every element from a source Document into a destination via
+	// elementNames() + get() + addElement().
+	Document::Ptr base = new Document();
+	base->add("name"s, "idx_age"s);
+	base->add("unique"s, true);
+
+	Document::Ptr filter = new Document();
+	filter->add("age"s, static_cast<Poco::Int32>(18));
+
+	Document::Ptr extras = new Document();
+	extras->add("partialFilterExpression"s, filter);
+	extras->add("hidden"s, true);
+
+	std::vector<std::string> names;
+	extras->elementNames(names);
+	for (const auto& name: names)
+	{
+		Element::Ptr element = extras->get(name);
+		assertFalse(element.isNull());
+		base->addElement(element);
+	}
+
+	assertEqual(static_cast<std::size_t>(4), base->size());
+	assertTrue(base->exists("name"));
+	assertTrue(base->exists("unique"));
+	assertTrue(base->exists("partialFilterExpression"));
+	assertTrue(base->exists("hidden"));
+
+	Document::Ptr partial = base->get<Document::Ptr>("partialFilterExpression");
+	assertFalse(partial.isNull());
+	assertEqual(static_cast<Poco::Int32>(18), partial->get<Poco::Int32>("age"));
+	assertEqual(true, base->get<bool>("hidden"));
 }
 
 
@@ -718,6 +763,236 @@ void BSONTest::testJavaScriptCode()
 	Document::Ptr jsDoc = new Document();
 	jsDoc->add("code"s, js1);
 	assertEqual(jsDoc->toString(), R"({"code":"function() { return 42; }"})");
+}
+
+
+void BSONTest::testDecimal128Specials()
+{
+	Decimal128 zero;
+	assertFalse(zero.isNaN());
+	assertFalse(zero.isInfinite());
+	assertFalse(zero.isNegative());
+	assertEqual(std::string("0"), zero.toString());
+
+	Decimal128 negZero = Decimal128::negativeZero();
+	assertTrue(negZero.isNegative());
+	assertEqual(std::string("-0"), negZero.toString());
+
+	Decimal128 nan = Decimal128::nan();
+	assertTrue(nan.isNaN());
+	assertEqual(std::string("NaN"), nan.toString());
+
+	Decimal128 posInf = Decimal128::positiveInfinity();
+	assertTrue(posInf.isInfinite());
+	assertFalse(posInf.isNegative());
+	assertEqual(std::string("Infinity"), posInf.toString());
+
+	Decimal128 negInf = Decimal128::negativeInfinity();
+	assertTrue(negInf.isInfinite());
+	assertTrue(negInf.isNegative());
+	assertEqual(std::string("-Infinity"), negInf.toString());
+}
+
+
+void BSONTest::testDecimal128FromString()
+{
+	struct Case
+	{
+		const char* in;
+		const char* out;
+	};
+	const Case cases[] = {
+		{"0",         "0"},
+		{"-0",        "-0"},
+		{"1",         "1"},
+		{"-1",        "-1"},
+		{"123",       "123"},
+		{"-456",      "-456"},
+		{"1.5",       "1.5"},
+		{"-1.5",      "-1.5"},
+		{"0.1",       "0.1"},
+		{"0.0001",    "0.0001"},
+		{"1E+5",      "1E+5"},
+		{"1.234E+10", "1.234E+10"},
+		{"-1E-3",     "-0.001"},
+		// Trailing zeros are part of the canonical (coefficient, exponent)
+		// pair per the BSON Decimal128 spec and must round-trip.
+		{"100",       "100"},
+		{"1.10",      "1.10"},
+		{"0.10",      "0.10"},
+		{"NaN",       "NaN"},
+		{"Infinity",  "Infinity"},
+		{"-Infinity", "-Infinity"},
+		{"inf",       "Infinity"},
+		{"-inf",      "-Infinity"}
+	};
+
+	for (const Case& c: cases)
+	{
+		Decimal128 v = Decimal128::fromString(c.in);
+		assertEqual(std::string(c.out), v.toString());
+	}
+
+	const char* syntaxErrors[] = {
+		"not a number",
+		"1E",        // exponent indicator with no digits
+		"1E+",       // exponent sign with no digits
+		"1e-",
+		"1.2.3"      // multiple decimal points
+	};
+	for (const char* bad: syntaxErrors)
+	{
+		try
+		{
+			Decimal128::fromString(bad);
+			failmsg(std::string("expected SyntaxException for '") + bad + "'");
+		}
+		catch (const Poco::SyntaxException&) {}
+	}
+
+	const char* rangeErrors[] = {
+		"12345678901234567890123456789012345",  // 35 digits, > 34 max
+		"1E10000"                                // exponent above EXPONENT_MAX (6144)
+	};
+	for (const char* bad: rangeErrors)
+	{
+		try
+		{
+			Decimal128::fromString(bad);
+			failmsg(std::string("expected RangeException for '") + bad + "'");
+		}
+		catch (const Poco::RangeException&) {}
+	}
+}
+
+
+void BSONTest::testDecimal128RoundTrip()
+{
+	// Round-trip via toString -> fromString -> toString.
+	Decimal128 a = Decimal128::fromString("3.14159265358979323846");
+	Decimal128 b = Decimal128::fromString(a.toString());
+	assertTrue(a == b);
+	assertEqual(a.toString(), b.toString());
+
+	// Raw construction round-trips the bits.
+	Decimal128 raw(0x0102030405060708ULL, 0x3040000000000000ULL);
+	Decimal128 raw2(raw.low(), raw.high());
+	assertTrue(raw == raw2);
+}
+
+
+void BSONTest::testDecimal128SerializeDocument()
+{
+	// Serialize a Document containing a Decimal128 to BSON, then read it
+	// back and verify the value survives the round trip.
+	Document::Ptr doc = new Document();
+	Decimal128::Ptr value = new Decimal128(Decimal128::fromString("3.14159265358979"));
+	doc->add("pi"s, value);
+
+	std::stringstream stream;
+	Poco::BinaryWriter writer(stream, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
+	doc->write(writer);
+	writer.flush();
+
+	Document::Ptr restored = new Document();
+	Poco::BinaryReader reader(stream, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	restored->read(reader);
+
+	assertTrue(restored->exists("pi"));
+	Decimal128::Ptr round = restored->get<Decimal128::Ptr>("pi");
+	assertFalse(round.isNull());
+	assertEqual(value->toString(), round->toString());
+	assertTrue(*value == *round);
+}
+
+
+void BSONTest::testMinKeyMaxKeySerializeDocument()
+{
+	Document::Ptr doc = new Document();
+	doc->add("min"s, MinKey{});
+	doc->add("max"s, MaxKey{});
+
+	std::stringstream stream;
+	Poco::BinaryWriter writer(stream, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
+	doc->write(writer);
+	writer.flush();
+
+	Document::Ptr restored = new Document();
+	Poco::BinaryReader reader(stream, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	restored->read(reader);
+
+	assertTrue(restored->exists("min"));
+	assertTrue(restored->exists("max"));
+	assertTrue(restored->isType<MinKey>("min"));
+	assertTrue(restored->isType<MaxKey>("max"));
+}
+
+
+void BSONTest::testAuthMechanismConstants()
+{
+	// Lock wire strings; these are part of the public API.
+	assertEqual(std::string("SCRAM-SHA-1"), Database::AUTH_SCRAM_SHA1);
+	assertEqual(std::string("SCRAM-SHA-256"), Database::AUTH_SCRAM_SHA256);
+}
+
+
+void BSONTest::testAuthSCRAM256RejectsNonAscii()
+{
+	// Non-ASCII password must throw NotImplementedException before any
+	// network I/O (SASLprep is not implemented).
+	Poco::MongoDB::Database db("test");
+	Poco::MongoDB::Connection conn;
+	const std::string nonAsciiPassword = "p\xC3\xA9ncil"; // "pencil" with e-acute
+
+	try
+	{
+		db.authenticate(conn, "alice", nonAsciiPassword,
+			Poco::MongoDB::Database::AUTH_SCRAM_SHA256);
+		failmsg("expected NotImplementedException on non-ASCII password");
+	}
+	catch (const Poco::NotImplementedException&)
+	{
+	}
+}
+
+
+namespace
+{
+	class RecordingSocketFactory: public Poco::MongoDB::Connection::SocketFactory
+	{
+	public:
+		bool secureRequested = false;
+		bool called = false;
+
+		Poco::Net::StreamSocket createSocket(const std::string& /*host*/,
+			int /*port*/, Poco::Timespan /*connectTimeout*/, bool secure) override
+		{
+			called = true;
+			secureRequested = secure;
+			// We don't actually want to open a socket; throw to abort the
+			// connect() call after the URI options have been parsed.
+			throw Poco::NotImplementedException("Test factory does not connect");
+		}
+	};
+}
+
+
+void BSONTest::testConnectionURITlsAlias()
+{
+	// "tls=" and "ssl=" must flip the same internal secure flag.
+	auto check = [this](const std::string& uri, bool expectSecure)
+	{
+		Poco::MongoDB::Connection conn;
+		RecordingSocketFactory factory;
+		try { conn.connect(uri, factory); }
+		catch (const Poco::NotImplementedException&) {}
+		assertTrue(factory.called);
+		assertEqual(expectSecure, factory.secureRequested);
+	};
+
+	check("mongodb://localhost:27017/admin?tls=true", true);
+	check("mongodb://localhost:27017/admin?ssl=true", true);
+	check("mongodb://localhost:27017/admin",          false);
 }
 
 
@@ -1249,6 +1524,7 @@ CppUnit::Test* BSONTest::suite()
 	CppUnit_addTest(pSuite, BSONTest, testDocumentElementNames);
 	CppUnit_addTest(pSuite, BSONTest, testNestedDocuments);
 	CppUnit_addTest(pSuite, BSONTest, testDuplicateDocumentMembers);
+	CppUnit_addTest(pSuite, BSONTest, testDocumentAddElementMerge);
 
 	// Array tests
 	CppUnit_addTest(pSuite, BSONTest, testArray);
@@ -1279,6 +1555,17 @@ CppUnit::Test* BSONTest::suite()
 
 	// JavaScriptCode tests
 	CppUnit_addTest(pSuite, BSONTest, testJavaScriptCode);
+
+	CppUnit_addTest(pSuite, BSONTest, testDecimal128Specials);
+	CppUnit_addTest(pSuite, BSONTest, testDecimal128FromString);
+	CppUnit_addTest(pSuite, BSONTest, testDecimal128RoundTrip);
+	CppUnit_addTest(pSuite, BSONTest, testDecimal128SerializeDocument);
+	CppUnit_addTest(pSuite, BSONTest, testMinKeyMaxKeySerializeDocument);
+
+	CppUnit_addTest(pSuite, BSONTest, testAuthMechanismConstants);
+	CppUnit_addTest(pSuite, BSONTest, testAuthSCRAM256RejectsNonAscii);
+
+	CppUnit_addTest(pSuite, BSONTest, testConnectionURITlsAlias);
 
 	// Serialization/Deserialization tests
 	CppUnit_addTest(pSuite, BSONTest, testDocumentSerialization);

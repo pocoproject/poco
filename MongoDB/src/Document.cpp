@@ -15,7 +15,10 @@
 #include "Poco/MongoDB/Document.h"
 #include "Poco/MongoDB/Array.h"
 #include "Poco/MongoDB/Binary.h"
+#include "Poco/MongoDB/Decimal128.h"
 #include "Poco/MongoDB/JavaScriptCode.h"
+#include "Poco/MongoDB/MaxKey.h"
+#include "Poco/MongoDB/MinKey.h"
 #include "Poco/MongoDB/ObjectId.h"
 #include "Poco/MongoDB/RegularExpression.h"
 #include "Poco/Exception.h"
@@ -157,6 +160,15 @@ void Document::read(BinaryReader& reader)
 		case ElementTraits<Int64>::TypeId:
 			element = new ConcreteElement<Int64>(name, 0);
 			break;
+		case ElementTraits<Decimal128::Ptr>::TypeId:
+			element = new ConcreteElement<Decimal128::Ptr>(name, new Decimal128);
+			break;
+		case ElementTraits<MinKey>::TypeId:
+			element = new ConcreteElement<MinKey>(name, MinKey{});
+			break;
+		case ElementTraits<MaxKey>::TypeId:
+			element = new ConcreteElement<MaxKey>(name, MaxKey{});
+			break;
 		default:
 			{
 				std::stringstream ss;
@@ -164,8 +176,6 @@ void Document::read(BinaryReader& reader)
 				throw Poco::NotImplementedException(ss.str());
 			}
 		//TODO: x0F -> JavaScript code with scope
-		//		xFF -> Min Key
-		//		x7F -> Max Key
 		}
 
 		element->read(reader);

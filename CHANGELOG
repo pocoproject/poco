@@ -25,6 +25,28 @@ Breaking Changes:
 
 API Changes:
 
+- Poco::MongoDB::Database::authenticate() default mechanism changed from
+  "SCRAM-SHA-1" to "SCRAM-SHA-256", matching the MongoDB server default
+  for new users since 4.0 and the convention used by every official
+  MongoDB driver. Existing callers that rely on SCRAM-SHA-1 should pass
+  Database::AUTH_SCRAM_SHA1 explicitly. SCRAM-SHA-256 currently requires
+  ASCII passwords; non-ASCII passwords throw NotImplementedException
+  pending full SASLprep (RFC 4013) support.
+- Poco::MongoDB::Database::count() now uses aggregation [{$count: "n"}]
+  instead of the legacy "count" command. The signature is unchanged.
+  Aggregation $count is in the Stable API v1, returns accurate results
+  on sharded clusters (the legacy command over-reports due to orphans),
+  and is permitted in multi-document transactions. Operators watching
+  server-side query metrics will see "aggregate" commands where they
+  previously saw "count".
+- Poco::MongoDB::Database::INDEX_BACKGROUND is now marked POCO_DEPRECATED
+  (deprecated by MongoDB in 4.2; server-side no-op). The flag is kept
+  for source compatibility but its value is no longer forwarded to the
+  server.
+- Poco::MongoDB::OpMsgMessage::CMD_MAP_REDUCE is now marked
+  POCO_DEPRECATED (mapReduce deprecated by MongoDB in 5.0); use the
+  aggregation pipeline.
+
 - GH #5322 PropertyFileConfiguration: the optional parent-configuration
   parameter (added in 1.15.1 via #5253) is now an AbstractConfiguration*
   raw non-owning pointer instead of AbstractConfiguration::Ptr. Callers

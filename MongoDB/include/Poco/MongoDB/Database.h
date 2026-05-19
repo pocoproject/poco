@@ -38,8 +38,14 @@ public:
 
 	enum IndexOptions {
 		INDEX_UNIQUE        = 1 << 0,
+			///< For new indexes with conditional-inclusion semantics, prefer
+			///< partialFilterExpression (see createIndex with extraOptions)
+			///< over INDEX_SPARSE.
 		INDEX_SPARSE        = 1 << 1,
-		INDEX_BACKGROUND    = 1 << 2
+		INDEX_BACKGROUND POCO_DEPRECATED("Deprecated since MongoDB 4.2; index builds are online by default") = 1 << 2,
+			///< Hybrid online index builds since 4.2; no longer forwarded to the server.
+		INDEX_HIDDEN        = 1 << 3
+			///< Hide the index from the query planner (since MongoDB 4.4).
 	};
 
 	using FieldIndex = std::tuple<std::string, bool>;
@@ -57,18 +63,20 @@ public:
 	[[nodiscard]] const std::string& name() const;
 		/// Database name
 
-	bool authenticate(Connection& connection, const std::string& username, const std::string& password, const std::string& method = AUTH_SCRAM_SHA1);
+	bool authenticate(Connection& connection, const std::string& username, const std::string& password, const std::string& method = AUTH_SCRAM_SHA256);
 		/// Authenticates against the database using the given connection,
-		/// username and password, as well as authentication method.
+		/// username and password, and authentication method:
 		///
-		/// "SCRAM-SHA-1" (default starting in MongoDB 3.0) is the only supported
-		/// authentication method. "MONGODB-CR" is no longer supported as it
-		/// requires the legacy wire protocol.
+		///   - "SCRAM-SHA-256" (MongoDB 4.0+)
+		///   - "SCRAM-SHA-1"   (MongoDB 3.0+)
 		///
-		/// Returns true if authentication was successful, otherwise false.
+		/// MONGODB-CR is not supported (requires the legacy wire protocol).
 		///
-		/// May throw a Poco::ProtocolException if authentication fails for a reason other than
-		/// invalid credentials.
+		/// SCRAM-SHA-256 accepts ASCII passwords only; SASLprep (RFC 4013)
+		/// is not implemented. Non-ASCII throws Poco::NotImplementedException.
+		///
+		/// Returns true on success, false on invalid credentials. Throws
+		/// Poco::ProtocolException on other failures.
 
 	[[nodiscard]] Document::Ptr queryBuildInfo(Connection& connection) const;
 		/// Queries server build info using OP_MSG protocol.
@@ -77,7 +85,12 @@ public:
 		/// Queries hello response from server using OP_MSG protocol.
 
 	[[nodiscard]] Int64 count(Connection& connection, const std::string& collectionName) const;
-		/// Sends a count request for the given collection to MongoDB using OP_MSG protocol.
+		/// Counts documents in the given collection using the aggregation
+		/// framework ([{$count: "n"}]) over OP_MSG. Aggregation-based counting
+		/// is preferred over the legacy "count" command because it is part of
+		/// the Stable API v1 (since MongoDB 5.0), is accurate on sharded
+		/// clusters (the legacy command can over-report due to orphaned
+		/// documents), and is permitted in multi-document transactions.
 		///
 		/// If the command fails, -1 is returned.
 
@@ -98,11 +111,46 @@ public:
 		unsigned long options = 0,
 		int expirationSeconds = 0,
 		int version = 0);
-		/// Creates an index. The document returned is the response body..
-		/// For more info look at the createIndex information on the MongoDB website. (new wire protocol)
+		/// Creates an index. The document returned is the response body.
+		/// For more info look at the createIndex information on the MongoDB
+		/// website. (new wire protocol)
+		///
+		/// Leave version at 0 to use the server default (v=2 since MongoDB 3.4).
+		/// Setting v=1 is only for compatibility with pre-3.4 servers and is
+		/// incompatible with text, wildcard, and several other modern index
+		/// types.
+
+	Document::Ptr createIndex(
+		Connection& connection,
+		const std::string& collection,
+		const IndexedFields& indexedFields,
+		const std::string& indexName,
+		Document::Ptr extraOptions,
+		unsigned long options = 0,
+		int expirationSeconds = 0,
+		int version = 0);
+		/// Creates an index, allowing arbitrary additional fields in the
+		/// per-index spec via extraOptions. Every element of extraOptions
+		/// is added to the index spec document on top of the fields derived
+		/// from indexedFields, indexName, options, expirationSeconds and
+		/// version. Typical keys to pass in extraOptions include:
+		///
+		///   - "partialFilterExpression" (Document): partial indexes,
+		///     MongoDB 3.2+. Preferred over INDEX_SPARSE for new code.
+		///   - "collation" (Document): per-index collation, MongoDB 3.4+.
+		///   - "wildcardProjection" (Document): wildcard / compound-wildcard
+		///     indexes (the wildcard field itself is specified as "$**" or
+		///     "path.$**" in indexedFields).
+		///   - "weights", "default_language", "language_override" (text indexes).
+		///   - "2dsphereIndexVersion", "bits", "min", "max" (geo indexes).
+		///
+		/// The document returned is the createIndexes response body.
 
 	static const std::string AUTH_SCRAM_SHA1;
-		/// Default authentication mechanism for MongoDB 3.0 and later.
+		/// SCRAM-SHA-1 authentication mechanism (MongoDB 3.0+).
+
+	static const std::string AUTH_SCRAM_SHA256;
+		/// SCRAM-SHA-256 authentication mechanism (MongoDB 4.0+).
 
 	enum WireVersion
 		/// Wire version as reported by the command hello.
@@ -134,6 +182,10 @@ public:
 
 protected:
 	bool authSCRAM(Connection& connection, const std::string& username, const std::string& password);
+		/// Performs SCRAM-SHA-1 authentication.
+
+	bool authSCRAM256(Connection& connection, const std::string& username, const std::string& password);
+		/// Performs SCRAM-SHA-256 authentication. ASCII passwords only.
 
 private:
 	std::string _dbname;

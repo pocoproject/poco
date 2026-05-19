@@ -171,12 +171,12 @@ void Connection::connect(const std::string& uri, SocketFactory& socketFactory)
 	bool ssl = false;
 	Poco::Timespan connectTimeout;
 	Poco::Timespan socketTimeout;
-	std::string authMechanism = Database::AUTH_SCRAM_SHA1;
+	std::string authMechanism = Database::AUTH_SCRAM_SHA256;
 
 	Poco::URI::QueryParameters params = theURI.getQueryParameters();
 	for (Poco::URI::QueryParameters::const_iterator it = params.begin(); it != params.end(); ++it)
 	{
-		if (it->first == "ssl"s)
+		if (it->first == "ssl"s || it->first == "tls"s)
 		{
 			ssl = (it->second == "true"s);
 		}
