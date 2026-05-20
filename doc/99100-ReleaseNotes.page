@@ -1,6 +1,63 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.15.3
+
+!!Summary of Changes
+
+Bug fixes, expat CVE updates in bundled deps, MongoDB 6.0/7.0/8.0
+compatibility, PostgreSQL URI connection strings, and a corrected %c
+date/time format specifier (breaking).
+
+!!Breaking Changes
+
+  - GH #3949 Poco::DateTimeFormatter %c does not format to centisecond but decisecond (PR #5350)
+
+!!API Changes
+
+  - MongoDB::Database::authenticate() default is now SCRAM-SHA-256; pass AUTH_SCRAM_SHA1 for the previous default. ASCII passwords only. (PR #5359)
+  - MongoDB::Database::count() now uses {$count: "n"} aggregation; signature unchanged, accurate on sharded clusters, transaction-safe. (PR #5359)
+  - MongoDB::Database::INDEX_BACKGROUND and MongoDB::OpMsgMessage::CMD_MAP_REDUCE are POCO_DEPRECATED (deprecated server-side in 4.2 and 5.0). (PR #5359)
+  - GH #5322 Circular reference in `Application::loadConfiguration()` -- PropertyFileConfiguration parent parameter is now AbstractConfiguration* (was Ptr); caller owns lifetime. Ptr overloads retained as deprecated. Constructors are now explicit.
+
+!!Security Fixes
+
+  - PR #5351 chore(deps): bundled third-party library updates for 1.15.3
+  - GH #5050 CodeQL: Net: Comparison result is always the same (PR #5349)
+
+Bundled Third-Party Library Upgrades:
+  - expat 2.7.5 -> 2.8.1 (CVE-2026-41080, CVE-2026-45186)
+  - SQLite 3.53.0 -> 3.53.1 (WAL-reset corruption fix)
+  - libpng 1.6.57 -> 1.6.58 (png_get_PLTE regression fix)
+  - 7zip (LZMA SDK) 26.00 -> 26.01
+
+!!Features, Enhancements and Third Party Updates
+
+  - PR #5359 enh(MongoDB): MongoDB 6.0/7.0/8.0 compat -- partial indexes, Decimal128, SCRAM-SHA-256
+  - GH #5354 CppUnit terminate handler (PR #5355)
+  - PR #5346 Support quoted parameters and URI syntax in PostgreSQL connection strings
+  - GH #5344 POCO::JWT issue with OPENSSL_NO_DEPRECATED (PR #5332)
+  - PR #5334 enh(MongoDB): add wire version constants for MongoDB 6.1-8.0
+  - GH #5337 `ProcessRunner` error message format (PR #5338)
+
+!!Bug Fixes and Improvements
+
+  - PR #5358 fix(AbstractEvent): operator-= holds the event mutex across Delegate destructor
+  - PR #5356 [fix] Only allow use atomic when C++20 is properly configured
+  - GH #5352 C++ 20 does not guarantee atomic_flag.test (PR #5353)
+  - GH #5347 PDF does not build with make
+  - GH #5342 Oracle ODBC CI fail (PR #5343)
+  - GH #5340 PropertyFileConfiguration does not persist deletion of last key from included property files (PR #5341)
+  - GH #5330 POCO_UNBUNDLED=ON build fails when ZLIB is a transitive dependency of another found package
+  - GH #5327 UnbufferedStreamBuf::xsgetn silently swallows decoder errors after partial read (regression from #5290)
+  - GH #5324 `Logger::shutdown()` use-after-free
+  - GH #5316 ThreadTest::testTrySleep flaky on macOS, causes segfault
+  - PR #5345 fix(cmake): replace obsolete -s with -Wl,-x on Apple linker
+  - PR #5336 Fix C1021 fatal error when building DataSQLite with POCO_SQLITE_UNBUNDLED on MSVC
+  - PR #5333 fix(Foundation): handle INTERFACE_LIBRARY Pcre2::Pcre2 from CONFIG-mode packages
+  - PR #5318 Fix: DateTimeParser trailing timezone designators & Timezone UTC offset cache invalidation
+
+
 !!!Release 1.15.2
 
 !!Summary of Changes
