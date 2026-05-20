@@ -101,7 +101,7 @@ private:
 
 // Installs a std::set_terminate handler that prints the in-flight
 // exception's displayText() (for Poco::Exception) or what() (for any
-// other std::exception) before std::abort() — so an unhandled throw
+// other std::exception) before std::abort() -- so an unhandled throw
 // from a destructor, fixture-static dtor, or worker thread surfaces
 // its message instead of just the default
 // "terminate called after throwing an instance of '...'" line.

@@ -30,9 +30,7 @@ target_include_directories(CppUnit
 		${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 if(WIN32)
-	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-		target_compile_definitions(CppUnit PUBLIC POCO_NO_AUTOMATIC_LIBS)
-	endif()
+	target_compile_definitions(CppUnit PUBLIC POCO_NO_AUTOMATIC_LIBS)
 endif()
 
 if(NOT BUILD_SHARED_LIBS)
