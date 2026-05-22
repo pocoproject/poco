@@ -24,6 +24,7 @@ using namespace Poco::Redis;
 
 
 bool RedisTest::_connected = false;
+bool RedisTest::_connectFailed = false;
 Poco::Redis::Client RedisTest::_redis;
 
 
@@ -35,17 +36,22 @@ RedisTest::RedisTest(const std::string& name):
 #if POCO_OS == POCO_OS_ANDROID
 	_host = "10.0.2.2";
 #endif
-	if (!_connected)
+	// Skip the connect attempt if a prior test in this run already failed —
+	// otherwise every one of the ~54 tests pays the timeout (and on Windows
+	// the firewall silently drops instead of refusing, so each attempt eats
+	// the full timeout). One failure is enough to know Redis isn't there.
+	if (!_connected && !_connectFailed)
 	{
 		try
 		{
-			Poco::Timespan t(10, 0); // Connect within 10 seconds
+			Poco::Timespan t(1, 0); // 1 second is plenty for localhost
 			_redis.connect(_host, _port, t);
 			_connected = true;
 			std::cout << "Connected to [" << _host << ':' << _port << ']' << std::endl;
 		}
 		catch (Poco::Exception& e)
 		{
+			_connectFailed = true;
 			std::cout << "Couldn't connect to [" << _host << ':' << _port << ']' << e.message() << ". " << std::endl;
 		}
 	}
