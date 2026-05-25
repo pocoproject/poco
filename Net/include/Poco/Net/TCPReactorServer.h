@@ -3,6 +3,7 @@
 
 #include "Poco/Net/Net.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/TCPReactorAcceptor.h"
 #include "Poco/Net/TCPServerParams.h"
 #include "Poco/ThreadPool.h"
@@ -23,6 +24,14 @@ class Net_API TCPReactorServer
 {
 public:
 	TCPReactorServer(int port, TCPServerParams::Ptr pParams);
+		/// Binds the listening sockets to the wildcard address on the
+		/// given port (e.g. 0.0.0.0:port for IPv4).
+
+	TCPReactorServer(const SocketAddress& address, TCPServerParams::Ptr pParams);
+		/// Binds the listening sockets to the given address (host + port).
+		/// Use this overload when the server should listen only on a
+		/// specific interface — e.g. SocketAddress("127.0.0.1", 9800)
+		/// for a localhost-only service.
 
 	~TCPReactorServer();
 

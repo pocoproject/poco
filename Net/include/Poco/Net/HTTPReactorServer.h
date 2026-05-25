@@ -7,6 +7,7 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerRequestImpl.h"
 #include "Poco/Net/HTTPSession.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/TCPReactorServer.h"
 #include "Poco/ThreadPool.h"
 namespace Poco::Net {
@@ -16,6 +17,13 @@ class Net_API HTTPReactorServer
 {
 public:
 	HTTPReactorServer(int port, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory);
+		/// Listens on the wildcard address on the given port.
+
+	HTTPReactorServer(const SocketAddress& address, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory);
+		/// Listens on a specific (host, port) so deployments can bind to a
+		/// single interface (e.g. SocketAddress("127.0.0.1", 9800) for a
+		/// localhost-only service).
+
 	~HTTPReactorServer();
 	void start();
 	void stop();
