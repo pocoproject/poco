@@ -9,16 +9,18 @@ include $(POCO_BASE)/build/rules/global
 objects = \
 	Collector \
 	Counter \
-	IntCounter \
+	Exporter \
 	Gauge \
+	Histogram \
+	IntCounter \
 	IntGauge \
 	LabeledMetric \
-	Histogram \
-	Registry \
-	TextExporter \
+	Metric \
 	MetricsRequestHandler \
 	MetricsServer \
 	ProcessCollector \
+	Registry \
+	TextExporter \
 	ThreadPoolCollector
 
 target         = PocoPrometheus

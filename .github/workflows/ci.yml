@@ -357,6 +357,8 @@ jobs:
   # sanity check so the legacy ./configure + make path keeps compiling. All
   # standard components are built (--everything); tests are compiled but not
   # run (cmake jobs above already cover the test signal). Samples are skipped.
+  # Uses the Linux-c++20 config to match the cmake default (C++20 since 1.15.0);
+  # the codebase has moved past C++17 in places (e.g. std::ranges).
   linux-gcc-make-build:
     runs-on: ubuntu-24.04
     needs: changes
@@ -368,8 +370,8 @@ jobs:
       - run: >-
           sudo apt -y update &&
           sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev libpq-dev
-      - name: Configure (classic make)
-        run: ./configure --everything --no-samples
+      - name: Configure (classic make, C++20)
+        run: ./configure --config=Linux-c++20 --everything --no-samples
       - name: Build libraries and testsuites
         run: make -s -j$(nproc)
 
