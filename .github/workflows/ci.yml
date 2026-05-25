@@ -353,6 +353,26 @@ jobs:
         with:
           build-dir: build
 
+  # Classic GNU make build. Not officially supported anymore, but kept as a
+  # sanity check so the legacy ./configure + make path keeps compiling. All
+  # standard components are built (--everything); tests are compiled but not
+  # run (cmake jobs above already cover the test signal). Samples are skipped.
+  linux-gcc-make-build:
+    runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - run: >-
+          sudo apt -y update &&
+          sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev libpq-dev
+      - name: Configure (classic make)
+        run: ./configure --everything --no-samples
+      - name: Build libraries and testsuites
+        run: make -s -j$(nproc)
+
   # ------------------------------------------------------------------------
   # Linux cross-compile and other arch build-only probes
   # ------------------------------------------------------------------------
