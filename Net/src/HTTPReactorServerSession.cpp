@@ -8,8 +8,14 @@ namespace Poco::Net {
 
 HTTPReactorServerSession::HTTPReactorServerSession(
 	const StreamSocket& socket, std::string& buf, HTTPServerParams::Ptr pParams)
-	: // do not deliver socket to HTTPSession
-	  HTTPSession(), _buf(buf), _realsocket(socket)
+	: HTTPSession(socket), _buf(buf), _realsocket(socket)
+	// Deliver the socket to HTTPSession's base too, so callers that
+	// reach for HTTPSession::socket() / detachSocket() (notably the
+	// WebSocket(req, rsp) upgrade constructor, which extracts the
+	// underlying StreamSocket from the request) get a real socket
+	// rather than the default-constructed empty one. The reactor
+	// session still overrides read/write/get/peek to drive I/O
+	// through _realsocket + the parsed-message buffer.
 {
 	_pcur = const_cast<char*>(_buf.c_str());
 }
@@ -21,6 +27,10 @@ HTTPReactorServerSession::~HTTPReactorServerSession()
 	{
 		popCompletedRequest();
 	}
+	// Clear HTTPSession::_socket before the base destructor's close()
+	// would otherwise tear down the per-keep-alive-connection fd. The
+	// fd stays alive because _realsocket still holds a ref to the impl.
+	(void)detachSocket();
 };
 /// Destroys the HTTPReactorServerSession.
 

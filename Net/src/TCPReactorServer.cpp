@@ -8,15 +8,21 @@ namespace Poco::Net {
 
 
 TCPReactorServer::TCPReactorServer(int port, TCPServerParams::Ptr pParams)
+	: TCPReactorServer(SocketAddress(static_cast<Poco::UInt16>(port)), pParams)
+{
+}
+
+
+TCPReactorServer::TCPReactorServer(const SocketAddress& address, TCPServerParams::Ptr pParams)
 	: _threadPool("TCPRA", pParams->getAcceptorNum()),
 	  _reactors(pParams->getAcceptorNum()),
 	  _pParams(pParams),
-	  _port(port),
+	  _port(address.port()),
 	  _stopped(false)
 {
 	for (auto& reactor : _reactors)
 	{
-		ServerSocket socket(_port);
+		ServerSocket socket(address);
 		_sockets.push_back(socket);
 		if (_sockets.size() == 1)
 		{

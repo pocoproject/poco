@@ -18,6 +18,18 @@ HTTPReactorServer::HTTPReactorServer(int port, HTTPServerParams::Ptr pParams, HT
 		});
 }
 
+HTTPReactorServer::HTTPReactorServer(const SocketAddress& address, HTTPServerParams::Ptr pParams, HTTPRequestHandlerFactory::Ptr pFactory)
+	: _tcpReactorServer(address, pParams)
+{
+	_pParams = pParams;
+	_pFactory = pFactory;
+	_tcpReactorServer.setRecvMessageCallback(
+		[this](const TcpReactorConnectionPtr& conn)
+		{
+			this->onMessage(conn);
+		});
+}
+
 HTTPReactorServer::~HTTPReactorServer()
 {
 }
