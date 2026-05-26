@@ -369,7 +369,7 @@ jobs:
       - uses: actions/checkout@v5
       - run: >-
           sudo apt -y update &&
-          sudo apt -y install libssl-dev unixodbc-dev libmysqlclient-dev libpq-dev
+          sudo apt -y install libssl-dev unixodbc-dev libltdl-dev libmysqlclient-dev libpq-dev
       - name: Configure (classic make, C++20)
         run: ./configure --config=Linux-c++20 --everything --no-samples
       - name: Build libraries and testsuites
