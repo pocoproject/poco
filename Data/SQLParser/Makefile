@@ -72,9 +72,12 @@ $(LIB_BUILD): $(LIB_OBJ)
 	$(LIBLINKER) $(LIB_LFLAGS) $(LIB_BUILD) $(LIB_OBJ)
 
 # The auto-generated code from bison and flex contains some parts the compiler complains about with -Wall.
+# bison_parser.cpp #includes flex_lexer.h, so bison_parser.o must wait for flex_lexer.cpp regeneration
+# to finish (which also produces flex_lexer.h). Without this dep, parallel make races and bison_parser.o
+# can start before hsql_lex is declared, producing 'hsql_lex was not declared' errors.
 $(SRCPARSER)/flex_lexer.o: $(SRCPARSER)/flex_lexer.cpp $(SRCPARSER)/bison_parser.cpp
 	$(CXX) $(LIB_CFLAGS) -c -o $@ $< -Wno-sign-compare -Wno-unneeded-internal-declaration -Wno-register
-$(SRCPARSER)/bison_parser.o: $(SRCPARSER)/bison_parser.cpp
+$(SRCPARSER)/bison_parser.o: $(SRCPARSER)/bison_parser.cpp $(SRCPARSER)/flex_lexer.cpp
 	$(CXX) $(LIB_CFLAGS) -c -o $@ $< -Wno-unused-but-set-variable
 
 %.o: %.cpp $(PARSER_CPP) $(LIB_H)
