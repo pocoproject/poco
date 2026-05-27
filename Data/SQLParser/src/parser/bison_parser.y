@@ -1308,7 +1308,7 @@ interval_literal : INTVAL duration_field { $$ = Expr::makeIntervalLiteral($1, $2
 param_expr
   : '?' {
       $$ = Expr::makeParameter(yylloc.total_column);
-      $$->ival2 = yyloc.param_list.size();
+      $$->ival2 = yylloc.total_column - 1;  // source column (0-based) of the '?' token
       yyloc.param_list.push_back($$);
     }
   | DOLLAR_PARAM {
@@ -1317,10 +1317,15 @@ param_expr
         YYERROR;
       }
       $$ = Expr::makeDollarParameter($1);
+      // length of $N token: 1 for '$' + digit count of N
+      int64_t dollarLen = 1;
+      for (int64_t v = $1; v > 0; v /= 10) ++dollarLen;
+      $$->ival2 = yylloc.total_column - dollarLen;
       yyloc.param_list.push_back($$);
     }
   | NAMED_PARAM {
       $$ = Expr::makeNamedParameter($1);
+      $$->ival2 = yylloc.total_column - 1 - (int64_t)strlen($1);
       yyloc.param_list.push_back($$);
     }
   ;

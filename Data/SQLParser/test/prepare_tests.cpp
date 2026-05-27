@@ -55,12 +55,14 @@ TEST(StatementWithParameters) {
   ASSERT(eq1->expr->isType(hsql::kExprColumnRef));
   ASSERT(eq1->expr2->isType(kExprParameter));
   ASSERT_EQ(eq1->expr2->ival, 0);
+  ASSERT_EQ(eq1->expr2->ival2, 29);  // start column of first '?'
   ASSERT_EQ(result.parameters()[0], eq1->expr2);
 
   ASSERT_EQ(eq2->opType, hsql::kOpEquals);
   ASSERT(eq2->expr->isType(hsql::kExprColumnRef));
   ASSERT(eq2->expr2->isType(kExprParameter));
   ASSERT_EQ(eq2->expr2->ival, 1);
+  ASSERT_EQ(eq2->expr2->ival2, 39);  // start column of second '?'
   ASSERT_EQ(result.parameters()[1], eq2->expr2);
 }
 
@@ -74,9 +76,11 @@ TEST(StatementWithDollarParameters) {
 
   ASSERT(eq1->expr2->isType(kExprParameterDollar));
   ASSERT_EQ(eq1->expr2->ival, 1);
+  ASSERT_EQ(eq1->expr2->ival2, 29);  // start column of "$1"
 
   ASSERT(eq2->expr2->isType(kExprParameterDollar));
   ASSERT_EQ(eq2->expr2->ival, 2);
+  ASSERT_EQ(eq2->expr2->ival2, 40);  // start column of "$2"
 }
 
 TEST(StatementWithDollarParametersOutOfOrder) {
@@ -85,11 +89,14 @@ TEST(StatementWithDollarParametersOutOfOrder) {
 
   ASSERT_EQ(result.parameters().size(), 2);
 
-  // addParameter sorts by ival, so the explicit positions order the result vector.
+  // addParameter sorts by ival, so the explicit positions order the result vector
+  // but ival2 (source column) is independent and reflects the textual order.
   ASSERT(result.parameters()[0]->isType(kExprParameterDollar));
   ASSERT_EQ(result.parameters()[0]->ival, 1);
+  ASSERT_EQ(result.parameters()[0]->ival2, 40);  // "$1" appears at column 40
   ASSERT(result.parameters()[1]->isType(kExprParameterDollar));
   ASSERT_EQ(result.parameters()[1]->ival, 2);
+  ASSERT_EQ(result.parameters()[1]->ival2, 29);  // "$2" appears at column 29
 }
 
 TEST(StatementWithNamedParameters) {
@@ -102,9 +109,11 @@ TEST(StatementWithNamedParameters) {
 
   ASSERT(eq1->expr2->isType(kExprParameterNamed));
   ASSERT_STREQ(eq1->expr2->name, "user");
+  ASSERT_EQ(eq1->expr2->ival2, 29);  // start column of ":user"
 
   ASSERT(eq2->expr2->isType(kExprParameterNamed));
   ASSERT_STREQ(eq2->expr2->name, "id");
+  ASSERT_EQ(eq2->expr2->ival2, 43);  // start column of ":id"
 }
 
 TEST(ExecuteStatementTest) {
