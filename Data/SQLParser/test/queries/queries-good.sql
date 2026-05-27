@@ -124,3 +124,5 @@ SELECT rank() OVER (PARTITION BY test1 ORDER BY test2) FROM test;
 SELECT * FROM t WHERE a = $1 AND b = $2;
 SELECT * FROM t WHERE a = :user AND b = :id;
 SELECT * FROM t WHERE a = ? AND b = :id AND c = $3;
+INSERT INTO foo VALUES (?);
+EXECUTE statement_a(?);

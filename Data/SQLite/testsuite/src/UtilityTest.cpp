@@ -151,7 +151,7 @@ void UtilityTest::testBoundSQLQuestionTooFew()
 {
 	try
 	{
-		Utility::boundSQL("VALUES(?, ?, ?)", 1, 2);
+		Utility::boundSQL("INSERT INTO t VALUES(?, ?, ?)", 1, 2);
 		fail("must fail with too-few-args");
 	}
 	catch (const InvalidArgumentException&)
@@ -164,7 +164,7 @@ void UtilityTest::testBoundSQLQuestionTooMany()
 {
 	try
 	{
-		Utility::boundSQL("VALUES(?)", 1, 2);
+		Utility::boundSQL("INSERT INTO t VALUES(?)", 1, 2);
 		fail("must fail with too-many-args");
 	}
 	catch (const InvalidArgumentException&)
@@ -175,15 +175,16 @@ void UtilityTest::testBoundSQLQuestionTooMany()
 
 void UtilityTest::testBoundSQLDollar()
 {
-	const std::string s = Utility::boundSQL("VALUES($1, $2)", 42, std::string("John"));
-	assertTrue(s == "VALUES(42, 'John')");
+	const std::string s = Utility::boundSQL(
+		"INSERT INTO t VALUES($1, $2)", 42, std::string("John"));
+	assertTrue(s == "INSERT INTO t VALUES(42, 'John')");
 }
 
 
 void UtilityTest::testBoundSQLDollarRepetition()
 {
-	const std::string s = Utility::boundSQL("VALUES($1, $1)", 42);
-	assertTrue(s == "VALUES(42, 42)");
+	const std::string s = Utility::boundSQL("INSERT INTO t VALUES($1, $1)", 42);
+	assertTrue(s == "INSERT INTO t VALUES(42, 42)");
 }
 
 
@@ -191,7 +192,7 @@ void UtilityTest::testBoundSQLDollarGap()
 {
 	try
 	{
-		Utility::boundSQL("VALUES($1, $3)", 1, 2);
+		Utility::boundSQL("INSERT INTO t VALUES($1, $3)", 1, 2);
 		fail("must fail with $N arity gap");
 	}
 	catch (const InvalidArgumentException&)
@@ -204,7 +205,7 @@ void UtilityTest::testBoundSQLDollarOutOfRange()
 {
 	try
 	{
-		Utility::boundSQL("VALUES($5)", 1, 2);
+		Utility::boundSQL("INSERT INTO t VALUES($5)", 1, 2);
 		fail("must fail with $N out of range");
 	}
 	catch (const InvalidArgumentException&)
@@ -217,7 +218,7 @@ void UtilityTest::testBoundSQLDollarZero()
 {
 	try
 	{
-		Utility::boundSQL("VALUES($0)", 1);
+		Utility::boundSQL("INSERT INTO t VALUES($0)", 1);
 		fail("must fail with $0");
 	}
 	catch (const InvalidArgumentException&)
@@ -230,7 +231,7 @@ void UtilityTest::testBoundSQLMixedStyles()
 {
 	try
 	{
-		Utility::boundSQL("VALUES(?, $1)", 1, 2);
+		Utility::boundSQL("INSERT INTO t VALUES(?, $1)", 1, 2);
 		fail("must fail with mixed styles");
 	}
 	catch (const InvalidArgumentException&)
@@ -305,7 +306,9 @@ void UtilityTest::testExecuteSQLMalformed()
 
 	assertTrue(rc == 0);
 	assertTrue(!captured.ok);
-	assertTrue(captured.sql == "INSERT INVALID NONSENSE 7");
+	// Parser-based boundSQL refuses to render unparseable SQL; executeSQL falls
+	// back to the raw template string with placeholders left in place.
+	assertTrue(captured.sql == "INSERT INVALID NONSENSE ?");
 	assertTrue(!captured.error.empty());
 }
 

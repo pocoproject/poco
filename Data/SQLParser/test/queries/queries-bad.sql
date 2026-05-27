@@ -84,10 +84,9 @@
 !SELECT * FROM foo INNER JOIN bar USING (a AS b);
 !SELECT * FROM foo INNER JOIN bar USING (1);
 # INSERT, EXECUTE, and HINTS only allow specific expressions.
-!INSERT INTO foo VALUES (?);
+# Note: '?' placeholders accepted in INSERT VALUES and EXECUTE (Poco fork extension).
 !INSERT INTO foo VALUES (CAST(column_a AS INT));
 !INSERT INTO foo VALUES (AVG(another_column));
-!EXECUTE statement_a(?);
 !EXECUTE statement_a(CAST(column_a AS INT));
 !EXECUTE statement_a(AVG(another_column));
 !SELECT * FROM foo WITH HINT (?);

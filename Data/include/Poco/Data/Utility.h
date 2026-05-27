@@ -27,10 +27,16 @@
 #include "Poco/Nullable.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Types.h"
+#ifndef POCO_DATA_NO_SQL_PARSER
+#include "SQLParser.h"
+#include "sql/Expr.h"
+#endif
+#include <algorithm>
 #include <array>
 #include <cctype>
 #include <chrono>
 #include <cstddef>
+#include <cstring>
 #include <exception>
 #include <functional>
 #include <memory>
@@ -38,6 +44,7 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+#include <vector>
 
 
 namespace Poco {
@@ -179,22 +186,102 @@ public:
 	template <typename... Args>
 	static std::string boundSQL(const std::string& sql, const Args&... bindings)
 		/// Renders a parameterised SQL template by substituting placeholders
-		/// with stringified bindings. Supports two placeholder styles:
-		///   * `?` — positional; one binding consumed per occurrence.
-		///   * `$N` — numbered; `$N` substitutes bindings[N-1] and may repeat.
-		/// Mixing styles in one statement throws Poco::InvalidArgumentException.
-		/// Placeholders inside single-quoted SQL literals are preserved
-		/// (the state machine respects the `''` escape).
+		/// with stringified bindings. Supports three placeholder styles:
+		///   * `?`     — positional; one binding consumed per occurrence.
+		///   * `$N`    — numbered; `$N` substitutes bindings[N-1] and may repeat.
+		///   * `:name` — named; left verbatim (pass-through, no substitution).
+		/// Placeholder positions are obtained from the SQL parser, so literals
+		/// and comments are handled by the parser's lexer rather than a local
+		/// scanner; placeholders inside single-quoted strings are inert.
+		/// Mixing `?` and `$N` in one statement throws
+		/// Poco::InvalidArgumentException.
 		/// Arity:
-		///   * `?`-style — count of `?` outside literals must equal sizeof...(Args).
+		///   * `?`-style — count of `?` must equal sizeof...(Args).
 		///   * `$N`-style — the maximum N referenced must equal sizeof...(Args);
-		///     `$0` is invalid.
+		///     `$0` is rejected by the parser.
 		/// Arity mismatches throw Poco::InvalidArgumentException.
-		/// `:name` placeholders are not supported.
+		/// When the parser is disabled (POCO_DATA_NO_SQL_PARSER), falls back to
+		/// a hand-rolled scanner that supports `?` and `$N` only.
 	{
 		constexpr std::size_t N = sizeof...(Args);
 		const std::array<std::string, N> values = { renderValue(bindings)... };
 
+#ifndef POCO_DATA_NO_SQL_PARSER
+		hsql::SQLParserResult result;
+		hsql::SQLParser::parse(sql, &result);
+		if (!result.isValid())
+			throw Poco::InvalidArgumentException(std::string("Utility::boundSQL: ") + result.errorMsg());
+
+		// Walk placeholders in source-text order.
+		std::vector<const hsql::Expr*> phs(result.parameters().begin(), result.parameters().end());
+		std::sort(phs.begin(), phs.end(),
+			[](const hsql::Expr* a, const hsql::Expr* b) { return a->ival2 < b->ival2; });
+
+		enum class Style { None, Question, Dollar };  // :name is pass-through
+		Style style = Style::None;
+		std::size_t questionCount = 0;
+		std::size_t maxN = 0;
+
+		std::string out;
+		out.reserve(sql.size() + N * 8);
+		std::size_t cursor = 0;
+
+		for (const hsql::Expr* p: phs)
+		{
+			const std::size_t start = static_cast<std::size_t>(p->ival2);
+			out.append(sql, cursor, start - cursor);
+
+			switch (p->type)
+			{
+			case hsql::kExprParameter:
+				if (style == Style::Dollar)
+					throw Poco::InvalidArgumentException("Utility::boundSQL: mixed placeholder styles");
+				style = Style::Question;
+				if (questionCount >= N)
+					throw Poco::InvalidArgumentException("Utility::boundSQL: too few arguments for ? placeholders");
+				out.append(values[questionCount++]);
+				cursor = start + 1;
+				break;
+
+			case hsql::kExprParameterDollar:
+			{
+				if (style == Style::Question)
+					throw Poco::InvalidArgumentException("Utility::boundSQL: mixed placeholder styles");
+				style = Style::Dollar;
+				const std::size_t n = static_cast<std::size_t>(p->ival);
+				if (n > N)
+					throw Poco::InvalidArgumentException("Utility::boundSQL: $N out of range");
+				if (n > maxN) maxN = n;
+				out.append(values[n - 1]);
+				std::size_t len = 1;  // '$' + digits
+				for (auto v = p->ival; v > 0; v /= 10) ++len;
+				cursor = start + len;
+				break;
+			}
+
+			case hsql::kExprParameterNamed:
+			{
+				// Pass-through: copy the ":name" token verbatim.
+				const std::size_t len = 1 + std::strlen(p->name);
+				out.append(sql, start, len);
+				cursor = start + len;
+				break;
+			}
+
+			default:
+				break;
+			}
+		}
+
+		out.append(sql, cursor, std::string::npos);
+
+		if (style == Style::Question && questionCount != N)
+			throw Poco::InvalidArgumentException("Utility::boundSQL: too many arguments for ? placeholders");
+		if (style == Style::Dollar && maxN != N)
+			throw Poco::InvalidArgumentException("Utility::boundSQL: $N arity mismatch");
+
+		return out;
+#else
 		std::string out;
 		out.reserve(sql.size() + N * 8);
 
@@ -273,6 +360,7 @@ public:
 			throw Poco::InvalidArgumentException("Utility::boundSQL: $N arity mismatch");
 
 		return out;
+#endif
 	}
 
 	template <typename... Args>

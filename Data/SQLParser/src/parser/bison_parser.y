@@ -1095,14 +1095,7 @@ casted_extended_literal : extended_literal | CAST '(' extended_literal AS column
   $$ = Expr::makeCast($3, $5);
 };
 
-extended_literal : literal {
-  if ($1->type == ExprType::kExprParameter) {
-    delete $1;
-    yyerror(&yyloc, result, scanner, "Parameter ? is not a valid literal.");
-    YYERROR;
-  }
-  $$ = $1;
-}
+extended_literal : literal { $$ = $1; }
 | '-' num_literal { $$ = Expr::makeOpUnary(kOpUnaryMinus, $2); };
 | '-' interval_literal { $$ = Expr::makeOpUnary(kOpUnaryMinus, $2); };
 
