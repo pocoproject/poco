@@ -211,7 +211,7 @@ public:
 	}
 
 	template <typename... Args>
-	static std::string boundSQL(const std::string& sql, const Args&... bindings)
+	static std::string boundSQL(const std::string& sql, [[maybe_unused]] const Args&... bindings)
 		/// Renders a parameterised SQL template by substituting placeholders
 		/// with stringified bindings. Supports three placeholder styles:
 		///   * `?`     — positional; one binding consumed per occurrence.
@@ -288,7 +288,7 @@ public:
 		const std::string& sql,
 		std::unique_ptr<std::string> context,
 		Callback callback,
-		const Args&... bindings)
+		[[maybe_unused]] const Args&... bindings)
 		/// Executes sql against session with the given bindings.
 		/// Returns the number of affected rows (0 on failure).
 		/// If callback is set, invokes it with an ExecResult describing the
