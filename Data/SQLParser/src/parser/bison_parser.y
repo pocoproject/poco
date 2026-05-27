@@ -204,6 +204,23 @@
   free($$->second);
   delete ($$);
 } <csv_option_t>
+%destructor {
+  // ColumnConstraints owns heap-allocated members (constraints, references).
+  // The happy path transfers those pointers into a ColumnDefinition and then
+  // deletes the wrapper; bison only reaches this destructor on parse error,
+  // when the inner pointers are still owned by the wrapper and must be
+  // released here to avoid leaks.
+  if ($$) {
+    delete $$->constraints;
+    if ($$->references) {
+      for (auto ptr : *($$->references)) {
+        delete ptr;
+      }
+    }
+    delete $$->references;
+  }
+  delete ($$);
+} <column_constraints_t>
 %destructor { delete ($$); } <*>
 
 
