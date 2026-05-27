@@ -7,7 +7,7 @@
 //
 // Definition of the OpMsgMessage class.
 //
-// Copyright (c) 2022, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2022-2025, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -50,7 +50,10 @@ public:
 	// Aggregation
 	static const std::string CMD_AGGREGATE;
 	static const std::string CMD_COUNT;
+		/// Legacy command; outside Stable API v1 since MongoDB 5.0.
+		/// Prefer aggregation $count (see Database::count).
 	static const std::string CMD_DISTINCT;
+	POCO_DEPRECATED("Deprecated since MongoDB 5.0; use the aggregation pipeline with $accumulator / $function / $out / $merge instead.")
 	static const std::string CMD_MAP_REDUCE;
 
 	// Replication and administration 

@@ -67,28 +67,58 @@ public:
 
 	void remove(const TDelegate& delegate)
 	{
+		DelegatePtr p = detach(delegate);
+		if (p) p->disable();
+	}
+
+	void remove(DelegateHandle delegateHandle)
+	{
+		DelegatePtr p = detach(delegateHandle);
+		if (p) p->disable();
+	}
+
+	DelegatePtr detach(const TDelegate& delegate)
+		/// Removes a matching delegate from the internal list without
+		/// disabling it, and returns the detached delegate (or an empty
+		/// DelegatePtr if no match). The caller is responsible for
+		/// calling disable() on the returned delegate. This separation
+		/// allows AbstractEvent to call disable() outside its own mutex,
+		/// breaking the lock-order edge M_event -> M_delegate.
+	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
 			if (delegate.equals(**it))
 			{
-				(*it)->disable();
+				DelegatePtr p = *it;
 				_delegates.erase(it);
-				return;
+				return p;
 			}
 		}
+		return DelegatePtr();
 	}
 
-	void remove(DelegateHandle delegateHandle)
+	DelegatePtr detach(DelegateHandle delegateHandle)
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
 			if (*it == delegateHandle)
 			{
-				(*it)->disable();
+				DelegatePtr p = *it;
 				_delegates.erase(it);
-				return;
+				return p;
 			}
 		}
+		return DelegatePtr();
+	}
+
+	Delegates detachAll()
+		/// Removes all delegates from the internal list without disabling
+		/// them, and returns them so the caller can call disable() outside
+		/// its mutex. See detach().
+	{
+		Delegates out;
+		out.swap(_delegates);
+		return out;
 	}
 
 	DefaultStrategy& operator = (const DefaultStrategy& s)
@@ -102,11 +132,11 @@ public:
 
 	void clear()
 	{
-		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
+		Delegates detached = detachAll();
+		for (Iterator it = detached.begin(); it != detached.end(); ++it)
 		{
 			(*it)->disable();
 		}
-		_delegates.clear();
 	}
 
 	[[nodiscard]]
@@ -166,28 +196,50 @@ public:
 
 	void remove(const TDelegate& delegate)
 	{
+		DelegatePtr p = detach(delegate);
+		if (p) p->disable();
+	}
+
+	void remove(DelegateHandle delegateHandle)
+	{
+		DelegatePtr p = detach(delegateHandle);
+		if (p) p->disable();
+	}
+
+	DelegatePtr detach(const TDelegate& delegate)
+		/// See the TArgs specialization above.
+	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
 			if (delegate.equals(**it))
 			{
-				(*it)->disable();
+				DelegatePtr p = *it;
 				_delegates.erase(it);
-				return;
+				return p;
 			}
 		}
+		return DelegatePtr();
 	}
 
-	void remove(DelegateHandle delegateHandle)
+	DelegatePtr detach(DelegateHandle delegateHandle)
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
 			if (*it == delegateHandle)
 			{
-				(*it)->disable();
+				DelegatePtr p = *it;
 				_delegates.erase(it);
-				return;
+				return p;
 			}
 		}
+		return DelegatePtr();
+	}
+
+	Delegates detachAll()
+	{
+		Delegates out;
+		out.swap(_delegates);
+		return out;
 	}
 
 	DefaultStrategy& operator = (const DefaultStrategy& s)
@@ -210,11 +262,11 @@ public:
 
 	void clear()
 	{
-		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
+		Delegates detached = detachAll();
+		for (Iterator it = detached.begin(); it != detached.end(); ++it)
 		{
 			(*it)->disable();
 		}
-		_delegates.clear();
 	}
 
 	[[nodiscard]]

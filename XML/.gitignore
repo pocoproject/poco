@@ -21,3 +21,15 @@ src/xmltok.h
 src/xmltok_impl.c
 src/xmltok_impl.h
 src/xmltok_ns.c
+src/random_arc4random.c
+src/random_arc4random.h
+src/random_arc4random_buf.c
+src/random_arc4random_buf.h
+src/random_dev_urandom.c
+src/random_dev_urandom.h
+src/random_getentropy.c
+src/random_getentropy.h
+src/random_getrandom.c
+src/random_getrandom.h
+src/random_rand_s.c
+src/random_rand_s.h

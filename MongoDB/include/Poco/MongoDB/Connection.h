@@ -116,11 +116,13 @@ public:
 		///
 		/// The following options are supported:
 		///
-		///   - ssl: If ssl=true is specified, a custom SocketFactory subclass creating
-		///     a SecureStreamSocket must be supplied.
+		///   - tls (or ssl, historical alias): If true, a custom SocketFactory
+		///     subclass creating a SecureStreamSocket must be supplied. "tls"
+		///     is the canonical option name since MongoDB 4.2; "ssl" remains
+		///     accepted as a synonym.
 		///   - connectTimeoutMS: Socket connection timeout in milliseconds.
 		///   - socketTimeoutMS: Socket send/receive timeout in milliseconds.
-		///   - authMechanism: Authentication mechanism. Only "SCRAM-SHA-1" is supported.
+		///   - authMechanism: "SCRAM-SHA-256" (default) or "SCRAM-SHA-1".
 		///
 		/// Unknown options are silently ignored.
 		///

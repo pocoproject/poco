@@ -71,28 +71,51 @@ public:
 
 	void remove(const TDelegate& delegate)
 	{
+		DelegatePtr p = detach(delegate);
+		if (p) p->disable();
+	}
+
+	void remove(DelegateHandle delegateHandle)
+	{
+		DelegatePtr p = detach(delegateHandle);
+		if (p) p->disable();
+	}
+
+	DelegatePtr detach(const TDelegate& delegate)
+		/// Removes a matching delegate from the internal list without
+		/// disabling it. See DefaultStrategy::detach.
+	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
 			if (delegate.equals(**it))
 			{
-				(*it)->disable();
+				DelegatePtr p = *it;
 				_delegates.erase(it);
-				return;
+				return p;
 			}
 		}
+		return DelegatePtr();
 	}
 
-	void remove(DelegateHandle delegateHandle)
+	DelegatePtr detach(DelegateHandle delegateHandle)
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
 			if (*it == delegateHandle)
 			{
-				(*it)->disable();
+				DelegatePtr p = *it;
 				_delegates.erase(it);
-				return;
+				return p;
 			}
 		}
+		return DelegatePtr();
+	}
+
+	Delegates detachAll()
+	{
+		Delegates out;
+		out.swap(_delegates);
+		return out;
 	}
 
 	PriorityStrategy& operator = (const PriorityStrategy& s)
@@ -106,11 +129,11 @@ public:
 
 	void clear()
 	{
-		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
+		Delegates detached = detachAll();
+		for (Iterator it = detached.begin(); it != detached.end(); ++it)
 		{
 			(*it)->disable();
 		}
-		_delegates.clear();
 	}
 
 	[[nodiscard]]
@@ -173,28 +196,50 @@ public:
 
 	void remove(const TDelegate& delegate)
 	{
+		DelegatePtr p = detach(delegate);
+		if (p) p->disable();
+	}
+
+	void remove(DelegateHandle delegateHandle)
+	{
+		DelegatePtr p = detach(delegateHandle);
+		if (p) p->disable();
+	}
+
+	DelegatePtr detach(const TDelegate& delegate)
+		/// See the TArgs specialization above.
+	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
 			if (delegate.equals(**it))
 			{
-				(*it)->disable();
+				DelegatePtr p = *it;
 				_delegates.erase(it);
-				return;
+				return p;
 			}
 		}
+		return DelegatePtr();
 	}
 
-	void remove(DelegateHandle delegateHandle)
+	DelegatePtr detach(DelegateHandle delegateHandle)
 	{
 		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
 		{
 			if (*it == delegateHandle)
 			{
-				(*it)->disable();
+				DelegatePtr p = *it;
 				_delegates.erase(it);
-				return;
+				return p;
 			}
 		}
+		return DelegatePtr();
+	}
+
+	Delegates detachAll()
+	{
+		Delegates out;
+		out.swap(_delegates);
+		return out;
 	}
 
 	PriorityStrategy& operator = (const PriorityStrategy& s)
@@ -208,11 +253,11 @@ public:
 
 	void clear()
 	{
-		for (Iterator it = _delegates.begin(); it != _delegates.end(); ++it)
+		Delegates detached = detachAll();
+		for (Iterator it = detached.begin(); it != detached.end(); ++it)
 		{
 			(*it)->disable();
 		}
-		_delegates.clear();
 	}
 
 	[[nodiscard]]

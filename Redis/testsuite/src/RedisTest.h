@@ -95,6 +95,7 @@ private:
 	std::string _host;
 	unsigned    _port;
 	static bool _connected;
+	static bool _connectFailed;
 	static Poco::Redis::Client _redis;
 
 };

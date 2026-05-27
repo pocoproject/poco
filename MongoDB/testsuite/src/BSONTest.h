@@ -35,6 +35,7 @@ public:
 	void testDocumentElementNames();
 	void testNestedDocuments();
 	void testDuplicateDocumentMembers();
+	void testDocumentAddElementMerge();
 
 	// Array tests
 	void testArray();
@@ -65,6 +66,20 @@ public:
 
 	// JavaScriptCode tests
 	void testJavaScriptCode();
+
+	// Decimal128 / MinKey / MaxKey tests
+	void testDecimal128Specials();
+	void testDecimal128FromString();
+	void testDecimal128RoundTrip();
+	void testDecimal128SerializeDocument();
+	void testMinKeyMaxKeySerializeDocument();
+
+	// Authentication constants and SASLprep guard
+	void testAuthMechanismConstants();
+	void testAuthSCRAM256RejectsNonAscii();
+
+	// Connection URI parsing: tls alias
+	void testConnectionURITlsAlias();
 
 	// Serialization/Deserialization tests
 	void testDocumentSerialization();

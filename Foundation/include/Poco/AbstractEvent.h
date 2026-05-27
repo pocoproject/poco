@@ -184,8 +184,16 @@ public:
 		///
 		/// If the delegate is not found, this function does nothing.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
-		_strategy.remove(aDelegate);
+		// Detach under the event mutex, disable() outside it. Holding
+		// the event mutex across Delegate::disable() would close a
+		// lock-order cycle with the M_delegate -> M_event edge that
+		// notify()'s target callbacks set up when they do `event -= d`.
+		typename TStrategy::DelegatePtr pRemoved;
+		{
+			typename TMutex::ScopedLock lock(_mutex);
+			pRemoved = _strategy.detach(aDelegate);
+		}
+		if (pRemoved) pRemoved->disable();
 	}
 
 	DelegateHandle add(const TDelegate& aDelegate)
@@ -206,8 +214,12 @@ public:
 		///
 		/// If the delegate is not found, this function does nothing.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
-		_strategy.remove(delegateHandle);
+		typename TStrategy::DelegatePtr pRemoved;
+		{
+			typename TMutex::ScopedLock lock(_mutex);
+			pRemoved = _strategy.detach(delegateHandle);
+		}
+		if (pRemoved) pRemoved->disable();
 	}
 
 	void operator () (const void* pSender, TArgs& args)
@@ -307,8 +319,17 @@ public:
 	void clear()
 		/// Removes all delegates.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
-		_strategy.clear();
+		// Same reason as operator -=: disable() must run outside _mutex.
+		typename TStrategy::Delegates detached;
+		{
+			typename TMutex::ScopedLock lock(_mutex);
+			detached = _strategy.detachAll();
+		}
+		for (typename TStrategy::Delegates::iterator it = detached.begin();
+		     it != detached.end(); ++it)
+		{
+			(*it)->disable();
+		}
 	}
 
 	[[nodiscard]]
@@ -392,8 +413,13 @@ public:
 		///
 		/// If the delegate is not found, this function does nothing.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
-		_strategy.remove(aDelegate);
+		// See the TArgs specialization for the rationale.
+		typename TStrategy::DelegatePtr pRemoved;
+		{
+			typename TMutex::ScopedLock lock(_mutex);
+			pRemoved = _strategy.detach(aDelegate);
+		}
+		if (pRemoved) pRemoved->disable();
 	}
 
 	DelegateHandle add(const TDelegate& aDelegate)
@@ -414,8 +440,12 @@ public:
 		///
 		/// If the delegate is not found, this function does nothing.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
-		_strategy.remove(delegateHandle);
+		typename TStrategy::DelegatePtr pRemoved;
+		{
+			typename TMutex::ScopedLock lock(_mutex);
+			pRemoved = _strategy.detach(delegateHandle);
+		}
+		if (pRemoved) pRemoved->disable();
 	}
 
 	void operator () (const void* pSender)
@@ -507,8 +537,17 @@ public:
 	void clear()
 		/// Removes all delegates.
 	{
-		typename TMutex::ScopedLock lock(_mutex);
-		_strategy.clear();
+		// Same reason as operator -=: disable() must run outside _mutex.
+		typename TStrategy::Delegates detached;
+		{
+			typename TMutex::ScopedLock lock(_mutex);
+			detached = _strategy.detachAll();
+		}
+		for (typename TStrategy::Delegates::iterator it = detached.begin();
+		     it != detached.end(); ++it)
+		{
+			(*it)->disable();
+		}
 	}
 
 	[[nodiscard]]

@@ -28,7 +28,7 @@ endif # FreeBSD
 objects = CryptoTestSuite Driver \
 	CryptoTest DigestEngineTest ECTest \
 	EVPTest RSATest PKCS12ContainerTest \
-	EnvelopeTest
+	EnvelopeTest OpenSSLInitializerTest
 
 target         = testrunner
 target_version = 1
