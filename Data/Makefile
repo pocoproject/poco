@@ -13,7 +13,7 @@ objects = AbstractBinder AbstractBinding AbstractExtraction AbstractExtractor \
 	Range RecordSet Row RowFilter RowFormatter RowIterator \
 	SimpleRowFormatter Session SessionFactory SessionImpl \
 	SessionPool SessionPoolContainer SQLChannel \
-	Statement StatementCreator StatementImpl Time Transcoder
+	Statement StatementCreator StatementImpl Time Transcoder Utility
 
 ifndef POCO_DATA_NO_SQL_PARSER
 	objects += SQLParser SQLParserResult \

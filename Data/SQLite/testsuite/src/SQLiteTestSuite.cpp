@@ -10,6 +10,7 @@
 
 #include "SQLiteTestSuite.h"
 #include "SQLiteTest.h"
+#include "UtilityTest.h"
 
 
 CppUnit::Test* SQLiteTestSuite::suite()
@@ -17,6 +18,7 @@ CppUnit::Test* SQLiteTestSuite::suite()
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("SQLiteTestSuite");
 
 	pSuite->addTest(SQLiteTest::suite());
+	pSuite->addTest(UtilityTest::suite());
 
 	return pSuite;
 }
