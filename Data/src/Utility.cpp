@@ -63,9 +63,19 @@ namespace
 	}
 
 #ifndef POCO_DATA_NO_SQL_PARSER
-	// Renders a single row by substituting placeholders against rb at this row index.
-	std::string renderRow(const std::string& sql, const RenderingBinder& rb, std::size_t row,
-		std::size_t totalPositions)
+	// Placeholder span captured once per template. paramIndex is the binder slot
+	// to substitute from (npos for :name, which copies verbatim from sql).
+	struct PlaceholderSpan
+	{
+		std::size_t srcStart;
+		std::size_t srcLen;
+		std::size_t paramIndex;
+	};
+
+	// Parses sql once, validates arity, and returns the ordered placeholder
+	// spans plus their binder indices. Hoisted out of the row loop so
+	// boundSQLImpl pays the parser cost once per render, not once per row.
+	std::vector<PlaceholderSpan> collectPlaceholders(const std::string& sql, std::size_t totalPositions)
 	{
 		hsql::SQLParserResult result;
 		hsql::SQLParser::parse(sql, &result);
@@ -82,14 +92,13 @@ namespace
 		std::size_t questionCount = 0;
 		std::size_t maxN = 0;
 
-		std::string out;
-		out.reserve(sql.size() + totalPositions * 8);
-		std::size_t cursor = 0;
+		std::vector<PlaceholderSpan> spans;
+		spans.reserve(phs.size());
 
 		for (const hsql::Expr* p: phs)
 		{
-			const std::size_t start = static_cast<std::size_t>(p->ival2);
-			out.append(sql, cursor, start - cursor);
+			PlaceholderSpan span;
+			span.srcStart = static_cast<std::size_t>(p->ival2);
 
 			switch (p->type)
 			{
@@ -99,8 +108,8 @@ namespace
 				style = Style::Question;
 				if (questionCount >= totalPositions)
 					throw Poco::InvalidArgumentException("Utility::boundSQL: too few arguments for ? placeholders");
-				out.append(captureAt(rb, questionCount++, row));
-				cursor = start + 1;
+				span.paramIndex = questionCount++;
+				span.srcLen = 1;
 				break;
 
 			case hsql::kExprParameterDollar:
@@ -112,33 +121,51 @@ namespace
 				if (n > totalPositions)
 					throw Poco::InvalidArgumentException("Utility::boundSQL: $N out of range");
 				if (n > maxN) maxN = n;
-				out.append(captureAt(rb, n - 1, row));
+				span.paramIndex = n - 1;
 				std::size_t len = 1;
 				for (auto v = p->ival; v > 0; v /= 10) ++len;
-				cursor = start + len;
+				span.srcLen = len;
 				break;
 			}
 
 			case hsql::kExprParameterNamed:
-			{
-				const std::size_t len = 1 + std::strlen(p->name);
-				out.append(sql, start, len);
-				cursor = start + len;
+				span.paramIndex = std::string::npos;
+				span.srcLen = 1 + std::strlen(p->name);
 				break;
-			}
 
 			default:
-				break;
+				continue;
 			}
-		}
 
-		out.append(sql, cursor, std::string::npos);
+			spans.push_back(span);
+		}
 
 		if (style == Style::Question && questionCount != totalPositions)
 			throw Poco::InvalidArgumentException("Utility::boundSQL: too many arguments for ? placeholders");
 		if (style == Style::Dollar && maxN != totalPositions)
 			throw Poco::InvalidArgumentException("Utility::boundSQL: $N arity mismatch");
 
+		return spans;
+	}
+
+	// Substitutes one row's values into sql using pre-computed placeholder spans.
+	// No reparsing; just an O(sql.size() + spans.size()) splice.
+	std::string renderRow(const std::string& sql, const std::vector<PlaceholderSpan>& spans,
+		const RenderingBinder& rb, std::size_t row)
+	{
+		std::string out;
+		out.reserve(sql.size() + spans.size() * 8);
+		std::size_t cursor = 0;
+		for (const auto& span: spans)
+		{
+			out.append(sql, cursor, span.srcStart - cursor);
+			if (span.paramIndex == std::string::npos)
+				out.append(sql, span.srcStart, span.srcLen);
+			else
+				out.append(captureAt(rb, span.paramIndex, row));
+			cursor = span.srcStart + span.srcLen;
+		}
+		out.append(sql, cursor, std::string::npos);
 		return out;
 	}
 #else
@@ -237,11 +264,14 @@ std::string Utility::boundSQLImpl(const std::string& sql, const RenderingBinder&
 	const std::size_t toRender = std::min(totalRows, cap);
 
 	std::string out;
+#ifndef POCO_DATA_NO_SQL_PARSER
+	const auto spans = collectPlaceholders(sql, totalPositions);
+#endif
 	for (std::size_t row = 0; row < toRender; ++row)
 	{
 		if (row > 0) out.append(";\n");
 #ifndef POCO_DATA_NO_SQL_PARSER
-		out.append(renderRow(sql, rb, row, totalPositions));
+		out.append(renderRow(sql, spans, rb, row));
 #else
 		out.append(renderRowScanner(sql, rb, row, totalPositions));
 #endif
