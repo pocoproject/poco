@@ -60,7 +60,12 @@ public:
 	~RenderingBinder() override;
 
 	void reset() override;
-		/// Clears all captured renderings.
+		/// No-op. AbstractBinding::reset() cascades into this for scalar
+		/// bindings (Binding<T>::reset() calls pBinder->reset()); clearing
+		/// here would wipe captures from earlier walked bindings during a
+		/// multi-binding walk. The binder is single-use - scoped to one
+		/// render call and discarded afterwards, so there is nothing to
+		/// clean up.
 
 	// --- Scalar bind() overrides ---
 	void bind(std::size_t pos, const Poco::Int8&  val, Direction dir = PD_IN) override;
