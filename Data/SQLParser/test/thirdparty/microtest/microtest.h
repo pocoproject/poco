@@ -23,51 +23,59 @@
 
 #define ASSERT(cond) ASSERT_TRUE(cond)
 
-#define ASSERT_TRUE(cond)                                       \
-  if (!(cond)) {                                                \
-    throw mt::AssertFailedException(#cond, __FILE__, __LINE__); \
-  }                                                             \
-  static_assert(true, "End call of macro with a semicolon.")
+#define ASSERT_TRUE(cond)                                         \
+  do {                                                            \
+    if (!(cond)) {                                                \
+      throw mt::AssertFailedException(#cond, __FILE__, __LINE__); \
+    }                                                             \
+  } while (false)
 
-#define ASSERT_FALSE(cond)                                      \
-  if (cond) {                                                   \
-    throw mt::AssertFailedException(#cond, __FILE__, __LINE__); \
-  }                                                             \
-  static_assert(true, "End call of macro with a semicolon.")
+#define ASSERT_FALSE(cond)                                        \
+  do {                                                            \
+    if (cond) {                                                   \
+      throw mt::AssertFailedException(#cond, __FILE__, __LINE__); \
+    }                                                             \
+  } while (false)
 
 #define ASSERT_NULL(value) ASSERT_TRUE(value == NULL)
 
 #define ASSERT_NOTNULL(value) ASSERT_TRUE(value != NULL)
 
-#define ASSERT_STREQ(a, b)                                             \
-  if (std::string(a).compare(std::string(b)) != 0) {                   \
-    printf("%s{    info} %s", mt::yellow(), mt::def());                \
-    std::cout << "Actual values: " << a << " != " << b << std::endl;   \
-    throw mt::AssertFailedException(#a " == " #b, __FILE__, __LINE__); \
-  }                                                                    \
-  static_assert(true, "End call of macro with a semicolon.")
+#define ASSERT_STREQ(a, b)                                               \
+  do {                                                                   \
+    if (std::string(a).compare(std::string(b)) != 0) {                   \
+      printf("%s{    info} %s", mt::yellow(), mt::def());                \
+      std::cout << "Actual values: " << a << " != " << b << std::endl;   \
+      throw mt::AssertFailedException(#a " == " #b, __FILE__, __LINE__); \
+    }                                                                    \
+  } while (false)
 
-#define ASSERT_STRNEQ(a, b)                                            \
-  if (std::string(a).compare(std::string(b)) == 0) {                   \
-    printf("%s{    info} %s", mt::yellow(), mt::def());                \
-    std::cout << "Actual values: " << a << " == " << b << std::endl;   \
-    throw mt::AssertFailedException(#a " != " #b, __FILE__, __LINE__); \
-  }                                                                    \
-  static_assert(true, "End call of macro with a semicolon.")
+#define ASSERT_STRNEQ(a, b)                                              \
+  do {                                                                   \
+    if (std::string(a).compare(std::string(b)) == 0) {                   \
+      printf("%s{    info} %s", mt::yellow(), mt::def());                \
+      std::cout << "Actual values: " << a << " == " << b << std::endl;   \
+      throw mt::AssertFailedException(#a " != " #b, __FILE__, __LINE__); \
+    }                                                                    \
+  } while (false)
 
-#define ASSERT_EQ(a, b)                                              \
-  if (a != b) {                                                      \
-    printf("%s{    info} %s", mt::yellow(), mt::def());              \
-    std::cout << "Actual values: " << a << " != " << b << std::endl; \
-  }                                                                  \
-  ASSERT(a == b)
+#define ASSERT_EQ(a, b)                                                \
+  do {                                                                 \
+    if (a != b) {                                                      \
+      printf("%s{    info} %s", mt::yellow(), mt::def());              \
+      std::cout << "Actual values: " << a << " != " << b << std::endl; \
+    }                                                                  \
+    ASSERT(a == b);                                                    \
+  } while (false)
 
-#define ASSERT_NEQ(a, b)                                             \
-  if (a == b) {                                                      \
-    printf("%s{    info} %s", mt::yellow(), mt::def());              \
-    std::cout << "Actual values: " << a << " == " << b << std::endl; \
-  }                                                                  \
-  ASSERT(a != b)
+#define ASSERT_NEQ(a, b)                                               \
+  do {                                                                 \
+    if (a == b) {                                                      \
+      printf("%s{    info} %s", mt::yellow(), mt::def());              \
+      std::cout << "Actual values: " << a << " == " << b << std::endl; \
+    }                                                                  \
+    ASSERT(a != b);                                                    \
+  } while (false)
 
 ////////////////
 // Unit Tests //
