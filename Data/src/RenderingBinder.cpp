@@ -14,14 +14,7 @@
 
 #include "Poco/Data/RenderingBinder.h"
 #include "Poco/Data/Utility.h"
-#include "Poco/Data/LOB.h"
-#include "Poco/Data/Date.h"
-#include "Poco/Data/Time.h"
-#include "Poco/DateTime.h"
 #include "Poco/Exception.h"
-#include "Poco/NumberFormatter.h"
-#include "Poco/UnicodeConverter.h"
-#include "Poco/UUID.h"
 #include <algorithm>
 
 
@@ -30,51 +23,12 @@ namespace Data {
 
 
 namespace {
-
-
-// Per-scalar formatters mirror Utility::renderValue<T> but as plain
-// non-template functions so the container code path can dispatch by overload.
-
-inline std::string fmt(const Poco::Int8&  v) { return Poco::NumberFormatter::format(static_cast<int>(v)); }
-inline std::string fmt(const Poco::UInt8& v) { return Poco::NumberFormatter::format(static_cast<unsigned>(v)); }
-inline std::string fmt(const Poco::Int16& v) { return Poco::NumberFormatter::format(v); }
-inline std::string fmt(const Poco::UInt16& v) { return Poco::NumberFormatter::format(v); }
-inline std::string fmt(const Poco::Int32& v) { return Poco::NumberFormatter::format(v); }
-inline std::string fmt(const Poco::UInt32& v) { return Poco::NumberFormatter::format(v); }
-inline std::string fmt(const Poco::Int64& v) { return Poco::NumberFormatter::format(v); }
-inline std::string fmt(const Poco::UInt64& v) { return Poco::NumberFormatter::format(v); }
-#ifndef POCO_INT64_IS_LONG
-inline std::string fmt(const long& v) { return Poco::NumberFormatter::format(v); }
-inline std::string fmt(const unsigned long& v) { return Poco::NumberFormatter::format(v); }
-#endif
-inline std::string fmt(const bool& v) { return v ? "1" : "0"; }
-inline std::string fmt(const float& v) { return Poco::NumberFormatter::format(v); }
-inline std::string fmt(const double& v) { return Poco::NumberFormatter::format(v); }
-inline std::string fmt(const char& v) { return Utility::quoteString(std::string(1, v)); }
-inline std::string fmt(const std::string& v) { return Utility::quoteString(v); }
-inline std::string fmt(const UTF16String& v)
-{
-	std::string utf8;
-	Poco::UnicodeConverter::convert(v, utf8);
-	return Utility::quoteString(utf8);
+	inline const std::string& outSentinel()
+	{
+		static const std::string s("?");
+		return s;
+	}
 }
-inline std::string fmt(const BLOB& v) { return Utility::formatBLOB(v); }
-inline std::string fmt(const CLOB& v) { return Utility::formatCLOB(v); }
-inline std::string fmt(const DateTime& v) { return Utility::formatDateTime(v); }
-inline std::string fmt(const Date& v) { return Utility::formatDate(v); }
-inline std::string fmt(const Time& v) { return Utility::formatTime(v); }
-inline std::string fmt(const UUID& v) { return Utility::quoteString(v.toString()); }
-inline std::string fmt(const NullData&) { return "NULL"; }
-
-
-inline const std::string& outSentinel()
-{
-	static const std::string s("?");
-	return s;
-}
-
-
-} // anonymous namespace
 
 
 RenderingBinder::RenderingBinder(std::size_t maxRows):
@@ -100,7 +54,7 @@ void RenderingBinder::recordScalar(std::size_t pos, const T& val, Direction dir)
 	if (dir == PD_OUT)
 		_values[pos] = { outSentinel() };
 	else
-		_values[pos] = { fmt(val) };
+		_values[pos] = { Utility::renderValue(val) };
 }
 
 
@@ -122,7 +76,13 @@ void RenderingBinder::recordContainer(std::size_t pos, const C& container, Direc
 	slot.reserve(toRender);
 	std::size_t i = 0;
 	for (auto it = container.begin(); it != container.end() && i < toRender; ++it, ++i)
-		slot.push_back(fmt(*it));
+	{
+		// vector<bool>::iterator dereferences to a proxy; copy to a real bool
+		// (or whatever the element type is) so renderValue's overload set sees
+		// the value rather than the proxy.
+		typename C::value_type elem = *it;
+		slot.push_back(Utility::renderValue(elem));
+	}
 }
 
 
@@ -166,7 +126,7 @@ void RenderingBinder::bind(std::size_t pos, const char* const& pVal, Direction d
 	if (dir == PD_OUT)
 		_values[pos] = { outSentinel() };
 	else
-		_values[pos] = { Utility::quoteString(pVal ? pVal : "") };
+		_values[pos] = { Utility::renderValue(std::string(pVal ? pVal : "")) };
 }
 
 

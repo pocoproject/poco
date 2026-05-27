@@ -30,6 +30,8 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/SharedPtr.h"
 #include "Poco/Types.h"
+#include "Poco/UUID.h"
+#include "Poco/UnicodeConverter.h"
 #include <chrono>
 #include <cstddef>
 #include <exception>
@@ -100,20 +102,36 @@ public:
 
 	template <typename T>
 	static std::string renderValue(const T& v)
-		/// Renders a single C++ value as a SQL literal.
-		/// Handled directly: std::nullptr_t ("NULL"); Poco::Nullable and
-		/// std::optional (NULL or recurse on the inner value); bool ("1"/"0");
-		/// integral types via Poco::NumberFormatter; floating-point via the
-		/// shortest round-trip Poco::NumberFormatter; Poco::Data::Date,
-		/// Poco::Data::Time, Poco::DateTime, Poco::LocalDateTime as quoted
-		/// SQL literals; Poco::Data::BLOB as X'…' hex; Poco::Data::CLOB as a
-		/// quoted text literal; Poco::Dynamic::Var inspected and dispatched;
-		/// std::string / const char* / string-view single-quoted with internal
-		/// ' doubled.
+		/// Renders a single C++ value as a SQL literal. This is the single
+		/// source of truth for value → SQL-literal conversion; the
+		/// RenderingBinder dispatches through it for every captured scalar.
+		///
+		/// Handled types:
+		///   * std::nullptr_t and Poco::Data::NullData → "NULL"
+		///   * Poco::Nullable and std::optional → "NULL" or recurse on the
+		///     inner value
+		///   * bool → "1"/"0"
+		///   * char → single-character quoted string literal
+		///   * remaining integral types via Poco::NumberFormatter
+		///   * floating-point via the shortest round-trip Poco::NumberFormatter
+		///   * Poco::Data::Date / Time / Poco::DateTime / LocalDateTime → SQL
+		///     literals
+		///   * Poco::Data::BLOB → X'…' hex; CLOB → quoted text
+		///   * Poco::Dynamic::Var → inspected and dispatched
+		///   * Poco::UUID → quoted text
+		///   * Poco::UTF16String → quoted UTF-8 text after conversion
+		///   * std::string / const char* / anything string-view-convertible →
+		///     single-quoted with internal ' doubled
+		///
 		/// Any other type returns "?" so the diagnostic SQL stays valid-shaped
 		/// (the actual statement still binds the value via its TypeHandler).
 	{
 		if constexpr (std::is_same_v<std::remove_cv_t<T>, std::nullptr_t>)
+		{
+			(void)v;
+			return "NULL";
+		}
+		else if constexpr (std::is_same_v<std::remove_cv_t<T>, NullData>)
 		{
 			(void)v;
 			return "NULL";
@@ -129,6 +147,11 @@ public:
 		else if constexpr (std::is_same_v<std::remove_cv_t<T>, bool>)
 		{
 			return v ? "1" : "0";
+		}
+		else if constexpr (std::is_same_v<std::remove_cv_t<T>, char>)
+		{
+			// char is a TEXT(1) in SQL, not a number. Quote as a 1-char string.
+			return quoteString(std::string(1, v));
 		}
 		else if constexpr (std::is_integral_v<T>)
 		{
@@ -165,6 +188,16 @@ public:
 		else if constexpr (std::is_same_v<std::remove_cv_t<T>, CLOB>)
 		{
 			return formatCLOB(v);
+		}
+		else if constexpr (std::is_same_v<std::remove_cv_t<T>, Poco::UUID>)
+		{
+			return quoteString(v.toString());
+		}
+		else if constexpr (std::is_same_v<std::remove_cv_t<T>, Poco::UTF16String>)
+		{
+			std::string utf8;
+			Poco::UnicodeConverter::convert(v, utf8);
+			return quoteString(utf8);
 		}
 		else if constexpr (std::is_convertible_v<const T&, std::string_view>)
 		{
