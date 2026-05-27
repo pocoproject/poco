@@ -7,7 +7,7 @@ namespace hsql {
 
 // Represents SQL Prepare statements.
 // Example: PREPARE test FROM 'SELECT * FROM test WHERE a = ?;'
-struct SQLParser_API PrepareStatement : SQLStatement {
+struct PrepareStatement : SQLStatement {
   PrepareStatement();
   ~PrepareStatement() override;
 

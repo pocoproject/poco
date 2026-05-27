@@ -33,6 +33,10 @@ CREATE TABLE teachers (name CHARACTER VARYING(30));
 CREATE TABLE students_2 AS SELECT * FROM students
 CREATE TABLE students_3 AS SELECT city, grade FROM students WHERE grade > 3.0
 CREATE TABLE students (date_of_birth DATE, matriculation_date DATETIME, graduation_date TIMESTAMP, graduated BOOLEAN);
+CREATE TABLE foo (a int, b int REFERENCES bar REFERENCES baz);
+CREATE TABLE foo (a int, b int REFERENCES bar (x) REFERENCES baz (y));
+CREATE TABLE foo (a int, b int, FOREIGN KEY (b) REFERENCES bar, FOREIGN KEY (b) REFERENCES baz);
+CREATE TABLE foo (a int, b int, FOREIGN KEY (b) REFERENCES bar (x), FOREIGN KEY (b) REFERENCES baz (y));
 # Multiple statements
 CREATE TABLE "table" FROM TBL FILE 'students.tbl'; SELECT * FROM "table";
 # INSERT
@@ -61,26 +65,34 @@ DROP INDEX IF EXISTS myindex;
 # PREPARE
 PREPARE prep_inst FROM 'INSERT INTO test VALUES (?, ?, ?)';
 PREPARE prep2 FROM 'INSERT INTO test VALUES (?, 0, 0); INSERT INTO test VALUES (0, ?, 0); INSERT INTO test VALUES (0, 0, ?);';
-EXECUTE prep_inst(1, 2, 3);
+EXECUTE prep_another_inst(1, 2, 3, CAST(1 AS LONG), -2.5, INTERVAL '3 HOURS', -2 SECONDS, TRUE, NULL, DATE '2000-01-01');
 EXECUTE prep;
 DEALLOCATE PREPARE prep;
 # COPY
 COPY students FROM 'student.tbl';
-COPY students FROM 'file_path' WITH FORMAT TBL;
-COPY students FROM 'file_path' WITH FORMAT CSV;
-COPY students FROM 'file_path' WITH FORMAT BIN;
-COPY students FROM 'file_path' WITH FORMAT BINARY;
+COPY students FROM 'file_path' WITH (FORMAT TBL);
+COPY students FROM 'file_path' WITH (FORMAT CSV);
+COPY students FROM 'file_path' WITH (FORMAT BIN);
+COPY students FROM 'file_path' WITH (FORMAT BINARY);
+COPY students FROM 'file_path' WITH (FORMAT CSV, DELIMITER '|', NULL '', QUOTE '"');
+COPY students FROM 'file_path' WITH (DELIMITER '|', NULL '', FORMAT CSV, QUOTE '"');
+COPY students FROM 'file_path' WITH (DELIMITER '|', NULL '', QUOTE '"');
+COPY students FROM 'file_path' WITH (DELIMITER '|', FORMAT CSV);
+COPY students FROM 'file_path' (FORMAT TBL);
 COPY good_students FROM 'file_path' WHERE grade > (SELECT AVG(grade) from alumni);
 COPY students TO 'student.tbl';
-COPY students TO 'file_path' WITH FORMAT TBL;
-COPY students TO 'file_path' WITH FORMAT CSV;
-COPY students TO 'file_path' WITH FORMAT BIN;
-COPY students TO 'file_path' WITH FORMAT BINARY;
+COPY students TO 'file_path' WITH (ENCODING 'some_encoding', FORMAT TBL);
+COPY students TO 'file_path' WITH (FORMAT CSV);
+COPY students TO 'file_path' WITH (FORMAT BIN);
+COPY students TO 'file_path' WITH (FORMAT BINARY);
+COPY students TO 'file_path' (FORMAT BINARY, ENCODING 'FSST');
+COPY students TO 'file_path' WITH (ENCODING 'Dictionary');
 COPY (SELECT firstname, COUNT(*) FROM students GROUP BY firstname) TO 'student_names.csv';
 # HINTS
 SELECT * FROM test WITH HINT(NO_CACHE);
 SELECT * FROM test WITH HINT(NO_CACHE, NO_SAMPLING);
-SELECT * FROM test WITH HINT(NO_CACHE, SAMPLE_RATE(0.1), OMW(1.0, 'test'));
+SELECT * FROM test WITH HINT(NO_CACHE, SAMPLE_RATE(0.1), OMW(1.0, 'test'), START_DATE(CAST('2000-01-01' AS DATE)));
+SELECT * FROM test WITH HINT(TIME_DIFFERENCE(-3 HOURS), ALLOW_RESULT_CACHE(FALSE), DEFAULT_VALUE(NULL), TIMETRAVEL_TO(DATE '2000-01-01'));
 SHOW TABLES;
 SHOW COLUMNS students;
 DESCRIBE students;

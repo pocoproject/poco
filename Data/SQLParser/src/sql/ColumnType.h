@@ -1,8 +1,8 @@
 #ifndef SQLPARSER_COLUMN_TYPE_H
 #define SQLPARSER_COLUMN_TYPE_H
 
-#include"sqlparser_win.h"
 #include <ostream>
+#include <stdint.h>
 
 namespace hsql {
 enum class DataType {
@@ -25,7 +25,7 @@ enum class DataType {
 };
 
 // Represents the type of a column, e.g., FLOAT or VARCHAR(10)
-struct SQLParser_API ColumnType {
+struct ColumnType {
   ColumnType() = default;
   ColumnType(DataType data_type, int64_t length = 0, int64_t precision = 0, int64_t scale = 0);
   DataType data_type;

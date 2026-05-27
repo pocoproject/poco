@@ -1,13 +1,13 @@
 #ifndef SQLPARSER_EXPORT_STATEMENT_H
 #define SQLPARSER_EXPORT_STATEMENT_H
 
-#include "ImportStatement.h"
+#include "ImportExportOptions.h"
 #include "SQLStatement.h"
 #include "SelectStatement.h"
 
 namespace hsql {
 // Represents SQL Export statements.
-struct SQLParser_API ExportStatement : SQLStatement {
+struct ExportStatement : SQLStatement {
   ExportStatement(ImportType type);
   ~ExportStatement() override;
 
@@ -17,6 +17,8 @@ struct SQLParser_API ExportStatement : SQLStatement {
   char* schema;
   char* tableName;
   SelectStatement* select;
+  char* encoding;
+  CsvOptions* csv_options;
 };
 
 }  // namespace hsql

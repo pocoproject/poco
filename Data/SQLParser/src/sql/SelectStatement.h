@@ -7,6 +7,7 @@
 
 namespace hsql {
 enum OrderType { kOrderAsc, kOrderDesc };
+enum NullOrdering { Undefined, First, Last };
 
 enum SetType { kSetUnion, kSetIntersect, kSetExcept };
 
@@ -14,16 +15,17 @@ enum RowLockMode { ForUpdate, ForNoKeyUpdate, ForShare, ForKeyShare };
 enum RowLockWaitPolicy { NoWait, SkipLocked, None };
 
 // Description of the order by clause within a select statement.
-struct SQLParser_API OrderDescription {
-  OrderDescription(OrderType type, Expr* expr);
+struct OrderDescription {
+  OrderDescription(OrderType type, Expr* expr, NullOrdering null_ordering);
   virtual ~OrderDescription();
 
   OrderType type;
   Expr* expr;
+  NullOrdering null_ordering;
 };
 
 // Description of the limit clause within a select statement.
-struct SQLParser_API LimitDescription {
+struct LimitDescription {
   LimitDescription(Expr* limit, Expr* offset);
   virtual ~LimitDescription();
 
@@ -32,7 +34,7 @@ struct SQLParser_API LimitDescription {
 };
 
 // Description of the group-by clause within a select statement.
-struct SQLParser_API GroupByDescription {
+struct GroupByDescription {
   GroupByDescription();
   virtual ~GroupByDescription();
 
@@ -40,14 +42,14 @@ struct SQLParser_API GroupByDescription {
   Expr* having;
 };
 
-struct SQLParser_API WithDescription {
+struct WithDescription {
   ~WithDescription();
 
   char* alias;
   SelectStatement* select;
 };
 
-struct SQLParser_API SetOperation {
+struct SetOperation {
   SetOperation();
   virtual ~SetOperation();
 
@@ -59,14 +61,14 @@ struct SQLParser_API SetOperation {
   LimitDescription* resultLimit;
 };
 
-struct SQLParser_API LockingClause {
+struct LockingClause {
   RowLockMode rowLockMode;
   RowLockWaitPolicy rowLockWaitPolicy;
   std::vector<char*>* tables;
 };
 
 // Representation of a full SQL select statement.
-struct SQLParser_API SelectStatement : SQLStatement {
+struct SelectStatement : SQLStatement {
   SelectStatement();
   ~SelectStatement() override;
 

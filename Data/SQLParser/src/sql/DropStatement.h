@@ -10,7 +10,7 @@ enum DropType { kDropTable, kDropSchema, kDropIndex, kDropView, kDropPreparedSta
 
 // Represents SQL Delete statements.
 // Example "DROP TABLE students;"
-struct SQLParser_API DropStatement : SQLStatement {
+struct DropStatement : SQLStatement {
   DropStatement(DropType type);
   ~DropStatement() override;
 

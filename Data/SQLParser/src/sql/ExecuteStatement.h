@@ -7,7 +7,7 @@ namespace hsql {
 
 // Represents SQL Execute statements.
 // Example: "EXECUTE ins_prep(100, "test", 2.3);"
-struct SQLParser_API ExecuteStatement : SQLStatement {
+struct ExecuteStatement : SQLStatement {
   ExecuteStatement();
   ~ExecuteStatement() override;
 

@@ -2,11 +2,12 @@
 #define SQLPARSER_SQLPARSER_H
 
 #include "SQLParserResult.h"
+#include "sql/statements.h"
 
 namespace hsql {
 
 // Static methods used to parse SQL strings.
-class SQLParser_API SQLParser {
+class SQLParser {
  public:
   // Parses a given constant character SQL string into the result object.
   // Returns true if the lexer and parser could run without internal errors.
@@ -17,12 +18,12 @@ class SQLParser_API SQLParser {
   // Run tokenization on the given string and store the tokens in the output vector.
   static bool tokenize(const std::string& sql, std::vector<int16_t>* tokens);
 
+  // Deprecated.
   // Old method to parse SQL strings. Replaced by parse().
-  [[deprecated("Use parse()")]]
   static bool parseSQLString(const char* sql, SQLParserResult* result);
 
+  // Deprecated.
   // Old method to parse SQL strings. Replaced by parse().
-  [[deprecated("Use parse()")]]
   static bool parseSQLString(const std::string& sql, SQLParserResult* result);
 
  private:

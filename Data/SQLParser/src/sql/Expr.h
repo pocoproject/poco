@@ -95,7 +95,7 @@ struct FrameBound {
 };
 
 enum FrameType { kRange, kRows, kGroups };
-struct SQLParser_API FrameDescription {
+struct FrameDescription {
   FrameDescription(FrameType type, FrameBound* start, FrameBound* end);
   virtual ~FrameDescription();
 
@@ -107,9 +107,9 @@ struct SQLParser_API FrameDescription {
 typedef struct Expr Expr;
 
 // Description of additional fields for a window expression.
-struct SQLParser_API WindowDescription {
+struct WindowDescription {
   WindowDescription(std::vector<Expr*>* partitionList, std::vector<OrderDescription*>* orderList,
-					FrameDescription* frameDescription);
+                    FrameDescription* frameDescription);
   virtual ~WindowDescription();
 
   std::vector<Expr*>* partitionList;
@@ -120,7 +120,7 @@ struct SQLParser_API WindowDescription {
 // Represents SQL expressions (i.e. literals, operators, column_refs).
 // TODO: When destructing a placeholder expression, we might need to alter the
 // placeholder_list.
-struct SQLParser_API Expr {
+struct Expr {
   Expr(ExprType type);
   virtual ~Expr();
 
@@ -133,6 +133,7 @@ struct SQLParser_API Expr {
   SelectStatement* select;
   char* name;
   char* table;
+  char* schema;
   char* alias;
   double fval;
   int64_t ival;
@@ -200,6 +201,8 @@ struct SQLParser_API Expr {
 
   static Expr* makeFunctionRef(char* func_name, std::vector<Expr*>* exprList, bool distinct, WindowDescription* window);
 
+  static Expr* makeFunctionRef(char* func_name, char* schema, std::vector<Expr*>* exprList, bool distinct, WindowDescription* window);
+
   static Expr* makeArray(std::vector<Expr*>* exprList);
 
   static Expr* makeArrayIndex(Expr* expr, int64_t index);
@@ -226,9 +229,9 @@ struct SQLParser_API Expr {
 #define ALLOC_EXPR(var, type)         \
   Expr* var;                          \
   do {                                \
-	Expr zero = {type};               \
-	var = (Expr*)malloc(sizeof *var); \
-	*var = zero;                      \
+    Expr zero = {type};               \
+    var = (Expr*)malloc(sizeof *var); \
+    *var = zero;                      \
   } while (0);
 #undef ALLOC_EXPR
 

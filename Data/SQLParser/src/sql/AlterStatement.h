@@ -26,7 +26,7 @@ struct DropColumnAction : AlterAction {
 
 // Represents SQL Alter Table statements.
 // Example "ALTER TABLE students DROP COLUMN name;"
-struct SQLParser_API AlterStatement : SQLStatement {
+struct AlterStatement : SQLStatement {
   AlterStatement(char* name, AlterAction* action);
   ~AlterStatement() override;
 

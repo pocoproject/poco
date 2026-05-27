@@ -1,7 +1,7 @@
 // clang-format off
 %{
-  // clang-format on
-  /**
+
+/**
  * bison_parser.y
  * defines bison_parser.h
  * outputs bison_parser.c
@@ -9,10 +9,11 @@
  * Grammar File Spec: http://dinosaur.compilertools.net/bison/bison_6.html
  *
  */
-  /*********************************
+/*********************************
  ** Section 1: C Declarations
  *********************************/
 
+// clang-format on
 #include "bison_parser.h"
 #include "flex_lexer.h"
 
@@ -62,7 +63,12 @@
 // %output  "bison_parser.cpp"
 // %defines "bison_parser.h"
 
-// Tell bison to create a reentrant parser
+// Raise error on shift/reduce conflict, i.e., when bison's one-token lookahead cannot decide on a single next state.
+// Without this line, only a warning is printed. The line raises an error when the expected number of conflicts (0)
+// does not occur.
+%expect 0
+
+// Tell bison to create a reentrant parser.
 %define api.pure full
 
 // Prefix the parser
@@ -119,6 +125,7 @@
 
   hsql::Alias* alias_t;
   hsql::AlterAction* alter_action_t;
+  hsql::ColumnConstraints* column_constraints_t;
   hsql::ColumnDefinition* column_t;
   hsql::ColumnType column_type_t;
   hsql::ConstraintType column_constraint_t;
@@ -135,6 +142,8 @@
   hsql::LockingClause* locking_t;
   hsql::OrderDescription* order;
   hsql::OrderType order_type;
+  hsql::NullOrdering null_ordering_t;
+  hsql::ReferencesSpecification* references_spec_t;
   hsql::SetOperation* set_operator_t;
   hsql::TableConstraint* table_constraint_t;
   hsql::TableElement* table_element_t;
@@ -145,7 +154,6 @@
   hsql::WithDescription* with_description_t;
 
   std::vector<char*>* str_vec;
-  std::unordered_set<hsql::ConstraintType>* column_constraint_set;
   std::vector<hsql::Expr*>* expr_vec;
   std::vector<hsql::OrderDescription*>* order_vec;
   std::vector<hsql::SQLStatement*>* stmt_vec;
@@ -159,164 +167,177 @@
 
   hsql::RowLockMode lock_mode_t;
   hsql::RowLockWaitPolicy lock_wait_policy_t;
+
+  hsql::ImportExportOptions* import_export_option_t;
+  std::pair<hsql::CsvOptionType, char*>* csv_option_t;
+
+  // clang-format off
 }
 
-    /*********************************
-     ** Destructor symbols
-     *********************************/
-    // clang-format off
-    %destructor { } <fval> <ival> <bval> <join_type> <order_type> <datetime_field> <column_type_t> <column_constraint_t> <import_type_t> <column_constraint_set> <lock_mode_t> <lock_wait_policy_t> <frame_type>
-    %destructor {
-      free( ($$.name) );
-      free( ($$.schema) );
-    } <table_name>
-    %destructor {
-      if ($$) {
-        for (auto ptr : *($$)) {
-          free(ptr);
-        }
-      }
-      delete ($$);
-    } <str_vec>
-    %destructor { free( ($$) ); } <sval>
-    %destructor {
-      if ($$) {
-        for (auto ptr : *($$)) {
-          delete ptr;
-        }
-      }
-      delete ($$);
-    } <table_vec> <table_element_vec> <update_vec> <expr_vec> <order_vec> <stmt_vec>
-    %destructor { delete ($$); } <*>
+/*********************************
+ ** Destructor symbols
+ *********************************/
+
+%destructor { } <fval> <ival> <bval> <join_type> <order_type> <datetime_field> <column_type_t> <column_constraint_t> <import_type_t> <lock_mode_t> <lock_wait_policy_t> <frame_type> <null_ordering_t>
+%destructor {
+  free($$.name);
+  free($$.schema);
+} <table_name>
+%destructor {
+  if ($$) {
+    for (auto ptr : *($$)) {
+      free(ptr);
+    }
+  }
+  delete ($$);
+} <str_vec>
+%destructor { free($$); } <sval>
+%destructor {
+  if ($$) {
+    for (auto ptr : *($$)) {
+      delete ptr;
+    }
+  }
+  delete ($$);
+} <table_vec> <table_element_vec> <update_vec> <expr_vec> <order_vec> <stmt_vec>
+%destructor {
+  free($$->second);
+  delete ($$);
+} <csv_option_t>
+%destructor { delete ($$); } <*>
 
 
-    /*********************************
-     ** Token Definition
-     *********************************/
-    %token <sval> IDENTIFIER STRING
-    %token <fval> FLOATVAL
-    %token <ival> INTVAL
+/*********************************
+ ** Token Definition
+ *********************************/
+%token <sval> IDENTIFIER STRING
+%token <fval> FLOATVAL
+%token <ival> INTVAL
 
-    /* SQL Keywords */
-    %token DEALLOCATE PARAMETERS INTERSECT TEMPORARY TIMESTAMP
-    %token DISTINCT NVARCHAR RESTRICT TRUNCATE ANALYZE BETWEEN
-    %token CASCADE COLUMNS CONTROL DEFAULT EXECUTE EXPLAIN
-    %token INTEGER NATURAL PREPARE PRIMARY SCHEMAS CHARACTER_VARYING REAL DECIMAL SMALLINT BIGINT
-    %token SPATIAL VARCHAR VIRTUAL DESCRIBE BEFORE COLUMN CREATE DELETE DIRECT
-    %token DOUBLE ESCAPE EXCEPT EXISTS EXTRACT CAST FORMAT GLOBAL HAVING IMPORT
-    %token INSERT ISNULL OFFSET RENAME SCHEMA SELECT SORTED
-    %token TABLES UNIQUE UNLOAD UPDATE VALUES AFTER ALTER CROSS
-    %token DELTA FLOAT GROUP INDEX INNER LIMIT LOCAL MERGE MINUS ORDER OVER
-    %token OUTER RIGHT TABLE UNION USING WHERE CALL CASE CHAR COPY DATE DATETIME
-    %token DESC DROP ELSE FILE FROM FULL HASH HINT INTO JOIN
-    %token LEFT LIKE LOAD LONG NULL PARTITION PLAN SHOW TEXT THEN TIME
-    %token VIEW WHEN WITH ADD ALL AND ASC END FOR INT KEY
-    %token NOT OFF SET TOP AS BY IF IN IS OF ON OR TO NO
-    %token ARRAY CONCAT ILIKE SECOND MINUTE HOUR DAY MONTH YEAR
-    %token SECONDS MINUTES HOURS DAYS MONTHS YEARS INTERVAL
-    %token TRUE FALSE BOOLEAN
-    %token TRANSACTION BEGIN COMMIT ROLLBACK
-    %token NOWAIT SKIP LOCKED SHARE
-    %token RANGE ROWS GROUPS UNBOUNDED FOLLOWING PRECEDING CURRENT_ROW
+/* SQL Keywords */
+%token DEALLOCATE PARAMETERS INTERSECT TEMPORARY TIMESTAMP
+%token DISTINCT NVARCHAR RESTRICT TRUNCATE ANALYZE BETWEEN
+%token CASCADE COLUMNS CONTROL DEFAULT EXECUTE EXPLAIN ENCODING
+%token INTEGER NATURAL PREPARE SCHEMAS CHARACTER_VARYING REAL DECIMAL SMALLINT BIGINT
+%token SPATIAL VARCHAR VIRTUAL DESCRIBE BEFORE COLUMN CREATE DELETE DIRECT
+%token DOUBLE ESCAPE EXCEPT EXISTS EXTRACT CAST FORMAT GLOBAL HAVING IMPORT
+%token INSERT ISNULL OFFSET RENAME SCHEMA SELECT SORTED
+%token TABLES UNLOAD UPDATE VALUES AFTER ALTER CROSS
+%token DELTA FLOAT GROUP INDEX INNER LIMIT LOCAL MERGE MINUS ORDER OVER
+%token OUTER RIGHT TABLE UNION USING WHERE CALL CASE CHAR COPY DATE DATETIME
+%token DESC DROP ELSE FILE FROM FULL HASH HINT INTO JOIN
+%token LEFT LIKE LOAD LONG NULL PARTITION PLAN SHOW TEXT THEN TIME
+%token VIEW WHEN WITH ADD ALL AND ASC END FOR INT
+%token NOT OFF SET TOP AS BY IF IN IS OF ON OR TO NO
+%token ARRAY CONCAT ILIKE SECOND MINUTE HOUR DAY MONTH YEAR
+%token SECONDS MINUTES HOURS DAYS MONTHS YEARS INTERVAL
+%token TRUE FALSE BOOLEAN
+%token TRANSACTION BEGIN COMMIT ROLLBACK
+%token NOWAIT SKIP LOCKED SHARE
+%token RANGE ROWS GROUPS UNBOUNDED FOLLOWING PRECEDING CURRENT_ROW
+%token UNIQUE PRIMARY FOREIGN KEY REFERENCES
 
-    /*********************************
-     ** Non-Terminal types (http://www.gnu.org/software/bison/manual/html_node/Type-Decl.html)
-     *********************************/
-    %type <stmt_vec>               statement_list
-    %type <statement>              statement preparable_statement
-    %type <exec_stmt>              execute_statement
-    %type <transaction_stmt>       transaction_statement
-    %type <prep_stmt>              prepare_statement
-    %type <select_stmt>            select_statement select_with_paren select_no_paren select_clause select_within_set_operation select_within_set_operation_no_parentheses
-    %type <import_stmt>            import_statement
-    %type <export_stmt>            export_statement
-    %type <create_stmt>            create_statement
-    %type <insert_stmt>            insert_statement
-    %type <delete_stmt>            delete_statement truncate_statement
-    %type <update_stmt>            update_statement
-    %type <drop_stmt>              drop_statement
-    %type <alter_stmt>             alter_statement
-    %type <show_stmt>              show_statement
-    %type <table_name>             table_name
-    %type <sval>                   opt_index_name
-    %type <sval>                   file_path prepare_target_query
-    %type <frame_description>      opt_frame_clause
-    %type <frame_bound>            frame_bound
-    %type <frame_type>             frame_type
-    %type <window_description>     opt_window
-    %type <bval>                   opt_not_exists opt_exists opt_distinct opt_all
-    %type <ival_pair>              opt_decimal_specification
-    %type <ival>                   opt_time_precision
-    %type <join_type>              opt_join_type
-    %type <table>                  opt_from_clause from_clause table_ref table_ref_atomic table_ref_name nonjoin_table_ref_atomic
-    %type <table>                  join_clause table_ref_name_no_alias
-    %type <expr>                   expr operand scalar_expr unary_expr binary_expr logic_expr exists_expr extract_expr cast_expr
-    %type <expr>                   function_expr between_expr expr_alias param_expr
-    %type <expr>                   column_name literal int_literal num_literal string_literal bool_literal date_literal interval_literal
-    %type <expr>                   comp_expr opt_where join_condition opt_having case_expr case_list in_expr hint
-    %type <expr>                   array_expr array_index null_literal
-    %type <limit>                  opt_limit opt_top
-    %type <order>                  order_desc
-    %type <order_type>             opt_order_type
-    %type <datetime_field>         datetime_field datetime_field_plural duration_field
-    %type <column_t>               column_def
-    %type <table_element_t>        table_elem
-    %type <column_type_t>          column_type
-    %type <table_constraint_t>     table_constraint
-    %type <update_t>               update_clause
-    %type <locking_t>              locking_clause
-    %type <group_t>                opt_group
-    %type <alias_t>                opt_table_alias table_alias opt_alias alias
-    %type <with_description_t>     with_description
-    %type <set_operator_t>         set_operator set_type
-    %type <column_constraint_t>    column_constraint
-    %type <column_constraint_set>  opt_column_constraints
-    %type <column_constraint_set>  column_constraint_set
-    %type <alter_action_t>         alter_action
-    %type <drop_action_t>          drop_action
-    %type <lock_wait_policy_t>     opt_row_lock_policy
-    %type <lock_mode_t>            row_lock_mode
+/*********************************
+ ** Non-Terminal types (http://www.gnu.org/software/bison/manual/html_node/Type-Decl.html)
+ *********************************/
+%type <stmt_vec>               statement_list
+%type <statement>              statement preparable_statement
+%type <exec_stmt>              execute_statement
+%type <transaction_stmt>       transaction_statement
+%type <prep_stmt>              prepare_statement
+%type <select_stmt>            select_statement select_with_paren select_no_paren select_clause select_within_set_operation select_within_set_operation_no_parentheses
+%type <import_stmt>            import_statement
+%type <export_stmt>            export_statement
+%type <create_stmt>            create_statement
+%type <insert_stmt>            insert_statement
+%type <delete_stmt>            delete_statement truncate_statement
+%type <update_stmt>            update_statement
+%type <drop_stmt>              drop_statement
+%type <alter_stmt>             alter_statement
+%type <show_stmt>              show_statement
+%type <table_name>             table_name
+%type <sval>                   opt_index_name
+%type <sval>                   file_path prepare_target_query
+%type <frame_description>      opt_frame_clause
+%type <frame_bound>            frame_bound
+%type <frame_type>             frame_type
+%type <window_description>     opt_window
+%type <bval>                   opt_not_exists opt_exists opt_distinct opt_all
+%type <ival_pair>              opt_decimal_specification
+%type <ival>                   opt_time_precision
+%type <join_type>              opt_join_type
+%type <table>                  opt_from_clause from_clause table_ref table_ref_atomic table_ref_name nonjoin_table_ref_atomic
+%type <table>                  join_clause table_ref_name_no_alias
+%type <expr>                   expr operand scalar_expr unary_expr binary_expr logic_expr exists_expr extract_expr cast_expr
+%type <expr>                   function_expr between_expr expr_alias param_expr
+%type <expr>                   column_name literal int_literal num_literal string_literal bool_literal date_literal interval_literal
+%type <expr>                   comp_expr opt_where join_condition opt_having case_expr case_list in_expr hint
+%type <expr>                   array_expr array_index null_literal extended_literal casted_extended_literal
+%type <limit>                  opt_limit opt_top
+%type <order>                  order_desc
+%type <order_type>             opt_order_type
+%type <null_ordering_t>        opt_null_ordering
+%type <datetime_field>         datetime_field datetime_field_plural duration_field
+%type <column_t>               column_def
+%type <table_element_t>        table_elem
+%type <column_type_t>          column_type
+%type <references_spec_t>      references_spec
+%type <table_constraint_t>     table_constraint
+%type <update_t>               update_clause
+%type <locking_t>              locking_clause
+%type <group_t>                opt_group
+%type <alias_t>                opt_table_alias table_alias opt_alias alias
+%type <with_description_t>     with_description
+%type <set_operator_t>         set_operator set_type
+%type <column_constraint_t>    column_constraint
+%type <column_constraints_t>   opt_column_constraints column_constraints
+%type <alter_action_t>         alter_action
+%type <drop_action_t>          drop_action
+%type <lock_wait_policy_t>     opt_row_lock_policy
+%type <lock_mode_t>            row_lock_mode
 
-    // ImportType is used for compatibility reasons
-    %type <import_type_t>          opt_file_type file_type
+// ImportType is used for compatibility reasons
+%type <import_type_t>          file_type
+%type <import_export_option_t> opt_import_export_options import_export_options
+%type <csv_option_t>           csv_option
 
-    %type <str_vec>                ident_commalist opt_column_list
-    %type <expr_vec>               expr_list select_list opt_literal_list literal_list hint_list opt_hints opt_partition
-    %type <table_vec>              table_ref_commalist
-    %type <order_vec>              opt_order order_list
-    %type <with_description_vec>   opt_with_clause with_clause with_description_list
-    %type <update_vec>             update_clause_commalist
-    %type <table_element_vec>      table_elem_commalist
-    %type <locking_clause_vec>     opt_locking_clause_list opt_locking_clause
+%type <str_vec>                ident_commalist opt_column_list
+%type <expr_vec>               expr_list select_list opt_extended_literal_list extended_literal_list hint_list opt_hints opt_partition
+%type <table_vec>              table_ref_commalist
+%type <order_vec>              opt_order order_list
+%type <with_description_vec>   opt_with_clause with_clause with_description_list
+%type <update_vec>             update_clause_commalist
+%type <table_element_vec>      table_elem_commalist
+%type <locking_clause_vec>     opt_locking_clause_list opt_locking_clause
 
-    /******************************
-     ** Token Precedence and Associativity
-     ** Precedence: lowest to highest
-     ******************************/
-    %left     OR
-    %left     AND
-    %right    NOT
-    %nonassoc '=' EQUALS NOTEQUALS LIKE ILIKE
-    %nonassoc '<' '>' LESS GREATER LESSEQ GREATEREQ
+/******************************
+ ** Token Precedence and Associativity
+ ** Precedence: lowest to highest
+ ******************************/
+%left     OR
+%left     AND
+%right    NOT
+%nonassoc '=' EQUALS NOTEQUALS LIKE ILIKE
+%nonassoc '<' '>' LESS GREATER LESSEQ GREATEREQ
 
-    %nonassoc NOTNULL
-    %nonassoc ISNULL
-    %nonassoc IS        /* sets precedence for IS NULL, etc */
-    %left     '+' '-'
-    %left     '*' '/' '%'
-    %left     '^'
-    %left     CONCAT
+%nonassoc NOTNULL
+%nonassoc ISNULL
+%nonassoc IS        /* sets precedence for IS NULL, etc */
+%left     '+' '-'
+%left     '*' '/' '%'
+%left     '^'
+%left     CONCAT
 
-    /* Unary Operators */
-    %right    UMINUS
-    %left     '[' ']'
-    %left     '(' ')'
-    %left     '.'
-    %left     JOIN
+/* Unary Operators */
+%right    UMINUS
+%left     '[' ']'
+%left     '(' ')'
+%left     '.'
+%left     JOIN
 %%
 /*********************************
-  ** Section 3: Grammar Definition
-*********************************/
+ ** Section 3: Grammar Definition
+ *********************************/
 
 // Defines our general input.
 input : statement_list opt_semicolon {
@@ -394,7 +415,7 @@ hint : IDENTIFIER {
   $$ = Expr::make(kExprHint);
   $$->name = $1;
 }
-| IDENTIFIER '(' literal_list ')' {
+| IDENTIFIER '(' extended_literal_list ')' {
   $$ = Expr::make(kExprHint);
   $$->name = $1;
   $$->exprList = $3;
@@ -420,13 +441,13 @@ prepare_statement : PREPARE IDENTIFIER FROM prepare_target_query {
   $$->query = $4;
 };
 
-prepare_target_query : STRING
+prepare_target_query : STRING;
 
-                           execute_statement : EXECUTE IDENTIFIER {
+execute_statement : EXECUTE IDENTIFIER {
   $$ = new ExecuteStatement();
   $$->name = $2;
 }
-| EXECUTE IDENTIFIER '(' opt_literal_list ')' {
+| EXECUTE IDENTIFIER '(' opt_extended_literal_list ')' {
   $$ = new ExecuteStatement();
   $$->name = $2;
   $$->parameters = $4;
@@ -435,7 +456,8 @@ prepare_target_query : STRING
 /******************************
  * Import Statement
  * IMPORT FROM TBL FILE 'test/students.tbl' INTO students
- * COPY students FROM 'test/students.tbl' [WITH FORMAT TBL]
+ * COPY students FROM 'test/students.tbl'
+ * COPY students FROM 'test/students.tbl' WITH (FORMAT TBL, ENCODING 'Dictionary')
  ******************************/
 import_statement : IMPORT FROM file_type FILE file_path INTO table_name {
   $$ = new ImportStatement($3);
@@ -443,12 +465,21 @@ import_statement : IMPORT FROM file_type FILE file_path INTO table_name {
   $$->schema = $7.schema;
   $$->tableName = $7.name;
 }
-| COPY table_name FROM file_path opt_file_type opt_where {
-  $$ = new ImportStatement($5);
+| COPY table_name FROM file_path opt_import_export_options opt_where {
+  $$ = new ImportStatement($5->format);
   $$->filePath = $4;
   $$->schema = $2.schema;
   $$->tableName = $2.name;
   $$->whereClause = $6;
+  if ($5->encoding) {
+    $$->encoding = $5->encoding;
+    $5->encoding = nullptr;
+  }
+  if ($5->csv_options) {
+    $$->csv_options = $5->csv_options;
+    $5->csv_options = nullptr;
+  }
+  delete $5;
 };
 
 file_type : IDENTIFIER {
@@ -466,28 +497,124 @@ file_type : IDENTIFIER {
   free($1);
 };
 
-file_path : string_literal {
-  $$ = strdup($1->name);
-  delete $1;
-};
+file_path : STRING { $$ = $1; };
 
-opt_file_type : WITH FORMAT file_type { $$ = $3; }
-| /* empty */ { $$ = kImportAuto; };
+opt_import_export_options : WITH '(' import_export_options ')' { $$ = $3; }
+| '(' import_export_options ')' { $$ = $2; }
+| /* empty */ { $$ = new ImportExportOptions{}; };
+
+import_export_options : import_export_options ',' FORMAT file_type {
+  if ($1->format != kImportAuto) {
+    delete $1;
+    yyerror(&yyloc, result, scanner, "File type must only be provided once.");
+    YYERROR;
+  }
+  if ($1->csv_options && $4 != kImportCSV && $4 != kImportAuto) {
+    delete $1;
+    yyerror(&yyloc, result, scanner, "CSV options (DELIMITER, NULL, QUOTE) are only allowed for CSV files.");
+    YYERROR;
+  }
+  $1->format = $4;
+  $$ = $1;
+}
+| FORMAT file_type {
+  $$ = new ImportExportOptions{};
+  $$->format = $2;
+}
+| import_export_options ',' ENCODING STRING {
+  if ($1->encoding) {
+    delete $1;
+    free($4);
+    yyerror(&yyloc, result, scanner, "Encoding type must only be provided once.");
+    YYERROR;
+  }
+  $1->encoding = $4;
+  $$ = $1;
+}
+| ENCODING STRING {
+  $$ = new ImportExportOptions{};
+  $$->encoding = $2;
+}
+| import_export_options ',' csv_option {
+  if ($1->format != kImportAuto && $1->format != kImportCSV) {
+    delete $1;
+    free($3->second);
+    delete $3;
+    yyerror(&yyloc, result, scanner, "CSV options (DELIMITER, NULL, QUOTE) are only allowed for CSV files.");
+    YYERROR;
+  }
+
+  if ($1->csv_options == nullptr) {
+    $1->csv_options = new CsvOptions{};
+  }
+
+  if (!$1->csv_options->accept_csv_option($3)) {
+    free($3->second);
+    delete $3;
+    delete $1;
+    yyerror(&yyloc, result, scanner, "CSV options (DELIMITER, NULL, QUOTE) cannot be provided more than once.");
+    YYERROR;
+  }
+
+  delete $3;
+  $$ = $1;
+}
+| csv_option {
+  $$ = new ImportExportOptions{};
+  $$->csv_options = new CsvOptions{};
+  $$->csv_options->accept_csv_option($1);
+
+  delete $1;
+}
+
+csv_option : IDENTIFIER STRING {
+  if (strcasecmp($1, "DELIMITER") == 0) {
+    $$ = new std::pair<CsvOptionType, char*>(CsvOptionType::Delimiter, $2);
+  } else if (strcasecmp($1, "QUOTE") == 0) {
+    $$ = new std::pair<CsvOptionType, char*>(CsvOptionType::Quote, $2);
+  } else {
+    free($1);
+    free($2);
+    yyerror(&yyloc, result, scanner, "Unknown CSV option.");
+    YYERROR;
+  }
+  free($1);
+}
+| NULL STRING { $$ = new std::pair<CsvOptionType, char*>(CsvOptionType::Null, $2); }
 
 /******************************
  * Export Statement
- * COPY students TO 'test/students.tbl' (WITH FORMAT TBL)
+ * COPY students TO 'test/students.tbl'
+ * COPY students TO 'test/students.tbl' WITH (FORMAT BINARY, ENCODING 'Dictionary')
  ******************************/
-export_statement : COPY table_name TO file_path opt_file_type {
-  $$ = new ExportStatement($5);
+export_statement : COPY table_name TO file_path opt_import_export_options {
+  $$ = new ExportStatement($5->format);
   $$->filePath = $4;
   $$->schema = $2.schema;
   $$->tableName = $2.name;
+  if ($5->encoding) {
+    $$->encoding = $5->encoding;
+    $5->encoding = nullptr;
+  }
+  if ($5->csv_options) {
+    $$->csv_options = $5->csv_options;
+    $5->csv_options = nullptr;
+  }
+  delete $5;
 }
-| COPY select_with_paren TO file_path opt_file_type {
-  $$ = new ExportStatement($5);
+| COPY select_with_paren TO file_path opt_import_export_options {
+  $$ = new ExportStatement($5->format);
   $$->filePath = $4;
   $$->select = $2;
+  if ($5->encoding) {
+    $$->encoding = $5->encoding;
+    $5->encoding = nullptr;
+  }
+  if ($5->csv_options) {
+    $$->csv_options = $5->csv_options;
+    $5->csv_options = nullptr;
+  }
+  delete $5;
 };
 
 /******************************
@@ -576,10 +703,11 @@ table_elem : column_def { $$ = $1; }
 | table_constraint { $$ = $1; };
 
 column_def : IDENTIFIER column_type opt_column_constraints {
-  $$ = new ColumnDefinition($1, $2, $3);
+  $$ = new ColumnDefinition($1, $2, $3->constraints, $3->references);
   if (!$$->trySetNullableExplicit()) {
     yyerror(&yyloc, result, scanner, ("Conflicting nullability constraints for " + std::string{$1}).c_str());
   }
+  delete $3;
 };
 
 column_type : BIGINT { $$ = ColumnType{DataType::BIGINT}; }
@@ -602,7 +730,7 @@ column_type : BIGINT { $$ = ColumnType{DataType::BIGINT}; }
 | TEXT { $$ = ColumnType{DataType::TEXT}; }
 | TIME opt_time_precision { $$ = ColumnType{DataType::TIME, 0, $2}; }
 | TIMESTAMP { $$ = ColumnType{DataType::DATETIME}; }
-| VARCHAR '(' INTVAL ')' { $$ = ColumnType{DataType::VARCHAR, $3}; }
+| VARCHAR '(' INTVAL ')' { $$ = ColumnType{DataType::VARCHAR, $3}; };
 
 opt_time_precision : '(' INTVAL ')' { $$ = $2; }
 | /* empty */ { $$ = 0; };
@@ -611,17 +739,29 @@ opt_decimal_specification : '(' INTVAL ',' INTVAL ')' { $$ = new std::pair<int64
 | '(' INTVAL ')' { $$ = new std::pair<int64_t, int64_t>{$2, 0}; }
 | /* empty */ { $$ = new std::pair<int64_t, int64_t>{0, 0}; };
 
-opt_column_constraints : column_constraint_set { $$ = $1; }
-| /* empty */ { $$ = new std::unordered_set<ConstraintType>(); };
+opt_column_constraints : column_constraints { $$ = $1; }
+| /* empty */ { $$ = new ColumnConstraints(); };
 
-column_constraint_set : column_constraint {
-  $$ = new std::unordered_set<ConstraintType>();
-  $$->insert($1);
+column_constraints : column_constraint {
+  $$ = new ColumnConstraints();
+  $$->constraints->insert($1);
 }
-| column_constraint_set column_constraint {
-  $1->insert($2);
+| column_constraints column_constraint {
+  $1->constraints->insert($2);
   $$ = $1;
 }
+| references_spec {
+  $$ = new ColumnConstraints();
+  $$->constraints->insert(ConstraintType::ForeignKey);
+  $$->references->emplace_back($1);
+}
+| column_constraints references_spec {
+  // Multiple foreign keys for the same column could be possible, so we do not raise an error in that case.
+  // Think of foreign keys referenced on multiple levels (returned item references sold item references items).
+  $1->constraints->insert(ConstraintType::ForeignKey);
+  $1->references->emplace_back($2);
+  $$ = $1;
+};
 
 column_constraint : PRIMARY KEY { $$ = ConstraintType::PrimaryKey; }
 | UNIQUE { $$ = ConstraintType::Unique; }
@@ -629,7 +769,10 @@ column_constraint : PRIMARY KEY { $$ = ConstraintType::PrimaryKey; }
 | NOT NULL { $$ = ConstraintType::NotNull; };
 
 table_constraint : PRIMARY KEY '(' ident_commalist ')' { $$ = new TableConstraint(ConstraintType::PrimaryKey, $4); }
-| UNIQUE '(' ident_commalist ')' { $$ = new TableConstraint(ConstraintType::Unique, $3); };
+| UNIQUE '(' ident_commalist ')' { $$ = new TableConstraint(ConstraintType::Unique, $3); }
+| FOREIGN KEY '(' ident_commalist ')' references_spec { $$ = new ForeignKeyConstraint($4, $6); };
+
+references_spec : REFERENCES table_name opt_column_list { $$ = new ReferencesSpecification($2.schema, $2.name, $3); };
 
 /******************************
  * Drop Statement
@@ -705,7 +848,7 @@ truncate_statement : TRUNCATE table_name {
  * INSERT INTO students VALUES ('Max', 1112233, 'Musterhausen', 2.3)
  * INSERT INTO employees SELECT * FROM stundents
  ******************************/
-insert_statement : INSERT INTO table_name opt_column_list VALUES '(' literal_list ')' {
+insert_statement : INSERT INTO table_name opt_column_list VALUES '(' extended_literal_list ')' {
   $$ = new InsertStatement(kInsertValues);
   $$->schema = $3.schema;
   $$->tableName = $3.name;
@@ -881,11 +1024,32 @@ order_list : order_desc {
   $$ = $1;
 };
 
-order_desc : expr opt_order_type { $$ = new OrderDescription($2, $1); };
+order_desc : expr opt_order_type opt_null_ordering { $$ = new OrderDescription($2, $1, $3); };
 
 opt_order_type : ASC { $$ = kOrderAsc; }
 | DESC { $$ = kOrderDesc; }
 | /* empty */ { $$ = kOrderAsc; };
+
+opt_null_ordering : /* empty */ { $$ = NullOrdering::Undefined; }
+| IDENTIFIER IDENTIFIER {
+  auto null_ordering = NullOrdering::Undefined;
+  if (strcasecmp($1, "nulls") == 0) {
+    if (strcasecmp($2, "first") == 0) {
+      null_ordering = NullOrdering::First;
+    } else if (strcasecmp($2, "last") == 0) {
+      null_ordering = NullOrdering::Last;
+    }
+  }
+  free($1);
+  free($2);
+
+  if (null_ordering == NullOrdering::Undefined) {
+    yyerror(&yyloc, result, scanner, "Expected NULLS FIRST or NULLS LAST ordering.");
+    YYERROR;
+  }
+
+  $$ = null_ordering;
+};
 
 // TODO: TOP and LIMIT can take more than just int literals.
 
@@ -911,22 +1075,39 @@ expr_list : expr_alias {
   $$ = $1;
 };
 
-opt_literal_list : literal_list { $$ = $1; }
+// Literals, casted literals, and negative numbers/intervals are allowed for INSERT and EXECUTE statements or hints.
+opt_extended_literal_list : extended_literal_list { $$ = $1; }
 | /* empty */ { $$ = nullptr; };
 
-literal_list : literal {
+extended_literal_list : casted_extended_literal {
   $$ = new std::vector<Expr*>();
   $$->push_back($1);
 }
-| literal_list ',' literal {
+| extended_literal_list ',' casted_extended_literal {
   $1->push_back($3);
   $$ = $1;
 };
 
+casted_extended_literal : extended_literal | CAST '(' extended_literal AS column_type ')' {
+  $$ = Expr::makeCast($3, $5);
+};
+
+extended_literal : literal {
+  if ($1->type == ExprType::kExprParameter) {
+    delete $1;
+    yyerror(&yyloc, result, scanner, "Parameter ? is not a valid literal.");
+    YYERROR;
+  }
+  $$ = $1;
+}
+| '-' num_literal { $$ = Expr::makeOpUnary(kOpUnaryMinus, $2); };
+| '-' interval_literal { $$ = Expr::makeOpUnary(kOpUnaryMinus, $2); };
+
 expr_alias : expr opt_alias {
   $$ = $1;
   if ($2) {
-    $$->alias = strdup($2->name);
+    $$->alias = $2->name;
+    $2->name = nullptr;
     delete $2;
   }
 };
@@ -990,7 +1171,9 @@ comp_expr : operand '=' operand { $$ = Expr::makeOpBinary($1, kOpEquals, $3); }
 // `function_expr is used for window functions, aggregate expressions, and functions calls because we run into shift/
 // reduce conflicts when splitting them.
 function_expr : IDENTIFIER '(' ')' opt_window { $$ = Expr::makeFunctionRef($1, new std::vector<Expr*>(), false, $4); }
-| IDENTIFIER '(' opt_distinct expr_list ')' opt_window { $$ = Expr::makeFunctionRef($1, $4, $3, $6); };
+| IDENTIFIER '(' opt_distinct expr_list ')' opt_window { $$ = Expr::makeFunctionRef($1, $4, $3, $6); }
+| IDENTIFIER '.' IDENTIFIER '(' ')' opt_window { $$ = Expr::makeFunctionRef($3, $1, new std::vector<Expr*>(), false, $6); }
+| IDENTIFIER '.' IDENTIFIER '(' opt_distinct expr_list ')' opt_window { $$ = Expr::makeFunctionRef($3, $1, $6, $5, $8); };
 
 // Window function expressions, based on https://www.postgresql.org/docs/15/sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS
 // We do not support named windows, collations and exclusions (for simplicity) and filters (not part of the SQL standard).
@@ -1075,10 +1258,7 @@ date_literal : DATE STRING {
   $$ = Expr::makeDateLiteral($2);
 };
 
-interval_literal : int_literal duration_field {
-  $$ = Expr::makeIntervalLiteral($1->ival, $2);
-  delete $1;
-}
+interval_literal : INTVAL duration_field { $$ = Expr::makeIntervalLiteral($1, $2); }
 | INTERVAL STRING datetime_field {
   int duration{0}, chars_parsed{0};
   // If the whole string is parsed, chars_parsed points to the terminating null byte after the last character
@@ -1271,28 +1451,13 @@ join_clause : table_ref_atomic NATURAL JOIN nonjoin_table_ref_atomic {
   $$->join->right = $4;
   $$->join->condition = $6;
 }
-| table_ref_atomic opt_join_type JOIN table_ref_atomic USING '(' column_name ')' {
+| table_ref_atomic opt_join_type JOIN table_ref_atomic USING '(' ident_commalist ')' {
   $$ = new TableRef(kTableJoin);
   $$->join = new JoinDefinition();
-  $$->join->type = (JoinType)$2;
+  $$->join->type = $2;
   $$->join->left = $1;
   $$->join->right = $4;
-  auto left_col = Expr::makeColumnRef(strdup($7->name));
-  if ($7->alias) {
-    left_col->alias = strdup($7->alias);
-  }
-  if ($1->getName()) {
-    left_col->table = strdup($1->getName());
-  }
-  auto right_col = Expr::makeColumnRef(strdup($7->name));
-  if ($7->alias) {
-    right_col->alias = strdup($7->alias);
-  }
-  if ($4->getName()) {
-    right_col->table = strdup($4->getName());
-  }
-  $$->join->condition = Expr::makeOpBinary(left_col, kOpEquals, right_col);
-  delete $7;
+  $$->join->namedColumns = $7;
 };
 
 opt_join_type : INNER { $$ = kJoinInner; }
@@ -1326,9 +1491,11 @@ ident_commalist : IDENTIFIER {
 
 // clang-format off
 %%
-    // clang-format on
-    /*********************************
+
+/*********************************
  ** Section 4: Additional C code
  *********************************/
 
-    /* empty */
+/* empty */
+
+    // clang-format on

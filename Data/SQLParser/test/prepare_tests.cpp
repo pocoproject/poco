@@ -22,7 +22,7 @@ using hsql::SelectStatement;
 
 TEST(PrepareSingleStatementTest) {
   TEST_PARSE_SINGLE_SQL("PREPARE test FROM 'SELECT * FROM students WHERE grade = ?';", kStmtPrepare, PrepareStatement,
-						result, prepare);
+                        result, prepare);
 
   ASSERT_STREQ(prepare->name, "test");
   ASSERT_STREQ(prepare->query, "SELECT * FROM students WHERE grade = ?");
@@ -30,8 +30,8 @@ TEST(PrepareSingleStatementTest) {
   TEST_PARSE_SINGLE_SQL(prepare->query, kStmtSelect, SelectStatement, result2, select);
 
   ASSERT_EQ(result2.parameters().size(), 1);
-  ASSERT(select->whereClause->expr2->isType(kExprParameter))
-  ASSERT_EQ(select->whereClause->expr2->ival, 0)
+  ASSERT(select->whereClause->expr2->isType(kExprParameter));
+  ASSERT_EQ(select->whereClause->expr2->ival, 0);
 }
 
 TEST(DeallocatePrepareStatementTest) {
@@ -49,16 +49,16 @@ TEST(StatementWithParameters) {
 
   ASSERT_EQ(result.parameters().size(), 2);
 
-  ASSERT_EQ(eq1->opType, hsql::kOpEquals)
-  ASSERT(eq1->expr->isType(hsql::kExprColumnRef))
-  ASSERT(eq1->expr2->isType(kExprParameter))
-  ASSERT_EQ(eq1->expr2->ival, 0)
+  ASSERT_EQ(eq1->opType, hsql::kOpEquals);
+  ASSERT(eq1->expr->isType(hsql::kExprColumnRef));
+  ASSERT(eq1->expr2->isType(kExprParameter));
+  ASSERT_EQ(eq1->expr2->ival, 0);
   ASSERT_EQ(result.parameters()[0], eq1->expr2);
 
-  ASSERT_EQ(eq2->opType, hsql::kOpEquals)
-  ASSERT(eq2->expr->isType(hsql::kExprColumnRef))
-  ASSERT(eq2->expr2->isType(kExprParameter))
-  ASSERT_EQ(eq2->expr2->ival, 1)
+  ASSERT_EQ(eq2->opType, hsql::kOpEquals);
+  ASSERT(eq2->expr->isType(hsql::kExprColumnRef));
+  ASSERT(eq2->expr2->isType(kExprParameter));
+  ASSERT_EQ(eq2->expr2->ival, 1);
   ASSERT_EQ(result.parameters()[1], eq2->expr2);
 }
 

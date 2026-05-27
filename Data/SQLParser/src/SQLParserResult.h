@@ -1,13 +1,12 @@
 #ifndef SQLPARSER_SQLPARSER_RESULT_H
 #define SQLPARSER_SQLPARSER_RESULT_H
 
-#include "sqlparser_win.h"
 #include "sql/SQLStatement.h"
 
 namespace hsql {
 // Represents the result of the SQLParser.
 // If parsing was successful it contains a list of SQLStatement.
-class SQLParser_API SQLParserResult {
+class SQLParserResult {
  public:
   // Initialize with empty statement list.
   SQLParserResult();
@@ -63,7 +62,7 @@ class SQLParser_API SQLParserResult {
   std::vector<SQLStatement*> releaseStatements();
 
   // Deletes all statements and other data within the result.
-  void reset(bool mv = false);
+  void reset();
 
   // Does NOT take ownership.
   void addParameter(Expr* parameter);
@@ -72,7 +71,7 @@ class SQLParser_API SQLParserResult {
 
  private:
   // List of statements within the result.
-  mutable std::vector<SQLStatement*>* statements_;
+  std::vector<SQLStatement*> statements_;
 
   // Flag indicating the parsing was successful.
   bool isValid_;
@@ -87,7 +86,7 @@ class SQLParser_API SQLParserResult {
   int errorColumn_;
 
   // Does NOT have ownership.
-  std::vector<Expr*>* parameters_;
+  std::vector<Expr*> parameters_;
 };
 
 }  // namespace hsql
