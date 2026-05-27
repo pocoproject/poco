@@ -23,11 +23,13 @@
 #include "Poco/Data/Statement.h"
 #include "Poco/Data/Binding.h"
 #include "Poco/Data/DataException.h"
+#include "Poco/Data/RenderingBinder.h"
+#include "Poco/Data/TypeHandler.h"
 #include "Poco/Exception.h"
 #include "Poco/Nullable.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/SharedPtr.h"
 #include "Poco/Types.h"
-#include <array>
 #include <chrono>
 #include <cstddef>
 #include <exception>
@@ -192,14 +194,38 @@ public:
 		///   * `$N`-style — the maximum N referenced must equal sizeof...(Args);
 		///     `$0` is rejected by the parser.
 		/// Arity mismatches throw Poco::InvalidArgumentException.
+		///
+		/// Bindings flow through a RenderingBinder, which dispatches through
+		/// Poco::Data's full TypeHandler machinery. This means STL containers
+		/// (std::vector/deque/list) and user types with custom TypeHandler
+		/// specializations render with their actual bound values, not "?".
+		/// For bulk container bindings, only the first row is rendered by
+		/// default; use boundSQLBulk to render more.
+		///
 		/// When the parser is disabled (POCO_DATA_NO_SQL_PARSER), falls back to
 		/// a hand-rolled scanner that supports `?` and `$N` only.
 	{
-		constexpr std::size_t N = sizeof...(Args);
-		if constexpr (N == 0)
-			return boundSQLImpl(sql, nullptr, 0);
-		const std::array<std::string, N> values = { renderValue(bindings)... };
-		return boundSQLImpl(sql, values.data(), N);
+		return boundSQLBulk(sql, 1, bindings...);
+	}
+
+	template <typename... Args>
+	static std::string boundSQLBulk(const std::string& sql, std::size_t maxRows, const Args&... bindings)
+		/// Variant of boundSQL that retains up to maxRows entries per binding
+		/// position. For scalar bindings the value is the same in every row;
+		/// for STL container bindings the iterator advances row by row. The
+		/// result is up to maxRows rendered statements joined by ";\n". If
+		/// the largest container has more rows than maxRows, a trailing
+		/// "-- (+N more rows)" comment is appended. maxRows == 0 is treated
+		/// as 1.
+	{
+		Poco::SharedPtr<RenderingBinder> rbPtr = new RenderingBinder(maxRows);
+		AbstractBinder::Ptr abPtr = rbPtr;
+
+		std::size_t pos = 0;
+		((TypeHandler<Args>::bind(pos, bindings, abPtr, AbstractBinder::PD_IN),
+		  pos += TypeHandler<Args>::size()), ...);
+
+		return boundSQLImpl(sql, *rbPtr);
 	}
 
 	template <typename... Args>
@@ -278,13 +304,6 @@ public:
 		return ok ? rowsAffected : 0;
 	}
 
-private:
-	static std::string boundSQLImpl(const std::string& sql, const std::string* values, std::size_t n);
-		/// Non-template back-end for boundSQL: takes pre-rendered binding strings
-		/// and performs the placeholder substitution. Lives in Utility.cpp so
-		/// that the SQL parser headers do not appear on the public include
-		/// surface.
-
 	static std::string quoteString(std::string_view s);
 		/// SQL-quotes a string literal: surrounds with ' and doubles internal '.
 
@@ -316,6 +335,13 @@ private:
 
 	static std::string formatCLOB(const CLOB& c);
 		/// Renders Poco::Data::CLOB as a quoted SQL text literal.
+
+private:
+	static std::string boundSQLImpl(const std::string& sql, const RenderingBinder& rb);
+		/// Non-template back-end for boundSQL: takes a RenderingBinder
+		/// populated with per-position captures and performs the placeholder
+		/// substitution. Lives in Utility.cpp so that the SQL parser headers
+		/// do not appear on the public include surface.
 };
 
 

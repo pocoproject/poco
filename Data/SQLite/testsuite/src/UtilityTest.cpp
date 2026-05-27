@@ -306,9 +306,15 @@ void UtilityTest::testExecuteSQLMalformed()
 
 	assertTrue(rc == 0);
 	assertTrue(!captured.ok);
+#ifndef POCO_DATA_NO_SQL_PARSER
 	// Parser-based boundSQL refuses to render unparseable SQL; executeSQL falls
 	// back to the raw template string with placeholders left in place.
 	assertTrue(captured.sql == "INSERT INVALID NONSENSE ?");
+#else
+	// Hand-rolled scanner does not validate SQL; it substitutes the '?' even
+	// though the rest of the statement is nonsense.
+	assertTrue(captured.sql == "INSERT INVALID NONSENSE 7");
+#endif
 	assertTrue(!captured.error.empty());
 }
 
@@ -446,6 +452,63 @@ void UtilityTest::testToJSONEscapes()
 }
 
 
+namespace
+{
+	// Custom value type for testBoundSQLCustomTypeHandler.
+	struct UPair
+	{
+		int id;
+		std::string name;
+	};
+}
+
+
+namespace Poco {
+namespace Data {
+
+	template <>
+	class TypeHandler<UPair>: public AbstractTypeHandler
+	{
+	public:
+		static std::size_t size() { return 2u; }
+
+		static void bind(std::size_t pos, const UPair& v, AbstractBinder::Ptr pBinder, AbstractBinder::Direction dir)
+		{
+			pBinder->bind(pos,     Poco::Int32(v.id), dir);
+			pBinder->bind(pos + 1, v.name,           dir);
+		}
+
+		static void extract(std::size_t /*pos*/, UPair& /*v*/, const UPair& /*defVal*/, AbstractExtractor::Ptr /*pExt*/) {}
+		static void prepare(std::size_t /*pos*/, const UPair& /*v*/, AbstractPreparator::Ptr /*pPreparator*/) {}
+	};
+
+} } // namespace Poco::Data
+
+
+void UtilityTest::testBoundSQLVectorScalar()
+{
+	const std::vector<int> rows{1, 2, 3};
+	const std::string s = Utility::boundSQL("INSERT INTO t VALUES(?)", rows);
+	assertTrue (s == "INSERT INTO t VALUES(1)\n-- (+2 more rows)");
+}
+
+
+void UtilityTest::testBoundSQLVectorMaxRows3()
+{
+	const std::vector<int> rows{1, 2, 3};
+	const std::string s = Utility::boundSQLBulk("INSERT INTO t VALUES(?)", 3, rows);
+	assertTrue (s == "INSERT INTO t VALUES(1);\nINSERT INTO t VALUES(2);\nINSERT INTO t VALUES(3)");
+}
+
+
+void UtilityTest::testBoundSQLCustomTypeHandler()
+{
+	const UPair p{42, "Alice"};
+	const std::string s = Utility::boundSQL("INSERT INTO t VALUES(?, ?)", p);
+	assertTrue (s == "INSERT INTO t VALUES(42, 'Alice')");
+}
+
+
 CppUnit::Test* UtilityTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("UtilityTest");
@@ -472,6 +535,9 @@ CppUnit::Test* UtilityTest::suite()
 	CppUnit_addTest(pSuite, UtilityTest, testToJSONFailure);
 	CppUnit_addTest(pSuite, UtilityTest, testToJSONNoContext);
 	CppUnit_addTest(pSuite, UtilityTest, testToJSONEscapes);
+	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLVectorScalar);
+	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLVectorMaxRows3);
+	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLCustomTypeHandler);
 
 	return pSuite;
 }

@@ -46,6 +46,9 @@ public:
 	void testToJSONFailure();
 	void testToJSONNoContext();
 	void testToJSONEscapes();
+	void testBoundSQLVectorScalar();
+	void testBoundSQLVectorMaxRows3();
+	void testBoundSQLCustomTypeHandler();
 
 	void setUp();
 	void tearDown();
