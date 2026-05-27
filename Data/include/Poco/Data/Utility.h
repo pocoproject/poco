@@ -27,16 +27,9 @@
 #include "Poco/Nullable.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Types.h"
-#ifndef POCO_DATA_NO_SQL_PARSER
-#include "SQLParser.h"
-#include "sql/Expr.h"
-#endif
-#include <algorithm>
 #include <array>
-#include <cctype>
 #include <chrono>
 #include <cstddef>
-#include <cstring>
 #include <exception>
 #include <functional>
 #include <memory>
@@ -44,7 +37,6 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
-#include <vector>
 
 
 namespace Poco {
@@ -204,163 +196,10 @@ public:
 		/// a hand-rolled scanner that supports `?` and `$N` only.
 	{
 		constexpr std::size_t N = sizeof...(Args);
+		if constexpr (N == 0)
+			return boundSQLImpl(sql, nullptr, 0);
 		const std::array<std::string, N> values = { renderValue(bindings)... };
-
-#ifndef POCO_DATA_NO_SQL_PARSER
-		hsql::SQLParserResult result;
-		hsql::SQLParser::parse(sql, &result);
-		if (!result.isValid())
-			throw Poco::InvalidArgumentException(std::string("Utility::boundSQL: ") + result.errorMsg());
-
-		// Walk placeholders in source-text order.
-		std::vector<const hsql::Expr*> phs(result.parameters().begin(), result.parameters().end());
-		std::sort(phs.begin(), phs.end(),
-			[](const hsql::Expr* a, const hsql::Expr* b) { return a->ival2 < b->ival2; });
-
-		enum class Style { None, Question, Dollar };  // :name is pass-through
-		Style style = Style::None;
-		std::size_t questionCount = 0;
-		std::size_t maxN = 0;
-
-		std::string out;
-		out.reserve(sql.size() + N * 8);
-		std::size_t cursor = 0;
-
-		for (const hsql::Expr* p: phs)
-		{
-			const std::size_t start = static_cast<std::size_t>(p->ival2);
-			out.append(sql, cursor, start - cursor);
-
-			switch (p->type)
-			{
-			case hsql::kExprParameter:
-				if (style == Style::Dollar)
-					throw Poco::InvalidArgumentException("Utility::boundSQL: mixed placeholder styles");
-				style = Style::Question;
-				if (questionCount >= N)
-					throw Poco::InvalidArgumentException("Utility::boundSQL: too few arguments for ? placeholders");
-				out.append(values[questionCount++]);
-				cursor = start + 1;
-				break;
-
-			case hsql::kExprParameterDollar:
-			{
-				if (style == Style::Question)
-					throw Poco::InvalidArgumentException("Utility::boundSQL: mixed placeholder styles");
-				style = Style::Dollar;
-				const std::size_t n = static_cast<std::size_t>(p->ival);
-				if (n > N)
-					throw Poco::InvalidArgumentException("Utility::boundSQL: $N out of range");
-				if (n > maxN) maxN = n;
-				out.append(values[n - 1]);
-				std::size_t len = 1;  // '$' + digits
-				for (auto v = p->ival; v > 0; v /= 10) ++len;
-				cursor = start + len;
-				break;
-			}
-
-			case hsql::kExprParameterNamed:
-			{
-				// Pass-through: copy the ":name" token verbatim.
-				const std::size_t len = 1 + std::strlen(p->name);
-				out.append(sql, start, len);
-				cursor = start + len;
-				break;
-			}
-
-			default:
-				break;
-			}
-		}
-
-		out.append(sql, cursor, std::string::npos);
-
-		if (style == Style::Question && questionCount != N)
-			throw Poco::InvalidArgumentException("Utility::boundSQL: too many arguments for ? placeholders");
-		if (style == Style::Dollar && maxN != N)
-			throw Poco::InvalidArgumentException("Utility::boundSQL: $N arity mismatch");
-
-		return out;
-#else
-		std::string out;
-		out.reserve(sql.size() + N * 8);
-
-		enum class Style { None, Question, Dollar };
-		Style style = Style::None;
-		bool inLit = false;
-		std::size_t qi = 0;
-		std::size_t maxN = 0;
-
-		std::size_t i = 0;
-		while (i < sql.size())
-		{
-			const char c = sql[i];
-			if (inLit)
-			{
-				out.push_back(c);
-				if (c == '\'')
-				{
-					if (i + 1 < sql.size() && sql[i + 1] == '\'')
-					{
-						out.push_back('\'');
-						i += 2;
-						continue;
-					}
-					inLit = false;
-				}
-				++i;
-			}
-			else if (c == '\'')
-			{
-				inLit = true;
-				out.push_back(c);
-				++i;
-			}
-			else if (c == '?')
-			{
-				if (style == Style::Dollar)
-					throw Poco::InvalidArgumentException("Utility::boundSQL: mixed placeholder styles");
-				style = Style::Question;
-				if (qi >= N)
-					throw Poco::InvalidArgumentException("Utility::boundSQL: too few arguments for ? placeholders");
-				out.append(values[qi]);
-				++qi;
-				++i;
-			}
-			else if (c == '$' && i + 1 < sql.size() && std::isdigit(static_cast<unsigned char>(sql[i + 1])))
-			{
-				if (style == Style::Question)
-					throw Poco::InvalidArgumentException("Utility::boundSQL: mixed placeholder styles");
-				style = Style::Dollar;
-				std::size_t j = i + 1;
-				std::size_t n = 0;
-				while (j < sql.size() && std::isdigit(static_cast<unsigned char>(sql[j])))
-				{
-					n = n * 10 + static_cast<std::size_t>(sql[j] - '0');
-					++j;
-				}
-				if (n == 0)
-					throw Poco::InvalidArgumentException("Utility::boundSQL: $0 is invalid");
-				if (n > N)
-					throw Poco::InvalidArgumentException("Utility::boundSQL: $N out of range");
-				if (n > maxN) maxN = n;
-				out.append(values[n - 1]);
-				i = j;
-			}
-			else
-			{
-				out.push_back(c);
-				++i;
-			}
-		}
-
-		if (style == Style::Question && qi != N)
-			throw Poco::InvalidArgumentException("Utility::boundSQL: too many arguments for ? placeholders");
-		if (style == Style::Dollar && maxN != N)
-			throw Poco::InvalidArgumentException("Utility::boundSQL: $N arity mismatch");
-
-		return out;
-#endif
+		return boundSQLImpl(sql, values.data(), N);
 	}
 
 	template <typename... Args>
@@ -440,6 +279,12 @@ public:
 	}
 
 private:
+	static std::string boundSQLImpl(const std::string& sql, const std::string* values, std::size_t n);
+		/// Non-template back-end for boundSQL: takes pre-rendered binding strings
+		/// and performs the placeholder substitution. Lives in Utility.cpp so
+		/// that the SQL parser headers do not appear on the public include
+		/// surface.
+
 	static std::string quoteString(std::string_view s);
 		/// SQL-quotes a string literal: surrounds with ' and doubles internal '.
 
