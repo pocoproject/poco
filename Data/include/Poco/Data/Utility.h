@@ -242,7 +242,7 @@ public:
 	}
 
 	template <typename... Args>
-	static std::string boundSQLBulk(const std::string& sql, std::size_t maxRows, const Args&... bindings)
+	static std::string boundSQLBulk(const std::string& sql, std::size_t maxRows, [[maybe_unused]] const Args&... bindings)
 		/// Variant of boundSQL that retains up to maxRows entries per binding
 		/// position. For scalar bindings the value is the same in every row;
 		/// for STL container bindings the iterator advances row by row. The
@@ -254,7 +254,7 @@ public:
 		Poco::SharedPtr<RenderingBinder> rbPtr = new RenderingBinder(maxRows);
 		AbstractBinder::Ptr abPtr = rbPtr;
 
-		std::size_t pos = 0;
+		[[maybe_unused]] std::size_t pos = 0;
 		((TypeHandler<Args>::bind(pos, bindings, abPtr, AbstractBinder::PD_IN),
 		  pos += TypeHandler<Args>::size()), ...);
 
