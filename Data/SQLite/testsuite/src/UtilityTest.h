@@ -49,6 +49,11 @@ public:
 	void testBoundSQLVectorScalar();
 	void testBoundSQLVectorMaxRows3();
 	void testBoundSQLCustomTypeHandler();
+	void testBoundSQLFromStatementScalar();
+	void testBoundSQLFromStatementVector();
+	void testBoundSQLFromStatementVectorBulk();
+	void testBoundSQLFromStatementCustomTypeHandler();
+	void testBoundSQLFromStatementPreservesExecute();
 
 	void setUp();
 	void tearDown();

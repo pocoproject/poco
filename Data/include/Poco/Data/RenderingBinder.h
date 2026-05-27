@@ -174,6 +174,14 @@ public:
 		/// Maximum container size seen across all captured positions, or 1
 		/// if no container bindings were captured.
 
+	void setTotalRows(std::size_t n);
+		/// Sets totalRows explicitly. Used by callers that drive the binder
+		/// row-by-row via existing AbstractBinding instances (where the
+		/// binder receives scalar bind() calls rather than container ones,
+		/// so cannot infer the row count from the value) and need to
+		/// communicate the actual total so the truncation suffix renders
+		/// correctly.
+
 	std::size_t maxRows() const;
 		/// Returns the maxRows cap passed to the constructor.
 
@@ -196,6 +204,12 @@ private:
 inline std::size_t RenderingBinder::totalRows() const
 {
 	return _totalRows;
+}
+
+
+inline void RenderingBinder::setTotalRows(std::size_t n)
+{
+	_totalRows = n;
 }
 
 

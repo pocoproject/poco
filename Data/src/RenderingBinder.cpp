@@ -43,18 +43,23 @@ RenderingBinder::~RenderingBinder() = default;
 
 void RenderingBinder::reset()
 {
-	_values.clear();
-	_totalRows = 1;
+	// No-op. AbstractBinding::reset() cascades into this for scalar bindings
+	// (Binding<T>::reset() calls pBinder->reset()); we must not wipe the
+	// captures here or a multi-binding walk would lose earlier bindings'
+	// rendered values when later bindings are reset. The binder is scoped to
+	// a single render call and discarded afterwards, so there's nothing to
+	// clean up.
 }
 
 
 template <typename T>
 void RenderingBinder::recordScalar(std::size_t pos, const T& val, Direction dir)
 {
+	std::vector<std::string>& slot = _values[pos];
 	if (dir == PD_OUT)
-		_values[pos] = { outSentinel() };
+		slot.push_back(outSentinel());
 	else
-		_values[pos] = { Utility::renderValue(val) };
+		slot.push_back(Utility::renderValue(val));
 }
 
 

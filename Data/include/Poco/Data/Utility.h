@@ -261,6 +261,28 @@ public:
 		return boundSQLImpl(sql, *rbPtr);
 	}
 
+	static std::string boundSQL(const Statement& stmt);
+		/// Renders the SQL template that stmt would execute, with the values
+		/// already bound to it substituted into the placeholders. Only the
+		/// first row of any bulk binding is included; if any binding has
+		/// more rows, a "-- (+N more rows)" comment is appended.
+		///
+		/// SAFETY: the returned string contains the actual bound values.
+		/// Bound values frequently carry sensitive data (passwords, PII,
+		/// tokens). Do not log this unconditionally — call it only where the
+		/// operator has authorised exposure of bound values, typically inside
+		/// a catch block where diagnostic detail outweighs PII risk.
+		///
+		/// The helper does not consume the bindings. It temporarily swaps
+		/// each binding's binder to a RenderingBinder, drives bind() row by
+		/// row, and restores the original binder plus calls reset(). Safe to
+		/// call before or after stmt.execute().
+
+	static std::string boundSQLBulk(const Statement& stmt, std::size_t maxRows);
+		/// As above, but renders up to maxRows rows joined by ";\n". maxRows
+		/// == 0 is treated as 1. The "-- (+N more rows)" suffix appears when
+		/// the largest binding has more rows than maxRows.
+
 	template <typename... Args>
 	static std::size_t executeSQL(Session& session,
 		const std::string& sql,

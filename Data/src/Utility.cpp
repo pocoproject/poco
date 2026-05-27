@@ -259,6 +259,70 @@ std::string Utility::boundSQLImpl(const std::string& sql, const RenderingBinder&
 }
 
 
+std::string Utility::boundSQL(const Statement& stmt)
+{
+	return boundSQLBulk(stmt, 1);
+}
+
+
+std::string Utility::boundSQLBulk(const Statement& stmt, std::size_t maxRows)
+{
+	if (maxRows == 0) maxRows = 1;
+
+	auto& bindings = const_cast<Statement&>(stmt).bindings();
+
+	// Compute the max row count any binding handles. Suffix logic in
+	// boundSQLImpl uses this; the per-binding loop below caps capture at
+	// maxRows.
+	std::size_t totalRows = 1;
+	for (const auto& b: bindings)
+	{
+		if (b->numOfRowsHandled() > totalRows)
+			totalRows = b->numOfRowsHandled();
+	}
+
+	const std::size_t rowsToCapture = std::min(totalRows, maxRows);
+
+	Poco::SharedPtr<RenderingBinder> rbPtr = new RenderingBinder(rowsToCapture);
+	AbstractBinder::Ptr abPtr = rbPtr;
+
+	std::size_t pos = 0;
+	for (auto& binding: bindings)
+	{
+		const auto savedBinder = binding->getBinder();
+		binding->setBinder(abPtr);
+
+		// Reset is required so this helper works after a prior bind()/execute()
+		// left the binding's _bound flag set (canBind() would otherwise return
+		// false and we'd render nothing). Safe to call: RenderingBinder::reset()
+		// is intentionally a no-op so the cascade in scalar Binding<T>::reset()
+		// (Binding.h:93-98) won't wipe captures from earlier walked bindings.
+		binding->reset();
+
+		for (std::size_t r = 0; r < rowsToCapture; ++r)
+		{
+			if (!binding->canBind()) break;
+			binding->bind(pos);
+		}
+
+		// Reset again to undo iterator advance / clear _bound so a subsequent
+		// stmt.execute() (or another boundSQL call) re-binds from the top.
+		// Cascade into our no-op RenderingBinder::reset() is harmless.
+		binding->reset();
+
+		// Statement attaches its own binder when execute() runs, so only
+		// restore if there was a previous binder to put back. setBinder
+		// rejects a null pointer.
+		if (!savedBinder.isNull()) binding->setBinder(savedBinder);
+		pos += binding->numOfColumnsHandled();
+	}
+
+	rbPtr->setTotalRows(totalRows);
+
+	return boundSQLImpl(stmt.toString(), *rbPtr);
+}
+
+
 std::string Utility::quoteString(std::string_view s)
 {
 	std::string out;

@@ -509,6 +509,88 @@ void UtilityTest::testBoundSQLCustomTypeHandler()
 }
 
 
+void UtilityTest::testBoundSQLFromStatementScalar()
+{
+	Session session(Connector::KEY, ":memory:");
+	int id = 42;
+	std::string customer = "Alice";
+	double total = 99.5;
+	Poco::Data::Statement stmt(session);
+	stmt << "INSERT INTO t VALUES(?, ?, ?)",
+		Poco::Data::Keywords::use(id),
+		Poco::Data::Keywords::use(customer),
+		Poco::Data::Keywords::use(total);
+
+	const std::string rendered = Utility::boundSQL(stmt);
+	assertTrue (rendered == "INSERT INTO t VALUES(42, 'Alice', 99.5)");
+}
+
+
+void UtilityTest::testBoundSQLFromStatementVector()
+{
+	Session session(Connector::KEY, ":memory:");
+	std::vector<int> rows{1, 2, 3};
+	Poco::Data::Statement stmt(session);
+	stmt << "INSERT INTO t VALUES(?)",
+		Poco::Data::Keywords::use(rows);
+
+	const std::string rendered = Utility::boundSQL(stmt);
+	assertTrue (rendered == "INSERT INTO t VALUES(1)\n-- (+2 more rows)");
+}
+
+
+void UtilityTest::testBoundSQLFromStatementVectorBulk()
+{
+	Session session(Connector::KEY, ":memory:");
+	std::vector<int> rows{1, 2, 3};
+	Poco::Data::Statement stmt(session);
+	stmt << "INSERT INTO t VALUES(?)",
+		Poco::Data::Keywords::use(rows);
+
+	const std::string rendered = Utility::boundSQLBulk(stmt, 3);
+	assertTrue (rendered == "INSERT INTO t VALUES(1);\nINSERT INTO t VALUES(2);\nINSERT INTO t VALUES(3)");
+}
+
+
+void UtilityTest::testBoundSQLFromStatementCustomTypeHandler()
+{
+	Session session(Connector::KEY, ":memory:");
+	UPair p{42, "Alice"};
+	Poco::Data::Statement stmt(session);
+	stmt << "INSERT INTO t VALUES(?, ?)",
+		Poco::Data::Keywords::use(p);
+
+	const std::string rendered = Utility::boundSQL(stmt);
+	assertTrue (rendered == "INSERT INTO t VALUES(42, 'Alice')");
+}
+
+
+void UtilityTest::testBoundSQLFromStatementPreservesExecute()
+{
+	// Render via the helper, then execute, then render again. Both renderings
+	// must agree and execute must succeed (the helper must reset iterators).
+	Session session(Connector::KEY, ":memory:");
+	session << "CREATE TABLE u_psv(id INTEGER, customer TEXT)",
+		Poco::Data::Keywords::now;
+
+	int id = 7;
+	std::string customer = "Bob";
+	Poco::Data::Statement stmt(session);
+	stmt << "INSERT INTO u_psv(id, customer) VALUES(?, ?)",
+		Poco::Data::Keywords::use(id),
+		Poco::Data::Keywords::use(customer);
+
+	const std::string before = Utility::boundSQL(stmt);
+	assertTrue (before == "INSERT INTO u_psv(id, customer) VALUES(7, 'Bob')");
+
+	const std::size_t affected = stmt.execute();
+	assertTrue (affected == 1);
+
+	const std::string after = Utility::boundSQL(stmt);
+	assertTrue (after == before);
+}
+
+
 CppUnit::Test* UtilityTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("UtilityTest");
@@ -538,6 +620,11 @@ CppUnit::Test* UtilityTest::suite()
 	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLVectorScalar);
 	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLVectorMaxRows3);
 	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLCustomTypeHandler);
+	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLFromStatementScalar);
+	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLFromStatementVector);
+	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLFromStatementVectorBulk);
+	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLFromStatementCustomTypeHandler);
+	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLFromStatementPreservesExecute);
 
 	return pSuite;
 }
