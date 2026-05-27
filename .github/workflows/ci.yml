@@ -99,6 +99,7 @@ jobs:
       foundation_util: ${{ steps.filter.outputs.foundation_util }}
       arm_cross: ${{ steps.filter.outputs.arm_cross }}
       data: ${{ steps.filter.outputs.data }}
+      sqlparser: ${{ steps.filter.outputs.sqlparser }}
     steps:
       - uses: actions/checkout@v5
       - uses: dorny/paths-filter@v4
@@ -1237,6 +1238,26 @@ jobs:
           max_attempts: 3
           retry_on: any
           command: nix-shell Data/ODBC/oracle.nix --pure --run "build_and_test"
+
+  # Standalone hyrise/sql-parser upstream tests: builds the vendored
+  # SQLParser sources with its own Makefile and runs the upstream test
+  # suite (queries-good.sql / queries-bad.sql), a valgrind leak check,
+  # and the bison grammar-conflict check. This is the only job that
+  # exercises the grammar-level features (FOREIGN KEY, NULLS FIRST/LAST,
+  # CSV import options, schema-qualified functions, ...). bison and flex
+  # are pre-installed on ubuntu-24.04 (3.8.2 and 2.6.4); valgrind is too.
+  linux-sqlparser-upstream-tests:
+    runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.sqlparser == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt -y update && sudo apt -y install bison flex valgrind
+      - run: cd Data/SQLParser && make -j$(nproc)
+      - run: cd Data/SQLParser && make test
 
   linux-gcc-cmake-sqlite-no-sqlparser:
     runs-on: ubuntu-24.04
