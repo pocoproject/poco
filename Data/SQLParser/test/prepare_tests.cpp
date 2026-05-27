@@ -5,6 +5,8 @@
 
 using hsql::kExprLiteralInt;
 using hsql::kExprParameter;
+using hsql::kExprParameterDollar;
+using hsql::kExprParameterNamed;
 
 using hsql::kStmtDrop;
 using hsql::kStmtExecute;
@@ -60,6 +62,49 @@ TEST(StatementWithParameters) {
   ASSERT(eq2->expr2->isType(kExprParameter));
   ASSERT_EQ(eq2->expr2->ival, 1);
   ASSERT_EQ(result.parameters()[1], eq2->expr2);
+}
+
+TEST(StatementWithDollarParameters) {
+  TEST_PARSE_SINGLE_SQL("SELECT * FROM test WHERE a = $1 AND b = $2", kStmtSelect, SelectStatement, result, stmt);
+
+  const hsql::Expr* eq1 = stmt->whereClause->expr;
+  const hsql::Expr* eq2 = stmt->whereClause->expr2;
+
+  ASSERT_EQ(result.parameters().size(), 2);
+
+  ASSERT(eq1->expr2->isType(kExprParameterDollar));
+  ASSERT_EQ(eq1->expr2->ival, 1);
+
+  ASSERT(eq2->expr2->isType(kExprParameterDollar));
+  ASSERT_EQ(eq2->expr2->ival, 2);
+}
+
+TEST(StatementWithDollarParametersOutOfOrder) {
+  TEST_PARSE_SINGLE_SQL("SELECT * FROM test WHERE a = $2 AND b = $1", kStmtSelect, SelectStatement, result, stmt);
+  (void)stmt;
+
+  ASSERT_EQ(result.parameters().size(), 2);
+
+  // addParameter sorts by ival, so the explicit positions order the result vector.
+  ASSERT(result.parameters()[0]->isType(kExprParameterDollar));
+  ASSERT_EQ(result.parameters()[0]->ival, 1);
+  ASSERT(result.parameters()[1]->isType(kExprParameterDollar));
+  ASSERT_EQ(result.parameters()[1]->ival, 2);
+}
+
+TEST(StatementWithNamedParameters) {
+  TEST_PARSE_SINGLE_SQL("SELECT * FROM test WHERE a = :user AND b = :id", kStmtSelect, SelectStatement, result, stmt);
+
+  const hsql::Expr* eq1 = stmt->whereClause->expr;
+  const hsql::Expr* eq2 = stmt->whereClause->expr2;
+
+  ASSERT_EQ(result.parameters().size(), 2);
+
+  ASSERT(eq1->expr2->isType(kExprParameterNamed));
+  ASSERT_STREQ(eq1->expr2->name, "user");
+
+  ASSERT(eq2->expr2->isType(kExprParameterNamed));
+  ASSERT_STREQ(eq2->expr2->name, "id");
 }
 
 TEST(ExecuteStatementTest) {

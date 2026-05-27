@@ -238,6 +238,16 @@ CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
 ">="        TOKEN(GREATEREQ)
 "||"        TOKEN(CONCAT)
 
+\$[0-9]+    {
+  yylval->ival = atoll(yytext + 1);
+  return SQL_DOLLAR_PARAM;
+}
+
+:[A-Za-z][A-Za-z0-9_]*  {
+  yylval->sval = strdup(yytext + 1);
+  return SQL_NAMED_PARAM;
+}
+
 [-+*/(){},.;<>=^%:?[\]|]    { return yytext[0]; }
 
 [0-9]+"."[0-9]* |

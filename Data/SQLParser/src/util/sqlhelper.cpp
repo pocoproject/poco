@@ -152,6 +152,12 @@ void printExpression(Expr* expr, uintmax_t num_indent) {
     case kExprParameter:
       inprint(expr->ival, num_indent);
       break;
+    case kExprParameterDollar:
+      inprint(expr->ival, num_indent);
+      break;
+    case kExprParameterNamed:
+      inprint(expr->name, num_indent);
+      break;
     case kExprArray:
       for (Expr* e : *expr->exprList) {
         printExpression(e, num_indent + 1);

@@ -23,6 +23,8 @@ enum ExprType {
   kExprLiteralInterval,
   kExprStar,
   kExprParameter,
+  kExprParameterDollar,
+  kExprParameterNamed,
   kExprColumnRef,
   kExprFunctionRef,
   kExprOperator,
@@ -208,6 +210,10 @@ struct SQLParser_API Expr {
   static Expr* makeArrayIndex(Expr* expr, int64_t index);
 
   static Expr* makeParameter(int id);
+
+  static Expr* makeDollarParameter(int64_t n);
+
+  static Expr* makeNamedParameter(char* name);
 
   static Expr* makeSelect(SelectStatement* select);
 

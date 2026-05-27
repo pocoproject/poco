@@ -110,3 +110,6 @@
 !COPY students FROM 'file_path' WITH (NULL '', QUOTE '"', DELIMITER '|', DELIMITER '/');
 !COPY students FROM 'file_path' WITH (QUOTE '"', NULL '', DELIMITER '/', QUOTE '_',);
 !COPY students FROM 'file_path' WITH (FORMAT CSV, QUOTE '"', DELIMINIMITER '|');
+# Placeholders: rejected $0, lone $
+!SELECT * FROM t WHERE a = $0;
+!SELECT * FROM t WHERE a = $;

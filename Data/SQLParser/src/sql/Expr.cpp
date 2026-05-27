@@ -250,6 +250,18 @@ Expr* Expr::makeParameter(int id) {
   return e;
 }
 
+Expr* Expr::makeDollarParameter(int64_t n) {
+  Expr* e = new Expr(kExprParameterDollar);
+  e->ival = n;
+  return e;
+}
+
+Expr* Expr::makeNamedParameter(char* name) {
+  Expr* e = new Expr(kExprParameterNamed);
+  e->name = name;
+  return e;
+}
+
 Expr* Expr::makeSelect(SelectStatement* select) {
   Expr* e = new Expr(kExprSelect);
   e->select = select;
@@ -299,6 +311,7 @@ bool Expr::isType(ExprType exprType) const { return exprType == type; }
 
 bool Expr::isLiteral() const {
   return isType(kExprLiteralInt) || isType(kExprLiteralFloat) || isType(kExprLiteralString) || isType(kExprParameter) ||
+         isType(kExprParameterDollar) || isType(kExprParameterNamed) ||
          isType(kExprLiteralNull) || isType(kExprLiteralDate) || isType(kExprLiteralInterval);
 }
 

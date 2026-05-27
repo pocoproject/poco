@@ -213,6 +213,8 @@
 %token <sval> IDENTIFIER STRING
 %token <fval> FLOATVAL
 %token <ival> INTVAL
+%token <ival> DOLLAR_PARAM
+%token <sval> NAMED_PARAM
 
 /* SQL Keywords */
 %token DEALLOCATE PARAMETERS INTERSECT TEMPORARY TIMESTAMP
@@ -350,9 +352,10 @@ input : statement_list opt_semicolon {
   for (void* param : yyloc.param_list) {
     if (param) {
       Expr* expr = (Expr*)param;
-      expr->ival = param_id;
+      if (expr->type == kExprParameter) {
+        expr->ival = param_id++;
+      }
       result->addParameter(expr);
-      ++param_id;
     }
   }
     delete $1;
@@ -1302,11 +1305,25 @@ interval_literal : INTVAL duration_field { $$ = Expr::makeIntervalLiteral($1, $2
   $$ = Expr::makeIntervalLiteral(duration, unit);
 };
 
-param_expr : '?' {
-  $$ = Expr::makeParameter(yylloc.total_column);
-  $$->ival2 = yyloc.param_list.size();
-  yyloc.param_list.push_back($$);
-};
+param_expr
+  : '?' {
+      $$ = Expr::makeParameter(yylloc.total_column);
+      $$->ival2 = yyloc.param_list.size();
+      yyloc.param_list.push_back($$);
+    }
+  | DOLLAR_PARAM {
+      if ($1 < 1) {
+        yyerror(&yyloc, result, scanner, "$0 is not a valid positional parameter.");
+        YYERROR;
+      }
+      $$ = Expr::makeDollarParameter($1);
+      yyloc.param_list.push_back($$);
+    }
+  | NAMED_PARAM {
+      $$ = Expr::makeNamedParameter($1);
+      yyloc.param_list.push_back($$);
+    }
+  ;
 
 /******************************
  * Table

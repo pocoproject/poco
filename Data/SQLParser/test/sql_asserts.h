@@ -1,6 +1,8 @@
 #ifndef __HELPER_H__
 #define __HELPER_H__
 
+#include "sql/statements.h"
+
 #define TEST_PARSE_SQL_QUERY(query, result, numStatements) \
   hsql::SQLParserResult result;                            \
   hsql::SQLParser::parse(query, &result);                  \

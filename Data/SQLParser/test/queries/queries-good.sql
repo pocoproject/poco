@@ -120,3 +120,7 @@ SELECT test1, rank() OVER (ORDER BY test2 DESC, test3 ASC) rnk FROM test;
 SELECT rank() OVER () FROM test;
 SELECT rank() OVER (PARTITION BY test1) FROM test;
 SELECT rank() OVER (PARTITION BY test1 ORDER BY test2) FROM test;
+# Placeholders: PostgreSQL $N and SQLite :name (Poco fork extension)
+SELECT * FROM t WHERE a = $1 AND b = $2;
+SELECT * FROM t WHERE a = :user AND b = :id;
+SELECT * FROM t WHERE a = ? AND b = :id AND c = $3;
