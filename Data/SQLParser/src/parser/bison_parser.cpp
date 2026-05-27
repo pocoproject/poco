@@ -40,6 +40,11 @@
    define necessary library symbols; they are noted "INFRINGES ON
    USER NAME SPACE" below.  */
 
+#if defined(_WIN32) || defined(_WIN64)
+#pragma warning(disable : 4996)
+#pragma warning(disable : 4267)
+#endif
+
 /* Identify Bison output.  */
 #define YYBISON 1
 
@@ -5863,6 +5868,9 @@ yyreturn:
 }
 #line 1493 "bison_parser.y" /* yacc.c:1906  */
 
+#if defined(_WIN32) || defined(_WIN64)
+#pragma warning(default : 4996)
+#endif
 
 /*********************************
  ** Section 4: Additional C code

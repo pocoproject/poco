@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "sqlparser_win.h"
 #include "Expr.h"
 
 namespace hsql {
@@ -25,7 +26,7 @@ enum StatementType {
 };
 
 // Base struct for every SQL statement
-struct SQLStatement {
+struct SQLParser_API SQLStatement {
   SQLStatement(StatementType type);
 
   virtual ~SQLStatement();

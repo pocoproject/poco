@@ -15,7 +15,7 @@ enum RowLockMode { ForUpdate, ForNoKeyUpdate, ForShare, ForKeyShare };
 enum RowLockWaitPolicy { NoWait, SkipLocked, None };
 
 // Description of the order by clause within a select statement.
-struct OrderDescription {
+struct SQLParser_API OrderDescription {
   OrderDescription(OrderType type, Expr* expr, NullOrdering null_ordering);
   virtual ~OrderDescription();
 
@@ -25,7 +25,7 @@ struct OrderDescription {
 };
 
 // Description of the limit clause within a select statement.
-struct LimitDescription {
+struct SQLParser_API LimitDescription {
   LimitDescription(Expr* limit, Expr* offset);
   virtual ~LimitDescription();
 
@@ -34,7 +34,7 @@ struct LimitDescription {
 };
 
 // Description of the group-by clause within a select statement.
-struct GroupByDescription {
+struct SQLParser_API GroupByDescription {
   GroupByDescription();
   virtual ~GroupByDescription();
 
@@ -42,14 +42,14 @@ struct GroupByDescription {
   Expr* having;
 };
 
-struct WithDescription {
+struct SQLParser_API WithDescription {
   ~WithDescription();
 
   char* alias;
   SelectStatement* select;
 };
 
-struct SetOperation {
+struct SQLParser_API SetOperation {
   SetOperation();
   virtual ~SetOperation();
 
@@ -61,14 +61,14 @@ struct SetOperation {
   LimitDescription* resultLimit;
 };
 
-struct LockingClause {
+struct SQLParser_API LockingClause {
   RowLockMode rowLockMode;
   RowLockWaitPolicy rowLockWaitPolicy;
   std::vector<char*>* tables;
 };
 
 // Representation of a full SQL select statement.
-struct SelectStatement : SQLStatement {
+struct SQLParser_API SelectStatement : SQLStatement {
   SelectStatement();
   ~SelectStatement() override;
 

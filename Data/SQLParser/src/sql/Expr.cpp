@@ -313,6 +313,9 @@ const char* Expr::getName() const {
     return name;
 }
 
+#if defined(_WIN32) || defined(_WIN64)
+#pragma warning(disable : 4996)
+#endif
 char* substr(const char* source, int from, int to) {
   int len = to - from;
   char* copy = (char*)malloc(len + 1);
@@ -321,4 +324,7 @@ char* substr(const char* source, int from, int to) {
   copy[len] = '\0';
   return copy;
 }
+#if defined(_WIN32) || defined(_WIN64)
+#pragma warning(default : 4996)
+#endif
 }  // namespace hsql

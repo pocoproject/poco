@@ -10,7 +10,7 @@ enum ShowType { kShowColumns, kShowTables };
 
 // Represents SQL SHOW statements.
 // Example "SHOW TABLES;"
-struct ShowStatement : SQLStatement {
+struct SQLParser_API ShowStatement : SQLStatement {
   ShowStatement(ShowType type);
   ~ShowStatement() override;
 

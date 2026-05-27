@@ -1,6 +1,7 @@
 #ifndef SQLPARSER_IMPORT_EXPORT_OPTIONS_H
 #define SQLPARSER_IMPORT_EXPORT_OPTIONS_H
 
+#include "sqlparser_win.h"
 #include <utility>
 
 namespace hsql {
@@ -21,7 +22,7 @@ enum CsvOptionType {
   Quote,
 };
 
-struct CsvOptions {
+struct SQLParser_API CsvOptions {
   CsvOptions();
   ~CsvOptions();
 
@@ -32,7 +33,7 @@ struct CsvOptions {
   bool accept_csv_option(std::pair<CsvOptionType, char*>* option);
 };
 
-struct ImportExportOptions {
+struct SQLParser_API ImportExportOptions {
   ImportExportOptions();
   ~ImportExportOptions();
 

@@ -7,7 +7,7 @@
 
 namespace hsql {
 // Represents SQL Export statements.
-struct ExportStatement : SQLStatement {
+struct SQLParser_API ExportStatement : SQLStatement {
   ExportStatement(ImportType type);
   ~ExportStatement() override;
 

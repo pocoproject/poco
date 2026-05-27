@@ -95,7 +95,7 @@ struct FrameBound {
 };
 
 enum FrameType { kRange, kRows, kGroups };
-struct FrameDescription {
+struct SQLParser_API FrameDescription {
   FrameDescription(FrameType type, FrameBound* start, FrameBound* end);
   virtual ~FrameDescription();
 
@@ -107,7 +107,7 @@ struct FrameDescription {
 typedef struct Expr Expr;
 
 // Description of additional fields for a window expression.
-struct WindowDescription {
+struct SQLParser_API WindowDescription {
   WindowDescription(std::vector<Expr*>* partitionList, std::vector<OrderDescription*>* orderList,
                     FrameDescription* frameDescription);
   virtual ~WindowDescription();
@@ -120,7 +120,7 @@ struct WindowDescription {
 // Represents SQL expressions (i.e. literals, operators, column_refs).
 // TODO: When destructing a placeholder expression, we might need to alter the
 // placeholder_list.
-struct Expr {
+struct SQLParser_API Expr {
   Expr(ExprType type);
   virtual ~Expr();
 

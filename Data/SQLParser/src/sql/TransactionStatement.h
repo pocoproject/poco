@@ -9,7 +9,7 @@ namespace hsql {
 // Example: BEGIN TRANSACTION;
 enum TransactionCommand { kBeginTransaction, kCommitTransaction, kRollbackTransaction };
 
-struct TransactionStatement : SQLStatement {
+struct SQLParser_API TransactionStatement : SQLStatement {
   TransactionStatement(TransactionCommand command);
   ~TransactionStatement() override;
 

@@ -14,12 +14,12 @@ struct TableRef;
 // Possible table reference types.
 enum TableRefType { kTableName, kTableSelect, kTableJoin, kTableCrossProduct };
 
-struct TableName {
+struct SQLParser_API TableName {
   char* schema;
   char* name;
 };
 
-struct Alias {
+struct SQLParser_API Alias {
   Alias(char* name, std::vector<char*>* columns = nullptr);
   ~Alias();
 
@@ -28,7 +28,7 @@ struct Alias {
 };
 
 // Holds reference to tables. Can be either table names or a select statement.
-struct TableRef {
+struct SQLParser_API TableRef {
   TableRef(TableRefType type);
   virtual ~TableRef();
 
@@ -53,7 +53,7 @@ struct TableRef {
 enum JoinType { kJoinInner, kJoinFull, kJoinLeft, kJoinRight, kJoinCross, kJoinNatural };
 
 // Definition of a join construct.
-struct JoinDefinition {
+struct SQLParser_API JoinDefinition {
   JoinDefinition();
   virtual ~JoinDefinition();
 

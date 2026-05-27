@@ -9,7 +9,7 @@ enum InsertType { kInsertValues, kInsertSelect };
 
 // Represents SQL Insert statements.
 // Example: "INSERT INTO students VALUES ('Max', 1112233, 'Musterhausen', 2.3)"
-struct InsertStatement : SQLStatement {
+struct SQLParser_API InsertStatement : SQLStatement {
   InsertStatement(InsertType type);
   ~InsertStatement() override;
 

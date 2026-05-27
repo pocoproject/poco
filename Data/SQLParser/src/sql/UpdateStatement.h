@@ -12,7 +12,7 @@ struct UpdateClause {
 };
 
 // Represents SQL Update statements.
-struct UpdateStatement : SQLStatement {
+struct SQLParser_API UpdateStatement : SQLStatement {
   UpdateStatement();
   ~UpdateStatement() override;
 

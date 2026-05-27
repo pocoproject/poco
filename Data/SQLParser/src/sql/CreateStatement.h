@@ -14,12 +14,12 @@ enum struct ConstraintType { ForeignKey, NotNull, Null, PrimaryKey, Unique };
 std::ostream& operator<<(std::ostream& os, const ConstraintType constraint_type);
 
 // Superclass for both TableConstraint and ColumnDefinition.
-struct TableElement {
+struct SQLParser_API TableElement {
   virtual ~TableElement() = default;
 };
 
 // Represents definition of a table constraint.
-struct TableConstraint : TableElement {
+struct SQLParser_API TableConstraint : TableElement {
   TableConstraint(ConstraintType keyType, std::vector<char*>* columnNames);
 
   ~TableConstraint() override;
@@ -29,7 +29,7 @@ struct TableConstraint : TableElement {
 };
 
 // Table and columns referenced by foreign key constraint on table or column level.
-struct ReferencesSpecification {
+struct SQLParser_API ReferencesSpecification {
   ReferencesSpecification(char* schema, char* table, std::vector<char*>* columns);
   ~ReferencesSpecification();
 
@@ -39,7 +39,7 @@ struct ReferencesSpecification {
 };
 
 // Foreign key constraint on table level (when specified as table element).
-struct ForeignKeyConstraint : TableConstraint {
+struct SQLParser_API ForeignKeyConstraint : TableConstraint {
   ForeignKeyConstraint(std::vector<char*>* columnNames, ReferencesSpecification* references);
   ~ForeignKeyConstraint() override;
 
@@ -47,7 +47,7 @@ struct ForeignKeyConstraint : TableConstraint {
 };
 
 // Represents definition of a table column
-struct ColumnDefinition : TableElement {
+struct SQLParser_API ColumnDefinition : TableElement {
   ColumnDefinition(char* name, ColumnType type, std::unordered_set<ConstraintType>* column_constraints,
                    std::vector<ReferencesSpecification*>* references);
   ~ColumnDefinition() override;
@@ -63,7 +63,7 @@ struct ColumnDefinition : TableElement {
   std::vector<ReferencesSpecification*>* references;
 };
 
-struct ColumnConstraints {
+struct SQLParser_API ColumnConstraints {
   explicit ColumnConstraints();
 
   std::unordered_set<ConstraintType>* constraints;
@@ -79,7 +79,7 @@ enum CreateType {
 
 // Represents SQL Create statements.
 // Example: "CREATE TABLE students (name TEXT, student_number INTEGER, city TEXT, grade DOUBLE)"
-struct CreateStatement : SQLStatement {
+struct SQLParser_API CreateStatement : SQLStatement {
   CreateStatement(CreateType type);
   ~CreateStatement() override;
 
