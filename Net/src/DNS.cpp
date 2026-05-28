@@ -85,11 +85,7 @@ HostEntry DNS::hostByName(const std::string& hostname, unsigned
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	else if(rc == WSANO_DATA && hostname == "localhost") // no data record found and is local host 
 	{
- #if defined(POCO_HAVE_IPv6)
-		return HostEntry("localhost", Poco::Net::IPAddress("::1"));
- #else
 		return HostEntry("localhost",Poco::Net::IPAddress("127.0.0.1"));
-#endif // ipv6
 	}
 #endif // _WIN32
 	else
