@@ -328,8 +328,7 @@ bool Utility::setThreadMode(int mode)
 
 void* Utility::eventHookRegister(sqlite3* pDB, UpdateCallbackType callbackFn, void* pParam)
 {
-	typedef void(*pF)(void*, int, const char*, const char*, sqlite3_int64);
-	return sqlite3_update_hook(pDB, reinterpret_cast<pF>(callbackFn), pParam);
+	return sqlite3_update_hook(pDB, callbackFn, pParam);
 }
 
 

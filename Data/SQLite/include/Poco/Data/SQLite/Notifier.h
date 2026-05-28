@@ -110,7 +110,7 @@ public:
 	bool disableAll();
 		/// Disables all callbacks.
 
-	static void sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB, const char* pTable, Poco::Int64 row);
+	static void sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB, const char* pTable, long long row);
 		/// Update callback event dispatcher. Determines the type of the event, updates the row number
 		/// and triggers the event.
 

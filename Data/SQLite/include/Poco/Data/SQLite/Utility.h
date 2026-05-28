@@ -119,8 +119,12 @@ public:
 	static int getThreadMode();
 		/// Returns the thread mode.
 
-	typedef void(*UpdateCallbackType)(void*, int, const char*, const char*, Poco::Int64);
-		/// Update callback function type.
+	typedef void(*UpdateCallbackType)(void*, int, const char*, const char*, long long);
+		/// Update callback function type. The row id parameter is long long to match
+		/// SQLite's sqlite3_int64 typedef exactly; calling the callback through a
+		/// function pointer of any other type (e.g. with Poco::Int64, which is long
+		/// on most 64-bit platforms) is undefined behavior even when the underlying
+		/// width agrees.
 
 	typedef int(*CommitCallbackType)(void*);
 		/// Commit callback function type.
