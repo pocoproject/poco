@@ -32,4 +32,11 @@ else()
 endif()
 
 target_link_libraries(DataSQLite-testrunner PUBLIC Poco::DataSQLite Poco::DataTest CppUnit)
-target_include_directories(DataSQLite-testrunner PUBLIC ${PROJECT_SOURCE_DIR}/Data/DataTest/include/)
+target_include_directories(DataSQLite-testrunner
+	PUBLIC ${PROJECT_SOURCE_DIR}/Data/DataTest/include/
+	# MemoryDBTest.cpp #includes <sqlite3.h> directly (to lower
+	# SQLITE_LIMIT_ATTACHED in testShardCeilingAutoDrop). The symlink that
+	# the bundled SQLite build drops into Data/SQLite/src/ provides the
+	# header; matches Data/SQLite/testsuite/Makefile's target_includes.
+	PRIVATE ${PROJECT_SOURCE_DIR}/Data/SQLite/src/
+)
