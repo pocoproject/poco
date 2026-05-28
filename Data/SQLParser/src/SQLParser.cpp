@@ -54,14 +54,19 @@ bool SQLParser::tokenize(const std::string& sql, std::vector<int16_t>* tokens) {
   YYSTYPE yylval;
   YYLTYPE yylloc;
 
-  // Step through the string until EOF is read.
-  // Note: hsql_lex returns int, but we know that its range is within 16 bit.
-  int16_t token = hsql_lex(&yylval, &yylloc, scanner);
-  while (token != 0) {
+  // Step through the string until EOF is read. Each lex pass that returns
+  // an sval-bearing token (SQL_IDENTIFIER, SQL_STRING, SQL_NAMED_PARAM)
+  // allocates yylval.sval via strdup / hsql::substr; free it before the
+  // next lex call overwrites yylval. The previous loop shape lexed twice
+  // before freeing, which leaked the first sval-bearing token and missed
+  // SQL_NAMED_PARAM entirely. The set mirrors bison's `%destructor
+  // { free($$); } <sval>` for the same tokens.
+  // Note: hsql_lex returns int, but we know its range is within 16 bit.
+  while (true) {
+    int16_t token = hsql_lex(&yylval, &yylloc, scanner);
+    if (token == 0) break;
     tokens->push_back(token);
-    token = hsql_lex(&yylval, &yylloc, scanner);
-
-    if (token == SQL_IDENTIFIER || token == SQL_STRING) {
+    if (token == SQL_IDENTIFIER || token == SQL_STRING || token == SQL_NAMED_PARAM) {
       free(yylval.sval);
     }
   }
