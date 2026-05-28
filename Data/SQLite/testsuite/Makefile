@@ -7,10 +7,12 @@
 include $(POCO_BASE)/build/rules/global
 
 objects = SQLiteTestSuite Driver \
-	SQLiteTest UtilityTest
+	SQLiteTest UtilityTest SQLiteThreadSafetyTest
 
 ifndef POCO_DATA_NO_SQL_PARSER
-	target_includes = $(POCO_BASE)/Data/SQLParser $(POCO_BASE)/Data/SQLParser/src
+	target_includes = $(POCO_BASE)/Data/SQLParser $(POCO_BASE)/Data/SQLParser/src \
+		$(POCO_BASE)/Data/SQLite/src
+	objects += MemoryDBTest
 endif
 
 target         = testrunner

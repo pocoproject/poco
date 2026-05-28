@@ -316,10 +316,24 @@ std::string Utility::boundSQLBulk(const Statement& stmt, std::size_t maxRows)
 	Poco::SharedPtr<RenderingBinder> rbPtr = new RenderingBinder(rowsToCapture);
 	AbstractBinder::Ptr abPtr = rbPtr;
 
+	// RAII guard to restore the original binder on every exit path - including
+	// the unhappy one where binding->bind() throws (a user TypeHandler<T>::bind
+	// can). Without this, an exception leaves the binding pointing at the
+	// RenderingBinder, which dies with rbPtr at function end and leaves a
+	// dangling reference until the driver attaches its own on the next execute.
+	// The null-check mirrors the original "Statement attaches its own binder
+	// when execute() runs" condition; setBinder rejects a null pointer.
+	struct BinderGuard
+	{
+		AbstractBinding* b;
+		AbstractBinder::Ptr saved;
+		~BinderGuard() { if (!saved.isNull()) b->setBinder(saved); }
+	};
+
 	std::size_t pos = 0;
 	for (auto& binding: bindings)
 	{
-		const auto savedBinder = binding->getBinder();
+		BinderGuard guard{binding.get(), binding->getBinder()};
 		binding->setBinder(abPtr);
 
 		// Reset is required so this helper works after a prior bind()/execute()
@@ -340,10 +354,6 @@ std::string Utility::boundSQLBulk(const Statement& stmt, std::size_t maxRows)
 		// Cascade into our no-op RenderingBinder::reset() is harmless.
 		binding->reset();
 
-		// Statement attaches its own binder when execute() runs, so only
-		// restore if there was a previous binder to put back. setBinder
-		// rejects a null pointer.
-		if (!savedBinder.isNull()) binding->setBinder(savedBinder);
 		pos += binding->numOfColumnsHandled();
 	}
 

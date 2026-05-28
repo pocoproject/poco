@@ -254,7 +254,7 @@ void UtilityTest::testExecuteSQLSuccess()
 
 	const auto rc = Utility::executeSQL(session,
 		"INSERT INTO u_test(id, customer, total) VALUES(?, ?, ?)",
-		std::make_unique<std::string>("hash-abc"),
+		"hash-abc",
 		cb,
 		1, std::string("John"), 99.5);
 
@@ -279,7 +279,7 @@ void UtilityTest::testExecuteSQLConstraintFailure()
 
 	const auto rc = Utility::executeSQL(session,
 		"INSERT INTO u_pk(id) VALUES(?)",
-		nullptr,
+		"",
 		cb,
 		1);
 
@@ -300,7 +300,7 @@ void UtilityTest::testExecuteSQLMalformed()
 
 	const auto rc = Utility::executeSQL(session,
 		"INSERT INVALID NONSENSE ?",
-		nullptr,
+		"",
 		cb,
 		7);
 
@@ -329,7 +329,7 @@ void UtilityTest::testExecuteSQLNullContext()
 
 	Utility::executeSQL(session,
 		"INSERT INTO u_nc(id) VALUES(?)",
-		nullptr,
+		"",
 		cb,
 		1);
 
@@ -344,7 +344,7 @@ void UtilityTest::testExecuteSQLNullCallback()
 
 	const auto rc = Utility::executeSQL(session,
 		"INSERT INTO u_nck(id) VALUES(?)",
-		nullptr,
+		"",
 		Utility::Callback(),
 		42);
 
@@ -361,7 +361,7 @@ void UtilityTest::testExecuteSQLNoBindings()
 
 	Utility::executeSQL(session,
 		"CREATE TABLE u_nob(id INTEGER)",
-		nullptr,
+		"",
 		cb);
 
 	assertTrue(captured.ok);

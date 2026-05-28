@@ -277,24 +277,32 @@ public:
 		/// each binding's binder to a RenderingBinder, drives bind() row by
 		/// row, and restores the original binder plus calls reset(). Safe to
 		/// call before or after stmt.execute().
+		///
+		/// Not thread-safe with respect to the Statement: do not call
+		/// concurrently with stmt.execute() or with another boundSQL(stmt) /
+		/// boundSQLBulk(stmt) on the same Statement. The helper mutates each
+		/// binding (binder swap, reset(), iterator walk) and assumes a single
+		/// driver at a time.
 
 	static std::string boundSQLBulk(const Statement& stmt, std::size_t maxRows);
 		/// As above, but renders up to maxRows rows joined by ";\n". maxRows
 		/// == 0 is treated as 1. The "-- (+N more rows)" suffix appears when
-		/// the largest binding has more rows than maxRows.
+		/// the largest binding has more rows than maxRows. The same
+		/// not-thread-safe-with-respect-to-the-Statement contract as
+		/// boundSQL(stmt) applies.
 
 	template <typename... Args>
 	static std::size_t executeSQL(Session& session,
 		const std::string& sql,
-		std::unique_ptr<std::string> context,
+		std::string context,
 		Callback callback,
 		[[maybe_unused]] const Args&... bindings)
 		/// Executes sql against session with the given bindings.
 		/// Returns the number of affected rows (0 on failure).
 		/// If callback is set, invokes it with an ExecResult describing the
-		/// outcome. The context unique_ptr is moved into ExecResult::context
-		/// when non-null; otherwise ExecResult::context stays empty.
-		/// If callback is empty, no ExecResult is constructed.
+		/// outcome. The context string is moved into ExecResult::context
+		/// (pass an empty string when no context is needed). If callback is
+		/// empty, no ExecResult is constructed.
 	{
 		const auto tsMicros = std::chrono::duration_cast<std::chrono::microseconds>(
 			std::chrono::system_clock::now().time_since_epoch()).count();
@@ -352,7 +360,7 @@ public:
 			r.error           = std::move(error);
 			r.tsMicros        = static_cast<std::int64_t>(tsMicros);
 			r.executionMicros = executionMicros;
-			if (context) r.context = std::move(*context);
+			r.context = std::move(context);
 			callback(r);
 		}
 
@@ -387,6 +395,12 @@ public:
 
 	static std::string formatBLOB(const BLOB& b);
 		/// Renders Poco::Data::BLOB as the SQL hex literal X'AABB…'.
+		/// This is the standard-SQL / SQLite / MySQL form. Not portable to
+		/// PostgreSQL (which expects bytea literals like E'\\xAABB' or
+		/// '\\xAABB') or MS SQL Server (which uses 0xAABB). Fine for the
+		/// intended use as a diagnostic-only renderer (boundSQL output);
+		/// rewrite if you need to feed it back into a non-SQLite/MySQL
+		/// engine.
 
 	static std::string formatCLOB(const CLOB& c);
 		/// Renders Poco::Data::CLOB as a quoted SQL text literal.
