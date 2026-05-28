@@ -81,7 +81,7 @@ void SQLiteStatementImpl::compileImpl()
 		{
 			if (pStmt) sqlite3_finalize(pStmt);
 			pStmt = nullptr;
-			std::string errMsg = sqlite3_errmsg(_pDB);
+			std::string errMsg = Utility::lastError(_pDB);
 			Utility::throwException(_pDB, rc, errMsg);
 		}
 		else if (rc == SQLITE_OK && pStmt)
