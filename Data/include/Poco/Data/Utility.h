@@ -201,6 +201,16 @@ public:
 		}
 		else if constexpr (std::is_convertible_v<const T&, std::string_view>)
 		{
+			// Character pointer types (const char*, char*) are convertible to
+			// string_view via its const char* constructor, which is UB if the
+			// pointer is null (it calls traits::length on nullptr). A null
+			// char pointer maps to SQL NULL, matching what the bind layer
+			// would emit. The if-constexpr around is_pointer_v keeps the
+			// runtime branch out of the std::string / string_view fast path.
+			if constexpr (std::is_pointer_v<std::remove_cv_t<T>>)
+			{
+				if (!v) return "NULL";
+			}
 			return quoteString(std::string_view(v));
 		}
 		else

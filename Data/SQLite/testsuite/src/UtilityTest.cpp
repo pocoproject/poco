@@ -67,6 +67,18 @@ void UtilityTest::testRenderValue()
 	assertTrue(Utility::renderValue(std::string("hello")) == "'hello'");
 	assertTrue(Utility::renderValue("hello") == "'hello'");
 	assertTrue(Utility::renderValue(std::string("O'Brien")) == "'O''Brien'");
+
+	// A null character pointer (distinct from the nullptr literal: the type
+	// is const char*, not nullptr_t) is convertible to std::string_view, and
+	// the string_view(const char*) constructor is UB on null. renderValue
+	// must catch the null pointer before that conversion happens and map to
+	// SQL NULL, matching what the bind layer would emit.
+	{
+		const char* p = nullptr;
+		assertTrue(Utility::renderValue(p) == "NULL");
+		char* q = nullptr;
+		assertTrue(Utility::renderValue(q) == "NULL");
+	}
 	const std::string d = Utility::renderValue(3.5);
 	assertTrue(d == "3.5" || d == "3.5000000000000000");
 
