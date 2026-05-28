@@ -46,6 +46,7 @@ SQLiteThreadSafetyTest::SQLiteThreadSafetyTest(const std::string& name):
 
 SQLiteThreadSafetyTest::~SQLiteThreadSafetyTest()
 {
+	Connector::unregisterConnector();
 }
 
 
