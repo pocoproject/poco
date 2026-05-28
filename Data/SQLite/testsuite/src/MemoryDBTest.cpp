@@ -15,7 +15,6 @@
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/Session.h"
-#include <sqlite3.h>
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/TemporaryFile.h"
@@ -823,12 +822,14 @@ void MemoryDBTest::testHistoryViewTimeRange()
 void MemoryDBTest::testHistoryViewTimeRangeOverflow()
 {
 	MemoryDB db(_dir);
-	sqlite3* h = Poco::Data::SQLite::Utility::dbHandle(db.session());
 
 	// Raise SQLITE_LIMIT_ATTACHED above the shard count we're about to create
 	// so the always-on auto-drop in enforceRetention doesn't fire while we
-	// build up history.
-	sqlite3_limit(h, SQLITE_LIMIT_ATTACHED, 20);
+	// build up history. The compile-time SQLITE_MAX_ATTACHED (default 10)
+	// caps the runtime limit, so this requests 20 but actually gets 10 -
+	// still enough for the 12 seals below to coexist briefly before the
+	// post-stop lowering of the limit makes the overflow check trip.
+	Poco::Data::SQLite::Utility::setAttachedLimit(db.session(), 20);
 
 	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
 	std::string x("x");
@@ -843,7 +844,7 @@ void MemoryDBTest::testHistoryViewTimeRangeOverflow()
 	// check at MemoryDB.cpp now trips because matching > sqlite3_limit - 1.
 	// (We don't flush after this, so the auto-drop in enforceRetention does
 	// not run between the limit drop and the assertion.)
-	sqlite3_limit(h, SQLITE_LIMIT_ATTACHED, 4);
+	Poco::Data::SQLite::Utility::setAttachedLimit(db.session(), 4);
 
 	try
 	{
@@ -903,8 +904,7 @@ void MemoryDBTest::testShardCeilingAutoDrop()
 	MemoryDB::Options o;
 	o.shardMaxBytes = 1; // seal whenever the active shard has any content
 	MemoryDB db(_dir, o);
-	sqlite3* h = Poco::Data::SQLite::Utility::dbHandle(db.session());
-	sqlite3_limit(h, SQLITE_LIMIT_ATTACHED, 3);
+	Poco::Data::SQLite::Utility::setAttachedLimit(db.session(), 3);
 
 	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
 	std::string x("x");
