@@ -3181,7 +3181,16 @@ static thread_local std::stringstream strbuf;
  * down here because we want the user's section 1 to have been scanned first.
  * The user has a chance to override it with an option.
  */
+/* POCO-LOCAL: io.h provides the POSIX-ish I/O declarations flex's runtime
+ * uses (read/write/isatty/close) on MSVC; unistd.h does not exist there.
+ * Re-apply this conditional after every flex regen - it lives in the
+ * generated file, not in flex_lexer.l.
+ */
+#if defined(_WIN32) || defined(_WIN64)
+	#include <io.h>
+#else
 #include <unistd.h>
+#endif
 #endif
 
 #ifndef YY_EXTRA_TYPE
