@@ -567,18 +567,20 @@ void MemoryDBTest::testDeleteActiveShardRefused()
 
 void MemoryDBTest::testDeleteNonexistentShardRefused()
 {
+	// deleteShard is idempotent on a vanished id - it returns silently so a
+	// retention loop iterating a stale shards() snapshot stays safe even if
+	// another thread already dropped the same shard. The contract is no
+	// longer "throws NotFoundException"; verify the no-throw behaviour and
+	// that the db remains usable.
 	MemoryDB db(_dir);
 	db << "CREATE TABLE t(x INTEGER)", now;
 	db.flush();
 
-	try
-	{
-		db.deleteShard(999);
-		failmsg("deleting a non-existent shard must throw");
-	}
-	catch (Poco::NotFoundException&)
-	{
-	}
+	db.deleteShard(999); // must not throw
+
+	int cnt = 0;
+	db << "SELECT count(*) FROM t", into(cnt), now;
+	assertTrue (cnt == 0);
 }
 
 

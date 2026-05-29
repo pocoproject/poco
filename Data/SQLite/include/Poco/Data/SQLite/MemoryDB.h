@@ -194,12 +194,25 @@ public:
 	void flush();
 		/// Attempts to persist all unpersisted changes to disk.
 		///
-		/// Best-effort under concurrency: if another flush (timer-driven, user-called,
+		/// Best-effort under concurrency. If another flush (timer-driven, user-called,
 		/// or destructor-triggered) is already running, this call returns immediately
-		/// without waiting and without doing anything. Use dirty() to check whether
-		/// a follow-up call is needed for full durability:
+		/// without waiting and without doing anything: the in-progress flush will
+		/// persist everything written before it started, but this caller's writes
+		/// (and any new tables created in the brief sample-to-lock window) may have
+		/// to wait until the next flush.
 		///
-		///     while (db.dirty()) db.flush();   // or sleep+retry in a hot loop
+		/// Durability pattern:
+		///
+		///     Poco::Timestamp t;
+		///     db.flush();
+		///     while (db.dirty() || db.lastFlushTime() < t) db.flush();
+		///
+		/// Plain `while (db.dirty()) db.flush();` is acceptable for single-writer
+		/// workloads but can spin under sustained concurrent writes (the
+		/// open-range slice intentionally defers concurrent writes to the next
+		/// cycle) and, in a narrow window where a CREATE TABLE races the flush's
+		/// userTables sample, may exit early; checking lastFlushTime() against a
+		/// pre-flush wall-clock timestamp closes both cases.
 		///
 		/// The skip-on-busy semantic avoids cascading waits on _flushMutex when many
 		/// threads attempt to flush in parallel.
@@ -209,6 +222,15 @@ public:
 
 	bool dirty() const;
 		/// Returns true if there are changes that have not yet been persisted.
+
+	Poco::Timestamp lastFlushTime() const;
+		/// Returns the wall-clock timestamp of the most recently completed flush.
+		/// Useful in combination with dirty() to bound durability waits:
+		///
+		///     Poco::Timestamp t;
+		///     while (db.lastFlushTime() < t) { db.flush(); Poco::Thread::sleep(1); }
+		///
+		/// guarantees every write before t has been persisted (or thrown).
 
 	std::size_t shardCount() const;
 		/// Returns the total number of shards (sealed plus the active one).
@@ -234,6 +256,12 @@ public:
 		///
 		///     for (const auto& d : db.shards())
 		///         if (d.sealed && d.sealedAt < cutoff) db.deleteShard(d.id);
+		///
+		/// Thread-safe but the snapshot is stale the moment it returns: a concurrent
+		/// retention sweep, deleteShard(), or seal can remove or add entries before
+		/// the caller acts on them. deleteShard() is idempotent on a vanished shard
+		/// (returns silently rather than throwing) so the loop above is safe to use
+		/// from any thread.
 
 	std::vector<Poco::UInt32> archivedShardIds() const;
 		/// Returns the ids of sealed shards. Relevant when Options::loadArchivedShards is false.
@@ -243,6 +271,12 @@ public:
 		/// schema alias under which it can be queried (e.g. "arc_7" -> "SELECT * FROM arc_7.t").
 		/// No-op-safe if already attached. Relevant when Options::loadArchivedShards is false.
 		/// Thread-safe: concurrent attach/detach/historyView calls serialize via an internal mutex.
+		///
+		/// Force-detach hazard: a concurrent deleteShard() (or the always-on
+		/// SQLITE_LIMIT_ATTACHED auto-drop in enforceRetention) bypasses the
+		/// reference count and detaches the shard. Subsequent "SELECT FROM arc_N.t"
+		/// from this thread will fail with "no such table" / "no such database". Be
+		/// prepared to catch and retry, or hold deleteShard back yourself.
 
 	void detachArchived(Poco::UInt32 shardId);
 		/// Detaches a previously attached sealed shard. Thread-safe (see attachArchived).
@@ -254,15 +288,18 @@ public:
 
 	void deleteShard(Poco::UInt32 shardId);
 		/// Permanently removes the given sealed shard from the catalog and deletes its
-		/// file from disk. Throws Poco::InvalidArgumentException if the shard is the
-		/// active one (seal it first if you really want to drop in-flight data) and
-		/// Poco::NotFoundException if no such shard exists. If the shard is currently
-		/// attached read-only via attachArchived(), it is detached first. In
-		/// loadArchivedShards=true mode the shard's rows are also in main; they are
-		/// deleted from the in-memory tables so the drop actually removes the data,
-		/// not just the disk copy. The removal is crash-safe: the manifest transaction
-		/// commits before the file is unlinked, so a crash in the window leaves an
-		/// orphan file that cleanOrphans() removes on the next open.
+		/// file from disk. Idempotent on a vanished shard (returns silently if the id
+		/// is no longer present, so racing snapshots from shards() are safe). Throws
+		/// Poco::InvalidArgumentException if the shard exists but is the active one
+		/// (seal it first if you really want to drop in-flight data). If the shard is
+		/// currently attached read-only via attachArchived(), it is force-detached;
+		/// any concurrent caller relying on its alias will see "no such table" errors
+		/// on subsequent steps. In loadArchivedShards=true mode the shard's rows are
+		/// also in main; they are deleted from the in-memory tables so the drop
+		/// actually removes the data, not just the disk copy. The removal is
+		/// crash-safe: the manifest transaction commits before the file is unlinked,
+		/// so a crash in the window leaves an orphan file that cleanOrphans() removes
+		/// on the next open. Thread-safe (serializes via the internal flush mutex).
 
 	std::size_t enforceRetention();
 		/// Applies the Options-driven retention policy (retentionMaxAge, retentionMaxBytes)
@@ -270,15 +307,18 @@ public:
 		/// Called automatically at the end of every successful flush; safe to call
 		/// manually at any time. Returns the number of shards dropped. When the backstop
 		/// fires, logs a warning to the "Poco.Data.SQLite.MemoryDB" logger naming the
-		/// cap and the four ways to avoid the auto-drop.
+		/// cap and the four ways to avoid the auto-drop. Thread-safe (serializes via
+		/// the internal flush mutex; can transiently force-detach attached shards -
+		/// see attachArchived's force-detach hazard).
 
 	std::size_t dropOlderThan(const Poco::Timestamp& cutoff);
 		/// Drops every sealed shard whose sealedAt is strictly before cutoff. Returns the
-		/// number of shards dropped.
+		/// number of shards dropped. Thread-safe (see enforceRetention).
 
 	std::size_t dropToFit(Poco::UInt64 maxTotalBytes);
 		/// Drops oldest sealed shards until the sum of all shard files' bytes is at most
 		/// maxTotalBytes, or no more sealed shards remain. Returns the number dropped.
+		/// Thread-safe (see enforceRetention).
 
 	std::string historyView(const std::string& table);
 		/// Creates (or refreshes) a read-only TEMP VIEW spanning the in-memory base table
@@ -308,6 +348,12 @@ public:
 		/// Note: the [createdAt, sealedAt] window approximates the data's time span
 		/// accurately for real-time ingestion. If your inserts use back-dated
 		/// timestamps, filter further with a WHERE clause on your time column.
+		///
+		/// Performance: this call holds the SQLite connection mutex across N ATTACH
+		/// statements plus the view create. Concurrent INSERTs / SELECTs on the
+		/// connection serialize behind it for the duration. For wide ranges, prefer
+		/// fewer history-view rebuilds (cache the view name and re-query it) over
+		/// frequent calls with overlapping ranges.
 
 	void detachAllArchived();
 		/// Detaches every sealed shard currently attached read-only. Useful after a
@@ -351,7 +397,7 @@ private:
 	void load();
 	void startFresh();
 	void registerHooks();
-	void doFlush();
+	void doFlush(bool allowSeal = true);
 	void writeCatalog(int schemaVersion, const std::vector<std::string>& schemaLog);
 	std::string buildHistoryView(const std::string& table, const std::vector<Poco::UInt32>& shardIds);
 	void maybeSeal(const std::vector<std::string>& tables,
@@ -385,9 +431,19 @@ private:
 	Poco::Timestamp            _lastChange;
 	Poco::Timestamp            _lastFlush;
 
-	std::string                _rejected;     // non-empty => a prohibited operation occurred
+	std::string                _rejected;     // non-empty => a prohibited operation occurred.
+	                                          // Set under _stateMutex from traceCallback
+	                                          // (assignment can heap-allocate and throw); _poisoned
+	                                          // is the noexcept companion - a successful flag set
+	                                          // without _rejected being set means we ran out of
+	                                          // memory while recording the message.
+	std::atomic<bool>          _poisoned{false};
 	std::map<Poco::UInt32, int> _attached;    // sealed shards attached read-only,
-	                                          // value = reference count (matched attach calls)
+	                                          // value = reference count (matched attach calls).
+	                                          // Always accessed under _attachMutex; entries
+	                                          // are read concurrently via _stateMutex only by
+	                                          // the dtor's snapshot path - mutation paths do
+	                                          // not need _stateMutex.
 
 	// O(1) common-case for owningShard: per-table max sealed-shard hi (=lo of the
 	// active shard's range). Recomputed in load()/maybeSeal()/deleteShard().
@@ -399,10 +455,41 @@ private:
 	std::unordered_map<std::string, ColumnCopy> _columnCopyCache;
 
 	Poco::Timer                _timer;
-	mutable Poco::FastMutex    _stateMutex;   // guards shard bookkeeping / dirty / timestamps
-	Poco::Mutex                _flushMutex;   // serializes flushes
-	Poco::Mutex                _attachMutex;  // serializes attach/detach/historyView
-	std::atomic<bool>          _flushing{false}; // CAS-bail gate on doFlush re-entry
+
+	// Three-mutex layering, deliberately not consolidated:
+	//
+	//   _stateMutex - FastMutex, non-recursive. Guards shard bookkeeping,
+	//      _dirty / _sealRequested / _rejected / timestamps, _columnCopyCache,
+	//      _schemaVersion / _schemaLog, _nextShardId. Taken from the hot user
+	//      write path (trace + update hooks) - must stay brief and uncontended.
+	//
+	//   _flushMutex - recursive. Serializes all catalog/shard-file mutators
+	//      (doFlush, deleteShard, enforceRetention, dropOlderThan, dropToFit).
+	//      Recursion is load-bearing: doFlush calls enforceRetention which
+	//      calls deleteShard. Held for seconds across IO; merging it into
+	//      _stateMutex would stall every user INSERT for the duration.
+	//
+	//   _attachMutex - recursive. Serializes ATTACH/DETACH/historyView and
+	//      guards _attached's lifetime alongside the SQLite-side attachment
+	//      state. Recursion is load-bearing: attachAllArchived and
+	//      historyView(table,from,to) call attachArchived under their own
+	//      lock. Held for ms-scale ATTACH/DETACH; merging into _flushMutex
+	//      would block history queries behind every flush's IO loop.
+	//
+	//   _flushing - skip-on-concurrent-flush gate at doFlush entry. NOT a
+	//      try_lock on _flushMutex: deleteShard / enforceRetention also hold
+	//      _flushMutex and a try_lock would early-bail past those too, which
+	//      is not the contract flush() advertises.
+	//
+	// Lock-acquisition order (outer -> inner):
+	//   _flushMutex -> _attachMutex -> _stateMutex -> sqlite3_db_mutex
+	// The hook path inverts: sqlite3_db_mutex -> _stateMutex, deliberately
+	// kept disjoint from _flushMutex/_attachMutex (doFlush samples _persist
+	// BEFORE taking _stateMutex - see comment at the top of doFlush).
+	mutable Poco::FastMutex    _stateMutex;
+	Poco::Mutex                _flushMutex;
+	Poco::Mutex                _attachMutex;
+	std::atomic<bool>          _flushing{false};
 };
 
 

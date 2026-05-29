@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cctype>
+#include <set>
 
 #include "SQLParser.h"
 #include "sql/SQLStatement.h"
@@ -182,11 +183,18 @@ namespace
 MemoryDB::ColumnCopy MemoryDB::columnCopy(Session& s, const std::string& table)
 {
 	// Schemas are stable per MemoryDB instance (all sessions see the same DDL),
-	// so cache by table name. onDDL clears the cache on schema change.
+	// so cache by table name. onDDL clears the cache and bumps _schemaVersion
+	// on schema change. We snapshot _schemaVersion before releasing the lock
+	// and only insert into the cache if no DDL happened in the meantime;
+	// otherwise our pragma_table_info result reflects the pre-DDL schema and
+	// installing it would resurrect a stale ColumnCopy, silently dropping
+	// values of newly-added columns on the next flush.
+	int snapshotSchemaVersion;
 	{
 		Poco::FastMutex::ScopedLock l(_stateMutex);
 		auto it = _columnCopyCache.find(table);
 		if (it != _columnCopyCache.end()) return it->second;
+		snapshotSchemaVersion = _schemaVersion;
 	}
 
 	std::vector<std::string> names;
@@ -230,7 +238,8 @@ MemoryDB::ColumnCopy MemoryDB::columnCopy(Session& s, const std::string& table)
 	}
 
 	Poco::FastMutex::ScopedLock l(_stateMutex);
-	_columnCopyCache[table] = cc;
+	if (_schemaVersion == snapshotSchemaVersion)
+		_columnCopyCache[table] = cc;
 	return cc;
 }
 
@@ -286,10 +295,20 @@ MemoryDB::~MemoryDB()
 		sqlite3_update_hook(_memHandle, nullptr, nullptr);
 	}
 
-	try
-	{
-		if (dirty()) doFlush();
-	}
+	// Unconditional final flush, with allowSeal=false so we don't introduce
+	// fresh shards on shutdown (a shardMaxBytes-driven seal at this point
+	// would create an empty shard that the next open() would see). Two
+	// reasons not to gate on dirty():
+	//   1. The H2 scenario (CREATE TABLE in the sample-to-lock window) can
+	//      exit a prior doFlush with _dirty==false while a new-table row is
+	//      still unpersisted. A second, unconditional pass re-samples
+	//      userTables and catches it.
+	//   2. _rejected being set must not strand legitimately-dirty data; the
+	//      onTimer gate already filters _rejected, so the dtor was the
+	//      asymmetric path. doFlush still throws on _rejected, but we let
+	//      the try/catch swallow it - the same outcome as before for the
+	//      poisoned case, with the correct outcome for the common case.
+	try { doFlush(false); }
 	catch (...) {}
 }
 
@@ -542,9 +561,16 @@ void MemoryDB::cleanOrphans()
 //
 void MemoryDB::throwIfRejected() const
 {
+	// Fast path: noexcept atomic load. The vast majority of calls hit this
+	// and never need the mutex.
+	if (!_poisoned.load(std::memory_order_acquire)) return;
 	Poco::FastMutex::ScopedLock l(_stateMutex);
-	if (!_rejected.empty())
-		throw Poco::NotImplementedException(_rejected);
+	if (!_rejected.empty()) throw Poco::NotImplementedException(_rejected);
+	// _poisoned set but _rejected empty: heap was out at the time the trace
+	// hook tried to record the message. Throw with a static reason so the
+	// caller still sees a clear failure.
+	throw Poco::NotImplementedException(
+		"MemoryDB rejected a prohibited operation (out of memory recording details)");
 }
 
 
@@ -552,6 +578,13 @@ bool MemoryDB::dirty() const
 {
 	Poco::FastMutex::ScopedLock l(_stateMutex);
 	return _dirty;
+}
+
+
+Poco::Timestamp MemoryDB::lastFlushTime() const
+{
+	Poco::FastMutex::ScopedLock l(_stateMutex);
+	return _lastFlush;
 }
 
 
@@ -626,24 +659,27 @@ namespace
 
 std::string MemoryDB::attachArchived(Poco::UInt32 shardId)
 {
-	// Four layers of coordination:
+	// Coordination layers (also see the comment block on the mutex declarations
+	// in MemoryDB.h):
 	//   _attachMutex (recursive) serializes our own attach/detach/historyView
-	//     calls against each other.
-	//   _stateMutex (FastMutex) guards the _attached map and shard metadata.
-	//   _attached is reference-counted (int per shard id) so concurrent callers
-	//     pair their attach/detach correctly: the SQLite ATTACH happens on the
-	//     first call, the DETACH on the last matching detach.
+	//     calls against each other AND guards _attached. _attached is
+	//     reference-counted (int per shard id) so concurrent callers pair their
+	//     attach/detach correctly: the SQLite ATTACH happens on the first call,
+	//     the DETACH on the last matching detach.
+	//   _stateMutex (FastMutex) guards _shards (the metadata we look up below
+	//     to resolve the shard id to a filename and confirm it is sealed).
 	//   sqlite3_db_mutex (held during the ATTACH itself) blocks any concurrent
 	//     sqlite3_step on _session, so user statements never see the connection
 	//     in a half-attached state.
 	Poco::Mutex::ScopedLock al(_attachMutex);
 
 	std::string alias = "arc_" + Poco::NumberFormatter::format(shardId);
+	auto it = _attached.find(shardId);
+	if (it != _attached.end()) { ++it->second; return alias; }
+
 	std::string file;
 	{
 		Poco::FastMutex::ScopedLock l(_stateMutex);
-		auto it = _attached.find(shardId);
-		if (it != _attached.end()) { ++it->second; return alias; }
 		for (const auto& s: _shards)
 		{
 			if (s.id == shardId)
@@ -653,8 +689,8 @@ std::string MemoryDB::attachArchived(Poco::UInt32 shardId)
 				break;
 			}
 		}
-		if (file.empty()) throw Poco::NotFoundException("no such sealed shard");
 	}
+	if (file.empty()) throw Poco::NotFoundException("no such sealed shard");
 
 	std::string path = Poco::Path(_dir, file).toString();
 	{
@@ -665,27 +701,13 @@ std::string MemoryDB::attachArchived(Poco::UInt32 shardId)
 		DbMutexGuard dbm(_memHandle);
 		_session << ("ATTACH DATABASE " + quoteLit("file:" + path + "?mode=ro") + " AS " + alias), now;
 	}
-	{
-		Poco::FastMutex::ScopedLock l(_stateMutex);
-		_attached[shardId] = 1;
-	}
+	_attached[shardId] = 1;
 	return alias;
 }
 
 
 void MemoryDB::detachArchived(Poco::UInt32 shardId)
 {
-	Poco::Mutex::ScopedLock al(_attachMutex);
-	{
-		Poco::FastMutex::ScopedLock l(_stateMutex);
-		auto it = _attached.find(shardId);
-		if (it == _attached.end()) return;
-		if (it->second > 1) { --it->second; return; } // still attached by another caller
-		// refcount == 1; we are the last detacher. Run DETACH first; only erase
-		// on success so an exception here leaves _attached consistent with the
-		// actual SQLite state (a re-attach attempt would otherwise fail with
-		// "database arc_X is already in use" because SQLite still has it).
-	}
 	std::string alias = "arc_" + Poco::NumberFormatter::format(shardId);
 	std::string sql = "DETACH DATABASE " + alias;
 
@@ -696,24 +718,39 @@ void MemoryDB::detachArchived(Poco::UInt32 shardId)
 	// from other threads' stmts) arc_<id>'s btree can transiently show
 	// SQLITE_TXN_READ even when no one is querying arc_<id> directly. Retry
 	// briefly with backoff; the window where DETACH is rejected is short.
+	//
+	// We RELEASE _attachMutex across the sleep so that a concurrent
+	// deleteShard() waiting on _attachMutex (while holding _flushMutex) does
+	// not transitively stall the flush IO loop. Each iteration re-acquires
+	// _attachMutex, re-checks the refcount (another caller may have brought
+	// it above 1), attempts DETACH, and either succeeds or sleeps. Bounded
+	// by maxAttempts so a pathological hold cannot loop forever.
 	const int maxAttempts = 100;
 	for (int attempt = 0; ; ++attempt)
 	{
-		try
 		{
-			InternalGuard guard;
-			DbMutexGuard dbm(_memHandle);
-			_session << sql, now;
-			break;
-		}
-		catch (const Poco::Exception&)
-		{
-			if (attempt + 1 >= maxAttempts) throw;
-			Poco::Thread::sleep(1);
-		}
+			Poco::Mutex::ScopedLock al(_attachMutex);
+			auto it = _attached.find(shardId);
+			if (it == _attached.end()) return;
+			if (it->second > 1) { --it->second; return; }
+			// refcount == 1; we are the last detacher. Run DETACH first;
+			// only erase on success so an exception here leaves _attached
+			// consistent with the actual SQLite state.
+			try
+			{
+				InternalGuard guard;
+				DbMutexGuard dbm(_memHandle);
+				_session << sql, now;
+				_attached.erase(shardId);
+				return;
+			}
+			catch (const Poco::Exception&)
+			{
+				if (attempt + 1 >= maxAttempts) throw;
+			}
+		} // release _attachMutex before sleeping
+		Poco::Thread::sleep(1);
 	}
-	Poco::FastMutex::ScopedLock l(_stateMutex);
-	_attached.erase(shardId);
 }
 
 
@@ -727,8 +764,11 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 		Poco::FastMutex::ScopedLock l(_stateMutex);
 		auto it = std::find_if(_shards.begin(), _shards.end(),
 			[shardId](const ShardInfo& s) { return s.id == shardId; });
-		if (it == _shards.end())
-			throw Poco::NotFoundException("no such shard");
+		// Idempotent on a vanished shard: a concurrent retention sweep (or
+		// another deleteShard) may have already dropped it between when the
+		// caller sampled shards() and now. Silently return rather than throw
+		// so user retention loops over a stale snapshot stay correct.
+		if (it == _shards.end()) return;
 		if (!it->sealed)
 			throw Poco::InvalidArgumentException("cannot delete the active shard; seal it first");
 		file = it->file;
@@ -743,12 +783,7 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 	// caller can retry rather than silently leaving a stale alias around.
 	{
 		Poco::Mutex::ScopedLock al(_attachMutex);
-		bool needDetach;
-		{
-			Poco::FastMutex::ScopedLock l(_stateMutex);
-			needDetach = (_attached.find(shardId) != _attached.end());
-		}
-		if (needDetach)
+		if (_attached.find(shardId) != _attached.end())
 		{
 			std::string alias = "arc_" + Poco::NumberFormatter::format(shardId);
 			{
@@ -756,7 +791,6 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 				DbMutexGuard dbm(_memHandle);
 				_session << ("DETACH DATABASE " + alias), now;
 			}
-			Poco::FastMutex::ScopedLock l(_stateMutex);
 			_attached.erase(shardId);
 		}
 	}
@@ -984,10 +1018,7 @@ std::string MemoryDB::historyView(const std::string& table)
 	}
 
 	std::vector<Poco::UInt32> attachedIds;
-	{
-		Poco::FastMutex::ScopedLock l(_stateMutex);
-		for (const auto& kv: _attached) attachedIds.push_back(kv.first);
-	}
+	for (const auto& kv: _attached) attachedIds.push_back(kv.first);
 	std::sort(attachedIds.begin(), attachedIds.end());
 	return buildHistoryView(table, attachedIds);
 }
@@ -1064,10 +1095,7 @@ void MemoryDB::detachAllArchived()
 	// history queries to release the per-shard SQLite page caches").
 	Poco::Mutex::ScopedLock al(_attachMutex);
 	std::vector<Poco::UInt32> ids;
-	{
-		Poco::FastMutex::ScopedLock l(_stateMutex);
-		for (const auto& kv: _attached) ids.push_back(kv.first);
-	}
+	for (const auto& kv: _attached) ids.push_back(kv.first);
 	for (auto id: ids)
 	{
 		std::string alias = "arc_" + Poco::NumberFormatter::format(id);
@@ -1078,7 +1106,6 @@ void MemoryDB::detachAllArchived()
 				DbMutexGuard dbm(_memHandle);
 				_session << ("DETACH DATABASE " + alias), now;
 			}
-			Poco::FastMutex::ScopedLock l(_stateMutex);
 			_attached.erase(id);
 		}
 		catch (...) {} // DETACH failed; leave _attached entry alone so it stays
@@ -1115,8 +1142,33 @@ void MemoryDB::updateCallback(void* ctx, int op, const char* /*db*/, const char*
 void MemoryDB::onStatement(const char* sql)
 {
 	if (!sql || !*sql) return;
-	if (sql[0] == '-') return; // trigger subprogram comment
 	if (t_inInternal) return;  // SQL issued by MemoryDB's own bookkeeping, not a user write
+
+	// Skip leading whitespace and SQL comments so the keyword we sample below
+	// is the actual first keyword. SQLite emits trace strings beginning with
+	// "--" for trigger subprograms; the old single-char "if (sql[0] == '-')"
+	// also matched any user statement that began with a "--" comment, letting
+	// it bypass the WITHOUT-ROWID rejection. /* ... */ and -- ... \n forms
+	// are both handled here. If the statement is comment-only, bail.
+	const char* p = sql;
+	while (*p)
+	{
+		while (*p && std::isspace(static_cast<unsigned char>(*p))) ++p;
+		if (p[0] == '-' && p[1] == '-')
+		{
+			p += 2;
+			while (*p && *p != '\n') ++p;
+		}
+		else if (p[0] == '/' && p[1] == '*')
+		{
+			p += 2;
+			while (*p && !(p[0] == '*' && p[1] == '/')) ++p;
+			if (*p) p += 2;
+		}
+		else break;
+	}
+	if (!*p) return;
+	sql = p;
 
 	std::string kw = firstKeyword(sql);
 
@@ -1126,12 +1178,21 @@ void MemoryDB::onStatement(const char* sql)
 		kw == "SAVEPOINT" || kw == "RELEASE")
 		return;
 
-	// WITHOUT ROWID is prohibited; check independently of the parser (it may not accept the clause)
+	// WITHOUT ROWID is prohibited; check independently of the parser (it may not accept the clause).
+	// Set _poisoned first (noexcept) so that even if the string assignment that follows
+	// throws bad_alloc, throwIfRejected() will still surface the failure on the next call -
+	// L4 in the threading review. SQLite has already executed the statement by the time
+	// the trace hook fires, so silently letting it slide would leave a corrupt shard model.
 	if (kw == "CREATE" && mentionsWithoutRowid(sql))
 	{
-		Poco::FastMutex::ScopedLock l(_stateMutex);
-		if (_rejected.empty())
-			_rejected = "MemoryDB does not support WITHOUT ROWID tables";
+		_poisoned.store(true, std::memory_order_release);
+		static const std::string kMsg = "MemoryDB does not support WITHOUT ROWID tables";
+		try
+		{
+			Poco::FastMutex::ScopedLock l(_stateMutex);
+			if (_rejected.empty()) _rejected = kMsg;
+		}
+		catch (...) {} // _poisoned is already set; throwIfRejected uses the static fallback
 		return;
 	}
 
@@ -1240,8 +1301,14 @@ void MemoryDB::onDDL(const char* sql, const char* table)
 	std::string normalized = addIfExistsClause(sql);
 
 	Poco::FastMutex::ScopedLock l(_stateMutex);
-	++_schemaVersion;
+	// push_back BEFORE ++_schemaVersion so a bad_alloc on vector growth leaves
+	// _schemaVersion consistent with _schemaLog.size(). If we incremented first
+	// and push_back threw, the catalog write at the next flush would persist
+	// schemaVersion=N+1 with only N log entries; on restart migrateShardFile
+	// would bump shard.schemaVersion past the missing DDL and lose it
+	// permanently. push_back is the only operation here that can throw.
 	_schemaLog.push_back(std::move(normalized));
+	++_schemaVersion;
 	_columnCopyCache.clear();
 	if (table) markTableDirty(table);
 	else if (ShardInfo* a = activeShard()) a->dirty = true;
@@ -1262,10 +1329,11 @@ void MemoryDB::onRowChange(int /*op*/, const char* table, Poco::Int64 row)
 //
 void MemoryDB::onTimer(Poco::Timer&)
 {
+	if (_poisoned.load(std::memory_order_acquire)) return;
 	bool go = false;
 	{
 		Poco::FastMutex::ScopedLock l(_stateMutex);
-		if (_dirty && _rejected.empty())
+		if (_dirty)
 		{
 			Poco::Timestamp now;
 			Poco::Timestamp::TimeDiff idleUs = _opts.idleInterval.totalMicroseconds();
@@ -1437,7 +1505,7 @@ void MemoryDB::maybeSeal(const std::vector<std::string>& tables,
 }
 
 
-void MemoryDB::doFlush()
+void MemoryDB::doFlush(bool allowSeal)
 {
 	// Skip-if-busy gate: if another doFlush is in progress (timer, user, or
 	// destructor), bail immediately rather than queue up on _flushMutex. The
@@ -1474,10 +1542,11 @@ void MemoryDB::doFlush()
 
 	{
 		Poco::FastMutex::ScopedLock l(_stateMutex);
-		if (!_rejected.empty())
-			throw Poco::NotImplementedException(_rejected);
+		if (_poisoned.load(std::memory_order_acquire))
+			throw Poco::NotImplementedException(_rejected.empty() ?
+				std::string("MemoryDB rejected a prohibited operation") : _rejected);
 
-		maybeSeal(tables, maxRowids);
+		if (allowSeal) maybeSeal(tables, maxRowids);
 		schemaVersion = _schemaVersion;
 		schemaLog = _schemaLog;
 
@@ -1615,6 +1684,29 @@ void MemoryDB::doFlush()
 		ok = false;
 	}
 
+	// Detect tables that appeared between the initial userTables() sample
+	// (line above, outside _stateMutex - the trace-hook A/B inversion forces
+	// us to sample without it) and now. A CREATE TABLE + INSERT in that
+	// window leaves the new table out of every shard's slice plan; the rows
+	// are in the in-memory db but no slice was built for them. Without
+	// flagging _dirty here, the recompute below would clear it and the next
+	// dtor / dirty()-gated flush would skip, losing the rows on reopen.
+	// We can sample userTables on _persist safely here because we are
+	// outside _stateMutex (held only briefly above to fold results) and
+	// _flushMutex is still held so no second flush can race.
+	bool newTablesObserved = false;
+	try
+	{
+		std::vector<std::string> tablesNow = userTables(_persist);
+		if (tablesNow.size() != tables.size())
+		{
+			std::set<std::string> orig(tables.begin(), tables.end());
+			for (const auto& t: tablesNow)
+				if (orig.find(t) == orig.end()) { newTablesObserved = true; break; }
+		}
+	}
+	catch (...) { newTablesObserved = true; } // conservative: assume yes
+
 	{
 		Poco::FastMutex::ScopedLock l(_stateMutex);
 		_lastFlush.update();
@@ -1626,9 +1718,13 @@ void MemoryDB::doFlush()
 		}
 		else
 		{
-			// dirty only if a concurrent write came in during the flush
+			// dirty only if a concurrent write came in during the flush, a
+			// new table appeared in the sampling window (H2), or a seal was
+			// requested but swallowed by an in-flight flush (L1).
 			_dirty = false;
 			for (const auto& s: _shards) if (s.dirty) { _dirty = true; break; }
+			if (newTablesObserved) _dirty = true;
+			if (_sealRequested) _dirty = true;
 		}
 	}
 
@@ -1639,7 +1735,9 @@ void MemoryDB::doFlush()
 	// total shard count is unconditional, and age/bytes retention (if
 	// configured) is checked here too. With nothing to drop, the call is a
 	// cheap no-op (one shards() snapshot + a couple of size comparisons).
-	try { enforceRetention(); } catch (...) {}
+	// Skipped on the !allowSeal (dtor) path to keep shutdown bounded:
+	// deleteShard's detach retry can take up to ~100 ms per attached shard.
+	if (allowSeal) try { enforceRetention(); } catch (...) {}
 }
 
 
