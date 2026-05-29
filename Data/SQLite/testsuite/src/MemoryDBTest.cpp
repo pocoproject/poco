@@ -644,13 +644,34 @@ namespace
 		for (int i = 0; i < rows; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
 		db.flush();
 	}
+
+	// Poll `pred` until it returns true or `timeout` elapses. Returns whether
+	// `pred` was observed true. Use when a test needs to wait for a wall-clock
+	// or state condition without hard-coding a "should be enough" sleep.
+	template <typename Pred>
+	bool waitUntil(Pred pred, Poco::Timespan timeout,
+		Poco::Timespan pollInterval = Poco::Timespan(0, 5 * 1000))
+	{
+		Poco::Timestamp deadline;
+		deadline += timeout.totalMicroseconds();
+		while (!pred())
+		{
+			if (Poco::Timestamp() >= deadline) return pred();
+			Poco::Thread::sleep(static_cast<long>(pollInterval.totalMilliseconds()));
+		}
+		return true;
+	}
 }
 
 
 void MemoryDBTest::testRetentionByAge()
 {
 	MemoryDB::Options o;
-	o.retentionMaxAge = Poco::Timespan(0, 200 * 1000); // 200 ms
+	// Generous headroom so the two seal+flush calls below cannot age shard 1
+	// out on slow CI before the shardCount check. The post-setup wait below
+	// only blocks until the cutoff is actually crossed, so a large value here
+	// does not slow the test in the common case.
+	o.retentionMaxAge = Poco::Timespan(2, 0);
 
 	MemoryDB db(_dir, o);
 	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
@@ -661,7 +682,18 @@ void MemoryDBTest::testRetentionByAge()
 	sealAndInsert(db, 2); // shard 2 sealed (~now); active=3
 	assertTrue (db.shardCount() == 3);
 
-	Poco::Thread::sleep(300); // both sealed shards exceed the 200ms age limit
+	// Wait until both sealed shards have aged out, with a generous timeout.
+	const Poco::Timestamp::TimeDiff maxAgeUs = o.retentionMaxAge.totalMicroseconds();
+	bool aged = waitUntil([&]() {
+		std::vector<MemoryDB::ShardDescriptor> ds = db.shards();
+		Poco::Timestamp cutoff;
+		cutoff -= maxAgeUs;
+		int agedSealed = 0;
+		for (const auto& d: ds)
+			if (d.sealed && d.sealedAt < cutoff) ++agedSealed;
+		return agedSealed >= 2;
+	}, Poco::Timespan(10, 0));
+	assertTrue (aged);
 
 	sealAndInsert(db, 1); // flush -> enforceRetention drops shards 1 and 2
 	std::vector<Poco::UInt32> arc = db.archivedShardIds();
@@ -767,17 +799,34 @@ void MemoryDBTest::testHistoryViewTimeRange()
 	// loadArchivedShards=false main holds only the active shard's rows.
 	{
 		MemoryDB dbw(_dir);
+
+		// Widen each shard's [createdAt, sealedAt] window beyond the host
+		// clock's tick granularity (Windows ~15 ms) BEFORE sealing. maybeSeal
+		// sets the freezing shard's sealedAt and the new shard's createdAt
+		// in adjacent statements (microseconds apart), so on a coarse clock
+		// shard(N+1).createdAt collapses onto shard(N).sealedAt and a bound
+		// between them is not expressible. With a wide window we place the
+		// test bound INSIDE shard 1 instead of between shards. The wait is
+		// bounded so the test cannot hang.
+		auto widenActiveWindow = [&](Poco::Timespan minSpan) {
+			Poco::Timestamp activeCreated = dbw.shards().back().createdAt;
+			waitUntil([&]() {
+				return (Poco::Timestamp() - activeCreated) >=
+					minSpan.totalMicroseconds();
+			}, Poco::Timespan(5, 0));
+		};
+
 		dbw << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
 		std::string a("old");
 		for (int i = 0; i < 3; ++i) dbw << "INSERT INTO t(v) VALUES(:v)", use(a), now;
+		widenActiveWindow(Poco::Timespan(0, 100 * 1000));
 		dbw.sealActive();
 		dbw.flush();
-		Poco::Thread::sleep(50);
 		std::string b("mid");
 		for (int i = 0; i < 2; ++i) dbw << "INSERT INTO t(v) VALUES(:v)", use(b), now;
+		widenActiveWindow(Poco::Timespan(0, 100 * 1000));
 		dbw.sealActive();
 		dbw.flush();
-		Poco::Thread::sleep(50);
 		std::string c("live");
 		dbw << "INSERT INTO t(v) VALUES(:v)", use(c), now;
 		dbw.flush();
@@ -787,7 +836,6 @@ void MemoryDBTest::testHistoryViewTimeRange()
 	std::vector<MemoryDB::ShardDescriptor> ds = db.shards();
 	assertTrue (ds.size() == 3);
 	Poco::Timestamp shard1Sealed = ds[0].sealedAt;
-	Poco::Timestamp shard2Created = ds[1].createdAt;
 	Poco::Timestamp shard2Sealed = ds[1].sealedAt;
 
 	// sanity: live view only shows the active shard's rows
@@ -795,8 +843,14 @@ void MemoryDBTest::testHistoryViewTimeRange()
 	db << "SELECT count(*) FROM t", into(live), now;
 	assertTrue (live == 1);
 
-	// range that covers only shard 1 -> view = main + arc_1 = 1 live + 3 old = 4
-	std::string view = db.historyView("t", Poco::Timestamp(0), shard2Created - 1);
+	// Range that covers only shard 1 -> view = main + arc_1 = 1 live + 3 old = 4.
+	// `to` is one microsecond before shard1Sealed: still inside shard 1's
+	// (widened) window so shard 1 matches, but strictly before shard 2's
+	// createdAt (always >= shard1Sealed) so shard 2 is excluded. Bounding
+	// against shard2.createdAt directly is unsafe on coarse-clock platforms
+	// where it can collapse onto shard1.sealedAt.
+	std::string view = db.historyView("t", Poco::Timestamp(0),
+		shard1Sealed - Poco::Timespan(0, 1));
 	int n = 0;
 	db << ("SELECT count(*) FROM " + view), into(n), now;
 	assertTrue (n == 4);
@@ -949,8 +1003,11 @@ void MemoryDBTest::testConcurrentAccess()
 	// HIST has sealed shards to attach and shardsCreated > 1 holds) while
 	// staying comfortably under SQLITE_LIMIT_ATTACHED (default 10), so the
 	// auto-drop in enforceRetention does not fire and create cross-thread
-	// detach races with HIST workers.
-	o.shardMaxBytes    = 256 * 1024;
+	// detach races with HIST workers. 4 MiB sustains fast Windows/MSVC and
+	// linux-gcc-deprecated CI runs (which can produce >10 seals/5s at the
+	// old 256 KiB) without losing the 3 pre-seeded shards either - those
+	// hold ~80 bytes total each, so they alone never trip the cap.
+	o.shardMaxBytes    = 4 * 1024 * 1024;
 	o.idleInterval     = Poco::Timespan(0, 50 * 1000);   // 50 ms
 	o.maxFlushInterval = Poco::Timespan(0, 200 * 1000);  // 200 ms
 	o.checkIntervalMs  = 25;
