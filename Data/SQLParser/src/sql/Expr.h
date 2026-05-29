@@ -23,6 +23,8 @@ enum ExprType {
   kExprLiteralInterval,
   kExprStar,
   kExprParameter,
+  kExprParameterDollar,
+  kExprParameterNamed,
   kExprColumnRef,
   kExprFunctionRef,
   kExprOperator,
@@ -109,7 +111,7 @@ typedef struct Expr Expr;
 // Description of additional fields for a window expression.
 struct SQLParser_API WindowDescription {
   WindowDescription(std::vector<Expr*>* partitionList, std::vector<OrderDescription*>* orderList,
-					FrameDescription* frameDescription);
+                    FrameDescription* frameDescription);
   virtual ~WindowDescription();
 
   std::vector<Expr*>* partitionList;
@@ -133,6 +135,7 @@ struct SQLParser_API Expr {
   SelectStatement* select;
   char* name;
   char* table;
+  char* schema;
   char* alias;
   double fval;
   int64_t ival;
@@ -200,11 +203,17 @@ struct SQLParser_API Expr {
 
   static Expr* makeFunctionRef(char* func_name, std::vector<Expr*>* exprList, bool distinct, WindowDescription* window);
 
+  static Expr* makeFunctionRef(char* func_name, char* schema, std::vector<Expr*>* exprList, bool distinct, WindowDescription* window);
+
   static Expr* makeArray(std::vector<Expr*>* exprList);
 
   static Expr* makeArrayIndex(Expr* expr, int64_t index);
 
   static Expr* makeParameter(int id);
+
+  static Expr* makeDollarParameter(int64_t n);
+
+  static Expr* makeNamedParameter(char* name);
 
   static Expr* makeSelect(SelectStatement* select);
 
@@ -226,9 +235,9 @@ struct SQLParser_API Expr {
 #define ALLOC_EXPR(var, type)         \
   Expr* var;                          \
   do {                                \
-	Expr zero = {type};               \
-	var = (Expr*)malloc(sizeof *var); \
-	*var = zero;                      \
+    Expr zero = {type};               \
+    var = (Expr*)malloc(sizeof *var); \
+    *var = zero;                      \
   } while (0);
 #undef ALLOC_EXPR
 

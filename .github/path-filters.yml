@@ -31,3 +31,6 @@ data:
   - 'Data/**'
   - 'Redis/**'
   - 'MongoDB/**'
+
+sqlparser:
+  - 'Data/SQLParser/**'

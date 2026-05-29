@@ -1,6 +1,6 @@
 C++ SQL Parser
 =========================
-[![Build Status](https://github.com/hyrise/sql-parser/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/hyrise/sql-parser/actions?query=branch%3Amaster)
+[![Build Status](https://github.com/hyrise/sql-parser/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/hyrise/sql-parser/actions?query=branch%3Amain)
 
 
 This is a SQL Parser for C++. It parses the given SQL query into C++ objects.
@@ -20,7 +20,7 @@ To use the SQL parser in your own projects you simply have to follow these few s
  3. *(Optional, Recommended)* Run `make install` to copy the library to `/usr/local/lib/`
  4. Run the tests `make test` to make sure everything worked
  5. Include the `SQLParser.h` from `src/` (or from `/usr/local/lib/hsql/` if you installed it) and link the library in your project
- 6. Take a look at the [example project here](https://github.com/hyrise/sql-parser/tree/master/example)
+ 6. Take a look at the [example project here](https://github.com/hyrise/sql-parser/tree/main/example)
 
 ```cpp
 #include "hsql/SQLParser.h"

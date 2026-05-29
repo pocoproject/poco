@@ -23,7 +23,12 @@
 #include "Poco/Data/LOB.h"
 #include "Poco/Any.h"
 #include "Poco/Dynamic/Var.h"
-#include <sqlite3.h>
+
+
+extern "C"
+{
+	typedef struct sqlite3_stmt sqlite3_stmt;
+}
 
 
 namespace Poco::Data::SQLite {
@@ -117,18 +122,18 @@ private:
 		/// Checks the SQLite return code and throws an appropriate exception
 		/// if error has occurred.
 
+	static int bindBlobStatic(sqlite3_stmt* pStmt, int pos, const void* pData, int valSize);
+		/// Type-erased wrapper over sqlite3_bind_blob with SQLITE_STATIC lifetime.
+		/// Exists so the bindLOB template body does not have to name a sqlite3
+		/// function or macro - that lets the header forward-declare sqlite3_stmt
+		/// and skip pulling in <sqlite3.h>. See bindLOB below.
+
 	template <typename T>
 	void bindLOB(std::size_t pos, const Poco::Data::LOB<T>& val, Direction dir)
 	{
-		// convert a blob to a an unsigned char* array
 		const T* pData = reinterpret_cast<const T*>(val.rawContent());
 		int valSize = static_cast<int>(val.size());
-
-		// nullptr is equivalent to SQLITE_STATIC ((sqlite3_destructor_type)0)
-		// It tells SQLite that the data is static/persistent and should not be freed.
-		// Using nullptr instead of SQLITE_STATIC avoids -Wzero-as-null-pointer-constant warning.
-		int rc = sqlite3_bind_blob(_pStmt, static_cast<int>(pos), pData, valSize, nullptr);
-		checkReturn(rc);
+		checkReturn(bindBlobStatic(_pStmt, static_cast<int>(pos), pData, valSize));
 	}
 
 	sqlite3_stmt* _pStmt;

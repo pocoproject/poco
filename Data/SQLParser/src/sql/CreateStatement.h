@@ -7,18 +7,18 @@
 #include <ostream>
 #include <unordered_set>
 
-// Note: Implementations of constructors and destructors can be found in statements.cpp.
 namespace hsql {
-struct SQLParser_API SelectStatement;
+struct SelectStatement;
 
-enum struct ConstraintType { None, NotNull, Null, PrimaryKey, Unique };
+enum struct ConstraintType { ForeignKey, NotNull, Null, PrimaryKey, Unique };
+std::ostream& operator<<(std::ostream& os, const ConstraintType constraint_type);
 
-// Superclass for both TableConstraint and Column Definition
+// Superclass for both TableConstraint and ColumnDefinition.
 struct SQLParser_API TableElement {
-  virtual ~TableElement() {}
+  virtual ~TableElement() = default;
 };
 
-// Represents definition of a table constraint
+// Represents definition of a table constraint.
 struct SQLParser_API TableConstraint : TableElement {
   TableConstraint(ConstraintType keyType, std::vector<char*>* columnNames);
 
@@ -28,29 +28,46 @@ struct SQLParser_API TableConstraint : TableElement {
   std::vector<char*>* columnNames;
 };
 
+// Table and columns referenced by foreign key constraint on table or column level.
+struct SQLParser_API ReferencesSpecification {
+  ReferencesSpecification(char* schema, char* table, std::vector<char*>* columns);
+  ~ReferencesSpecification();
+
+  char* schema;
+  char* table;
+  std::vector<char*>* columns;
+};
+
+// Foreign key constraint on table level (when specified as table element).
+struct SQLParser_API ForeignKeyConstraint : TableConstraint {
+  ForeignKeyConstraint(std::vector<char*>* columnNames, ReferencesSpecification* references);
+  ~ForeignKeyConstraint() override;
+
+  ReferencesSpecification* references;
+};
+
 // Represents definition of a table column
 struct SQLParser_API ColumnDefinition : TableElement {
-  ColumnDefinition(char* name, ColumnType type, std::unordered_set<ConstraintType>* column_constraints);
-
+  ColumnDefinition(char* name, ColumnType type, std::unordered_set<ConstraintType>* column_constraints,
+                   std::vector<ReferencesSpecification*>* references);
   ~ColumnDefinition() override;
 
   // By default, columns are nullable. However, we track if a column is explicitly requested to be nullable to
   // notice conflicts with PRIMARY KEY table constraints.
-  bool trySetNullableExplicit() {
-	if (column_constraints->count(ConstraintType::NotNull) || column_constraints->count(ConstraintType::PrimaryKey)) {
-	  if (column_constraints->count(ConstraintType::Null)) {
-		return false;
-	  }
-	  nullable = false;
-	}
-
-	return true;
-  }
+  bool trySetNullableExplicit();
 
   std::unordered_set<ConstraintType>* column_constraints;
   char* name;
   ColumnType type;
   bool nullable;
+  std::vector<ReferencesSpecification*>* references;
+};
+
+struct SQLParser_API ColumnConstraints {
+  explicit ColumnConstraints();
+
+  std::unordered_set<ConstraintType>* constraints;
+  std::vector<ReferencesSpecification*>* references;
 };
 
 enum CreateType {
@@ -62,7 +79,7 @@ enum CreateType {
 
 // Represents SQL Create statements.
 // Example: "CREATE TABLE students (name TEXT, student_number INTEGER, city TEXT, grade DOUBLE)"
-struct CreateStatement : SQLStatement {
+struct SQLParser_API CreateStatement : SQLStatement {
   CreateStatement(CreateType type);
   ~CreateStatement() override;
 

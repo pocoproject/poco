@@ -60,6 +60,7 @@ struct SQLParser_API JoinDefinition {
   TableRef* left;
   TableRef* right;
   Expr* condition;
+  std::vector<char*>* namedColumns;
 
   JoinType type;
 };

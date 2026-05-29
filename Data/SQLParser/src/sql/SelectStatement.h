@@ -7,6 +7,7 @@
 
 namespace hsql {
 enum OrderType { kOrderAsc, kOrderDesc };
+enum NullOrdering { Undefined, First, Last };
 
 enum SetType { kSetUnion, kSetIntersect, kSetExcept };
 
@@ -15,11 +16,12 @@ enum RowLockWaitPolicy { NoWait, SkipLocked, None };
 
 // Description of the order by clause within a select statement.
 struct SQLParser_API OrderDescription {
-  OrderDescription(OrderType type, Expr* expr);
+  OrderDescription(OrderType type, Expr* expr, NullOrdering null_ordering);
   virtual ~OrderDescription();
 
   OrderType type;
   Expr* expr;
+  NullOrdering null_ordering;
 };
 
 // Description of the limit clause within a select statement.

@@ -2,9 +2,9 @@
 #define hsql_HEADER_H 1
 #define hsql_IN_HEADER 1
 
-#line 5 "flex_lexer.h"
+#line 6 "flex_lexer.h"
 
-#line 7 "flex_lexer.h"
+#line 8 "flex_lexer.h"
 
 #define  YY_INT_ALIGNED short int
 
@@ -419,8 +419,8 @@ struct yy_buffer_state
 	 */
 	int yy_at_bol;
 
-	int yy_bs_lineno; /**< The line count. */
-	int yy_bs_column; /**< The column count. */
+    int yy_bs_lineno; /**< The line count. */
+    int yy_bs_column; /**< The column count. */
 
 	/* Whether to try to fill the input buffer when we reach the
 	 * end of it.
@@ -467,10 +467,15 @@ void yyfree ( void * , yyscan_t yyscanner );
  * down here because we want the user's section 1 to have been scanned first.
  * The user has a chance to override it with an option.
  */
+/* POCO-LOCAL: io.h provides the POSIX-ish I/O declarations flex's runtime
+ * uses (read/write/isatty/close) on MSVC; unistd.h does not exist there.
+ * Re-apply this conditional after every flex regen - it lives in the
+ * generated header, not in flex_lexer.l.
+ */
 #if defined(_WIN32) || defined(_WIN64)
 	#include <io.h>
 #else
-	#include <unistd.h>
+#include <unistd.h>
 #endif
 #endif
 
@@ -519,10 +524,10 @@ YYSTYPE * yyget_lval ( yyscan_t yyscanner );
 
 void yyset_lval ( YYSTYPE * yylval_param , yyscan_t yyscanner );
 
-	   YYLTYPE *yyget_lloc ( yyscan_t yyscanner );
-	
-		void yyset_lloc ( YYLTYPE * yylloc_param , yyscan_t yyscanner );
-	
+       YYLTYPE *yyget_lloc ( yyscan_t yyscanner );
+    
+        void yyset_lloc ( YYLTYPE * yylloc_param , yyscan_t yyscanner );
+    
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
  */
@@ -569,10 +574,10 @@ static int yy_flex_strlen ( const char * , yyscan_t yyscanner);
 #define YY_DECL_IS_OURS 1
 
 extern int yylex \
-			   (YYSTYPE * yylval_param, YYLTYPE * yylloc_param , yyscan_t yyscanner);
+               (YYSTYPE * yylval_param, YYLTYPE * yylloc_param , yyscan_t yyscanner);
 
 #define YY_DECL int yylex \
-			   (YYSTYPE * yylval_param, YYLTYPE * yylloc_param , yyscan_t yyscanner)
+               (YYSTYPE * yylval_param, YYLTYPE * yylloc_param , yyscan_t yyscanner)
 #endif /* !YY_DECL */
 
 /* yy_get_previous_state - get the state just before the EOB char was reached */
@@ -734,9 +739,9 @@ extern int yylex \
 #undef yyTABLES_NAME
 #endif
 
-#line 285 "flex_lexer.l"
+#line 298 "flex_lexer.l"
 
 
-#line 736 "flex_lexer.h"
+#line 737 "flex_lexer.h"
 #undef hsql_IN_HEADER
 #endif /* hsql_HEADER_H */

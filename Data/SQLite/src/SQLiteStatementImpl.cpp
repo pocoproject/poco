@@ -81,7 +81,7 @@ void SQLiteStatementImpl::compileImpl()
 		{
 			if (pStmt) sqlite3_finalize(pStmt);
 			pStmt = nullptr;
-			std::string errMsg = sqlite3_errmsg(_pDB);
+			std::string errMsg = Utility::lastError(_pDB);
 			Utility::throwException(_pDB, rc, errMsg);
 		}
 		else if (rc == SQLITE_OK && pStmt)
@@ -238,8 +238,18 @@ bool SQLiteStatementImpl::hasNext()
 	_nextResponse = sqlite3_step(_pStmt);
 
 	if (_affectedRowCount == POCO_SQLITE_INV_ROW_CNT) _affectedRowCount = 0;
-	if (!sqlite3_stmt_readonly(_pStmt))
-		_affectedRowCount += sqlite3_changes(_pDB);
+	{
+		// sqlite3_stmt_readonly and sqlite3_changes read Vdbe / connection
+		// state that another thread can be writing under the db mutex (e.g.
+		// ATTACH on the same connection calls sqlite3ExpirePreparedStatements,
+		// which writes Vdbe flags packed into the same word that holds
+		// readOnly). sqlite3_step itself takes the db mutex internally and
+		// releases it before returning; without re-acquiring it here, TSan
+		// (correctly) reports a data race on those Vdbe bytes.
+		Utility::SQLiteMutex m(_pDB);
+		if (!sqlite3_stmt_readonly(_pStmt))
+			_affectedRowCount += sqlite3_changes(_pDB);
+	}
 
 	if (_nextResponse != SQLITE_ROW && _nextResponse != SQLITE_OK && _nextResponse != SQLITE_DONE)
 		Utility::throwException(_pDB, _nextResponse);
@@ -303,7 +313,16 @@ const MetaColumn& SQLiteStatementImpl::metaColumn(std::size_t pos) const
 int SQLiteStatementImpl::affectedRowCount() const
 {
 	if (_affectedRowCount != POCO_SQLITE_INV_ROW_CNT) return _affectedRowCount;
-	return _pStmt == nullptr || sqlite3_stmt_readonly(_pStmt) ? 0 : sqlite3_changes(_pDB);
+	if (_pStmt == nullptr) return 0;
+	// Same race pattern as the SQLiteMutex wrap in hasNext: sqlite3_stmt_readonly
+	// and sqlite3_changes are bare reads of Vdbe / connection state that another
+	// thread can be writing under the db mutex (e.g. ATTACH calling
+	// sqlite3ExpirePreparedStatements). The cached fast-path above usually wins;
+	// this branch only runs in the narrow window between compile and the first
+	// hasNext, but the race is real when it does. Match the hasNext lock so the
+	// pattern is uniform.
+	Utility::SQLiteMutex m(_pDB);
+	return sqlite3_stmt_readonly(_pStmt) ? 0 : sqlite3_changes(_pDB);
 }
 
 

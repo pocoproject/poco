@@ -1,15 +1,18 @@
 #include "Expr.h"
+
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "SelectStatement.h"
 
 namespace hsql {
 
 FrameBound::FrameBound(int64_t offset, FrameBoundType type, bool unbounded)
-	: offset{offset}, type{type}, unbounded{unbounded} {}
+    : offset{offset}, type{type}, unbounded{unbounded} {}
 
 FrameDescription::FrameDescription(FrameType type, FrameBound* start, FrameBound* end)
-	: type{type}, start{start}, end{end} {}
+    : type{type}, start{start}, end{end} {}
 
 FrameDescription::~FrameDescription() {
   delete start;
@@ -17,45 +20,46 @@ FrameDescription::~FrameDescription() {
 }
 
 WindowDescription::WindowDescription(std::vector<Expr*>* partitionList, std::vector<OrderDescription*>* orderList,
-									 FrameDescription* frameDescription)
-	: partitionList{partitionList}, orderList{orderList}, frameDescription{frameDescription} {}
+                                     FrameDescription* frameDescription)
+    : partitionList{partitionList}, orderList{orderList}, frameDescription{frameDescription} {}
 
 WindowDescription::~WindowDescription() {
   if (partitionList) {
-	for (Expr* e : *partitionList) {
-	  delete e;
-	}
-	delete partitionList;
+    for (Expr* e : *partitionList) {
+      delete e;
+    }
+    delete partitionList;
   }
 
   if (orderList) {
-	for (OrderDescription* orderDescription : *orderList) {
-	  delete orderDescription;
-	}
-	delete orderList;
+    for (OrderDescription* orderDescription : *orderList) {
+      delete orderDescription;
+    }
+    delete orderList;
   }
 
   delete frameDescription;
 }
 
 Expr::Expr(ExprType type)
-	: type(type),
-	  expr(nullptr),
-	  expr2(nullptr),
-	  exprList(nullptr),
-	  select(nullptr),
-	  name(nullptr),
-	  table(nullptr),
-	  alias(nullptr),
-	  fval(0),
-	  ival(0),
-	  ival2(0),
-	  datetimeField(kDatetimeNone),
-	  columnType(DataType::UNKNOWN, 0),
-	  isBoolLiteral(false),
-	  opType(kOpNone),
-	  distinct(false),
-	  windowDescription(nullptr) {}
+    : type(type),
+      expr(nullptr),
+      expr2(nullptr),
+      exprList(nullptr),
+      select(nullptr),
+      name(nullptr),
+      table(nullptr),
+      schema(nullptr),
+      alias(nullptr),
+      fval(0),
+      ival(0),
+      ival2(0),
+      datetimeField(kDatetimeNone),
+      columnType(DataType::UNKNOWN, 0),
+      isBoolLiteral(false),
+      opType(kOpNone),
+      distinct(false),
+      windowDescription(nullptr) {}
 
 Expr::~Expr() {
   delete expr;
@@ -65,13 +69,14 @@ Expr::~Expr() {
 
   free(name);
   free(table);
+  free(schema);
   free(alias);
 
   if (exprList) {
-	for (Expr* e : *exprList) {
-	  delete e;
-	}
-	delete exprList;
+    for (Expr* e : *exprList) {
+      delete e;
+    }
+    delete exprList;
   }
 }
 
@@ -216,6 +221,16 @@ Expr* Expr::makeFunctionRef(char* func_name, std::vector<Expr*>* exprList, bool 
   return e;
 }
 
+Expr* Expr::makeFunctionRef(char* func_name, char* schema, std::vector<Expr*>* exprList, bool distinct, WindowDescription* window) {
+  Expr* e = new Expr(kExprFunctionRef);
+  e->name = func_name;
+  e->schema = schema;
+  e->exprList = exprList;
+  e->distinct = distinct;
+  e->windowDescription = window;
+  return e;
+}
+
 Expr* Expr::makeArray(std::vector<Expr*>* exprList) {
   Expr* e = new Expr(kExprArray);
   e->exprList = exprList;
@@ -232,6 +247,18 @@ Expr* Expr::makeArrayIndex(Expr* expr, int64_t index) {
 Expr* Expr::makeParameter(int id) {
   Expr* e = new Expr(kExprParameter);
   e->ival = id;
+  return e;
+}
+
+Expr* Expr::makeDollarParameter(int64_t n) {
+  Expr* e = new Expr(kExprParameterDollar);
+  e->ival = n;
+  return e;
+}
+
+Expr* Expr::makeNamedParameter(char* name) {
+  Expr* e = new Expr(kExprParameterNamed);
+  e->name = name;
   return e;
 }
 
@@ -284,7 +311,8 @@ bool Expr::isType(ExprType exprType) const { return exprType == type; }
 
 bool Expr::isLiteral() const {
   return isType(kExprLiteralInt) || isType(kExprLiteralFloat) || isType(kExprLiteralString) || isType(kExprParameter) ||
-		 isType(kExprLiteralNull) || isType(kExprLiteralDate) || isType(kExprLiteralInterval);
+         isType(kExprParameterDollar) || isType(kExprParameterNamed) ||
+         isType(kExprLiteralNull) || isType(kExprLiteralDate) || isType(kExprLiteralInterval);
 }
 
 bool Expr::hasAlias() const { return alias != nullptr; }
@@ -293,23 +321,23 @@ bool Expr::hasTable() const { return table != nullptr; }
 
 const char* Expr::getName() const {
   if (alias)
-	return alias;
+    return alias;
   else
-	return name;
+    return name;
 }
 
+#if defined(_WIN32) || defined(_WIN64)
+#pragma warning(disable : 4996)
+#endif
 char* substr(const char* source, int from, int to) {
   int len = to - from;
   char* copy = (char*)malloc(len + 1);
   ;
-#if defined(_WIN32) || defined(_WIN64)
-#pragma warning(disable : 4996)
-#endif
   strncpy(copy, source + from, len);
   copy[len] = '\0';
   return copy;
+}
 #if defined(_WIN32) || defined(_WIN64)
 #pragma warning(default : 4996)
 #endif
-}
 }  // namespace hsql
