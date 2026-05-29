@@ -1249,6 +1249,102 @@ void MemoryDBTest::testConcurrentAccess()
 }
 
 
+void MemoryDBTest::testCommentPrefixedWithoutRowidRejected()
+{
+	// Two paths. (a) The operator<< prophylactic check mentionsWithoutRowid()
+	// requires CREATE as the first non-whitespace token and therefore does NOT
+	// see through leading line comments - the CREATE statement is allowed to
+	// reach the in-memory SQLite. (b) The session() bypass skips even that
+	// check. In both cases the reactive trace-hook backstop must catch the
+	// WITHOUT ROWID and poison the instance so subsequent operations throw.
+	// This is what the leading-comment-skip rewrite in onStatement was added
+	// to guarantee; previously the single-char "if (sql[0] == '-')" treated
+	// any --prefixed user SQL as a SQLite trigger marker and skipped it.
+
+	// (a) operator<< path with leading comment
+	{
+		MemoryDB db(_dir);
+		db << "-- a leading comment\nCREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT) WITHOUT ROWID", now;
+		try
+		{
+			std::string h("hi");
+			db << "INSERT INTO t(v) VALUES(:v)", use(h), now;
+			failmsg("trace-hook backstop must reject comment-prefixed WITHOUT ROWID on operator<< path");
+		}
+		catch (Poco::NotImplementedException&)
+		{
+		}
+	}
+
+	// (b) session() bypass with leading comment
+	{
+		MemoryDB db(_dir);
+		db.session() << "-- a leading comment\nCREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT) WITHOUT ROWID", now;
+		try
+		{
+			std::string h("hi");
+			db << "INSERT INTO t(v) VALUES(:v)", use(h), now;
+			failmsg("trace-hook backstop must reject comment-prefixed WITHOUT ROWID via session() bypass");
+		}
+		catch (Poco::NotImplementedException&)
+		{
+		}
+	}
+}
+
+
+void MemoryDBTest::testDropTableClassified()
+{
+	// DROP TABLE must be classified by the trace hook as kStmtDrop + kDropTable
+	// and replayed via the schema log on reopen so the table is genuinely absent,
+	// not just absent from main while still in a sealed shard. Pins the dispatch
+	// at the kStmtDrop branch in MemoryDB::onStatement.
+	{
+		MemoryDB db(_dir);
+		db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+		std::string x("x");
+		db << "INSERT INTO t(v) VALUES(:v)", use(x), now;
+		db.flush();
+
+		db << "DROP TABLE t", now;
+		db.flush();
+	}
+
+	MemoryDB db(_dir);
+	int tcnt = -1;
+	db << "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='t'",
+		into(tcnt), now;
+	assertTrue (tcnt == 0);
+}
+
+
+void MemoryDBTest::testAlterTableClassified()
+{
+	// ALTER TABLE ADD COLUMN: hsql parses this but does not currently model
+	// ADD COLUMN as an AlterAction (only DROP COLUMN is in the enum), so the
+	// trace hook's parser branch reports !isValid() and the keyword-fallback
+	// path classifies it as DDL via the first-keyword check. The schema log
+	// records the ALTER either way; on reopen the column must be present.
+	{
+		MemoryDB db(_dir);
+		db << "CREATE TABLE t(id INTEGER PRIMARY KEY, a TEXT)", now;
+		std::string a1("a1");
+		db << "INSERT INTO t(a) VALUES(:a)", use(a1), now;
+
+		db << "ALTER TABLE t ADD COLUMN b TEXT", now;
+
+		std::string a2("a2"), b2("b2");
+		db << "INSERT INTO t(a, b) VALUES(:a, :b)", use(a2), use(b2), now;
+		db.flush();
+	}
+
+	MemoryDB db(_dir);
+	std::string b;
+	db << "SELECT b FROM t WHERE id=2", into(b), now;
+	assertTrue (b == "b2");
+}
+
+
 CppUnit::Test* MemoryDBTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MemoryDBTest");
@@ -1262,10 +1358,13 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testTruncate);
 	CppUnit_addTest(pSuite, MemoryDBTest, testWithoutRowidRejected);
 	CppUnit_addTest(pSuite, MemoryDBTest, testWithoutRowidRejectedViaSession);
+	CppUnit_addTest(pSuite, MemoryDBTest, testCommentPrefixedWithoutRowidRejected);
 	CppUnit_addTest(pSuite, MemoryDBTest, testLoadArchivedFalse);
 	CppUnit_addTest(pSuite, MemoryDBTest, testIdleFlush);
 	CppUnit_addTest(pSuite, MemoryDBTest, testCustomShardNamer);
 	CppUnit_addTest(pSuite, MemoryDBTest, testIndexPreservedAcrossReload);
+	CppUnit_addTest(pSuite, MemoryDBTest, testDropTableClassified);
+	CppUnit_addTest(pSuite, MemoryDBTest, testAlterTableClassified);
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryView);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteSealedShardLoaded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteSealedShardUnloaded);

@@ -34,10 +34,13 @@ public:
 	void testTruncate();
 	void testWithoutRowidRejected();
 	void testWithoutRowidRejectedViaSession();
+	void testCommentPrefixedWithoutRowidRejected();
 	void testLoadArchivedFalse();
 	void testIdleFlush();
 	void testCustomShardNamer();
 	void testIndexPreservedAcrossReload();
+	void testDropTableClassified();
+	void testAlterTableClassified();
 	void testHistoryView();
 	void testDeleteSealedShardLoaded();
 	void testDeleteSealedShardUnloaded();

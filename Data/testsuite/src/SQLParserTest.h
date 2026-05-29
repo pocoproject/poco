@@ -28,6 +28,14 @@ public:
 	~SQLParserTest();
 
 	void testSQLParser();
+	void testInvalidSQL();
+	void testResetClearsParameters();
+	void testNamedParameter();
+	void testAlterDropColumnIfExists();
+	void testDropDiscrimination();
+	void testDeleteShape();
+	void testComments();
+	void testTokenize();
 
 	void setUp();
 	void tearDown();

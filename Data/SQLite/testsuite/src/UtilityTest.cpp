@@ -252,6 +252,25 @@ void UtilityTest::testBoundSQLMixedStyles()
 }
 
 
+void UtilityTest::testBoundSQLNamed()
+{
+	// Pins the current pass-through behaviour of the kExprParameterNamed
+	// branch in Utility.cpp:131-134: paramIndex is set to npos and srcLen
+	// to 1 + strlen(name), so renderRow at Utility.cpp:162-163 copies the
+	// original :name span verbatim and the Style stays None - the arity
+	// checks at lines 144/146 never fire and the supplied args are
+	// silently ignored.
+	//
+	// Net effect: :name placeholders are a no-op pass-through; the args
+	// are dropped and the returned SQL equals the input SQL. If Utility
+	// is ever taught to actually substitute named placeholders, this
+	// test must be rewritten.
+	const std::string sql = "SELECT * FROM t WHERE u = :user AND a = :age";
+	const std::string s = Utility::boundSQL(sql, std::string("John"), 42);
+	assertTrue (s == sql);
+}
+
+
 void UtilityTest::testExecuteSQLSuccess()
 {
 	Session session(Connector::KEY, ":memory:");
@@ -619,6 +638,7 @@ CppUnit::Test* UtilityTest::suite()
 	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLDollarOutOfRange);
 	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLDollarZero);
 	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLMixedStyles);
+	CppUnit_addTest(pSuite, UtilityTest, testBoundSQLNamed);
 	CppUnit_addTest(pSuite, UtilityTest, testExecuteSQLSuccess);
 	CppUnit_addTest(pSuite, UtilityTest, testExecuteSQLConstraintFailure);
 	CppUnit_addTest(pSuite, UtilityTest, testExecuteSQLMalformed);

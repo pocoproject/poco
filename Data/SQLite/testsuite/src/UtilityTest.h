@@ -36,6 +36,7 @@ public:
 	void testBoundSQLDollarOutOfRange();
 	void testBoundSQLDollarZero();
 	void testBoundSQLMixedStyles();
+	void testBoundSQLNamed();
 	void testExecuteSQLSuccess();
 	void testExecuteSQLConstraintFailure();
 	void testExecuteSQLMalformed();
