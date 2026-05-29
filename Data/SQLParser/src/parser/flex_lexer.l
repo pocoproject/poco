@@ -41,7 +41,7 @@ static thread_local std::stringstream strbuf;
 
 /* other flags */
 %option noyywrap
-%option nounput
+%option noinput nounput
 %option warn
 %option case-insensitive
 %option prefix="hsql_"

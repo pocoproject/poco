@@ -2,9 +2,9 @@
 #define hsql_HEADER_H 1
 #define hsql_IN_HEADER 1
 
-#line 5 "flex_lexer.h"
+#line 6 "flex_lexer.h"
 
-#line 7 "flex_lexer.h"
+#line 8 "flex_lexer.h"
 
 #define  YY_INT_ALIGNED short int
 
@@ -467,11 +467,7 @@ void yyfree ( void * , yyscan_t yyscanner );
  * down here because we want the user's section 1 to have been scanned first.
  * The user has a chance to override it with an option.
  */
-#if defined(_WIN32) || defined(_WIN64)
-	#include <io.h>
-#else
 #include <unistd.h>
-#endif
 #endif
 
 #ifndef YY_EXTRA_TYPE
@@ -737,6 +733,6 @@ extern int yylex \
 #line 298 "flex_lexer.l"
 
 
-#line 736 "flex_lexer.h"
+#line 737 "flex_lexer.h"
 #undef hsql_IN_HEADER
 #endif /* hsql_HEADER_H */

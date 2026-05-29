@@ -53,7 +53,7 @@
 extern int hsql_debug;
 #endif
 /* "%code requires" blocks.  */
-#line 39 "bison_parser.y"
+#line 54 "bison_parser.y"
 
 // %code requires block
 
@@ -276,7 +276,7 @@ extern int hsql_debug;
 #if ! defined HSQL_STYPE && ! defined HSQL_STYPE_IS_DECLARED
 union HSQL_STYPE
 {
-#line 102 "bison_parser.y"
+#line 117 "bison_parser.y"
 
   // clang-format on
   bool bval;

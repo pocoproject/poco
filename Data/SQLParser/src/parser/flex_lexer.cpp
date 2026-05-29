@@ -1,11 +1,6 @@
-#line 1 "flex_lexer.cpp"
+#line 2 "flex_lexer.cpp"
 
-#line 3 "flex_lexer.cpp"
-
-#if defined(_WIN32) || defined(_WIN64)
-#pragma warning(disable : 4996)
-#pragma warning(disable : 4267)
-#endif
+#line 4 "flex_lexer.cpp"
 
 #define  YY_INT_ALIGNED short int
 
@@ -294,8 +289,6 @@ typedef unsigned char flex_uint8_t;
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
 
-#if (__cplusplus >= 201703L)
-#if !__has_include(<stdint.h>)
 /* Limits of integral types. */
 #ifndef INT8_MIN
 #define INT8_MIN               (-128)
@@ -328,8 +321,6 @@ typedef unsigned int flex_uint32_t;
 #ifndef SIZE_MAX
 #define SIZE_MAX               (~(size_t)0)
 #endif
-#endif // (__cplusplus >= 201703L)
-#endif // !__has_include(<stdint.h>)
 
 #endif /* ! C99 */
 
@@ -3164,7 +3155,7 @@ static const flex_int16_t yy_chk[9211] =
 
 static thread_local std::stringstream strbuf;
 
-#line 3158 "flex_lexer.cpp"
+#line 3159 "flex_lexer.cpp"
 
 /***************************
  ** Section 2: Rules
@@ -3173,12 +3164,13 @@ static thread_local std::stringstream strbuf;
 /* Make reentrant */
 /* performance tweeks */
 /* other flags */
+#define YY_NO_INPUT 1
 /* %option nodefault */
 
 /***************************
  ** Section 3: Rules
  ***************************/
-#line 3172 "flex_lexer.cpp"
+#line 3174 "flex_lexer.cpp"
 
 #define INITIAL 0
 #define singlequotedstring 1
@@ -3189,11 +3181,7 @@ static thread_local std::stringstream strbuf;
  * down here because we want the user's section 1 to have been scanned first.
  * The user has a chance to override it with an option.
  */
-#if defined(_WIN32) || defined(_WIN64)
-	#include <io.h>
-#else
 #include <unistd.h>
-#endif
 #endif
 
 #ifndef YY_EXTRA_TYPE
@@ -3469,7 +3457,7 @@ YY_DECL
 #line 57 "flex_lexer.l"
 
 
-#line 3459 "flex_lexer.cpp"
+#line 3461 "flex_lexer.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -4516,7 +4504,7 @@ YY_RULE_SETUP
 #line 298 "flex_lexer.l"
 ECHO;
 	YY_BREAK
-#line 4506 "flex_lexer.cpp"
+#line 4508 "flex_lexer.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT):
 	yyterminate();
@@ -5682,9 +5670,4 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 int yyerror(const char *msg) {
     fprintf(stderr, "[SQL-Lexer-Error] %s\n",msg); return 0;
 }
-
-#if defined(_WIN32) || defined(_WIN64)
-#pragma warning(default : 4996)
-#pragma warning(default : 4267)
-#endif
 

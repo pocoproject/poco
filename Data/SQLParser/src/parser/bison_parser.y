@@ -36,6 +36,21 @@
 
 // Specify code that is included in the generated .h and .c files
 // clang-format off
+
+// Bison 3.x emits `int yynerrs = 0;` in yyparse() and only ever
+// increments it (`++yynerrs`), never reading the value. GCC's
+// -Wunused-but-set-variable (enabled by -Wall on g++ 10+) considers
+// increment-only as "set but not used" and fires on the declaration.
+// Silence it locally so downstream consumers can build with -Wall
+// without per-file -Wno-* flags. %code top injects at the very top
+// of the generated .cpp (not the .h), so the suppression scope is
+// exactly bison_parser.cpp.
+%code top {
+#if defined(__GNUC__) || defined(__clang__)
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
+}
+
 %code requires {
 // %code requires block
 
@@ -1185,8 +1200,12 @@ comp_expr : operand '=' operand { $$ = Expr::makeOpBinary($1, kOpEquals, $3); }
 // reduce conflicts when splitting them.
 function_expr : IDENTIFIER '(' ')' opt_window { $$ = Expr::makeFunctionRef($1, new std::vector<Expr*>(), false, $4); }
 | IDENTIFIER '(' opt_distinct expr_list ')' opt_window { $$ = Expr::makeFunctionRef($1, $4, $3, $6); }
-| IDENTIFIER '.' IDENTIFIER '(' ')' opt_window { $$ = Expr::makeFunctionRef($3, $1, new std::vector<Expr*>(), false, $6); }
-| IDENTIFIER '.' IDENTIFIER '(' opt_distinct expr_list ')' opt_window { $$ = Expr::makeFunctionRef($3, $1, $6, $5, $8); };
+| IDENTIFIER '.' IDENTIFIER '(' ')' opt_window {
+  $$ = Expr::makeFunctionRef($3, $1, new std::vector<Expr*>(), false, $6);
+}
+| IDENTIFIER '.' IDENTIFIER '(' opt_distinct expr_list ')' opt_window {
+  $$ = Expr::makeFunctionRef($3, $1, $6, $5, $8);
+};
 
 // Window function expressions, based on https://www.postgresql.org/docs/15/sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS
 // We do not support named windows, collations and exclusions (for simplicity) and filters (not part of the SQL standard).
@@ -1315,30 +1334,28 @@ interval_literal : INTVAL duration_field { $$ = Expr::makeIntervalLiteral($1, $2
   $$ = Expr::makeIntervalLiteral(duration, unit);
 };
 
-param_expr
-  : '?' {
-      $$ = Expr::makeParameter(yylloc.total_column);
-      $$->ival2 = yylloc.total_column - 1;  // source column (0-based) of the '?' token
-      yyloc.param_list.push_back($$);
-    }
-  | DOLLAR_PARAM {
-      if ($1 < 1) {
-        yyerror(&yyloc, result, scanner, "$0 is not a valid positional parameter.");
-        YYERROR;
-      }
-      $$ = Expr::makeDollarParameter($1);
-      // length of $N token: 1 for '$' + digit count of N
-      int64_t dollarLen = 1;
-      for (int64_t v = $1; v > 0; v /= 10) ++dollarLen;
-      $$->ival2 = yylloc.total_column - dollarLen;
-      yyloc.param_list.push_back($$);
-    }
-  | NAMED_PARAM {
-      $$ = Expr::makeNamedParameter($1);
-      $$->ival2 = yylloc.total_column - 1 - (int64_t)strlen($1);
-      yyloc.param_list.push_back($$);
-    }
-  ;
+param_expr : '?' {
+  $$ = Expr::makeParameter(yylloc.total_column);
+  $$->ival2 = yylloc.total_column - 1;  // source column (0-based) of the '?' token
+  yyloc.param_list.push_back($$);
+}
+| DOLLAR_PARAM {
+  if ($1 < 1) {
+    yyerror(&yyloc, result, scanner, "$0 is not a valid positional parameter.");
+    YYERROR;
+  }
+  $$ = Expr::makeDollarParameter($1);
+  // length of $N token: 1 for '$' + digit count of N
+  int64_t dollarLen = 1;
+  for (int64_t v = $1; v > 0; v /= 10) ++dollarLen;
+  $$->ival2 = yylloc.total_column - dollarLen;
+  yyloc.param_list.push_back($$);
+}
+| NAMED_PARAM {
+  $$ = Expr::makeNamedParameter($1);
+  $$->ival2 = yylloc.total_column - 1 - (int64_t)strlen($1);
+  yyloc.param_list.push_back($$);
+};
 
 /******************************
  * Table
