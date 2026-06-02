@@ -105,12 +105,13 @@ std::string Net_API htmlize(const std::string& str);
 extern "C" const struct NetworkInitializer Net_API pocoNetworkInitializer;
 
 // clang-cl defines BOTH __clang__ and _MSC_VER and supports the MSVC linker
-// pragmas (/include:, /export) — the robust way to force the network-initializer
-// symbol. The `static void*` reference trick below is optimized away by
-// clang-cl /O2 in static builds, so pocoNetworkInitializer is never pulled in
-// and WSAStartup never runs ("Net subsystem not initialized"). Route clang-cl to
-// the pragma path (same as MSVC); keep the symbol trick only for GNU-mode clang
-// and MinGW, which don't support those pragmas.
+// pragmas (/include:, /export). The `static void*` reference trick below
+// misbehaves under clang-cl: /O2 strips it in static builds, and in shared
+// builds it references the bare symbol of a __declspec(dllimport) variable (the
+// consumer only has __imp_pocoNetworkInitializer), so the initializer is never
+// linked and WSAStartup never runs. Route clang-cl to the pragma path (like
+// MSVC); keep the symbol trick only for GNU-mode clang and MinGW, which lack
+// those pragmas.
 #if defined(POCO_COMPILER_MINGW) || (defined(__clang__) && !defined(_MSC_VER))
 	#define POCO_NET_FORCE_SYMBOL(x) static void *__ ## x ## _fp = (void*)&x;
 #elif defined(Net_EXPORTS)
@@ -121,10 +122,21 @@ extern "C" const struct NetworkInitializer Net_API pocoNetworkInitializer;
 	#endif
 #else  // !Net_EXPORTS
 	#if !defined(POCO_NETWORK_INITIALIZER_INCLUDE_PATH)
-		#if defined(_WIN64)
-			#define POCO_NETWORK_INITIALIZER_INCLUDE_PATH "/include:"
-		#elif defined(_WIN32)
-			#define POCO_NETWORK_INITIALIZER_INCLUDE_PATH "/include:_"
+		#if defined(POCO_DLL)
+			// A DLL consumer references the initializer as its import-address
+			// symbol __imp_<name>; force that so the import (and thus the DLL's
+			// load-time WSAStartup) is pulled in.
+			#if defined(_WIN64)
+				#define POCO_NETWORK_INITIALIZER_INCLUDE_PATH "/include:__imp_"
+			#elif defined(_WIN32)
+				#define POCO_NETWORK_INITIALIZER_INCLUDE_PATH "/include:__imp__"
+			#endif
+		#else
+			#if defined(_WIN64)
+				#define POCO_NETWORK_INITIALIZER_INCLUDE_PATH "/include:"
+			#elif defined(_WIN32)
+				#define POCO_NETWORK_INITIALIZER_INCLUDE_PATH "/include:_"
+			#endif
 		#endif
 	#endif
 	#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, POCO_NETWORK_INITIALIZER_INCLUDE_PATH#s))
