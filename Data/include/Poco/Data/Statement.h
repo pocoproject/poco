@@ -319,6 +319,18 @@ public:
 		/// Creates a string from the accumulated SQL statement.
 
 	[[nodiscard]]
+	AbstractBindingVec& bindings();
+		/// Returns a reference to the attached bindings. Advanced API:
+		/// useful for tools that need to traverse or temporarily rebind
+		/// the bindings (for example, Utility::boundSQL renders the SQL
+		/// with bound values by walking this vector through a
+		/// RenderingBinder).
+
+  [[nodiscard]]
+	const AbstractBindingVec& bindings() const;
+		/// Const overload of bindings().
+
+  [[nodiscard]]
 	Optional<std::size_t> statementsCount() const;
 		/// Returns the total number of SQL statements held in the accummulated SQL statement.
 		///
@@ -856,6 +868,16 @@ inline Statement::ImplPtr Statement::impl() const
 inline const std::string& Statement::toString() const
 {
 	return _stmtString = _pImpl->toString();
+}
+
+inline AbstractBindingVec& Statement::bindings()
+{
+	return _pImpl->bindings();
+}
+
+inline const AbstractBindingVec& Statement::bindings() const
+{
+	return _pImpl->bindings();
 }
 
 inline const AbstractExtractionVec& Statement::extractions() const

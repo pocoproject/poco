@@ -1,5 +1,8 @@
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
+if(POCO_DATA_NO_SQL_PARSER)
+	list(REMOVE_ITEM SRCS_G "${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryDBTest.cpp")
+endif()
 POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
 
 # Headers

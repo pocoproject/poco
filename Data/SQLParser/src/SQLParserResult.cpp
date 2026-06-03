@@ -80,39 +80,34 @@ const std::vector<SQLStatement*>& SQLParserResult::getStatements() const {
 
 std::vector<SQLStatement*> SQLParserResult::releaseStatements() {
   std::vector<SQLStatement*> copy;
-  if (statements_)
-  {
-	copy = *statements_;
-	statements_->clear();
+  if (statements_) {
+    copy = *statements_;
+    statements_->clear();
   }
   return copy;
 }
 
 void SQLParserResult::reset(bool mv) {
-  if (statements_)
-  {
-	if (!mv)
-	{
-	  for (SQLStatement* statement : *statements_) {
-		delete statement;
-	  }
-	  delete statements_;
-	}
-	statements_ = nullptr;
+  if (statements_) {
+    if (!mv) {
+      for (SQLStatement* statement : *statements_) {
+        delete statement;
+      }
+      delete statements_;
+    }
+    statements_ = nullptr;
   }
 
-  if (parameters_)
-  {
-	if (!mv) delete parameters_;
-	parameters_ = nullptr;
+  if (parameters_) {
+    if (!mv) delete parameters_;
+    parameters_ = nullptr;
   }
 
   isValid_ = false;
 
-  if (errorMsg_)
-  {
-	if (!mv) free(errorMsg_);
-	errorMsg_ = nullptr;
+  if (errorMsg_) {
+    if (!mv) free(errorMsg_);
+    errorMsg_ = nullptr;
   }
   errorLine_ = -1;
   errorColumn_ = -1;

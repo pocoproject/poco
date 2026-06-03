@@ -153,7 +153,7 @@ public:
 	void setUp();
 	void tearDown();
 
-	static void sqliteUpdateCallbackFn(void*, int, const char*, const char*, Poco::Int64);
+	static void sqliteUpdateCallbackFn(void*, int, const char*, const char*, long long);
 	static int sqliteCommitCallbackFn(void*);
 	static void sqliteRollbackCallbackFn(void*);
 

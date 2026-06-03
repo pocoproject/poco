@@ -90,6 +90,6 @@ std::string htmlize(const std::string& str)
 		}
 	};
 
-	const NetworkInitializer pocoNetworkInitializer;
+	extern "C" const NetworkInitializer Net_API pocoNetworkInitializer{};
 
 #endif

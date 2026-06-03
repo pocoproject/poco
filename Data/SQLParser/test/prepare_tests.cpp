@@ -5,6 +5,8 @@
 
 using hsql::kExprLiteralInt;
 using hsql::kExprParameter;
+using hsql::kExprParameterDollar;
+using hsql::kExprParameterNamed;
 
 using hsql::kStmtDrop;
 using hsql::kStmtExecute;
@@ -22,7 +24,7 @@ using hsql::SelectStatement;
 
 TEST(PrepareSingleStatementTest) {
   TEST_PARSE_SINGLE_SQL("PREPARE test FROM 'SELECT * FROM students WHERE grade = ?';", kStmtPrepare, PrepareStatement,
-						result, prepare);
+                        result, prepare);
 
   ASSERT_STREQ(prepare->name, "test");
   ASSERT_STREQ(prepare->query, "SELECT * FROM students WHERE grade = ?");
@@ -30,8 +32,8 @@ TEST(PrepareSingleStatementTest) {
   TEST_PARSE_SINGLE_SQL(prepare->query, kStmtSelect, SelectStatement, result2, select);
 
   ASSERT_EQ(result2.parameters().size(), 1);
-  ASSERT(select->whereClause->expr2->isType(kExprParameter))
-  ASSERT_EQ(select->whereClause->expr2->ival, 0)
+  ASSERT(select->whereClause->expr2->isType(kExprParameter));
+  ASSERT_EQ(select->whereClause->expr2->ival, 0);
 }
 
 TEST(DeallocatePrepareStatementTest) {
@@ -49,17 +51,69 @@ TEST(StatementWithParameters) {
 
   ASSERT_EQ(result.parameters().size(), 2);
 
-  ASSERT_EQ(eq1->opType, hsql::kOpEquals)
-  ASSERT(eq1->expr->isType(hsql::kExprColumnRef))
-  ASSERT(eq1->expr2->isType(kExprParameter))
-  ASSERT_EQ(eq1->expr2->ival, 0)
+  ASSERT_EQ(eq1->opType, hsql::kOpEquals);
+  ASSERT(eq1->expr->isType(hsql::kExprColumnRef));
+  ASSERT(eq1->expr2->isType(kExprParameter));
+  ASSERT_EQ(eq1->expr2->ival, 0);
+  ASSERT_EQ(eq1->expr2->ival2, 29);  // start column of first '?'
   ASSERT_EQ(result.parameters()[0], eq1->expr2);
 
-  ASSERT_EQ(eq2->opType, hsql::kOpEquals)
-  ASSERT(eq2->expr->isType(hsql::kExprColumnRef))
-  ASSERT(eq2->expr2->isType(kExprParameter))
-  ASSERT_EQ(eq2->expr2->ival, 1)
+  ASSERT_EQ(eq2->opType, hsql::kOpEquals);
+  ASSERT(eq2->expr->isType(hsql::kExprColumnRef));
+  ASSERT(eq2->expr2->isType(kExprParameter));
+  ASSERT_EQ(eq2->expr2->ival, 1);
+  ASSERT_EQ(eq2->expr2->ival2, 39);  // start column of second '?'
   ASSERT_EQ(result.parameters()[1], eq2->expr2);
+}
+
+TEST(StatementWithDollarParameters) {
+  TEST_PARSE_SINGLE_SQL("SELECT * FROM test WHERE a = $1 AND b = $2", kStmtSelect, SelectStatement, result, stmt);
+
+  const hsql::Expr* eq1 = stmt->whereClause->expr;
+  const hsql::Expr* eq2 = stmt->whereClause->expr2;
+
+  ASSERT_EQ(result.parameters().size(), 2);
+
+  ASSERT(eq1->expr2->isType(kExprParameterDollar));
+  ASSERT_EQ(eq1->expr2->ival, 1);
+  ASSERT_EQ(eq1->expr2->ival2, 29);  // start column of "$1"
+
+  ASSERT(eq2->expr2->isType(kExprParameterDollar));
+  ASSERT_EQ(eq2->expr2->ival, 2);
+  ASSERT_EQ(eq2->expr2->ival2, 40);  // start column of "$2"
+}
+
+TEST(StatementWithDollarParametersOutOfOrder) {
+  TEST_PARSE_SINGLE_SQL("SELECT * FROM test WHERE a = $2 AND b = $1", kStmtSelect, SelectStatement, result, stmt);
+  (void)stmt;
+
+  ASSERT_EQ(result.parameters().size(), 2);
+
+  // addParameter sorts by ival, so the explicit positions order the result vector
+  // but ival2 (source column) is independent and reflects the textual order.
+  ASSERT(result.parameters()[0]->isType(kExprParameterDollar));
+  ASSERT_EQ(result.parameters()[0]->ival, 1);
+  ASSERT_EQ(result.parameters()[0]->ival2, 40);  // "$1" appears at column 40
+  ASSERT(result.parameters()[1]->isType(kExprParameterDollar));
+  ASSERT_EQ(result.parameters()[1]->ival, 2);
+  ASSERT_EQ(result.parameters()[1]->ival2, 29);  // "$2" appears at column 29
+}
+
+TEST(StatementWithNamedParameters) {
+  TEST_PARSE_SINGLE_SQL("SELECT * FROM test WHERE a = :user AND b = :id", kStmtSelect, SelectStatement, result, stmt);
+
+  const hsql::Expr* eq1 = stmt->whereClause->expr;
+  const hsql::Expr* eq2 = stmt->whereClause->expr2;
+
+  ASSERT_EQ(result.parameters().size(), 2);
+
+  ASSERT(eq1->expr2->isType(kExprParameterNamed));
+  ASSERT_STREQ(eq1->expr2->name, "user");
+  ASSERT_EQ(eq1->expr2->ival2, 29);  // start column of ":user"
+
+  ASSERT(eq2->expr2->isType(kExprParameterNamed));
+  ASSERT_STREQ(eq2->expr2->name, "id");
+  ASSERT_EQ(eq2->expr2->ival2, 43);  // start column of ":id"
 }
 
 TEST(ExecuteStatementTest) {

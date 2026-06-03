@@ -153,6 +153,18 @@ std::string Utility::lastError(sqlite3* pDB)
 }
 
 
+int Utility::setAttachedLimit(Session& session, int newVal)
+{
+	// sqlite3_limit acquires db->mutex internally, so no SQLiteMutex wrap
+	// needed here. Existence rationale lives in the docstring (Utility.h):
+	// we want callers to be able to set this limit without pulling
+	// <sqlite3.h> into their TU, and we want the symbol exported through
+	// PocoDataSQLite's normal SQLite_API surface so static-lib link works
+	// on Windows.
+	return sqlite3_limit(dbHandle(session), SQLITE_LIMIT_ATTACHED, newVal);
+}
+
+
 MetaColumn::ColumnDataType Utility::getColumnType(sqlite3_stmt* pStmt, std::size_t pos)
 {
 	poco_assert_dbg (pStmt);
@@ -328,8 +340,7 @@ bool Utility::setThreadMode(int mode)
 
 void* Utility::eventHookRegister(sqlite3* pDB, UpdateCallbackType callbackFn, void* pParam)
 {
-	typedef void(*pF)(void*, int, const char*, const char*, sqlite3_int64);
-	return sqlite3_update_hook(pDB, reinterpret_cast<pF>(callbackFn), pParam);
+	return sqlite3_update_hook(pDB, callbackFn, pParam);
 }
 
 

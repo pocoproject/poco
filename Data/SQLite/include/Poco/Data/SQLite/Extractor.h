@@ -33,9 +33,14 @@
 #include "Poco/UTFString.h"
 #include "Poco/Any.h"
 #include "Poco/Dynamic/Var.h"
-#include <sqlite3.h>
 #include <vector>
 #include <utility>
+
+
+extern "C"
+{
+	typedef struct sqlite3_stmt sqlite3_stmt;
+}
 
 
 namespace Poco::Data::SQLite {
@@ -586,12 +591,19 @@ private:
 		return ret;
 	}
 
+	static int         columnBytes(sqlite3_stmt* pStmt, int pos);
+	static const void* columnBlobPtr(sqlite3_stmt* pStmt, int pos);
+		/// Type-erased wrappers over sqlite3_column_bytes / sqlite3_column_blob
+		/// so the extractLOB template body does not have to name a sqlite3
+		/// function - that lets the header forward-declare sqlite3_stmt and
+		/// skip pulling in <sqlite3.h>. See extractLOB below.
+
 	template <typename T>
 	bool extractLOB(std::size_t pos, Poco::Data::LOB<T>& val)
 	{
 		if (isNull(pos)) return false;
-		int size = sqlite3_column_bytes(_pStmt, (int) pos);
-		const T* pTmp = reinterpret_cast<const T*>(sqlite3_column_blob(_pStmt, (int) pos));
+		int size = columnBytes(_pStmt, static_cast<int>(pos));
+		const T* pTmp = reinterpret_cast<const T*>(columnBlobPtr(_pStmt, static_cast<int>(pos)));
 		val = Poco::Data::LOB<T>(pTmp, size);
 		return true;
 	}

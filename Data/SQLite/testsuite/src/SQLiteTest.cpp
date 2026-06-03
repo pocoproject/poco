@@ -3120,7 +3120,7 @@ void SQLiteTest::testThreadModes()
 }
 
 
-void SQLiteTest::sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB, const char* pTable, Poco::Int64 row)
+void SQLiteTest::sqliteUpdateCallbackFn(void* pVal, int opCode, const char* pDB, const char* pTable, long long row)
 {
 	poco_check_ptr(pVal);
 	Poco::Int64* pV = reinterpret_cast<Poco::Int64*>(pVal);

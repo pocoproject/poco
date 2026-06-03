@@ -1,5 +1,8 @@
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
+if(POCO_DATA_NO_SQL_PARSER)
+	list(REMOVE_ITEM SRCS_G "${CMAKE_CURRENT_SOURCE_DIR}/src/MemoryDB.cpp")
+endif()
 POCO_SOURCES_AUTO(SQLITE_SRCS ${SRCS_G})
 
 # Headers
@@ -34,6 +37,18 @@ target_include_directories(DataSQLite
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
+
+# MemoryDB.cpp #includes "SQLParser.h" / "sql/..." headers from the bundled
+# parser. Mirror Data/CMakeLists.txt's PRIVATE include of Data/SQLParser so
+# the cmake build resolves them the same way the gnu-make build does (via
+# Data/SQLite/Makefile's target_includes under the same SQL-parser guard).
+if(NOT POCO_DATA_NO_SQL_PARSER)
+	target_include_directories(DataSQLite
+		PRIVATE
+			${PROJECT_SOURCE_DIR}/Data/SQLParser/src
+			${PROJECT_SOURCE_DIR}/Data/SQLParser
+	)
+endif()
 
 POCO_INSTALL(DataSQLite)
 POCO_GENERATE_PACKAGE(DataSQLite)

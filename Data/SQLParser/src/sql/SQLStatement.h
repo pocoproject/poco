@@ -2,6 +2,7 @@
 #define SQLPARSER_SQLSTATEMENT_H
 
 #include <vector>
+
 #include "sqlparser_win.h"
 #include "Expr.h"
 

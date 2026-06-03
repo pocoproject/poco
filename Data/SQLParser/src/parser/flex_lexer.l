@@ -41,7 +41,7 @@ static thread_local std::stringstream strbuf;
 
 /* other flags */
 %option noyywrap
-%option nounput
+%option noinput nounput
 %option warn
 %option case-insensitive
 %option prefix="hsql_"
@@ -105,6 +105,7 @@ DISTINCT    TOKEN(DISTINCT)
 DOUBLE      TOKEN(DOUBLE)
 DROP        TOKEN(DROP)
 ELSE        TOKEN(ELSE)
+ENCODING    TOKEN(ENCODING)
 END         TOKEN(END)
 ESCAPE      TOKEN(ESCAPE)
 EXCEPT      TOKEN(EXCEPT)
@@ -117,6 +118,7 @@ FILE        TOKEN(FILE)
 FLOAT       TOKEN(FLOAT)
 FOLLOWING   TOKEN(FOLLOWING)
 FOR         TOKEN(FOR)
+FOREIGN     TOKEN(FOREIGN)
 FORMAT      TOKEN(FORMAT)
 FROM        TOKEN(FROM)
 FULL        TOKEN(FULL)
@@ -179,6 +181,7 @@ PREPARE     TOKEN(PREPARE)
 PRIMARY     TOKEN(PRIMARY)
 RANGE       TOKEN(RANGE)
 REAL        TOKEN(REAL)
+REFERENCES  TOKEN(REFERENCES)
 RENAME      TOKEN(RENAME)
 RESTRICT    TOKEN(RESTRICT)
 RIGHT       TOKEN(RIGHT)
@@ -234,6 +237,16 @@ CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
 "<="        TOKEN(LESSEQ)
 ">="        TOKEN(GREATEREQ)
 "||"        TOKEN(CONCAT)
+
+\$[0-9]+    {
+  yylval->ival = atoll(yytext + 1);
+  return SQL_DOLLAR_PARAM;
+}
+
+:[A-Za-z][A-Za-z0-9_]*  {
+  yylval->sval = strdup(yytext + 1);
+  return SQL_NAMED_PARAM;
+}
 
 [-+*/(){},.;<>=^%:?[\]|]    { return yytext[0]; }
 

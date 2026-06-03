@@ -11,10 +11,10 @@ NC='\033[0m'
 BOLD='\033[1;39m'
 
 RET=0
-SQL_TEST_RET=0
-MEM_LEAK_EXECUTED=$?
-MEM_LEAK_RET=0
-CONFLICT_RET=0
+SQL_TEST_RET=1
+MEM_LEAK_EXECUTED=false
+MEM_LEAK_RET=1
+CONFLICT_RET=1
 
 #################################################
 # Running SQL parser tests.
@@ -25,7 +25,6 @@ SQL_TEST_RET=$?
 if [ $SQL_TEST_RET -eq 0 ]; then
   printf "${GREEN}SQL parser tests succeeded!${NC}\n"
 else
-  RET=1
   printf "${RED}SQL parser tests failed!${NC}\n"
 fi
 
@@ -38,14 +37,11 @@ if [[ "$unamestr" == 'Linux' ]]; then
     bin/tests -f "test/queries/queries-good.sql" -f "test/queries/queries-bad.sql" \
     3>&1>/dev/null;
 
-  MEM_LEAK_EXECUTED=true
   MEM_LEAK_RET=$?
-  RET=1
+  MEM_LEAK_EXECUTED=true
 
   if [ $MEM_LEAK_RET -eq 0 ]; then
     printf "${GREEN}Memory leak check succeeded!${NC}\n"
-    MEM_LEAK_RET=0
-    RET=0
   elif [ $MEM_LEAK_RET -eq 200 ]; then
     printf "${RED}Memory leak check failed!${NC}\n"
   elif [ $MEM_LEAK_RET -eq 127 ]; then
@@ -55,7 +51,6 @@ if [[ "$unamestr" == 'Linux' ]]; then
   fi
 else
   printf "\n${YELLOW}Skipping memory leak checks (can only be executed on Linux)!${NC}\n"
-  MEM_LEAK_EXECUTED=false
 fi
 
 #################################################
@@ -68,7 +63,6 @@ CONFLICT_RET=$?
 if [ $CONFLICT_RET -eq 0 ]; then
   printf "${GREEN}Conflict check succeeded!${NC}\n"
 else
-  RET=1
   printf "${RED}Conflict check failed!${NC}\n"
 fi
 
@@ -86,9 +80,22 @@ fi
 if [ $CONFLICT_RET -eq 0 ]; then printf "Grammar Conflict Check: ${GREEN}Success${BOLD}\n";
 else                             printf "Grammar Conflict Check: ${RED}Failure${BOLD}\n"; fi
 
-if [ $RET -ne 0 ]; then                     printf "${RED}Some tests failed!${NC}\n"
-elif [ "$MEM_LEAK_EXECUTED" = false ]; then printf "${YELLOW}Some tests were skipped!${NC}\n"
-else                                        printf "${GREEN}All tests passed!${NC}\n"
+if [[ $SQL_TEST_RET -ne 0 || $CONFLICT_RET -ne 0 ]]; then
+  RET=1
+fi
+
+if [ $MEM_LEAK_RET -ne 0 ]; then
+  if [ "$MEM_LEAK_EXECUTED" = true ]; then
+    RET=1
+  fi
+fi
+
+
+if [ $RET -eq 0 ]; then
+  if [ "$MEM_LEAK_EXECUTED" = true ]; then printf "${GREEN}All tests passed!${NC}\n"
+  else                                     printf "${YELLOW}Some tests were skipped!${NC}\n"
+  fi
+else                                       printf "${RED}Some tests failed!${NC}\n"
 fi
 printf "${NC}----------------------------------\n"
 

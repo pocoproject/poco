@@ -77,6 +77,18 @@ Extractor::~Extractor()
 }
 
 
+int Extractor::columnBytes(sqlite3_stmt* pStmt, int pos)
+{
+	return sqlite3_column_bytes(pStmt, pos);
+}
+
+
+const void* Extractor::columnBlobPtr(sqlite3_stmt* pStmt, int pos)
+{
+	return sqlite3_column_blob(pStmt, pos);
+}
+
+
 bool Extractor::extract(std::size_t pos, Poco::Int32& val)
 {
 	return extract(sqlite3_column_int, pos, val);

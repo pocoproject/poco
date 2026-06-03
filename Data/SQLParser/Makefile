@@ -42,7 +42,12 @@ relaxed_build ?= "off"
 ifeq ($(relaxed_build), on)
     $(warning $(NAME) will be built with most compiler warnings deactivated. This is fine if you want to test $(NAME) but will become an issue when you want to contribute code.)
 else
-    LIB_CLFAGS += -Wall -Werror
+    LIB_CFLAGS += -Wall -Werror
+    # Clang: ensure files end with newline. Missing final newlines here triggered
+    # -Wnewline-eof warnings in downstream projects (e.g., Hyrise).
+    ifneq (,$(findstring clang,$(shell $(CXX) --version 2>/dev/null)))
+        LIB_CFLAGS += -Wnewline-eof
+    endif
 endif
 
 static ?= no
@@ -66,8 +71,14 @@ library: $(LIB_BUILD)
 $(LIB_BUILD): $(LIB_OBJ)
 	$(LIBLINKER) $(LIB_LFLAGS) $(LIB_BUILD) $(LIB_OBJ)
 
+# The auto-generated code from bison and flex contains some parts the compiler complains about with -Wall.
+# bison_parser.cpp #includes flex_lexer.h, so bison_parser.o must wait for flex_lexer.cpp regeneration
+# to finish (which also produces flex_lexer.h). Without this dep, parallel make races and bison_parser.o
+# can start before hsql_lex is declared, producing 'hsql_lex was not declared' errors.
 $(SRCPARSER)/flex_lexer.o: $(SRCPARSER)/flex_lexer.cpp $(SRCPARSER)/bison_parser.cpp
 	$(CXX) $(LIB_CFLAGS) -c -o $@ $< -Wno-sign-compare -Wno-unneeded-internal-declaration -Wno-register
+$(SRCPARSER)/bison_parser.o: $(SRCPARSER)/bison_parser.cpp $(SRCPARSER)/flex_lexer.cpp
+	$(CXX) $(LIB_CFLAGS) -c -o $@ $< -Wno-unused-but-set-variable
 
 %.o: %.cpp $(PARSER_CPP) $(LIB_H)
 	$(CXX) $(LIB_CFLAGS) -c -o $@ $<

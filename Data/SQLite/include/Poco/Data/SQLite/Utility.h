@@ -69,7 +69,22 @@ public:
 	static sqlite3* dbHandle(const Session& session);
 		/// Returns native DB handle.
 
-	[[nodiscard]]
+	static int setAttachedLimit(Session& session, int newVal);
+		/// Sets the per-connection limit on the number of databases that can
+		/// be attached simultaneously (SQLite's SQLITE_LIMIT_ATTACHED). Thin
+		/// wrapper over sqlite3_limit() so callers don't need the raw handle
+		/// or to pull <sqlite3.h> into their include path (and so the
+		/// underlying symbol doesn't need to be re-exported from
+		/// PocoDataSQLite on platforms whose static-lib link only sees
+		/// __declspec(dllexport) symbols).
+		///
+		/// Passing newVal < 0 leaves the limit unchanged and returns the
+		/// current value. The runtime limit cannot exceed
+		/// SQLITE_MAX_ATTACHED (compile-time constant, default 10, SQLite
+		/// hard ceiling 125); requests above the compile-time cap are
+		/// silently clamped to it by SQLite. Returns the previous value.
+
+  [[nodiscard]]
 	static std::string lastError(sqlite3* pDB);
 		/// Retreives the last error code from sqlite and converts it to a string.
 
@@ -125,8 +140,12 @@ public:
 	static int getThreadMode();
 		/// Returns the thread mode.
 
-	typedef void(*UpdateCallbackType)(void*, int, const char*, const char*, Poco::Int64);
-		/// Update callback function type.
+	typedef void(*UpdateCallbackType)(void*, int, const char*, const char*, long long);
+		/// Update callback function type. The row id parameter is long long to match
+		/// SQLite's sqlite3_int64 typedef exactly; calling the callback through a
+		/// function pointer of any other type (e.g. with Poco::Int64, which is long
+		/// on most 64-bit platforms) is undefined behavior even when the underlying
+		/// width agrees.
 
 	typedef int(*CommitCallbackType)(void*);
 		/// Commit callback function type.
