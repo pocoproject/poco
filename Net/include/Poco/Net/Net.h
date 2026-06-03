@@ -115,10 +115,15 @@ extern "C" const struct NetworkInitializer Net_API pocoNetworkInitializer;
 #if defined(POCO_COMPILER_MINGW) || (defined(__clang__) && !defined(_MSC_VER))
 	#define POCO_NET_FORCE_SYMBOL(x) static void *__ ## x ## _fp = (void*)&x;
 #elif defined(Net_EXPORTS)
+	// Building Net itself: Net_API (dllexport) on pocoNetworkInitializer above
+	// already places it in the DLL export table. Force-reference it with /include:
+	// rather than a second /export: -- a redundant /export: triggers LNK4197
+	// (export specified multiple times). /include: keeps /OPT:REF from stripping
+	// the initializer without re-exporting it.
 	#if defined(_WIN64)
-		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:"#s))
+		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:"#s))
 	#elif defined(_WIN32)
-		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/export:_"#s))
+		#define POCO_NET_FORCE_SYMBOL(s) __pragma(comment (linker, "/include:_"#s))
 	#endif
 #else  // !Net_EXPORTS
 	#if !defined(POCO_NETWORK_INITIALIZER_INCLUDE_PATH)
