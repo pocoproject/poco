@@ -106,6 +106,7 @@ private:
 	bool         _throwOnHasNext = false;
 	Poco::Any    _p;
 	bool         _connected;
+	bool         _inTransaction = false;
 	std::string  _connectionString;
 };
 

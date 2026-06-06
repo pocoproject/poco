@@ -21,7 +21,8 @@ namespace Poco::Data {
 
 Transaction::Transaction(Poco::Data::Session& rSession, Poco::Logger* pLogger):
 	_rSession(rSession),
-	_pLogger(pLogger)
+	_pLogger(pLogger),
+	_autoCommit(_rSession.hasFeature("autoCommit") ? _rSession.getFeature("autoCommit") : false)
 {
 	begin();
 }
@@ -29,7 +30,8 @@ Transaction::Transaction(Poco::Data::Session& rSession, Poco::Logger* pLogger):
 
 Transaction::Transaction(Poco::Data::Session& rSession, bool start):
 	_rSession(rSession),
-	_pLogger(nullptr)
+	_pLogger(nullptr),
+	_autoCommit(_rSession.hasFeature("autoCommit") ? _rSession.getFeature("autoCommit") : false)
 {
 	if (start) begin();
 }
@@ -47,6 +49,8 @@ Transaction::~Transaction()
 					_pLogger->debug("Rolling back transaction.");
 
 				_rSession.rollback();
+				if (_autoCommit)
+					_rSession.setFeature("autoCommit", true);
 			}
 			catch (Poco::Exception& exc)
 			{
@@ -70,7 +74,15 @@ Transaction::~Transaction()
 void Transaction::begin()
 {
 	if (!_rSession.isTransaction())
+	{
+		// On an auto-commit session SessionImpl::begin() throws, so turn auto-commit
+		// off for the duration of the transaction; it is restored (only if it was on
+		// to begin with) by commit(), rollback() and the destructor. Captured per
+		// session in the ctor, so sessions already in manual-commit mode are untouched.
+		if (_autoCommit)
+			_rSession.setFeature("autoCommit", false);
 		_rSession.begin();
+	}
 	else
 		throw InvalidAccessException("Transaction in progress.");
 }
@@ -78,7 +90,7 @@ void Transaction::begin()
 
 void Transaction::execute(const std::string& sql, bool doCommit)
 {
-	if (!_rSession.isTransaction()) _rSession.begin();
+	if (!_rSession.isTransaction()) begin();
 	_rSession << sql, Keywords::now;
 	if (doCommit) commit();
 }
@@ -115,6 +127,8 @@ void Transaction::commit()
 		_pLogger->debug("Committing transaction.");
 
 	_rSession.commit();
+	if (_autoCommit)
+		_rSession.setFeature("autoCommit", true);
 }
 
 
@@ -124,6 +138,8 @@ void Transaction::rollback()
 		_pLogger->debug("Rolling back transaction.");
 
 	_rSession.rollback();
+	if (_autoCommit)
+		_rSession.setFeature("autoCommit", true);
 }
 
 

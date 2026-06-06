@@ -79,16 +79,19 @@ StatementImpl::Ptr SessionImpl::createStatementImpl()
 
 void SessionImpl::begin()
 {
+	_inTransaction = true;
 }
 
 
 void SessionImpl::commit()
 {
+	_inTransaction = false;
 }
 
 
 void SessionImpl::rollback()
 {
+	_inTransaction = false;
 }
 
 
@@ -100,7 +103,7 @@ bool SessionImpl::canTransact() const
 
 bool SessionImpl::isTransaction() const
 {
-	return false;
+	return _inTransaction;
 }
 
 

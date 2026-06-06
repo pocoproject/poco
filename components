@@ -10,11 +10,12 @@ SSH
 NetSSL_OpenSSL
 NetSSL_Win
 Data
+Data/DataTest
+Data/SQLParser
 Data/SQLite
 Data/ODBC
 Data/MySQL
 Data/PostgreSQL
-Data/DataTest
 Zip
 PageCompiler
 PageCompiler/File2Page
