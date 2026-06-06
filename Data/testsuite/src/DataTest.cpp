@@ -1669,6 +1669,22 @@ void DataTest::testTransactionAutoCommit()
 	assertTrue (!sess.isTransaction());
 	assertTrue (sess.getFeature("autoCommit"));
 
+	// --- begin() failure must restore auto-commit (regression) ---
+	// The Transaction ctor unwinds on a failed begin(), so its destructor never runs;
+	// begin() itself must restore the feature, else a pooled session is handed back in
+	// manual-commit mode.
+	{
+		bool threw = false;
+		sess.setFeature("throwOnBegin", true);
+		try { Transaction trans(sess); }
+		catch (Poco::Exception&) { threw = true; }
+		sess.setFeature("throwOnBegin", false);
+		assertTrue (threw);
+		assertTrue (!sess.isTransaction());
+		assertTrue (sess.getFeature("autoCommit"));
+	}
+	assertTrue (sess.getFeature("autoCommit"));
+
 	// --- auto-commit OFF: Transaction must leave the feature untouched ---
 	sess.setFeature("autoCommit", false);
 	{
@@ -1678,6 +1694,16 @@ void DataTest::testTransactionAutoCommit()
 		assertTrue (!sess.getFeature("autoCommit"));
 	}
 	assertTrue (!sess.getFeature("autoCommit"));
+
+	// --- dtor restores auto-commit even if rollback() throws (regression) ---
+	sess.setFeature("autoCommit", true);
+	{
+		Transaction trans(sess);
+		assertTrue (!sess.getFeature("autoCommit"));
+		sess.setFeature("throwOnRollback", true);
+	} // dtor: rollback() throws (swallowed) and auto-commit is still restored
+	sess.setFeature("throwOnRollback", false);
+	assertTrue (sess.getFeature("autoCommit"));
 }
 
 

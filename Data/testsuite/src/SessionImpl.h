@@ -98,12 +98,18 @@ public:
 	bool getF(const std::string& name) const;
 	void setThrowOnHasNext(const std::string& name, bool value);
 	bool getThrowOnHasNext(const std::string& name) const;
+	void setThrowOnBegin(const std::string& name, bool value);
+	bool getThrowOnBegin(const std::string& name) const;
+	void setThrowOnRollback(const std::string& name, bool value);
+	bool getThrowOnRollback(const std::string& name) const;
 	void setP(const std::string& name, const Poco::Any& value);
 	Poco::Any getP(const std::string& name) const;
 
 private:
 	bool         _f;
 	bool         _throwOnHasNext = false;
+	bool         _throwOnBegin = false;
+	bool         _throwOnRollback = false;
 	Poco::Any    _p;
 	bool         _connected;
 	bool         _inTransaction = false;

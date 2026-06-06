@@ -49,8 +49,6 @@ Transaction::~Transaction()
 					_pLogger->debug("Rolling back transaction.");
 
 				_rSession.rollback();
-				if (_autoCommit)
-					_rSession.setFeature("autoCommit", true);
 			}
 			catch (Poco::Exception& exc)
 			{
@@ -61,6 +59,27 @@ Transaction::~Transaction()
 			{
 				if (_pLogger)
 					_pLogger->error("Error while rolling back database transaction.");
+			}
+
+			// Restore auto-commit even if rollback() threw (the dtor documents restoring
+			// it on destruction). Separate try/catch so a rollback error cannot skip it;
+			// restore errors are swallowed/logged.
+			if (_autoCommit)
+			{
+				try
+				{
+					_rSession.setFeature("autoCommit", true);
+				}
+				catch (Poco::Exception& exc)
+				{
+					if (_pLogger)
+						_pLogger->error("Error while restoring auto-commit: %s", exc.displayText());
+				}
+				catch (...)
+				{
+					if (_pLogger)
+						_pLogger->error("Error while restoring auto-commit.");
+				}
 			}
 		}
 	}
@@ -81,7 +100,22 @@ void Transaction::begin()
 		// session in the ctor, so sessions already in manual-commit mode are untouched.
 		if (_autoCommit)
 			_rSession.setFeature("autoCommit", false);
-		_rSession.begin();
+		try
+		{
+			_rSession.begin();
+		}
+		catch (...)
+		{
+			// begin() failed (e.g. connection error): restore auto-commit so a pooled
+			// session is not returned in manual-commit mode. The ctor is unwinding, so
+			// the destructor will not run to restore it. Best-effort; ignore errors.
+			if (_autoCommit)
+			{
+				try { _rSession.setFeature("autoCommit", true); }
+				catch (...) {}
+			}
+			throw;
+		}
 	}
 	else
 		throw InvalidAccessException("Transaction in progress.");

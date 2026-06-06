@@ -11,6 +11,7 @@
 #include "SessionImpl.h"
 #include "TestStatementImpl.h"
 #include "Connector.h"
+#include "Poco/Data/DataException.h"
 
 
 namespace Poco::Data::Test {
@@ -25,6 +26,8 @@ SessionImpl::SessionImpl(const std::string& init, std::size_t timeout):
 	addFeature("f2", nullptr, &SessionImpl::getF);
 	addFeature("f3", &SessionImpl::setF, nullptr);
 	addFeature("throwOnHasNext", &SessionImpl::setThrowOnHasNext, &SessionImpl::getThrowOnHasNext);
+	addFeature("throwOnBegin", &SessionImpl::setThrowOnBegin, &SessionImpl::getThrowOnBegin);
+	addFeature("throwOnRollback", &SessionImpl::setThrowOnRollback, &SessionImpl::getThrowOnRollback);
 	addFeature("connected", &SessionImpl::setConnected, &SessionImpl::getConnected);
 	addProperty("p1", &SessionImpl::setP, &SessionImpl::getP);
 	addProperty("p2", nullptr, &SessionImpl::getP);
@@ -79,6 +82,8 @@ StatementImpl::Ptr SessionImpl::createStatementImpl()
 
 void SessionImpl::begin()
 {
+	if (_throwOnBegin)
+		throw Poco::Data::ConnectionFailedException("Test: begin() failed");
 	_inTransaction = true;
 }
 
@@ -92,6 +97,8 @@ void SessionImpl::commit()
 void SessionImpl::rollback()
 {
 	_inTransaction = false;
+	if (_throwOnRollback)
+		throw Poco::Data::ConnectionFailedException("Test: rollback() failed");
 }
 
 
@@ -169,6 +176,30 @@ void SessionImpl::setThrowOnHasNext(const std::string&, bool value)
 bool SessionImpl::getThrowOnHasNext(const std::string& name) const
 {
 	return _throwOnHasNext;
+}
+
+
+void SessionImpl::setThrowOnBegin(const std::string&, bool value)
+{
+	_throwOnBegin = value;
+}
+
+
+bool SessionImpl::getThrowOnBegin(const std::string& name) const
+{
+	return _throwOnBegin;
+}
+
+
+void SessionImpl::setThrowOnRollback(const std::string&, bool value)
+{
+	_throwOnRollback = value;
+}
+
+
+bool SessionImpl::getThrowOnRollback(const std::string& name) const
+{
+	return _throwOnRollback;
 }
 
 void SessionImpl::setP(const std::string& name, const Poco::Any& value)
