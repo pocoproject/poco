@@ -140,13 +140,19 @@ public:
 
 #endif
 
+	void stop();
+		/// Stops async dispatch: signals the dequeue/worker thread(s) to finish any
+		/// in-flight notification and joins them (it enqueues an urgent shutdown, so
+		/// queued-but-unstarted notifications are discarded). Idempotent - the
+		/// destructor also calls it. Lets a consumer quiesce async dispatch before
+		/// destroying objects the observers depend on (e.g. a DB session pool).
+
 protected:
 
 	void notifyObservers(Notification::Ptr& pNotification) override;
 
 private:
 	void start();
-	void stop();
 	void dequeue();
 
 	using Adapter = RunnableAdapter<AsyncNotificationCenter>;
