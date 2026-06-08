@@ -48,6 +48,7 @@ public:
 	void testSQLParse();
 	void testSQLChannel();
 	void testNullableExtract();
+	void testTransactionAutoCommit();
 
 	void setUp();
 	void tearDown();
