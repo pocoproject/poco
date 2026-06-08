@@ -29,11 +29,15 @@ namespace Poco::Data {
 
 class Data_API Transaction
 	/// Transaction helps with transactions in domain logic.
-	/// When an Transaction object is created, it first checks whether a
-	/// transaction is in progress. If not, a new transaction is created.
+	/// When a Transaction object is created, it first checks whether a
+	/// transaction is in progress. If not, a new transaction is started.
 	/// When the Transaction is destroyed, and commit() has been called,
-	/// nothing is done. Otherwise, the current transaction is rolled back.
-	/// See Transaction for more details and purpose of this template.
+	/// nothing is done; otherwise the transaction is rolled back.
+	///
+	/// If the session is in auto-commit mode when the Transaction is created,
+	/// auto-commit is disabled for the duration of the transaction and restored
+	/// when it ends (commit(), rollback() or destruction). This lets a
+	/// Transaction be used directly on a default (auto-commit) session.
 {
 public:
 	Transaction(Poco::Data::Session& session, Poco::Logger* pLogger = nullptr);
@@ -47,7 +51,8 @@ public:
 	template <typename T>
 	Transaction(Poco::Data::Session& rSession, T& t, Poco::Logger* pLogger = nullptr):
 		_rSession(rSession),
-		_pLogger(pLogger)
+		_pLogger(pLogger),
+		_autoCommit(_rSession.hasFeature("autoCommit") ? _rSession.getFeature("autoCommit") : false)
 		/// Creates the Transaction, using the given database session, transactor and logger.
 		/// The transactor type must provide operator () overload taking non-const Session
 		/// reference as an argument.
@@ -151,11 +156,16 @@ private:
 	Transaction& operator = (const Transaction&);
 
 	void begin();
-		/// Begins the transaction if the session is already not in transaction.
-		/// Otherwise does nothing.
+		/// Starts a transaction on the session, disabling auto-commit first if it
+		/// was enabled. Throws InvalidAccessException if a transaction is already
+		/// in progress.
 
 	Session _rSession;
 	Logger* _pLogger = nullptr;
+	bool _autoCommit = false;
+		/// Auto-commit state captured at construction. Auto-commit is disabled for
+		/// the duration of the transaction and restored to this value by commit(),
+		/// rollback() and the destructor — only when it was originally enabled.
 };
 
 

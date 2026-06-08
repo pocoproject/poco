@@ -14,6 +14,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/Data/Session.h"
 #include "Poco/Data/SessionFactory.h"
+#include "Poco/Data/Transaction.h"
 #include "Poco/Data/LOB.h"
 #include "Poco/Data/LOBStream.h"
 #include "Poco/Data/MetaColumn.h"
@@ -1626,6 +1627,86 @@ void DataTest::testNullableExtract()
 }
 
 
+void DataTest::testTransactionAutoCommit()
+{
+	// Transaction must work on an auto-commit session: it disables auto-commit for
+	// the duration (so a real SessionImpl::begin() does not throw "Session in auto
+	// commit mode") and restores it on commit(), rollback() AND destruction — the
+	// last path being what keeps a pooled session from being handed back in
+	// manual-commit mode. Uses the no-op Test connector, so no server is involved.
+	Session sess(SessionFactory::instance().create("test", "cs"));
+
+	// --- auto-commit ON: Transaction disables it for the txn, then restores it ---
+	sess.setFeature("autoCommit", true);
+	assertTrue (sess.getFeature("autoCommit"));
+
+	// commit() restores auto-commit
+	{
+		Transaction trans(sess);
+		assertTrue (sess.isTransaction());
+		assertTrue (!sess.getFeature("autoCommit"));
+		trans.commit();
+		assertTrue (!sess.isTransaction());
+		assertTrue (sess.getFeature("autoCommit"));
+	}
+	assertTrue (sess.getFeature("autoCommit"));
+
+	// rollback() restores auto-commit
+	{
+		Transaction trans(sess);
+		assertTrue (!sess.getFeature("autoCommit"));
+		trans.rollback();
+		assertTrue (sess.getFeature("autoCommit"));
+	}
+	assertTrue (sess.getFeature("autoCommit"));
+
+	// destruction without commit/rollback rolls back AND restores auto-commit
+	{
+		Transaction trans(sess);
+		assertTrue (sess.isTransaction());
+		assertTrue (!sess.getFeature("autoCommit"));
+	}
+	assertTrue (!sess.isTransaction());
+	assertTrue (sess.getFeature("autoCommit"));
+
+	// --- begin() failure must restore auto-commit (regression) ---
+	// The Transaction ctor unwinds on a failed begin(), so its destructor never runs;
+	// begin() itself must restore the feature, else a pooled session is handed back in
+	// manual-commit mode.
+	{
+		bool threw = false;
+		sess.setFeature("throwOnBegin", true);
+		try { Transaction trans(sess); }
+		catch (Poco::Exception&) { threw = true; }
+		sess.setFeature("throwOnBegin", false);
+		assertTrue (threw);
+		assertTrue (!sess.isTransaction());
+		assertTrue (sess.getFeature("autoCommit"));
+	}
+	assertTrue (sess.getFeature("autoCommit"));
+
+	// --- auto-commit OFF: Transaction must leave the feature untouched ---
+	sess.setFeature("autoCommit", false);
+	{
+		Transaction trans(sess);
+		assertTrue (!sess.getFeature("autoCommit"));
+		trans.commit();
+		assertTrue (!sess.getFeature("autoCommit"));
+	}
+	assertTrue (!sess.getFeature("autoCommit"));
+
+	// --- dtor restores auto-commit even if rollback() throws (regression) ---
+	sess.setFeature("autoCommit", true);
+	{
+		Transaction trans(sess);
+		assertTrue (!sess.getFeature("autoCommit"));
+		sess.setFeature("throwOnRollback", true);
+	} // dtor: rollback() throws (swallowed) and auto-commit is still restored
+	sess.setFeature("throwOnRollback", false);
+	assertTrue (sess.getFeature("autoCommit"));
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -1661,6 +1742,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testSQLParse);
 	CppUnit_addTest(pSuite, DataTest, testSQLChannel);
 	CppUnit_addTest(pSuite, DataTest, testNullableExtract);
+	CppUnit_addTest(pSuite, DataTest, testTransactionAutoCommit);
 
 	return pSuite;
 }
