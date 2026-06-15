@@ -39,69 +39,69 @@ $(OBJPATH_RELEASE_STATIC) $(OBJPATH_DEBUG_STATIC) $(OBJPATH_RELEASE_SHARED) $(OB
 
 # Regular sources
 
-$(OBJPATH_DEBUG_STATIC)/%.o: $(SRCDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_STATIC)/%.o: $(SRCDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_STATIC)
 	@echo "** Compiling" $< "(debug, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(DEBUGOPT_CXX) $(STATICOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_STATIC)/%.o: $(SRCDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_STATIC)/%.o: $(SRCDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_STATIC)
 	@echo "** Compiling" $< "(release, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(RELEASEOPT_CXX) $(STATICOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_DEBUG_STATIC)/%.o: $(SRCDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_STATIC)/%.o: $(SRCDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_STATIC)
 	@echo "** Compiling" $< "(debug, static)"
 	$(CC) $(INCLUDE) $(CFLAGS) $(EXTRA_CFLAGS) $(DEBUGOPT_CC) $(STATICOPT_CC) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_STATIC)/%.o: $(SRCDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_STATIC)/%.o: $(SRCDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_STATIC)
 	@echo "** Compiling" $< "(release, static)"
 	$(CC) $(INCLUDE) $(CFLAGS) $(EXTRA_CFLAGS) $(RELEASEOPT_CC) $(STATICOPT_CC) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_DEBUG_SHARED)/%.o: $(SRCDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_SHARED)/%.o: $(SRCDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_SHARED)
 	@echo "** Compiling" $< "(debug, shared)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(DEBUGOPT_CXX) $(SHAREDOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_SHARED)/%.o: $(SRCDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_SHARED)/%.o: $(SRCDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_SHARED)
 	@echo "** Compiling" $< "(release, shared)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(RELEASEOPT_CXX) $(SHAREDOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_DEBUG_SHARED)/%.o: $(SRCDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_SHARED)/%.o: $(SRCDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_SHARED)
 	@echo "** Compiling" $< "(debug, shared)"
 	$(CC) $(INCLUDE) $(CFLAGS) $(EXTRA_CFLAGS) $(DEBUGOPT_CC) $(SHAREDOPT_CC) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_SHARED)/%.o: $(SRCDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_SHARED)/%.o: $(SRCDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_SHARED)
 	@echo "** Compiling" $< "(release, shared)"
 	$(CC) $(INCLUDE) $(CFLAGS) $(EXTRA_CFLAGS) $(RELEASEOPT_CC) $(SHAREDOPT_CC) -c $< -o $@ $(POCO_BUILD_STDERR)
 
 # Generated sources
 
-$(OBJPATH_DEBUG_STATIC)/%.o: $(GENDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_STATIC)/%.o: $(GENDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_STATIC)
 	@echo "** Compiling" $< "(debug, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(DEBUGOPT_CXX) $(STATICOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_STATIC)/%.o: $(GENDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_STATIC)/%.o: $(GENDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_STATIC)
 	@echo "** Compiling" $< "(release, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(RELEASEOPT_CXX) $(STATICOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_DEBUG_STATIC)/%.o: $(GENDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_STATIC)/%.o: $(GENDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_STATIC)
 	@echo "** Compiling" $< "(debug, static)"
 	$(CC) $(INCLUDE) $(CFLAGS) $(EXTRA_CFLAGS) $(DEBUGOPT_CC) $(STATICOPT_CC) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_STATIC)/%.o: $(GENDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_STATIC)/%.o: $(GENDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_STATIC)
 	@echo "** Compiling" $< "(release, static)"
 	$(CC) $(INCLUDE) $(CFLAGS) $(EXTRA_CFLAGS) $(RELEASEOPT_CC) $(STATICOPT_CC) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_DEBUG_SHARED)/%.o: $(GENDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_SHARED)/%.o: $(GENDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_SHARED)
 	@echo "** Compiling" $< "(debug, shared)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(DEBUGOPT_CXX) $(SHAREDOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_SHARED)/%.o: $(GENDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_SHARED)/%.o: $(GENDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_SHARED)
 	@echo "** Compiling" $< "(release, shared)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(EXTRA_CXXFLAGS) $(RELEASEOPT_CXX) $(SHAREDOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_DEBUG_SHARED)/%.o: $(GENDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_SHARED)/%.o: $(GENDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_SHARED)
 	@echo "** Compiling" $< "(debug, shared)"
 	$(CC) $(INCLUDE) $(CFLAGS) $(EXTRA_CFLAGS) $(DEBUGOPT_CC) $(SHAREDOPT_CC) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_SHARED)/%.o: $(GENDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_SHARED)/%.o: $(GENDIR)/%.c $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_SHARED)
 	@echo "** Compiling" $< "(release, shared)"
 	$(CC) $(INCLUDE) $(CFLAGS) $(EXTRA_CFLAGS) $(RELEASEOPT_CC) $(SHAREDOPT_CC) -c $< -o $@ $(POCO_BUILD_STDERR)
 
@@ -115,71 +115,71 @@ SQLSQLDIR    = $(SQLDIR)/sql
 SQLUTILDIR   = $(SQLDIR)/util
 
 # SQLParser
-$(OBJPATH_DEBUG_STATIC)/%.o: $(SQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_STATIC)/%.o: $(SQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_STATIC)
 	@echo "** Compiling" $< "(debug, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(DEBUGOPT_CXX) $(STATICOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_STATIC)/%.o: $(SQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_STATIC)/%.o: $(SQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_STATIC)
 	@echo "** Compiling" $< "(release, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(RELEASEOPT_CXX) $(STATICOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_DEBUG_SHARED)/%.o: $(SQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_SHARED)/%.o: $(SQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_SHARED)
 	@echo "** Compiling" $< "(debug, shared)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(DEBUGOPT_CXX) $(SHAREDOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_SHARED)/%.o: $(SQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_SHARED)/%.o: $(SQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_SHARED)
 	@echo "** Compiling" $< "(release, shared)"
 	@echo "** Compiling" $@ "(release, shared)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(RELEASEOPT_CXX) $(SHAREDOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
 # parser
-$(OBJPATH_DEBUG_STATIC)/%.o: $(SQLPARSERDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_STATIC)/%.o: $(SQLPARSERDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_STATIC)
 	@echo "** Compiling" $< "(debug, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(DEBUGOPT_CXX) $(STATICOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_STATIC)/%.o: $(SQLPARSERDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_STATIC)/%.o: $(SQLPARSERDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_STATIC)
 	@echo "** Compiling" $< "(release, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(RELEASEOPT_CXX) $(STATICOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_DEBUG_SHARED)/%.o: $(SQLPARSERDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_SHARED)/%.o: $(SQLPARSERDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_SHARED)
 	@echo "** Compiling" $< "(debug, shared)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(DEBUGOPT_CXX) $(SHAREDOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_SHARED)/%.o: $(SQLPARSERDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_SHARED)/%.o: $(SQLPARSERDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_SHARED)
 	@echo "** Compiling" $< "(release, shared)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(RELEASEOPT_CXX) $(SHAREDOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
 # sql
-$(OBJPATH_DEBUG_STATIC)/%.o: $(SQLSQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_STATIC)/%.o: $(SQLSQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_STATIC)
 	@echo "** Compiling" $< "(debug, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(DEBUGOPT_CXX) $(STATICOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_STATIC)/%.o: $(SQLSQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_STATIC)/%.o: $(SQLSQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_STATIC)
 	@echo "** Compiling" $< "(release, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(RELEASEOPT_CXX) $(STATICOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_DEBUG_SHARED)/%.o: $(SQLSQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_SHARED)/%.o: $(SQLSQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_SHARED)
 	@echo "** Compiling" $< "(debug, shared)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(DEBUGOPT_CXX) $(SHAREDOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_SHARED)/%.o: $(SQLSQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_SHARED)/%.o: $(SQLSQLDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_SHARED)
 	@echo "** Compiling" $< "(release, shared)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(RELEASEOPT_CXX) $(SHAREDOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
 # util
-$(OBJPATH_DEBUG_STATIC)/%.o: $(SQLUTILDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_STATIC)/%.o: $(SQLUTILDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_STATIC)
 	@echo "** Compiling" $< "(debug, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(DEBUGOPT_CXX) $(STATICOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_STATIC)/%.o: $(SQLUTILDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_STATIC)/%.o: $(SQLUTILDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_STATIC)
 	@echo "** Compiling" $< "(release, static)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(RELEASEOPT_CXX) $(STATICOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_DEBUG_SHARED)/%.o: $(SQLUTILDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_DEBUG_SHARED)/%.o: $(SQLUTILDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_DEBUG_SHARED)
 	@echo "** Compiling" $< "(debug, shared)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(DEBUGOPT_CXX) $(SHAREDOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
-$(OBJPATH_RELEASE_SHARED)/%.o: $(SQLUTILDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG)
+$(OBJPATH_RELEASE_SHARED)/%.o: $(SQLUTILDIR)/%.cpp $(DEPPATH)/%.d $(POCO_BASE)/build/config/$(POCO_CONFIG) | $(OBJPATH_RELEASE_SHARED)
 	@echo "** Compiling" $< "(release, shared)"
 	$(CXX) $(INCLUDE) $(CXXFLAGS) $(RELEASEOPT_CXX) $(SHAREDOPT_CXX) -c $< -o $@ $(POCO_BUILD_STDERR)
 
