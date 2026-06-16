@@ -360,12 +360,11 @@ jobs:
   # run (cmake jobs above already cover the test signal). Samples are skipped.
   # Uses the Linux-c++20 config to match the cmake default (C++20 since 1.15.0);
   # the codebase has moved past C++17 in places (e.g. std::ranges).
+  # Always run: the ci_core path filter does not cover the make build system
+  # (build/**, configure, component Makefiles), so gating on it would skip this
+  # sanity check on the very PRs that change the legacy make path.
   linux-gcc-make-build:
     runs-on: ubuntu-24.04
-    needs: changes
-    if: |
-      needs.changes.outputs.ci_core == 'true' ||
-      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - uses: actions/checkout@v5
       - run: >-
