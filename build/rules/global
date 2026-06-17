@@ -341,10 +341,15 @@ LIBRARY = -L$(LIBPATH) $(POCO_LIBRARY) $(MACCHINA_LIBRARY) $(foreach p,$(POCO_AD
 # Strip Command definition
 #
 ifndef POCO_ENABLE_TRACE
+ifeq ($(strip $(SANITIZEFLAGS)),)
 ifeq ($(strip $(STRIP)),)
 STRIPCMD =
 else
 STRIPCMD = $(STRIP) $@$(BINEXT)
+endif
+else
+# sanitizer build: keep symbols so suppressions resolve and stacks symbolize
+STRIPCMD =
 endif
 else
 STRIPCMD =
