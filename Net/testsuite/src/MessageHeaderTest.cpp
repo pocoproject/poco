@@ -376,6 +376,7 @@ void MessageHeaderTest::testNameLengthLimit()
 	}
 }
 
+
 void MessageHeaderTest::testValueLengthLimit()
 {
 	std::string s("name1: value1\r\n");
@@ -391,6 +392,19 @@ void MessageHeaderTest::testValueLengthLimit()
 	{
 	}
 }
+
+
+void MessageHeaderTest::testLongValue()
+{
+	std::string longValue(10000, 'x');
+	std::string s("long: " + longValue + "\r\n");
+	std::istringstream istr(s);
+	MessageHeader mh;
+	mh.setValueLengthLimit(10000);
+	mh.read(istr);
+	assertTrue (mh.get("long") == longValue);
+}
+
 
 void MessageHeaderTest::testDecodeWord()
 {
@@ -409,7 +423,7 @@ void MessageHeaderTest::testDecodeWord()
 	coded = "Hello =?UTF-8?B?RnJhbmNpcw==?=, good bye";
 	decoded = MessageHeader::decodeWord(coded, "ISO-8859-1");
 	assertTrue (decoded == "Hello Francis, good bye");
-	
+
 	coded = "application/pdf; name=\"=?utf-8?Q?RUG_Regler-_und_Ger=C3=A4tebau_Gm?= =?utf-8?Q?bH_Angebot_Erneuerung_=C3=9CE.pdf?=\"";
 	decoded = MessageHeader::decodeWord(coded, "UTF-8");
 	assertTrue (decoded == "application/pdf; name=\"RUG Regler- und Gerätebau GmbH Angebot Erneuerung ÜE.pdf\"");
@@ -489,6 +503,9 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitElements);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testSplitParameters);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testFieldLimit);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testNameLengthLimit);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testValueLengthLimit);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testLongValue);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWord);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testAutoDecode);
 

@@ -42,6 +42,7 @@ public:
 	void testFieldLimit();
 	void testNameLengthLimit();
 	void testValueLengthLimit();
+	void testLongValue();
 	void testDecodeWord();
 	void testAutoDecode();
 
