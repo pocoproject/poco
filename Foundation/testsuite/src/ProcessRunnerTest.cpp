@@ -533,6 +533,58 @@ void ProcessRunnerTest::testPathResolution()
 }
 
 
+void ProcessRunnerTest::testFailedStartJoinsMonitorThread()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	// Regression for a heap-use-after-free on a FAILED start of a heap-allocated
+	// ProcessRunner. start() launches the monitor thread (run()), the child then
+	// exits, and start() throws while waiting for the PID file. The cleanup
+	// handler called Process::kill() on the already-exited child - which throws
+	// NotFoundException (ESRCH) - and that exception skipped _t.join(); the
+	// throwing constructor's storage was then reclaimed by operator delete while
+	// run() was still writing to its members. We loop to exercise the
+	// failed-start cleanup path under sanitizers; with the join guaranteed, this
+	// runs clean. Unix-only: the trigger relies on kill() throwing on ESRCH for
+	// an already-dead PID.
+	std::string name("TestApp");
+#if defined(_DEBUG)
+	name += "d";
+#endif
+	const std::string cmd = name;
+
+	const std::string pidFile = Path::tempHome() + "pr-failed-start.pid";
+	{
+		File pf(pidFile);
+		if (pf.exists()) pf.remove();
+	}
+
+	for (int i = 0; i < 50; ++i)
+	{
+		// A single unrecognized argument makes TestApp exit immediately with a
+		// non-zero code (it returns argc - 1) and never writes pidFile, so the
+		// monitor thread starts, the child dies, and start() throws while waiting
+		// for the PID file - the exact failed-start cleanup path.
+		std::vector<std::string> args;
+		args.push_back("--exit-nonzero");
+		std::unique_ptr<ProcessRunner> pr;
+		try
+		{
+			pr.reset(new ProcessRunner(cmd, args, pidFile,
+				ProcessRunner::NO_OUT, 5 /* timeout, seconds */));
+			failmsg("ProcessRunner should have failed to start: the child exits "
+				"non-zero before the PID file appears.");
+		}
+		catch (const Poco::Exception&)
+		{
+			// expected: start() throws (RuntimeException / TimeoutException).
+		}
+	}
+
+	assertFalse (File(pidFile).exists());
+#endif
+}
+
+
 std::string ProcessRunnerTest::cmdLine(const std::string& cmd, const ProcessRunner::Args& args)
 {
 	std::string cmdL = cmd + ' ';
@@ -578,6 +630,7 @@ CppUnit::Test* ProcessRunnerTest::suite()
 	CppUnit_addTest(pSuite, ProcessRunnerTest, testKillTree);
 	CppUnit_addTest(pSuite, ProcessRunnerTest, testKillTreeWithChild);
 	CppUnit_addTest(pSuite, ProcessRunnerTest, testPathResolution);
+	CppUnit_addTest(pSuite, ProcessRunnerTest, testFailedStartJoinsMonitorThread);
 
 	return pSuite;
 }
