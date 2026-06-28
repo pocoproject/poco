@@ -31,12 +31,19 @@ class Foundation_API Latin1Encoding: public TextEncoding
 public:
 	Latin1Encoding();
 	~Latin1Encoding() override;
+	[[nodiscard]]
 	const char* canonicalName() const override;
+	[[nodiscard]]
 	bool isA(const std::string& encodingName) const override;
+	[[nodiscard]]
 	const CharacterMap& characterMap() const override;
+	[[nodiscard]]
 	int convert(const unsigned char* bytes) const override;
+	[[nodiscard]]
 	int convert(int ch, unsigned char* bytes, int length) const override;
+	[[nodiscard]]
 	int queryConvert(const unsigned char* bytes, int length) const override;
+	[[nodiscard]]
 	int sequenceLength(const unsigned char* bytes, int length) const override;
 
 private:

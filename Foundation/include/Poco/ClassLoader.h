@@ -85,10 +85,12 @@ public:
 			_it = it._it;
 			return *this;
 		}
+		[[nodiscard]]
 		inline bool operator == (const Iterator& it) const
 		{
 			return _it == it._it;
 		}
+		[[nodiscard]]
 		inline bool operator != (const Iterator& it) const
 		{
 			return _it != it._it;
@@ -243,6 +245,7 @@ public:
 		else throw NotFoundException(path);
 	}
 
+	[[nodiscard]]
 	const Meta* findClass(const std::string& className) const
 		/// Returns a pointer to the MetaObject for the given
 		/// class, or a null pointer if the class is not known.
@@ -259,6 +262,7 @@ public:
 		return nullptr;
 	}
 
+	[[nodiscard]]
 	const Meta& classFor(const std::string& className) const
 		/// Returns a reference to the MetaObject for the given
 		/// class. Throws a NotFoundException if the class
@@ -271,6 +275,7 @@ public:
 			throw NotFoundException(className);
 	}
 
+	[[nodiscard]]
 	Base* create(const std::string& className) const
 		/// Creates an instance of the given class.
 		/// Throws a NotFoundException if the class
@@ -279,6 +284,7 @@ public:
 		return classFor(className).create();
 	}
 
+	[[nodiscard]]
 	Base& instance(const std::string& className) const
 		/// Returns a reference to the sole instance of
 		/// the given class. The class must be a singleton,
@@ -289,6 +295,7 @@ public:
 		return classFor(className).instance();
 	}
 
+	[[nodiscard]]
 	bool canCreate(const std::string& className) const
 		/// Returns true if create() can create new instances
 		/// of the class.
@@ -303,6 +310,7 @@ public:
 		classFor(className).destroy(pObject);
 	}
 
+	[[nodiscard]]
 	bool isAutoDelete(const std::string& className, Base* pObject) const
 		/// Returns true if the object is automatically
 		/// deleted by its meta object.
@@ -310,6 +318,7 @@ public:
 		return classFor(className).isAutoDelete(pObject);
 	}
 
+	[[nodiscard]]
 	const Manif* findManifest(const std::string& path) const
 		/// Returns a pointer to the Manifest for the given
 		/// library, or a null pointer if the library has not been loaded.
@@ -323,6 +332,7 @@ public:
 			return nullptr;
 	}
 
+	[[nodiscard]]
 	const Manif& manifestFor(const std::string& path) const
 		/// Returns a reference to the Manifest for the given library
 		/// Throws a NotFoundException if the library has not been loaded.
@@ -334,6 +344,7 @@ public:
 			throw NotFoundException(path);
 	}
 
+	[[nodiscard]]
 	bool isLibraryLoaded(const std::string& path) const
 		/// Returns true if the library with the given name
 		/// has already been loaded.
@@ -341,6 +352,7 @@ public:
 		return findManifest(path) != nullptr;
 	}
 
+	[[nodiscard]]
 	Iterator begin() const
 	{
 		FastMutex::ScopedLock lock(_mutex);
@@ -348,6 +360,7 @@ public:
 		return Iterator(_map.begin());
 	}
 
+	[[nodiscard]]
 	Iterator end() const
 	{
 		FastMutex::ScopedLock lock(_mutex);

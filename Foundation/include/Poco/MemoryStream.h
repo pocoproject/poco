@@ -65,16 +65,19 @@ public:
 	BasicMemoryStreamBuf(const BasicMemoryStreamBuf&) = delete;
 	BasicMemoryStreamBuf& operator=(const BasicMemoryStreamBuf&) = delete;
 
+	[[nodiscard]]
 	int_type overflow(int_type /*c*/) override
 	{
 		return char_traits::eof();
 	}
 
+	[[nodiscard]]
 	int_type underflow() override
 	{
 		return char_traits::eof();
 	}
 
+	[[nodiscard]]
 	pos_type seekoff(off_type off, std::ios_base::seekdir way, std::ios_base::openmode which = std::ios_base::in | std::ios_base::out) override
 	{
 		const pos_type fail = off_type(-1);
@@ -154,6 +157,7 @@ public:
 		return 0;
 	}
 
+	[[nodiscard]]
 	std::streamsize charsWritten() const
 	{
 		return static_cast<std::streamsize>(this->pptr() - this->pbase());
@@ -191,6 +195,7 @@ public:
 	~MemoryIOS() override;
 	/// Destroys the stream.
 
+	[[nodiscard]]
 	MemoryStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
 
@@ -223,6 +228,7 @@ public:
 	~MemoryOutputStream() override;
 	/// Destroys the MemoryInputStream.
 
+	[[nodiscard]]
 	std::streamsize charsWritten() const;
 		/// Returns the number of chars written to the buffer.
 };

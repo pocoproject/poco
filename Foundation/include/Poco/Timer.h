@@ -117,6 +117,7 @@ public:
 		/// Sets a new periodic interval and restarts the timer.
 		/// An interval of 0 will stop the timer.
 
+	[[nodiscard]]
 	long getStartInterval() const;
 		/// Returns the start interval.
 
@@ -124,6 +125,7 @@ public:
 		/// Sets the start interval. Will only be
 		/// effective before start() is called.
 
+	[[nodiscard]]
 	long getPeriodicInterval() const;
 		/// Returns the periodic interval.
 
@@ -132,6 +134,7 @@ public:
 		/// the new interval will be effective when the current interval
 		/// expires.
 
+	[[nodiscard]]
 	long skipped() const;
 		/// Returns the number of skipped invocations since the last invocation.
 		/// Skipped invocations happen if the timer callback function takes
@@ -167,6 +170,7 @@ public:
 	AbstractTimerCallback& operator = (const AbstractTimerCallback& callback);
 
 	virtual void invoke(Timer& timer) const = 0;
+	[[nodiscard]]
 	virtual AbstractTimerCallback* clone() const = 0;
 };
 
@@ -210,6 +214,7 @@ public:
 		(_pObject->*_method)(timer);
 	}
 
+	[[nodiscard]]
 	AbstractTimerCallback* clone() const override
 	{
 		return new TimerCallback(*this);

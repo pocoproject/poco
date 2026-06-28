@@ -46,19 +46,31 @@ struct Foundation_API UTF8
 		NORMALIZATION_FORM_KC  /// Compatibility Decomposition, followed by Canonical Composition
 	};
 
+	[[nodiscard]]
 	static int icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, std::string::const_iterator it2, std::string::const_iterator end2);
+	[[nodiscard]]
 	static int icompare(const std::string& str1, const std::string& str2);
+	[[nodiscard]]
 	static int icompare(const std::string& str1, std::string::size_type n1, const std::string& str2, std::string::size_type n2);
+	[[nodiscard]]
 	static int icompare(const std::string& str1, std::string::size_type n, const std::string& str2);
+	[[nodiscard]]
 	static int icompare(const std::string& str1, std::string::size_type pos, std::string::size_type n, const std::string& str2);
+	[[nodiscard]]
 	static int icompare(const std::string& str1, std::string::size_type pos1, std::string::size_type n1, const std::string& str2, std::string::size_type pos2, std::string::size_type n2);
+	[[nodiscard]]
 	static int icompare(const std::string& str1, std::string::size_type pos1, std::string::size_type n, const std::string& str2, std::string::size_type pos2);
+	[[nodiscard]]
 	static int icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, const std::string::value_type* ptr);
+	[[nodiscard]]
 	static int icompare(const std::string& str, std::string::size_type pos, const std::string::value_type* ptr);
+	[[nodiscard]]
 	static int icompare(const std::string& str, const std::string::value_type* ptr);
 
+	[[nodiscard]]
 	static std::string toUpper(const std::string& str);
 	static std::string& toUpperInPlace(std::string& str);
+	[[nodiscard]]
 	static std::string toLower(const std::string& str);
 	static std::string& toLowerInPlace(std::string& str);
 
@@ -78,16 +90,20 @@ struct Foundation_API UTF8
 		/// If strictJSON is true, \a and \v will be escaped to \\u0007 and \\u000B
 		/// instead of \\a and \\v for strict JSON conformance.
 
+	[[nodiscard]]
 	static std::string unescape(const std::string& s);
 		/// Creates an UTF8 string from a string that contains escaped characters.
 
+	[[nodiscard]]
 	static std::string unescape(const std::string::const_iterator& begin, const std::string::const_iterator& end);
 		/// Creates an UTF8 string from a string that contains escaped characters.
 
+	[[nodiscard]]
 	static std::string normalize(const std::string& s, NormalizationForm form);
 		/// Normalizes the given UTF8 string according to the given normalization form.
 		/// Returns the normalized UTF8 string.
 
+	[[nodiscard]]
 	static std::string normalize(const std::string::const_iterator& begin, const std::string::const_iterator& end, NormalizationForm form);
 		/// Normalizes the given UTF8 string range according to the given normalization form.
 		/// Returns the normalized UTF8 string.

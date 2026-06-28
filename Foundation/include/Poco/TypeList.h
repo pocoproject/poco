@@ -39,8 +39,11 @@ struct NullTypeList
 {
 	static constexpr std::size_t length = 0;
 
+	[[nodiscard]]
 	bool operator == (const NullTypeList&) const { return true; }
+	[[nodiscard]]
 	bool operator != (const NullTypeList&) const { return false; }
+	[[nodiscard]]
 	bool operator < (const NullTypeList&) const { return false; }
 };
 

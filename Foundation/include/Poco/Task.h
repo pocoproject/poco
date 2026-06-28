@@ -53,6 +53,7 @@ public:
 	Task(const std::string& name);
 		/// Creates the Task.
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// Returns the task's name.
 
@@ -70,6 +71,7 @@ public:
 		/// but the base class implementation of cancel() should
 		/// be called to ensure proper behavior.
 
+	[[nodiscard]]
 	bool isCancelled() const;
 		/// Returns true if cancellation of the task has been
 		/// requested.
@@ -80,6 +82,7 @@ public:
 		/// If task is cancelled before it had a chance to run,
 		/// runTask() will never be called.
 
+	[[nodiscard]]
 	TaskState state() const;
 		/// Returns the task's current state.
 
@@ -98,6 +101,7 @@ public:
 		/// If task has been cancelled prior to this call, it only sets
 		/// the state to TASK_FINISHED and notifies the owner.
 
+	[[nodiscard]]
 	bool hasOwner() const;
 		/// Returns true iff the task has an owner.
 protected:
@@ -138,6 +142,7 @@ protected:
 	void setOwner(TaskManager* pOwner);
 		/// Sets the (optional) owner of the task.
 
+	[[nodiscard]]
 	TaskManager* getOwner() const;
 		/// Returns the owner of the task, which may be nullptr.
 

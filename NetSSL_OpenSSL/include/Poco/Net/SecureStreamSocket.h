@@ -154,10 +154,12 @@ public:
 		/// attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.
 
+	[[nodiscard]]
 	bool havePeerCertificate() const;
 		/// Returns true iff the peer has presented a
 		/// certificate.
 
+	[[nodiscard]]
 	X509Certificate peerCertificate() const;
 		/// Returns the peer's X509 certificate.
 		///
@@ -167,19 +169,23 @@ public:
 	void setPeerHostName(const std::string& hostName);
 		/// Sets the peer's host name used for certificate validation.
 
+	[[nodiscard]]
 	const std::string& getPeerHostName() const;
 		/// Returns the peer's host name used for certificate validation.
 
+	[[nodiscard]]
 	static SecureStreamSocket attach(const StreamSocket& streamSocket);
 		/// Creates a SecureStreamSocket over an existing socket
 		/// connection. The given StreamSocket must be connected.
 		/// A SSL handshake will be performed.
 
+	[[nodiscard]]
 	static SecureStreamSocket attach(const StreamSocket& streamSocket, Context::Ptr pContext);
 		/// Creates a SecureStreamSocket over an existing socket
 		/// connection. The given StreamSocket must be connected.
 		/// A SSL handshake will be performed.
 
+	[[nodiscard]]
 	static SecureStreamSocket attach(const StreamSocket& streamSocket, Context::Ptr pContext, Session::Ptr pSession);
 		/// Creates a SecureStreamSocket over an existing socket
 		/// connection. The given StreamSocket must be connected.
@@ -189,16 +195,19 @@ public:
 		/// caching is enabled for the given Context, and the server
 		/// agrees to reuse the session).
 
+	[[nodiscard]]
 	static SecureStreamSocket attach(const StreamSocket& streamSocket, const std::string& peerHostName);
 		/// Creates a SecureStreamSocket over an existing socket
 		/// connection. The given StreamSocket must be connected.
 		/// A SSL handshake will be performed.
 
+	[[nodiscard]]
 	static SecureStreamSocket attach(const StreamSocket& streamSocket, const std::string& peerHostName, Context::Ptr pContext);
 		/// Creates a SecureStreamSocket over an existing socket
 		/// connection. The given StreamSocket must be connected.
 		/// A SSL handshake will be performed.
 
+	[[nodiscard]]
 	static SecureStreamSocket attach(const StreamSocket& streamSocket, const std::string& peerHostName, Context::Ptr pContext, Session::Ptr pSession);
 		/// Creates a SecureStreamSocket over an existing socket
 		/// connection. The given StreamSocket must be connected.
@@ -208,6 +217,7 @@ public:
 		/// caching is enabled for the given Context, and the server
 		/// agrees to reuse the session).
 
+	[[nodiscard]]
 	Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.
 
@@ -216,6 +226,7 @@ public:
 		/// will be performed the first time date is sent or
 		/// received over the connection.
 
+	[[nodiscard]]
 	bool getLazyHandshake() const;
 		/// Returns true if setLazyHandshake(true) has been called.
 
@@ -246,6 +257,7 @@ public:
 		/// handshake. In this case, completeHandshake() should be called
 		/// again, after the necessary condition has been met.
 
+	[[nodiscard]]
 	Session::Ptr currentSession();
 		/// Returns the SSL session of the current connection,
 		/// for reuse in a future connection (if session caching
@@ -263,6 +275,7 @@ public:
 		///
 		/// Must be called before connect() to be effective.
 
+	[[nodiscard]]
 	bool sessionWasReused();
 		/// Returns true iff a reused session was negotiated during
 		/// the handshake.

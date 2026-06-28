@@ -65,6 +65,7 @@ public:
 	static const int OPERATION_DELETE;
 	static const int OPERATION_UPDATE;
 
+	[[nodiscard]]
 	static sqlite3* dbHandle(const Session& session);
 		/// Returns native DB handle.
 
@@ -83,15 +84,18 @@ public:
 		/// hard ceiling 125); requests above the compile-time cap are
 		/// silently clamped to it by SQLite. Returns the previous value.
 
+  [[nodiscard]]
 	static std::string lastError(sqlite3* pDB);
 		/// Retreives the last error code from sqlite and converts it to a string.
 
+	[[nodiscard]]
 	static std::string lastError(const Session& session);
 		/// Retreives the last error code from sqlite and converts it to a string.
 
 	static void throwException(sqlite3* pDB, int rc, const std::string& addErrMsg = std::string());
 		/// Throws for an error code the appropriate exception
 
+	[[nodiscard]]
 	static MetaColumn::ColumnDataType getColumnType(sqlite3_stmt* pStmt, std::size_t pos);
 		/// Returns column data type.
 
@@ -119,6 +123,7 @@ public:
 		///
 		/// Returns true if succesful.
 
+	[[nodiscard]]
 	static bool isThreadSafe();
 		/// Returns true if SQLite was compiled in multi-thread or serialized mode.
 		/// See http://www.sqlite.org/c3ref/threadsafe.html for details.
@@ -131,6 +136,7 @@ public:
 		///
 		/// Returns true if succesful
 
+	[[nodiscard]]
 	static int getThreadMode();
 		/// Returns the thread mode.
 

@@ -32,16 +32,19 @@ class XML_API ProcessingInstruction: public AbstractNode
 	/// of the document.
 {
 public:
+	[[nodiscard]]
 	const XMLString& target() const;
 		/// Returns the target of this processing instruction.
 		/// XML defines this as being the first token following
 		/// the markup that begins the processing instruction.
 
+	[[nodiscard]]
 	const XMLString& data() const;
 		/// Returns the content of this processing instruction. This is from the first non
 		/// white space character after the target to the character immediately preceding
 		/// the ?>.
 
+	[[nodiscard]]
 	const XMLString& getData() const;
 		/// Returns the content of this processing instruction. This is from the first non
 		/// white space character after the target to the character immediately preceding
@@ -51,9 +54,12 @@ public:
 		/// Sets the content of this processing instruction.
 
 	// Node
+	[[nodiscard]]
 	const XMLString& nodeName() const;
+	[[nodiscard]]
 	const XMLString& getNodeValue() const;
 	void setNodeValue(const XMLString& data);
+	[[nodiscard]]
 	unsigned short nodeType() const;
 
 protected:
@@ -61,6 +67,7 @@ protected:
 	ProcessingInstruction(Document* pOwnerDocument, const ProcessingInstruction& processingInstruction);
 	~ProcessingInstruction();
 
+	[[nodiscard]]
 	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:

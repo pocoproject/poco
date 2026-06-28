@@ -70,6 +70,7 @@ public:
 		/// Callers that need the fractional digits captured must use %s (millis+micros),
 		/// %i (milliseconds only), %c (centiseconds), or %F (six-digit fractional seconds).
 
+	[[nodiscard]]
 	static DateTime parse(const std::string& fmt, const std::string& str, int& timeZoneDifferential);
 		/// Parses a date and time in the given format from the given string.
 		/// Performs cleanup of the input string (trims spaces).
@@ -92,6 +93,7 @@ public:
 		/// Please see DateTimeFormatter::format() for a description of the format string.
 		/// Class DateTimeFormat defines format strings for various standard date/time formats.
 
+	[[nodiscard]]
 	static DateTime parse(const std::string& str, int& timeZoneDifferential);
 		/// Parses a date and time from the given dateTime string. Before parsing, the method
 		/// performs cleanup of the input string (trims spaces) and
@@ -106,12 +108,14 @@ public:
 		/// Please see DateTimeFormatter::format() for a description of the format string.
 		/// Class DateTimeFormat defines format strings for various standard date/time formats.
 
+	[[nodiscard]]
 	static int parseMonth(std::string::const_iterator& it, const std::string::const_iterator& end);
 		/// Tries to interpret the given range as a month name. The range must be at least
 		/// three characters long.
 		/// Returns the month number (1 .. 12) if the month name is valid. Otherwise throws
 		/// a SyntaxException.
 
+	[[nodiscard]]
 	static int parseDayOfWeek(std::string::const_iterator& it, const std::string::const_iterator& end);
 		/// Tries to interpret the given range as a weekday name. The range must be at least
 		/// three characters long.

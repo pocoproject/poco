@@ -71,6 +71,7 @@ class Foundation_API Base64DecoderIOS: public virtual std::ios
 public:
 	Base64DecoderIOS(std::istream& istr, int options = 0);
 	~Base64DecoderIOS() override;
+	[[nodiscard]]
 	Base64DecoderBuf* rdbuf();
 
 protected:

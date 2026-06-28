@@ -86,12 +86,14 @@ public:
 		else return false;
 	}
 
+	[[nodiscard]]
 	bool equals(const AbstractDelegate<TArgs>& other) const
 	{
 		const PriorityDelegate* pOtherDelegate = dynamic_cast<const PriorityDelegate*>(other.unwrap());
 		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
+	[[nodiscard]]
 	AbstractDelegate<TArgs>* clone() const
 	{
 		return new PriorityDelegate(*this);
@@ -166,12 +168,14 @@ public:
 		else return false;
 	}
 
+	[[nodiscard]]
 	bool equals(const AbstractDelegate<void>& other) const override
 	{
 		const PriorityDelegate* pOtherDelegate = dynamic_cast<const PriorityDelegate*>(other.unwrap());
 		return pOtherDelegate && this->priority() == pOtherDelegate->priority() && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
+	[[nodiscard]]
 	AbstractDelegate<void>* clone() const override
 	{
 		return new PriorityDelegate(*this);
@@ -191,6 +195,7 @@ protected:
 
 
 template <class TObj, class TArgs>
+[[nodiscard]]
 static PriorityDelegate<TObj, TArgs, true> priorityDelegate(TObj* pObj, void (TObj::*NotifyMethod)(const void*, TArgs&), int prio)
 {
 	return PriorityDelegate<TObj, TArgs, true>(pObj, NotifyMethod, prio);
@@ -198,6 +203,7 @@ static PriorityDelegate<TObj, TArgs, true> priorityDelegate(TObj* pObj, void (TO
 
 
 template <class TObj, class TArgs>
+[[nodiscard]]
 static PriorityDelegate<TObj, TArgs, false> priorityDelegate(TObj* pObj, void (TObj::*NotifyMethod)(TArgs&), int prio)
 {
 	return PriorityDelegate<TObj, TArgs, false>(pObj, NotifyMethod, prio);
@@ -205,6 +211,7 @@ static PriorityDelegate<TObj, TArgs, false> priorityDelegate(TObj* pObj, void (T
 
 
 template <class TObj, class TArgs>
+[[nodiscard]]
 static PriorityExpire<TArgs> priorityDelegate(TObj* pObj, void (TObj::*NotifyMethod)(const void*, TArgs&), int prio, Timestamp::TimeDiff expireMilliSec)
 {
 	return PriorityExpire<TArgs>(PriorityDelegate<TObj, TArgs, true>(pObj, NotifyMethod, prio), expireMilliSec);
@@ -212,6 +219,7 @@ static PriorityExpire<TArgs> priorityDelegate(TObj* pObj, void (TObj::*NotifyMet
 
 
 template <class TObj, class TArgs>
+[[nodiscard]]
 static PriorityExpire<TArgs> priorityDelegate(TObj* pObj, void (TObj::*NotifyMethod)(TArgs&), int prio, Timestamp::TimeDiff expireMilliSec)
 {
 	return PriorityExpire<TArgs>(PriorityDelegate<TObj, TArgs, false>(pObj, NotifyMethod, prio), expireMilliSec);
@@ -219,6 +227,7 @@ static PriorityExpire<TArgs> priorityDelegate(TObj* pObj, void (TObj::*NotifyMet
 
 
 template <class TArgs>
+[[nodiscard]]
 static PriorityExpire<TArgs> priorityDelegate(void (*NotifyMethod)(const void*, TArgs&), int prio, Timestamp::TimeDiff expireMilliSec)
 {
 	return PriorityExpire<TArgs>(FunctionPriorityDelegate<TArgs, true, true>(NotifyMethod, prio), expireMilliSec);
@@ -226,6 +235,7 @@ static PriorityExpire<TArgs> priorityDelegate(void (*NotifyMethod)(const void*, 
 
 
 template <class TArgs>
+[[nodiscard]]
 static PriorityExpire<TArgs> priorityDelegate(void (*NotifyMethod)(void*, TArgs&), int prio, Timestamp::TimeDiff expireMilliSec)
 {
 	return PriorityExpire<TArgs>(FunctionPriorityDelegate<TArgs, true, false>(NotifyMethod, prio), expireMilliSec);
@@ -233,6 +243,7 @@ static PriorityExpire<TArgs> priorityDelegate(void (*NotifyMethod)(void*, TArgs&
 
 
 template <class TArgs>
+[[nodiscard]]
 static PriorityExpire<TArgs> priorityDelegate(void (*NotifyMethod)(TArgs&), int prio, Timestamp::TimeDiff expireMilliSec)
 {
 	return PriorityExpire<TArgs>(FunctionPriorityDelegate<TArgs, false>(NotifyMethod, prio), expireMilliSec);
@@ -240,6 +251,7 @@ static PriorityExpire<TArgs> priorityDelegate(void (*NotifyMethod)(TArgs&), int 
 
 
 template <class TArgs>
+[[nodiscard]]
 static FunctionPriorityDelegate<TArgs, true, true> priorityDelegate(void (*NotifyMethod)(const void*, TArgs&), int prio)
 {
 	return FunctionPriorityDelegate<TArgs, true, true>(NotifyMethod, prio);
@@ -247,6 +259,7 @@ static FunctionPriorityDelegate<TArgs, true, true> priorityDelegate(void (*Notif
 
 
 template <class TArgs>
+[[nodiscard]]
 static FunctionPriorityDelegate<TArgs, true, false> priorityDelegate(void (*NotifyMethod)(void*, TArgs&), int prio)
 {
 	return FunctionPriorityDelegate<TArgs, true, false>(NotifyMethod, prio);
@@ -254,6 +267,7 @@ static FunctionPriorityDelegate<TArgs, true, false> priorityDelegate(void (*Noti
 
 
 template <class TArgs>
+[[nodiscard]]
 static FunctionPriorityDelegate<TArgs, false> priorityDelegate(void (*NotifyMethod)(TArgs&), int prio)
 {
 	return FunctionPriorityDelegate<TArgs, false>(NotifyMethod, prio);
@@ -261,6 +275,7 @@ static FunctionPriorityDelegate<TArgs, false> priorityDelegate(void (*NotifyMeth
 
 
 template <class TObj>
+[[nodiscard]]
 static PriorityDelegate<TObj, void, true> priorityDelegate(TObj* pObj, void (TObj::*NotifyMethod)(const void*), int prio)
 {
 	return PriorityDelegate<TObj, void, true>(pObj, NotifyMethod, prio);
@@ -268,6 +283,7 @@ static PriorityDelegate<TObj, void, true> priorityDelegate(TObj* pObj, void (TOb
 
 
 template <class TObj>
+[[nodiscard]]
 static PriorityDelegate<TObj, void, false> priorityDelegate(TObj* pObj, void (TObj::*NotifyMethod)(), int prio)
 {
 	return PriorityDelegate<TObj, void, false>(pObj, NotifyMethod, prio);
@@ -282,42 +298,49 @@ static PriorityExpire<void> priorityDelegate(TObj* pObj, void (TObj::*NotifyMeth
 
 
 template <class TObj>
+[[nodiscard]]
 static PriorityExpire<void> priorityDelegate(TObj* pObj, void (TObj::*NotifyMethod)(), int prio, Timestamp::TimeDiff expireMilliSec)
 {
 	return PriorityExpire<void>(PriorityDelegate<TObj, void, false>(pObj, NotifyMethod, prio), expireMilliSec);
 }
 
 
+[[nodiscard]]
 inline PriorityExpire<void> priorityDelegate(void (*NotifyMethod)(const void*), int prio, Timestamp::TimeDiff expireMilliSec)
 {
 	return PriorityExpire<void>(FunctionPriorityDelegate<void, true, true>(NotifyMethod, prio), expireMilliSec);
 }
 
 
+[[nodiscard]]
 inline PriorityExpire<void> priorityDelegate(void (*NotifyMethod)(void*), int prio, Timestamp::TimeDiff expireMilliSec)
 {
 	return PriorityExpire<void>(FunctionPriorityDelegate<void, true, false>(NotifyMethod, prio), expireMilliSec);
 }
 
 
+[[nodiscard]]
 inline PriorityExpire<void> priorityDelegate(void (*NotifyMethod)(), int prio, Timestamp::TimeDiff expireMilliSec)
 {
 	return PriorityExpire<void>(FunctionPriorityDelegate<void, false>(NotifyMethod, prio), expireMilliSec);
 }
 
 
+[[nodiscard]]
 inline FunctionPriorityDelegate<void, true, true> priorityDelegate(void (*NotifyMethod)(const void*), int prio)
 {
 	return FunctionPriorityDelegate<void, true, true>(NotifyMethod, prio);
 }
 
 
+[[nodiscard]]
 inline FunctionPriorityDelegate<void, true, false> priorityDelegate(void (*NotifyMethod)(void*), int prio)
 {
 	return FunctionPriorityDelegate<void, true, false>(NotifyMethod, prio);
 }
 
 
+[[nodiscard]]
 inline FunctionPriorityDelegate<void, false> priorityDelegate(void (*NotifyMethod)(), int prio)
 {
 	return FunctionPriorityDelegate<void, false>(NotifyMethod, prio);

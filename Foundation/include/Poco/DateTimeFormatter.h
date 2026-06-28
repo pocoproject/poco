@@ -46,6 +46,7 @@ public:
 		UTC = 0xFFFF /// Special value for timeZoneDifferential denoting UTC.
 	};
 
+	[[nodiscard]]
 	static std::string format(const Timestamp& timestamp, const std::string& fmt, int timeZoneDifferential = UTC);
 		/// Formats the given timestamp according to the given format.
 		/// The format string is used as a template to format the date and
@@ -80,14 +81,17 @@ public:
 		///
 		/// Class DateTimeFormat defines format strings for various standard date/time formats.
 
+	[[nodiscard]]
 	static std::string format(const DateTime& dateTime, const std::string& fmt, int timeZoneDifferential = UTC);
 		/// Formats the given date and time according to the given format.
 		/// See format(const Timestamp&, const std::string&, int) for more information.
 
+	[[nodiscard]]
 	static std::string format(const LocalDateTime& dateTime, const std::string& fmt);
 		/// Formats the given local date and time according to the given format.
 		/// See format(const Timestamp&, const std::string&, int) for more information.
 
+	[[nodiscard]]
 	static std::string format(const Timespan& timespan, const std::string& fmt = "%dd %H:%M:%S.%i");
 		/// Formats the given timespan according to the given format.
 		/// The format string is used as a template to format the date and
@@ -126,11 +130,13 @@ public:
 		///
 		/// See format() for documentation of the formatting string.
 
+	[[nodiscard]]
 	static std::string tzdISO(int timeZoneDifferential);
 		/// Formats the given timezone differential in ISO format.
 		/// If timeZoneDifferential is UTC, "Z" is returned,
 		/// otherwise, +HH.MM (or -HH.MM) is returned.
 
+	[[nodiscard]]
 	static std::string tzdRFC(int timeZoneDifferential);
 		/// Formats the given timezone differential in RFC format.
 		/// If timeZoneDifferential is UTC, "GMT" is returned,

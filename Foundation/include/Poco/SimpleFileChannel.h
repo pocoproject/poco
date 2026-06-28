@@ -107,20 +107,25 @@ public:
 		///                    flushed to the log file. See the SimpleFileChannel
 		///                    class for details.
 
+	[[nodiscard]]
 	std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.
 		/// See setProperty() for a description of the supported
 		/// properties.
 
+	[[nodiscard]]
 	Timestamp creationDate() const;
 		/// Returns the log file's creation date.
 
+	[[nodiscard]]
 	UInt64 size() const;
 		/// Returns the log file's current size in bytes.
 
+	[[nodiscard]]
 	const std::string& path() const;
 		/// Returns the log file's primary path.
 
+	[[nodiscard]]
 	const std::string& secondaryPath() const;
 		/// Returns the log file's secondary path.
 

@@ -117,15 +117,18 @@ public:
 	void wakeUpAll();
 		/// Wakes up all threads that wait for a notification.
 
+	[[nodiscard]]
 	bool empty() const;
 		/// Returns true iff the queue is empty.
 
+	[[nodiscard]]
 	int size() const;
 		/// Returns the number of notifications in the queue.
 
 	void clear();
 		/// Removes all notifications from the queue.
 
+	[[nodiscard]]
 	bool hasIdleThreads() const;
 		/// Returns true if the queue has at least one thread waiting
 		/// for a notification.

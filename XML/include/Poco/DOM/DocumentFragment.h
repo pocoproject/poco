@@ -60,7 +60,9 @@ class XML_API DocumentFragment: public AbstractContainerNode
 {
 public:
 	// Node
+	[[nodiscard]]
 	const XMLString& nodeName() const;
+	[[nodiscard]]
 	unsigned short nodeType() const;
 
 protected:
@@ -68,6 +70,7 @@ protected:
 	DocumentFragment(Document* pOwnerDocument, const DocumentFragment& fragment);
 	~DocumentFragment();
 
+	[[nodiscard]]
 	Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:

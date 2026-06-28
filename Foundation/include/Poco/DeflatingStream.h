@@ -137,6 +137,7 @@ public:
 	~DeflatingIOS() override;
 	/// Destroys the DeflatingIOS.
 
+	[[nodiscard]]
 	DeflatingStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying stream buffer.
 

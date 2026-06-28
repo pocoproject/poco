@@ -60,12 +60,14 @@ public:
 	void setMethod(const std::string& method);
 		/// Sets the method.
 
+	[[nodiscard]]
 	const std::string& getMethod() const;
 		/// Returns the method.
 
 	void setURI(const std::string& uri);
 		/// Sets the request URI.
 
+	[[nodiscard]]
 	const std::string& getURI() const;
 		/// Returns the request URI.
 
@@ -79,6 +81,7 @@ public:
 		/// port number (other than 80 or 443), it is
 		/// included in the Host header field.
 
+	[[nodiscard]]
 	const std::string& getHost() const;
 		/// Returns the value of the Host header field.
 		///
@@ -93,6 +96,7 @@ public:
 		/// Fills cookies with the cookies extracted
 		/// from the Cookie headers in the request.
 
+	[[nodiscard]]
 	bool hasCredentials() const;
 		/// Returns true iff the request contains authentication
 		/// information in the form of an Authorization header.
@@ -111,6 +115,7 @@ public:
 	void removeCredentials();
 		/// Removes any credentials from the request.
 
+	[[nodiscard]]
 	bool getExpectContinue() const;
 		/// Returns true if the request contains an
 		/// "Expect: 100-continue" header.
@@ -119,6 +124,7 @@ public:
 		/// Adds a "Expect: 100-continue" header to the request if
 		/// expectContinue is true, otherwise removes the Expect header.
 
+	[[nodiscard]]
 	bool hasProxyCredentials() const;
 		/// Returns true iff the request contains proxy authentication
 		/// information in the form of an Proxy-Authorization header.

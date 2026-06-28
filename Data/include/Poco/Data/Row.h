@@ -92,12 +92,15 @@ public:
 	~Row();
 		/// Destroys the Row.
 
+	[[nodiscard]]
 	Poco::Dynamic::Var& get(std::size_t col);
 		/// Returns the reference to data value at column location.
 
+	[[nodiscard]]
 	Poco::Dynamic::Var& operator [] (std::size_t col);
 		/// Returns the reference to data value at column location.
 
+	[[nodiscard]]
 	Poco::Dynamic::Var& operator [] (const std::string& name);
 		/// Returns the reference to data value at named column location.
 
@@ -142,6 +145,7 @@ public:
 		throw NotFoundException(os.str());
 	}
 
+	[[nodiscard]]
 	std::size_t fieldCount() const;
 		/// Returns the number of fields in this row.
 
@@ -172,30 +176,37 @@ public:
 	void resetSort();
 		/// Resets the sorting criteria to field 0 only.
 
+	[[nodiscard]]
 	const std::string& namesToString() const;
 		/// Converts the column names to string.
 
 	void formatNames() const;
 		/// Fomats the column names.
 
+	[[nodiscard]]
 	const std::string& valuesToString() const;
 		/// Converts the row values to string and returns the formated string.
 
 	void formatValues() const;
 		/// Fomats the row values.
 
+	[[nodiscard]]
 	bool operator == (const Row& other) const;
 		/// Equality operator.
 
+	[[nodiscard]]
 	bool operator != (const Row& other) const;
 		/// Inequality operator.
 
+	[[nodiscard]]
 	bool operator < (const Row& other) const;
 		/// Less-than operator.
 
+	[[nodiscard]]
 	const NameVecPtr names() const;
 		/// Returns the shared pointer to names vector.
 
+	[[nodiscard]]
 	const ValueVec& values() const;
 		/// Returns the const reference to values vector.
 
@@ -203,6 +214,7 @@ public:
 		/// Sets the formatter for this row and takes the
 		/// shared ownership of it.
 
+	[[nodiscard]]
 	const RowFormatter& getFormatter() const;
 		/// Returns the reference to the formatter.
 
@@ -210,17 +222,22 @@ public:
 		/// Adds the sorting fields entry and takes the
 		/// shared ownership of it.
 
+	[[nodiscard]]
 	const SortMapPtr& getSortMap() const;
 		/// Returns the reference to the sorting fields.
 
 private:
 	void init(const SortMapPtr& pSortMap, const RowFormatter::Ptr& pFormatter);
 
+	[[nodiscard]]
 	ValueVec& values();
 		/// Returns the reference to values vector.
 
+	[[nodiscard]]
 	std::size_t getPosition(const std::string& name);
+	[[nodiscard]]
 	bool isEqualSize(const Row& other) const;
+	[[nodiscard]]
 	bool isEqualType(const Row& other) const;
 
 	NameVecPtr                _pNames;

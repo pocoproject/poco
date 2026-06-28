@@ -42,6 +42,7 @@ public:
 		/// Destroys the BonjourResponderImpl.
 
 	// DNSSDResponderImpl
+	[[nodiscard]]
 	DNSSDBrowser& browser() override;
 	ServiceHandle registerService(const Service& service, int options) override;
 	void unregisterService(ServiceHandle& serviceHandle) override;
@@ -52,12 +53,14 @@ public:
 	void stop() override;
 
 	// Implementation
+	[[nodiscard]]
 	static const char* describeError(int code);
 		/// Returns a human-readable string describing the error.
 
 	void onRegisterServiceReply(DNSServiceRef sdRef, DNSServiceFlags flags, DNSServiceErrorType errorCode, const char* name, const char* regtype, const char* domain);
 
 protected:
+	[[nodiscard]]
 	static std::string createTXTRecord(const Service::Properties& properties);
 
 private:
@@ -73,6 +76,7 @@ class DNSSD_Bonjour_API BonjourResponderImplFactory: public Poco::DNSSD::DNSSDRe
 	/// A factory for BonjourResponderImplFactory objects.
 {
 public:
+	[[nodiscard]]
 	DNSSDResponderImpl* createResponderImpl(Poco::DNSSD::DNSSDResponder& owner)
 	{
 		return new BonjourResponderImpl(owner);

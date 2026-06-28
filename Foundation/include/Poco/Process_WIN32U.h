@@ -37,7 +37,9 @@ public:
 	ProcessHandleImpl(HANDLE _hProcess, UInt32 pid);
 	~ProcessHandleImpl();
 
+	[[nodiscard]]
 	UInt32 id() const;
+	[[nodiscard]]
 	HANDLE process() const;
 	int wait() const;
 	int tryWait() const;
@@ -59,6 +61,7 @@ public:
 	typedef std::vector<std::string> ArgsImpl;
 	typedef std::map<std::string, std::string> EnvImpl;
 
+	[[nodiscard]]
 	static PIDImpl idImpl();
 	static void timesImpl(long& userTime, long& kernelTime);
 	static void timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kernelTime);
@@ -73,11 +76,16 @@ public:
 		int options = 0);
 	static void killImpl(ProcessHandleImpl& handle);
 	static void killImpl(PIDImpl pid);
+	[[nodiscard]]
 	static bool isRunningImpl(const ProcessHandleImpl& handle);
+	[[nodiscard]]
 	static bool isRunningImpl(PIDImpl pid);
 	static void requestTerminationImpl(PIDImpl pid);
+	[[nodiscard]]
 	static std::string terminationEventName(PIDImpl pid);
+	[[nodiscard]]
 	static bool mustEscapeArg(const std::string& arg);
+	[[nodiscard]]
 	static std::string escapeArg(const std::string& arg);
 };
 

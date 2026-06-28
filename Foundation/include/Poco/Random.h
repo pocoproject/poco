@@ -86,26 +86,33 @@ public:
 		/// Seeds the pseudo random generator with a random seed
 		/// obtained from a RandomInputStream.
 
+	[[nodiscard]]
 	UInt32 next();
 		/// Returns the next 31-bit pseudo random number.
 
+	[[nodiscard]]
 	UInt32 next(UInt32 n);
 		/// Returns the next 31-bit pseudo random number modulo n.
 
+	[[nodiscard]]
 	char nextChar();
 		/// Returns the next pseudo random character.
 
+	[[nodiscard]]
 	bool nextBool();
 		/// Returns the next boolean pseudo random value.
 
+	[[nodiscard]]
 	float nextFloat();
 		/// Returns the next float pseudo random number between 0.0 and 1.0.
 
+	[[nodiscard]]
 	double nextDouble();
 		/// Returns the next double pseudo random number between 0.0 and 1.0.
 
 protected:
 	void initState(UInt32 seed, char* arg_state, Int32 n);
+	[[nodiscard]]
 	static UInt32 goodRand(Int32 x);
 
 private:

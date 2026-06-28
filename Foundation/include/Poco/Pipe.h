@@ -91,10 +91,12 @@ public:
 		///
 		/// Throws a ReadFileException if nothing can be read.
 
+	[[nodiscard]]
 	Handle readHandle() const;
 		/// Returns the read handle or file descriptor
 		/// for the Pipe. For internal use only.
 
+	[[nodiscard]]
 	Handle writeHandle() const;
 		/// Returns the write handle or file descriptor
 		/// for the Pipe. For internal use only.

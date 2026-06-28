@@ -53,6 +53,7 @@ public:
 		/// before they are passed on. If null, the message
 		/// is passed on unmodified.
 
+	[[nodiscard]]
 	Formatter::Ptr getFormatter() const;
 		/// Returns the Formatter used to format messages,
 		/// which may be null.
@@ -61,6 +62,7 @@ public:
 		/// Sets the destination channel to which the formatted
 		/// messages are passed on.
 
+	[[nodiscard]]
 	Channel::Ptr getChannel() const;
 		/// Returns the channel to which the formatted
 		/// messages are passed on.

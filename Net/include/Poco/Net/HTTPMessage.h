@@ -39,6 +39,7 @@ public:
 	void setVersion(const std::string& version);
 		/// Sets the HTTP version for this message.
 
+	[[nodiscard]]
 	const std::string& getVersion() const;
 		/// Returns the HTTP version for this message.
 
@@ -48,6 +49,7 @@ public:
 		/// If length is UNKNOWN_CONTENT_LENGTH, removes
 		/// the Content-Length header.
 
+	[[nodiscard]]
 	std::streamsize getContentLength() const;
 		/// Returns the content length for this message,
 		/// which may be UNKNOWN_CONTENT_LENGTH if
@@ -63,6 +65,7 @@ public:
 		/// In contrast to setContentLength(), this method takes
 		/// a 64-bit integer as content length.
 
+	[[nodiscard]]
 	Poco::Int64 getContentLength64() const;
 		/// Returns the content length for this message,
 		/// which may be UNKNOWN_CONTENT_LENGTH if
@@ -72,6 +75,7 @@ public:
 		/// always returns a 64-bit integer for content length.
 #endif // defined(POCO_HAVE_INT64)
 
+	[[nodiscard]]
 	bool hasContentLength() const;
 		/// Returns true iff a Content-Length header is present.
 
@@ -81,6 +85,7 @@ public:
 		/// The value should be either IDENTITY_TRANSFER_CODING
 		/// or CHUNKED_TRANSFER_CODING.
 
+	[[nodiscard]]
 	std::string getTransferEncoding() const;
 		/// Returns the transfer encoding used for this
 		/// message.
@@ -94,6 +99,7 @@ public:
 		/// chunked. Otherwise, removes the Transfer-Encoding
 		/// header.
 
+	[[nodiscard]]
 	bool getChunkedTransferEncoding() const;
 		/// Returns true if the Transfer-Encoding header is set
 		/// and its value is chunked.
@@ -107,6 +113,7 @@ public:
 	void setContentType(const MediaType& mediaType);
 		/// Sets the content type for this message.
 
+	[[nodiscard]]
 	std::string getContentType() const;
 		/// Returns the content type for this message.
 		///
@@ -119,6 +126,7 @@ public:
 		/// The value is set to "Keep-Alive" if keepAlive is
 		/// true, or to "Close" otherwise.
 
+	[[nodiscard]]
 	bool getKeepAlive() const;
 		/// Returns true if
 		///   * the message has a Connection header field and its value is "Keep-Alive"

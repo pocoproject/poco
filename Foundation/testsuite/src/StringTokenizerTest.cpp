@@ -378,14 +378,14 @@ void StringTokenizerTest::testFind()
 
 	try
 	{
-		std::size_t POCO_UNUSED p = st.find("4");
+		[[maybe_unused]] std::size_t p = st.find("4");
 		fail ("must fail");
 	}
 	catch (NotFoundException&) { }
 
 	try
 	{
-		std::string POCO_UNUSED s = st[8];
+		[[maybe_unused]] std::string s = st[8];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }

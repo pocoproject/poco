@@ -59,6 +59,7 @@ public:
 		SELECT_ERROR = 4
 	};
 
+	[[nodiscard]]
 	virtual SocketImpl* acceptConnection(SocketAddress& clientAddr);
 		/// Get the next completed connection from the
 		/// socket's completed connection queue.
@@ -311,10 +312,12 @@ public:
 		/// Also throws a NetException if the socket has been set to
 		/// non-blocking.
 
+	[[nodiscard]]
 	virtual int available();
 		/// Returns the number of bytes available that can be read
 		/// without causing the socket to block.
 
+	[[nodiscard]]
 	virtual bool poll(const Poco::Timespan& timeout, int mode);
 		/// Determines the status of the socket, using a
 		/// call to select().
@@ -325,15 +328,18 @@ public:
 		/// Returns true if the next operation corresponding to
 		/// mode will not block, false otherwise.
 
+	[[nodiscard]]
 	Type type();
 		/// Returns the socket type.
 
+	[[nodiscard]]
 	virtual int getError();
 		/// Returns the socket error.
 
 	virtual void setSendBufferSize(int size);
 		/// Sets the size of the send buffer.
 
+	[[nodiscard]]
 	virtual int getSendBufferSize();
 		/// Returns the size of the send buffer.
 		///
@@ -344,6 +350,7 @@ public:
 	virtual void setReceiveBufferSize(int size);
 		/// Sets the size of the receive buffer.
 
+	[[nodiscard]]
 	virtual int getReceiveBufferSize();
 		/// Returns the size of the receive buffer.
 		///
@@ -354,6 +361,7 @@ public:
 	virtual void setSendTimeout(const Poco::Timespan& timeout);
 		/// Sets the send timeout for the socket.
 
+	[[nodiscard]]
 	virtual Poco::Timespan getSendTimeout();
 		/// Returns the send timeout for the socket.
 		///
@@ -367,6 +375,7 @@ public:
 		/// On systems that do not support SO_RCVTIMEO, a
 		/// workaround using poll() is provided.
 
+	[[nodiscard]]
 	virtual Poco::Timespan getReceiveTimeout();
 		/// Returns the receive timeout for the socket.
 		///
@@ -374,9 +383,11 @@ public:
 		/// timeout previously set with setReceiveTimeout(),
 		/// as the system is free to adjust the value.
 
+	[[nodiscard]]
 	virtual SocketAddress address();
 		/// Returns the IP address and port number of the socket.
 
+	[[nodiscard]]
 	virtual SocketAddress peerAddress();
 		/// Returns the IP address and port number of the peer socket.
 
@@ -437,18 +448,21 @@ public:
 	void setNoDelay(bool flag);
 		/// Sets the value of the TCP_NODELAY socket option.
 
+	[[nodiscard]]
 	bool getNoDelay();
 		/// Returns the value of the TCP_NODELAY socket option.
 
 	void setKeepAlive(bool flag);
 		/// Sets the value of the SO_KEEPALIVE socket option.
 
+	[[nodiscard]]
 	bool getKeepAlive();
 		/// Returns the value of the SO_KEEPALIVE socket option.
 
 	void setReuseAddress(bool flag);
 		/// Sets the value of the SO_REUSEADDR socket option.
 
+	[[nodiscard]]
 	bool getReuseAddress();
 		/// Returns the value of the SO_REUSEADDR socket option.
 
@@ -457,6 +471,7 @@ public:
 		/// Does nothing if the socket implementation does not
 		/// support SO_REUSEPORT.
 
+	[[nodiscard]]
 	bool getReusePort();
 		/// Returns the value of the SO_REUSEPORT socket option.
 		///
@@ -466,12 +481,14 @@ public:
 	void setOOBInline(bool flag);
 		/// Sets the value of the SO_OOBINLINE socket option.
 
+	[[nodiscard]]
 	bool getOOBInline();
 		/// Returns the value of the SO_OOBINLINE socket option.
 
 	void setBroadcast(bool flag);
 		/// Sets the value of the SO_BROADCAST socket option.
 
+	[[nodiscard]]
 	bool getBroadcast();
 		/// Returns the value of the SO_BROADCAST socket option.
 
@@ -479,18 +496,22 @@ public:
 		/// Sets the socket in blocking mode if flag is true,
 		/// disables blocking mode if flag is false.
 
+	[[nodiscard]]
 	virtual bool getBlocking() const;
 		/// Returns the blocking mode of the socket.
 		/// This method will only work if the blocking modes of
 		/// the socket are changed via the setBlocking method!
 
+	[[nodiscard]]
 	virtual bool secure() const;
 		/// Returns true iff the socket's connection is secure
 		/// (using SSL or TLS).
 
+	[[nodiscard]]
 	int socketError();
 		/// Returns the value of the SO_ERROR socket option.
 
+	[[nodiscard]]
 	poco_socket_t sockfd() const;
 		/// Returns the socket descriptor for the
 		/// underlying native socket.
@@ -509,6 +530,7 @@ public:
 		/// A wrapper for the fcntl system call.
 #endif
 
+	[[nodiscard]]
 	bool initialized() const;
 		/// Returns true iff the underlying socket is initialized.
 
@@ -560,6 +582,7 @@ protected:
 		/// Implements sendFile() by reading the file blockwise and
 		/// calling sendBytes() for each block.
 
+	[[nodiscard]]
 	static int lastError();
 		/// Returns the last error code.
 

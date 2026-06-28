@@ -84,12 +84,14 @@ public:
 		_thread.join();
 	}
 
+	[[nodiscard]]
 	std::size_t blockSize() const
 		/// Returns the memory block size.
 	{
 		return _blockSize;
 	}
 
+	[[nodiscard]]
 	char* next(poco_socket_t sock)
 		/// Creates the next BufList entry, and returns
 		/// the pointers to the newly created guard/buffer.
@@ -192,12 +194,14 @@ public:
 		_dataReady.set();
 	}
 
+	[[nodiscard]]
 	bool stopped() const
 		/// Returns true if the handler was signalled to stop.
 	{
 		return _stop == true;
 	}
 
+	[[nodiscard]]
 	bool done() const
 		/// Returns true if handler is done (ie. run() thread
 		/// entrypoint end was reached).
@@ -242,6 +246,7 @@ public:
 		return --_errorBacklog;
 	}
 
+	[[nodiscard]]
 	bool hasData(char*& pBuf)
 		/// Returns true if buffer contains data.
 	{
@@ -249,6 +254,7 @@ public:
 		return *reinterpret_cast<MsgSizeT*>(pBuf) > 0;
 	}
 
+	[[nodiscard]]
 	bool isError(char*& pBuf)
 		/// Returns true if buffer contains error.
 	{
@@ -256,17 +262,20 @@ public:
 		return *reinterpret_cast<MsgSizeT*>(pBuf) == BUF_STATUS_ERROR;
 	}
 
+	[[nodiscard]]
 	static Poco::UInt16 offset()
 		/// Returns buffer data offset.
 	{
 		return sizeof(MsgSizeT) + sizeof(poco_socklen_t) + SocketAddress::MAX_ADDRESS_LENGTH;
 	}
 
+	[[nodiscard]]
 	static MsgSizeT payloadSize(char* buf)
 	{
 		return *((MsgSizeT*) buf);
 	}
 
+	[[nodiscard]]
 	static SocketAddress address(char* buf)
 	{
 		auto* len = reinterpret_cast<poco_socklen_t*>(buf + sizeof(MsgSizeT));
@@ -274,6 +283,7 @@ public:
 		return {pSA, *len};
 	}
 
+	[[nodiscard]]
 	static char* payload(char* buf)
 		/// Returns pointer to payload.
 		///
@@ -288,6 +298,7 @@ public:
 		return buf + offset();
 	}
 
+	[[nodiscard]]
 	static Poco::StringTokenizer payload(char* buf, char delimiter)
 		/// Returns tokenized payload.
 		/// Used when multiple logical messages are contained in a
@@ -297,6 +308,7 @@ public:
 		return Poco::StringTokenizer(payload(buf), std::string(1, delimiter), StringTokenizer::TOK_IGNORE_EMPTY);
 	}
 
+	[[nodiscard]]
 	static char* error(char* buf)
 		/// Returns pointer to the erro message payload.
 		///

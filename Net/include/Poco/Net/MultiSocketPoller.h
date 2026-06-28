@@ -60,6 +60,7 @@ public:
 	{
 	}
 
+	[[nodiscard]]
 	Poco::UInt16 port() const
 		/// Returns the port the socket is
 		/// listening on.
@@ -67,6 +68,7 @@ public:
 		return _address.port();
 	}
 
+	[[nodiscard]]
 	Poco::Net::SocketAddress address() const
 		/// Returns the address of the server.
 	{
@@ -101,6 +103,7 @@ public:
 		_reader.stopHandler();
 	}
 
+	[[nodiscard]]
 	bool done() const
 	{
 		return _reader.handlerDone();

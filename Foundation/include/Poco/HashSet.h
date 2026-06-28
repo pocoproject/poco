@@ -76,42 +76,49 @@ public:
 		_table.swap(set._table);
 	}
 
+	[[nodiscard]]
 	ConstIterator begin() const
 		/// Returns an iterator pointing to the first entry, if one exists.
 	{
 		return _table.begin();
 	}
 
+	[[nodiscard]]
 	ConstIterator end() const
 		/// Returns an iterator pointing to the end of the table.
 	{
 		return _table.end();
 	}
 
+	[[nodiscard]]
 	Iterator begin()
 		/// Returns an iterator pointing to the first entry, if one exists.
 	{
 		return _table.begin();
 	}
 
+	[[nodiscard]]
 	Iterator end()
 		/// Returns an iterator pointing to the end of the table.
 	{
 		return _table.end();
 	}
 
+	[[nodiscard]]
 	ConstIterator find(const ValueType& value) const
 		/// Finds an entry in the table.
 	{
 		return _table.find(value);
 	}
 
+	[[nodiscard]]
 	Iterator find(const ValueType& value)
 		/// Finds an entry in the table.
 	{
 		return _table.find(value);
 	}
 
+	[[nodiscard]]
 	std::size_t count(const ValueType& value) const
 		/// Returns the number of elements with the given
 		/// value, with is either 1 or 0.
@@ -150,12 +157,14 @@ public:
 		_table.clear();
 	}
 
+	[[nodiscard]]
 	std::size_t size() const
 		/// Returns the number of elements in the table.
 	{
 		return _table.size();
 	}
 
+	[[nodiscard]]
 	bool empty() const
 		/// Returns true iff the table is empty.
 	{

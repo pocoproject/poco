@@ -140,6 +140,7 @@ public:
 		///
 		/// See the class documentation for a list of supported color values.
 
+	[[nodiscard]]
 	std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
 		/// See setProperty() for a description of the supported
@@ -167,7 +168,9 @@ protected:
 	};
 
 	~WindowsColorConsoleChannel();
+	[[nodiscard]]
 	WORD parseColor(const std::string& color) const;
+	[[nodiscard]]
 	std::string formatColor(WORD color) const;
 	void initColors();
 

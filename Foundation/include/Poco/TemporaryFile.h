@@ -71,6 +71,7 @@ public:
 		/// Registers the given file for deletion
 		/// at process termination.
 
+	[[nodiscard]]
 	static std::string tempName(const std::string& tempDir = "");
 		/// Returns a unique path name for a temporary
 		/// file in the system's scratch directory (see Path::temp())

@@ -78,6 +78,7 @@ public:
 		/// Increases (or decreases, if n is negative)
 		/// the maximum number of threads.
 
+	[[nodiscard]]
 	int capacity() const;
 		/// Returns the maximum capacity of threads.
 
@@ -85,15 +86,19 @@ public:
 		/// Sets the stack size for threads.
 		/// New stack size applies only for newly created threads.
 
+	[[nodiscard]]
 	int getStackSize() const;
 		/// Returns the stack size used to create new threads.
 
+	[[nodiscard]]
 	int used() const;
 		/// Returns the number of currently used threads.
 
+	[[nodiscard]]
 	int allocated() const;
 		/// Returns the number of currently allocated threads.
 
+	[[nodiscard]]
 	int available() const;
 		/// Returns the number available threads.
 
@@ -148,17 +153,21 @@ public:
 		/// as the thread pool is also implicitly managed in
 		/// calls to start(), addCapacity() and joinAll().
 
+	[[nodiscard]]
 	const std::string& name() const;
 		/// Returns the name of the thread pool,
 		/// or an empty string if no name has been
 		/// specified in the constructor.
 
+	[[nodiscard]]
 	static ThreadPool& defaultPool();
 		/// Returns a reference to the default
 		/// thread pool.
 
 protected:
+	[[nodiscard]]
 	PooledThread* getThread();
+	[[nodiscard]]
 	PooledThread* createThread();
 
 	void housekeep();

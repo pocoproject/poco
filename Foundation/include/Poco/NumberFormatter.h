@@ -57,25 +57,30 @@ public:
 	static const unsigned NF_MAX_INT_STRING_LEN = 32; // increase for 64-bit binary formatting support
 	static const unsigned NF_MAX_FLT_STRING_LEN = POCO_MAX_FLT_STRING_LEN;
 
+	[[nodiscard]]
 	static std::string format(int value);
 		/// Formats an integer value in decimal notation.
 
+	[[nodiscard]]
 	static std::string format(int value, int width);
 		/// Formats an integer value in decimal notation,
 		/// right justified in a field having at least
 		/// the specified width.
 
+	[[nodiscard]]
 	static std::string format0(int value, int width);
 		/// Formats an integer value in decimal notation,
 		/// right justified and zero-padded in a field
 		/// having at least the specified width.
 
+	[[nodiscard]]
 	static std::string formatHex(int value, Options options = Options::DEFAULT);
 		/// Formats an int value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 		/// The value is treated as unsigned.
 
+	[[nodiscard]]
 	static std::string formatHex(int value, int width, Options options = Options::DEFAULT);
 		/// Formats an int value in hexadecimal notation,
 		/// right justified and zero-padded in
@@ -84,24 +89,29 @@ public:
 		/// generated string.
 		/// The value is treated as unsigned.
 
+	[[nodiscard]]
 	static std::string format(unsigned value);
 		/// Formats an unsigned int value in decimal notation.
 
+	[[nodiscard]]
 	static std::string format(unsigned value, int width);
 		/// Formats an unsigned long int in decimal notation,
 		/// right justified in a field having at least the
 		/// specified width.
 
+	[[nodiscard]]
 	static std::string format0(unsigned int value, int width);
 		/// Formats an unsigned int value in decimal notation,
 		/// right justified and zero-padded in a field having at
 		/// least the specified width.
 
+	[[nodiscard]]
 	static std::string formatHex(unsigned value, Options options = Options::DEFAULT);
 		/// Formats an unsigned int value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
+	[[nodiscard]]
 	static std::string formatHex(unsigned value, int width, Options options = Options::DEFAULT);
 		/// Formats an unsigned value in hexadecimal notation,
 		/// right justified and zero-padded in
@@ -109,24 +119,29 @@ public:
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
+	[[nodiscard]]
 	static std::string format(long value);
 		/// Formats a long value in decimal notation.
 
+	[[nodiscard]]
 	static std::string format(long value, int width);
 		/// Formats a long value in decimal notation,
 		/// right justified in a field having at least the
 		/// specified width.
 
+	[[nodiscard]]
 	static std::string format0(long value, int width);
 		/// Formats a long value in decimal notation,
 		/// right justified and zero-padded in a field
 		/// having at least the specified width.
 
+	[[nodiscard]]
 	static std::string formatHex(long value, Options options = Options::DEFAULT);
 		/// Formats a long value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
+	[[nodiscard]]
 	static std::string formatHex(long value, int width, Options options = Options::DEFAULT);
 		/// Formats a long value in hexadecimal notation,
 		/// right justified and zero-padded in
@@ -134,24 +149,29 @@ public:
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
+	[[nodiscard]]
 	static std::string format(unsigned long value);
 		/// Formats an unsigned long value in decimal notation.
 
+	[[nodiscard]]
 	static std::string format(unsigned long value, int width);
 		/// Formats an unsigned long value in decimal notation,
 		/// right justified in a field having at least the specified
 		/// width.
 
+	[[nodiscard]]
 	static std::string format0(unsigned long value, int width);
 		/// Formats an unsigned long value in decimal notation,
 		/// right justified and zero-padded
 		/// in a field having at least the specified width.
 
+	[[nodiscard]]
 	static std::string formatHex(unsigned long value, Options options = Options::DEFAULT);
 		/// Formats an unsigned long value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
+	[[nodiscard]]
 	static std::string formatHex(unsigned long value, int width, Options options = Options::DEFAULT);
 		/// Formats an unsigned long value in hexadecimal notation,
 		/// right justified and zero-padded in
@@ -162,23 +182,28 @@ public:
 #ifdef POCO_HAVE_INT64
 #ifdef POCO_INT64_IS_LONG
 
+	[[nodiscard]]
 	static std::string format(long long value);
 		/// Formats a 64-bit integer value in decimal notation.
 
+	[[nodiscard]]
 	static std::string format(long long value, int width);
 		/// Formats a 64-bit integer value in decimal notation,
 		/// right justified in a field having at least the specified width.
 
+	[[nodiscard]]
 	static std::string format0(long long value, int width);
 		/// Formats a 64-bit integer value in decimal notation,
 		/// right justified and zero-padded in a field having at least
 		/// the specified width.
 
+	[[nodiscard]]
 	static std::string formatHex(long long value, Options options = Options::DEFAULT);
 		/// Formats a 64-bit integer value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
+	[[nodiscard]]
 	static std::string formatHex(long long value, int width, Options options = Options::DEFAULT);
 		/// Formats a 64-bit integer value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
@@ -187,23 +212,28 @@ public:
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
+	[[nodiscard]]
 	static std::string format(unsigned long long value);
 		/// Formats an unsigned 64-bit integer value in decimal notation.
 
+	[[nodiscard]]
 	static std::string format(unsigned long long value, int width);
 		/// Formats an unsigned 64-bit integer value in decimal notation,
 		/// right justified in a field having at least the specified width.
 
+	[[nodiscard]]
 	static std::string format0(unsigned long long value, int width);
 		/// Formats an unsigned 64-bit integer value in decimal notation,
 		/// right justified and zero-padded in a field having at least the
 		/// specified width.
 
+	[[nodiscard]]
 	static std::string formatHex(unsigned long long value, Options options = Options::DEFAULT);
 		/// Formats an unsigned 64-bit value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
+	[[nodiscard]]
 	static std::string formatHex(unsigned long long value, int width, Options options = Options::DEFAULT);
 		/// Formats an unsigned 64-bit value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
@@ -214,23 +244,28 @@ public:
 
 #else // ifndef POCO_INT64_IS_LONG
 
+	[[nodiscard]]
 	static std::string format(Int64 value);
 		/// Formats a 64-bit integer value in decimal notation.
 
+	[[nodiscard]]
 	static std::string format(Int64 value, int width);
 		/// Formats a 64-bit integer value in decimal notation,
 		/// right justified in a field having at least the specified width.
 
+	[[nodiscard]]
 	static std::string format0(Int64 value, int width);
 		/// Formats a 64-bit integer value in decimal notation,
 		/// right justified and zero-padded in a field having at least
 		/// the specified width.
 
+	[[nodiscard]]
 	static std::string formatHex(Int64 value, Options options = Options::DEFAULT);
 		/// Formats a 64-bit integer value in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
+	[[nodiscard]]
 	static std::string formatHex(Int64 value, int width, Options options = Options::DEFAULT);
 		/// Formats a 64-bit integer value in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
@@ -239,23 +274,28 @@ public:
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
+	[[nodiscard]]
 	static std::string format(UInt64 value);
 		/// Formats an unsigned 64-bit integer value in decimal notation.
 
+	[[nodiscard]]
 	static std::string format(UInt64 value, int width);
 		/// Formats an unsigned 64-bit integer value in decimal notation,
 		/// right justified in a field having at least the specified width.
 
+	[[nodiscard]]
 	static std::string format0(UInt64 value, int width);
 		/// Formats an unsigned 64-bit integer value in decimal notation,
 		/// right justified and zero-padded in a field having at least the
 		/// specified width.
 
+	[[nodiscard]]
 	static std::string formatHex(UInt64 value, Options options = Options::DEFAULT);
 		/// Formats an unsigned 64-bit integer in hexadecimal notation.
 		/// Options (see NumberFormatter::Options) define the format of the
 		/// generated string.
 
+	[[nodiscard]]
 	static std::string formatHex(UInt64 value, int width, Options options = Options::DEFAULT);
 		/// Formats an unsigned 64-bit integer in hexadecimal notation,
 		/// right justified and zero-padded in a field having at least
@@ -267,37 +307,45 @@ public:
 #endif // ifdef POCO_INT64_IS_LONG
 #endif // ifdef POCO_HAVE_INT64
 
+	[[nodiscard]]
 	static std::string format(float value);
 		/// Formats a float value in decimal floating-point notation,
 		/// according to std::printf's %g format with a precision of 8 fractional digits.
 
+	[[nodiscard]]
 	static std::string format(float value, int precision);
 		/// Formats a double value in decimal floating-point notation,
 		/// according to std::printf's %f format with the given precision.
 
+	[[nodiscard]]
 	static std::string format(float value, int width, int precision);
 		/// Formats a double value in decimal floating-point notation,
 		/// right justified in a field of the specified width,
 		/// with the number of fractional digits given in precision.
 
+	[[nodiscard]]
 	static std::string format(double value);
 		/// Formats a double value in decimal floating-point notation,
 		/// according to std::printf's %g format with a precision of 16 fractional digits.
 
+	[[nodiscard]]
 	static std::string format(double value, int precision);
 		/// Formats a double value in decimal floating-point notation,
 		/// according to std::printf's %f format with the given precision.
 
+	[[nodiscard]]
 	static std::string format(double value, int width, int precision);
 		/// Formats a double value in decimal floating-point notation,
 		/// right justified in a field of the specified width,
 		/// with the number of fractional digits given in precision.
 
+	[[nodiscard]]
 	static std::string format(const void* ptr);
 		/// Formats a pointer in an eight (32-bit architectures) or
 		/// sixteen (64-bit architectures) characters wide
 		/// field in hexadecimal notation.
 
+	[[nodiscard]]
 	static std::string format(bool value, BoolFormat format = FMT_TRUE_FALSE);
 		/// Formats a bool value in decimal/text notation,
 		/// according to format parameter.
@@ -517,6 +565,7 @@ public:
 // Deprecated functions
 //
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(int value, bool prefix);
 		/// Formats an int value in hexadecimal notation.
@@ -524,6 +573,7 @@ public:
 		/// resulting string.
 		/// The value is treated as unsigned.
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(int value, int width, bool prefix);
 		/// Formats an int value in hexadecimal notation,
@@ -533,12 +583,14 @@ public:
 		/// resulting string.
 		/// The value is treated as unsigned.
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(unsigned value, bool prefix);
 		/// Formats an unsigned int value in hexadecimal notation.
 		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(unsigned value, int width, bool prefix);
 		/// Formats an unsigned value in hexadecimal notation,
@@ -547,6 +599,7 @@ public:
 		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(long value, bool prefix);
 		/// Formats a long value in hexadecimal notation.
@@ -554,6 +607,7 @@ public:
 		/// resulting string.
 		/// The value is treated as unsigned.
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(long value, int width, bool prefix);
 		/// Formats a long value in hexadecimal notation,
@@ -563,12 +617,14 @@ public:
 		/// resulting string.
 		/// The value is treated as unsigned.
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(unsigned long value, bool prefix);
 		/// Formats an unsigned long value in hexadecimal notation.
 		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(unsigned long value, int width, bool prefix);
 		/// Formats an unsigned long value in hexadecimal notation,
@@ -580,6 +636,7 @@ public:
 #ifdef POCO_HAVE_INT64
 #ifdef POCO_INT64_IS_LONG
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(long long value, bool prefix);
 		/// Formats a 64-bit integer value in hexadecimal notation.
@@ -587,6 +644,7 @@ public:
 		/// resulting string.
 		/// The value is treated as unsigned.
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(long long value, int width, bool prefix);
 		/// Formats a 64-bit integer value in hexadecimal notation,
@@ -595,12 +653,14 @@ public:
 		/// The value is treated as unsigned.
 		/// If prefix is true, "0x" prefix is prepended to the resulting string.
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(unsigned long long value, bool prefix);
 		/// Formats an unsigned 64-bit integer value in hexadecimal notation.
 		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(unsigned long long value, int width, bool prefix);
 		/// Formats an unsigned 64-bit integer value in hexadecimal notation,
@@ -610,6 +670,7 @@ public:
 
 #else // ifndef POCO_INT64_IS_LONG
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(Int64 value, bool prefix);
 		/// Formats a 64-bit integer value in hexadecimal notation.
@@ -617,6 +678,7 @@ public:
 		/// resulting string.
 		/// The value is treated as unsigned.
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(Int64 value, int width, bool prefix);
 		/// Formats a 64-bit integer value in hexadecimal notation,
@@ -625,12 +687,14 @@ public:
 		/// The value is treated as unsigned.
 		/// If prefix is true, "0x" prefix is prepended to the resulting string.
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(UInt64 value, bool prefix);
 		/// Formats an unsigned 64-bit integer value in hexadecimal notation.
 		/// If prefix is true, "0x" prefix is prepended to the
 		/// resulting string.
 
+	[[nodiscard]]
 	POCO_DEPRECATED("use formatHex with options instead")
 	static std::string formatHex(UInt64 value, int width, bool prefix);
 		/// Formats an unsigned 64-bit integer value in hexadecimal notation,
@@ -643,6 +707,7 @@ public:
 
 private:
 
+	[[nodiscard]]
 	static bool isEnabled(NumberFormatter::Options options, NumberFormatter::Options opt);
 };
 

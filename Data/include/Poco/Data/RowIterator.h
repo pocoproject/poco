@@ -64,9 +64,11 @@ public:
 	RowIterator& operator = (RowIterator&& other) noexcept;
 		/// Move assignment.
 
+	[[nodiscard]]
 	bool operator == (const RowIterator& other) const;
 		/// Equality operator.
 
+	[[nodiscard]]
 	bool operator != (const RowIterator& other) const;
 		/// Inequality operator.
 
@@ -79,7 +81,7 @@ public:
 	const RowIterator& operator ++ () const;
 		/// Advances by one position and returns current position.
 
-	RowIterator operator ++ (int) const;
+	RowIterator operator ++ ([[maybe_unused]] int n) const;
 		/// Advances by one position and returns copy of the iterator with
 		/// previous current position.
 
@@ -87,7 +89,7 @@ public:
 		/// Goes back by one position and returns copy of the iterator with
 		/// previous current position.
 
-	RowIterator operator -- (int) const;
+	RowIterator operator -- ([[maybe_unused]] int n) const;
 		/// Goes back by one position and returns previous current position.
 
 	RowIterator operator + (std::size_t diff) const;
@@ -142,7 +144,7 @@ inline bool RowIterator::operator != (const RowIterator& other) const
 
 namespace std
 {
-	template<>
+	template <>
 	inline void swap<Poco::Data::RowIterator>(Poco::Data::RowIterator& s1, Poco::Data::RowIterator& s2) noexcept
 		/// Full template specalization of std:::swap for RowIterator
 	{

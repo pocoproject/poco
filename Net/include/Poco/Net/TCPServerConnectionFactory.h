@@ -71,6 +71,7 @@ public:
 		/// implementation behavior after this call is to return nullptr
 		/// on all subsequent connection creation attempts.
 
+	[[nodiscard]]
 	bool isStopped() const;
 		/// Returns true if the factory was stopped, false otherwise.
 

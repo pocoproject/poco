@@ -35,8 +35,8 @@ class Time;
 namespace Poco::Dynamic {
 
 
-template <> Data_API Var::operator Poco::Data::Date () const;
-template <> Data_API Var::operator Poco::Data::Time () const;
+template <> [[nodiscard]] Data_API Var::operator Poco::Data::Date () const;
+template <> [[nodiscard]] Data_API Var::operator Poco::Data::Time () const;
 
 
 } // namespace Poco::Dynamic

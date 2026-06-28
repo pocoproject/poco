@@ -63,6 +63,7 @@ public:
 		/// as ignorable, which means that next() will
 		/// not return it.
 
+	[[nodiscard]]
 	const Token* next();
 		/// Extracts the next token from the input stream.
 		/// Returns a pointer to an EOFToken if there are

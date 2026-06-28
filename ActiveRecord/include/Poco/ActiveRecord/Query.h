@@ -116,6 +116,7 @@ public:
 		return *this;
 	}
 
+	[[nodiscard]]
 	std::vector<typename ActRec::Ptr> execute()
 		/// Execute the query and return a vector with the
 		/// results.
@@ -147,6 +148,7 @@ public:
 		return result;
 	}
 
+	[[nodiscard]]
 	std::size_t totalResults() const
 		/// In case of a paged query, returns the total number of results
 		/// that would be returned without paging.

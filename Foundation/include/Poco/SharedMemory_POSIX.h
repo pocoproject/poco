@@ -52,9 +52,11 @@ public:
 		/// is actually honored is, however, up to the system. Windows platform
 		/// will generally ignore the hint.
 
+	[[nodiscard]]
 	char* begin() const;
 		/// Returns the start address of the shared memory segment.
 
+	[[nodiscard]]
 	char* end() const;
 		/// Returns the one-past-end end address of the shared memory segment.
 

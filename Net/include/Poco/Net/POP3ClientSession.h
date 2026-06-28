@@ -68,6 +68,7 @@ public:
 	void setTimeout(const Poco::Timespan& timeout);
 		/// Sets the timeout for socket read operations.
 
+	[[nodiscard]]
 	Poco::Timespan getTimeout() const;
 		/// Returns the timeout for socket read operations.
 
@@ -84,6 +85,7 @@ public:
 		/// Throws a POP3Exception in case of a POP3-specific error, or a
 		/// NetException in case of a general network communication failure.
 
+	[[nodiscard]]
 	int messageCount();
 		/// Sends a STAT command to determine the number of messages
 		/// available on the server and returns that number.

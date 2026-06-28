@@ -57,11 +57,13 @@ public:
 		return *this;
 	}
 
+	[[nodiscard]]
 	operator T () const
 	{
 		return _value.load();
 	}
 
+	[[nodiscard]]
 	T value() const
 	{
 		return _value.load();

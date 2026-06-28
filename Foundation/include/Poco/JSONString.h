@@ -57,6 +57,7 @@ void Foundation_API toJSON(const std::string& value, std::ostream& out, int opti
 	/// only the compulsory ones.
 
 
+[[nodiscard]]
 std::string Foundation_API toJSON(const std::string& value, int options = Poco::JSON_WRAP_STRINGS);
 	/// Formats string value by escaping control characters.
 	/// If JSON_WRAP_STRINGS is in options, the resulting string is enclosed in double quotes

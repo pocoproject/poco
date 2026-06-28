@@ -139,7 +139,7 @@ void FileChannel::log(const Message& msg)
 		// we must call mustRotate() again to give the
 		// RotateByIntervalStrategy a chance to write its timestamp
 		// to the new file.
-		_pRotateStrategy->mustRotate(_pFile);
+		[[maybe_unused]] bool rotated = _pRotateStrategy->mustRotate(_pFile);
 	}
 	_pFile->write(msg.getText(), _flush);
 }

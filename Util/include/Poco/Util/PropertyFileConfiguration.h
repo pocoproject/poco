@@ -187,12 +187,17 @@ private:
 	void loadStream(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);
 	void parseLine(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);
 	static void saveToFile(const std::string& path, const std::map<std::string, std::string>& values);
+  [[nodiscard]]
 	std::string resolveIncludePath(const std::string& rawPath, const std::string& basePath) const;
+  [[nodiscard]]
 	static std::string extractIncludePath(const std::string& line);
 		/// If line is an !include directive, returns the raw path; otherwise returns empty.
+  [[nodiscard]]
 	std::vector<std::string> scanIncludeFiles(const std::string& filePath) const;
 		/// Scans the given file for !include directives. Caller must hold the lock.
+  [[nodiscard]]
 	static int readChar(std::istream& istr);
+  [[nodiscard]]
 	static std::string escapeValue(const std::string& value);
 
 	AbstractConfiguration* _pParentConfig = nullptr;

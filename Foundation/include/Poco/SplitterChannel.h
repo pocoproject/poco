@@ -60,6 +60,7 @@ public:
 	void close() override;
 		/// Removes all channels.
 
+	[[nodiscard]]
 	int count() const;
 		/// Returns the number of channels in the SplitterChannel.
 

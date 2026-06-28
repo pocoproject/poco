@@ -84,6 +84,7 @@ public:
 		/// When verifying JWTs, the algorithm used for signing
 		/// must be one of the allowed algorithms.
 
+	[[nodiscard]]
 	const std::set<std::string>& getAlgorithms() const;
 		/// Returns the allowed algorithms for signing.
 
@@ -96,18 +97,21 @@ public:
 	Signer& setHMACKey(const std::string& key);
 		/// Sets the key used for HMAC-based signing and verification.
 
+	[[nodiscard]]
 	const std::string getHMACKey() const;
 		/// Returns the key used for HMAC-based signing and verification.
 
 	Signer& setRSAKey(const Poco::SharedPtr<Poco::Crypto::RSAKey>& pKey);
 		/// Sets the key used for RSA-based signing and verification.
 
+	[[nodiscard]]
 	Poco::SharedPtr<Poco::Crypto::RSAKey> getRSAKey() const;
 		/// Returns the key used for RSA-based signing and verification.
 
 	Signer& setECKey(const Poco::SharedPtr<Poco::Crypto::ECKey>& pKey);
 		/// Sets the key used for EC-based signing and verification.
 
+	[[nodiscard]]
 	Poco::SharedPtr<Poco::Crypto::ECKey> getECKey() const;
 		/// Returns the key used for EC-based signing and verification.
 
@@ -118,6 +122,7 @@ public:
 		///
 		/// Returns the serialized JWT including the signature.
 
+	[[nodiscard]]
 	Token verify(const std::string& jwt) const;
 		/// Verifies the given serialized JSON Web Token.
 		///

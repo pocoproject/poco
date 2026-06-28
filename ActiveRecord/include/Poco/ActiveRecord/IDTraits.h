@@ -39,11 +39,13 @@ class IDTraits<Poco::UInt64>
 public:
 	static constexpr Poco::UInt64 INVALID_ID = std::numeric_limits<Poco::UInt64>::max();
 
+	[[nodiscard]]
 	static bool isValid(Poco::UInt64 id)
 	{
 		return id != INVALID_ID;
 	}
 
+	[[nodiscard]]
 	static std::string toString(Poco::UInt64 id)
 	{
 		return Poco::NumberFormatter::format(id);
@@ -57,11 +59,13 @@ class IDTraits<Poco::Int64>
 public:
 	static constexpr Poco::Int64 INVALID_ID = std::numeric_limits<Poco::Int64>::max();
 
+	[[nodiscard]]
 	static bool isValid(Poco::Int64 id)
 	{
 		return id != INVALID_ID;
 	}
 
+	[[nodiscard]]
 	static std::string toString(Poco::Int64 id)
 	{
 		return Poco::NumberFormatter::format(id);
@@ -75,11 +79,13 @@ class IDTraits<Poco::UInt32>
 public:
 	static constexpr Poco::UInt32 INVALID_ID = std::numeric_limits<Poco::UInt32>::max();
 
+	[[nodiscard]]
 	static bool isValid(Poco::UInt32 id)
 	{
 		return id != INVALID_ID;
 	}
 
+	[[nodiscard]]
 	static std::string toString(Poco::UInt32 id)
 	{
 		return Poco::NumberFormatter::format(id);
@@ -93,11 +99,13 @@ class IDTraits<Poco::Int32>
 public:
 	static const Poco::Int32 INVALID_ID = std::numeric_limits<Poco::Int32>::max();
 
+	[[nodiscard]]
 	static bool isValid(Poco::Int32 id)
 	{
 		return id != INVALID_ID;
 	}
 
+	[[nodiscard]]
 	static std::string toString(Poco::Int32 id)
 	{
 		return Poco::NumberFormatter::format(id);
@@ -111,11 +119,13 @@ class IDTraits<Poco::UInt16>
 public:
 	static constexpr Poco::UInt16 INVALID_ID = std::numeric_limits<Poco::UInt16>::max();
 
+	[[nodiscard]]
 	static bool isValid(Poco::UInt16 id)
 	{
 		return id != INVALID_ID;
 	}
 
+	[[nodiscard]]
 	static std::string toString(Poco::UInt16 id)
 	{
 		return Poco::NumberFormatter::format(id);
@@ -129,11 +139,13 @@ class IDTraits<Poco::Int16>
 public:
 	static constexpr Poco::Int16 INVALID_ID = std::numeric_limits<Poco::Int16>::max();
 
+	[[nodiscard]]
 	static bool isValid(Poco::Int16 id)
 	{
 		return id != INVALID_ID;
 	}
 
+	[[nodiscard]]
 	static std::string toString(Poco::Int16 id)
 	{
 		return Poco::NumberFormatter::format(id);
@@ -147,11 +159,13 @@ class IDTraits<std::string>
 public:
 	static ActiveRecordLib_API const std::string INVALID_ID;
 
+	[[nodiscard]]
 	static bool isValid(const std::string& id)
 	{
 		return !id.empty();
 	}
 
+	[[nodiscard]]
 	static std::string toString(const std::string& id)
 	{
 		return id;
@@ -165,11 +179,13 @@ class IDTraits<Poco::UUID>
 public:
 	static ActiveRecordLib_API const Poco::UUID INVALID_ID;
 
+	[[nodiscard]]
 	static bool isValid(const Poco::UUID& id)
 	{
 		return !id.isNull();
 	}
 
+	[[nodiscard]]
 	static std::string toString(const Poco::UUID& id)
 	{
 		return id.toString();

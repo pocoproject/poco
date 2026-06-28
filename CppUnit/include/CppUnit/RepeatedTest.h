@@ -32,7 +32,9 @@ public:
 	{
 	}
 
+	[[nodiscard]]
 	int countTestCases();
+	[[nodiscard]]
 	std::string toString();
 	void run(TestResult* result, const Test::Callback& callback = nullptr) override;
 

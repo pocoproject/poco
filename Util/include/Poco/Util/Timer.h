@@ -162,13 +162,16 @@ public:
 		/// If task execution takes longer than the given interval,
 		/// further executions are delayed.
 
+	[[nodiscard]]
 	bool idle() const;
 		/// Returns true if the task queue is empty, otherwise false.
 
+	[[nodiscard]]
 	std::size_t taskCount() const;
 		/// Returns the number of tasks currently scheduled in the timer.
 
 	template <typename Fn>
+	[[nodiscard]]
 	static TimerTask::Ptr func(const Fn& fn)
 		/// Helper function template to use a functor or lambda
 		/// with Timer::schedule() and Timer::scheduleAtFixedRate().
@@ -177,6 +180,7 @@ public:
 	}
 
 	template <typename Fn>
+	[[nodiscard]]
 	static TimerTask::Ptr func(Fn&& fn)
 		/// Helper function template to use a functor or lambda
 		/// with Timer::schedule() and Timer::scheduleAtFixedRate().

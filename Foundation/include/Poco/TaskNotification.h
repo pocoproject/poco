@@ -33,6 +33,7 @@ public:
 	TaskNotification(Task* pTask);
 		/// Creates the TaskNotification.
 
+	[[nodiscard]]
 	Task* task() const;
 		/// Returns the subject of the notification.
 
@@ -88,6 +89,7 @@ class Foundation_API TaskFailedNotification: public TaskNotification
 public:
 	TaskFailedNotification(Task* pTask, const Exception& exc);
 
+	[[nodiscard]]
 	const Exception& reason() const;
 
 protected:
@@ -105,6 +107,7 @@ class Foundation_API TaskProgressNotification: public TaskNotification
 public:
 	TaskProgressNotification(Task* pTask, float progress);
 
+	[[nodiscard]]
 	float progress() const;
 
 protected:
@@ -130,6 +133,7 @@ public:
 	{
 	}
 
+	[[nodiscard]]
 	const C& custom() const
 	{
 		return _custom;

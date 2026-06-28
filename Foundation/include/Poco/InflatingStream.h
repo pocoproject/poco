@@ -130,6 +130,7 @@ public:
 	~InflatingIOS() override;
 	/// Destroys the InflatingIOS.
 
+	[[nodiscard]]
 	InflatingStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying stream buffer.
 

@@ -71,6 +71,7 @@ class Foundation_API Base32DecoderIOS: public virtual std::ios
 public:
 	Base32DecoderIOS(std::istream& istr, int options = 0);
 	~Base32DecoderIOS() override;
+	[[nodiscard]]
 	Base32DecoderBuf* rdbuf();
 
 protected:
