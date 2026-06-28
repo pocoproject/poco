@@ -476,6 +476,7 @@ jobs:
         run: |
           brew install openssl@3 libssh redis
           brew tap mongodb/brew
+          brew trust mongodb/brew
           brew install mongodb-community
       - name: Start Redis and MongoDB
         run: |
@@ -593,6 +594,7 @@ jobs:
         run: |
           brew install openssl@3 libssh redis
           brew tap mongodb/brew
+          brew trust mongodb/brew
           brew install mongodb-community
       - name: Start Redis and MongoDB
         run: |
