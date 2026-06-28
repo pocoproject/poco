@@ -44,6 +44,36 @@ using Poco::Stopwatch;
 namespace Poco {
 
 
+namespace {
+
+
+// RAII guard that joins the ProcessRunner monitor thread on scope exit, so the
+// thread is always reaped before control leaves a function even if an
+// intervening operation throws. Thread::join() is a safe no-op when the thread
+// was never started or is already joined; a destructor must not throw while
+// unwinding, so a (practically impossible) join failure is swallowed. Callers
+// must have already signalled the monitored process to exit before this guard
+// runs, otherwise the join blocks until run()'s process wait returns.
+struct ThreadJoiner
+{
+	explicit ThreadJoiner(Thread& t): _t(t) {}
+
+	~ThreadJoiner()
+	{
+		try { _t.join(); }
+		catch (...) { }
+	}
+
+	ThreadJoiner(const ThreadJoiner&) = delete;
+	ThreadJoiner& operator = (const ThreadJoiner&) = delete;
+
+	Thread& _t;
+};
+
+
+} // namespace
+
+
 ProcessRunner::ProcessRunner(const std::string& cmd,
 		const Args& args,
 		const std::string& pidFile,
@@ -238,6 +268,13 @@ void ProcessRunner::stop()
 		_sw.restart();
 		if (_pPH.exchange(nullptr) && ((pid = _pid.exchange(INVALID_PID))) != INVALID_PID)
 		{
+			// Join the monitor thread on every exit from this block, even if the
+			// termination logic below throws (e.g. the process will not die, or a
+			// signal fails). stop() runs from ~ProcessRunner(), so a skipped join
+			// would let the thread race the object's destruction. The process is
+			// signalled to exit by the logic below before this guard's join runs.
+			ThreadJoiner joiner(_t);
+
 			if (pid <= 0)
 				throw Poco::IllegalStateException("Invalid PID, can't terminate process");
 
@@ -328,7 +365,6 @@ void ProcessRunner::stop()
 					Thread::sleep(10);
 				}
 			}
-			_t.join();
 		}
 
 #if defined(POCO_OS_FAMILY_WINDOWS)
@@ -452,14 +488,21 @@ void ProcessRunner::start()
 		}
 		catch (...)
 		{
-			// Clean up the process to prevent orphan
+			// The monitored child has usually already exited - often the very
+			// reason we are here, e.g. a duplicate instance that bailed out at
+			// startup. Signal it best-effort first (Process::kill() throws
+			// NotFoundException on ESRCH, which must NOT prevent the join), then
+			// let ThreadJoiner reap the monitor thread as we unwind. Leaving run()
+			// executing past this point would let a throwing heap-allocated
+			// constructor's operator delete free the object under the running
+			// thread - a heap-use-after-free.
 			PID p = _pid.load();
 			if (p != INVALID_PID)
 			{
-				Process::kill(p);
+				try { Process::kill(p); }
+				catch (...) { /* already gone or not permitted - nothing to clean up */ }
 			}
-			if (_t.isRunning())
-				_t.join();
+			ThreadJoiner joiner(_t);
 			_started.store(false);
 			throw;
 		}
