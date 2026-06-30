@@ -27,6 +27,15 @@ public:
 	void testConfigurator();
 	void testFastLoggerConfigurator();
 	void testFastLoggerRootConfigurator();
+	void testFastLoggerRootPocoLoggerWritesFile();
+	void testFastLoggerPerLoggerTraceIndependence();
+	void testFastLoggerFlushDrainsPerSourceLoggers();
+	void testFastLoggerMultipleSourcesRouted();
+	void testFastLoggerReconfigureRoutesToNewSinks();
+	void testFastLoggerConcurrentSourcesRouted();
+	void testFastLoggerPerLoggerLevelWithSplitter();
+	void testFastLoggerMalformedBackendOption();
+	void testFastLoggerEventChannelOnlyNoConsole();
 	void testFastLoggerWithRegistry();
 	void testFastLoggerOptions();
 	void testFastLoggerOptionsWarnings();
