@@ -55,7 +55,9 @@ void FastLoggerConfigurator::configureSinks(AbstractConfiguration::Ptr pConfig)
 	// Start the backend first
 	FastLogger::startBackend();
 
-	// Check for file sink configuration
+	// File and pattern sinks are unsupported: addFileSink/setPattern throw
+	// NotImplementedException. Forward the request so a misconfiguration fails
+	// here instead of being silently ignored.
 	if (pConfig->hasProperty("file"s))
 	{
 		std::string filename = pConfig->getString("file"s);
@@ -65,7 +67,6 @@ void FastLoggerConfigurator::configureSinks(AbstractConfiguration::Ptr pConfig)
 		}
 	}
 
-	// Pattern configuration (for future use)
 	if (pConfig->hasProperty("pattern"s))
 	{
 		std::string pattern = pConfig->getString("pattern"s);

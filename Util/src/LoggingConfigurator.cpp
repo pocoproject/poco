@@ -304,6 +304,17 @@ void LoggingConfigurator::configureLogger(AbstractConfiguration::Ptr pConfig)
 				FastLogger::setProperty(logger.name(), p, pConfig->getString(p));
 			}
 		}
+
+		// Application code logs through Poco::Logger, so install the FastLogger
+		// (a Channel) as that logger's channel to route messages through Quill.
+		// Mirror the configured level so the Poco logger does not filter messages
+		// before they reach the FastLogger; without a configured level, keep the
+		// Poco logger's hierarchy inheritance. The mirror is one-time: later
+		// runtime setLevel calls on either side are not propagated to the other.
+		Logger& pocoLogger = Logger::get(loggerName);
+		pocoLogger.setChannel(Channel::Ptr(&logger, true));
+		if (pConfig->hasProperty("level"s))
+			pocoLogger.setLevel(logger.getLevel());
 #else
 		throw Poco::InvalidAccessException("FastLogger is not available (POCO_ENABLE_FASTLOGGER is not defined)");
 #endif
