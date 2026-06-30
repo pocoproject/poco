@@ -1,2 +1,2 @@
-add_executable(RecordSet src/RecordSet.cpp)
+poco_add_executable(RecordSet src/RecordSet.cpp)
 target_link_libraries(RecordSet PUBLIC Poco::DataSQLite)

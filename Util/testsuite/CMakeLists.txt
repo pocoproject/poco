@@ -13,8 +13,7 @@ POCO_SOURCES_AUTO_PLAT(TEST_SRCS WIN32
 	src/WindowsTestSuite.cpp
 )
 
-add_executable(Util-testrunner ${TEST_SRCS})
-set_target_properties(Util-testrunner PROPERTIES DEBUG_POSTFIX "d")
+poco_add_executable(Util-testrunner ${TEST_SRCS})
 if(ANDROID)
 	add_test(
 		NAME Util

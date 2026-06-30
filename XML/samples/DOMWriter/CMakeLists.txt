@@ -1,2 +1,2 @@
-add_executable(DOMWriter src/DOMWriter.cpp)
+poco_add_executable(DOMWriter src/DOMWriter.cpp)
 target_link_libraries(DOMWriter PUBLIC Poco::XML)

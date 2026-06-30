@@ -10,7 +10,7 @@ if(MSVC)
 	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
-add_executable(PageCompiler ${SRCS})
+poco_add_executable(PageCompiler ${SRCS})
 set_target_properties(PageCompiler
 	PROPERTIES
 	OUTPUT_NAME cpspc

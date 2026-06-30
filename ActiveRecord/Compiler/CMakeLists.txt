@@ -8,7 +8,7 @@ if(MSVC)
 	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
-add_executable(ActiveRecordCompiler ${SRCS})
+poco_add_executable(ActiveRecordCompiler ${SRCS})
 set_target_properties(ActiveRecordCompiler
 	PROPERTIES
 	OUTPUT_NAME poco-arc

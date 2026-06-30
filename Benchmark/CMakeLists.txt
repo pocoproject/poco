@@ -19,7 +19,7 @@ set(SRCS
 # Headers
 file(GLOB_RECURSE HDRS_G "include/*.h")
 
-add_executable(Benchmark ${SRCS} ${HDRS_G})
+poco_add_executable(Benchmark ${SRCS} ${HDRS_G})
 
 target_link_libraries(Benchmark
 	PUBLIC

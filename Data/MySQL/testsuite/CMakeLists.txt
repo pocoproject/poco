@@ -6,8 +6,7 @@ POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "src/*.h")
 POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_G})
 
-add_executable(DataMySQL-testrunner ${TEST_SRCS})
-set_target_properties(DataMySQL-testrunner PROPERTIES DEBUG_POSTFIX "d")
+poco_add_executable(DataMySQL-testrunner ${TEST_SRCS})
 if(ANDROID)
 	add_test(
 		NAME DataMySQL

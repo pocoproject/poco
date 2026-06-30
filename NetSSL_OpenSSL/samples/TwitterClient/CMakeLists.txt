@@ -1,4 +1,4 @@
-add_executable(TwitterClient
+poco_add_executable(TwitterClient
 	src/TweetApp.cpp
 	src/Twitter.cpp
 )

@@ -1,4 +1,4 @@
-add_executable(HTTPSTimeServer src/HTTPSTimeServer.cpp)
+poco_add_executable(HTTPSTimeServer src/HTTPSTimeServer.cpp)
 target_link_libraries(HTTPSTimeServer PUBLIC Poco::NetSSL Poco::Util Poco::XML)
 if(MSVC)
 	target_link_libraries(HTTPSTimeServer PRIVATE OpenSSL::applink)
