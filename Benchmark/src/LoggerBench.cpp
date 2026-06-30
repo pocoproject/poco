@@ -16,6 +16,7 @@
 #include "Poco/Channel.h"
 #include "Poco/NullChannel.h"
 #include "Poco/FormattingChannel.h"
+#include "Poco/SplitterChannel.h"
 #include "Poco/PatternFormatter.h"
 #include "Poco/Message.h"
 #include "Poco/AutoPtr.h"
@@ -36,6 +37,7 @@ using Poco::Logger;
 using Poco::Channel;
 using Poco::NullChannel;
 using Poco::FormattingChannel;
+using Poco::SplitterChannel;
 using Poco::PatternFormatter;
 using Poco::Message;
 using Poco::AutoPtr;
@@ -459,6 +461,159 @@ static void Logger_FormattingChannel_Debug(benchmark::State& state)
 	}
 }
 BENCHMARK(Logger_FormattingChannel_Debug);
+
+
+// SplitterChannel fan-out to N sinks (the Arg). The regular Logger formats once per
+// child on the logging thread, so cost grows with the sink count.
+static void Logger_Splitter(benchmark::State& state)
+{
+	const int n = static_cast<int>(state.range(0));
+	AutoPtr<PatternFormatter> pFormatter(new PatternFormatter("%Y-%m-%d %H:%M:%S.%i [%p] %s: %t"));
+	AutoPtr<SplitterChannel> pSplitter(new SplitterChannel);
+	for (int i = 0; i < n; ++i)
+		pSplitter->addChannel(new FormattingChannel(pFormatter, new NullChannel));
+	Logger& logger = Logger::get("BenchLogger.Splitter");
+	logger.setChannel(pSplitter);
+	logger.setLevel(Message::PRIO_TRACE);
+
+	for (auto _ : state)
+	{
+		logger.information("This is a test log message");
+	}
+}
+BENCHMARK(Logger_Splitter)->Arg(1)->Arg(2)->Arg(4)->Arg(8);
+
+
+#ifdef POCO_ENABLE_FASTLOGGER
+
+//
+// FastLogger (type=fast), same patterns and sinks as the FormattingChannel cases
+// above for a direct comparison. The pattern is translated to Quill and rendered on
+// the backend thread, so the measured cost is the enqueue on the logging thread.
+//
+
+static void FastLogger_Direct_Simple(benchmark::State& state)
+{
+	AutoPtr<NullChannel> pNullChannel(new NullChannel);
+	AutoPtr<PatternFormatter> pFormatter(new PatternFormatter("%t"));
+	AutoPtr<FormattingChannel> pChannel(new FormattingChannel(pFormatter, pNullChannel));
+	Poco::FastLogger& logger = Poco::FastLogger::get("BenchFast.Direct.Simple");
+	logger.setChannel(pChannel);
+	logger.setLevel(Message::PRIO_TRACE);
+
+	for (auto _ : state)
+	{
+		logger.information("This is a test log message");
+	}
+	logger.flush();
+}
+BENCHMARK(FastLogger_Direct_Simple);
+
+
+static void FastLogger_Direct_Typical(benchmark::State& state)
+{
+	AutoPtr<NullChannel> pNullChannel(new NullChannel);
+	AutoPtr<PatternFormatter> pFormatter(new PatternFormatter("%Y-%m-%d %H:%M:%S.%i [%p] %s: %t"));
+	AutoPtr<FormattingChannel> pChannel(new FormattingChannel(pFormatter, pNullChannel));
+	Poco::FastLogger& logger = Poco::FastLogger::get("BenchFast.Direct.Typical");
+	logger.setChannel(pChannel);
+	logger.setLevel(Message::PRIO_TRACE);
+
+	for (auto _ : state)
+	{
+		logger.information("This is a test log message");
+	}
+	logger.flush();
+}
+BENCHMARK(FastLogger_Direct_Typical);
+
+
+static void FastLogger_Direct_Full(benchmark::State& state)
+{
+	AutoPtr<NullChannel> pNullChannel(new NullChannel);
+	AutoPtr<PatternFormatter> pFormatter(new PatternFormatter("%Y-%m-%d %H:%M:%S.%i [%p] [%T:%I] %s: %t"));
+	AutoPtr<FormattingChannel> pChannel(new FormattingChannel(pFormatter, pNullChannel));
+	Poco::FastLogger& logger = Poco::FastLogger::get("BenchFast.Direct.Full");
+	logger.setChannel(pChannel);
+	logger.setLevel(Message::PRIO_TRACE);
+
+	for (auto _ : state)
+	{
+		logger.information("This is a test log message");
+	}
+	logger.flush();
+}
+BENCHMARK(FastLogger_Direct_Full);
+
+
+// Log through a Poco::Logger whose channel is a FastLogger: the transparent path an
+// application takes after adding .type = fast to an ordinary logger.
+static void FastLogger_Bridge_Typical(benchmark::State& state)
+{
+	AutoPtr<NullChannel> pNullChannel(new NullChannel);
+	AutoPtr<PatternFormatter> pFormatter(new PatternFormatter("%Y-%m-%d %H:%M:%S.%i [%p] %s: %t"));
+	AutoPtr<FormattingChannel> pChannel(new FormattingChannel(pFormatter, pNullChannel));
+	Poco::FastLogger& fast = Poco::FastLogger::get("BenchFastBridge.Typical");
+	fast.setChannel(pChannel);
+	fast.setLevel(Message::PRIO_TRACE);
+	Logger& logger = Logger::get("BenchFastBridge.Source");
+	logger.setChannel(Channel::Ptr(&fast, true));
+	logger.setLevel(Message::PRIO_TRACE);
+
+	for (auto _ : state)
+	{
+		logger.information("This is a test log message");
+	}
+	fast.flush();
+}
+BENCHMARK(FastLogger_Bridge_Typical);
+
+
+// SplitterChannel under type=fast: the splitter maps to N Quill sinks (the Arg); the
+// backend renders and fans out, so the logging thread enqueues once regardless of count.
+static void FastLogger_Direct_Splitter(benchmark::State& state)
+{
+	const int n = static_cast<int>(state.range(0));
+	AutoPtr<PatternFormatter> pFormatter(new PatternFormatter("%Y-%m-%d %H:%M:%S.%i [%p] %s: %t"));
+	AutoPtr<SplitterChannel> pSplitter(new SplitterChannel);
+	for (int i = 0; i < n; ++i)
+		pSplitter->addChannel(new FormattingChannel(pFormatter, new NullChannel));
+	Poco::FastLogger& logger = Poco::FastLogger::get("BenchFast.Direct.Splitter");
+	logger.setChannel(pSplitter);
+	logger.setLevel(Message::PRIO_TRACE);
+
+	for (auto _ : state)
+	{
+		logger.information("This is a test log message");
+	}
+	logger.flush();
+}
+BENCHMARK(FastLogger_Direct_Splitter)->Arg(1)->Arg(2)->Arg(4)->Arg(8);
+
+
+static void FastLogger_Bridge_Splitter(benchmark::State& state)
+{
+	const int n = static_cast<int>(state.range(0));
+	AutoPtr<PatternFormatter> pFormatter(new PatternFormatter("%Y-%m-%d %H:%M:%S.%i [%p] %s: %t"));
+	AutoPtr<SplitterChannel> pSplitter(new SplitterChannel);
+	for (int i = 0; i < n; ++i)
+		pSplitter->addChannel(new FormattingChannel(pFormatter, new NullChannel));
+	Poco::FastLogger& fast = Poco::FastLogger::get("BenchFastBridge.Splitter");
+	fast.setChannel(pSplitter);
+	fast.setLevel(Message::PRIO_TRACE);
+	Logger& logger = Logger::get("BenchFastBridge.Splitter.Source");
+	logger.setChannel(Channel::Ptr(&fast, true));
+	logger.setLevel(Message::PRIO_TRACE);
+
+	for (auto _ : state)
+	{
+		logger.information("This is a test log message");
+	}
+	fast.flush();
+}
+BENCHMARK(FastLogger_Bridge_Splitter)->Arg(1)->Arg(2)->Arg(4)->Arg(8);
+
+#endif // POCO_ENABLE_FASTLOGGER
 
 
 //
