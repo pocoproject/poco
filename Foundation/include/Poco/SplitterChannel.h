@@ -63,6 +63,11 @@ public:
 	int count() const;
 		/// Returns the number of channels in the SplitterChannel.
 
+	Channel::Ptr getChannel(int index) const;
+		/// Returns the channel at the given 0-based index, or null when the index
+		/// is out of range. With count() this lets callers enumerate the attached
+		/// channels.
+
 protected:
 	~SplitterChannel() override;
 

@@ -117,6 +117,15 @@ public:
 		/// throws a PropertyNotSupported exception if the given
 		/// name is not recognized.
 
+	bool getLocalTime() const;
+		/// Returns true if timestamps are formatted in local time, false if in UTC.
+		/// Reflects the "times" property, which defaults to UTC.
+
+	bool isLocalTimeConfigured() const;
+		/// Returns true if the "times" property has been explicitly set, false if
+		/// still at its default. Lets callers distinguish an explicit "UTC" from an
+		/// unspecified default.
+
 	static const std::string PROP_PATTERN;
 	static const std::string PROP_TIMES;
 	static const std::string PROP_PRIORITY_NAMES;
@@ -152,6 +161,7 @@ private:
 
 	std::vector<PatternAction> _patternActions;
 	bool _localTime;
+	bool _localTimeSet;
 	std::string _pattern;
 	std::string _priorityNames;
 	std::string _priorities[9];

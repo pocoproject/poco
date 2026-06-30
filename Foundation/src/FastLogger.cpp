@@ -33,6 +33,7 @@
 #include "Poco/PatternFormatter.h"
 #include "Poco/AsyncChannel.h"
 #include "Poco/SplitterChannel.h"
+#include "Poco/EventChannel.h"
 #include "Poco/StreamChannel.h"
 #include "Poco/Environment.h"
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_SYSLOG_CHANNEL)
@@ -69,6 +70,9 @@
 #endif
 
 #include <algorithm>
+#include <unordered_set>
+#include <unordered_map>
+#include <atomic>
 
 #ifdef __linux__
 #include <unistd.h>  // for sysconf
@@ -121,33 +125,6 @@ namespace {
 
 namespace {
 
-// Map Poco log levels to Quill log levels
-quill::LogLevel pocoToQuillLevel(int pocoLevel)
-{
-	switch (pocoLevel)
-	{
-	case Message::PRIO_FATAL:
-		return quill::LogLevel::Critical;  // Quill doesn't have Fatal, use Critical
-	case Message::PRIO_CRITICAL:
-		return quill::LogLevel::Critical;
-	case Message::PRIO_ERROR:
-		return quill::LogLevel::Error;
-	case Message::PRIO_WARNING:
-		return quill::LogLevel::Warning;
-	case Message::PRIO_NOTICE:
-		return quill::LogLevel::Notice;
-	case Message::PRIO_INFORMATION:
-		return quill::LogLevel::Info;
-	case Message::PRIO_DEBUG:
-		return quill::LogLevel::Debug;
-	case Message::PRIO_TRACE:
-		return quill::LogLevel::TraceL1;
-	default:
-		if (pocoLevel <= 0)
-			return quill::LogLevel::None;
-		return quill::LogLevel::Info;
-	}
-}
 
 
 // NullSink - discards all log output (for benchmarking/testing)
@@ -216,9 +193,15 @@ const std::string& getCachedHostname()
 }
 
 
-// Translate Poco PatternFormatter pattern to Quill format pattern
-// Returns a pair of (format_pattern, timestamp_pattern)
-std::pair<std::string, std::string> translatePocoPatternToQuill(const std::string& pocoPattern)
+// Translate Poco PatternFormatter pattern to a Quill format/timestamp pattern.
+struct PatternTranslation
+{
+	std::string formatPattern;     // Quill format pattern
+	std::string timestampPattern;  // Quill timestamp pattern
+	bool localTime = false;        // true if the Poco pattern carried a %L flag
+};
+
+PatternTranslation translatePocoPatternToQuill(const std::string& pocoPattern)
 {
 	// Quill format pattern attributes:
 	// %(time), %(file_name), %(full_path), %(caller_function), %(log_level),
@@ -230,187 +213,219 @@ std::pair<std::string, std::string> translatePocoPatternToQuill(const std::strin
 	// %P - process id, %T - thread name, %I - thread id, %N - hostname
 	// %U - source file path, %O - source file basename, %u - source line
 	// Date/time: %Y, %m, %d, %H, %M, %S, %i (ms), %F (us), etc.
+	//
+	// Quill renders the whole timestamp through a single %(time) attribute whose
+	// layout is a separate timestamp_pattern. Poco patterns interleave date/time
+	// specifiers with their separators and with non-time fields, e.g.
+	//   %Y-%m-%d %H:%M:%S.%i [%p] %s: %t
+	// A contiguous run of date/time specifiers (including the separators between
+	// them) goes into the timestamp pattern, with one %(time) emitted in the
+	// format pattern at the run's position; everything else goes to the format
+	// pattern. Literals inside a run are buffered until the next token decides
+	// whether they are intra-timestamp separators or a trailing literal.
 
 	std::string quillPattern;
 	std::string timestampPattern;
-	bool hasTimestamp = false;
+	std::string pendingLiterals;   // literals inside a run, routed once the run continues or ends
+	bool inTimestamp = false;      // currently inside a date/time run
+	bool emittedTime = false;      // a %(time) has been emitted
+	bool localTimeFlag = false;
 
 	quillPattern.reserve(pocoPattern.size() * 2);
-	timestampPattern.reserve(64);
+	timestampPattern.reserve(32);
+
+	// Begin or continue a date/time run, appending token to the timestamp pattern.
+	auto onDateField = [&](const char* token)
+	{
+		if (!inTimestamp)
+		{
+			quillPattern += "%(time)";
+			inTimestamp = true;
+			emittedTime = true;
+		}
+		else
+		{
+			// literals since the previous date field were intra-timestamp separators
+			timestampPattern += pendingLiterals;
+			pendingLiterals.clear();
+		}
+		timestampPattern += token;
+	};
+
+	// End an active run: literals buffered after the last date field belong to
+	// the surrounding line layout (they follow %(time) in the format pattern).
+	auto endTimestampRun = [&]()
+	{
+		if (inTimestamp)
+		{
+			quillPattern += pendingLiterals;
+			pendingLiterals.clear();
+			inTimestamp = false;
+		}
+	};
 
 	std::string::const_iterator it = pocoPattern.begin();
 	std::string::const_iterator end = pocoPattern.end();
 
 	while (it != end)
 	{
-		if (*it == '%')
+		if (*it != '%')
 		{
+			if (inTimestamp) pendingLiterals += *it;
+			else quillPattern += *it;
 			++it;
-			if (it == end)
-			{
-				quillPattern += '%';
-				break;
-			}
-
-			char spec = *it;
-			++it;
-
-			switch (spec)
-			{
-			// Message content
-			case 't':  // message text
-				quillPattern += "%(message)";
-				break;
-			case 's':  // message source (logger name)
-				quillPattern += "%(logger)";
-				break;
-
-			// Log level
-			case 'l':  // level number - Quill doesn't have this, use short code
-				quillPattern += "%(log_level_short_code)";
-				break;
-			case 'p':  // priority name (Fatal, Critical, etc.)
-				quillPattern += "%(log_level)";
-				break;
-			case 'q':  // abbreviated priority (F, C, E, W, N, I, D, T)
-				quillPattern += "%(log_level_short_code)";
-				break;
-
-			// Process/Thread info
-			case 'P':  // process id
-				quillPattern += "%(process_id)";
-				break;
-			case 'T':  // thread name
-				quillPattern += "%(thread_name)";
-				break;
-			case 'I':  // thread id
-				quillPattern += "%(thread_id)";
-				break;
-			case 'J':  // OS thread id - use thread_id as fallback
-				quillPattern += "%(thread_id)";
-				break;
-			case 'N':  // hostname - hardcoded from cached value
-				quillPattern += getCachedHostname();
-				break;
-
-			// Source location
-			case 'U':  // source file path
-				quillPattern += "%(full_path)";
-				break;
-			case 'O':  // source file basename
-				quillPattern += "%(file_name)";
-				break;
-			case 'u':  // source line number
-				quillPattern += "%(line_number)";
-				break;
-
-			// Date/time specifiers - collect into timestamp pattern
-			case 'Y':  // year with century
-			case 'y':  // year without century
-			case 'm':  // month (01-12)
-			case 'n':  // month (1-12)
-			case 'd':  // day (01-31)
-			case 'e':  // day (1-31)
-			case 'H':  // hour (00-23)
-			case 'h':  // hour (01-12)
-			case 'M':  // minute
-			case 'S':  // second
-			case 'a':  // am/pm
-			case 'A':  // AM/PM
-			case 'w':  // weekday abbrev
-			case 'W':  // weekday full
-			case 'b':  // month abbrev
-			case 'B':  // month full
-			case 'z':  // timezone ISO
-			case 'Z':  // timezone RFC
-				if (!hasTimestamp)
-				{
-					quillPattern += "%(time)";
-					hasTimestamp = true;
-				}
-				// Build timestamp pattern
-				timestampPattern += '%';
-				if (spec == 'n' || spec == 'e')
-					timestampPattern += (spec == 'n') ? 'm' : 'd';  // Quill uses standard strftime
-				else
-					timestampPattern += spec;
-				break;
-
-			case 'i':  // milliseconds
-				if (!hasTimestamp)
-				{
-					quillPattern += "%(time)";
-					hasTimestamp = true;
-				}
-				timestampPattern += "%Qms";
-				break;
-
-			case 'c':  // centiseconds - approximate with milliseconds
-				if (!hasTimestamp)
-				{
-					quillPattern += "%(time)";
-					hasTimestamp = true;
-				}
-				timestampPattern += "%Qms";
-				break;
-
-			case 'F':  // microseconds
-				if (!hasTimestamp)
-				{
-					quillPattern += "%(time)";
-					hasTimestamp = true;
-				}
-				timestampPattern += "%Qus";
-				break;
-
-			case 'E':  // epoch time - not directly supported
-				quillPattern += "%(time)";
-				hasTimestamp = true;
-				break;
-
-			case 'L':  // local time flag - affects timestamp handling
-				// Quill handles timezone separately, skip
-				break;
-
-			case 'v':  // source with width - just use logger name
-				// Skip optional width specifier [n]
-				if (it != end && *it == '[')
-				{
-					while (it != end && *it != ']') ++it;
-					if (it != end) ++it;
-				}
-				quillPattern += "%(logger)";
-				break;
-
-			case '[':  // custom property %[name] - not supported in Quill
-				{
-					// Skip until ]
-					while (it != end && *it != ']') ++it;
-					if (it != end) ++it;
-					quillPattern += "[prop]";
-				}
-				break;
-
-			case '%':  // literal %
-				quillPattern += '%';
-				break;
-
-			default:
-				// Unknown specifier, pass through
-				quillPattern += '%';
-				quillPattern += spec;
-				break;
-			}
+			continue;
 		}
-		else
+
+		++it;
+		if (it == end)
 		{
-			quillPattern += *it;
-			++it;
+			quillPattern += '%';
+			break;
+		}
+
+		char spec = *it;
+		++it;
+
+		switch (spec)
+		{
+		// Date/time specifiers - part of the timestamp run.
+		case 'Y':  // year with century
+		case 'y':  // year without century
+		case 'm':  // month (01-12)
+		case 'n':  // month (1-12)
+		case 'd':  // day (01-31)
+		case 'e':  // day (1-31)
+		case 'H':  // hour (00-23)
+		case 'h':  // hour (01-12)
+		case 'M':  // minute
+		case 'S':  // second
+		case 'a':  // am/pm
+		case 'A':  // AM/PM
+		case 'w':  // weekday abbrev
+		case 'W':  // weekday full
+		case 'b':  // month abbrev
+		case 'B':  // month full
+		case 'z':  // timezone ISO
+		case 'Z':  // timezone RFC
+			{
+				char tok = spec;
+				if (spec == 'n') tok = 'm';        // Quill uses standard strftime
+				else if (spec == 'e') tok = 'd';
+				const char token[3] = { '%', tok, '\0' };
+				onDateField(token);
+			}
+			break;
+
+		case 'i':  // milliseconds
+			onDateField("%Qms");
+			break;
+		case 'c':  // centiseconds - approximate with milliseconds
+			onDateField("%Qms");
+			break;
+		case 'F':  // microseconds
+			onDateField("%Qus");
+			break;
+
+		case 'E':  // epoch time - not directly supported; emit %(time), no token
+			if (!inTimestamp)
+			{
+				quillPattern += "%(time)";
+				inTimestamp = true;
+				emittedTime = true;
+			}
+			break;
+
+		case 'L':  // Poco local-time flag - emits no token and does not bound
+			// the run; mapped to Quill's timestamp timezone.
+			localTimeFlag = true;
+			break;
+
+		// Message content
+		case 't':  // message text
+			endTimestampRun(); quillPattern += "%(message)";
+			break;
+		case 's':  // message source (logger name)
+			endTimestampRun(); quillPattern += "%(logger)";
+			break;
+
+		// Log level
+		case 'l':  // level number - Quill doesn't have this, use short code
+			endTimestampRun(); quillPattern += "%(log_level_short_code)";
+			break;
+		case 'p':  // priority name (Fatal, Critical, etc.)
+			endTimestampRun(); quillPattern += "%(log_level)";
+			break;
+		case 'q':  // abbreviated priority (F, C, E, W, N, I, D, T)
+			endTimestampRun(); quillPattern += "%(log_level_short_code)";
+			break;
+
+		// Process/Thread info
+		case 'P':  // process id
+			endTimestampRun(); quillPattern += "%(process_id)";
+			break;
+		case 'T':  // thread name
+			endTimestampRun(); quillPattern += "%(thread_name)";
+			break;
+		case 'I':  // thread id
+			endTimestampRun(); quillPattern += "%(thread_id)";
+			break;
+		case 'J':  // OS thread id - use thread_id as fallback
+			endTimestampRun(); quillPattern += "%(thread_id)";
+			break;
+		case 'N':  // hostname - hardcoded from cached value
+			endTimestampRun(); quillPattern += getCachedHostname();
+			break;
+
+		// Source location
+		case 'U':  // source file path
+			endTimestampRun(); quillPattern += "%(full_path)";
+			break;
+		case 'O':  // source file basename
+			endTimestampRun(); quillPattern += "%(file_name)";
+			break;
+		case 'u':  // source line number
+			endTimestampRun(); quillPattern += "%(line_number)";
+			break;
+
+		case 'v':  // source with width - just use logger name
+			endTimestampRun();
+			// Skip optional width specifier [n]
+			if (it != end && *it == '[')
+			{
+				while (it != end && *it != ']') ++it;
+				if (it != end) ++it;
+			}
+			quillPattern += "%(logger)";
+			break;
+
+		case '[':  // custom property %[name] - not supported in Quill
+			endTimestampRun();
+			// Skip until ]
+			while (it != end && *it != ']') ++it;
+			if (it != end) ++it;
+			quillPattern += "[prop]";
+			break;
+
+		case '%':  // literal %
+			if (inTimestamp) pendingLiterals += '%';
+			else quillPattern += '%';
+			break;
+
+		default:
+			// Unknown specifier, pass through to the format pattern.
+			endTimestampRun();
+			quillPattern += '%';
+			quillPattern += spec;
+			break;
 		}
 	}
 
+	// Flush any trailing literals that followed the last date field.
+	endTimestampRun();
+
 	// If no timestamp pattern was built, use a sensible default
-	if (timestampPattern.empty() && hasTimestamp)
+	if (timestampPattern.empty() && emittedTime)
 	{
 		timestampPattern = "%Y-%m-%d %H:%M:%S.%Qms";
 	}
@@ -419,7 +434,11 @@ std::pair<std::string, std::string> translatePocoPatternToQuill(const std::strin
 		timestampPattern = "%H:%M:%S.%Qns";  // Quill default
 	}
 
-	return std::make_pair(quillPattern, timestampPattern);
+	PatternTranslation result;
+	result.formatPattern = quillPattern;
+	result.timestampPattern = timestampPattern;
+	result.localTime = localTimeFlag;
+	return result;
 }
 
 
@@ -429,11 +448,13 @@ struct SinkInfo
 	std::vector<std::shared_ptr<quill::Sink>> sinks;
 	std::string formatPattern;      // Quill format pattern (empty = default)
 	std::string timestampPattern;   // Quill timestamp pattern (empty = default)
+	// Defaults to local time; a configured PatternFormatter "times" or a %L flag overrides it.
+	quill::Timezone timestampTimezone = quill::Timezone::LocalTime;
 };
 
 
 // Forward declaration for recursive sink collection
-void collectSinksFromChannel(Channel::Ptr pChannel, SinkInfo& info);
+void collectSinksFromChannel(Channel::Ptr pChannel, SinkInfo& info, std::unordered_set<const Channel*>& visited);
 
 
 // Structure to hold rotation configuration extracted from Poco FileChannel
@@ -702,9 +723,14 @@ int pocoToSyslogFacility(int pocoFacility)
 
 
 // Recursively collect Quill sinks from a Poco channel hierarchy
-void collectSinksFromChannel(Channel::Ptr pChannel, SinkInfo& info)
+void collectSinksFromChannel(Channel::Ptr pChannel, SinkInfo& info, std::unordered_set<const Channel*>& visited)
 {
 	if (!pChannel) return;
+
+	// Guard against cycles in the channel graph: a SplitterChannel can
+	// transitively contain itself (e.g. splitter.channels = splitter), which
+	// would otherwise recurse until the stack overflows.
+	if (!visited.insert(pChannel.get()).second) return;
 
 	// Unwrap FormattingChannel - extract formatter pattern
 	if (FormattingChannel* pFormattingChannel = dynamic_cast<FormattingChannel*>(pChannel.get()))
@@ -722,31 +748,50 @@ void collectSinksFromChannel(Channel::Ptr pChannel, SinkInfo& info)
 					if (!pocoPattern.empty())
 					{
 						auto translated = translatePocoPatternToQuill(pocoPattern);
-						info.formatPattern = translated.first;
-						info.timestampPattern = translated.second;
+						info.formatPattern = translated.formatPattern;
+						info.timestampPattern = translated.timestampPattern;
+
+						// FastLogger defaults to local time, unlike a regular
+						// Logger/PatternFormatter, which defaults to UTC. Precedence
+						// matches Poco's PatternFormatter: a %L flag forces local;
+						// otherwise a configured "times" (local/UTC) is honored;
+						// otherwise the local default stands. The formatter's reported
+						// "UTC" is also its unset default, so isLocalTimeConfigured()
+						// is needed to tell a configured UTC from an unset one.
+						if (translated.localTime)
+							info.timestampTimezone = quill::Timezone::LocalTime;
+						else if (pPatternFormatter->isLocalTimeConfigured())
+							info.timestampTimezone = pPatternFormatter->getLocalTime()
+								? quill::Timezone::LocalTime
+								: quill::Timezone::GmtTime;
 					}
 				}
 			}
 		}
-		collectSinksFromChannel(pFormattingChannel->getChannel(), info);
+		collectSinksFromChannel(pFormattingChannel->getChannel(), info, visited);
 		return;
 	}
 
 	// AsyncChannel - FastLogger is already async, just forward to inner channel
 	if (AsyncChannel* pAsyncChannel = dynamic_cast<AsyncChannel*>(pChannel.get()))
 	{
-		collectSinksFromChannel(pAsyncChannel->getChannel(), info);
+		collectSinksFromChannel(pAsyncChannel->getChannel(), info, visited);
 		return;
 	}
 
-	// SplitterChannel - the internal channel list is not accessible, so we fall back to console.
-	// Users needing multiple sinks should configure them directly with FastLogger::addFileSink()
-	// or by creating multiple FastLoggers.
-	if (dynamic_cast<SplitterChannel*>(pChannel.get()))
+	// SplitterChannel - recurse into each attached channel so a single
+	// root.channel = splitter (e.g. console + file) maps to multiple Quill
+	// sinks, and per-child PatternFormatter patterns are picked up.
+	//
+	// Limitation: all sinks collected from a splitter share one format/timezone
+	// (the first child that supplies a PatternFormatter -- see the info.formatPattern
+	// guard above), so per-child distinct formatting is not reproduced under
+	// type=fast; use separate loggers if children need different formats.
+	if (SplitterChannel* pSplitter = dynamic_cast<SplitterChannel*>(pChannel.get()))
 	{
-		// SplitterChannel's _channels vector is private with no accessor.
-		// Fall back to console as a reasonable default.
-		info.sinks.push_back(getConsoleSink());
+		const int n = pSplitter->count();
+		for (int i = 0; i < n; ++i)
+			collectSinksFromChannel(pSplitter->getChannel(i), info, visited);
 		return;
 	}
 
@@ -894,6 +939,17 @@ void collectSinksFromChannel(Channel::Ptr pChannel, SinkInfo& info)
 	}
 #endif
 
+	// EventChannel - dispatches Poco Messages to in-process listeners. Quill
+	// bypasses Poco's Message/Channel pipeline, so it cannot feed an EventChannel.
+	// Skip it and warn, rather than add a spurious console sink via the fallback below.
+	if (dynamic_cast<EventChannel*>(pChannel.get()))
+	{
+		std::cerr << "FastLogger warning: EventChannel is not supported by the fast "
+		          << "logger; its output is omitted. Use a regular Logger for that "
+		          << "channel if you need it." << std::endl;
+		return;
+	}
+
 	// Unknown channel type - fall back to console
 	info.sinks.push_back(getConsoleSink());
 }
@@ -901,11 +957,40 @@ void collectSinksFromChannel(Channel::Ptr pChannel, SinkInfo& info)
 } // anonymous namespace
 
 
+// Per-source routing state for when a FastLogger is installed as a Poco::Logger
+// channel (the type=fast bridge). Retains the configured sinks and format so each
+// distinct Message source routes to its own Quill logger (named after the source),
+// preserving the %s/%(logger) field instead of collapsing every source to this
+// logger's name. Held behind a void* in the header to keep it quill-free.
+namespace {
+struct PerSourceState
+{
+	std::vector<std::shared_ptr<quill::Sink>>          sinks;
+	quill::PatternFormatterOptions                     options;
+	std::unordered_map<std::string, PocoQuillLogger*>  loggers;
+	Poco::FastMutex                                    mutex;
+};
+
+// Free per-source Quill loggers created under a previous configuration. Quill's
+// frontend never releases loggers and keys them by name, so without removing the
+// old ones, create_or_get_logger(source, ...) for an already-seen source returns
+// the stale logger still bound to the old sinks, silently ignoring a reconfigure.
+// remove_logger_blocking is Quill's supported way to recreate a logger of the same
+// name with new sinks. It spin-waits, so call it outside state->mutex.
+void releaseStaleSourceLoggers(std::unordered_map<std::string, PocoQuillLogger*>& stale)
+{
+	for (auto& entry: stale)
+		PocoQuillFrontend::remove_logger_blocking(entry.second);
+	stale.clear();
+}
+} // namespace
+
+
 FastLogger::FastLogger(const std::string& name, int level):
 	_name(name),
 	_level(level),
 	_pQuillLogger(nullptr),
-	_sinkVersion(0)
+	_pSourceState(nullptr)
 {
 	ensureBackendStarted();
 
@@ -916,24 +1001,26 @@ FastLogger::FastLogger(const std::string& name, int level):
 	);
 	_pQuillLogger = static_cast<void*>(logger);
 
-	// Set the log level
-	logger->set_log_level(pocoToQuillLevel(level));
+	// Quill stays permissive; the Poco logger's per-logger level is authoritative
+	// (this channel does not re-gate). See log() and setLevel().
+	logger->set_log_level(quill::LogLevel::TraceL3);
 }
 
 
 FastLogger::~FastLogger()
 {
-	// Quill manages logger lifetime
+	// Quill manages logger lifetime; free our per-source routing state.
+	delete static_cast<PerSourceState*>(_pSourceState.load());
 }
 
 
 void FastLogger::setLevel(int level)
 {
+	// _level gates the direct logger-API methods (trace()/debug()/...) and the
+	// is()/trace() predicates. The Quill loggers stay permissive so the originating
+	// Poco logger's level decides what the channel emits (see log() and
+	// resolveSourceLogger).
 	_level = level;
-	if (_pQuillLogger)
-	{
-		static_cast<PocoQuillLogger*>(_pQuillLogger)->set_log_level(pocoToQuillLevel(level));
-	}
 }
 
 
@@ -949,12 +1036,33 @@ void FastLogger::setChannel(Channel::Ptr pChannel)
 
 	ensureBackendStarted();
 
+	// Not thread-safe against concurrent log(): this reassigns _pQuillLogger and
+	// rebuilds _pSourceState without a lock, while log()/resolveSourceLogger read
+	// them. The contract is that logging is configured once at startup, before
+	// logging begins; do not call setChannel() concurrently with logging.
+
 	// Recursively collect all sinks from the channel hierarchy
 	// This handles FormattingChannel, AsyncChannel, SplitterChannel, and all
 	// supported channel types (Console, File, Syslog, Stream, etc.)
 	// Also extracts PatternFormatter patterns if present.
 	SinkInfo info;
-	collectSinksFromChannel(pChannel, info);
+	std::unordered_set<const Channel*> visited;
+	collectSinksFromChannel(pChannel, info, visited);
+
+	// Some sinks are process-wide singletons (e.g. the shared console sink), so a
+	// channel tree can surface the same sink more than once; de-duplicate so Quill
+	// does not emit each line multiple times.
+	if (info.sinks.size() > 1)
+	{
+		std::vector<std::shared_ptr<quill::Sink>> uniqueSinks;
+		for (auto& s: info.sinks)
+		{
+			bool dup = false;
+			for (auto& u: uniqueSinks) { if (u == s) { dup = true; break; } }
+			if (!dup) uniqueSinks.push_back(s);
+		}
+		info.sinks.swap(uniqueSinks);
+	}
 
 	if (!info.sinks.empty())
 	{
@@ -962,10 +1070,17 @@ void FastLogger::setChannel(Channel::Ptr pChannel)
 		// We create a new logger with a versioned name each time setChannel is called.
 		// Always use a version suffix because the base name is already taken by the
 		// constructor (which creates a logger with the default sink).
-		++_sinkVersion;
+		// The version suffix must be unique for the process lifetime, not just this
+		// FastLogger instance. Quill's frontend keeps previously created loggers
+		// across shutdown(), so a per-instance counter would restart at 1 for a
+		// recreated logger and collide with a stale Quill logger of the same name;
+		// create_or_get_logger() would then return the old sinks and ignore the new
+		// channel's. A process-wide counter guarantees a fresh logger every time.
+		static std::atomic<Poco::UInt64> sLoggerVersion{0};
+		const Poco::UInt64 version = ++sLoggerVersion;
 		std::string loggerName = _name.empty() ? "root" : _name;
 		loggerName += "_v";
-		NumberFormatter::append(loggerName, _sinkVersion);
+		NumberFormatter::append(loggerName, version);
 
 		// Create PatternFormatterOptions if a custom pattern was extracted
 		quill::PatternFormatterOptions formatterOptions;
@@ -978,13 +1093,66 @@ void FastLogger::setChannel(Channel::Ptr pChannel)
 			formatterOptions.timestamp_pattern = info.timestampPattern;
 		}
 
+		// Default to local time, set explicitly so it cannot regress if Quill's
+		// default changes; a configured PatternFormatter "times"/%L overrides it
+		// (see SinkInfo).
+		formatterOptions.timestamp_timezone = info.timestampTimezone;
+
+		// Retain the sinks and format so that, when this FastLogger is used as a
+		// Poco::Logger channel (the bridge), each Message source routes to its own
+		// Quill logger (named after the source) sharing them, preserving %s/%(logger)
+		// instead of collapsing every source to this name.
+		if (_pSourceState == nullptr) _pSourceState = new PerSourceState();
+		{
+			PerSourceState* state = static_cast<PerSourceState*>(_pSourceState.load());
+			std::unordered_map<std::string, PocoQuillLogger*> stale;
+			{
+				Poco::FastMutex::ScopedLock lock(state->mutex);
+				state->sinks = info.sinks;        // copy the shared sink pointers
+				state->options = formatterOptions;
+				stale.swap(state->loggers);       // detach per-source loggers from the prior config
+			}
+			releaseStaleSourceLoggers(stale);     // free them so the new sinks take effect
+		}
+
 		PocoQuillLogger* newLogger = PocoQuillFrontend::create_or_get_logger(
 			loggerName,
 			std::move(info.sinks),
 			formatterOptions
 		);
-		newLogger->set_log_level(pocoToQuillLevel(_level));
+		newLogger->set_log_level(quill::LogLevel::TraceL3);  // permissive; the Poco logger level is authoritative
 		_pQuillLogger = static_cast<void*>(newLogger);
+	}
+	else
+	{
+		// The channel tree yielded no Quill sink -- e.g. an EventChannel-only
+		// configuration, which collectSinksFromChannel skips (no Quill analogue).
+		// Leaving _pQuillLogger at the constructor's default console sink would emit
+		// to the console despite an event-only configuration. Route to a null sink
+		// instead, and mirror that into the per-source state.
+		static std::atomic<Poco::UInt64> sNullLoggerVersion{0};
+		const Poco::UInt64 version = ++sNullLoggerVersion;
+		std::string loggerName = _name.empty() ? "root" : _name;
+		loggerName += "_null_v";
+		NumberFormatter::append(loggerName, version);
+
+		std::vector<std::shared_ptr<quill::Sink>> nullSinks{ getNullSink() };
+		if (_pSourceState == nullptr) _pSourceState = new PerSourceState();
+		{
+			PerSourceState* state = static_cast<PerSourceState*>(_pSourceState.load());
+			std::unordered_map<std::string, PocoQuillLogger*> stale;
+			{
+				Poco::FastMutex::ScopedLock lock(state->mutex);
+				state->sinks = nullSinks;
+				state->options = quill::PatternFormatterOptions();
+				stale.swap(state->loggers);
+			}
+			releaseStaleSourceLoggers(stale);
+		}
+		PocoQuillLogger* nullLogger = PocoQuillFrontend::create_or_get_logger(
+			loggerName, std::move(nullSinks), quill::PatternFormatterOptions());
+		nullLogger->set_log_level(quill::LogLevel::TraceL3);
+		_pQuillLogger = static_cast<void*>(nullLogger);
 	}
 }
 
@@ -1041,12 +1209,30 @@ std::string FastLogger::getProperty(const std::string& name) const
 
 void FastLogger::log(const Message& msg)
 {
-	if (_level >= msg.getPriority())
+	// No level gate here. The originating Poco::Logger has already applied its
+	// per-logger level (Logger::logImpl) before the message reaches this channel.
+	// Re-gating on this channel's single _level would override per-logger levels
+	// (a child set to trace would be dropped while root stays at information). In
+	// Poco, loggers filter and channels do not; the Quill loggers stay permissive
+	// (see the constructor, setChannel, resolveSourceLogger), so the Poco logger's
+	// level is the single authority for what this channel emits.
+	void* target = resolveSourceLogger(msg.getSource());
+	const Priority prio = static_cast<Priority>(msg.getPriority());
+	if (msg.getSourceFile() != nullptr)
 	{
-		if (msg.getSourceFile())
-			logImpl(msg.getText(), static_cast<Priority>(msg.getPriority()), msg.getSourceFile(), msg.getSourceLine());
-		else
-			logImpl(msg.getText(), static_cast<Priority>(msg.getPriority()));
+		std::string fullMsg;
+		fullMsg.reserve(msg.getText().size() + 64);
+		fullMsg.append(msg.getText());
+		fullMsg.append(" [");
+		fullMsg.append(msg.getSourceFile());
+		fullMsg.append(":");
+		NumberFormatter::append(fullMsg, static_cast<int>(msg.getSourceLine()));
+		fullMsg.append("]");
+		logToQuill(target, fullMsg, prio);
+	}
+	else
+	{
+		logToQuill(target, msg.getText(), prio);
 	}
 }
 
@@ -1188,9 +1374,52 @@ void FastLogger::dump(const std::string& msg, const void* buffer, std::size_t le
 
 void FastLogger::logImpl(const std::string& text, Priority prio)
 {
-	if (!_pQuillLogger) return;
+	logToQuill(_pQuillLogger, text, prio);
+}
 
-	PocoQuillLogger* logger = static_cast<PocoQuillLogger*>(_pQuillLogger);
+
+void* FastLogger::resolveSourceLogger(const std::string& source)
+{
+	PerSourceState* state = static_cast<PerSourceState*>(_pSourceState.load());
+	if (state == nullptr || source.empty())
+		return _pQuillLogger;
+
+	Poco::FastMutex::ScopedLock lock(state->mutex);
+	auto it = state->loggers.find(source);
+	if (it != state->loggers.end())
+		return it->second;
+
+	// Bound growth: every distinct source permanently creates a Quill logger that
+	// Quill's frontend never releases. Bridged logger names are expected to come
+	// from a fixed set; if a caller routes high-cardinality dynamic names through
+	// the bridge, cap the distinct per-source loggers and fall back to the base
+	// logger for the overflow, losing only the %s/%(logger) attribution for those.
+	static constexpr std::size_t kMaxSourceLoggers = 8192;
+	if (state->loggers.size() >= kMaxSourceLoggers)
+		return _pQuillLogger;
+
+	// Lazily create a Quill logger named after the source, sharing the configured
+	// sinks and format, so %(logger)/%s shows the originating logger name. The bare
+	// source name is used for clean attribution. setChannel() removes the previous
+	// configuration's per-source loggers on reconfigure (see releaseStaleSourceLoggers),
+	// so create_or_get_logger here always builds against the current sinks. A given
+	// source name is bridged by a single FastLogger (Poco's one-logger-per-name model).
+	PocoQuillLogger* logger = PocoQuillFrontend::create_or_get_logger(
+		source,
+		state->sinks,
+		state->options
+	);
+	logger->set_log_level(quill::LogLevel::TraceL3);  // permissive; the source Poco logger's level gates it
+	state->loggers[source] = logger;
+	return logger;
+}
+
+
+void FastLogger::logToQuill(void* pQuillLoggerVoid, const std::string& text, Priority prio)
+{
+	if (pQuillLoggerVoid == nullptr) return;
+
+	PocoQuillLogger* logger = static_cast<PocoQuillLogger*>(pQuillLoggerVoid);
 
 	// Use Quill's logging macros. We use QUILL_LOG_* prefixed macros
 	// to avoid conflicts with syslog.h macros (LOG_INFO, LOG_WARNING, etc.)
@@ -1585,35 +1814,44 @@ void FastLogger::flush()
 {
 	if (_pQuillLogger)
 	{
-		static_cast<PocoQuillLogger*>(_pQuillLogger)->flush_log();
+		static_cast<PocoQuillLogger*>(_pQuillLogger.load())->flush_log();
+	}
+
+	// Bridge path: messages routed through resolveSourceLogger() land in per-source
+	// Quill loggers, not _pQuillLogger, so drain those too. Otherwise flush() on its
+	// own (without a following shutdown(), whose Backend::stop() flushes everything)
+	// leaves bridged output queued in the backend. Use the same state mutex
+	// resolveSourceLogger takes to create them.
+	if (PerSourceState* state = static_cast<PerSourceState*>(_pSourceState.load()))
+	{
+		Poco::FastMutex::ScopedLock lock(state->mutex);
+		for (auto& kv: state->loggers)
+			if (kv.second) kv.second->flush_log();
 	}
 }
 
 
-void FastLogger::setPattern(const std::string& pattern)
+void FastLogger::setPattern(const std::string& /* pattern */)
 {
-	// Quill uses different pattern syntax, store for new loggers
-	// This would need to be applied when creating sinks
-	// For now, we use Quill's default pattern
+	// Pattern and sinks are configured per logger through the Channel passed to
+	// setChannel() (a PatternFormatter on a FormattingChannel). Each Quill logger
+	// binds its sinks and format at creation and cannot be mutated afterwards, so a
+	// global setPattern cannot be honored; throw rather than silently ignore it.
+	throw NotImplementedException(
+		"FastLogger::setPattern: configure the pattern via a PatternFormatter on the "
+		"FormattingChannel passed to setChannel() (logging.loggers...type=fast)");
 }
 
 
-void FastLogger::addFileSink(const std::string& filename)
+void FastLogger::addFileSink(const std::string& /* filename */)
 {
-	ensureBackendStarted();
-
-	auto fileSink = PocoQuillFrontend::create_or_get_sink<quill::FileSink>(
-		filename,
-		[]() {
-			quill::FileSinkConfig cfg;
-			cfg.set_open_mode('w');
-			return cfg;
-		}(),
-		quill::FileEventNotifier{}
-	);
-
-	// Add to existing loggers - this would need more sophisticated handling
-	// for production use (e.g., maintaining list of sinks per logger)
+	// Sinks are derived from the Channel passed to setChannel() (e.g. a FileChannel,
+	// possibly inside a SplitterChannel); there is no global sink list to add to in
+	// the per-source bridge model. Throw rather than create a sink that is silently
+	// dropped, which would also truncate the target file as a side effect.
+	throw NotImplementedException(
+		"FastLogger::addFileSink: configure file output via a FileChannel passed to "
+		"setChannel() (logging.loggers...type=fast)");
 }
 
 
@@ -1739,10 +1977,23 @@ void FastLogger::ensureBackendStarted()
 		// Apply any pending backend options
 		{
 			Mutex::ScopedLock optionsLock(_backendOptionsMtx);
+			// On a malformed value, warn and skip rather than throw.
+			// ensureBackendStarted() runs lazily on the first logger or log call, so a
+			// throw here would surface from an unrelated get()/log() call far from the
+			// setBackendOption() site.
+			auto parseU64 = [](const std::string& n, const std::string& v, Poco::UInt64& out) -> bool
+			{
+				if (NumberParser::tryParseUnsigned64(v, out)) return true;
+				std::cerr << "FastLogger warning: ignoring non-numeric value \"" << v
+				          << "\" for backend option \"" << n << "\"." << std::endl;
+				return false;
+			};
+
 			for (const auto& opt : _pendingBackendOptions)
 			{
 				const std::string& name = opt.first;
 				const std::string& value = opt.second;
+				Poco::UInt64 num = 0;
 
 				if (name == "threadName")
 				{
@@ -1750,7 +2001,8 @@ void FastLogger::ensureBackendStarted()
 				}
 				else if (name == "sleepDuration")
 				{
-					options.sleep_duration = std::chrono::microseconds{NumberParser::parseUnsigned64(value)};
+					if (parseU64(name, value, num))
+						options.sleep_duration = std::chrono::microseconds{num};
 				}
 				else if (name == "enableYieldWhenIdle")
 				{
@@ -1758,27 +2010,33 @@ void FastLogger::ensureBackendStarted()
 				}
 				else if (name == "cpuAffinity")
 				{
-					options.cpu_affinity = static_cast<uint16_t>(NumberParser::parseUnsigned(value));
+					if (parseU64(name, value, num))
+						options.cpu_affinity = static_cast<uint16_t>(num);
 				}
 				else if (name == "transitEventBufferInitialCapacity")
 				{
-					options.transit_event_buffer_initial_capacity = static_cast<size_t>(NumberParser::parseUnsigned64(value));
+					if (parseU64(name, value, num))
+						options.transit_event_buffer_initial_capacity = static_cast<size_t>(num);
 				}
 				else if (name == "transitEventsSoftLimit")
 				{
-					options.transit_events_soft_limit = static_cast<size_t>(NumberParser::parseUnsigned64(value));
+					if (parseU64(name, value, num))
+						options.transit_events_soft_limit = static_cast<size_t>(num);
 				}
 				else if (name == "transitEventsHardLimit")
 				{
-					options.transit_events_hard_limit = static_cast<size_t>(NumberParser::parseUnsigned64(value));
+					if (parseU64(name, value, num))
+						options.transit_events_hard_limit = static_cast<size_t>(num);
 				}
 				else if (name == "logTimestampOrderingGracePeriod")
 				{
-					options.log_timestamp_ordering_grace_period = std::chrono::microseconds{NumberParser::parseUnsigned64(value)};
+					if (parseU64(name, value, num))
+						options.log_timestamp_ordering_grace_period = std::chrono::microseconds{num};
 				}
 				else if (name == "sinkMinFlushInterval")
 				{
-					options.sink_min_flush_interval = std::chrono::milliseconds{NumberParser::parseUnsigned64(value)};
+					if (parseU64(name, value, num))
+						options.sink_min_flush_interval = std::chrono::milliseconds{num};
 				}
 				else if (name == "waitForQueuesToEmptyBeforeExit")
 				{

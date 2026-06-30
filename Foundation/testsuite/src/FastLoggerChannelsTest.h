@@ -34,6 +34,15 @@ public:
 	void testFormattingChannel();
 	void testAsyncChannel();
 	void testSplitterChannel();
+	void testEventChannelSkipped();
+	void testLocalTimeDefault();
+	void testTimesUtcHonored();
+	void testTimestampLayout();
+	void testSplitterChannelCycle();
+	void testLocalTimeHourMatchesSystemClock();
+	void testSplitterConsoleFileWritesFile();
+	void testDirectApiStillFiltersWithPermissiveQuill();
+	void testUnsupportedSettersThrow();
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_SYSLOG_CHANNEL)
 	void testSyslogChannel();
 #endif

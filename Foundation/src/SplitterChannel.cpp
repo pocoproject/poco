@@ -105,4 +105,14 @@ int SplitterChannel::count() const
 }
 
 
+Channel::Ptr SplitterChannel::getChannel(int index) const
+{
+	FastMutex::ScopedLock lock(_mutex);
+
+	if (index >= 0 && index < (int) _channels.size())
+		return _channels[index];
+	return Channel::Ptr();
+}
+
+
 } // namespace Poco

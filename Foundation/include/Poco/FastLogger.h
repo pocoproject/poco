@@ -31,6 +31,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <atomic>
 #include <cstddef>
 
 
@@ -355,11 +356,17 @@ public:
 		/// Note: This should not be called from a static destructor.
 
 	static void setPattern(const std::string& pattern);
-		/// Sets the log output pattern for the console sink.
-		/// Uses Quill pattern syntax.
+		/// Not supported: throws NotImplementedException.
+		///
+		/// The output pattern is configured per logger through a PatternFormatter on
+		/// the Channel passed to setChannel(); a Quill logger binds its format at
+		/// creation and cannot be changed through a global setter.
 
 	static void addFileSink(const std::string& filename);
-		/// Adds a file sink for log output.
+		/// Not supported: throws NotImplementedException.
+		///
+		/// File output is configured through a FileChannel on the Channel passed to
+		/// setChannel() (the per-source bridge model has no global sink list).
 
 	static void setBackendOption(const std::string& name, const std::string& value);
 		/// Sets a Quill backend option before the backend is started.
@@ -389,6 +396,17 @@ protected:
 	void logImpl(const std::string& text, Priority prio);
 	void logImpl(const std::string& text, Priority prio, const char* file, LineNumber line);
 
+	void logToQuill(void* pQuillLogger, const std::string& text, Priority prio);
+		/// Emits text at the given priority to the given Quill logger (quill::Logger*).
+
+	void* resolveSourceLogger(const std::string& source);
+		/// Returns the Quill logger (quill::Logger*) to use for a message with the
+		/// given source. When this FastLogger is used as a Poco::Logger channel,
+		/// each distinct source is routed to its own Quill logger (named after the
+		/// source, sharing the configured sinks and format) so the %s/%(logger)
+		/// field is preserved. Falls back to this FastLogger's own Quill logger when
+		/// the message has no source or no channel has been configured.
+
 	static std::string formatImpl(const std::string& fmt, int argc, std::string argv[]);
 	static FastLogger& parent(const std::string& name);
 	static void add(Ptr pLogger);
@@ -403,9 +421,12 @@ private:
 	FastLogger& operator = (const FastLogger&);
 
 	std::string   _name;
-	int           _level;
-	void*         _pQuillLogger;  // quill::Logger* - opaque to avoid header dependency
-	int           _sinkVersion;   // Incremented on each setChannel() to create unique Quill logger names
+	// Read lock-free on the logging path and reassigned by setLevel()/setChannel();
+	// atomic keeps those reads well-defined. The configure-once contract still
+	// governs the data the pointers refer to.
+	std::atomic<int>   _level;
+	std::atomic<void*> _pQuillLogger;  // quill::Logger* - opaque to avoid header dependency
+	std::atomic<void*> _pSourceState;  // PerSourceState* - per-source routing for channel (bridge) use; opaque
 
 	static LoggerMapPtr _pLoggerMap;
 	static Mutex        _mapMtx;
