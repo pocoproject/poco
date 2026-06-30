@@ -1051,6 +1051,10 @@ std::string MemoryDB::historyView(const std::string& table,
 			" attached simultaneously. Narrow the range or query in batches.");
 	}
 
+	// These attaches are released by detachAllArchived(), not detachArchived():
+	// the _attached refcount is intentionally left unbalanced so repeated range
+	// queries keep the matching shards (and their page caches) attached. Pairing
+	// each with a detachArchived() would leave the refcount above 0.
 	for (auto id: matching) attachArchived(id); // recursive _attachMutex -> safe
 
 	return buildHistoryView(table, matching);
