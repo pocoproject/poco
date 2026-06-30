@@ -6,10 +6,11 @@ POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "src/*.h")
 POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_G})
 
-add_executable(Modules-testrunner ${TEST_SRCS})
-set_target_properties(Modules-testrunner PROPERTIES DEBUG_POSTFIX "d")
+poco_add_executable(Modules-testrunner ${TEST_SRCS})
 target_compile_definitions(Modules-testrunner PUBLIC ENABLE_MODULES)
 target_link_libraries(Modules-testrunner PUBLIC Poco::Modules Poco::Foundation)
+# import Poco; needs C++20 module scanning, which is off by default under the 3.26 floor (CMP0155).
+set_target_properties(Modules-testrunner PROPERTIES CXX_SCAN_FOR_MODULES ON)
 
 if(ANDROID)
 	add_test(

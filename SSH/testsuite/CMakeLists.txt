@@ -4,8 +4,7 @@ POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "src/*.h")
 POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_G})
 
-add_executable(SSH-testrunner ${TEST_SRCS})
-set_target_properties(SSH-testrunner PROPERTIES DEBUG_POSTFIX "d")
+poco_add_executable(SSH-testrunner ${TEST_SRCS})
 
 target_link_libraries(SSH-testrunner PUBLIC Poco::SSH Poco::Foundation CppUnit)
 target_link_libraries(SSH-testrunner PRIVATE ssh)

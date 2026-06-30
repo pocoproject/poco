@@ -6,8 +6,7 @@ POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "src/*.h")
 POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_G})
 
-add_executable(NetSSL-testrunner ${TEST_SRCS})
-set_target_properties(NetSSL-testrunner PROPERTIES DEBUG_POSTFIX "d")
+poco_add_executable(NetSSL-testrunner ${TEST_SRCS})
 
 if(ANDROID)
 	add_test(
@@ -37,7 +36,7 @@ if(MSVC)
 endif()
 
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ping/websocket-server.cpp)
-	add_executable(NetSSL-server ping/websocket-server.cpp)
+	poco_add_executable(NetSSL-server ping/websocket-server.cpp)
 	target_link_libraries(NetSSL-server PUBLIC Poco::NetSSL Poco::Util)
 	if (NOT ANDROID)
 		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetSSL-server.xml COPYONLY)
@@ -45,7 +44,7 @@ if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ping/websocket-server.cpp)
 endif()
 
 if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/ping/websocket-client.cpp)
-	add_executable(NetSSL-client ping/websocket-client.cpp)
+	poco_add_executable(NetSSL-client ping/websocket-client.cpp)
 	target_link_libraries(NetSSL-client PUBLIC Poco::NetSSL Poco::Util)
 	if (NOT ANDROID)
 		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/testrunner.xml ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/NetSSL-client.xml COPYONLY)

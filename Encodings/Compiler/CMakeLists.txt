@@ -2,7 +2,7 @@
 file(GLOB SRCS_G "src/*.cpp")
 POCO_SOURCES_AUTO(SRCS ${SRCS_G})
 
-add_executable(EncodingsCompiler ${SRCS})
+poco_add_executable(EncodingsCompiler ${SRCS})
 set_target_properties(EncodingsCompiler
 	PROPERTIES
 	OUTPUT_NAME tec

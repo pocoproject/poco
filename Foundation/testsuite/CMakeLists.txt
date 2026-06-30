@@ -25,8 +25,7 @@ POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
 file(GLOB_RECURSE HDRS_G "src/*.h")
 POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_G})
 
-add_executable(Foundation-testrunner ${TEST_SRCS})
-set_target_properties(Foundation-testrunner PROPERTIES DEBUG_POSTFIX "d")
+poco_add_executable(Foundation-testrunner ${TEST_SRCS})
 if(ANDROID)
 	add_test(
 		NAME Foundation
@@ -58,10 +57,9 @@ if(Poco_ATOMIC_LIBRARIES)
 endif()
 
 # TestApp
-add_executable(TestApp src/TestApp.cpp)
+poco_add_executable(TestApp src/TestApp.cpp)
 # The test is run in the runtime directory. So the TestApp is built there too because it is used by the tests
 set_target_properties(TestApp PROPERTIES
-	DEBUG_POSTFIX "d"
 	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
 )
 target_link_libraries(TestApp PUBLIC Poco::Foundation)

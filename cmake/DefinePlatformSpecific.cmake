@@ -51,7 +51,7 @@ else(MSVC)
 
 	# Strip symbols from Release binaries. Apple's ld deprecated `-s`;
 	# `-Wl,-x` is its documented replacement and keeps dynamic exports.
-	# MSVC has no equivalent — symbols live in the .pdb, not the binary.
+	# MSVC has no equivalent -- symbols live in the .pdb, not the binary.
 	if(APPLE)
 		add_link_options($<$<CONFIG:Release>:-Wl,-x>)
 	else()
@@ -148,6 +148,20 @@ else(BUILD_SHARED_LIBS)
 	set(CMAKE_MINSIZEREL_POSTFIX "${STATIC_POSTFIX}" CACHE STRING "Set MinSizeRel library postfix" FORCE)
 	set(CMAKE_RELWITHDEBINFO_POSTFIX "${STATIC_POSTFIX}" CACHE STRING "Set RelWithDebInfo library postfix" FORCE)
 endif()
+
+# Add a Poco executable that also carries the debug 'd' postfix.
+#
+# CMAKE_DEBUG_POSTFIX applies only to non-executable targets, so use this in
+# place of add_executable() to give Poco's own executables the 'd' postfix too.
+#
+# A macro, not a command override of add_executable(), so it does not leak into a
+# parent project that builds Poco via add_subdirectory(). Running in the caller's
+# scope also means the real add_executable() uses the call site's policies (e.g.
+# CMP0155 for C++20 module scanning) rather than this file's older policy scope.
+macro(poco_add_executable _name)
+	add_executable(${_name} ${ARGN})
+	set_target_properties(${_name} PROPERTIES DEBUG_POSTFIX "d")
+endmacro()
 
 # OS Detection
 include(CheckTypeSize)

@@ -7,8 +7,7 @@ POCO_SOURCES_AUTO(TEST_SRCS ${SRCS_G})
 file(GLOB HDRS_G "src/*.h")
 POCO_HEADERS_AUTO(TEST_SRCS ${HDRS_G})
 
-add_executable(Data-testrunner ${TEST_SRCS})
-set_target_properties(Data-testrunner PROPERTIES DEBUG_POSTFIX "d")
+poco_add_executable(Data-testrunner ${TEST_SRCS})
 if(ANDROID)
 	add_test(
 		NAME Data

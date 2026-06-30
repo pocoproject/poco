@@ -8,7 +8,7 @@ if(MSVC)
 	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
-add_executable(File2Page ${SRCS})
+poco_add_executable(File2Page ${SRCS})
 set_target_properties(File2Page
 	PROPERTIES
 	OUTPUT_NAME f2cpsp
