@@ -129,6 +129,9 @@ namespace
 			}
 
 			case hsql::kExprParameterNamed:
+				// Named placeholders (:name) are bound by name, so they leave style
+				// unset and stay out of the positional ?/$N arity checks; the binder
+				// resolves names separately.
 				span.paramIndex = std::string::npos;
 				span.srcLen = 1 + std::strlen(p->name);
 				break;

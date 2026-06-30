@@ -68,6 +68,13 @@ void UtilityTest::testRenderValue()
 	assertTrue(Utility::renderValue("hello") == "'hello'");
 	assertTrue(Utility::renderValue(std::string("O'Brien")) == "'O''Brien'");
 
+	// Int8/UInt8 render numerically; only the bare char type maps to a quoted
+	// one-character string literal.
+	assertTrue(Utility::renderValue(static_cast<Poco::Int8>(65)) == "65");
+	assertTrue(Utility::renderValue(static_cast<Poco::Int8>(-5)) == "-5");
+	assertTrue(Utility::renderValue(static_cast<Poco::UInt8>(200)) == "200");
+	assertTrue(Utility::renderValue('A') == "'A'");
+
 	// A null character pointer (distinct from the nullptr literal: the type
 	// is const char*, not nullptr_t) is convertible to std::string_view, and
 	// the string_view(const char*) constructor is UB on null. renderValue
@@ -82,27 +89,27 @@ void UtilityTest::testRenderValue()
 	const std::string d = Utility::renderValue(3.5);
 	assertTrue(d == "3.5" || d == "3.5000000000000000");
 
-	// Poco::Nullable<T>: empty → NULL, populated → recurse on T.
+	// Poco::Nullable<T>: empty -> NULL, populated -> recurse on T.
 	assertTrue(Utility::renderValue(Poco::Nullable<int>()) == "NULL");
 	assertTrue(Utility::renderValue(Poco::Nullable<int>(42)) == "42");
 	assertTrue(Utility::renderValue(Poco::Nullable<std::string>(std::string("hi"))) == "'hi'");
 
-	// std::optional<T>: empty → NULL, populated → recurse on T.
+	// std::optional<T>: empty -> NULL, populated -> recurse on T.
 	assertTrue(Utility::renderValue(std::optional<int>()) == "NULL");
 	assertTrue(Utility::renderValue(std::optional<int>(7)) == "7");
 	assertTrue(Utility::renderValue(std::optional<std::string>(std::string("ok"))) == "'ok'");
 
-	// Date / Time — SQL literal form.
+	// Date / Time -- SQL literal form.
 	assertTrue(Utility::renderValue(Poco::Data::Date(2026, 5, 27)) == "'2026-05-27'");
 	assertTrue(Utility::renderValue(Poco::Data::Time(14, 30, 45)) == "'14:30:45'");
 
-	// DateTime / LocalDateTime — sortable format.
+	// DateTime / LocalDateTime -- sortable format.
 	assertTrue(Utility::renderValue(Poco::DateTime(2026, 5, 27, 14, 30, 45))
 		== "'2026-05-27 14:30:45'");
 	assertTrue(Utility::renderValue(Poco::LocalDateTime(2026, 5, 27, 14, 30, 45))
 		== "'2026-05-27 14:30:45'");
 
-	// Poco::Dynamic::Var — inspect and dispatch.
+	// Poco::Dynamic::Var -- inspect and dispatch.
 	assertTrue(Utility::renderValue(Poco::Dynamic::Var()) == "NULL");
 	assertTrue(Utility::renderValue(Poco::Dynamic::Var(true)) == "1");
 	assertTrue(Utility::renderValue(Poco::Dynamic::Var(false)) == "0");
@@ -114,7 +121,7 @@ void UtilityTest::testRenderValue()
 	assertTrue(Utility::renderValue(Poco::Dynamic::Var(Poco::Data::Date(2026, 5, 27)))
 		== "'2026-05-27'");
 
-	// BLOB — uppercase hex literal, X'...' form.
+	// BLOB -- uppercase hex literal, X'...' form.
 	{
 		const unsigned char bytes[] = { 0xDE, 0xAD, 0xBE, 0xEF };
 		Poco::Data::BLOB blob(bytes, sizeof(bytes));
@@ -122,14 +129,14 @@ void UtilityTest::testRenderValue()
 	}
 	assertTrue(Utility::renderValue(Poco::Data::BLOB()) == "X''");
 
-	// CLOB — single-quoted text, internal ' doubled.
+	// CLOB -- single-quoted text, internal ' doubled.
 	{
 		const std::string s = "O'Brien";
 		Poco::Data::CLOB clob(s.data(), s.size());
 		assertTrue(Utility::renderValue(clob) == "'O''Brien'");
 	}
 
-	// Unknown type → "?" fallback (no operator<<, no specialised handling).
+	// Unknown type -> "?" fallback (no operator<<, no specialised handling).
 	struct Unknown {};
 	assertTrue(Utility::renderValue(Unknown{}) == "?");
 }
