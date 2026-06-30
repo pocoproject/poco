@@ -21,6 +21,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/FastLogger.h"
+#include "Poco/Exception.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Message.h"
 #include "Poco/NullChannel.h"
@@ -32,9 +33,15 @@
 #include "Poco/PatternFormatter.h"
 #include "Poco/AsyncChannel.h"
 #include "Poco/SplitterChannel.h"
+#include "Poco/EventChannel.h"
 #include "Poco/File.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/FileStream.h"
+#include "Poco/DateTime.h"
+#include "Poco/LocalDateTime.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/Timezone.h"
+#include "Poco/NumberParser.h"
 #include <sstream>
 
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_SYSLOG_CHANNEL)
@@ -53,11 +60,28 @@ using Poco::FormattingChannel;
 using Poco::PatternFormatter;
 using Poco::AsyncChannel;
 using Poco::SplitterChannel;
+using Poco::EventChannel;
 using Poco::Channel;
 using Poco::Message;
 using Poco::AutoPtr;
 using Poco::File;
 using Poco::TemporaryFile;
+
+
+namespace
+{
+	// Returns the first whitespace-delimited token of the first line of a file
+	// (the rendered timestamp field for the timezone tests).
+	std::string firstToken(const std::string& path)
+	{
+		Poco::FileInputStream fis(path);
+		std::string line;
+		std::getline(fis, line);
+		fis.close();
+		std::string::size_type sp = line.find(' ');
+		return (sp == std::string::npos) ? line : line.substr(0, sp);
+	}
+}
 
 
 FastLoggerChannelsTest::FastLoggerChannelsTest(const std::string& name): CppUnit::TestCase(name)
@@ -281,21 +305,345 @@ void FastLoggerChannelsTest::testAsyncChannel()
 
 void FastLoggerChannelsTest::testSplitterChannel()
 {
-	// Test SplitterChannel handling
-	// Note: SplitterChannel's internal channels are private, so FastLogger
-	// falls back to console output. Use NullChannel for test.
-	AutoPtr<NullChannel> pNullChannel(new NullChannel);
+	// A SplitterChannel must fan out to all its children, each with its own
+	// pattern, rather than collapsing to a single console sink. Verify both
+	// children receive the formatted output.
+	std::string file1 = TemporaryFile::tempName() + "_split1.log";
+	std::string file2 = TemporaryFile::tempName() + "_split2.log";
+
+	AutoPtr<FileChannel> pFile1(new FileChannel(file1));
+	// Wrap the second file in a FormattingChannel to exercise pattern
+	// extraction through the splitter.
+	AutoPtr<FileChannel> pFile2(new FileChannel(file2));
+	AutoPtr<PatternFormatter> pFormatter(new PatternFormatter("[%p] %t"));
+	AutoPtr<FormattingChannel> pFmt2(new FormattingChannel(pFormatter, pFile2));
+
+	AutoPtr<SplitterChannel> pSplitter(new SplitterChannel);
+	pSplitter->addChannel(pFile1);
+	pSplitter->addChannel(pFmt2);
+
+	// Introspection API FastLogger uses to map a splitter onto multiple sinks.
+	assertTrue(pSplitter->count() == 2);
+	assertTrue(pSplitter->getChannel(0).get() == pFile1.get());
+	assertTrue(pSplitter->getChannel(1).get() == pFmt2.get());
+	assertTrue(pSplitter->getChannel(2).isNull());
+	assertTrue(pSplitter->getChannel(-1).isNull());
 
 	FastLogger& logger = FastLogger::get("TestAdapters.SplitterChannel");
-	logger.setChannel(pNullChannel);  // Use null to avoid console spam
+	logger.setChannel(pSplitter);
 	logger.setLevel(Message::PRIO_TRACE);
-
-	// Log messages
-	logger.information("Test message to splitter channel (falls back to console)");
-
+	logger.information("splitter routed message");
 	logger.flush();
 
-	// Test passes if no crash occurs
+	// Both children received output, not just a single console fallback.
+	File f1(file1);
+	File f2(file2);
+	assertTrue(f1.exists() && f1.getSize() > 0);
+	assertTrue(f2.exists() && f2.getSize() > 0);
+
+	// The message reached the formatted file sink through the splitter.
+	Poco::FileInputStream fis(file2);
+	std::string content;
+	std::getline(fis, content);
+	fis.close();
+	assertTrue(content.find("splitter routed message") != std::string::npos);
+
+	try { f1.remove(); } catch (...) {}
+	try { f2.remove(); } catch (...) {}
+}
+
+
+void FastLoggerChannelsTest::testEventChannelSkipped()
+{
+	// EventChannel cannot be mapped to a Quill sink, since FastLogger bypasses
+	// Poco's Message/Channel pipeline. FastLogger must skip it without crashing
+	// or adding a duplicate console sink, while still serving the splitter's
+	// other children. A warning on stderr is expected.
+	std::string tempFile = TemporaryFile::tempName() + "_evt.log";
+
+	AutoPtr<FileChannel> pFile(new FileChannel(tempFile));
+	AutoPtr<EventChannel> pEvent(new EventChannel);
+
+	AutoPtr<SplitterChannel> pSplitter(new SplitterChannel);
+	pSplitter->addChannel(pEvent);
+	pSplitter->addChannel(pFile);
+
+	FastLogger& logger = FastLogger::get("TestAdapters.SplitterEventChannel");
+	logger.setChannel(pSplitter);
+	logger.setLevel(Message::PRIO_TRACE);
+	logger.information("message with an EventChannel sibling");
+	logger.flush();
+
+	// The FileChannel sibling still works despite the unsupported EventChannel.
+	File file(tempFile);
+	assertTrue(file.exists() && file.getSize() > 0);
+
+	try { file.remove(); } catch (...) {}
+}
+
+
+void FastLoggerChannelsTest::testLocalTimeDefault()
+{
+	// With no "times"/%L configured, FastLogger defaults to local time, unlike
+	// Poco's PatternFormatter which defaults to UTC. Log the hour and compare
+	// against the local hour captured around the call.
+	const std::string tempFile = TemporaryFile::tempName() + "_tzlocal.log";
+	AutoPtr<FileChannel> pFile(new FileChannel(tempFile));
+	AutoPtr<PatternFormatter> pFmt(new PatternFormatter("%H %t"));   // no times, no %L
+	AutoPtr<FormattingChannel> pFc(new FormattingChannel(pFmt, pFile));
+
+	FastLogger& logger = FastLogger::get("TestAdapters.TzLocalDefault");
+	logger.setChannel(pFc);
+	logger.setLevel(Message::PRIO_TRACE);
+
+	// The hour changes at most once during the call, so accept before-or-after.
+	const std::string hBefore = Poco::DateTimeFormatter::format(Poco::LocalDateTime(), "%H");
+	logger.information("tz");
+	logger.flush();
+	const std::string hAfter = Poco::DateTimeFormatter::format(Poco::LocalDateTime(), "%H");
+
+	File f(tempFile);
+	assertTrue(f.exists() && f.getSize() > 0);
+	const std::string logged = firstToken(tempFile);
+	assertTrue(logged == hBefore || logged == hAfter);
+
+	try { f.remove(); } catch (...) {}
+}
+
+
+void FastLoggerChannelsTest::testTimesUtcHonored()
+{
+	// An explicitly configured times=UTC must be honored, overriding the local
+	// default. Machine-independent: the logged hour equals the UTC hour.
+	const std::string tempFile = TemporaryFile::tempName() + "_tzutc.log";
+	AutoPtr<FileChannel> pFile(new FileChannel(tempFile));
+	AutoPtr<PatternFormatter> pFmt(new PatternFormatter("%H %t"));
+	pFmt->setProperty(PatternFormatter::PROP_TIMES, "UTC");          // explicit UTC
+	AutoPtr<FormattingChannel> pFc(new FormattingChannel(pFmt, pFile));
+
+	FastLogger& logger = FastLogger::get("TestAdapters.TzUtc");
+	logger.setChannel(pFc);
+	logger.setLevel(Message::PRIO_TRACE);
+
+	const std::string hBefore = Poco::DateTimeFormatter::format(Poco::DateTime(), "%H");
+	logger.information("tz");
+	logger.flush();
+	const std::string hAfter = Poco::DateTimeFormatter::format(Poco::DateTime(), "%H");
+
+	File f(tempFile);
+	assertTrue(f.exists() && f.getSize() > 0);
+	const std::string logged = firstToken(tempFile);
+	assertTrue(logged == hBefore || logged == hAfter);
+
+	try { f.remove(); } catch (...) {}
+}
+
+
+void FastLoggerChannelsTest::testTimestampLayout()
+{
+	// A multi-field Poco date/time pattern must render with its separators
+	// intact, e.g. "2026-06-01 12:30:45" rather than "20260601 123045".
+	const std::string tempFile = TemporaryFile::tempName() + "_tslayout.log";
+	AutoPtr<FileChannel> pFile(new FileChannel(tempFile));
+	AutoPtr<PatternFormatter> pFmt(new PatternFormatter("%Y-%m-%d %H:%M:%S [%p] %t"));
+	AutoPtr<FormattingChannel> pFc(new FormattingChannel(pFmt, pFile));
+
+	FastLogger& logger = FastLogger::get("TestAdapters.TsLayout");
+	logger.setChannel(pFc);
+	logger.setLevel(Message::PRIO_TRACE);
+
+	const std::string dBefore = Poco::DateTimeFormatter::format(Poco::LocalDateTime(), "%Y-%m-%d");
+	logger.information("layout");
+	logger.flush();
+	const std::string dAfter = Poco::DateTimeFormatter::format(Poco::LocalDateTime(), "%Y-%m-%d");
+
+	File f(tempFile);
+	assertTrue(f.exists() && f.getSize() > 0);
+	Poco::FileInputStream fis(tempFile);
+	std::string line;
+	std::getline(fis, line);
+	fis.close();
+
+	// Expect "YYYY-MM-DD HH:MM:SS [<level>] layout".
+	assertTrue(line.length() > 19);
+	assertTrue(line.compare(0, 10, dBefore) == 0 || line.compare(0, 10, dAfter) == 0);  // date keeps its dashes
+	assertTrue(line[10] == ' ');
+	assertTrue(line[13] == ':' && line[16] == ':');  // HH:MM:SS keeps its colons
+	assertTrue(line.find("layout") != std::string::npos);
+
+	try { f.remove(); } catch (...) {}
+}
+
+
+void FastLoggerChannelsTest::testSplitterChannelCycle()
+{
+	// A SplitterChannel that (transitively) contains itself must not send
+	// FastLogger::setChannel() into infinite recursion; the real children must
+	// still be served.
+	const std::string tempFile = TemporaryFile::tempName() + "_cycle.log";
+	AutoPtr<FileChannel> pFile(new FileChannel(tempFile));
+
+	AutoPtr<SplitterChannel> pSplitter(new SplitterChannel);
+	pSplitter->addChannel(pFile);
+	pSplitter->addChannel(pSplitter);   // self-reference -> cycle in the channel graph
+
+	FastLogger& logger = FastLogger::get("TestAdapters.SplitterCycle");
+	logger.setChannel(pSplitter);       // must terminate, not overflow the stack
+	logger.setLevel(Message::PRIO_TRACE);
+	logger.information("cycle");
+	logger.flush();
+
+	// The non-cyclic FileChannel child is still served.
+	File f(tempFile);
+	assertTrue(f.exists() && f.getSize() > 0);
+
+	pSplitter->close();   // break the self-reference so the splitter can be freed
+	try { f.remove(); } catch (...) {}
+}
+
+
+void FastLoggerChannelsTest::testLocalTimeHourMatchesSystemClock()
+{
+	// FastLogger must stamp entries in local time. Log with an HH:MM:SS pattern,
+	// parse the hour from the rendered line, and require it to equal the system
+	// local hour at the moment of logging. Catches a regression to UTC rendering,
+	// where the logged hour would differ from the wall clock by the UTC offset.
+	std::string tempFile = TemporaryFile::tempName() + "_localhour.log";
+	AutoPtr<FileChannel> pFile(new FileChannel(tempFile));
+	AutoPtr<PatternFormatter> pFmt(new PatternFormatter("%H:%M:%S %t"));  // no times/%L => default local
+	AutoPtr<FormattingChannel> pFc(new FormattingChannel(pFmt, pFile));
+
+	FastLogger& logger = FastLogger::get("TestAdapters.LocalHourClock");
+	logger.setChannel(pFc);
+	logger.setLevel(Message::PRIO_TRACE);
+
+	Poco::LocalDateTime before;
+	logger.information("clock");
+	logger.flush();
+	Poco::LocalDateTime after;
+
+	File f(tempFile);
+	assertTrue(f.exists() && f.getSize() > 0);
+	Poco::FileInputStream fis(tempFile);
+	std::string line;
+	std::getline(fis, line);
+	fis.close();
+
+	// Line begins with "HH:MM:SS ".
+	assertTrue(line.length() >= 8);
+	assertTrue(line[2] == ':' && line[5] == ':');
+	const int loggedHour = Poco::NumberParser::parse(line.substr(0, 2));
+
+	// Must equal the local hour (allow an hour rollover during the call).
+	assertTrue(loggedHour == before.hour() || loggedHour == after.hour());
+
+	// On a host with a non-zero whole-hour UTC offset, the local hour differs
+	// from the UTC hour, so a regression to UTC rendering is caught right here.
+	const int offsetSec = Poco::Timezone::utcOffset() + Poco::Timezone::dst();
+	const int utcHour = Poco::DateTime().hour();
+	if ((offsetSec % 3600) == 0 && offsetSec != 0 &&
+	    before.hour() == after.hour() && before.hour() != utcHour)
+	{
+		assertTrue(loggedHour != utcHour);
+	}
+
+	try { f.remove(); } catch (...) {}
+}
+
+
+void FastLoggerChannelsTest::testSplitterConsoleFileWritesFile()
+{
+	// A SplitterChannel of a ColorConsoleChannel and a FileChannel, both wrapped
+	// in a shared FormattingChannel and with no EventChannel. The file must still
+	// be written; the absence of an EventChannel sibling must not disable file
+	// logging.
+	std::string tempFile = TemporaryFile::tempName() + "_splitcf.log";
+	AutoPtr<PatternFormatter> pFmt(new PatternFormatter("%H:%M:%S.%i [%p] %s<%I>: %t"));
+	pFmt->setProperty(PatternFormatter::PROP_TIMES, "local");
+
+	AutoPtr<ColorConsoleChannel> pConsole(new ColorConsoleChannel);
+	AutoPtr<FormattingChannel> pConsoleFc(new FormattingChannel(pFmt, pConsole));
+	AutoPtr<FileChannel> pFile(new FileChannel(tempFile));
+	AutoPtr<FormattingChannel> pFileFc(new FormattingChannel(pFmt, pFile));
+
+	AutoPtr<SplitterChannel> pSplitter(new SplitterChannel);
+	pSplitter->addChannel(pConsoleFc);
+	pSplitter->addChannel(pFileFc);
+
+	FastLogger& logger = FastLogger::get("TestAdapters.SplitterConsoleFile");
+	logger.setChannel(pSplitter);
+	logger.setLevel(Message::PRIO_TRACE);
+	logger.information("file output without an event channel");
+	logger.flush();
+
+	File f(tempFile);
+	assertTrue(f.exists() && f.getSize() > 0);
+	Poco::FileInputStream fis(tempFile);
+	std::string content;
+	std::getline(fis, content);
+	fis.close();
+	assertTrue(content.find("file output without an event channel") != std::string::npos);
+
+	try { f.remove(); } catch (...) {}
+}
+
+
+void FastLoggerChannelsTest::testDirectApiStillFiltersWithPermissiveQuill()
+{
+	// The Quill loggers are permissive (TraceL3) so the per-logger Poco level is
+	// the sole authority on the channel path. The direct logger-API methods must
+	// still filter on their own _level before touching Quill: a FastLogger at
+	// INFORMATION must drop .trace() even though its Quill logger accepts
+	// everything.
+	std::string tempFile = TemporaryFile::tempName() + "_directgate.log";
+	AutoPtr<PatternFormatter> pFmt(new PatternFormatter("[%p] %s: %t"));
+	AutoPtr<FileChannel> pFile(new FileChannel(tempFile));
+	AutoPtr<FormattingChannel> pFileFc(new FormattingChannel(pFmt, pFile));
+
+	FastLogger& logger = FastLogger::get("TestAdapters.DirectGate");
+	logger.setChannel(pFileFc);
+	logger.setLevel(Message::PRIO_INFORMATION);
+	logger.trace("DIRECT_TRACE_SHOULD_NOT_APPEAR");
+	logger.information("DIRECT_INFO_SHOULD_APPEAR");
+	logger.flush();
+
+	File f(tempFile);
+	assertTrue(f.exists());
+	Poco::FileInputStream fis(tempFile);
+	std::string content, line;
+	while (std::getline(fis, line)) content += line + "\n";
+	fis.close();
+	assertTrue(content.find("DIRECT_INFO_SHOULD_APPEAR") != std::string::npos);
+	assertTrue(content.find("DIRECT_TRACE_SHOULD_NOT_APPEAR") == std::string::npos);
+
+	try { f.remove(); } catch (...) {}
+}
+
+
+void FastLoggerChannelsTest::testUnsupportedSettersThrow()
+{
+	// setPattern()/addFileSink() cannot be honored in the per-source bridge model,
+	// where sinks and format derive from the Channel passed to setChannel(), so
+	// they must throw NotImplementedException without side effects.
+	try
+	{
+		FastLogger::setPattern("%(message)");
+		failmsg("setPattern must throw NotImplementedException");
+	}
+	catch (const Poco::NotImplementedException&) { }
+
+	const std::string tempFile = TemporaryFile::tempName() + "_nosink.log";
+	assertTrue (!File(tempFile).exists());
+	try
+	{
+		FastLogger::addFileSink(tempFile);
+		failmsg("addFileSink must throw NotImplementedException");
+	}
+	catch (const Poco::NotImplementedException&) { }
+
+	// The throw happens before any sink is created, so the target file must not
+	// be opened or truncated as a side effect.
+	assertTrue (!File(tempFile).exists());
 }
 
 
@@ -346,6 +694,15 @@ CppUnit::Test* FastLoggerChannelsTest::suite()
 	CppUnit_addTest(pSuite, FastLoggerChannelsTest, testFormattingChannel);
 	CppUnit_addTest(pSuite, FastLoggerChannelsTest, testAsyncChannel);
 	CppUnit_addTest(pSuite, FastLoggerChannelsTest, testSplitterChannel);
+	CppUnit_addTest(pSuite, FastLoggerChannelsTest, testEventChannelSkipped);
+	CppUnit_addTest(pSuite, FastLoggerChannelsTest, testLocalTimeDefault);
+	CppUnit_addTest(pSuite, FastLoggerChannelsTest, testTimesUtcHonored);
+	CppUnit_addTest(pSuite, FastLoggerChannelsTest, testTimestampLayout);
+	CppUnit_addTest(pSuite, FastLoggerChannelsTest, testSplitterChannelCycle);
+	CppUnit_addTest(pSuite, FastLoggerChannelsTest, testLocalTimeHourMatchesSystemClock);
+	CppUnit_addTest(pSuite, FastLoggerChannelsTest, testSplitterConsoleFileWritesFile);
+	CppUnit_addTest(pSuite, FastLoggerChannelsTest, testDirectApiStillFiltersWithPermissiveQuill);
+	CppUnit_addTest(pSuite, FastLoggerChannelsTest, testUnsupportedSettersThrow);
 #if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_NO_SYSLOG_CHANNEL)
 	CppUnit_addTest(pSuite, FastLoggerChannelsTest, testSyslogChannel);
 #endif
@@ -421,6 +778,60 @@ void FastLoggerChannelsTest::testAsyncChannel()
 
 
 void FastLoggerChannelsTest::testSplitterChannel()
+{
+	// FastLogger not enabled
+}
+
+
+void FastLoggerChannelsTest::testEventChannelSkipped()
+{
+	// FastLogger not enabled
+}
+
+
+void FastLoggerChannelsTest::testLocalTimeDefault()
+{
+	// FastLogger not enabled
+}
+
+
+void FastLoggerChannelsTest::testTimesUtcHonored()
+{
+	// FastLogger not enabled
+}
+
+
+void FastLoggerChannelsTest::testTimestampLayout()
+{
+	// FastLogger not enabled
+}
+
+
+void FastLoggerChannelsTest::testSplitterChannelCycle()
+{
+	// FastLogger not enabled
+}
+
+
+void FastLoggerChannelsTest::testLocalTimeHourMatchesSystemClock()
+{
+	// FastLogger not enabled
+}
+
+
+void FastLoggerChannelsTest::testSplitterConsoleFileWritesFile()
+{
+	// FastLogger not enabled
+}
+
+
+void FastLoggerChannelsTest::testDirectApiStillFiltersWithPermissiveQuill()
+{
+	// FastLogger not enabled
+}
+
+
+void FastLoggerChannelsTest::testUnsupportedSettersThrow()
 {
 	// FastLogger not enabled
 }

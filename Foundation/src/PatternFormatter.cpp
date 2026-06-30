@@ -37,6 +37,7 @@ std::string PatternFormatter::_cachedNodeName;
 
 PatternFormatter::PatternFormatter():
 	_localTime(false),
+	_localTimeSet(false),
 	_priorityNames(DEFAULT_PRIORITY_NAMES)
 {
 	parsePriorityNames();
@@ -45,6 +46,7 @@ PatternFormatter::PatternFormatter():
 
 PatternFormatter::PatternFormatter(const std::string& format):
 	_localTime(false),
+	_localTimeSet(false),
 	_pattern(format),
 	_priorityNames(DEFAULT_PRIORITY_NAMES)
 {
@@ -215,6 +217,7 @@ void PatternFormatter::setProperty(const std::string& name, const std::string& v
 	else if (name == PROP_TIMES)
 	{
 		_localTime = (value == "local");
+		_localTimeSet = true;
 	}
 	else if (name == PROP_PRIORITY_NAMES)
 	{
@@ -238,6 +241,18 @@ std::string PatternFormatter::getProperty(const std::string& name) const
 		return _priorityNames;
 	else
 		return Formatter::getProperty(name);
+}
+
+
+bool PatternFormatter::getLocalTime() const
+{
+	return _localTime;
+}
+
+
+bool PatternFormatter::isLocalTimeConfigured() const
+{
+	return _localTimeSet;
 }
 
 
