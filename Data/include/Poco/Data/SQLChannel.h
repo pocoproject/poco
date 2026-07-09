@@ -192,7 +192,7 @@ public:
 		///                  during an extened period of inactivity. This setting ensures that
 		///                  unlogged entries are flushed in such circumstances, even when the
 		///                  minimum batch size was not reached.
-		///                  Zero value means no flushing.
+		///                  Zero value means no flushing. Defaults to 10 seconds.
 
 	std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.

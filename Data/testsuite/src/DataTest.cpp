@@ -1584,6 +1584,8 @@ void DataTest::testSQLChannel()
 		}
 	}
 
+	assertEqual(int(SQLChannel::DEFAULT_FLUSH_SECONDS), NumberParser::parse(pChannel->getProperty("flush")));
+
 	constexpr int mcount{10};
 	constexpr int batch{3};
 	pChannel->setProperty("minBatch", std::to_string(batch));
