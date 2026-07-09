@@ -192,7 +192,7 @@ public:
 		///                  during an extened period of inactivity. This setting ensures that
 		///                  unlogged entries are flushed in such circumstances, even when the
 		///                  minimum batch size was not reached.
-		///                  Zero value means no flushing.
+		///                  Zero value means no flushing. Defaults to 10 seconds.
 		///
 		///     * times      Whether timestamps in SQL statements written to the file
 		///                  are in UTC ("UTC", default) or local time ("local").
