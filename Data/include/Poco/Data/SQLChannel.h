@@ -193,6 +193,9 @@ public:
 		///                  unlogged entries are flushed in such circumstances, even when the
 		///                  minimum batch size was not reached.
 		///                  Zero value means no flushing.
+		///
+		///     * times      Whether timestamps in SQL statements written to the file
+		///                  are in UTC ("UTC", default) or local time ("local").
 
 	std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.
@@ -226,6 +229,7 @@ public:
 	static const std::string PROP_DIRECTORY;
 	static const std::string PROP_FILE;
 	static const std::string PROP_FLUSH;
+	static const std::string PROP_TIMES;
 
 protected:
 	~SQLChannel() override;
@@ -280,6 +284,10 @@ private:
 		/// Returns true if there are unflushed log entries
 		/// and the flush timer has expired.
 
+	std::string formatTimestamp(const DateTime& dt) const;
+		/// Returns the timestamp formatted in UTC or local time,
+		/// depending on the "times" property.
+
 	mutable Poco::FastMutex _mutex;
 
 	std::string       _connector;
@@ -296,6 +304,7 @@ private:
 	std::atomic<bool> _bulk;
 	std::atomic<bool> _throw;
 	std::atomic<int>  _flush;
+	std::atomic<bool> _localTime;
 
 	// members for log entry cache
 	std::deque<std::string>      _source;

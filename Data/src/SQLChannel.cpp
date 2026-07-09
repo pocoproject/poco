@@ -50,6 +50,7 @@ const std::string SQLChannel::PROP_THROW("throw");
 const std::string SQLChannel::PROP_DIRECTORY("directory");
 const std::string SQLChannel::PROP_FILE("file");
 const std::string SQLChannel::PROP_FLUSH("flush");
+const std::string SQLChannel::PROP_TIMES("times");
 
 
 const std::string SQLChannel::SQL_INSERT_STMT = "INSERT INTO %s " \
@@ -66,6 +67,7 @@ SQLChannel::SQLChannel():
 	_maxSQL(DEFAULT_MAX_SQL_SIZE),
 	_bulk(true),
 	_throw(false),
+	_localTime(false),
 	_pid(),
 	_tid(),
 	_priority(),
@@ -98,6 +100,7 @@ SQLChannel::SQLChannel(const std::string& connector,
 	_maxSQL(maxSQL),
 	_bulk(false),
 	_throw(false),
+	_localTime(false),
 	_pid(),
 	_tid(),
 	_priority(),
@@ -330,6 +333,14 @@ void SQLChannel::reconnect()
 }
 
 
+std::string SQLChannel::formatTimestamp(const DateTime& dt) const
+{
+	if (_localTime)
+		return DateTimeFormatter::format(LocalDateTime(dt), "%Y-%m-%d %H:%M:%S.%i");
+	return DateTimeFormatter::format(dt, "%Y-%m-%d %H:%M:%S.%i");
+}
+
+
 size_t SQLChannel::logToFile(bool flush)
 {
 	if (_source.empty()) return 0u;
@@ -386,7 +397,7 @@ size_t SQLChannel::logToFile(bool flush)
 		int idx = 0;
 		for (; it != end; ++idx)
 		{
-			std::string dt = DateTimeFormatter::format(_dateTime[idx], "%Y-%m-%d %H:%M:%S.%i");
+			std::string dt = formatTimestamp(_dateTime[idx]);
 			tmp.str("");
 			tmp << "('" << *it << "','" <<
 				names[idx] << "'," <<
@@ -660,6 +671,10 @@ void SQLChannel::setProperty(const std::string& name, const std::string& value)
 	{
 		_flush.store(NumberParser::parse(value));
 	}
+	else if (name == PROP_TIMES)
+	{
+		_localTime = (value == "local");
+	}
 	else
 	{
 		Channel::setProperty(name, value);
@@ -733,6 +748,10 @@ std::string SQLChannel::getProperty(const std::string& name) const
 	else if (name == PROP_FLUSH)
 	{
 		return std::to_string(_flush);
+	}
+	else if (name == PROP_TIMES)
+	{
+		return _localTime ? "local" : "UTC";
 	}
 	else
 	{

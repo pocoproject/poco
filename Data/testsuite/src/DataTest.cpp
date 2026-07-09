@@ -1590,6 +1590,11 @@ void DataTest::testSQLChannel()
 	constexpr int flush{1};
 	pChannel->setProperty("flush", std::to_string(flush));
 	assertEqual(flush, NumberParser::parse(pChannel->getProperty("flush")));
+	assertTrue(pChannel->getProperty("times") == "UTC");
+	pChannel->setProperty("times", "local");
+	assertTrue(pChannel->getProperty("times") == "local");
+	pChannel->setProperty("times", "UTC");
+	assertTrue(pChannel->getProperty("times") == "UTC");
 	for (int i = 0; i < mcount; i++)
 	{
 		Message msgInfA("InformationSource", Poco::format("%d Informational sync message", i), Message::PRIO_INFORMATION);
