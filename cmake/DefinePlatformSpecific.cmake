@@ -89,9 +89,15 @@ else(MSVC)
 endif(MSVC)
 
 if (DEFINED POCO_SANITIZEFLAGS AND NOT "${POCO_SANITIZEFLAGS}" STREQUAL "")
-	message(STATUS "Using sanitize flags: ${POCO_SANITIZEFLAGS}")
-	add_compile_options(${POCO_SANITIZEFLAGS})
-	add_link_options(${POCO_SANITIZEFLAGS})
+	# separate_arguments splits the space-separated string into individual
+	# tokens. Passing the raw variable to add_compile_options would treat a
+	# multi-flag value (e.g. "-fsanitize=undefined -fno-sanitize=vptr") as a
+	# single argument, which the compiler rejects; CMake only splits on ';'.
+	separate_arguments(_poco_san_flags UNIX_COMMAND "${POCO_SANITIZEFLAGS}")
+	message(STATUS "Using sanitize flags: ${_poco_san_flags}")
+	add_compile_options(${_poco_san_flags})
+	add_link_options(${_poco_san_flags})
+	unset(_poco_san_flags)
 endif()
 
 #################################################################################
