@@ -7,6 +7,7 @@
                                  |_| XML parser
 
    Copyright (c) 2026 Sebastian Pipping <sebastian@pipping.org>
+   Copyright (c) 2026 Matthew Fernandez <matthew.fernandez@gmail.com>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -45,10 +46,15 @@
 #  include <unistd.h>
 #endif // ! defined(__APPLE__)
 
+#include "memory_sanitizer.h"
 #include <errno.h>
 
 bool
 writeRandomBytes_getentropy(void *target, size_t count) {
   errno = 0;
-  return getentropy(target, count) == 0;
+  const bool success = getentropy(target, count);
+  // MSan does not understand `getentropy`, so explain its effects
+  if (success)
+    MSAN_UNPOISON(target, count);
+  return success;
 }

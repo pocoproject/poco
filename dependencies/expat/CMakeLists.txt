@@ -1,6 +1,6 @@
 # Expat XML parser library
-# Version: 2.8.1
-# Source: https://github.com/libexpat/libexpat/releases/tag/R_2_8_1
+# Version: 2.8.2
+# Source: https://github.com/libexpat/libexpat/releases/tag/R_2_8_2
 
 if(POCO_UNBUNDLED)
 	if (ENABLE_XML)
@@ -11,8 +11,14 @@ else()
 	# Core sources -- exclude the per-entropy-source random_*.c files;
 	# those are added conditionally below to mirror the upstream
 	# CMakeLists gating (see expat-2.8.1/CMakeLists.txt).
+	# Also exclude xcsinc.c: unlike xmltok_impl.c/xmltok_ns.c (which guard
+	# themselves with #ifdef XML_TOK_IMPL_C/XML_TOK_NS_C and compile to an
+	# empty translation unit standalone), xcsinc.c has no include guard and
+	# is only meant to be #include-d from xmlparse.c; compiling it as its
+	# own translation unit fails since XML_Char is undefined.
 	file(GLOB SRCS_G "src/*.c")
 	list(FILTER SRCS_G EXCLUDE REGEX "/random_.*\\.c$")
+	list(FILTER SRCS_G EXCLUDE REGEX "/xcsinc\\.c$")
 	POCO_SOURCES(SRCS expat ${SRCS_G})
 
 	# Headers

@@ -14,12 +14,14 @@
 #include "Poco/SAX/SAXParser.h"
 #include "Poco/SAX/InputSource.h"
 #include "Poco/SAX/EntityResolver.h"
+#include "Poco/SAX/DefaultHandler.h"
 #include "Poco/SAX/SAXException.h"
 #include "Poco/SAX/WhitespaceFilter.h"
 #include "Poco/XML/XMLWriter.h"
 #include "Poco/Latin9Encoding.h"
 #include "Poco/FileStream.h"
 #include <sstream>
+#include <stdexcept>
 
 
 using Poco::XML::SAXParser;
@@ -28,8 +30,11 @@ using Poco::XML::XMLReader;
 using Poco::XML::InputSource;
 using Poco::XML::EntityResolver;
 using Poco::XML::XMLString;
+using Poco::XML::XMLException;
 using Poco::XML::SAXParseException;
 using Poco::XML::WhitespaceFilter;
+using Poco::XML::DefaultHandler;
+using Poco::XML::Attributes;
 
 
 class TestEntityResolver: public EntityResolver
@@ -59,6 +64,32 @@ public:
 		delete pSource->getByteStream();
 		delete pSource;
 	}
+};
+
+
+class ThrowingHandler: public DefaultHandler
+{
+public:
+	enum Kind
+	{
+		THROW_STD,
+		THROW_XML
+	};
+
+	ThrowingHandler(Kind kind): _kind(kind)
+	{
+	}
+
+	void startElement(const XMLString& uri, const XMLString& localName, const XMLString& qname, const Attributes& attrList)
+	{
+		if (_kind == THROW_STD)
+			throw std::runtime_error("handler failure");
+		else
+			throw XMLException("handler failure");
+	}
+
+private:
+	Kind _kind;
 };
 
 
@@ -313,6 +344,38 @@ void SAXParserTest::testParsePartialReads()
 }
 
 
+void SAXParserTest::testContentHandlerThrows()
+{
+	SAXParser parser;
+
+	ThrowingHandler stdHandler(ThrowingHandler::THROW_STD);
+	parser.setContentHandler(&stdHandler);
+	try
+	{
+		parser.parseString("<root/>");
+		fail("must throw");
+	}
+	catch (const std::runtime_error& exc)
+	{
+		assertTrue (std::string(exc.what()) == "handler failure");
+	}
+
+	ThrowingHandler xmlHandler(ThrowingHandler::THROW_XML);
+	parser.setContentHandler(&xmlHandler);
+	try
+	{
+		parser.parseString("<root/>");
+		fail("must throw");
+	}
+	catch (const SAXParseException&)
+	{
+	}
+
+	parser.setContentHandler(nullptr);
+	parser.parseString(SIMPLE1);
+}
+
+
 void SAXParserTest::setUp()
 {
 }
@@ -378,6 +441,7 @@ CppUnit::Test* SAXParserTest::suite()
 	CppUnit_addTest(pSuite, SAXParserTest, testCharacters);
 	CppUnit_addTest(pSuite, SAXParserTest, testParseMemory);
 	CppUnit_addTest(pSuite, SAXParserTest, testParsePartialReads);
+	CppUnit_addTest(pSuite, SAXParserTest, testContentHandlerThrows);
 
 	return pSuite;
 }

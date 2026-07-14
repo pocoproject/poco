@@ -6,7 +6,6 @@
                         \___/_/\_\ .__/ \__,_|\__|
                                  |_| XML parser
 
-   Copyright (c) 2026 Sebastian Pipping <sebastian@pipping.org>
    Copyright (c) 2026 Matthew Fernandez <matthew.fernandez@gmail.com>
    Licensed under the MIT license:
 
@@ -30,18 +29,23 @@
    USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "random_arc4random_buf.h"
+#if ! defined(MEMORY_SANITIZER_H)
+#  define MEMORY_SANITIZER_H 1
 
-#if ! defined(_DEFAULT_SOURCE)
-#  define _DEFAULT_SOURCE 1 /* for glibc */
-#endif
+#  if defined(__has_feature)
+#    if __has_feature(memory_sanitizer)
+#      include <sanitizer/msan_interface.h>
 
-#include "memory_sanitizer.h"
-#include <stdlib.h> // for arc4random_buf
+// inform Memory Sanitizer that [base, base + extent) is now initialized
+#      define MSAN_UNPOISON(base, extent) __msan_unpoison((base), (extent))
 
-void
-writeRandomBytes_arc4random_buf(void *target, size_t count) {
-  arc4random_buf(target, count);
-  // MSan does not understand `arc4random_buf`, so explain its effects
-  MSAN_UNPOISON(target, count);
-}
+#    endif
+#  endif
+
+#  if ! defined(MSAN_UNPOISON)
+#    define MSAN_UNPOISON(base, extent)                                        \
+      do {                                                                     \
+      } while (0)
+#  endif
+
+#endif // ! defined(MEMORY_SANITIZER_H)

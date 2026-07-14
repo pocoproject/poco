@@ -7,7 +7,7 @@
 //
 // Definition of the ParseEngine class.
 //
-// Copyright (c) 2004-2006, Applied Informatics Software Engineering GmbH.
+// Copyright (c) 2004-2026, Applied Informatics Software Engineering GmbH.
 // and Contributors.
 //
 // SPDX-License-Identifier:	BSL-1.0
@@ -23,6 +23,7 @@
 #include "Poco/SAX/Locator.h"
 #include "Poco/TextEncoding.h"
 #include <expat.h>
+#include <exception>
 #include <map>
 #include <vector>
 
@@ -221,6 +222,33 @@ protected:
 		/// Throws an XMLException with a message corresponding
 		/// to the given Expat error code.
 
+	void checkError(XML_Parser parser);
+		/// Called after a failed XML_Parse()/XML_ParseBuffer() call.
+		/// If a C++ exception thrown from within a handler has been
+		/// captured by abortParse(), rethrows it (and clears it);
+		/// otherwise translates the parser's current Expat error code
+		/// into an exception via handleError().
+
+	void abortParse(XML_Parser parser, std::exception_ptr ex);
+		/// Called from an Expat callback when invoking application code
+		/// (a SAX/DTD/lexical handler or entity resolver) throws a C++
+		/// exception. Expat is a C library and does not support C++
+		/// exceptions unwinding through its call stack -- doing so skips
+		/// Expat's internal handler-call-depth bookkeeping and leaves the
+		/// parser (and everything it owns) permanently leaked, since Expat
+		/// then refuses to free a parser it believes is still inside a
+		/// handler call.
+		///
+		/// Instead, the exception is captured here and the parser is
+		/// stopped gracefully via XML_StopParser(), which Expat fully
+		/// supports from within a handler. Once XML_Parse() returns,
+		/// checkError() rethrows the captured exception.
+
+	XML_Parser currentParser() const;
+		/// Returns the Expat parser instance (the main parser, or the
+		/// external entity sub-parser currently being parsed) that is
+		/// active for the top-most entry of the context stack.
+
 	void parseExternal(XML_Parser extParser, InputSource* pInputSource);
 		/// Parse an XML document from the given InputSource.
 
@@ -290,6 +318,8 @@ private:
 	ContentHandler* _pContentHandler;
 	LexicalHandler* _pLexicalHandler;
 	ErrorHandler*   _pErrorHandler;
+
+	std::exception_ptr _exception;
 
 	float _maximumAmplificationFactor;
 	Poco::UInt64 _activationThresholdBytes;

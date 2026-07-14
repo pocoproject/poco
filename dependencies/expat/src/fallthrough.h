@@ -6,8 +6,7 @@
                         \___/_/\_\ .__/ \__,_|\__|
                                  |_| XML parser
 
-   Copyright (c) 2026 Sebastian Pipping <sebastian@pipping.org>
-   Copyright (c) 2026 Matthew Fernandez <matthew.fernandez@gmail.com>
+   Copyright (c) 2026 Nick Begg <nick@stunttruck.net>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -30,18 +29,21 @@
    USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "random_arc4random_buf.h"
+#ifndef FALLTHROUGH_H
+#  define FALLTHROUGH_H 1
 
-#if ! defined(_DEFAULT_SOURCE)
-#  define _DEFAULT_SOURCE 1 /* for glibc */
-#endif
+// Explicit fallthrough in switch case to avoid warnings
+// with compiler flag -Wimplicit-fallthrough.
 
-#include "memory_sanitizer.h"
-#include <stdlib.h> // for arc4random_buf
+#  define EXPAT_FALLTHROUGH                                                    \
+    do {                                                                       \
+    } while (0)
 
-void
-writeRandomBytes_arc4random_buf(void *target, size_t count) {
-  arc4random_buf(target, count);
-  // MSan does not understand `arc4random_buf`, so explain its effects
-  MSAN_UNPOISON(target, count);
-}
+#  if defined(__has_attribute)
+#    if __has_attribute(fallthrough)
+#      undef EXPAT_FALLTHROUGH
+#      define EXPAT_FALLTHROUGH __attribute__((fallthrough))
+#    endif
+#  endif
+
+#endif // FALLTHROUGH_H

@@ -1,4 +1,4 @@
-/*
+/* This file is included from other .c files!
                             __  __            _
                          ___\ \/ /_ __   __ _| |_
                         / _ \\  /| '_ \ / _` | __|
@@ -6,8 +6,7 @@
                         \___/_/\_\ .__/ \__,_|\__|
                                  |_| XML parser
 
-   Copyright (c) 2026 Sebastian Pipping <sebastian@pipping.org>
-   Copyright (c) 2026 Matthew Fernandez <matthew.fernandez@gmail.com>
+   Copyright (c) 2022 Sebastian Pipping <sebastian@pipping.org>
    Licensed under the MIT license:
 
    Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -30,18 +29,20 @@
    USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#include "random_arc4random_buf.h"
-
-#if ! defined(_DEFAULT_SOURCE)
-#  define _DEFAULT_SOURCE 1 /* for glibc */
+static size_t
+xcslen(const XML_Char *s) {
+#ifdef XML_UNICODE
+#  ifdef XML_UNICODE_WCHAR_T
+  return wcslen(s);
+#  else
+  // XML_Char is unsigned short
+  size_t len = 0;
+  while (s[len]) {
+    len++;
+  }
+  return len;
+#  endif
+#else
+  return strlen(s);
 #endif
-
-#include "memory_sanitizer.h"
-#include <stdlib.h> // for arc4random_buf
-
-void
-writeRandomBytes_arc4random_buf(void *target, size_t count) {
-  arc4random_buf(target, count);
-  // MSan does not understand `arc4random_buf`, so explain its effects
-  MSAN_UNPOISON(target, count);
 }

@@ -48,6 +48,7 @@ public:
 	void testParseMemory();
 	void testCharacters();
 	void testParsePartialReads();
+	void testContentHandlerThrows();
 
 	void setUp();
 	void tearDown();
