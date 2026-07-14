@@ -145,6 +145,30 @@ public:
 		///
 		/// The document returned is the createIndexes response body.
 
+	Document::Ptr dropIndex(
+		Connection& connection,
+		const std::string& collection,
+		const std::string& indexName);
+		/// Drops the index with the given name from the collection. Passing "*"
+		/// drops all indexes except the _id index; prefer dropAllIndexes() for
+		/// that. The document returned is the dropIndexes response body.
+		/// (new wire protocol)
+
+	Document::Ptr dropIndex(
+		Connection& connection,
+		const std::string& collection,
+		const IndexedFields& indexedFields);
+		/// Drops the index matching the given key specification (the same
+		/// IndexedFields form accepted by createIndex). The document returned
+		/// is the dropIndexes response body. (new wire protocol)
+
+	Document::Ptr dropAllIndexes(
+		Connection& connection,
+		const std::string& collection);
+		/// Drops all indexes on the collection except the _id index (and, on a
+		/// sharded collection, the shard key index). The document returned is
+		/// the dropIndexes response body. (new wire protocol)
+
 	static const std::string AUTH_SCRAM_SHA1;
 		/// SCRAM-SHA-1 authentication mechanism (MongoDB 3.0+).
 

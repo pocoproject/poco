@@ -32,6 +32,7 @@ const std::string OpMsgMessage::CMD_DELETE { "delete"s };
 const std::string OpMsgMessage::CMD_UPDATE { "update"s };
 const std::string OpMsgMessage::CMD_FIND { "find"s };
 const std::string OpMsgMessage::CMD_FIND_AND_MODIFY { "findAndModify"s };
+const std::string OpMsgMessage::CMD_BULK_WRITE { "bulkWrite"s };
 const std::string OpMsgMessage::CMD_GET_MORE { "getMore"s };
 
 // Aggregation
@@ -47,17 +48,33 @@ const std::string OpMsgMessage::CMD_REPL_SET_GET_CONFIG { "replSetGetConfig"s };
 
 const std::string OpMsgMessage::CMD_CREATE { "create"s };
 const std::string OpMsgMessage::CMD_CREATE_INDEXES { "createIndexes"s };
+const std::string OpMsgMessage::CMD_DROP_INDEXES { "dropIndexes"s };
 const std::string OpMsgMessage::CMD_DROP { "drop"s };
 const std::string OpMsgMessage::CMD_DROP_DATABASE { "dropDatabase"s };
 const std::string OpMsgMessage::CMD_KILL_CURSORS { "killCursors"s };
 const std::string OpMsgMessage::CMD_LIST_DATABASES { "listDatabases"s };
 const std::string OpMsgMessage::CMD_LIST_INDEXES { "listIndexes"s };
+const std::string OpMsgMessage::CMD_LIST_COLLECTIONS { "listCollections"s };
+const std::string OpMsgMessage::CMD_RENAME_COLLECTION { "renameCollection"s };
+const std::string OpMsgMessage::CMD_COLL_MOD { "collMod"s };
+const std::string OpMsgMessage::CMD_GET_PARAMETER { "getParameter"s };
+const std::string OpMsgMessage::CMD_SET_PARAMETER { "setParameter"s };
 
 // Diagnostic
 const std::string OpMsgMessage::CMD_BUILD_INFO { "buildInfo"s };
 const std::string OpMsgMessage::CMD_COLL_STATS { "collStats"s };
 const std::string OpMsgMessage::CMD_DB_STATS { "dbStats"s };
 const std::string OpMsgMessage::CMD_HOST_INFO { "hostInfo"s };
+const std::string OpMsgMessage::CMD_PING { "ping"s };
+const std::string OpMsgMessage::CMD_SERVER_STATUS { "serverStatus"s };
+const std::string OpMsgMessage::CMD_CONNECTION_STATUS { "connectionStatus"s };
+const std::string OpMsgMessage::CMD_EXPLAIN { "explain"s };
+const std::string OpMsgMessage::CMD_LIST_COMMANDS { "listCommands"s };
+const std::string OpMsgMessage::CMD_GET_LOG { "getLog"s };
+
+// Authentication
+const std::string OpMsgMessage::CMD_SASL_START { "saslStart"s };
+const std::string OpMsgMessage::CMD_SASL_CONTINUE { "saslContinue"s };
 
 
 static const std::string& commandIdentifier(const std::string& command);

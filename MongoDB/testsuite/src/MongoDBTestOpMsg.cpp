@@ -22,6 +22,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <tuple>
 
 
 using namespace Poco::MongoDB;
@@ -451,6 +452,68 @@ void MongoDBTest::testOpCmdDropDatabase()
 	std::cout << response.body().toString(2) << std::endl;
 
 	assertTrue(response.responseOk());
+}
+
+
+void MongoDBTest::testOpCmdDropIndex()
+{
+	Database db("team");
+
+	// Start from a clean collection.
+	Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage("players");
+	OpMsgMessage response;
+	request->setCommandName(OpMsgMessage::CMD_DROP);
+	_mongo->sendRequest(*request, response); // Ignore result: the collection may not exist yet.
+
+	// Insert one document so the collection exists.
+	request = db.createOpMsgMessage("players");
+	request->setCommandName(OpMsgMessage::CMD_INSERT);
+	Document::Ptr player = new Document();
+	player->add("lastname"s, "Braem"s).add("firstname"s, "Franky"s);
+	request->documents().push_back(player);
+	_mongo->sendRequest(*request, response);
+	assertTrue(response.responseOk());
+
+	Database::IndexedFields lastnameField;
+	lastnameField.push_back(std::make_tuple("lastname", true));
+	Database::IndexedFields firstnameField;
+	firstnameField.push_back(std::make_tuple("firstname", true));
+
+	// 1. Drop by name.
+	Document::Ptr result = db.createIndex(*_mongo, "players", lastnameField, "lastname_1");
+	assertTrue(result->getInteger("ok") == 1);
+	result = db.dropIndex(*_mongo, "players", "lastname_1");
+	assertTrue(result->getInteger("ok") == 1);
+
+	// 2. Drop by key specification.
+	result = db.createIndex(*_mongo, "players", firstnameField, "firstname_1");
+	assertTrue(result->getInteger("ok") == 1);
+	result = db.dropIndex(*_mongo, "players", firstnameField);
+	assertTrue(result->getInteger("ok") == 1);
+
+	// 3. Drop all indexes: create two, then drop them at once.
+	db.createIndex(*_mongo, "players", lastnameField, "lastname_1");
+	db.createIndex(*_mongo, "players", firstnameField, "firstname_1");
+	result = db.dropAllIndexes(*_mongo, "players");
+	assertTrue(result->getInteger("ok") == 1);
+
+	// Only the _id index remains.
+	Poco::SharedPtr<OpMsgCursor> cursor = db.createOpMsgCursor("players");
+	cursor->query().setCommandName(OpMsgMessage::CMD_LIST_INDEXES);
+	auto listResponse = cursor->next(*_mongo);
+	int indexCount = 0;
+	while (true)
+	{
+		indexCount += static_cast<int>(listResponse.documents().size());
+		if (cursor->cursorID() == 0) break;
+		listResponse = cursor->next(*_mongo);
+	}
+	assertEquals (1, indexCount);
+
+	// Cleanup.
+	request = db.createOpMsgMessage("players");
+	request->setCommandName(OpMsgMessage::CMD_DROP);
+	_mongo->sendRequest(*request, response);
 }
 
 

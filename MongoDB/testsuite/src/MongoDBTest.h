@@ -47,6 +47,7 @@ public:
 	void testOpCmdUnaknowledgedInsert();
 	void testOpCmdConnectionPool();
 	void testOpCmdDropDatabase();
+	void testOpCmdDropIndex();
 	void testDBCount();
 
 	static CppUnit::Test* suite();

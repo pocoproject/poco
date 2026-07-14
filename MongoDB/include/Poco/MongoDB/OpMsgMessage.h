@@ -46,6 +46,10 @@ public:
 	static const std::string CMD_UPDATE;
 	static const std::string CMD_FIND;
 	static const std::string CMD_FIND_AND_MODIFY;
+	static const std::string CMD_BULK_WRITE;
+		/// Since MongoDB 8.0. Name constant only: the type-1 payload sections
+		/// (ops/nsInfo) are not wired into commandIdentifier(), so callers must
+		/// build the command body manually.
 
 	// Aggregation
 	static const std::string CMD_AGGREGATE;
@@ -63,17 +67,34 @@ public:
 
 	static const std::string CMD_CREATE;
 	static const std::string CMD_CREATE_INDEXES;
+	static const std::string CMD_DROP_INDEXES;
 	static const std::string CMD_DROP;
 	static const std::string CMD_DROP_DATABASE;
 	static const std::string CMD_KILL_CURSORS;
 	static const std::string CMD_LIST_DATABASES;
 	static const std::string CMD_LIST_INDEXES;
+	static const std::string CMD_LIST_COLLECTIONS;
+	static const std::string CMD_RENAME_COLLECTION;
+	static const std::string CMD_COLL_MOD;
+	static const std::string CMD_GET_PARAMETER;
+	static const std::string CMD_SET_PARAMETER;
 
 	// Diagnostic
 	static const std::string CMD_BUILD_INFO;
+	POCO_DEPRECATED("Deprecated since MongoDB 6.2; use the $collStats aggregation stage instead.")
 	static const std::string CMD_COLL_STATS;
 	static const std::string CMD_DB_STATS;
 	static const std::string CMD_HOST_INFO;
+	static const std::string CMD_PING;
+	static const std::string CMD_SERVER_STATUS;
+	static const std::string CMD_CONNECTION_STATUS;
+	static const std::string CMD_EXPLAIN;
+	static const std::string CMD_LIST_COMMANDS;
+	static const std::string CMD_GET_LOG;
+
+	// Authentication
+	static const std::string CMD_SASL_START;
+	static const std::string CMD_SASL_CONTINUE;
 
 
 	enum Flags : UInt32

@@ -150,7 +150,7 @@ namespace
 		std::string clientFirstMsg = Poco::format("n=%s,r=%s", username, clientNonce);
 
 		Poco::SharedPtr<OpMsgMessage> pCommand = db.createOpMsgMessage("$cmd");
-		pCommand->setCommandName("saslStart");
+		pCommand->setCommandName(OpMsgMessage::CMD_SASL_START);
 		pCommand->body()
 			.add<std::string>("mechanism", mechanism)
 			.add<Binary::Ptr>("payload", new Binary(Poco::format("n,,%s", clientFirstMsg)))
@@ -214,7 +214,7 @@ namespace
 		std::string clientFinal = Poco::format("%s,p=%s", clientFinalNoProof, encodeBase64(clientProof));
 
 		pCommand = db.createOpMsgMessage("$cmd");
-		pCommand->setCommandName("saslContinue");
+		pCommand->setCommandName(OpMsgMessage::CMD_SASL_CONTINUE);
 		pCommand->body()
 			.add<Poco::Int32>("conversationId", conversationId)
 			.add<Binary::Ptr>("payload", new Binary(clientFinal));
@@ -247,13 +247,24 @@ namespace
 			throw Poco::ProtocolException("server signature verification failed");
 
 		pCommand = db.createOpMsgMessage("$cmd");
-		pCommand->setCommandName("saslContinue");
+		pCommand->setCommandName(OpMsgMessage::CMD_SASL_CONTINUE);
 		pCommand->body()
 			.add<Poco::Int32>("conversationId", conversationId)
 			.add<Binary::Ptr>("payload", new Binary);
 
 		connection.sendRequest(*pCommand, response);
 		return response.responseOk();
+	}
+
+
+	Document::Ptr keysFromIndexedFields(const Database::IndexedFields& indexedFields)
+	{
+		Document::Ptr keys = new Document();
+		for (const auto& [name, ascending]: indexedFields)
+		{
+			keys->add(name, ascending ? 1 : -1);
+		}
+		return keys;
 	}
 } // namespace
 
@@ -407,11 +418,7 @@ Poco::MongoDB::Document::Ptr Database::createIndex(
 {
 // https://www.mongodb.com/docs/manual/reference/command/createIndexes/
 
-	MongoDB::Document::Ptr keys = new MongoDB::Document();
-
-	for (const auto& [name, ascending]: indexedFields) {
-		keys->add(name, ascending ? 1 : -1);
-	}
+	MongoDB::Document::Ptr keys = keysFromIndexedFields(indexedFields);
 
 	MongoDB::Document::Ptr index = new MongoDB::Document();
 	index->add("key"s, keys);
@@ -464,6 +471,50 @@ Poco::MongoDB::Document::Ptr Database::createIndex(
 	MongoDB::Document::Ptr result = new MongoDB::Document(response.body());
 
 	return result;
+}
+
+
+Poco::MongoDB::Document::Ptr Database::dropIndex(
+	Connection& connection,
+	const std::string& collection,
+	const std::string& indexName)
+{
+// https://www.mongodb.com/docs/manual/reference/command/dropIndexes/
+
+	auto request = createOpMsgMessage(collection);
+	request->setCommandName(OpMsgMessage::CMD_DROP_INDEXES);
+	request->body().add("index"s, indexName);
+
+	OpMsgMessage response;
+	connection.sendRequest(*request, response);
+
+	return new MongoDB::Document(response.body());
+}
+
+
+Poco::MongoDB::Document::Ptr Database::dropIndex(
+	Connection& connection,
+	const std::string& collection,
+	const IndexedFields& indexedFields)
+{
+// https://www.mongodb.com/docs/manual/reference/command/dropIndexes/
+
+	auto request = createOpMsgMessage(collection);
+	request->setCommandName(OpMsgMessage::CMD_DROP_INDEXES);
+	request->body().add("index"s, keysFromIndexedFields(indexedFields));
+
+	OpMsgMessage response;
+	connection.sendRequest(*request, response);
+
+	return new MongoDB::Document(response.body());
+}
+
+
+Poco::MongoDB::Document::Ptr Database::dropAllIndexes(
+	Connection& connection,
+	const std::string& collection)
+{
+	return dropIndex(connection, collection, "*"s);
 }
 
 
