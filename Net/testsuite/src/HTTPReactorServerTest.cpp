@@ -8,9 +8,15 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Thread.h"
+#include "Poco/Timespan.h"
+#include "Poco/Exception.h"
 #include "CppUnit/TestSuite.h"
 #include "CppUnit/TestCaller.h"
+#include <stdexcept>
 
 
 using Poco::Net::HTTPServerParams;
@@ -53,6 +59,47 @@ namespace
 		}
 	};
 
+	// Throws a Poco exception from the handler. HTTPReactorServer sends a 500
+	// then re-throws; the exception propagates out to onRead, which must catch
+	// it and close the connection instead of leaking it.
+	class ThrowPocoRequestHandler: public HTTPRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest&, HTTPServerResponse&)
+		{
+			throw Poco::ApplicationException("intentional handler failure (poco)");
+		}
+	};
+
+	// Throws a non-Poco exception; HTTPReactorServer does not catch std::
+	// exceptions, so this escapes all the way to onRead's std::exception guard.
+	class ThrowStdRequestHandler: public HTTPRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest&, HTTPServerResponse&)
+		{
+			throw std::runtime_error("intentional handler failure (std)");
+		}
+	};
+
+	// Sends a large fixed-length body. Used to exercise the send timeout: a
+	// client that stops reading makes the server block in send until the
+	// timeout fires.
+	class BigBodyRequestHandler: public HTTPRequestHandler
+	{
+	public:
+		void handleRequest(HTTPServerRequest&, HTTPServerResponse& response)
+		{
+			const std::size_t chunk = 64 * 1024;
+			const int chunks = 512;                 // 32 MiB total
+			response.setContentLength(static_cast<Poco::Int64>(chunk) * chunks);
+			std::string data(chunk, 'A');
+			std::ostream& ostr = response.send();
+			for (int i = 0; i < chunks; ++i) ostr.write(data.data(), data.size());
+			ostr.flush();
+		}
+	};
+
 	class RequestHandlerFactory: public HTTPRequestHandlerFactory
 	{
 	public:
@@ -62,6 +109,9 @@ namespace
 			{
 				return nullptr;
 			}
+			if (request.getURI() == "/throw-poco") return new ThrowPocoRequestHandler;
+			if (request.getURI() == "/throw-std")  return new ThrowStdRequestHandler;
+			if (request.getURI() == "/big")        return new BigBodyRequestHandler;
 			return new EchoBodyRequestHandler;
 		}
 	};
@@ -512,6 +562,164 @@ void HTTPReactorServerTest::testNotImplementedResponseWithKeepAlive()
 }
 
 
+void HTTPReactorServerTest::testSendTimeoutParam()
+{
+	// The new opt-in param defaults to disabled (0) so existing TCPServer users
+	// are unaffected, and round-trips when set.
+	HTTPServerParams::Ptr pParams = new HTTPServerParams;
+	assertTrue(pParams->getSendTimeout().totalMicroseconds() == 0);
+	pParams->setSendTimeout(Poco::Timespan(5, 0));
+	assertTrue(pParams->getSendTimeout() == Poco::Timespan(5, 0));
+}
+
+void HTTPReactorServerTest::testClientAbortKeepsServerAlive()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	pParams->setMaxThreads(2);
+	pParams->setReactorMode(true);
+
+	Poco::Net::HTTPReactorServer srv(0, pParams, new RequestHandlerFactory);
+	srv.start();
+	int port = srv.port();
+
+	// Liveness guard for the new error-close path: abusively abort many
+	// connections (connect, send a partial request, close with linger 0 so the
+	// OS sends a RST). On a blocking accepted socket the reset makes
+	// receiveBytes throw out of onRead, which must run handleClose and leave the
+	// server serving. This is a crash/hang/deadlock smoke test - it does not by
+	// itself prove the fd-leak/hot-spin is gone (the reactor thread survives a
+	// swallowed exception even unpatched). testSendTimeoutClosesStalledClient is
+	// the behavioral guard for the fix.
+	for (int i = 0; i < 50; ++i)
+	{
+		Poco::Net::StreamSocket s;
+		s.connect(Poco::Net::SocketAddress("127.0.0.1", port));
+		s.setLinger(true, 0);                       // close -> RST
+		std::string partial("GET / HTTP/1.1\r\nHost: x\r\n");  // no terminating blank line
+		s.sendBytes(partial.data(), static_cast<int>(partial.size()));
+		s.close();                                  // abortive
+	}
+
+	HTTPClientSession cs("127.0.0.1", port);
+	cs.setTimeout(Poco::Timespan(10, 0));   // fail fast if a regression wedges the server
+	std::string body("still alive");
+	HTTPRequest request("POST", "/", HTTPMessage::HTTP_1_1);
+	request.setContentLength((int) body.length());
+	cs.sendRequest(request) << body;
+	HTTPResponse response;
+	std::string rbody;
+	std::istream& rs = cs.receiveResponse(response);
+	rbody.assign((std::istreambuf_iterator<char>(rs)), std::istreambuf_iterator<char>());
+	assertTrue(rbody == body);
+	srv.stop();
+}
+
+void HTTPReactorServerTest::testHandlerExceptionKeepsServerAlive()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	pParams->setMaxThreads(2);
+	pParams->setReactorMode(true);
+
+	Poco::Net::HTTPReactorServer srv(0, pParams, new RequestHandlerFactory);
+	srv.start();
+	int port = srv.port();
+
+	// Liveness guard: fire requests at handlers that throw a Poco and a non-Poco
+	// exception. onRead must catch both and close cleanly, leaving the server
+	// serving. Short client timeouts so a regression that fails to close (the
+	// pre-fix behavior on the std path, where the socket is never shut) fails
+	// this test in seconds instead of stalling on the 60 s default timeout.
+	const char* uris[] = { "/throw-poco", "/throw-std" };
+	for (const char* uri : uris)
+	{
+		try
+		{
+			HTTPClientSession cs("127.0.0.1", port);
+			cs.setTimeout(Poco::Timespan(10, 0));
+			HTTPRequest request("GET", uri, HTTPMessage::HTTP_1_1);
+			request.setContentLength(0);
+			cs.sendRequest(request);
+			HTTPResponse response;
+			std::string rbody;
+			std::istream& rs = cs.receiveResponse(response);
+			rbody.assign((std::istreambuf_iterator<char>(rs)), std::istreambuf_iterator<char>());
+			// A 500 (poco path) or a reset (std path) are both acceptable; we
+			// only care that the server survives, asserted by the request below.
+		}
+		catch (const Poco::Exception&)
+		{
+		}
+	}
+
+	HTTPClientSession cs("127.0.0.1", port);
+	cs.setTimeout(Poco::Timespan(10, 0));
+	std::string body("still serving");
+	HTTPRequest request("POST", "/", HTTPMessage::HTTP_1_1);
+	request.setContentLength((int) body.length());
+	cs.sendRequest(request) << body;
+	HTTPResponse response;
+	std::string rbody;
+	std::istream& rs = cs.receiveResponse(response);
+	rbody.assign((std::istreambuf_iterator<char>(rs)), std::istreambuf_iterator<char>());
+	assertTrue(rbody == body);
+	srv.stop();
+}
+
+void HTTPReactorServerTest::testSendTimeoutClosesStalledClient()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	pParams->setMaxThreads(2);
+	pParams->setReactorMode(true);
+	pParams->setSendTimeout(Poco::Timespan(1, 0));   // 1 s
+
+	Poco::Net::HTTPReactorServer srv(0, pParams, new RequestHandlerFactory);
+	srv.start();
+	int port = srv.port();
+
+	// Request a 32 MiB body, then STOP reading. The server fills the socket
+	// buffers and blocks in send; the send timeout turns that into a bounded
+	// wait instead of wedging the worker reactor forever. After the timeout
+	// fires the response is abandoned, so when we finally drain we hit EOF
+	// quickly having received far less than the full body. Without the timeout
+	// (or without a client that eventually reads) the send would block forever.
+	Poco::Net::StreamSocket s;
+	s.connect(Poco::Net::SocketAddress("127.0.0.1", port));
+	std::string req("GET /big HTTP/1.1\r\nHost: x\r\nConnection: close\r\n\r\n");
+	s.sendBytes(req.data(), static_cast<int>(req.size()));
+
+	// Give the server's send time to stall and time out (timeout is 1 s).
+	Poco::Thread::sleep(3000);
+
+	s.setReceiveTimeout(Poco::Timespan(5, 0));
+	std::size_t total = 0;
+	bool closed = false;
+	char buf[16 * 1024];
+	try
+	{
+		for (;;)
+		{
+			int n = s.receiveBytes(buf, sizeof(buf));
+			if (n <= 0) { closed = true; break; }
+			total += static_cast<std::size_t>(n);
+			if (total > 48u * 1024 * 1024) break;    // safety bound
+		}
+	}
+	catch (const Poco::Exception&)
+	{
+		closed = true;                               // reset also means closed
+	}
+	s.close();
+
+	assertTrue(closed);
+	// Truncated well below the 32 MiB body: the stalled send was aborted rather
+	// than run to completion once we started reading.
+	assertTrue(total < 16u * 1024 * 1024);
+	srv.stop();
+}
+
 void HTTPReactorServerTest::setUp()
 {
 }
@@ -539,6 +747,10 @@ CppUnit::Test* HTTPReactorServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testConcurrentRequests);
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testUseSelfReactor);
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testNotImplementedResponseWithKeepAlive);
+	CppUnit_addTest(pSuite, HTTPReactorServerTest, testSendTimeoutParam);
+	CppUnit_addTest(pSuite, HTTPReactorServerTest, testClientAbortKeepsServerAlive);
+	CppUnit_addTest(pSuite, HTTPReactorServerTest, testHandlerExceptionKeepsServerAlive);
+	CppUnit_addTest(pSuite, HTTPReactorServerTest, testSendTimeoutClosesStalledClient);
 
 	return pSuite;
 }
