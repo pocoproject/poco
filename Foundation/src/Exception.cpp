@@ -15,6 +15,7 @@
 #include "Poco/Exception.h"
 #include <typeinfo>
 #ifdef POCO_ENABLE_TRACE
+#include "Poco/Mutex.h"
 #include <sstream>
 #include <cpptrace/cpptrace.hpp>
 #endif
@@ -23,13 +24,31 @@
 namespace Poco {
 
 
+#ifdef POCO_ENABLE_TRACE
+namespace {
+
+std::string captureTrace()
+{
+	// cpptrace symbolizes through libbacktrace's process-global DWARF cache,
+	// which is not thread-safe; serialize so exceptions constructed
+	// concurrently on different threads cannot race inside it. Only compiled
+	// when ENABLE_TRACE is set (a diagnostic build; off by default).
+	static Poco::FastMutex traceMutex;
+	Poco::FastMutex::ScopedLock lock(traceMutex);
+	std::ostringstream ostr;
+	ostr << '\n';
+	cpptrace::generate_trace(0, 100).print(ostr);
+	return ostr.str();
+}
+
+} // namespace
+#endif
+
+
 Exception::Exception(int code): _pNested(nullptr), _code(code)
 {
 #ifdef POCO_ENABLE_TRACE
-	std::ostringstream ostr;
-	ostr << '\n';
-	cpptrace::generate_trace(0,100).print(ostr);
-	_msg = ostr.str();
+	_msg = captureTrace();
 #endif
 }
 
@@ -37,10 +56,7 @@ Exception::Exception(int code): _pNested(nullptr), _code(code)
 Exception::Exception(const std::string& msg, int code): _msg(msg), _pNested(nullptr), _code(code)
 {
 #ifdef POCO_ENABLE_TRACE
-	std::ostringstream ostr;
-	ostr << '\n';
-	cpptrace::generate_trace(0,100).print(ostr);
-	_msg += ostr.str();
+	_msg += captureTrace();
 #endif
 }
 
@@ -53,10 +69,7 @@ Exception::Exception(const std::string& msg, const std::string& arg, int code): 
 		_msg.append(arg);
 	}
 #ifdef POCO_ENABLE_TRACE
-	std::ostringstream ostr;
-	ostr << '\n';
-	cpptrace::generate_trace(0,100).print(ostr);
-	_msg += ostr.str();
+	_msg += captureTrace();
 #endif
 }
 
@@ -64,10 +77,7 @@ Exception::Exception(const std::string& msg, const std::string& arg, int code): 
 Exception::Exception(const std::string& msg, const Exception& nested, int code): _msg(msg), _pNested(nested.clone()), _code(code)
 {
 #ifdef POCO_ENABLE_TRACE
-	std::ostringstream ostr;
-	ostr << '\n';
-	cpptrace::generate_trace(0,100).print(ostr);
-	_msg += ostr.str();
+	_msg += captureTrace();
 #endif
 }
 
