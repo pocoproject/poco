@@ -583,11 +583,14 @@ void HTTPReactorServerTest::testClientAbortKeepsServerAlive()
 	srv.start();
 	int port = srv.port();
 
-	// Abusively abort many connections: connect, send a partial request, then
-	// close with linger 0 so the OS sends a RST. On a blocking accepted socket
-	// the reset makes receiveBytes THROW out of onRead; before the fix that
-	// leaked the connection and hot-spun the reactor on the dead fd. The server
-	// must shrug all of this off and stay fully functional.
+	// Liveness guard for the new error-close path: abusively abort many
+	// connections (connect, send a partial request, close with linger 0 so the
+	// OS sends a RST). On a blocking accepted socket the reset makes
+	// receiveBytes throw out of onRead, which must run handleClose and leave the
+	// server serving. This is a crash/hang/deadlock smoke test - it does not by
+	// itself prove the fd-leak/hot-spin is gone (the reactor thread survives a
+	// swallowed exception even unpatched). testSendTimeoutClosesStalledClient is
+	// the behavioral guard for the fix.
 	for (int i = 0; i < 50; ++i)
 	{
 		Poco::Net::StreamSocket s;
@@ -599,6 +602,7 @@ void HTTPReactorServerTest::testClientAbortKeepsServerAlive()
 	}
 
 	HTTPClientSession cs("127.0.0.1", port);
+	cs.setTimeout(Poco::Timespan(10, 0));   // fail fast if a regression wedges the server
 	std::string body("still alive");
 	HTTPRequest request("POST", "/", HTTPMessage::HTTP_1_1);
 	request.setContentLength((int) body.length());
@@ -622,16 +626,18 @@ void HTTPReactorServerTest::testHandlerExceptionKeepsServerAlive()
 	srv.start();
 	int port = srv.port();
 
-	// Fire requests at handlers that throw - a Poco exception and a non-Poco
-	// exception. Before the fix, the escaping exception skipped handleClose and
-	// leaked the connection; now onRead catches both kinds and closes cleanly.
-	// The server must keep serving afterwards.
+	// Liveness guard: fire requests at handlers that throw a Poco and a non-Poco
+	// exception. onRead must catch both and close cleanly, leaving the server
+	// serving. Short client timeouts so a regression that fails to close (the
+	// pre-fix behavior on the std path, where the socket is never shut) fails
+	// this test in seconds instead of stalling on the 60 s default timeout.
 	const char* uris[] = { "/throw-poco", "/throw-std" };
 	for (const char* uri : uris)
 	{
 		try
 		{
 			HTTPClientSession cs("127.0.0.1", port);
+			cs.setTimeout(Poco::Timespan(10, 0));
 			HTTPRequest request("GET", uri, HTTPMessage::HTTP_1_1);
 			request.setContentLength(0);
 			cs.sendRequest(request);
@@ -648,6 +654,7 @@ void HTTPReactorServerTest::testHandlerExceptionKeepsServerAlive()
 	}
 
 	HTTPClientSession cs("127.0.0.1", port);
+	cs.setTimeout(Poco::Timespan(10, 0));
 	std::string body("still serving");
 	HTTPRequest request("POST", "/", HTTPMessage::HTTP_1_1);
 	request.setContentLength((int) body.length());
