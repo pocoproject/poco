@@ -116,6 +116,22 @@ public:
 		///
 		/// If true, use acceptor's self reactor, else create {_maxThreads} threads to use
 
+	const Poco::Timespan& getSendTimeout() const;
+		/// Returns the send timeout applied to accepted connections in reactor
+		/// mode. Zero (the default) means no timeout.
+
+	void setSendTimeout(const Poco::Timespan& timeout);
+		/// Sets a send timeout on accepted connections (reactor mode only).
+		///
+		/// In reactor mode HTTP handlers write the response on the reactor
+		/// thread over a blocking socket. Without a send timeout a client that
+		/// stops reading (suspended laptop, zero TCP window) blocks that thread
+		/// forever, permanently wedging the worker reactor and every connection
+		/// multiplexed onto it. A non-zero send timeout turns that into a
+		/// TimeoutException that closes the stuck connection instead.
+		///
+		/// Zero (the default) preserves the historical no-timeout behavior.
+
 protected:
 	virtual ~TCPServerParams();
 		/// Destroys the TCPServerParams.
@@ -129,6 +145,7 @@ private:
 	bool _reactorMode;
 	int _acceptorNum;
 	bool _useSelfReactor;
+	Poco::Timespan _sendTimeout;
 };
 
 
@@ -156,6 +173,18 @@ inline int TCPServerParams::getMaxQueued() const
 inline Poco::Thread::Priority TCPServerParams::getThreadPriority() const
 {
 	return _threadPriority;
+}
+
+
+inline const Poco::Timespan& TCPServerParams::getSendTimeout() const
+{
+	return _sendTimeout;
+}
+
+
+inline void TCPServerParams::setSendTimeout(const Poco::Timespan& timeout)
+{
+	_sendTimeout = timeout;
 }
 
 

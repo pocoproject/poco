@@ -26,7 +26,8 @@ TCPServerParams::TCPServerParams():
 	_threadPriority(Poco::Thread::PRIO_NORMAL),
 	_reactorMode(false),
 	_acceptorNum(1),
-	_useSelfReactor(false)
+	_useSelfReactor(false),
+	_sendTimeout(0)
 {
 }
 

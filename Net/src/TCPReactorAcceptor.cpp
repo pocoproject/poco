@@ -69,6 +69,14 @@ TCPReactorServerConnection* TCPReactorAcceptor::createServiceHandler(Poco::Net::
 	{
 		socket.setNoDelay(true);
 	}
+	// Bound blocking response writes on the reactor thread: without this a
+	// client that stops reading wedges the worker reactor (and every
+	// connection multiplexed onto it) forever. Zero = disabled (default).
+	const Poco::Timespan sendTimeout = _pParams->getSendTimeout();
+	if (sendTimeout.totalMicroseconds() > 0)
+	{
+		socket.setSendTimeout(sendTimeout);
+	}
 	auto tmpConnPtr = std::make_shared<TCPReactorServerConnection>(socket, reactor());
 	tmpConnPtr->setRecvMessageCallback(_recvMessageCallback);
 	tmpConnPtr->initialize();

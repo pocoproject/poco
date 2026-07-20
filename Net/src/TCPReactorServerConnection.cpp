@@ -1,5 +1,7 @@
 #include "Poco/Net/TCPReactorServerConnection.h"
 #include "Poco/Net/HTTPObserver.h"
+#include "Poco/Exception.h"
+#include "Poco/Logger.h"
 
 namespace Poco::Net {
 
@@ -27,19 +29,47 @@ void TCPReactorServerConnection::initialize()
 
 void TCPReactorServerConnection::onRead(const AutoPtr<ReadableNotification>& pNf)
 {
-	char tmp[BUFFER_SIZE] = {0};
-	int  n = _socket.receiveBytes(tmp, sizeof(tmp));
-	if (n == 0)
+	// The accepted socket is blocking, so receiveBytes never returns < 0: on a
+	// peer reset it THROWS (ConnectionResetException), and the read callback
+	// runs the HTTP handler, which can throw too (a send timeout, a handler
+	// error). An exception escaping onRead would be swallowed by the reactor's
+	// per-socket catch and route to the ErrorHandler WITHOUT ever running
+	// handleClose(): the connection object and its fd leak, and because the
+	// dead fd keeps polling readable, the reactor re-dispatches onRead forever
+	// and busy-spins. So contain every failure here and always close the
+	// connection on error. See issue: HubMonitor dashboard silently unavailable.
+	try
 	{
+		char tmp[BUFFER_SIZE] = {0};
+		int  n = _socket.receiveBytes(tmp, sizeof(tmp));
+		if (n <= 0)
+		{
+			// 0 = orderly EOF; blocking receiveBytes does not return < 0.
+			handleClose();
+		}
+		else
+		{
+			_buf.append(tmp, n);
+			_rcvCallback(shared_from_this());
+		}
+	}
+	catch (const Poco::Exception& exc)
+	{
+		Poco::Logger::get("Poco.Net.TCPReactorServer").error(
+			"connection closed on error: %s", exc.displayText());
 		handleClose();
-	} else if (n < 0)
+	}
+	catch (const std::exception& exc)
 	{
-		// TODO
+		Poco::Logger::get("Poco.Net.TCPReactorServer").error(
+			"connection closed on error: %s", std::string(exc.what()));
 		handleClose();
-	} else
+	}
+	catch (...)
 	{
-		_buf.append(tmp, n);
-		_rcvCallback(shared_from_this());
+		Poco::Logger::get("Poco.Net.TCPReactorServer").error(
+			"connection closed on unknown error");
+		handleClose();
 	}
 }
 

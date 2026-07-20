@@ -24,6 +24,10 @@ public:
 	void testConcurrentRequests();
 	void testUseSelfReactor();
 	void testNotImplementedResponseWithKeepAlive();
+	void testSendTimeoutParam();
+	void testClientAbortKeepsServerAlive();
+	void testHandlerExceptionKeepsServerAlive();
+	void testSendTimeoutClosesStalledClient();
 
 	void setUp();
 	void tearDown();
