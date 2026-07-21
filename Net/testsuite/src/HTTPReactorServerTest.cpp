@@ -10,6 +10,7 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Thread.h"
 #include "Poco/Timespan.h"
@@ -667,6 +668,58 @@ void HTTPReactorServerTest::testHandlerExceptionKeepsServerAlive()
 	srv.stop();
 }
 
+void HTTPReactorServerTest::testOnErrorPreservesExceptionType()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setReactorMode(true);
+	Poco::Net::HTTPReactorServer srv(0, pParams, new RequestHandlerFactory);
+
+	// onError() rethrows the exception it is handed. It MUST preserve the dynamic
+	// type: onRead classifies failures with dynamic_cast to keep routine client
+	// churn (reset/abort/timeout) at debug and only log genuine faults at error.
+	// `throw ex` on a Poco::Exception& slices to the base class, so every such
+	// disconnect would be misreported as an error — silently defeating the
+	// classification while everything still "works". Assert the derived type
+	// survives, for a Net exception and for a Foundation one.
+	try
+	{
+		srv.onError(Poco::Net::ConnectionResetException("reset"));
+		fail("onError must rethrow");
+	}
+	catch (const Poco::Net::ConnectionResetException&) { }
+	catch (const Poco::Exception&)
+	{
+		fail("ConnectionResetException was sliced to Poco::Exception");
+	}
+
+	try
+	{
+		srv.onError(Poco::TimeoutException("timeout"));
+		fail("onError must rethrow");
+	}
+	catch (const Poco::TimeoutException&) { }
+	catch (const Poco::Exception&)
+	{
+		fail("TimeoutException was sliced to Poco::Exception");
+	}
+
+	// A plain Poco::Exception must still round-trip with its payload intact.
+	// Prefix, NOT equality: under ENABLE_TRACE (which every CI job sets) the
+	// Exception constructor APPENDS a captured stack trace to _msg — see
+	// Foundation/src/Exception.cpp — so message() is "plain\n<trace>" there and
+	// exactly "plain" in a default build. Asserting the prefix holds in both.
+	try
+	{
+		srv.onError(Poco::Exception("plain"));
+		fail("onError must rethrow");
+	}
+	catch (const Poco::Exception& e)
+	{
+		assertTrue(std::string(e.message()).rfind("plain", 0) == 0);
+	}
+}
+
+
 void HTTPReactorServerTest::testSendTimeoutClosesStalledClient()
 {
 	HTTPServerParams* pParams = new HTTPServerParams;
@@ -750,6 +803,7 @@ CppUnit::Test* HTTPReactorServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testSendTimeoutParam);
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testClientAbortKeepsServerAlive);
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testHandlerExceptionKeepsServerAlive);
+	CppUnit_addTest(pSuite, HTTPReactorServerTest, testOnErrorPreservesExceptionType);
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testSendTimeoutClosesStalledClient);
 
 	return pSuite;
