@@ -703,7 +703,11 @@ void HTTPReactorServerTest::testOnErrorPreservesExceptionType()
 		fail("TimeoutException was sliced to Poco::Exception");
 	}
 
-	// A plain Poco::Exception must still round-trip unchanged.
+	// A plain Poco::Exception must still round-trip with its payload intact.
+	// Prefix, NOT equality: under ENABLE_TRACE (which every CI job sets) the
+	// Exception constructor APPENDS a captured stack trace to _msg — see
+	// Foundation/src/Exception.cpp — so message() is "plain\n<trace>" there and
+	// exactly "plain" in a default build. Asserting the prefix holds in both.
 	try
 	{
 		srv.onError(Poco::Exception("plain"));
@@ -711,7 +715,7 @@ void HTTPReactorServerTest::testOnErrorPreservesExceptionType()
 	}
 	catch (const Poco::Exception& e)
 	{
-		assertTrue(std::string(e.message()) == "plain");
+		assertTrue(std::string(e.message()).rfind("plain", 0) == 0);
 	}
 }
 
