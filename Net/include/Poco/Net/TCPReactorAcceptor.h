@@ -34,7 +34,7 @@ private:
 private:
 	TCPReactorAcceptor(const TCPReactorAcceptor&) = delete;
 	TCPReactorAcceptor&                         operator=(const TCPReactorAcceptor&) = delete;
-	std::vector<std::shared_ptr<SocketReactor>> _wokerReactors;
+	std::vector<std::shared_ptr<SocketReactor>> _workerReactors;
 	SocketReactor&                              _selfReactor;
 	bool                                        _useSelfReactor;
 	std::shared_ptr<ThreadPool>                 _threadPool;

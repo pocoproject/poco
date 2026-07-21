@@ -27,6 +27,7 @@ public:
 	void testSendTimeoutParam();
 	void testClientAbortKeepsServerAlive();
 	void testHandlerExceptionKeepsServerAlive();
+	void testOnErrorPreservesExceptionType();
 	void testSendTimeoutClosesStalledClient();
 
 	void setUp();

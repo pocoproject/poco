@@ -19,7 +19,7 @@ TCPReactorAcceptor::TCPReactorAcceptor(Poco::Net::ServerSocket& socket, Poco::Ne
 		for (int i = 0; i < workerThreads; i++)
 		{
 			std::shared_ptr<SocketReactor> workerReactor(std::make_shared<SocketReactor>());
-			_wokerReactors.push_back(workerReactor);
+			_workerReactors.push_back(workerReactor);
 			_threadPool->start(*workerReactor);
 		}
 	}
@@ -40,7 +40,7 @@ void TCPReactorAcceptor::stop()
 	{
 		return;
 	}
-	for (auto& worker : _wokerReactors)
+	for (auto& worker : _workerReactors)
 	{
 		worker->stop();
 	}
@@ -57,7 +57,7 @@ SocketReactor& TCPReactorAcceptor::reactor()
 		return _selfReactor;
 	}
 	static std::atomic_uint index(0);
-	return *_wokerReactors[index++ % _wokerReactors.size()];
+	return *_workerReactors[index++ % _workerReactors.size()];
 }
 
 TCPReactorServerConnection* TCPReactorAcceptor::createServiceHandler(Poco::Net::StreamSocket& socket)

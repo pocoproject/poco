@@ -124,7 +124,15 @@ void HTTPReactorServer::sendErrorResponse(HTTPSession& session, HTTPResponse::HT
 
 void HTTPReactorServer::onError(const Poco::Exception& ex)
 {
-	throw ex;
+	// rethrow(), not `throw ex`. The parameter is a Poco::Exception reference, so
+	// `throw ex` copy-constructs a plain Poco::Exception and SLICES the dynamic
+	// type away. Everything downstream that classifies the failure by type then
+	// fails to recognize it: TCPReactorServerConnection::onRead dynamic_casts for
+	// ConnectionReset/ConnectionAborted/Timeout to log routine client churn at
+	// debug, and a sliced exception falls through to the error branch instead.
+	// rethrow() is virtual and each POCO_DECLARE_EXCEPTION class implements it as
+	// `throw *this`, preserving the derived type.
+	ex.rethrow();
 }
 
 } // namespace Poco::Net
