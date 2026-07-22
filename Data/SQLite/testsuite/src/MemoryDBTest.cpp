@@ -85,6 +85,21 @@ void MemoryDBTest::testConnectorRegistrationBalanced()
 		try { Connector::unregisterConnector(); ++saved; }
 		catch (const Poco::Exception&) { break; }
 	}
+
+	// Restore the drained registrations however this test exits - a failing
+	// assertTrue throws, so a manual restore at the end would be skipped and
+	// leave the process-global refcount altered for later tests. RAII restores it
+	// during unwinding.
+	struct Restore
+	{
+		int n;
+		~Restore()
+		{
+			for (int i = 0; i < n; ++i)
+				Poco::Data::SQLite::Connector::registerConnector();
+		}
+	} restore{ saved };
+
 	assertTrue (!registered());
 
 	{
@@ -99,12 +114,7 @@ void MemoryDBTest::testConnectorRegistrationBalanced()
 	// PocoDataSQLite.dll has unloaded, so ~SessionFactory destroying the connector
 	// dispatches its virtual dtor through an unmapped vtable: the access violation
 	// in PocoData.dll seen when Hub.exe terminates.
-	const bool balanced = !registered();
-
-	// Restore the exact original refcount so nothing else in the process is disturbed.
-	for (int i = 0; i < saved; ++i) Connector::registerConnector();
-
-	assertTrue (balanced);
+	assertTrue (!registered());
 }
 
 
