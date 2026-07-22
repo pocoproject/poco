@@ -244,6 +244,24 @@ MemoryDB::ColumnCopy MemoryDB::columnCopy(Session& s, const std::string& table)
 }
 
 
+// registerConnector()/unregisterConnector() are refcounted through
+// SessionFactory, so several live MemoryDB instances keep the connector
+// registered until the last one is gone. Both calls are swallowed: they run
+// during construction/destruction, where a throw is not actionable.
+MemoryDB::ConnectorRegistration::ConnectorRegistration()
+{
+	try { Connector::registerConnector(); }
+	catch (...) {}
+}
+
+
+MemoryDB::ConnectorRegistration::~ConnectorRegistration()
+{
+	try { Connector::unregisterConnector(); }
+	catch (...) {}
+}
+
+
 //
 // construction / lifecycle
 //
@@ -315,9 +333,6 @@ MemoryDB::~MemoryDB()
 
 std::string MemoryDB::prepare(const std::string& dir)
 {
-	try { Connector::registerConnector(); }
-	catch (...) {} // already registered
-
 	std::string abs = Poco::Path(dir).absolute().toString();
 	Poco::File(abs).createDirectories();
 	return abs;

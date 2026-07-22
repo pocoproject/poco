@@ -25,6 +25,7 @@ public:
 	MemoryDBTest(const std::string& name);
 	~MemoryDBTest();
 
+	void testConnectorRegistrationBalanced();
 	void testPersistAndReload();
 	void testManualFlushAndDirty();
 	void testDestructorFlush();

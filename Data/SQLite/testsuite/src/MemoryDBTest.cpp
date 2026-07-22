@@ -15,6 +15,7 @@
 #include "Poco/Data/SQLite/Connector.h"
 #include "Poco/Data/SQLite/Utility.h"
 #include "Poco/Data/Session.h"
+#include "Poco/Data/SessionFactory.h"
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/TemporaryFile.h"
@@ -57,6 +58,53 @@ void MemoryDBTest::tearDown()
 {
 	try { Poco::File(_dir).remove(true); }
 	catch (...) {}
+}
+
+
+void MemoryDBTest::testConnectorRegistrationBalanced()
+{
+	using Poco::Data::SessionFactory;
+	using Poco::Data::SQLite::Connector;
+
+	// Is the SQLite connector currently registered in the (process-global,
+	// refcounted) SessionFactory? Probe by trying to make a throwaway session;
+	// create() throws NotFoundException when the connector is absent.
+	auto registered = []() -> bool
+	{
+		try { SessionFactory::instance().create(Connector::KEY, ":memory:"); return true; }
+		catch (const Poco::NotFoundException&) { return false; }
+	};
+
+	// Establish a clean baseline by draining every outstanding registration,
+	// counting each one so we can restore the exact refcount afterwards and leave
+	// the process-global SessionFactory exactly as we found it. remove() throws
+	// (poco_assert) once the refcount reaches zero and the entry is erased.
+	int saved = 0;
+	for (;;)
+	{
+		try { Connector::unregisterConnector(); ++saved; }
+		catch (const Poco::Exception&) { break; }
+	}
+	assertTrue (!registered());
+
+	{
+		MemoryDB db(_dir);              // ctor registers the connector
+		assertTrue (registered());      // registered while the MemoryDB is alive
+	}                                   // ~MemoryDB must unregister (balance the ctor)
+
+	// The crux: creating and destroying a MemoryDB must leave the connector
+	// registration exactly as it found it. Without ~MemoryDB unregistering, the
+	// connector's SharedPtr lingers in the SessionFactory singleton (PocoData.dll)
+	// until process-exit static teardown - by which point, on Windows,
+	// PocoDataSQLite.dll has unloaded, so ~SessionFactory destroying the connector
+	// dispatches its virtual dtor through an unmapped vtable: the access violation
+	// in PocoData.dll seen when Hub.exe terminates.
+	const bool balanced = !registered();
+
+	// Restore the exact original refcount so nothing else in the process is disturbed.
+	for (int i = 0; i < saved; ++i) Connector::registerConnector();
+
+	assertTrue (balanced);
 }
 
 
@@ -1349,6 +1397,7 @@ CppUnit::Test* MemoryDBTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MemoryDBTest");
 
+	CppUnit_addTest(pSuite, MemoryDBTest, testConnectorRegistrationBalanced);
 	CppUnit_addTest(pSuite, MemoryDBTest, testPersistAndReload);
 	CppUnit_addTest(pSuite, MemoryDBTest, testManualFlushAndDirty);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDestructorFlush);

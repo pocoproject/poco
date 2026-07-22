@@ -414,9 +414,29 @@ private:
 	std::string shardPath(Poco::UInt32 id, const Poco::Timestamp& createdAt) const;
 	void cleanOrphans();
 
+	// RAII holder for the SQLite Connector registration; released whether the
+	// MemoryDB is destroyed normally or its constructor throws part-way through.
+	// Without the release the Connector's SharedPtr lingers in the process-global
+	// SessionFactory (in PocoData) until static teardown; by then, on Windows,
+	// PocoDataSQLite has unloaded, so ~SessionFactory destroying it dispatches a
+	// virtual through an unmapped vtable - an access violation in PocoData.dll on
+	// process shutdown.
+	struct ConnectorRegistration
+	{
+		ConnectorRegistration();
+		~ConnectorRegistration();
+	};
+
 	std::string                _dir;
 	std::string                _memName;     // shared-cache in-memory URI name
 	Options                    _opts;
+	// MUST be declared before _session/_persist/_catalog and never reordered
+	// after them: members construct in declaration order, so this registers the
+	// Connector before the Sessions are built (they need it), and destruct in
+	// reverse, so it releases only after the Sessions are gone. Moving it below a
+	// Session would build that Session against an unregistered connector and, on
+	// teardown, release the registration while a Session still lives.
+	ConnectorRegistration      _connectorReg;
 	Session                    _session;      // user-facing in-memory connection
 	Session                    _persist;      // second connection to the same in-memory db (flush/IO)
 	Session                    _catalog;      // on-disk manifest.db
