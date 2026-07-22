@@ -246,12 +246,13 @@ MemoryDB::ColumnCopy MemoryDB::columnCopy(Session& s, const std::string& table)
 
 // registerConnector()/unregisterConnector() are refcounted through
 // SessionFactory, so several live MemoryDB instances keep the connector
-// registered until the last one is gone. Both calls are swallowed: they run
-// during construction/destruction, where a throw is not actionable.
+// registered until the last one is gone. A failed registration propagates:
+// construction cannot proceed without it (the Session members need the
+// connector), so the caller must see the failure instead of getting a MemoryDB
+// wired to a missing connector.
 MemoryDB::ConnectorRegistration::ConnectorRegistration()
 {
-	try { Connector::registerConnector(); }
-	catch (...) {}
+	Connector::registerConnector();
 }
 
 
