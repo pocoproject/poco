@@ -92,17 +92,25 @@ void SecureSocketImpl::acceptSSL()
 		throw SSLException("Cannot create SSL object");
 	}
 
-	/* TLS 1.3 server sends session tickets after a handhake as part of
-	* the SSL_accept(). If a client finishes all its job before server
-	* sends the tickets, SSL_accept() fails with EPIPE errno. Since we
-	* are not interested in a session resumption, we can not to send the
-	* tickets. */
-	if (1 != SSL_set_num_tickets(_pSSL, 0))
+	/* A TLS 1.3 server sends session tickets at handshake completion. If the
+	 * client sends its data and closes without reading, the ticket write fails
+	 * with EPIPE and the handshake is reported as failed even though the peer
+	 * completed it. Therefore, no tickets are sent during the handshake.
+	 * With OpenSSL >= 3.0, if the session cache is enabled, a ticket is queued
+	 * after the handshake instead and goes out with the first application data
+	 * written (see completeHandshake()). With older OpenSSL, handshake-time
+	 * tickets are the only way to support session resumption, so they are kept
+	 * enabled when the session cache is enabled. */
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	const bool suppressTickets = true;
+#else
+	const bool suppressTickets = !_pContext->sessionCacheEnabled();
+#endif
+	if (suppressTickets && 1 != SSL_set_num_tickets(_pSSL, 0))
 	{
 		::BIO_free(pBIO);
-		throw SSLException("Cannot create SSL object");
+		throw SSLException("Cannot disable session tickets");
 	}
-	//Otherwise we can perform two-way shutdown. Client must call SSL_read() before the final SSL_shutdown().
 
 	::SSL_set_bio(_pSSL, pBIO, pBIO);
 	::SSL_set_accept_state(_pSSL);
@@ -453,6 +461,18 @@ int SecureSocketImpl::completeHandshake()
 		return handleError(rc);
 	}
 	_needHandshake = false;
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	if (SSL_is_server(_pSSL) && _pContext->sessionCacheEnabled())
+	{
+		/* Deferred replacement for the handshake-time tickets suppressed in
+		 * acceptSSL(): queue a ticket to be sent with the next application
+		 * data write. Deliberately not flushed here, because an immediate
+		 * flush would fail with EPIPE if the peer has already closed.
+		 * The return value is ignored: the call fails for TLS < 1.3, where
+		 * tickets are handled during the handshake. */
+		SSL_new_session_ticket(_pSSL);
+	}
+#endif
 	return rc;
 }
 

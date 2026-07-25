@@ -413,6 +413,135 @@ void TCPServerTest::testReuseSession()
 }
 
 
+void TCPServerTest::testReuseSessionTLS13()
+{
+	// ensure OpenSSL machinery is fully setup
+	Context::Ptr pDefaultServerContext = SSLManager::instance().defaultServerContext();
+	Context::Ptr pDefaultClientContext = SSLManager::instance().defaultClientContext();
+
+	Context::Ptr pServerContext = new Context(
+		Context::TLS_SERVER_USE,
+		Application::instance().config().getString("openSSL.server.privateKeyFile"),
+		Application::instance().config().getString("openSSL.server.privateKeyFile"),
+		Application::instance().config().getString("openSSL.server.caConfig"),
+		Context::VERIFY_NONE,
+		9,
+		true,
+		"ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+	pServerContext->requireMinimumProtocol(Context::PROTO_TLSV1_3);
+	pServerContext->enableSessionCache(true, "TestSuite");
+	pServerContext->setSessionTimeout(10);
+	pServerContext->setSessionCacheSize(1000);
+
+	SecureServerSocket svs(0, 64, pServerContext);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	Context::Ptr pClientContext = new Context(
+		Context::TLS_CLIENT_USE,
+		Application::instance().config().getString("openSSL.client.privateKeyFile"),
+		Application::instance().config().getString("openSSL.client.privateKeyFile"),
+		Application::instance().config().getString("openSSL.client.caConfig"),
+		Context::VERIFY_RELAXED,
+		9,
+		true,
+		"ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+	pClientContext->enableSessionCache(true);
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
+	SecureStreamSocket ss1(sa, pClientContext);
+	assertTrue (!ss1.sessionWasReused());
+	std::string data("hello, world");
+	ss1.sendBytes(data.data(), (int) data.size());
+	char buffer[256];
+	// the echo reply also carries the session ticket issued after the handshake
+	int n = ss1.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+
+	Session::Ptr pSession = ss1.currentSession();
+	assertTrue (!pSession.isNull());
+	assertTrue (pSession->isResumable());
+	ss1.close();
+	Thread::sleep(300);
+	assertTrue (srv.currentConnections() == 0);
+
+	ss1.useSession(pSession);
+	ss1.connect(sa);
+	ss1.sendBytes(data.data(), (int) data.size());
+	n = ss1.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (ss1.sessionWasReused());
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+	ss1.close();
+	Thread::sleep(300);
+	assertTrue (srv.currentConnections() == 0);
+}
+
+
+void TCPServerTest::testNoSessionTicketsTLS13()
+{
+	// ensure OpenSSL machinery is fully setup
+	Context::Ptr pDefaultServerContext = SSLManager::instance().defaultServerContext();
+	Context::Ptr pDefaultClientContext = SSLManager::instance().defaultClientContext();
+
+	// server session cache not enabled: no session tickets are issued
+	Context::Ptr pServerContext = new Context(
+		Context::TLS_SERVER_USE,
+		Application::instance().config().getString("openSSL.server.privateKeyFile"),
+		Application::instance().config().getString("openSSL.server.privateKeyFile"),
+		Application::instance().config().getString("openSSL.server.caConfig"),
+		Context::VERIFY_NONE,
+		9,
+		true,
+		"ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+	pServerContext->requireMinimumProtocol(Context::PROTO_TLSV1_3);
+
+	SecureServerSocket svs(0, 64, pServerContext);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	Context::Ptr pClientContext = new Context(
+		Context::TLS_CLIENT_USE,
+		Application::instance().config().getString("openSSL.client.privateKeyFile"),
+		Application::instance().config().getString("openSSL.client.privateKeyFile"),
+		Application::instance().config().getString("openSSL.client.caConfig"),
+		Context::VERIFY_RELAXED,
+		9,
+		true,
+		"ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
+	pClientContext->enableSessionCache(true);
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
+	SecureStreamSocket ss1(sa, pClientContext);
+	std::string data("hello, world");
+	ss1.sendBytes(data.data(), (int) data.size());
+	char buffer[256];
+	int n = ss1.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+
+	Session::Ptr pSession = ss1.currentSession();
+	assertTrue (pSession.isNull() || !pSession->isResumable());
+	ss1.close();
+	Thread::sleep(300);
+	assertTrue (srv.currentConnections() == 0);
+
+	if (!pSession.isNull())
+	{
+		ss1.useSession(pSession);
+		ss1.connect(sa);
+		ss1.sendBytes(data.data(), (int) data.size());
+		n = ss1.receiveBytes(buffer, sizeof(buffer));
+		assertTrue (!ss1.sessionWasReused());
+		assertTrue (n > 0);
+		ss1.close();
+		Thread::sleep(300);
+		assertTrue (srv.currentConnections() == 0);
+	}
+}
+
+
 void TCPServerTest::testContextInvalidCertificateHandler()
 {
 	SecureServerSocket svs(0);
@@ -525,6 +654,8 @@ CppUnit::Test* TCPServerTest::suite()
 	CppUnit_addTest(pSuite, TCPServerTest, testMultiConnections);
 	CppUnit_addTest(pSuite, TCPServerTest, testReuseSocket);
 	CppUnit_addTest(pSuite, TCPServerTest, testReuseSession);
+	CppUnit_addTest(pSuite, TCPServerTest, testReuseSessionTLS13);
+	CppUnit_addTest(pSuite, TCPServerTest, testNoSessionTicketsTLS13);
 	CppUnit_addTest(pSuite, TCPServerTest, testContextInvalidCertificateHandler);
 	CppUnit_addTest(pSuite, TCPServerTest, testAddCertificateAuthority);
 

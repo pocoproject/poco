@@ -29,6 +29,8 @@ public:
 	void testMultiConnections();
 	void testReuseSocket();
 	void testReuseSession();
+	void testReuseSessionTLS13();
+	void testNoSessionTicketsTLS13();
 	void testContextInvalidCertificateHandler();
 	void testAddCertificateAuthority();
 

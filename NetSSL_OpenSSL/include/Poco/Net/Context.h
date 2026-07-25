@@ -382,6 +382,14 @@ public:
 		/// session caching is disabled to avoid problems with clients
 		/// requesting to reuse a session (e.g. Firefox 3.6).
 		///
+		/// For TLS 1.3 connections, enabling the session cache also
+		/// enables the sending of session tickets, which are required
+		/// for TLS 1.3 session resumption. With OpenSSL 3.0 or newer,
+		/// the ticket is not sent during the handshake, but together
+		/// with the first application data written after the handshake.
+		/// If session caching is disabled (default), a TLS 1.3 server
+		/// does not send session tickets and sessions cannot be resumed.
+		///
 		/// This method may only be called on SERVER_USE Context objects.
 
 	bool sessionCacheEnabled() const;
