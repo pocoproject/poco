@@ -252,6 +252,12 @@ public:
 		/// is enabled).
 		///
 		/// If no connection is established, returns null.
+		///
+		/// For a TLS 1.3 connection, a session that can be reused
+		/// only becomes available once the server has sent a session
+		/// ticket, which happens with the first application data it
+		/// writes. Calling this immediately after the handshake
+		/// returns a session that cannot be resumed.
 
 	void useSession(Session::Ptr pSession);
 		/// Sets the SSL session to use for the next

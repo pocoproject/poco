@@ -31,6 +31,8 @@ public:
 	void testReuseSession();
 	void testReuseSessionTLS13();
 	void testNoSessionTicketsTLS13();
+	void testClientClosesWithoutReadingTLS13();
+	void testShutdownWithoutDataTLS13();
 	void testContextInvalidCertificateHandler();
 	void testAddCertificateAuthority();
 

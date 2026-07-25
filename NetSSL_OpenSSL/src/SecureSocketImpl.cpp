@@ -42,7 +42,8 @@ SecureSocketImpl::SecureSocketImpl(Poco::AutoPtr<SocketImpl> pSocketImpl, Contex
 	_pSSL(nullptr),
 	_pSocket(pSocketImpl),
 	_pContext(pContext),
-	_needHandshake(false)
+	_needHandshake(false),
+	_ticketPending(false)
 {
 	poco_check_ptr (_pSocket);
 	poco_check_ptr (_pContext);
@@ -95,12 +96,13 @@ void SecureSocketImpl::acceptSSL()
 	/* A TLS 1.3 server sends session tickets at handshake completion. If the
 	 * client sends its data and closes without reading, the ticket write fails
 	 * with EPIPE and the handshake is reported as failed even though the peer
-	 * completed it. Therefore, no tickets are sent during the handshake.
-	 * With OpenSSL >= 3.0, if the session cache is enabled, a ticket is queued
-	 * after the handshake instead and goes out with the first application data
-	 * written (see completeHandshake()). With older OpenSSL, handshake-time
-	 * tickets are the only way to support session resumption, so they are kept
-	 * enabled when the session cache is enabled. */
+	 * completed it.
+	 * With OpenSSL >= 3.0 tickets are therefore always suppressed here; when the
+	 * session cache is enabled, one is requested later, immediately before the
+	 * first application data write (see sendBytes()).
+	 * Older OpenSSL has no way to request a ticket after the handshake, so for
+	 * TLS 1.3 resumption there the handshake-time tickets have to be kept, at
+	 * the price of reinstating the failure described above. */
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	const bool suppressTickets = true;
 #else
@@ -109,6 +111,8 @@ void SecureSocketImpl::acceptSSL()
 	if (suppressTickets && 1 != SSL_set_num_tickets(_pSSL, 0))
 	{
 		::BIO_free(pBIO);
+		::SSL_free(_pSSL);
+		_pSSL = nullptr;
 		throw SSLException("Cannot disable session tickets");
 	}
 
@@ -360,6 +364,16 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 		else
 			return rc;
 	}
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	if (_ticketPending)
+	{
+		/* The ticket is queued, not written, and goes out with the data below.
+		 * The return value is ignored: it also reports "not applicable", which
+		 * is the case for every connection below TLS 1.3. */
+		::SSL_new_session_ticket(_pSSL);
+		_ticketPending = false;
+	}
+#endif
 	const auto sendTimeout = _pSocket->getSendTimeout();
 	Poco::Timestamp tsStart;
 	while (true)
@@ -462,16 +476,12 @@ int SecureSocketImpl::completeHandshake()
 	}
 	_needHandshake = false;
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
-	if (SSL_is_server(_pSSL) && _pContext->sessionCacheEnabled())
-	{
-		/* Deferred replacement for the handshake-time tickets suppressed in
-		 * acceptSSL(): queue a ticket to be sent with the next application
-		 * data write. Deliberately not flushed here, because an immediate
-		 * flush would fail with EPIPE if the peer has already closed.
-		 * The return value is ignored: the call fails for TLS < 1.3, where
-		 * tickets are handled during the handshake. */
-		SSL_new_session_ticket(_pSSL);
-	}
+	/* Request the ticket suppressed in acceptSSL() only once, and only in
+	 * sendBytes(): SSL_new_session_ticket() puts the connection back into the
+	 * handshake state until the ticket is written, and SSL_shutdown() fails
+	 * while in that state. Deferring it to the write keeps the state alive
+	 * only across the call that immediately flushes it. */
+	_ticketPending = ::SSL_is_server(_pSSL) && _pContext->sessionCacheEnabled();
 #endif
 	return rc;
 }
@@ -681,6 +691,7 @@ void SecureSocketImpl::reset()
 		::SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), nullptr);
 		::SSL_free(_pSSL);
 		_pSSL = nullptr;
+		_ticketPending = false;
 	}
 }
 

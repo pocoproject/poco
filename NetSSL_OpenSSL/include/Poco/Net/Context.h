@@ -365,7 +365,8 @@ public:
 		///
 		/// To enable session caching on the server side, use the
 		/// two-argument version of this method to specify
-		/// a session ID context.
+		/// a session ID context. See that overload for the effect
+		/// of session caching on TLS 1.3 session tickets.
 
 	void enableSessionCache(bool flag, const std::string& sessionIdContext);
 		/// Enables or disables SSL/TLS session caching on the server.
@@ -384,11 +385,23 @@ public:
 		///
 		/// For TLS 1.3 connections, enabling the session cache also
 		/// enables the sending of session tickets, which are required
-		/// for TLS 1.3 session resumption. With OpenSSL 3.0 or newer,
-		/// the ticket is not sent during the handshake, but together
-		/// with the first application data written after the handshake.
-		/// If session caching is disabled (default), a TLS 1.3 server
-		/// does not send session tickets and sessions cannot be resumed.
+		/// for TLS 1.3 session resumption. If session caching is
+		/// disabled (default), a TLS 1.3 server does not send session
+		/// tickets and sessions cannot be resumed.
+		///
+		/// With OpenSSL 3.0 or newer, one ticket is sent together with
+		/// the first application data written after the handshake. A
+		/// server that never writes therefore issues no ticket, and its
+		/// sessions cannot be resumed. Since a ticket can be used for
+		/// one resumption only, a client that has to resume repeatedly
+		/// (such as an FTPS client opening several data connections)
+		/// must take a new session from each connection instead of
+		/// reusing the first one.
+		///
+		/// With older OpenSSL versions, which cannot request a ticket
+		/// after the handshake, tickets are sent during the handshake
+		/// instead. A client that closes the connection without reading
+		/// them makes the handshake fail on the server side.
 		///
 		/// This method may only be called on SERVER_USE Context objects.
 
