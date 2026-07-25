@@ -63,33 +63,6 @@ namespace
 	private:
 		FTPSClientSession& _session;
 	};
-
-	class SocketCloser
-		/// Closes a socket handed to an FTPSClientSession constructor.
-		///
-		/// A constructor that throws leaks the control socket, leaving the
-		/// connection open. DialogServer's destructor would then wait forever
-		/// for its peer to disconnect, turning a test failure into a hang.
-	{
-	public:
-		SocketCloser(StreamSocket& socket): _socket(socket)
-		{
-		}
-
-		~SocketCloser()
-		{
-			try
-			{
-				_socket.close();
-			}
-			catch (...)
-			{
-			}
-		}
-
-	private:
-		StreamSocket& _socket;
-	};
 };
 
 
@@ -246,7 +219,6 @@ void FTPSClientSessionTest::testWelcomeMessageRead()
 	DialogServer server;
 	server.addResponse("220 localhost FTP ready");
 	StreamSocket socket(SocketAddress("127.0.0.1", server.port()));
-	SocketCloser closer(socket);
 
 	// The control connection is kept in plain mode; the TLS upgrade is
 	// covered by the SSL tests.
@@ -269,7 +241,6 @@ void FTPSClientSessionTest::testWelcomeMessageNotRead()
 	DialogServer server;
 	server.addResponse("220 localhost FTP ready");
 	StreamSocket socket(SocketAddress("127.0.0.1", server.port()));
-	SocketCloser closer(socket);
 
 	// readWelcomeMessage == false means the caller has already read the
 	// welcome reply from the socket.

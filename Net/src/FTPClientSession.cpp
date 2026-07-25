@@ -57,14 +57,24 @@ FTPClientSession::FTPClientSession(const StreamSocket& socket,
 	_isLoggedIn(false),
 	_timeout(DEFAULT_TIMEOUT)
 {
-	_pControlSocket->setReceiveTimeout(_timeout);
-	if (readWelcomeMessage)
+	// The destructor does not run if the constructor throws, so the control
+	// socket has to be released here to close the connection.
+	try
 	{
-		FTPClientSession::receiveServerReadyReply();
+		_pControlSocket->setReceiveTimeout(_timeout);
+		if (readWelcomeMessage)
+		{
+			FTPClientSession::receiveServerReadyReply();
+		}
+		else
+		{
+			_serverReady = true;
+		}
 	}
-	else
+	catch (...)
 	{
-		_serverReady = true;
+		delete _pControlSocket;
+		throw;
 	}
 }
 
@@ -86,9 +96,19 @@ FTPClientSession::FTPClientSession(const std::string& host,
 	_isLoggedIn(false),
 	_timeout(DEFAULT_TIMEOUT)
 {
-	_pControlSocket->setReceiveTimeout(_timeout);
-	if (!username.empty())
-		login(username, password);
+	// The destructor does not run if the constructor throws, so the control
+	// socket has to be released here to close the connection.
+	try
+	{
+		_pControlSocket->setReceiveTimeout(_timeout);
+		if (!username.empty())
+			login(username, password);
+	}
+	catch (...)
+	{
+		delete _pControlSocket;
+		throw;
+	}
 }
 
 

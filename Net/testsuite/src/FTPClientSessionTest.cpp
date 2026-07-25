@@ -14,6 +14,7 @@
 #include "DialogServer.h"
 #include "Poco/Net/FTPClientSession.h"
 #include "Poco/Net/DialogSocket.h"
+#include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
@@ -26,6 +27,7 @@
 
 using Poco::Net::FTPClientSession;
 using Poco::Net::DialogSocket;
+using Poco::Net::ServerSocket;
 using Poco::Net::StreamSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::FTPException;
@@ -62,31 +64,31 @@ namespace
 		FTPClientSession& _session;
 	};
 
-	class SocketCloser
-		/// Closes a socket handed to an FTPClientSession constructor.
-		///
-		/// A constructor that throws leaks the control socket, leaving the
-		/// connection open. DialogServer's destructor would then wait forever
-		/// for its peer to disconnect, turning a test failure into a hang.
+	class ActiveConnector
+		/// Runs the connecting constructor off the test thread, so that the
+		/// test itself can accept the connection and script the reply.
 	{
 	public:
-		SocketCloser(StreamSocket& socket): _socket(socket)
+		ActiveConnector():
+			connect(this, &ActiveConnector::connectImpl)
 		{
 		}
 
-		~SocketCloser()
+		ActiveMethod<bool, Poco::UInt16, ActiveConnector> connect;
+
+	protected:
+		bool connectImpl(const Poco::UInt16& port)
 		{
 			try
 			{
-				_socket.close();
+				FTPClientSession session("127.0.0.1", port, "user", "password");
 			}
-			catch (...)
+			catch (FTPException&)
 			{
+				return true;
 			}
+			return false;
 		}
-
-	private:
-		StreamSocket& _socket;
 	};
 };
 
@@ -115,6 +117,16 @@ void FTPClientSessionTest::login(DialogServer& server, FTPClientSession& session
 	assertTrue (cmd == "TYPE I");
 
 	assertTrue (session.getFileType() == FTPClientSession::TYPE_BINARY);
+}
+
+
+void FTPClientSessionTest::assertConnectionClosed(DialogSocket& peer)
+{
+	// The timeout keeps a still-open connection from blocking the test
+	// forever; receiveBytes() returns 0 once the peer has disconnected.
+	peer.setReceiveTimeout(Poco::Timespan(10, 0));
+	char buffer[16];
+	assertTrue (peer.receiveBytes(buffer, sizeof(buffer)) == 0);
 }
 
 
@@ -239,7 +251,6 @@ void FTPClientSessionTest::testWelcomeMessageRead()
 	DialogServer server;
 	server.addResponse("220 localhost FTP ready");
 	StreamSocket socket(SocketAddress("127.0.0.1", server.port()));
-	SocketCloser closer(socket);
 
 	FTPClientSession session(socket);
 	assertTrue (session.isOpen());
@@ -260,7 +271,6 @@ void FTPClientSessionTest::testWelcomeMessageNotRead()
 	DialogServer server;
 	server.addResponse("220 localhost FTP ready");
 	StreamSocket socket(SocketAddress("127.0.0.1", server.port()));
-	SocketCloser closer(socket);
 
 	// readWelcomeMessage == false means the caller has already read the
 	// welcome reply from the socket.
@@ -283,6 +293,47 @@ void FTPClientSessionTest::testWelcomeMessageNotRead()
 	server.addResponse("221 Good Bye");
 	session.close();
 	assertTrue (!session.isOpen());
+}
+
+
+void FTPClientSessionTest::testConstructorFailureClosesSocket1()
+{
+	ServerSocket serverSocket(SocketAddress("127.0.0.1", 0));
+	DialogSocket peer;
+	{
+		StreamSocket clientSocket(SocketAddress("127.0.0.1", serverSocket.address().port()));
+		peer = serverSocket.acceptConnection();
+		peer.sendMessage("421 Service not available");
+		try
+		{
+			FTPClientSession session(clientSocket);
+			fail("server not ready - must throw");
+		}
+		catch (FTPException&)
+		{
+		}
+	}
+
+	// The constructor threw after taking over the socket, so releasing the
+	// caller's own reference must close the connection. DialogServer is not
+	// used here: it only leaves its receive loop once the peer disconnects,
+	// so a socket kept open would hang the test instead of failing it.
+	assertConnectionClosed(peer);
+}
+
+
+void FTPClientSessionTest::testConstructorFailureClosesSocket2()
+{
+	ServerSocket serverSocket(SocketAddress("127.0.0.1", 0));
+	ActiveConnector connector;
+	ActiveResult<bool> result = connector.connect(serverSocket.address().port());
+
+	DialogSocket peer = serverSocket.acceptConnection();
+	peer.sendMessage("421 Service not available");
+	result.wait();
+	assertTrue (result.data());
+
+	assertConnectionClosed(peer);
 }
 
 
@@ -675,6 +726,8 @@ CppUnit::Test* FTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testLoginFailed2);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testWelcomeMessageRead);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testWelcomeMessageNotRead);
+	CppUnit_addTest(pSuite, FTPClientSessionTest, testConstructorFailureClosesSocket1);
+	CppUnit_addTest(pSuite, FTPClientSessionTest, testConstructorFailureClosesSocket2);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testCommands);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testDownloadPORT);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testDownloadEPRT);
