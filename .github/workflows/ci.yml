@@ -100,6 +100,7 @@ jobs:
       arm_cross: ${{ steps.filter.outputs.arm_cross }}
       data: ${{ steps.filter.outputs.data }}
       sqlparser: ${{ steps.filter.outputs.sqlparser }}
+      crypto_netssl: ${{ steps.filter.outputs.crypto_netssl }}
     steps:
       - uses: actions/checkout@v5
       - uses: dorny/paths-filter@v4
@@ -232,6 +233,36 @@ jobs:
             cd cmake-build &&
             PWD=`pwd`
             ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Net|Crypto|Util|XML|JSON|Data|DataSQLite)$"
+      - uses: ./.github/actions/upload-test-report
+
+  # OpenSSL no-deprecated probe: build Crypto/NetSSL/JWT with deprecated
+  # OpenSSL declarations hidden (#5415). Debug + -D_DEBUG so that
+  # poco_assert_dbg expressions compile too.
+  linux-gcc-cmake-openssl-no-deprecated:
+    runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.crypto_netssl == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_CXX_FLAGS="-DOPENSSL_NO_DEPRECATED -D_DEBUG"
+          -DPOCO_MINIMAL_BUILD=ON -DENABLE_TESTS=ON
+          -DENABLE_CRYPTO=ON -DENABLE_NETSSL=ON -DENABLE_JWT=ON
+      - run: cmake --build cmake-build --target all --parallel $(nproc)
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 30
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            PWD=`pwd`
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Crypto|JWT)$"
       - uses: ./.github/actions/upload-test-report
 
   # POCO_SOO=OFF probe: Foundation only.
