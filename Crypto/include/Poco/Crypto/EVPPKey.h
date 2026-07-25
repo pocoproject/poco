@@ -29,6 +29,7 @@
 #include <openssl/pem.h>
 #include <sstream>
 #include <map>
+#include <type_traits>
 
 
 namespace Poco::Crypto {
@@ -202,12 +203,13 @@ private:
 		const std::string& keyFile,
 		const std::string& pass = "")
 	{
-#ifndef OPENSSL_NO_DEPRECATED_3_0
-		poco_assert_dbg (((typeid(K*) == typeid(RSA*) || typeid(K*) == typeid(EC_KEY*)) && getFunc) ||
-						((typeid(K*) == typeid(EVP_PKEY*)) && !getFunc));
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+		// Native key extraction is only compiled for OpenSSL < 3.0; the RSA and
+		// EC_KEY types are not even declared when deprecated APIs are disabled.
+		poco_assert_dbg ((std::is_same_v<K, EVP_PKEY> && !getFunc));
 #else
-		// RSA/EC_KEY types are not declared; only EVP_PKEY loading is possible
-		poco_assert_dbg ((typeid(K*) == typeid(EVP_PKEY*)) && !getFunc);
+		poco_assert_dbg (((std::is_same_v<K, RSA> || std::is_same_v<K, EC_KEY>) && getFunc) ||
+						(std::is_same_v<K, EVP_PKEY> && !getFunc));
 #endif
 		poco_check_ptr (ppKey);
 		poco_assert_dbg (!*ppKey);
@@ -242,7 +244,7 @@ private:
 						}
 						else
 						{
-							poco_assert_dbg (typeid(K*) == typeid(EVP_PKEY*));
+							poco_assert_dbg ((std::is_same_v<K, EVP_PKEY>));
 							*ppKey = (K*)pKey;
 						}
 						if (!*ppKey) goto error;
@@ -279,12 +281,13 @@ private:
 		std::istream* pIstr,
 		const std::string& pass = "")
 	{
-#ifndef OPENSSL_NO_DEPRECATED_3_0
-		poco_assert_dbg (((typeid(K*) == typeid(RSA*) || typeid(K*) == typeid(EC_KEY*)) && getFunc) ||
-						((typeid(K*) == typeid(EVP_PKEY*)) && !getFunc));
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+		// Native key extraction is only compiled for OpenSSL < 3.0; the RSA and
+		// EC_KEY types are not even declared when deprecated APIs are disabled.
+		poco_assert_dbg ((std::is_same_v<K, EVP_PKEY> && !getFunc));
 #else
-		// RSA/EC_KEY types are not declared; only EVP_PKEY loading is possible
-		poco_assert_dbg ((typeid(K*) == typeid(EVP_PKEY*)) && !getFunc);
+		poco_assert_dbg (((std::is_same_v<K, RSA> || std::is_same_v<K, EC_KEY>) && getFunc) ||
+						(std::is_same_v<K, EVP_PKEY> && !getFunc));
 #endif
 		poco_check_ptr(ppKey);
 		poco_assert_dbg(!*ppKey);
@@ -314,7 +317,7 @@ private:
 						}
 						else
 						{
-							poco_assert_dbg (typeid(K*) == typeid(EVP_PKEY*));
+							poco_assert_dbg ((std::is_same_v<K, EVP_PKEY>));
 							*ppKey = (K*)pKey;
 						}
 						if (!*ppKey) goto error;
