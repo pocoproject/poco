@@ -301,7 +301,11 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 		return 0;
 	}
 
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	X509* pPeerCert = SSL_get1_peer_certificate(pSSL);
+#else
 	X509* pPeerCert = SSL_get_peer_certificate(pSSL);
+#endif
 	if (!pPeerCert)
 	{
 		OCSP_BASICRESP_free(pBasicResp);
