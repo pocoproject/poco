@@ -202,8 +202,13 @@ private:
 		const std::string& keyFile,
 		const std::string& pass = "")
 	{
+#ifndef OPENSSL_NO_DEPRECATED_3_0
 		poco_assert_dbg (((typeid(K*) == typeid(RSA*) || typeid(K*) == typeid(EC_KEY*)) && getFunc) ||
 						((typeid(K*) == typeid(EVP_PKEY*)) && !getFunc));
+#else
+		// RSA/EC_KEY types are not declared; only EVP_PKEY loading is possible
+		poco_assert_dbg ((typeid(K*) == typeid(EVP_PKEY*)) && !getFunc);
+#endif
 		poco_check_ptr (ppKey);
 		poco_assert_dbg (!*ppKey);
 
@@ -274,8 +279,13 @@ private:
 		std::istream* pIstr,
 		const std::string& pass = "")
 	{
+#ifndef OPENSSL_NO_DEPRECATED_3_0
 		poco_assert_dbg (((typeid(K*) == typeid(RSA*) || typeid(K*) == typeid(EC_KEY*)) && getFunc) ||
 						((typeid(K*) == typeid(EVP_PKEY*)) && !getFunc));
+#else
+		// RSA/EC_KEY types are not declared; only EVP_PKEY loading is possible
+		poco_assert_dbg ((typeid(K*) == typeid(EVP_PKEY*)) && !getFunc);
+#endif
 		poco_check_ptr(ppKey);
 		poco_assert_dbg(!*ppKey);
 
