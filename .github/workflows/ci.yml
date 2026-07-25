@@ -235,9 +235,9 @@ jobs:
             ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Net|Crypto|Util|XML|JSON|Data|DataSQLite)$"
       - uses: ./.github/actions/upload-test-report
 
-  # OpenSSL no-deprecated probe: build Crypto/NetSSL/JWT with deprecated
-  # OpenSSL declarations hidden (#5415). Debug + -D_DEBUG so that
-  # poco_assert_dbg expressions compile too.
+  # OpenSSL no-deprecated probe: build and test Crypto/NetSSL/JWT with
+  # deprecated OpenSSL declarations hidden. Debug + -D_DEBUG so that
+  # poco_assert_dbg expressions are compiled as well.
   linux-gcc-cmake-openssl-no-deprecated:
     runs-on: ubuntu-24.04
     needs: changes
@@ -262,7 +262,7 @@ jobs:
           command: >-
             cd cmake-build &&
             PWD=`pwd`
-            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Crypto|JWT)$"
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Crypto|NetSSL|JWT)$"
       - uses: ./.github/actions/upload-test-report
 
   # POCO_SOO=OFF probe: Foundation only.
