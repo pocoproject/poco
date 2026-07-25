@@ -14,9 +14,11 @@
 #include "DialogServer.h"
 #include "Poco/Net/FTPClientSession.h"
 #include "Poco/Net/DialogSocket.h"
+#include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Thread.h"
+#include "Poco/Timespan.h"
 #include "Poco/ActiveMethod.h"
 #include "Poco/StreamCopier.h"
 #include <sstream>
@@ -24,6 +26,7 @@
 
 using Poco::Net::FTPClientSession;
 using Poco::Net::DialogSocket;
+using Poco::Net::StreamSocket;
 using Poco::Net::SocketAddress;
 using Poco::Net::FTPException;
 using Poco::ActiveMethod;
@@ -57,6 +60,33 @@ namespace
 
 	private:
 		FTPClientSession& _session;
+	};
+
+	class SocketCloser
+		/// Closes a socket handed to an FTPClientSession constructor.
+		///
+		/// A constructor that throws leaks the control socket, leaving the
+		/// connection open. DialogServer's destructor would then wait forever
+		/// for its peer to disconnect, turning a test failure into a hang.
+	{
+	public:
+		SocketCloser(StreamSocket& socket): _socket(socket)
+		{
+		}
+
+		~SocketCloser()
+		{
+			try
+			{
+				_socket.close();
+			}
+			catch (...)
+			{
+			}
+		}
+
+	private:
+		StreamSocket& _socket;
 	};
 };
 
@@ -201,6 +231,58 @@ void FTPClientSessionTest::testLoginFailed2()
 	}
 	server.addResponse("221 Good Bye");
 	session.close();
+}
+
+
+void FTPClientSessionTest::testWelcomeMessageRead()
+{
+	DialogServer server;
+	server.addResponse("220 localhost FTP ready");
+	StreamSocket socket(SocketAddress("127.0.0.1", server.port()));
+	SocketCloser closer(socket);
+
+	FTPClientSession session(socket);
+	assertTrue (session.isOpen());
+	assertTrue (!session.isLoggedIn());
+	assertTrue (session.welcomeMessage() == "220 localhost FTP ready");
+
+	login(server, session);
+	assertTrue (session.isLoggedIn());
+
+	server.addResponse("221 Good Bye");
+	session.close();
+	assertTrue (!session.isOpen());
+}
+
+
+void FTPClientSessionTest::testWelcomeMessageNotRead()
+{
+	DialogServer server;
+	server.addResponse("220 localhost FTP ready");
+	StreamSocket socket(SocketAddress("127.0.0.1", server.port()));
+	SocketCloser closer(socket);
+
+	// readWelcomeMessage == false means the caller has already read the
+	// welcome reply from the socket.
+	{
+		DialogSocket ds(socket);
+		std::string response;
+		int status = ds.receiveStatusMessage(response);
+		assertTrue (status == 220);
+	}
+
+	FTPClientSession session(socket, false);
+	assertTrue (session.isOpen());
+	assertTrue (session.welcomeMessage().empty());
+
+	// Reading the welcome reply again would block until this timeout expires.
+	session.setTimeout(Poco::Timespan(5, 0));
+	login(server, session);
+	assertTrue (session.isLoggedIn());
+
+	server.addResponse("221 Good Bye");
+	session.close();
+	assertTrue (!session.isOpen());
 }
 
 
@@ -591,6 +673,8 @@ CppUnit::Test* FTPClientSessionTest::suite()
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testLogin3);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testLoginFailed1);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testLoginFailed2);
+	CppUnit_addTest(pSuite, FTPClientSessionTest, testWelcomeMessageRead);
+	CppUnit_addTest(pSuite, FTPClientSessionTest, testWelcomeMessageNotRead);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testCommands);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testDownloadPORT);
 	CppUnit_addTest(pSuite, FTPClientSessionTest, testDownloadEPRT);

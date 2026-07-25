@@ -37,6 +37,8 @@ public:
 	void testLogin3();
 	void testLoginFailed1();
 	void testLoginFailed2();
+	void testWelcomeMessageRead();
+	void testWelcomeMessageNotRead();
 	void testCommands();
 	void testDownloadPORT();
 	void testDownloadEPRT();
