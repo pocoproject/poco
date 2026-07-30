@@ -220,8 +220,11 @@ void PropertyFileConfiguration::saveToFile(const std::string& path, const std::m
 			std::string::size_type pos = 0;
 			while (pos < line.size() && Poco::Ascii::isSpace(line[pos])) ++pos;
 
-			// Comment or !include
-			if (pos < line.size() && (line[pos] == '#' || line[pos] == '!'))
+			// Comment, !include, or ?include directive. A '?' line that is NOT
+			// a ?include directive keeps its legacy key-value treatment below.
+			const bool optionalIncludeLine =
+				pos < line.size() && line[pos] == '?' && !extractIncludePath(line).empty();
+			if (pos < line.size() && (line[pos] == '#' || line[pos] == '!' || optionalIncludeLine))
 			{
 				out << line << "\n";
 				continue;
@@ -349,25 +352,47 @@ void PropertyFileConfiguration::clear()
 }
 
 
-std::string PropertyFileConfiguration::extractIncludePath(const std::string& line)
+std::string PropertyFileConfiguration::extractIncludePath(const std::string& line, bool* pOptional)
 {
 	// Per .properties spec, lines starting with '!' are comments.
-	// Only "!include " (with a trailing space/tab) is treated as an include directive.
-	// Bare "!include" without a space is treated as a comment, same as "!includeSomething".
-	constexpr std::string_view includeDirective = "!include";
+	// Only "!include " (with a trailing space/tab) is treated as an include
+	// directive; "?include " is its OPTIONAL twin (a missing file is
+	// tolerated at load). Bare "!include"/"?include" without a space are NOT
+	// directives ("!..." stays a comment, "?..." stays an ordinary key),
+	// same as "!includeSomething"/"?includeSomething".
+	constexpr std::string_view mandatoryDirective = "!include";
+	constexpr std::string_view optionalDirective  = "?include";
+
+	if (pOptional) *pOptional = false;
 
 	std::string_view sv(line);
 	std::string_view::size_type pos = 0;
 	while (pos < sv.size() && Poco::Ascii::isSpace(sv[pos])) ++pos;
 	sv.remove_prefix(pos);
 
-	if (sv.size() > includeDirective.size() &&
-		sv.compare(0, includeDirective.size(), includeDirective) == 0 &&
-		Poco::Ascii::isSpace(sv[includeDirective.size()]))
+	bool optional = false;
+	std::string_view directive = mandatoryDirective;
+	if (!sv.empty() && sv[0] == '?')
 	{
-		std::string path = Poco::trim(std::string(sv.substr(includeDirective.size())));
+		directive = optionalDirective;
+		optional = true;
+	}
+
+	if (sv.size() > directive.size() &&
+		sv.compare(0, directive.size(), directive) == 0 &&
+		Poco::Ascii::isSpace(sv[directive.size()]))
+	{
+		std::string path = Poco::trim(std::string(sv.substr(directive.size())));
 		if (path.empty())
+		{
+			// A "?include" with no path is not a directive either - it keeps
+			// its legacy meaning as an ordinary (odd) property key, while the
+			// comment-form "!include" with no path stays the hard error it
+			// always was.
+			if (optional) return {};
 			throw Poco::SyntaxException("Missing path in !include directive");
+		}
+		if (pOptional) *pOptional = optional;
 		return path;
 	}
 	return {};
@@ -588,6 +613,35 @@ void PropertyFileConfiguration::removeIncludeFile(const std::string& path, bool 
 }
 
 
+void PropertyFileConfiguration::processInclude(const std::string& includePath, bool optional, const std::string& basePath, std::set<std::string>& includeStack)
+{
+	const std::string absPathStr = resolveIncludePath(includePath, basePath);
+
+	if (includeStack.find(absPathStr) != includeStack.end())
+	{
+		throw Poco::FileException("Cyclic property file include detected", absPathStr);
+	}
+
+	// The ?include form tolerates a MISSING file only - an existing file that
+	// cannot be opened still throws (a permission problem must stay loud).
+	if (optional && !Poco::File(absPathStr).exists())
+		return;
+
+	struct StackGuard
+	{
+		std::set<std::string>& stack;
+		const std::string& key;
+		StackGuard(std::set<std::string>& s, const std::string& k): stack(s), key(k) { stack.insert(k); }
+		~StackGuard() { stack.erase(key); }
+	} guard(includeStack, absPathStr);
+
+	Poco::FileInputStream includeIstr(absPathStr);
+	if (!includeIstr.good())
+		throw Poco::OpenFileException(absPathStr);
+	loadStream(includeIstr, Poco::Path(absPathStr).parent().toString(), absPathStr, includeStack);
+}
+
+
 void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack)
 {
 	constexpr int eof = std::char_traits<char>::eof();
@@ -613,26 +667,66 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 
 			std::string includePath = extractIncludePath(line);
 			if (!includePath.empty())
+				processInclude(includePath, false, basePath, includeStack);
+		}
+		else if (c == '?')
+		{
+			// Potential "?include" (optional include) directive. '?' is NOT a
+			// comment character, so match incrementally: the moment the line
+			// deviates from "?include" + whitespace, fall back to the standard
+			// key=value parse (preserving exact legacy semantics for ordinary
+			// '?'-prefixed keys, including multi-line value continuation).
+			static const std::string directive("?include");
+			std::string prefix;
+			prefix += static_cast<char>(c);
+			c = istr.get();
+			while (c != eof && prefix.size() < directive.size() &&
+			       static_cast<char>(c) == directive[prefix.size()])
 			{
-				const std::string absPathStr = resolveIncludePath(includePath, basePath);
-
-				if (includeStack.find(absPathStr) != includeStack.end())
+				prefix += static_cast<char>(c);
+				c = istr.get();
+			}
+			if (prefix == directive && c != eof && c != '\r' && c != '\n' &&
+			    Poco::Ascii::isSpace(c))
+			{
+				std::string line = prefix;
+				line += static_cast<char>(c);
+				while (c != eof && c != '\n' && c != '\r')
 				{
-					throw Poco::FileException("Cyclic property file include detected", absPathStr);
+					c = istr.get();
+					if (c != eof && c != '\n' && c != '\r')
+						line += static_cast<char>(c);
 				}
-
-				struct StackGuard
+				bool optional = false;
+				std::string includePath = extractIncludePath(line, &optional);
+				if (!includePath.empty())
+					processInclude(includePath, optional, basePath, includeStack);
+				else
 				{
-					std::set<std::string>& stack;
-					const std::string& key;
-					StackGuard(std::set<std::string>& s, const std::string& k): stack(s), key(k) { stack.insert(k); }
-					~StackGuard() { stack.erase(key); }
-				} guard(includeStack, absPathStr);
-
-				Poco::FileInputStream includeIstr(absPathStr);
-				if (!includeIstr.good())
-					throw Poco::OpenFileException(absPathStr);
-				loadStream(includeIstr, Poco::Path(absPathStr).parent().toString(), absPathStr, includeStack);
+					// "?include" followed only by whitespace: legacy parsing
+					// made this the (odd) key "?include" with an empty value -
+					// keep that.
+					setRaw(prefix, std::string());
+					if (!currentFile.empty())
+						_sourceMap[prefix] = currentFile;
+				}
+			}
+			else
+			{
+				// Ordinary key line starting with '?': continue the standard
+				// key=value parse with what was already consumed.
+				std::string key = prefix;
+				while (c != eof && c != '=' && c != ':' && c != '\r' && c != '\n') { key += (char) c; c = istr.get(); }
+				std::string value;
+				if (c == '=' || c == ':')
+				{
+					c = readChar(istr);
+					while (c != eof && c) { value += (char) c; c = readChar(istr); }
+				}
+				std::string trimmedKey = trim(key);
+				setRaw(trimmedKey, trim(value));
+				if (!currentFile.empty())
+					_sourceMap[trimmedKey] = currentFile;
 			}
 		}
 		else

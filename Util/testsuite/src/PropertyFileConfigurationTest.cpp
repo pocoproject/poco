@@ -345,6 +345,148 @@ void PropertyFileConfigurationTest::testInclude()
 }
 
 
+void PropertyFileConfigurationTest::testOptionalInclude()
+{
+	// Existing overlay: loaded exactly like !include; the overlay's keys
+	// override earlier assignments (last one wins).
+	Poco::TemporaryFile overlayFile;
+	{
+		Poco::FileOutputStream ostr(overlayFile.path());
+		ostr << "shared.prop = overlayValue\n";
+		ostr << "overlay.prop = overlayOnly\n";
+	}
+	Poco::TemporaryFile mainFile;
+	{
+		Poco::FileOutputStream ostr(mainFile.path());
+		ostr << "shared.prop = baseValue\n";
+		ostr << "base.prop = base\n";
+		ostr << "?include " << overlayFile.path() << "\n";
+	}
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(mainFile.path());
+	assertTrue (pConf->getString("base.prop") == "base");
+	assertTrue (pConf->getString("shared.prop") == "overlayValue");
+	assertTrue (pConf->getString("overlay.prop") == "overlayOnly");
+
+	// Missing overlay (absolute path): silently skipped, the rest loads.
+	Poco::TemporaryFile mainFile2;
+	{
+		Poco::FileOutputStream ostr(mainFile2.path());
+		ostr << "before.prop = beforeValue\n";
+		Poco::Path missing(mainFile2.path());
+		missing.setFileName("nonexistent_overlay.properties");
+		ostr << "?include " << missing.toString() << "\n";
+		ostr << "after.prop = afterValue\n";
+	}
+	AutoPtr<PropertyFileConfiguration> pConf2 = new PropertyFileConfiguration(mainFile2.path());
+	assertTrue (pConf2->getString("before.prop") == "beforeValue");
+	assertTrue (pConf2->getString("after.prop") == "afterValue");
+
+	// Missing overlay by relative filename - the prod-base + dev-overlay
+	// deployment shape: the same file works with and without the overlay.
+	Poco::TemporaryFile mainFile3;
+	{
+		Poco::FileOutputStream ostr(mainFile3.path());
+		ostr << "prod.prop = prodValue\n";
+		ostr << "?include no_such_overlay.dev.properties\n";
+	}
+	AutoPtr<PropertyFileConfiguration> pConf3 = new PropertyFileConfiguration(mainFile3.path());
+	assertTrue (pConf3->getString("prod.prop") == "prodValue");
+
+	// The mandatory form must still throw for the same missing file.
+	Poco::TemporaryFile mainFile4;
+	{
+		Poco::FileOutputStream ostr(mainFile4.path());
+		ostr << "prod.prop = prodValue\n";
+		ostr << "!include no_such_overlay.dev.properties\n";
+	}
+	try
+	{
+		AutoPtr<PropertyFileConfiguration> pBad = new PropertyFileConfiguration(mainFile4.path());
+		fail("missing !include - must throw");
+	}
+	catch (Poco::FileException&)
+	{
+	}
+
+	// A cyclic ?include of an EXISTING file is still detected.
+	Poco::TemporaryFile cycleFile;
+	{
+		Poco::FileOutputStream ostr(cycleFile.path());
+		ostr << "cycle.prop = v\n";
+		ostr << "?include " << Poco::Path(cycleFile.path()).getFileName() << "\n";
+	}
+	try
+	{
+		AutoPtr<PropertyFileConfiguration> pBad = new PropertyFileConfiguration(cycleFile.path());
+		fail("cyclic ?include - must throw");
+	}
+	catch (Poco::FileException&)
+	{
+	}
+
+	// getIncludeFiles reports ?include directives too (even when missing).
+	assertTrue (pConf3->getIncludeFiles().size() == 1);
+}
+
+
+void PropertyFileConfigurationTest::testOptionalIncludeCompat()
+{
+	// '?' is not a comment character: every '?' line that is not exactly
+	// "?include <path>" keeps its legacy key=value meaning.
+	std::istringstream istr(
+		"?includeX = notADirective\n"
+		"?inc = alsoAKey\n"
+		"? include = spacedKey\n"
+		"?include\n"
+		"?multi = one \\\n two\n"
+		"normal.prop = normalValue\n");
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(istr);
+	assertTrue (pConf->getString("?includeX") == "notADirective");
+	assertTrue (pConf->getString("?inc") == "alsoAKey");
+	assertTrue (pConf->getString("? include") == "spacedKey");
+	assertTrue (pConf->hasProperty("?include"));
+	assertTrue (pConf->getString("?include") == "");
+	assertTrue (pConf->getString("?multi") == "one  two");
+	assertTrue (pConf->getString("normal.prop") == "normalValue");
+}
+
+
+void PropertyFileConfigurationTest::testOptionalIncludeSavePreserving()
+{
+	// save() must preserve a ?include directive line verbatim - including a
+	// path containing ':' (a drive letter), which the key=value scan would
+	// otherwise mistake for a separator and mangle.
+	Poco::TemporaryFile overlayFile;
+	{
+		Poco::FileOutputStream ostr(overlayFile.path());
+		ostr << "overlay.prop = overlayValue\n";
+	}
+	Poco::TemporaryFile mainFile;
+	{
+		Poco::FileOutputStream ostr(mainFile.path());
+		ostr << "base.prop = base\n";
+		ostr << "?include " << overlayFile.path() << "\n";
+	}
+	AutoPtr<PropertyFileConfiguration> pConf = new PropertyFileConfiguration(mainFile.path());
+	pConf->setString("base.prop", "changed");
+	pConf->save(mainFile.path());
+
+	std::string contents;
+	{
+		Poco::FileInputStream istr(mainFile.path());
+		std::string line;
+		while (std::getline(istr, line)) { contents += line; contents += '\n'; }
+	}
+	assertTrue (contents.find("?include " + overlayFile.path()) != std::string::npos);
+	assertTrue (contents.find("base.prop = changed") != std::string::npos);
+
+	// Reload round-trip still resolves the overlay.
+	AutoPtr<PropertyFileConfiguration> pConf2 = new PropertyFileConfiguration(mainFile.path());
+	assertTrue (pConf2->getString("base.prop") == "changed");
+	assertTrue (pConf2->getString("overlay.prop") == "overlayValue");
+}
+
+
 void PropertyFileConfigurationTest::testSavePreserving()
 {
 	// Create an included properties file
@@ -994,6 +1136,9 @@ CppUnit::Test* PropertyFileConfigurationTest::suite()
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testLoad);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSave);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testInclude);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testOptionalInclude);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testOptionalIncludeCompat);
+	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testOptionalIncludeSavePreserving);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSavePreserving);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSaveRemovesLastIncludedKey);
 	CppUnit_addTest(pSuite, PropertyFileConfigurationTest, testSaveRemovesRootKey);
