@@ -56,10 +56,23 @@ class Util_API PropertyFileConfiguration: public MapConfiguration
 	/// A line of the form
 	///   !include <path>
 	/// (where <path> is a relative or absolute file path) includes another properties file.
+	/// The included file must exist; a missing file throws Poco::OpenFileException.
+	/// A line of the form
+	///   ?include <path>
+	/// is an OPTIONAL include: if the file does not exist the directive is
+	/// silently ignored (an existing but unreadable file still throws). This
+	/// enables overlay configurations - e.g. a production file ending in
+	///   ?include app.dev.properties
+	/// is unaffected where the overlay is absent, while a development
+	/// environment that ships the overlay has its values override the
+	/// preceding ones (the last assignment of a key wins).
 	/// Relative paths are resolved relative to the directory of the including file.
 	/// ${variable} references in include paths are expanded, either from
 	/// properties already loaded in the same file, or from an optional parent
 	/// configuration passed via the constructor.
+	/// Note: '?' is not a comment character - a line starting with '?' that is
+	/// not exactly '?include' followed by whitespace is parsed as an ordinary
+	/// property assignment, as before.
 	///
 	/// Property names are case sensitive. Leading and trailing whitespace is
 	/// removed from both keys and values. A property name can neither contain
@@ -186,12 +199,17 @@ protected:
 private:
 	void loadStream(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);
 	void parseLine(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack);
+	void processInclude(const std::string& includePath, bool optional, const std::string& basePath, std::set<std::string>& includeStack);
+		/// Resolves and loads one include directive's file (cycle-guarded).
+		/// optional = the ?include form: a missing file is silently skipped.
 	static void saveToFile(const std::string& path, const std::map<std::string, std::string>& values);
 	std::string resolveIncludePath(const std::string& rawPath, const std::string& basePath) const;
-	static std::string extractIncludePath(const std::string& line);
-		/// If line is an !include directive, returns the raw path; otherwise returns empty.
+	static std::string extractIncludePath(const std::string& line, bool* pOptional = nullptr);
+		/// If line is an !include or ?include directive, returns the raw path
+		/// (and sets *pOptional to true for the ?include form); otherwise
+		/// returns empty.
 	std::vector<std::string> scanIncludeFiles(const std::string& filePath) const;
-		/// Scans the given file for !include directives. Caller must hold the lock.
+		/// Scans the given file for !include / ?include directives. Caller must hold the lock.
 	static int readChar(std::istream& istr);
 	static std::string escapeValue(const std::string& value);
 
