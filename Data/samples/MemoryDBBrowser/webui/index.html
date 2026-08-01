@@ -19,7 +19,7 @@
     <button id="theme" class="icon-btn" title="toggle light/dark theme">🌙</button>
   </nav>
 
-  <section id="panel-structure" class="panel active">
+  <section id="panel-structure" class="panel active" role="tabpanel" aria-labelledby="tab-structure">
     <div class="toolbar">
       <div id="stats" class="stats"></div>
       <span class="spacer"></span>
@@ -54,7 +54,7 @@
     </div>
   </section>
 
-  <section id="panel-sql" class="panel">
+  <section id="panel-sql" class="panel" role="tabpanel" aria-labelledby="tab-sql">
     <div class="toolbar">
       <button class="btn btn-primary" id="run">Run</button>
       <span class="hint">Ctrl/&#8984;+Enter</span>
