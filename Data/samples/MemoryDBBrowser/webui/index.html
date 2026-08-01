@@ -11,8 +11,8 @@
 <div id="app">
   <nav id="tabs" role="tablist">
     <span class="app-title">MemoryDB</span>
-    <button class="tab active" data-panel="structure" role="tab">Structure</button>
-    <button class="tab" data-panel="sql" role="tab">SQL</button>
+    <button id="tab-structure" class="tab active" data-panel="structure" role="tab" aria-controls="panel-structure" aria-selected="true">Structure</button>
+    <button id="tab-sql" class="tab" data-panel="sql" role="tab" aria-controls="panel-sql" aria-selected="false">SQL</button>
     <span class="spacer"></span>
     <span id="mode" class="badge ro hidden" title="the SQL console only accepts SELECT">read-only</span>
     <span id="dir" class="dir" title="persistence directory"></span>
