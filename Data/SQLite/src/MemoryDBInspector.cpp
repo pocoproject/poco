@@ -514,8 +514,13 @@ void MemoryDBInspector::fillQueryResult(QueryResult& result, Statement& stmt, st
 					cell.isNull = false;
 					if (rs.columnType(c) == MetaColumn::FDT_BLOB)
 					{
+						// Sized via convert(), not extract<BLOB>(): extract matches the
+						// holder by RTTI, which -fvisibility=hidden builds do not keep
+						// unique across library boundaries (macOS), so it would throw
+						// for every blob there. The BLOB holder's convert() copies the
+						// raw bytes; their count is all this marker needs.
 						cell.text = "<blob, " +
-							Poco::NumberFormatter::format(v.extract<Poco::Data::BLOB>().size()) +
+							Poco::NumberFormatter::format(v.convert<std::string>().size()) +
 							" bytes>";
 					}
 					else cell.text = v.convert<std::string>();
