@@ -277,7 +277,8 @@
         parts.push(fmtInt(r.affected) + ' row' + (r.affected === 1 ? '' : 's') + ' affected');
       }
       parts.push(r.elapsedMs.toFixed(1) + ' ms');
-      if (r.dirty) parts.push('unflushed changes');
+      // Query responses do not include a `dirty` flag; the Status panel carries
+      // that signal, refreshed below after any write.
       $('query-status').textContent = parts.join(' · ');
       // A write changes the shard model and the schema, so keep Structure honest.
       if (!r.columns.length && !readOnly) refresh();
