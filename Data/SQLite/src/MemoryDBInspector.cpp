@@ -26,6 +26,7 @@
 #include "Poco/Stopwatch.h"
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <ostream>
 
 #include "SQLParser.h"
@@ -537,6 +538,12 @@ void MemoryDBInspector::fillQueryResult(QueryResult& result, Statement& stmt, st
 
 MemoryDBInspector::QueryResult MemoryDBInspector::query(const std::string& sql, std::size_t maxRows)
 {
+	// The statement's row limit is a Poco::UInt32 carrying maxRows + 1: clamp
+	// up front so an oversized request can neither wrap the + 1 nor truncate in
+	// the cast. The clamped value is also what the result reports as its cap.
+	constexpr std::size_t maxRowsCap = std::numeric_limits<Poco::UInt32>::max() - 1;
+	if (maxRows > maxRowsCap) maxRows = maxRowsCap;
+
 	QueryResult result;
 	result.maxRows = maxRows;
 
@@ -556,8 +563,12 @@ MemoryDBInspector::QueryResult MemoryDBInspector::query(const std::string& sql, 
 		stmt, limit(static_cast<Poco::UInt32>(maxRows + 1));
 
 		result.affected = stmt.execute();
-		sw.stop();
+		// Extraction is part of the measured work: with the row limit bound,
+		// rows materialize while the result set is walked, so stopping the
+		// timer before fillQueryResult would report a large SELECT as
+		// near-instantaneous.
 		fillQueryResult(result, stmt, maxRows);
+		sw.stop();
 		result.ok = true;
 	}
 	catch (const Poco::Exception& exc)
