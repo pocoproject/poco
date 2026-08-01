@@ -214,7 +214,7 @@
     }
   }
   delete ($$);
-} <table_vec> <table_element_vec> <update_vec> <expr_vec> <order_vec> <stmt_vec>
+} <table_vec> <table_element_vec> <update_vec> <expr_vec> <order_vec> <stmt_vec> <with_description_vec>
 %destructor {
   free($$->second);
   delete ($$);
