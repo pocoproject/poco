@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>MemoryDB Browser</title>
+<link rel="stylesheet" href="common.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div id="app">
+  <nav id="tabs" role="tablist">
+    <span class="app-title">MemoryDB</span>
+    <button class="tab active" data-panel="structure" role="tab">Structure</button>
+    <button class="tab" data-panel="sql" role="tab">SQL</button>
+    <span class="spacer"></span>
+    <span id="mode" class="badge ro hidden" title="the SQL console only accepts SELECT">read-only</span>
+    <span id="dir" class="dir" title="persistence directory"></span>
+    <button id="theme" class="icon-btn" title="toggle light/dark theme">🌙</button>
+  </nav>
+
+  <section id="panel-structure" class="panel active">
+    <div class="toolbar">
+      <div id="stats" class="stats"></div>
+      <span class="spacer"></span>
+      <label class="hint auto"><input type="checkbox" id="auto"> auto-refresh</label>
+      <button class="btn" data-action="refresh">Refresh</button>
+      <button class="btn" data-action="flush" title="persist unflushed changes now">Flush</button>
+      <button class="btn write-only" data-action="seal" title="seal the active shard and start a new one">Seal</button>
+      <button class="btn" data-action="attachAll" title="attach every sealed shard read-only">Attach all</button>
+      <button class="btn" data-action="detachAll">Detach all</button>
+    </div>
+    <div id="action-result" class="action-result"></div>
+    <div id="note" class="note"></div>
+
+    <div class="scroll">
+      <h2>Shards</h2>
+      <table class="grid" id="shards">
+        <thead><tr>
+          <th>id</th><th>state</th><th>file</th><th class="num">bytes</th>
+          <th>created</th><th>sealed</th><th>attached</th><th>actions</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+
+      <h2>Files on disk</h2>
+      <table class="grid" id="files">
+        <thead><tr><th>name</th><th class="num">bytes</th><th>modified</th></tr></thead>
+        <tbody></tbody>
+      </table>
+
+      <h2>Schema</h2>
+      <div id="schema"></div>
+    </div>
+  </section>
+
+  <section id="panel-sql" class="panel">
+    <div class="toolbar">
+      <button class="btn btn-primary" id="run">Run</button>
+      <span class="hint">Ctrl/&#8984;+Enter</span>
+      <span class="spacer"></span>
+      <span id="query-status" class="hint"></span>
+    </div>
+    <textarea id="sql" spellcheck="false"
+      placeholder="SELECT * FROM sqlite_master;"></textarea>
+    <div id="query-error" class="query-error"></div>
+    <div class="scroll result-scroll">
+      <table class="grid" id="result">
+        <thead><tr></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script src="common.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

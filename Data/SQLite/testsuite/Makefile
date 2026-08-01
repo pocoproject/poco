@@ -11,7 +11,7 @@ objects = SQLiteTestSuite Driver \
 
 ifndef POCO_DATA_NO_SQL_PARSER
 	target_includes = $(POCO_BASE)/Data/SQLParser $(POCO_BASE)/Data/SQLParser/src
-	objects += MemoryDBTest
+	objects += MemoryDBTest MemoryDBInspectorTest
 endif
 
 target         = testrunner

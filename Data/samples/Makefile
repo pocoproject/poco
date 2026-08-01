@@ -16,4 +16,5 @@ projects:
 	$(MAKE) -C DBLogger $(MAKECMDGOALS)
 ifndef POCO_DATA_NO_SQL_PARSER
 	$(MAKE) -C MemoryDB $(MAKECMDGOALS)
+	$(MAKE) -C MemoryDBBrowser $(MAKECMDGOALS)
 endif
