@@ -33,6 +33,7 @@
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
 	#include <ws2def.h>
+	#include <mstcpip.h> // TCP_KEEPIDLE, TCP_KEEPINTVL, TCP_KEEPCNT
 	#if !defined (POCO_NET_NO_UNIX_SOCKET)
 		#if POCO_HAVE_CPP17_COMPILER
 			#if __has_include(<afunix.h>)

@@ -283,8 +283,30 @@ public:
 	bool getNoDelay() const;
 		/// Returns the value of the TCP_NODELAY socket option.
 
-	void setKeepAlive(bool flag);
+	void setKeepAlive(bool flag, int idleSeconds = 0, int intervalSeconds = 0, int probeCount = 0);
 		/// Sets the value of the SO_KEEPALIVE socket option.
+		///
+		/// Optionally also tunes the per-socket probe timings, which otherwise
+		/// come from the system settings - typically a two hour idle time,
+		/// far too long to notice a connection whose path has broken without
+		/// a FIN or RST (a peer that lost power, a dropped tunnel or firewall
+		/// state). Each value is applied only when greater than zero, so any
+		/// of them can be left at the system default:
+		///
+		///   * idleSeconds     - quiet time before the first probe
+		///   * intervalSeconds - time between probes
+		///   * probeCount      - unanswered probes before the connection fails
+		///
+		/// A timing the build platform has no option for at all is skipped:
+		/// macOS before 10.9 has neither an interval nor a probe count.
+		///
+		/// Throws an IOException if the running system rejects a timing, which
+		/// a binary built against a current SDK can meet on an older kernel -
+		/// on Windows, anything before 10 1709 / Server 2016. Failing rather
+		/// than ignoring is deliberate: silently keeping the system default
+		/// would leave a caller that asked for a one minute idle time believing
+		/// it has one while the connection actually sits at the two hour
+		/// default. Catch it where best effort tuning is what is wanted.
 
 	bool getKeepAlive() const;
 		/// Returns the value of the SO_KEEPALIVE socket option.
@@ -703,11 +725,11 @@ inline bool Socket::getNoDelay() const
 }
 
 
-inline void Socket::setKeepAlive(bool flag)
+inline void Socket::setKeepAlive(bool flag, int idleSeconds, int intervalSeconds, int probeCount)
 {
 	POCO_CHECK_NEW_STATE_ON_MOVE;
 
-	_pImpl->setKeepAlive(flag);
+	_pImpl->setKeepAlive(flag, idleSeconds, intervalSeconds, probeCount);
 }
 
 

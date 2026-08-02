@@ -1136,10 +1136,31 @@ bool SocketImpl::getNoDelay()
 }
 
 
-void SocketImpl::setKeepAlive(bool flag)
+void SocketImpl::setKeepAlive(bool flag, int idleSeconds, int intervalSeconds, int probeCount)
 {
 	int value = flag ? 1 : 0;
 	setOption(SOL_SOCKET, SO_KEEPALIVE, value);
+	if (!flag) return;
+
+	// The option names differ across platforms: Linux, Android, the BSDs and
+	// Windows 10 1709 / Server 2016 and later spell the idle time TCP_KEEPIDLE,
+	// while macOS and iOS call it TCP_KEEPALIVE. The interval and probe count
+	// are spelled alike wherever they exist (macOS gained them in 10.9). Each
+	// is set only when asked for, so an unspecified timing keeps the system
+	// default, and one the platform lacks compiles out.
+#if defined(TCP_KEEPIDLE)
+	if (idleSeconds > 0) setOption(IPPROTO_TCP, TCP_KEEPIDLE, idleSeconds);
+#elif defined(TCP_KEEPALIVE)
+	if (idleSeconds > 0) setOption(IPPROTO_TCP, TCP_KEEPALIVE, idleSeconds);
+#endif
+
+#if defined(TCP_KEEPINTVL)
+	if (intervalSeconds > 0) setOption(IPPROTO_TCP, TCP_KEEPINTVL, intervalSeconds);
+#endif
+
+#if defined(TCP_KEEPCNT)
+	if (probeCount > 0) setOption(IPPROTO_TCP, TCP_KEEPCNT, probeCount);
+#endif
 }
 
 
