@@ -266,6 +266,16 @@ public:
 	std::vector<Poco::UInt32> archivedShardIds() const;
 		/// Returns the ids of sealed shards. Relevant when Options::loadArchivedShards is false.
 
+	std::vector<Poco::UInt32> attachedShardIds() const;
+		/// Returns the ids of the sealed shards currently attached read-only via
+		/// attachArchived(), in ascending order. Thread-safe.
+		///
+		/// Contrast archivedShardIds(), which reports every sealed shard whether or
+		/// not it is attached. The snapshot is stale the moment it returns: a
+		/// concurrent deleteShard() or the SQLITE_LIMIT_ATTACHED backstop in
+		/// enforceRetention() can force-detach a shard without going through the
+		/// reference count (see attachArchived).
+
 	std::string attachArchived(Poco::UInt32 shardId);
 		/// Attaches the given sealed shard read-only to the in-memory connection and returns the
 		/// schema alias under which it can be queried (e.g. "arc_7" -> "SELECT * FROM arc_7.t").
@@ -508,7 +518,7 @@ private:
 	// BEFORE taking _stateMutex - see comment at the top of doFlush).
 	mutable Poco::FastMutex    _stateMutex;
 	Poco::Mutex                _flushMutex;
-	Poco::Mutex                _attachMutex;
+	mutable Poco::Mutex        _attachMutex;
 	std::atomic<bool>          _flushing{false};
 };
 

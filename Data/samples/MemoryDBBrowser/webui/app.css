@@ -1,0 +1,160 @@
+/*
+ * Layout for the MemoryDB browser. Theme variables + base reset come from
+ * common.css (loaded first).
+ */
+#app { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+
+/* Tab bar */
+#tabs {
+  display: flex; align-items: center; gap: 4px;
+  padding: 0 14px; height: 44px; flex: 0 0 auto;
+  background: var(--bg-panel); border-bottom: 1px solid var(--border);
+}
+.app-title {
+  font-weight: 700; color: var(--text-strong); margin-right: 14px; font-size: 15px;
+}
+.tab {
+  font: inherit; font-size: 13px; padding: 7px 14px; cursor: pointer;
+  background: transparent; color: var(--text-muted);
+  border: none; border-bottom: 2px solid transparent;
+}
+.tab:hover { color: var(--text-default); }
+.tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); }
+.spacer { flex: 1; }
+.dir {
+  color: var(--text-faint); font-size: 11px; margin-right: 10px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  max-width: 40vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.icon-btn {
+  font-size: 16px; line-height: 1; padding: 4px 8px; cursor: pointer;
+  background: transparent; border: 1px solid transparent; border-radius: 5px;
+  color: var(--text-default);
+}
+.icon-btn:hover { border-color: var(--border); }
+
+/* Panels: only one visible at a time; each owns its own scrolling. */
+.panel { flex: 1; min-height: 0; display: none; flex-direction: column; }
+.panel.active { display: flex; }
+
+.toolbar {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding: 8px 14px; flex: 0 0 auto;
+  background: var(--bg-panel); border-bottom: 1px solid var(--border-soft);
+}
+.btn {
+  font: inherit; font-size: 12px; padding: 3px 12px; border-radius: 5px; cursor: pointer;
+  background: var(--bg-elev); color: var(--text-default); border: 1px solid var(--border);
+}
+.btn:hover { border-color: var(--accent-blue); }
+.btn-primary { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; border-color: var(--border); }
+.btn-mini { font-size: 10px; padding: 1px 7px; }
+.hint { color: var(--text-muted); font-size: 11px; }
+.auto { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+.auto input { accent-color: var(--accent-blue); }
+
+/* Stat tiles — label above value, the compact form the HubMonitor header uses. */
+.stats { display: flex; gap: 18px; flex-wrap: wrap; }
+.stat { display: flex; flex-direction: column; line-height: 1.25; }
+.stat .k {
+  color: var(--text-muted); font-size: 9px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.stat .v {
+  color: var(--text-strong); font-size: 13px; font-variant-numeric: tabular-nums;
+}
+.stat .v.dirty { color: var(--accent-amber); }
+.stat .v.clean { color: var(--accent-green); }
+
+.hidden { display: none !important; }
+
+/* Read-only SQL policy: the header badge and the caveat line under the toolbar.
+   Amber rather than red — it is the default way to run, not an error. */
+.badge.ro {
+  color: var(--accent-amber); border-color: var(--accent-amber);
+  margin-right: 10px; letter-spacing: .06em;
+}
+.note { padding: 0 14px; font-size: 11px; color: var(--accent-amber); }
+.note:not(:empty) { padding: 6px 14px; }
+
+.action-result { padding: 0 14px; font-size: 11px; min-height: 0; }
+.action-result:not(:empty) { padding: 6px 14px; }
+.action-result.ok  { color: var(--accent-green); }
+.action-result.err { color: var(--accent-red); }
+
+.scroll { flex: 1; min-height: 0; overflow: auto; padding: 0 14px 24px; }
+.scroll h2 {
+  margin: 18px 0 6px; font-size: 11px; font-weight: 600;
+  color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;
+}
+
+/* Tables */
+.grid {
+  width: 100%; border-collapse: collapse; font-size: 11px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+.grid th, .grid td {
+  padding: 4px 8px; border-bottom: 1px solid var(--border-soft);
+  text-align: left; white-space: nowrap;
+}
+.grid th {
+  color: var(--text-muted); font-weight: 500; font-size: 10px;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  position: sticky; top: 0; z-index: 1;
+  background: var(--bg-elev); border-bottom: 1px solid var(--border);
+}
+.grid th.num, .grid td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.grid tbody tr:hover td { background: var(--row-hover); }
+.grid td.muted { color: var(--text-muted); }
+.grid td.null { color: var(--text-faint); font-style: italic; }
+.grid .empty { color: var(--text-muted); font-style: italic; }
+
+.badge {
+  font-size: 9px; text-transform: uppercase; letter-spacing: .04em;
+  padding: 1px 5px; border-radius: 3px; border: 1px solid var(--border);
+}
+.badge.active { color: var(--accent-green); border-color: var(--accent-green); }
+.badge.sealed { color: var(--accent-blue); border-color: var(--accent-blue); }
+.badge.pk     { color: var(--accent-amber); border-color: var(--accent-amber); }
+.badge.on     { color: var(--accent-green); border-color: var(--accent-green); }
+
+/* Schema tree: one <details> per database, one per table inside it. */
+.db { margin: 8px 0 14px; }
+.db > summary, .tbl > summary {
+  cursor: pointer; padding: 4px 0; color: var(--text-strong);
+  font-size: 12px; user-select: none;
+}
+.db > summary:hover, .tbl > summary:hover { color: var(--accent-blue); }
+.db > summary .file, .tbl > summary .meta {
+  color: var(--text-muted); font-size: 10px; font-weight: 400; margin-left: 8px;
+}
+.tbl { margin: 0 0 4px 16px; }
+.tbl-body { margin-left: 16px; padding: 4px 0 10px; }
+/* The column list is a detail table, not a data grid: let the cells hug their
+   content instead of stretching the pk/not-null flags across the viewport. */
+.tbl-body .grid { width: auto; margin-top: 4px; }
+.tbl-body .grid td { border-bottom: none; padding: 2px 14px 2px 0; }
+.ddl {
+  margin: 6px 0 0; padding: 6px 8px; border-radius: 4px;
+  background: var(--code-bg); border: 1px solid var(--border-soft);
+  color: var(--text-muted); font-size: 10px; white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+
+/* SQL panel */
+#sql {
+  flex: 0 0 auto; height: 34%; min-height: 90px; resize: vertical;
+  margin: 0; padding: 10px 14px; border: none;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-deep); color: var(--text-default);
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  font-size: 12px; line-height: 1.5;
+}
+#sql:focus { outline: none; box-shadow: inset 0 0 0 1px var(--accent-blue); }
+.query-error { color: var(--accent-red); font-size: 11px; }
+.query-error:not(:empty) {
+  padding: 8px 14px; white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+.result-scroll { padding-top: 0; }

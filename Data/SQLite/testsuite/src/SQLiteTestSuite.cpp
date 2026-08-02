@@ -14,6 +14,7 @@
 #include "SQLiteThreadSafetyTest.h"
 #ifndef POCO_DATA_NO_SQL_PARSER
 #include "MemoryDBTest.h"
+#include "MemoryDBInspectorTest.h"
 #endif
 
 
@@ -26,6 +27,7 @@ CppUnit::Test* SQLiteTestSuite::suite()
 	pSuite->addTest(SQLiteThreadSafetyTest::suite());
 #ifndef POCO_DATA_NO_SQL_PARSER
 	pSuite->addTest(MemoryDBTest::suite());
+	pSuite->addTest(MemoryDBInspectorTest::suite());
 #endif
 
 	return pSuite;

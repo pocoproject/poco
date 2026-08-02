@@ -3030,20 +3030,41 @@ yydestruct (const char *yymsg,
         break;
 
     case YYSYMBOL_opt_with_clause: /* opt_with_clause  */
-#line 239 "bison_parser.y"
-            { delete (((*yyvaluep).with_description_vec)); }
+#line 210 "bison_parser.y"
+            {
+  if (((*yyvaluep).with_description_vec)) {
+    for (auto ptr : *(((*yyvaluep).with_description_vec))) {
+      delete ptr;
+    }
+  }
+  delete (((*yyvaluep).with_description_vec));
+}
 #line 3036 "bison_parser.cpp"
         break;
 
     case YYSYMBOL_with_clause: /* with_clause  */
-#line 239 "bison_parser.y"
-            { delete (((*yyvaluep).with_description_vec)); }
+#line 210 "bison_parser.y"
+            {
+  if (((*yyvaluep).with_description_vec)) {
+    for (auto ptr : *(((*yyvaluep).with_description_vec))) {
+      delete ptr;
+    }
+  }
+  delete (((*yyvaluep).with_description_vec));
+}
 #line 3042 "bison_parser.cpp"
         break;
 
     case YYSYMBOL_with_description_list: /* with_description_list  */
-#line 239 "bison_parser.y"
-            { delete (((*yyvaluep).with_description_vec)); }
+#line 210 "bison_parser.y"
+            {
+  if (((*yyvaluep).with_description_vec)) {
+    for (auto ptr : *(((*yyvaluep).with_description_vec))) {
+      delete ptr;
+    }
+  }
+  delete (((*yyvaluep).with_description_vec));
+}
 #line 3048 "bison_parser.cpp"
         break;
 

@@ -629,6 +629,17 @@ std::vector<Poco::UInt32> MemoryDB::archivedShardIds() const
 }
 
 
+std::vector<Poco::UInt32> MemoryDB::attachedShardIds() const
+{
+	Poco::Mutex::ScopedLock al(_attachMutex);
+	std::vector<Poco::UInt32> ids;
+	ids.reserve(_attached.size());
+	// _attached is a std::map keyed by shard id, so this is already ascending.
+	for (const auto& a: _attached) ids.push_back(a.first);
+	return ids;
+}
+
+
 std::vector<MemoryDB::ShardDescriptor> MemoryDB::shards() const
 {
 	Poco::FastMutex::ScopedLock l(_stateMutex);
