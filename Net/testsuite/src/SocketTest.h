@@ -39,6 +39,7 @@ public:
 	void testTimeout();
 	void testBufferSize();
 	void testOptions();
+	void testKeepAliveParams();
 
 #if defined(POCO_TEST_DEPRECATED)
 	void testSelect();

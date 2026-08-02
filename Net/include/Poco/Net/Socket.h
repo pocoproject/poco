@@ -283,8 +283,23 @@ public:
 	bool getNoDelay() const;
 		/// Returns the value of the TCP_NODELAY socket option.
 
-	void setKeepAlive(bool flag);
+	void setKeepAlive(bool flag, int idleSeconds = 0, int intervalSeconds = 0, int probeCount = 0);
 		/// Sets the value of the SO_KEEPALIVE socket option.
+		///
+		/// Optionally also tunes the per-socket probe timings, which otherwise
+		/// come from the system settings - typically a two hour idle time,
+		/// far too long to notice a connection whose path has broken without
+		/// a FIN or RST (a peer that lost power, a dropped tunnel or firewall
+		/// state). Each value is applied only when greater than zero, so any
+		/// of them can be left at the system default:
+		///
+		///   * idleSeconds     - quiet time before the first probe
+		///   * intervalSeconds - time between probes
+		///   * probeCount      - unanswered probes before the connection fails
+		///
+		/// A value the platform does not support is ignored rather than
+		/// reported: macOS before 10.9 has no probe count or interval, and
+		/// the per-socket options need Windows 10 1709 / Server 2016.
 
 	bool getKeepAlive() const;
 		/// Returns the value of the SO_KEEPALIVE socket option.
@@ -703,11 +718,11 @@ inline bool Socket::getNoDelay() const
 }
 
 
-inline void Socket::setKeepAlive(bool flag)
+inline void Socket::setKeepAlive(bool flag, int idleSeconds, int intervalSeconds, int probeCount)
 {
 	POCO_CHECK_NEW_STATE_ON_MOVE;
 
-	_pImpl->setKeepAlive(flag);
+	_pImpl->setKeepAlive(flag, idleSeconds, intervalSeconds, probeCount);
 }
 
 

@@ -440,8 +440,13 @@ public:
 	bool getNoDelay();
 		/// Returns the value of the TCP_NODELAY socket option.
 
-	void setKeepAlive(bool flag);
-		/// Sets the value of the SO_KEEPALIVE socket option.
+	void setKeepAlive(bool flag, int idleSeconds = 0, int intervalSeconds = 0, int probeCount = 0);
+		/// Sets the value of the SO_KEEPALIVE socket option, and optionally the
+		/// per-socket probe timings (idle time before the first probe, interval
+		/// between probes, and number of unanswered probes before the connection
+		/// fails). Each timing is applied only when greater than zero; the rest
+		/// keep the system defaults. Timings the platform does not support are
+		/// silently ignored. See Socket::setKeepAlive.
 
 	bool getKeepAlive();
 		/// Returns the value of the SO_KEEPALIVE socket option.

@@ -516,6 +516,69 @@ void SocketTest::testOptions()
 	assertTrue (!ss.getOOBInline());
 }
 
+
+void SocketTest::testKeepAliveParams()
+{
+	EchoServer echoServer;
+	StreamSocket ss;
+	ss.connect(SocketAddress("127.0.0.1", echoServer.port()));
+
+	// The idle time is TCP_KEEPIDLE everywhere except macOS and iOS, which
+	// spell it TCP_KEEPALIVE. Read it back through the same name it was set by.
+#if defined(TCP_KEEPIDLE)
+	const int idleOption = TCP_KEEPIDLE;
+#elif defined(TCP_KEEPALIVE)
+	const int idleOption = TCP_KEEPALIVE;
+#endif
+
+#if defined(TCP_KEEPIDLE) || defined(TCP_KEEPALIVE)
+	int sysIdle = 0;
+	ss.getOption(IPPROTO_TCP, idleOption, sysIdle);
+
+	// Enabling without timings must leave the system settings alone.
+	ss.setKeepAlive(true);
+	assertTrue (ss.getKeepAlive());
+	int idle = 0;
+	ss.getOption(IPPROTO_TCP, idleOption, idle);
+	assertTrue (idle == sysIdle);
+
+	// A short idle time so a peer that disappears without a FIN or RST is
+	// noticed in seconds instead of the two hours the system defaults to.
+	ss.setKeepAlive(true, 5, 1, 2);
+	assertTrue (ss.getKeepAlive());
+	ss.getOption(IPPROTO_TCP, idleOption, idle);
+	assertTrue (idle == 5);
+
+#if defined(TCP_KEEPINTVL)
+	int interval = 0;
+	ss.getOption(IPPROTO_TCP, TCP_KEEPINTVL, interval);
+	assertTrue (interval == 1);
+#endif
+
+#if defined(TCP_KEEPCNT)
+	int probes = 0;
+	ss.getOption(IPPROTO_TCP, TCP_KEEPCNT, probes);
+	assertTrue (probes == 2);
+#endif
+
+	// Zero means "keep what is there", so the short idle time must survive a
+	// call that only re-enables the option.
+	ss.setKeepAlive(true, 0, 0, 0);
+	ss.getOption(IPPROTO_TCP, idleOption, idle);
+	assertTrue (idle == 5);
+
+	// Timings are only meaningful while keepalive is on; turning it off must
+	// not fail, and turning it back on must still accept new timings.
+	ss.setKeepAlive(false);
+	assertTrue (!ss.getKeepAlive());
+	ss.setKeepAlive(true, 7);
+	ss.getOption(IPPROTO_TCP, idleOption, idle);
+	assertTrue (idle == 7);
+#endif
+
+	ss.close();
+}
+
 #if defined(POCO_TEST_DEPRECATED)
 
 void SocketTest::testSelect()
@@ -890,6 +953,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testTimeout);
 	CppUnit_addTest(pSuite, SocketTest, testBufferSize);
 	CppUnit_addTest(pSuite, SocketTest, testOptions);
+	CppUnit_addTest(pSuite, SocketTest, testKeepAliveParams);
 
 #if defined(POCO_TEST_DEPRECATED)
 	CppUnit_addTest(pSuite, SocketTest, testSelect);
