@@ -532,10 +532,15 @@ void SocketTest::testKeepAliveParams()
 #endif
 
 #if defined(TCP_KEEPIDLE) || defined(TCP_KEEPALIVE)
+	// Enable before reading the baseline: not every stack reports the keepalive
+	// timings on a socket whose SO_KEEPALIVE is still off.
+	ss.setKeepAlive(true);
+	assertTrue (ss.getKeepAlive());
+
 	int sysIdle = 0;
 	ss.getOption(IPPROTO_TCP, idleOption, sysIdle);
 
-	// Enabling without timings must leave the system settings alone.
+	// Asking again without timings must leave the system settings alone.
 	ss.setKeepAlive(true);
 	assertTrue (ss.getKeepAlive());
 	int idle = 0;
