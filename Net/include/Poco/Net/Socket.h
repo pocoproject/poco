@@ -297,9 +297,16 @@ public:
 		///   * intervalSeconds - time between probes
 		///   * probeCount      - unanswered probes before the connection fails
 		///
-		/// A value the platform does not support is ignored rather than
-		/// reported: macOS before 10.9 has no probe count or interval, and
-		/// the per-socket options need Windows 10 1709 / Server 2016.
+		/// A timing the build platform has no option for at all is skipped:
+		/// macOS before 10.9 has neither an interval nor a probe count.
+		///
+		/// Throws an IOException if the running system rejects a timing, which
+		/// a binary built against a current SDK can meet on an older kernel -
+		/// on Windows, anything before 10 1709 / Server 2016. Failing rather
+		/// than ignoring is deliberate: silently keeping the system default
+		/// would leave a caller that asked for a one minute idle time believing
+		/// it has one while the connection actually sits at the two hour
+		/// default. Catch it where best effort tuning is what is wanted.
 
 	bool getKeepAlive() const;
 		/// Returns the value of the SO_KEEPALIVE socket option.

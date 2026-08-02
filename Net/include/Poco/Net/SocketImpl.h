@@ -445,8 +445,9 @@ public:
 		/// per-socket probe timings (idle time before the first probe, interval
 		/// between probes, and number of unanswered probes before the connection
 		/// fails). Each timing is applied only when greater than zero; the rest
-		/// keep the system defaults. Timings the platform does not support are
-		/// silently ignored. See Socket::setKeepAlive.
+		/// keep the system defaults. A timing this platform has no option for
+		/// is skipped; one the running system rejects throws an IOException.
+		/// See Socket::setKeepAlive.
 
 	bool getKeepAlive();
 		/// Returns the value of the SO_KEEPALIVE socket option.
