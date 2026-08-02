@@ -579,6 +579,12 @@ void SocketTest::testKeepAliveParams()
 	ss.setKeepAlive(true, 7);
 	ss.getOption(IPPROTO_TCP, idleOption, idle);
 	assertTrue (idle == 7);
+#else
+	// Nothing to read back on a platform without the per-socket knobs, but the
+	// timings must be skipped rather than refused: the call still succeeds and
+	// still enables the option.
+	ss.setKeepAlive(true, 5, 1, 2);
+	assertTrue (ss.getKeepAlive());
 #endif
 
 	ss.close();
