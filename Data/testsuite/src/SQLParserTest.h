@@ -30,6 +30,7 @@ public:
 	void testSQLParser();
 	void testInvalidSQL();
 	void testTopWithParentheses();
+	void testOffsetFetchNext();
 	void testResetClearsParameters();
 	void testNamedParameter();
 	void testAlterDropColumnIfExists();
