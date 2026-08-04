@@ -1089,6 +1089,7 @@ opt_null_ordering : /* empty */ { $$ = NullOrdering::Undefined; }
 // TODO: TOP and LIMIT can take more than just int literals.
 
 opt_top : TOP int_literal { $$ = new LimitDescription($2, nullptr); }
+| TOP '(' int_literal ')' { $$ = new LimitDescription($3, nullptr); }
 | /* empty */ { $$ = nullptr; };
 
 opt_limit : LIMIT expr { $$ = new LimitDescription($2, nullptr); }
