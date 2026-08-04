@@ -50,6 +50,7 @@ static thread_local std::stringstream strbuf;
 
 
 %s COMMENT
+%x afterarray
 
 /***************************
  ** Section 3: Rules
@@ -68,7 +69,7 @@ ALL         TOKEN(ALL)
 ALTER       TOKEN(ALTER)
 ANALYZE     TOKEN(ANALYZE)
 AND         TOKEN(AND)
-ARRAY       TOKEN(ARRAY)
+ARRAY       { BEGIN(afterarray); return SQL_ARRAY; }
 AS          TOKEN(AS)
 ASC         TOKEN(ASC)
 BEFORE      TOKEN(BEFORE)
@@ -285,11 +286,30 @@ CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
   return SQL_IDENTIFIER;
 }
 
+<afterarray>[ \t\n]+ ; /* stay in afterarray across whitespace before the '[', e.g. "ARRAY [1,2,3]" */
+
+<afterarray>\[ {
+  // The '[' immediately after ARRAY belongs to the array_expr grammar
+  // (ARRAY '[' expr_list ']'), not bracket-quoting - even for a single
+  // bare-identifier element like ARRAY[foo]. Let it fall through as plain
+  // punctuation instead of being swallowed by the bracket-identifier rule below.
+  BEGIN(INITIAL);
+  return yytext[0];
+}
+
+<afterarray>. {
+  // Whatever follows ARRAY wasn't '[' (a syntax error downstream either
+  // way) - drop back to normal lexing and reprocess this character there.
+  BEGIN(INITIAL);
+  yyless(0);
+}
+
 \[[A-Za-z_][A-Za-z0-9_ ]*\] {
   // T-SQL bracket-quoted identifier, e.g. [dbo] or [My Table]. Restricted to
   // content starting with a letter/underscore so it doesn't shadow the
-  // existing array_index ('[' int_literal ']') or ARRAY['[' expr_list ']']
-  // grammar, whose bracket contents start with a digit or contain commas.
+  // existing array_index ('[' int_literal ']') grammar, whose bracket
+  // contents start with a digit. The ARRAY[...] case (including a single
+  // bare-identifier element) is handled above via the afterarray state.
   yylval->sval = hsql::substr(yytext, 1, strlen(yytext)-1);
   return SQL_IDENTIFIER;
 }

@@ -33,6 +33,7 @@ public:
 	void testOffsetFetchNext();
 	void testBracketedIdentifiers();
 	void testThreePartTableName();
+	void testArrayLiteralNotShadowedByBracketIdentifier();
 	void testResetClearsParameters();
 	void testNamedParameter();
 	void testAlterDropColumnIfExists();
