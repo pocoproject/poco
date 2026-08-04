@@ -1409,6 +1409,16 @@ table_name : IDENTIFIER {
 | IDENTIFIER '.' IDENTIFIER {
   $$.schema = $1;
   $$.name = $3;
+}
+| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER {
+  // Three-part (database.schema.table) name. TableName has no separate
+  // database slot, so fold database+schema into schema as "database.schema" -
+  // callers here only need the statement to parse, not the individual parts.
+  std::string combined(std::string($1) + "." + $3);
+  free($1);
+  free($3);
+  $$.schema = strdup(combined.c_str());
+  $$.name = $5;
 };
 
 opt_index_name : IDENTIFIER { $$ = $1; }

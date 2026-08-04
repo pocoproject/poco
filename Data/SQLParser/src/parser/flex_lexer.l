@@ -285,6 +285,15 @@ CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
   return SQL_IDENTIFIER;
 }
 
+\[[A-Za-z_][A-Za-z0-9_ ]*\] {
+  // T-SQL bracket-quoted identifier, e.g. [dbo] or [My Table]. Restricted to
+  // content starting with a letter/underscore so it doesn't shadow the
+  // existing array_index ('[' int_literal ']') or ARRAY['[' expr_list ']']
+  // grammar, whose bracket contents start with a digit or contain commas.
+  yylval->sval = hsql::substr(yytext, 1, strlen(yytext)-1);
+  return SQL_IDENTIFIER;
+}
+
 [A-Za-z][A-Za-z0-9_]* {
   yylval->sval = strdup(yytext);
   return SQL_IDENTIFIER;
