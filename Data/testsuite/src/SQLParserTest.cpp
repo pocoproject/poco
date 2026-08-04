@@ -108,6 +108,17 @@ void SQLParserTest::testInvalidSQL()
 }
 
 
+void SQLParserTest::testTopWithParentheses()
+{
+	std::string query = "SELECT TOP (10) * FROM Test;";
+	SQLParserResult result;
+	SQLParser::parse(query, &result);
+	assertTrue(result.isValid());
+	assertEqual(1, result.size());
+	assertTrue(result.getStatement(0)->type() == kStmtSelect);
+}
+
+
 void SQLParserTest::testResetClearsParameters()
 {
 	// Reuses the testSQLParser query (8 statements, 2 '?' parameters) and
@@ -273,6 +284,7 @@ CppUnit::Test* SQLParserTest::suite()
 
 	CppUnit_addTest(pSuite, SQLParserTest, testSQLParser);
 	CppUnit_addTest(pSuite, SQLParserTest, testInvalidSQL);
+	CppUnit_addTest(pSuite, SQLParserTest, testTopWithParentheses);
 	CppUnit_addTest(pSuite, SQLParserTest, testResetClearsParameters);
 	CppUnit_addTest(pSuite, SQLParserTest, testNamedParameter);
 	CppUnit_addTest(pSuite, SQLParserTest, testAlterDropColumnIfExists);

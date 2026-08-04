@@ -29,6 +29,7 @@ public:
 
 	void testSQLParser();
 	void testInvalidSQL();
+	void testTopWithParentheses();
 	void testResetClearsParameters();
 	void testNamedParameter();
 	void testAlterDropColumnIfExists();
