@@ -269,6 +269,7 @@
 %token TRANSACTION BEGIN COMMIT ROLLBACK
 %token NOWAIT SKIP LOCKED SHARE
 %token RANGE ROWS GROUPS UNBOUNDED FOLLOWING PRECEDING CURRENT_ROW
+%token FETCH NEXT ONLY
 %token UNIQUE PRIMARY FOREIGN KEY REFERENCES
 
 /*********************************
@@ -1097,6 +1098,7 @@ opt_limit : LIMIT expr { $$ = new LimitDescription($2, nullptr); }
 | LIMIT expr OFFSET expr { $$ = new LimitDescription($2, $4); }
 | LIMIT ALL { $$ = new LimitDescription(nullptr, nullptr); }
 | LIMIT ALL OFFSET expr { $$ = new LimitDescription(nullptr, $4); }
+| OFFSET expr ROWS FETCH NEXT expr ROWS ONLY { $$ = new LimitDescription($6, $2); }
 | /* empty */ { $$ = nullptr; };
 
 /******************************

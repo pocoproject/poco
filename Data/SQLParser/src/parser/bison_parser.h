@@ -255,19 +255,22 @@ extern int hsql_debug;
     SQL_FOLLOWING = 423,           /* FOLLOWING  */
     SQL_PRECEDING = 424,           /* PRECEDING  */
     SQL_CURRENT_ROW = 425,         /* CURRENT_ROW  */
-    SQL_UNIQUE = 426,              /* UNIQUE  */
-    SQL_PRIMARY = 427,             /* PRIMARY  */
-    SQL_FOREIGN = 428,             /* FOREIGN  */
-    SQL_KEY = 429,                 /* KEY  */
-    SQL_REFERENCES = 430,          /* REFERENCES  */
-    SQL_EQUALS = 431,              /* EQUALS  */
-    SQL_NOTEQUALS = 432,           /* NOTEQUALS  */
-    SQL_LESS = 433,                /* LESS  */
-    SQL_GREATER = 434,             /* GREATER  */
-    SQL_LESSEQ = 435,              /* LESSEQ  */
-    SQL_GREATEREQ = 436,           /* GREATEREQ  */
-    SQL_NOTNULL = 437,             /* NOTNULL  */
-    SQL_UMINUS = 438               /* UMINUS  */
+    SQL_FETCH = 426,               /* FETCH  */
+    SQL_NEXT = 427,                /* NEXT  */
+    SQL_ONLY = 428,                /* ONLY  */
+    SQL_UNIQUE = 429,              /* UNIQUE  */
+    SQL_PRIMARY = 430,             /* PRIMARY  */
+    SQL_FOREIGN = 431,             /* FOREIGN  */
+    SQL_KEY = 432,                 /* KEY  */
+    SQL_REFERENCES = 433,          /* REFERENCES  */
+    SQL_EQUALS = 434,              /* EQUALS  */
+    SQL_NOTEQUALS = 435,           /* NOTEQUALS  */
+    SQL_LESS = 436,                /* LESS  */
+    SQL_GREATER = 437,             /* GREATER  */
+    SQL_LESSEQ = 438,              /* LESSEQ  */
+    SQL_GREATEREQ = 439,           /* GREATEREQ  */
+    SQL_NOTNULL = 440,             /* NOTNULL  */
+    SQL_UMINUS = 441               /* UMINUS  */
   };
   typedef enum hsql_tokentype hsql_token_kind_t;
 #endif
@@ -351,7 +354,7 @@ union HSQL_STYPE
 
   // clang-format off
 
-#line 355 "bison_parser.h"
+#line 358 "bison_parser.h"
 
 };
 typedef union HSQL_STYPE HSQL_STYPE;
