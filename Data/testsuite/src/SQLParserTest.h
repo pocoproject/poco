@@ -31,6 +31,8 @@ public:
 	void testInvalidSQL();
 	void testTopWithParentheses();
 	void testOffsetFetchNext();
+	void testBracketedIdentifiers();
+	void testThreePartTableName();
 	void testResetClearsParameters();
 	void testNamedParameter();
 	void testAlterDropColumnIfExists();

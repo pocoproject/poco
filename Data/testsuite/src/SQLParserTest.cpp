@@ -130,6 +130,28 @@ void SQLParserTest::testOffsetFetchNext()
 }
 
 
+void SQLParserTest::testBracketedIdentifiers()
+{
+	std::string query = "SELECT * FROM [dbo].[Test];";
+	SQLParserResult result;
+	SQLParser::parse(query, &result);
+	assertTrue(result.isValid());
+	assertEqual(1, result.size());
+	assertTrue(result.getStatement(0)->type() == kStmtSelect);
+}
+
+
+void SQLParserTest::testThreePartTableName()
+{
+	std::string query = "SELECT * FROM mydb.dbo.Test;";
+	SQLParserResult result;
+	SQLParser::parse(query, &result);
+	assertTrue(result.isValid());
+	assertEqual(1, result.size());
+	assertTrue(result.getStatement(0)->type() == kStmtSelect);
+}
+
+
 void SQLParserTest::testResetClearsParameters()
 {
 	// Reuses the testSQLParser query (8 statements, 2 '?' parameters) and
@@ -297,6 +319,8 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testInvalidSQL);
 	CppUnit_addTest(pSuite, SQLParserTest, testTopWithParentheses);
 	CppUnit_addTest(pSuite, SQLParserTest, testOffsetFetchNext);
+	CppUnit_addTest(pSuite, SQLParserTest, testBracketedIdentifiers);
+	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testResetClearsParameters);
 	CppUnit_addTest(pSuite, SQLParserTest, testNamedParameter);
 	CppUnit_addTest(pSuite, SQLParserTest, testAlterDropColumnIfExists);
