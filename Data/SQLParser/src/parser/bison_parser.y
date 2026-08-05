@@ -269,6 +269,7 @@
 %token TRANSACTION BEGIN COMMIT ROLLBACK
 %token NOWAIT SKIP LOCKED SHARE
 %token RANGE ROWS GROUPS UNBOUNDED FOLLOWING PRECEDING CURRENT_ROW
+%token FETCH NEXT ONLY
 %token UNIQUE PRIMARY FOREIGN KEY REFERENCES
 
 /*********************************
@@ -1089,6 +1090,7 @@ opt_null_ordering : /* empty */ { $$ = NullOrdering::Undefined; }
 // TODO: TOP and LIMIT can take more than just int literals.
 
 opt_top : TOP int_literal { $$ = new LimitDescription($2, nullptr); }
+| TOP '(' int_literal ')' { $$ = new LimitDescription($3, nullptr); }
 | /* empty */ { $$ = nullptr; };
 
 opt_limit : LIMIT expr { $$ = new LimitDescription($2, nullptr); }
@@ -1096,6 +1098,7 @@ opt_limit : LIMIT expr { $$ = new LimitDescription($2, nullptr); }
 | LIMIT expr OFFSET expr { $$ = new LimitDescription($2, $4); }
 | LIMIT ALL { $$ = new LimitDescription(nullptr, nullptr); }
 | LIMIT ALL OFFSET expr { $$ = new LimitDescription(nullptr, $4); }
+| OFFSET expr ROWS FETCH NEXT expr ROWS ONLY { $$ = new LimitDescription($6, $2); }
 | /* empty */ { $$ = nullptr; };
 
 /******************************
@@ -1256,7 +1259,14 @@ duration_field : datetime_field | datetime_field_plural;
 
 array_expr : ARRAY '[' expr_list ']' { $$ = Expr::makeArray($3); };
 
-array_index : operand '[' int_literal ']' { $$ = Expr::makeArrayIndex($1, $3->ival); };
+// makeArrayIndex takes the index by value, so the int_literal Expr is not
+// adopted by the result and has to be released here - bison only runs the
+// %destructor for symbols discarded during error recovery, not for ones a
+// successful reduction consumed.
+array_index : operand '[' int_literal ']' {
+  $$ = Expr::makeArrayIndex($1, $3->ival);
+  delete $3;
+};
 
 between_expr : operand BETWEEN operand AND operand { $$ = Expr::makeBetween($1, $3, $5); };
 
@@ -1406,6 +1416,16 @@ table_name : IDENTIFIER {
 | IDENTIFIER '.' IDENTIFIER {
   $$.schema = $1;
   $$.name = $3;
+}
+| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER {
+  // Three-part (database.schema.table) name. TableName has no separate
+  // database slot, so fold database+schema into schema as "database.schema" -
+  // callers here only need the statement to parse, not the individual parts.
+  std::string combined(std::string($1) + "." + $3);
+  free($1);
+  free($3);
+  $$.schema = strdup(combined.c_str());
+  $$.name = $5;
 };
 
 opt_index_name : IDENTIFIER { $$ = $1; }

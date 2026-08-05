@@ -2,9 +2,9 @@
 #define hsql_HEADER_H 1
 #define hsql_IN_HEADER 1
 
-#line 6 "flex_lexer.h"
+#line 5 "flex_lexer.h"
 
-#line 8 "flex_lexer.h"
+#line 7 "flex_lexer.h"
 
 #define  YY_INT_ALIGNED short int
 
@@ -459,6 +459,7 @@ void yyfree ( void * , yyscan_t yyscanner );
 #define INITIAL 0
 #define singlequotedstring 1
 #define COMMENT 2
+#define afterarray 3
 
 #endif
 
@@ -478,7 +479,7 @@ void yyfree ( void * , yyscan_t yyscanner );
 #include <unistd.h>
 #endif
 #endif
-
+    
 #ifndef YY_EXTRA_TYPE
 #define YY_EXTRA_TYPE void *
 #endif
@@ -739,7 +740,7 @@ extern int yylex \
 #undef yyTABLES_NAME
 #endif
 
-#line 298 "flex_lexer.l"
+#line 330 "flex_lexer.l"
 
 
 #line 737 "flex_lexer.h"

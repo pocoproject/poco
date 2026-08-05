@@ -29,6 +29,11 @@ public:
 
 	void testSQLParser();
 	void testInvalidSQL();
+	void testTopWithParentheses();
+	void testOffsetFetchNext();
+	void testBracketedIdentifiers();
+	void testThreePartTableName();
+	void testArrayLiteralNotShadowedByBracketIdentifier();
 	void testResetClearsParameters();
 	void testNamedParameter();
 	void testAlterDropColumnIfExists();

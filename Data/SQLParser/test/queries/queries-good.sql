@@ -126,3 +126,12 @@ SELECT * FROM t WHERE a = :user AND b = :id;
 SELECT * FROM t WHERE a = ? AND b = :id AND c = $3;
 INSERT INTO foo VALUES (?);
 EXECUTE statement_a(?);
+# T-SQL dialect (Poco fork extension)
+SELECT TOP (10) * FROM test;
+SELECT TOP (10) a, b FROM test ORDER BY a;
+SELECT * FROM test ORDER BY id OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;
+SELECT * FROM test ORDER BY id OFFSET 20 ROWS FETCH NEXT 5 ROWS ONLY;
+SELECT * FROM [test];
+SELECT [my col] FROM [some schema].[my table];
+SELECT * FROM mydb.some_schema.test;
+SELECT ARRAY[foo] FROM test;

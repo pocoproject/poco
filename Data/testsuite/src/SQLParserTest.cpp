@@ -108,6 +108,90 @@ void SQLParserTest::testInvalidSQL()
 }
 
 
+void SQLParserTest::testTopWithParentheses()
+{
+	std::string query = "SELECT TOP (10) * FROM Test;";
+	SQLParserResult result;
+	SQLParser::parse(query, &result);
+	assertTrue(result.isValid());
+	assertEqual(1, result.size());
+	assertTrue(result.getStatement(0)->type() == kStmtSelect);
+}
+
+
+void SQLParserTest::testOffsetFetchNext()
+{
+	std::string query = "SELECT * FROM Test ORDER BY Id OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;";
+	SQLParserResult result;
+	SQLParser::parse(query, &result);
+	assertTrue(result.isValid());
+	assertEqual(1, result.size());
+	assertTrue(result.getStatement(0)->type() == kStmtSelect);
+}
+
+
+void SQLParserTest::testBracketedIdentifiers()
+{
+	std::string query = "SELECT * FROM [dbo].[Test];";
+	SQLParserResult result;
+	SQLParser::parse(query, &result);
+	assertTrue(result.isValid());
+	assertEqual(1, result.size());
+	assertTrue(result.getStatement(0)->type() == kStmtSelect);
+}
+
+
+void SQLParserTest::testThreePartTableName()
+{
+	std::string query = "SELECT * FROM mydb.dbo.Test;";
+	SQLParserResult result;
+	SQLParser::parse(query, &result);
+	assertTrue(result.isValid());
+	assertEqual(1, result.size());
+	assertTrue(result.getStatement(0)->type() == kStmtSelect);
+}
+
+
+void SQLParserTest::testArrayLiteralNotShadowedByBracketIdentifier()
+{
+	// ARRAY[foo] - single bare-identifier element. Regression case: the
+	// bracket-quoted-identifier lexer rule (testBracketedIdentifiers) would
+	// otherwise swallow the whole "[foo]" as one SQL_IDENTIFIER token,
+	// leaving the parser without the '[' / ']' tokens array_expr needs.
+	{
+		std::string query = "SELECT ARRAY[foo] FROM Test;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+		assertTrue(result.getStatement(0)->type() == kStmtSelect);
+	}
+
+	// ARRAY[1,2,3] - multi-element array literal still parses (already
+	// safe against the bracket-identifier rule since content starts with a
+	// digit, but pinned here so the afterarray lexer state doesn't regress it).
+	{
+		std::string query = "SELECT ARRAY[1,2,3] FROM Test;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+		assertTrue(result.getStatement(0)->type() == kStmtSelect);
+	}
+
+	// operand[int_literal] array indexing still parses (unaffected, but
+	// pinned since it shares the '[' ']' tokens with the two cases above).
+	{
+		std::string query = "SELECT col[0] FROM Test;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+		assertTrue(result.getStatement(0)->type() == kStmtSelect);
+	}
+}
+
+
 void SQLParserTest::testResetClearsParameters()
 {
 	// Reuses the testSQLParser query (8 statements, 2 '?' parameters) and
@@ -273,6 +357,11 @@ CppUnit::Test* SQLParserTest::suite()
 
 	CppUnit_addTest(pSuite, SQLParserTest, testSQLParser);
 	CppUnit_addTest(pSuite, SQLParserTest, testInvalidSQL);
+	CppUnit_addTest(pSuite, SQLParserTest, testTopWithParentheses);
+	CppUnit_addTest(pSuite, SQLParserTest, testOffsetFetchNext);
+	CppUnit_addTest(pSuite, SQLParserTest, testBracketedIdentifiers);
+	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
+	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
 	CppUnit_addTest(pSuite, SQLParserTest, testResetClearsParameters);
 	CppUnit_addTest(pSuite, SQLParserTest, testNamedParameter);
 	CppUnit_addTest(pSuite, SQLParserTest, testAlterDropColumnIfExists);
