@@ -742,6 +742,102 @@ TEST(SetLimitOffset) {
   ASSERT_EQ(stmt->limit->offset->type, kExprSelect);
 }
 
+// T-SQL dialect support (Poco fork extension).
+
+TEST(SelectTopParenthesesTest) {
+  SelectStatement* stmt;
+
+  TEST_PARSE_SQL_QUERY(
+      "SELECT TOP (10) a FROM t1; \
+                    SELECT TOP 10 a FROM t1;",
+      result, 2);
+
+  // TOP (10) - parenthesized form must yield the same LimitDescription as the
+  // bare form below; the parentheses are syntax only, not a nested expression.
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->limit);
+  ASSERT_EQ(stmt->limit->limit->type, kExprLiteralInt);
+  ASSERT_EQ(stmt->limit->limit->ival, 10);
+  ASSERT_NULL(stmt->limit->offset);
+
+  stmt = (SelectStatement*)result.getStatement(1);
+  ASSERT_NOTNULL(stmt->limit);
+  ASSERT_EQ(stmt->limit->limit->type, kExprLiteralInt);
+  ASSERT_EQ(stmt->limit->limit->ival, 10);
+  ASSERT_NULL(stmt->limit->offset);
+}
+
+TEST(SelectOffsetFetchNextTest) {
+  SelectStatement* stmt;
+
+  TEST_PARSE_SQL_QUERY(
+      "SELECT a FROM t1 ORDER BY a OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY; \
+                    SELECT a FROM t1 ORDER BY a OFFSET 20 ROWS FETCH NEXT 5 ROWS ONLY;",
+      result, 2);
+
+  // The FETCH NEXT count is the limit and the OFFSET count is the offset -
+  // asymmetric values below so a swap of the two would fail here.
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->limit);
+  ASSERT_EQ(stmt->limit->limit->type, kExprLiteralInt);
+  ASSERT_EQ(stmt->limit->limit->ival, 10);
+  ASSERT_EQ(stmt->limit->offset->type, kExprLiteralInt);
+  ASSERT_EQ(stmt->limit->offset->ival, 0);
+
+  stmt = (SelectStatement*)result.getStatement(1);
+  ASSERT_NOTNULL(stmt->limit);
+  ASSERT_EQ(stmt->limit->limit->ival, 5);
+  ASSERT_EQ(stmt->limit->offset->ival, 20);
+}
+
+TEST(SelectBracketedIdentifierTest) {
+  TEST_PARSE_SINGLE_SQL("SELECT [my col] FROM [some schema].[my table];", kStmtSelect, SelectStatement, result, stmt);
+
+  // Brackets are stripped, and the contents (including embedded spaces) become
+  // an ordinary identifier - schema qualification still applies.
+  ASSERT(stmt->fromTable);
+  ASSERT_EQ(std::string(stmt->fromTable->schema), "some schema");
+  ASSERT_EQ(std::string(stmt->fromTable->name), "my table");
+  ASSERT_EQ(stmt->selectList->size(), 1);
+  ASSERT_EQ(std::string(stmt->selectList->at(0)->name), "my col");
+}
+
+TEST(SelectThreePartTableNameTest) {
+  TEST_PARSE_SINGLE_SQL("SELECT grade FROM mydb.some_schema.students;", kStmtSelect, SelectStatement, result, stmt);
+
+  // TableName has no separate database slot, so database and schema are folded
+  // into schema as "database.schema".
+  ASSERT(stmt->fromTable);
+  ASSERT_EQ(std::string(stmt->fromTable->schema), "mydb.some_schema");
+  ASSERT_EQ(std::string(stmt->fromTable->name), "students");
+}
+
+TEST(SelectArrayNotShadowedByBracketedIdentifierTest) {
+  SelectStatement* stmt;
+
+  TEST_PARSE_SQL_QUERY(
+      "SELECT ARRAY[foo] FROM t1; \
+                    SELECT ARRAY[1, 2, 3] FROM t1; \
+                    SELECT a[0] FROM t1;",
+      result, 3);
+
+  // ARRAY[foo] - a single bare-identifier element. The bracketed-identifier
+  // rule must not swallow "[foo]" here, which would leave array_expr without
+  // its '[' / ']' tokens.
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 1);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprArray);
+  ASSERT_EQ(stmt->selectList->at(0)->exprList->size(), 1);
+
+  stmt = (SelectStatement*)result.getStatement(1);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprArray);
+  ASSERT_EQ(stmt->selectList->at(0)->exprList->size(), 3);
+
+  // Array indexing shares the '[' ']' tokens and must stay intact.
+  stmt = (SelectStatement*)result.getStatement(2);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprArrayIndex);
+}
+
 TEST(Extract) {
   SelectStatement* stmt;
 
