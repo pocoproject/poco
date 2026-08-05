@@ -1259,7 +1259,14 @@ duration_field : datetime_field | datetime_field_plural;
 
 array_expr : ARRAY '[' expr_list ']' { $$ = Expr::makeArray($3); };
 
-array_index : operand '[' int_literal ']' { $$ = Expr::makeArrayIndex($1, $3->ival); };
+// makeArrayIndex takes the index by value, so the int_literal Expr is not
+// adopted by the result and has to be released here - bison only runs the
+// %destructor for symbols discarded during error recovery, not for ones a
+// successful reduction consumed.
+array_index : operand '[' int_literal ']' {
+  $$ = Expr::makeArrayIndex($1, $3->ival);
+  delete $3;
+};
 
 between_expr : operand BETWEEN operand AND operand { $$ = Expr::makeBetween($1, $3, $5); };
 
