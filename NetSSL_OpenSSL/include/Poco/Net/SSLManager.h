@@ -353,11 +353,6 @@ private:
 	static const std::string CFG_DH_PARAMS_FILE;
 	static const std::string CFG_ECDH_CURVE;
 
-#ifdef OPENSSL_FIPS
-	static const std::string CFG_FIPS_MODE;
-	static const bool        VAL_FIPS_MODE;
-#endif
-
 	friend class Poco::SingletonHolder<SSLManager>;
 	friend class Context;
 	friend class SecureSocketImpl;
@@ -381,8 +376,8 @@ inline CertificateHandlerFactoryMgr& SSLManager::certificateHandlerFactoryMgr()
 
 inline bool SSLManager::isFIPSEnabled()
 {
-#ifdef OPENSSL_FIPS
-	return FIPS_mode() ? true : false;
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	return EVP_default_properties_is_fips_enabled(NULL);
 #else
 	return false;
 #endif

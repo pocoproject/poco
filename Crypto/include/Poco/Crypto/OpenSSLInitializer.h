@@ -21,6 +21,7 @@
 #include "Poco/Crypto/Crypto.h"
 #include "Poco/AtomicCounter.h"
 #include <openssl/crypto.h>
+#include <openssl/evp.h>
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 #include <openssl/provider.h>
 #include <atomic>
@@ -73,18 +74,21 @@ private:
 //
 inline bool OpenSSLInitializer::isFIPSEnabled()
 {
-#ifdef OPENSSL_FIPS
-	return FIPS_mode() ? true : false;
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	return EVP_default_properties_is_fips_enabled(NULL);
 #else
 	return false;
 #endif
 }
 
 
-#ifdef OPENSSL_FIPS
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 inline void OpenSSLInitializer::enableFIPSMode(bool enabled)
 {
-	FIPS_mode_set(enabled);
+	OSSL_LIB_CTX* libctx = OSSL_LIB_CTX_get0_global_default();
+
+	if(libctx != NULL)
+		EVP_default_properties_enable_fips(libctx,enabled);
 }
 #else
 inline void OpenSSLInitializer::enableFIPSMode(bool /*enabled*/)
