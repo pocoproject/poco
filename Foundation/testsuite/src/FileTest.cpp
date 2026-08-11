@@ -18,6 +18,7 @@
 #include "Poco/Thread.h"
 #include "Poco/Environment.h"
 #include <fstream>
+#include <algorithm>
 #include <set>
 #include <atomic>
 #include <vector>
@@ -38,6 +39,24 @@ using Poco::Path;
 using Poco::Exception;
 using Poco::Timestamp;
 using Poco::Thread;
+
+
+#if defined(POCO_OS_FAMILY_UNIX)
+namespace {
+
+
+class FileImplTest: public Poco::FileImpl
+{
+public:
+	static bool isGroupMember(gid_t gid)
+	{
+		return isGroupMemberImpl(gid);
+	}
+};
+
+
+} // namespace
+#endif
 
 
 FileTest::FileTest(const std::string& name): CppUnit::TestCase(name)
@@ -275,6 +294,32 @@ void FileTest::testFileAttributes3()
 	assertTrue (!f.isFile());
 	assertTrue (!f.isDirectory());
 }
+
+
+#if defined(POCO_OS_FAMILY_UNIX)
+void FileTest::testGroupMembership()
+{
+	const int count = ::getgroups(0, nullptr);
+	assertTrue (count >= 0);
+
+	std::vector<gid_t> groups(count);
+	const int actualCount = ::getgroups(count, groups.data());
+	assertTrue (actualCount >= 0);
+
+	assertTrue (FileImplTest::isGroupMember(::getegid()));
+	for (int i = 0; i < actualCount; ++i)
+	{
+		assertTrue (FileImplTest::isGroupMember(groups[i]));
+	}
+
+	gid_t nonMember = 0;
+	while (nonMember == ::getegid() || std::find(groups.begin(), groups.begin() + actualCount, nonMember) != groups.begin() + actualCount)
+	{
+		++nonMember;
+	}
+	assertFalse (FileImplTest::isGroupMember(nonMember));
+}
+#endif
 
 
 void FileTest::testCompare()
@@ -1020,6 +1065,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathRelative);
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathPATHEXT);
 #if defined(POCO_OS_FAMILY_UNIX)
+	CppUnit_addTest(pSuite, FileTest, testGroupMembership);
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathThreadSafety);
 #endif
 

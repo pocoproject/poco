@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <utime.h>
 #include <cstring>
+#include <vector>
 
 #if (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
 #define STATFSFN ::statvfs
@@ -133,6 +134,25 @@ bool FileImpl::existsImpl() const
 }
 
 
+bool FileImpl::isGroupMemberImpl(gid_t gid)
+{
+	if (gid == ::getegid()) return true;
+
+	for (int attempt = 0; attempt < 2; ++attempt)
+	{
+		const int count = ::getgroups(0, nullptr);
+		if (count <= 0) return false;
+
+		std::vector<gid_t> groups(count);
+		const int actualCount = ::getgroups(count, groups.data());
+		if (actualCount >= 0)
+			return std::find(groups.begin(), groups.begin() + actualCount, gid) != groups.begin() + actualCount;
+		if (errno != EINVAL) return false;
+	}
+	return false;
+}
+
+
 bool FileImpl::canReadImpl() const
 {
 	poco_assert (!_path.empty());
@@ -142,7 +162,7 @@ bool FileImpl::canReadImpl() const
 	{
 		if (st.st_uid == ::geteuid())
 			return (st.st_mode & S_IRUSR) != 0;
-		else if (st.st_gid == ::getegid())
+		else if (isGroupMemberImpl(st.st_gid))
 			return (st.st_mode & S_IRGRP) != 0;
 		else
 			return (st.st_mode & S_IROTH) != 0 || ::geteuid() == 0;
@@ -164,7 +184,7 @@ bool FileImpl::canWriteImpl() const
 	{
 		if (st.st_uid == ::geteuid())
 			return (st.st_mode & S_IWUSR) != 0;
-		else if (st.st_gid == ::getegid())
+		else if (isGroupMemberImpl(st.st_gid))
 			return (st.st_mode & S_IWGRP) != 0;
 		else
 			return (st.st_mode & S_IWOTH) != 0 || ::geteuid() == 0;
@@ -189,7 +209,7 @@ bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 		return (st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0;
 	else if (st.st_uid == ::geteuid())
 		return (st.st_mode & S_IXUSR) != 0;
-	else if (st.st_gid == ::getegid())
+	else if (isGroupMemberImpl(st.st_gid))
 		return (st.st_mode & S_IXGRP) != 0;
 	else
 		return (st.st_mode & S_IXOTH) != 0;

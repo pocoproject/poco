@@ -20,6 +20,7 @@
 
 #include "Poco/Foundation.h"
 #include "Poco/Timestamp.h"
+#include <sys/types.h>
 
 
 namespace Poco {
@@ -46,6 +47,7 @@ protected:
 	[[nodiscard]] bool canReadImpl() const;
 	[[nodiscard]] bool canWriteImpl() const;
 	[[nodiscard]] bool canExecuteImpl(const std::string& absolutePath) const;
+	[[nodiscard]] static bool Foundation_API isGroupMemberImpl(gid_t gid);
 	[[nodiscard]] bool isFileImpl() const;
 	[[nodiscard]] bool isDirectoryImpl() const;
 	[[nodiscard]] bool isLinkImpl() const;
