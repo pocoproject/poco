@@ -1373,4 +1373,38 @@ TEST(FunctionSchema) {
   ASSERT_STREQ(stmt->selectList->at(0)->exprList->at(0)->name, "[1, 2, 3]");
 }
 
+TEST(SelectScientificNotationTest) {
+  SelectStatement* stmt;
+
+  TEST_PARSE_SQL_QUERY(
+      "SELECT 1.5e3 FROM t;"
+      "SELECT 1.5E+3 FROM t;"
+      "SELECT 5e-1 FROM t;"
+      "SELECT .5e1 FROM t;"
+      "SELECT 2e10 FROM t;",
+      result, 5);
+
+  // One float literal per statement, no alias. Without an exponent rule in the
+  // lexer the mantissa is scanned as a number and the exponent as an
+  // identifier, so "SELECT 1.5e3" parses as "SELECT 1.5 AS e3" - a valid parse
+  // of a different statement rather than an error.
+  const double expected[] = {1500.0, 1500.0, 0.5, 5.0, 2e10};
+  for (size_t i = 0; i < 5; ++i) {
+    stmt = (SelectStatement*)result.getStatement(i);
+    ASSERT_NOTNULL(stmt->selectList);
+    ASSERT_EQ(stmt->selectList->size(), 1);
+    ASSERT_EQ(stmt->selectList->at(0)->type, kExprLiteralFloat);
+    ASSERT_EQ(stmt->selectList->at(0)->fval, expected[i]);
+    ASSERT_NULL(stmt->selectList->at(0)->alias);
+  }
+
+  // Outside a select list there is no alias to absorb the exponent, so the
+  // same literal used to be a hard syntax error.
+  TEST_PARSE_SQL_QUERY("SELECT a FROM t WHERE x = 0.5e-2;", whereResult, 1);
+  stmt = (SelectStatement*)whereResult.getStatement(0);
+  ASSERT_NOTNULL(stmt->whereClause);
+  ASSERT_EQ(stmt->whereClause->expr2->type, kExprLiteralFloat);
+  ASSERT_EQ(stmt->whereClause->expr2->fval, 0.005);
+}
+
 }  // namespace hsql

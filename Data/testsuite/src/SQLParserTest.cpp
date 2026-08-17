@@ -21,6 +21,7 @@
 #include "sql/AlterStatement.h"
 #include "sql/DropStatement.h"
 #include "sql/DeleteStatement.h"
+#include "sql/SelectStatement.h"
 
 
 namespace Poco::Data {
@@ -188,6 +189,57 @@ void SQLParserTest::testArrayLiteralNotShadowedByBracketIdentifier()
 		assertTrue(result.isValid());
 		assertEqual(1, result.size());
 		assertTrue(result.getStatement(0)->type() == kStmtSelect);
+	}
+}
+
+
+void SQLParserTest::testScientificNotationLiteral()
+{
+	// In a select list a missing exponent rule does not fail the parse: the
+	// mantissa is scanned as a number and the exponent as an identifier, so
+	// "SELECT 1.5e3" used to parse as "SELECT 1.5 AS e3" - one literal with an
+	// alias. Pin both the literal type and the absence of an alias.
+	{
+		std::string query = "SELECT 1.5e3 FROM Test;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+		assertTrue(result.getStatement(0)->type() == kStmtSelect);
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertEqual(1, pSelect->selectList->size());
+		assertTrue(pSelect->selectList->at(0)->type == kExprLiteralFloat);
+		assertEqualDelta(1500.0, pSelect->selectList->at(0)->fval, 0.0);
+		assertNull(pSelect->selectList->at(0)->alias);
+	}
+
+	// Outside a select list there is no alias to absorb the exponent, so the
+	// same literal was a syntax error.
+	{
+		std::string query = "SELECT * FROM Test WHERE Value = 0.5e-2;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+		assertTrue(result.getStatement(0)->type() == kStmtSelect);
+	}
+
+	// Signed and leading-dot exponents, and an exponent without a fraction.
+	{
+		std::string query = "SELECT 1.5E+3, 5e-1, .5e1, 2e10 FROM Test;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertEqual(4, pSelect->selectList->size());
+		for (const auto* pExpr: *pSelect->selectList)
+		{
+			assertTrue(pExpr->type == kExprLiteralFloat);
+			assertNull(pExpr->alias);
+		}
 	}
 }
 
@@ -362,6 +414,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testBracketedIdentifiers);
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
+	CppUnit_addTest(pSuite, SQLParserTest, testScientificNotationLiteral);
 	CppUnit_addTest(pSuite, SQLParserTest, testResetClearsParameters);
 	CppUnit_addTest(pSuite, SQLParserTest, testNamedParameter);
 	CppUnit_addTest(pSuite, SQLParserTest, testAlterDropColumnIfExists);

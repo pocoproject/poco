@@ -254,6 +254,19 @@ CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
 
 [-+*/(){},.;<>=^%:?[\]|]    { return yytext[0]; }
 
+  /*
+   * Scientific notation, e.g. 1.5e3, 1.5E+3, .5e-3, 2e10. Has to come before the
+   * plain float and integer rules: without it the mantissa is scanned as a number
+   * and the exponent as a separate identifier, so `SELECT 1.5e3 FROM t` silently
+   * parses as `SELECT 1.5 AS e3` instead of failing.
+   */
+[0-9]+"."[0-9]*[eE][-+]?[0-9]+ |
+"."[0-9]+[eE][-+]?[0-9]+ |
+[0-9]+[eE][-+]?[0-9]+ {
+  yylval->fval = atof(yytext);
+  return SQL_FLOATVAL;
+}
+
 [0-9]+"."[0-9]* |
 "."[0-9]*  {
   yylval->fval = atof(yytext);

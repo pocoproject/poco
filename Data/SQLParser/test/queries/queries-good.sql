@@ -135,3 +135,7 @@ SELECT * FROM [test];
 SELECT [my col] FROM [some schema].[my table];
 SELECT * FROM mydb.some_schema.test;
 SELECT ARRAY[foo] FROM test;
+# Scientific notation numeric literals
+SELECT 1.5e3 FROM test;
+SELECT 1.5E+3, 5e-1, .5e1, 2e10 FROM test;
+SELECT * FROM test WHERE a = 0.5e-2;
