@@ -177,6 +177,14 @@ jobs:
     env:
       TSAN_OPTIONS: ${{ matrix.name == 'tsan' && format('suppressions={0}/tsan.suppress,second_deadlock_stack=1', github.workspace) || '' }}
       ASAN_OPTIONS: ${{ matrix.name == 'hidden-asan' && 'detect_odr_violation=2' || '' }}
+    services:
+      mongodb:
+        image: mongo:8
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ping:1})'"
+          --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v5
       - run: sysctl vm.legacy_va_layout
@@ -186,7 +194,6 @@ jobs:
       - run: >-
           sudo apt -y update && sudo apt -y install libssl-dev libssh-dev libltdl-dev apache2-dev libapr1-dev libaprutil1-dev libavahi-client-dev
           libsqlite3-dev redis-server
-      - uses: supercharge/mongodb-github-action@1.12.1
       - run: >-
           cmake -S. -Bcmake-build -GNinja
           ${{ matrix.visibility == 'hidden' && '-DCMAKE_CXX_VISIBILITY_PRESET=hidden' || '' }}
@@ -959,9 +966,16 @@ jobs:
     env:
       POCO_BASE: ${{ github.workspace }}
       LD_LIBRARY_PATH: ${{ github.workspace }}/cmake-build/lib
+    services:
+      mongodb:
+        image: mongo:8
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ping:1})'"
+          --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@v5
-      - uses: supercharge/mongodb-github-action@1.12.1
       - uses: actions/download-artifact@v8
         with:
           name: data-build-artifacts
