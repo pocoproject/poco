@@ -135,6 +135,9 @@ SELECT * FROM [test];
 SELECT [my col] FROM [some schema].[my table];
 SELECT * FROM mydb.some_schema.test;
 SELECT ARRAY[foo] FROM test;
+# String literal used as an alias
+SELECT a AS 'Coil Id', b AS 'X' FROM test;
+SELECT * FROM test AS 'my table';
 # Non-reserved keywords used as names
 SELECT * FROM test WHERE created >= DATEADD(MINUTE, -10, GETDATE());
 SELECT DATEDIFF(SECOND, a, b), DATEADD(year, -1, GETDATE()) FROM test;

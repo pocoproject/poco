@@ -1420,6 +1420,25 @@ TEST(SelectNonReservedKeywordTest) {
   ASSERT_EQ(((SelectStatement*)keptResult.getStatement(2))->selectList->at(0)->type, kExprCast);
 }
 
+TEST(SelectStringAliasTest) {
+  SelectStatement* stmt;
+
+  TEST_PARSE_SQL_QUERY("SELECT a AS 'Coil Id', b AS 'X' FROM t;", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_STREQ(stmt->selectList->at(0)->alias, "Coil Id");
+  ASSERT_STREQ(stmt->selectList->at(1)->alias, "X");
+
+  // Only the AS form is accepted, so a bare string in the select list is still
+  // a string literal and not an alias for the expression before it.
+  TEST_PARSE_SQL_QUERY("SELECT 'literal', a AS b FROM t;", literalResult, 1);
+  stmt = (SelectStatement*)literalResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprLiteralString);
+  ASSERT_NULL(stmt->selectList->at(0)->alias);
+  ASSERT_STREQ(stmt->selectList->at(1)->alias, "b");
+}
+
 TEST(SelectScientificNotationTest) {
   SelectStatement* stmt;
 

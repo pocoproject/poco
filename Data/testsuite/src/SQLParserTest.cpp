@@ -238,6 +238,39 @@ void SQLParserTest::testNonReservedKeywords()
 }
 
 
+void SQLParserTest::testStringAlias()
+{
+	// T-SQL accepts a string literal as an alias, e.g. SELECT A AS 'My Col'.
+	{
+		std::string query = "SELECT A AS 'Coil Id', B AS 'X' FROM Test;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertEqual(2, pSelect->selectList->size());
+		assertEqual("Coil Id", std::string(pSelect->selectList->at(0)->alias));
+		assertEqual("X", std::string(pSelect->selectList->at(1)->alias));
+	}
+
+	// Only the AS form is accepted, so a bare string in the select list is
+	// still a string literal, not an alias for the expression before it.
+	{
+		std::string query = "SELECT 'literal', A AS B FROM Test;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertEqual(2, pSelect->selectList->size());
+		assertTrue(pSelect->selectList->at(0)->type == kExprLiteralString);
+		assertNull(pSelect->selectList->at(0)->alias);
+	}
+}
+
+
 void SQLParserTest::testScientificNotationLiteral()
 {
 	// In a select list a missing exponent rule does not fail the parse: the
@@ -460,6 +493,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
 	CppUnit_addTest(pSuite, SQLParserTest, testNonReservedKeywords);
+	CppUnit_addTest(pSuite, SQLParserTest, testStringAlias);
 	CppUnit_addTest(pSuite, SQLParserTest, testScientificNotationLiteral);
 	CppUnit_addTest(pSuite, SQLParserTest, testResetClearsParameters);
 	CppUnit_addTest(pSuite, SQLParserTest, testNamedParameter);

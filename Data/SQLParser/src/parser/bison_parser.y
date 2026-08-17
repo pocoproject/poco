@@ -1468,6 +1468,10 @@ table_alias : alias | AS IDENTIFIER '(' ident_commalist ')' { $$ = new Alias($2,
 opt_table_alias : table_alias | /* empty */ { $$ = nullptr; };
 
 alias : AS IDENTIFIER { $$ = new Alias($2); }
+// T-SQL also accepts a string literal as the alias, e.g. SELECT a AS 'My Col'.
+// Only the AS form is accepted: without AS the string is indistinguishable from
+// a string literal in the select list.
+| AS STRING { $$ = new Alias($2); }
 | IDENTIFIER { $$ = new Alias($1); };
 
 opt_alias : alias | /* empty */ { $$ = nullptr; };
