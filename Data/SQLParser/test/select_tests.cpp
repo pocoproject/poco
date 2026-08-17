@@ -1373,6 +1373,53 @@ TEST(FunctionSchema) {
   ASSERT_STREQ(stmt->selectList->at(0)->exprList->at(0)->name, "[1, 2, 3]");
 }
 
+TEST(SelectNonReservedKeywordTest) {
+  SelectStatement* stmt;
+
+  // Date part keywords as function arguments. The abbreviated spellings (mi,
+  // hh, ...) lex as identifiers and have always parsed, so before this the
+  // behaviour depended on how the date part was spelled.
+  TEST_PARSE_SQL_QUERY("SELECT DATEADD(MINUTE, -10, GETDATE()) FROM t;", dateAddResult, 1);
+  stmt = (SelectStatement*)dateAddResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 1);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprFunctionRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "DATEADD");
+  ASSERT_EQ(stmt->selectList->at(0)->exprList->size(), 3);
+  ASSERT_EQ(stmt->selectList->at(0)->exprList->at(0)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->exprList->at(0)->name, "MINUTE");
+
+  // Keywords as function names.
+  TEST_PARSE_SQL_QUERY("SELECT ISNULL(a, 0), CHAR(10), FORMAT(x, '00') FROM t;", funcResult, 1);
+  stmt = (SelectStatement*)funcResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 3);
+  const char* expectedNames[] = {"ISNULL", "CHAR", "FORMAT"};
+  for (size_t i = 0; i < 3; ++i) {
+    ASSERT_EQ(stmt->selectList->at(i)->type, kExprFunctionRef);
+    ASSERT_STREQ(stmt->selectList->at(i)->name, expectedNames[i]);
+  }
+
+  // Keywords as column names.
+  TEST_PARSE_SQL_QUERY("SELECT YEAR, MONTH FROM t;", columnResult, 1);
+  stmt = (SelectStatement*)columnResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "YEAR");
+  ASSERT_EQ(stmt->selectList->at(1)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(1)->name, "MONTH");
+
+  // The keyword uses these tokens still have: EXTRACT's datetime_field, the
+  // ISNULL postfix operator, CAST's column_type and the INTERVAL qualifier.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT EXTRACT(MINUTE FROM d) FROM t;"
+      "SELECT a FROM t WHERE b ISNULL;"
+      "SELECT CAST(a AS INT) FROM t;"
+      "SELECT INTERVAL '1' MINUTE FROM t;",
+      keptResult, 4);
+  ASSERT_EQ(((SelectStatement*)keptResult.getStatement(0))->selectList->at(0)->type, kExprExtract);
+  ASSERT_EQ(((SelectStatement*)keptResult.getStatement(1))->whereClause->opType, kOpIsNull);
+  ASSERT_EQ(((SelectStatement*)keptResult.getStatement(2))->selectList->at(0)->type, kExprCast);
+}
+
 TEST(SelectScientificNotationTest) {
   SelectStatement* stmt;
 

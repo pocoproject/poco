@@ -135,6 +135,12 @@ SELECT * FROM [test];
 SELECT [my col] FROM [some schema].[my table];
 SELECT * FROM mydb.some_schema.test;
 SELECT ARRAY[foo] FROM test;
+# Non-reserved keywords used as names
+SELECT * FROM test WHERE created >= DATEADD(MINUTE, -10, GETDATE());
+SELECT DATEDIFF(SECOND, a, b), DATEADD(year, -1, GETDATE()) FROM test;
+SELECT ISNULL(a, 0), CHAR(10), FORMAT(a, '00') FROM test;
+SELECT CONVERT(INT, a), CONVERT(DATETIME, b) FROM test;
+SELECT YEAR, MONTH FROM test ORDER BY YEAR;
 # Scientific notation numeric literals
 SELECT 1.5e3 FROM test;
 SELECT 1.5E+3, 5e-1, .5e1, 2e10 FROM test;

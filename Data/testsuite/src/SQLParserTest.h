@@ -34,6 +34,7 @@ public:
 	void testBracketedIdentifiers();
 	void testThreePartTableName();
 	void testArrayLiteralNotShadowedByBracketIdentifier();
+	void testNonReservedKeywords();
 	void testScientificNotationLiteral();
 	void testResetClearsParameters();
 	void testNamedParameter();

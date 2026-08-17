@@ -292,7 +292,7 @@
 %type <show_stmt>              show_statement
 %type <table_name>             table_name
 %type <sval>                   opt_index_name
-%type <sval>                   file_path prepare_target_query
+%type <sval>                   file_path prepare_target_query nonreserved_keyword
 %type <frame_description>      opt_frame_clause
 %type <frame_bound>            frame_bound
 %type <frame_type>             frame_type
@@ -1208,7 +1208,11 @@ function_expr : IDENTIFIER '(' ')' opt_window { $$ = Expr::makeFunctionRef($1, n
 }
 | IDENTIFIER '.' IDENTIFIER '(' opt_distinct expr_list ')' opt_window {
   $$ = Expr::makeFunctionRef($3, $1, $6, $5, $8);
-};
+}
+// Dialect functions whose names collide with grammar keywords, e.g.
+// ISNULL(a, 0), CHAR(10), FORMAT(x, '00'). See nonreserved_keyword.
+| nonreserved_keyword '(' ')' opt_window { $$ = Expr::makeFunctionRef($1, new std::vector<Expr*>(), false, $4); }
+| nonreserved_keyword '(' opt_distinct expr_list ')' opt_window { $$ = Expr::makeFunctionRef($1, $4, $3, $6); };
 
 // Window function expressions, based on https://www.postgresql.org/docs/15/sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS
 // We do not support named windows, collations and exclusions (for simplicity) and filters (not part of the SQL standard).
@@ -1273,7 +1277,35 @@ between_expr : operand BETWEEN operand AND operand { $$ = Expr::makeBetween($1, 
 column_name : IDENTIFIER { $$ = Expr::makeColumnRef($1); }
 | IDENTIFIER '.' IDENTIFIER { $$ = Expr::makeColumnRef($1, $3); }
 | '*' { $$ = Expr::makeStar(); }
-| IDENTIFIER '.' '*' { $$ = Expr::makeStar($1); };
+| IDENTIFIER '.' '*' { $$ = Expr::makeStar($1); }
+| nonreserved_keyword { $$ = Expr::makeColumnRef($1); };
+
+// Keywords the grammar needs as tokens elsewhere, but which dialects also use
+// as plain names - column names, and date part arguments such as
+// DATEADD(MINUTE, -10, GETDATE()). The abbreviated spellings (mi, hh, ...) are
+// lexed as identifiers and have always worked, so without this the behaviour
+// depends on how the date part is spelled. The token's canonical spelling is
+// used as the name; the original casing is not preserved.
+nonreserved_keyword : SECOND { $$ = strdup("SECOND"); }
+| MINUTE { $$ = strdup("MINUTE"); }
+| HOUR { $$ = strdup("HOUR"); }
+| DAY { $$ = strdup("DAY"); }
+| MONTH { $$ = strdup("MONTH"); }
+| YEAR { $$ = strdup("YEAR"); }
+| SECONDS { $$ = strdup("SECONDS"); }
+| MINUTES { $$ = strdup("MINUTES"); }
+| HOURS { $$ = strdup("HOURS"); }
+| DAYS { $$ = strdup("DAYS"); }
+| MONTHS { $$ = strdup("MONTHS"); }
+| YEARS { $$ = strdup("YEARS"); }
+| ISNULL { $$ = strdup("ISNULL"); }
+| FORMAT { $$ = strdup("FORMAT"); }
+| CHAR { $$ = strdup("CHAR"); }
+| VARCHAR { $$ = strdup("VARCHAR"); }
+| INT { $$ = strdup("INT"); }
+| INTEGER { $$ = strdup("INTEGER"); }
+| DATETIME { $$ = strdup("DATETIME"); }
+| TIMESTAMP { $$ = strdup("TIMESTAMP"); };
 
 literal : string_literal | bool_literal | num_literal | null_literal | date_literal | interval_literal | param_expr;
 

@@ -193,6 +193,51 @@ void SQLParserTest::testArrayLiteralNotShadowedByBracketIdentifier()
 }
 
 
+void SQLParserTest::testNonReservedKeywords()
+{
+	// Date part keywords as function arguments. The abbreviated spellings
+	// (mi, hh, ...) lex as identifiers and have always parsed, so before this
+	// the behaviour depended on how the date part was spelled.
+	{
+		std::string query = "SELECT * FROM Test WHERE CreatedAt >= DATEADD(MINUTE, -10, GETDATE());";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+		assertTrue(result.getStatement(0)->type() == kStmtSelect);
+	}
+
+	// Keywords as function names and as column names.
+	{
+		std::string query = "SELECT ISNULL(A, 0), CHAR(10), FORMAT(A, '00'), YEAR, MONTH FROM Test;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertEqual(5, pSelect->selectList->size());
+		assertTrue(pSelect->selectList->at(0)->type == kExprFunctionRef);
+		assertEqual("ISNULL", std::string(pSelect->selectList->at(0)->name));
+		assertTrue(pSelect->selectList->at(3)->type == kExprColumnRef);
+		assertEqual("YEAR", std::string(pSelect->selectList->at(3)->name));
+	}
+
+	// The keyword uses these tokens still have: EXTRACT's datetime field, the
+	// ISNULL postfix operator, CAST's column type and the INTERVAL qualifier.
+	{
+		std::string query = "SELECT EXTRACT(MINUTE FROM D) FROM Test;"
+			"SELECT A FROM Test WHERE B ISNULL;"
+			"SELECT CAST(A AS INT) FROM Test;"
+			"SELECT INTERVAL '1' MINUTE FROM Test;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(4, result.size());
+	}
+}
+
+
 void SQLParserTest::testScientificNotationLiteral()
 {
 	// In a select list a missing exponent rule does not fail the parse: the
@@ -414,6 +459,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testBracketedIdentifiers);
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
+	CppUnit_addTest(pSuite, SQLParserTest, testNonReservedKeywords);
 	CppUnit_addTest(pSuite, SQLParserTest, testScientificNotationLiteral);
 	CppUnit_addTest(pSuite, SQLParserTest, testResetClearsParameters);
 	CppUnit_addTest(pSuite, SQLParserTest, testNamedParameter);
