@@ -1278,7 +1278,38 @@ column_name : IDENTIFIER { $$ = Expr::makeColumnRef($1); }
 | IDENTIFIER '.' IDENTIFIER { $$ = Expr::makeColumnRef($1, $3); }
 | '*' { $$ = Expr::makeStar(); }
 | IDENTIFIER '.' '*' { $$ = Expr::makeStar($1); }
-| nonreserved_keyword { $$ = Expr::makeColumnRef($1); };
+| nonreserved_keyword { $$ = Expr::makeColumnRef($1); }
+// Column qualified by a multi-part table name, e.g. dbo.Table.Column or
+// mydb.dbo.Table.Column - the column-side counterpart of the multi-part
+// table_name below. Expr has a single table slot, so the qualifiers are folded
+// into it the same way table_name folds database+schema; callers that only
+// classify the statement do not read the parts back.
+| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER {
+  std::string combined(std::string($1) + "." + $3);
+  free($1);
+  free($3);
+  $$ = Expr::makeColumnRef(strdup(combined.c_str()), $5);
+}
+| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER {
+  std::string combined(std::string($1) + "." + $3 + "." + $5);
+  free($1);
+  free($3);
+  free($5);
+  $$ = Expr::makeColumnRef(strdup(combined.c_str()), $7);
+}
+| IDENTIFIER '.' IDENTIFIER '.' '*' {
+  std::string combined(std::string($1) + "." + $3);
+  free($1);
+  free($3);
+  $$ = Expr::makeStar(strdup(combined.c_str()));
+}
+| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER '.' '*' {
+  std::string combined(std::string($1) + "." + $3 + "." + $5);
+  free($1);
+  free($3);
+  free($5);
+  $$ = Expr::makeStar(strdup(combined.c_str()));
+};
 
 // Keywords the grammar needs as tokens elsewhere, but which dialects also use
 // as plain names - column names, and date part arguments such as

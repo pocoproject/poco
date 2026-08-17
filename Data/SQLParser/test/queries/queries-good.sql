@@ -135,6 +135,10 @@ SELECT * FROM [test];
 SELECT [my col] FROM [some schema].[my table];
 SELECT * FROM mydb.some_schema.test;
 SELECT ARRAY[foo] FROM test;
+# Multi-part column references
+SELECT dbo.test.a, mydb.dbo.test.b FROM mydb.dbo.test;
+SELECT dbo.test.*, mydb.dbo.test.* FROM mydb.dbo.test;
+SELECT * FROM [mydb].[dbo].test INNER JOIN [mydb].[dbo].other ON [mydb].[dbo].test.id = [mydb].[dbo].other.id;
 # String literal used as an alias
 SELECT a AS 'Coil Id', b AS 'X' FROM test;
 SELECT * FROM test AS 'my table';

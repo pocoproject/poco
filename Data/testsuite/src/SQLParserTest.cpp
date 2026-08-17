@@ -238,6 +238,58 @@ void SQLParserTest::testNonReservedKeywords()
 }
 
 
+void SQLParserTest::testMultiPartColumnName()
+{
+	// Three- and four-part column references, the column-side counterpart of
+	// the multi-part table names from #5429. The qualifiers are folded into
+	// the single table slot Expr has.
+	{
+		std::string query = "SELECT dbo.Test.A, mydb.dbo.Test.B FROM mydb.dbo.Test;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertEqual(2, pSelect->selectList->size());
+		assertTrue(pSelect->selectList->at(0)->type == kExprColumnRef);
+		assertEqual("dbo.Test", std::string(pSelect->selectList->at(0)->table));
+		assertEqual("A", std::string(pSelect->selectList->at(0)->name));
+		assertEqual("mydb.dbo.Test", std::string(pSelect->selectList->at(1)->table));
+		assertEqual("B", std::string(pSelect->selectList->at(1)->name));
+	}
+
+	// Multi-part qualified star, and bracket-quoted names on both sides of a
+	// join condition - the shape this was found as.
+	{
+		std::string query = "SELECT mydb.dbo.Test.* FROM mydb.dbo.Test;"
+			"SELECT * FROM [mydb].[dbo].Test INNER JOIN [mydb].[dbo].Other "
+			"ON [mydb].[dbo].Test.Id = [mydb].[dbo].Other.Id;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(2, result.size());
+	}
+
+	// One- and two-part references and schema-qualified function calls are
+	// unchanged - they share the leading IDENTIFIER '.' IDENTIFIER prefix.
+	{
+		std::string query = "SELECT C, A.B, A.*, sys.uuid() FROM X A;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertEqual(4, pSelect->selectList->size());
+		assertNull(pSelect->selectList->at(0)->table);
+		assertEqual("A", std::string(pSelect->selectList->at(1)->table));
+		assertTrue(pSelect->selectList->at(2)->type == kExprStar);
+		assertTrue(pSelect->selectList->at(3)->type == kExprFunctionRef);
+	}
+}
+
+
 void SQLParserTest::testStringAlias()
 {
 	// T-SQL accepts a string literal as an alias, e.g. SELECT A AS 'My Col'.
@@ -493,6 +545,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
 	CppUnit_addTest(pSuite, SQLParserTest, testNonReservedKeywords);
+	CppUnit_addTest(pSuite, SQLParserTest, testMultiPartColumnName);
 	CppUnit_addTest(pSuite, SQLParserTest, testStringAlias);
 	CppUnit_addTest(pSuite, SQLParserTest, testScientificNotationLiteral);
 	CppUnit_addTest(pSuite, SQLParserTest, testResetClearsParameters);

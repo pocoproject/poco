@@ -1420,6 +1420,42 @@ TEST(SelectNonReservedKeywordTest) {
   ASSERT_EQ(((SelectStatement*)keptResult.getStatement(2))->selectList->at(0)->type, kExprCast);
 }
 
+TEST(SelectMultiPartColumnNameTest) {
+  SelectStatement* stmt;
+
+  // Three- and four-part column references. The qualifiers are folded into the
+  // single table slot Expr has, mirroring how table_name folds database+schema.
+  TEST_PARSE_SQL_QUERY("SELECT dbo.T.C, mydb.dbo.T.C2 FROM mydb.dbo.T;", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->table, "dbo.T");
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "C");
+  ASSERT_EQ(stmt->selectList->at(1)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(1)->table, "mydb.dbo.T");
+  ASSERT_STREQ(stmt->selectList->at(1)->name, "C2");
+
+  // Star qualified by the same multi-part names.
+  TEST_PARSE_SQL_QUERY("SELECT dbo.T.*, mydb.dbo.T.* FROM mydb.dbo.T;", starResult, 1);
+  stmt = (SelectStatement*)starResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprStar);
+  ASSERT_STREQ(stmt->selectList->at(0)->table, "dbo.T");
+  ASSERT_EQ(stmt->selectList->at(1)->type, kExprStar);
+  ASSERT_STREQ(stmt->selectList->at(1)->table, "mydb.dbo.T");
+
+  // One- and two-part references and schema-qualified function calls are
+  // unchanged - they share the leading IDENTIFIER '.' IDENTIFIER prefix.
+  TEST_PARSE_SQL_QUERY("SELECT c, a.b, a.*, sys.uuid() FROM x a;", keptResult, 1);
+  stmt = (SelectStatement*)keptResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 4);
+  ASSERT_NULL(stmt->selectList->at(0)->table);
+  ASSERT_STREQ(stmt->selectList->at(1)->table, "a");
+  ASSERT_EQ(stmt->selectList->at(2)->type, kExprStar);
+  ASSERT_EQ(stmt->selectList->at(3)->type, kExprFunctionRef);
+  ASSERT_STREQ(stmt->selectList->at(3)->schema, "sys");
+}
+
 TEST(SelectStringAliasTest) {
   SelectStatement* stmt;
 
