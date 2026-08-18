@@ -29,16 +29,26 @@
     return 0;
   }
 
+  namespace {
+
+  // Joins two name parts with a dot, taking ownership of both. Multi-part names
+  // are folded into one string wherever the node has a single slot for them.
+  char* dotJoin(char* first, char* second) {
+    std::string combined(std::string(first) + "." + second);
+    free(first);
+    free(second);
+    return strdup(combined.c_str());
+  }
+
   // Flattens a possibly qualified name back into one string, taking ownership
   // of both parts. Used where the statement has a single name field, e.g. the
   // procedure of an ODBC call escape.
   char* qualifiedName(TableName name) {
     if (!name.schema) return name.name;
-    std::string combined(std::string(name.schema) + "." + name.name);
-    free(name.schema);
-    free(name.name);
-    return strdup(combined.c_str());
+    return dotJoin(name.schema, name.name);
   }
+
+  }  // namespace
   // clang-format off
 %}
 // clang-format on
@@ -69,6 +79,14 @@
 #include "../SQLParserResult.h"
 #include "../sql/statements.h"
 #include "parser_typedef.h"
+
+// Carries the two conditions of an Oracle hierarchical query out of one
+// grammar rule, so START WITH and CONNECT BY can be given in either order.
+// Trivially copyable, which a %union member has to be.
+struct HierarchicalClause {
+  hsql::Expr* startWith;
+  hsql::Expr* connectBy;
+};
 
 // Auto update column and line number
 #define YY_USER_ACTION                        \
@@ -163,6 +181,7 @@
   hsql::FrameDescription* frame_description;
   hsql::FrameType frame_type;
   hsql::GroupByDescription* group_t;
+  HierarchicalClause hierarchical_t;
   hsql::ImportType import_type_t;
   hsql::JoinType join_type;
   hsql::LimitDescription* limit;
@@ -210,6 +229,10 @@
   free($$.name);
   free($$.schema);
 } <table_name>
+%destructor {
+  delete $$.startWith;
+  delete $$.connectBy;
+} <hierarchical_t>
 %destructor {
   if ($$) {
     for (auto ptr : *($$)) {
@@ -283,7 +306,9 @@
 %token RANGE ROWS GROUPS UNBOUNDED FOLLOWING PRECEDING CURRENT_ROW
 %token FETCH NEXT ONLY
 %token UNIQUE PRIMARY FOREIGN KEY REFERENCES
-%token OUTERJOIN WITHIN CONNECT PRIOR START ODBC_OJ NEXT_VALUE_FOR
+%token OUTERJOIN PRIOR ODBC_OJ NEXT_VALUE_FOR
+// Lexed as whole phrases, so START, CONNECT and WITHIN stay usable as names.
+%token START_WITH CONNECT_BY CONNECT_BY_NOCYCLE WITHIN_GROUP
 
 /*********************************
  ** Non-Terminal types (http://www.gnu.org/software/bison/manual/html_node/Type-Decl.html)
@@ -305,7 +330,7 @@
 %type <show_stmt>              show_statement
 %type <table_name>             table_name
 %type <sval>                   opt_index_name
-%type <sval>                   file_path prepare_target_query nonreserved_keyword
+%type <sval>                   file_path prepare_target_query nonreserved_keyword name_or_keyword
 %type <frame_description>      opt_frame_clause
 %type <frame_bound>            frame_bound
 %type <frame_type>             frame_type
@@ -321,7 +346,7 @@
 %type <expr>                   table_function_expr
 %type <expr>                   column_name literal int_literal num_literal string_literal bool_literal date_literal interval_literal
 %type <expr>                   comp_expr opt_where join_condition opt_having case_expr case_list in_expr hint
-%type <expr>                   opt_start_with opt_connect_by
+%type <hierarchical_t>         opt_hierarchical_clause
 %type <expr>                   array_expr array_index null_literal extended_literal casted_extended_literal
 %type <limit>                  opt_limit opt_top
 %type <order>                  order_desc
@@ -772,7 +797,7 @@ table_elem_commalist : table_elem {
 table_elem : column_def { $$ = $1; }
 | table_constraint { $$ = $1; };
 
-column_def : IDENTIFIER column_type opt_column_constraints {
+column_def : name_or_keyword column_type opt_column_constraints {
   $$ = new ColumnDefinition($1, $2, $3->constraints, $3->references);
   if (!$$->trySetNullableExplicit()) {
     yyerror(&yyloc, result, scanner, ("Conflicting nullability constraints for " + std::string{$1}).c_str());
@@ -868,7 +893,7 @@ drop_statement : DROP TABLE opt_exists table_name {
   $$->name = $3;
 }
 
-| DROP INDEX opt_exists IDENTIFIER {
+| DROP INDEX opt_exists name_or_keyword {
   $$ = new DropStatement(kDropIndex);
   $$->ifExists = $3;
   $$->indexName = $4;
@@ -890,7 +915,7 @@ alter_statement : ALTER TABLE opt_exists table_name alter_action {
 
 alter_action : drop_action { $$ = $1; }
 
-drop_action : DROP COLUMN opt_exists IDENTIFIER {
+drop_action : DROP COLUMN opt_exists name_or_keyword {
   $$ = new DropColumnAction($4);
   $$->ifExists = $3;
 };
@@ -957,7 +982,7 @@ update_clause_commalist : update_clause {
   $$ = $1;
 };
 
-update_clause : IDENTIFIER '=' expr {
+update_clause : name_or_keyword '=' expr {
   $$ = new UpdateClause();
   $$->column = $1;
   $$->value = $3;
@@ -1049,24 +1074,28 @@ set_type : UNION {
 opt_all : ALL { $$ = true; }
 | /* empty */ { $$ = false; };
 
-// Oracle hierarchical query clauses. Written in the canonical order, START
-// WITH before CONNECT BY; either may be omitted.
-opt_start_with : START WITH expr { $$ = $3; }
-| /* empty */ { $$ = nullptr; };
+// Oracle hierarchical query clauses. Oracle accepts START WITH and CONNECT BY
+// in either order and either may be omitted, so both are produced by one rule.
+opt_hierarchical_clause : START_WITH expr connect_by expr { $$ = HierarchicalClause{$2, $4}; }
+| connect_by expr START_WITH expr { $$ = HierarchicalClause{$4, $2}; }
+| START_WITH expr { $$ = HierarchicalClause{$2, nullptr}; }
+| connect_by expr { $$ = HierarchicalClause{nullptr, $2}; }
+| /* empty */ { $$ = HierarchicalClause{nullptr, nullptr}; };
 
-opt_connect_by : CONNECT BY expr { $$ = $3; }
-| /* empty */ { $$ = nullptr; };
+// NOCYCLE only tells Oracle to tolerate loops in the data; it carries nothing
+// the tree needs, so both spellings reduce to the same clause.
+connect_by : CONNECT_BY | CONNECT_BY_NOCYCLE;
 
-select_clause : SELECT opt_top opt_distinct select_list opt_from_clause opt_where opt_start_with opt_connect_by opt_group {
+select_clause : SELECT opt_top opt_distinct select_list opt_from_clause opt_where opt_hierarchical_clause opt_group {
   $$ = new SelectStatement();
   $$->limit = $2;
   $$->selectDistinct = $3;
   $$->selectList = $4;
   $$->fromTable = $5;
   $$->whereClause = $6;
-  $$->startWith = $7;
-  $$->connectBy = $8;
-  $$->groupBy = $9;
+  $$->startWith = $7.startWith;
+  $$->connectBy = $7.connectBy;
+  $$->groupBy = $8;
 };
 
 opt_distinct : DISTINCT { $$ = true; }
@@ -1095,7 +1124,7 @@ opt_having : HAVING expr { $$ = $2; }
 // Ordered-set aggregate, e.g. LISTAGG(x, ', ') WITHIN GROUP (ORDER BY y). The
 // sort order belongs to the aggregate itself, so it is kept apart from the
 // window description an OVER clause would produce.
-opt_within_group : WITHIN GROUP '(' ORDER BY order_list ')' { $$ = $6; }
+opt_within_group : WITHIN_GROUP '(' ORDER BY order_list ')' { $$ = $5; }
 | /* empty */ { $$ = nullptr; };
 
 opt_order : ORDER BY order_list { $$ = $3; }
@@ -1389,31 +1418,18 @@ column_name : IDENTIFIER { $$ = Expr::makeColumnRef($1); }
 // table_name below. Expr has a single table slot, so the qualifiers are folded
 // into it the same way table_name folds database+schema; callers that only
 // classify the statement do not read the parts back.
-| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER {
-  std::string combined(std::string($1) + "." + $3);
-  free($1);
-  free($3);
-  $$ = Expr::makeColumnRef(strdup(combined.c_str()), $5);
-}
+| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER { $$ = Expr::makeColumnRef(dotJoin($1, $3), $5); }
 | IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER {
-  std::string combined(std::string($1) + "." + $3 + "." + $5);
-  free($1);
-  free($3);
-  free($5);
-  $$ = Expr::makeColumnRef(strdup(combined.c_str()), $7);
+  $$ = Expr::makeColumnRef(dotJoin(dotJoin($1, $3), $5), $7);
 }
-| IDENTIFIER '.' IDENTIFIER '.' '*' {
-  std::string combined(std::string($1) + "." + $3);
-  free($1);
-  free($3);
-  $$ = Expr::makeStar(strdup(combined.c_str()));
-}
-| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER '.' '*' {
-  std::string combined(std::string($1) + "." + $3 + "." + $5);
-  free($1);
-  free($3);
-  free($5);
-  $$ = Expr::makeStar(strdup(combined.c_str()));
+| IDENTIFIER '.' IDENTIFIER '.' '*' { $$ = Expr::makeStar(dotJoin($1, $3)); }
+| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER '.' '*' { $$ = Expr::makeStar(dotJoin(dotJoin($1, $3), $5)); }
+// Qualified forms of the keywords below, e.g. t.YEAR, dbo.t.MONTH. Without
+// these the keyword only works as an unqualified name.
+| IDENTIFIER '.' nonreserved_keyword { $$ = Expr::makeColumnRef($1, $3); }
+| IDENTIFIER '.' IDENTIFIER '.' nonreserved_keyword { $$ = Expr::makeColumnRef(dotJoin($1, $3), $5); }
+| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER '.' nonreserved_keyword {
+  $$ = Expr::makeColumnRef(dotJoin(dotJoin($1, $3), $5), $7);
 };
 
 // Keywords the grammar needs as tokens elsewhere, but which dialects also use
@@ -1442,9 +1458,12 @@ nonreserved_keyword : SECOND { $$ = strdup("SECOND"); }
 | INTEGER { $$ = strdup("INTEGER"); }
 | DATETIME { $$ = strdup("DATETIME"); }
 | TIMESTAMP { $$ = strdup("TIMESTAMP"); }
-| CONNECT { $$ = strdup("CONNECT"); }
-| START { $$ = strdup("START"); }
 | NEXT { $$ = strdup("NEXT"); };
+
+// Any position that names a database object. Kept out of column_name, which
+// would have to choose between reducing an IDENTIFIER here and shifting the
+// '(' of a function call.
+name_or_keyword : IDENTIFIER | nonreserved_keyword;
 
 literal : string_literal | bool_literal | num_literal | null_literal | date_literal | interval_literal | param_expr;
 
@@ -1612,33 +1631,37 @@ table_ref_name_no_alias : table_name {
   $$->name = $1.name;
 };
 
-table_name : IDENTIFIER {
+// Only the last part may be a keyword. Allowing one in a leading part would
+// put '.' in its follow set, which collides with the qualified function call
+// in table_function_expr.
+table_name : name_or_keyword {
   $$.schema = nullptr;
   $$.name = $1;
 }
-| IDENTIFIER '.' IDENTIFIER {
+| IDENTIFIER '.' name_or_keyword {
   $$.schema = $1;
   $$.name = $3;
 }
-| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER {
+| IDENTIFIER '.' IDENTIFIER '.' name_or_keyword {
   // Three-part (database.schema.table) name. TableName has no separate
   // database slot, so fold database+schema into schema as "database.schema" -
   // callers here only need the statement to parse, not the individual parts.
-  std::string combined(std::string($1) + "." + $3);
-  free($1);
-  free($3);
-  $$.schema = strdup(combined.c_str());
+  $$.schema = dotJoin($1, $3);
   $$.name = $5;
 };
 
-opt_index_name : IDENTIFIER { $$ = $1; }
+opt_index_name : name_or_keyword { $$ = $1; }
 | /* empty */ { $$ = nullptr; };
 
-table_alias : alias | AS IDENTIFIER '(' ident_commalist ')' { $$ = new Alias($2, $4); };
+table_alias : alias | AS name_or_keyword '(' ident_commalist ')' { $$ = new Alias($2, $4); };
 
 opt_table_alias : table_alias | /* empty */ { $$ = nullptr; };
 
 alias : AS IDENTIFIER { $$ = new Alias($2); }
+// A keyword from nonreserved_keyword may also be the alias, e.g. SELECT a AS year.
+// Only accepted after AS: a bare one would be ambiguous with an interval
+// literal such as SELECT 1 YEAR.
+| AS nonreserved_keyword { $$ = new Alias($2); }
 // T-SQL also accepts a string literal as the alias, e.g. SELECT a AS 'My Col'.
 // Only the AS form is accepted: without AS the string is indistinguishable from
 // a string literal in the select list.
@@ -1702,7 +1725,7 @@ with_description_list : with_description {
   $$ = $1;
 };
 
-with_description : IDENTIFIER AS select_with_paren {
+with_description : name_or_keyword AS select_with_paren {
   $$ = new WithDescription();
   $$->alias = $1;
   $$->select = $3;
@@ -1756,11 +1779,11 @@ join_condition : expr;
 opt_semicolon : ';' | /* empty */
     ;
 
-ident_commalist : IDENTIFIER {
+ident_commalist : name_or_keyword {
   $$ = new std::vector<char*>();
   $$->push_back($1);
 }
-| ident_commalist ',' IDENTIFIER {
+| ident_commalist ',' name_or_keyword {
   $1->push_back($3);
   $$ = $1;
 };

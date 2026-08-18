@@ -100,7 +100,6 @@ COLUMN      TOKEN(COLUMN)
 COLUMNS     TOKEN(COLUMNS)
 COMMIT      TOKEN(COMMIT)
 CONTROL     TOKEN(CONTROL)
-CONNECT     TOKEN(CONNECT)
 COPY        TOKEN(COPY)
 CREATE      TOKEN(CREATE)
 CROSS       TOKEN(CROSS)
@@ -218,7 +217,6 @@ SKIP        TOKEN(SKIP)
 SMALLINT    TOKEN(SMALLINT)
 SORTED      TOKEN(SORTED)
 SPATIAL     TOKEN(SPATIAL)
-START       TOKEN(START)
 TABLE       TOKEN(TABLE)
 TABLES      TOKEN(TABLES)
 TEMPORARY   TOKEN(TEMPORARY)
@@ -244,9 +242,19 @@ VIRTUAL     TOKEN(VIRTUAL)
 WHEN        TOKEN(WHEN)
 WHERE       TOKEN(WHERE)
 WITH        TOKEN(WITH)
-WITHIN      TOKEN(WITHIN)
 YEAR        TOKEN(YEAR)
 YEARS       TOKEN(YEARS)
+
+  /*
+   * Phrases rather than single reserved words: START, CONNECT and WITHIN are
+   * ordinary names on their own, and reserving them broke statements such as
+   * "SELECT * FROM start". The trailing context keeps "CONNECT BY nocycleflag"
+   * from lexing as CONNECT_BY_NOCYCLE followed by "flag".
+   */
+START{WS}+WITH/[^A-Za-z0-9_]              TOKEN(START_WITH)
+CONNECT{WS}+BY{WS}+NOCYCLE/[^A-Za-z0-9_]  TOKEN(CONNECT_BY_NOCYCLE)
+CONNECT{WS}+BY/[^A-Za-z0-9_]              TOKEN(CONNECT_BY)
+WITHIN{WS}+GROUP/[^A-Za-z0-9_]            TOKEN(WITHIN_GROUP)
 
 CURRENT{WS}+ROW              TOKEN(CURRENT_ROW)
 NEXT{WS}+VALUE{WS}+FOR       TOKEN(NEXT_VALUE_FOR)

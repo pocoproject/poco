@@ -53,13 +53,21 @@
 extern int hsql_debug;
 #endif
 /* "%code requires" blocks.  */
-#line 66 "bison_parser.y"
+#line 76 "bison_parser.y"
 
 // %code requires block
 
 #include "../SQLParserResult.h"
 #include "../sql/statements.h"
 #include "parser_typedef.h"
+
+// Carries the two conditions of an Oracle hierarchical query out of one
+// grammar rule, so START WITH and CONNECT BY can be given in either order.
+// Trivially copyable, which a %union member has to be.
+struct HierarchicalClause {
+  hsql::Expr* startWith;
+  hsql::Expr* connectBy;
+};
 
 // Auto update column and line number
 #define YY_USER_ACTION                        \
@@ -76,7 +84,7 @@ extern int hsql_debug;
     }                                         \
   }
 
-#line 80 "bison_parser.h"
+#line 88 "bison_parser.h"
 
 /* Token kinds.  */
 #ifndef HSQL_TOKENTYPE
@@ -264,20 +272,21 @@ extern int hsql_debug;
     SQL_KEY = 432,                 /* KEY  */
     SQL_REFERENCES = 433,          /* REFERENCES  */
     SQL_OUTERJOIN = 434,           /* OUTERJOIN  */
-    SQL_WITHIN = 435,              /* WITHIN  */
-    SQL_CONNECT = 436,             /* CONNECT  */
-    SQL_PRIOR = 437,               /* PRIOR  */
-    SQL_START = 438,               /* START  */
-    SQL_ODBC_OJ = 439,             /* ODBC_OJ  */
-    SQL_NEXT_VALUE_FOR = 440,      /* NEXT_VALUE_FOR  */
-    SQL_EQUALS = 441,              /* EQUALS  */
-    SQL_NOTEQUALS = 442,           /* NOTEQUALS  */
-    SQL_LESS = 443,                /* LESS  */
-    SQL_GREATER = 444,             /* GREATER  */
-    SQL_LESSEQ = 445,              /* LESSEQ  */
-    SQL_GREATEREQ = 446,           /* GREATEREQ  */
-    SQL_NOTNULL = 447,             /* NOTNULL  */
-    SQL_UMINUS = 448               /* UMINUS  */
+    SQL_PRIOR = 435,               /* PRIOR  */
+    SQL_ODBC_OJ = 436,             /* ODBC_OJ  */
+    SQL_NEXT_VALUE_FOR = 437,      /* NEXT_VALUE_FOR  */
+    SQL_START_WITH = 438,          /* START_WITH  */
+    SQL_CONNECT_BY = 439,          /* CONNECT_BY  */
+    SQL_CONNECT_BY_NOCYCLE = 440,  /* CONNECT_BY_NOCYCLE  */
+    SQL_WITHIN_GROUP = 441,        /* WITHIN_GROUP  */
+    SQL_EQUALS = 442,              /* EQUALS  */
+    SQL_NOTEQUALS = 443,           /* NOTEQUALS  */
+    SQL_LESS = 444,                /* LESS  */
+    SQL_GREATER = 445,             /* GREATER  */
+    SQL_LESSEQ = 446,              /* LESSEQ  */
+    SQL_GREATEREQ = 447,           /* GREATEREQ  */
+    SQL_NOTNULL = 448,             /* NOTNULL  */
+    SQL_UMINUS = 449               /* UMINUS  */
   };
   typedef enum hsql_tokentype hsql_token_kind_t;
 #endif
@@ -286,7 +295,7 @@ extern int hsql_debug;
 #if ! defined HSQL_STYPE && ! defined HSQL_STYPE_IS_DECLARED
 union HSQL_STYPE
 {
-#line 129 "bison_parser.y"
+#line 147 "bison_parser.y"
 
   // clang-format on
   bool bval;
@@ -324,6 +333,7 @@ union HSQL_STYPE
   hsql::FrameDescription* frame_description;
   hsql::FrameType frame_type;
   hsql::GroupByDescription* group_t;
+  HierarchicalClause hierarchical_t;
   hsql::ImportType import_type_t;
   hsql::JoinType join_type;
   hsql::LimitDescription* limit;
@@ -361,7 +371,7 @@ union HSQL_STYPE
 
   // clang-format off
 
-#line 365 "bison_parser.h"
+#line 375 "bison_parser.h"
 
 };
 typedef union HSQL_STYPE HSQL_STYPE;
