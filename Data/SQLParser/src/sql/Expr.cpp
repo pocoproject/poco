@@ -59,13 +59,21 @@ Expr::Expr(ExprType type)
       isBoolLiteral(false),
       opType(kOpNone),
       distinct(false),
-      windowDescription(nullptr) {}
+      windowDescription(nullptr),
+      withinGroupOrder(nullptr) {}
 
 Expr::~Expr() {
   delete expr;
   delete expr2;
   delete select;
   delete windowDescription;
+
+  if (withinGroupOrder) {
+    for (OrderDescription* orderDescription : *withinGroupOrder) {
+      delete orderDescription;
+    }
+    delete withinGroupOrder;
+  }
 
   free(name);
   free(table);

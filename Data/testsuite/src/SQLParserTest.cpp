@@ -238,6 +238,58 @@ void SQLParserTest::testNonReservedKeywords()
 }
 
 
+void SQLParserTest::testWithinGroup()
+{
+	// LISTAGG(X, ', ') WITHIN GROUP (ORDER BY Y) - ordered-set aggregate. The
+	// sort order belongs to the aggregate itself, so it is kept in
+	// withinGroupOrder, separate from the window description an OVER produces.
+	{
+		std::string query = "SELECT LISTAGG(A, ', ') WITHIN GROUP (ORDER BY B) FROM Test;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertTrue(pSelect->selectList->at(0)->type == kExprFunctionRef);
+		assertEqual("LISTAGG", std::string(pSelect->selectList->at(0)->name));
+		assertNotNull(pSelect->selectList->at(0)->withinGroupOrder);
+		assertEqual(1, pSelect->selectList->at(0)->withinGroupOrder->size());
+		assertNull(pSelect->selectList->at(0)->windowDescription);
+	}
+
+	// Several sort keys with direction, and an alias on the aggregate.
+	{
+		std::string query = "SELECT LISTAGG(A, ', ') WITHIN GROUP (ORDER BY B DESC, C ASC) AS Lst FROM Test;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertEqual(2, pSelect->selectList->at(0)->withinGroupOrder->size());
+		assertEqual("Lst", std::string(pSelect->selectList->at(0)->alias));
+	}
+
+	// Plain aggregates, OVER windows, GROUP BY and ORDER BY are unaffected.
+	{
+		std::string query = "SELECT COUNT(A) FROM Test;"
+			"SELECT COUNT(*) OVER (PARTITION BY A ORDER BY B) FROM Test;"
+			"SELECT A FROM Test GROUP BY A ORDER BY A;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(3, result.size());
+
+		const SelectStatement* pPlain = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertNull(pPlain->selectList->at(0)->withinGroupOrder);
+		const SelectStatement* pWindow = static_cast<const SelectStatement*>(result.getStatement(1));
+		assertNotNull(pWindow->selectList->at(0)->windowDescription);
+		assertNull(pWindow->selectList->at(0)->withinGroupOrder);
+	}
+}
+
+
 void SQLParserTest::testOracleOuterJoin()
 {
 	// WHERE T.Id (+) = U.Id - Oracle's legacy outer join marker, kept in the
@@ -714,6 +766,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
 	CppUnit_addTest(pSuite, SQLParserTest, testNonReservedKeywords);
+	CppUnit_addTest(pSuite, SQLParserTest, testWithinGroup);
 	CppUnit_addTest(pSuite, SQLParserTest, testOracleOuterJoin);
 	CppUnit_addTest(pSuite, SQLParserTest, testTableValueConstructor);
 	CppUnit_addTest(pSuite, SQLParserTest, testTableValuedFunction);

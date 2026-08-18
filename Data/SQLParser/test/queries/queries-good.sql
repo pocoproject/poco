@@ -135,6 +135,9 @@ SELECT * FROM [test];
 SELECT [my col] FROM [some schema].[my table];
 SELECT * FROM mydb.some_schema.test;
 SELECT ARRAY[foo] FROM test;
+# Ordered-set aggregate (WITHIN GROUP)
+SELECT LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b) FROM test;
+SELECT LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b DESC, c ASC) AS lst FROM test;
 # Oracle outer join marker
 SELECT * FROM test, other WHERE test.id (+) = other.id;
 SELECT * FROM test, other WHERE test.id = other.id (+);

@@ -271,7 +271,7 @@
 %token RANGE ROWS GROUPS UNBOUNDED FOLLOWING PRECEDING CURRENT_ROW
 %token FETCH NEXT ONLY
 %token UNIQUE PRIMARY FOREIGN KEY REFERENCES
-%token OUTERJOIN
+%token OUTERJOIN WITHIN
 
 /*********************************
  ** Non-Terminal types (http://www.gnu.org/software/bison/manual/html_node/Type-Decl.html)
@@ -341,7 +341,7 @@
 %type <expr_vec>               expr_list select_list opt_extended_literal_list extended_literal_list hint_list opt_hints opt_partition
 %type <expr_vec>               row_expr_list table_value_row_list
 %type <table_vec>              table_ref_commalist
-%type <order_vec>              opt_order order_list
+%type <order_vec>              opt_order order_list opt_within_group
 %type <with_description_vec>   opt_with_clause with_clause with_description_list
 %type <update_vec>             update_clause_commalist
 %type <table_element_vec>      table_elem_commalist
@@ -1050,6 +1050,12 @@ opt_group : GROUP BY expr_list opt_having {
 opt_having : HAVING expr { $$ = $2; }
 | /* empty */ { $$ = nullptr; };
 
+// Ordered-set aggregate, e.g. LISTAGG(x, ', ') WITHIN GROUP (ORDER BY y). The
+// sort order belongs to the aggregate itself, so it is kept apart from the
+// window description an OVER clause would produce.
+opt_within_group : WITHIN GROUP '(' ORDER BY order_list ')' { $$ = $6; }
+| /* empty */ { $$ = nullptr; };
+
 opt_order : ORDER BY order_list { $$ = $3; }
 | /* empty */ { $$ = nullptr; };
 
@@ -1225,7 +1231,10 @@ comp_expr : operand '=' operand { $$ = Expr::makeOpBinary($1, kOpEquals, $3); }
 // `function_expr is used for window functions, aggregate expressions, and functions calls because we run into shift/
 // reduce conflicts when splitting them.
 function_expr : IDENTIFIER '(' ')' opt_window { $$ = Expr::makeFunctionRef($1, new std::vector<Expr*>(), false, $4); }
-| IDENTIFIER '(' opt_distinct expr_list ')' opt_window { $$ = Expr::makeFunctionRef($1, $4, $3, $6); }
+| IDENTIFIER '(' opt_distinct expr_list ')' opt_within_group opt_window {
+  $$ = Expr::makeFunctionRef($1, $4, $3, $7);
+  $$->withinGroupOrder = $6;
+}
 | IDENTIFIER '.' IDENTIFIER '(' ')' opt_window {
   $$ = Expr::makeFunctionRef($3, $1, new std::vector<Expr*>(), false, $6);
 }

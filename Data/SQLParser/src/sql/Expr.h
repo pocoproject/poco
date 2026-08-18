@@ -153,6 +153,11 @@ struct SQLParser_API Expr {
 
   WindowDescription* windowDescription;
 
+  // Set for ordered-set aggregates, e.g. LISTAGG(x, ',') WITHIN GROUP (ORDER BY y).
+  // Holds the WITHIN GROUP sort order, which is part of the aggregate itself and
+  // not a window frame - hence separate from windowDescription.
+  std::vector<OrderDescription*>* withinGroupOrder;
+
   // Convenience accessor methods.
 
   bool isType(ExprType exprType) const;

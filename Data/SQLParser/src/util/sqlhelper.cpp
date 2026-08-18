@@ -137,6 +137,11 @@ void printExpression(Expr* expr, uintmax_t num_indent) {
         printExpression(e, num_indent + 1);
       }
 
+      if (expr->withinGroupOrder) {
+        inprint("WITHIN GROUP (ORDER BY)", num_indent + 1);
+        printOrderBy(expr->withinGroupOrder, num_indent + 2);
+      }
+
       if (expr->windowDescription) {
         printWindowDescription(expr->windowDescription, num_indent + 1);
       }

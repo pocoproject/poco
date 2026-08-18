@@ -1420,6 +1420,41 @@ TEST(SelectNonReservedKeywordTest) {
   ASSERT_EQ(((SelectStatement*)keptResult.getStatement(2))->selectList->at(0)->type, kExprCast);
 }
 
+TEST(SelectWithinGroupTest) {
+  SelectStatement* stmt;
+
+  // LISTAGG(x, ', ') WITHIN GROUP (ORDER BY y) - the sort order belongs to the
+  // aggregate, so it is kept in withinGroupOrder and not in a window
+  // description, which only an OVER clause produces.
+  TEST_PARSE_SQL_QUERY("SELECT LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b) FROM t;", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 1);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprFunctionRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "LISTAGG");
+  ASSERT_NOTNULL(stmt->selectList->at(0)->withinGroupOrder);
+  ASSERT_EQ(stmt->selectList->at(0)->withinGroupOrder->size(), 1);
+  ASSERT_NULL(stmt->selectList->at(0)->windowDescription);
+
+  // Several sort keys with direction, plus an alias on the aggregate.
+  TEST_PARSE_SQL_QUERY("SELECT LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b DESC, c ASC) AS lst FROM t;", multiResult, 1);
+  stmt = (SelectStatement*)multiResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->at(0)->withinGroupOrder->size(), 2);
+  ASSERT_EQ(stmt->selectList->at(0)->withinGroupOrder->at(0)->type, kOrderDesc);
+  ASSERT_STREQ(stmt->selectList->at(0)->alias, "lst");
+
+  // Plain aggregates, OVER windows, GROUP BY and ORDER BY are unaffected.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT COUNT(a) FROM t;"
+      "SELECT COUNT(*) OVER (PARTITION BY a ORDER BY b) FROM t;"
+      "SELECT a FROM t GROUP BY a ORDER BY a;",
+      keptResult, 3);
+  stmt = (SelectStatement*)keptResult.getStatement(0);
+  ASSERT_NULL(stmt->selectList->at(0)->withinGroupOrder);
+  stmt = (SelectStatement*)keptResult.getStatement(1);
+  ASSERT_NOTNULL(stmt->selectList->at(0)->windowDescription);
+  ASSERT_NULL(stmt->selectList->at(0)->withinGroupOrder);
+}
+
 TEST(SelectOracleOuterJoinTest) {
   SelectStatement* stmt;
 
