@@ -283,7 +283,7 @@
 %token RANGE ROWS GROUPS UNBOUNDED FOLLOWING PRECEDING CURRENT_ROW
 %token FETCH NEXT ONLY
 %token UNIQUE PRIMARY FOREIGN KEY REFERENCES
-%token OUTERJOIN WITHIN CONNECT PRIOR START ODBC_OJ
+%token OUTERJOIN WITHIN CONNECT PRIOR START ODBC_OJ NEXT_VALUE_FOR
 
 /*********************************
  ** Non-Terminal types (http://www.gnu.org/software/bison/manual/html_node/Type-Decl.html)
@@ -317,7 +317,7 @@
 %type <table>                  opt_from_clause from_clause table_ref table_ref_atomic table_ref_name nonjoin_table_ref_atomic
 %type <table>                  join_clause table_ref_name_no_alias
 %type <expr>                   expr operand scalar_expr unary_expr binary_expr logic_expr exists_expr extract_expr cast_expr
-%type <expr>                   function_expr between_expr expr_alias param_expr
+%type <expr>                   function_expr between_expr expr_alias param_expr next_value_expr
 %type <expr>                   column_name literal int_literal num_literal string_literal bool_literal date_literal interval_literal
 %type <expr>                   comp_expr opt_where join_condition opt_having case_expr case_list in_expr hint
 %type <expr>                   opt_start_with opt_connect_by
@@ -1199,7 +1199,7 @@ expr_alias : expr opt_alias {
 expr : operand | between_expr | logic_expr | exists_expr | in_expr;
 
 operand : '(' expr ')' { $$ = $2; }
-| array_index | scalar_expr | unary_expr | binary_expr | case_expr | function_expr | extract_expr | cast_expr |
+| array_index | scalar_expr | unary_expr | binary_expr | case_expr | function_expr | extract_expr | cast_expr | next_value_expr |
     array_expr | '(' select_no_paren ')' {
   $$ = Expr::makeSelect($2);
 };
@@ -1322,6 +1322,15 @@ frame_bound : UNBOUNDED PRECEDING { $$ = new FrameBound{0, kPreceding, true}; }
 
 extract_expr : EXTRACT '(' datetime_field FROM expr ')' { $$ = Expr::makeExtract($3, $5); };
 
+// T-SQL sequence expression, e.g. SELECT NEXT VALUE FOR mydb.dbo.seq. It yields
+// a value like a function call does, so it is kept as one, with the sequence as
+// its single argument - Expr has no dedicated sequence node.
+next_value_expr : NEXT_VALUE_FOR table_name {
+  auto args = new std::vector<Expr*>();
+  args->push_back(Expr::makeColumnRef(qualifiedName($2)));
+  $$ = Expr::makeFunctionRef(strdup("NEXT VALUE FOR"), args, false, nullptr);
+};
+
 cast_expr : CAST '(' expr AS column_type ')' { $$ = Expr::makeCast($3, $5); };
 
 datetime_field : SECOND { $$ = kDatetimeSecond; }
@@ -1417,7 +1426,8 @@ nonreserved_keyword : SECOND { $$ = strdup("SECOND"); }
 | DATETIME { $$ = strdup("DATETIME"); }
 | TIMESTAMP { $$ = strdup("TIMESTAMP"); }
 | CONNECT { $$ = strdup("CONNECT"); }
-| START { $$ = strdup("START"); };
+| START { $$ = strdup("START"); }
+| NEXT { $$ = strdup("NEXT"); };
 
 literal : string_literal | bool_literal | num_literal | null_literal | date_literal | interval_literal | param_expr;
 

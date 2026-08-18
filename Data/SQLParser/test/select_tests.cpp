@@ -1420,6 +1420,36 @@ TEST(SelectNonReservedKeywordTest) {
   ASSERT_EQ(((SelectStatement*)keptResult.getStatement(2))->selectList->at(0)->type, kExprCast);
 }
 
+TEST(SelectNextValueForTest) {
+  SelectStatement* stmt;
+
+  // T-SQL sequence expression. It yields a value like a function call does, so
+  // it is kept as one, with the sequence as its single argument.
+  TEST_PARSE_SQL_QUERY("SELECT NEXT VALUE FOR mydb.dbo.seq AS nextId;", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 1);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprFunctionRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "NEXT VALUE FOR");
+  ASSERT_EQ(stmt->selectList->at(0)->exprList->size(), 1);
+  ASSERT_STREQ(stmt->selectList->at(0)->exprList->at(0)->name, "mydb.dbo.seq");
+  ASSERT_STREQ(stmt->selectList->at(0)->alias, "nextId");
+
+  // NEXT VALUE FOR is lexed as one token, so "value" keeps working as a plain
+  // column name and as a bare alias, and FETCH NEXT is unaffected.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT id, value FROM t WHERE value = 1;"
+      "SELECT COALESCE(MAX(seq_value) + 1, 1) value FROM t;"
+      "SELECT a FROM t ORDER BY a OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;",
+      keptResult, 3);
+  stmt = (SelectStatement*)keptResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->at(1)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(1)->name, "value");
+  stmt = (SelectStatement*)keptResult.getStatement(1);
+  ASSERT_STREQ(stmt->selectList->at(0)->alias, "value");
+  stmt = (SelectStatement*)keptResult.getStatement(2);
+  ASSERT_NOTNULL(stmt->limit);
+}
+
 TEST(SelectOdbcOuterJoinEscapeTest) {
   SelectStatement* stmt;
 

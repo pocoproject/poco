@@ -236,6 +236,7 @@ YEAR        TOKEN(YEAR)
 YEARS       TOKEN(YEARS)
 
 CURRENT[ \t\n]+ROW       TOKEN(CURRENT_ROW)
+NEXT[ \t\n]+VALUE[ \t\n]+FOR TOKEN(NEXT_VALUE_FOR)
 CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
 
             /* Allow =/== see https://sqlite.org/lang_expr.html#collateop */

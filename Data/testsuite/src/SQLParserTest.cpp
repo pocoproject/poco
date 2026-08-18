@@ -238,6 +238,41 @@ void SQLParserTest::testNonReservedKeywords()
 }
 
 
+void SQLParserTest::testNextValueFor()
+{
+	// T-SQL sequence expression. It yields a value like a function call does,
+	// so it is kept as one, with the sequence as its single argument.
+	{
+		std::string query = "SELECT NEXT VALUE FOR mydb.dbo.Seq AS NextId;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertTrue(pSelect->selectList->at(0)->type == kExprFunctionRef);
+		assertEqual("NEXT VALUE FOR", std::string(pSelect->selectList->at(0)->name));
+		assertEqual(1, pSelect->selectList->at(0)->exprList->size());
+		assertEqual("mydb.dbo.Seq", std::string(pSelect->selectList->at(0)->exprList->at(0)->name));
+	}
+
+	// NEXT VALUE FOR is lexed as one token, so "value" keeps working as a plain
+	// column name and as a bare alias, and FETCH NEXT is unaffected.
+	{
+		std::string query = "SELECT Id, Value FROM Test WHERE Value = 1;"
+			"SELECT COALESCE(MAX(SeqValue) + 1, 1) Value FROM Test;"
+			"SELECT A FROM Test ORDER BY A OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(3, result.size());
+
+		const SelectStatement* pAliased = static_cast<const SelectStatement*>(result.getStatement(1));
+		assertEqual("Value", std::string(pAliased->selectList->at(0)->alias));
+	}
+}
+
+
 void SQLParserTest::testODBCEscapes()
 {
 	// ODBC outer join escape - the escape only marks the join for the driver,
@@ -904,6 +939,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
 	CppUnit_addTest(pSuite, SQLParserTest, testNonReservedKeywords);
+	CppUnit_addTest(pSuite, SQLParserTest, testNextValueFor);
 	CppUnit_addTest(pSuite, SQLParserTest, testODBCEscapes);
 	CppUnit_addTest(pSuite, SQLParserTest, testTopWithExpression);
 	CppUnit_addTest(pSuite, SQLParserTest, testHierarchicalQuery);

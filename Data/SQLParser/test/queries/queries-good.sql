@@ -135,6 +135,10 @@ SELECT * FROM [test];
 SELECT [my col] FROM [some schema].[my table];
 SELECT * FROM mydb.some_schema.test;
 SELECT ARRAY[foo] FROM test;
+# T-SQL sequence expression
+SELECT NEXT VALUE FOR seq;
+SELECT NEXT VALUE FOR mydb.dbo.seq AS next_id;
+SELECT COALESCE(MAX(seq_value) + 1, 1) value FROM test;
 # ODBC escape sequences
 SELECT * FROM {oj test LEFT OUTER JOIN other ON test.id = other.id};
 {? = call some_proc(?, 'a', 1)};
