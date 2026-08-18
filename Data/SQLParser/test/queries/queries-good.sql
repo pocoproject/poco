@@ -135,6 +135,10 @@ SELECT * FROM [test];
 SELECT [my col] FROM [some schema].[my table];
 SELECT * FROM mydb.some_schema.test;
 SELECT ARRAY[foo] FROM test;
+# Oracle outer join marker
+SELECT * FROM test, other WHERE test.id (+) = other.id;
+SELECT * FROM test, other WHERE test.id = other.id (+);
+SELECT * FROM test, other WHERE test.id(+)=other.id AND test.x > 5;
 # Table value constructor in FROM
 SELECT * FROM (VALUES (0, 'Any'), (1, 'One')) AS v(id, name);
 SELECT * FROM (VALUES (1)) AS v(x);

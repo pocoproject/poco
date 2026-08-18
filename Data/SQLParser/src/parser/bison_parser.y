@@ -271,6 +271,7 @@
 %token RANGE ROWS GROUPS UNBOUNDED FOLLOWING PRECEDING CURRENT_ROW
 %token FETCH NEXT ONLY
 %token UNIQUE PRIMARY FOREIGN KEY REFERENCES
+%token OUTERJOIN
 
 /*********************************
  ** Non-Terminal types (http://www.gnu.org/software/bison/manual/html_node/Type-Decl.html)
@@ -1152,7 +1153,11 @@ operand : '(' expr ')' { $$ = $2; }
   $$ = Expr::makeSelect($2);
 };
 
-scalar_expr : column_name | literal;
+scalar_expr : column_name | literal
+// Oracle outer join marker, e.g. WHERE a.id (+) = b.id. Only a column
+// reference can carry it, which is where Oracle allows it; the marked side
+// stays visible in the tree as a unary operator.
+| column_name OUTERJOIN { $$ = Expr::makeOpUnary(kOpOuterJoin, $1); };
 
 unary_expr : '-' operand { $$ = Expr::makeOpUnary(kOpUnaryMinus, $2); }
 | NOT operand { $$ = Expr::makeOpUnary(kOpNot, $2); }

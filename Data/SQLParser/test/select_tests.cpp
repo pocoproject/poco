@@ -1420,6 +1420,45 @@ TEST(SelectNonReservedKeywordTest) {
   ASSERT_EQ(((SelectStatement*)keptResult.getStatement(2))->selectList->at(0)->type, kExprCast);
 }
 
+TEST(SelectOracleOuterJoinTest) {
+  SelectStatement* stmt;
+
+  // WHERE t.id (+) = u.id - the marker stays in the tree as a unary operator
+  // on the column it follows, so the null-extended side remains visible.
+  TEST_PARSE_SQL_QUERY("SELECT a FROM t, u WHERE t.id (+) = u.id;", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->whereClause);
+  ASSERT_EQ(stmt->whereClause->opType, kOpEquals);
+  ASSERT_EQ(stmt->whereClause->expr->type, kExprOperator);
+  ASSERT_EQ(stmt->whereClause->expr->opType, kOpOuterJoin);
+  ASSERT_EQ(stmt->whereClause->expr->expr->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->whereClause->expr->expr->name, "id");
+  ASSERT_EQ(stmt->whereClause->expr2->type, kExprColumnRef);
+
+  // Marker on the right-hand side, without spaces, and with spaces inside.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT a FROM t, u WHERE t.id = u.id (+);"
+      "SELECT a FROM t, u WHERE t.id(+)=u.id;"
+      "SELECT a FROM t, u WHERE t.id ( + ) = u.id;",
+      moreResult, 3);
+  stmt = (SelectStatement*)moreResult.getStatement(0);
+  ASSERT_EQ(stmt->whereClause->expr2->opType, kOpOuterJoin);
+  stmt = (SelectStatement*)moreResult.getStatement(1);
+  ASSERT_EQ(stmt->whereClause->expr->opType, kOpOuterJoin);
+
+  // Arithmetic and parenthesized expressions are unaffected: only a lone '+'
+  // between parentheses is the marker.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT a + 1 FROM t;"
+      "SELECT (a + b) FROM t;"
+      "SELECT a FROM t WHERE x = (1 + 2);",
+      keptResult, 3);
+  stmt = (SelectStatement*)keptResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->at(0)->opType, kOpPlus);
+  stmt = (SelectStatement*)keptResult.getStatement(2);
+  ASSERT_EQ(stmt->whereClause->expr2->opType, kOpPlus);
+}
+
 TEST(SelectTableValueConstructorTest) {
   SelectStatement* stmt;
 

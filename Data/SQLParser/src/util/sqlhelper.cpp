@@ -463,7 +463,7 @@ std::ostream& operator<<(std::ostream& os, const OperatorType& op) {
       {kOpOr, "OR"},         {kOpIn, "IN"},
       {kOpConcat, "CONCAT"}, {kOpNot, "NOT"},
       {kOpUnaryMinus, "-"},  {kOpIsNull, "IS NULL"},
-      {kOpExists, "EXISTS"}};
+      {kOpExists, "EXISTS"},  {kOpOuterJoin, "(+)"}};
 
   const auto found = operatorToToken.find(op);
   if (found == operatorToToken.cend()) {

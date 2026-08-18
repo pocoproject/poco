@@ -73,7 +73,11 @@ enum OperatorType {
   kOpNot,
   kOpUnaryMinus,
   kOpIsNull,
-  kOpExists
+  kOpExists,
+
+  // Oracle's legacy outer join marker, e.g. WHERE a.id (+) = b.id. Marks the
+  // operand it follows as the null-extended side of the join.
+  kOpOuterJoin
 };
 
 enum DatetimeField {

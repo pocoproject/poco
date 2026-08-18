@@ -238,6 +238,53 @@ void SQLParserTest::testNonReservedKeywords()
 }
 
 
+void SQLParserTest::testOracleOuterJoin()
+{
+	// WHERE T.Id (+) = U.Id - Oracle's legacy outer join marker, kept in the
+	// tree as a unary operator on the column it follows.
+	{
+		std::string query = "SELECT A FROM Test T, Other U WHERE T.Id (+) = U.Id;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertNotNull(pSelect->whereClause);
+		assertTrue(pSelect->whereClause->opType == kOpEquals);
+		assertTrue(pSelect->whereClause->expr->type == kExprOperator);
+		assertTrue(pSelect->whereClause->expr->opType == kOpOuterJoin);
+		assertTrue(pSelect->whereClause->expr->expr->type == kExprColumnRef);
+	}
+
+	// Right-hand side, no spaces, and spaces inside the marker.
+	{
+		std::string query = "SELECT A FROM Test T, Other U WHERE T.Id = U.Id (+);"
+			"SELECT A FROM Test T, Other U WHERE T.Id(+)=U.Id;"
+			"SELECT A FROM Test T, Other U WHERE T.Id ( + ) = U.Id;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(3, result.size());
+	}
+
+	// Only a lone '+' between parentheses is the marker; arithmetic and
+	// parenthesized expressions are unaffected.
+	{
+		std::string query = "SELECT A + 1 FROM Test;"
+			"SELECT (A + B) FROM Test;"
+			"SELECT A FROM Test WHERE X = (1 + 2);";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(3, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertTrue(pSelect->selectList->at(0)->opType == kOpPlus);
+	}
+}
+
+
 void SQLParserTest::testTableValueConstructor()
 {
 	// FROM (VALUES (...), (...)) AS t(cols) - each row is kept as an array
@@ -667,6 +714,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
 	CppUnit_addTest(pSuite, SQLParserTest, testNonReservedKeywords);
+	CppUnit_addTest(pSuite, SQLParserTest, testOracleOuterJoin);
 	CppUnit_addTest(pSuite, SQLParserTest, testTableValueConstructor);
 	CppUnit_addTest(pSuite, SQLParserTest, testTableValuedFunction);
 	CppUnit_addTest(pSuite, SQLParserTest, testRowConstructorIn);

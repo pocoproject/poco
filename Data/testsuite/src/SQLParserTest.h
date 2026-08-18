@@ -35,6 +35,7 @@ public:
 	void testThreePartTableName();
 	void testArrayLiteralNotShadowedByBracketIdentifier();
 	void testNonReservedKeywords();
+	void testOracleOuterJoin();
 	void testTableValueConstructor();
 	void testTableValuedFunction();
 	void testRowConstructorIn();
