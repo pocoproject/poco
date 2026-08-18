@@ -112,3 +112,6 @@
 # Placeholders: rejected $0, lone $
 !SELECT * FROM t WHERE a = $0;
 !SELECT * FROM t WHERE a = $;
+# A window function or an ordered-set aggregate is not a table reference
+!SELECT * FROM COUNT(*) OVER (PARTITION BY a);
+!SELECT * FROM LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b);

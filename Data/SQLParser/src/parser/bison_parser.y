@@ -318,6 +318,7 @@
 %type <table>                  join_clause table_ref_name_no_alias
 %type <expr>                   expr operand scalar_expr unary_expr binary_expr logic_expr exists_expr extract_expr cast_expr
 %type <expr>                   function_expr between_expr expr_alias param_expr next_value_expr
+%type <expr>                   table_function_expr
 %type <expr>                   column_name literal int_literal num_literal string_literal bool_literal date_literal interval_literal
 %type <expr>                   comp_expr opt_where join_condition opt_having case_expr case_list in_expr hint
 %type <expr>                   opt_start_with opt_connect_by
@@ -1293,6 +1294,22 @@ function_expr : IDENTIFIER '(' ')' opt_window { $$ = Expr::makeFunctionRef($1, n
 | nonreserved_keyword '(' ')' opt_window { $$ = Expr::makeFunctionRef($1, new std::vector<Expr*>(), false, $4); }
 | nonreserved_keyword '(' opt_distinct expr_list ')' opt_window { $$ = Expr::makeFunctionRef($1, $4, $3, $6); };
 
+// A plain function call, without the OVER and WITHIN GROUP clauses
+// function_expr allows. Only this form can stand as a table reference: a
+// window function or an ordered-set aggregate is not a table.
+table_function_expr : IDENTIFIER '(' ')' {
+  $$ = Expr::makeFunctionRef($1, new std::vector<Expr*>(), false, nullptr);
+}
+| IDENTIFIER '(' opt_distinct expr_list ')' {
+  $$ = Expr::makeFunctionRef($1, $4, $3, nullptr);
+}
+| IDENTIFIER '.' IDENTIFIER '(' ')' {
+  $$ = Expr::makeFunctionRef($3, $1, new std::vector<Expr*>(), false, nullptr);
+}
+| IDENTIFIER '.' IDENTIFIER '(' opt_distinct expr_list ')' {
+  $$ = Expr::makeFunctionRef($3, $1, $6, $5, nullptr);
+};
+
 // Window function expressions, based on https://www.postgresql.org/docs/15/sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS
 // We do not support named windows, collations and exclusions (for simplicity) and filters (not part of the SQL standard).
 opt_window : OVER '(' opt_partition opt_order opt_frame_clause ')' { $$ = new WindowDescription($3, $4, $5); }
@@ -1545,7 +1562,7 @@ nonjoin_table_ref_atomic : table_ref_name | '(' select_statement ')' opt_table_a
 }
 // Table-valued function, e.g. FROM STRING_SPLIT(s, ','). name mirrors the
 // function name so getName() behaves like it does for a plain table.
-| function_expr opt_table_alias {
+| table_function_expr opt_table_alias {
   auto tbl = new TableRef(kTableFunc);
   tbl->func = $1;
   if ($1->name) tbl->name = strdup($1->name);

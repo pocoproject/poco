@@ -584,6 +584,22 @@ void SQLParserTest::testTableValuedFunction()
 		assertEqual("S", std::string(pAliased->fromTable->getName()));
 	}
 
+	// A window function and an ordered-set aggregate are not table references,
+	// so only a plain call is accepted there - both stay valid in a select list.
+	{
+		SQLParserResult windowResult;
+		SQLParser::parse("SELECT * FROM COUNT(*) OVER (PARTITION BY A);", &windowResult);
+		assertTrue(!windowResult.isValid());
+
+		SQLParserResult aggregateResult;
+		SQLParser::parse("SELECT * FROM LISTAGG(A, ', ') WITHIN GROUP (ORDER BY B);", &aggregateResult);
+		assertTrue(!aggregateResult.isValid());
+
+		SQLParserResult selectListResult;
+		SQLParser::parse("SELECT COUNT(*) OVER (PARTITION BY A) FROM Test;", &selectListResult);
+		assertTrue(selectListResult.isValid());
+	}
+
 	// Plain table references and subqueries in FROM are unchanged.
 	{
 		std::string query = "SELECT * FROM Test A, Other B WHERE A.Id = B.Id;"

@@ -1682,11 +1682,25 @@ TEST(SelectTableValuedFunctionTest) {
   ASSERT_EQ(stmt->fromTable->type, kTableFunc);
   ASSERT_STREQ(stmt->fromTable->getName(), "s");
 
-  // Plain table references and subqueries in FROM are unchanged.
+  // A window function and an ordered-set aggregate are not table references,
+  // so only a plain call is accepted here - they stay valid in a select list.
+  {
+    SQLParserResult windowResult;
+    SQLParser::parse("SELECT * FROM COUNT(*) OVER (PARTITION BY a);", &windowResult);
+    ASSERT_FALSE(windowResult.isValid());
+
+    SQLParserResult aggregateResult;
+    SQLParser::parse("SELECT * FROM LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b);", &aggregateResult);
+    ASSERT_FALSE(aggregateResult.isValid());
+  }
+
+  // Plain table references, subqueries in FROM and the same expressions used in
+  // a select list are unchanged.
   TEST_PARSE_SQL_QUERY(
       "SELECT * FROM t a, u b WHERE a.id = b.id;"
-      "SELECT * FROM (SELECT 1) x;",
-      keptResult, 2);
+      "SELECT * FROM (SELECT 1) x;"
+      "SELECT COUNT(*) OVER (PARTITION BY a) FROM t;",
+      keptResult, 3);
   ASSERT_EQ(((SelectStatement*)keptResult.getStatement(0))->fromTable->type, kTableCrossProduct);
   ASSERT_EQ(((SelectStatement*)keptResult.getStatement(1))->fromTable->type, kTableSelect);
 }
