@@ -135,6 +135,11 @@ SELECT * FROM [test];
 SELECT [my col] FROM [some schema].[my table];
 SELECT * FROM mydb.some_schema.test;
 SELECT ARRAY[foo] FROM test;
+# ODBC escape sequences
+SELECT * FROM {oj test LEFT OUTER JOIN other ON test.id = other.id};
+{? = call some_proc(?, 'a', 1)};
+{call some_proc(?)};
+{ ? = call [mydb].[dbo].[some_proc]('a') };
 # TOP with an expression
 SELECT TOP (?) * FROM test;
 SELECT TOP (:limit) * FROM test;

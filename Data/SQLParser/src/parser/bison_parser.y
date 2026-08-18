@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
   using namespace hsql;
 
@@ -26,6 +27,17 @@
     result->setIsValid(false);
     result->setErrorDetails(strdup(msg), llocp->first_line, llocp->first_column);
     return 0;
+  }
+
+  // Flattens a possibly qualified name back into one string, taking ownership
+  // of both parts. Used where the statement has a single name field, e.g. the
+  // procedure of an ODBC call escape.
+  char* qualifiedName(TableName name) {
+    if (!name.schema) return name.name;
+    std::string combined(std::string(name.schema) + "." + name.name);
+    free(name.schema);
+    free(name.name);
+    return strdup(combined.c_str());
   }
   // clang-format off
 %}
@@ -271,14 +283,14 @@
 %token RANGE ROWS GROUPS UNBOUNDED FOLLOWING PRECEDING CURRENT_ROW
 %token FETCH NEXT ONLY
 %token UNIQUE PRIMARY FOREIGN KEY REFERENCES
-%token OUTERJOIN WITHIN CONNECT PRIOR START
+%token OUTERJOIN WITHIN CONNECT PRIOR START ODBC_OJ
 
 /*********************************
  ** Non-Terminal types (http://www.gnu.org/software/bison/manual/html_node/Type-Decl.html)
  *********************************/
 %type <stmt_vec>               statement_list
 %type <statement>              statement preparable_statement
-%type <exec_stmt>              execute_statement
+%type <exec_stmt>              execute_statement odbc_call_statement
 %type <transaction_stmt>       transaction_statement
 %type <prep_stmt>              prepare_statement
 %type <select_stmt>            select_statement select_with_paren select_no_paren select_clause select_within_set_operation select_within_set_operation_no_parentheses
@@ -433,6 +445,7 @@ preparable_statement : select_statement { $$ = $1; }
 | drop_statement { $$ = $1; }
 | alter_statement { $$ = $1; }
 | execute_statement { $$ = $1; }
+| odbc_call_statement { $$ = $1; }
 | transaction_statement { $$ = $1; };
 
 /******************************
@@ -482,6 +495,22 @@ prepare_statement : PREPARE IDENTIFIER FROM prepare_target_query {
 };
 
 prepare_target_query : STRING;
+
+// ODBC procedure call escape, e.g. {? = call some_proc(?, ?)} or
+// {call some_proc(?)}. The optional "? =" is the driver's return value marker
+// and carries nothing the statement itself needs, so both forms produce the
+// same ExecuteStatement an EXECUTE would.
+odbc_call_statement : '{' opt_odbc_return CALL table_name '(' opt_extended_literal_list ')' '}' {
+  $$ = new ExecuteStatement();
+  $$->name = qualifiedName($4);
+  $$->parameters = $6;
+}
+| '{' opt_odbc_return CALL table_name '}' {
+  $$ = new ExecuteStatement();
+  $$->name = qualifiedName($4);
+};
+
+opt_odbc_return : '?' '=' | /* empty */;
 
 execute_statement : EXECUTE IDENTIFIER {
   $$ = new ExecuteStatement();
@@ -1492,7 +1521,11 @@ table_ref : table_ref_atomic | table_ref_commalist ',' table_ref_atomic {
   $$ = tbl;
 };
 
-table_ref_atomic : nonjoin_table_ref_atomic | join_clause;
+table_ref_atomic : nonjoin_table_ref_atomic | join_clause
+// ODBC outer join escape, e.g. FROM {oj T LEFT OUTER JOIN U ON T.id = U.id}.
+// The escape only marks the join for the driver, so the join itself is what
+// ends up in the tree.
+| ODBC_OJ table_ref_atomic '}' { $$ = $2; };
 
 nonjoin_table_ref_atomic : table_ref_name | '(' select_statement ')' opt_table_alias {
   auto tbl = new TableRef(kTableSelect);

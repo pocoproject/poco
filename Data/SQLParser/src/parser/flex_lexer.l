@@ -247,6 +247,12 @@ CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
 "||"        TOKEN(CONCAT)
 
   /*
+   * ODBC outer join escape prefix. Lexed as one token so "oj" keeps working as
+   * an ordinary identifier everywhere else.
+   */
+"{"[ \t\r\n]*[oO][jJ]    TOKEN(ODBC_OJ)
+
+  /*
    * Oracle's legacy outer join marker. Lexed as one token so it cannot be
    * confused with a parenthesized expression - "(" followed by a lone "+" is
    * not valid SQL in any other position, since the grammar has no unary plus.

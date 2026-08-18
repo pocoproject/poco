@@ -1420,6 +1420,27 @@ TEST(SelectNonReservedKeywordTest) {
   ASSERT_EQ(((SelectStatement*)keptResult.getStatement(2))->selectList->at(0)->type, kExprCast);
 }
 
+TEST(SelectOdbcOuterJoinEscapeTest) {
+  SelectStatement* stmt;
+
+  // ODBC outer join escape, e.g. FROM {oj T LEFT OUTER JOIN U ON ...}. The
+  // escape only marks the join for the driver, so the join itself is what ends
+  // up in the tree.
+  TEST_PARSE_SQL_QUERY("SELECT * FROM {oj t LEFT OUTER JOIN u ON t.id = u.id};", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->fromTable);
+  ASSERT_EQ(stmt->fromTable->type, kTableJoin);
+  ASSERT_EQ(stmt->fromTable->join->type, kJoinLeft);
+  ASSERT_NOTNULL(stmt->fromTable->join->condition);
+
+  // "oj" outside the escape is still an ordinary identifier.
+  TEST_PARSE_SQL_QUERY("SELECT oj FROM t oj;", identResult, 1);
+  stmt = (SelectStatement*)identResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "oj");
+  ASSERT_STREQ(stmt->fromTable->getName(), "oj");
+}
+
 TEST(SelectTopExpressionTest) {
   SelectStatement* stmt;
 

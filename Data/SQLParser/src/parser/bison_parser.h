@@ -53,7 +53,7 @@
 extern int hsql_debug;
 #endif
 /* "%code requires" blocks.  */
-#line 54 "bison_parser.y"
+#line 66 "bison_parser.y"
 
 // %code requires block
 
@@ -268,14 +268,15 @@ extern int hsql_debug;
     SQL_CONNECT = 436,             /* CONNECT  */
     SQL_PRIOR = 437,               /* PRIOR  */
     SQL_START = 438,               /* START  */
-    SQL_EQUALS = 439,              /* EQUALS  */
-    SQL_NOTEQUALS = 440,           /* NOTEQUALS  */
-    SQL_LESS = 441,                /* LESS  */
-    SQL_GREATER = 442,             /* GREATER  */
-    SQL_LESSEQ = 443,              /* LESSEQ  */
-    SQL_GREATEREQ = 444,           /* GREATEREQ  */
-    SQL_NOTNULL = 445,             /* NOTNULL  */
-    SQL_UMINUS = 446               /* UMINUS  */
+    SQL_ODBC_OJ = 439,             /* ODBC_OJ  */
+    SQL_EQUALS = 440,              /* EQUALS  */
+    SQL_NOTEQUALS = 441,           /* NOTEQUALS  */
+    SQL_LESS = 442,                /* LESS  */
+    SQL_GREATER = 443,             /* GREATER  */
+    SQL_LESSEQ = 444,              /* LESSEQ  */
+    SQL_GREATEREQ = 445,           /* GREATEREQ  */
+    SQL_NOTNULL = 446,             /* NOTNULL  */
+    SQL_UMINUS = 447               /* UMINUS  */
   };
   typedef enum hsql_tokentype hsql_token_kind_t;
 #endif
@@ -284,7 +285,7 @@ extern int hsql_debug;
 #if ! defined HSQL_STYPE && ! defined HSQL_STYPE_IS_DECLARED
 union HSQL_STYPE
 {
-#line 117 "bison_parser.y"
+#line 129 "bison_parser.y"
 
   // clang-format on
   bool bval;
@@ -359,7 +360,7 @@ union HSQL_STYPE
 
   // clang-format off
 
-#line 363 "bison_parser.h"
+#line 364 "bison_parser.h"
 
 };
 typedef union HSQL_STYPE HSQL_STYPE;

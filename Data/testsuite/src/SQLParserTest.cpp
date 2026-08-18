@@ -238,6 +238,53 @@ void SQLParserTest::testNonReservedKeywords()
 }
 
 
+void SQLParserTest::testODBCEscapes()
+{
+	// ODBC outer join escape - the escape only marks the join for the driver,
+	// so the join itself is what ends up in the tree.
+	{
+		std::string query = "SELECT * FROM {oj Test LEFT OUTER JOIN Other ON Test.Id = Other.Id};";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertNotNull(pSelect->fromTable);
+		assertTrue(pSelect->fromTable->type == kTableJoin);
+		assertTrue(pSelect->fromTable->join->type == kJoinLeft);
+	}
+
+	// ODBC procedure call escape, with and without the "? =" return marker and
+	// with a qualified procedure name.
+	{
+		std::string query = "{? = call SomeProc(?, 'a', 1)};"
+			"{call SomeProc(?)};"
+			"{ ? = call [mydb].[dbo].[SomeProc]('a') };";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(3, result.size());
+		assertTrue(result.getStatement(0)->type() == kStmtExecute);
+		assertTrue(result.getStatement(1)->type() == kStmtExecute);
+		assertTrue(result.getStatement(2)->type() == kStmtExecute);
+	}
+
+	// "oj" outside the escape stays an ordinary identifier, and a plain
+	// EXECUTE is unchanged.
+	{
+		std::string query = "SELECT oj FROM Test oj;"
+			"EXECUTE SomeProc(1, 2);";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(2, result.size());
+		assertTrue(result.getStatement(0)->type() == kStmtSelect);
+		assertTrue(result.getStatement(1)->type() == kStmtExecute);
+	}
+}
+
+
 void SQLParserTest::testTopWithExpression()
 {
 	// T-SQL requires the parentheses exactly when TOP takes an expression
@@ -857,6 +904,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
 	CppUnit_addTest(pSuite, SQLParserTest, testNonReservedKeywords);
+	CppUnit_addTest(pSuite, SQLParserTest, testODBCEscapes);
 	CppUnit_addTest(pSuite, SQLParserTest, testTopWithExpression);
 	CppUnit_addTest(pSuite, SQLParserTest, testHierarchicalQuery);
 	CppUnit_addTest(pSuite, SQLParserTest, testWithinGroup);
