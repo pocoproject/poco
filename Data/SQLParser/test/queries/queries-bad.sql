@@ -115,3 +115,5 @@
 # A window function or an ordered-set aggregate is not a table reference
 !SELECT * FROM COUNT(*) OVER (PARTITION BY a);
 !SELECT * FROM LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b);
+# A parenthesized TOP holding a placeholder cannot be combined with LIMIT
+!SELECT TOP (?) * FROM t LIMIT 5;

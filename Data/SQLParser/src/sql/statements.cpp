@@ -119,10 +119,12 @@ TransactionStatement::TransactionStatement(TransactionCommand command)
 TransactionStatement::~TransactionStatement() {}
 
 // ExecuteStatement
-ExecuteStatement::ExecuteStatement() : SQLStatement(kStmtExecute), name(nullptr), parameters(nullptr) {}
+ExecuteStatement::ExecuteStatement()
+    : SQLStatement(kStmtExecute), name(nullptr), parameters(nullptr), returnValue(nullptr) {}
 
 ExecuteStatement::~ExecuteStatement() {
   free(name);
+  delete returnValue;
 
   if (parameters) {
     for (Expr* param : *parameters) {

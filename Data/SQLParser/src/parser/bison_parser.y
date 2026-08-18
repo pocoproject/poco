@@ -342,7 +342,7 @@ struct HierarchicalClause {
 %type <table>                  opt_from_clause from_clause table_ref table_ref_atomic table_ref_name nonjoin_table_ref_atomic
 %type <table>                  join_clause table_ref_name_no_alias
 %type <expr>                   expr operand scalar_expr unary_expr binary_expr logic_expr exists_expr extract_expr cast_expr
-%type <expr>                   function_expr between_expr expr_alias param_expr next_value_expr
+%type <expr>                   function_expr between_expr expr_alias param_expr next_value_expr opt_odbc_return
 %type <expr>                   table_function_expr
 %type <expr>                   column_name literal int_literal num_literal string_literal bool_literal date_literal interval_literal
 %type <expr>                   comp_expr opt_where join_condition opt_having case_expr case_list in_expr hint
@@ -378,7 +378,7 @@ struct HierarchicalClause {
 
 %type <str_vec>                ident_commalist opt_column_list
 %type <expr_vec>               expr_list select_list opt_extended_literal_list extended_literal_list hint_list opt_hints opt_partition
-%type <expr_vec>               row_expr_list table_value_row_list
+%type <expr_vec>               row_expr_list table_value_row_list opt_call_args
 %type <table_vec>              table_ref_commalist
 %type <order_vec>              opt_order order_list opt_within_group
 %type <with_description_vec>   opt_with_clause with_clause with_description_list
@@ -526,26 +526,25 @@ prepare_target_query : STRING;
 // {call some_proc(?)}. The optional "? =" is the driver's return value marker
 // and carries nothing the statement itself needs, so both forms produce the
 // same ExecuteStatement an EXECUTE would.
-odbc_call_statement : '{' opt_odbc_return CALL table_name '(' opt_extended_literal_list ')' '}' {
+odbc_call_statement : '{' opt_odbc_return CALL table_name opt_call_args '}' {
   $$ = new ExecuteStatement();
+  $$->returnValue = $2;
   $$->name = qualifiedName($4);
-  $$->parameters = $6;
-}
-| '{' opt_odbc_return CALL table_name '}' {
-  $$ = new ExecuteStatement();
-  $$->name = qualifiedName($4);
+  $$->parameters = $5;
 };
 
-opt_odbc_return : '?' '=' | /* empty */;
+// The marker has to go through param_expr: consumed as a bare '?' it would not
+// reach the parameter list, and ODBC counts it as the first bound parameter.
+opt_odbc_return : param_expr '=' { $$ = $1; }
+| /* empty */ { $$ = nullptr; };
 
-execute_statement : EXECUTE IDENTIFIER {
+opt_call_args : '(' opt_extended_literal_list ')' { $$ = $2; }
+| /* empty */ { $$ = nullptr; };
+
+execute_statement : EXECUTE IDENTIFIER opt_call_args {
   $$ = new ExecuteStatement();
   $$->name = $2;
-}
-| EXECUTE IDENTIFIER '(' opt_extended_literal_list ')' {
-  $$ = new ExecuteStatement();
-  $$->name = $2;
-  $$->parameters = $4;
+  $$->parameters = $3;
 };
 
 /******************************
@@ -1031,8 +1030,25 @@ select_no_paren : select_clause opt_order opt_limit opt_locking_clause {
   $$ = $1;
   $$->order = $2;
 
-  // Limit could have been set by TOP.
+  // Limit could have been set by TOP. A parenthesized TOP may hold a
+  // placeholder, which is also referenced from the parameter list the input
+  // rule walks; deleting it here would leave that reference dangling. TOP with
+  // a literal has no such reference, so "top 20 ... limit 10" keeps working.
   if ($3) {
+    if ($$->limit && $$->limit->limit->type != kExprLiteralInt) {
+      delete $1;
+      if ($2) {
+        for (auto ptr : *$2) delete ptr;
+        delete $2;
+      }
+      delete $3;
+      if ($4) {
+        for (auto ptr : *$4) delete ptr;
+        delete $4;
+      }
+      yyerror(&yyloc, result, scanner, "TOP with an expression cannot be combined with LIMIT.");
+      YYERROR;
+    }
     delete $$->limit;
     $$->limit = $3;
   }
