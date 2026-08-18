@@ -1376,9 +1376,7 @@ TEST(FunctionSchema) {
 TEST(SelectNonReservedKeywordTest) {
   SelectStatement* stmt;
 
-  // Date part keywords as function arguments. The abbreviated spellings (mi,
-  // hh, ...) lex as identifiers and have always parsed, so before this the
-  // behaviour depended on how the date part was spelled.
+  // Date part keywords as function arguments, spelled out or abbreviated.
   TEST_PARSE_SQL_QUERY("SELECT DATEADD(MINUTE, -10, GETDATE()) FROM t;", dateAddResult, 1);
   stmt = (SelectStatement*)dateAddResult.getStatement(0);
   ASSERT_EQ(stmt->selectList->size(), 1);
@@ -1423,11 +1421,9 @@ TEST(SelectNonReservedKeywordTest) {
 TEST(SelectCarriageReturnTest) {
   SelectStatement* stmt;
 
-  // A statement written with CRLF line endings has to parse like the same
-  // statement written with LF. Carriage return is not matched by any rule but
-  // the catch-all one, which ends the token stream, so the statement used to be
-  // cut off at the first line break - sometimes into a syntax error, sometimes
-  // into a shorter statement that still parsed.
+  // A statement written with CRLF line endings parses like the same statement
+  // written with LF. Carriage return is whitespace, so it never reaches the
+  // catch-all rule, which ends the token stream.
   TEST_PARSE_SQL_QUERY("SELECT a,\r\n       b\r\nFROM t\r\nWHERE c = 1;", crlfResult, 1);
   stmt = (SelectStatement*)crlfResult.getStatement(0);
   ASSERT_EQ(stmt->selectList->size(), 2);
@@ -1845,8 +1841,7 @@ TEST(SelectScientificNotationTest) {
     ASSERT_NULL(stmt->selectList->at(0)->alias);
   }
 
-  // Outside a select list there is no alias to absorb the exponent, so the
-  // same literal used to be a hard syntax error.
+  // Outside a select list there is no alias to absorb the exponent.
   TEST_PARSE_SQL_QUERY("SELECT a FROM t WHERE x = 0.5e-2;", whereResult, 1);
   stmt = (SelectStatement*)whereResult.getStatement(0);
   ASSERT_NOTNULL(stmt->whereClause);
