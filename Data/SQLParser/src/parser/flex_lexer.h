@@ -471,7 +471,7 @@ void yyfree ( void * , yyscan_t yyscanner );
 /* POCO-LOCAL: io.h provides the POSIX-ish I/O declarations flex's runtime
  * uses (read/write/isatty/close) on MSVC; unistd.h does not exist there.
  * Re-apply this conditional after every flex regen - it lives in the
- * generated header, not in flex_lexer.l.
+ * generated file, not in flex_lexer.l.
  */
 #if defined(_WIN32) || defined(_WIN64)
 	#include <io.h>
@@ -740,7 +740,7 @@ extern int yylex \
 #undef yyTABLES_NAME
 #endif
 
-#line 361 "flex_lexer.l"
+#line 376 "flex_lexer.l"
 
 
 #line 737 "flex_lexer.h"

@@ -21,6 +21,14 @@
 static thread_local std::stringstream strbuf;
 
 %}
+
+  /*
+   * Whitespace, carriage return included. Every rule that has to skip or span
+   * whitespace uses this, so a CRLF input cannot be handled by one rule and
+   * missed by the next.
+   */
+WS  [ \t\r\n]
+
 %x singlequotedstring
 
 /***************************
@@ -49,7 +57,12 @@ static thread_local std::stringstream strbuf;
 /* %option nodefault */
 
 
-%s COMMENT
+  /*
+   * Exclusive: an inclusive COMMENT would also run the whitespace rule below,
+   * which matches longer than the newline ending the comment and so never
+   * returns to INITIAL - silently swallowing the line after the comment.
+   */
+%x COMMENT
 %x afterarray
 
 /***************************
@@ -61,7 +74,7 @@ static thread_local std::stringstream strbuf;
 <COMMENT>[^\n]* /* skipping comment content until a end of line is read */;
 <COMMENT>\n     BEGIN(INITIAL);
 
-[ \t\r\n]+      /* skip whitespace, CR included: a CRLF file would otherwise hit the catch-all rule below, which ends the token stream */;
+{WS}+           /* skip whitespace, CR included: a CRLF file would otherwise hit the catch-all rule below, which ends the token stream */;
 
 ADD         TOKEN(ADD)
 AFTER       TOKEN(AFTER)
@@ -235,9 +248,9 @@ WITHIN      TOKEN(WITHIN)
 YEAR        TOKEN(YEAR)
 YEARS       TOKEN(YEARS)
 
-CURRENT[ \t\n]+ROW       TOKEN(CURRENT_ROW)
-NEXT[ \t\n]+VALUE[ \t\n]+FOR TOKEN(NEXT_VALUE_FOR)
-CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
+CURRENT{WS}+ROW              TOKEN(CURRENT_ROW)
+NEXT{WS}+VALUE{WS}+FOR       TOKEN(NEXT_VALUE_FOR)
+CHARACTER{WS}+VARYING        TOKEN(CHARACTER_VARYING)
 
             /* Allow =/== see https://sqlite.org/lang_expr.html#collateop */
 "=="        TOKEN(EQUALS)
@@ -249,16 +262,17 @@ CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
 
   /*
    * ODBC outer join escape prefix. Lexed as one token so "oj" keeps working as
-   * an ordinary identifier everywhere else.
+   * an ordinary identifier everywhere else. The trailing context stops the rule
+   * from taking the "{oj" out of a name such as "{ojtest".
    */
-"{"[ \t\r\n]*[oO][jJ]    TOKEN(ODBC_OJ)
+"{"{WS}*oj/[^A-Za-z0-9_]    TOKEN(ODBC_OJ)
 
   /*
    * Oracle's legacy outer join marker. Lexed as one token so it cannot be
    * confused with a parenthesized expression - "(" followed by a lone "+" is
    * not valid SQL in any other position, since the grammar has no unary plus.
    */
-"("[ \t\r\n]*"+"[ \t\r\n]*")"    TOKEN(OUTERJOIN)
+"("{WS}*"+"{WS}*")"    TOKEN(OUTERJOIN)
 
 \$[0-9]+    {
   yylval->ival = atoll(yytext + 1);
@@ -278,9 +292,9 @@ CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
    * and the exponent as a separate identifier, so `SELECT 1.5e3 FROM t` silently
    * parses as `SELECT 1.5 AS e3` instead of failing.
    */
-[0-9]+"."[0-9]*[eE][-+]?[0-9]+ |
-"."[0-9]+[eE][-+]?[0-9]+ |
-[0-9]+[eE][-+]?[0-9]+ {
+[0-9]+"."[0-9]*e[-+]?[0-9]+ |
+"."[0-9]+e[-+]?[0-9]+ |
+[0-9]+e[-+]?[0-9]+ {
   yylval->fval = atof(yytext);
   return SQL_FLOATVAL;
 }
@@ -317,7 +331,7 @@ CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
   return SQL_IDENTIFIER;
 }
 
-<afterarray>[ \t\n]+ ; /* stay in afterarray across whitespace before the '[', e.g. "ARRAY [1,2,3]" */
+<afterarray>{WS}+ ; /* stay in afterarray across whitespace before the '[', e.g. "ARRAY [1,2,3]" */
 
 <afterarray>\[ {
   // The '[' immediately after ARRAY belongs to the array_expr grammar
