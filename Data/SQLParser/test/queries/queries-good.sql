@@ -135,6 +135,10 @@ SELECT * FROM [test];
 SELECT [my col] FROM [some schema].[my table];
 SELECT * FROM mydb.some_schema.test;
 SELECT ARRAY[foo] FROM test;
+# Oracle hierarchical query
+SELECT LEVEL FROM dual CONNECT BY LEVEL <= 5;
+SELECT id FROM test START WITH id = 1 CONNECT BY PRIOR id = parent_id;
+SELECT id FROM test CONNECT BY PRIOR id = parent_id;
 # Ordered-set aggregate (WITHIN GROUP)
 SELECT LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b) FROM test;
 SELECT LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b DESC, c ASC) AS lst FROM test;

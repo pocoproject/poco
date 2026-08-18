@@ -238,6 +238,56 @@ void SQLParserTest::testNonReservedKeywords()
 }
 
 
+void SQLParserTest::testHierarchicalQuery()
+{
+	// CONNECT BY on its own, with the LEVEL pseudo column. LEVEL is not a
+	// keyword, so it stays an ordinary column reference.
+	{
+		std::string query = "SELECT LEVEL FROM Dual CONNECT BY LEVEL <= 5;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertNotNull(pSelect->connectBy);
+		assertTrue(pSelect->connectBy->opType == kOpLessEq);
+		assertNull(pSelect->startWith);
+	}
+
+	// START WITH plus CONNECT BY PRIOR - PRIOR binds to the operand after it,
+	// so the condition stays a comparison of PRIOR Id against ParentId.
+	{
+		std::string query = "SELECT Id FROM Test START WITH Id = 1 CONNECT BY PRIOR Id = ParentId;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertNotNull(pSelect->startWith);
+		assertNotNull(pSelect->connectBy);
+		assertTrue(pSelect->connectBy->expr->type == kExprOperator);
+		assertTrue(pSelect->connectBy->expr->opType == kOpPrior);
+	}
+
+	// CONNECT and START stay usable as ordinary names, and a statement without
+	// the clauses leaves both null.
+	{
+		std::string query = "SELECT Connect, Start FROM Test WHERE Connect = 1;"
+			"SELECT A FROM Test WHERE B = 1 GROUP BY A ORDER BY A;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(2, result.size());
+
+		const SelectStatement* pPlain = static_cast<const SelectStatement*>(result.getStatement(1));
+		assertNull(pPlain->startWith);
+		assertNull(pPlain->connectBy);
+	}
+}
+
+
 void SQLParserTest::testWithinGroup()
 {
 	// LISTAGG(X, ', ') WITHIN GROUP (ORDER BY Y) - ordered-set aggregate. The
@@ -766,6 +816,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
 	CppUnit_addTest(pSuite, SQLParserTest, testNonReservedKeywords);
+	CppUnit_addTest(pSuite, SQLParserTest, testHierarchicalQuery);
 	CppUnit_addTest(pSuite, SQLParserTest, testWithinGroup);
 	CppUnit_addTest(pSuite, SQLParserTest, testOracleOuterJoin);
 	CppUnit_addTest(pSuite, SQLParserTest, testTableValueConstructor);

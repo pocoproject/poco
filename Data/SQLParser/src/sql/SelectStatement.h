@@ -76,6 +76,13 @@ struct SQLParser_API SelectStatement : SQLStatement {
   bool selectDistinct;
   std::vector<Expr*>* selectList;
   Expr* whereClause;
+
+  // Oracle hierarchical query clauses, e.g.
+  // START WITH id = 1 CONNECT BY PRIOR id = parent_id. Both are null for a
+  // statement that is not hierarchical.
+  Expr* startWith;
+  Expr* connectBy;
+
   GroupByDescription* groupBy;
 
   // Note that a SetOperation is always connected to a

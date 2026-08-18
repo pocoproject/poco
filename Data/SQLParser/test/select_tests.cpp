@@ -1420,6 +1420,45 @@ TEST(SelectNonReservedKeywordTest) {
   ASSERT_EQ(((SelectStatement*)keptResult.getStatement(2))->selectList->at(0)->type, kExprCast);
 }
 
+TEST(SelectHierarchicalQueryTest) {
+  SelectStatement* stmt;
+
+  // CONNECT BY on its own, with the LEVEL pseudo column. LEVEL is not a
+  // keyword, so it stays an ordinary column reference.
+  TEST_PARSE_SQL_QUERY("SELECT LEVEL FROM dual CONNECT BY LEVEL <= 5;", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->connectBy);
+  ASSERT_EQ(stmt->connectBy->opType, kOpLessEq);
+  ASSERT_EQ(stmt->connectBy->expr->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->connectBy->expr->name, "LEVEL");
+  ASSERT_NULL(stmt->startWith);
+
+  // START WITH plus CONNECT BY PRIOR - PRIOR binds to the operand that follows
+  // it, so the condition stays a comparison of PRIOR id against parent_id.
+  TEST_PARSE_SQL_QUERY("SELECT id FROM t START WITH id = 1 CONNECT BY PRIOR id = parent_id;", hierResult, 1);
+  stmt = (SelectStatement*)hierResult.getStatement(0);
+  ASSERT_NOTNULL(stmt->startWith);
+  ASSERT_EQ(stmt->startWith->opType, kOpEquals);
+  ASSERT_NOTNULL(stmt->connectBy);
+  ASSERT_EQ(stmt->connectBy->opType, kOpEquals);
+  ASSERT_EQ(stmt->connectBy->expr->type, kExprOperator);
+  ASSERT_EQ(stmt->connectBy->expr->opType, kOpPrior);
+  ASSERT_STREQ(stmt->connectBy->expr->expr->name, "id");
+
+  // CONNECT and START stay usable as ordinary names, and a statement without
+  // the clauses leaves both null.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT connect, start FROM t WHERE connect = 1;"
+      "SELECT a FROM t WHERE b = 1 GROUP BY a ORDER BY a;",
+      keptResult, 2);
+  stmt = (SelectStatement*)keptResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprColumnRef);
+  stmt = (SelectStatement*)keptResult.getStatement(1);
+  ASSERT_NULL(stmt->startWith);
+  ASSERT_NULL(stmt->connectBy);
+}
+
 TEST(SelectWithinGroupTest) {
   SelectStatement* stmt;
 

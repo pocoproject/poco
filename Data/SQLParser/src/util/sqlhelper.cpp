@@ -248,6 +248,16 @@ void printSelectStatementInfo(const SelectStatement* stmt, uintmax_t num_indent)
     printExpression(stmt->whereClause, num_indent + 2);
   }
 
+  if (stmt->startWith) {
+    inprint("START WITH:", num_indent + 1);
+    printExpression(stmt->startWith, num_indent + 2);
+  }
+
+  if (stmt->connectBy) {
+    inprint("CONNECT BY:", num_indent + 1);
+    printExpression(stmt->connectBy, num_indent + 2);
+  }
+
   if (stmt->groupBy) {
     inprint("GroupBy:", num_indent + 1);
     for (Expr* expr : *stmt->groupBy->columns) printExpression(expr, num_indent + 2);
@@ -468,7 +478,8 @@ std::ostream& operator<<(std::ostream& os, const OperatorType& op) {
       {kOpOr, "OR"},         {kOpIn, "IN"},
       {kOpConcat, "CONCAT"}, {kOpNot, "NOT"},
       {kOpUnaryMinus, "-"},  {kOpIsNull, "IS NULL"},
-      {kOpExists, "EXISTS"},  {kOpOuterJoin, "(+)"}};
+      {kOpExists, "EXISTS"},  {kOpOuterJoin, "(+)"},
+      {kOpPrior, "PRIOR"}};
 
   const auto found = operatorToToken.find(op);
   if (found == operatorToToken.cend()) {

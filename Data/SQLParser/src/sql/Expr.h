@@ -77,7 +77,11 @@ enum OperatorType {
 
   // Oracle's legacy outer join marker, e.g. WHERE a.id (+) = b.id. Marks the
   // operand it follows as the null-extended side of the join.
-  kOpOuterJoin
+  kOpOuterJoin,
+
+  // Oracle's PRIOR, used in the CONNECT BY clause of a hierarchical query to
+  // refer to the parent row, e.g. CONNECT BY PRIOR id = parent_id.
+  kOpPrior
 };
 
 enum DatetimeField {

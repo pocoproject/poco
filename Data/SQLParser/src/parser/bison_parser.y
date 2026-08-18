@@ -271,7 +271,7 @@
 %token RANGE ROWS GROUPS UNBOUNDED FOLLOWING PRECEDING CURRENT_ROW
 %token FETCH NEXT ONLY
 %token UNIQUE PRIMARY FOREIGN KEY REFERENCES
-%token OUTERJOIN WITHIN
+%token OUTERJOIN WITHIN CONNECT PRIOR START
 
 /*********************************
  ** Non-Terminal types (http://www.gnu.org/software/bison/manual/html_node/Type-Decl.html)
@@ -308,6 +308,7 @@
 %type <expr>                   function_expr between_expr expr_alias param_expr
 %type <expr>                   column_name literal int_literal num_literal string_literal bool_literal date_literal interval_literal
 %type <expr>                   comp_expr opt_where join_condition opt_having case_expr case_list in_expr hint
+%type <expr>                   opt_start_with opt_connect_by
 %type <expr>                   array_expr array_index null_literal extended_literal casted_extended_literal
 %type <limit>                  opt_limit opt_top
 %type <order>                  order_desc
@@ -367,6 +368,7 @@
 
 /* Unary Operators */
 %right    UMINUS
+%right    PRIOR
 %left     '[' ']'
 %left     '(' ')'
 %left     '.'
@@ -1017,14 +1019,24 @@ set_type : UNION {
 opt_all : ALL { $$ = true; }
 | /* empty */ { $$ = false; };
 
-select_clause : SELECT opt_top opt_distinct select_list opt_from_clause opt_where opt_group {
+// Oracle hierarchical query clauses. Written in the canonical order, START
+// WITH before CONNECT BY; either may be omitted.
+opt_start_with : START WITH expr { $$ = $3; }
+| /* empty */ { $$ = nullptr; };
+
+opt_connect_by : CONNECT BY expr { $$ = $3; }
+| /* empty */ { $$ = nullptr; };
+
+select_clause : SELECT opt_top opt_distinct select_list opt_from_clause opt_where opt_start_with opt_connect_by opt_group {
   $$ = new SelectStatement();
   $$->limit = $2;
   $$->selectDistinct = $3;
   $$->selectList = $4;
   $$->fromTable = $5;
   $$->whereClause = $6;
-  $$->groupBy = $7;
+  $$->startWith = $7;
+  $$->connectBy = $8;
+  $$->groupBy = $9;
 };
 
 opt_distinct : DISTINCT { $$ = true; }
@@ -1166,6 +1178,8 @@ scalar_expr : column_name | literal
 | column_name OUTERJOIN { $$ = Expr::makeOpUnary(kOpOuterJoin, $1); };
 
 unary_expr : '-' operand { $$ = Expr::makeOpUnary(kOpUnaryMinus, $2); }
+// Oracle's PRIOR, referring to the parent row inside CONNECT BY.
+| PRIOR operand %prec PRIOR { $$ = Expr::makeOpUnary(kOpPrior, $2); }
 | NOT operand { $$ = Expr::makeOpUnary(kOpNot, $2); }
 | operand ISNULL { $$ = Expr::makeOpUnary(kOpIsNull, $1); }
 | operand IS NULL { $$ = Expr::makeOpUnary(kOpIsNull, $1); }
@@ -1368,7 +1382,9 @@ nonreserved_keyword : SECOND { $$ = strdup("SECOND"); }
 | INT { $$ = strdup("INT"); }
 | INTEGER { $$ = strdup("INTEGER"); }
 | DATETIME { $$ = strdup("DATETIME"); }
-| TIMESTAMP { $$ = strdup("TIMESTAMP"); };
+| TIMESTAMP { $$ = strdup("TIMESTAMP"); }
+| CONNECT { $$ = strdup("CONNECT"); }
+| START { $$ = strdup("START"); };
 
 literal : string_literal | bool_literal | num_literal | null_literal | date_literal | interval_literal | param_expr;
 

@@ -291,6 +291,8 @@ SelectStatement::SelectStatement()
       selectDistinct(false),
       selectList(nullptr),
       whereClause(nullptr),
+      startWith(nullptr),
+      connectBy(nullptr),
       groupBy(nullptr),
       setOperations(nullptr),
       order(nullptr),
@@ -301,6 +303,8 @@ SelectStatement::SelectStatement()
 SelectStatement::~SelectStatement() {
   delete fromTable;
   delete whereClause;
+  delete startWith;
+  delete connectBy;
   delete groupBy;
   delete limit;
 
