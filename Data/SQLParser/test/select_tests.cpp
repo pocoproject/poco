@@ -1420,6 +1420,38 @@ TEST(SelectNonReservedKeywordTest) {
   ASSERT_EQ(((SelectStatement*)keptResult.getStatement(2))->selectList->at(0)->type, kExprCast);
 }
 
+TEST(SelectRowConstructorInTest) {
+  SelectStatement* stmt;
+
+  // (a, b) IN (SELECT x, y FROM u) - the tuple is kept as an array expression,
+  // so every element stays in the tree.
+  TEST_PARSE_SQL_QUERY("SELECT c FROM t WHERE (a, b) IN (SELECT x, y FROM u);", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->whereClause);
+  ASSERT_EQ(stmt->whereClause->opType, kOpIn);
+  ASSERT_EQ(stmt->whereClause->expr->type, kExprArray);
+  ASSERT_EQ(stmt->whereClause->expr->exprList->size(), 2);
+  ASSERT_NOTNULL(stmt->whereClause->select);
+
+  TEST_PARSE_SQL_QUERY("SELECT c FROM t WHERE (a, b, c) NOT IN (SELECT x, y, z FROM u);", notInResult, 1);
+  stmt = (SelectStatement*)notInResult.getStatement(0);
+  ASSERT_EQ(stmt->whereClause->opType, kOpNot);
+  ASSERT_EQ(stmt->whereClause->expr->opType, kOpIn);
+  ASSERT_EQ(stmt->whereClause->expr->expr->exprList->size(), 3);
+
+  // A single parenthesized expression is still a plain operand, not a
+  // one-element row, and the value-list form of IN is unchanged.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT c FROM t WHERE (a) IN (SELECT x FROM u);"
+      "SELECT c FROM t WHERE a IN (1, 2, 3);",
+      keptResult, 2);
+  stmt = (SelectStatement*)keptResult.getStatement(0);
+  ASSERT_EQ(stmt->whereClause->expr->type, kExprColumnRef);
+  stmt = (SelectStatement*)keptResult.getStatement(1);
+  ASSERT_EQ(stmt->whereClause->opType, kOpIn);
+  ASSERT_EQ(stmt->whereClause->exprList->size(), 3);
+}
+
 TEST(SelectMultiPartColumnNameTest) {
   SelectStatement* stmt;
 

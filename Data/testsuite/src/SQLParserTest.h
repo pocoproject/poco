@@ -35,6 +35,7 @@ public:
 	void testThreePartTableName();
 	void testArrayLiteralNotShadowedByBracketIdentifier();
 	void testNonReservedKeywords();
+	void testRowConstructorIn();
 	void testMultiPartColumnName();
 	void testStringAlias();
 	void testScientificNotationLiteral();

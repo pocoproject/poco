@@ -338,6 +338,7 @@
 
 %type <str_vec>                ident_commalist opt_column_list
 %type <expr_vec>               expr_list select_list opt_extended_literal_list extended_literal_list hint_list opt_hints opt_partition
+%type <expr_vec>               row_expr_list
 %type <table_vec>              table_ref_commalist
 %type <order_vec>              opt_order order_list
 %type <with_description_vec>   opt_with_clause with_clause with_description_list
@@ -1176,7 +1177,24 @@ logic_expr : expr AND expr { $$ = Expr::makeOpBinary($1, kOpAnd, $3); }
 in_expr : operand IN '(' expr_list ')' { $$ = Expr::makeInOperator($1, $4); }
 | operand NOT IN '(' expr_list ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator($1, $5)); }
 | operand IN '(' select_no_paren ')' { $$ = Expr::makeInOperator($1, $4); }
-| operand NOT IN '(' select_no_paren ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator($1, $5)); };
+| operand NOT IN '(' select_no_paren ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator($1, $5)); }
+// Row constructor on the left of IN, e.g. (a, b) IN (SELECT x, y FROM t). The
+// tuple is represented as an array expression - Expr has no dedicated row type
+// and this keeps every element in the tree instead of dropping any.
+| '(' row_expr_list ')' IN '(' select_no_paren ')' { $$ = Expr::makeInOperator(Expr::makeArray($2), $6); }
+| '(' row_expr_list ')' NOT IN '(' select_no_paren ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator(Expr::makeArray($2), $7)); };
+
+// Two or more elements: a single parenthesized expression stays a plain operand,
+// so the grammar has no ambiguity to resolve between "(a)" and a one-element row.
+row_expr_list : expr_alias ',' expr_alias {
+  $$ = new std::vector<Expr*>();
+  $$->push_back($1);
+  $$->push_back($3);
+}
+| row_expr_list ',' expr_alias {
+  $1->push_back($3);
+  $$ = $1;
+};
 
 // CASE grammar based on: flex & bison by John Levine
 // https://www.safaribooksonline.com/library/view/flex-bison/9780596805418/ch04.html#id352665

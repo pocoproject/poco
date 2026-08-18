@@ -135,6 +135,9 @@ SELECT * FROM [test];
 SELECT [my col] FROM [some schema].[my table];
 SELECT * FROM mydb.some_schema.test;
 SELECT ARRAY[foo] FROM test;
+# Row constructor on the left of IN
+SELECT * FROM test WHERE (a, b) IN (SELECT x, y FROM other);
+SELECT * FROM test WHERE (a, b, c) NOT IN (SELECT x, y, z FROM other);
 # Multi-part column references
 SELECT dbo.test.a, mydb.dbo.test.b FROM mydb.dbo.test;
 SELECT dbo.test.*, mydb.dbo.test.* FROM mydb.dbo.test;

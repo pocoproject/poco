@@ -238,6 +238,40 @@ void SQLParserTest::testNonReservedKeywords()
 }
 
 
+void SQLParserTest::testRowConstructorIn()
+{
+	// (A, B) IN (SELECT X, Y FROM ...) - row constructor on the left of IN.
+	// The tuple is represented as an array expression, so no element is lost.
+	{
+		std::string query = "SELECT C FROM Test WHERE (A, B) IN (SELECT X, Y FROM Other);";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertNotNull(pSelect->whereClause);
+		assertTrue(pSelect->whereClause->opType == kOpIn);
+		assertTrue(pSelect->whereClause->expr->type == kExprArray);
+		assertEqual(2, pSelect->whereClause->expr->exprList->size());
+	}
+
+	// NOT IN form, and the unchanged single-operand forms.
+	{
+		std::string query = "SELECT C FROM Test WHERE (A, B, C) NOT IN (SELECT X, Y, Z FROM Other);"
+			"SELECT C FROM Test WHERE (A) IN (SELECT X FROM Other);"
+			"SELECT C FROM Test WHERE A IN (1, 2, 3);";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(3, result.size());
+
+		const SelectStatement* pSingle = static_cast<const SelectStatement*>(result.getStatement(1));
+		assertTrue(pSingle->whereClause->expr->type == kExprColumnRef);
+	}
+}
+
+
 void SQLParserTest::testMultiPartColumnName()
 {
 	// Three- and four-part column references, the column-side counterpart of
@@ -545,6 +579,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
 	CppUnit_addTest(pSuite, SQLParserTest, testNonReservedKeywords);
+	CppUnit_addTest(pSuite, SQLParserTest, testRowConstructorIn);
 	CppUnit_addTest(pSuite, SQLParserTest, testMultiPartColumnName);
 	CppUnit_addTest(pSuite, SQLParserTest, testStringAlias);
 	CppUnit_addTest(pSuite, SQLParserTest, testScientificNotationLiteral);
