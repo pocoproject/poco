@@ -148,6 +148,7 @@ public:
 		poco_assert(_bOwns == false);
 
 		_bOwns = _pMutex->tryLock();
+		return _bOwns;
 	}
 
 	void unlock()
