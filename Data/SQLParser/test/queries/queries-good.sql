@@ -135,6 +135,10 @@ SELECT * FROM [test];
 SELECT [my col] FROM [some schema].[my table];
 SELECT * FROM mydb.some_schema.test;
 SELECT ARRAY[foo] FROM test;
+# Table-valued function in FROM
+SELECT value FROM STRING_SPLIT('a,b', ',');
+SELECT * FROM STRING_SPLIT('a,b', ',') AS s;
+SELECT * FROM dbo.fn_split('a', ',') f;
 # Row constructor on the left of IN
 SELECT * FROM test WHERE (a, b) IN (SELECT x, y FROM other);
 SELECT * FROM test WHERE (a, b, c) NOT IN (SELECT x, y, z FROM other);

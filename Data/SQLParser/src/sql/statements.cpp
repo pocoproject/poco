@@ -379,7 +379,14 @@ Alias::~Alias() {
 
 // TableRef
 TableRef::TableRef(TableRefType type)
-    : type(type), schema(nullptr), name(nullptr), alias(nullptr), select(nullptr), list(nullptr), join(nullptr) {}
+    : type(type),
+      schema(nullptr),
+      name(nullptr),
+      alias(nullptr),
+      select(nullptr),
+      list(nullptr),
+      join(nullptr),
+      func(nullptr) {}
 
 TableRef::~TableRef() {
   free(schema);
@@ -388,6 +395,7 @@ TableRef::~TableRef() {
   delete select;
   delete join;
   delete alias;
+  delete func;
 
   if (list) {
     for (TableRef* table : *list) {

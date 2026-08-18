@@ -1420,6 +1420,40 @@ TEST(SelectNonReservedKeywordTest) {
   ASSERT_EQ(((SelectStatement*)keptResult.getStatement(2))->selectList->at(0)->type, kExprCast);
 }
 
+TEST(SelectTableValuedFunctionTest) {
+  SelectStatement* stmt;
+
+  // FROM STRING_SPLIT(s, ',') - the table reference is the function call
+  // itself; name mirrors the function name so getName() keeps working.
+  TEST_PARSE_SQL_QUERY("SELECT value FROM STRING_SPLIT('a,b', ',');", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->fromTable);
+  ASSERT_EQ(stmt->fromTable->type, kTableFunc);
+  ASSERT_NOTNULL(stmt->fromTable->func);
+  ASSERT_EQ(stmt->fromTable->func->type, kExprFunctionRef);
+  ASSERT_STREQ(stmt->fromTable->func->name, "STRING_SPLIT");
+  ASSERT_EQ(stmt->fromTable->func->exprList->size(), 2);
+  ASSERT_STREQ(stmt->fromTable->getName(), "STRING_SPLIT");
+
+  // With an alias, schema qualified, and nested in a subquery.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT * FROM STRING_SPLIT('a,b', ',') AS s;"
+      "SELECT * FROM dbo.fn_split('a', ',') f;"
+      "SELECT a FROM t WHERE id IN (SELECT CAST(value AS INT) FROM STRING_SPLIT('1,2', ','));",
+      moreResult, 3);
+  stmt = (SelectStatement*)moreResult.getStatement(0);
+  ASSERT_EQ(stmt->fromTable->type, kTableFunc);
+  ASSERT_STREQ(stmt->fromTable->getName(), "s");
+
+  // Plain table references and subqueries in FROM are unchanged.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT * FROM t a, u b WHERE a.id = b.id;"
+      "SELECT * FROM (SELECT 1) x;",
+      keptResult, 2);
+  ASSERT_EQ(((SelectStatement*)keptResult.getStatement(0))->fromTable->type, kTableCrossProduct);
+  ASSERT_EQ(((SelectStatement*)keptResult.getStatement(1))->fromTable->type, kTableSelect);
+}
+
 TEST(SelectRowConstructorInTest) {
   SelectStatement* stmt;
 

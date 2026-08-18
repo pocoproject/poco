@@ -12,7 +12,7 @@ struct JoinDefinition;
 struct TableRef;
 
 // Possible table reference types.
-enum TableRefType { kTableName, kTableSelect, kTableJoin, kTableCrossProduct };
+enum TableRefType { kTableName, kTableSelect, kTableJoin, kTableCrossProduct, kTableFunc };
 
 struct SQLParser_API TableName {
   char* schema;
@@ -41,6 +41,11 @@ struct SQLParser_API TableRef {
   SelectStatement* select;
   std::vector<TableRef*>* list;
   JoinDefinition* join;
+
+  // Set for kTableFunc: the table-valued function call this reference is,
+  // e.g. FROM STRING_SPLIT(s, ','). name mirrors the function name so
+  // getName() keeps working for every table reference type.
+  Expr* func;
 
   // Returns true if a schema is set.
   bool hasSchema() const;

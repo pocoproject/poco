@@ -238,6 +238,54 @@ void SQLParserTest::testNonReservedKeywords()
 }
 
 
+void SQLParserTest::testTableValuedFunction()
+{
+	// FROM STRING_SPLIT(s, ',') - the table reference is the function call
+	// itself, kept as kTableFunc with the call in TableRef::func.
+	{
+		std::string query = "SELECT Value FROM STRING_SPLIT('a,b', ',');";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertNotNull(pSelect->fromTable);
+		assertTrue(pSelect->fromTable->type == kTableFunc);
+		assertNotNull(pSelect->fromTable->func);
+		assertEqual("STRING_SPLIT", std::string(pSelect->fromTable->func->name));
+		assertEqual(2, pSelect->fromTable->func->exprList->size());
+		assertEqual("STRING_SPLIT", std::string(pSelect->fromTable->getName()));
+	}
+
+	// Aliased, schema qualified, and nested in a subquery.
+	{
+		std::string query = "SELECT * FROM STRING_SPLIT('a,b', ',') AS S;"
+			"SELECT * FROM dbo.fn_split('a', ',') F;"
+			"SELECT A FROM Test WHERE Id IN (SELECT CAST(Value AS INT) FROM STRING_SPLIT('1,2', ','));";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(3, result.size());
+
+		const SelectStatement* pAliased = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertEqual("S", std::string(pAliased->fromTable->getName()));
+	}
+
+	// Plain table references and subqueries in FROM are unchanged.
+	{
+		std::string query = "SELECT * FROM Test A, Other B WHERE A.Id = B.Id;"
+			"SELECT * FROM (SELECT 1) X;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(2, result.size());
+		assertTrue(static_cast<const SelectStatement*>(result.getStatement(0))->fromTable->type == kTableCrossProduct);
+		assertTrue(static_cast<const SelectStatement*>(result.getStatement(1))->fromTable->type == kTableSelect);
+	}
+}
+
+
 void SQLParserTest::testRowConstructorIn()
 {
 	// (A, B) IN (SELECT X, Y FROM ...) - row constructor on the left of IN.
@@ -579,6 +627,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
 	CppUnit_addTest(pSuite, SQLParserTest, testNonReservedKeywords);
+	CppUnit_addTest(pSuite, SQLParserTest, testTableValuedFunction);
 	CppUnit_addTest(pSuite, SQLParserTest, testRowConstructorIn);
 	CppUnit_addTest(pSuite, SQLParserTest, testMultiPartColumnName);
 	CppUnit_addTest(pSuite, SQLParserTest, testStringAlias);

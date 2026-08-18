@@ -1465,6 +1465,15 @@ nonjoin_table_ref_atomic : table_ref_name | '(' select_statement ')' opt_table_a
   tbl->select = $2;
   tbl->alias = $4;
   $$ = tbl;
+}
+// Table-valued function, e.g. FROM STRING_SPLIT(s, ','). name mirrors the
+// function name so getName() behaves like it does for a plain table.
+| function_expr opt_table_alias {
+  auto tbl = new TableRef(kTableFunc);
+  tbl->func = $1;
+  if ($1->name) tbl->name = strdup($1->name);
+  tbl->alias = $2;
+  $$ = tbl;
 };
 
 table_ref_commalist : table_ref_atomic {
