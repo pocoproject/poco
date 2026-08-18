@@ -1764,7 +1764,7 @@ case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
 #line 78 "flex_lexer.l"
-/* skip whitespace, CR included: a CRLF file would otherwise hit the catch-all rule below, which ends the token stream */;
+/* skip whitespace; CR is included so CRLF input never reaches the catch-all rule below, which ends the token stream */;
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
@@ -2750,27 +2750,26 @@ YY_RULE_SETUP
 	YY_BREAK
 /*
    * Scientific notation, e.g. 1.5e3, 1.5E+3, .5e-3, 2e10. Has to come before the
-   * plain float and integer rules: without it the mantissa is scanned as a number
-   * and the exponent as a separate identifier, so `SELECT 1.5e3 FROM t` silently
-   * parses as `SELECT 1.5 AS e3` instead of failing.
+   * plain float and integer rules, which would otherwise take the mantissa and
+   * leave the exponent to be scanned as an identifier.
    */
 case 191:
-#line 305 "flex_lexer.l"
+#line 304 "flex_lexer.l"
 case 192:
-#line 306 "flex_lexer.l"
+#line 305 "flex_lexer.l"
 case 193:
 YY_RULE_SETUP
-#line 306 "flex_lexer.l"
+#line 305 "flex_lexer.l"
 {
   yylval->fval = atof(yytext);
   return SQL_FLOATVAL;
 }
 	YY_BREAK
 case 194:
-#line 312 "flex_lexer.l"
+#line 311 "flex_lexer.l"
 case 195:
 YY_RULE_SETUP
-#line 312 "flex_lexer.l"
+#line 311 "flex_lexer.l"
 {
   yylval->fval = atof(yytext);
   return SQL_FLOATVAL;
@@ -2783,7 +2782,7 @@ YY_RULE_SETUP
    */
 case 196:
 YY_RULE_SETUP
-#line 322 "flex_lexer.l"
+#line 321 "flex_lexer.l"
 {
   yylval->ival = LLONG_MIN;
   return SQL_INTVAL;
@@ -2791,7 +2790,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 197:
 YY_RULE_SETUP
-#line 327 "flex_lexer.l"
+#line 326 "flex_lexer.l"
 {
   errno = 0;
   yylval->ival = strtoll(yytext, nullptr, 0);
@@ -2804,7 +2803,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 198:
 YY_RULE_SETUP
-#line 337 "flex_lexer.l"
+#line 336 "flex_lexer.l"
 {
   // Crop the leading and trailing quote char
   yylval->sval = hsql::substr(yytext, 1, strlen(yytext)-1);
@@ -2814,12 +2813,12 @@ YY_RULE_SETUP
 case 199:
 /* rule 199 can match eol */
 YY_RULE_SETUP
-#line 343 "flex_lexer.l"
+#line 342 "flex_lexer.l"
 ; /* stay in afterarray across whitespace before the '[', e.g. "ARRAY [1,2,3]" */
 	YY_BREAK
 case 200:
 YY_RULE_SETUP
-#line 345 "flex_lexer.l"
+#line 344 "flex_lexer.l"
 {
   // The '[' immediately after ARRAY belongs to the array_expr grammar
   // (ARRAY '[' expr_list ']'), not bracket-quoting - even for a single
@@ -2831,7 +2830,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 201:
 YY_RULE_SETUP
-#line 354 "flex_lexer.l"
+#line 353 "flex_lexer.l"
 {
   // Whatever follows ARRAY wasn't '[' (a syntax error downstream either
   // way) - drop back to normal lexing and reprocess this character there.
@@ -2841,7 +2840,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 202:
 YY_RULE_SETUP
-#line 361 "flex_lexer.l"
+#line 360 "flex_lexer.l"
 {
   // T-SQL bracket-quoted identifier, e.g. [dbo] or [My Table]. Restricted to
   // content starting with a letter/underscore so it doesn't shadow the
@@ -2854,7 +2853,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 203:
 YY_RULE_SETUP
-#line 371 "flex_lexer.l"
+#line 370 "flex_lexer.l"
 {
   yylval->sval = strdup(yytext);
   return SQL_IDENTIFIER;
@@ -2862,40 +2861,40 @@ YY_RULE_SETUP
 	YY_BREAK
 case 204:
 YY_RULE_SETUP
-#line 376 "flex_lexer.l"
+#line 375 "flex_lexer.l"
 { BEGIN singlequotedstring; strbuf.clear(); strbuf.str(""); }  // Clear strbuf manually, see #170
 	YY_BREAK
 case 205:
 YY_RULE_SETUP
-#line 377 "flex_lexer.l"
+#line 376 "flex_lexer.l"
 { strbuf << '\''; }
 	YY_BREAK
 case 206:
 /* rule 206 can match eol */
 YY_RULE_SETUP
-#line 378 "flex_lexer.l"
+#line 377 "flex_lexer.l"
 { strbuf << yytext; }
 	YY_BREAK
 case 207:
 YY_RULE_SETUP
-#line 379 "flex_lexer.l"
+#line 378 "flex_lexer.l"
 { BEGIN 0; yylval->sval = strdup(strbuf.str().c_str()); return SQL_STRING; }
 	YY_BREAK
 case YY_STATE_EOF(singlequotedstring):
-#line 380 "flex_lexer.l"
+#line 379 "flex_lexer.l"
 { fprintf(stderr, "[SQL-Lexer-Error] Unterminated string\n"); return 0; }
 	YY_BREAK
 case 208:
 YY_RULE_SETUP
-#line 382 "flex_lexer.l"
+#line 381 "flex_lexer.l"
 { fprintf(stderr, "[SQL-Lexer-Error] Unknown Character: %c\n", yytext[0]); return 0; }
 	YY_BREAK
 case 209:
 YY_RULE_SETUP
-#line 384 "flex_lexer.l"
+#line 383 "flex_lexer.l"
 ECHO;
 	YY_BREAK
-#line 2889 "flex_lexer.cpp"
+#line 2888 "flex_lexer.cpp"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(COMMENT):
 case YY_STATE_EOF(afterarray):
@@ -4053,7 +4052,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 384 "flex_lexer.l"
+#line 383 "flex_lexer.l"
 
 /***************************
  ** Section 3: User code

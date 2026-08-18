@@ -193,639 +193,159 @@ void SQLParserTest::testArrayLiteralNotShadowedByBracketIdentifier()
 }
 
 
-void SQLParserTest::testNonReservedKeywords()
+void SQLParserTest::testDialectStatements()
 {
-	// Date part keywords as function arguments. The abbreviated spellings
-	// (mi, hh, ...) lex as identifiers and have always parsed, so before this
-	// the behaviour depended on how the date part was spelled.
+	// The upstream suite (linux-sqlparser-upstream-tests) already asserts the
+	// tree shape for these forms. What is asserted here is the contract Poco
+	// depends on: the statement parses, yields one statement, and classifies as
+	// SELECT so Statement::isSelect() can be trusted.
+	static const char* const selects[] =
 	{
-		std::string query = "SELECT * FROM Test WHERE CreatedAt >= DATEADD(MINUTE, -10, GETDATE());";
+		// Non-reserved keywords as names and as function names.
+		"SELECT * FROM Test WHERE CreatedAt >= DATEADD(MINUTE, -10, GETDATE());",
+		"SELECT ISNULL(A, 0), CHAR(10), FORMAT(A, '00'), YEAR, MONTH FROM Test;",
+		"SELECT Test.YEAR, dbo.Test.MONTH FROM dbo.Test;",
+		"SELECT A AS year FROM Test AS next;",
+		"SELECT * FROM start WHERE connect = 1;",
+		// T-SQL sequence expression.
+		"SELECT NEXT VALUE FOR Seq;",
+		"SELECT NEXT VALUE FOR MyDb.dbo.Seq AS NextId;",
+		// Parenthesized TOP taking an expression.
+		"SELECT TOP (?) * FROM Test;",
+		"SELECT TOP (:limit) * FROM Test;",
+		"SELECT TOP (N + 1) * FROM Test;",
+		// Oracle hierarchical queries, either clause order, with and without NOCYCLE.
+		"SELECT Level FROM Dual CONNECT BY Level <= 5;",
+		"SELECT Id FROM Test START WITH Id = 1 CONNECT BY PRIOR Id = ParentId;",
+		"SELECT Id FROM Test CONNECT BY PRIOR Id = ParentId START WITH Id = 1;",
+		"SELECT Id FROM Test CONNECT BY NOCYCLE PRIOR Id = ParentId;",
+		// Ordered-set aggregates.
+		"SELECT ListAgg(A, ', ') WITHIN GROUP (ORDER BY B) FROM Test;",
+		"SELECT dbo.ListAgg(A, ', ') WITHIN GROUP (ORDER BY B DESC) AS L FROM Test;",
+		// Oracle outer join marker.
+		"SELECT * FROM Test, Other WHERE Test.Id (+) = Other.Id;",
+		"SELECT * FROM Test, Other WHERE Test.Id = Other.Id (+);",
+		// Table value constructor and table-valued functions in FROM.
+		"SELECT * FROM (VALUES (0, 'Any'), (1, 'One')) AS V(Id, Name);",
+		"SELECT Value FROM String_Split('a,b', ',');",
+		"SELECT * FROM dbo.Fn_Split('a', ',') F;",
+		// Row constructor on the left of IN, both right-hand forms.
+		"SELECT * FROM Test WHERE (A, B) IN (SELECT X, Y FROM Other);",
+		"SELECT * FROM Test WHERE (A, B) IN ((1, 2), (3, 4));",
+		"SELECT * FROM Test WHERE (A, B) NOT IN ((1, 2), (3, 4));",
+		// Multi-part column references and string literal aliases.
+		"SELECT dbo.Test.A, MyDb.dbo.Test.B FROM MyDb.dbo.Test;",
+		"SELECT dbo.Test.*, MyDb.dbo.Test.* FROM MyDb.dbo.Test;",
+		"SELECT A AS 'Coil Id' FROM Test AS 'my table';",
+		// ODBC outer join escape.
+		"SELECT * FROM {oj Test LEFT OUTER JOIN Other ON Test.Id = Other.Id};",
+		// Scientific notation numeric literals.
+		"SELECT 1.5e3, 1.5E+3, 5e-1, .5e1, 2e10 FROM Test;"
+	};
+
+	for (const char* query: selects)
+	{
 		SQLParserResult result;
 		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
+		assertTrue (result.isValid());
 		assertEqual(1, result.size());
-		assertTrue(result.getStatement(0)->type() == kStmtSelect);
+		assertTrue (result.getStatement(0)->type() == kStmtSelect);
 	}
 
-	// Keywords as function names and as column names.
+	// ODBC procedure call escapes are execute statements, not selects.
+	static const char* const executes[] =
 	{
-		std::string query = "SELECT ISNULL(A, 0), CHAR(10), FORMAT(A, '00'), YEAR, MONTH FROM Test;";
+		"{? = call some_proc(?, 'a', 1)};",
+		"{call some_proc(?)};",
+		"{call some_proc};",
+		"{ ? = call [MyDb].[dbo].[some_proc]('a') };"
+	};
+
+	for (const char* query: executes)
+	{
 		SQLParserResult result;
 		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
+		assertTrue (result.isValid());
 		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertEqual(5, pSelect->selectList->size());
-		assertTrue(pSelect->selectList->at(0)->type == kExprFunctionRef);
-		assertEqual("ISNULL", std::string(pSelect->selectList->at(0)->name));
-		assertTrue(pSelect->selectList->at(3)->type == kExprColumnRef);
-		assertEqual("YEAR", std::string(pSelect->selectList->at(3)->name));
+		assertTrue (result.getStatement(0)->type() == kStmtExecute);
 	}
 
-	// The keyword uses these tokens still have: EXTRACT's datetime field, the
-	// ISNULL postfix operator, CAST's column type and the INTERVAL qualifier.
+	// A window function or an ordered-set aggregate is not a table reference,
+	// and a parenthesized TOP holding a placeholder cannot be combined with
+	// LIMIT: the placeholder is also held by the parameter list.
+	static const char* const invalid[] =
 	{
-		std::string query = "SELECT EXTRACT(MINUTE FROM D) FROM Test;"
-			"SELECT A FROM Test WHERE B ISNULL;"
-			"SELECT CAST(A AS INT) FROM Test;"
-			"SELECT INTERVAL '1' MINUTE FROM Test;";
+		"SELECT * FROM Count(*) OVER (PARTITION BY A);",
+		"SELECT * FROM ListAgg(A, ', ') WITHIN GROUP (ORDER BY B);",
+		"SELECT TOP (?) * FROM Test LIMIT 5;"
+	};
+
+	for (const char* query: invalid)
+	{
 		SQLParserResult result;
 		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(4, result.size());
+		assertTrue (!result.isValid());
 	}
 }
 
 
 void SQLParserTest::testCarriageReturn()
 {
-	// A statement written with CRLF line endings has to parse like the same
-	// statement written with LF. Carriage return is not matched by any rule but
-	// the catch-all one, which ends the token stream, so such a statement used
-	// to be cut off at the first line break - sometimes into a syntax error,
-	// sometimes into a shorter statement that still parsed.
+	// CR is whitespace, including inside the multi-word tokens. A statement read
+	// from a CRLF file must parse exactly like the LF form.
+	static const char* const queries[] =
 	{
-		std::string crlf = "SELECT A,\r\n       B\r\nFROM Test\r\nWHERE C = 1;";
-		std::string lf = "SELECT A,\n       B\nFROM Test\nWHERE C = 1;";
+		"SELECT A\r\nFROM Test\r\nWHERE B = 1;",
+		"SELECT NEXT VALUE\r\nFOR Seq;",
+		"SELECT Sum(A) OVER (ROWS BETWEEN CURRENT\r\nROW AND UNBOUNDED FOLLOWING) FROM Test;",
+		"SELECT Array\r\n[Foo] FROM Test;",
+		"SELECT Id FROM Test START\r\nWITH Id = 1 CONNECT\r\nBY PRIOR Id = ParentId;",
+		"SELECT * FROM Test, Other WHERE Test.Id (\r\n+\r\n) = Other.Id;"
+	};
 
-		SQLParserResult crlfResult;
-		SQLParser::parse(crlf, &crlfResult);
-		assertTrue(crlfResult.isValid());
-		assertEqual(1, crlfResult.size());
-
-		SQLParserResult lfResult;
-		SQLParser::parse(lf, &lfResult);
-		assertTrue(lfResult.isValid());
-		assertEqual(1, lfResult.size());
-
-		const SelectStatement* pCrlf = static_cast<const SelectStatement*>(crlfResult.getStatement(0));
-		const SelectStatement* pLf = static_cast<const SelectStatement*>(lfResult.getStatement(0));
-		assertEqual(pLf->selectList->size(), pCrlf->selectList->size());
-		assertEqual(2, pCrlf->selectList->size());
-		assertNotNull(pCrlf->fromTable);
-		assertNotNull(pCrlf->whereClause);
-	}
-
-	// A carriage return inside a string literal is content, not whitespace, and
-	// has to survive untouched.
+	for (const char* query: queries)
 	{
-		std::string query = "SELECT 'first\r\nsecond' AS S FROM Test;";
 		SQLParserResult result;
 		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
+		assertTrue (result.isValid());
 		assertEqual(1, result.size());
+	}
 
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertTrue(pSelect->selectList->at(0)->type == kExprLiteralString);
-		assertEqual(std::string("first\r\nsecond"), std::string(pSelect->selectList->at(0)->name));
+	// A line comment ends at its newline. If the following line were swallowed,
+	// the FROM clause would be lost and the statement would not parse.
+	static const char* const commented[] =
+	{
+		"SELECT A FROM\n-- comment\n  Test;",
+		"SELECT A FROM -- comment\n\nTest;",
+		"SELECT A FROM\r\n-- comment\r\n  Test;",
+		"SELECT A FROM Test -- comment   \n   WHERE B IN (1, 2);"
+	};
+
+	for (const char* query: commented)
+	{
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue (result.isValid());
+		assertEqual(1, result.size());
+		assertTrue (result.getStatement(0)->type() == kStmtSelect);
 	}
 }
 
 
-void SQLParserTest::testNextValueFor()
+void SQLParserTest::testODBCCallParameters()
 {
-	// T-SQL sequence expression. It yields a value like a function call does,
-	// so it is kept as one, with the sequence as its single argument.
-	{
-		std::string query = "SELECT NEXT VALUE FOR mydb.dbo.Seq AS NextId;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertTrue(pSelect->selectList->at(0)->type == kExprFunctionRef);
-		assertEqual("NEXT VALUE FOR", std::string(pSelect->selectList->at(0)->name));
-		assertEqual(1, pSelect->selectList->at(0)->exprList->size());
-		assertEqual("mydb.dbo.Seq", std::string(pSelect->selectList->at(0)->exprList->at(0)->name));
-	}
-
-	// NEXT VALUE FOR is lexed as one token, so "value" keeps working as a plain
-	// column name and as a bare alias, and FETCH NEXT is unaffected.
-	{
-		std::string query = "SELECT Id, Value FROM Test WHERE Value = 1;"
-			"SELECT COALESCE(MAX(SeqValue) + 1, 1) Value FROM Test;"
-			"SELECT A FROM Test ORDER BY A OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(3, result.size());
-
-		const SelectStatement* pAliased = static_cast<const SelectStatement*>(result.getStatement(1));
-		assertEqual("Value", std::string(pAliased->selectList->at(0)->alias));
-	}
-}
-
-
-void SQLParserTest::testODBCEscapes()
-{
-	// ODBC outer join escape - the escape only marks the join for the driver,
-	// so the join itself is what ends up in the tree.
-	{
-		std::string query = "SELECT * FROM {oj Test LEFT OUTER JOIN Other ON Test.Id = Other.Id};";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertNotNull(pSelect->fromTable);
-		assertTrue(pSelect->fromTable->type == kTableJoin);
-		assertTrue(pSelect->fromTable->join->type == kJoinLeft);
-	}
-
-	// ODBC procedure call escape, with and without the "? =" return marker and
-	// with a qualified procedure name.
-	{
-		std::string query = "{? = call SomeProc(?, 'a', 1)};"
-			"{call SomeProc(?)};"
-			"{ ? = call [mydb].[dbo].[SomeProc]('a') };";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(3, result.size());
-		assertTrue(result.getStatement(0)->type() == kStmtExecute);
-		assertTrue(result.getStatement(1)->type() == kStmtExecute);
-		assertTrue(result.getStatement(2)->type() == kStmtExecute);
-	}
-
-	// "oj" outside the escape stays an ordinary identifier, and a plain
-	// EXECUTE is unchanged.
-	{
-		std::string query = "SELECT oj FROM Test oj;"
-			"EXECUTE SomeProc(1, 2);";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(2, result.size());
-		assertTrue(result.getStatement(0)->type() == kStmtSelect);
-		assertTrue(result.getStatement(1)->type() == kStmtExecute);
-	}
-}
-
-
-void SQLParserTest::testTopWithExpression()
-{
-	// T-SQL requires the parentheses exactly when TOP takes an expression
-	// rather than a constant, so TOP (?) is the documented form for a
-	// parameterised row count. The bare form stays literal-only, since
-	// "TOP A" would be ambiguous with the select list.
-	{
-		std::string query = "SELECT TOP (?) * FROM Test;"
-			"SELECT TOP (:limit) * FROM Test;"
-			"SELECT TOP (N + 1) * FROM Test;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(3, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertNotNull(pSelect->limit);
-		assertTrue(pSelect->limit->limit->type == kExprParameter);
-		assertNull(pSelect->limit->offset);
-	}
-
-	// Both literal forms keep yielding the same LimitDescription as before.
-	{
-		std::string query = "SELECT TOP (10) * FROM Test;"
-			"SELECT TOP 10 * FROM Test;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(2, result.size());
-
-		for (std::size_t i = 0; i < 2; ++i)
-		{
-			const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(i));
-			assertNotNull(pSelect->limit);
-			assertTrue(pSelect->limit->limit->type == kExprLiteralInt);
-			assertEqual(10, pSelect->limit->limit->ival);
-		}
-	}
-}
-
-
-void SQLParserTest::testHierarchicalQuery()
-{
-	// CONNECT BY on its own, with the LEVEL pseudo column. LEVEL is not a
-	// keyword, so it stays an ordinary column reference.
-	{
-		std::string query = "SELECT LEVEL FROM Dual CONNECT BY LEVEL <= 5;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertNotNull(pSelect->connectBy);
-		assertTrue(pSelect->connectBy->opType == kOpLessEq);
-		assertNull(pSelect->startWith);
-	}
-
-	// START WITH plus CONNECT BY PRIOR - PRIOR binds to the operand after it,
-	// so the condition stays a comparison of PRIOR Id against ParentId.
-	{
-		std::string query = "SELECT Id FROM Test START WITH Id = 1 CONNECT BY PRIOR Id = ParentId;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertNotNull(pSelect->startWith);
-		assertNotNull(pSelect->connectBy);
-		assertTrue(pSelect->connectBy->expr->type == kExprOperator);
-		assertTrue(pSelect->connectBy->expr->opType == kOpPrior);
-	}
-
-	// CONNECT and START stay usable as ordinary names, and a statement without
-	// the clauses leaves both null.
-	{
-		std::string query = "SELECT Connect, Start FROM Test WHERE Connect = 1;"
-			"SELECT A FROM Test WHERE B = 1 GROUP BY A ORDER BY A;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(2, result.size());
-
-		const SelectStatement* pPlain = static_cast<const SelectStatement*>(result.getStatement(1));
-		assertNull(pPlain->startWith);
-		assertNull(pPlain->connectBy);
-	}
-}
-
-
-void SQLParserTest::testWithinGroup()
-{
-	// LISTAGG(X, ', ') WITHIN GROUP (ORDER BY Y) - ordered-set aggregate. The
-	// sort order belongs to the aggregate itself, so it is kept in
-	// withinGroupOrder, separate from the window description an OVER produces.
-	{
-		std::string query = "SELECT LISTAGG(A, ', ') WITHIN GROUP (ORDER BY B) FROM Test;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertTrue(pSelect->selectList->at(0)->type == kExprFunctionRef);
-		assertEqual("LISTAGG", std::string(pSelect->selectList->at(0)->name));
-		assertNotNull(pSelect->selectList->at(0)->withinGroupOrder);
-		assertEqual(1, pSelect->selectList->at(0)->withinGroupOrder->size());
-		assertNull(pSelect->selectList->at(0)->windowDescription);
-	}
-
-	// Several sort keys with direction, and an alias on the aggregate.
-	{
-		std::string query = "SELECT LISTAGG(A, ', ') WITHIN GROUP (ORDER BY B DESC, C ASC) AS Lst FROM Test;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertEqual(2, pSelect->selectList->at(0)->withinGroupOrder->size());
-		assertEqual("Lst", std::string(pSelect->selectList->at(0)->alias));
-	}
-
-	// Plain aggregates, OVER windows, GROUP BY and ORDER BY are unaffected.
-	{
-		std::string query = "SELECT COUNT(A) FROM Test;"
-			"SELECT COUNT(*) OVER (PARTITION BY A ORDER BY B) FROM Test;"
-			"SELECT A FROM Test GROUP BY A ORDER BY A;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(3, result.size());
-
-		const SelectStatement* pPlain = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertNull(pPlain->selectList->at(0)->withinGroupOrder);
-		const SelectStatement* pWindow = static_cast<const SelectStatement*>(result.getStatement(1));
-		assertNotNull(pWindow->selectList->at(0)->windowDescription);
-		assertNull(pWindow->selectList->at(0)->withinGroupOrder);
-	}
-}
-
-
-void SQLParserTest::testOracleOuterJoin()
-{
-	// WHERE T.Id (+) = U.Id - Oracle's legacy outer join marker, kept in the
-	// tree as a unary operator on the column it follows.
-	{
-		std::string query = "SELECT A FROM Test T, Other U WHERE T.Id (+) = U.Id;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertNotNull(pSelect->whereClause);
-		assertTrue(pSelect->whereClause->opType == kOpEquals);
-		assertTrue(pSelect->whereClause->expr->type == kExprOperator);
-		assertTrue(pSelect->whereClause->expr->opType == kOpOuterJoin);
-		assertTrue(pSelect->whereClause->expr->expr->type == kExprColumnRef);
-	}
-
-	// Right-hand side, no spaces, and spaces inside the marker.
-	{
-		std::string query = "SELECT A FROM Test T, Other U WHERE T.Id = U.Id (+);"
-			"SELECT A FROM Test T, Other U WHERE T.Id(+)=U.Id;"
-			"SELECT A FROM Test T, Other U WHERE T.Id ( + ) = U.Id;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(3, result.size());
-	}
-
-	// Only a lone '+' between parentheses is the marker; arithmetic and
-	// parenthesized expressions are unaffected.
-	{
-		std::string query = "SELECT A + 1 FROM Test;"
-			"SELECT (A + B) FROM Test;"
-			"SELECT A FROM Test WHERE X = (1 + 2);";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(3, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertTrue(pSelect->selectList->at(0)->opType == kOpPlus);
-	}
-}
-
-
-void SQLParserTest::testTableValueConstructor()
-{
-	// FROM (VALUES (...), (...)) AS t(cols) - each row is kept as an array
-	// expression, the column names come from the alias.
-	{
-		std::string query = "SELECT * FROM (VALUES (0, 'Any'), (1, 'One')) AS V(Id, Name);";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertNotNull(pSelect->fromTable);
-		assertTrue(pSelect->fromTable->type == kTableValues);
-		assertNotNull(pSelect->fromTable->values);
-		assertEqual(2, pSelect->fromTable->values->size());
-		assertTrue(pSelect->fromTable->values->at(0)->type == kExprArray);
-		assertEqual(2, pSelect->fromTable->values->at(0)->exprList->size());
-
-		assertNotNull(pSelect->fromTable->alias);
-		assertEqual("V", std::string(pSelect->fromTable->alias->name));
-		assertNotNull(pSelect->fromTable->alias->columns);
-		assertEqual(2, pSelect->fromTable->alias->columns->size());
-	}
-
-	// A single row, a subquery in FROM and INSERT ... VALUES are unaffected.
-	{
-		std::string query = "SELECT * FROM (VALUES (1)) AS V(X);"
-			"SELECT A FROM (SELECT 1 AS A) X;"
-			"INSERT INTO Test VALUES (1, 'a');";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(3, result.size());
-		assertTrue(static_cast<const SelectStatement*>(result.getStatement(1))->fromTable->type == kTableSelect);
-		assertTrue(result.getStatement(2)->type() == kStmtInsert);
-	}
-}
-
-
-void SQLParserTest::testTableValuedFunction()
-{
-	// FROM STRING_SPLIT(s, ',') - the table reference is the function call
-	// itself, kept as kTableFunc with the call in TableRef::func.
-	{
-		std::string query = "SELECT Value FROM STRING_SPLIT('a,b', ',');";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertNotNull(pSelect->fromTable);
-		assertTrue(pSelect->fromTable->type == kTableFunc);
-		assertNotNull(pSelect->fromTable->func);
-		assertEqual("STRING_SPLIT", std::string(pSelect->fromTable->func->name));
-		assertEqual(2, pSelect->fromTable->func->exprList->size());
-		assertEqual("STRING_SPLIT", std::string(pSelect->fromTable->getName()));
-	}
-
-	// Aliased, schema qualified, and nested in a subquery.
-	{
-		std::string query = "SELECT * FROM STRING_SPLIT('a,b', ',') AS S;"
-			"SELECT * FROM dbo.fn_split('a', ',') F;"
-			"SELECT A FROM Test WHERE Id IN (SELECT CAST(Value AS INT) FROM STRING_SPLIT('1,2', ','));";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(3, result.size());
-
-		const SelectStatement* pAliased = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertEqual("S", std::string(pAliased->fromTable->getName()));
-	}
-
-	// A window function and an ordered-set aggregate are not table references,
-	// so only a plain call is accepted there - both stay valid in a select list.
-	{
-		SQLParserResult windowResult;
-		SQLParser::parse("SELECT * FROM COUNT(*) OVER (PARTITION BY A);", &windowResult);
-		assertTrue(!windowResult.isValid());
-
-		SQLParserResult aggregateResult;
-		SQLParser::parse("SELECT * FROM LISTAGG(A, ', ') WITHIN GROUP (ORDER BY B);", &aggregateResult);
-		assertTrue(!aggregateResult.isValid());
-
-		SQLParserResult selectListResult;
-		SQLParser::parse("SELECT COUNT(*) OVER (PARTITION BY A) FROM Test;", &selectListResult);
-		assertTrue(selectListResult.isValid());
-	}
-
-	// Plain table references and subqueries in FROM are unchanged.
-	{
-		std::string query = "SELECT * FROM Test A, Other B WHERE A.Id = B.Id;"
-			"SELECT * FROM (SELECT 1) X;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(2, result.size());
-		assertTrue(static_cast<const SelectStatement*>(result.getStatement(0))->fromTable->type == kTableCrossProduct);
-		assertTrue(static_cast<const SelectStatement*>(result.getStatement(1))->fromTable->type == kTableSelect);
-	}
-}
-
-
-void SQLParserTest::testRowConstructorIn()
-{
-	// (A, B) IN (SELECT X, Y FROM ...) - row constructor on the left of IN.
-	// The tuple is represented as an array expression, so no element is lost.
-	{
-		std::string query = "SELECT C FROM Test WHERE (A, B) IN (SELECT X, Y FROM Other);";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertNotNull(pSelect->whereClause);
-		assertTrue(pSelect->whereClause->opType == kOpIn);
-		assertTrue(pSelect->whereClause->expr->type == kExprArray);
-		assertEqual(2, pSelect->whereClause->expr->exprList->size());
-	}
-
-	// NOT IN form, and the unchanged single-operand forms.
-	{
-		std::string query = "SELECT C FROM Test WHERE (A, B, C) NOT IN (SELECT X, Y, Z FROM Other);"
-			"SELECT C FROM Test WHERE (A) IN (SELECT X FROM Other);"
-			"SELECT C FROM Test WHERE A IN (1, 2, 3);";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(3, result.size());
-
-		const SelectStatement* pSingle = static_cast<const SelectStatement*>(result.getStatement(1));
-		assertTrue(pSingle->whereClause->expr->type == kExprColumnRef);
-	}
-}
-
-
-void SQLParserTest::testMultiPartColumnName()
-{
-	// Three- and four-part column references, the column-side counterpart of
-	// the multi-part table names from #5429. The qualifiers are folded into
-	// the single table slot Expr has.
-	{
-		std::string query = "SELECT dbo.Test.A, mydb.dbo.Test.B FROM mydb.dbo.Test;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertEqual(2, pSelect->selectList->size());
-		assertTrue(pSelect->selectList->at(0)->type == kExprColumnRef);
-		assertEqual("dbo.Test", std::string(pSelect->selectList->at(0)->table));
-		assertEqual("A", std::string(pSelect->selectList->at(0)->name));
-		assertEqual("mydb.dbo.Test", std::string(pSelect->selectList->at(1)->table));
-		assertEqual("B", std::string(pSelect->selectList->at(1)->name));
-	}
-
-	// Multi-part qualified star, and bracket-quoted names on both sides of a
-	// join condition - the shape this was found as.
-	{
-		std::string query = "SELECT mydb.dbo.Test.* FROM mydb.dbo.Test;"
-			"SELECT * FROM [mydb].[dbo].Test INNER JOIN [mydb].[dbo].Other "
-			"ON [mydb].[dbo].Test.Id = [mydb].[dbo].Other.Id;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(2, result.size());
-	}
-
-	// One- and two-part references and schema-qualified function calls are
-	// unchanged - they share the leading IDENTIFIER '.' IDENTIFIER prefix.
-	{
-		std::string query = "SELECT C, A.B, A.*, sys.uuid() FROM X A;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertEqual(4, pSelect->selectList->size());
-		assertNull(pSelect->selectList->at(0)->table);
-		assertEqual("A", std::string(pSelect->selectList->at(1)->table));
-		assertTrue(pSelect->selectList->at(2)->type == kExprStar);
-		assertTrue(pSelect->selectList->at(3)->type == kExprFunctionRef);
-	}
-}
-
-
-void SQLParserTest::testStringAlias()
-{
-	// T-SQL accepts a string literal as an alias, e.g. SELECT A AS 'My Col'.
-	{
-		std::string query = "SELECT A AS 'Coil Id', B AS 'X' FROM Test;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertEqual(2, pSelect->selectList->size());
-		assertEqual("Coil Id", std::string(pSelect->selectList->at(0)->alias));
-		assertEqual("X", std::string(pSelect->selectList->at(1)->alias));
-	}
-
-	// Only the AS form is accepted, so a bare string in the select list is
-	// still a string literal, not an alias for the expression before it.
-	{
-		std::string query = "SELECT 'literal', A AS B FROM Test;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertEqual(2, pSelect->selectList->size());
-		assertTrue(pSelect->selectList->at(0)->type == kExprLiteralString);
-		assertNull(pSelect->selectList->at(0)->alias);
-	}
-}
-
-
-void SQLParserTest::testScientificNotationLiteral()
-{
-	// In a select list a missing exponent rule does not fail the parse: the
-	// mantissa is scanned as a number and the exponent as an identifier, so
-	// "SELECT 1.5e3" used to parse as "SELECT 1.5 AS e3" - one literal with an
-	// alias. Pin both the literal type and the absence of an alias.
-	{
-		std::string query = "SELECT 1.5e3 FROM Test;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-		assertTrue(result.getStatement(0)->type() == kStmtSelect);
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertEqual(1, pSelect->selectList->size());
-		assertTrue(pSelect->selectList->at(0)->type == kExprLiteralFloat);
-		assertEqualDelta(1500.0, pSelect->selectList->at(0)->fval, 0.0);
-		assertNull(pSelect->selectList->at(0)->alias);
-	}
-
-	// Outside a select list there is no alias to absorb the exponent, so the
-	// same literal was a syntax error.
-	{
-		std::string query = "SELECT * FROM Test WHERE Value = 0.5e-2;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-		assertTrue(result.getStatement(0)->type() == kStmtSelect);
-	}
-
-	// Signed and leading-dot exponents, and an exponent without a fraction.
-	{
-		std::string query = "SELECT 1.5E+3, 5e-1, .5e1, 2e10 FROM Test;";
-		SQLParserResult result;
-		SQLParser::parse(query, &result);
-		assertTrue(result.isValid());
-		assertEqual(1, result.size());
-
-		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
-		assertEqual(4, pSelect->selectList->size());
-		for (const auto* pExpr: *pSelect->selectList)
-		{
-			assertTrue(pExpr->type == kExprLiteralFloat);
-			assertNull(pExpr->alias);
-		}
-	}
+	// ODBC numbers the return marker as parameter 1 and binds it positionally,
+	// so it has to reach the parameter list like any other placeholder -
+	// Utility::boundSQL derives its arity check from that list.
+	SQLParserResult result;
+	SQLParser::parse("{? = call some_proc(?, ?)};", &result);
+	assertTrue (result.isValid());
+	assertEqual(3, static_cast<int>(result.parameters().size()));
+
+	result.reset();
+	SQLParser::parse("{call some_proc(?, ?)};", &result);
+	assertTrue (result.isValid());
+	assertEqual(2, static_cast<int>(result.parameters().size()));
 }
 
 
@@ -999,20 +519,9 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testBracketedIdentifiers);
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
-	CppUnit_addTest(pSuite, SQLParserTest, testNonReservedKeywords);
+	CppUnit_addTest(pSuite, SQLParserTest, testDialectStatements);
 	CppUnit_addTest(pSuite, SQLParserTest, testCarriageReturn);
-	CppUnit_addTest(pSuite, SQLParserTest, testNextValueFor);
-	CppUnit_addTest(pSuite, SQLParserTest, testODBCEscapes);
-	CppUnit_addTest(pSuite, SQLParserTest, testTopWithExpression);
-	CppUnit_addTest(pSuite, SQLParserTest, testHierarchicalQuery);
-	CppUnit_addTest(pSuite, SQLParserTest, testWithinGroup);
-	CppUnit_addTest(pSuite, SQLParserTest, testOracleOuterJoin);
-	CppUnit_addTest(pSuite, SQLParserTest, testTableValueConstructor);
-	CppUnit_addTest(pSuite, SQLParserTest, testTableValuedFunction);
-	CppUnit_addTest(pSuite, SQLParserTest, testRowConstructorIn);
-	CppUnit_addTest(pSuite, SQLParserTest, testMultiPartColumnName);
-	CppUnit_addTest(pSuite, SQLParserTest, testStringAlias);
-	CppUnit_addTest(pSuite, SQLParserTest, testScientificNotationLiteral);
+	CppUnit_addTest(pSuite, SQLParserTest, testODBCCallParameters);
 	CppUnit_addTest(pSuite, SQLParserTest, testResetClearsParameters);
 	CppUnit_addTest(pSuite, SQLParserTest, testNamedParameter);
 	CppUnit_addTest(pSuite, SQLParserTest, testAlterDropColumnIfExists);

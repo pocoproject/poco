@@ -378,7 +378,7 @@ struct HierarchicalClause {
 
 %type <str_vec>                ident_commalist opt_column_list
 %type <expr_vec>               expr_list select_list opt_extended_literal_list extended_literal_list hint_list opt_hints opt_partition
-%type <expr_vec>               row_expr_list table_value_row_list opt_call_args
+%type <expr_vec>               row_expr_list table_value_row_list opt_call_args in_row_list
 %type <table_vec>              table_ref_commalist
 %type <order_vec>              opt_order order_list opt_within_group
 %type <with_description_vec>   opt_with_clause with_clause with_description_list
@@ -1182,12 +1182,10 @@ opt_null_ordering : /* empty */ { $$ = NullOrdering::Undefined; }
   $$ = null_ordering;
 };
 
-// TODO: LIMIT can take more than just int literals.
-
 // T-SQL requires the parentheses exactly when TOP takes an expression rather
-// than a constant, e.g. TOP (@n) or the TOP (?) a parameterised statement ends
-// up with. The bare form stays literal-only: "TOP a" cannot be told apart from
-// a select list starting with a column named a.
+// than a constant, e.g. TOP (?) or TOP (:limit). The bare form is literal-only:
+// "TOP a" cannot be told apart from a select list starting with a column named
+// a.
 opt_top : TOP int_literal { $$ = new LimitDescription($2, nullptr); }
 | TOP '(' expr ')' { $$ = new LimitDescription($3, nullptr); }
 | /* empty */ { $$ = nullptr; };
@@ -1258,7 +1256,7 @@ scalar_expr : column_name | literal
 
 unary_expr : '-' operand { $$ = Expr::makeOpUnary(kOpUnaryMinus, $2); }
 // Oracle's PRIOR, referring to the parent row inside CONNECT BY.
-| PRIOR operand %prec PRIOR { $$ = Expr::makeOpUnary(kOpPrior, $2); }
+| PRIOR operand { $$ = Expr::makeOpUnary(kOpPrior, $2); }
 | NOT operand { $$ = Expr::makeOpUnary(kOpNot, $2); }
 | operand ISNULL { $$ = Expr::makeOpUnary(kOpIsNull, $1); }
 | operand IS NULL { $$ = Expr::makeOpUnary(kOpIsNull, $1); }
@@ -1286,16 +1284,30 @@ in_expr : operand IN '(' expr_list ')' { $$ = Expr::makeInOperator($1, $4); }
 // tuple is represented as an array expression - Expr has no dedicated row type
 // and this keeps every element in the tree instead of dropping any.
 | '(' row_expr_list ')' IN '(' select_no_paren ')' { $$ = Expr::makeInOperator(Expr::makeArray($2), $6); }
-| '(' row_expr_list ')' NOT IN '(' select_no_paren ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator(Expr::makeArray($2), $7)); };
+| '(' row_expr_list ')' NOT IN '(' select_no_paren ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator(Expr::makeArray($2), $7)); }
+// The literal-list counterpart, e.g. (a, b) IN ((1, 2), (3, 4)).
+| '(' row_expr_list ')' IN '(' in_row_list ')' { $$ = Expr::makeInOperator(Expr::makeArray($2), $6); }
+| '(' row_expr_list ')' NOT IN '(' in_row_list ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator(Expr::makeArray($2), $7)); };
+
+// Each row of the list is an array expression, the same representation the row
+// constructor on the left uses.
+in_row_list : '(' row_expr_list ')' {
+  $$ = new std::vector<Expr*>();
+  $$->push_back(Expr::makeArray($2));
+}
+| in_row_list ',' '(' row_expr_list ')' {
+  $1->push_back(Expr::makeArray($4));
+  $$ = $1;
+};
 
 // Two or more elements: a single parenthesized expression stays a plain operand,
 // so the grammar has no ambiguity to resolve between "(a)" and a one-element row.
-row_expr_list : expr_alias ',' expr_alias {
+row_expr_list : expr ',' expr {
   $$ = new std::vector<Expr*>();
   $$->push_back($1);
   $$->push_back($3);
 }
-| row_expr_list ',' expr_alias {
+| row_expr_list ',' expr {
   $1->push_back($3);
   $$ = $1;
 };
@@ -1321,27 +1333,8 @@ comp_expr : operand '=' operand { $$ = Expr::makeOpBinary($1, kOpEquals, $3); }
 | operand LESSEQ operand { $$ = Expr::makeOpBinary($1, kOpLessEq, $3); }
 | operand GREATEREQ operand { $$ = Expr::makeOpBinary($1, kOpGreaterEq, $3); };
 
-// `function_expr is used for window functions, aggregate expressions, and functions calls because we run into shift/
-// reduce conflicts when splitting them.
-function_expr : IDENTIFIER '(' ')' opt_window { $$ = Expr::makeFunctionRef($1, new std::vector<Expr*>(), false, $4); }
-| IDENTIFIER '(' opt_distinct expr_list ')' opt_within_group opt_window {
-  $$ = Expr::makeFunctionRef($1, $4, $3, $7);
-  $$->withinGroupOrder = $6;
-}
-| IDENTIFIER '.' IDENTIFIER '(' ')' opt_window {
-  $$ = Expr::makeFunctionRef($3, $1, new std::vector<Expr*>(), false, $6);
-}
-| IDENTIFIER '.' IDENTIFIER '(' opt_distinct expr_list ')' opt_window {
-  $$ = Expr::makeFunctionRef($3, $1, $6, $5, $8);
-}
-// Dialect functions whose names collide with grammar keywords, e.g.
-// ISNULL(a, 0), CHAR(10), FORMAT(x, '00'). See nonreserved_keyword.
-| nonreserved_keyword '(' ')' opt_window { $$ = Expr::makeFunctionRef($1, new std::vector<Expr*>(), false, $4); }
-| nonreserved_keyword '(' opt_distinct expr_list ')' opt_window { $$ = Expr::makeFunctionRef($1, $4, $3, $6); };
-
-// A plain function call, without the OVER and WITHIN GROUP clauses
-// function_expr allows. Only this form can stand as a table reference: a
-// window function or an ordered-set aggregate is not a table.
+// The bare call. Every call form is written once here, so OVER and WITHIN GROUP
+// below apply to all of them, and a table reference can reuse the same shape.
 table_function_expr : IDENTIFIER '(' ')' {
   $$ = Expr::makeFunctionRef($1, new std::vector<Expr*>(), false, nullptr);
 }
@@ -1353,6 +1346,23 @@ table_function_expr : IDENTIFIER '(' ')' {
 }
 | IDENTIFIER '.' IDENTIFIER '(' opt_distinct expr_list ')' {
   $$ = Expr::makeFunctionRef($3, $1, $6, $5, nullptr);
+}
+// Dialect functions whose names collide with grammar keywords, e.g.
+// ISNULL(a, 0), CHAR(10), FORMAT(x, '00'). See nonreserved_keyword.
+| nonreserved_keyword '(' ')' {
+  $$ = Expr::makeFunctionRef($1, new std::vector<Expr*>(), false, nullptr);
+}
+| nonreserved_keyword '(' opt_distinct expr_list ')' {
+  $$ = Expr::makeFunctionRef($1, $4, $3, nullptr);
+};
+
+// A call in an expression, which may carry the ordered-set aggregate sort order
+// and a window description. A table reference uses table_function_expr directly:
+// a window function or an ordered-set aggregate is not a table.
+function_expr : table_function_expr opt_within_group opt_window {
+  $$ = $1;
+  $$->withinGroupOrder = $2;
+  $$->windowDescription = $3;
 };
 
 // Window function expressions, based on https://www.postgresql.org/docs/15/sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS
@@ -1450,10 +1460,8 @@ column_name : IDENTIFIER { $$ = Expr::makeColumnRef($1); }
 
 // Keywords the grammar needs as tokens elsewhere, but which dialects also use
 // as plain names - column names, and date part arguments such as
-// DATEADD(MINUTE, -10, GETDATE()). The abbreviated spellings (mi, hh, ...) are
-// lexed as identifiers and have always worked, so without this the behaviour
-// depends on how the date part is spelled. The token's canonical spelling is
-// used as the name; the original casing is not preserved.
+// DATEADD(MINUTE, -10, GETDATE()). The token's canonical spelling is used as
+// the name; the original casing is not preserved.
 nonreserved_keyword : SECOND { $$ = strdup("SECOND"); }
 | MINUTE { $$ = strdup("MINUTE"); }
 | HOUR { $$ = strdup("HOUR"); }
@@ -1600,7 +1608,8 @@ nonjoin_table_ref_atomic : table_ref_name | '(' select_statement ')' opt_table_a
 | table_function_expr opt_table_alias {
   auto tbl = new TableRef(kTableFunc);
   tbl->func = $1;
-  if ($1->name) tbl->name = strdup($1->name);
+  tbl->name = strdup($1->name);
+  if ($1->schema) tbl->schema = strdup($1->schema);
   tbl->alias = $2;
   $$ = tbl;
 }
@@ -1657,6 +1666,14 @@ table_name : name_or_keyword {
 | IDENTIFIER '.' name_or_keyword {
   $$.schema = $1;
   $$.name = $3;
+}
+| nonreserved_keyword '.' name_or_keyword {
+  $$.schema = $1;
+  $$.name = $3;
+}
+| nonreserved_keyword '.' name_or_keyword '.' name_or_keyword {
+  $$.schema = dotJoin($1, $3);
+  $$.name = $5;
 }
 | IDENTIFIER '.' IDENTIFIER '.' name_or_keyword {
   // Three-part (database.schema.table) name. TableName has no separate

@@ -74,7 +74,7 @@ WS  [ \t\r\n]
 <COMMENT>[^\n]* /* skipping comment content until a end of line is read */;
 <COMMENT>\n     BEGIN(INITIAL);
 
-{WS}+           /* skip whitespace, CR included: a CRLF file would otherwise hit the catch-all rule below, which ends the token stream */;
+{WS}+           /* skip whitespace; CR is included so CRLF input never reaches the catch-all rule below, which ends the token stream */;
 
 ADD         TOKEN(ADD)
 AFTER       TOKEN(AFTER)
@@ -296,9 +296,8 @@ CHARACTER{WS}+VARYING        TOKEN(CHARACTER_VARYING)
 
   /*
    * Scientific notation, e.g. 1.5e3, 1.5E+3, .5e-3, 2e10. Has to come before the
-   * plain float and integer rules: without it the mantissa is scanned as a number
-   * and the exponent as a separate identifier, so `SELECT 1.5e3 FROM t` silently
-   * parses as `SELECT 1.5 AS e3` instead of failing.
+   * plain float and integer rules, which would otherwise take the mantissa and
+   * leave the exponent to be scanned as an identifier.
    */
 [0-9]+"."[0-9]*e[-+]?[0-9]+ |
 "."[0-9]+e[-+]?[0-9]+ |
