@@ -135,6 +135,10 @@ SELECT * FROM [test];
 SELECT [my col] FROM [some schema].[my table];
 SELECT * FROM mydb.some_schema.test;
 SELECT ARRAY[foo] FROM test;
+# TOP with an expression
+SELECT TOP (?) * FROM test;
+SELECT TOP (:limit) * FROM test;
+SELECT TOP (n + 1) * FROM test;
 # Oracle hierarchical query
 SELECT LEVEL FROM dual CONNECT BY LEVEL <= 5;
 SELECT id FROM test START WITH id = 1 CONNECT BY PRIOR id = parent_id;

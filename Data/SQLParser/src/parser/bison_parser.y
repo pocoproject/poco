@@ -1107,10 +1107,14 @@ opt_null_ordering : /* empty */ { $$ = NullOrdering::Undefined; }
   $$ = null_ordering;
 };
 
-// TODO: TOP and LIMIT can take more than just int literals.
+// TODO: LIMIT can take more than just int literals.
 
+// T-SQL requires the parentheses exactly when TOP takes an expression rather
+// than a constant, e.g. TOP (@n) or the TOP (?) a parameterised statement ends
+// up with. The bare form stays literal-only: "TOP a" cannot be told apart from
+// a select list starting with a column named a.
 opt_top : TOP int_literal { $$ = new LimitDescription($2, nullptr); }
-| TOP '(' int_literal ')' { $$ = new LimitDescription($3, nullptr); }
+| TOP '(' expr ')' { $$ = new LimitDescription($3, nullptr); }
 | /* empty */ { $$ = nullptr; };
 
 opt_limit : LIMIT expr { $$ = new LimitDescription($2, nullptr); }

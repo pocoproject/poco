@@ -238,6 +238,47 @@ void SQLParserTest::testNonReservedKeywords()
 }
 
 
+void SQLParserTest::testTopWithExpression()
+{
+	// T-SQL requires the parentheses exactly when TOP takes an expression
+	// rather than a constant, so TOP (?) is the documented form for a
+	// parameterised row count. The bare form stays literal-only, since
+	// "TOP A" would be ambiguous with the select list.
+	{
+		std::string query = "SELECT TOP (?) * FROM Test;"
+			"SELECT TOP (:limit) * FROM Test;"
+			"SELECT TOP (N + 1) * FROM Test;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(3, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertNotNull(pSelect->limit);
+		assertTrue(pSelect->limit->limit->type == kExprParameter);
+		assertNull(pSelect->limit->offset);
+	}
+
+	// Both literal forms keep yielding the same LimitDescription as before.
+	{
+		std::string query = "SELECT TOP (10) * FROM Test;"
+			"SELECT TOP 10 * FROM Test;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(2, result.size());
+
+		for (std::size_t i = 0; i < 2; ++i)
+		{
+			const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(i));
+			assertNotNull(pSelect->limit);
+			assertTrue(pSelect->limit->limit->type == kExprLiteralInt);
+			assertEqual(10, pSelect->limit->limit->ival);
+		}
+	}
+}
+
+
 void SQLParserTest::testHierarchicalQuery()
 {
 	// CONNECT BY on its own, with the LEVEL pseudo column. LEVEL is not a
@@ -816,6 +857,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
 	CppUnit_addTest(pSuite, SQLParserTest, testNonReservedKeywords);
+	CppUnit_addTest(pSuite, SQLParserTest, testTopWithExpression);
 	CppUnit_addTest(pSuite, SQLParserTest, testHierarchicalQuery);
 	CppUnit_addTest(pSuite, SQLParserTest, testWithinGroup);
 	CppUnit_addTest(pSuite, SQLParserTest, testOracleOuterJoin);

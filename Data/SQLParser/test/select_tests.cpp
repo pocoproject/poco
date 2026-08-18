@@ -1420,6 +1420,47 @@ TEST(SelectNonReservedKeywordTest) {
   ASSERT_EQ(((SelectStatement*)keptResult.getStatement(2))->selectList->at(0)->type, kExprCast);
 }
 
+TEST(SelectTopExpressionTest) {
+  SelectStatement* stmt;
+
+  // T-SQL requires the parentheses exactly when TOP takes an expression rather
+  // than a constant, so TOP (?) and TOP (:limit) are the documented forms for a
+  // parameterised row count - the bare form stays literal-only because "TOP a"
+  // would be ambiguous with the select list.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT TOP (?) a FROM t;"
+      "SELECT TOP (:limit) a FROM t;"
+      "SELECT TOP ($1) a FROM t;",
+      result, 3);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->limit);
+  ASSERT_EQ(stmt->limit->limit->type, kExprParameter);
+  ASSERT_NULL(stmt->limit->offset);
+  stmt = (SelectStatement*)result.getStatement(1);
+  ASSERT_EQ(stmt->limit->limit->type, kExprParameterNamed);
+  stmt = (SelectStatement*)result.getStatement(2);
+  ASSERT_EQ(stmt->limit->limit->type, kExprParameterDollar);
+
+  // An arithmetic expression and a column reference are accepted too.
+  TEST_PARSE_SQL_QUERY("SELECT TOP (n + 1) a FROM t;", exprResult, 1);
+  stmt = (SelectStatement*)exprResult.getStatement(0);
+  ASSERT_EQ(stmt->limit->limit->type, kExprOperator);
+  ASSERT_EQ(stmt->limit->limit->opType, kOpPlus);
+
+  // Both literal forms keep yielding the same LimitDescription as before.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT TOP (10) a FROM t;"
+      "SELECT TOP 10 a FROM t;",
+      literalResult, 2);
+  for (size_t i = 0; i < 2; ++i) {
+    stmt = (SelectStatement*)literalResult.getStatement(i);
+    ASSERT_NOTNULL(stmt->limit);
+    ASSERT_EQ(stmt->limit->limit->type, kExprLiteralInt);
+    ASSERT_EQ(stmt->limit->limit->ival, 10);
+    ASSERT_NULL(stmt->limit->offset);
+  }
+}
+
 TEST(SelectHierarchicalQueryTest) {
   SelectStatement* stmt;
 
