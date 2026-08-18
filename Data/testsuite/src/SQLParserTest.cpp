@@ -238,6 +238,46 @@ void SQLParserTest::testNonReservedKeywords()
 }
 
 
+void SQLParserTest::testTableValueConstructor()
+{
+	// FROM (VALUES (...), (...)) AS t(cols) - each row is kept as an array
+	// expression, the column names come from the alias.
+	{
+		std::string query = "SELECT * FROM (VALUES (0, 'Any'), (1, 'One')) AS V(Id, Name);";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertNotNull(pSelect->fromTable);
+		assertTrue(pSelect->fromTable->type == kTableValues);
+		assertNotNull(pSelect->fromTable->values);
+		assertEqual(2, pSelect->fromTable->values->size());
+		assertTrue(pSelect->fromTable->values->at(0)->type == kExprArray);
+		assertEqual(2, pSelect->fromTable->values->at(0)->exprList->size());
+
+		assertNotNull(pSelect->fromTable->alias);
+		assertEqual("V", std::string(pSelect->fromTable->alias->name));
+		assertNotNull(pSelect->fromTable->alias->columns);
+		assertEqual(2, pSelect->fromTable->alias->columns->size());
+	}
+
+	// A single row, a subquery in FROM and INSERT ... VALUES are unaffected.
+	{
+		std::string query = "SELECT * FROM (VALUES (1)) AS V(X);"
+			"SELECT A FROM (SELECT 1 AS A) X;"
+			"INSERT INTO Test VALUES (1, 'a');";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(3, result.size());
+		assertTrue(static_cast<const SelectStatement*>(result.getStatement(1))->fromTable->type == kTableSelect);
+		assertTrue(result.getStatement(2)->type() == kStmtInsert);
+	}
+}
+
+
 void SQLParserTest::testTableValuedFunction()
 {
 	// FROM STRING_SPLIT(s, ',') - the table reference is the function call
@@ -627,6 +667,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
 	CppUnit_addTest(pSuite, SQLParserTest, testNonReservedKeywords);
+	CppUnit_addTest(pSuite, SQLParserTest, testTableValueConstructor);
 	CppUnit_addTest(pSuite, SQLParserTest, testTableValuedFunction);
 	CppUnit_addTest(pSuite, SQLParserTest, testRowConstructorIn);
 	CppUnit_addTest(pSuite, SQLParserTest, testMultiPartColumnName);

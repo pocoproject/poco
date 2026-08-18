@@ -386,7 +386,8 @@ TableRef::TableRef(TableRefType type)
       select(nullptr),
       list(nullptr),
       join(nullptr),
-      func(nullptr) {}
+      func(nullptr),
+      values(nullptr) {}
 
 TableRef::~TableRef() {
   free(schema);
@@ -396,6 +397,13 @@ TableRef::~TableRef() {
   delete join;
   delete alias;
   delete func;
+
+  if (values) {
+    for (Expr* row : *values) {
+      delete row;
+    }
+    delete values;
+  }
 
   if (list) {
     for (TableRef* table : *list) {

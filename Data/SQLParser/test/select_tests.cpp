@@ -1420,6 +1420,38 @@ TEST(SelectNonReservedKeywordTest) {
   ASSERT_EQ(((SelectStatement*)keptResult.getStatement(2))->selectList->at(0)->type, kExprCast);
 }
 
+TEST(SelectTableValueConstructorTest) {
+  SelectStatement* stmt;
+
+  TEST_PARSE_SQL_QUERY("SELECT * FROM (VALUES (0, 'Any'), (1, 'One')) AS v(id, name);", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->fromTable);
+  ASSERT_EQ(stmt->fromTable->type, kTableValues);
+  ASSERT_NOTNULL(stmt->fromTable->values);
+  ASSERT_EQ(stmt->fromTable->values->size(), 2);
+
+  // Every row is an array expression holding that row's values.
+  ASSERT_EQ(stmt->fromTable->values->at(0)->type, kExprArray);
+  ASSERT_EQ(stmt->fromTable->values->at(0)->exprList->size(), 2);
+  ASSERT_EQ(stmt->fromTable->values->at(1)->exprList->at(0)->type, kExprLiteralInt);
+
+  // The column names come from the alias.
+  ASSERT_NOTNULL(stmt->fromTable->alias);
+  ASSERT_STREQ(stmt->fromTable->alias->name, "v");
+  ASSERT_NOTNULL(stmt->fromTable->alias->columns);
+  ASSERT_EQ(stmt->fromTable->alias->columns->size(), 2);
+
+  // A single row, a subquery in FROM and INSERT ... VALUES are unaffected.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT * FROM (VALUES (1)) AS v(x);"
+      "SELECT a FROM (SELECT 1 AS a) x;"
+      "INSERT INTO t VALUES (1, 'a');",
+      keptResult, 3);
+  ASSERT_EQ(((SelectStatement*)keptResult.getStatement(0))->fromTable->type, kTableValues);
+  ASSERT_EQ(((SelectStatement*)keptResult.getStatement(1))->fromTable->type, kTableSelect);
+  ASSERT_EQ(keptResult.getStatement(2)->type(), kStmtInsert);
+}
+
 TEST(SelectTableValuedFunctionTest) {
   SelectStatement* stmt;
 

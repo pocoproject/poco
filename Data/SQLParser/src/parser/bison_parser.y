@@ -338,7 +338,7 @@
 
 %type <str_vec>                ident_commalist opt_column_list
 %type <expr_vec>               expr_list select_list opt_extended_literal_list extended_literal_list hint_list opt_hints opt_partition
-%type <expr_vec>               row_expr_list
+%type <expr_vec>               row_expr_list table_value_row_list
 %type <table_vec>              table_ref_commalist
 %type <order_vec>              opt_order order_list
 %type <with_description_vec>   opt_with_clause with_clause with_description_list
@@ -1474,6 +1474,25 @@ nonjoin_table_ref_atomic : table_ref_name | '(' select_statement ')' opt_table_a
   if ($1->name) tbl->name = strdup($1->name);
   tbl->alias = $2;
   $$ = tbl;
+}
+// Table value constructor, e.g. FROM (VALUES (1, 'a'), (2, 'b')) AS t(id, name).
+// The column names come from the alias, which table_alias already parses.
+| '(' VALUES table_value_row_list ')' opt_table_alias {
+  auto tbl = new TableRef(kTableValues);
+  tbl->values = $3;
+  tbl->alias = $5;
+  $$ = tbl;
+};
+
+// Each row is kept as an array expression, the same representation used for a
+// row constructor in IN.
+table_value_row_list : '(' expr_list ')' {
+  $$ = new std::vector<Expr*>();
+  $$->push_back(Expr::makeArray($2));
+}
+| table_value_row_list ',' '(' expr_list ')' {
+  $1->push_back(Expr::makeArray($4));
+  $$ = $1;
 };
 
 table_ref_commalist : table_ref_atomic {

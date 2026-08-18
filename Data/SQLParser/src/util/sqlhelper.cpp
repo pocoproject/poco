@@ -59,6 +59,10 @@ void printTableRefInfo(TableRef* table, uintmax_t num_indent) {
       inprint("Table-valued Function", num_indent);
       printExpression(table->func, num_indent + 1);
       break;
+    case kTableValues:
+      inprint("Values", num_indent);
+      for (Expr* row : *table->values) printExpression(row, num_indent + 1);
+      break;
   }
 
   if (table->alias) {

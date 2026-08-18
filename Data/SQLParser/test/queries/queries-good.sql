@@ -135,6 +135,9 @@ SELECT * FROM [test];
 SELECT [my col] FROM [some schema].[my table];
 SELECT * FROM mydb.some_schema.test;
 SELECT ARRAY[foo] FROM test;
+# Table value constructor in FROM
+SELECT * FROM (VALUES (0, 'Any'), (1, 'One')) AS v(id, name);
+SELECT * FROM (VALUES (1)) AS v(x);
 # Table-valued function in FROM
 SELECT value FROM STRING_SPLIT('a,b', ',');
 SELECT * FROM STRING_SPLIT('a,b', ',') AS s;
