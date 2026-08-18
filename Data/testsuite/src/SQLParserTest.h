@@ -35,6 +35,7 @@ public:
 	void testThreePartTableName();
 	void testArrayLiteralNotShadowedByBracketIdentifier();
 	void testNonReservedKeywords();
+	void testCarriageReturn();
 	void testNextValueFor();
 	void testODBCEscapes();
 	void testTopWithExpression();

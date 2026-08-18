@@ -1420,6 +1420,34 @@ TEST(SelectNonReservedKeywordTest) {
   ASSERT_EQ(((SelectStatement*)keptResult.getStatement(2))->selectList->at(0)->type, kExprCast);
 }
 
+TEST(SelectCarriageReturnTest) {
+  SelectStatement* stmt;
+
+  // A statement written with CRLF line endings has to parse like the same
+  // statement written with LF. Carriage return is not matched by any rule but
+  // the catch-all one, which ends the token stream, so the statement used to be
+  // cut off at the first line break - sometimes into a syntax error, sometimes
+  // into a shorter statement that still parsed.
+  TEST_PARSE_SQL_QUERY("SELECT a,\r\n       b\r\nFROM t\r\nWHERE c = 1;", crlfResult, 1);
+  stmt = (SelectStatement*)crlfResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_NOTNULL(stmt->fromTable);
+  ASSERT_NOTNULL(stmt->whereClause);
+
+  TEST_PARSE_SQL_QUERY("SELECT a,\n       b\nFROM t\nWHERE c = 1;", lfResult, 1);
+  stmt = (SelectStatement*)lfResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_NOTNULL(stmt->fromTable);
+  ASSERT_NOTNULL(stmt->whereClause);
+
+  // A carriage return inside a string literal is content, not whitespace, and
+  // has to survive untouched.
+  TEST_PARSE_SQL_QUERY("SELECT 'first\r\nsecond' AS s FROM t;", stringResult, 1);
+  stmt = (SelectStatement*)stringResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprLiteralString);
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "first\r\nsecond");
+}
+
 TEST(SelectNextValueForTest) {
   SelectStatement* stmt;
 

@@ -61,7 +61,7 @@ static thread_local std::stringstream strbuf;
 <COMMENT>[^\n]* /* skipping comment content until a end of line is read */;
 <COMMENT>\n     BEGIN(INITIAL);
 
-[ \t\n]+        /* skip whitespace */;
+[ \t\r\n]+      /* skip whitespace, CR included: a CRLF file would otherwise hit the catch-all rule below, which ends the token stream */;
 
 ADD         TOKEN(ADD)
 AFTER       TOKEN(AFTER)

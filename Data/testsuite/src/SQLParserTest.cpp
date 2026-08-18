@@ -238,6 +238,51 @@ void SQLParserTest::testNonReservedKeywords()
 }
 
 
+void SQLParserTest::testCarriageReturn()
+{
+	// A statement written with CRLF line endings has to parse like the same
+	// statement written with LF. Carriage return is not matched by any rule but
+	// the catch-all one, which ends the token stream, so such a statement used
+	// to be cut off at the first line break - sometimes into a syntax error,
+	// sometimes into a shorter statement that still parsed.
+	{
+		std::string crlf = "SELECT A,\r\n       B\r\nFROM Test\r\nWHERE C = 1;";
+		std::string lf = "SELECT A,\n       B\nFROM Test\nWHERE C = 1;";
+
+		SQLParserResult crlfResult;
+		SQLParser::parse(crlf, &crlfResult);
+		assertTrue(crlfResult.isValid());
+		assertEqual(1, crlfResult.size());
+
+		SQLParserResult lfResult;
+		SQLParser::parse(lf, &lfResult);
+		assertTrue(lfResult.isValid());
+		assertEqual(1, lfResult.size());
+
+		const SelectStatement* pCrlf = static_cast<const SelectStatement*>(crlfResult.getStatement(0));
+		const SelectStatement* pLf = static_cast<const SelectStatement*>(lfResult.getStatement(0));
+		assertEqual(pLf->selectList->size(), pCrlf->selectList->size());
+		assertEqual(2, pCrlf->selectList->size());
+		assertNotNull(pCrlf->fromTable);
+		assertNotNull(pCrlf->whereClause);
+	}
+
+	// A carriage return inside a string literal is content, not whitespace, and
+	// has to survive untouched.
+	{
+		std::string query = "SELECT 'first\r\nsecond' AS S FROM Test;";
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue(result.isValid());
+		assertEqual(1, result.size());
+
+		const SelectStatement* pSelect = static_cast<const SelectStatement*>(result.getStatement(0));
+		assertTrue(pSelect->selectList->at(0)->type == kExprLiteralString);
+		assertEqual(std::string("first\r\nsecond"), std::string(pSelect->selectList->at(0)->name));
+	}
+}
+
+
 void SQLParserTest::testNextValueFor()
 {
 	// T-SQL sequence expression. It yields a value like a function call does,
@@ -955,6 +1000,7 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
 	CppUnit_addTest(pSuite, SQLParserTest, testNonReservedKeywords);
+	CppUnit_addTest(pSuite, SQLParserTest, testCarriageReturn);
 	CppUnit_addTest(pSuite, SQLParserTest, testNextValueFor);
 	CppUnit_addTest(pSuite, SQLParserTest, testODBCEscapes);
 	CppUnit_addTest(pSuite, SQLParserTest, testTopWithExpression);
