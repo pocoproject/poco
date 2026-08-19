@@ -127,7 +127,7 @@ public:
 		return Iterator(_metaMap.end());
 	}
 
-	bool insert(const Meta* pMeta)
+	[[nodiscard]] bool insert(const Meta* pMeta)
 		/// Inserts a MetaObject. Returns true if insertion
 		/// was successful, false if a class with the same
 		/// name already exists.

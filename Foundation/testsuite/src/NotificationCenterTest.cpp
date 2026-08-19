@@ -393,8 +393,8 @@ void NotificationCenterTest::handleDeadlock(const AutoPtr<Notification>& pNf)
 		NObserver<NotificationCenterTest, Notification> obs(*this, &NotificationCenterTest::handleDeadlock);
 
 		// Test read operations - acquire read lock while holding Observer mutex
-		_pNC->hasObserver(obs);
-		_pNC->hasObservers();
+		(void) _pNC->hasObserver(obs);
+		(void) _pNC->hasObservers();
 		std::size_t count = _pNC->countObservers();
 		(void)count;
 		int backlog = _pNC->backlog();

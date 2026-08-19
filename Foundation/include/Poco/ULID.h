@@ -57,7 +57,7 @@ public:
 	void parse(const std::string& ulid);
 		/// Parses the ULID from its string representation.
 
-	bool tryParse(const std::string& ulid);
+	[[nodiscard]] bool tryParse(const std::string& ulid);
 		/// Tries to interpret the given string as an ULID.
 		/// If the ULID is syntactically valid, assigns the
 		/// members and returns true. Otherwise leaves the

@@ -1643,9 +1643,9 @@ void StringTest::benchmarkStrToFloat()
 
 	{
 		double d;
-		bench("tryParseFloat(float str)", [&](int i){ NumberParser::tryParseFloat(fltStrs[i % N], d); gSink += static_cast<int>(d); });
-		bench("tryParseFloat(double str)", [&](int i){ NumberParser::tryParseFloat(dblStrs[i % N], d); gSink += static_cast<int>(d); });
-		bench("tryParseFloat(fixed str)", [&](int i){ NumberParser::tryParseFloat(dblFixedStrs[i % N], d); gSink += static_cast<int>(d); });
+		bench("tryParseFloat(float str)", [&](int i){ (void) NumberParser::tryParseFloat(fltStrs[i % N], d); gSink += static_cast<int>(d); });
+		bench("tryParseFloat(double str)", [&](int i){ (void) NumberParser::tryParseFloat(dblStrs[i % N], d); gSink += static_cast<int>(d); });
+		bench("tryParseFloat(fixed str)", [&](int i){ (void) NumberParser::tryParseFloat(dblFixedStrs[i % N], d); gSink += static_cast<int>(d); });
 
 		std::cout << std::endl << "  baselines:" << std::endl;
 		bench("std::strtod", [&](int i){ gSink += static_cast<int>(std::strtod(dblStrs[i % N].c_str(), nullptr)); });

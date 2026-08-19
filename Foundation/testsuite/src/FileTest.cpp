@@ -181,7 +181,7 @@ void FileTest::testExists()
 	assertFalse (File("").exists());
 	{
 		File f("testfile.dat");
-		f.createFile();
+		(void) f.createFile();
 		assertTrue (f.exists());
 		assertFalse (f.canExecute());
 	}
@@ -370,11 +370,11 @@ void FileTest::testDirectory()
 	assertTrue (files.empty());
 
 	File f = Path("testdir/file1", Path::PATH_UNIX);
-	f.createFile();
+	(void) f.createFile();
 	f = Path("testdir/file2", Path::PATH_UNIX);
-	f.createFile();
+	(void) f.createFile();
 	f = Path("testdir/file3", Path::PATH_UNIX);
-	f.createFile();
+	(void) f.createFile();
 
 	d.list(files);
 	assertTrue (files.size() == 3);
@@ -423,7 +423,7 @@ void FileTest::testCopyFailIfDestinationFileExists()
 
 	File f1("testfile.dat");
 	TemporaryFile f2;
-	f2.createFile();
+	(void) f2.createFile();
 	try {
 		f1.setReadOnly().copyTo(f2.path(), File::OPT_FAIL_ON_OVERWRITE);
 		failmsg("file exist - must throw exception");
@@ -457,7 +457,7 @@ void FileTest::testMoveFailIfDestinationFileExists() {
 
 	File f1("testfile.dat");
 	TemporaryFile f2;
-	f2.createFile();
+	(void) f2.createFile();
 	try {
 		f1.moveTo(f2.path(), File::OPT_FAIL_ON_OVERWRITE);
 		failmsg("file exist - must throw exception");
@@ -602,7 +602,7 @@ void FileTest::testRenameFailIfExists() {
 
 	File f1("testfile.dat");
 	File f2("testfile2.dat");
-	f2.createFile();
+	(void) f2.createFile();
 
 	try {
 		f1.renameTo(f2.path(), File::OPT_FAIL_ON_OVERWRITE);
@@ -729,7 +729,7 @@ void FileTest::testGetExecutablePathNonExecutable()
 	// Non-executable file returns empty
 #if defined(POCO_OS_FAMILY_UNIX)
 	TemporaryFile tmp;
-	tmp.createFile();
+	(void) tmp.createFile();
 	chmod(tmp.path().c_str(), 0644);
 	File f(tmp.path());
 	assertTrue (f.getExecutablePath().empty());

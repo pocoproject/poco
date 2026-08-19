@@ -72,7 +72,7 @@ public:
 	Pipe& operator = (const Pipe& pipe);
 		/// Releases the Pipe's PipeImpl and assigns another one.
 
-	int writeBytes(const void* buffer, int length);
+	[[nodiscard]] int writeBytes(const void* buffer, int length);
 		/// Sends the contents of the given buffer through
 		/// the pipe. Blocks until the receiver is ready
 		/// to read the data.
@@ -81,7 +81,7 @@ public:
 		///
 		/// Throws a WriteFileException if the data cannot be written.
 
-	int readBytes(void* buffer, int length);
+	[[nodiscard]] int readBytes(void* buffer, int length);
 		/// Receives data from the pipe and stores it
 		/// in buffer. Up to length bytes are received.
 		/// Blocks until data becomes available.

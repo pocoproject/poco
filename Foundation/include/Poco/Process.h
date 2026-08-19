@@ -62,7 +62,7 @@ public:
 		/// Waits for the process to terminate
 		/// and returns the exit code of the process.
 
-	int tryWait() const;
+	[[nodiscard]] int tryWait() const;
 		/// Checks that process is terminated
 		/// and returns the exit code of the process.
 		/// If the process is still running, returns -1.
@@ -221,7 +221,7 @@ public:
 		/// Waits for the process specified by handle to terminate
 		/// and returns the exit code of the process.
 
-	static int tryWait(const ProcessHandle& handle);
+	[[nodiscard]] static int tryWait(const ProcessHandle& handle);
 		/// Checks that process is finished and returns the exit code of the
 		/// process. If the process is still running, returns -1.
 

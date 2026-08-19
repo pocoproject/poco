@@ -248,13 +248,13 @@ public:
 		/// file is a directory, recursively deletes all
 		/// files in the directory.
 
-	bool createFile();
+	[[nodiscard]] bool createFile();
 		/// Creates a new, empty file in an atomic operation.
 		/// Returns true if the file has been created and false
 		/// if the file already exists. Throws an exception if
 		/// an error occurs.
 
-	bool createDirectory();
+	[[nodiscard]] bool createDirectory();
 		/// Creates a directory. Returns true if the directory
 		/// has been created and false if it already exists.
 		/// Throws an exception if an error occurs.

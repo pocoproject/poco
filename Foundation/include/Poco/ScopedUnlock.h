@@ -25,7 +25,7 @@ namespace Poco {
 
 
 template <class M>
-class ScopedUnlock
+class [[nodiscard]] ScopedUnlock
 	/// A class that simplifies thread synchronization
 	/// with a mutex.
 	/// The constructor accepts a Mutex and unlocks it.

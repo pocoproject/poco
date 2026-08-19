@@ -65,7 +65,7 @@ public:
 	~TaskManager();
 		/// Destroys the TaskManager.
 
-	bool start(Task* pTask);
+	[[nodiscard]] bool start(Task* pTask);
 		/// Starts the given task in a thread obtained
 		/// from the thread pool; returns true if successful.
 		///

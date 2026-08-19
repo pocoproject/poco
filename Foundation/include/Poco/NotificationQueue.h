@@ -72,7 +72,7 @@ public:
 		///     notificationQueue.enqueueUrgentNotification(new MyNotification);
 		/// does not result in a memory leak.
 
-	Notification* dequeueNotification();
+	[[nodiscard]] Notification* dequeueNotification();
 		/// Dequeues the next pending notification.
 		/// Returns nullptr if no notification is available.
 		/// The caller gains ownership of the notification and
@@ -82,7 +82,7 @@ public:
 		/// assigned to a Notification::Ptr, to avoid potential
 		/// memory management issues.
 
-	Notification* waitDequeueNotification();
+	[[nodiscard]] Notification* waitDequeueNotification();
 		/// Dequeues the next pending notification.
 		/// If no notification is available, waits for a notification
 		/// to be enqueued.
@@ -95,7 +95,7 @@ public:
 		/// assigned to a Notification::Ptr, to avoid potential
 		/// memory management issues.
 
-	Notification* waitDequeueNotification(long milliseconds);
+	[[nodiscard]] Notification* waitDequeueNotification(long milliseconds);
 		/// Dequeues the next pending notification.
 		/// If no notification is available, waits for a notification
 		/// to be enqueued up to the specified time.

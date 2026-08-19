@@ -105,7 +105,7 @@ public:
 	MPSCQueue(MPSCQueue&&) = delete;
 	MPSCQueue& operator=(MPSCQueue&&) = delete;
 
-	bool tryPush(const T& item)
+	[[nodiscard]] bool tryPush(const T& item)
 		/// Attempts to push a copy of item onto the queue.
 		/// Returns true if successful, false if the queue is full.
 		/// Thread-safe for multiple concurrent producers.
@@ -113,7 +113,7 @@ public:
 		return emplace(item);
 	}
 
-	bool tryPush(T&& item)
+	[[nodiscard]] bool tryPush(T&& item)
 		/// Attempts to push item onto the queue using move semantics.
 		/// Returns true if successful, false if the queue is full.
 		/// Thread-safe for multiple concurrent producers.
@@ -161,7 +161,7 @@ public:
 		}
 	}
 
-	bool tryPop(T& item)
+	[[nodiscard]] bool tryPop(T& item)
 		/// Attempts to pop an item from the queue.
 		/// If successful, moves the item into the provided reference
 		/// and returns true. Returns false if the queue is empty.

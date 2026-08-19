@@ -60,7 +60,7 @@ public:
 		/// Acquires a read lock. If another thread currently holds a write lock,
 		/// waits until the write lock is released.
 
-	bool tryReadLock();
+	[[nodiscard]] bool tryReadLock();
 		/// Tries to acquire a read lock. Immediately returns true if successful, or
 		/// false if another thread currently holds a write lock.
 
@@ -69,7 +69,7 @@ public:
 		/// locks, waits until all locks are released. The results are undefined
 		/// if the same thread already holds a read or write lock
 
-	bool tryWriteLock();
+	[[nodiscard]] bool tryWriteLock();
 		/// Tries to acquire a write lock. Immediately returns true if successful,
 		/// or false if one or more other threads currently hold
 		/// locks. The result is undefined if the same thread already
@@ -84,7 +84,7 @@ private:
 };
 
 
-class Foundation_API ScopedRWLock
+class [[nodiscard]] Foundation_API ScopedRWLock
 	/// A variant of ScopedLock for reader/writer locks.
 {
 public:
@@ -100,7 +100,7 @@ private:
 };
 
 
-class Foundation_API ScopedReadRWLock : public ScopedRWLock
+class [[nodiscard]] Foundation_API ScopedReadRWLock : public ScopedRWLock
 	/// A variant of ScopedLock for reader locks.
 {
 public:
@@ -109,7 +109,7 @@ public:
 };
 
 
-class Foundation_API ScopedWriteRWLock : public ScopedRWLock
+class [[nodiscard]] Foundation_API ScopedWriteRWLock : public ScopedRWLock
 	/// A variant of ScopedLock for writer locks.
 {
 public:

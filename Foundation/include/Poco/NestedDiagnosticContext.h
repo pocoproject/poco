@@ -115,7 +115,7 @@ private:
 
 using NDC = NestedDiagnosticContext;
 
-class Foundation_API NDCScope
+class [[nodiscard]] Foundation_API NDCScope
 	/// This class can be used to automatically push a context onto
 	/// the NDC stack at the beginning of a scope, and to pop
 	/// the context at the end of the scope.

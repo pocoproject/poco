@@ -356,7 +356,7 @@ public:
 		///
 		/// Throws an InvalidAddressException if the address cannot be parsed.
 
-	static bool tryParse(const std::string& addr, IPAddress& result);
+	[[nodiscard]] static bool tryParse(const std::string& addr, IPAddress& result);
 		/// Tries to interpret the given address string as an
 		/// IP address in presentation format (dotted decimal
 		/// for IPv4, hex string for IPv6).

@@ -129,14 +129,14 @@ public:
 	Path& parse(const std::string& path, Style style);
 		/// Assigns a string containing a path.
 
-	bool tryParse(const std::string& path);
+	[[nodiscard]] bool tryParse(const std::string& path);
 		/// Tries to interpret the given string as a path
 		/// in native format.
 		/// If the path is syntactically valid, assigns the
 		/// path and returns true. Otherwise leaves the
 		/// object unchanged and returns false.
 
-	bool tryParse(const std::string& path, Style style);
+	[[nodiscard]] bool tryParse(const std::string& path, Style style);
 		/// Tries to interpret the given string as a path,
 		/// according to the given style.
 		/// If the path is syntactically valid, assigns the

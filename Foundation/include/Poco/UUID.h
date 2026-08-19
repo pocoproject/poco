@@ -81,7 +81,7 @@ public:
 	void parse(const std::string& uuid);
 		/// Parses the UUID from its string representation.
 
-	bool tryParse(const std::string& uuid);
+	[[nodiscard]] bool tryParse(const std::string& uuid);
 		/// Tries to interpret the given string as an UUID.
 		/// If the UUID is syntactically valid, assigns the
 		/// members and returns true. Otherwise leaves the

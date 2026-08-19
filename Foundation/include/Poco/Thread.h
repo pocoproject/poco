@@ -188,7 +188,7 @@ public:
 		/// to complete. Throws a TimeoutException if the thread
 		/// does not complete within the specified time interval.
 
-	bool tryJoin(long milliseconds);
+	[[nodiscard]] bool tryJoin(long milliseconds);
 		/// Waits for at most the given interval for the thread
 		/// to complete. Returns true if the thread has finished,
 		/// false otherwise.

@@ -27,7 +27,7 @@
 namespace Poco::Data {
 
 
-class Data_API Transaction
+class [[nodiscard]] Data_API Transaction
 	/// Transaction helps with transactions in domain logic.
 	/// When a Transaction object is created, it first checks whether a
 	/// transaction is in progress. If not, a new transaction is started.
