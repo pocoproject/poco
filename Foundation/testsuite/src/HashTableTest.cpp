@@ -51,7 +51,7 @@ void HashTableTest::testInsert()
 	catch (Exception&){}
 	try
 	{
-		hashTable.get(s2);
+		(void) hashTable.get(s2);
 		failmsg ("getting a non inserted item must fail");
 	}
 	catch (Exception&){}
@@ -106,7 +106,7 @@ void HashTableTest::testSize()
 	assertTrue (hashTable.size() == 0);
 	(void) hashTable.insert("1", 1);
 	assertTrue (hashTable.size() == 1);
-	(void) hashTable.update("2", 2);
+	const Poco::UInt32 h2 = hashTable.update("2", 2);
 	assertTrue (hashTable.size() == 2);
 	hashTable.remove("1");
 	assertTrue (hashTable.size() == 1);

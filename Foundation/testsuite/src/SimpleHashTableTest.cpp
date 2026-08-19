@@ -50,7 +50,7 @@ void SimpleHashTableTest::testInsert()
 	catch (Exception&){}
 	try
 	{
-		hashTable.get(s2);
+		(void) hashTable.get(s2);
 		failmsg ("getting a non inserted item must fail");
 	}
 	catch (Exception&){}

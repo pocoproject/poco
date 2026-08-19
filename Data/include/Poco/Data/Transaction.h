@@ -27,7 +27,7 @@
 namespace Poco::Data {
 
 
-class [[nodiscard]] Data_API Transaction
+class Data_API Transaction
 	/// Transaction helps with transactions in domain logic.
 	/// When a Transaction object is created, it first checks whether a
 	/// transaction is in progress. If not, a new transaction is started.
@@ -40,10 +40,10 @@ class [[nodiscard]] Data_API Transaction
 	/// Transaction be used directly on a default (auto-commit) session.
 {
 public:
-	Transaction(Poco::Data::Session& session, Poco::Logger* pLogger = nullptr);
+	POCO_NODISCARD_CTOR Transaction(Poco::Data::Session& session, Poco::Logger* pLogger = nullptr);
 		/// Creates the Transaction and starts it, using the given database session and logger.
 
-	Transaction(Poco::Data::Session& session, bool start);
+	POCO_NODISCARD_CTOR Transaction(Poco::Data::Session& session, bool start);
 		/// Creates the Transaction, using the given database session.
 		/// If start is true, transaction is started, otherwise begin() must be called
 		/// to start the transaction.

@@ -84,11 +84,11 @@ private:
 };
 
 
-class [[nodiscard]] Foundation_API ScopedRWLock
+class Foundation_API ScopedRWLock
 	/// A variant of ScopedLock for reader/writer locks.
 {
 public:
-	ScopedRWLock(RWLock& rwl, bool write = false);
+	POCO_NODISCARD_CTOR ScopedRWLock(RWLock& rwl, bool write = false);
 	~ScopedRWLock();
 
 	ScopedRWLock() = delete;
@@ -100,20 +100,20 @@ private:
 };
 
 
-class [[nodiscard]] Foundation_API ScopedReadRWLock : public ScopedRWLock
+class Foundation_API ScopedReadRWLock : public ScopedRWLock
 	/// A variant of ScopedLock for reader locks.
 {
 public:
-	ScopedReadRWLock(RWLock& rwl);
+	POCO_NODISCARD_CTOR ScopedReadRWLock(RWLock& rwl);
 	~ScopedReadRWLock();
 };
 
 
-class [[nodiscard]] Foundation_API ScopedWriteRWLock : public ScopedRWLock
+class Foundation_API ScopedWriteRWLock : public ScopedRWLock
 	/// A variant of ScopedLock for writer locks.
 {
 public:
-	ScopedWriteRWLock(RWLock& rwl);
+	POCO_NODISCARD_CTOR ScopedWriteRWLock(RWLock& rwl);
 	~ScopedWriteRWLock();
 };
 
