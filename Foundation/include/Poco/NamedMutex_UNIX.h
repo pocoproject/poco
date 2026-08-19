@@ -39,8 +39,7 @@ protected:
 	void unlockImpl();
 
 private:
-	[[nodiscard]]
-	std::string getFileName();
+	[[nodiscard]] std::string getFileName();
 
 	std::string _name;
 #if defined(sun) || defined(__APPLE__) || defined(__osf__) || defined(__QNX__) || defined(_AIX) || defined(__GNU__)

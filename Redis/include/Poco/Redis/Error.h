@@ -37,8 +37,7 @@ public:
 	~Error();
 		/// Destroys the Error.
 
-	[[nodiscard]]
-	const std::string& getMessage() const;
+	[[nodiscard]] const std::string& getMessage() const;
 		/// Returns the error message.
 
 	void setMessage(const std::string& message);

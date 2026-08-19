@@ -47,12 +47,10 @@ public:
 	Void& operator = (const Void& v);
 		/// Assigns another void.
 
-	[[nodiscard]]
-	bool operator == ([[maybe_unused]] const Void& v) const;
+	bool operator ==(const Void& v) const;
 		/// Will return always true due to Voids having no members.
 
-	[[nodiscard]]
-	bool operator != ([[maybe_unused]] const Void& v) const;
+	bool operator !=(const Void& v) const;
 		/// Will return always false due to Voids having no members.
 };
 

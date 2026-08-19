@@ -76,8 +76,7 @@ public:
 	void setProperty(const std::string& name, const std::string& value) override;
 		/// Throws a PropertyNotSupportedException.
 
-	[[nodiscard]]
-	std::string getProperty(const std::string& name) const override;
+	[[nodiscard]] std::string getProperty(const std::string& name) const override;
 		/// Throws a PropertyNotSupportedException.
 
 protected:

@@ -55,23 +55,19 @@ public:
 	void importNameSpace(const std::string& nameSpace);
 		/// Imports a namespace (using namespace <namespace>).
 
-	[[nodiscard]]
-	Iterator begin() const;
+	[[nodiscard]] Iterator begin() const;
 		/// Returns an iterator for iterating over the NameSpace's Symbol's.
 
-	[[nodiscard]]
-	Iterator end() const;
+	[[nodiscard]] Iterator end() const;
 		/// Returns an iterator for iterating over the NameSpace's Symbol's.
 
-	[[nodiscard]]
-	virtual Symbol* lookup(const std::string& name) const;
+	[[nodiscard]] virtual Symbol* lookup(const std::string& name) const;
 		/// Looks up the given name in the symbol table
 		/// and returns the corresponding symbol, or null
 		/// if no symbol can be found. The name can include
 		/// a namespace.
 
-	[[nodiscard]]
-	static NameSpace* root();
+	[[nodiscard]] static NameSpace* root();
 		/// Returns the root namespace. Never delete this one!
 
 	void nameSpaces(SymbolTable& table) const;
@@ -95,13 +91,11 @@ public:
 	void variables(SymbolTable& table) const;
 		/// Fills the symbol table with all variables.
 
-	[[nodiscard]]
-	const AliasMap& importedSymbols() const;
+	[[nodiscard]] const AliasMap& importedSymbols() const;
 		/// Returns a const reference to a SymbolTable containing all
 		/// imported symbols.
 
-	[[nodiscard]]
-	const NameSpaceVec& importedNameSpaces() const;
+	[[nodiscard]] const NameSpaceVec& importedNameSpaces() const;
 		/// Returns a vector containing all imported namespaces.
 
 	[[nodiscard]]
@@ -111,14 +105,11 @@ public:
 	void setInline(bool isInline);
 		/// Sets the inline flag for this namespace.
 
-  [[nodiscard]]
-	Symbol::Kind kind() const;
-	[[nodiscard]]
-	std::string toString() const;
+	[[nodiscard]] Symbol::Kind kind() const;
+	[[nodiscard]] std::string toString() const;
 
 private:
-	[[nodiscard]]
-	Symbol* lookup(const std::string& name, std::set<const NameSpace*>& alreadyVisited) const;
+	[[nodiscard]] Symbol* lookup(const std::string& name, std::set<const NameSpace*>& alreadyVisited) const;
 		/// Looks up the given name in the symbol table
 		/// and returns the corresponding symbol, or null
 		/// if no symbol can be found. The name can include

@@ -66,22 +66,19 @@ public:
 		}
 	}
 
-	[[nodiscard]]
-	operator const H& () const
+	[[nodiscard]] operator const H& () const
 		/// Const conversion operator into reference to native type.
 	{
 		return handle();
 	}
 
-	[[nodiscard]]
-	const H& handle() const
+	[[nodiscard]] const H& handle() const
 		/// Returns const reference to native type.
 	{
 		return _handle;
 	}
 
-	[[nodiscard]]
-	const ConnectionHandle& connection() const
+	[[nodiscard]] const ConnectionHandle& connection() const
 		/// Returns the connection handle.
 	{
 		return _rConnection;
@@ -91,15 +88,13 @@ private:
 	Handle(const Handle&) = delete;
 	const Handle& operator=(const Handle&) = delete;
 
-	[[nodiscard]]
-	operator H& ()
+	[[nodiscard]] operator H& ()
 		/// Conversion operator into reference to native type.
 	{
 		return handle();
 	}
 
-	[[nodiscard]]
-	H& handle()
+	[[nodiscard]] H& handle()
 		/// Returns reference to native type.
 	{
 		return _handle;

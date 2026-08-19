@@ -112,8 +112,7 @@ public:
 		/// If any other property name is given, a PropertyNotSupported
 		/// exception is thrown.
 
-	[[nodiscard]]
-	std::string getProperty(const std::string& name) const override;
+	[[nodiscard]] std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name or
 		/// throws a PropertyNotSupported exception if the given
 		/// name is not recognized.
@@ -132,8 +131,7 @@ public:
 	static const std::string PROP_PRIORITY_NAMES;
 
 protected:
-	[[nodiscard]]
-	const std::string& getPriorityName([[maybe_unused]] int x);
+	const std::string& getPriorityName(int);
 		/// Returns a string for the given priority value.
 
 private:
@@ -156,8 +154,7 @@ private:
 
 	void parsePriorityNames();
 
-	[[nodiscard]]
-	static const char* extractBasename(const char* path);
+	[[nodiscard]] static const char* extractBasename(const char* path);
 		/// Extracts the filename from a path without creating a Path object.
 
 	static const std::string DEFAULT_PRIORITY_NAMES;

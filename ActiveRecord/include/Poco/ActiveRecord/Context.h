@@ -41,12 +41,10 @@ public:
 	~Context();
 		/// Destroys the Context.
 
-	[[nodiscard]]
-	Poco::Data::Session& session();
+	[[nodiscard]] Poco::Data::Session& session();
 		/// Returns the database session.
 
-	[[nodiscard]]
-	StatementPlaceholderProvider::Ptr statementPlaceholderProvider() const;
+	[[nodiscard]] StatementPlaceholderProvider::Ptr statementPlaceholderProvider() const;
 		/// Returns a new StatementPlaceholderProvider.
 
 private:

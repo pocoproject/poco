@@ -88,8 +88,7 @@ public:
 	void removeFilter(Ptr pFilter);
 		/// Removes filter from this filter.
 
-	[[nodiscard]]
-	bool has(Ptr pFilter) const;
+	[[nodiscard]] bool has(Ptr pFilter) const;
 		/// Returns true if this filter is parent of pFilter;
 
 	template <typename T>
@@ -130,20 +129,16 @@ public:
 	void toggleNot();
 		/// Togless the NOT operator for this filter;
 
-	[[nodiscard]]
-	bool isNot() const;
+	[[nodiscard]] bool isNot() const;
 		/// Returns true if filter is NOT-ed, false otherwise.
 
-	[[nodiscard]]
-	bool isEmpty() const;
+	[[nodiscard]] bool isEmpty() const;
 		/// Returns true if there is not filtering criteria specified.
 
-	[[nodiscard]]
-	bool isAllowed(std::size_t row) const;
+	[[nodiscard]] bool isAllowed(std::size_t row) const;
 		/// Returns true if name and value are allowed.
 
-	[[nodiscard]]
-	bool exists(const std::string& name) const;
+	[[nodiscard]] bool exists(const std::string& name) const;
 		/// Returns true if name is known to this row filter.
 
 private:
@@ -153,24 +148,15 @@ private:
 
 	void init();
 
-	[[nodiscard]]
-	static bool equal(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
-	[[nodiscard]]
-	static bool notEqual(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
-	[[nodiscard]]
-	static bool less(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
-	[[nodiscard]]
-	static bool greater(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
-	[[nodiscard]]
-	static bool lessOrEqual(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
-	[[nodiscard]]
-	static bool greaterOrEqual(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
-	[[nodiscard]]
-	static bool logicalAnd(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
-	[[nodiscard]]
-	static bool logicalOr(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
-	[[nodiscard]]
-	static bool isNull(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var&);
+	[[nodiscard]] static bool equal(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	[[nodiscard]] static bool notEqual(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	[[nodiscard]] static bool less(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	[[nodiscard]] static bool greater(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	[[nodiscard]] static bool lessOrEqual(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	[[nodiscard]] static bool greaterOrEqual(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	[[nodiscard]] static bool logicalAnd(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	[[nodiscard]] static bool logicalOr(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var& p2);
+	[[nodiscard]] static bool isNull(const Poco::Dynamic::Var& p1, const Poco::Dynamic::Var&);
 
 	static void doCompare(Poco::Dynamic::Var& ret,
 		Poco::Dynamic::Var& val,
@@ -179,8 +165,7 @@ private:
 
 	RecordSet& recordSet() const;
 
-	[[nodiscard]]
-	Comparison getComparison(const std::string& comp) const;
+	[[nodiscard]] Comparison getComparison(const std::string& comp) const;
 
 	void rewindRecordSet();
 

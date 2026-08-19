@@ -55,8 +55,7 @@ public:
 	{
 	}
 
-	[[nodiscard]]
-	Sample& labels(const std::vector<std::string>& labelValues)
+	[[nodiscard]] Sample& labels(const std::vector<std::string>& labelValues)
 		/// Returns the Sample associated with the given label values.
 		///
 		/// If the sample does not exist yet, it is created.
@@ -87,8 +86,7 @@ public:
 		}
 	}
 
-	[[nodiscard]]
-	const Sample& labels(const std::vector<std::string>& labelValues) const
+	[[nodiscard]] const Sample& labels(const std::vector<std::string>& labelValues) const
 		/// Returns the Sample associated with the given label values.
 		///
 		/// If the sample does not exist, a Poco::NotFoundException is thrown.
@@ -133,8 +131,7 @@ public:
 		_samples.clear();
 	}
 
-	[[nodiscard]]
-	std::size_t sampleCount() const
+	[[nodiscard]] std::size_t sampleCount() const
 		/// Returns the number of samples.
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
@@ -167,8 +164,7 @@ public:
 	}
 
 protected:
-	[[nodiscard]]
-	virtual std::unique_ptr<Sample> createSample() const = 0;
+	[[nodiscard]] virtual std::unique_ptr<Sample> createSample() const = 0;
 		/// Creates a new Sample. Must be overridden by subclasses.
 
 	virtual void writeSample(Exporter& exporter, const std::vector<std::string>& labelValues, const Sample& sample) const

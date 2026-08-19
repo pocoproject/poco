@@ -45,8 +45,7 @@ public:
 
 	virtual ~AbstractPriorityDelegate() = default;
 
-	[[nodiscard]]
-	int priority() const
+	[[nodiscard]] int priority() const
 	{
 		return _priority;
 	}

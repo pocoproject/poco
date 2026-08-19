@@ -49,8 +49,7 @@ public:
 		/// If this is not set to valid DNS name for your host, server-generated
 		/// redirections will not work.
 
-	[[nodiscard]]
-	const std::string& getServerName() const;
+	[[nodiscard]] const std::string& getServerName() const;
 		/// Returns the name and port (name:port) that the server uses to identify itself.
 
 	void setSoftwareVersion(const std::string& softwareVersion);
@@ -62,31 +61,27 @@ public:
 		/// The format of the softwareVersion string should be name/version
 		/// (e.g. MyHTTPServer/1.0).
 
-	[[nodiscard]]
-	const std::string& getSoftwareVersion() const;
+	[[nodiscard]] const std::string& getSoftwareVersion() const;
 		/// Returns the server software name and version that the server uses to
 		/// identify itself.
 
 	void setTimeout(const Poco::Timespan& timeout);
 		/// Sets the connection timeout for HTTP connections.
 
-	[[nodiscard]]
-	const Poco::Timespan& getTimeout() const;
+	[[nodiscard]] const Poco::Timespan& getTimeout() const;
 		/// Returns the connection timeout for HTTP connections.
 
 	void setKeepAlive(bool keepAlive);
 		/// Enables (keepAlive == true) or disables (keepAlive == false)
 		/// persistent connections.
 
-	[[nodiscard]]
-	bool getKeepAlive() const;
+	[[nodiscard]] bool getKeepAlive() const;
 		/// Returns true if persistent connections are enabled.
 
 	void setKeepAliveTimeout(const Poco::Timespan& timeout);
 		/// Sets the keep-alive timeout for persistent HTTP connections.
 
-	[[nodiscard]]
-	const Poco::Timespan& getKeepAliveTimeout() const;
+	[[nodiscard]] const Poco::Timespan& getKeepAliveTimeout() const;
 		/// Returns the keep-alive timeout for persistent HTTP connections.
 
 	void setMaxKeepAliveRequests(int maxKeepAliveRequests);
@@ -94,8 +89,7 @@ public:
 		/// during a persistent connection. 0 means unlimited
 		/// connections.
 
-	[[nodiscard]]
-	int getMaxKeepAliveRequests() const;
+	[[nodiscard]] int getMaxKeepAliveRequests() const;
 		/// Returns the maximum number of requests allowed
 		/// during a persistent connection, or 0 if
 		/// unlimited connections are allowed.
@@ -105,8 +99,7 @@ public:
 		/// RFC2047.
 		/// Default is true: convert header values when reading HTTP header.
 
-	[[nodiscard]]
-	bool getAutoDecodeHeaders() const;
+	[[nodiscard]] bool getAutoDecodeHeaders() const;
 		/// Returns true if automatic conversion of HTTP header values
 		/// when reading HTTP header.
 

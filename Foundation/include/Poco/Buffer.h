@@ -253,15 +253,13 @@ public:
 		append(buf.begin(), buf.size());
 	}
 
-	[[nodiscard]]
-	std::size_t capacity() const
+	[[nodiscard]] std::size_t capacity() const
 		/// Returns the allocated memory size in elements.
 	{
 		return _capacity;
 	}
 
-	[[nodiscard]]
-	std::size_t capacityBytes() const
+	[[nodiscard]] std::size_t capacityBytes() const
 		/// Returns the allocated memory size in bytes.
 	{
 		return _capacity * sizeof(T);
@@ -278,8 +276,7 @@ public:
 		swap(_ownMem, other._ownMem);
 	}
 
-	[[nodiscard]]
-	bool operator == (const Buffer& other) const
+	[[nodiscard]] bool operator == (const Buffer& other) const
 		/// Compare operator.
 	{
 		if (this != &other)
@@ -298,8 +295,7 @@ public:
 		return true;
 	}
 
-	[[nodiscard]]
-	bool operator != (const Buffer& other) const
+	[[nodiscard]] bool operator != (const Buffer& other) const
 		/// Compare operator.
 	{
 		return !(*this == other);
@@ -311,65 +307,56 @@ public:
 		std::memset(_ptr, 0, _used * sizeof(T));
 	}
 
-	[[nodiscard]]
-	std::size_t size() const
+	[[nodiscard]] std::size_t size() const
 		/// Returns the used size of the buffer in elements.
 	{
 		return _used;
 	}
 
-	[[nodiscard]]
-	std::size_t sizeBytes() const
+	[[nodiscard]] std::size_t sizeBytes() const
 		/// Returns the used size of the buffer in bytes.
 	{
 		return _used * sizeof(T);
 	}
 
-	[[nodiscard]]
-	T* begin()
+	[[nodiscard]] T* begin()
 		/// Returns a pointer to the beginning of the buffer.
 	{
 		return _ptr;
 	}
 
-	[[nodiscard]]
-	const T* begin() const
+	[[nodiscard]] const T* begin() const
 		/// Returns a pointer to the beginning of the buffer.
 	{
 		return _ptr;
 	}
 
-	[[nodiscard]]
-	T* end()
+	[[nodiscard]] T* end()
 		/// Returns a pointer to end of the buffer.
 	{
 		return _ptr + _used;
 	}
 
-	[[nodiscard]]
-	const T* end() const
+	[[nodiscard]] const T* end() const
 		/// Returns a pointer to the end of the buffer.
 	{
 		return _ptr + _used;
 	}
 
-	[[nodiscard]]
-	bool empty() const
+	[[nodiscard]] bool empty() const
 		/// Return true if buffer is empty.
 	{
 		return 0 == _used;
 	}
 
-	[[nodiscard]]
-	T& operator [] (std::size_t index)
+	[[nodiscard]] T& operator [] (std::size_t index)
 	{
 		poco_assert (index < _used);
 
 		return _ptr[index];
 	}
 
-	[[nodiscard]]
-	const T& operator [] (std::size_t index) const
+	[[nodiscard]] const T& operator [] (std::size_t index) const
 	{
 		poco_assert (index < _used);
 

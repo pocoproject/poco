@@ -38,34 +38,27 @@ public:
 	~Parameter();
 		/// Destroys the Parameter.
 
-	[[nodiscard]]
-	Symbol::Kind kind() const;
+	[[nodiscard]] Symbol::Kind kind() const;
 
-	[[nodiscard]]
-	bool isReference() const;
+	[[nodiscard]] bool isReference() const;
 		/// Returns true iff the parameter is a reference.
 
-	[[nodiscard]]
-	bool isPointer() const;
+	[[nodiscard]] bool isPointer() const;
 		/// Returns true iff the parameter is a pointer.
 
-	[[nodiscard]]
-	bool isConst() const;
+	[[nodiscard]] bool isConst() const;
 		/// Returns true iff the parameter is const.
 
-	[[nodiscard]]
-	bool hasDefaultValue() const;
+	[[nodiscard]] bool hasDefaultValue() const;
 		/// Returns true if a defaultvalue was set at this parameter,
 		/// Example: const std::string& data = std::string("default").
 
-	[[nodiscard]]
-	const std::string& declType() const;
+	[[nodiscard]] const std::string& declType() const;
 		/// Returns the type of the parameter without const and & if present.
 		///
 		/// Example: a type const std::string& -> std::string, a type const std::string* returns std::string
 
-	[[nodiscard]]
-	const std::string& defaultValue() const;
+	[[nodiscard]] const std::string& defaultValue() const;
 		/// If hasDefaultValue() returns true, this method returns the default value, i.e. all data found between
 		/// the opening and closing bracket of the init string.
 		///
@@ -73,8 +66,7 @@ public:
 		/// for = std::string() it will return a zero length string, for = ComplexClass(13,12, "test", 0);
 		/// it will return 13,12, "test", 0.
 
-	[[nodiscard]]
-	const std::string& defaultDecl() const;
+	[[nodiscard]] const std::string& defaultDecl() const;
 		/// If hasDefaultValue() returns true, this method returns the
 		/// default value declaration.
 		///

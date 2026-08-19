@@ -65,7 +65,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		[[maybe_unused]] Timestamp ts = f.created();
+		(void) f.created();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -74,7 +74,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		[[maybe_unused]] Timestamp ts = f.getLastModified();
+		(void) f.getLastModified();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)
@@ -93,7 +93,7 @@ void FileTest::testFileAttributes1()
 
 	try
 	{
-		[[maybe_unused]] File::FileSize fs = f.getSize();
+		(void) f.getSize();
 		failmsg("file does not exist - must throw exception");
 	}
 	catch (Exception&)

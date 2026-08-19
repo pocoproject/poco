@@ -54,16 +54,16 @@ void ZipTest::testSkipSingleFile()
 	ZipLocalFileHeader hdr(inp, false, skip);
 	assertTrue (ZipCommon::HS_FAT == hdr.getHostSystem());
 	int major = hdr.getMajorVersionNumber();
-	[[maybe_unused]] int minor = hdr.getMinorVersionNumber();
+	(void) hdr.getMinorVersionNumber();
 	assertTrue (major <= 2);
 	std::size_t hdrSize = hdr.getHeaderSize();
 	assertTrue (hdrSize > 30);
-	[[maybe_unused]] ZipCommon::CompressionMethod cm = hdr.getCompressionMethod();
+	(void) hdr.getCompressionMethod();
 	assertTrue (!hdr.isEncrypted());
 	Poco::DateTime aDate = hdr.lastModifiedAt();
-	[[maybe_unused]] Poco::UInt64 cS = hdr.getCompressedSize();
-	[[maybe_unused]] Poco::UInt64 uS = hdr.getUncompressedSize();
-	[[maybe_unused]] const std::string& fileName = hdr.getFileName();
+	(void) hdr.getCompressedSize();
+	(void) hdr.getUncompressedSize();
+	(void) hdr.getFileName();
 }
 
 

@@ -56,8 +56,7 @@ public:
 	using ArgsImpl = std::vector<std::string>;
 	using EnvImpl = std::map<std::string, std::string>;
 
-	[[nodiscard]]
-	static PIDImpl idImpl();
+	[[nodiscard]] static PIDImpl idImpl();
 	static void timesImpl(long& userTime, long& kernelTime);
 	static void timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kernelTime);
 	static ProcessHandleImpl* launchImpl(
@@ -70,10 +69,8 @@ public:
 		const EnvImpl& env);
 	static void killImpl(ProcessHandleImpl& handle);
 	static void killImpl(PIDImpl pid);
-	[[nodiscard]]
-	static bool isRunningImpl(const ProcessHandleImpl& handle);
-	[[nodiscard]]
-	static bool isRunningImpl(PIDImpl pid);
+	[[nodiscard]] static bool isRunningImpl(const ProcessHandleImpl& handle);
+	[[nodiscard]] static bool isRunningImpl(PIDImpl pid);
 	static void requestTerminationImpl(PIDImpl pid);
 };
 

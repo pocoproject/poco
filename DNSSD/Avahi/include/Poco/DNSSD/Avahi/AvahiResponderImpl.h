@@ -53,8 +53,7 @@ public:
 		/// Destroys the AvahiResponderImpl.
 
 	// DNSSDResponderImpl
-	[[nodiscard]]
-	DNSSDBrowser& browser();
+	[[nodiscard]] DNSSDBrowser& browser();
 	ServiceHandle registerService(const Service& service, int options);
 	void unregisterService(ServiceHandle& serviceHandle);
 	RecordHandle addRecord(ServiceHandle serviceHandle, const Record& record);
@@ -67,8 +66,7 @@ public:
 	void run();
 
 	// Implementation
-	[[nodiscard]]
-	static const char* describeError(int code);
+	[[nodiscard]] static const char* describeError(int code);
 		/// Returns a human-readable string describing the error.
 
 	void onClientStateChange(AvahiClientState state);
@@ -99,8 +97,7 @@ protected:
 
 	void reregisterServices();
 	void setupEntryGroup(AvahiEntryGroup* avahiGroup, const Service& service, const RecordVec& records, int options, bool rename);
-	[[nodiscard]]
-	static AvahiStringList* createTXTRecord(const Service::Properties& properties);
+	[[nodiscard]] static AvahiStringList* createTXTRecord(const Service::Properties& properties);
 
 private:
 	Poco::DNSSD::DNSSDResponder& _owner;

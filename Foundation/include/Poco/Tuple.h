@@ -43,15 +43,13 @@ namespace Detail {
 template <typename T>
 struct DefaultValue
 {
-	[[nodiscard]]
-	static T get() { return T(); }
+	[[nodiscard]] static T get() { return T(); }
 };
 
 template <>
 struct DefaultValue<NullTypeList>
 {
-	[[nodiscard]]
-	static NullTypeList get() { return NullTypeList(); }
+	[[nodiscard]] static NullTypeList get() { return NullTypeList(); }
 };
 
 
@@ -77,8 +75,7 @@ template <std::size_t I, std::size_t N>
 struct TupleLess
 {
 	template <typename T>
-	[[nodiscard]]
-	static bool compare(const T& a, const T& b)
+	[[nodiscard]] static bool compare(const T& a, const T& b)
 	{
 		if (std::get<I>(a) < std::get<I>(b)) return true;
 		if (std::get<I>(b) < std::get<I>(a)) return false;
@@ -90,8 +87,7 @@ template <std::size_t N>
 struct TupleLess<N, N>
 {
 	template <typename T>
-	[[nodiscard]]
-	static bool compare(const T&, const T&)
+	[[nodiscard]] static bool compare(const T&, const T&)
 	{
 		return false;
 	}
@@ -232,15 +228,13 @@ struct Tuple
 	}
 
 	template <std::size_t N>
-	[[nodiscard]]
-	typename TypeGetter<N, Type>::HeadType& get()
+	[[nodiscard]] typename TypeGetter<N, Type>::HeadType& get()
 	{
 		return std::get<N>(_data);
 	}
 
 	template <std::size_t N>
-	[[nodiscard]]
-	const typename TypeGetter<N, Type>::HeadType& get() const
+	[[nodiscard]] const typename TypeGetter<N, Type>::HeadType& get() const
 	{
 		return std::get<N>(_data);
 	}
@@ -251,29 +245,24 @@ struct Tuple
 		std::get<N>(_data) = val;
 	}
 
-	[[nodiscard]]
-	bool operator==(const Tuple& other) const
+	[[nodiscard]] bool operator==(const Tuple& other) const
 	{
 		return _data == other._data;
 	}
 
-	[[nodiscard]]
-	bool operator!=(const Tuple& other) const
+	[[nodiscard]] bool operator!=(const Tuple& other) const
 	{
 		return _data != other._data;
 	}
 
-	[[nodiscard]]
-	bool operator<(const Tuple& other) const
+	[[nodiscard]] bool operator<(const Tuple& other) const
 	{
 		return Detail::TupleLess<0, length>::compare(_data, other._data);
 	}
 
-	[[nodiscard]]
-	explicit operator TupleType& () { return _data; }
+	[[nodiscard]] explicit operator TupleType& () { return _data; }
 
-	[[nodiscard]]
-	explicit operator const TupleType& () const { return _data; }
+	[[nodiscard]] explicit operator const TupleType& () const { return _data; }
 
 private:
 	template <std::size_t I, typename U, typename... Us>

@@ -31,8 +31,7 @@ public:
 
 	virtual void reset() = 0;
 
-	[[nodiscard]]
-	virtual std::string next() = 0;
+	[[nodiscard]] virtual std::string next() = 0;
 
 	virtual ~StatementPlaceholderProvider();
 };
@@ -43,8 +42,7 @@ class ActiveRecordLib_API DefaultStatementPlaceholderProvider: public StatementP
 public:
 	void reset();
 
-	[[nodiscard]]
-	std::string next();
+	[[nodiscard]] std::string next();
 };
 
 
@@ -53,8 +51,7 @@ class ActiveRecordLib_API PostgresStatementPlaceholderProvider: public Statement
 public:
 	void reset();
 
-	[[nodiscard]]
-	std::string next();
+	[[nodiscard]] std::string next();
 
 private:
 	int _n = 1;

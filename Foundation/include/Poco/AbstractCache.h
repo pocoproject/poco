@@ -122,16 +122,14 @@ public:
 		doRemove(it);
 	}
 
-	[[nodiscard]]
-	bool has(const TKey& key) const
+	[[nodiscard]] bool has(const TKey& key) const
 		/// Returns true if the cache contains a value for the key.
 	{
 		typename TMutex::ScopedLock lock(_mutex);
 		return doHas(key);
 	}
 
-	[[nodiscard]]
-	SharedPtr<TValue> get(const TKey& key)
+	[[nodiscard]] SharedPtr<TValue> get(const TKey& key)
 		/// Returns a SharedPtr of the value. The SharedPointer will remain valid
 		/// even when cache replacement removes the element.
 		/// If for the key no value exists, an empty SharedPtr is returned.
@@ -147,8 +145,7 @@ public:
 		doClear();
 	}
 
-	[[nodiscard]]
-	std::size_t size()
+	[[nodiscard]] std::size_t size()
 		/// Returns the number of cached elements
 	{
 		typename TMutex::ScopedLock lock(_mutex);
@@ -167,8 +164,7 @@ public:
 		doReplace();
 	}
 
-	[[nodiscard]]
-	std::set<TKey> getAllKeys()
+	[[nodiscard]] std::set<TKey> getAllKeys()
 		/// Returns a copy of all keys stored in the cache
 	{
 		typename TMutex::ScopedLock lock(_mutex);
@@ -306,8 +302,7 @@ protected:
 		}
 	}
 
-	[[nodiscard]]
-	bool doHas(const TKey& key) const
+	[[nodiscard]] bool doHas(const TKey& key) const
 		/// Returns true if the cache contains a value for the key
 	{
 		// ask the strategy if the key is valid
@@ -324,8 +319,7 @@ protected:
 		return result;
 	}
 
-	[[nodiscard]]
-	SharedPtr<TValue> doGet(const TKey& key)
+	[[nodiscard]] SharedPtr<TValue> doGet(const TKey& key)
 		/// Returns a SharedPtr of the cache entry, returns 0 if for
 		/// the key no value was found
 	{

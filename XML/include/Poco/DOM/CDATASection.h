@@ -57,22 +57,18 @@ class XML_API CDATASection: public Text
 {
 public:
 	// Text
-	[[nodiscard]]
-	Text* splitText(unsigned long offset);
+	[[nodiscard]] Text* splitText(unsigned long offset);
 
 	// Node
-	[[nodiscard]]
-	const XMLString& nodeName() const;
-	[[nodiscard]]
-	unsigned short nodeType() const;
+	[[nodiscard]] const XMLString& nodeName() const;
+	[[nodiscard]] unsigned short nodeType() const;
 
 protected:
 	CDATASection(Document* pOwnerDocument, const XMLString& data);
 	CDATASection(Document* pOwnerDocument, const CDATASection& sec);
 	~CDATASection();
 
-	[[nodiscard]]
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	[[nodiscard]] Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:
 	static const XMLString NODE_NAME;

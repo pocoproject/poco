@@ -73,18 +73,12 @@ public:
 	void update();
 		/// Updates the Clock with the current system clock.
 
-	[[nodiscard]]
-	bool operator == (const Clock& ts) const;
-	[[nodiscard]]
-	bool operator != (const Clock& ts) const;
-	[[nodiscard]]
-	bool operator >  (const Clock& ts) const;
-	[[nodiscard]]
-	bool operator >= (const Clock& ts) const;
-	[[nodiscard]]
-	bool operator <  (const Clock& ts) const;
-	[[nodiscard]]
-	bool operator <= (const Clock& ts) const;
+	[[nodiscard]] bool operator == (const Clock& ts) const;
+	[[nodiscard]] bool operator != (const Clock& ts) const;
+	[[nodiscard]] bool operator >  (const Clock& ts) const;
+	[[nodiscard]] bool operator >= (const Clock& ts) const;
+	[[nodiscard]] bool operator <  (const Clock& ts) const;
+	[[nodiscard]] bool operator <= (const Clock& ts) const;
 
 	Clock  operator +  (ClockDiff d) const;
 	Clock  operator -  (ClockDiff d) const;
@@ -92,42 +86,35 @@ public:
 	Clock& operator += (ClockDiff d);
 	Clock& operator -= (ClockDiff d);
 
-	[[nodiscard]]
-	ClockVal microseconds() const;
+	[[nodiscard]] ClockVal microseconds() const;
 		/// Returns the clock value expressed in microseconds
 		/// since the system-specific epoch time (usually system
 		/// startup).
 
-	[[nodiscard]]
-	ClockVal raw() const;
+	[[nodiscard]] ClockVal raw() const;
 		/// Returns the clock value expressed in microseconds
 		/// since the system-specific epoch time (usually system
 		/// startup).
 		///
 		/// Same as microseconds().
 
-	[[nodiscard]]
-	ClockDiff elapsed() const;
+	[[nodiscard]] ClockDiff elapsed() const;
 		/// Returns the time elapsed since the time denoted by
 		/// the Clock instance. Equivalent to Clock() - *this.
 
-	[[nodiscard]]
-	bool isElapsed(ClockDiff interval) const;
+	[[nodiscard]] bool isElapsed(ClockDiff interval) const;
 		/// Returns true iff the given interval has passed
 		/// since the time denoted by the Clock instance.
 
-	[[nodiscard]]
-	static ClockDiff resolution();
+	[[nodiscard]] static ClockDiff resolution();
 		/// Returns the resolution in units per second.
 		/// Since the Clock class has microsecond resolution,
 		/// the returned value is always 1000000.
 
-	[[nodiscard]]
-	static ClockDiff accuracy();
+	[[nodiscard]] static ClockDiff accuracy();
 		/// Returns the system's clock accuracy in microseconds.
 
-	[[nodiscard]]
-	static bool monotonic();
+	[[nodiscard]] static bool monotonic();
 		/// Returns true iff the system's clock is monotonic.
 
 private:

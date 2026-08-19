@@ -35,27 +35,22 @@ public:
 	~VerificationErrorArgs();
 		/// Destroys the VerificationErrorArgs.
 
-	[[nodiscard]]
-	const X509Certificate& certificate() const;
+	[[nodiscard]] const X509Certificate& certificate() const;
 		/// Returns the certificate that caused the error.
 
-	[[nodiscard]]
-	int errorDepth() const;
+	[[nodiscard]] int errorDepth() const;
 		/// Returns the position of the certificate in the certificate chain.
 
-	[[nodiscard]]
-	int errorNumber() const;
+	[[nodiscard]] int errorNumber() const;
 		/// Returns the id of the error
 
-	[[nodiscard]]
-	const std::string& errorMessage() const;
+	[[nodiscard]] const std::string& errorMessage() const;
 		/// Returns the textual presentation of the errorNumber.
 
 	void setIgnoreError(bool ignoreError);
 		/// setIgnoreError to true, if a verification error is judged non-fatal by the user.
 
-	[[nodiscard]]
-	bool getIgnoreError() const;
+	[[nodiscard]] bool getIgnoreError() const;
 		/// returns the value of _ignoreError
 
 private:

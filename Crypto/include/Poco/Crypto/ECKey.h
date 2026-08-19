@@ -88,12 +88,10 @@ public:
 	ECKey& operator = (ECKey&& other) noexcept;
 		/// Move assignment.
 
-	[[nodiscard]]
-	ECKeyImpl::Ptr impl() const;
+	[[nodiscard]] ECKeyImpl::Ptr impl() const;
 		/// Returns the impl object.
 
-	[[nodiscard]]
-	static std::string getCurveName(int nid = -1);
+	[[nodiscard]] static std::string getCurveName(int nid = -1);
 		/// Returns elliptical curve name corresponding to
 		/// the given nid; if nid is not found, returns
 		/// empty string.
@@ -102,15 +100,13 @@ public:
 		///
 		/// If no curves are found, returns empty string;
 
-	[[nodiscard]]
-	static int getCurveNID(std::string& name);
+	[[nodiscard]] static int getCurveNID(std::string& name);
 		/// Returns the NID of the specified curve.
 		///
 		/// If name is empty, returns the first curve NID
 		/// and updates the name accordingly.
 
-	[[nodiscard]]
-	static bool hasCurve(const std::string& name);
+	[[nodiscard]] static bool hasCurve(const std::string& name);
 		/// Returns true if the named curve is found,
 		/// false otherwise.
 };

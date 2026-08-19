@@ -57,19 +57,16 @@ public:
 	std::string& formatValues(const ValueVec& vals, std::string& formattedValues);
 		/// Formats the row values.
 
-	[[nodiscard]]
-	int rowCount() const;
+	[[nodiscard]] int rowCount() const;
 		/// Returns row count.
 
 	void setColumnWidth(std::streamsize width);
 		/// Sets the column width.
 
-	[[nodiscard]]
-	std::streamsize getColumnWidth() const;
+	[[nodiscard]] std::streamsize getColumnWidth() const;
 		/// Returns the column width.
 
-	[[nodiscard]]
-	std::streamsize getSpacing() const;
+	[[nodiscard]] std::streamsize getSpacing() const;
 		/// Returns the spacing.
 
 private:

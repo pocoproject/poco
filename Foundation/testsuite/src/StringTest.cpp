@@ -1084,19 +1084,19 @@ void StringTest::testNumericStringLimit()
 	assertTrue(isIntOverflow<char>(s));
 	try
 	{
-		[[maybe_unused]] char _ = safeIntCast(s, t);
+		(void) safeIntCast(s, t);
 		fail("cast must fail");
 	}
-	catch([[maybe_unused]] Poco::BadCastException& e){}
+	catch(Poco::BadCastException&){}
 
 	s = SHRT_MIN;
 	assertTrue(isIntOverflow<char>(s));
 	try
 	{
-		[[maybe_unused]] char _ = safeIntCast(s, t);
+		(void) safeIntCast(s, t);
 		fail("short => char cast must fail");
 	}
-	catch([[maybe_unused]] Poco::BadCastException& e){}
+	catch(Poco::BadCastException&){}
 
 	signed char sc = 0, st = -1;
 	char ct = -1;
@@ -1109,20 +1109,20 @@ void StringTest::testNumericStringLimit()
 	assertTrue(isIntOverflow<char>(ss));
 	try
 	{
-		[[maybe_unused]] char _ = safeIntCast(ss, st);
+		(void) safeIntCast(ss, st);
 		fail("short => signed char  cast must fail");
 	}
-	catch([[maybe_unused]] Poco::BadCastException& e){}
+	catch(Poco::BadCastException&){}
 
 	ss = SHRT_MIN;
 	assertTrue(isIntOverflow<signed char>(ss));
 	assertTrue(isIntOverflow<char>(ss));
 	try
 	{
-		[[maybe_unused]] char _ = safeIntCast(ss, st);
+		(void) safeIntCast(ss, st);
 		fail("short => signed char cast must fail");
 	}
-	catch([[maybe_unused]] Poco::BadCastException& e){}
+	catch(Poco::BadCastException&){}
 
 	assertTrue(safeIntCast<signed char>(sc, st) == c);
 	assertTrue(st == sc);
@@ -1137,19 +1137,19 @@ void StringTest::testNumericStringLimit()
 	assertTrue(isIntOverflow<unsigned char>(ss));
 	try
 	{
-		[[maybe_unused]] signed char _ = safeIntCast(ss, st);
+		(void) safeIntCast(ss, st);
 		fail("cast must fail");
 	}
-	catch([[maybe_unused]] Poco::BadCastException& e){}
+	catch(Poco::BadCastException&){}
 
 	ss = -1;
 	assertTrue(isIntOverflow<unsigned char>(ss));
 	try
 	{
-		[[maybe_unused]] unsigned char _ = safeIntCast(ss, uc);
+		(void) safeIntCast(ss, uc);
 		fail("unsigned short => unsigned char cast must fail");
 	}
-	catch([[maybe_unused]] Poco::BadCastException& e){}
+	catch(Poco::BadCastException&){}
 
 	int i = 0;
 	assertTrue(!isIntOverflow<int>(i));
@@ -1159,10 +1159,10 @@ void StringTest::testNumericStringLimit()
 	assertTrue(isIntOverflow<unsigned>(i));
 	try
 	{
-		[[maybe_unused]] unsigned int _ = safeIntCast(i, ti);
+		(void) safeIntCast(i, ti);
 		fail("unsigned int => int cast must fail");
 	}
-	catch([[maybe_unused]] Poco::BadCastException& e){}
+	catch(Poco::BadCastException&){}
 
 	if (sizeof(long) > sizeof(int))
 	{
@@ -1178,10 +1178,10 @@ void StringTest::testNumericStringLimit()
 		assertTrue(isIntOverflow<long>(ul));
 		try
 		{
-			[[maybe_unused]] long _ = safeIntCast(ul, tl);
+			(void) safeIntCast(ul, tl);
 			fail("unsigned long => long cast must fail");
 		}
-		catch([[maybe_unused]] Poco::BadCastException& e){}
+		catch(Poco::BadCastException&){}
 		assertTrue(!isIntOverflow<unsigned long>(ul));
 		tl = 0;
 		assertTrue(safeIntCast(ul, tul) == ul);
@@ -1189,10 +1189,10 @@ void StringTest::testNumericStringLimit()
 		assertTrue(isIntOverflow<unsigned long>(l));
 		try
 		{
-			[[maybe_unused]] unsigned long _ = safeIntCast(l, ul);
+			(void) safeIntCast(l, ul);
 			fail("unsigned long => long cast must fail");
 		}
-		catch([[maybe_unused]] Poco::BadCastException& e){}
+		catch(Poco::BadCastException&){}
 		ul = LONG_MAX;
 		assertTrue(!isIntOverflow<long>(ul));
 		assertTrue(safeIntCast(ul, l) == ul);

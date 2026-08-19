@@ -35,37 +35,30 @@ public:
 	~ApacheServerRequest();
 		/// Destroys the ApacheServerRequest.
 
-	[[nodiscard]]
-	std::istream& stream();
+	[[nodiscard]] std::istream& stream();
 		/// Returns the input stream for reading
 		/// the request body.
 		///
 		/// The stream is valid until the HTTPServerRequest
 		/// object is destroyed.
 
-	[[nodiscard]]
-	bool expectContinue() const;
+	[[nodiscard]] bool expectContinue() const;
 		/// Returns true if the client expects a
 		/// 100 Continue response.
 
-	[[nodiscard]]
-	const Poco::Net::SocketAddress& clientAddress() const;
+	[[nodiscard]] const Poco::Net::SocketAddress& clientAddress() const;
 		/// Returns the client's address.
 
-	[[nodiscard]]
-	const Poco::Net::SocketAddress& serverAddress() const;
+	[[nodiscard]] const Poco::Net::SocketAddress& serverAddress() const;
 		/// Returns the server's address.
 
-	[[nodiscard]]
-	const Poco::Net::HTTPServerParams& serverParams() const;
+	[[nodiscard]] const Poco::Net::HTTPServerParams& serverParams() const;
 		/// Returns a reference to the server parameters.
 
-	[[nodiscard]]
-	Poco::Net::HTTPServerResponse& response() const;
+	[[nodiscard]] Poco::Net::HTTPServerResponse& response() const;
 		/// Returns a reference to the associated response
 
-	[[nodiscard]]
-	bool secure() const;
+	[[nodiscard]] bool secure() const;
 		/// Returns true if the request is using a secure
 		/// connection. Returns false if no secure connection
 		/// is used, or if it is not known whether a secure

@@ -92,12 +92,10 @@ public:
 		/// facilities, these threads must also complete
 		/// before joinAll() can return.
 
-	[[nodiscard]]
-	TaskList taskList() const;
+	[[nodiscard]] TaskList taskList() const;
 		/// Returns a copy of the internal task list.
 
-	[[nodiscard]]
-	int count() const;
+	[[nodiscard]] int count() const;
 		/// Returns the number of tasks in the internal task list.
 
 	void addObserver(const AbstractObserver& observer);

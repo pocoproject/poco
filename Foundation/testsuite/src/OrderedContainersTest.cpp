@@ -748,10 +748,10 @@ void OrderedContainersTest::testAt()
 	assertEquals(map.at(-2), 20);
 	try
 	{
-		[[maybe_unused]] std::int64_t val = map.at(1);
+		(void) map.at(1);
 		fail("must throw out of range");
 	}
-	catch ([[maybe_unused]] std::out_of_range& e) {}
+	catch (std::out_of_range&) {}
 }
 
 
@@ -904,10 +904,10 @@ void OrderedContainersTest::testHeterogeneousLookups()
 	assertEquals(map.at(addr2), 5);
 	try
 	{
-		[[maybe_unused]] int val = map.at(addr_unknown);
+		(void) map.at(addr_unknown);
 		fail("must throw");
 	}
-	catch ([[maybe_unused]] std::out_of_range& e) {}
+	catch (std::out_of_range&) {}
 
 	assertTrue(map.find(addr1) != map.end());
 	assertEquals(*map.find(addr1)->first, 1);
@@ -949,16 +949,16 @@ void OrderedContainersTest::testEmptyMap()
 
 	try
 	{
-		[[maybe_unused]] int val = map.at("");
+		(void) map.at("");
 		fail ("must throw");
 	}
-	catch ([[maybe_unused]] std::out_of_range& e) {}
+	catch (std::out_of_range&) {}
 	try
 	{
-		[[maybe_unused]] int val = map.at("test");
+		(void) map.at("test");
 		fail ("must throw");
 	}
-	catch ([[maybe_unused]] std::out_of_range& e) {}
+	catch (std::out_of_range&) {}
 	auto range = map.equal_range("test");
 	assertTrue(range.first == range.second);
 
@@ -995,8 +995,8 @@ void OrderedContainersTest::testPrecalculatedHash()
 	assertTrue(map.hash_function()(2) != map.hash_function()(3));
 	try
 	{
-		[[maybe_unused]] int val = map.at(3, map.hash_function()(2));
-	} catch([[maybe_unused]] std::out_of_range& e) {}
+		(void) map.at(3, map.hash_function()(2));
+	} catch(std::out_of_range&) {}
 
 	/**
 	 * count

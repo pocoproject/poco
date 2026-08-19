@@ -62,20 +62,17 @@ public:
 
 	~ExpirationDecorator() = default;
 
-	[[nodiscard]]
-	const Poco::Timestamp& getExpiration() const
+	[[nodiscard]] const Poco::Timestamp& getExpiration() const
 	{
 		return _expiresAt;
 	}
 
-	[[nodiscard]]
-	const TArgs& value() const
+	[[nodiscard]] const TArgs& value() const
 	{
 		return _value;
 	}
 
-	[[nodiscard]]
-	TArgs& value()
+	[[nodiscard]] TArgs& value()
 	{
 		return _value;
 	}

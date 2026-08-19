@@ -41,8 +41,7 @@ public:
 	virtual ~HTTPSessionInstantiator();
 		/// Destroys the HTTPSessionInstantiator.
 
-	[[nodiscard]]
-	virtual HTTPClientSession* createClientSession(const Poco::URI& uri);
+	[[nodiscard]] virtual HTTPClientSession* createClientSession(const Poco::URI& uri);
 		/// Creates a HTTPClientSession for the given URI.
 
 	static void registerInstantiator();
@@ -55,8 +54,7 @@ protected:
 	void setProxyConfig(const ProxyConfig& proxyConfig);
 		/// Sets the proxy configuration.
 
-  [[nodiscard]]
-	const ProxyConfig& getProxyConfig() const;
+	[[nodiscard]] const ProxyConfig& getProxyConfig() const;
 		/// Returns the proxy configuration.
 
 private:

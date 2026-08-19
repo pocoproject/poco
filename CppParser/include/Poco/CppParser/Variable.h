@@ -43,29 +43,23 @@ public:
 	~Variable();
 		/// Destroys the Variable.
 
-	[[nodiscard]]
-	int flags() const;
+	[[nodiscard]] int flags() const;
 		/// Returns the variable's flags.
 
-	[[nodiscard]]
-	bool isPointer() const;
+	[[nodiscard]] bool isPointer() const;
 		/// Returns true iff the variable holds a pointer.
 
-	[[nodiscard]]
-	Symbol::Kind kind() const;
+	[[nodiscard]] Symbol::Kind kind() const;
 
-	[[nodiscard]]
-	const std::string& declType() const;
+	[[nodiscard]] const std::string& declType() const;
 		/// Returns the type of the parameter without const and & if present.
 		///
 		/// Example: a type const std::string& -> std::string, a type const std::string* returns std::string
 
-	[[nodiscard]]
-	bool isConst() const;
+	[[nodiscard]] bool isConst() const;
 		/// Returns true iff the variable is const.
 
-	[[nodiscard]]
-	bool isStatic() const;
+	[[nodiscard]] bool isStatic() const;
 		/// Returns true iff the variable is static.
 
 private:

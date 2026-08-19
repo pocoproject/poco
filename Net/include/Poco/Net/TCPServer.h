@@ -148,8 +148,7 @@ public:
 	virtual ~TCPServer();
 		/// Destroys the TCPServer and its TCPServerConnectionFactory.
 
-	[[nodiscard]]
-	const TCPServerParams& params() const;
+	[[nodiscard]] const TCPServerParams& params() const;
 		/// Returns a const reference to the TCPServerParam object
 		/// used by the server's TCPServerDispatcher.
 
@@ -169,40 +168,31 @@ public:
 		///
 		/// Once the server has been stopped, it cannot be restarted.
 
-	[[nodiscard]]
-	int currentThreads() const;
+	[[nodiscard]] int currentThreads() const;
 		/// Returns the number of currently used connection threads.
 
-	[[nodiscard]]
-	int maxThreads() const;
+	[[nodiscard]] int maxThreads() const;
 		/// Returns the maximum number of threads available.
 
-	[[nodiscard]]
-	Int64 totalConnections() const;
+	[[nodiscard]] Int64 totalConnections() const;
 		/// Returns the total number of handled connections.
 
-	[[nodiscard]]
-	int currentConnections() const;
+	[[nodiscard]] int currentConnections() const;
 		/// Returns the number of currently handled connections.
 
-	[[nodiscard]]
-	int maxConcurrentConnections() const;
+	[[nodiscard]] int maxConcurrentConnections() const;
 		/// Returns the maximum number of concurrently handled connections.
 
-	[[nodiscard]]
-	int queuedConnections() const;
+	[[nodiscard]] int queuedConnections() const;
 		/// Returns the number of queued connections.
 
-	[[nodiscard]]
-	int refusedConnections() const;
+	[[nodiscard]] int refusedConnections() const;
 		/// Returns the number of refused connections.
 
-	[[nodiscard]]
-	const ServerSocket& socket() const;
+	[[nodiscard]] const ServerSocket& socket() const;
 		/// Returns the underlying server socket.
 
-	[[nodiscard]]
-	Poco::UInt16 port() const;
+	[[nodiscard]] Poco::UInt16 port() const;
 		/// Returns the port the server socket listens on.
 
 	void setConnectionFilter(const TCPServerConnectionFilter::Ptr& pFilter);

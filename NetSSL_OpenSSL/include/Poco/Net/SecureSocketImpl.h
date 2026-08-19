@@ -186,18 +186,15 @@ public:
 		/// the server-side handshake is completed, otherwise
 		/// a client-side handshake is performed.
 
-	[[nodiscard]]
-	poco_socket_t sockfd();
+	[[nodiscard]] poco_socket_t sockfd();
 		/// Returns the underlying socket descriptor.
 
-	[[nodiscard]]
-	X509* peerCertificate() const;
+	[[nodiscard]] X509* peerCertificate() const;
 		/// Returns the peer's certificate, or a null pointer if
 		/// no certificate is available. The caller is responsible
 		/// for releasing the returned reference with X509_free().
 
-	[[nodiscard]]
-	Context::Ptr context() const;
+	[[nodiscard]] Context::Ptr context() const;
 		/// Returns the SSL context used for this socket.
 
 	void verifyPeerCertificate();
@@ -212,12 +209,10 @@ public:
 	void setPeerHostName(const std::string& hostName);
 		/// Sets the peer host name for certificate validation purposes.
 
-	[[nodiscard]]
-	const std::string& getPeerHostName() const;
+	[[nodiscard]] const std::string& getPeerHostName() const;
 		/// Returns the peer host name.
 
-	[[nodiscard]]
-	Session::Ptr currentSession();
+	[[nodiscard]] Session::Ptr currentSession();
 		/// Returns the SSL session of the current connection,
 		/// for reuse in a future connection (if session caching
 		/// is enabled).
@@ -234,17 +229,14 @@ public:
 		///
 		/// Must be called before connect() to be effective.
 
-	[[nodiscard]]
-	bool sessionWasReused();
+	[[nodiscard]] bool sessionWasReused();
 		/// Returns true iff a reused session was negotiated during
 		/// the handshake.
 
-	[[nodiscard]]
-	SocketImpl* socket();
+	[[nodiscard]] SocketImpl* socket();
 		/// Returns the underlying SocketImpl.
 
-	[[nodiscard]]
-	const SocketImpl* socket() const;
+	[[nodiscard]] const SocketImpl* socket() const;
 		/// Returns the underlying SocketImpl.
 
 protected:
@@ -258,13 +250,11 @@ protected:
 	long verifyPeerCertificateImpl(const std::string& hostName);
 		/// Performs post-connect (or post-accept) peer certificate validation.
 
-	[[nodiscard]]
-	static bool isLocalHost(const std::string& hostName);
+	[[nodiscard]] static bool isLocalHost(const std::string& hostName);
 		/// Returns true iff the given host name is the local host
 		/// (either "localhost" or "127.0.0.1").
 
-	[[nodiscard]]
-	bool mustRetry(int rc);
+	[[nodiscard]] bool mustRetry(int rc);
 		/// Returns true if the last operation should be retried,
 		/// otherwise false.
 		///

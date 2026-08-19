@@ -68,13 +68,11 @@ public:
 		~Iterator() = default;
 		Iterator& operator=(const Iterator &it) = default;
 
-		[[nodiscard]]
-		inline bool operator==(const Iterator &it) const
+		[[nodiscard]] inline bool operator==(const Iterator &it) const
 		{
 			return _it == it._it;
 		}
-		[[nodiscard]]
-		inline bool operator != (const Iterator& it) const
+		[[nodiscard]] inline bool operator != (const Iterator& it) const
 		{
 			return _it != it._it;
 		}
@@ -111,8 +109,7 @@ public:
 		clear();
 	}
 
-	[[nodiscard]]
-	Iterator find(const std::string& className) const
+	[[nodiscard]] Iterator find(const std::string& className) const
 		/// Returns an iterator pointing to the MetaObject
 		/// for the given class. If the MetaObject cannot
 		/// be found, the iterator points to end().
@@ -120,14 +117,12 @@ public:
 		return Iterator(_metaMap.find(className));
 	}
 
-	[[nodiscard]]
-	Iterator begin() const
+	[[nodiscard]] Iterator begin() const
 	{
 		return Iterator(_metaMap.begin());
 	}
 
-	[[nodiscard]]
-	Iterator end() const
+	[[nodiscard]] Iterator end() const
 	{
 		return Iterator(_metaMap.end());
 	}
@@ -150,22 +145,19 @@ public:
 		_metaMap.clear();
 	}
 
-	[[nodiscard]]
-	int size() const
+	[[nodiscard]] int size() const
 		/// Returns the number of MetaObjects in the Manifest.
 	{
 		return int(_metaMap.size());
 	}
 
-	[[nodiscard]]
-	bool empty() const
+	[[nodiscard]] bool empty() const
 		/// Returns true iff the Manifest does not contain any MetaObjects.
 	{
 		return _metaMap.empty();
 	}
 
-	[[nodiscard]]
-	const char* className() const override
+	[[nodiscard]] const char* className() const override
 	{
 		return typeid(*this).name();
 	}

@@ -74,8 +74,7 @@ public:
 		/// possible.
 
 protected:
-	[[nodiscard]]
-	static std::string what(const char* msg, const char* file, LineNumber line, const char* text = nullptr);
+	[[nodiscard]] static std::string what(const char* msg, const char* file, LineNumber line, const char* text = nullptr);
 };
 
 

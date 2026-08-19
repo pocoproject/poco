@@ -46,35 +46,30 @@ public:
 	void update(const std::string& data);
 		/// Updates the digest with the given data.
 
-	[[nodiscard]]
-	virtual std::size_t digestLength() const = 0;
+	[[nodiscard]] virtual std::size_t digestLength() const = 0;
 		/// Returns the length of the digest in bytes.
 
 	virtual void reset() = 0;
 		/// Resets the engine so that a new
 		/// digest can be computed.
 
-	[[nodiscard]]
-	virtual const Digest& digest() = 0;
+	[[nodiscard]] virtual const Digest& digest() = 0;
 		/// Finishes the computation of the digest and
 		/// returns the message digest. Resets the engine
 		/// and can thus only be called once for every digest.
 		/// The returned reference is valid until the next
 		/// time digest() is called, or the engine object is destroyed.
 
-	[[nodiscard]]
-	static std::string digestToHex(const Digest& bytes, std::size_t length = 0);
+	[[nodiscard]] static std::string digestToHex(const Digest& bytes, std::size_t length = 0);
 		/// Converts a message digest into a string of hexadecimal numbers.
 		/// If length is greater than zero, the output is truncated to length
 		/// bytes. If size is greater than the length of untruncated output,
 		/// InvalidArgumentException is thrown.
 
-	[[nodiscard]]
-	static Digest digestFromHex(const std::string& digest);
+	[[nodiscard]] static Digest digestFromHex(const std::string& digest);
 		/// Converts a string created by digestToHex back to its Digest presentation
 
-	[[nodiscard]]
-	static bool constantTimeEquals(const Digest& d1, const Digest& d2);
+	[[nodiscard]] static bool constantTimeEquals(const Digest& d1, const Digest& d2);
 		/// Compares two Digest values using a constant-time comparison
 		/// algorithm. This can be used to prevent timing attacks
 		/// (as discussed in <https://codahale.com/a-lesson-in-timing-attacks/>).

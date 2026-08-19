@@ -46,16 +46,13 @@ public:
 	void setPriority(Message::Priority priority);
 		/// Sets the priority for log messages.
 
-	[[nodiscard]]
-	Message::Priority getPriority() const;
+	[[nodiscard]] Message::Priority getPriority() const;
 		/// Returns the priority for log messages.
 
-	[[nodiscard]]
-	Logger& logger() const;
+	[[nodiscard]] Logger& logger() const;
 		/// Returns a reference to the Logger.
 
-	[[nodiscard]]
-	std::size_t capacity() const;
+	[[nodiscard]] std::size_t capacity() const;
 		/// Returns the internal message buffer capacity.
 
 	void reserve(std::size_t capacity);
@@ -80,8 +77,7 @@ class Foundation_API LogIOS: public virtual std::ios
 public:
 	LogIOS(Logger& logger, Message::Priority priority, std::size_t bufferCapacity = 0);
 	~LogIOS() override;
-	[[nodiscard]]
-	LogStreamBuf* rdbuf();
+	[[nodiscard]] LogStreamBuf* rdbuf();
 
 protected:
 	LogStreamBuf _buf;

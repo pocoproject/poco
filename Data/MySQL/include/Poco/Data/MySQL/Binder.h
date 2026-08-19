@@ -227,12 +227,10 @@ public:
 
 	void bind(std::size_t pos, const std::list<std::string>& val, Direction dir = PD_IN) override;
 
-	[[nodiscard]]
-	std::size_t size() const;
+	[[nodiscard]] std::size_t size() const;
 		/// Return count of binded parameters
 
-	[[nodiscard]]
-	MYSQL_BIND* getBindArray() const;
+	[[nodiscard]] MYSQL_BIND* getBindArray() const;
 		/// Return array
 
 private:

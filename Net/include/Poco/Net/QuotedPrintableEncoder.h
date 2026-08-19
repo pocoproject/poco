@@ -57,8 +57,7 @@ public:
 	QuotedPrintableEncoderIOS(std::ostream& ostr);
 	~QuotedPrintableEncoderIOS();
 	int close();
-	[[nodiscard]]
-	QuotedPrintableEncoderBuf* rdbuf();
+	[[nodiscard]] QuotedPrintableEncoderBuf* rdbuf();
 
 protected:
 	QuotedPrintableEncoderBuf _buf;

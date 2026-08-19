@@ -128,8 +128,7 @@ public:
 		pBinder->bind(pos, obj, dir);
 	}
 
-	[[nodiscard]]
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return 1u;
 	}
@@ -159,8 +158,7 @@ public:
 		pBinder->bind(pos, obj, dir);
 	}
 
-	[[nodiscard]]
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return 1u;
 	}
@@ -191,8 +189,7 @@ public:
 		pBinder->bind(pos, obj, dir);
 	}
 
-	[[nodiscard]]
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return 1u;
 	}
@@ -223,8 +220,7 @@ public:
 		pBinder->bind(pos, obj, dir);
 	}
 
-	[[nodiscard]]
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return 1u;
 	}
@@ -264,8 +260,7 @@ public:
 		tuplePrepare<0>(pos, t, pPrepare);
 	}
 
-	[[nodiscard]]
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		std::size_t sz = 0;
 		tupleSize<0>(sz);
@@ -352,8 +347,7 @@ public:
 			pPreparator->prepare(pos++, T()); //Poco::Data::Keywords::null);
 	}
 
-	[[nodiscard]]
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return 1u;
 	}
@@ -393,8 +387,7 @@ public:
 			pPreparator->prepare(pos++, obj.value());
 	}
 
-	[[nodiscard]]
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return 1u;
 	}
@@ -426,8 +419,7 @@ public:
 		TypeHandler<TupleType>::prepare(pos, static_cast<const TupleType&>(tuple), pPreparator);
 	}
 
-	[[nodiscard]]
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return TypeHandler<TupleType>::size();
 	}
@@ -450,8 +442,7 @@ public:
 		TypeHandler<V>::bind(pos, obj.second, pBinder, dir);
 	}
 
-	[[nodiscard]]
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return TypeHandler<K>::size() + TypeHandler<V>::size();
 	}
@@ -483,8 +474,7 @@ public:
 		TypeHandler<T>::bind(pos, *obj, pBinder, dir);
 	}
 
-	[[nodiscard]]
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return TypeHandler<T>::size();
 	}
@@ -520,8 +510,7 @@ public:
 		TypeHandler<T>::bind(pos, *obj, pBinder, dir);
 	}
 
-	[[nodiscard]]
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return TypeHandler<T>::size();
 	}

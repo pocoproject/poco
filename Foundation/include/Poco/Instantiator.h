@@ -38,8 +38,7 @@ public:
 		/// Destroys the AbstractInstantiator.
 		= default;
 
-	[[nodiscard]]
-	virtual Base* createInstance() const = 0;
+	[[nodiscard]] virtual Base* createInstance() const = 0;
 		/// Creates an instance of a concrete subclass of Base.
 
 	AbstractInstantiator(const AbstractInstantiator&) = delete;
@@ -63,8 +62,7 @@ public:
 	virtual ~Instantiator() = default;
 		/// Destroys the Instantiator.
 
-	[[nodiscard]]
-	Base* createInstance() const
+	[[nodiscard]] Base* createInstance() const
 	{
 		return new C;
 	}

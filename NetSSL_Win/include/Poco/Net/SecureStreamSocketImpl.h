@@ -102,8 +102,7 @@ public:
 		///
 		/// Throws a Poco::InvalidAccessException.
 
-	[[nodiscard]]
-	int available() override;
+	[[nodiscard]] int available() override;
 		/// Returns the number of bytes available that can be read
 		/// without causing the socket to block.
 		///
@@ -141,32 +140,27 @@ public:
 		/// Aborts the connection by closing the underlying
 		/// TCP connection. No orderly SSL shutdown is performed.
 
-	[[nodiscard]]
-	bool secure() const override;
+	[[nodiscard]] bool secure() const override;
 		/// Returns true iff the socket's connection is secure
 		/// (using SSL or TLS).
 
 	void setPeerHostName(const std::string& hostName);
 		/// Sets the peer host name for certificate validation purposes.
 
-	[[nodiscard]]
-	const std::string& getPeerHostName() const;
+	[[nodiscard]] const std::string& getPeerHostName() const;
 		/// Returns the peer host name.
 
-	[[nodiscard]]
-	bool havePeerCertificate() const;
+	[[nodiscard]] bool havePeerCertificate() const;
 		/// Returns true iff the peer has presented a
 		/// certificate.
 
-	[[nodiscard]]
-	X509Certificate peerCertificate() const;
+	[[nodiscard]] X509Certificate peerCertificate() const;
 		/// Returns the peer's X509 certificate.
 		///
 		/// Throws a SSLException if the peer did not
 		/// present a certificate.
 
-	[[nodiscard]]
-	Context::Ptr context() const;
+	[[nodiscard]] Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.
 
 	void setLazyHandshake(bool flag = true);
@@ -174,8 +168,7 @@ public:
 		/// will be performed the first time date is sent or
 		/// received over the connection.
 
-	[[nodiscard]]
-	bool getLazyHandshake() const;
+	[[nodiscard]] bool getLazyHandshake() const;
 		/// Returns true if setLazyHandshake(true) has been called.
 
 	void verifyPeerCertificate();
@@ -193,8 +186,7 @@ public:
 		/// the server-side handshake is completed, otherwise
 		/// a client-side handshake is performed.
 
-	[[nodiscard]]
-	Session::Ptr currentSession();
+	[[nodiscard]] Session::Ptr currentSession();
 		/// Returns the SSL session of the current connection,
 		/// for reuse in a future connection (if session caching
 		/// is enabled).
@@ -211,18 +203,15 @@ public:
 		///
 		/// Must be called before connect() to be effective.
 
-	[[nodiscard]]
-	bool sessionWasReused();
+	[[nodiscard]] bool sessionWasReused();
 		/// Returns true iff a reused session was negotiated during
 		/// the handshake.
 
 	// SocketImpl
 	virtual void setBlocking(bool flag) override;
-	[[nodiscard]]
-	virtual bool getBlocking() const override;
+	[[nodiscard]] virtual bool getBlocking() const override;
 	virtual void setRawOption(int level, int option, const void* value, poco_socklen_t length) override;
-	[[nodiscard]]
-	virtual void getRawOption(int level, int option, void* value, poco_socklen_t& length) override;
+	[[nodiscard]] virtual void getRawOption(int level, int option, void* value, poco_socklen_t& length) override;
 	
 protected:
 	void acceptSSL();
@@ -234,8 +223,7 @@ protected:
 	~SecureStreamSocketImpl();
 		/// Destroys the SecureStreamSocketImpl.
 
-	[[nodiscard]]
-	static int lastError();
+	[[nodiscard]] static int lastError();
 	static void error();
 	static void error(const std::string& arg);
 	static void error(int code);

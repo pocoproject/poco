@@ -83,8 +83,7 @@ public:
 	bool disableUpdate();
 		/// Disables update callbacks.
 
-	[[nodiscard]]
-	bool updateEnabled() const;
+	[[nodiscard]] bool updateEnabled() const;
 		/// Returns true if update callbacks are enabled, false otherwise.
 
 	bool enableCommit();
@@ -93,8 +92,7 @@ public:
 	bool disableCommit();
 		/// Disables commit callbacks.
 
-	[[nodiscard]]
-	bool commitEnabled() const;
+	[[nodiscard]] bool commitEnabled() const;
 		/// Returns true if update callbacks are enabled, false otherwise.
 
 	bool enableRollback();
@@ -103,8 +101,7 @@ public:
 	bool disableRollback();
 		/// Disables rollback callbacks.
 
-	[[nodiscard]]
-	bool rollbackEnabled() const;
+	[[nodiscard]] bool rollbackEnabled() const;
 		/// Returns true if rollback callbacks are enabled, false otherwise.
 
 	bool enableAll();
@@ -126,27 +123,23 @@ public:
 	static void sqliteRollbackCallbackFn(void* pVal);
 		/// Rollback callback event dispatcher.
 
-	[[nodiscard]]
-	bool operator == (const Notifier& other) const;
+	[[nodiscard]] bool operator == (const Notifier& other) const;
 		/// Equality operator. Compares value, row and database handles and
 		/// returns true iff all are equal.
 
-	[[nodiscard]]
-	const std::string& getTable() const;
+	[[nodiscard]] const std::string& getTable() const;
 		/// Returns the table name.
 
 	void setTable(const std::string& table);
 		/// Sets the row number.
 
-	[[nodiscard]]
-	Poco::Int64 getRow() const;
+	[[nodiscard]] Poco::Int64 getRow() const;
 		/// Returns the row number.
 
 	void setRow(Poco::Int64 row);
 		/// Sets the row number.
 
-	[[nodiscard]]
-	const Poco::Dynamic::Var& getValue() const;
+	[[nodiscard]] const Poco::Dynamic::Var& getValue() const;
 		/// Returns the value.
 
 	template <typename T>

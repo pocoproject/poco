@@ -39,12 +39,10 @@ public:
 	~Bulk();
 		/// Destroys the bulk.
 
-	[[nodiscard]]
-	const Limit& limit() const;
+	[[nodiscard]] const Limit& limit() const;
 		/// Returns the limit asociated with this bulk object.
 
-	[[nodiscard]]
-	Poco::UInt32 size() const;
+	[[nodiscard]] Poco::UInt32 size() const;
 		/// Returns the value of the limit asociated with
 		/// this bulk object.
 
@@ -70,8 +68,7 @@ inline Poco::UInt32 Bulk::size() const
 
 namespace Keywords {
 
-[[nodiscard]]
-inline Bulk bulk(const Limit& limit = Limit(Limit::LIMIT_UNLIMITED, false, false))
+[[nodiscard]] inline Bulk bulk(const Limit& limit = Limit(Limit::LIMIT_UNLIMITED, false, false))
 	/// Convenience function for creation of bulk.
 {
 	return {limit};

@@ -2229,8 +2229,8 @@ void SQLiteTest::testInternalExtraction()
 	const Column<IntDeq>& col = rset.column<IntDeq>(0);
 	assertTrue (col[0] == 1);
 
-	try { [[maybe_unused]] const Column<IntDeq>& _ = rset.column<IntDeq>(100); fail ("must fail"); }
-	catch ([[maybe_unused]] RangeException& e) { }
+	try { (void) rset.column<IntDeq>(100); fail ("must fail"); }
+	catch (RangeException&) { }
 
 	const Column<IntDeq>& col1 = rset.column<IntDeq>(0);
 	assertTrue ("int0" == col1.name());
@@ -2247,8 +2247,8 @@ void SQLiteTest::testInternalExtraction()
 	stmt = (tmp << "DELETE FROM Vectors", now);
 	rset = stmt;
 
-	try { [[maybe_unused]] const Column<IntDeq>& _ = rset.column<IntDeq>(0); fail ("must fail"); }
-	catch ([[maybe_unused]] RangeException& e) { }
+	try { (void) rset.column<IntDeq>(0); fail ("must fail"); }
+	catch (RangeException&) { }
 }
 
 
@@ -2271,7 +2271,7 @@ void SQLiteTest::testPrimaryKeyConstraint()
 			if (i > 0)
 				fail("must fail");
 		}
-		catch([[maybe_unused]] Poco::Exception& e)
+		catch(Poco::Exception&)
 		{
 			if (i == 0) // the very first insert must work
 				throw;

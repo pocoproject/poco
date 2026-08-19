@@ -42,14 +42,12 @@ public:
 	{
 	}
 
-	[[nodiscard]]
-	Redis::Client::Ptr createObject()
+	[[nodiscard]] Redis::Client::Ptr createObject()
 	{
 		return new Redis::Client(_address);
 	}
 
-	[[nodiscard]]
-	bool validateObject(Redis::Client::Ptr pObject)
+	[[nodiscard]] bool validateObject(Redis::Client::Ptr pObject)
 	{
 		return pObject->isConnected();
 	}
@@ -99,8 +97,7 @@ public:
 		}
 	}
 
-	[[nodiscard]]
-	operator Client::Ptr()
+	[[nodiscard]] operator Client::Ptr()
 	{
 		return _client;
 	}

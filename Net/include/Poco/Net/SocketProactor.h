@@ -97,8 +97,7 @@ public:
 	void removeWork();
 		/// Removes all scheduled work.
 
-	[[nodiscard]]
-	int scheduledWork();
+	[[nodiscard]] int scheduledWork();
 		/// Returns the number of scheduled functions.
 
 	int removeScheduledWork(int count = -1);
@@ -106,8 +105,7 @@ public:
 		/// from the front of the schedule queue.
 		/// Default is removal of all scheduled functions.
 
-	[[nodiscard]]
-	int permanentWork();
+	[[nodiscard]] int permanentWork();
 		/// Returns the number of permanent functions.
 
 	int removePermanentWork(int count = -1);
@@ -115,8 +113,7 @@ public:
 		/// from the front of the schedule queue.
 		/// Default is removal of all functions.
 
-	[[nodiscard]]
-	int poll(int* pHandled = nullptr);
+	[[nodiscard]] int poll(int* pHandled = nullptr);
 		/// Polls all registered sockets and calls their respective handlers.
 		/// If pHandled is not null, after the call it contains the total number
 		/// of read/write/error socket handlers called.
@@ -157,8 +154,7 @@ public:
 		/// The timeout is passed to the Socket::select()
 		/// method.
 
-	[[nodiscard]]
-	Poco::Timespan getTimeout() const;
+	[[nodiscard]] Poco::Timespan getTimeout() const;
 		/// Returns the timeout.
 
 	void addSocket(const Socket& sock, int mode);
@@ -196,16 +192,13 @@ public:
 	bool hasSocketHandlers() const;
 		/// Returns true if proactor had at least one I/O completion handler.
 
-	[[nodiscard]]
-	bool has(const Socket& sock) const;
+	[[nodiscard]] bool has(const Socket& sock) const;
 		/// Returns true if socket is registered with this proactor.
 
-	[[nodiscard]]
-	bool isRunning() const;
+	[[nodiscard]] bool isRunning() const;
 		/// Returns true if this proactor is running
 
-	[[nodiscard]]
-	bool ioCompletionInProgress() const;
+	[[nodiscard]] bool ioCompletionInProgress() const;
 		/// Returns true if there are not executed handlers from last IO.
 
 private:
@@ -317,8 +310,7 @@ private:
 			_nq.wakeUpAll();
 		}
 
-		[[nodiscard]]
-		int queueSize() const
+		[[nodiscard]] int queueSize() const
 		{
 			return _nq.size();
 		}
@@ -381,14 +373,12 @@ private:
 		/// The value of _timeout can grow up to
 		/// _maxTimeout value.
 
-	[[nodiscard]]
-	int error(Socket& sock);
+	[[nodiscard]] int error(Socket& sock);
 		/// Enqueues the completion handlers and removes
 		/// them from the handlers list after the operation
 		/// successfully completes.
 
-	[[nodiscard]]
-	bool hasHandlers(SubscriberMap& handlers, int sockfd);
+	[[nodiscard]] bool hasHandlers(SubscriberMap& handlers, int sockfd);
 	void deleteHandler(IOHandlerList& handlers, IOHandlerList::iterator& it);
 
 	template <typename T>
@@ -448,8 +438,7 @@ private:
 		/// Enqueues the completion handler into the I/O
 		/// completion handler.
 
-	[[nodiscard]]
-	Worker& worker();
+	[[nodiscard]] Worker& worker();
 
 	std::atomic<bool> _isRunning;
 	std::atomic<bool> _isStopped;

@@ -59,8 +59,7 @@ class Net_API HTTPIOS: public virtual std::ios
 public:
 	HTTPIOS(HTTPSession& session, HTTPStreamBuf::openmode mode);
 	~HTTPIOS();
-	[[nodiscard]]
-	HTTPStreamBuf* rdbuf();
+	[[nodiscard]] HTTPStreamBuf* rdbuf();
 
 protected:
 	HTTPStreamBuf _buf;
@@ -74,7 +73,6 @@ public:
 	HTTPInputStream(HTTPSession& session);
 	~HTTPInputStream();
 
-	[[nodiscard]]
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
 
@@ -90,7 +88,6 @@ public:
 	HTTPOutputStream(HTTPSession& session);
 	~HTTPOutputStream();
 
-	[[nodiscard]]
 	void* operator new(std::size_t size);
 	void operator delete(void* ptr);
 

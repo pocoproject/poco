@@ -349,8 +349,7 @@ public:
 		/// The given buffer will not be modified until the full frame has 
 		/// been received.
 
-	[[nodiscard]]
-	Mode mode() const;
+	[[nodiscard]] Mode mode() const;
 		/// Returns WS_SERVER if the WebSocket is a server-side
 		/// WebSocket, or WS_CLIENT otherwise.
 
@@ -359,8 +358,7 @@ public:
 		///
 		/// The default is std::numeric_limits<int>::max().
 
-	[[nodiscard]]
-	int getMaxPayloadSize() const;
+	[[nodiscard]] int getMaxPayloadSize() const;
 		/// Returns the maximum payload size for receiveFrame().
 		///
 		/// The default is std::numeric_limits<int>::max().

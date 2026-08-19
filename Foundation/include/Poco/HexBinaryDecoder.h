@@ -61,8 +61,7 @@ class Foundation_API HexBinaryDecoderIOS: public virtual std::ios
 public:
 	HexBinaryDecoderIOS(std::istream& istr);
 	~HexBinaryDecoderIOS() override;
-	[[nodiscard]]
-	HexBinaryDecoderBuf* rdbuf();
+	[[nodiscard]] HexBinaryDecoderBuf* rdbuf();
 
 protected:
 	HexBinaryDecoderBuf _buf;

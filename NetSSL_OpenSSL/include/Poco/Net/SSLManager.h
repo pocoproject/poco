@@ -166,8 +166,7 @@ public:
 		/// Fired when a encrypted certificate is loaded. Not setting the password
 		/// in the event parameter will result in a failure to load the certificate.
 
-	[[nodiscard]]
-	static SSLManager& instance();
+	[[nodiscard]] static SSLManager& instance();
 		/// Returns the instance of the SSLManager singleton.
 
 	void initializeServer(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, InvalidCertificateHandlerPtr ptrCertificateHandler, Context::Ptr ptrContext);
@@ -202,52 +201,43 @@ public:
 		///     Context::Ptr pContext = new Context(Context::CLIENT_USE, "", "", "rootcert.pem", Context::VERIFY_RELAXED, 9, false, "ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
 		///     SSLManager::instance().initializeClient(pConsoleHandler, pInvalidCertHandler, pContext);
 
-	[[nodiscard]]
-	Context::Ptr defaultServerContext();
+	[[nodiscard]] Context::Ptr defaultServerContext();
 		/// Returns the default Context used by the server.
 		///
 		/// Unless initializeServer() has been called, the first call to this method initializes the default Context
 		/// from the application configuration.
 
-	[[nodiscard]]
-	Context::Ptr defaultClientContext();
+	[[nodiscard]] Context::Ptr defaultClientContext();
 		/// Returns the default Context used by the client.
 		///
 		/// Unless initializeClient() has been called, the first call to this method initializes the default Context
 		/// from the application configuration.
 
-	[[nodiscard]]
-	PrivateKeyPassphraseHandlerPtr serverPassphraseHandler();
+	[[nodiscard]] PrivateKeyPassphraseHandlerPtr serverPassphraseHandler();
 		/// Returns the configured passphrase handler of the server. If none is set, the method will create a default one
 		/// from an application configuration.
 
-	[[nodiscard]]
-	InvalidCertificateHandlerPtr serverCertificateHandler();
+	[[nodiscard]] InvalidCertificateHandlerPtr serverCertificateHandler();
 		/// Returns an initialized certificate handler (used by the server to verify client cert) which determines how invalid certificates are treated.
 		/// If none is set, it will try to auto-initialize one from an application configuration.
 
-	[[nodiscard]]
-	PrivateKeyPassphraseHandlerPtr clientPassphraseHandler();
+	[[nodiscard]] PrivateKeyPassphraseHandlerPtr clientPassphraseHandler();
 		/// Returns the configured passphrase handler of the client. If none is set, the method will create a default one
 		/// from an application configuration.
 
-	[[nodiscard]]
-	InvalidCertificateHandlerPtr clientCertificateHandler();
+	[[nodiscard]] InvalidCertificateHandlerPtr clientCertificateHandler();
 		/// Returns an initialized certificate handler (used by the client to verify server cert) which determines how invalid certificates are treated.
 		/// If none is set, it will try to auto-initialize one from an application configuration.
 
-	[[nodiscard]]
-	PrivateKeyFactoryMgr& privateKeyFactoryMgr();
+	[[nodiscard]] PrivateKeyFactoryMgr& privateKeyFactoryMgr();
 		/// Returns the private key factory manager which stores the
 		/// factories for the different registered passphrase handlers for private keys.
 
-	[[nodiscard]]
-	CertificateHandlerFactoryMgr& certificateHandlerFactoryMgr();
+	[[nodiscard]] CertificateHandlerFactoryMgr& certificateHandlerFactoryMgr();
 		/// Returns the CertificateHandlerFactoryMgr which stores the
 		/// factories for the different registered certificate handlers.
 
-	[[nodiscard]]
-	static bool isFIPSEnabled();
+	[[nodiscard]] static bool isFIPSEnabled();
 		// Returns true if FIPS mode is enabled, false otherwise.
 
 	void shutdown();
@@ -283,20 +273,17 @@ protected:
 		/// verification are handled. Return 0 to terminate the handshake,
 		/// or 1 to continue despite the error.
 
-	[[nodiscard]]
-	static Poco::Util::AbstractConfiguration& appConfig();
+	[[nodiscard]] static Poco::Util::AbstractConfiguration& appConfig();
 		/// Returns the application configuration.
 		///
 		/// Throws a InvalidStateException if not application instance
 		/// is available.
 
-	[[nodiscard]]
-	int contextIndex() const;
+	[[nodiscard]] int contextIndex() const;
 		/// Returns the index for SSL_CTX_set_ex_data() and SSL_CTX_get_ex_data() to
 		/// store the Context* in the underlying SSL_CTX.
 
-	[[nodiscard]]
-	int socketIndex() const;
+	[[nodiscard]] int socketIndex() const;
 		/// Returns the index for SSL_set_ex_data() and SSL_get_ex_data() to
 		/// store the SecureSocketImpl* in the underlying SSL.
 

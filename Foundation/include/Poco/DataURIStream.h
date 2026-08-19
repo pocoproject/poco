@@ -40,8 +40,7 @@ class Foundation_API DataURIStreamIOS: public virtual std::ios
 public:
 	DataURIStreamIOS(const URI& uri);
 	~DataURIStreamIOS() override;
-	[[nodiscard]]
-	std::streambuf* rdbuf();
+	[[nodiscard]] std::streambuf* rdbuf();
 
 protected:
 	std::streambuf* _buf;

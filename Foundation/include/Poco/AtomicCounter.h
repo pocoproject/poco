@@ -55,12 +55,10 @@ public:
 	AtomicCounter& operator = (ValueType value);
 		/// Assigns a value to the counter.
 
-	[[nodiscard]]
-	operator ValueType () const;
+	[[nodiscard]] operator ValueType () const;
 		/// Converts the AtomicCounter to ValueType.
 
-	[[nodiscard]]
-	ValueType value() const;
+	[[nodiscard]] ValueType value() const;
 		/// Returns the value of the counter.
 
 	ValueType operator ++ (); // prefix
@@ -75,8 +73,7 @@ public:
 	ValueType operator -- (int); // postfix
 		/// Decrements the counter and returns the previous value.
 
-	[[nodiscard]]
-	bool operator ! () const;
+	[[nodiscard]] bool operator ! () const;
 		/// Returns true if the counter is zero, false otherwise.
 
 private:

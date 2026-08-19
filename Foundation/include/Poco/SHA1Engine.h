@@ -45,11 +45,9 @@ public:
 	SHA1Engine();
 	~SHA1Engine() override;
 
-	[[nodiscard]]
-	std::size_t digestLength() const override;
+	[[nodiscard]] std::size_t digestLength() const override;
 	void reset() override;
-	[[nodiscard]]
-	const DigestEngine::Digest& digest() override;
+	[[nodiscard]] const DigestEngine::Digest& digest() override;
 
 protected:
 	void updateImpl(const void *data, std::size_t length) override;

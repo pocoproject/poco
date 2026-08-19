@@ -192,43 +192,37 @@ public:
 	}
 
 	template <typename OV, typename OU>
-	[[nodiscard]]
-	bool operator == (const Value<OV, OU>& other) const
+	[[nodiscard]] bool operator == (const Value<OV, OU>& other) const
 	{
 		return get() == Value(other).get();
 	}
 
 	template <typename OV, typename OU>
-	[[nodiscard]]
-	bool operator != (const Value<OV, OU>& other) const
+	[[nodiscard]] bool operator != (const Value<OV, OU>& other) const
 	{
 		return get() != Value(other).get();
 	}
 
 	template <typename OV, typename OU>
-	[[nodiscard]]
-	bool operator < (const Value<OV, OU>& other) const
+	[[nodiscard]] bool operator < (const Value<OV, OU>& other) const
 	{
 		return get() < Value(other).get();
 	}
 
 	template <typename OV, typename OU>
-	[[nodiscard]]
-	bool operator <= (const Value<OV, OU>& other) const
+	[[nodiscard]] bool operator <= (const Value<OV, OU>& other) const
 	{
 		return get() <= Value(other).get();
 	}
 
 	template <typename OV, typename OU>
-	[[nodiscard]]
-	bool operator > (const Value<OV, OU>& other) const
+	[[nodiscard]] bool operator > (const Value<OV, OU>& other) const
 	{
 		return get() > Value(other).get();
 	}
 
 	template <typename OV, typename OU>
-	[[nodiscard]]
-	bool operator >= (const Value<OV, OU>& other) const
+	[[nodiscard]] bool operator >= (const Value<OV, OU>& other) const
 	{
 		return get() >= Value(other).get();
 	}
@@ -279,40 +273,35 @@ Value<V, U > operator * (const V& a, const Value<V, U>& b)
 
 
 template <typename V, typename U>
-[[nodiscard]]
-Value<V, U> abs(const Value<V, U>& a)
+[[nodiscard]] Value<V, U> abs(const Value<V, U>& a)
 {
     return Value<V, U>(std::abs(a.get()));
 }
 
 
 template <typename V, typename U>
-[[nodiscard]]
-Value<V, Power<U, 1, 2> > sqrt(const Value<V, U>& a)
+[[nodiscard]] Value<V, Power<U, 1, 2> > sqrt(const Value<V, U>& a)
 {
 	return Value<V, Power<U, 1, 2> >(std::sqrt(a.get()));
 }
 
 
 template <typename V, typename U>
-[[nodiscard]]
-Value<V, Power<U, 2, 1> > square(const Value<V, U>& a)
+[[nodiscard]] Value<V, Power<U, 2, 1> > square(const Value<V, U>& a)
 {
 	return Value<V, Power<U, 2, 1> >(std::pow(a.get(), 2));
 }
 
 
 template <typename V, typename U>
-[[nodiscard]]
-Value<V, Power<U, 3, 1> > cube(const Value<V, U>& a)
+[[nodiscard]] Value<V, Power<U, 3, 1> > cube(const Value<V, U>& a)
 {
 	return Value<V, Power<U, 3, 1> >(std::pow(a.get(), 3));
 }
 
 
 template <int Num, int Den, typename V, typename U>
-[[nodiscard]]
-Value<V, Power<U, Num, Den> > raise(const Value<V, U>& a)
+[[nodiscard]] Value<V, Power<U, Num, Den> > raise(const Value<V, U>& a)
 {
 	return Value<V, Power<U, Num, Den> >(Internal::FixedPower<Num, Den>::Power(a.get()));
 }

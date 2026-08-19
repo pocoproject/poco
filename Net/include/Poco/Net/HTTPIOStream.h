@@ -56,8 +56,7 @@ public:
 
 	~HTTPResponseIOS();
 
-	[[nodiscard]]
-	HTTPResponseStreamBuf* rdbuf();
+	[[nodiscard]] HTTPResponseStreamBuf* rdbuf();
 
 protected:
 	HTTPResponseStreamBuf _buf;

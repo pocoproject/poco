@@ -75,42 +75,34 @@ public:
 	Token& operator = (const std::string& token);
 		/// Parses and assigns serialized JWT.
 
-	[[nodiscard]]
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Returns the serialized string representation of the JSON Web Token.
 
-	[[nodiscard]]
-	const Poco::JSON::Object& header() const;
+	[[nodiscard]] const Poco::JSON::Object& header() const;
 		/// Returns the header JSON object.
 
-	[[nodiscard]]
-	Poco::JSON::Object& header();
+	[[nodiscard]] Poco::JSON::Object& header();
 		/// Returns the header JSON object.
 
-	[[nodiscard]]
-	const Poco::JSON::Object& payload() const;
+	[[nodiscard]] const Poco::JSON::Object& payload() const;
 		/// Returns the payload JSON object.
 
-	[[nodiscard]]
-	Poco::JSON::Object& payload();
+	[[nodiscard]] Poco::JSON::Object& payload();
 		/// Returns the payload JSON object.
 
-	[[nodiscard]]
-	const std::string& signature() const;
+	[[nodiscard]] const std::string& signature() const;
 		/// Returns the signature string.
 
 	void setIssuer(const std::string& issuer);
 		/// Sets the issuer ("iss" claim in payload).
 
-	[[nodiscard]]
-	std::string getIssuer() const;
+	[[nodiscard]] std::string getIssuer() const;
 		/// Returns the issuer, or an empty string if no issuer has been specified.
 
 	void setSubject(const std::string& subject);
 		/// Sets the subject ("sub" claim in paylod).
 
-	[[nodiscard]]
-	std::string getSubject() const;
+	[[nodiscard]] std::string getSubject() const;
 		/// Returns the subject, or an empty string if no issuer has been specified.
 
 	void setAudience(const std::string& audience);
@@ -119,43 +111,37 @@ public:
 	void setAudience(const std::vector<std::string>& audience);
 		/// Sets the audience ("aud" claim in payload).
 
-	[[nodiscard]]
-	std::vector<std::string> getAudience() const;
+	[[nodiscard]] std::vector<std::string> getAudience() const;
 		/// Returns the audience.
 
 	void setExpiration(const Poco::Timestamp& expiration);
 		/// Sets the expiration ("exp" claim in payload).
 
-	[[nodiscard]]
-	Poco::Timestamp getExpiration() const;
+	[[nodiscard]] Poco::Timestamp getExpiration() const;
 		/// Returns the expiration, or a zero Poco::Timestamp if no expiration has been specified.
 
 	void setNotBefore(const Poco::Timestamp& notBefore);
 		/// Sets the not-before time ("nbf" claim in payload).
 
-	[[nodiscard]]
-	Poco::Timestamp getNotBefore() const;
+	[[nodiscard]] Poco::Timestamp getNotBefore() const;
 		/// Returns the not-before time, or a zero Poco::Timestamp if no not-before time has been specified.
 
 	void setIssuedAt(const Poco::Timestamp& issuedAt);
 		/// Sets the issued-at time ("iat" claim in payload).
 
-	[[nodiscard]]
-	Poco::Timestamp getIssuedAt() const;
+	[[nodiscard]] Poco::Timestamp getIssuedAt() const;
 		/// Returns the issued-at time, or a zero Poco::Timestamp if no issued-at time has been specified.
 
 	void setId(const std::string& id);
 		/// Sets the JWT ID ("jti" claim in payload).
 
-	[[nodiscard]]
-	std::string getId() const;
+	[[nodiscard]] std::string getId() const;
 		/// Returns the JWT ID, or an empty string if no JWT ID has been specified.
 
 	void setType(const std::string& type);
 		/// Sets the JWT type ("typ" claim in payload).
 
-	[[nodiscard]]
-	std::string getType() const;
+	[[nodiscard]] std::string getType() const;
 		/// Returns the JWT type or an empty string if no type has been specified.
 
 	void setAlgorithm(const std::string& algorithm);
@@ -167,8 +153,7 @@ public:
 	void setContentType(const std::string& contentType);
 		/// Sets the JWT content type ("cty" claim in header").
 
-	[[nodiscard]]
-	std::string getContentType() const;
+	[[nodiscard]] std::string getContentType() const;
 		/// Returns the JWT content type, or an empty string if no content type has been specified.
 
 	static const std::string CLAIM_ISSUER;

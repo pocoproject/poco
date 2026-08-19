@@ -52,8 +52,7 @@ public:
 		/// Connects the AsyncChannel to the given target channel.
 		/// All messages will be forwarded to this channel.
 
-	[[nodiscard]]
-	Channel::Ptr getChannel() const;
+	[[nodiscard]] Channel::Ptr getChannel() const;
 		/// Returns the target channel.
 
 	void open() override;

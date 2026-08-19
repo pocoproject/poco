@@ -92,16 +92,14 @@ public:
 		/// Version must be either 0 (denoting a RFC6265 cookie)
 		/// or 1 (denoting a RFC 2109 cookie).
 
-	[[nodiscard]]
-	int getVersion() const;
+	[[nodiscard]] int getVersion() const;
 		/// Returns the version of the cookie, which is
 		/// either 0 or 1.
 
 	void setName(const std::string& name);
 		/// Sets the name of the cookie.
 
-	[[nodiscard]]
-	const std::string& getName() const;
+	[[nodiscard]] const std::string& getName() const;
 		/// Returns the name of the cookie.
 
 	void setValue(const std::string& value);
@@ -114,8 +112,7 @@ public:
 		/// characters, the value should be escaped by calling escape()
 		/// prior to passing it to setName().
 
-	[[nodiscard]]
-	const std::string& getValue() const;
+	[[nodiscard]] const std::string& getValue() const;
 		/// Returns the value of the cookie.
 
 	POCO_DEPRECATED("Support for RFC 2109 cookies has been deprecated")
@@ -124,22 +121,19 @@ public:
 		///
 		/// Comments are only supported for version 1 cookies.
 
-	[[nodiscard]]
-	const std::string& getComment() const;
+	[[nodiscard]] const std::string& getComment() const;
 		/// Returns the comment for the cookie.
 
 	void setDomain(const std::string& domain);
 		/// Sets the domain for the cookie.
 
-	[[nodiscard]]
-	const std::string& getDomain() const;
+	[[nodiscard]] const std::string& getDomain() const;
 		/// Returns the domain for the cookie.
 
 	void setPath(const std::string& path);
 		/// Sets the path for the cookie.
 
-	[[nodiscard]]
-	const std::string& getPath() const;
+	[[nodiscard]] const std::string& getPath() const;
 		/// Returns the path for the cookie.
 
 	void setPriority(const std::string& priority);
@@ -147,16 +141,14 @@ public:
 		///
 		/// This is a non-standard field.
 
-	[[nodiscard]]
-	const std::string& getPriority() const;
+	[[nodiscard]] const std::string& getPriority() const;
 		/// Returns the priority for the cookie.
 
 	void setSecure(bool secure);
 		/// Sets the value of the secure flag for
 		/// the cookie.
 
-	[[nodiscard]]
-	bool getSecure() const;
+	[[nodiscard]] bool getSecure() const;
 		/// Returns the value of the secure flag
 		/// for the cookie.
 
@@ -172,32 +164,27 @@ public:
 		/// A value of 0 deletes the cookie on
 		/// the client.
 
-	[[nodiscard]]
-	int getMaxAge() const;
+	[[nodiscard]] int getMaxAge() const;
 		/// Returns the maximum age in seconds for
 		/// the cookie.
 
 	void setHttpOnly(bool flag = true);
 		/// Sets the HttpOnly flag for the cookie.
 
-	[[nodiscard]]
-	bool getHttpOnly() const;
+	[[nodiscard]] bool getHttpOnly() const;
 		/// Returns true iff the cookie's HttpOnly flag is set.
 
 	void setSameSite(SameSite value);
 		/// Sets the cookie's SameSite attribute.
 
-	[[nodiscard]]
-	SameSite getSameSite() const;
+	[[nodiscard]] SameSite getSameSite() const;
 		/// Returns the cookie's SameSite attribute.
 
-	[[nodiscard]]
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Returns a string representation of the cookie,
 		/// suitable for use in a Set-Cookie header.
 
-	[[nodiscard]]
-	static std::string escape(const std::string& str);
+	[[nodiscard]] static std::string escape(const std::string& str);
 		/// Escapes the given string by replacing all
 		/// non-alphanumeric characters with escape
 		/// sequences in the form %xx, where xx is the
@@ -220,8 +207,7 @@ public:
 		///   - comma and semicolon , and ;
 		///   - whitespace and control characters
 
-	[[nodiscard]]
-	static std::string unescape(const std::string& str);
+	[[nodiscard]] static std::string unescape(const std::string& str);
 		/// Unescapes the given string by replacing all
 		/// escape sequences in the form %xx with the
 		/// respective characters.

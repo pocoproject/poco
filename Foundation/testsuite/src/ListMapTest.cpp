@@ -222,7 +222,7 @@ void ListMapTest::testIntIndex()
 	try
 	{
 		const IntMap& im = hm;
-		[[maybe_unused]] int x = im[4];
+		(void) im[4];
 		fail("no such key - must throw");
 	}
 	catch (Poco::NotFoundException&)

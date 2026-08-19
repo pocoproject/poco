@@ -122,8 +122,7 @@ public:
 	~EVPPKey();
 		/// Destroys the EVPPKey.
 
-	[[nodiscard]]
-	bool operator == (const EVPPKey& other) const;
+	[[nodiscard]] bool operator == (const EVPPKey& other) const;
 		/// Comparison operator.
 		/// Returns true if public key components and parameters
 		/// of the other key are equal to this key.
@@ -131,8 +130,7 @@ public:
 		/// Works as expected when one key contains only public key,
 		/// while the other one contains private (thus also public) key.
 
-	[[nodiscard]]
-	bool operator != (const EVPPKey& other) const;
+	[[nodiscard]] bool operator != (const EVPPKey& other) const;
 		/// Comparison operator.
 		/// Returns true if public key components and parameters
 		/// of the other key are different from this key.
@@ -152,24 +150,19 @@ public:
 		/// If a null pointer is passed for a stream, the corresponding
 		/// key is not exported.
 
-	[[nodiscard]]
-	int type() const;
+	[[nodiscard]] int type() const;
 		/// Retuns the EVPPKey type NID.
 
-	[[nodiscard]]
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Retuns the EVPPKey name.
 
-	[[nodiscard]]
-	bool isSupported(int type) const;
+	[[nodiscard]] bool isSupported(int type) const;
 		/// Returns true if OpenSSL type is supported
 
-	[[nodiscard]]
-	operator const EVP_PKEY*() const;
+	[[nodiscard]] operator const EVP_PKEY*() const;
 		/// Returns const pointer to the OpenSSL EVP_PKEY structure.
 
-	[[nodiscard]]
-	operator EVP_PKEY*();
+	[[nodiscard]] operator EVP_PKEY*();
 		/// Returns pointer to the OpenSSL EVP_PKEY structure.
 
 	static EVP_PKEY* duplicate(const EVP_PKEY* pFromKey, EVP_PKEY** pToKey);

@@ -41,8 +41,7 @@ public:
 	~HTTPSSessionInstantiator();
 		/// Destroys the HTTPSSessionInstantiator.
 
-	[[nodiscard]]
-	HTTPClientSession* createClientSession(const Poco::URI& uri);
+	[[nodiscard]] HTTPClientSession* createClientSession(const Poco::URI& uri);
 		/// Creates a HTTPSClientSession for the given URI.
 
 	static void registerInstantiator();

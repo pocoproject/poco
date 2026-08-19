@@ -95,31 +95,26 @@ public:
 	void unload();
 		/// Unloads a shared library.
 
-	[[nodiscard]]
-	bool isLoaded() const;
+	[[nodiscard]] bool isLoaded() const;
 		/// Returns true iff a library has been loaded.
 
-	[[nodiscard]]
-	bool hasSymbol(const std::string& name);
+	[[nodiscard]] bool hasSymbol(const std::string& name);
 		/// Returns true iff the loaded library contains
 		/// a symbol with the given name.
 
-	[[nodiscard]]
-	void* getSymbol(const std::string& name);
+	[[nodiscard]] void* getSymbol(const std::string& name);
 		/// Returns the address of the symbol with
 		/// the given name. For functions, this
 		/// is the entry point of the function.
 		/// Throws a NotFoundException if the symbol
 		/// does not exist.
 
-	[[nodiscard]]
-	const std::string& getPath() const;
+	[[nodiscard]] const std::string& getPath() const;
 		/// Returns the path of the library, as
 		/// specified in a call to load() or the
 		/// constructor.
 
-	[[nodiscard]]
-	static std::string suffix();
+	[[nodiscard]] static std::string suffix();
 		/// Returns the platform-specific filename suffix
 		/// for shared libraries (including the period).
 		/// In debug mode, the suffix also includes a
@@ -137,8 +132,7 @@ public:
 		/// SetDllDirectory(). On all other platforms, does not
 		/// do anything and returns false.
 
-	[[nodiscard]]
-	static std::vector<std::string> findMissingDependencies(const std::string& path);
+	[[nodiscard]] static std::vector<std::string> findMissingDependencies(const std::string& path);
 		/// Parses the shared library at the given path and returns
 		/// a list of dependent libraries that cannot be found.
 		/// If the library itself whose dependencies are checked is not found,

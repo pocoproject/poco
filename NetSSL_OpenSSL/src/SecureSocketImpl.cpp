@@ -572,14 +572,14 @@ bool SecureSocketImpl::mustRetry(int rc)
 		case SSL_ERROR_WANT_READ:
 			if (_pSocket->getBlocking())
 			{
-				[[maybe_unused]] bool _ = _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
+				(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
 				return true;
 			}
 			break;
 		case SSL_ERROR_WANT_WRITE:
 			if (_pSocket->getBlocking())
 			{
-				[[maybe_unused]] bool _ = _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
+				(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
 				return true;
 			}
 			break;

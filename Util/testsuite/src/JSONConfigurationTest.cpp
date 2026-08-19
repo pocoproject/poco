@@ -75,10 +75,10 @@ void JSONConfigurationTest::testLoad()
 
 	try
 	{
-		[[maybe_unused]] std::string _ = config.getString("propertyUnknown");
+		(void) config.getString("propertyUnknown");
 		assertTrue (true);
 	}
-	catch([[maybe_unused]] NotFoundException& nfe)
+	catch(NotFoundException& nfe)
 	{
 	}
 }
@@ -127,10 +127,10 @@ void JSONConfigurationTest::testConfigurationView()
 
 	try
 	{
-		[[maybe_unused]] std::string _ = pView->getString("[1]");
+		(void) pView->getString("[1]");
 		fail ("must throw on index out of bounds");
 	}
-	catch([[maybe_unused]] Poco::NotFoundException& e){}
+	catch(Poco::NotFoundException&){}
 }
 
 

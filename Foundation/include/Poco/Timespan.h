@@ -80,31 +80,19 @@ public:
 	void swap(Timespan& timespan) noexcept;
 		/// Swaps the Timespan with another one.
 
-	[[nodiscard]]
-	bool operator == (const Timespan& ts) const;
-	[[nodiscard]]
-	bool operator != (const Timespan& ts) const;
-	[[nodiscard]]
-	bool operator >  (const Timespan& ts) const;
-	[[nodiscard]]
-	bool operator >= (const Timespan& ts) const;
-	[[nodiscard]]
-	bool operator <  (const Timespan& ts) const;
-	[[nodiscard]]
-	bool operator <= (const Timespan& ts) const;
+	[[nodiscard]] bool operator == (const Timespan& ts) const;
+	[[nodiscard]] bool operator != (const Timespan& ts) const;
+	[[nodiscard]] bool operator >  (const Timespan& ts) const;
+	[[nodiscard]] bool operator >= (const Timespan& ts) const;
+	[[nodiscard]] bool operator <  (const Timespan& ts) const;
+	[[nodiscard]] bool operator <= (const Timespan& ts) const;
 
-	[[nodiscard]]
-	bool operator == (TimeDiff microSeconds) const;
-	[[nodiscard]]
-	bool operator != (TimeDiff microSeconds) const;
-	[[nodiscard]]
-	bool operator >  (TimeDiff microSeconds) const;
-	[[nodiscard]]
-	bool operator >= (TimeDiff microSeconds) const;
-	[[nodiscard]]
-	bool operator <  (TimeDiff microSeconds) const;
-	[[nodiscard]]
-	bool operator <= (TimeDiff microSeconds) const;
+	[[nodiscard]] bool operator == (TimeDiff microSeconds) const;
+	[[nodiscard]] bool operator != (TimeDiff microSeconds) const;
+	[[nodiscard]] bool operator >  (TimeDiff microSeconds) const;
+	[[nodiscard]] bool operator >= (TimeDiff microSeconds) const;
+	[[nodiscard]] bool operator <  (TimeDiff microSeconds) const;
+	[[nodiscard]] bool operator <= (TimeDiff microSeconds) const;
 
 	Timespan operator + (const Timespan& d) const;
 	Timespan operator - (const Timespan& d) const;
@@ -116,54 +104,42 @@ public:
 	Timespan& operator += (TimeDiff microSeconds);
 	Timespan& operator -= (TimeDiff microSeconds);
 
-	[[nodiscard]]
-	int days() const;
+	[[nodiscard]] int days() const;
 		/// Returns the number of days.
 
-	[[nodiscard]]
-	int hours() const;
+	[[nodiscard]] int hours() const;
 		/// Returns the number of hours (0 to 23).
 
-	[[nodiscard]]
-	int totalHours() const;
+	[[nodiscard]] int totalHours() const;
 		/// Returns the total number of hours.
 
-	[[nodiscard]]
-	int minutes() const;
+	[[nodiscard]] int minutes() const;
 		/// Returns the number of minutes (0 to 59).
 
-	[[nodiscard]]
-	int totalMinutes() const;
+	[[nodiscard]] int totalMinutes() const;
 		/// Returns the total number of minutes.
 
-	[[nodiscard]]
-	int seconds() const;
+	[[nodiscard]] int seconds() const;
 		/// Returns the number of seconds (0 to 59).
 
-	[[nodiscard]]
-	int totalSeconds() const;
+	[[nodiscard]] int totalSeconds() const;
 		/// Returns the total number of seconds.
 
-	[[nodiscard]]
-	int milliseconds() const;
+	[[nodiscard]] int milliseconds() const;
 		/// Returns the number of milliseconds (0 to 999).
 
-	[[nodiscard]]
-	TimeDiff totalMilliseconds() const;
+	[[nodiscard]] TimeDiff totalMilliseconds() const;
 		/// Returns the total number of milliseconds.
 
-	[[nodiscard]]
-	int microseconds() const;
+	[[nodiscard]] int microseconds() const;
 		/// Returns the fractions of a millisecond
 		/// in microseconds (0 to 999).
 
-	[[nodiscard]]
-	int useconds() const;
+	[[nodiscard]] int useconds() const;
 		/// Returns the fractions of a second
 		/// in microseconds (0 to 999999).
 
-	[[nodiscard]]
-	TimeDiff totalMicroseconds() const;
+	[[nodiscard]] TimeDiff totalMicroseconds() const;
 		/// Returns the total number of microseconds.
 
 	static const TimeDiff MILLISECONDS; /// The number of microseconds in a millisecond.

@@ -132,8 +132,7 @@ public:
 		swap(_optional, other._optional);
 	}
 
-	[[nodiscard]]
-	const C& value() const
+	[[nodiscard]] const C& value() const
 		/// Returns the Optional's value.
 		///
 		/// Throws a Poco::NullValueException if the value has not been specified.
@@ -144,8 +143,7 @@ public:
 		throw NullValueException();
 	}
 
-	[[nodiscard]]
-	const C& value(const C& deflt) const
+	[[nodiscard]] const C& value(const C& deflt) const
 		/// Returns the Optional's value, or the
 		/// given default value if the Optional's
 		/// value has not been specified.
@@ -156,8 +154,7 @@ public:
 		return deflt;
 	}
 
-	[[nodiscard]]
-	bool isSpecified() const
+	[[nodiscard]] bool isSpecified() const
 		/// Returns true iff the Optional's value has been specified.
 	{
 		return _optional.has_value();

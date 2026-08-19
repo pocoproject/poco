@@ -50,8 +50,7 @@ public:
 	void close(Poco::UInt64& extraDataSize);
 		/// Informs a writing outputstream that writing is done for this stream
 
-	[[nodiscard]]
-	bool crcValid() const;
+	[[nodiscard]] bool crcValid() const;
 		/// Call this method once all bytes were read from the input stream to determine if the CRC is valid
 
 protected:
@@ -101,8 +100,7 @@ public:
 	~ZipIOS();
 		/// Destroys the stream.
 
-	[[nodiscard]]
-	ZipStreamBuf* rdbuf();
+	[[nodiscard]] ZipStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
 
 protected:
@@ -122,8 +120,7 @@ public:
 	~ZipInputStream();
 		/// Destroys the ZipInputStream.
 
-	[[nodiscard]]
-	bool crcValid() const;
+	[[nodiscard]] bool crcValid() const;
 		/// Call this method once all bytes were read from the input stream to determine if the CRC is valid
 };
 

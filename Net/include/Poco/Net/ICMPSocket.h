@@ -65,24 +65,19 @@ public:
 		/// Returns the time elapsed since the originating
 		/// request was sent.
 
-	[[nodiscard]]
-	int dataSize() const;
+	[[nodiscard]] int dataSize() const;
 		/// Returns the data size in bytes.
 
-	[[nodiscard]]
-	int packetSize() const;
+	[[nodiscard]] int packetSize() const;
 		/// Returns the packet size in bytes.
 
-	[[nodiscard]]
-	int ttl() const;
+	[[nodiscard]] int ttl() const;
 		/// Returns the Time-To-Live value.
 
-	[[nodiscard]]
-	int timeout() const;
+	[[nodiscard]] int timeout() const;
 		/// Returns the socket timeout value.
 
-	[[nodiscard]]
-	static Poco::UInt16 mtu(const SocketAddress& address, Poco::UInt16 sz);
+	[[nodiscard]] static Poco::UInt16 mtu(const SocketAddress& address, Poco::UInt16 sz);
 		/// Returns minimum payload path MTU size for the destination,
 		/// or 0 if MTU can not be determined.
 

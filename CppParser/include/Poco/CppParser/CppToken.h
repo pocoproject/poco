@@ -97,12 +97,10 @@ public:
 
 	OperatorToken();
 	~OperatorToken();
-	[[nodiscard]]
-	Poco::Token::Class tokenClass() const;
+	[[nodiscard]] Poco::Token::Class tokenClass() const;
 	bool start(char c, std::istream& istr);
 	void finish(std::istream& istr);
-	[[nodiscard]]
-	int asInteger() const;
+	[[nodiscard]] int asInteger() const;
 
 private:
 	using OpMap = std::map<std::string, int>;
@@ -204,12 +202,10 @@ public:
 
 	IdentifierToken();
 	~IdentifierToken();
-	[[nodiscard]]
-	Poco::Token::Class tokenClass() const;
+	[[nodiscard]] Poco::Token::Class tokenClass() const;
 	bool start(char c, std::istream& istr);
 	void finish(std::istream& istr);
-	[[nodiscard]]
-	int asInteger() const;
+	[[nodiscard]] int asInteger() const;
 
 private:
 	void finishRawString(std::istream& istr);
@@ -225,12 +221,10 @@ class CppParser_API StringLiteralToken: public CppToken
 public:
 	StringLiteralToken();
 	~StringLiteralToken();
-	[[nodiscard]]
-	Poco::Token::Class tokenClass() const;
+	[[nodiscard]] Poco::Token::Class tokenClass() const;
 	bool start(char c, std::istream& istr);
 	void finish(std::istream& istr);
-	[[nodiscard]]
-	std::string asString() const;
+	[[nodiscard]] std::string asString() const;
 };
 
 
@@ -239,12 +233,10 @@ class CppParser_API CharLiteralToken: public CppToken
 public:
 	CharLiteralToken();
 	~CharLiteralToken();
-	[[nodiscard]]
-	Poco::Token::Class tokenClass() const;
+	[[nodiscard]] Poco::Token::Class tokenClass() const;
 	bool start(char c, std::istream& istr);
 	void finish(std::istream& istr);
-	[[nodiscard]]
-	char asChar() const;
+	[[nodiscard]] char asChar() const;
 };
 
 
@@ -253,14 +245,11 @@ class CppParser_API NumberLiteralToken: public CppToken
 public:
 	NumberLiteralToken();
 	~NumberLiteralToken();
-	[[nodiscard]]
-	Poco::Token::Class tokenClass() const;
+	[[nodiscard]] Poco::Token::Class tokenClass() const;
 	bool start(char c, std::istream& istr);
 	void finish(std::istream& istr);
-	[[nodiscard]]
-	int asInteger() const;
-	[[nodiscard]]
-	double asFloat() const;
+	[[nodiscard]] int asInteger() const;
+	[[nodiscard]] double asFloat() const;
 
 protected:
 	void finishHex(std::istream& istr, int next);
@@ -278,12 +267,10 @@ class CppParser_API CommentToken: public CppToken
 public:
 	CommentToken();
 	~CommentToken();
-	[[nodiscard]]
-	Poco::Token::Class tokenClass() const;
+	[[nodiscard]] Poco::Token::Class tokenClass() const;
 	bool start(char c, std::istream& istr);
 	void finish(std::istream& istr);
-	[[nodiscard]]
-	std::string asString() const;
+	[[nodiscard]] std::string asString() const;
 };
 
 
@@ -292,8 +279,7 @@ class CppParser_API PreprocessorToken: public CppToken
 public:
 	PreprocessorToken();
 	~PreprocessorToken();
-	[[nodiscard]]
-	Poco::Token::Class tokenClass() const;
+	[[nodiscard]] Poco::Token::Class tokenClass() const;
 	bool start(char c, std::istream& istr);
 	void finish(std::istream& istr);
 };

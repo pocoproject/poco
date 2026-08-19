@@ -82,14 +82,12 @@ public:
 		}
 	}
 
-	[[nodiscard]]
-	SecBuffer& operator [] (Poco::UInt32 idx)
+	[[nodiscard]] SecBuffer& operator [] (Poco::UInt32 idx)
 	{
 		return _buffers[idx];
 	}
 
-	[[nodiscard]]
-	const SecBuffer& operator [] (Poco::UInt32 idx) const
+	[[nodiscard]] const SecBuffer& operator [] (Poco::UInt32 idx) const
 	{
 		return _buffers[idx];
 	}

@@ -41,29 +41,23 @@ public:
 	~ZipDataInfo();
 		/// Destroys the ZipDataInfo.
 
-	[[nodiscard]]
-	bool isValid() const;
+	[[nodiscard]] bool isValid() const;
 
-	[[nodiscard]]
-	Poco::UInt32 getCRC32() const;
+	[[nodiscard]] Poco::UInt32 getCRC32() const;
 
 	void setCRC32(Poco::UInt32 crc);
 
-	[[nodiscard]]
-	Poco::UInt32 getCompressedSize() const;
+	[[nodiscard]] Poco::UInt32 getCompressedSize() const;
 
 	void setCompressedSize(Poco::UInt32 size);
 
-	[[nodiscard]]
-	Poco::UInt32 getUncompressedSize() const;
+	[[nodiscard]] Poco::UInt32 getUncompressedSize() const;
 
 	void setUncompressedSize(Poco::UInt32 size);
 
-	[[nodiscard]]
-	static Poco::UInt32 getFullHeaderSize();
+	[[nodiscard]] static Poco::UInt32 getFullHeaderSize();
 
-	[[nodiscard]]
-	const char* getRawHeader() const;
+	[[nodiscard]] const char* getRawHeader() const;
 
 private:
 	enum
@@ -98,16 +92,13 @@ public:
 	~ZipDataInfo64();
 		/// Destroys the ZipDataInfo64.
 
-	[[nodiscard]]
-	bool isValid() const;
+	[[nodiscard]] bool isValid() const;
 
-	[[nodiscard]]
-	Poco::UInt32 getCRC32() const;
+	[[nodiscard]] Poco::UInt32 getCRC32() const;
 
 	void setCRC32(Poco::UInt32 crc);
 
-	[[nodiscard]]
-	Poco::UInt64 getCompressedSize() const;
+	[[nodiscard]] Poco::UInt64 getCompressedSize() const;
 
 	void setCompressedSize(Poco::UInt64 size);
 
@@ -115,11 +106,9 @@ public:
 
 	void setUncompressedSize(Poco::UInt64 size);
 
-	[[nodiscard]]
-	static Poco::UInt32 getFullHeaderSize();
+	[[nodiscard]] static Poco::UInt32 getFullHeaderSize();
 
-	[[nodiscard]]
-	const char* getRawHeader() const;
+	[[nodiscard]] const char* getRawHeader() const;
 
 private:
 	enum

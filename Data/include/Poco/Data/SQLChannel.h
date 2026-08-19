@@ -83,8 +83,7 @@ public:
 		{
 		}
 
-		[[nodiscard]]
-		const Poco::Message& message() const
+		[[nodiscard]] const Poco::Message& message() const
 		{
 			return _message;
 		}
@@ -126,8 +125,7 @@ public:
 	void run() override;
 		/// Dequeues and sends the logs to the DB.
 
-	[[nodiscard]]
-	bool isRunning() const;
+	[[nodiscard]] bool isRunning() const;
 		/// Returns true if the logging thread is running.
 
 	void log(const Message& msg) override;
@@ -209,8 +207,7 @@ public:
 		/// Waits for the completion of the previous operation and returns
 		/// the result. If chanel is in synchronous mode, returns 0 immediately.
 
-	[[nodiscard]]
-	size_t logged() const;
+	[[nodiscard]] size_t logged() const;
 		/// Returns the number of logged entries.
 
 	static void registerChannel();
@@ -277,15 +274,13 @@ private:
 		/// Adds the message to the local SQLChannel log queue, and logs it to the file.
 		/// Typically used to log DB connection/execution erors.
 
-	[[nodiscard]]
-	std::string maskPwd();
+	[[nodiscard]] std::string maskPwd();
 		/// Masks the password in the connection
 		/// string, if detected. This is not a
 		/// bullet-proof method; if not succesful,
 		/// empty string is returned.
 
-	[[nodiscard]]
-	bool shouldFlush() const;
+	[[nodiscard]] bool shouldFlush() const;
 		/// Returns true if there are unflushed log entries
 		/// and the flush timer has expired.
 

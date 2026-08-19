@@ -67,8 +67,7 @@ public:
 	~RSADigestEngine();
 		/// Destroys the RSADigestEngine.
 
-	[[nodiscard]]
-	std::size_t digestLength() const;
+	[[nodiscard]] std::size_t digestLength() const;
 		/// Returns the length of the digest in bytes.
 
 	void reset();
@@ -89,8 +88,7 @@ public:
 		///
 		/// Can be called multiple times.
 
-	[[nodiscard]]
-	bool verify(const DigestEngine::Digest& signature);
+	[[nodiscard]] bool verify(const DigestEngine::Digest& signature);
 		/// Verifies the data against the signature.
 		///
 		/// Returns true if the signature can be verified, false otherwise.

@@ -60,8 +60,7 @@ public:
 	DigestIOS(DigestEngine& eng, std::istream& istr);
 	DigestIOS(DigestEngine& eng, std::ostream& ostr);
 	~DigestIOS() override;
-	[[nodiscard]]
-	DigestBuf* rdbuf();
+	[[nodiscard]] DigestBuf* rdbuf();
 
 protected:
 	DigestBuf _buf;

@@ -64,8 +64,7 @@ public:
 		///
 		/// Specify 0 for an unlimited line length.
 
-	[[nodiscard]]
-	int getLineLength() const;
+	[[nodiscard]] int getLineLength() const;
 		/// Returns the currently set line length.
 
 private:
@@ -99,8 +98,7 @@ public:
 	Base64EncoderIOS(std::ostream& ostr, int options = 0);
 	~Base64EncoderIOS() override;
 	int close();
-	[[nodiscard]]
-	Base64EncoderBuf* rdbuf();
+	[[nodiscard]] Base64EncoderBuf* rdbuf();
 
 protected:
 	Base64EncoderBuf _buf;

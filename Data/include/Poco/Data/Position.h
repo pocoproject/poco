@@ -35,8 +35,7 @@ public:
 	~Position();
 		/// Destroys the Position.
 
-	[[nodiscard]]
-	Poco::UInt32 value() const;
+	[[nodiscard]] Poco::UInt32 value() const;
 		/// Returns the position value.
 
 private:

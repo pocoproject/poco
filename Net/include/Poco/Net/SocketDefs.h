@@ -377,8 +377,7 @@ namespace Poco::Net {
 
 typedef std::vector<SocketBuf> SocketBufVec;
 
-[[nodiscard]]
-inline int SocketBufVecSize(const SocketBufVec& sbv)
+[[nodiscard]] inline int SocketBufVecSize(const SocketBufVec& sbv)
 	/// Returns total length of all SocketBufs in the vector.
 {
 	std::size_t sz = 0;

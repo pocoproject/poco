@@ -16,24 +16,21 @@ namespace CppUnit {
 
 
 // Create a std::string from a const char pointer
-[[nodiscard]]
-inline std::string estring(const char *cstring)
+[[nodiscard]] inline std::string estring(const char *cstring)
 {
 	return std::string(cstring);
 }
 
 
 // Create a std::string from a std::string (for uniformities' sake)
-[[nodiscard]]
-inline std::string estring(std::string& expandedString)
+[[nodiscard]] inline std::string estring(std::string& expandedString)
 {
 	return expandedString;
 }
 
 
 // Create a std::string from an int
-[[nodiscard]]
-inline std::string estring(int number)
+[[nodiscard]] inline std::string estring(int number)
 {
 	char buffer[50];
 	std::snprintf(buffer, sizeof(buffer), "%d", number);
@@ -42,8 +39,7 @@ inline std::string estring(int number)
 
 
 // Create a string from a long
-[[nodiscard]]
-inline std::string estring(long number)
+[[nodiscard]] inline std::string estring(long number)
 {
 	char buffer[50];
 	std::snprintf(buffer, sizeof(buffer), "%ld", number);
@@ -52,8 +48,7 @@ inline std::string estring(long number)
 
 
 // Create a std::string from a double
-[[nodiscard]]
-inline std::string estring(double number)
+[[nodiscard]] inline std::string estring(double number)
 {
 	char buffer[50];
 	std::snprintf(buffer, sizeof(buffer), "%lf", number);
@@ -62,8 +57,7 @@ inline std::string estring(double number)
 
 
 // Create a std::string from a double
-[[nodiscard]]
-inline std::string estring(const void* ptr)
+[[nodiscard]] inline std::string estring(const void* ptr)
 {
 	char buffer[50];
 	std::snprintf(buffer, sizeof(buffer), "%p", ptr);

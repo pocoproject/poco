@@ -104,9 +104,9 @@ void HashTableTest::testSize()
 {
 	HashTable<std::string, int> hashTable(13);
 	assertTrue (hashTable.size() == 0);
-	[[maybe_unused]] Poco::UInt32 h1 = hashTable.insert("1", 1);
+	(void) hashTable.insert("1", 1);
 	assertTrue (hashTable.size() == 1);
-	[[maybe_unused]] Poco::UInt32 h2 = hashTable.update("2", 2);
+	(void) hashTable.update("2", 2);
 	assertTrue (hashTable.size() == 2);
 	hashTable.remove("1");
 	assertTrue (hashTable.size() == 1);

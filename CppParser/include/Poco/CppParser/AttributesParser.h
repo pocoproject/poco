@@ -63,14 +63,10 @@ protected:
 	const Poco::Token* parseIdentifier(const Poco::Token* pNext, std::string& id);
 	const Poco::Token* next();
 
-	[[nodiscard]]
-	static bool isIdentifier(const Poco::Token* pToken);
-	[[nodiscard]]
-	static bool isOperator(const Poco::Token* pToken, int kind);
-	[[nodiscard]]
-	static bool isLiteral(const Poco::Token* pToken);
-	[[nodiscard]]
-	static bool isEOF(const Poco::Token* pToken);
+	[[nodiscard]] static bool isIdentifier(const Poco::Token* pToken);
+	[[nodiscard]] static bool isOperator(const Poco::Token* pToken, int kind);
+	[[nodiscard]] static bool isLiteral(const Poco::Token* pToken);
+	[[nodiscard]] static bool isEOF(const Poco::Token* pToken);
 
 private:
 	Attributes& _attrs;

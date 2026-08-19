@@ -118,8 +118,7 @@ public:
 		///   * NEWLINE_LF      (Unix),
 		///   * NEWLINE_CR      (Macintosh)
 
-	[[nodiscard]]
-	const std::string& getNewLine() const;
+	[[nodiscard]] const std::string& getNewLine() const;
 		/// Returns the line ending currently in use.
 
 	void setIndent(const std::string& indent);
@@ -130,8 +129,7 @@ public:
 		/// characters (e.g., a single TAB character, or
 		/// two to four SPACE characters).
 
-	[[nodiscard]]
-	const std::string& getIndent() const;
+	[[nodiscard]] const std::string& getIndent() const;
 		/// Returns the string used for one indentation step.
 
 	// ContentHandler
@@ -262,19 +260,16 @@ public:
 	static const std::string NEWLINE_LF;
 
 	// Namespace support.
-	[[nodiscard]]
-	XMLString uniquePrefix();
+	[[nodiscard]] XMLString uniquePrefix();
 		/// Creates and returns a unique namespace prefix that
 		/// can be used with startPrefixMapping().
 
-	[[nodiscard]]
-	bool isNamespaceMapped(const XMLString& namespc) const;
+	[[nodiscard]] bool isNamespaceMapped(const XMLString& namespc) const;
 		/// Returns true if the given namespace has been mapped
 		/// to a prefix in the current element or its ancestors.
 
 	// Misc.
-	[[nodiscard]]
-	int depth() const;
+	[[nodiscard]] int depth() const;
 		/// Return the number of nested XML elements.
 		///
 		/// Will be -1 if no document or fragment has been started,
@@ -307,8 +302,7 @@ protected:
 	void writeAttributes(const AttributeMap& attributeMap);
 	void writeAttributes(const CanonicalAttributeMap& attributeMap);
 	void prettyPrint() const;
-	[[nodiscard]]
-	static std::string nameToString(const XMLString& localName, const XMLString& qname);
+	[[nodiscard]] static std::string nameToString(const XMLString& localName, const XMLString& qname);
 
 private:
 	struct Namespace

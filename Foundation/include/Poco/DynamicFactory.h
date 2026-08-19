@@ -53,8 +53,7 @@ public:
 	DynamicFactory(const DynamicFactory&) = delete;
 	DynamicFactory& operator=(const DynamicFactory&) = delete;
 
-	[[nodiscard]]
-	Base* createInstance(const std::string& className) const
+	[[nodiscard]] Base* createInstance(const std::string& className) const
 		/// Creates a new instance of the class with the given name.
 		/// The class must have been registered with registerClass.
 		/// If the class name is unknown, a NotFoundException is thrown.
@@ -115,8 +114,7 @@ public:
 		else throw NotFoundException(className);
 	}
 
-	[[nodiscard]]
-	bool isClass(const std::string& className) const
+	[[nodiscard]] bool isClass(const std::string& className) const
 		/// Returns true iff the given class has been registered.
 	{
 		FastMutex::ScopedLock lock(_mutex);

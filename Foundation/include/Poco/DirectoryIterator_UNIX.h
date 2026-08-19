@@ -34,10 +34,8 @@ public:
 	void duplicate();
 	void release();
 
-	[[nodiscard]]
-	const std::string& get() const;
-	[[nodiscard]]
-	const std::string& next();
+	[[nodiscard]] const std::string& get() const;
+	[[nodiscard]] const std::string& next();
 
 private:
 	DIR*        _pDir;

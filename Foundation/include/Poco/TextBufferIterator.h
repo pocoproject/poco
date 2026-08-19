@@ -92,19 +92,16 @@ public:
 	TextBufferIterator& operator ++ ();
 		/// Prefix increment operator.
 
-	TextBufferIterator operator ++ ([[maybe_unused]] int n);
+	TextBufferIterator operator ++ (int);
 		/// Postfix increment operator.
 
-	[[nodiscard]]
-	bool operator == (const TextBufferIterator& it) const;
+	[[nodiscard]] bool operator == (const TextBufferIterator& it) const;
 		/// Compares two iterators for equality.
 
-	[[nodiscard]]
-	bool operator != (const TextBufferIterator& it) const;
+	[[nodiscard]] bool operator != (const TextBufferIterator& it) const;
 		/// Compares two iterators for inequality.
 
-	[[nodiscard]]
-	TextBufferIterator end() const;
+	[[nodiscard]] TextBufferIterator end() const;
 		/// Returns the end iterator for the range handled
 		/// by the iterator.
 

@@ -50,13 +50,13 @@ void SessionPoolTest::testSessionPool()
 
 	pool.setFeature("f1", true);
 	assertTrue (pool.getFeature("f1"));
-	try { [[maybe_unused]] bool b = pool.getFeature("g1"); fail ("must fail"); }
-	catch ( [[maybe_unused]] Poco::NotFoundException& e ) { }
+	try { (void) pool.getFeature("g1"); fail ("must fail"); }
+	catch ( Poco::NotFoundException& ) { }
 
 	pool.setProperty("p1", 1);
 	assertTrue (1 == Poco::AnyCast<int>(pool.getProperty("p1")));
-	try { [[maybe_unused]] Poco::Any i = pool.getProperty("r1"); fail ("must fail"); }
-	catch ( [[maybe_unused]] Poco::NotFoundException& e ) { }
+	try { (void) pool.getProperty("r1"); fail ("must fail"); }
+	catch ( Poco::NotFoundException& ) { }
 
 	assertTrue (pool.capacity() == 4);
 	assertTrue (pool.allocated() == 0);
@@ -71,10 +71,10 @@ void SessionPoolTest::testSessionPool()
 	assertTrue (1 == Poco::AnyCast<int>(s1.getProperty("p1")));
 
 	try { pool.setFeature("f1", true); fail ("must fail"); }
-	catch ( [[maybe_unused]] Poco::InvalidAccessException& e ) { }
+	catch ( Poco::InvalidAccessException& ) { }
 
 	try { pool.setProperty("p1", 1); fail ("must fail"); }
-	catch ( [[maybe_unused]] Poco::InvalidAccessException& e ) { }
+	catch ( Poco::InvalidAccessException& ) { }
 
 	assertTrue (pool.capacity() == 4);
 	assertTrue (pool.allocated() == 1);
@@ -145,7 +145,7 @@ void SessionPoolTest::testSessionPool()
 		Session s6(pool.get());
 		fail("pool exhausted - must throw");
 	}
-	catch ([[maybe_unused]] SessionPoolExhaustedException& e) { }
+	catch (SessionPoolExhaustedException&) { }
 
 	s5.close();
 	assertTrue (pool.capacity() == 4);
@@ -161,7 +161,7 @@ void SessionPoolTest::testSessionPool()
 		s5 << "DROP TABLE IF EXISTS Test", now;
 		fail("session unusable - must throw");
 	}
-	catch ([[maybe_unused]] SessionUnavailableException& e) { }
+	catch (SessionUnavailableException&) { }
 
 	s4.close();
 	assertTrue (pool.capacity() == 4);
@@ -211,7 +211,7 @@ void SessionPoolTest::testSessionPool()
 		Session s7(pool.get());
 		fail("pool shut down - must throw");
 	}
-	catch ([[maybe_unused]] InvalidAccessException& e) { }
+	catch (InvalidAccessException&) { }
 
 	assertTrue (pool.capacity() == 4);
 	assertTrue (pool.allocated() == 0);
@@ -240,7 +240,7 @@ void SessionPoolTest::testSessionPoolContainer()
 	assertTrue ("test:///Cs" == sess.uri());
 
 	try { spc.add(pPool); fail ("must fail"); }
-	catch ([[maybe_unused]] SessionPoolExistsException& e) { }
+	catch (SessionPoolExistsException&) { }
 	pPool->shutdown();
 	assertTrue (!pPool->isActive());
 	assertTrue (!spc.isActive("test", "cs"));
@@ -250,16 +250,16 @@ void SessionPoolTest::testSessionPoolContainer()
 	assertTrue (!spc.isActive("test", "cs"));
 	assertTrue (!spc.isActive("test:///cs"));
 	assertTrue (0 == spc.count());
-	try { [[maybe_unused]] Session s = spc.get("test"); fail ("must fail"); }
-	catch ([[maybe_unused]] NotFoundException& e) { }
+	try { (void) spc.get("test"); fail ("must fail"); }
+	catch (NotFoundException&) { }
 
 	spc.add("tEsT", "cs");
 	spc.add("TeSt", "cs");//duplicate request, must be silently ignored
 	assertTrue (1 == spc.count());
 	spc.remove("TesT:///cs");
 	assertTrue (0 == spc.count());
-	try { [[maybe_unused]] Session s = spc.get("test"); fail ("must fail"); }
-	catch ([[maybe_unused]] NotFoundException& e) { }
+	try { (void) spc.get("test"); fail ("must fail"); }
+	catch (NotFoundException&) { }
 }
 
 

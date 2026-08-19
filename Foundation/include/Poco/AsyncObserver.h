@@ -93,8 +93,7 @@ public:
 		_nq.enqueueNotification(NotificationPtr(static_cast<N*>(pNf), true));
 	}
 
-	[[nodiscard]]
-	virtual AbstractObserver* clone() const
+	[[nodiscard]] virtual AbstractObserver* clone() const
 	{
 		return new AsyncObserver(*this);
 	}
@@ -131,8 +130,7 @@ public:
 		NObserver<C, N>::disable();
 	}
 
-	[[nodiscard]]
-	virtual int backlog() const
+	[[nodiscard]] virtual int backlog() const
 	{
 		return _nq.size();
 	}

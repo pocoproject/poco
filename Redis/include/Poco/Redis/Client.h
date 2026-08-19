@@ -103,8 +103,7 @@ public:
 	virtual ~Client();
 		/// Destroys the Client.
 
-	[[nodiscard]]
-	Net::SocketAddress address() const;
+	[[nodiscard]] Net::SocketAddress address() const;
 		/// Returns the address of the Redis connection.
 
 	void connect(const std::string& hostAndPort);
@@ -135,8 +134,7 @@ public:
 	void disconnect();
 		/// Disconnects from the Redis server.
 
-	[[nodiscard]]
-	bool isConnected() const;
+	[[nodiscard]] bool isConnected() const;
 		/// Returns true iff the Client is connected to a Redis server.
 
 	template <typename T>
@@ -201,8 +199,7 @@ public:
 	void setReceiveTimeout(const Timespan& timeout);
 		/// Sets a receive timeout.
 
-	[[nodiscard]]
-	NotificationCenterPtr notificationCenter();
+	[[nodiscard]] NotificationCenterPtr notificationCenter();
 		/// Returns the notification center for this client.
 
 private:

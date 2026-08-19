@@ -50,40 +50,32 @@ public:
 	Exception& operator = (const Exception& exc);
 		/// Assignment operator.
 
-	[[nodiscard]]
-	virtual const char* name() const noexcept;
+	[[nodiscard]] virtual const char* name() const noexcept;
 		/// Returns a static string describing the exception.
 
-	[[nodiscard]]
-	virtual const char* className() const noexcept;
+	[[nodiscard]] virtual const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
-	[[nodiscard]]
-	const char* what() const noexcept override;
+	[[nodiscard]] const char* what() const noexcept override;
 		/// Returns a static string describing the exception.
 		///
 		/// Same as name(), but for compatibility with std::exception.
 
-	[[nodiscard]]
-	const Exception* nested() const;
+	[[nodiscard]] const Exception* nested() const;
 		/// Returns a pointer to the nested exception, or
 		/// null if no nested exception exists.
 
-	[[nodiscard]]
-	const std::string& message() const;
+	[[nodiscard]] const std::string& message() const;
 		/// Returns the message text.
 
-	[[nodiscard]]
-	int code() const;
+	[[nodiscard]] int code() const;
 		/// Returns the exception code if defined.
 
-	[[nodiscard]]
-	std::string displayText() const;
+	[[nodiscard]] std::string displayText() const;
 		/// Returns a string consisting of the
 		/// message name and the message text.
 
-	[[nodiscard]]
-	virtual Exception* clone() const;
+	[[nodiscard]] virtual Exception* clone() const;
 		/// Creates an exact copy of the exception.
 		///
 		/// The copy can later be thrown again by

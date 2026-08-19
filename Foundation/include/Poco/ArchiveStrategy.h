@@ -48,12 +48,10 @@ public:
 	ArchiveStrategy();
 	virtual ~ArchiveStrategy();
 
-	[[nodiscard]]
-	virtual LogFile* open(LogFile* pFile) = 0;
+	[[nodiscard]] virtual LogFile* open(LogFile* pFile) = 0;
 		/// Open a new log file and return it.
 
-	[[nodiscard]]
-	virtual LogFile* archive(LogFile* pFile) = 0;
+	[[nodiscard]] virtual LogFile* archive(LogFile* pFile) = 0;
 		/// Renames the given log file for archiving
 		/// and creates and returns a new log file.
 		/// The given LogFile object is deleted.
@@ -69,8 +67,7 @@ public:
 
 protected:
 	void moveFile(const std::string& oldName, const std::string& newName);
-	[[nodiscard]]
-	bool exists(const std::string& name);
+	[[nodiscard]] bool exists(const std::string& name);
 
 	Poco::FastMutex _rotateMutex;
 
@@ -104,10 +101,8 @@ public:
 	ArchiveByNumberStrategy();
 	~ArchiveByNumberStrategy() override;
 
-	[[nodiscard]]
-	LogFile* open(LogFile *pFile) override;
-	[[nodiscard]]
-	LogFile* archive(LogFile *pFile) override;
+	[[nodiscard]] LogFile* open(LogFile *pFile) override;
+	[[nodiscard]] LogFile* archive(LogFile *pFile) override;
 };
 
 
@@ -121,14 +116,12 @@ public:
 
 	~ArchiveByTimestampStrategy() override = default;
 
-	[[nodiscard]]
-	LogFile* open(LogFile* pFile) override
+	[[nodiscard]] LogFile* open(LogFile* pFile) override
 	{
 		return pFile;
 	}
 
-	[[nodiscard]]
-	LogFile* archive(LogFile* pFile) override
+	[[nodiscard]] LogFile* archive(LogFile* pFile) override
 	/// Archives the file by appending the current timestamp to the
 	/// file name. If the new file name exists, additionally a monotonic
 	/// increasing number is appended to the log file name.

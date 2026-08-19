@@ -70,8 +70,7 @@ public:
 	~Glob();
 		/// Destroys the Glob.
 
-	[[nodiscard]]
-	bool match(const std::string& subject);
+	[[nodiscard]] bool match(const std::string& subject);
 		/// Matches the given subject against the glob pattern.
 		/// Returns true if the subject matches the pattern, false
 		/// otherwise.
@@ -131,15 +130,11 @@ public:
 		/// ignored.
 
 protected:
-	[[nodiscard]]
-	bool match(TextIterator& itp, const TextIterator& endp, TextIterator& its, const TextIterator& ends);
-	[[nodiscard]]
-	bool matchAfterAsterisk(TextIterator itp, const TextIterator& endp, TextIterator its, const TextIterator& ends);
-	[[nodiscard]]
-	bool matchSet(TextIterator& itp, const TextIterator& endp, int c);
+	[[nodiscard]] bool match(TextIterator& itp, const TextIterator& endp, TextIterator& its, const TextIterator& ends);
+	[[nodiscard]] bool matchAfterAsterisk(TextIterator itp, const TextIterator& endp, TextIterator its, const TextIterator& ends);
+	[[nodiscard]] bool matchSet(TextIterator& itp, const TextIterator& endp, int c);
 	static void collect(const Path& pathPattern, const Path& base, const Path& current, const std::string& pattern, std::set<std::string>& files, int options);
-	[[nodiscard]]
-	static bool isDirectory(const Path& path, bool followSymlink);
+	[[nodiscard]] static bool isDirectory(const Path& path, bool followSymlink);
 
 private:
 	std::string _pattern;

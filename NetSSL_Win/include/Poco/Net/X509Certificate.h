@@ -90,28 +90,23 @@ public:
 	~X509Certificate();
 		/// Destroys the X509Certificate.
 
-	[[nodiscard]]
-	const std::string& issuerName() const;
+	[[nodiscard]] const std::string& issuerName() const;
 		/// Returns the certificate issuer's distinguished name.
 
-	[[nodiscard]]
-	std::string issuerName(NID nid) const;
+	[[nodiscard]] std::string issuerName(NID nid) const;
 		/// Extracts the information specified by the given
 		/// NID (name identifier) from the certificate issuer's
 		/// distinguished name.
 
-	[[nodiscard]]
-	const std::string& subjectName() const;
+	[[nodiscard]] const std::string& subjectName() const;
 		/// Returns the certificate subject's distinguished name.
 
-	[[nodiscard]]
-	std::string subjectName(NID nid) const;
+	[[nodiscard]] std::string subjectName(NID nid) const;
 		/// Extracts the information specified by the given
 		/// NID (name identifier) from the certificate subject's
 		/// distinguished name.
 
-	[[nodiscard]]
-	std::string commonName() const;
+	[[nodiscard]] std::string commonName() const;
 		/// Returns the common name stored in the certificate
 		/// subject's distinguished name.
 
@@ -119,16 +114,13 @@ public:
 		/// Extracts the common name and the alias domain names from the
 		/// certificate.
 
-	[[nodiscard]]
-	Poco::DateTime validFrom() const;
+	[[nodiscard]] Poco::DateTime validFrom() const;
 		/// Returns the date and time the certificate is valid from.
 
-	[[nodiscard]]
-	Poco::DateTime expiresOn() const;
+	[[nodiscard]] Poco::DateTime expiresOn() const;
 		/// Returns the date and time the certificate expires.
 
-	[[nodiscard]]
-	bool issuedBy(const X509Certificate& issuerCertificate) const;
+	[[nodiscard]] bool issuedBy(const X509Certificate& issuerCertificate) const;
 		/// Checks whether the certificate has been issued by
 		/// the issuer given by issuerCertificate. This can be
 		/// used to validate a certificate chain.
@@ -139,8 +131,7 @@ public:
 		/// Returns true if verification against the issuer certificate
 		/// was successful, false otherwise.
 
-	[[nodiscard]]
-	bool verify(const std::string& hostName) const;
+	[[nodiscard]] bool verify(const std::string& hostName) const;
 		/// Verifies the validity of the certificate against the host name.
 		///
 		/// For this check to be successful, the certificate must contain
@@ -149,8 +140,7 @@ public:
 		///
 		/// Returns true if verification succeeded, or false otherwise.
 
-	[[nodiscard]]
-	static bool verify(const Poco::Net::X509Certificate& cert, const std::string& hostName);
+	[[nodiscard]] static bool verify(const Poco::Net::X509Certificate& cert, const std::string& hostName);
 		/// Verifies the validity of the certificate against the host name.
 		///
 		/// For this check to be successful, the certificate must contain
@@ -159,16 +149,14 @@ public:
 		///
 		/// Returns true if verification succeeded, or false otherwise.
 
-	[[nodiscard]]
-	const PCCERT_CONTEXT system() const;
+	[[nodiscard]] const PCCERT_CONTEXT system() const;
 		/// Returns the underlying WinCrypt certificate.
 
 protected:
 	void init();
 		/// Extracts issuer and subject name from the certificate.
 
-	[[nodiscard]]
-	static void* nid2oid(NID nid);
+	[[nodiscard]] static void* nid2oid(NID nid);
 		/// Returns the OID for the given NID.
 
 	void loadCertificate(const std::string& certName, const std::string& certStoreName, bool useMachineStore);
@@ -178,10 +166,8 @@ protected:
 	void importPEMCertificate(const char* pBuffer, std::size_t size);
 	void importDERCertificate(const char* pBuffer, std::size_t size);
 
-	[[nodiscard]]
-	static bool containsWildcards(const std::string& commonName);
-	[[nodiscard]]
-	static bool matchWildcard(const std::string& alias, const std::string& hostName);
+	[[nodiscard]] static bool containsWildcards(const std::string& commonName);
+	[[nodiscard]] static bool matchWildcard(const std::string& alias, const std::string& hostName);
 
 private:
 	std::string _issuerName;

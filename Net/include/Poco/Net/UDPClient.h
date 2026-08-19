@@ -50,12 +50,10 @@ public:
 	void run();
 		/// Runs listener (typically invoked internally, in separate thread).
 
-	[[nodiscard]]
-	SocketAddress address() const;
+	[[nodiscard]] SocketAddress address() const;
 		/// Returns client address.
 
-	[[nodiscard]]
-	SocketAddress peerAddress() const;
+	[[nodiscard]] SocketAddress peerAddress() const;
 		/// Returns server address.
 
 	int send(void* data, int length);
@@ -71,19 +69,16 @@ public:
 	void setOption(int opt, int val);
 		/// Sets socket option.
 
-	[[nodiscard]]
-	int getOption(int opt);
+	[[nodiscard]] int getOption(int opt);
 		/// Returns socket option.
 
 	void stop();
 		/// Stops the server reply receiving thread, if running.
 
-	[[nodiscard]]
-	int dataBacklog() const;
+	[[nodiscard]] int dataBacklog() const;
 		/// Returns current server data backlog.
 
-	[[nodiscard]]
-	int errorBacklog();
+	[[nodiscard]] int errorBacklog();
 		/// Returns current server error backlog.
 
 private:

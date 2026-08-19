@@ -68,8 +68,7 @@ public:
 		///
 		/// Does nothing if no collector with the given name has been registered.
 
-	[[nodiscard]]
-	Collector* findCollector(const std::string& collectorName) const;
+	[[nodiscard]] Collector* findCollector(const std::string& collectorName) const;
 		/// Looks up the Collector with the given name.
 		///
 		/// Returns a pointer to the collector instance if found,
@@ -81,8 +80,7 @@ public:
 	void exportTo(Exporter& exporter) const;
 		/// Exports all registered collector's metrics through the given Exporter.
 
-	[[nodiscard]]
-	static Registry& defaultRegistry();
+	[[nodiscard]] static Registry& defaultRegistry();
 		/// Returns the default Registry.
 
 private:

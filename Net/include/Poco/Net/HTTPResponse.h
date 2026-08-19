@@ -144,8 +144,7 @@ public:
 		///
 		/// Does not change the reason phrase.
 
-	[[nodiscard]]
-	HTTPStatus getStatus() const;
+	[[nodiscard]] HTTPStatus getStatus() const;
 		/// Returns the HTTP status code.
 
 	void setStatus(const std::string& status);
@@ -157,8 +156,7 @@ public:
 	void setReason(const std::string& reason);
 		/// Sets the HTTP reason phrase.
 
-	[[nodiscard]]
-	const std::string& getReason() const;
+	[[nodiscard]] const std::string& getReason() const;
 		/// Returns the HTTP reason phrase.
 
 	void setStatusAndReason(HTTPStatus status, const std::string& reason);
@@ -172,8 +170,7 @@ public:
 	void setDate(const Poco::Timestamp& dateTime);
 		/// Sets the Date header to the given date/time value.
 
-	[[nodiscard]]
-	Poco::Timestamp getDate() const;
+	[[nodiscard]] Poco::Timestamp getDate() const;
 		/// Returns the value of the Date header.
 
 	void addCookie(const HTTPCookie& cookie);
@@ -206,8 +203,7 @@ public:
 		///
 		/// 100 Continue responses are ignored.
 
-	[[nodiscard]]
-	static const std::string& getReasonForStatus(HTTPStatus status);
+	[[nodiscard]] static const std::string& getReasonForStatus(HTTPStatus status);
 		/// Returns an appropriate reason phrase
 		/// for the given status code.
 

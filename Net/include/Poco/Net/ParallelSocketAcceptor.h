@@ -138,13 +138,12 @@ public:
 	{
 		StreamSocket sock = _socket.acceptConnection();
 		_pReactor->wakeUp();
-		[[maybe_unused]] ServiceHandler* handler = createServiceHandler(sock);
+		(void) createServiceHandler(sock);
 	}
 
 protected:
 	using ReactorVec = std::vector<typename ParallelReactor::Ptr>;
 
-	[[nodiscard]]
 	virtual ServiceHandler* createServiceHandler(StreamSocket& socket)
 		/// Create and initialize a new ServiceHandler instance.
 		/// If socket is already registered with a reactor, the new
@@ -165,8 +164,7 @@ protected:
 		return new ServiceHandler(socket, *pReactor);
 	}
 
-	[[nodiscard]]
-	SocketReactor* reactor(const Socket& socket)
+	[[nodiscard]] SocketReactor* reactor(const Socket& socket)
 		/// Returns reactor where this socket is already registered
 		/// for polling, if found; otherwise returns null pointer.
 	{
@@ -179,8 +177,7 @@ protected:
 		return nullptr;
 	}
 
-	[[nodiscard]]
-	SocketReactor* reactor()
+	[[nodiscard]] SocketReactor* reactor()
 		/// Returns a pointer to the SocketReactor where
 		/// this SocketAcceptor is registered.
 		///
@@ -189,8 +186,7 @@ protected:
 		return _pReactor;
 	}
 
-	[[nodiscard]]
-	Socket& socket()
+	[[nodiscard]] Socket& socket()
 		/// Returns a reference to the SocketAcceptor's socket.
 	{
 		return _socket;
@@ -205,22 +201,19 @@ protected:
 			_reactors.push_back(new ParallelReactor(_threadName + "#" + std::to_string(i)));
 	}
 
-	[[nodiscard]]
-	ReactorVec& reactors()
+	[[nodiscard]] ReactorVec& reactors()
 		/// Returns reference to vector of reactors.
 	{
 		return _reactors;
 	}
 
-	[[nodiscard]]
-	SocketReactor* reactor(std::size_t idx)
+	[[nodiscard]] SocketReactor* reactor(std::size_t idx)
 		/// Returns reference to the reactor at position idx.
 	{
 		return _reactors.at(idx).get();
 	}
 
-	[[nodiscard]]
-	std::size_t next()
+	[[nodiscard]] std::size_t next()
 		/// Returns the next reactor index.
 	{
 		return _next;

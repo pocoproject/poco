@@ -61,19 +61,16 @@ public:
 	~Envelope();
 		/// Destroys the Envelope.
 
-	[[nodiscard]]
-	const ByteVec& iv() const;
+	[[nodiscard]] const ByteVec& iv() const;
 		/// Returns the initialization vector.
 
 	void addKey(const EVPPKey& key);
 		/// Adds the key to the list of private keys.
 
-	[[nodiscard]]
-	const EncKeyVec& keys() const;
+	[[nodiscard]] const EncKeyVec& keys() const;
 		/// Returns encrypted symmetric keys.
 
-	[[nodiscard]]
-	int cipherNID() const;
+	[[nodiscard]] int cipherNID() const;
 		/// Reurns the cipher NID.
 
 	const ByteVec& seal(const std::string& plainText);
@@ -82,8 +79,7 @@ public:
 	const ByteVec& seal(const ByteVec& plainData);
 		/// Encrypts the given data and returns the encrypted data.
 
-	[[nodiscard]]
-	const ByteVec& getContent() const;
+	[[nodiscard]] const ByteVec& getContent() const;
 		/// Returns the encrypted content.
 	
 	void setContent(const ByteVec& enc);
@@ -95,18 +91,15 @@ public:
 	std::string openAsString(const EVPPKey& privKey, const ByteVec& encKeys, const ByteVec& iv = ByteVec());
 		/// Decrypts the stored encrypted data and returns it.
 
-	[[nodiscard]]
-	static std::string toString(const ByteVec& data);
+	[[nodiscard]] static std::string toString(const ByteVec& data);
 		/// Converts and returns string from ByteVec.
 
 private:
 	Envelope(int cipherNID);
 	Envelope(int cipherNID, const ByteVec& iv);
 
-	[[nodiscard]]
-	int ivSize() const;
-	[[nodiscard]]
-	int blockSize() const;
+	[[nodiscard]] int ivSize() const;
+	[[nodiscard]] int blockSize() const;
 	void handleErrors(std::string&& msg);
 
 	const EVP_CIPHER* _pCipher;

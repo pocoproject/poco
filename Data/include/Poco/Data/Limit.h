@@ -47,24 +47,19 @@ public:
 	~Limit();
 		/// Destroys the Limit.
 
-	[[nodiscard]]
-	SizeT value() const;
+	[[nodiscard]] SizeT value() const;
 		/// Returns the value of the limit
 
-	[[nodiscard]]
-	bool isHardLimit() const;
+	[[nodiscard]] bool isHardLimit() const;
 		/// Returns true if the limit is a hard limit.
 
-	[[nodiscard]]
-	bool isLowerLimit() const;
+	[[nodiscard]] bool isLowerLimit() const;
 		/// Returns true if the limit is a lower limit, otherwise it is an upperLimit
 
-	[[nodiscard]]
-	bool operator == (const Limit& other) const;
+	[[nodiscard]] bool operator == (const Limit& other) const;
 		/// Equality operator.
 
-	[[nodiscard]]
-	bool operator != (const Limit& other) const;
+	[[nodiscard]] bool operator != (const Limit& other) const;
 		/// Inequality operator.
 
 private:

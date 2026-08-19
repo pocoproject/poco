@@ -38,8 +38,7 @@ namespace Poco {
 
 
 template <typename C>
-[[nodiscard]]
-std::size_t cstrlen(const C* str)
+[[nodiscard]] std::size_t cstrlen(const C* str)
 	/// Returns the length of a zero-terminated C string.
 	/// For char and wchar_t based strings, overloads are
 	/// provided that call strlen() and wcslen().
@@ -50,8 +49,7 @@ std::size_t cstrlen(const C* str)
 }
 
 
-[[nodiscard]]
-inline std::size_t cstrlen(const char* str)
+[[nodiscard]] inline std::size_t cstrlen(const char* str)
 	/// Returns the length of a zero-terminated C string.
 	/// This implementation calls std::strlen().
 {
@@ -62,8 +60,7 @@ inline std::size_t cstrlen(const char* str)
 #if !defined(POCO_NO_WSTRING)
 
 
-[[nodiscard]]
-inline std::size_t cstrlen(const wchar_t* str)
+[[nodiscard]] inline std::size_t cstrlen(const wchar_t* str)
 	/// Returns the length of a zero-terminated C string.
 	/// This implementation calls std::wcslen().
 {
@@ -75,8 +72,7 @@ inline std::size_t cstrlen(const wchar_t* str)
 
 
 template <class S>
-[[nodiscard]]
-S trimLeft(const S& str)
+[[nodiscard]] S trimLeft(const S& str)
 	/// Returns a copy of str with all leading
 	/// whitespace removed.
 {
@@ -102,8 +98,7 @@ S& trimLeftInPlace(S& str)
 
 
 template <class S>
-[[nodiscard]]
-S trimRight(const S& str)
+[[nodiscard]] S trimRight(const S& str)
 	/// Returns a copy of str with all trailing
 	/// whitespace removed.
 {
@@ -128,8 +123,7 @@ S& trimRightInPlace(S& str)
 
 
 template <class S>
-[[nodiscard]]
-S trim(const S& str)
+[[nodiscard]] S trim(const S& str)
 	/// Returns a copy of str with all leading and
 	/// trailing whitespace removed.
 {
@@ -163,8 +157,7 @@ S& trimInPlace(S& str)
 
 
 template <class S>
-[[nodiscard]]
-S toUpper(const S& str)
+[[nodiscard]] S toUpper(const S& str)
 	/// Returns a copy of str containing all upper-case characters.
 {
 	S result(str);
@@ -210,8 +203,7 @@ S& toUpperInPlace(S& str)
 
 
 template <class S>
-[[nodiscard]]
-S toLower(const S& str)
+[[nodiscard]] S toLower(const S& str)
 	/// Returns a copy of str containing all lower-case characters.
 {
 	S result(str);
@@ -260,8 +252,7 @@ S& toLowerInPlace(S& str)
 
 
 template <class S, class It>
-[[nodiscard]]
-int icompare(
+[[nodiscard]] int icompare(
 	const S& str,
 	typename S::size_type pos,
 	typename S::size_type n,
@@ -293,8 +284,7 @@ int icompare(
 
 
 template <class S>
-[[nodiscard]]
-int icompare(const S& str1, const S& str2)
+[[nodiscard]] int icompare(const S& str1, const S& str2)
 	// A special optimization for an often used case.
 {
 	typename S::const_iterator it1(str1.begin());
@@ -320,8 +310,7 @@ int icompare(const S& str1, const S& str2)
 
 
 template <class S>
-[[nodiscard]]
-int icompare(const S& str1, typename S::size_type n1, const S& str2, typename S::size_type n2)
+[[nodiscard]] int icompare(const S& str1, typename S::size_type n1, const S& str2, typename S::size_type n2)
 {
 	if (n2 > str2.size()) n2 = str2.size();
 	return icompare(str1, 0, n1, str2.begin(), str2.begin() + n2);
@@ -329,8 +318,7 @@ int icompare(const S& str1, typename S::size_type n1, const S& str2, typename S:
 
 
 template <class S>
-[[nodiscard]]
-int icompare(const S& str1, typename S::size_type n, const S& str2)
+[[nodiscard]] int icompare(const S& str1, typename S::size_type n, const S& str2)
 {
 	if (n > str2.size()) n = str2.size();
 	return icompare(str1, 0, n, str2.begin(), str2.begin() + n);
@@ -338,16 +326,14 @@ int icompare(const S& str1, typename S::size_type n, const S& str2)
 
 
 template <class S>
-[[nodiscard]]
-int icompare(const S& str1, typename S::size_type pos, typename S::size_type n, const S& str2)
+[[nodiscard]] int icompare(const S& str1, typename S::size_type pos, typename S::size_type n, const S& str2)
 {
 	return icompare(str1, pos, n, str2.begin(), str2.end());
 }
 
 
 template <class S>
-[[nodiscard]]
-int icompare(
+[[nodiscard]] int icompare(
 	const S& str1,
 	typename S::size_type pos1,
 	typename S::size_type n1,
@@ -363,8 +349,7 @@ int icompare(
 
 
 template <class S>
-[[nodiscard]]
-int icompare(
+[[nodiscard]] int icompare(
 	const S& str1,
 	typename S::size_type pos1,
 	typename S::size_type n,
@@ -379,8 +364,7 @@ int icompare(
 
 
 template <class S>
-[[nodiscard]]
-int icompare(
+[[nodiscard]] int icompare(
 	const S& str,
 	typename S::size_type pos,
 	typename S::size_type n,
@@ -411,8 +395,7 @@ int icompare(
 
 
 template <class S>
-[[nodiscard]]
-int icompare(
+[[nodiscard]] int icompare(
 	const S& str,
 	typename S::size_type pos,
 	const typename S::value_type* ptr)
@@ -423,8 +406,7 @@ int icompare(
 
 
 template <class S>
-[[nodiscard]]
-int icompare(
+[[nodiscard]] int icompare(
 	const S& str,
 	const typename S::value_type* ptr)
 {
@@ -435,34 +417,23 @@ int icompare(
 #else
 
 
-[[nodiscard]]
-int Foundation_API icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, std::string::const_iterator it2, std::string::const_iterator end2);
-[[nodiscard]]
-int Foundation_API icompare(const std::string& str1, const std::string& str2);
-[[nodiscard]]
-int Foundation_API icompare(const std::string& str1, std::string::size_type n1, const std::string& str2, std::string::size_type n2);
-[[nodiscard]]
-int Foundation_API icompare(const std::string& str1, std::string::size_type n, const std::string& str2);
-[[nodiscard]]
-int Foundation_API icompare(const std::string& str1, std::string::size_type pos, std::string::size_type n, const std::string& str2);
-[[nodiscard]]
-int Foundation_API icompare(const std::string& str1, std::string::size_type pos1, std::string::size_type n1, const std::string& str2, std::string::size_type pos2, std::string::size_type n2);
-[[nodiscard]]
-int Foundation_API icompare(const std::string& str1, std::string::size_type pos1, std::string::size_type n, const std::string& str2, std::string::size_type pos2);
-[[nodiscard]]
-int Foundation_API icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, const std::string::value_type* ptr);
-[[nodiscard]]
-int Foundation_API icompare(const std::string& str, std::string::size_type pos, const std::string::value_type* ptr);
-[[nodiscard]]
-int Foundation_API icompare(const std::string& str, const std::string::value_type* ptr);
+[[nodiscard]] int Foundation_API icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, std::string::const_iterator it2, std::string::const_iterator end2);
+[[nodiscard]] int Foundation_API icompare(const std::string& str1, const std::string& str2);
+[[nodiscard]] int Foundation_API icompare(const std::string& str1, std::string::size_type n1, const std::string& str2, std::string::size_type n2);
+[[nodiscard]] int Foundation_API icompare(const std::string& str1, std::string::size_type n, const std::string& str2);
+[[nodiscard]] int Foundation_API icompare(const std::string& str1, std::string::size_type pos, std::string::size_type n, const std::string& str2);
+[[nodiscard]] int Foundation_API icompare(const std::string& str1, std::string::size_type pos1, std::string::size_type n1, const std::string& str2, std::string::size_type pos2, std::string::size_type n2);
+[[nodiscard]] int Foundation_API icompare(const std::string& str1, std::string::size_type pos1, std::string::size_type n, const std::string& str2, std::string::size_type pos2);
+[[nodiscard]] int Foundation_API icompare(const std::string& str, std::string::size_type pos, std::string::size_type n, const std::string::value_type* ptr);
+[[nodiscard]] int Foundation_API icompare(const std::string& str, std::string::size_type pos, const std::string::value_type* ptr);
+[[nodiscard]] int Foundation_API icompare(const std::string& str, const std::string::value_type* ptr);
 
 
 #endif
 
 
 template <class S>
-[[nodiscard]]
-S translate(const S& str, const S& from, const S& to)
+[[nodiscard]] S translate(const S& str, const S& from, const S& to)
 	/// Returns a copy of str with all characters in
 	/// from replaced by the corresponding (by position)
 	/// characters in to. If there is no corresponding
@@ -492,8 +463,7 @@ S translate(const S& str, const S& from, const S& to)
 
 
 template <class S>
-[[nodiscard]]
-S translate(const S& str, const typename S::value_type* from, const typename S::value_type* to)
+[[nodiscard]] S translate(const S& str, const typename S::value_type* from, const typename S::value_type* to)
 {
 	poco_check_ptr (from);
 	poco_check_ptr (to);
@@ -611,8 +581,7 @@ S& removeInPlace(S& str, const typename S::value_type ch, typename S::size_type 
 
 
 template <class S>
-[[nodiscard]]
-S replace(const S& str, const S& from, const S& to, typename S::size_type start = 0)
+[[nodiscard]] S replace(const S& str, const S& from, const S& to, typename S::size_type start = 0)
 	/// Replace all occurrences of from (which must not be the empty string)
 	/// in str with to, starting at position start.
 {
@@ -623,8 +592,7 @@ S replace(const S& str, const S& from, const S& to, typename S::size_type start 
 
 
 template <class S>
-[[nodiscard]]
-S replace(const S& str, const typename S::value_type* from, const typename S::value_type* to, typename S::size_type start = 0)
+[[nodiscard]] S replace(const S& str, const typename S::value_type* from, const typename S::value_type* to, typename S::size_type start = 0)
 {
 	S result(str);
 	replaceInPlace(result, from, to, start);
@@ -633,8 +601,7 @@ S replace(const S& str, const typename S::value_type* from, const typename S::va
 
 
 template <class S>
-[[nodiscard]]
-S replace(const S& str, const typename S::value_type from, const typename S::value_type to = 0, typename S::size_type start = 0)
+[[nodiscard]] S replace(const S& str, const typename S::value_type from, const typename S::value_type to = 0, typename S::size_type start = 0)
 {
 	S result(str);
 	replaceInPlace(result, from, to, start);
@@ -643,8 +610,7 @@ S replace(const S& str, const typename S::value_type from, const typename S::val
 
 
 template <class S>
-[[nodiscard]]
-S remove(const S& str, const typename S::value_type ch, typename S::size_type start = 0)
+[[nodiscard]] S remove(const S& str, const typename S::value_type ch, typename S::size_type start = 0)
 {
 	S result(str);
 	replaceInPlace(result, ch, 0, start);
@@ -655,14 +621,10 @@ S remove(const S& str, const typename S::value_type ch, typename S::size_type st
 #else
 
 
-[[nodiscard]]
-Foundation_API std::string replace(const std::string& str, const std::string& from, const std::string& to, std::string::size_type start = 0);
-[[nodiscard]]
-Foundation_API std::string replace(const std::string& str, const std::string::value_type* from, const std::string::value_type* to, std::string::size_type start = 0);
-[[nodiscard]]
-Foundation_API std::string replace(const std::string& str, const std::string::value_type from, const std::string::value_type to = 0, std::string::size_type start = 0);
-[[nodiscard]]
-Foundation_API std::string remove(const std::string& str, const std::string::value_type ch, std::string::size_type start = 0);
+[[nodiscard]] Foundation_API std::string replace(const std::string& str, const std::string& from, const std::string& to, std::string::size_type start = 0);
+[[nodiscard]] Foundation_API std::string replace(const std::string& str, const std::string::value_type* from, const std::string::value_type* to, std::string::size_type start = 0);
+[[nodiscard]] Foundation_API std::string replace(const std::string& str, const std::string::value_type from, const std::string::value_type to = 0, std::string::size_type start = 0);
+[[nodiscard]] Foundation_API std::string remove(const std::string& str, const std::string::value_type ch, std::string::size_type start = 0);
 Foundation_API std::string& replaceInPlace(std::string& str, const std::string& from, const std::string& to, std::string::size_type start = 0);
 Foundation_API std::string& replaceInPlace(std::string& str, const std::string::value_type* from, const std::string::value_type* to, std::string::size_type start = 0);
 Foundation_API std::string& replaceInPlace(std::string& str, const std::string::value_type from, const std::string::value_type to = 0, std::string::size_type start = 0);
@@ -673,8 +635,7 @@ Foundation_API std::string& removeInPlace(std::string& str, const std::string::v
 
 
 template <class S>
-[[nodiscard]]
-S cat(const S& s1, const S& s2)
+[[nodiscard]] S cat(const S& s1, const S& s2)
 	/// Concatenates two strings.
 {
 	S result = s1;
@@ -685,8 +646,7 @@ S cat(const S& s1, const S& s2)
 
 
 template <class S>
-[[nodiscard]]
-S cat(const S& s1, const S& s2, const S& s3)
+[[nodiscard]] S cat(const S& s1, const S& s2, const S& s3)
 	/// Concatenates three strings.
 {
 	S result = s1;
@@ -698,8 +658,7 @@ S cat(const S& s1, const S& s2, const S& s3)
 
 
 template <class S>
-[[nodiscard]]
-S cat(const S& s1, const S& s2, const S& s3, const S& s4)
+[[nodiscard]] S cat(const S& s1, const S& s2, const S& s3, const S& s4)
 	/// Concatenates four strings.
 {
 	S result = s1;
@@ -712,8 +671,7 @@ S cat(const S& s1, const S& s2, const S& s3, const S& s4)
 
 
 template <class S>
-[[nodiscard]]
-S cat(const S& s1, const S& s2, const S& s3, const S& s4, const S& s5)
+[[nodiscard]] S cat(const S& s1, const S& s2, const S& s3, const S& s4, const S& s5)
 	/// Concatenates five strings.
 {
 	S result = s1;
@@ -727,8 +685,7 @@ S cat(const S& s1, const S& s2, const S& s3, const S& s4, const S& s5)
 
 
 template <class S>
-[[nodiscard]]
-S cat(const S& s1, const S& s2, const S& s3, const S& s4, const S& s5, const S& s6)
+[[nodiscard]] S cat(const S& s1, const S& s2, const S& s3, const S& s4, const S& s5, const S& s6)
 	/// Concatenates six strings.
 {
 	S result = s1;
@@ -743,8 +700,7 @@ S cat(const S& s1, const S& s2, const S& s3, const S& s4, const S& s5, const S& 
 
 
 template <class S, class It>
-[[nodiscard]]
-S cat(const S& delim, const It& begin, const It& end)
+[[nodiscard]] S cat(const S& delim, const It& begin, const It& end)
 	/// Concatenates a sequence of strings, delimited
 	/// by the string given in delim.
 {
@@ -759,8 +715,7 @@ S cat(const S& delim, const It& begin, const It& end)
 
 
 template <class S>
-[[nodiscard]]
-bool startsWith(const S& str, const S& prefix)
+[[nodiscard]] bool startsWith(const S& str, const S& prefix)
 	/// Tests whether the string starts with the given prefix.
 {
 	return str.size() >= prefix.size() && equal(prefix.begin(), prefix.end(), str.begin());
@@ -768,8 +723,7 @@ bool startsWith(const S& str, const S& prefix)
 
 
 template <class S>
-[[nodiscard]]
-bool endsWith(const S& str, const S& suffix)
+[[nodiscard]] bool endsWith(const S& str, const S& suffix)
 	/// Tests whether the string ends with the given suffix.
 {
 	return str.size() >= suffix.size() && equal(suffix.rbegin(), suffix.rend(), str.rbegin());
@@ -824,8 +778,7 @@ using istring = std::basic_string<char, i_char_traits<char>>;
 
 
 template<typename T>
-[[nodiscard]]
-std::size_t isubstr(const T& str, const T& sought)
+[[nodiscard]] std::size_t isubstr(const T& str, const T& sought)
 	/// Case-insensitive substring; searches for a substring
 	/// without regards to case.
 {

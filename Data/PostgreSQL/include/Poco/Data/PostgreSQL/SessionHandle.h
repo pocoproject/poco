@@ -89,8 +89,7 @@ public:
 
 	void connect(const char* aHost, const char* aUser, const char* aPassword, const char* aDatabase, unsigned short aPort, unsigned int aConnectionTimeout);
 
-	[[nodiscard]]
-	bool isConnected() const;
+	[[nodiscard]] bool isConnected() const;
 		/// is a connection established?
 
 	void disconnect();
@@ -99,15 +98,13 @@ public:
 	bool reset();
 		/// reset the connection
 
-	[[nodiscard]]
-	std::string lastError() const;
+	[[nodiscard]] std::string lastError() const;
 		/// last error on the connection
 
 	void startTransaction();
 		/// Start transaction
 
-	[[nodiscard]]
-	bool isTransaction() const;
+	[[nodiscard]] bool isTransaction() const;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
 
 	void commit();
@@ -116,15 +113,13 @@ public:
 	void rollback();
 		/// Rollback trabsaction
 
-	[[nodiscard]]
-	bool isAutoCommit() const;
+	[[nodiscard]] bool isAutoCommit() const;
 		/// is the connection in auto commit mode?
 
 	void autoCommit(bool val);
 		/// is the connection in auto commit mode?
 
-	[[nodiscard]]
-	bool isAsynchronousCommit() const;
+	[[nodiscard]] bool isAsynchronousCommit() const;
 		/// is the connection in Asynchronous commit mode?
 
 	void setAsynchronousCommit(bool aShouldAsynchronousCommit = true);
@@ -136,73 +131,57 @@ public:
 	void setTransactionIsolation(Poco::UInt32 aTI);
 		/// Sets the transaction isolation level.
 
-	[[nodiscard]]
-	Poco::UInt32 transactionIsolation() const;
+	[[nodiscard]] Poco::UInt32 transactionIsolation() const;
 		/// Returns the transaction isolation level.
 
-	[[nodiscard]]
-	static bool hasTransactionIsolation(Poco::UInt32 aTI);
+	[[nodiscard]] static bool hasTransactionIsolation(Poco::UInt32 aTI);
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
 	void deallocatePreparedStatement(const std::string& aPreparedStatementToDeAllocate);
 		/// deallocates a previously prepared statement
 
-	[[nodiscard]]
-	int serverVersion() const;
+	[[nodiscard]] int serverVersion() const;
 		/// remote server version
 
-	[[nodiscard]]
-	int serverProcessID() const;
+	[[nodiscard]] int serverProcessID() const;
 		/// the process ID of the remotee server process
 
-	[[nodiscard]]
-	int protocoVersion() const;
+	[[nodiscard]] int protocoVersion() const;
 		/// the protocol version between the client and the server
 
-	[[nodiscard]]
-	std::string clientEncoding() const;
+	[[nodiscard]] std::string clientEncoding() const;
 		/// returns the client encoding
 
-	[[nodiscard]]
-	std::string parameterStatus(const std::string& param) const;
+	[[nodiscard]] std::string parameterStatus(const std::string& param) const;
 		/// Returns the value configured on the server for the given parameter.
 
-	[[nodiscard]]
-	int libpqVersion() const;
+	[[nodiscard]] int libpqVersion() const;
 		/// returns the version of libpq
 
-	[[nodiscard]]
-	static SessionParametersMap connectionDefaultParameters();
+	[[nodiscard]] static SessionParametersMap connectionDefaultParameters();
 		/// returns the default parameters used on a connection
 
-	[[nodiscard]]
-	SessionParametersMap connectionParameters() const;
+	[[nodiscard]] SessionParametersMap connectionParameters() const;
 		/// returns the parameters used on the connection
 
-	[[nodiscard]]
-	std::string connectionString() const;
+	[[nodiscard]] std::string connectionString() const;
 		/// returns the string used to connect
 
-	[[nodiscard]]
-	operator PGconn* ();
+	[[nodiscard]] operator PGconn* ();
 		/// Get the PostgreSQL connection pointer
 
-	[[nodiscard]]
-	Poco::FastMutex& mutex();
+	[[nodiscard]] Poco::FastMutex& mutex();
 		/// Get the sessionHandle mutex to protect the connection pointer
 
 private:
-	[[nodiscard]]
-	static SessionParametersMap setConnectionInfoParameters(PQconninfoOption* aConnectionInfoOptionsPtr);
+	[[nodiscard]] static SessionParametersMap setConnectionInfoParameters(PQconninfoOption* aConnectionInfoOptionsPtr);
 
 	void deallocateStoredPreparedStatements();
 
 	void deallocatePreparedStatementNoLock(const std::string& aPreparedStatementToDeAllocate);
-	[[nodiscard]]
-	bool isConnectedNoLock() const;
-	[[nodiscard]]
-	std::string lastErrorNoLock() const;
+	[[nodiscard]] bool isConnectedNoLock() const;
+	[[nodiscard]] std::string lastErrorNoLock() const;
 
 	SessionHandle(const SessionHandle&) = delete;
 	SessionHandle& operator= (const SessionHandle&) = delete;

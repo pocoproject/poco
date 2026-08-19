@@ -1159,7 +1159,7 @@ void JSONTest::testQuery()
 
 	Object address;
 	address.set("dummy", 123);
-	[[maybe_unused]] Object o = query.findObject("bad address", address);
+	(void) query.findObject("bad address", address);
 	assertTrue (!address.has("dummy"));
 	Object& rAddress = query.findObject("address", address);
 	assertTrue (rAddress.getValue<int>("number") == 123);
@@ -1176,7 +1176,7 @@ void JSONTest::testQuery()
 
 	Array children;
 	children.add("dummy");
-	[[maybe_unused]] Array& _rChildren = query.findArray("no children", children);
+	(void) query.findArray("no children", children);
 	assertTrue (children.size() == 0);
 	Array& rChildren = query.findArray("children", children);
 	assertTrue (rChildren.getElement<std::string>(1) == "Ellen");
@@ -1198,11 +1198,11 @@ void JSONTest::testQuery()
 		Query badQuery(bad);
 		fail ("must throw");
 	}
-	catch ([[maybe_unused]] Poco::InvalidArgumentException& e) { }
+	catch (Poco::InvalidArgumentException&) { }
 
 	json = R"json({"foo":["bar"]})json";
 	try { result = parser.parse(json); }
-	catch([[maybe_unused]] JSONException& jsone)
+	catch(JSONException& jsone)
 	{
 		fail (jsone.message());
 	}
@@ -1226,13 +1226,13 @@ void JSONTest::testComment()
 
 	try
 	{
-		[[maybe_unused]] Var _ = parser.parse(json);
+		parser.parse(json);
 		fail ("must fail");
 	}
-	catch([[maybe_unused]] Poco::SyntaxException& e)
+	catch(Poco::SyntaxException&)
 	{
 	}
-	catch ([[maybe_unused]] JSONException& e)
+	catch (JSONException&)
 	{
 	}
 
@@ -1264,13 +1264,13 @@ void JSONTest::testPrintHandler()
 	std::ostringstream ostr;
 	PrintHandler::Ptr pHandler = new PrintHandler(ostr);
 	parser.setHandler(pHandler);
-	[[maybe_unused]] Var v1 = parser.parse(json);
+	parser.parse(json);
 	assertTrue (ostr.str() == "{\"name\":\"Homer\",\"age\":38,\"wife\":\"Marge\",\"age\":36,\"children\":[\"Bart\",\"Lisa\",\"Maggie\"]}");
 
 	pHandler->setIndent(1);
 	ostr.str("");
 	parser.reset();
-	[[maybe_unused]] Var v2 = parser.parse(json);
+	parser.parse(json);
 	assertTrue (ostr.str() == "{\n"
 		" \"name\" : \"Homer\",\n"
 		" \"age\" : 38,\n"
@@ -1287,7 +1287,7 @@ void JSONTest::testPrintHandler()
 	pHandler->setIndent(2);
 	ostr.str("");
 	parser.reset();
-	[[maybe_unused]] Var v3 = parser.parse(json);
+	parser.parse(json);
 	assertTrue (ostr.str() == "{\n"
 		"  \"name\" : \"Homer\",\n"
 		"  \"age\" : 38,\n"
@@ -1304,7 +1304,7 @@ void JSONTest::testPrintHandler()
 	pHandler->setIndent(4);
 	ostr.str("");
 	parser.reset();
-	[[maybe_unused]] Var v4 = parser.parse(json);
+	parser.parse(json);
 	assertTrue (ostr.str() == "{\n"
 		"    \"name\" : \"Homer\",\n"
 		"    \"age\" : 38,\n"
@@ -1354,21 +1354,21 @@ void JSONTest::testPrintHandler()
 	ostr.str("");
 	pHandler->setIndent(0);
 	parser.reset();
-	[[maybe_unused]] Var v5 = parser.parse(json);
+	parser.parse(json);
 	assertTrue (json == ostr.str());
 
 	json="[[\"a\"],[\"b\"],[[\"c\"],[\"d\"]]]";
 	ostr.str("");
 	pHandler->setIndent(0);
 	parser.reset();
-	[[maybe_unused]] Var v6 = parser.parse(json);
+	parser.parse(json);
 	assertTrue (json == ostr.str());
 
 	json="[{\"1\":\"one\",\"0\":[\"zero\",\"nil\"]}]";
 	ostr.str("");
 	pHandler->setIndent(0);
 	parser.reset();
-	[[maybe_unused]] Var v7 = parser.parse(json);
+	parser.parse(json);
 	assertTrue (json == ostr.str());
 
 	json=
@@ -1407,7 +1407,7 @@ void JSONTest::testPrintHandler()
 	ostr.str("");
 	pHandler->setIndent(0);
 	parser.reset();
-	[[maybe_unused]] Var v8 = parser.parse(json);
+	parser.parse(json);
 	assertTrue (json == ostr.str());
 }
 
@@ -1896,17 +1896,17 @@ void JSONTest::testValidJanssonFiles()
 
 				try
 				{
-					[[maybe_unused]] Var _ = parser.parse(fis);
+					parser.parse(fis);
 					result = parser.asVar();
 					std::cout << "Ok!" << std::endl;
 				}
-				catch([[maybe_unused]] JSONException& jsone)
+				catch(JSONException& jsone)
 				{
 					std::string err = jsone.displayText();
 					std::cout << "Failed:" << err << std::endl;
 					fail (err);
 				}
-				catch([[maybe_unused]] Poco::Exception& e)
+				catch(Poco::Exception& e)
 				{
 					std::string err = e.displayText();
 					std::cout << "Failed:" << err << std::endl;
@@ -1943,13 +1943,13 @@ void JSONTest::testInvalidJanssonFiles()
 
 				try
 				{
-					[[maybe_unused]] Var _ = parser.parse(fis);
+					parser.parse(fis);
 					result = parser.asVar();
 					// We shouldn't get here.
 					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl;
 					fail(result.convert<std::string>());
 				}
-				catch([[maybe_unused]] Poco::Exception& ex)
+				catch(Poco::Exception& /*ex*/)
 				{
 					std::cout << /*" (" << ex.displayText() << ") " <<*/ "Ok!" << std::endl;
 				}
@@ -1984,13 +1984,13 @@ void JSONTest::testInvalidUnicodeJanssonFiles()
 
 				try
 				{
-					[[maybe_unused]] Var _ = parser.parse(fis);
+					parser.parse(fis);
 					result = parser.asVar();
 					// We shouldn't get here.
 					std::cout << "We didn't get an exception. This is the result: " << result.convert<std::string>() << std::endl;
 					fail(result.convert<std::string>());
 				}
-				catch([[maybe_unused]] Poco::Exception& ex)
+				catch(Poco::Exception& /*ex*/)
 				{
 					std::cout << /*" (" << ex.displayText() << ") " <<*/ "Ok!" << std::endl;
 				}
@@ -2026,7 +2026,7 @@ void JSONTest::testUnicode()
 	Parser parser;
 
 	Var result;
-	[[maybe_unused]] Var v = parser.parse(json);
+	parser.parse(json);
 	result = parser.asVar();
 
 	assertTrue (result.type() == typeid(Object::Ptr));
@@ -2047,10 +2047,10 @@ void JSONTest::testUnicode()
 	os << '[' << (char) 0x92 << ']';
 	try
 	{
-		[[maybe_unused]] Var _ = parser.parse(os.str());
+		parser.parse(os.str());
 		fail("Invalid Unicode sequence, must fail.");
 	}
-	catch ([[maybe_unused]] JSONException& e) {}
+	catch (JSONException&) {}
 
 	parser.reset();
 	os.str("");
@@ -2063,10 +2063,10 @@ void JSONTest::testUnicode()
 	os << "[\"" << (char)0xAC << "\"]";
 	try
 	{
-		[[maybe_unused]] Var _ = parser.parse(os.str());
+		parser.parse(os.str());
 		fail("Invalid Unicode sequence, must fail.");
 	}
-	catch ([[maybe_unused]] JSONException& e) {}
+	catch (JSONException&) {}
 
 	parser.reset();
 	os.str("");
@@ -2079,10 +2079,10 @@ void JSONTest::testUnicode()
 	os << "[\"" << (char)0xA2 << "\"]";
 	try
 	{
-		[[maybe_unused]] Var _ = parser.parse(os.str());
+		parser.parse(os.str());
 		fail("Invalid Unicode sequence, must fail.");
 	}
-	catch ([[maybe_unused]] JSONException& e){}
+	catch (JSONException&){}
 
 	parser.reset();
 	os.str("");
@@ -2151,7 +2151,7 @@ void JSONTest::testNonEscapeUnicode()
 	obj1.stringify(ss);
 
 	parser.reset();
-	[[maybe_unused]] Var _ = parser.parse(ss.str());
+	parser.parse(ss.str());
 	result = parser.asVar();
 
 	assertTrue (result.type() == typeid(Object::Ptr));

@@ -124,8 +124,7 @@ public:
 		/// sendBytes(), receiveBytes() or completeHandshake()
 		/// is called on the returned SecureStreamSocket.
 
-	[[nodiscard]]
-	Context::Ptr context() const;
+	[[nodiscard]] Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.
 };
 

@@ -47,8 +47,7 @@ public:
 	virtual ~AsyncReader();
 		/// Destroys the AsyncReader.
 
-	[[nodiscard]]
-	bool isStopped();
+	[[nodiscard]] bool isStopped();
 		/// Returns true if the activity is not running, false when it is.
 
 	void start();

@@ -107,8 +107,7 @@ public:
 	}
 
 	template <typename T>
-	[[nodiscard]]
-	static T to(const char* pChar)
+	[[nodiscard]] static T to(const char* pChar)
 	{
 		T utfStr;
 		Poco::UnicodeConverter::convert(pChar, utfStr);
@@ -117,8 +116,7 @@ public:
 
 
 	template <typename T>
-	[[nodiscard]]
-	static T to(const std::string& str)
+	[[nodiscard]] static T to(const std::string& str)
 	{
 		T utfStr;
 		Poco::UnicodeConverter::convert(str, utfStr);
@@ -126,8 +124,7 @@ public:
 	}
 
 	template <typename T>
-	[[nodiscard]]
-	static std::size_t UTFStrlen(const T* ptr)
+	[[nodiscard]] static std::size_t UTFStrlen(const T* ptr)
 		/// Returns the length (in characters) of a zero-terminated UTF string.
 	{
 		if (ptr == nullptr) return 0;

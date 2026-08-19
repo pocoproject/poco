@@ -44,14 +44,12 @@ public:
 
 	ValidArgs& operator=(const ValidArgs& args) = delete;
 
-	[[nodiscard]]
-	const TKey&	key() const
+	[[nodiscard]] const TKey&	key() const
 	{
 		return _key;
 	}
 
-	[[nodiscard]]
-	bool isValid() const
+	[[nodiscard]] bool isValid() const
 	{
 		return _isValid;
 	}

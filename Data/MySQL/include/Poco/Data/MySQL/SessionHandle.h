@@ -75,12 +75,10 @@ public:
 	void reset();
 		/// Reset connection with dababase and clears session state, but without disconnecting
 
-	[[nodiscard]]
-	bool ping();
+	[[nodiscard]] bool ping();
 		/// Checks if the connection is alive.
 
-	[[nodiscard]]
-	operator MYSQL* ();
+	[[nodiscard]] operator MYSQL* ();
 
 private:
 	MYSQL* _pHandle;

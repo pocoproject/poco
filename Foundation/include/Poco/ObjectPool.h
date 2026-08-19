@@ -42,15 +42,13 @@ class PoolableObjectFactory
 	/// shrunk.
 {
 public:
-	[[nodiscard]]
-	P createObject()
+	[[nodiscard]] P createObject()
 		/// Create and return a new object.
 	{
 		return new C;
 	}
 
-	[[nodiscard]]
-	bool validateObject(P pObject)
+	[[nodiscard]] bool validateObject(P pObject)
 		/// Checks whether the object is still valid
 		/// and can be reused.
 		///
@@ -95,14 +93,12 @@ template <class C>
 class PoolableObjectFactory <C, Poco::AutoPtr<C>>
 {
 public:
-	[[nodiscard]]
-	Poco::AutoPtr<C> createObject()
+	[[nodiscard]] Poco::AutoPtr<C> createObject()
 	{
 		return new C;
 	}
 
-	[[nodiscard]]
-	bool validateObject(Poco::AutoPtr<C> pObject)
+	[[nodiscard]] bool validateObject(Poco::AutoPtr<C> pObject)
 	{
 		return true;
 	}
@@ -125,14 +121,12 @@ template <class C>
 class PoolableObjectFactory <C, Poco::SharedPtr<C>>
 {
 public:
-	[[nodiscard]]
-	Poco::SharedPtr<C> createObject()
+	[[nodiscard]] Poco::SharedPtr<C> createObject()
 	{
 		return new C;
 	}
 
-	[[nodiscard]]
-	bool validateObject(Poco::SharedPtr<C> pObject)
+	[[nodiscard]] bool validateObject(Poco::SharedPtr<C> pObject)
 	{
 		return true;
 	}
@@ -216,8 +210,7 @@ public:
 	ObjectPool(const ObjectPool&) = delete;
 	ObjectPool& operator=(const ObjectPool&) = delete;
 
-	[[nodiscard]]
-	P borrowObject(long timeoutMilliseconds = 0)
+	[[nodiscard]] P borrowObject(long timeoutMilliseconds = 0)
 		/// Obtains an object from the pool, or creates a new object if
 		/// possible.
 		///
@@ -286,28 +279,24 @@ public:
 		_availableCondition.signal();
 	}
 
-	[[nodiscard]]
-	std::size_t capacity() const
+	[[nodiscard]] std::size_t capacity() const
 	{
 		return _capacity;
 	}
 
-	[[nodiscard]]
-	std::size_t peakCapacity() const
+	[[nodiscard]] std::size_t peakCapacity() const
 	{
 		return _peakCapacity;
 	}
 
-	[[nodiscard]]
-	std::size_t size() const
+	[[nodiscard]] std::size_t size() const
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 
 		return _size;
 	}
 
-	[[nodiscard]]
-	std::size_t available() const
+	[[nodiscard]] std::size_t available() const
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 

@@ -48,8 +48,7 @@ public:
 	void addOption(const Option& option);
 		/// Adds an option to the collection.
 
-	[[nodiscard]]
-	bool hasOption(const std::string& name, bool matchShort = false) const;
+	[[nodiscard]] bool hasOption(const std::string& name, bool matchShort = false) const;
 		/// Returns a true iff an option with the given name exists.
 		///
 		/// The given name can either be a fully specified short name,
@@ -59,8 +58,7 @@ public:
 		/// option. Comparison case sensitive for the short name and
 		/// not case sensitive for the full name.
 
-	[[nodiscard]]
-	const Option& getOption(const std::string& name, bool matchShort = false) const;
+	[[nodiscard]] const Option& getOption(const std::string& name, bool matchShort = false) const;
 		/// Returns a reference to the option with the given name.
 		///
 		/// The given name can either be a fully specified short name,
@@ -72,15 +70,13 @@ public:
 		/// Throws an AmbiguousOptionException if a partial full name matches
 		/// more than one option.
 
-	[[nodiscard]]
-	Iterator begin() const
+	[[nodiscard]] Iterator begin() const
 		/// Supports iterating over all options.
 	{
 		return _options.begin();
 	}
 
-	[[nodiscard]]
-	Iterator end() const
+	[[nodiscard]] Iterator end() const
 		/// Supports iterating over all options.
 	{
 		return _options.end();

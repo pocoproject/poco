@@ -78,22 +78,19 @@ public:
 		return *this;
 	}
 
-	[[nodiscard]]
-	inline const K& first() const
+	[[nodiscard]] inline const K& first() const
 		/// Returns the first member of the pair.
 	{
 		return _data.first;
 	}
 
-	[[nodiscard]]
-	inline const Var& second() const
+	[[nodiscard]] inline const Var& second() const
 		/// Returns the second member of the pair.
 	{
 		return _data.second;
 	}
 
-	[[nodiscard]]
-	std::string toString()
+	[[nodiscard]] std::string toString()
 	{
 		std::string str;
 		Var(*this).template convert<std::string>(str);
@@ -115,8 +112,7 @@ public:
 
 	~VarHolderImpl() override = default;
 
-	[[nodiscard]]
-	const std::type_info& type() const override
+	[[nodiscard]] const std::type_info& type() const override
 	{
 		return typeid(Pair<std::string>);
 	}
@@ -208,50 +204,42 @@ public:
 		throw BadCastException("Pair -> Poco::Timestamp");
 	}
 
-	[[nodiscard]]
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
+	[[nodiscard]] VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
 
-	[[nodiscard]]
-	const Pair<std::string>& value() const
+	[[nodiscard]] const Pair<std::string>& value() const
 	{
 		return _val;
 	}
 
-	[[nodiscard]]
-	bool isArray() const override
+	[[nodiscard]] bool isArray() const override
 	{
 		return false;
 	}
 
-	[[nodiscard]]
-	bool isStruct() const override
+	[[nodiscard]] bool isStruct() const override
 	{
 		return false;
 	}
 
-	[[nodiscard]]
-	bool isInteger() const override
+	[[nodiscard]] bool isInteger() const override
 	{
 		return false;
 	}
 
-	[[nodiscard]]
-	bool isSigned() const override
+	[[nodiscard]] bool isSigned() const override
 	{
 		return false;
 	}
 
-	[[nodiscard]]
-	bool isNumeric() const override
+	[[nodiscard]] bool isNumeric() const override
 	{
 		return false;
 	}
 
-	[[nodiscard]]
-	bool isString() const override
+	[[nodiscard]] bool isString() const override
 	{
 		return false;
 	}
@@ -271,8 +259,7 @@ public:
 
 	~VarHolderImpl() override = default;
 
-	[[nodiscard]]
-	const std::type_info& type() const override
+	[[nodiscard]] const std::type_info& type() const override
 	{
 		return typeid(Pair<int>);
 	}
@@ -364,48 +351,40 @@ public:
 		throw BadCastException("Pair -> Poco::Timestamp");
 	}
 
-	[[nodiscard]]
-	VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
+	[[nodiscard]] VarHolder* clone(Placeholder<VarHolder>* pVarHolder = nullptr) const override
 	{
 		return cloneHolder(pVarHolder, _val);
 	}
 
-	[[nodiscard]]
-	const Pair<int>& value() const
+	[[nodiscard]] const Pair<int>& value() const
 	{
 		return _val;
 	}
 
-	[[nodiscard]]
-	bool isArray() const override
+	[[nodiscard]] bool isArray() const override
 	{
 		return false;
 	}
 
-	[[nodiscard]]
-	bool isStruct() const override {
+	[[nodiscard]] bool isStruct() const override {
 		return false;
 	}
 
-	[[nodiscard]]
-	bool isInteger() const override
+	[[nodiscard]] bool isInteger() const override
 	{
 		return false;
 	}
 
-	[[nodiscard]]
-	bool isSigned() const override {
+	[[nodiscard]] bool isSigned() const override {
 		return false;
 	}
 
-	[[nodiscard]]
-	bool isNumeric() const override
+	[[nodiscard]] bool isNumeric() const override
 	{
 		return false;
 	}
 
-	[[nodiscard]]
-	bool isString() const override {
+	[[nodiscard]] bool isString() const override {
 		return false;
 	}
 

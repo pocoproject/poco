@@ -79,12 +79,10 @@ public:
 		/// Creates a new document using a name pool with the given size, which
 		/// should be a prime number (e.g., 251, 509, 1021, 4093).
 
-	[[nodiscard]]
-	NamePool& namePool();
+	[[nodiscard]] NamePool& namePool();
 		/// Returns a pointer to the documents Name Pool.
 
-	[[nodiscard]]
-	AutoReleasePool& autoReleasePool();
+	[[nodiscard]] AutoReleasePool& autoReleasePool();
 		/// Returns a pointer to the documents Auto Release Pool.
 
 	void collectGarbage();
@@ -96,16 +94,13 @@ public:
 	void resumeEvents();
 		/// Resumes all events suspended with suspendEvent()
 
-	[[nodiscard]]
-	bool eventsSuspended() const;
+	[[nodiscard]] bool eventsSuspended() const;
 		/// Returns true if events are suspended.
 
-	[[nodiscard]]
-	bool events() const;
+	[[nodiscard]] bool events() const;
 		/// Returns true if events are not suspended.
 
-	[[nodiscard]]
-	const DocumentType* doctype() const;
+	[[nodiscard]] const DocumentType* doctype() const;
 		/// The Document Type Declaration (see DocumentType) associated with this document.
 		/// For HTML documents as well as XML documents without a document type declaration
 		/// this returns null. The DOM Level 1 does not support editing the Document
@@ -113,19 +108,16 @@ public:
 		/// the use of methods inherited from the Node interface, such as insertNode
 		/// or removeNode.
 
-	[[nodiscard]]
-	const DOMImplementation& implementation() const;
+	[[nodiscard]] const DOMImplementation& implementation() const;
 		/// The DOMImplementation object that handles this document. A DOM application
 		/// may use objects from multiple implementations.
 
-	[[nodiscard]]
-	Element* documentElement() const;
+	[[nodiscard]] Element* documentElement() const;
 		/// This is a convenience attribute that allows direct access to the child node
 		/// that is the root element of the document. For HTML documents, this is the
 		/// element with the tagName "HTML".
 
-	[[nodiscard]]
-	Element* createElement(const XMLString& tagName) const;
+	[[nodiscard]] Element* createElement(const XMLString& tagName) const;
 		/// Creates an element of the type specified. Note that the instance returned
 		/// implements the Element interface, so attributes can be specified directly
 		/// on the returned object.
@@ -133,39 +125,31 @@ public:
 		/// In addition, if there are known attributes with default values, Attr nodes
 		/// representing them are automatically created and attached to the element.
 
-	[[nodiscard]]
-	DocumentFragment* createDocumentFragment() const;
+	[[nodiscard]] DocumentFragment* createDocumentFragment() const;
 		/// Creates an empty DocumentFragment object.
 
-	[[nodiscard]]
-	Text* createTextNode(const XMLString& data) const;
+	[[nodiscard]] Text* createTextNode(const XMLString& data) const;
 		/// Creates a text node given the specified string.
 
-	[[nodiscard]]
-	Comment* createComment(const XMLString& data) const;
+	[[nodiscard]] Comment* createComment(const XMLString& data) const;
 		/// Creates a comment node given the specified string.
 
-	[[nodiscard]]
-	CDATASection* createCDATASection(const XMLString& data) const;
+	[[nodiscard]] CDATASection* createCDATASection(const XMLString& data) const;
 		/// Creates a CDATASection node whose value is the specified string.
 
-	[[nodiscard]]
-	ProcessingInstruction* createProcessingInstruction(const XMLString& target, const XMLString& data) const;
+	[[nodiscard]] ProcessingInstruction* createProcessingInstruction(const XMLString& target, const XMLString& data) const;
 		/// Creates a ProcessingInstruction node given the specified target and data strings.
 
-	[[nodiscard]]
-	Attr* createAttribute(const XMLString& name) const;
+	[[nodiscard]] Attr* createAttribute(const XMLString& name) const;
 		/// Creates an Attr of the given name. Note that the Attr instance can then
 		/// be set on an Element using the setAttributeNode method.
 
-	[[nodiscard]]
-	EntityReference* createEntityReference(const XMLString& name) const;
+	[[nodiscard]] EntityReference* createEntityReference(const XMLString& name) const;
 		/// Creates an EntityReference object. In addition, if the referenced entity
 		/// is known, the child list of the EntityReference node is made the same as
 		/// that of the corresponding Entity node.
 
-	[[nodiscard]]
-	NodeList* getElementsByTagName(const XMLString& name) const;
+	[[nodiscard]] NodeList* getElementsByTagName(const XMLString& name) const;
 		/// Returns a NodeList of all Elements with a given tag name in the order
 		/// in which they would be encountered in a preorder traversal of the
 		/// document tree.
@@ -189,22 +173,18 @@ public:
 		/// copied from one document to another, recognizing that the two documents
 		/// may have different DTDs in the XML case.
 
-	[[nodiscard]]
-	Element* createElementNS(const XMLString& namespaceURI, const XMLString& qualifiedName) const;
+	[[nodiscard]] Element* createElementNS(const XMLString& namespaceURI, const XMLString& qualifiedName) const;
 		/// Creates an element of the given qualified name and namespace URI.
 
-	[[nodiscard]]
-	Attr* createAttributeNS(const XMLString& namespaceURI, const XMLString& qualifiedName) const;
+	[[nodiscard]] Attr* createAttributeNS(const XMLString& namespaceURI, const XMLString& qualifiedName) const;
 		/// Creates an attribute of the given qualified name and namespace URI.
 
-	[[nodiscard]]
-	NodeList* getElementsByTagNameNS(const XMLString& namespaceURI, const XMLString& localName) const;
+	[[nodiscard]] NodeList* getElementsByTagNameNS(const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Returns a NodeList of all the Elements with a given local name and
 		/// namespace URI in the order in which they are encountered in a
 		/// preorder traversal of the Document tree.
 
-	[[nodiscard]]
-	Element* getElementById(const XMLString& elementId) const;
+	[[nodiscard]] Element* getElementById(const XMLString& elementId) const;
 		/// Returns the Element whose ID is given by elementId. If no such
 		/// element exists, returns null. Behavior is not defined if more
 		/// than one element has this ID.
@@ -219,40 +199,33 @@ public:
 		/// and getElementByIdNS().
 
 	// DocumentEvent
-	[[nodiscard]]
-	Event* createEvent(const XMLString& eventType) const;
+	[[nodiscard]] Event* createEvent(const XMLString& eventType) const;
 
 	// Node
-	[[nodiscard]]
-	const XMLString& nodeName() const;
-	[[nodiscard]]
-	unsigned short nodeType() const;
+	[[nodiscard]] const XMLString& nodeName() const;
+	[[nodiscard]] unsigned short nodeType() const;
 
 	// EventTarget
 	bool dispatchEvent(Event* evt);
 
 	// Extensions
-	[[nodiscard]]
-	Entity* createEntity(const XMLString& name, const XMLString& publicId, const XMLString& systemId, const XMLString& notationName) const;
+	[[nodiscard]] Entity* createEntity(const XMLString& name, const XMLString& publicId, const XMLString& systemId, const XMLString& notationName) const;
 		/// Creates an Entity with the given name, publicId, systemId and notationName.
 		///
 		/// This method is not part of the W3C Document Object Model.
 
-	[[nodiscard]]
-	Notation* createNotation(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const;
+	[[nodiscard]] Notation* createNotation(const XMLString& name, const XMLString& publicId, const XMLString& systemId) const;
 		/// Creates a Notation with the given name, publicId and systemId.
 		///
 		/// This method is not part of the W3C Document Object Model.
 
-	[[nodiscard]]
-	Element* getElementById(const XMLString& elementId, const XMLString& idAttribute) const;
+	[[nodiscard]] Element* getElementById(const XMLString& elementId, const XMLString& idAttribute) const;
 		/// Returns the first Element whose ID attribute (given in idAttribute)
 		/// has the given elementId. If no such element exists, returns null.
 		///
 		/// This method is an extension to the W3C Document Object Model.
 
-	[[nodiscard]]
-	Element* getElementByIdNS(const XMLString& elementId, const XMLString& idAttributeURI, const XMLString& idAttributeLocalName) const;
+	[[nodiscard]] Element* getElementByIdNS(const XMLString& elementId, const XMLString& idAttributeURI, const XMLString& idAttributeLocalName) const;
 		/// Returns the first Element whose ID attribute (given in idAttributeURI and idAttributeLocalName)
 		/// has the given elementId. If no such element exists, returns null.
 		///
@@ -261,11 +234,9 @@ public:
 protected:
 	~Document();
 
-	[[nodiscard]]
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	[[nodiscard]] Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
-	[[nodiscard]]
-	DocumentType* getDoctype();
+	[[nodiscard]] DocumentType* getDoctype();
 	void setDoctype(DocumentType* pDoctype);
 
 private:

@@ -60,8 +60,7 @@ public:
 protected:
 	void buildMetrics();
 
-	[[nodiscard]]
-	static std::string collectorName(const std::string& threadPoolName);
+	[[nodiscard]] static std::string collectorName(const std::string& threadPoolName);
 
 	static const std::string NAME_PREFIX;
 

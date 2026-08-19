@@ -60,8 +60,7 @@ public:
 	void close() override;
 		/// Removes all channels.
 
-	[[nodiscard]]
-	int count() const;
+	[[nodiscard]] int count() const;
 		/// Returns the number of channels in the SplitterChannel.
 
 	Channel::Ptr getChannel(int index) const;

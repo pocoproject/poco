@@ -225,16 +225,14 @@ public:
 		/// LayeredConfiguration with the given priority.
 
 	template <class C>
-	[[nodiscard]]
-	C& getSubsystem() const;
+	[[nodiscard]] C& getSubsystem() const;
 		/// Returns a reference to the subsystem of the class
 		/// given as template argument.
 		///
 		/// Throws a NotFoundException if such a subsystem has
 		/// not been registered.
 
-	[[nodiscard]]
-	SubsystemVec& subsystems();
+	[[nodiscard]] SubsystemVec& subsystems();
 		/// Returns a reference to the subsystem list
 
 	virtual int run();
@@ -251,35 +249,28 @@ public:
 	void getApplicationPath(Poco::Path& path) const;
 		/// Sets the path argument to the file path of the application executable.
 
-	[[nodiscard]]
-	Poco::Path getApplicationPath() const;
+	[[nodiscard]] Poco::Path getApplicationPath() const;
 		/// Returns the file path of the application executable.
 
 	void getApplicationDirectory(Poco::Path& dir) const;
 		/// Sets the path argument to the directory that contains the application executable.
 
-	[[nodiscard]]
-	Poco::Path getApplicationDirectory() const;
+	[[nodiscard]] Poco::Path getApplicationDirectory() const;
 		/// Returns the directory that contains the application executable.
 
-	[[nodiscard]]
-	std::string commandName() const;
+	[[nodiscard]] std::string commandName() const;
 		/// Returns the command name used to invoke the application.
 
-	[[nodiscard]]
-	std::string commandPath() const;
+	[[nodiscard]] std::string commandPath() const;
 		/// Returns the full command path used to invoke the application.
 
-	[[nodiscard]]
-	LayeredConfiguration& config() const;
+	[[nodiscard]] LayeredConfiguration& config() const;
 		/// Returns the application's configuration reference.
 
-	[[nodiscard]]
-	LayeredConfiguration::Ptr configPtr() const;
+	[[nodiscard]] LayeredConfiguration::Ptr configPtr() const;
 		/// Returns the application's configuration smart pointer.
 
-	[[nodiscard]]
-	Poco::Logger& logger() const;
+	[[nodiscard]] Poco::Logger& logger() const;
 		/// Returns the application's logger.
 		///
 		/// Before the logging subsystem has been initialized, the
@@ -292,8 +283,7 @@ public:
 		/// "application.logger" configuration property. If that property
 		/// is not specified, the logger is "Application".
 
-	[[nodiscard]]
-	const ArgVec& argv() const;
+	[[nodiscard]] const ArgVec& argv() const;
 		/// Returns reference to vector of the application's arguments as
 		/// specified on the command line. If user overrides the
 		/// Application::main(const ArgVec&) function, it will receive
@@ -302,26 +292,21 @@ public:
 		/// full set of command line parameters as received in
 		/// main(argc, argv*).
 
-	[[nodiscard]]
-	const OptionSet& options() const;
+	[[nodiscard]] const OptionSet& options() const;
 		/// Returns the application's option set.
 
-	[[nodiscard]]
-	static bool exists();
+	[[nodiscard]] static bool exists();
 		/// Returns true iff instance exists.
 
-	[[nodiscard]]
-	static Application& instance();
+	[[nodiscard]] static Application& instance();
 		/// Returns a reference to the Application singleton.
 		///
 		/// Throws a NullPointerException if no Application instance exists.
 
-	[[nodiscard]]
-	const Poco::Timestamp& startTime() const;
+	[[nodiscard]] const Poco::Timestamp& startTime() const;
 		/// Returns the application start time (UTC).
 
-	[[nodiscard]]
-	Poco::Timespan uptime() const;
+	[[nodiscard]] Poco::Timespan uptime() const;
 		/// Returns the application uptime.
 
 	void stopOptionsProcessing();
@@ -344,8 +329,7 @@ public:
 		/// calling this function can help you handle only the options
 		/// you want to handle
 
-	[[nodiscard]]
-	static WindowSize windowSize();
+	[[nodiscard]] static WindowSize windowSize();
 		/// Returns the current window size of the console window,
 		/// if available.
 		///
@@ -354,8 +338,7 @@ public:
 		///
 		/// Returns zero width and height if the window size cannot be determined.
 
-	[[nodiscard]]
-	const char* name() const override;
+	[[nodiscard]] const char* name() const override;
 
 protected:
 	void initialize(Application& self) override;
@@ -434,12 +417,10 @@ protected:
 	~Application() override;
 		/// Destroys the Application and deletes all registered subsystems.
 
-	[[nodiscard]]
-	static ArgVec toArgs(int argc, char** argv);
+	[[nodiscard]] static ArgVec toArgs(int argc, char** argv);
 
 #if defined(_WIN32)
-	[[nodiscard]]
-	static ArgVec toArgs(int argc, wchar_t** argv);
+	[[nodiscard]] static ArgVec toArgs(int argc, wchar_t** argv);
 #endif
 
 private:

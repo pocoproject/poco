@@ -228,12 +228,10 @@ public:
 
 	void bind(std::size_t pos, const std::list<std::string>& val, Direction dir = PD_IN) override;
 
-	[[nodiscard]]
-	std::size_t size() const;
+	[[nodiscard]] std::size_t size() const;
 		/// Return count of bound parameters
 
-	[[nodiscard]]
-	InputParameterVector bindVector() const;
+	[[nodiscard]] InputParameterVector bindVector() const;
 		/// Return the vector of bound parameters.
 
 	void updateBindVectorToCurrentValues();

@@ -52,30 +52,23 @@ public:
 		/// Destroys the XMLFilterImpl.
 
 	// XMLFilter
-	[[nodiscard]]
-	XMLReader* getParent() const;
+	[[nodiscard]] XMLReader* getParent() const;
 	void setParent(XMLReader* pParent);
 
 	// XMLReader
 	void setEntityResolver(EntityResolver* pResolver);
-	[[nodiscard]]
-	EntityResolver* getEntityResolver() const;
+	[[nodiscard]] EntityResolver* getEntityResolver() const;
 	void setDTDHandler(DTDHandler* pDTDHandler);
-	[[nodiscard]]
-	DTDHandler* getDTDHandler() const;
+	[[nodiscard]] DTDHandler* getDTDHandler() const;
 	void setContentHandler(ContentHandler* pContentHandler);
-	[[nodiscard]]
-	ContentHandler* getContentHandler() const;
+	[[nodiscard]] ContentHandler* getContentHandler() const;
 	void setErrorHandler(ErrorHandler* pErrorHandler);
-	[[nodiscard]]
-	ErrorHandler* getErrorHandler() const;
+	[[nodiscard]] ErrorHandler* getErrorHandler() const;
 	void setFeature(const XMLString& featureId, bool state);
-	[[nodiscard]]
-	bool getFeature(const XMLString& featureId) const;
+	[[nodiscard]] bool getFeature(const XMLString& featureId) const;
 	void setProperty(const XMLString& propertyId, const XMLString& value);
 	void setProperty(const XMLString& propertyId, void* value);
-	[[nodiscard]]
-	void* getProperty(const XMLString& propertyId) const;
+	[[nodiscard]] void* getProperty(const XMLString& propertyId) const;
 	void parse(InputSource* pSource);
 	void parse(const XMLString& systemId);
 	void parseMemoryNP(const char* xml, std::size_t size);
@@ -105,8 +98,7 @@ public:
 	void fatalError(const SAXException& e);
 
 protected:
-	[[nodiscard]]
-	XMLReader* parent() const;
+	[[nodiscard]] XMLReader* parent() const;
 		/// Return a pointer to the parent reader.
 		/// Subclasses can use this method instead of
 		/// getParent() for better performance - this method

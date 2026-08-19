@@ -41,8 +41,7 @@ public:
 	virtual ~PrivateKeyFactory();
 		/// Destroys the PrivateKeyFactory.
 
-	[[nodiscard]]
-	virtual PrivateKeyPassphraseHandler* create(bool onServer) const = 0;
+	[[nodiscard]] virtual PrivateKeyPassphraseHandler* create(bool onServer) const = 0;
 		/// Creates a new PrivateKeyPassphraseHandler
 };
 
@@ -76,8 +75,7 @@ public:
 	{
 	}
 
-	[[nodiscard]]
-	PrivateKeyPassphraseHandler* create(bool server) const
+	[[nodiscard]] PrivateKeyPassphraseHandler* create(bool server) const
 	{
 		return new T(server);
 	}

@@ -51,8 +51,7 @@ public:
 	~LocalConfigurationView();
 
 protected:
-	[[nodiscard]]
-	bool getRaw(const std::string& key, std::string& value) const override;
+	[[nodiscard]] bool getRaw(const std::string& key, std::string& value) const override;
 };
 
 

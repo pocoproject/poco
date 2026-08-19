@@ -62,28 +62,22 @@ public:
 	VarIterator& operator = (VarIterator&& other) noexcept;
 		/// Assigns the other VarIterator.
 
-	[[nodiscard]]
-	bool operator == (const VarIterator& other) const;
+	[[nodiscard]] bool operator == (const VarIterator& other) const;
 		/// Equality operator.
 
-	[[nodiscard]]
-	bool operator != (const VarIterator& other) const;
+	[[nodiscard]] bool operator != (const VarIterator& other) const;
 		/// Inequality operator.
 
-	[[nodiscard]]
-	bool operator < (const VarIterator& other) const;
+	[[nodiscard]] bool operator < (const VarIterator& other) const;
 		/// Less than operator.
 
-	[[nodiscard]]
-	bool operator > (const VarIterator& other) const;
+	[[nodiscard]] bool operator > (const VarIterator& other) const;
 		/// Greater than operator.
 
-	[[nodiscard]]
-	bool operator <= (const VarIterator& other) const;
+	[[nodiscard]] bool operator <= (const VarIterator& other) const;
 		/// Less than or equal to operator.
 
-	[[nodiscard]]
-	bool operator >= (const VarIterator& other) const;
+	[[nodiscard]] bool operator >= (const VarIterator& other) const;
 		/// Greater than or equal to operator.
 
 	Var& operator * () const;
@@ -95,7 +89,7 @@ public:
 	const VarIterator& operator ++ () const;
 		/// Advances by one position and returns current position.
 
-	VarIterator operator ++ ([[maybe_unused]] int n) const;
+	VarIterator operator ++ (int) const;
 		/// Advances by one position and returns copy of the iterator with
 		/// previous current position.
 
@@ -103,7 +97,7 @@ public:
 		/// Goes back by one position and returns copy of the iterator with
 		/// previous current position.
 
-	VarIterator operator -- ([[maybe_unused]] int n) const;
+	VarIterator operator -- (int) const;
 		/// Goes back by one position and returns previous current position.
 
 	VarIterator operator + (std::size_t diff) const;

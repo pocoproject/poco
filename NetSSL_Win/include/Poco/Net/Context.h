@@ -160,21 +160,17 @@ public:
 	~Context();
 		/// Destroys the Context.
 
-	[[nodiscard]]
-	VerificationMode verificationMode() const;
+	[[nodiscard]] VerificationMode verificationMode() const;
 		/// Returns the certificate verification mode.
 
-	[[nodiscard]]
-	Usage usage() const;
+	[[nodiscard]] Usage usage() const;
 		/// Returns whether the context is for use by a client or by a server
 		/// and whether TLSv1.x is required.
 
-	[[nodiscard]]
-	bool isForServerUse() const;
+	[[nodiscard]] bool isForServerUse() const;
 		/// Returns true iff the context is for use by a server.
 
-	[[nodiscard]]
-	bool sessionCacheEnabled() const;
+	[[nodiscard]] bool sessionCacheEnabled() const;
 		/// Returns true iff the session cache is enabled.
 
 	void enableExtendedCertificateVerification(bool flag = true);
@@ -183,13 +179,11 @@ public:
 		///
 		/// See X509Certificate::verify() for more information.
 
-	[[nodiscard]]
-	bool extendedCertificateVerificationEnabled() const;
+	[[nodiscard]] bool extendedCertificateVerificationEnabled() const;
 		/// Returns true iff automatic extended certificate
 		/// verification is enabled.
 
-	[[nodiscard]]
-	int options() const;
+	[[nodiscard]] int options() const;
 		/// Returns the options flags.
 
 	void addTrustedCert(const Poco::Net::X509Certificate& cert);
@@ -209,8 +203,7 @@ public:
 		///
 		///   context.requireMinimumProtocol(PROTO_TLSV1_2);
 
-	[[nodiscard]]
-	Poco::Net::X509Certificate certificate();
+	[[nodiscard]] Poco::Net::X509Certificate certificate();
 		/// Loads or imports and returns the certificate specified in the constructor.
 		///
 		/// Throws a NoCertificateException if the certificate cannot
@@ -219,12 +212,10 @@ public:
 		/// May also throw a filesystem-related exception if the certificate file
 		/// cannot be found.
 
-	[[nodiscard]]
-	HCERTSTORE certificateStore() const;
+	[[nodiscard]] HCERTSTORE certificateStore() const;
 		/// Returns a handle to the certificate store.
 
-	[[nodiscard]]
-	CredHandle& credentials();
+	[[nodiscard]] CredHandle& credentials();
 		/// Returns a reference to the Schannel credentials for this Context.
 
 	static const std::string CERT_STORE_MY;
@@ -240,12 +231,9 @@ protected:
 	void importCertificate(const char* pBuffer, std::size_t size);
 	SECURITY_STATUS acquireSchannelCredentials(CredHandle& credHandle) const;
 	SECURITY_STATUS acquireSchannelCredentialsLegacy(CredHandle& credHandle) const;
-  [[nodiscard]]
-	DWORD proto() const;
-	[[nodiscard]]
-	DWORD enabledProtocols() const;
-  [[nodiscard]]
-	DWORD disabledProtocols() const;
+	[[nodiscard]] DWORD proto() const;
+	[[nodiscard]] DWORD enabledProtocols() const;
+	[[nodiscard]] DWORD disabledProtocols() const;
 
 private:
 	Context(const Context&);

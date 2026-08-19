@@ -176,22 +176,19 @@ public:
 		_size++;
 	}
 
-	[[nodiscard]]
-	UInt32 hash(const Key& key) const
+	[[nodiscard]] UInt32 hash(const Key& key) const
 	{
 		return _hash(key, _capacity);
 	}
 
-	[[nodiscard]]
-	const Value& get(const Key& key) const
+	[[nodiscard]] const Value& get(const Key& key) const
 		/// Throws an exception if the value does not exist
 	{
 		UInt32 hsh = hash(key);
 		return getRaw(key, hsh);
 	}
 
-	[[nodiscard]]
-	const Value& getRaw(const Key& key, UInt32 hsh) const
+	[[nodiscard]] const Value& getRaw(const Key& key, UInt32 hsh) const
 		/// Throws an exception if the value does not exist
 	{
 		UInt32 origHash = hsh;
@@ -212,22 +209,19 @@ public:
 		}
 	}
 
-	[[nodiscard]]
-	Value& get(const Key& key)
+	[[nodiscard]] Value& get(const Key& key)
 		/// Throws an exception if the value does not exist
 	{
 		UInt32 hsh = hash(key);
 		return const_cast<Value&>(getRaw(key, hsh));
 	}
 
-	[[nodiscard]]
-	const Value& operator [] (const Key& key) const
+	[[nodiscard]] const Value& operator [] (const Key& key) const
 	{
 		return get(key);
 	}
 
-	[[nodiscard]]
-	Value& operator [] (const Key& key)
+	[[nodiscard]] Value& operator [] (const Key& key)
 	{
 		UInt32 hsh = hash(key);
 		UInt32 origHash = hsh;
@@ -247,8 +241,7 @@ public:
 		}
 	}
 
-	[[nodiscard]]
-	const Key& getKeyRaw(const Key& key, UInt32 hsh)
+	[[nodiscard]] const Key& getKeyRaw(const Key& key, UInt32 hsh)
 		/// Throws an exception if the key does not exist. returns a reference to the internally
 		/// stored key. Useful when someone does an insert and wants for performance reason only to store
 		/// a pointer to the key in another collection
@@ -272,16 +265,14 @@ public:
 		}
 	}
 
-	[[nodiscard]]
-	bool get(const Key& key, Value& v) const
+	[[nodiscard]] bool get(const Key& key, Value& v) const
 		/// Sets v to the found value, returns false if no value was found
 	{
 		UInt32 hsh = hash(key);
 		return getRaw(key, hsh, v);
 	}
 
-	[[nodiscard]]
-	bool getRaw(const Key& key, UInt32 hsh, Value& v) const
+	[[nodiscard]] bool getRaw(const Key& key, UInt32 hsh, Value& v) const
 		/// Sets v to the found value, returns false if no value was found
 	{
 		UInt32 origHash = hsh;
@@ -303,15 +294,13 @@ public:
 		}
 	}
 
-	[[nodiscard]]
-	bool exists(const Key& key) const
+	[[nodiscard]] bool exists(const Key& key) const
 	{
 		UInt32 hsh = hash(key);
 		return existsRaw(key, hsh);
 	}
 
-	[[nodiscard]]
-	bool existsRaw(const Key& key, UInt32 hsh) const
+	[[nodiscard]] bool existsRaw(const Key& key, UInt32 hsh) const
 	{
 		UInt32 origHash = hsh;
 		while (true)
@@ -331,15 +320,13 @@ public:
 		}
 	}
 
-	[[nodiscard]]
-	std::size_t size() const
+	[[nodiscard]] std::size_t size() const
 		/// Returns the number of elements already inserted into the SimpleHashTable
 	{
 		return _size;
 	}
 
-	[[nodiscard]]
-	UInt32 capacity() const
+	[[nodiscard]] UInt32 capacity() const
 	{
 		return _capacity;
 	}
@@ -361,8 +348,7 @@ public:
 		}
 	}
 
-	[[nodiscard]]
-	HashStatistic currentState(bool details = false) const
+	[[nodiscard]] HashStatistic currentState(bool details = false) const
 		/// Returns the current internal state
 	{
 		UInt32 numberOfEntries = (UInt32)_size;

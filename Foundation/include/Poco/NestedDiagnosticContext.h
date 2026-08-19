@@ -76,12 +76,10 @@ public:
 	void pop();
 		/// Pops the top-most context off the stack.
 
-	[[nodiscard]]
-	int depth() const;
+	[[nodiscard]] int depth() const;
 		/// Returns the depth (number of contexts) of the stack.
 
-	[[nodiscard]]
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Returns the stack as a string with entries
 		/// delimited by colons. The string does not contain
 		/// line numbers and filenames.
@@ -100,8 +98,7 @@ public:
 	void clear();
 		/// Clears the NDC stack.
 
-	[[nodiscard]]
-	static NestedDiagnosticContext& current();
+	[[nodiscard]] static NestedDiagnosticContext& current();
 		/// Returns the current thread's NDC.
 
 private:

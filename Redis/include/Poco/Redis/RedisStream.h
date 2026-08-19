@@ -38,8 +38,7 @@ public:
 	~RedisStreamBuf();
 		/// Destructor
 
-	[[nodiscard]]
-	std::string readLine();
+	[[nodiscard]] std::string readLine();
 		/// Reads a line from Redis (until \r\n is encountered).
 
 protected:
@@ -64,8 +63,7 @@ public:
 		///
 		/// Flushes the buffer, but does not close the socket.
 
-	[[nodiscard]]
-	RedisStreamBuf* rdbuf();
+	[[nodiscard]] RedisStreamBuf* rdbuf();
 		/// Returns a pointer to the internal RedisStreamBuf.
 
 	void close();
@@ -100,8 +98,7 @@ public:
 	~RedisInputStream();
 		/// Destroys the RedisInputStream.
 
-	[[nodiscard]]
-	std::string getline();
+	[[nodiscard]] std::string getline();
 		/// Redis uses \r\n as delimiter. This getline version removes
 		/// the \r from the result.
 };

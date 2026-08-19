@@ -378,14 +378,14 @@ void StringTokenizerTest::testFind()
 
 	try
 	{
-		[[maybe_unused]] std::size_t p = st.find("4");
+		(void) st.find("4");
 		fail ("must fail");
 	}
 	catch (NotFoundException&) { }
 
 	try
 	{
-		[[maybe_unused]] std::string s = st[8];
+		(void) st[8];
 		fail ("must fail");
 	}
 	catch (RangeException&) { }

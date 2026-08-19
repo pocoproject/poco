@@ -57,13 +57,11 @@ public:
 		/// Warning: A TimerTask that has been cancelled must not be scheduled again.
 		/// An attempt to do so results in a Poco::Util::IllegalStateException being thrown.
 
-	[[nodiscard]]
-	bool isCancelled() const;
+	[[nodiscard]] bool isCancelled() const;
 		/// Returns true iff the TimerTask has been cancelled by a call
 		/// to cancel().
 
-	[[nodiscard]]
-	Poco::Timestamp lastExecution() const;
+	[[nodiscard]] Poco::Timestamp lastExecution() const;
 		/// Returns the time of the last execution of the timer task.
 		///
 		/// Returns 0 if the timer has never been executed.

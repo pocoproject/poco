@@ -73,16 +73,13 @@ public:
 		/// the contents of the stream buffer cannot synced back to
 		/// the filesystem), the bad bit is set in the stream state.
 
-	[[nodiscard]]
-	FileStreamBuf* rdbuf();
+	[[nodiscard]] FileStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
 
-	[[nodiscard]]
-	NativeHandle nativeHandle() const;
+	[[nodiscard]] NativeHandle nativeHandle() const;
 		/// Returns native file descriptor handle
 
-	[[nodiscard]]
-	UInt64 size() const;
+	[[nodiscard]] UInt64 size() const;
 		/// Returns file size
 
 	void flushToDisk();

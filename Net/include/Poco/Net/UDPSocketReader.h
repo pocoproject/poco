@@ -46,8 +46,7 @@ private:
 		{
 		}
 
-		[[nodiscard]]
-		operator AtomicCounter::ValueType ()
+		[[nodiscard]] operator AtomicCounter::ValueType ()
 		{
 			return static_cast<AtomicCounter::ValueType>(val);
 		}
@@ -153,8 +152,7 @@ public:
 		handler().notify();
 	}
 
-	[[nodiscard]]
-	bool handlerStopped() const
+	[[nodiscard]] bool handlerStopped() const
 		/// Returns true if all handlers are stopped.
 	{
 		bool stopped = true;
@@ -172,8 +170,7 @@ public:
 		for (; it != end; ++it) (*it)->stop();
 	}
 
-	[[nodiscard]]
-	bool handlerDone() const
+	[[nodiscard]] bool handlerDone() const
 		/// Returns true if all handlers are done processing data.
 	{
 		bool done = true;
@@ -202,8 +199,7 @@ private:
 		if (++_handler == _handlers.end()) _handler = _handlers.begin();
 	}
 
-	[[nodiscard]]
-	UDPHandlerImpl<S>& handler()
+	[[nodiscard]] UDPHandlerImpl<S>& handler()
 		/// Returns the reference to the current handler.
 	{
 		poco_assert_dbg (_handler != _handlers.end());

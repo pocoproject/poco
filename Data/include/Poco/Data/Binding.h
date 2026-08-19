@@ -68,20 +68,17 @@ public:
 	~Binding() override = default;
 		/// Destroys the Binding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return 1u;
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return !_bound;
 	}
@@ -137,20 +134,17 @@ public:
 	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return 1;
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return !_bound;
 	}
@@ -197,20 +191,17 @@ public:
 	~Binding() override = default;
 		/// Destroys the Binding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return 1u;
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return 1u;
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return !_bound;
 	}
@@ -258,20 +249,17 @@ public:
 	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return 1u;
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return 1u;
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return !_bound;
 	}
@@ -323,20 +311,17 @@ public:
 	~Binding() override = default;
 		/// Destroys the Binding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_val.size());
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -391,20 +376,17 @@ public:
 	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return _pVal->size();
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -473,20 +455,17 @@ public:
 	~Binding() override = default;
 		/// Destroys the Binding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return 1u;
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_val.size());
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -555,20 +534,17 @@ public:
 	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return 1u;
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_deq.size());
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -621,20 +597,17 @@ public:
 	~Binding() override = default;
 		/// Destroys the Binding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return _val.size();
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -687,20 +660,17 @@ public:
 	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return _pVal->size();
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -753,20 +723,17 @@ public:
 	~Binding() override = default;
 		/// Destroys the Binding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return _val.size();
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -819,20 +786,17 @@ public:
 	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return _pVal->size();
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -885,20 +849,17 @@ public:
 	~Binding() override = default;
 		/// Destroys the Binding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_val.size());
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -951,20 +912,17 @@ public:
 	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return _pVal->size();
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -1017,20 +975,17 @@ public:
 	~Binding() override = default;
 		/// Destroys the Binding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_val.size());
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -1083,20 +1038,17 @@ public:
 	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<T>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return _pVal->size();
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -1149,20 +1101,17 @@ public:
 	~Binding() override = default;
 		/// Destroys the Binding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<V>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_val.size());
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -1215,20 +1164,17 @@ public:
 	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<V>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return _pVal->size();
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -1281,20 +1227,17 @@ public:
 	~Binding() override = default;
 		/// Destroys the Binding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<V>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return static_cast<std::size_t>(_val.size());
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -1347,20 +1290,17 @@ public:
 	~CopyBinding() override = default;
 		/// Destroys the CopyBinding.
 
-	[[nodiscard]]
-	std::size_t numOfColumnsHandled() const override
+	[[nodiscard]] std::size_t numOfColumnsHandled() const override
 	{
 		return TypeHandler<V>::size();
 	}
 
-	[[nodiscard]]
-	std::size_t numOfRowsHandled() const override
+	[[nodiscard]] std::size_t numOfRowsHandled() const override
 	{
 		return _pVal->size();
 	}
 
-	[[nodiscard]]
-	bool canBind() const override
+	[[nodiscard]] bool canBind() const override
 	{
 		return _begin != _end;
 	}
@@ -1390,8 +1330,7 @@ namespace Keywords {
 
 
 template <typename T>
-[[nodiscard]]
-inline AbstractBinding::Ptr use(T& t, const std::string& name = "")
+[[nodiscard]] inline AbstractBinding::Ptr use(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	// If this fails to compile, a const ref was passed to use().
@@ -1403,8 +1342,7 @@ inline AbstractBinding::Ptr use(T& t, const std::string& name = "")
 }
 
 
-[[nodiscard]]
-inline AbstractBinding::Ptr use(const NullData& t, const std::string& name = "")
+[[nodiscard]] inline AbstractBinding::Ptr use(const NullData& t, const std::string& name = "")
 	/// NullData overload.
 {
 	return new Binding<NullData>(const_cast<NullData&>(t), name, AbstractBinding::PD_IN);
@@ -1412,8 +1350,7 @@ inline AbstractBinding::Ptr use(const NullData& t, const std::string& name = "")
 
 
 template <typename T>
-[[nodiscard]]
-inline AbstractBinding::Ptr useRef(T& t, const std::string& name = "")
+[[nodiscard]] inline AbstractBinding::Ptr useRef(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	return new Binding<T>(t, name, AbstractBinding::PD_IN);
@@ -1421,16 +1358,14 @@ inline AbstractBinding::Ptr useRef(T& t, const std::string& name = "")
 
 
 template <typename T>
-[[nodiscard]]
-inline AbstractBinding::Ptr in(T& t, const std::string& name = "")
+[[nodiscard]] inline AbstractBinding::Ptr in(T& t, const std::string& name = "")
 	/// Convenience function for a more compact Binding creation.
 {
 	return use(t, name);
 }
 
 
-[[nodiscard]]
-inline AbstractBinding::Ptr in(const NullData& t, const std::string& name = "")
+[[nodiscard]] inline AbstractBinding::Ptr in(const NullData& t, const std::string& name = "")
 	/// NullData overload.
 {
 	return use(t, name);
@@ -1438,8 +1373,7 @@ inline AbstractBinding::Ptr in(const NullData& t, const std::string& name = "")
 
 
 template <typename T>
-[[nodiscard]]
-inline AbstractBinding::Ptr out(T& t)
+[[nodiscard]] inline AbstractBinding::Ptr out(T& t)
 	/// Convenience function for a more compact Binding creation.
 {
 	poco_static_assert (!IsConst<T>::VALUE);
@@ -1448,8 +1382,7 @@ inline AbstractBinding::Ptr out(T& t)
 
 
 template <typename T>
-[[nodiscard]]
-inline AbstractBinding::Ptr io(T& t)
+[[nodiscard]] inline AbstractBinding::Ptr io(T& t)
 	/// Convenience function for a more compact Binding creation.
 {
 	poco_static_assert (!IsConst<T>::VALUE);
@@ -1486,8 +1419,7 @@ inline AbstractBindingVec& io(AbstractBindingVec& bv)
 
 
 template <typename T>
-[[nodiscard]]
-inline AbstractBinding::Ptr bind(T t, const std::string& name)
+[[nodiscard]] inline AbstractBinding::Ptr bind(T t, const std::string& name)
 	/// Convenience function for a more compact Binding creation.
 	/// This funtion differs from use() in its value copy semantics.
 {
@@ -1496,8 +1428,7 @@ inline AbstractBinding::Ptr bind(T t, const std::string& name)
 
 
 template <typename T>
-[[nodiscard]]
-inline AbstractBinding::Ptr bind(T t)
+[[nodiscard]] inline AbstractBinding::Ptr bind(T t)
 	/// Convenience function for a more compact Binding creation.
 	/// This funtion differs from use() in its value copy semantics.
 {

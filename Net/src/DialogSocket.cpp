@@ -248,7 +248,7 @@ bool DialogSocket::receiveLine(std::string& line, std::size_t lineLengthLimit)
 		ch = get();
 	}
 	if (ch == '\r' && peek() == '\n')
-		[[maybe_unused]] int x = get();
+		(void) get();
 	else if (ch == EOF_CHAR)
 		return false;
 	return true;

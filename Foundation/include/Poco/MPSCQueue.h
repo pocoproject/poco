@@ -192,8 +192,7 @@ public:
 		return false;
 	}
 
-	[[nodiscard]]
-	std::size_t size() const
+	[[nodiscard]] std::size_t size() const
 		/// Returns an approximate count of items in the queue.
 		/// This is approximate because producers may be modifying
 		/// the queue concurrently.
@@ -203,16 +202,14 @@ public:
 		return head - tail;
 	}
 
-	[[nodiscard]]
-	bool empty() const
+	[[nodiscard]] bool empty() const
 		/// Returns true if the queue appears to be empty.
 		/// This is approximate for the same reason as size().
 	{
 		return size() == 0;
 	}
 
-	[[nodiscard]]
-	std::size_t capacity() const
+	[[nodiscard]] std::size_t capacity() const
 		/// Returns the capacity of the queue.
 	{
 		return _capacity;
@@ -224,14 +221,11 @@ private:
 		std::atomic<std::size_t> sequence;
 		typename std::aligned_storage<sizeof(T), alignof(T)>::type storage;
 
-		[[nodiscard]]
-		T* ptr() { return reinterpret_cast<T*>(&storage); }
-		[[nodiscard]]
-		const T* ptr() const { return reinterpret_cast<const T*>(&storage); }
+		[[nodiscard]] T* ptr() { return reinterpret_cast<T*>(&storage); }
+		[[nodiscard]] const T* ptr() const { return reinterpret_cast<const T*>(&storage); }
 	};
 
-	[[nodiscard]]
-	static std::size_t nextPowerOfTwo(std::size_t n)
+	[[nodiscard]] static std::size_t nextPowerOfTwo(std::size_t n)
 	{
 		if (n == 0) return 1;
 		--n;
@@ -247,8 +241,7 @@ private:
 		return n + 1;
 	}
 
-	[[nodiscard]]
-	std::size_t index(std::size_t pos) const
+	[[nodiscard]] std::size_t index(std::size_t pos) const
 	{
 		return pos & _mask;
 	}

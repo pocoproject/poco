@@ -64,12 +64,10 @@ public:
 	RowIterator& operator = (RowIterator&& other) noexcept;
 		/// Move assignment.
 
-	[[nodiscard]]
-	bool operator == (const RowIterator& other) const;
+	[[nodiscard]] bool operator == (const RowIterator& other) const;
 		/// Equality operator.
 
-	[[nodiscard]]
-	bool operator != (const RowIterator& other) const;
+	[[nodiscard]] bool operator != (const RowIterator& other) const;
 		/// Inequality operator.
 
 	Row& operator * () const;
@@ -81,7 +79,7 @@ public:
 	const RowIterator& operator ++ () const;
 		/// Advances by one position and returns current position.
 
-	RowIterator operator ++ ([[maybe_unused]] int n) const;
+	RowIterator operator ++ (int) const;
 		/// Advances by one position and returns copy of the iterator with
 		/// previous current position.
 
@@ -89,7 +87,7 @@ public:
 		/// Goes back by one position and returns copy of the iterator with
 		/// previous current position.
 
-	RowIterator operator -- ([[maybe_unused]] int n) const;
+	RowIterator operator -- (int) const;
 		/// Goes back by one position and returns previous current position.
 
 	RowIterator operator + (std::size_t diff) const;

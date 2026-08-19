@@ -52,14 +52,12 @@ struct HashMapEntry
 	{
 	}
 
-	[[nodiscard]]
-	bool operator == (const HashMapEntry& entry) const
+	[[nodiscard]] bool operator == (const HashMapEntry& entry) const
 	{
 		return first == entry.first;
 	}
 
-	[[nodiscard]]
-	bool operator != (const HashMapEntry& entry) const
+	[[nodiscard]] bool operator != (const HashMapEntry& entry) const
 	{
 		return first != entry.first;
 	}
@@ -70,8 +68,7 @@ template <class HME, class KeyHashFunc>
 struct HashMapEntryHash
 	/// This class template is used internally by HashMap.
 {
-	[[nodiscard]]
-	std::size_t operator () (const HME& entry) const
+	[[nodiscard]] std::size_t operator () (const HME& entry) const
 	{
 		return _func(entry.first);
 	}
@@ -126,46 +123,39 @@ public:
 		_table.swap(map._table);
 	}
 
-	[[nodiscard]]
-	ConstIterator begin() const
+	[[nodiscard]] ConstIterator begin() const
 	{
 		return _table.begin();
 	}
 
-	[[nodiscard]]
-	ConstIterator end() const
+	[[nodiscard]] ConstIterator end() const
 	{
 		return _table.end();
 	}
 
-	[[nodiscard]]
-	Iterator begin()
+	[[nodiscard]] Iterator begin()
 	{
 		return _table.begin();
 	}
 
-	[[nodiscard]]
-	Iterator end()
+	[[nodiscard]] Iterator end()
 	{
 		return _table.end();
 	}
 
-	[[nodiscard]]
-	ConstIterator find(const KeyType& key) const
+	[[nodiscard]] ConstIterator find(const KeyType& key) const
 	{
 		ValueType value(key);
 		return _table.find(value);
 	}
 
-	[[nodiscard]]
-	Iterator find(const KeyType& key)
+	[[nodiscard]] Iterator find(const KeyType& key)
 	{
 		ValueType value(key);
 		return _table.find(value);
 	}
 
-	[[nodiscard]]
-	std::size_t count(const KeyType& key) const
+	[[nodiscard]] std::size_t count(const KeyType& key) const
 	{
 		ValueType value(key);
 		return _table.find(value) != _table.end() ? 1 : 0;
@@ -198,20 +188,17 @@ public:
 		_table.clear();
 	}
 
-	[[nodiscard]]
-	std::size_t size() const
+	[[nodiscard]] std::size_t size() const
 	{
 		return _table.size();
 	}
 
-	[[nodiscard]]
-	bool empty() const
+	[[nodiscard]] bool empty() const
 	{
 		return _table.empty();
 	}
 
-	[[nodiscard]]
-	ConstReference operator [] (const KeyType& key) const
+	[[nodiscard]] ConstReference operator [] (const KeyType& key) const
 	{
 		ConstIterator it = _table.find(key);
 		if (it != _table.end())
@@ -220,8 +207,7 @@ public:
 			throw NotFoundException();
 	}
 
-	[[nodiscard]]
-	Reference operator [] (const KeyType& key)
+	[[nodiscard]] Reference operator [] (const KeyType& key)
 	{
 		ValueType value(key);
 		std::pair<Iterator, bool> res = _table.insert(value);

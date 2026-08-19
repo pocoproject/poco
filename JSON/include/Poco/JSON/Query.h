@@ -43,8 +43,7 @@ public:
 	virtual ~Query();
 		/// Destroys the Query.
 
-	[[nodiscard]]
-	Object::Ptr findObject(const std::string& path) const;
+	[[nodiscard]] Object::Ptr findObject(const std::string& path) const;
 		/// Search for an object.
 		///
 		/// When the object can't be found, a zero Ptr is returned;
@@ -54,16 +53,14 @@ public:
 		/// internally, a shared pointer to new (heap-allocated) Object is
 		/// returned; this may be expensive operation.
 
-	[[nodiscard]]
-	Object& findObject(const std::string& path, Object& obj) const;
+	[[nodiscard]] Object& findObject(const std::string& path, Object& obj) const;
 		/// Search for an object.
 		///
 		/// If object is found, it is assigned to the
 		/// Object through the reference passed in. When the object can't be
 		/// found, the provided Object is emptied and returned.
 
-	[[nodiscard]]
-	Array::Ptr findArray(const std::string& path) const;
+	[[nodiscard]] Array::Ptr findArray(const std::string& path) const;
 		/// Search for an array.
 		///
 		/// When the array can't be found, a zero Ptr is returned;
@@ -73,16 +70,14 @@ public:
 		/// internally, a shared pointer to new (heap-allocated) Object is
 		/// returned; this may be expensive operation.
 
-	[[nodiscard]]
-	Array& findArray(const std::string& path, Array& obj) const;
+	[[nodiscard]] Array& findArray(const std::string& path, Array& obj) const;
 		/// Search for an array.
 		///
 		/// If array is found, it is assigned to the
 		/// Object through the reference passed in. When the array can't be
 		/// found, the provided Object is emptied and returned.
 
-	[[nodiscard]]
-	Dynamic::Var find(const std::string& path) const;
+	[[nodiscard]] Dynamic::Var find(const std::string& path) const;
 		/// Searches a value.
 		///
 		/// Example: "person.children[0].name" will return the
@@ -90,8 +85,7 @@ public:
 		/// an empty value is returned.
 
 	template <typename T>
-	[[nodiscard]]
-	T findValue(const std::string& path, const T& def) const
+	[[nodiscard]] T findValue(const std::string& path, const T& def) const
 		/// Searches for a value will convert it to the given type.
 		/// When the value can't be found or has an invalid type
 		/// the default value will be returned.
@@ -111,8 +105,7 @@ public:
 		return result;
 	}
 
-	[[nodiscard]]
-	std::string findValue(const char* path, const char* def) const
+	[[nodiscard]] std::string findValue(const char* path, const char* def) const
 		/// Searches for a value will convert it to the given type.
 		/// When the value can't be found or has an invalid type
 		/// the default value will be returned.

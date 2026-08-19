@@ -110,28 +110,24 @@ public:
 		handle(NotificationPtr(static_cast<N*>(pNf), true));
 	}
 
-	[[nodiscard]]
-	virtual bool equals(const AbstractObserver& abstractObserver) const
+	[[nodiscard]] virtual bool equals(const AbstractObserver& abstractObserver) const
 	{
 		const HTTPObserver* pObs = dynamic_cast<const HTTPObserver*>(&abstractObserver);
 		return pObs && pObs->_pObject == _pObject && pObs->_handler == _handler && pObs->_matcher == _matcher;
 	}
 
 	POCO_DEPRECATED("use `bool accepts(const Notification::Ptr&)` instead")
-	[[nodiscard]]
-	virtual bool accepts(Notification* pNf, const char* pName) const
+	[[nodiscard]] virtual bool accepts(Notification* pNf, const char* pName) const
 	{
 		return (!pName || pNf->name() == pName) && dynamic_cast<N*>(pNf) != nullptr;
 	}
 
-	[[nodiscard]]
-	virtual bool accepts(const Notification::Ptr& pNf) const
+	[[nodiscard]] virtual bool accepts(const Notification::Ptr& pNf) const
 	{
 		return (match(pNf) && (pNf.template cast<N>() != nullptr));
 	}
 
-	[[nodiscard]]
-	virtual AbstractObserver* clone() const
+	[[nodiscard]] virtual AbstractObserver* clone() const
 	{
 		return new HTTPObserver(*this);
 	}
@@ -151,16 +147,14 @@ protected:
 			(_pObject.get()->*_handler)(ptr);
 	}
 
-	[[nodiscard]]
-	bool match(const Notification::Ptr& ptr) const
+	[[nodiscard]] bool match(const Notification::Ptr& ptr) const
 	{
 		Mutex::ScopedLock l(_mutex);
 
 		return _pObject && (!_matcher || (_pObject.get()->*_matcher)(ptr->name()));
 	}
 
-	[[nodiscard]]
-	Mutex& mutex() const
+	[[nodiscard]] Mutex& mutex() const
 	{
 		return _mutex;
 	}

@@ -53,12 +53,9 @@ public:
 	virtual void endTest(Test* test);
 	virtual int runTests();
 	virtual int testErrors();
-	[[nodiscard]]
-	virtual int testFailures();
-	[[nodiscard]]
-	virtual bool wasSuccessful();
-	[[nodiscard]]
-	virtual bool shouldStop();
+	[[nodiscard]] virtual int testFailures();
+	[[nodiscard]] virtual bool wasSuccessful();
+	[[nodiscard]] virtual bool shouldStop();
 	virtual void stop();
 
 	virtual std::vector<TestFailure*>& errors();
@@ -96,8 +93,7 @@ public:
 		}
 	};
 
-	[[nodiscard]]
-	static std::string demangle(const char* name);
+	[[nodiscard]] static std::string demangle(const char* name);
 
 protected:
 	virtual void setSynchronizationObject(SynchronizationObject* syncObject);

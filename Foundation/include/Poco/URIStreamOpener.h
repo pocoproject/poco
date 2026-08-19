@@ -107,13 +107,11 @@ public:
 		/// Throws a NotFoundException if no URIStreamFactory has been registered
 		/// for the given scheme.
 
-	[[nodiscard]]
-	bool supportsScheme(const std::string& scheme);
+	[[nodiscard]] bool supportsScheme(const std::string& scheme);
 		/// Returns true iff a URIStreamFactory for the given scheme
 		/// has been registered.
 
-	[[nodiscard]]
-	static URIStreamOpener& defaultOpener();
+	[[nodiscard]] static URIStreamOpener& defaultOpener();
 		/// Returns a reference to the default URIStreamOpener.
 
 protected:

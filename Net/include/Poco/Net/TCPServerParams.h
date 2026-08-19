@@ -51,8 +51,7 @@ public:
 		///
 		/// The default idle time is 10 seconds;
 
-	[[nodiscard]]
-	const Poco::Timespan& getThreadIdleTime() const;
+	[[nodiscard]] const Poco::Timespan& getThreadIdleTime() const;
 		/// Returns the maximum thread idle time.
 
 	void setMaxQueued(int count);
@@ -64,8 +63,7 @@ public:
 		///
 		/// The default number is 64.
 
-	[[nodiscard]]
-	int getMaxQueued() const;
+	[[nodiscard]] int getMaxQueued() const;
 		/// Returns the maximum number of queued connections.
 
 	void setMaxThreads(int count);
@@ -81,8 +79,7 @@ public:
 		/// must at least have the capacity for the given
 		/// number of threads.
 
-	[[nodiscard]]
-	int getMaxThreads() const;
+	[[nodiscard]] int getMaxThreads() const;
 		/// Returns the maximum number of simultaneous threads
 		/// available for this TCPServerDispatcher.
 
@@ -90,13 +87,11 @@ public:
 		/// Sets the priority of TCP server threads
 		/// created by TCPServer.
 
-	[[nodiscard]]
-	Poco::Thread::Priority getThreadPriority() const;
+	[[nodiscard]] Poco::Thread::Priority getThreadPriority() const;
 		/// Returns the priority of TCP server threads
 		/// created by TCPServer.
 	//reactor
-	[[nodiscard]]
-	bool getReactorMode() const;
+	[[nodiscard]] bool getReactorMode() const;
 		/// Returns the reactor mode.
 		///
 		/// If true, use reactor mode, else use thread pool mode.
@@ -104,8 +99,7 @@ public:
 		/// Sets the reactor mode.
 		///
 		/// If true, use reactor mode, else use thread pool mode.
-	[[nodiscard]]
-	int getAcceptorNum() const;
+	[[nodiscard]] int getAcceptorNum() const;
 		/// Returns the number of acceptors.
 
 	void setAcceptorNum(int acceptorNum);
@@ -114,8 +108,7 @@ public:
 		/// The number of acceptors must be greater than 0.
 		/// The default is 1.
 
-	[[nodiscard]]
-	bool getUseSelfReactor() const;
+	[[nodiscard]] bool getUseSelfReactor() const;
 		/// Returns true if acceptor's self reactor is used.
 		
 	void setUseSelfReactor(bool useSelfReactor);

@@ -21,31 +21,26 @@ public:
 	virtual ~HTTPReactorServerSession();
 	/// Destroys the HTTPReactorServerSession.
 
-	[[nodiscard]]
-	SocketAddress clientAddress() override
+	[[nodiscard]] SocketAddress clientAddress() override
 	{
 		return _realsocket.peerAddress();
 	}
 	/// Returns the client's address.
 
-	[[nodiscard]]
-	SocketAddress serverAddress() override
+	[[nodiscard]] SocketAddress serverAddress() override
 	{
 		return _realsocket.address();
 	}
 	/// Returns the server's address.
 
-	[[nodiscard]]
-	bool checkRequestComplete();
+	[[nodiscard]] bool checkRequestComplete();
 
 	void popCompletedRequest();
 
 private:
-	[[nodiscard]]
-	int get() override;
+	[[nodiscard]] int get() override;
 
-	[[nodiscard]]
-	int peek() override;
+	[[nodiscard]] int peek() override;
 
 	int read(char* buffer, std::streamsize length) override;
 
