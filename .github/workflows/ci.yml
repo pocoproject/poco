@@ -354,6 +354,104 @@ jobs:
         with:
           build-dir: build
 
+  linux-gcc-cmake-openssl4:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+    env:
+      OPENSSL4_VERSION: "4.0.1"
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set OpenSSL 4.0 paths
+        run: |
+          prefix="${GITHUB_WORKSPACE}/.openssl-4.0.1"
+          echo "OPENSSL4_PREFIX=${prefix}" >> "$GITHUB_ENV"
+          echo "OPENSSL_ROOT_DIR=${prefix}" >> "$GITHUB_ENV"
+      - name: Cache OpenSSL 4.0 build
+        uses: actions/cache@v5
+        id: openssl4-cache
+        with:
+          path: ${{ github.workspace }}/.openssl-4.0.1
+          key: openssl4-${{ env.OPENSSL4_VERSION }}-${{ runner.os }}-${{ runner.arch }}-v2
+      - name: Check OpenSSL 4.0 install
+        id: openssl4-ready
+        run: |
+          libdir=""
+          for d in "${OPENSSL4_PREFIX}/lib" "${OPENSSL4_PREFIX}/lib64"; do
+            if [ -f "${d}/libssl.so.4" ]; then
+              libdir="$d"
+              break
+            fi
+          done
+          if [ -n "$libdir" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "libdir=${libdir}" >> "$GITHUB_OUTPUT"
+            echo "LD_LIBRARY_PATH=${libdir}" >> "$GITHUB_ENV"
+            echo "OPENSSL_MODULES=${libdir}/ossl-modules" >> "$GITHUB_ENV"
+            echo "OPENSSL4_LIBDIR=${libdir}" >> "$GITHUB_ENV"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build OpenSSL 4.0
+        if: steps.openssl4-ready.outputs.ready != 'true'
+        env:
+          LD_LIBRARY_PATH: ""
+        run: |
+          sudo apt -y update
+          sudo apt -y install build-essential curl perl patchelf
+          curl -fsSL -LO "https://www.openssl.org/source/openssl-${OPENSSL4_VERSION}.tar.gz"
+          tar xzf "openssl-${OPENSSL4_VERSION}.tar.gz"
+          cd "openssl-${OPENSSL4_VERSION}"
+          ./config --prefix="${OPENSSL4_PREFIX}" --openssldir="${OPENSSL4_PREFIX}/ssl" shared "-Wl,-rpath,${OPENSSL4_PREFIX}/lib"
+          make -j"$(nproc)"
+          make install_sw
+          libdir="${OPENSSL4_PREFIX}/lib"
+          if [ ! -f "${libdir}/libssl.so.4" ]; then
+            libdir="${OPENSSL4_PREFIX}/lib64"
+          fi
+          if [ ! -f "${libdir}/libssl.so.4" ]; then
+            echo "OpenSSL install incomplete: libssl.so.4 not found under ${OPENSSL4_PREFIX}" >&2
+            find "${OPENSSL4_PREFIX}" -name 'libssl.so*' >&2 || true
+            exit 1
+          fi
+          patchelf --set-rpath "${libdir}" "${OPENSSL4_PREFIX}/bin/openssl"
+          echo "LD_LIBRARY_PATH=${libdir}" >> "$GITHUB_ENV"
+          echo "OPENSSL_MODULES=${libdir}/ossl-modules" >> "$GITHUB_ENV"
+          echo "OPENSSL4_LIBDIR=${libdir}" >> "$GITHUB_ENV"
+      - name: Verify OpenSSL 4.0
+        run: |
+          libdir="${OPENSSL4_PREFIX}/lib"
+          if [ ! -f "${libdir}/libssl.so.4" ]; then
+            libdir="${OPENSSL4_PREFIX}/lib64"
+          fi
+          export LD_LIBRARY_PATH="${libdir}:${LD_LIBRARY_PATH:-}"
+          ls -la "${libdir}/libssl.so"* "${libdir}/libcrypto.so"*
+          "${OPENSSL4_PREFIX}/bin/openssl" version
+      - name: Install build dependencies
+        run: sudo apt -y update && sudo apt -y install cmake ninja-build
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          ${{ env.POCO_CMAKE_FOUNDATION_UTIL }}
+          -DENABLE_CRYPTO=ON -DENABLE_NETSSL=ON -DENABLE_JWT=ON
+          -DOPENSSL_ROOT_DIR=${{ env.OPENSSL4_PREFIX }}
+          -DCMAKE_BUILD_RPATH=${{ env.OPENSSL4_LIBDIR }}
+          -DCMAKE_INSTALL_RPATH=${{ env.OPENSSL4_LIBDIR }}
+      - run: >-
+          cmake --build cmake-build --parallel $(nproc) --target
+          Foundation-testrunner Util-testrunner Crypto-testrunner NetSSL-testrunner JWT-testrunner
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            PWD=`pwd`
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Util|Crypto|NetSSL|JWT)$"
+      - uses: ./.github/actions/upload-test-report
+        with:
+          suffix: openssl4
+
   # Classic GNU make build. Not officially supported anymore, but kept as a
   # sanity check so the legacy ./configure + make path keeps compiling. All
   # standard components are built (--everything); tests are compiled but not

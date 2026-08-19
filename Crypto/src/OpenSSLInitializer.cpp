@@ -104,7 +104,10 @@ void OpenSSLInitializer::uninitialize()
 {
 	if (--_rc == 0)
 	{
-#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+#if POCO_OPENSSL_VERSION_PREREQ(4, 0, 0)
+		OSSL_PROVIDER_unload(_defaultProvider);
+		OSSL_PROVIDER_unload(_legacyProvider);
+#elif POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 		// Provider cleanup is deliberately left to OpenSSL's internal
 		// atexit handler (OPENSSL_cleanup). We must NOT:
 		//  - call OSSL_PROVIDER_unload(): leaks OSSL_LIB_CTX child
