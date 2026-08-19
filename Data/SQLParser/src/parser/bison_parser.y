@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
   using namespace hsql;
 
@@ -27,6 +28,27 @@
     result->setErrorDetails(strdup(msg), llocp->first_line, llocp->first_column);
     return 0;
   }
+
+  namespace {
+
+  // Joins two name parts with a dot, taking ownership of both. Multi-part names
+  // are folded into one string wherever the node has a single slot for them.
+  char* dotJoin(char* first, char* second) {
+    std::string combined(std::string(first) + "." + second);
+    free(first);
+    free(second);
+    return strdup(combined.c_str());
+  }
+
+  // Flattens a possibly qualified name back into one string, taking ownership
+  // of both parts. Used where the statement has a single name field, e.g. the
+  // procedure of an ODBC call escape.
+  char* qualifiedName(TableName name) {
+    if (!name.schema) return name.name;
+    return dotJoin(name.schema, name.name);
+  }
+
+  }  // namespace
   // clang-format off
 %}
 // clang-format on
@@ -57,6 +79,14 @@
 #include "../SQLParserResult.h"
 #include "../sql/statements.h"
 #include "parser_typedef.h"
+
+// Carries the two conditions of an Oracle hierarchical query out of one
+// grammar rule, so START WITH and CONNECT BY can be given in either order.
+// Trivially copyable, which a %union member has to be.
+struct HierarchicalClause {
+  hsql::Expr* startWith;
+  hsql::Expr* connectBy;
+};
 
 // Auto update column and line number
 #define YY_USER_ACTION                        \
@@ -151,6 +181,7 @@
   hsql::FrameDescription* frame_description;
   hsql::FrameType frame_type;
   hsql::GroupByDescription* group_t;
+  HierarchicalClause hierarchical_t;
   hsql::ImportType import_type_t;
   hsql::JoinType join_type;
   hsql::LimitDescription* limit;
@@ -198,6 +229,10 @@
   free($$.name);
   free($$.schema);
 } <table_name>
+%destructor {
+  delete $$.startWith;
+  delete $$.connectBy;
+} <hierarchical_t>
 %destructor {
   if ($$) {
     for (auto ptr : *($$)) {
@@ -271,13 +306,16 @@
 %token RANGE ROWS GROUPS UNBOUNDED FOLLOWING PRECEDING CURRENT_ROW
 %token FETCH NEXT ONLY
 %token UNIQUE PRIMARY FOREIGN KEY REFERENCES
+%token OUTERJOIN PRIOR ODBC_OJ NEXT_VALUE_FOR
+// Lexed as whole phrases, so START, CONNECT and WITHIN stay usable as names.
+%token START_WITH CONNECT_BY CONNECT_BY_NOCYCLE WITHIN_GROUP
 
 /*********************************
  ** Non-Terminal types (http://www.gnu.org/software/bison/manual/html_node/Type-Decl.html)
  *********************************/
 %type <stmt_vec>               statement_list
 %type <statement>              statement preparable_statement
-%type <exec_stmt>              execute_statement
+%type <exec_stmt>              execute_statement odbc_call_statement
 %type <transaction_stmt>       transaction_statement
 %type <prep_stmt>              prepare_statement
 %type <select_stmt>            select_statement select_with_paren select_no_paren select_clause select_within_set_operation select_within_set_operation_no_parentheses
@@ -292,7 +330,7 @@
 %type <show_stmt>              show_statement
 %type <table_name>             table_name
 %type <sval>                   opt_index_name
-%type <sval>                   file_path prepare_target_query
+%type <sval>                   file_path prepare_target_query nonreserved_keyword name_or_keyword
 %type <frame_description>      opt_frame_clause
 %type <frame_bound>            frame_bound
 %type <frame_type>             frame_type
@@ -304,9 +342,11 @@
 %type <table>                  opt_from_clause from_clause table_ref table_ref_atomic table_ref_name nonjoin_table_ref_atomic
 %type <table>                  join_clause table_ref_name_no_alias
 %type <expr>                   expr operand scalar_expr unary_expr binary_expr logic_expr exists_expr extract_expr cast_expr
-%type <expr>                   function_expr between_expr expr_alias param_expr
+%type <expr>                   function_expr between_expr expr_alias param_expr next_value_expr opt_odbc_return
+%type <expr>                   table_function_expr
 %type <expr>                   column_name literal int_literal num_literal string_literal bool_literal date_literal interval_literal
 %type <expr>                   comp_expr opt_where join_condition opt_having case_expr case_list in_expr hint
+%type <hierarchical_t>         opt_hierarchical_clause
 %type <expr>                   array_expr array_index null_literal extended_literal casted_extended_literal
 %type <limit>                  opt_limit opt_top
 %type <order>                  order_desc
@@ -338,8 +378,9 @@
 
 %type <str_vec>                ident_commalist opt_column_list
 %type <expr_vec>               expr_list select_list opt_extended_literal_list extended_literal_list hint_list opt_hints opt_partition
+%type <expr_vec>               row_expr_list table_value_row_list opt_call_args in_row_list
 %type <table_vec>              table_ref_commalist
-%type <order_vec>              opt_order order_list
+%type <order_vec>              opt_order order_list opt_within_group
 %type <with_description_vec>   opt_with_clause with_clause with_description_list
 %type <update_vec>             update_clause_commalist
 %type <table_element_vec>      table_elem_commalist
@@ -365,6 +406,7 @@
 
 /* Unary Operators */
 %right    UMINUS
+%right    PRIOR
 %left     '[' ']'
 %left     '(' ')'
 %left     '.'
@@ -429,6 +471,7 @@ preparable_statement : select_statement { $$ = $1; }
 | drop_statement { $$ = $1; }
 | alter_statement { $$ = $1; }
 | execute_statement { $$ = $1; }
+| odbc_call_statement { $$ = $1; }
 | transaction_statement { $$ = $1; };
 
 /******************************
@@ -479,14 +522,29 @@ prepare_statement : PREPARE IDENTIFIER FROM prepare_target_query {
 
 prepare_target_query : STRING;
 
-execute_statement : EXECUTE IDENTIFIER {
+// ODBC procedure call escape, e.g. {? = call some_proc(?, ?)} or
+// {call some_proc(?)}. The optional "? =" is the driver's return value marker
+// and carries nothing the statement itself needs, so both forms produce the
+// same ExecuteStatement an EXECUTE would.
+odbc_call_statement : '{' opt_odbc_return CALL table_name opt_call_args '}' {
+  $$ = new ExecuteStatement();
+  $$->returnValue = $2;
+  $$->name = qualifiedName($4);
+  $$->parameters = $5;
+};
+
+// The marker has to go through param_expr: consumed as a bare '?' it would not
+// reach the parameter list, and ODBC counts it as the first bound parameter.
+opt_odbc_return : param_expr '=' { $$ = $1; }
+| /* empty */ { $$ = nullptr; };
+
+opt_call_args : '(' opt_extended_literal_list ')' { $$ = $2; }
+| /* empty */ { $$ = nullptr; };
+
+execute_statement : EXECUTE IDENTIFIER opt_call_args {
   $$ = new ExecuteStatement();
   $$->name = $2;
-}
-| EXECUTE IDENTIFIER '(' opt_extended_literal_list ')' {
-  $$ = new ExecuteStatement();
-  $$->name = $2;
-  $$->parameters = $4;
+  $$->parameters = $3;
 };
 
 /******************************
@@ -738,7 +796,7 @@ table_elem_commalist : table_elem {
 table_elem : column_def { $$ = $1; }
 | table_constraint { $$ = $1; };
 
-column_def : IDENTIFIER column_type opt_column_constraints {
+column_def : name_or_keyword column_type opt_column_constraints {
   $$ = new ColumnDefinition($1, $2, $3->constraints, $3->references);
   if (!$$->trySetNullableExplicit()) {
     yyerror(&yyloc, result, scanner, ("Conflicting nullability constraints for " + std::string{$1}).c_str());
@@ -834,7 +892,7 @@ drop_statement : DROP TABLE opt_exists table_name {
   $$->name = $3;
 }
 
-| DROP INDEX opt_exists IDENTIFIER {
+| DROP INDEX opt_exists name_or_keyword {
   $$ = new DropStatement(kDropIndex);
   $$->ifExists = $3;
   $$->indexName = $4;
@@ -856,7 +914,7 @@ alter_statement : ALTER TABLE opt_exists table_name alter_action {
 
 alter_action : drop_action { $$ = $1; }
 
-drop_action : DROP COLUMN opt_exists IDENTIFIER {
+drop_action : DROP COLUMN opt_exists name_or_keyword {
   $$ = new DropColumnAction($4);
   $$->ifExists = $3;
 };
@@ -923,7 +981,7 @@ update_clause_commalist : update_clause {
   $$ = $1;
 };
 
-update_clause : IDENTIFIER '=' expr {
+update_clause : name_or_keyword '=' expr {
   $$ = new UpdateClause();
   $$->column = $1;
   $$->value = $3;
@@ -972,8 +1030,25 @@ select_no_paren : select_clause opt_order opt_limit opt_locking_clause {
   $$ = $1;
   $$->order = $2;
 
-  // Limit could have been set by TOP.
+  // Limit could have been set by TOP. A parenthesized TOP may hold a
+  // placeholder, which is also referenced from the parameter list the input
+  // rule walks; deleting it here would leave that reference dangling. TOP with
+  // a literal has no such reference, so "top 20 ... limit 10" keeps working.
   if ($3) {
+    if ($$->limit && $$->limit->limit->type != kExprLiteralInt) {
+      delete $1;
+      if ($2) {
+        for (auto ptr : *$2) delete ptr;
+        delete $2;
+      }
+      delete $3;
+      if ($4) {
+        for (auto ptr : *$4) delete ptr;
+        delete $4;
+      }
+      yyerror(&yyloc, result, scanner, "TOP with an expression cannot be combined with LIMIT.");
+      YYERROR;
+    }
     delete $$->limit;
     $$->limit = $3;
   }
@@ -1015,14 +1090,28 @@ set_type : UNION {
 opt_all : ALL { $$ = true; }
 | /* empty */ { $$ = false; };
 
-select_clause : SELECT opt_top opt_distinct select_list opt_from_clause opt_where opt_group {
+// Oracle hierarchical query clauses. Oracle accepts START WITH and CONNECT BY
+// in either order and either may be omitted, so both are produced by one rule.
+opt_hierarchical_clause : START_WITH expr connect_by expr { $$ = HierarchicalClause{$2, $4}; }
+| connect_by expr START_WITH expr { $$ = HierarchicalClause{$4, $2}; }
+| START_WITH expr { $$ = HierarchicalClause{$2, nullptr}; }
+| connect_by expr { $$ = HierarchicalClause{nullptr, $2}; }
+| /* empty */ { $$ = HierarchicalClause{nullptr, nullptr}; };
+
+// NOCYCLE only tells Oracle to tolerate loops in the data; it carries nothing
+// the tree needs, so both spellings reduce to the same clause.
+connect_by : CONNECT_BY | CONNECT_BY_NOCYCLE;
+
+select_clause : SELECT opt_top opt_distinct select_list opt_from_clause opt_where opt_hierarchical_clause opt_group {
   $$ = new SelectStatement();
   $$->limit = $2;
   $$->selectDistinct = $3;
   $$->selectList = $4;
   $$->fromTable = $5;
   $$->whereClause = $6;
-  $$->groupBy = $7;
+  $$->startWith = $7.startWith;
+  $$->connectBy = $7.connectBy;
+  $$->groupBy = $8;
 };
 
 opt_distinct : DISTINCT { $$ = true; }
@@ -1046,6 +1135,12 @@ opt_group : GROUP BY expr_list opt_having {
 | /* empty */ { $$ = nullptr; };
 
 opt_having : HAVING expr { $$ = $2; }
+| /* empty */ { $$ = nullptr; };
+
+// Ordered-set aggregate, e.g. LISTAGG(x, ', ') WITHIN GROUP (ORDER BY y). The
+// sort order belongs to the aggregate itself, so it is kept apart from the
+// window description an OVER clause would produce.
+opt_within_group : WITHIN_GROUP '(' ORDER BY order_list ')' { $$ = $5; }
 | /* empty */ { $$ = nullptr; };
 
 opt_order : ORDER BY order_list { $$ = $3; }
@@ -1087,10 +1182,12 @@ opt_null_ordering : /* empty */ { $$ = NullOrdering::Undefined; }
   $$ = null_ordering;
 };
 
-// TODO: TOP and LIMIT can take more than just int literals.
-
+// T-SQL requires the parentheses exactly when TOP takes an expression rather
+// than a constant, e.g. TOP (?) or TOP (:limit). The bare form is literal-only:
+// "TOP a" cannot be told apart from a select list starting with a column named
+// a.
 opt_top : TOP int_literal { $$ = new LimitDescription($2, nullptr); }
-| TOP '(' int_literal ')' { $$ = new LimitDescription($3, nullptr); }
+| TOP '(' expr ')' { $$ = new LimitDescription($3, nullptr); }
 | /* empty */ { $$ = nullptr; };
 
 opt_limit : LIMIT expr { $$ = new LimitDescription($2, nullptr); }
@@ -1146,14 +1243,20 @@ expr_alias : expr opt_alias {
 expr : operand | between_expr | logic_expr | exists_expr | in_expr;
 
 operand : '(' expr ')' { $$ = $2; }
-| array_index | scalar_expr | unary_expr | binary_expr | case_expr | function_expr | extract_expr | cast_expr |
+| array_index | scalar_expr | unary_expr | binary_expr | case_expr | function_expr | extract_expr | cast_expr | next_value_expr |
     array_expr | '(' select_no_paren ')' {
   $$ = Expr::makeSelect($2);
 };
 
-scalar_expr : column_name | literal;
+scalar_expr : column_name | literal
+// Oracle outer join marker, e.g. WHERE a.id (+) = b.id. Only a column
+// reference can carry it, which is where Oracle allows it; the marked side
+// stays visible in the tree as a unary operator.
+| column_name OUTERJOIN { $$ = Expr::makeOpUnary(kOpOuterJoin, $1); };
 
 unary_expr : '-' operand { $$ = Expr::makeOpUnary(kOpUnaryMinus, $2); }
+// Oracle's PRIOR, referring to the parent row inside CONNECT BY.
+| PRIOR operand { $$ = Expr::makeOpUnary(kOpPrior, $2); }
 | NOT operand { $$ = Expr::makeOpUnary(kOpNot, $2); }
 | operand ISNULL { $$ = Expr::makeOpUnary(kOpIsNull, $1); }
 | operand IS NULL { $$ = Expr::makeOpUnary(kOpIsNull, $1); }
@@ -1176,7 +1279,38 @@ logic_expr : expr AND expr { $$ = Expr::makeOpBinary($1, kOpAnd, $3); }
 in_expr : operand IN '(' expr_list ')' { $$ = Expr::makeInOperator($1, $4); }
 | operand NOT IN '(' expr_list ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator($1, $5)); }
 | operand IN '(' select_no_paren ')' { $$ = Expr::makeInOperator($1, $4); }
-| operand NOT IN '(' select_no_paren ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator($1, $5)); };
+| operand NOT IN '(' select_no_paren ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator($1, $5)); }
+// Row constructor on the left of IN, e.g. (a, b) IN (SELECT x, y FROM t). The
+// tuple is represented as an array expression - Expr has no dedicated row type
+// and this keeps every element in the tree instead of dropping any.
+| '(' row_expr_list ')' IN '(' select_no_paren ')' { $$ = Expr::makeInOperator(Expr::makeArray($2), $6); }
+| '(' row_expr_list ')' NOT IN '(' select_no_paren ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator(Expr::makeArray($2), $7)); }
+// The literal-list counterpart, e.g. (a, b) IN ((1, 2), (3, 4)).
+| '(' row_expr_list ')' IN '(' in_row_list ')' { $$ = Expr::makeInOperator(Expr::makeArray($2), $6); }
+| '(' row_expr_list ')' NOT IN '(' in_row_list ')' { $$ = Expr::makeOpUnary(kOpNot, Expr::makeInOperator(Expr::makeArray($2), $7)); };
+
+// Each row of the list is an array expression, the same representation the row
+// constructor on the left uses.
+in_row_list : '(' row_expr_list ')' {
+  $$ = new std::vector<Expr*>();
+  $$->push_back(Expr::makeArray($2));
+}
+| in_row_list ',' '(' row_expr_list ')' {
+  $1->push_back(Expr::makeArray($4));
+  $$ = $1;
+};
+
+// Two or more elements: a single parenthesized expression stays a plain operand,
+// so the grammar has no ambiguity to resolve between "(a)" and a one-element row.
+row_expr_list : expr ',' expr {
+  $$ = new std::vector<Expr*>();
+  $$->push_back($1);
+  $$->push_back($3);
+}
+| row_expr_list ',' expr {
+  $1->push_back($3);
+  $$ = $1;
+};
 
 // CASE grammar based on: flex & bison by John Levine
 // https://www.safaribooksonline.com/library/view/flex-bison/9780596805418/ch04.html#id352665
@@ -1199,15 +1333,36 @@ comp_expr : operand '=' operand { $$ = Expr::makeOpBinary($1, kOpEquals, $3); }
 | operand LESSEQ operand { $$ = Expr::makeOpBinary($1, kOpLessEq, $3); }
 | operand GREATEREQ operand { $$ = Expr::makeOpBinary($1, kOpGreaterEq, $3); };
 
-// `function_expr is used for window functions, aggregate expressions, and functions calls because we run into shift/
-// reduce conflicts when splitting them.
-function_expr : IDENTIFIER '(' ')' opt_window { $$ = Expr::makeFunctionRef($1, new std::vector<Expr*>(), false, $4); }
-| IDENTIFIER '(' opt_distinct expr_list ')' opt_window { $$ = Expr::makeFunctionRef($1, $4, $3, $6); }
-| IDENTIFIER '.' IDENTIFIER '(' ')' opt_window {
-  $$ = Expr::makeFunctionRef($3, $1, new std::vector<Expr*>(), false, $6);
+// The bare call. Every call form is written once here, so OVER and WITHIN GROUP
+// below apply to all of them, and a table reference can reuse the same shape.
+table_function_expr : IDENTIFIER '(' ')' {
+  $$ = Expr::makeFunctionRef($1, new std::vector<Expr*>(), false, nullptr);
 }
-| IDENTIFIER '.' IDENTIFIER '(' opt_distinct expr_list ')' opt_window {
-  $$ = Expr::makeFunctionRef($3, $1, $6, $5, $8);
+| IDENTIFIER '(' opt_distinct expr_list ')' {
+  $$ = Expr::makeFunctionRef($1, $4, $3, nullptr);
+}
+| IDENTIFIER '.' IDENTIFIER '(' ')' {
+  $$ = Expr::makeFunctionRef($3, $1, new std::vector<Expr*>(), false, nullptr);
+}
+| IDENTIFIER '.' IDENTIFIER '(' opt_distinct expr_list ')' {
+  $$ = Expr::makeFunctionRef($3, $1, $6, $5, nullptr);
+}
+// Dialect functions whose names collide with grammar keywords, e.g.
+// ISNULL(a, 0), CHAR(10), FORMAT(x, '00'). See nonreserved_keyword.
+| nonreserved_keyword '(' ')' {
+  $$ = Expr::makeFunctionRef($1, new std::vector<Expr*>(), false, nullptr);
+}
+| nonreserved_keyword '(' opt_distinct expr_list ')' {
+  $$ = Expr::makeFunctionRef($1, $4, $3, nullptr);
+};
+
+// A call in an expression, which may carry the ordered-set aggregate sort order
+// and a window description. A table reference uses table_function_expr directly:
+// a window function or an ordered-set aggregate is not a table.
+function_expr : table_function_expr opt_within_group opt_window {
+  $$ = $1;
+  $$->withinGroupOrder = $2;
+  $$->windowDescription = $3;
 };
 
 // Window function expressions, based on https://www.postgresql.org/docs/15/sql-expressions.html#SYNTAX-WINDOW-FUNCTIONS
@@ -1238,6 +1393,15 @@ frame_bound : UNBOUNDED PRECEDING { $$ = new FrameBound{0, kPreceding, true}; }
 | CURRENT_ROW { $$ = new FrameBound{0, kCurrentRow, false}; };
 
 extract_expr : EXTRACT '(' datetime_field FROM expr ')' { $$ = Expr::makeExtract($3, $5); };
+
+// T-SQL sequence expression, e.g. SELECT NEXT VALUE FOR mydb.dbo.seq. It yields
+// a value like a function call does, so it is kept as one, with the sequence as
+// its single argument - Expr has no dedicated sequence node.
+next_value_expr : NEXT_VALUE_FOR table_name {
+  auto args = new std::vector<Expr*>();
+  args->push_back(Expr::makeColumnRef(qualifiedName($2)));
+  $$ = Expr::makeFunctionRef(strdup("NEXT VALUE FOR"), args, false, nullptr);
+};
 
 cast_expr : CAST '(' expr AS column_type ')' { $$ = Expr::makeCast($3, $5); };
 
@@ -1273,7 +1437,57 @@ between_expr : operand BETWEEN operand AND operand { $$ = Expr::makeBetween($1, 
 column_name : IDENTIFIER { $$ = Expr::makeColumnRef($1); }
 | IDENTIFIER '.' IDENTIFIER { $$ = Expr::makeColumnRef($1, $3); }
 | '*' { $$ = Expr::makeStar(); }
-| IDENTIFIER '.' '*' { $$ = Expr::makeStar($1); };
+| IDENTIFIER '.' '*' { $$ = Expr::makeStar($1); }
+| nonreserved_keyword { $$ = Expr::makeColumnRef($1); }
+// Column qualified by a multi-part table name, e.g. dbo.Table.Column or
+// mydb.dbo.Table.Column - the column-side counterpart of the multi-part
+// table_name below. Expr has a single table slot, so the qualifiers are folded
+// into it the same way table_name folds database+schema; callers that only
+// classify the statement do not read the parts back.
+| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER { $$ = Expr::makeColumnRef(dotJoin($1, $3), $5); }
+| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER {
+  $$ = Expr::makeColumnRef(dotJoin(dotJoin($1, $3), $5), $7);
+}
+| IDENTIFIER '.' IDENTIFIER '.' '*' { $$ = Expr::makeStar(dotJoin($1, $3)); }
+| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER '.' '*' { $$ = Expr::makeStar(dotJoin(dotJoin($1, $3), $5)); }
+// Qualified forms of the keywords below, e.g. t.YEAR, dbo.t.MONTH. Without
+// these the keyword only works as an unqualified name.
+| IDENTIFIER '.' nonreserved_keyword { $$ = Expr::makeColumnRef($1, $3); }
+| IDENTIFIER '.' IDENTIFIER '.' nonreserved_keyword { $$ = Expr::makeColumnRef(dotJoin($1, $3), $5); }
+| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER '.' nonreserved_keyword {
+  $$ = Expr::makeColumnRef(dotJoin(dotJoin($1, $3), $5), $7);
+};
+
+// Keywords the grammar needs as tokens elsewhere, but which dialects also use
+// as plain names - column names, and date part arguments such as
+// DATEADD(MINUTE, -10, GETDATE()). The token's canonical spelling is used as
+// the name; the original casing is not preserved.
+nonreserved_keyword : SECOND { $$ = strdup("SECOND"); }
+| MINUTE { $$ = strdup("MINUTE"); }
+| HOUR { $$ = strdup("HOUR"); }
+| DAY { $$ = strdup("DAY"); }
+| MONTH { $$ = strdup("MONTH"); }
+| YEAR { $$ = strdup("YEAR"); }
+| SECONDS { $$ = strdup("SECONDS"); }
+| MINUTES { $$ = strdup("MINUTES"); }
+| HOURS { $$ = strdup("HOURS"); }
+| DAYS { $$ = strdup("DAYS"); }
+| MONTHS { $$ = strdup("MONTHS"); }
+| YEARS { $$ = strdup("YEARS"); }
+| ISNULL { $$ = strdup("ISNULL"); }
+| FORMAT { $$ = strdup("FORMAT"); }
+| CHAR { $$ = strdup("CHAR"); }
+| VARCHAR { $$ = strdup("VARCHAR"); }
+| INT { $$ = strdup("INT"); }
+| INTEGER { $$ = strdup("INTEGER"); }
+| DATETIME { $$ = strdup("DATETIME"); }
+| TIMESTAMP { $$ = strdup("TIMESTAMP"); }
+| NEXT { $$ = strdup("NEXT"); };
+
+// Any position that names a database object. Kept out of column_name, which
+// would have to choose between reducing an IDENTIFIER here and shifting the
+// '(' of a function call.
+name_or_keyword : IDENTIFIER | nonreserved_keyword;
 
 literal : string_literal | bool_literal | num_literal | null_literal | date_literal | interval_literal | param_expr;
 
@@ -1377,13 +1591,46 @@ table_ref : table_ref_atomic | table_ref_commalist ',' table_ref_atomic {
   $$ = tbl;
 };
 
-table_ref_atomic : nonjoin_table_ref_atomic | join_clause;
+table_ref_atomic : nonjoin_table_ref_atomic | join_clause
+// ODBC outer join escape, e.g. FROM {oj T LEFT OUTER JOIN U ON T.id = U.id}.
+// The escape only marks the join for the driver, so the join itself is what
+// ends up in the tree.
+| ODBC_OJ table_ref_atomic '}' { $$ = $2; };
 
 nonjoin_table_ref_atomic : table_ref_name | '(' select_statement ')' opt_table_alias {
   auto tbl = new TableRef(kTableSelect);
   tbl->select = $2;
   tbl->alias = $4;
   $$ = tbl;
+}
+// Table-valued function, e.g. FROM STRING_SPLIT(s, ','). name mirrors the
+// function name so getName() behaves like it does for a plain table.
+| table_function_expr opt_table_alias {
+  auto tbl = new TableRef(kTableFunc);
+  tbl->func = $1;
+  tbl->name = strdup($1->name);
+  if ($1->schema) tbl->schema = strdup($1->schema);
+  tbl->alias = $2;
+  $$ = tbl;
+}
+// Table value constructor, e.g. FROM (VALUES (1, 'a'), (2, 'b')) AS t(id, name).
+// The column names come from the alias, which table_alias already parses.
+| '(' VALUES table_value_row_list ')' opt_table_alias {
+  auto tbl = new TableRef(kTableValues);
+  tbl->values = $3;
+  tbl->alias = $5;
+  $$ = tbl;
+};
+
+// Each row is kept as an array expression, the same representation used for a
+// row constructor in IN.
+table_value_row_list : '(' expr_list ')' {
+  $$ = new std::vector<Expr*>();
+  $$->push_back(Expr::makeArray($2));
+}
+| table_value_row_list ',' '(' expr_list ')' {
+  $1->push_back(Expr::makeArray($4));
+  $$ = $1;
 };
 
 table_ref_commalist : table_ref_atomic {
@@ -1409,33 +1656,49 @@ table_ref_name_no_alias : table_name {
   $$->name = $1.name;
 };
 
-table_name : IDENTIFIER {
+// Only the last part may be a keyword. Allowing one in a leading part would
+// put '.' in its follow set, which collides with the qualified function call
+// in table_function_expr.
+table_name : name_or_keyword {
   $$.schema = nullptr;
   $$.name = $1;
 }
-| IDENTIFIER '.' IDENTIFIER {
+| IDENTIFIER '.' name_or_keyword {
   $$.schema = $1;
   $$.name = $3;
 }
-| IDENTIFIER '.' IDENTIFIER '.' IDENTIFIER {
+| nonreserved_keyword '.' name_or_keyword {
+  $$.schema = $1;
+  $$.name = $3;
+}
+| nonreserved_keyword '.' name_or_keyword '.' name_or_keyword {
+  $$.schema = dotJoin($1, $3);
+  $$.name = $5;
+}
+| IDENTIFIER '.' IDENTIFIER '.' name_or_keyword {
   // Three-part (database.schema.table) name. TableName has no separate
   // database slot, so fold database+schema into schema as "database.schema" -
   // callers here only need the statement to parse, not the individual parts.
-  std::string combined(std::string($1) + "." + $3);
-  free($1);
-  free($3);
-  $$.schema = strdup(combined.c_str());
+  $$.schema = dotJoin($1, $3);
   $$.name = $5;
 };
 
-opt_index_name : IDENTIFIER { $$ = $1; }
+opt_index_name : name_or_keyword { $$ = $1; }
 | /* empty */ { $$ = nullptr; };
 
-table_alias : alias | AS IDENTIFIER '(' ident_commalist ')' { $$ = new Alias($2, $4); };
+table_alias : alias | AS name_or_keyword '(' ident_commalist ')' { $$ = new Alias($2, $4); };
 
 opt_table_alias : table_alias | /* empty */ { $$ = nullptr; };
 
 alias : AS IDENTIFIER { $$ = new Alias($2); }
+// A keyword from nonreserved_keyword may also be the alias, e.g. SELECT a AS year.
+// Only accepted after AS: a bare one would be ambiguous with an interval
+// literal such as SELECT 1 YEAR.
+| AS nonreserved_keyword { $$ = new Alias($2); }
+// T-SQL also accepts a string literal as the alias, e.g. SELECT a AS 'My Col'.
+// Only the AS form is accepted: without AS the string is indistinguishable from
+// a string literal in the select list.
+| AS STRING { $$ = new Alias($2); }
 | IDENTIFIER { $$ = new Alias($1); };
 
 opt_alias : alias | /* empty */ { $$ = nullptr; };
@@ -1495,7 +1758,7 @@ with_description_list : with_description {
   $$ = $1;
 };
 
-with_description : IDENTIFIER AS select_with_paren {
+with_description : name_or_keyword AS select_with_paren {
   $$ = new WithDescription();
   $$->alias = $1;
   $$->select = $3;
@@ -1549,11 +1812,11 @@ join_condition : expr;
 opt_semicolon : ';' | /* empty */
     ;
 
-ident_commalist : IDENTIFIER {
+ident_commalist : name_or_keyword {
   $$ = new std::vector<char*>();
   $$->push_back($1);
 }
-| ident_commalist ',' IDENTIFIER {
+| ident_commalist ',' name_or_keyword {
   $1->push_back($3);
   $$ = $1;
 };

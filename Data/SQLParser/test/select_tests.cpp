@@ -1373,4 +1373,480 @@ TEST(FunctionSchema) {
   ASSERT_STREQ(stmt->selectList->at(0)->exprList->at(0)->name, "[1, 2, 3]");
 }
 
+TEST(SelectNonReservedKeywordTest) {
+  SelectStatement* stmt;
+
+  // Date part keywords as function arguments, spelled out or abbreviated.
+  TEST_PARSE_SQL_QUERY("SELECT DATEADD(MINUTE, -10, GETDATE()) FROM t;", dateAddResult, 1);
+  stmt = (SelectStatement*)dateAddResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 1);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprFunctionRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "DATEADD");
+  ASSERT_EQ(stmt->selectList->at(0)->exprList->size(), 3);
+  ASSERT_EQ(stmt->selectList->at(0)->exprList->at(0)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->exprList->at(0)->name, "MINUTE");
+
+  // Keywords as function names.
+  TEST_PARSE_SQL_QUERY("SELECT ISNULL(a, 0), CHAR(10), FORMAT(x, '00') FROM t;", funcResult, 1);
+  stmt = (SelectStatement*)funcResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 3);
+  const char* expectedNames[] = {"ISNULL", "CHAR", "FORMAT"};
+  for (size_t i = 0; i < 3; ++i) {
+    ASSERT_EQ(stmt->selectList->at(i)->type, kExprFunctionRef);
+    ASSERT_STREQ(stmt->selectList->at(i)->name, expectedNames[i]);
+  }
+
+  // Keywords as column names.
+  TEST_PARSE_SQL_QUERY("SELECT YEAR, MONTH FROM t;", columnResult, 1);
+  stmt = (SelectStatement*)columnResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "YEAR");
+  ASSERT_EQ(stmt->selectList->at(1)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(1)->name, "MONTH");
+
+  // The keyword uses these tokens still have: EXTRACT's datetime_field, the
+  // ISNULL postfix operator, CAST's column_type and the INTERVAL qualifier.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT EXTRACT(MINUTE FROM d) FROM t;"
+      "SELECT a FROM t WHERE b ISNULL;"
+      "SELECT CAST(a AS INT) FROM t;"
+      "SELECT INTERVAL '1' MINUTE FROM t;",
+      keptResult, 4);
+  ASSERT_EQ(((SelectStatement*)keptResult.getStatement(0))->selectList->at(0)->type, kExprExtract);
+  ASSERT_EQ(((SelectStatement*)keptResult.getStatement(1))->whereClause->opType, kOpIsNull);
+  ASSERT_EQ(((SelectStatement*)keptResult.getStatement(2))->selectList->at(0)->type, kExprCast);
+}
+
+TEST(SelectCarriageReturnTest) {
+  SelectStatement* stmt;
+
+  // A statement written with CRLF line endings parses like the same statement
+  // written with LF. Carriage return is whitespace, so it never reaches the
+  // catch-all rule, which ends the token stream.
+  TEST_PARSE_SQL_QUERY("SELECT a,\r\n       b\r\nFROM t\r\nWHERE c = 1;", crlfResult, 1);
+  stmt = (SelectStatement*)crlfResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_NOTNULL(stmt->fromTable);
+  ASSERT_NOTNULL(stmt->whereClause);
+
+  TEST_PARSE_SQL_QUERY("SELECT a,\n       b\nFROM t\nWHERE c = 1;", lfResult, 1);
+  stmt = (SelectStatement*)lfResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_NOTNULL(stmt->fromTable);
+  ASSERT_NOTNULL(stmt->whereClause);
+
+  // A carriage return inside a string literal is content, not whitespace, and
+  // has to survive untouched.
+  TEST_PARSE_SQL_QUERY("SELECT 'first\r\nsecond' AS s FROM t;", stringResult, 1);
+  stmt = (SelectStatement*)stringResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprLiteralString);
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "first\r\nsecond");
+}
+
+TEST(SelectNextValueForTest) {
+  SelectStatement* stmt;
+
+  // T-SQL sequence expression. It yields a value like a function call does, so
+  // it is kept as one, with the sequence as its single argument.
+  TEST_PARSE_SQL_QUERY("SELECT NEXT VALUE FOR mydb.dbo.seq AS nextId;", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 1);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprFunctionRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "NEXT VALUE FOR");
+  ASSERT_EQ(stmt->selectList->at(0)->exprList->size(), 1);
+  ASSERT_STREQ(stmt->selectList->at(0)->exprList->at(0)->name, "mydb.dbo.seq");
+  ASSERT_STREQ(stmt->selectList->at(0)->alias, "nextId");
+
+  // NEXT VALUE FOR is lexed as one token, so "value" keeps working as a plain
+  // column name and as a bare alias, and FETCH NEXT is unaffected.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT id, value FROM t WHERE value = 1;"
+      "SELECT COALESCE(MAX(seq_value) + 1, 1) value FROM t;"
+      "SELECT a FROM t ORDER BY a OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;",
+      keptResult, 3);
+  stmt = (SelectStatement*)keptResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->at(1)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(1)->name, "value");
+  stmt = (SelectStatement*)keptResult.getStatement(1);
+  ASSERT_STREQ(stmt->selectList->at(0)->alias, "value");
+  stmt = (SelectStatement*)keptResult.getStatement(2);
+  ASSERT_NOTNULL(stmt->limit);
+}
+
+TEST(SelectOdbcOuterJoinEscapeTest) {
+  SelectStatement* stmt;
+
+  // ODBC outer join escape, e.g. FROM {oj T LEFT OUTER JOIN U ON ...}. The
+  // escape only marks the join for the driver, so the join itself is what ends
+  // up in the tree.
+  TEST_PARSE_SQL_QUERY("SELECT * FROM {oj t LEFT OUTER JOIN u ON t.id = u.id};", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->fromTable);
+  ASSERT_EQ(stmt->fromTable->type, kTableJoin);
+  ASSERT_EQ(stmt->fromTable->join->type, kJoinLeft);
+  ASSERT_NOTNULL(stmt->fromTable->join->condition);
+
+  // "oj" outside the escape is still an ordinary identifier.
+  TEST_PARSE_SQL_QUERY("SELECT oj FROM t oj;", identResult, 1);
+  stmt = (SelectStatement*)identResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "oj");
+  ASSERT_STREQ(stmt->fromTable->getName(), "oj");
+}
+
+TEST(SelectTopExpressionTest) {
+  SelectStatement* stmt;
+
+  // T-SQL requires the parentheses exactly when TOP takes an expression rather
+  // than a constant, so TOP (?) and TOP (:limit) are the documented forms for a
+  // parameterised row count - the bare form stays literal-only because "TOP a"
+  // would be ambiguous with the select list.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT TOP (?) a FROM t;"
+      "SELECT TOP (:limit) a FROM t;"
+      "SELECT TOP ($1) a FROM t;",
+      result, 3);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->limit);
+  ASSERT_EQ(stmt->limit->limit->type, kExprParameter);
+  ASSERT_NULL(stmt->limit->offset);
+  stmt = (SelectStatement*)result.getStatement(1);
+  ASSERT_EQ(stmt->limit->limit->type, kExprParameterNamed);
+  stmt = (SelectStatement*)result.getStatement(2);
+  ASSERT_EQ(stmt->limit->limit->type, kExprParameterDollar);
+
+  // An arithmetic expression and a column reference are accepted too.
+  TEST_PARSE_SQL_QUERY("SELECT TOP (n + 1) a FROM t;", exprResult, 1);
+  stmt = (SelectStatement*)exprResult.getStatement(0);
+  ASSERT_EQ(stmt->limit->limit->type, kExprOperator);
+  ASSERT_EQ(stmt->limit->limit->opType, kOpPlus);
+
+  // Both literal forms keep yielding the same LimitDescription as before.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT TOP (10) a FROM t;"
+      "SELECT TOP 10 a FROM t;",
+      literalResult, 2);
+  for (size_t i = 0; i < 2; ++i) {
+    stmt = (SelectStatement*)literalResult.getStatement(i);
+    ASSERT_NOTNULL(stmt->limit);
+    ASSERT_EQ(stmt->limit->limit->type, kExprLiteralInt);
+    ASSERT_EQ(stmt->limit->limit->ival, 10);
+    ASSERT_NULL(stmt->limit->offset);
+  }
+}
+
+TEST(SelectHierarchicalQueryTest) {
+  SelectStatement* stmt;
+
+  // CONNECT BY on its own, with the LEVEL pseudo column. LEVEL is not a
+  // keyword, so it stays an ordinary column reference.
+  TEST_PARSE_SQL_QUERY("SELECT LEVEL FROM dual CONNECT BY LEVEL <= 5;", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->connectBy);
+  ASSERT_EQ(stmt->connectBy->opType, kOpLessEq);
+  ASSERT_EQ(stmt->connectBy->expr->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->connectBy->expr->name, "LEVEL");
+  ASSERT_NULL(stmt->startWith);
+
+  // START WITH plus CONNECT BY PRIOR - PRIOR binds to the operand that follows
+  // it, so the condition stays a comparison of PRIOR id against parent_id.
+  TEST_PARSE_SQL_QUERY("SELECT id FROM t START WITH id = 1 CONNECT BY PRIOR id = parent_id;", hierResult, 1);
+  stmt = (SelectStatement*)hierResult.getStatement(0);
+  ASSERT_NOTNULL(stmt->startWith);
+  ASSERT_EQ(stmt->startWith->opType, kOpEquals);
+  ASSERT_NOTNULL(stmt->connectBy);
+  ASSERT_EQ(stmt->connectBy->opType, kOpEquals);
+  ASSERT_EQ(stmt->connectBy->expr->type, kExprOperator);
+  ASSERT_EQ(stmt->connectBy->expr->opType, kOpPrior);
+  ASSERT_STREQ(stmt->connectBy->expr->expr->name, "id");
+
+  // CONNECT and START stay usable as ordinary names, and a statement without
+  // the clauses leaves both null.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT connect, start FROM t WHERE connect = 1;"
+      "SELECT a FROM t WHERE b = 1 GROUP BY a ORDER BY a;",
+      keptResult, 2);
+  stmt = (SelectStatement*)keptResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprColumnRef);
+  stmt = (SelectStatement*)keptResult.getStatement(1);
+  ASSERT_NULL(stmt->startWith);
+  ASSERT_NULL(stmt->connectBy);
+}
+
+TEST(SelectWithinGroupTest) {
+  SelectStatement* stmt;
+
+  // LISTAGG(x, ', ') WITHIN GROUP (ORDER BY y) - the sort order belongs to the
+  // aggregate, so it is kept in withinGroupOrder and not in a window
+  // description, which only an OVER clause produces.
+  TEST_PARSE_SQL_QUERY("SELECT LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b) FROM t;", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 1);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprFunctionRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "LISTAGG");
+  ASSERT_NOTNULL(stmt->selectList->at(0)->withinGroupOrder);
+  ASSERT_EQ(stmt->selectList->at(0)->withinGroupOrder->size(), 1);
+  ASSERT_NULL(stmt->selectList->at(0)->windowDescription);
+
+  // Several sort keys with direction, plus an alias on the aggregate.
+  TEST_PARSE_SQL_QUERY("SELECT LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b DESC, c ASC) AS lst FROM t;", multiResult, 1);
+  stmt = (SelectStatement*)multiResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->at(0)->withinGroupOrder->size(), 2);
+  ASSERT_EQ(stmt->selectList->at(0)->withinGroupOrder->at(0)->type, kOrderDesc);
+  ASSERT_STREQ(stmt->selectList->at(0)->alias, "lst");
+
+  // Plain aggregates, OVER windows, GROUP BY and ORDER BY are unaffected.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT COUNT(a) FROM t;"
+      "SELECT COUNT(*) OVER (PARTITION BY a ORDER BY b) FROM t;"
+      "SELECT a FROM t GROUP BY a ORDER BY a;",
+      keptResult, 3);
+  stmt = (SelectStatement*)keptResult.getStatement(0);
+  ASSERT_NULL(stmt->selectList->at(0)->withinGroupOrder);
+  stmt = (SelectStatement*)keptResult.getStatement(1);
+  ASSERT_NOTNULL(stmt->selectList->at(0)->windowDescription);
+  ASSERT_NULL(stmt->selectList->at(0)->withinGroupOrder);
+}
+
+TEST(SelectOracleOuterJoinTest) {
+  SelectStatement* stmt;
+
+  // WHERE t.id (+) = u.id - the marker stays in the tree as a unary operator
+  // on the column it follows, so the null-extended side remains visible.
+  TEST_PARSE_SQL_QUERY("SELECT a FROM t, u WHERE t.id (+) = u.id;", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->whereClause);
+  ASSERT_EQ(stmt->whereClause->opType, kOpEquals);
+  ASSERT_EQ(stmt->whereClause->expr->type, kExprOperator);
+  ASSERT_EQ(stmt->whereClause->expr->opType, kOpOuterJoin);
+  ASSERT_EQ(stmt->whereClause->expr->expr->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->whereClause->expr->expr->name, "id");
+  ASSERT_EQ(stmt->whereClause->expr2->type, kExprColumnRef);
+
+  // Marker on the right-hand side, without spaces, and with spaces inside.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT a FROM t, u WHERE t.id = u.id (+);"
+      "SELECT a FROM t, u WHERE t.id(+)=u.id;"
+      "SELECT a FROM t, u WHERE t.id ( + ) = u.id;",
+      moreResult, 3);
+  stmt = (SelectStatement*)moreResult.getStatement(0);
+  ASSERT_EQ(stmt->whereClause->expr2->opType, kOpOuterJoin);
+  stmt = (SelectStatement*)moreResult.getStatement(1);
+  ASSERT_EQ(stmt->whereClause->expr->opType, kOpOuterJoin);
+
+  // Arithmetic and parenthesized expressions are unaffected: only a lone '+'
+  // between parentheses is the marker.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT a + 1 FROM t;"
+      "SELECT (a + b) FROM t;"
+      "SELECT a FROM t WHERE x = (1 + 2);",
+      keptResult, 3);
+  stmt = (SelectStatement*)keptResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->at(0)->opType, kOpPlus);
+  stmt = (SelectStatement*)keptResult.getStatement(2);
+  ASSERT_EQ(stmt->whereClause->expr2->opType, kOpPlus);
+}
+
+TEST(SelectTableValueConstructorTest) {
+  SelectStatement* stmt;
+
+  TEST_PARSE_SQL_QUERY("SELECT * FROM (VALUES (0, 'Any'), (1, 'One')) AS v(id, name);", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->fromTable);
+  ASSERT_EQ(stmt->fromTable->type, kTableValues);
+  ASSERT_NOTNULL(stmt->fromTable->values);
+  ASSERT_EQ(stmt->fromTable->values->size(), 2);
+
+  // Every row is an array expression holding that row's values.
+  ASSERT_EQ(stmt->fromTable->values->at(0)->type, kExprArray);
+  ASSERT_EQ(stmt->fromTable->values->at(0)->exprList->size(), 2);
+  ASSERT_EQ(stmt->fromTable->values->at(1)->exprList->at(0)->type, kExprLiteralInt);
+
+  // The column names come from the alias.
+  ASSERT_NOTNULL(stmt->fromTable->alias);
+  ASSERT_STREQ(stmt->fromTable->alias->name, "v");
+  ASSERT_NOTNULL(stmt->fromTable->alias->columns);
+  ASSERT_EQ(stmt->fromTable->alias->columns->size(), 2);
+
+  // A single row, a subquery in FROM and INSERT ... VALUES are unaffected.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT * FROM (VALUES (1)) AS v(x);"
+      "SELECT a FROM (SELECT 1 AS a) x;"
+      "INSERT INTO t VALUES (1, 'a');",
+      keptResult, 3);
+  ASSERT_EQ(((SelectStatement*)keptResult.getStatement(0))->fromTable->type, kTableValues);
+  ASSERT_EQ(((SelectStatement*)keptResult.getStatement(1))->fromTable->type, kTableSelect);
+  ASSERT_EQ(keptResult.getStatement(2)->type(), kStmtInsert);
+}
+
+TEST(SelectTableValuedFunctionTest) {
+  SelectStatement* stmt;
+
+  // FROM STRING_SPLIT(s, ',') - the table reference is the function call
+  // itself; name mirrors the function name so getName() keeps working.
+  TEST_PARSE_SQL_QUERY("SELECT value FROM STRING_SPLIT('a,b', ',');", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->fromTable);
+  ASSERT_EQ(stmt->fromTable->type, kTableFunc);
+  ASSERT_NOTNULL(stmt->fromTable->func);
+  ASSERT_EQ(stmt->fromTable->func->type, kExprFunctionRef);
+  ASSERT_STREQ(stmt->fromTable->func->name, "STRING_SPLIT");
+  ASSERT_EQ(stmt->fromTable->func->exprList->size(), 2);
+  ASSERT_STREQ(stmt->fromTable->getName(), "STRING_SPLIT");
+
+  // With an alias, schema qualified, and nested in a subquery.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT * FROM STRING_SPLIT('a,b', ',') AS s;"
+      "SELECT * FROM dbo.fn_split('a', ',') f;"
+      "SELECT a FROM t WHERE id IN (SELECT CAST(value AS INT) FROM STRING_SPLIT('1,2', ','));",
+      moreResult, 3);
+  stmt = (SelectStatement*)moreResult.getStatement(0);
+  ASSERT_EQ(stmt->fromTable->type, kTableFunc);
+  ASSERT_STREQ(stmt->fromTable->getName(), "s");
+
+  // A window function and an ordered-set aggregate are not table references,
+  // so only a plain call is accepted here - they stay valid in a select list.
+  {
+    SQLParserResult windowResult;
+    SQLParser::parse("SELECT * FROM COUNT(*) OVER (PARTITION BY a);", &windowResult);
+    ASSERT_FALSE(windowResult.isValid());
+
+    SQLParserResult aggregateResult;
+    SQLParser::parse("SELECT * FROM LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b);", &aggregateResult);
+    ASSERT_FALSE(aggregateResult.isValid());
+  }
+
+  // Plain table references, subqueries in FROM and the same expressions used in
+  // a select list are unchanged.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT * FROM t a, u b WHERE a.id = b.id;"
+      "SELECT * FROM (SELECT 1) x;"
+      "SELECT COUNT(*) OVER (PARTITION BY a) FROM t;",
+      keptResult, 3);
+  ASSERT_EQ(((SelectStatement*)keptResult.getStatement(0))->fromTable->type, kTableCrossProduct);
+  ASSERT_EQ(((SelectStatement*)keptResult.getStatement(1))->fromTable->type, kTableSelect);
+}
+
+TEST(SelectRowConstructorInTest) {
+  SelectStatement* stmt;
+
+  // (a, b) IN (SELECT x, y FROM u) - the tuple is kept as an array expression,
+  // so every element stays in the tree.
+  TEST_PARSE_SQL_QUERY("SELECT c FROM t WHERE (a, b) IN (SELECT x, y FROM u);", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_NOTNULL(stmt->whereClause);
+  ASSERT_EQ(stmt->whereClause->opType, kOpIn);
+  ASSERT_EQ(stmt->whereClause->expr->type, kExprArray);
+  ASSERT_EQ(stmt->whereClause->expr->exprList->size(), 2);
+  ASSERT_NOTNULL(stmt->whereClause->select);
+
+  TEST_PARSE_SQL_QUERY("SELECT c FROM t WHERE (a, b, c) NOT IN (SELECT x, y, z FROM u);", notInResult, 1);
+  stmt = (SelectStatement*)notInResult.getStatement(0);
+  ASSERT_EQ(stmt->whereClause->opType, kOpNot);
+  ASSERT_EQ(stmt->whereClause->expr->opType, kOpIn);
+  ASSERT_EQ(stmt->whereClause->expr->expr->exprList->size(), 3);
+
+  // A single parenthesized expression is still a plain operand, not a
+  // one-element row, and the value-list form of IN is unchanged.
+  TEST_PARSE_SQL_QUERY(
+      "SELECT c FROM t WHERE (a) IN (SELECT x FROM u);"
+      "SELECT c FROM t WHERE a IN (1, 2, 3);",
+      keptResult, 2);
+  stmt = (SelectStatement*)keptResult.getStatement(0);
+  ASSERT_EQ(stmt->whereClause->expr->type, kExprColumnRef);
+  stmt = (SelectStatement*)keptResult.getStatement(1);
+  ASSERT_EQ(stmt->whereClause->opType, kOpIn);
+  ASSERT_EQ(stmt->whereClause->exprList->size(), 3);
+}
+
+TEST(SelectMultiPartColumnNameTest) {
+  SelectStatement* stmt;
+
+  // Three- and four-part column references. The qualifiers are folded into the
+  // single table slot Expr has, mirroring how table_name folds database+schema.
+  TEST_PARSE_SQL_QUERY("SELECT dbo.T.C, mydb.dbo.T.C2 FROM mydb.dbo.T;", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(0)->table, "dbo.T");
+  ASSERT_STREQ(stmt->selectList->at(0)->name, "C");
+  ASSERT_EQ(stmt->selectList->at(1)->type, kExprColumnRef);
+  ASSERT_STREQ(stmt->selectList->at(1)->table, "mydb.dbo.T");
+  ASSERT_STREQ(stmt->selectList->at(1)->name, "C2");
+
+  // Star qualified by the same multi-part names.
+  TEST_PARSE_SQL_QUERY("SELECT dbo.T.*, mydb.dbo.T.* FROM mydb.dbo.T;", starResult, 1);
+  stmt = (SelectStatement*)starResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprStar);
+  ASSERT_STREQ(stmt->selectList->at(0)->table, "dbo.T");
+  ASSERT_EQ(stmt->selectList->at(1)->type, kExprStar);
+  ASSERT_STREQ(stmt->selectList->at(1)->table, "mydb.dbo.T");
+
+  // One- and two-part references and schema-qualified function calls are
+  // unchanged - they share the leading IDENTIFIER '.' IDENTIFIER prefix.
+  TEST_PARSE_SQL_QUERY("SELECT c, a.b, a.*, sys.uuid() FROM x a;", keptResult, 1);
+  stmt = (SelectStatement*)keptResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 4);
+  ASSERT_NULL(stmt->selectList->at(0)->table);
+  ASSERT_STREQ(stmt->selectList->at(1)->table, "a");
+  ASSERT_EQ(stmt->selectList->at(2)->type, kExprStar);
+  ASSERT_EQ(stmt->selectList->at(3)->type, kExprFunctionRef);
+  ASSERT_STREQ(stmt->selectList->at(3)->schema, "sys");
+}
+
+TEST(SelectStringAliasTest) {
+  SelectStatement* stmt;
+
+  TEST_PARSE_SQL_QUERY("SELECT a AS 'Coil Id', b AS 'X' FROM t;", result, 1);
+  stmt = (SelectStatement*)result.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_STREQ(stmt->selectList->at(0)->alias, "Coil Id");
+  ASSERT_STREQ(stmt->selectList->at(1)->alias, "X");
+
+  // Only the AS form is accepted, so a bare string in the select list is still
+  // a string literal and not an alias for the expression before it.
+  TEST_PARSE_SQL_QUERY("SELECT 'literal', a AS b FROM t;", literalResult, 1);
+  stmt = (SelectStatement*)literalResult.getStatement(0);
+  ASSERT_EQ(stmt->selectList->size(), 2);
+  ASSERT_EQ(stmt->selectList->at(0)->type, kExprLiteralString);
+  ASSERT_NULL(stmt->selectList->at(0)->alias);
+  ASSERT_STREQ(stmt->selectList->at(1)->alias, "b");
+}
+
+TEST(SelectScientificNotationTest) {
+  SelectStatement* stmt;
+
+  TEST_PARSE_SQL_QUERY(
+      "SELECT 1.5e3 FROM t;"
+      "SELECT 1.5E+3 FROM t;"
+      "SELECT 5e-1 FROM t;"
+      "SELECT .5e1 FROM t;"
+      "SELECT 2e10 FROM t;",
+      result, 5);
+
+  // One float literal per statement, no alias. Without an exponent rule in the
+  // lexer the mantissa is scanned as a number and the exponent as an
+  // identifier, so "SELECT 1.5e3" parses as "SELECT 1.5 AS e3" - a valid parse
+  // of a different statement rather than an error.
+  const double expected[] = {1500.0, 1500.0, 0.5, 5.0, 2e10};
+  for (size_t i = 0; i < 5; ++i) {
+    stmt = (SelectStatement*)result.getStatement(i);
+    ASSERT_NOTNULL(stmt->selectList);
+    ASSERT_EQ(stmt->selectList->size(), 1);
+    ASSERT_EQ(stmt->selectList->at(0)->type, kExprLiteralFloat);
+    ASSERT_EQ(stmt->selectList->at(0)->fval, expected[i]);
+    ASSERT_NULL(stmt->selectList->at(0)->alias);
+  }
+
+  // Outside a select list there is no alias to absorb the exponent.
+  TEST_PARSE_SQL_QUERY("SELECT a FROM t WHERE x = 0.5e-2;", whereResult, 1);
+  stmt = (SelectStatement*)whereResult.getStatement(0);
+  ASSERT_NOTNULL(stmt->whereClause);
+  ASSERT_EQ(stmt->whereClause->expr2->type, kExprLiteralFloat);
+  ASSERT_EQ(stmt->whereClause->expr2->fval, 0.005);
+}
+
 }  // namespace hsql

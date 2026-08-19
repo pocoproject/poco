@@ -21,6 +21,7 @@
 #include "sql/AlterStatement.h"
 #include "sql/DropStatement.h"
 #include "sql/DeleteStatement.h"
+#include "sql/SelectStatement.h"
 
 
 namespace Poco::Data {
@@ -189,6 +190,174 @@ void SQLParserTest::testArrayLiteralNotShadowedByBracketIdentifier()
 		assertEqual(1, result.size());
 		assertTrue(result.getStatement(0)->type() == kStmtSelect);
 	}
+}
+
+
+void SQLParserTest::testDialectStatements()
+{
+	// The upstream suite (linux-sqlparser-upstream-tests) already asserts the
+	// tree shape for these forms. What is asserted here is the contract Poco
+	// depends on: the statement parses, yields one statement, and classifies as
+	// SELECT so Statement::isSelect() can be trusted.
+	static const char* const selects[] =
+	{
+		// Non-reserved keywords as names and as function names.
+		"SELECT * FROM Test WHERE CreatedAt >= DATEADD(MINUTE, -10, GETDATE());",
+		"SELECT ISNULL(A, 0), CHAR(10), FORMAT(A, '00'), YEAR, MONTH FROM Test;",
+		"SELECT Test.YEAR, dbo.Test.MONTH FROM dbo.Test;",
+		"SELECT A AS year FROM Test AS next;",
+		"SELECT * FROM start WHERE connect = 1;",
+		// T-SQL sequence expression.
+		"SELECT NEXT VALUE FOR Seq;",
+		"SELECT NEXT VALUE FOR MyDb.dbo.Seq AS NextId;",
+		// Parenthesized TOP taking an expression.
+		"SELECT TOP (?) * FROM Test;",
+		"SELECT TOP (:limit) * FROM Test;",
+		"SELECT TOP (N + 1) * FROM Test;",
+		// Oracle hierarchical queries, either clause order, with and without NOCYCLE.
+		"SELECT Level FROM Dual CONNECT BY Level <= 5;",
+		"SELECT Id FROM Test START WITH Id = 1 CONNECT BY PRIOR Id = ParentId;",
+		"SELECT Id FROM Test CONNECT BY PRIOR Id = ParentId START WITH Id = 1;",
+		"SELECT Id FROM Test CONNECT BY NOCYCLE PRIOR Id = ParentId;",
+		// Ordered-set aggregates.
+		"SELECT ListAgg(A, ', ') WITHIN GROUP (ORDER BY B) FROM Test;",
+		"SELECT dbo.ListAgg(A, ', ') WITHIN GROUP (ORDER BY B DESC) AS L FROM Test;",
+		// Oracle outer join marker.
+		"SELECT * FROM Test, Other WHERE Test.Id (+) = Other.Id;",
+		"SELECT * FROM Test, Other WHERE Test.Id = Other.Id (+);",
+		// Table value constructor and table-valued functions in FROM.
+		"SELECT * FROM (VALUES (0, 'Any'), (1, 'One')) AS V(Id, Name);",
+		"SELECT Value FROM String_Split('a,b', ',');",
+		"SELECT * FROM dbo.Fn_Split('a', ',') F;",
+		// Row constructor on the left of IN, both right-hand forms.
+		"SELECT * FROM Test WHERE (A, B) IN (SELECT X, Y FROM Other);",
+		"SELECT * FROM Test WHERE (A, B) IN ((1, 2), (3, 4));",
+		"SELECT * FROM Test WHERE (A, B) NOT IN ((1, 2), (3, 4));",
+		// Multi-part column references and string literal aliases.
+		"SELECT dbo.Test.A, MyDb.dbo.Test.B FROM MyDb.dbo.Test;",
+		"SELECT dbo.Test.*, MyDb.dbo.Test.* FROM MyDb.dbo.Test;",
+		"SELECT A AS 'Coil Id' FROM Test AS 'my table';",
+		// ODBC outer join escape.
+		"SELECT * FROM {oj Test LEFT OUTER JOIN Other ON Test.Id = Other.Id};",
+		// Scientific notation numeric literals.
+		"SELECT 1.5e3, 1.5E+3, 5e-1, .5e1, 2e10 FROM Test;"
+	};
+
+	for (const char* query: selects)
+	{
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue (result.isValid());
+		assertEqual(1, result.size());
+		assertTrue (result.getStatement(0)->type() == kStmtSelect);
+	}
+
+	// ODBC procedure call escapes are execute statements, not selects.
+	static const char* const executes[] =
+	{
+		"{? = call some_proc(?, 'a', 1)};",
+		"{call some_proc(?)};",
+		"{call some_proc};",
+		"{ ? = call [MyDb].[dbo].[some_proc]('a') };"
+	};
+
+	for (const char* query: executes)
+	{
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue (result.isValid());
+		assertEqual(1, result.size());
+		assertTrue (result.getStatement(0)->type() == kStmtExecute);
+	}
+
+	// A window function or an ordered-set aggregate is not a table reference,
+	// and a parenthesized TOP holding a placeholder cannot be combined with
+	// LIMIT: the placeholder is also held by the parameter list.
+	static const char* const invalid[] =
+	{
+		"SELECT * FROM Count(*) OVER (PARTITION BY A);",
+		"SELECT * FROM ListAgg(A, ', ') WITHIN GROUP (ORDER BY B);",
+		"SELECT TOP (?) * FROM Test LIMIT 5;"
+	};
+
+	for (const char* query: invalid)
+	{
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue (!result.isValid());
+	}
+}
+
+
+void SQLParserTest::testCarriageReturn()
+{
+	// CR is whitespace, including inside the multi-word tokens. A statement read
+	// from a CRLF file must parse exactly like the LF form.
+	static const char* const queries[] =
+	{
+		"SELECT A\r\nFROM Test\r\nWHERE B = 1;",
+		"SELECT NEXT VALUE\r\nFOR Seq;",
+		"SELECT Sum(A) OVER (ROWS BETWEEN CURRENT\r\nROW AND UNBOUNDED FOLLOWING) FROM Test;",
+		"SELECT Array\r\n[Foo] FROM Test;",
+		"SELECT Id FROM Test START\r\nWITH Id = 1 CONNECT\r\nBY PRIOR Id = ParentId;",
+		"SELECT * FROM Test, Other WHERE Test.Id (\r\n+\r\n) = Other.Id;"
+	};
+
+	for (const char* query: queries)
+	{
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue (result.isValid());
+		assertEqual(1, result.size());
+	}
+
+	// A line comment ends at its newline. The clause after the comment carries
+	// the FROM target, so a swallowed line is a parse error rather than a
+	// silently shorter statement.
+	static const char* const commented[] =
+	{
+		"SELECT A FROM\n-- comment\n  Test;",
+		"SELECT A FROM -- comment\n\nTest;",
+		"SELECT A FROM\r\n-- comment\r\n  Test;",
+		"SELECT A FROM -- comment   \n   Test;"
+	};
+
+	for (const char* query: commented)
+	{
+		SQLParserResult result;
+		SQLParser::parse(query, &result);
+		assertTrue (result.isValid());
+		assertEqual(1, result.size());
+		assertTrue (result.getStatement(0)->type() == kStmtSelect);
+	}
+
+	// A clause a shorter statement could do without needs the tree checked
+	// instead: with an inclusive comment condition this parses as valid with
+	// no WHERE at all.
+	SQLParserResult whereResult;
+	SQLParser::parse("SELECT A FROM Test -- comment   \n   WHERE B IN (1, 2);", &whereResult);
+	assertTrue (whereResult.isValid());
+	assertEqual(1, whereResult.size());
+	const SelectStatement* commentedSelect =
+		static_cast<const SelectStatement*>(whereResult.getStatement(0));
+	assertTrue (commentedSelect->whereClause != nullptr);
+}
+
+
+void SQLParserTest::testODBCCallParameters()
+{
+	// ODBC numbers the return marker as parameter 1 and binds it positionally,
+	// so it has to reach the parameter list like any other placeholder -
+	// Utility::boundSQL derives its arity check from that list.
+	SQLParserResult result;
+	SQLParser::parse("{? = call some_proc(?, ?)};", &result);
+	assertTrue (result.isValid());
+	assertEqual(3, static_cast<int>(result.parameters().size()));
+
+	result.reset();
+	SQLParser::parse("{call some_proc(?, ?)};", &result);
+	assertTrue (result.isValid());
+	assertEqual(2, static_cast<int>(result.parameters().size()));
 }
 
 
@@ -362,6 +531,9 @@ CppUnit::Test* SQLParserTest::suite()
 	CppUnit_addTest(pSuite, SQLParserTest, testBracketedIdentifiers);
 	CppUnit_addTest(pSuite, SQLParserTest, testThreePartTableName);
 	CppUnit_addTest(pSuite, SQLParserTest, testArrayLiteralNotShadowedByBracketIdentifier);
+	CppUnit_addTest(pSuite, SQLParserTest, testDialectStatements);
+	CppUnit_addTest(pSuite, SQLParserTest, testCarriageReturn);
+	CppUnit_addTest(pSuite, SQLParserTest, testODBCCallParameters);
 	CppUnit_addTest(pSuite, SQLParserTest, testResetClearsParameters);
 	CppUnit_addTest(pSuite, SQLParserTest, testNamedParameter);
 	CppUnit_addTest(pSuite, SQLParserTest, testAlterDropColumnIfExists);

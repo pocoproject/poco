@@ -788,6 +788,35 @@ TEST(CastAsType) {
   ASSERT_EQ(stmt->selectList->front()->columnType.length, 8);
 }
 
+TEST(OdbcCallEscapeTest) {
+  // ODBC procedure call escape. The optional "? =" is the driver's return value
+  // marker and carries nothing the statement needs, so both forms produce the
+  // same ExecuteStatement an EXECUTE would.
+  TEST_PARSE_SQL_QUERY(
+      "{? = call some_proc(?, 'a', 1)};"
+      "{call some_proc(?)};"
+      "{ ? = call [mydb].[dbo].[some_proc]('a') };",
+      result, 3);
+
+  ASSERT_EQ(result.getStatement(0)->type(), kStmtExecute);
+  auto stmt = (ExecuteStatement*)result.getStatement(0);
+  ASSERT_STREQ(stmt->name, "some_proc");
+  ASSERT_NOTNULL(stmt->parameters);
+  ASSERT_EQ(stmt->parameters->size(), 3);
+
+  ASSERT_EQ(result.getStatement(1)->type(), kStmtExecute);
+  ASSERT_STREQ(((ExecuteStatement*)result.getStatement(1))->name, "some_proc");
+
+  // A qualified procedure name is kept whole.
+  ASSERT_EQ(result.getStatement(2)->type(), kStmtExecute);
+  ASSERT_STREQ(((ExecuteStatement*)result.getStatement(2))->name, "mydb.dbo.some_proc");
+
+  // Plain EXECUTE is unchanged.
+  TEST_PARSE_SQL_QUERY("EXECUTE some_proc(1, 2);", execResult, 1);
+  ASSERT_EQ(execResult.getStatement(0)->type(), kStmtExecute);
+  ASSERT_STREQ(((ExecuteStatement*)execResult.getStatement(0))->name, "some_proc");
+}
+
 }  // namespace hsql
 
 TEST_MAIN();

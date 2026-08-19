@@ -73,7 +73,15 @@ enum OperatorType {
   kOpNot,
   kOpUnaryMinus,
   kOpIsNull,
-  kOpExists
+  kOpExists,
+
+  // Oracle's legacy outer join marker, e.g. WHERE a.id (+) = b.id. Marks the
+  // operand it follows as the null-extended side of the join.
+  kOpOuterJoin,
+
+  // Oracle's PRIOR, used in the CONNECT BY clause of a hierarchical query to
+  // refer to the parent row, e.g. CONNECT BY PRIOR id = parent_id.
+  kOpPrior
 };
 
 enum DatetimeField {
@@ -148,6 +156,11 @@ struct SQLParser_API Expr {
   bool distinct;
 
   WindowDescription* windowDescription;
+
+  // Set for ordered-set aggregates, e.g. LISTAGG(x, ',') WITHIN GROUP (ORDER BY y).
+  // Holds the WITHIN GROUP sort order, which is part of the aggregate itself and
+  // not a window frame - hence separate from windowDescription.
+  std::vector<OrderDescription*>* withinGroupOrder;
 
   // Convenience accessor methods.
 

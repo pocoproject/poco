@@ -135,3 +135,81 @@ SELECT * FROM [test];
 SELECT [my col] FROM [some schema].[my table];
 SELECT * FROM mydb.some_schema.test;
 SELECT ARRAY[foo] FROM test;
+# T-SQL sequence expression
+SELECT NEXT VALUE FOR seq;
+SELECT NEXT VALUE FOR mydb.dbo.seq AS next_id;
+SELECT COALESCE(MAX(seq_value) + 1, 1) value FROM test;
+# ODBC escape sequences
+SELECT * FROM {oj test LEFT OUTER JOIN other ON test.id = other.id};
+{? = call some_proc(?, 'a', 1)};
+{call some_proc(?)};
+{ ? = call [mydb].[dbo].[some_proc]('a') };
+# TOP with an expression
+SELECT TOP (?) * FROM test;
+SELECT TOP (:limit) * FROM test;
+SELECT TOP (n + 1) * FROM test;
+# Oracle hierarchical query
+SELECT LEVEL FROM dual CONNECT BY LEVEL <= 5;
+SELECT id FROM test START WITH id = 1 CONNECT BY PRIOR id = parent_id;
+SELECT id FROM test CONNECT BY PRIOR id = parent_id;
+# Ordered-set aggregate (WITHIN GROUP)
+SELECT LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b) FROM test;
+SELECT LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b DESC, c ASC) AS lst FROM test;
+# Oracle outer join marker
+SELECT * FROM test, other WHERE test.id (+) = other.id;
+SELECT * FROM test, other WHERE test.id = other.id (+);
+SELECT * FROM test, other WHERE test.id(+)=other.id AND test.x > 5;
+# Table value constructor in FROM
+SELECT * FROM (VALUES (0, 'Any'), (1, 'One')) AS v(id, name);
+SELECT * FROM (VALUES (1)) AS v(x);
+# Table-valued function in FROM
+SELECT value FROM STRING_SPLIT('a,b', ',');
+SELECT * FROM STRING_SPLIT('a,b', ',') AS s;
+SELECT * FROM dbo.fn_split('a', ',') f;
+# Row constructor on the left of IN
+SELECT * FROM test WHERE (a, b) IN (SELECT x, y FROM other);
+SELECT * FROM test WHERE (a, b, c) NOT IN (SELECT x, y, z FROM other);
+# Multi-part column references
+SELECT dbo.test.a, mydb.dbo.test.b FROM mydb.dbo.test;
+SELECT dbo.test.*, mydb.dbo.test.* FROM mydb.dbo.test;
+SELECT * FROM [mydb].[dbo].test INNER JOIN [mydb].[dbo].other ON [mydb].[dbo].test.id = [mydb].[dbo].other.id;
+# String literal used as an alias
+SELECT a AS 'Coil Id', b AS 'X' FROM test;
+SELECT * FROM test AS 'my table';
+# Non-reserved keywords used as names
+SELECT * FROM test WHERE created >= DATEADD(MINUTE, -10, GETDATE());
+SELECT DATEDIFF(SECOND, a, b), DATEADD(year, -1, GETDATE()) FROM test;
+SELECT ISNULL(a, 0), CHAR(10), FORMAT(a, '00') FROM test;
+SELECT CONVERT(INT, a), CONVERT(DATETIME, b) FROM test;
+SELECT YEAR, MONTH FROM test ORDER BY YEAR;
+# Scientific notation numeric literals
+SELECT 1.5e3 FROM test;
+SELECT 1.5E+3, 5e-1, .5e1, 2e10 FROM test;
+SELECT * FROM test WHERE a = 0.5e-2;
+# Non-reserved words usable as ordinary names
+SELECT * FROM start;
+SELECT start.a FROM start;
+UPDATE test SET start = 1;
+INSERT INTO test (start, connect) VALUES (1, 2);
+CREATE TABLE test (start INT);
+SELECT a AS within FROM test;
+SELECT * FROM test AS connect;
+SELECT test.YEAR, dbo.test.MONTH FROM dbo.test;
+SELECT a AS year FROM test AS next;
+SELECT * FROM year.test;
+# Row constructor against a literal list
+SELECT * FROM test WHERE (a, b) IN ((1, 2), (3, 4));
+SELECT * FROM test WHERE (a, b, c) NOT IN ((1, 2, 3), (4, 5, 6));
+# Hierarchical clauses in either order, with and without NOCYCLE
+SELECT id FROM test CONNECT BY PRIOR id = parent_id START WITH id = 1;
+SELECT id FROM test CONNECT BY NOCYCLE PRIOR id = parent_id;
+SELECT id FROM test CONNECT BY NOCYCLE PRIOR id = parent_id START WITH id = 1;
+SELECT * FROM test CONNECT BY nocycleflag = 1;
+# Ordered-set aggregates and window clauses on every call form
+SELECT dbo.LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b) FROM test;
+SELECT FORMAT(a) WITHIN GROUP (ORDER BY b) FROM test;
+SELECT RANK() OVER (PARTITION BY a) FROM test;
+# Table-valued function keeps its schema
+SELECT * FROM dbo.fn_split('a', ',') f;
+# ODBC call escape with a return marker
+{? = call some_proc(?, ?)};

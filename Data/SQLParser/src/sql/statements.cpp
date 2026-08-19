@@ -119,10 +119,12 @@ TransactionStatement::TransactionStatement(TransactionCommand command)
 TransactionStatement::~TransactionStatement() {}
 
 // ExecuteStatement
-ExecuteStatement::ExecuteStatement() : SQLStatement(kStmtExecute), name(nullptr), parameters(nullptr) {}
+ExecuteStatement::ExecuteStatement()
+    : SQLStatement(kStmtExecute), name(nullptr), parameters(nullptr), returnValue(nullptr) {}
 
 ExecuteStatement::~ExecuteStatement() {
   free(name);
+  delete returnValue;
 
   if (parameters) {
     for (Expr* param : *parameters) {
@@ -291,6 +293,8 @@ SelectStatement::SelectStatement()
       selectDistinct(false),
       selectList(nullptr),
       whereClause(nullptr),
+      startWith(nullptr),
+      connectBy(nullptr),
       groupBy(nullptr),
       setOperations(nullptr),
       order(nullptr),
@@ -301,6 +305,8 @@ SelectStatement::SelectStatement()
 SelectStatement::~SelectStatement() {
   delete fromTable;
   delete whereClause;
+  delete startWith;
+  delete connectBy;
   delete groupBy;
   delete limit;
 
@@ -379,7 +385,15 @@ Alias::~Alias() {
 
 // TableRef
 TableRef::TableRef(TableRefType type)
-    : type(type), schema(nullptr), name(nullptr), alias(nullptr), select(nullptr), list(nullptr), join(nullptr) {}
+    : type(type),
+      schema(nullptr),
+      name(nullptr),
+      alias(nullptr),
+      select(nullptr),
+      list(nullptr),
+      join(nullptr),
+      func(nullptr),
+      values(nullptr) {}
 
 TableRef::~TableRef() {
   free(schema);
@@ -388,6 +402,14 @@ TableRef::~TableRef() {
   delete select;
   delete join;
   delete alias;
+  delete func;
+
+  if (values) {
+    for (Expr* row : *values) {
+      delete row;
+    }
+    delete values;
+  }
 
   if (list) {
     for (TableRef* table : *list) {

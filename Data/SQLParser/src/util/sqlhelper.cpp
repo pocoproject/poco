@@ -55,6 +55,14 @@ void printTableRefInfo(TableRef* table, uintmax_t num_indent) {
     case kTableCrossProduct:
       for (TableRef* tbl : *table->list) printTableRefInfo(tbl, num_indent);
       break;
+    case kTableFunc:
+      inprint("Table-valued Function", num_indent);
+      printExpression(table->func, num_indent + 1);
+      break;
+    case kTableValues:
+      inprint("Values", num_indent);
+      for (Expr* row : *table->values) printExpression(row, num_indent + 1);
+      break;
   }
 
   if (table->alias) {
@@ -127,6 +135,11 @@ void printExpression(Expr* expr, uintmax_t num_indent) {
       inprint(expr->name, num_indent);
       for (Expr* e : *expr->exprList) {
         printExpression(e, num_indent + 1);
+      }
+
+      if (expr->withinGroupOrder) {
+        inprint("WITHIN GROUP (ORDER BY)", num_indent + 1);
+        printOrderBy(expr->withinGroupOrder, num_indent + 2);
       }
 
       if (expr->windowDescription) {
@@ -233,6 +246,16 @@ void printSelectStatementInfo(const SelectStatement* stmt, uintmax_t num_indent)
   if (stmt->whereClause) {
     inprint("Search Conditions:", num_indent + 1);
     printExpression(stmt->whereClause, num_indent + 2);
+  }
+
+  if (stmt->startWith) {
+    inprint("START WITH:", num_indent + 1);
+    printExpression(stmt->startWith, num_indent + 2);
+  }
+
+  if (stmt->connectBy) {
+    inprint("CONNECT BY:", num_indent + 1);
+    printExpression(stmt->connectBy, num_indent + 2);
   }
 
   if (stmt->groupBy) {
@@ -455,7 +478,8 @@ std::ostream& operator<<(std::ostream& os, const OperatorType& op) {
       {kOpOr, "OR"},         {kOpIn, "IN"},
       {kOpConcat, "CONCAT"}, {kOpNot, "NOT"},
       {kOpUnaryMinus, "-"},  {kOpIsNull, "IS NULL"},
-      {kOpExists, "EXISTS"}};
+      {kOpExists, "EXISTS"},  {kOpOuterJoin, "(+)"},
+      {kOpPrior, "PRIOR"}};
 
   const auto found = operatorToToken.find(op);
   if (found == operatorToToken.cend()) {

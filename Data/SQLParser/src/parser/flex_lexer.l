@@ -21,6 +21,14 @@
 static thread_local std::stringstream strbuf;
 
 %}
+
+  /*
+   * Whitespace, carriage return included. Every rule that has to skip or span
+   * whitespace uses this, so a CRLF input cannot be handled by one rule and
+   * missed by the next.
+   */
+WS  [ \t\r\n]
+
 %x singlequotedstring
 
 /***************************
@@ -49,7 +57,12 @@ static thread_local std::stringstream strbuf;
 /* %option nodefault */
 
 
-%s COMMENT
+  /*
+   * Exclusive: an inclusive COMMENT would also run the whitespace rule below,
+   * which matches longer than the newline ending the comment and so never
+   * returns to INITIAL - silently swallowing the line after the comment.
+   */
+%x COMMENT
 %x afterarray
 
 /***************************
@@ -61,7 +74,7 @@ static thread_local std::stringstream strbuf;
 <COMMENT>[^\n]* /* skipping comment content until a end of line is read */;
 <COMMENT>\n     BEGIN(INITIAL);
 
-[ \t\n]+        /* skip whitespace */;
+{WS}+           /* skip whitespace; CR is included so CRLF input never reaches the catch-all rule below, which ends the token stream */;
 
 ADD         TOKEN(ADD)
 AFTER       TOKEN(AFTER)
@@ -183,6 +196,7 @@ PLAN        TOKEN(PLAN)
 PRECEDING   TOKEN(PRECEDING)
 PREPARE     TOKEN(PREPARE)
 PRIMARY     TOKEN(PRIMARY)
+PRIOR       TOKEN(PRIOR)
 RANGE       TOKEN(RANGE)
 REAL        TOKEN(REAL)
 REFERENCES  TOKEN(REFERENCES)
@@ -231,8 +245,20 @@ WITH        TOKEN(WITH)
 YEAR        TOKEN(YEAR)
 YEARS       TOKEN(YEARS)
 
-CURRENT[ \t\n]+ROW       TOKEN(CURRENT_ROW)
-CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
+  /*
+   * Phrases rather than single reserved words: START, CONNECT and WITHIN are
+   * ordinary names on their own, and reserving them broke statements such as
+   * "SELECT * FROM start". The trailing context keeps "CONNECT BY nocycleflag"
+   * from lexing as CONNECT_BY_NOCYCLE followed by "flag".
+   */
+START{WS}+WITH/[^A-Za-z0-9_]              TOKEN(START_WITH)
+CONNECT{WS}+BY{WS}+NOCYCLE/[^A-Za-z0-9_]  TOKEN(CONNECT_BY_NOCYCLE)
+CONNECT{WS}+BY/[^A-Za-z0-9_]              TOKEN(CONNECT_BY)
+WITHIN{WS}+GROUP/[^A-Za-z0-9_]            TOKEN(WITHIN_GROUP)
+
+CURRENT{WS}+ROW              TOKEN(CURRENT_ROW)
+NEXT{WS}+VALUE{WS}+FOR       TOKEN(NEXT_VALUE_FOR)
+CHARACTER{WS}+VARYING        TOKEN(CHARACTER_VARYING)
 
             /* Allow =/== see https://sqlite.org/lang_expr.html#collateop */
 "=="        TOKEN(EQUALS)
@@ -241,6 +267,20 @@ CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
 "<="        TOKEN(LESSEQ)
 ">="        TOKEN(GREATEREQ)
 "||"        TOKEN(CONCAT)
+
+  /*
+   * ODBC outer join escape prefix. Lexed as one token so "oj" keeps working as
+   * an ordinary identifier everywhere else. The trailing context stops the rule
+   * from taking the "{oj" out of a name such as "{ojtest".
+   */
+"{"{WS}*oj/[^A-Za-z0-9_]    TOKEN(ODBC_OJ)
+
+  /*
+   * Oracle's legacy outer join marker. Lexed as one token so it cannot be
+   * confused with a parenthesized expression - "(" followed by a lone "+" is
+   * not valid SQL in any other position, since the grammar has no unary plus.
+   */
+"("{WS}*"+"{WS}*")"    TOKEN(OUTERJOIN)
 
 \$[0-9]+    {
   yylval->ival = atoll(yytext + 1);
@@ -253,6 +293,18 @@ CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
 }
 
 [-+*/(){},.;<>=^%:?[\]|]    { return yytext[0]; }
+
+  /*
+   * Scientific notation, e.g. 1.5e3, 1.5E+3, .5e-3, 2e10. Matched as one token;
+   * the plain float and integer rules would otherwise take the mantissa and leave
+   * the exponent to be scanned as an identifier.
+   */
+[0-9]+"."[0-9]*e[-+]?[0-9]+ |
+"."[0-9]+e[-+]?[0-9]+ |
+[0-9]+e[-+]?[0-9]+ {
+  yylval->fval = atof(yytext);
+  return SQL_FLOATVAL;
+}
 
 [0-9]+"."[0-9]* |
 "."[0-9]*  {
@@ -286,7 +338,7 @@ CHARACTER[ \t\n]+VARYING TOKEN(CHARACTER_VARYING)
   return SQL_IDENTIFIER;
 }
 
-<afterarray>[ \t\n]+ ; /* stay in afterarray across whitespace before the '[', e.g. "ARRAY [1,2,3]" */
+<afterarray>{WS}+ ; /* stay in afterarray across whitespace before the '[', e.g. "ARRAY [1,2,3]" */
 
 <afterarray>\[ {
   // The '[' immediately after ARRAY belongs to the array_expr grammar

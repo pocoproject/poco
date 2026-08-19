@@ -34,6 +34,9 @@ public:
 	void testBracketedIdentifiers();
 	void testThreePartTableName();
 	void testArrayLiteralNotShadowedByBracketIdentifier();
+	void testDialectStatements();
+	void testCarriageReturn();
+	void testODBCCallParameters();
 	void testResetClearsParameters();
 	void testNamedParameter();
 	void testAlterDropColumnIfExists();
