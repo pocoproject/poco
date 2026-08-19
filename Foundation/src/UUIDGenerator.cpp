@@ -200,7 +200,7 @@ UUID UUIDGenerator::createV7()
 Timestamp::UtcTimeVal UUIDGenerator::timeStamp()
 {
 	Timestamp now;
-	for (;;)
+	while (true)
 	{
 		if (now != _lastTime)
 		{

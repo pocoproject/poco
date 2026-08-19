@@ -316,7 +316,7 @@ void ProcessRunner::stop()
 				//   EPERM  - group exists but no permission (still alive)
 				// Note: errno must be captured immediately after kill()
 				// since Thread::sleep() may overwrite it.
-				for (;;)
+				while (true)
 				{
 					int rc = ::kill(-pid, 0);
 					int err = errno;
@@ -326,7 +326,7 @@ void ProcessRunner::stop()
 					{
 						::kill(-pid, SIGKILL);
 						Stopwatch killSw; killSw.start();
-						for (;;)
+						while (true)
 						{
 							rc = ::kill(-pid, 0);
 							err = errno;

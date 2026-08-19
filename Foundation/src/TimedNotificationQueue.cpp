@@ -96,7 +96,7 @@ Notification* TimedNotificationQueue::dequeueNextNotification()
 
 Notification* TimedNotificationQueue::waitDequeueNotification()
 {
-	for (;;)
+	while (true)
 	{
 		_mutex.lock();
 		auto it = _nfQueue.begin();

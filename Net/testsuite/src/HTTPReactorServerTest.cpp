@@ -752,7 +752,7 @@ void HTTPReactorServerTest::testSendTimeoutClosesStalledClient()
 	char buf[16 * 1024];
 	try
 	{
-		for (;;)
+		while (true)
 		{
 			int n = s.receiveBytes(buf, sizeof(buf));
 			if (n <= 0) { closed = true; break; }

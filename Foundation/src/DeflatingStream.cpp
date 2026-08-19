@@ -205,7 +205,7 @@ std::streamsize DeflatingStreamBuf::readFromDevice(char* buffer, std::streamsize
 	}
 	_pZstr->next_out  = (unsigned char*) buffer;
 	_pZstr->avail_out = static_cast<unsigned>(length);
-	for (;;)
+	while (true)
 	{
 		int rc = deflate(_pZstr, _eof ? Z_FINISH : Z_NO_FLUSH);
 		if (_eof && rc == Z_STREAM_END)
@@ -250,7 +250,7 @@ std::streamsize DeflatingStreamBuf::writeToDevice(const char* buffer, std::strea
 	_pZstr->avail_in  = static_cast<unsigned>(length);
 	_pZstr->next_out  = (unsigned char*) _buffer;
 	_pZstr->avail_out = DEFLATE_BUFFER_SIZE;
-	for (;;)
+	while (true)
 	{
 		int rc = deflate(_pZstr, Z_NO_FLUSH);
 		if (rc != Z_OK) throw IOException(zError(rc));

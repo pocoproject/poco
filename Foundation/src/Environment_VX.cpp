@@ -133,7 +133,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 
 	int ifIndex = 1;
 	char ifName[32];
-	for (;;)
+	while (true)
 	{
 		if (ifIndexToIfName(ifIndex, ifName) == OK)
 		{
