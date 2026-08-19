@@ -186,3 +186,30 @@ SELECT YEAR, MONTH FROM test ORDER BY YEAR;
 SELECT 1.5e3 FROM test;
 SELECT 1.5E+3, 5e-1, .5e1, 2e10 FROM test;
 SELECT * FROM test WHERE a = 0.5e-2;
+# Non-reserved words usable as ordinary names
+SELECT * FROM start;
+SELECT start.a FROM start;
+UPDATE test SET start = 1;
+INSERT INTO test (start, connect) VALUES (1, 2);
+CREATE TABLE test (start INT);
+SELECT a AS within FROM test;
+SELECT * FROM test AS connect;
+SELECT test.YEAR, dbo.test.MONTH FROM dbo.test;
+SELECT a AS year FROM test AS next;
+SELECT * FROM year.test;
+# Row constructor against a literal list
+SELECT * FROM test WHERE (a, b) IN ((1, 2), (3, 4));
+SELECT * FROM test WHERE (a, b, c) NOT IN ((1, 2, 3), (4, 5, 6));
+# Hierarchical clauses in either order, with and without NOCYCLE
+SELECT id FROM test CONNECT BY PRIOR id = parent_id START WITH id = 1;
+SELECT id FROM test CONNECT BY NOCYCLE PRIOR id = parent_id;
+SELECT id FROM test CONNECT BY NOCYCLE PRIOR id = parent_id START WITH id = 1;
+SELECT * FROM test CONNECT BY nocycleflag = 1;
+# Ordered-set aggregates and window clauses on every call form
+SELECT dbo.LISTAGG(a, ', ') WITHIN GROUP (ORDER BY b) FROM test;
+SELECT FORMAT(a) WITHIN GROUP (ORDER BY b) FROM test;
+SELECT RANK() OVER (PARTITION BY a) FROM test;
+# Table-valued function keeps its schema
+SELECT * FROM dbo.fn_split('a', ',') f;
+# ODBC call escape with a return marker
+{? = call some_proc(?, ?)};

@@ -311,14 +311,15 @@ void SQLParserTest::testCarriageReturn()
 		assertEqual(1, result.size());
 	}
 
-	// A line comment ends at its newline. If the following line were swallowed,
-	// the FROM clause would be lost and the statement would not parse.
+	// A line comment ends at its newline. The clause after the comment carries
+	// the FROM target, so a swallowed line is a parse error rather than a
+	// silently shorter statement.
 	static const char* const commented[] =
 	{
 		"SELECT A FROM\n-- comment\n  Test;",
 		"SELECT A FROM -- comment\n\nTest;",
 		"SELECT A FROM\r\n-- comment\r\n  Test;",
-		"SELECT A FROM Test -- comment   \n   WHERE B IN (1, 2);"
+		"SELECT A FROM -- comment   \n   Test;"
 	};
 
 	for (const char* query: commented)
@@ -329,6 +330,17 @@ void SQLParserTest::testCarriageReturn()
 		assertEqual(1, result.size());
 		assertTrue (result.getStatement(0)->type() == kStmtSelect);
 	}
+
+	// A clause a shorter statement could do without needs the tree checked
+	// instead: with an inclusive comment condition this parses as valid with
+	// no WHERE at all.
+	SQLParserResult whereResult;
+	SQLParser::parse("SELECT A FROM Test -- comment   \n   WHERE B IN (1, 2);", &whereResult);
+	assertTrue (whereResult.isValid());
+	assertEqual(1, whereResult.size());
+	const SelectStatement* commentedSelect =
+		static_cast<const SelectStatement*>(whereResult.getStatement(0));
+	assertTrue (commentedSelect->whereClause != nullptr);
 }
 
 

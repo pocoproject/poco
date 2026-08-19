@@ -295,9 +295,9 @@ CHARACTER{WS}+VARYING        TOKEN(CHARACTER_VARYING)
 [-+*/(){},.;<>=^%:?[\]|]    { return yytext[0]; }
 
   /*
-   * Scientific notation, e.g. 1.5e3, 1.5E+3, .5e-3, 2e10. Has to come before the
-   * plain float and integer rules, which would otherwise take the mantissa and
-   * leave the exponent to be scanned as an identifier.
+   * Scientific notation, e.g. 1.5e3, 1.5E+3, .5e-3, 2e10. Matched as one token;
+   * the plain float and integer rules would otherwise take the mantissa and leave
+   * the exponent to be scanned as an identifier.
    */
 [0-9]+"."[0-9]*e[-+]?[0-9]+ |
 "."[0-9]+e[-+]?[0-9]+ |
