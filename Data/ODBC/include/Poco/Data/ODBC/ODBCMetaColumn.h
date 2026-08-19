@@ -52,7 +52,7 @@ public:
 private:
 	ODBCMetaColumn() = delete;
 
-	static const int NAME_BUFFER_LENGTH = 2048;
+	static constexpr int NAME_BUFFER_LENGTH = 2048;
 
 	struct ColumnDescription
 	{

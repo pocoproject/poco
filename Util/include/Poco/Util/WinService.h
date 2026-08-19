@@ -144,7 +144,7 @@ public:
 	std::string getDescription() const;
 		/// Returns the service description from the registry.
 
-	static const int STARTUP_TIMEOUT;
+	static constexpr int STARTUP_TIMEOUT = 30000;
 
 protected:
 	static const std::string REGISTRY_KEY;

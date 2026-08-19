@@ -35,7 +35,7 @@ class JSON_API PrintHandler: public Handler
 public:
 	using Ptr = SharedPtr<PrintHandler>;
 
-	static const unsigned JSON_PRINT_FLAT = 0;
+	static constexpr unsigned JSON_PRINT_FLAT = 0;
 
 	PrintHandler(unsigned indent = 0, int options = Poco::JSON_WRAP_STRINGS);
 		/// Creates the PrintHandler.

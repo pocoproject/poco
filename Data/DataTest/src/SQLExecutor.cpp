@@ -292,10 +292,6 @@ const std::string SQLExecutor::MULTI_SELECT =
 	"SELECT * FROM Test WHERE First = '5';";
 
 
-const float SQLExecutor::EPSILON_FLOAT = 1e-5f;
-const double SQLExecutor::EPSILON_DOUBLE = 1e-9;
-
-
 SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession, bool numberedPlaceHolders):
 	CppUnit::TestCase(name),
 	_pSession(pSession),

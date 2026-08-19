@@ -30,7 +30,7 @@ class Zip_API ZipArchiveInfo
 	/// A ZipArchiveInfo stores central directory info
 {
 public:
-	static const char HEADER[ZipCommon::HEADER_SIZE];
+	static constexpr char HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x05', '\x06'};
 
 	ZipArchiveInfo();
 		/// Default constructor, everything set to zero or empty
@@ -120,8 +120,8 @@ class Zip_API ZipArchiveInfo64
 	/// A ZipArchiveInfo64 stores central directory info
 {
 public:
-	static const char HEADER[ZipCommon::HEADER_SIZE];
-	static const char LOCATOR_HEADER[ZipCommon::HEADER_SIZE];
+	static constexpr char HEADER[ZipCommon::HEADER_SIZE]         = {'\x50', '\x4b', '\x06', '\x06'};
+	static constexpr char LOCATOR_HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x06', '\x07'};
 
 	ZipArchiveInfo64();
 		/// Default constructor, everything set to zero or empty

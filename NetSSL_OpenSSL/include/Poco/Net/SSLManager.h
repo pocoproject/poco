@@ -327,11 +327,11 @@ private:
 	static const std::string CFG_CERTIFICATE_FILE;
 	static const std::string CFG_CA_LOCATION;
 	static const std::string CFG_VER_MODE;
-	static const Context::VerificationMode VAL_VER_MODE;
+	static constexpr Context::VerificationMode VAL_VER_MODE = Context::VERIFY_RELAXED;
 	static const std::string CFG_VER_DEPTH;
-	static const int         VAL_VER_DEPTH;
+	static constexpr int     VAL_VER_DEPTH = 9;
 	static const std::string CFG_ENABLE_DEFAULT_CA;
-	static const bool        VAL_ENABLE_DEFAULT_CA;
+	static constexpr bool    VAL_ENABLE_DEFAULT_CA = true;
 	static const std::string CFG_CIPHER_LIST;
 	static const std::string CFG_CYPHER_LIST; // for backwards compatibility
 	static const std::string VAL_CIPHER_LIST;
@@ -355,7 +355,7 @@ private:
 
 #ifdef OPENSSL_FIPS
 	static const std::string CFG_FIPS_MODE;
-	static const bool        VAL_FIPS_MODE;
+	static constexpr bool    VAL_FIPS_MODE = false;
 #endif
 
 	friend class Poco::SingletonHolder<SSLManager>;

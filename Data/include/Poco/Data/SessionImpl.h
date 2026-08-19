@@ -39,22 +39,22 @@ class Data_API SessionImpl: public Poco::RefCountedObject
 public:
 	using Ptr = Poco::AutoPtr<SessionImpl>;
 
-	static const std::size_t LOGIN_TIMEOUT_INFINITE = 0;
+	static constexpr std::size_t LOGIN_TIMEOUT_INFINITE = 0;
 		/// Infinite connection/login timeout.
 
-	static const std::size_t LOGIN_TIMEOUT_DEFAULT = 60;
+	static constexpr std::size_t LOGIN_TIMEOUT_DEFAULT = 60;
 		/// Default connection/login timeout in seconds.
 
-	static const std::size_t CONNECTION_TIMEOUT_INFINITE = 0;
+	static constexpr std::size_t CONNECTION_TIMEOUT_INFINITE = 0;
 		/// Infinite connection/login timeout.
 
-	static const std::size_t CONNECTION_TIMEOUT_DEFAULT = CONNECTION_TIMEOUT_INFINITE;
+	static constexpr std::size_t CONNECTION_TIMEOUT_DEFAULT = CONNECTION_TIMEOUT_INFINITE;
 		/// Default connection/login timeout in seconds.
 
 	// ODBC only, otherwise no-op
-	static const int CURSOR_USE_ALWAYS = 0;
-	static const int CURSOR_USE_IF_NEEDED = 1;
-	static const int CURSOR_USE_NEVER = 2;
+	static constexpr int CURSOR_USE_ALWAYS = 0;
+	static constexpr int CURSOR_USE_IF_NEEDED = 1;
+	static constexpr int CURSOR_USE_NEVER = 2;
 
 	SessionImpl(const std::string& connectionString,
 		std::size_t loginTimeout = LOGIN_TIMEOUT_DEFAULT);

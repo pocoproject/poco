@@ -33,8 +33,8 @@ public:
 	//using NameVecPtr = RowFormatter::NameVecPtr;
 	//using ValueVec = RowFormatter::ValueVec;
 
-	static const int DEFAULT_COLUMN_WIDTH = 16;
-	static const int DEFAULT_SPACING = 1;
+	static constexpr int DEFAULT_COLUMN_WIDTH = 16;
+	static constexpr int DEFAULT_SPACING = 1;
 
 	SimpleRowFormatter(std::streamsize columnWidth = DEFAULT_COLUMN_WIDTH, std::streamsize spacing = DEFAULT_SPACING);
 		/// Creates the SimpleRowFormatter and sets the column width to specified value.

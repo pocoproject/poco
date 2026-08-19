@@ -16,13 +16,9 @@
 #include "Poco/Dynamic/Var.h"
 #undef min
 #undef max
-#include <limits>
 
 
 namespace Poco::Dynamic {
-
-
-const std::size_t VarIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
 
 
 VarIterator::VarIterator(Var* pVar, bool positionEnd):

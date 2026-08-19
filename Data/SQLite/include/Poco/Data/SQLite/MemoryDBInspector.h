@@ -262,7 +262,7 @@ public:
 		Poco::UInt64 count = 0;      // enforceRetention -> shards dropped
 	};
 
-	static const std::size_t DEFAULT_MAX_ROWS = 500;
+	static constexpr std::size_t DEFAULT_MAX_ROWS = 500;
 
 	MemoryDBInspector(MemoryDB& db, SQLPolicy policy = SQLPolicy::READ_ONLY);
 		/// Creates an inspector over db, which must outlive the inspector.

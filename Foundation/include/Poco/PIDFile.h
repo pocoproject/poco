@@ -33,7 +33,7 @@ class Foundation_API PIDFile
 public:
 	using Ptr = std::unique_ptr<PIDFile>;
 
-	static const int INVALID_PID = -1;
+	static constexpr int INVALID_PID = -1;
 
 	PIDFile();
 		/// Creates the PIDFile.

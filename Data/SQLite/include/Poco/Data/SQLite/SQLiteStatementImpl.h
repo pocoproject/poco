@@ -116,7 +116,7 @@ private:
 	bool             _isExtracted;
 	bool             _canCompile;
 
-	static const int POCO_SQLITE_INV_ROW_CNT;
+	static constexpr int POCO_SQLITE_INV_ROW_CNT = -1;
 };
 
 

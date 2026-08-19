@@ -81,7 +81,7 @@ int Base64EncoderBuf::getLineLength() const
 
 int Base64EncoderBuf::writeToDevice(char c)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	_group[_groupLength++] = (unsigned char) c;
 	if (_groupLength == 3)
@@ -110,7 +110,7 @@ int Base64EncoderBuf::writeToDevice(char c)
 
 int Base64EncoderBuf::close()
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	if (sync() == eof) return eof;
 	if (_groupLength == 1)

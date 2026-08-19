@@ -131,7 +131,7 @@ public:
 	static const std::string IDENTITY_TRANSFER_ENCODING;
 	static const std::string CHUNKED_TRANSFER_ENCODING;
 
-	static const int         UNKNOWN_CONTENT_LENGTH;
+	static constexpr int     UNKNOWN_CONTENT_LENGTH = -1;
 	static const std::string UNKNOWN_CONTENT_TYPE;
 
 	static const std::string CONTENT_LENGTH;

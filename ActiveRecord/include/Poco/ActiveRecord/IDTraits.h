@@ -91,7 +91,7 @@ template <>
 class IDTraits<Poco::Int32>
 {
 public:
-	static const Poco::Int32 INVALID_ID = std::numeric_limits<Poco::Int32>::max();
+	static constexpr Poco::Int32 INVALID_ID = std::numeric_limits<Poco::Int32>::max();
 
 	static bool isValid(Poco::Int32 id)
 	{

@@ -62,7 +62,7 @@ public:
 	virtual ~PartSource();
 		/// Destroys the PartSource.
 
-	static const int UNKNOWN_CONTENT_LENGTH;
+	static constexpr int UNKNOWN_CONTENT_LENGTH = -1;
 
 protected:
 	PartSource();

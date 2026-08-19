@@ -37,6 +37,7 @@
 #include <memory>
 #include <iostream>
 #include <system_error>
+#include <limits>
 
 
 namespace Poco {
@@ -62,11 +63,11 @@ public:
 	using Work = std::function<void()>;
 	using Callback = std::function<void (const std::error_code& failure, int bytesReceived)>;
 
-	static const int POLL_READ = PollSet::POLL_READ;
-	static const int POLL_WRITE = PollSet::POLL_WRITE;
-	static const int POLL_ERROR = PollSet::POLL_ERROR;
+	static constexpr int POLL_READ = PollSet::POLL_READ;
+	static constexpr int POLL_WRITE = PollSet::POLL_WRITE;
+	static constexpr int POLL_ERROR = PollSet::POLL_ERROR;
 
-	static const Timestamp::TimeDiff PERMANENT_COMPLETION_HANDLER;
+	static constexpr Timestamp::TimeDiff PERMANENT_COMPLETION_HANDLER = std::numeric_limits<Timestamp::TimeDiff>::max();
 
 	explicit SocketProactor(bool worker = true);
 		/// Creates the SocketProactor.
@@ -215,7 +216,7 @@ private:
 	using MutexType = Poco::Mutex;
 	using ScopedLock = MutexType::ScopedLock;
 
-	static const long DEFAULT_MAX_TIMEOUT_MS = 250;
+	static constexpr long DEFAULT_MAX_TIMEOUT_MS = 250;
 
 	struct Handler
 		/// Handler struct holds the scheduled I/O.

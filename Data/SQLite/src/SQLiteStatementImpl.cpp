@@ -24,9 +24,6 @@
 namespace Poco::Data::SQLite {
 
 
-const int SQLiteStatementImpl::POCO_SQLITE_INV_ROW_CNT = -1;
-
-
 SQLiteStatementImpl::SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqlite3* pDB):
 	StatementImpl(rSession),
 	_pDB(pDB),

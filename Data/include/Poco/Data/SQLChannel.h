@@ -92,10 +92,10 @@ public:
 		Poco::Message _message;
 	};
 
-	static const int DEFAULT_MIN_BATCH_SIZE = 1;
-	static const int DEFAULT_MAX_BATCH_SIZE = 1000;
-	static const int DEFAULT_MAX_SQL_SIZE = 65536;
-	static const int DEFAULT_FLUSH_SECONDS = 10;
+	static constexpr int DEFAULT_MIN_BATCH_SIZE = 1;
+	static constexpr int DEFAULT_MAX_BATCH_SIZE = 1000;
+	static constexpr int DEFAULT_MAX_SQL_SIZE = 65536;
+	static constexpr int DEFAULT_FLUSH_SECONDS = 10;
 
 	SQLChannel();
 		/// Creates SQLChannel.

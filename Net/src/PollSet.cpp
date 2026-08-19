@@ -533,7 +533,7 @@ public:
 
 	void wakeUp()
 	{
-		static const char c = 1;
+		static constexpr char c = 1;
 		if (_pollLock.isClosed())
 			return;
 		_pipe.writeBytes(&c, 1);

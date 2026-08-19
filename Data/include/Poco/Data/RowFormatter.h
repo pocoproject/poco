@@ -72,7 +72,7 @@ public:
 	using NameVecPtr = SharedPtr<std::vector<std::string>>;
 	using ValueVec = std::vector<Poco::Dynamic::Var>;
 
-	static const int INVALID_ROW_COUNT = -1;
+	static constexpr int INVALID_ROW_COUNT = -1;
 
 	enum Mode
 	{

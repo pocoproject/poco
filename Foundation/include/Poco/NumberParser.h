@@ -37,9 +37,9 @@ class Foundation_API NumberParser
 	/// can be used to remove leading or trailing whitespace.
 {
 public:
-	static const unsigned short NUM_BASE_OCT = 010;
-	static const unsigned short NUM_BASE_DEC = 10;
-	static const unsigned short NUM_BASE_HEX = 0x10;
+	static constexpr unsigned short NUM_BASE_OCT = 010;
+	static constexpr unsigned short NUM_BASE_DEC = 10;
+	static constexpr unsigned short NUM_BASE_HEX = 0x10;
 
 	static int parse(const std::string& s, char thousandSeparator = ',');
 		/// Parses an integer value in decimal notation from the given string.

@@ -84,7 +84,6 @@ private:
 };
 
 
-const int ParserEngine::PARSE_BUFFER_SIZE = 4096;
 const XMLString ParserEngine::EMPTY_STRING;
 
 

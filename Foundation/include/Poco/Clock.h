@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include <limits>
 
 
 namespace Poco {
@@ -49,8 +50,8 @@ public:
 	using ClockDiff = Int64;
 	/// Difference between two ClockVal values in microseconds.
 
-	static const ClockVal CLOCKVAL_MIN; /// Minimum clock value.
-	static const ClockVal CLOCKVAL_MAX; /// Maximum clock value.
+	static constexpr ClockVal CLOCKVAL_MIN = std::numeric_limits<ClockVal>::min(); /// Minimum clock value.
+	static constexpr ClockVal CLOCKVAL_MAX = std::numeric_limits<ClockVal>::max(); /// Maximum clock value.
 
 	Clock();
 		/// Creates a Clock with the current system clock value.

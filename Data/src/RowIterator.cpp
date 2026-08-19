@@ -16,13 +16,9 @@
 #include "Poco/Data/RecordSet.h"
 #undef min
 #undef max
-#include <limits>
 
 
 namespace Poco::Data {
-
-
-const std::size_t RowIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
 
 
 RowIterator::RowIterator(RecordSet* pRecordSet, bool positionEnd):

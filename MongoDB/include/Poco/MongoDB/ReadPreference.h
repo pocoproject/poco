@@ -76,7 +76,7 @@ public:
 		Nearest               /// Read from any available member (no RTT measurement)
 	};
 
-	static const Poco::Int64 NO_MAX_STALENESS = -1;
+	static constexpr Poco::Int64 NO_MAX_STALENESS = -1;
 		/// Constant indicating no max staleness constraint
 
 	explicit ReadPreference(Mode mode = Primary);

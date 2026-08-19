@@ -428,7 +428,7 @@ public:
 		/// Resets the internally cached length indicators.
 
 private:
-	static const int CHUNK_SIZE = 1024;
+	static constexpr int CHUNK_SIZE = 1024;
 		/// Amount of data retrieved in one SQLGetData() request when doing manual extract.
 
 	static const std::string FLD_SIZE_EXCEEDED_FMT;

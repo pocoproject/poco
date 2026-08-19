@@ -251,7 +251,7 @@ void PageReader::parse(std::istream& pageStream)
 
 void PageReader::parseAttributes()
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	std::string basename;
 	std::istringstream istr(_attrs);

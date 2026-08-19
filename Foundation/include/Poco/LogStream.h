@@ -99,7 +99,7 @@ class Foundation_API LogStream: public LogIOS, public std::ostream
 	///     ls.error() << "Some error message" << std::endl;
 {
 public:
-	static const std::size_t DEFAULT_BUFFER_CAPACITY = 255;
+	static constexpr std::size_t DEFAULT_BUFFER_CAPACITY = 255;
 
 	LogStream(Logger& logger, Message::Priority priority = Message::PRIO_INFORMATION, std::size_t bufferCapacity = DEFAULT_BUFFER_CAPACITY);
 		/// Creates the LogStream, using the given logger and priority.

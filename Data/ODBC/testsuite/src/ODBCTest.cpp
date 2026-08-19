@@ -49,8 +49,6 @@ using Poco::NotFoundException;
 
 
 ODBCTest::Drivers ODBCTest::_drivers;
-const bool        ODBCTest::_bindValues[8] =
-	{true, true, true, false, false, true, false, false};
 
 
 ODBCTest::ODBCTest(const std::string& name,

@@ -279,15 +279,15 @@ private:
 	static const std::string CFG_CERT_STORE;
 	static const std::string VAL_CERT_STORE;
 	static const std::string CFG_VER_MODE;
-	static const Context::VerificationMode VAL_VER_MODE;
+	static constexpr Context::VerificationMode VAL_VER_MODE = Context::VERIFY_RELAXED;
 	static const std::string CFG_REVOCATION_CHECK;
-	static const bool VAL_REVOCATION_CHECK;
+	static constexpr bool VAL_REVOCATION_CHECK = true;
 	static const std::string CFG_TRUST_ROOTS;
-	static const bool VAL_TRUST_ROOTS;
+	static constexpr bool VAL_TRUST_ROOTS = true;
 	static const std::string CFG_USE_MACHINE_STORE;
-	static const bool VAL_USE_MACHINE_STORE;
+	static constexpr bool VAL_USE_MACHINE_STORE = false;
 	static const std::string CFG_USE_STRONG_CRYPTO;
-	static const bool VAL_USE_STRONG_CRYPTO;
+	static constexpr bool VAL_USE_STRONG_CRYPTO = true;
 
 	static const std::string CFG_DELEGATE_HANDLER;
 	static const std::string VAL_DELEGATE_HANDLER;

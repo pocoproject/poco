@@ -50,7 +50,7 @@ using Poco::FileOutputStream;
 
 namespace
 {
-	static const int sendFileSize = 64000;
+	static constexpr int sendFileSize = 64000;
 
 	class EchoBodyRequestHandler: public HTTPRequestHandler
 	{

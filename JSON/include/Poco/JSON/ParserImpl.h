@@ -33,7 +33,7 @@ namespace Poco::JSON {
 class JSON_API ParserImpl
 {
 protected:
-	static const std::size_t JSON_DEFAULT_DEPTH = 128;
+	static constexpr std::size_t JSON_DEFAULT_DEPTH = 128;
 
 	ParserImpl(const Handler::Ptr& pHandler = new ParseHandler);
 		/// Creates JSON ParserImpl, using the given Handler and buffer size.

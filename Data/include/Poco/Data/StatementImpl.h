@@ -90,7 +90,7 @@ public:
 	static const std::string LIST;
 	static const std::string UNKNOWN;
 
-	static const int USE_CURRENT_DATA_SET = -1;
+	static constexpr int USE_CURRENT_DATA_SET = -1;
 
 	StatementImpl(SessionImpl& rSession);
 		/// Creates the StatementImpl.

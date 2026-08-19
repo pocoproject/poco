@@ -84,9 +84,9 @@ public:
 		/// Returns the description of the packet type.
 		/// Must be overridden.
 
-	static const Poco::UInt16 MAX_PACKET_SIZE;
-	static const Poco::UInt16 MAX_PAYLOAD_SIZE;
-	static const Poco::UInt16 MAX_SEQ_VALUE;
+	static constexpr Poco::UInt16 MAX_PACKET_SIZE  = 65535;
+	static constexpr Poco::UInt16 MAX_PAYLOAD_SIZE = 65507;
+	static constexpr Poco::UInt16 MAX_SEQ_VALUE    = 65535;
 
 protected:
 	Poco::UInt16 nextSequence();

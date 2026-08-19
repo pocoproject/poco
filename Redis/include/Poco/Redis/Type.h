@@ -136,7 +136,7 @@ struct RedisTypeTraits<Int64>
 		TypeId = RedisType::REDIS_INTEGER
 	};
 
-	static const char marker = ':';
+	static constexpr char marker = ':';
 
 	static std::string toString(const Int64& value)
 	{
@@ -159,7 +159,7 @@ struct RedisTypeTraits<std::string>
 		TypeId = RedisType::REDIS_SIMPLE_STRING
 	};
 
-	static const char marker = '+';
+	static constexpr char marker = '+';
 
 	static std::string toString(const std::string& value)
 	{
@@ -186,7 +186,7 @@ struct RedisTypeTraits<BulkString>
 		TypeId = RedisType::REDIS_BULK_STRING
 	};
 
-	static const char marker = '$';
+	static constexpr char marker = '$';
 
 	static std::string toString(const BulkString& value)
 	{

@@ -21,9 +21,6 @@
 namespace Poco {
 
 
-const int TaskManager::MIN_PROGRESS_NOTIFICATION_INTERVAL = 100000; // 100 milliseconds
-
-
 TaskManager::TaskManager(const std::string& name,
 		int minCapacity,
 		int maxCapacity,

@@ -45,7 +45,7 @@ std::streamsize SSHChannelStreamBuf::xsputn(const char* s, std::streamsize n)
 {
 	if (n <= 0) return 0;
 
-	static const uint32_t MAX_CHUNK = 0x7FFFFFFF; // max safe size for ssh_channel_write
+	static constexpr uint32_t MAX_CHUNK = 0x7FFFFFFF; // max safe size for ssh_channel_write
 	std::streamsize totalWritten = 0;
 	while (totalWritten < n)
 	{

@@ -22,9 +22,6 @@
 namespace Poco::Zip {
 
 
-const char ZipFileInfo::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x01', '\x02'};
-
-
 ZipFileInfo::ZipFileInfo(const ZipLocalFileHeader& header):
 	_rawInfo(),
 	_crc32(0),

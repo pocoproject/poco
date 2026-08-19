@@ -107,7 +107,7 @@ public:
 	void removeObserver(const AbstractObserver& observer);
 		/// Unregisters an observer with the NotificationCenter.
 
-	static const int MIN_PROGRESS_NOTIFICATION_INTERVAL;
+	static constexpr int MIN_PROGRESS_NOTIFICATION_INTERVAL = 100000; // 100 milliseconds
 
 protected:
 	void postNotification(const Notification::Ptr& pNf);

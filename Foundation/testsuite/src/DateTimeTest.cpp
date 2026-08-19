@@ -342,7 +342,7 @@ void DateTimeTest::testRelational()
 	assertTrue (!(dt1 > dt3));
 	assertTrue (!(dt1 < dt3));
 
-	static const struct
+	static constexpr struct
 	{
 		int year;
 		int month;
@@ -402,7 +402,7 @@ void DateTimeTest::testArithmetics()
 	dt1 += s;
 	assertTrue (dt1 == dt2);
 
-	static const struct
+	static constexpr struct
 	{
 		Poco::LineNumber lineNum;		// source line number
 		int year1;						// operand/result date1 year
@@ -471,7 +471,7 @@ void DateTimeTest::testArithmetics()
 
 void DateTimeTest::testIncrementDecrement()
 {
-	static const struct
+	static constexpr struct
 	{
 		int lineNum;		// source line number
 		int year1;			// (first) date year
@@ -625,7 +625,7 @@ void DateTimeTest::testUsage()
 
 void DateTimeTest::testSetYearDay()
 {
-	static const struct
+	static constexpr struct
 	{
 		int d_lineNum;			// source line number
 		int d_year;				// year under test
@@ -672,7 +672,7 @@ void DateTimeTest::testSetYearDay()
 #endif
 	}
 
-	static const struct
+	static constexpr struct
 	{
 		int d_lineNum;  // source line number
 		int d_year;	 // year under test
@@ -721,7 +721,7 @@ void DateTimeTest::testSetYearDay()
 
 void DateTimeTest::testIsValid()
 {
-	static const struct
+	static constexpr struct
 	{
 		int  d_lineNum;  // source line number
 		int  d_year;	 // year under test
@@ -785,7 +785,7 @@ void DateTimeTest::testDayOfWeek()
 {
 	typedef DateTime::DaysOfWeek DOW;
 
-	static const struct
+	static constexpr struct
 	{
 		int d_lineNum;	// source line number
 		int d_year;		// year under test

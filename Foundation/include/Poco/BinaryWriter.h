@@ -55,7 +55,7 @@ public:
 		LITTLE_ENDIAN_BYTE_ORDER = 3  /// little-endian byte-order
 	};
 
-	static const std::streamsize	DEFAULT_MAX_CSTR_LENGTH { 1024 };
+	static constexpr std::streamsize	DEFAULT_MAX_CSTR_LENGTH { 1024 };
 
 	BinaryWriter(std::ostream& ostr, StreamByteOrder byteOrder = NATIVE_BYTE_ORDER);
 		/// Creates the BinaryWriter.

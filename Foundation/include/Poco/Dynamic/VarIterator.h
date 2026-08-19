@@ -21,6 +21,7 @@
 #include "Poco/Exception.h"
 #include <iterator>
 #include <algorithm>
+#include <limits>
 
 
 namespace Poco::Dynamic {
@@ -39,7 +40,7 @@ public:
 	using pointer = Var *;
 	using reference = Var &;
 
-	static const std::size_t POSITION_END;
+	static constexpr std::size_t POSITION_END = std::numeric_limits<std::size_t>::max();
 		/// End position indicator.
 
 	VarIterator(Var* pVar, bool positionEnd);

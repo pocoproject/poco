@@ -96,11 +96,11 @@ public:
 		IPv4_OR_IPv6  /// Return interfaces with IPv4 or IPv6 address
 	};
 
-	static const unsigned NO_INDEX = ~0;
+	static constexpr unsigned NO_INDEX = ~0;
 #if defined(POCO_OS_FAMILY_WINDOWS)
-	static const char MAC_SEPARATOR = '-';
+	static constexpr char MAC_SEPARATOR = '-';
 #else
-	static const char MAC_SEPARATOR = ':';
+	static constexpr char MAC_SEPARATOR = ':';
 #endif
 
 	NetworkInterface(unsigned index = NO_INDEX);

@@ -475,7 +475,7 @@ std::string Utility::formatVar(const Poco::Dynamic::Var& v)
 
 std::string Utility::formatBLOB(const BLOB& b)
 {
-	static const char hex[] = "0123456789ABCDEF";
+	static constexpr char hex[] = "0123456789ABCDEF";
 	std::string out;
 	out.reserve(b.size() * 2 + 3);
 	out.append("X'");
