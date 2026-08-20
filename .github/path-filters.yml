@@ -34,3 +34,8 @@ data:
 
 sqlparser:
   - 'Data/SQLParser/**'
+
+crypto_netssl:
+  - 'Crypto/**'
+  - 'NetSSL_OpenSSL/**'
+  - 'JWT/**'
