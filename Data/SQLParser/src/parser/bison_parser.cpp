@@ -7027,7 +7027,7 @@ yyerrlab1:
   yyerrstatus = 3;      /* Each real token shifted decrements this.  */
 
   /* Pop stack until we find a state that shifts the error token.  */
-  for (;;)
+  while (true)
     {
       yyn = yypact[yystate];
       if (!yypact_value_is_default (yyn))

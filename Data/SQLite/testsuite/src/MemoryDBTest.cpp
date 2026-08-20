@@ -80,7 +80,7 @@ void MemoryDBTest::testConnectorRegistrationBalanced()
 	// the process-global SessionFactory exactly as we found it. remove() throws
 	// (poco_assert) once the refcount reaches zero and the entry is erased.
 	int saved = 0;
-	for (;;)
+	while (true)
 	{
 		try { Connector::unregisterConnector(); ++saved; }
 		catch (const Poco::Exception&) { break; }

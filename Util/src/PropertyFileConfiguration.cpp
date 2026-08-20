@@ -102,7 +102,7 @@ void PropertyFileConfiguration::load(const std::string& path)
 
 void PropertyFileConfiguration::loadStream(std::istream& istr, const std::string& basePath, const std::string& currentFile, std::set<std::string>& includeStack)
 {
-	for (;;)
+	while (true)
 	{
 		if (!istr.good())
 		{
@@ -750,7 +750,7 @@ void PropertyFileConfiguration::parseLine(std::istream& istr, const std::string&
 
 int PropertyFileConfiguration::readChar(std::istream& istr)
 {
-	for (;;)
+	while (true)
 	{
 		int c = istr.get();
 		if (c == '\\')

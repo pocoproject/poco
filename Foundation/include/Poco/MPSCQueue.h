@@ -129,7 +129,7 @@ public:
 	{
 		std::size_t head = _head.load(std::memory_order_relaxed);
 
-		for (;;)
+		while (true)
 		{
 			Slot& slot = _slots[index(head)];
 			std::size_t seq = slot.sequence.load(std::memory_order_acquire);

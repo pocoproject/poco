@@ -219,7 +219,7 @@ void ActivePooledThread::join()
 void ActivePooledThread::run()
 {
 	FastMutex::ScopedLock lock(_pool.mutex);
-	for (;;)
+	while (true)
 	{
 		auto r = _target;
 		_target.reset();

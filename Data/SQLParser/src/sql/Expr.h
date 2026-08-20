@@ -251,7 +251,7 @@ struct SQLParser_API Expr {
     Expr zero = {type};               \
     var = (Expr*)malloc(sizeof *var); \
     *var = zero;                      \
-  } while (0);
+  } while (false);
 #undef ALLOC_EXPR
 
 }  // namespace hsql

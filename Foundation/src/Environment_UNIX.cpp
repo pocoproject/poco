@@ -228,7 +228,7 @@ void EnvironmentImpl::nodeIdImpl(NodeId& id)
 	int len = 100*sizeof(struct ifreq);
 	struct ifconf ifc;
 	char* buf = nullptr;
-	for (;;)
+	while (true)
 	{
 		buf = new char[len];
 		ifc.ifc_len = len;

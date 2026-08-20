@@ -175,7 +175,7 @@ void PooledThread::release()
 void PooledThread::run()
 {
 	_started.set();
-	for (;;)
+	while (true)
 	{
 		_targetReady.wait();
 		_mutex.lock();

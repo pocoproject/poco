@@ -85,7 +85,7 @@ protected:
 		CppUnit_addTest(suite, cls, testRemove); \
 		CppUnit_addTest(suite, cls, testChangeEvents); \
 		CppUnit_addTest(suite, cls, testRemoveEvents); \
-	} while(0)
+	} while (false)
 
 
 #endif // AbstractConfigurationTest_INCLUDED
