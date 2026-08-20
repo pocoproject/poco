@@ -191,7 +191,9 @@ public:
 		/// Returns the underlying socket descriptor.
 
 	X509* peerCertificate() const;
-		/// Returns the peer's certificate.
+		/// Returns the peer's certificate, or a null pointer if
+		/// no certificate is available. The caller is responsible
+		/// for releasing the returned reference with X509_free().
 
 	Context::Ptr context() const;
 		/// Returns the SSL context used for this socket.

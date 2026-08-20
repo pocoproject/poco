@@ -487,7 +487,11 @@ long SecureSocketImpl::verifyPeerCertificateImpl(const std::string& hostName)
 		return X509_V_OK;
 	}
 
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	::X509* pCert = ::SSL_get1_peer_certificate(_pSSL);
+#else
 	::X509* pCert = ::SSL_get_peer_certificate(_pSSL);
+#endif
 	if (pCert)
 	{
 		X509Certificate cert(pCert);
@@ -515,10 +519,14 @@ X509* SecureSocketImpl::peerCertificate() const
 {
 	LockT l(_mutex);
 
-	if (_pSSL)
-		return ::SSL_get_peer_certificate(_pSSL);
-	else
+	if (_pSSL == nullptr)
 		return nullptr;
+
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	return ::SSL_get1_peer_certificate(_pSSL);
+#else
+	return ::SSL_get_peer_certificate(_pSSL);
+#endif
 }
 
 

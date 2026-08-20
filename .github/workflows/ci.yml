@@ -205,6 +205,30 @@ jobs:
             PWD=`pwd`
             ctest --output-on-failure
 
+  # OpenSSL no-deprecated probe: build and test Crypto/NetSSL/JWT with
+  # deprecated OpenSSL declarations hidden. Debug + -D_DEBUG so that
+  # poco_assert_dbg expressions are compiled as well.
+  linux-gcc-cmake-openssl-no-deprecated:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build libssl-dev
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DCMAKE_BUILD_TYPE=Debug
+          -DCMAKE_CXX_FLAGS="-DOPENSSL_NO_DEPRECATED -D_DEBUG"
+          -DPOCO_MINIMAL_BUILD=ON -DENABLE_TESTS=ON
+          -DENABLE_CRYPTO=ON -DENABLE_NETSSL=ON -DENABLE_JWT=ON
+      - run: cmake --build cmake-build --target all --parallel 4
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 30
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            PWD=`pwd`
+            ctest --output-on-failure --parallel 4 -R "^(Crypto|NetSSL|JWT)$"
+
   linux-gcc-cmake-asan:
     runs-on: ubuntu-24.04
     steps:
