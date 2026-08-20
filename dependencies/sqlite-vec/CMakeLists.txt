@@ -30,6 +30,12 @@ if(ENABLE_DATA_SQLITE_VEC AND ENABLE_DATA_SQLITE)
 	POCO_SOURCES(SRCS sqlite-vec src/sqlite-vec.c)
 	POCO_HEADERS(SRCS sqlite-vec src/sqlite-vec.h)
 
+	# 32-bit MSVC lacks the __popcnt64 intrinsic sqlite-vec.c maps
+	# __builtin_popcountl to; supply it without modifying the bundled source.
+	if(MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 4 AND NOT CMAKE_C_COMPILER_ID MATCHES "Clang")
+		POCO_SOURCES(SRCS sqlite-vec popcnt64_win32.c)
+	endif()
+
 	# NOTE: We use object library to be able to link it with static or shared libraries
 	add_library(_BUNDLED_SQLITE_VEC OBJECT EXCLUDE_FROM_ALL ${SRCS})
 
