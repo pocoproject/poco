@@ -90,13 +90,13 @@ protected:
 // https://developer.klocwork.com/documentation/en/insight/10-1/tuning-cc-analysis#Usingthe__KLOCWORK__macro
 
 #include <cstdlib> // for abort
-#define poco_assert_dbg(cond)           do { if (!(cond)) std::abort(); } while (0)
-#define poco_assert_msg_dbg(cond, text) do { if (!(cond)) std::abort(); } while (0)
-#define poco_assert(cond)               do { if (!(cond)) std::abort(); } while (0)
-#define poco_assert_msg(cond, text)     do { if (!(cond)) std::abort(); } while (0)
-#define poco_check_ptr(ptr)             do { if (!(ptr)) std::abort(); } while (0)
-#define poco_bugcheck()                 do { std::abort(); } while (0)
-#define poco_bugcheck_msg(msg)          do { std::abort(); } while (0)
+#define poco_assert_dbg(cond)           do { if (!(cond)) std::abort(); } while (false)
+#define poco_assert_msg_dbg(cond, text) do { if (!(cond)) std::abort(); } while (false)
+#define poco_assert(cond)               do { if (!(cond)) std::abort(); } while (false)
+#define poco_assert_msg(cond, text)     do { if (!(cond)) std::abort(); } while (false)
+#define poco_check_ptr(ptr)             do { if (!(ptr)) std::abort(); } while (false)
+#define poco_bugcheck()                 do { std::abort(); } while (false)
+#define poco_bugcheck_msg(msg)          do { std::abort(); } while (false)
 
 
 #else // defined(__KLOCWORK__) || defined(__clang_analyzer__)

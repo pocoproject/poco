@@ -526,7 +526,7 @@ private:
 #define POCO_AMBIGUOUS_ELSE_BLOCKER_BEG do {
 
 #define POCO_AMBIGUOUS_ELSE_BLOCKER_END \
-	} while(0)
+	} while(false)
 #endif
 
 #define poco_fatal(logger, msg) \

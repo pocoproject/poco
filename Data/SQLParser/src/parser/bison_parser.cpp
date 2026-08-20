@@ -2318,7 +2318,7 @@ yytnamerr (char *yyres, const char *yystr)
     {
       YYPTRDIFF_T yyn = 0;
       char const *yyp = yystr;
-      while (true)
+      for (;;)
         switch (*++yyp)
           {
           case '\'':
