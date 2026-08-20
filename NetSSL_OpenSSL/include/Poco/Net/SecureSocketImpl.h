@@ -295,6 +295,7 @@ private:
 	Poco::AutoPtr<SocketImpl> _pSocket;
 	Context::Ptr _pContext;
 	bool _needHandshake;
+	bool _ticketPending;
 	std::string _peerHostName;
 	Session::Ptr _pSession;
 	mutable MutexT _mutex;
