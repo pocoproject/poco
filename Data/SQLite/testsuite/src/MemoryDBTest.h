@@ -63,6 +63,7 @@ public:
 	void testHistoryViewTimeRange();
 	void testHistoryViewTimeRangeOverflow();
 	void testDetachAllArchived();
+	void testDetachDeferredUnderReadTxn();
 	void testShardCeilingAutoDrop();
 	void testConcurrentAccess();
 

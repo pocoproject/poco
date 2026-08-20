@@ -877,6 +877,37 @@ namespace
 }
 
 
+bool MemoryDB::tryDetach(Poco::UInt32 shardId)
+{
+	std::string alias = "arc_" + Poco::NumberFormatter::format(shardId);
+	try
+	{
+		InternalGuard guard;
+		DbMutexGuard dbm(_memHandle);
+		_session << ("DETACH DATABASE " + alias), now;
+		return true;
+	}
+	catch (const Poco::Exception&)
+	{
+		return false;
+	}
+}
+
+
+void MemoryDB::sweepDetached()
+{
+	// Complete deferred detaches (refcount 0, see detachArchived). Failures
+	// leave the entry for a later sweep.
+	for (auto it = _attached.begin(); it != _attached.end(); )
+	{
+		if (it->second == 0 && tryDetach(it->first))
+			it = _attached.erase(it);
+		else
+			++it;
+	}
+}
+
+
 std::string MemoryDB::attachArchived(Poco::UInt32 shardId)
 {
 	// Coordination layers (also see the comment block on the mutex declarations
@@ -895,7 +926,11 @@ std::string MemoryDB::attachArchived(Poco::UInt32 shardId)
 
 	std::string alias = "arc_" + Poco::NumberFormatter::format(shardId);
 	auto it = _attached.find(shardId);
+	// refcount 0 = deferred detach; the alias is still attached, reuse it
 	if (it != _attached.end()) { ++it->second; return alias; }
+
+	// reclaim attach slots held by deferred detaches before taking a new one
+	sweepDetached();
 
 	std::string file;
 	{
@@ -928,24 +963,15 @@ std::string MemoryDB::attachArchived(Poco::UInt32 shardId)
 
 void MemoryDB::detachArchived(Poco::UInt32 shardId)
 {
-	std::string alias = "arc_" + Poco::NumberFormatter::format(shardId);
-	std::string sql = "DETACH DATABASE " + alias;
-
-	// SQLite's DETACH fails with "database <alias> is locked" if the attached
-	// btree is in any transaction state (sqlite3.c:125750). This check
-	// returns immediately - sqlite3_busy_timeout() does NOT retry it. Under
-	// concurrent load on the same connection (constant prepare/step/finalize
-	// from other threads' stmts) arc_<id>'s btree can transiently show
-	// SQLITE_TXN_READ even when no one is querying arc_<id> directly. Retry
-	// briefly with backoff; the window where DETACH is rejected is short.
-	//
-	// We RELEASE _attachMutex across the sleep so that a concurrent
-	// deleteShard() waiting on _attachMutex (while holding _flushMutex) does
-	// not transitively stall the flush IO loop. Each iteration re-acquires
-	// _attachMutex, re-checks the refcount (another caller may have brought
-	// it above 1), attempts DETACH, and either succeeds or sleeps. Bounded
-	// by maxAttempts so a pathological hold cannot loop forever.
-	constexpr int maxAttempts = 100;
+	// SQLite refuses DETACH while the attached btree is in any transaction
+	// state, and a busy statement - even one reading only main - holds read
+	// transactions on all attached btrees while it steps, so under load the
+	// window may never open. Retry briefly, then defer: refcount 0 keeps the
+	// alias attached without an owner until sweepDetached(), deleteShard's
+	// force-detach, or detachAllArchived completes the DETACH.
+	// _attachMutex is released across the sleep so a deleteShard() waiting
+	// on it (while holding _flushMutex) does not stall the flush IO loop.
+	constexpr int maxAttempts = 10;
 	for (int attempt = 0; ; ++attempt)
 	{
 		{
@@ -953,20 +979,16 @@ void MemoryDB::detachArchived(Poco::UInt32 shardId)
 			auto it = _attached.find(shardId);
 			if (it == _attached.end()) return;
 			if (it->second > 1) { --it->second; return; }
-			// refcount == 1; we are the last detacher. Run DETACH first;
-			// only erase on success so an exception here leaves _attached
-			// consistent with the actual SQLite state.
-			try
+			// last detacher (refcount 1) or completing a deferred detach (0)
+			if (tryDetach(shardId))
 			{
-				InternalGuard guard;
-				DbMutexGuard dbm(_memHandle);
-				_session << sql, now;
-				_attached.erase(shardId);
+				_attached.erase(it);
 				return;
 			}
-			catch (const Poco::Exception&)
+			if (attempt + 1 >= maxAttempts)
 			{
-				if (attempt + 1 >= maxAttempts) throw;
+				it->second = 0; // defer the physical DETACH
+				return;
 			}
 		} // release _attachMutex before sleeping
 		Poco::Thread::sleep(1);

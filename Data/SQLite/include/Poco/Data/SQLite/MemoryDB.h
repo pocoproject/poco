@@ -304,6 +304,13 @@ public:
 
 	void detachArchived(Poco::UInt32 shardId);
 		/// Detaches a previously attached sealed shard. Thread-safe (see attachArchived).
+		///
+		/// SQLite refuses a DETACH while the attached database is in any
+		/// transaction state (busy statements hold read transactions on all
+		/// attached databases). If the refusal persists past a short retry, the
+		/// physical DETACH is deferred: the call returns normally and a later
+		/// attach/detach, deleteShard(), detachAllArchived(), or destruction
+		/// completes it.
 
 	void attachAllArchived();
 		/// Attaches every sealed shard read-only that is not already attached. Convenient
@@ -445,6 +452,8 @@ private:
 	ShardInfo* activeShard();                            // caller holds _stateMutex
 	ShardInfo* owningShard(const std::string& table, Poco::Int64 row); // caller holds _stateMutex
 	void rebuildActiveLo();                              // caller holds _stateMutex
+	bool tryDetach(Poco::UInt32 shardId);                // caller holds _attachMutex
+	void sweepDetached();                                // caller holds _attachMutex
 	void throwIfRejected() const;
 	std::string shardPath(Poco::UInt32 id, const Poco::Timestamp& createdAt) const;
 	void cleanOrphans();
@@ -494,7 +503,8 @@ private:
 	                                          // memory while recording the message.
 	std::atomic<bool>          _poisoned{false};
 	std::map<Poco::UInt32, int> _attached;    // sealed shards attached read-only,
-	                                          // value = reference count (matched attach calls).
+	                                          // value = reference count (matched attach calls);
+	                                          // 0 = deferred detach, completed by sweepDetached().
 	                                          // Always accessed under _attachMutex; entries
 	                                          // are read concurrently via _stateMutex only by
 	                                          // the dtor's snapshot path - mutation paths do

@@ -28,6 +28,7 @@
 #include <atomic>
 #include <chrono>
 #include <iostream>
+#include <mutex>
 #include <random>
 #include <thread>
 #include <vector>
@@ -1041,6 +1042,56 @@ void MemoryDBTest::testShardCeilingAutoDrop()
 }
 
 
+void MemoryDBTest::testDetachDeferredUnderReadTxn()
+{
+	// A busy statement holds a read transaction on the attached shard, so
+	// SQLite refuses the DETACH; detachArchived() must defer (alias stays
+	// attached) instead of throwing, and a later detach completes it.
+	MemoryDB db(_dir);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+	for (int i = 0; i < 5; ++i)
+	{
+		std::string v("v" + Poco::NumberFormatter::format(i));
+		db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+	}
+	db.sealActive();
+	db.flush();
+
+	std::vector<Poco::UInt32> ids = db.archivedShardIds();
+	assertTrue (ids.size() == 1);
+	const std::string alias = db.attachArchived(ids[0]);
+
+	{
+		int id = 0;
+		Poco::Data::Statement stmt = (db.session() <<
+			("SELECT id FROM " + alias + ".t"), into(id), limit(1));
+		stmt.execute(); // partially stepped: holds a read txn on the shard
+
+		db.detachArchived(ids[0]); // deferred, must not throw
+
+		int n = 0;
+		db << ("SELECT count(*) FROM " + alias + ".t"), into(n), now;
+		assertTrue (n == 5); // physically still attached
+	} // statement finalized; the read txn is released
+
+	db.detachArchived(ids[0]); // completes the deferred DETACH
+	try
+	{
+		int n = 0;
+		db << ("SELECT count(*) FROM " + alias + ".t"), into(n), now;
+		fail ("alias must be detached");
+	}
+	catch (Poco::Exception&) { }
+
+	// the shard can be attached and detached cleanly again
+	assertTrue (db.attachArchived(ids[0]) == alias);
+	int n = 0;
+	db << ("SELECT count(*) FROM " + alias + ".t"), into(n), now;
+	assertTrue (n == 5);
+	db.detachArchived(ids[0]);
+}
+
+
 void MemoryDBTest::testConcurrentAccess()
 {
 	// 5-second stress test of MemoryDB's thread-safe surfaces.
@@ -1103,6 +1154,7 @@ void MemoryDBTest::testConcurrentAccess()
 
 		std::atomic<bool> stop{false};
 		std::atomic<int>  errors{0};
+		std::mutex logMutex; // workers log concurrently; cerr itself is not synchronized
 		std::vector<std::atomic<long>> iters(workers);
 		for (auto& a: iters) a.store(0);
 
@@ -1228,6 +1280,7 @@ void MemoryDBTest::testConcurrentAccess()
 						msg.find("another row available") != std::string::npos;
 					if (!transient)
 					{
+						std::lock_guard<std::mutex> lg(logMutex);
 						std::cerr << "[concur] worker " << idx << " " << roleName(idx)
 							<< " Poco::Exception: " << msg << '\n';
 						errors.fetch_add(1, std::memory_order_relaxed);
@@ -1235,6 +1288,7 @@ void MemoryDBTest::testConcurrentAccess()
 				}
 				catch (std::exception& exc)
 				{
+					std::lock_guard<std::mutex> lg(logMutex);
 					std::cerr << "[concur] worker " << idx << " " << roleName(idx)
 						<< " std::exception: " << exc.what() << '\n';
 					errors.fetch_add(1, std::memory_order_relaxed);
@@ -1723,6 +1777,7 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryViewTimeRange);
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryViewTimeRangeOverflow);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDetachAllArchived);
+	CppUnit_addTest(pSuite, MemoryDBTest, testDetachDeferredUnderReadTxn);
 	CppUnit_addTest(pSuite, MemoryDBTest, testShardCeilingAutoDrop);
 	CppUnit_addTest(pSuite, MemoryDBTest, testConcurrentAccess);
 
