@@ -1403,6 +1403,238 @@ void MemoryDBTest::testAlterTableClassified()
 }
 
 
+void MemoryDBTest::testVecPersistAndReload()
+{
+#ifdef POCO_ENABLE_SQLITE_VEC
+	// A vec0 virtual table is persisted whole into the active shard and
+	// recreated (with its shadow tables) via schema-log replay on reopen.
+	{
+		MemoryDB db(_dir);
+		db << "CREATE VIRTUAL TABLE vecs USING vec0(embedding float[4])", now;
+		db << "INSERT INTO vecs(rowid, embedding) VALUES(1, '[1.0, 0.0, 0.0, 0.0]')", now;
+		db << "INSERT INTO vecs(rowid, embedding) VALUES(2, '[0.0, 1.0, 0.0, 0.0]')", now;
+		db << "INSERT INTO vecs(rowid, embedding) VALUES(3, '[0.9, 0.1, 0.0, 0.0]')", now;
+		db.flush();
+		assertTrue (!db.dirty());
+	}
+
+	MemoryDB db(_dir);
+	int cnt = 0;
+	db << "SELECT count(*) FROM vecs", into(cnt), now;
+	assertTrue (cnt == 3);
+
+	std::vector<int> ids;
+	db << "SELECT rowid FROM vecs WHERE embedding MATCH '[1.0, 0.0, 0.0, 0.0]' "
+		"ORDER BY distance LIMIT 2", into(ids), now;
+	assertTrue (ids.size() == 2);
+	assertTrue (ids[0] == 1);
+	assertTrue (ids[1] == 3);
+
+	// exactly one set of shadow tables (the schema replay must not create
+	// them twice, and the shard DDL replay must have skipped them)
+	int shadowCnt = 0;
+	db << "SELECT count(*) FROM pragma_table_list WHERE schema='main' AND type='shadow' "
+		"AND name LIKE 'vecs_%'", into(shadowCnt), now;
+	assertTrue (shadowCnt >= 3); // _info, _chunks, _rowids, vector chunks
+	int rowidsCnt = 0;
+	db << "SELECT count(*) FROM sqlite_master WHERE name='vecs_rowids'", into(rowidsCnt), now;
+	assertTrue (rowidsCnt == 1);
+#else
+	std::cout << "sqlite-vec not enabled, test not executed." << std::endl;
+#endif
+}
+
+
+void MemoryDBTest::testVecStaysInActiveShard()
+{
+#ifdef POCO_ENABLE_SQLITE_VEC
+	// Ordinary tables seal into archived shards; the vec0 table is rewritten
+	// whole into each new active shard and never contributes to shard_ranges,
+	// so its rows survive sealing exactly once.
+	MemoryDB::Options o;
+	o.shardMaxBytes = 1; // force a seal on every flush
+	o.loadArchivedShards = true;
+
+	{
+		MemoryDB db(_dir, o);
+		db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+		db << "CREATE VIRTUAL TABLE vecs USING vec0(embedding float[2])", now;
+		for (int i = 0; i < 4; ++i)
+		{
+			std::string v("row" + Poco::NumberFormatter::format(i));
+			db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+			std::string e("[" + Poco::NumberFormatter::format(i) + ".0, 1.0]");
+			db << "INSERT INTO vecs(rowid, embedding) VALUES(:i, :e)", use(i), use(e), now;
+			db.flush();
+		}
+		assertTrue (db.shardCount() >= 2);
+	}
+
+	MemoryDB db(_dir, o);
+	int cnt = 0;
+	db << "SELECT count(*) FROM t", into(cnt), now;
+	assertTrue (cnt == 4);
+	cnt = 0;
+	db << "SELECT count(*) FROM vecs", into(cnt), now;
+	assertTrue (cnt == 4); // present exactly once, no duplication from sealed shards
+#else
+	std::cout << "sqlite-vec not enabled, test not executed." << std::endl;
+#endif
+}
+
+
+void MemoryDBTest::testVecDirtyTracking()
+{
+#ifdef POCO_ENABLE_SQLITE_VEC
+	// Virtual-table writes reach the update hook only via their shadow
+	// tables; INSERT/UPDATE/DELETE must each mark the database dirty and
+	// be reflected after reload.
+	MemoryDB::Options o;
+	o.loadArchivedShards = true;
+	{
+		MemoryDB db(_dir, o);
+		db << "CREATE VIRTUAL TABLE vecs USING vec0(embedding float[2])", now;
+		db << "INSERT INTO vecs(rowid, embedding) VALUES(1, '[1.0, 0.0]')", now;
+		db << "INSERT INTO vecs(rowid, embedding) VALUES(2, '[0.0, 1.0]')", now;
+		db.flush();
+		assertTrue (!db.dirty());
+
+		db << "UPDATE vecs SET embedding = '[0.5, 0.5]' WHERE rowid = 1", now;
+		assertTrue (db.dirty());
+		db.flush();
+		assertTrue (!db.dirty());
+
+		db << "DELETE FROM vecs WHERE rowid = 2", now;
+		assertTrue (db.dirty());
+		db.flush();
+		assertTrue (!db.dirty());
+	}
+
+	MemoryDB db(_dir, o);
+	int cnt = 0;
+	db << "SELECT count(*) FROM vecs", into(cnt), now;
+	assertTrue (cnt == 1);
+	std::string e;
+	db << "SELECT vec_to_json(embedding) FROM vecs WHERE rowid = 1", into(e), now;
+	assertTrue (e.find("0.5") != std::string::npos);
+#else
+	std::cout << "sqlite-vec not enabled, test not executed." << std::endl;
+#endif
+}
+
+
+void MemoryDBTest::testVecDropTable()
+{
+#ifdef POCO_ENABLE_SQLITE_VEC
+	// DROP TABLE on a vec0 table removes the virtual table and its shadow
+	// tables; the schema log replays both create and drop on reopen.
+	{
+		MemoryDB db(_dir);
+		db << "CREATE VIRTUAL TABLE vecs USING vec0(embedding float[2])", now;
+		db << "INSERT INTO vecs(rowid, embedding) VALUES(1, '[1.0, 0.0]')", now;
+		db.flush();
+		db << "DROP TABLE vecs", now;
+		db.flush();
+	}
+
+	MemoryDB db(_dir);
+	int cnt = 0;
+	db << "SELECT count(*) FROM sqlite_master WHERE name LIKE 'vecs%'", into(cnt), now;
+	assertTrue (cnt == 0);
+#else
+	std::cout << "sqlite-vec not enabled, test not executed." << std::endl;
+#endif
+}
+
+
+void MemoryDBTest::testVecShadowNameCollisionRejected()
+{
+#ifdef POCO_ENABLE_SQLITE_VEC
+	// Tables in a virtual table's shadow namespace ("<vtabname>_...") are
+	// never persisted, so creating them must fail loudly in both directions.
+	MemoryDB db(_dir);
+	db << "CREATE VIRTUAL TABLE emb USING vec0(embedding float[2])", now;
+
+	try
+	{
+		db << "CREATE TABLE emb_meta(id INTEGER PRIMARY KEY, v TEXT)", now;
+		fail ("must reject table in shadow namespace");
+	}
+	catch (Poco::NotImplementedException&) { }
+
+	// quoted name must be rejected too
+	try
+	{
+		db << "CREATE TABLE \"emb_meta\"(id INTEGER PRIMARY KEY)", now;
+		fail ("must reject quoted table in shadow namespace");
+	}
+	catch (Poco::NotImplementedException&) { }
+
+	// reverse direction: a new virtual table must not claim existing tables
+	db << "CREATE TABLE t_x(id INTEGER PRIMARY KEY, v TEXT)", now;
+	try
+	{
+		db << "CREATE VIRTUAL TABLE t USING vec0(embedding float[2])", now;
+		fail ("must reject virtual table claiming existing tables");
+	}
+	catch (Poco::NotImplementedException&) { }
+
+	// the instance stays usable and the rejected tables never existed
+	int cnt = -1;
+	db << "SELECT count(*) FROM sqlite_master WHERE name IN ('emb_meta', 't')", into(cnt), now;
+	assertTrue (cnt == 0);
+
+	// backstop: a CREATE that bypasses operator<< via session() poisons the db
+	db.session() << "CREATE TABLE emb_extra(id INTEGER PRIMARY KEY)", now;
+	try
+	{
+		db << "SELECT 1", now;
+		fail ("must be poisoned after bypassing CREATE");
+	}
+	catch (Poco::NotImplementedException&) { }
+#else
+	std::cout << "sqlite-vec not enabled, test not executed." << std::endl;
+#endif
+}
+
+
+void MemoryDBTest::testVecHistoryView()
+{
+#ifdef POCO_ENABLE_SQLITE_VEC
+	// Virtual tables live whole in the active shard; archived shard files may
+	// hold stale copies from when they were active, and historyView must not
+	// union those in.
+	MemoryDB::Options o;
+	o.loadArchivedShards = false;
+	MemoryDB db(_dir, o);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+	db << "CREATE VIRTUAL TABLE vecs USING vec0(embedding float[2])", now;
+	std::string v1("a");
+	db << "INSERT INTO t(v) VALUES(:v)", use(v1), now;
+	db << "INSERT INTO vecs(rowid, embedding) VALUES(1, '[1.0, 0.0]')", now;
+	db.sealActive();
+	db.flush();
+	db << "INSERT INTO vecs(rowid, embedding) VALUES(2, '[0.0, 1.0]')", now;
+	db.flush();
+	assertTrue (db.archivedShardIds().size() == 1);
+
+	db.attachAllArchived();
+	std::string view = db.historyView("vecs");
+	int cnt = 0;
+	db << ("SELECT count(*) FROM " + view), into(cnt), now;
+	assertTrue (cnt == 2); // live rows only, no stale copy from the sealed shard
+
+	// ordinary tables still span archived shards
+	std::string tview = db.historyView("t");
+	cnt = 0;
+	db << ("SELECT count(*) FROM " + tview), into(cnt), now;
+	assertTrue (cnt >= 1);
+#else
+	std::cout << "sqlite-vec not enabled, test not executed." << std::endl;
+#endif
+}
+
+
 CppUnit::Test* MemoryDBTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MemoryDBTest");
@@ -1424,6 +1656,12 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testIndexPreservedAcrossReload);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDropTableClassified);
 	CppUnit_addTest(pSuite, MemoryDBTest, testAlterTableClassified);
+	CppUnit_addTest(pSuite, MemoryDBTest, testVecPersistAndReload);
+	CppUnit_addTest(pSuite, MemoryDBTest, testVecStaysInActiveShard);
+	CppUnit_addTest(pSuite, MemoryDBTest, testVecDirtyTracking);
+	CppUnit_addTest(pSuite, MemoryDBTest, testVecDropTable);
+	CppUnit_addTest(pSuite, MemoryDBTest, testVecShadowNameCollisionRejected);
+	CppUnit_addTest(pSuite, MemoryDBTest, testVecHistoryView);
 	CppUnit_addTest(pSuite, MemoryDBTest, testHistoryView);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteSealedShardLoaded);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDeleteSealedShardUnloaded);

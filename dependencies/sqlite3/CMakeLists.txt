@@ -8,6 +8,12 @@ if(POCO_SQLITE_UNBUNDLED)
 		set_target_properties(SQLite::SQLite3 PROPERTIES IMPORTED_GLOBAL TRUE)
 		message(WARNING "Unbundled SQLite3: Assuming that it was compiled with SQLITE_THREADSAFE=1")
 		target_compile_definitions(SQLite::SQLite3 INTERFACE SQLITE_THREADSAFE=1)
+		if(SQLite3_VERSION VERSION_LESS 3.37.0 AND NOT POCO_DATA_NO_SQL_PARSER)
+			# MemoryDB needs PRAGMA table_list (3.37); enforced by #error in MemoryDB.cpp
+			message(WARNING
+				"Unbundled SQLite ${SQLite3_VERSION} is older than 3.37.0; "
+				"MemoryDB will not compile. Upgrade SQLite or set POCO_DATA_NO_SQL_PARSER=ON")
+		endif()
 	endif()
 else()
 

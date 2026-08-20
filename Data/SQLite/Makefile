@@ -29,6 +29,34 @@ else
 	)
 endif
 
+ifdef POCO_ENABLE_SQLITE_VEC
+	# Always compiled from the bundled amalgamation, also with unbundled
+	# SQLite. SQLITE_CORE is harmless globally (sqlite3.c defines it itself).
+	SYSFLAGS += -DPOCO_ENABLE_SQLITE_VEC -DSQLITE_CORE -DSQLITE_VEC_STATIC
+	objects += sqlite-vec
+	prebuild += $(shell \
+		ln -sf $(POCO_BASE)/dependencies/sqlite-vec/src/*.c src/ && \
+		ln -sf $(POCO_BASE)/dependencies/sqlite-vec/src/*.h src/ \
+	)
+	# NEON kernels compile only with clang (GCC rejects the upstream
+	# int8x16_t/uint8x16_t intrinsic conversions)
+	ifneq (,$(filter aarch64 arm64,$(OSARCH)))
+		ifneq (,$(findstring clang,$(CC)))
+			SYSFLAGS += -DSQLITE_VEC_ENABLE_NEON
+		endif
+	endif
+	ifdef POCO_ENABLE_SQLITE_VEC_AVX
+		ifneq (,$(filter x86_64 amd64,$(OSARCH)))
+			# Applies to every TU of PocoDataSQLite (make cannot scope flags
+			# per file), so the whole library requires an AVX2-capable CPU.
+			SYSFLAGS += -mavx -mavx2 -DSQLITE_VEC_ENABLE_AVX
+		else
+			$(warning POCO_ENABLE_SQLITE_VEC_AVX ignored: target architecture $(OSARCH) is not x86_64)
+		endif
+	endif
+	SYSLIBS += -lm
+endif
+
 ifndef POCO_DATA_NO_SQL_PARSER
 	target_includes += $(POCO_BASE)/Data/SQLParser $(POCO_BASE)/Data/SQLParser/src
 	objects += MemoryDB MemoryDBInspector

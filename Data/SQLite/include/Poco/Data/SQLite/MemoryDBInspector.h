@@ -180,10 +180,10 @@ public:
 	};
 
 	struct TableInfo
-		/// A table or a view; type says which.
+		/// A table, view or virtual table; type says which.
 	{
 		std::string             name;
-		std::string             type;        // "table" or "view"
+		std::string             type;        // "table", "view" or "virtual"
 		std::string             sql;         // DDL from sqlite_master
 		std::vector<ColumnInfo> columns;
 		std::vector<IndexInfo>  indexes;

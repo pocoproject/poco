@@ -29,6 +29,12 @@
 #include <cctype>
 #include <set>
 
+// Table classification is built on PRAGMA table_list (SQLite 3.37),
+// independently of POCO_ENABLE_SQLITE_VEC.
+#if SQLITE_VERSION_NUMBER < 3037000
+#error "MemoryDB requires SQLite >= 3.37.0 (PRAGMA table_list); upgrade SQLite or build with POCO_DATA_NO_SQL_PARSER to exclude MemoryDB"
+#endif
+
 #include "SQLParser.h"
 #include "sql/SQLStatement.h"
 #include "sql/CreateStatement.h"
@@ -137,9 +143,21 @@ namespace
 		std::size_t typeEnd = typeStart;
 		while (typeEnd < lower.size() && std::isalpha(static_cast<unsigned char>(lower[typeEnd]))) ++typeEnd;
 		std::string type = lower.substr(typeStart, typeEnd - typeStart);
-		// Only the simple object types; leave CREATE VIRTUAL TABLE / CREATE UNIQUE INDEX
-		// (which would need more tokens to find the insertion point) alone for now -
-		// migrateShardFile's catch-and-continue handles them.
+		// CREATE VIRTUAL TABLE: the insertion point is after the TABLE keyword.
+		if (verb == "create" && type == "virtual")
+		{
+			std::size_t tblStart = typeEnd;
+			while (tblStart < lower.size() && std::isspace(static_cast<unsigned char>(lower[tblStart]))) ++tblStart;
+			std::size_t tblEnd = tblStart;
+			while (tblEnd < lower.size() && std::isalpha(static_cast<unsigned char>(lower[tblEnd]))) ++tblEnd;
+			if (lower.substr(tblStart, tblEnd - tblStart) != "table")
+				return sql;
+			typeEnd = tblEnd;
+			type = "table";
+		}
+		// Only the simple object types; leave CREATE UNIQUE INDEX (which would
+		// need more tokens to find the insertion point) alone for now -
+		// migrateShardFile's catch-and-continue handles it.
 		if (type != "table" && type != "index" && type != "view" && type != "trigger")
 			return sql;
 
@@ -175,12 +193,113 @@ namespace
 	}
 
 
+	// Excludes shadow tables of any virtual table in the given schema. The
+	// pragma's own 'shadow' type is not enough: schema parsing derives the
+	// owner from the prefix up to the LAST underscore, so names like vec0's
+	// "x_vector_chunks00" come back as plain 'table'. Keep in sync with
+	// isShadowName in MemoryDBInspector.cpp.
+	std::string shadowExclusion(const std::string& schema, const std::string& nameExpr)
+	{
+		return "NOT EXISTS (SELECT 1 FROM pragma_table_list v "
+			"WHERE v.schema=" + quoteLit(schema) + " AND v.type='virtual' "
+			"AND substr(" + nameExpr + ", 1, length(v.name)+1) = v.name || '_')";
+	}
+
+
+	// Minimal scan of "CREATE [TEMP|TEMPORARY] [UNIQUE] [VIRTUAL]
+	// TABLE|INDEX|VIEW|TRIGGER [IF NOT EXISTS] [schema.]name ...". Unwraps
+	// quoted names; valid is false when no name can be extracted.
+	struct CreateTarget
+	{
+		bool valid = false;
+		bool isVirtual = false;
+		std::string object; // "table", "index", "view", "trigger"
+		std::string name;
+	};
+
+	CreateTarget parseCreateTarget(std::string_view sql)
+	{
+		CreateTarget t;
+		std::string lower;
+		lower.reserve(sql.size());
+		for (char c: sql) lower += static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+
+		std::size_t i = 0;
+		auto nextWord = [&lower, &i]() -> std::string {
+			while (i < lower.size() && std::isspace(static_cast<unsigned char>(lower[i]))) ++i;
+			std::size_t b = i;
+			while (i < lower.size() && (std::isalnum(static_cast<unsigned char>(lower[i])) || lower[i] == '_')) ++i;
+			return lower.substr(b, i - b);
+		};
+
+		if (nextWord() != "create") return t;
+		std::string w = nextWord();
+		while (w == "temp" || w == "temporary" || w == "unique" || w == "virtual")
+		{
+			if (w == "virtual") t.isVirtual = true;
+			w = nextWord();
+		}
+		if (w != "table" && w != "index" && w != "view" && w != "trigger") return t;
+		t.object = w;
+
+		std::size_t save = i;
+		if (nextWord() == "if")
+		{
+			if (nextWord() == "not" && nextWord() == "exists") save = i;
+		}
+		i = save;
+
+		auto readName = [&sql, &i]() -> std::string {
+			std::string n;
+			while (i < sql.size() && std::isspace(static_cast<unsigned char>(sql[i]))) ++i;
+			if (i >= sql.size()) return n;
+			const char q = sql[i];
+			if (q == '"' || q == '`' || q == '[')
+			{
+				const char close = (q == '[') ? ']' : q;
+				++i;
+				while (i < sql.size())
+				{
+					if (sql[i] == close)
+					{
+						if (close != ']' && i + 1 < sql.size() && sql[i + 1] == close)
+						{
+							n += close;
+							i += 2;
+							continue;
+						}
+						++i;
+						break;
+					}
+					n += sql[i++];
+				}
+			}
+			else
+			{
+				while (i < sql.size() && (std::isalnum(static_cast<unsigned char>(sql[i])) || sql[i] == '_' || sql[i] == '$'))
+					n += sql[i++];
+			}
+			return n;
+		};
+		std::string name = readName();
+		while (i < sql.size() && std::isspace(static_cast<unsigned char>(sql[i]))) ++i;
+		if (i < sql.size() && sql[i] == '.')
+		{
+			++i;
+			name = readName(); // schema-qualified: keep the object name
+		}
+		t.name = name;
+		t.valid = !name.empty();
+		return t;
+	}
+
+
 	// (ColumnCopy / columnCopy moved to be a MemoryDB member so they can share
 	// _columnCopyCache - see MemoryDB::columnCopy below.)
 } // anonymous namespace
 
 
-MemoryDB::ColumnCopy MemoryDB::columnCopy(Session& s, const std::string& table)
+MemoryDB::ColumnCopy MemoryDB::columnCopy(Session& s, const std::string& table, bool isVirtual)
 {
 	// Schemas are stable per MemoryDB instance (all sessions see the same DDL),
 	// so cache by table name. onDDL clears the cache and bumps _schemaVersion
@@ -217,7 +336,9 @@ MemoryDB::ColumnCopy MemoryDB::columnCopy(Session& s, const std::string& table)
 	for (char c: pkType) upperPkType += static_cast<char>(std::toupper(static_cast<unsigned char>(c)));
 
 	ColumnCopy cc;
-	if (pkCount == 1 && upperPkType == "INTEGER")
+	// A virtual table's declared PRIMARY KEY is not a rowid alias; always copy
+	// with an explicit rowid column so the module's xUpdate preserves rowids.
+	if (!isVirtual && pkCount == 1 && upperPkType == "INTEGER")
 	{
 		// INTEGER PRIMARY KEY is an alias for rowid; SELECT * preserves it.
 		cc.selectList = "*";
@@ -414,6 +535,7 @@ void MemoryDB::startFresh()
 	a.schemaVersion = 0;
 	_shards.push_back(a);
 	_schemaVersion = 0;
+	_virtualNames.clear();
 }
 
 
@@ -488,12 +610,22 @@ void MemoryDB::load()
 	// sql IS NULL and cannot be dropped; the uniqueness checks they do are part of
 	// correctness and stay enabled. We recreate the dropped indexes once at the end,
 	// which builds each as a single sort+B-tree pass over the now-populated tables.
+	// Indexes on shadow tables belong to the module and must not be dropped
+	// behind its back.
 	std::vector<std::string> ixNames, ixDdls;
-	_persist << "SELECT name, sql FROM sqlite_master "
-		"WHERE type='index' AND sql IS NOT NULL ORDER BY rowid",
+	_persist << ("SELECT name, sql FROM sqlite_master "
+		"WHERE type='index' AND sql IS NOT NULL "
+		"AND " + shadowExclusion("main", "sqlite_master.tbl_name") + " "
+		"ORDER BY rowid"),
 		into(ixNames), into(ixDdls), now;
 	for (const auto& n: ixNames)
 		_persist << ("DROP INDEX " + quoteIdent(n)), now;
+
+	std::vector<std::string> mainVtabs = virtualTables(_persist);
+	{
+		Poco::FastMutex::ScopedLock l(_stateMutex);
+		_virtualNames = std::set<std::string>(mainVtabs.begin(), mainVtabs.end());
+	}
 
 	try
 	{
@@ -532,6 +664,11 @@ void MemoryDB::load()
 				throw;
 			}
 			ss << "DETACH DATABASE mem", now;
+
+			// Sealed shard files may hold stale virtual-table copies from
+			// before sealing; merge from the active shard only.
+			if (!s.sealed)
+				copyVirtualTables(path, "shardld", false, mainVtabs);
 		}
 	}
 	catch (...)
@@ -587,6 +724,52 @@ void MemoryDB::throwIfRejected() const
 	// caller still sees a clear failure.
 	throw Poco::NotImplementedException(
 		"MemoryDB rejected a prohibited operation (out of memory recording details)");
+}
+
+
+bool MemoryDB::collidesWithVirtualPrefix(const std::string& name)
+{
+	Poco::FastMutex::ScopedLock l(_stateMutex);
+	for (const auto& v: _virtualNames)
+	{
+		if (name.size() > v.size() && name[v.size()] == '_' && name.compare(0, v.size(), v) == 0)
+			return true;
+	}
+	return false;
+}
+
+
+void MemoryDB::checkStatementAllowed(std::string_view sql)
+{
+	if (mentionsWithoutRowid(sql))
+		throw Poco::NotImplementedException("MemoryDB does not support WITHOUT ROWID tables");
+
+	// Names in a virtual table's shadow namespace ("<vtabname>_...") are never
+	// persisted as user tables, so creating them would silently lose data.
+	// Reject both directions up front; the trace hook poisons the instance as
+	// a backstop for statements that bypass operator<<.
+	CreateTarget ct = parseCreateTarget(sql);
+	if (!ct.valid) return;
+
+	if (ct.isVirtual)
+	{
+		int cnt = 0;
+		std::string prefix = ct.name + "_";
+		int len = static_cast<int>(prefix.size());
+		_session << "SELECT count(*) FROM pragma_table_list WHERE schema='main' "
+			"AND type IN ('table','virtual') AND substr(name, 1, :len) = :p",
+			use(len), use(prefix), into(cnt), now;
+		if (cnt > 0)
+			throw Poco::NotImplementedException(
+				"MemoryDB: virtual table name '" + ct.name +
+				"' would claim existing tables named '" + prefix + "...'");
+	}
+	else if (ct.object == "table" && collidesWithVirtualPrefix(ct.name))
+	{
+		throw Poco::NotImplementedException(
+			"MemoryDB: table name '" + ct.name +
+			"' collides with a virtual table's shadow-table namespace");
+	}
 }
 
 
@@ -1094,13 +1277,21 @@ std::string MemoryDB::buildHistoryView(const std::string& table,
 	std::string viewName = table + "_history";
 	std::string sql = "SELECT * FROM main." + quoteIdent(table);
 
+	// Virtual tables live whole in the active shard; copies in archived shard
+	// files are stale, so their history view is just the base table.
+	bool isVirtual = false;
+	{
+		Poco::FastMutex::ScopedLock l(_stateMutex);
+		isVirtual = _virtualNames.find(table) != _virtualNames.end();
+	}
+
 	// Holding the SQLite connection mutex makes the whole "probe shards + drop
 	// old view + create new view" sequence atomic vs concurrent user steps.
 	// Without it a user's SELECT FROM <table>_history could see the view mid
 	// drop-and-recreate and fail with "no such table".
 	InternalGuard guard;
 	DbMutexGuard dbm(_memHandle);
-	for (auto id: shardIds)
+	if (!isVirtual) for (auto id: shardIds)
 	{
 		std::string alias = "arc_" + Poco::NumberFormatter::format(id);
 		int has = 0;
@@ -1115,6 +1306,47 @@ std::string MemoryDB::buildHistoryView(const std::string& table,
 	_session << ("DROP VIEW IF EXISTS " + quoteIdent(viewName)), now;
 	_session << ("CREATE TEMP VIEW " + quoteIdent(viewName) + " AS " + sql), now;
 	return viewName;
+}
+
+
+void MemoryDB::copyVirtualTables(const std::string& filePath, const std::string& alias,
+	bool intoFile, const std::vector<std::string>& vtabs)
+{
+	// Virtual tables are copied whole through the module's xUpdate (which also
+	// rebuilds the shadow tables), always on _persist with the file attached:
+	// instantiating a shared-cache virtual table on a transient connection
+	// leaves a dangling VTable after DETACH + close (SQLite does not
+	// disconnect vtabs of a detached schema) - a use-after-free when the
+	// schema is finally cleared. An attached file schema dies at DETACH while
+	// _persist is alive. The _session mutex is held so the copy sees only
+	// statement-boundary state; read_uncommitted on _persist could otherwise
+	// capture a torn multi-shadow-table snapshot mid-INSERT.
+	if (vtabs.empty()) return;
+
+	DbMutexGuard dbm(_memHandle);
+	_persist << ("ATTACH DATABASE " + quoteLit(filePath) + " AS " + alias), now;
+	try
+	{
+		// reading from the file: only tables present on both sides
+		std::vector<std::string> src = intoFile ? vtabs : virtualTables(_persist, alias);
+		const std::string dst = intoFile ? alias : std::string("main");
+		const std::string from = intoFile ? std::string("main") : alias;
+		for (const auto& vt: src)
+		{
+			if (std::find(vtabs.begin(), vtabs.end(), vt) == vtabs.end()) continue;
+			ColumnCopy cc = columnCopy(_persist, vt, true);
+			std::string sql = "INSERT INTO " + dst + "." + quoteIdent(vt);
+			if (!cc.insertCols.empty()) sql += " " + cc.insertCols;
+			sql += " SELECT " + cc.selectList + " FROM " + from + "." + quoteIdent(vt);
+			_persist << sql, now;
+		}
+	}
+	catch (...)
+	{
+		try { _persist << ("DETACH DATABASE " + alias), now; } catch (...) {}
+		throw;
+	}
+	_persist << ("DETACH DATABASE " + alias), now;
 }
 
 
@@ -1272,6 +1504,23 @@ void MemoryDB::onStatement(const char* sql)
 			case hsql::kStmtCreate:
 			{
 				const auto* c = static_cast<const hsql::CreateStatement*>(st);
+				// Backstop for statements that bypassed operator<<: a table
+				// in a shadow namespace would silently vanish from
+				// persistence, and SQLite has already executed the CREATE.
+				if (c->type == hsql::kCreateTable && c->tableName != nullptr
+					&& collidesWithVirtualPrefix(c->tableName))
+				{
+					_poisoned.store(true, std::memory_order_release);
+					static const std::string kMsg =
+						"MemoryDB: table name collides with a virtual table's shadow-table namespace";
+					try
+					{
+						Poco::FastMutex::ScopedLock l(_stateMutex);
+						if (_rejected.empty()) _rejected = kMsg;
+					}
+					catch (...) {} // _poisoned is already set
+					return;
+				}
 				onDDL(sql, (c->type == hsql::kCreateTable) ? c->tableName : nullptr);
 				wrote = true;
 				break;
@@ -1341,6 +1590,12 @@ void MemoryDB::onDDL(const char* sql, const char* table)
 	_schemaLog.push_back(std::move(normalized));
 	++_schemaVersion;
 	_columnCopyCache.clear();
+	// Track virtual-table names for shadow-prefix checks and historyView. An
+	// unclassified DROP (table == nullptr) can leave a stale entry, which only
+	// over-rejects new tables until the next reopen.
+	CreateTarget ct = parseCreateTarget(sql);
+	if (ct.valid && ct.isVirtual && ct.object == "table") _virtualNames.insert(ct.name);
+	else if (table != nullptr && firstKeyword(sql) == "DROP") _virtualNames.erase(table);
 	if (table) markTableDirty(table);
 	else if (ShardInfo* a = activeShard()) a->dirty = true;
 }
@@ -1463,8 +1718,21 @@ Poco::Int64 MemoryDB::maxRowid(const std::string& table)
 
 std::vector<std::string> MemoryDB::userTables(Session& s)
 {
+	// Virtual tables are persisted whole (copyVirtualTables), not by rowid
+	// range; shadow tables are module-managed and never user tables.
 	std::vector<std::string> tables;
-	s << "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'", into(tables), now;
+	s << ("SELECT t.name FROM pragma_table_list t "
+		"WHERE t.schema='main' AND t.type='table' AND t.name NOT LIKE 'sqlite_%' "
+		"AND " + shadowExclusion("main", "t.name")), into(tables), now;
+	return tables;
+}
+
+
+std::vector<std::string> MemoryDB::virtualTables(Session& s, const std::string& schema)
+{
+	std::vector<std::string> tables;
+	s << ("SELECT name FROM pragma_table_list WHERE schema=" + quoteLit(schema) +
+		" AND type='virtual' AND name NOT LIKE 'sqlite_%'"), into(tables), now;
 	return tables;
 }
 
@@ -1561,11 +1829,12 @@ void MemoryDB::doFlush(bool allowSeal)
 	// concurrent writes on _session during this sampling land in the
 	// open-range slice of the new active shard (see maybeSeal note).
 	std::vector<std::string> tables = userTables(_persist);
+	std::vector<std::string> vtabs = virtualTables(_persist);
 	std::map<std::string, Poco::Int64> maxRowids;
 	for (const auto& t: tables) maxRowids[t] = maxRowid(t);
 
 	struct Slice { std::string table; Poco::Int64 lo; Poco::Int64 hi; bool open; };
-	struct Plan { std::size_t idx; std::string finalName; std::vector<Slice> slices; };
+	struct Plan { std::size_t idx; std::string finalName; std::vector<Slice> slices; bool copyVtabs = false; };
 	std::vector<Plan> writes;
 	std::vector<std::size_t> migrates;
 	int schemaVersion = 0;
@@ -1608,6 +1877,9 @@ void MemoryDB::doFlush(bool allowSeal)
 						}
 						p.slices.push_back({t, lo, 0, true});
 					}
+					// virtual tables are written whole, and only into the
+					// active shard (no rowid-range partitioning)
+					p.copyVtabs = true;
 				}
 				else
 				{
@@ -1649,9 +1921,14 @@ void MemoryDB::doFlush(bool allowSeal)
 				ss << "PRAGMA read_uncommitted = true", now;
 				ss << ("ATTACH DATABASE " + quoteLit(_memName) + " AS mem"), now;
 
+				// Shadow tables and their indexes are excluded: the CREATE
+				// VIRTUAL TABLE replay recreates them via the module's xCreate.
 				std::vector<std::string> ddls;
-				ss << "SELECT sql FROM mem.sqlite_master WHERE type IN ('table','index') "
-					"AND name NOT LIKE 'sqlite_%' AND sql IS NOT NULL ORDER BY rowid", into(ddls), now;
+				ss << ("SELECT m.sql FROM mem.sqlite_master m "
+					"WHERE m.type IN ('table','index') AND m.name NOT LIKE 'sqlite_%' "
+					"AND m.sql IS NOT NULL "
+					"AND " + shadowExclusion("mem", "m.tbl_name") + " "
+					"ORDER BY m.rowid"), into(ddls), now;
 				for (const auto& d: ddls) ss << d, now;
 
 				for (const auto& sl: p.slices)
@@ -1672,6 +1949,11 @@ void MemoryDB::doFlush(bool allowSeal)
 
 				ss << "DETACH DATABASE mem", now;
 			}
+
+			// full copy of each virtual table (active shard only; no
+			// shard_ranges entry is recorded for them)
+			if (p.copyVtabs)
+				copyVirtualTables(tmpPath, "shardtmp", true, vtabs);
 
 			Poco::File tf(tmpPath);
 			Poco::Path fp(_dir, p.finalName);
@@ -1729,9 +2011,12 @@ void MemoryDB::doFlush(bool allowSeal)
 	try
 	{
 		std::vector<std::string> tablesNow = userTables(_persist);
-		if (tablesNow.size() != tables.size())
+		std::vector<std::string> vtabsNow = virtualTables(_persist);
+		if (tablesNow.size() != tables.size() || vtabsNow.size() != vtabs.size())
 		{
 			std::set<std::string> orig(tables.begin(), tables.end());
+			orig.insert(vtabs.begin(), vtabs.end());
+			tablesNow.insert(tablesNow.end(), vtabsNow.begin(), vtabsNow.end());
 			for (const auto& t: tablesNow)
 				if (orig.find(t) == orig.end()) { newTablesObserved = true; break; }
 		}

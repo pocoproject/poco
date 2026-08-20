@@ -46,6 +46,7 @@ LIBS=(
 	"hpdf                 gh     libharu/libharu"
 	"7zip                 7zip   -"
 	"cpptrace             gh     jeremy-rifkin/cpptrace"
+	"sqlite-vec           gh     asg017/sqlite-vec"
 	"quill                gh     odygrd/quill"
 	"wepoll               gh     piscisaureus/wepoll"
 	"tessil               gh     Tessil/ordered-map"

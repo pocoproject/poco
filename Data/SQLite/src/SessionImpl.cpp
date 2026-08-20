@@ -23,10 +23,29 @@
 #include "Poco/Data/DataException.h"
 #include <sqlite3.h>
 #include <cstdlib>
+#ifdef POCO_ENABLE_SQLITE_VEC
+// SQLITE_CORE makes sqlite-vec.h use the already-included sqlite3.h instead
+// of sqlite3ext.h (not shipped with the bundled amalgamation).
+#ifndef SQLITE_CORE
+#define SQLITE_CORE 1
+#endif
+#include "sqlite-vec.h"
+#endif
 
 
 #ifndef SQLITE_OPEN_URI
 #define SQLITE_OPEN_URI 0
+#endif
+
+
+#ifdef POCO_ENABLE_SQLITE_VEC
+// PRAGMA table_list (3.37) is required by MemoryDB's table classification;
+// below 3.44 sqlite-vec itself builds with reduced functionality.
+#if SQLITE_VERSION_NUMBER < 3037000
+#error "POCO_ENABLE_SQLITE_VEC requires SQLite >= 3.37.0"
+#elif SQLITE_VERSION_NUMBER < 3044000
+#pragma message("SQLite older than 3.44.0: sqlite-vec builds with reduced functionality")
+#endif
 #endif
 
 
@@ -198,6 +217,13 @@ void SessionImpl::open(const std::string& connect)
 	}
 
 	poco_assert_dbg (!connectionString().empty());
+
+#ifdef POCO_ENABLE_SQLITE_VEC
+	// Registered before every open, not once: Utility::setThreadMode() calls
+	// sqlite3_shutdown(), which clears the auto-extension list. The call is
+	// idempotent and serialized inside SQLite.
+	sqlite3_auto_extension(reinterpret_cast<void(*)(void)>(sqlite3_vec_init));
+#endif
 
 	try
 	{

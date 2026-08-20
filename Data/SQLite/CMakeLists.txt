@@ -24,6 +24,11 @@ else()
 	target_link_libraries(DataSQLite PRIVATE "$<BUILD_LOCAL_INTERFACE:SQLite::SQLite3>")
 endif()
 
+if(ENABLE_DATA_SQLITE_VEC)
+	target_link_libraries(DataSQLite PRIVATE "$<BUILD_LOCAL_INTERFACE:SQLiteVec::SQLiteVec>")
+	target_compile_definitions(DataSQLite PUBLIC POCO_ENABLE_SQLITE_VEC)
+endif()
+
 add_library(Poco::DataSQLite ALIAS DataSQLite)
 set_target_properties(DataSQLite
 	PROPERTIES

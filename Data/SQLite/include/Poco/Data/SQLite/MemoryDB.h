@@ -107,6 +107,17 @@ class SQLite_API MemoryDB
 	///     so seals fire less often, set Options::retentionMaxAge or retentionMaxBytes to
 	///     drop older shards proactively (by your policy rather than SQLite's), or raise
 	///     SQLITE_LIMIT_ATTACHED via sqlite3_limit() on session() before adding workload.
+	///   * Virtual tables (e.g. sqlite-vec vec0 tables with POCO_ENABLE_SQLITE_VEC) are
+	///     persisted whole: not partitioned by rowid range, never sealed into archived
+	///     shards, and rewritten completely into the active shard on each flush --
+	///     intended for moderate data sizes (tens of MB). Their shadow tables
+	///     ("<vtabname>_...") are managed by the module; CREATE statements colliding
+	///     with a shadow namespace in either direction are rejected. Modules must be
+	///     registered on every connection (built-in or auto extensions) and their
+	///     tables must round-trip INSERT INTO t(rowid, ...) SELECT; contentless or
+	///     external-content FTS5 tables are not supported. A directory that uses a
+	///     module can only be reopened by builds providing it. Requires SQLite >= 3.37
+	///     (PRAGMA table_list, enforced at compile time).
 {
 public:
 	struct Options
@@ -172,15 +183,14 @@ public:
 	Statement operator << (const T& t)
 		/// Creates a Statement, forwarding to the underlying in-memory Session. This enables
 		/// the usual db << "SQL", into(x), use(y), now; syntax. Statements containing a
-		/// CREATE TABLE ... WITHOUT ROWID clause are rejected up front (the in-memory DB
-		/// is left untouched, so this instance stays usable).
+		/// CREATE TABLE ... WITHOUT ROWID clause, and CREATE statements whose table name
+		/// collides with a virtual table's shadow-table namespace ("<vtabname>_..."), are
+		/// rejected up front (the in-memory DB is left untouched, so this instance stays
+		/// usable).
 	{
 		throwIfRejected();
 		if constexpr (std::is_convertible_v<const T&, std::string_view>)
-		{
-			if (mentionsWithoutRowid(std::string_view(t)))
-				throw Poco::NotImplementedException("MemoryDB does not support WITHOUT ROWID tables");
-		}
+			checkStatementAllowed(std::string_view(t));
 		return _session << t;
 	}
 
@@ -337,7 +347,9 @@ public:
 		/// being a SQLite view without INSTEAD OF triggers, so writes to it fail with a
 		/// clear SQLite error. If Options::loadArchivedShards is true, sealed data is
 		/// already merged into main, so the view simply aliases the base table to keep
-		/// the call site uniform across modes. Thread-safe (see attachArchived).
+		/// the call site uniform across modes. For a virtual table the view always
+		/// aliases only the base table: virtual tables live whole in the active shard,
+		/// so copies in archived shard files are stale. Thread-safe (see attachArchived).
 
 	std::string historyView(const std::string& table,
 		const Poco::Timestamp& from, const Poco::Timestamp& to);
@@ -413,9 +425,18 @@ private:
 	void maybeSeal(const std::vector<std::string>& tables,
 		const std::map<std::string, Poco::Int64>& maxRowids); // caller holds _stateMutex
 	void migrateShardFile(ShardInfo& shard, int toVersion, const std::vector<std::string>& schemaLog);
-	std::vector<std::string> userTables(Session& s);
+	std::vector<std::string> userTables(Session& s);    // ordinary rowid tables (no virtual, no shadow)
+	std::vector<std::string> virtualTables(Session& s, const std::string& schema = "main");
+		// CREATE VIRTUAL TABLE objects in the given schema
+	void copyVirtualTables(const std::string& filePath, const std::string& alias,
+		bool intoFile, const std::vector<std::string>& vtabs);
+		// whole-table copy of virtual tables between the in-memory db and an
+		// attached file; always runs on _persist (see impl comment for why)
+	void checkStatementAllowed(std::string_view sql);
+		// operator<< pre-filter: throws NotImplementedException for prohibited SQL
+	bool collidesWithVirtualPrefix(const std::string& name); // takes _stateMutex
 	Poco::Int64 maxRowid(const std::string& table);
-	ColumnCopy columnCopy(Session& s, const std::string& table); // cached by table name
+	ColumnCopy columnCopy(Session& s, const std::string& table, bool isVirtual = false); // cached by table name
 	void markTableDirty(const std::string& table);      // caller holds _stateMutex
 	ShardInfo* activeShard();                            // caller holds _stateMutex
 	ShardInfo* owningShard(const std::string& table, Poco::Int64 row); // caller holds _stateMutex
@@ -483,6 +504,8 @@ private:
 	// MemoryDB instance, so this is safe to share across sessions; cleared on
 	// every DDL in onDDL().
 	std::unordered_map<std::string, ColumnCopy> _columnCopyCache;
+	std::set<std::string>      _virtualNames;  // virtual-table names, for shadow-prefix checks
+	                                           // and historyView; load()/onDDL(), _stateMutex
 
 	Poco::Timer                _timer;
 
