@@ -613,6 +613,26 @@ void Context::createSSLContext()
 void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 {
 #ifndef OPENSSL_NO_DH
+
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	// In FIPS mode, EVP_PKEY_fromdata() rejects custom p/g parameters
+	// (error:0280007F:Diffie-Hellman routines::bad ffc parameters).
+	// Use FIPS-approved RFC 7919 named ffdhe groups via SSL_CTX_set1_groups_list() instead.
+	if (SSLManager::isFIPSEnabled())
+	{
+		// ffdhe groups are approved in FIPS 140-3 / SP 800-56Ar3.
+		// They will only be used when a DHE cipher suite is actually negotiated.
+		const char* fipsGroups = "ffdhe2048:ffdhe3072:ffdhe4096:ffdhe6144:ffdhe8192";
+		if (!SSL_CTX_set1_groups_list(_pSSLContext, fipsGroups))
+		{
+			std::string err = "Context::initDH():SSL_CTX_set1_groups_list(ffdhe)\n";
+			throw SSLContextException(Poco::Crypto::getError(err));
+		}
+		SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);
+		return;
+	}
+#endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+
 	static const unsigned char dh1024_p[] =
 	{
 		0xB1,0x0B,0x8F,0x96,0xA0,0x80,0xE0,0x1D,0xDE,0x92,0xDE,0x5E,
@@ -806,7 +826,7 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 			throw SSLContextException(Poco::Crypto::getError(err));
 		}
 
-		if (1 != EVP_PKEY_fromdata(pKeyCtx, &pKey, EVP_PKEY_KEYPAIR, params))
+		if (1 != EVP_PKEY_fromdata(pKeyCtx, &pKey, EVP_PKEY_KEY_PARAMETERS, params))
 		{
 			EVP_PKEY_CTX_free(pKeyCtx);
 			std::string err = "Context::initDH():EVP_PKEY_fromdata()\n";
@@ -932,7 +952,12 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 void Context::initECDH(const std::string& curve)
 {
 #ifndef OPENSSL_NO_ECDH
-	const std::string groups(curve.empty() ? "X448:X25519:P-521:P-384:P-256" : curve);
+	const std::string groups(curve.empty() 
+		? (SSLManager::isFIPSEnabled()
+					? "P-521:P-384:P-256"              // FIPS 140-2 + 140-3 safe
+					: "X448:X25519:P-521:P-384:P-256") // full list for non-FIPS
+		: curve);
+
 	if (SSL_CTX_set1_curves_list(_pSSLContext, groups.c_str()) == 0)
 	{
 		throw SSLContextException("Cannot set ECDH groups", groups);
