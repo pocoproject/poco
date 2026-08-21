@@ -613,26 +613,6 @@ void Context::createSSLContext()
 void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 {
 #ifndef OPENSSL_NO_DH
-
-#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
-	// In FIPS mode, EVP_PKEY_fromdata() rejects custom p/g parameters
-	// (error:0280007F:Diffie-Hellman routines::bad ffc parameters).
-	// Use FIPS-approved RFC 7919 named ffdhe groups via SSL_CTX_set1_groups_list() instead.
-	if (SSLManager::isFIPSEnabled())
-	{
-		// ffdhe groups are approved in FIPS 140-3 / SP 800-56Ar3.
-		// They will only be used when a DHE cipher suite is actually negotiated.
-		const char* fipsGroups = "ffdhe2048:ffdhe3072:ffdhe4096:ffdhe6144:ffdhe8192";
-		if (!SSL_CTX_set1_groups_list(_pSSLContext, fipsGroups))
-		{
-			std::string err = "Context::initDH():SSL_CTX_set1_groups_list(ffdhe)\n";
-			throw SSLContextException(Poco::Crypto::getError(err));
-		}
-		SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);
-		return;
-	}
-#endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
-
 	static const unsigned char dh1024_p[] =
 	{
 		0xB1,0x0B,0x8F,0x96,0xA0,0x80,0xE0,0x1D,0xDE,0x92,0xDE,0x5E,
@@ -826,7 +806,7 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 			throw SSLContextException(Poco::Crypto::getError(err));
 		}
 
-		if (1 != EVP_PKEY_fromdata(pKeyCtx, &pKey, EVP_PKEY_KEY_PARAMETERS, params))
+		if (1 != EVP_PKEY_fromdata(pKeyCtx, &pKey, EVP_PKEY_KEYPAIR, params))
 		{
 			EVP_PKEY_CTX_free(pKeyCtx);
 			std::string err = "Context::initDH():EVP_PKEY_fromdata()\n";
@@ -876,36 +856,44 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 			throw SSLContextException("Error creating Diffie-Hellman parameters", msg);
 		}
 
-#if !defined(LIBRESSL_VERSION_NUMBER)
+#if !defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER >= 0x2070000fL
 
 		BIGNUM* p = nullptr;
 		BIGNUM* g = nullptr;
+		long length = 0;
+
 		if (keyDHGroup == KEY_DH_GROUP_2048)
 		{
-			p = BN_bin2bn(dh2048_p, sizeof(dh2048_p), 0);
-			g = BN_bin2bn(dh2048_g, sizeof(dh2048_g), 0);
-			DH_set0_pqg(dh, p, 0, g);
-			DH_set_length(dh, 256);
+			p = BN_bin2bn(dh2048_p, sizeof(dh2048_p), nullptr);
+			g = BN_bin2bn(dh2048_g, sizeof(dh2048_g), nullptr);
+			length = 256;
 		}
 		else if (keyDHGroup == KEY_DH_GROUP_1024)
 		{
-			p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
-			g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
-			DH_set0_pqg(dh, p, 0, g);
-			DH_set_length(dh, 160);
+			p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), nullptr);
+			g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), nullptr);
+			length = 160;
 		}
 		else
 		{
+			DH_free(dh);
 			throw Poco::NotImplementedException(Poco::format(
 				"DH Group: %d", static_cast<int>(keyDHGroup)));
 		}
-		if (!p || !g)
+
+		// Verify allocations AND verification that DH_set0_pqg succeeds.
+		// If DH_set0_pqg fails (returns 0), it does NOT take ownership, so p and g must be freed manually.
+		if (!p || !g || !DH_set0_pqg(dh, p, nullptr, g))
 		{
+			BN_free(p);
+			BN_free(g);
 			DH_free(dh);
 			throw SSLContextException("Error creating Diffie-Hellman parameters");
 		}
 
-#else // LIBRESSL_VERSION_NUMBER
+		DH_set_length(dh, length);
+
+#else // Legacy LibreSSL (< 2.7.0)
 
 		if (keyDHGroup == KEY_DH_GROUP_2048)
 		{
@@ -921,16 +909,18 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 		}
 		else
 		{
+			DH_free(dh);
 			throw Poco::NotImplementedException(Poco::format(
 				"DH Group: %d", static_cast<int>(keyDHGroup)));
 		}
+
 		if ((!dh->p) || (!dh->g))
 		{
 			DH_free(dh);
 			throw SSLContextException("Error creating Diffie-Hellman parameters");
 		}
 
-#endif // !defined(LIBRESSL_VERSION_NUMBER)
+#endif // !defined(LIBRESSL_VERSION_NUMBER) || LIBRESSL_VERSION_NUMBER >= 0x2070000fL
 
 	}
 	SSL_CTX_set_tmp_dh(_pSSLContext, dh);
@@ -952,12 +942,12 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 void Context::initECDH(const std::string& curve)
 {
 #ifndef OPENSSL_NO_ECDH
-	const std::string groups(curve.empty() 
-		? (SSLManager::isFIPSEnabled()
-					? "P-521:P-384:P-256"              // FIPS 140-2 + 140-3 safe
-					: "X448:X25519:P-521:P-384:P-256") // full list for non-FIPS
-		: curve);
-
+#if defined(LIBRESSL_VERSION_NUMBER)
+	// LibreSSL does not support X448 in its curve parser
+	const std::string groups(curve.empty() ? "X25519:P-256:P-384:P-521" : curve);
+#else
+	const std::string groups(curve.empty() ? "X448:X25519:P-521:P-384:P-256" : curve);
+#endif
 	if (SSL_CTX_set1_curves_list(_pSSLContext, groups.c_str()) == 0)
 	{
 		throw SSLContextException("Cannot set ECDH groups", groups);
@@ -965,6 +955,5 @@ void Context::initECDH(const std::string& curve)
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_ECDH_USE);
 #endif
 }
-
 
 } // namespace Poco::Net
