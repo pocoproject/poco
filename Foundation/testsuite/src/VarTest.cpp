@@ -994,7 +994,7 @@ void VarTest::testChar()
 void VarTest::testFloat()
 {
 	Var any("0");
-	[[maybe_unused]] float f = any;
+	(void) static_cast<float>(any);
 
 	float src = 32.0F;
 	Var a1 = src;
@@ -1092,7 +1092,7 @@ void VarTest::testDouble()
 {
 	double d = 0;
 	Var v(d);
-	[[maybe_unused]] float f = v;
+	(void) static_cast<float>(v);
 
 	double src = 32.0;
 	Var a1 = src;
@@ -1764,7 +1764,7 @@ void VarTest::testUDT()
 
 	try
 	{
-		[[maybe_unused]] float f = da1;
+		(void) static_cast<float>(da1);
 		fail ("must fail");
 	}
 	catch (BadCastException&) { }
@@ -2123,7 +2123,7 @@ void VarTest::testLimitsFloat()
 	(void) anyFloat.convert<int>();
 	assertTrue (anyFloat.convert<int64_t>() == i);
 
-	try { [[maybe_unused]] float fl = anyFloat; fail("must throw", __LINE__, __FILE__); }
+	try { (void) static_cast<float>(anyFloat); fail("must throw", __LINE__, __FILE__); }
 	catch (Poco::RangeException&) {}
 
 	i = std::numeric_limits<int64_t>::max();
@@ -3145,7 +3145,7 @@ void VarTest::testEmpty()
 
 	try
 	{
-		[[maybe_unused]] int i = da;
+		(void) static_cast<int>(da);
 		fail ("must fail");
 	} catch (InvalidAccessException&) { }
 
