@@ -382,7 +382,11 @@ inline CertificateHandlerFactoryMgr& SSLManager::certificateHandlerFactoryMgr()
 
 inline bool SSLManager::isFIPSEnabled()
 {
-#ifdef OPENSSL_FIPS
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	// OpenSSL 3.x: OPENSSL_FIPS no longer exists. FIPS is now provider-based.
+	return EVP_default_properties_is_fips_enabled(NULL) ? true : false;
+#elif defined(OPENSSL_FIPS)
+	// OpenSSL 1.x legacy FIPS module#else
 	return FIPS_mode() ? true : false;
 #else
 	return false;
