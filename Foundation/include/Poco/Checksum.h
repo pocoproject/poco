@@ -19,6 +19,7 @@
 
 
 #include "Poco/Foundation.h"
+#include "Poco/zlib.h"
 
 
 namespace Poco {
@@ -62,16 +63,19 @@ public:
 
 	void update(char data);
 		/// Updates the checksum with the given data.
+	
+	uLong crc32_combine(uLong crc1, uLong crc2, z_off_t length);
+		/// Returns the combined checksum of checksums.
 
-	Poco::UInt32 checksum() const;
+	uLong checksum() const;
 		/// Returns the calculated checksum.
 
 	Type type() const;
-		/// Which type of checksum are we calulcating
+		/// Which type of checksum are we calculating
 
 private:
-	Type         _type;
-	Poco::UInt32 _value;
+	Type  _type;
+	uLong _value;
 };
 
 
@@ -90,7 +94,7 @@ inline void Checksum::update(char c)
 }
 
 
-inline Poco::UInt32 Checksum::checksum() const
+inline uLong Checksum::checksum() const
 {
 	return _value;
 }

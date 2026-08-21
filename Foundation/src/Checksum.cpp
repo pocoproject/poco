@@ -13,7 +13,6 @@
 
 
 #include "Poco/Checksum.h"
-#include <zlib.h>
 
 
 namespace Poco {
@@ -48,6 +47,11 @@ void Checksum::update(const char* data, unsigned length)
 		_value = adler32(_value, reinterpret_cast<const Bytef*>(data), length);
 	else
 		_value = crc32(_value, reinterpret_cast<const Bytef*>(data), length);
+}
+
+uLong Checksum::crc32_combine(uLong crc1, uLong crc2, z_off_t length)
+{
+	return crc32_combine(crc1, crc2, length);
 }
 
 
