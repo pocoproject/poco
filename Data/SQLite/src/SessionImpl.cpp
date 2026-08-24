@@ -221,8 +221,13 @@ void SessionImpl::open(const std::string& connect)
 #ifdef POCO_ENABLE_SQLITE_VEC
 	// Registered before every open, not once: Utility::setThreadMode() calls
 	// sqlite3_shutdown(), which clears the auto-extension list. The call is
-	// idempotent and serialized inside SQLite.
-	sqlite3_auto_extension(reinterpret_cast<void(*)(void)>(sqlite3_vec_init));
+	// idempotent and serialized inside SQLite. A failure here (SQLITE_NOMEM)
+	// must fail the open: silently returning a session without vec would
+	// violate the enabled-build contract.
+	int rcVec = sqlite3_auto_extension(reinterpret_cast<void(*)(void)>(sqlite3_vec_init));
+	if (rcVec != SQLITE_OK)
+		throw ConnectionFailedException(std::string("cannot register sqlite-vec extension: ")
+			+ sqlite3_errstr(rcVec));
 #endif
 
 	try
