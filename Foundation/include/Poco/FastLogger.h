@@ -355,14 +355,14 @@ public:
 		///
 		/// Note: This should not be called from a static destructor.
 
-	static void setPattern(const std::string& pattern);
+	[[noreturn]] static void setPattern(const std::string& pattern);
 		/// Not supported: throws NotImplementedException.
 		///
 		/// The output pattern is configured per logger through a PatternFormatter on
 		/// the Channel passed to setChannel(); a Quill logger binds its format at
 		/// creation and cannot be changed through a global setter.
 
-	static void addFileSink(const std::string& filename);
+	[[noreturn]] static void addFileSink(const std::string& filename);
 		/// Not supported: throws NotImplementedException.
 		///
 		/// File output is configured through a FileChannel on the Channel passed to

@@ -173,10 +173,10 @@ protected:
 	[[nodiscard]] static int lastError();
 		/// Returns the code of the last error.
 
-	static void error(int code, const std::string& arg);
+	[[noreturn]] static void error(int code, const std::string& arg);
 		/// Throws an exception according to the error code.
 
-	static void aierror(int code, const std::string& arg);
+	[[noreturn]] static void aierror(int code, const std::string& arg);
 		/// Throws an exception according to the getaddrinfo() error code.
 
 	[[nodiscard]] static std::string encodeIDNLabel(const std::string& idn);

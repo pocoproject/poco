@@ -42,7 +42,7 @@ public:
 	[[nodiscard]] const char* name() const noexcept;
 	[[nodiscard]] const char* className() const noexcept;
 	[[nodiscard]] Poco::Exception* clone() const;
-	void rethrow() const;
+	[[noreturn]] void rethrow() const;
 
 private:
 	void setExtMessage();

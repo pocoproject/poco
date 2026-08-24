@@ -250,13 +250,13 @@ protected:
 		}
 	}
 
-	void handleError(int err)
+	[[noreturn]] void handleError(int err)
 	{
 		std::string arg;
 		handleError(err, arg);
 	}
 
-	void handleError(int err, const std::string& arg)
+	[[noreturn]] void handleError(int err, const std::string& arg)
 	{
 		switch (err)
 		{

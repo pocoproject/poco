@@ -217,11 +217,11 @@ protected:
 	std::streamsize readChars(XMLCharInputStream& istr, XMLChar* pBuffer, std::streamsize bufferSize);
 		/// Reads at most bufferSize chars from the given stream into the given buffer.
 
-	void handleError(int errorNo);
+	[[noreturn]] void handleError(int errorNo);
 		/// Throws an XMLException with a message corresponding
 		/// to the given Expat error code.
 
-	void checkError(XML_Parser parser);
+	[[noreturn]] void checkError(XML_Parser parser);
 		/// Called after a failed XML_Parse()/XML_ParseBuffer() call.
 		/// If a C++ exception thrown from within a handler has been
 		/// captured by abortParse(), rethrows it (and clears it);

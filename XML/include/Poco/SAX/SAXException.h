@@ -112,7 +112,7 @@ public:
 	[[nodiscard]] Poco::Exception* clone() const;
 		/// Creates an exact copy of the exception.
 
-	void rethrow() const;
+	[[noreturn]] void rethrow() const;
 		/// (Re)Throws the exception.
 
 	[[nodiscard]] const XMLString& getPublicId() const;

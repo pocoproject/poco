@@ -277,7 +277,7 @@ private:
 	void init();
 	[[nodiscard]] EventType nextImpl(bool peek);
 	[[nodiscard]] EventType nextBody();
-	void handleError();
+	[[noreturn]] void handleError();
 
 #ifndef POCO_DOC
 	// If _size is 0, then data is std::istream. Otherwise, it is a buffer.

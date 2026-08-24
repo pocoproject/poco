@@ -34,7 +34,7 @@ public:
 	~CppToken();
 
 protected:
-	void syntaxError(const std::string& expected, const std::string& actual);
+	[[noreturn]] void syntaxError(const std::string& expected, const std::string& actual);
 };
 
 
