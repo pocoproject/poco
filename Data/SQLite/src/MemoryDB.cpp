@@ -405,6 +405,13 @@ MemoryDB::MemoryDB(const std::string& dir, const Options& options):
 		throw Poco::NotImplementedException("MemoryDB requires SQLite built in thread-safe mode");
 
 	_memHandle = Utility::dbHandle(_session);
+	// In THREAD_MODE_MULTI connections have no mutex (sqlite3_db_mutex() is
+	// null), so every DbMutexGuard below would silently be a no-op and the
+	// statement-boundary snapshots (historyView, virtual-table copies) would
+	// no longer be guaranteed. Require serialized mode up front.
+	if (sqlite3_db_mutex(_memHandle) == nullptr)
+		throw Poco::NotImplementedException(
+			"MemoryDB requires SQLite serialized threading mode (see Utility::setThreadMode)");
 	_persist << "PRAGMA read_uncommitted = true", now;
 
 	open();
@@ -536,6 +543,7 @@ void MemoryDB::startFresh()
 	_shards.push_back(a);
 	_schemaVersion = 0;
 	_virtualNames.clear();
+	_tableNames.clear();
 }
 
 
@@ -622,9 +630,11 @@ void MemoryDB::load()
 		_persist << ("DROP INDEX " + quoteIdent(n)), now;
 
 	std::vector<std::string> mainVtabs = virtualTables(_persist);
+	std::vector<std::string> mainUserTables = userTables(_persist);
 	{
 		Poco::FastMutex::ScopedLock l(_stateMutex);
 		_virtualNames = std::set<std::string>(mainVtabs.begin(), mainVtabs.end());
+		_tableNames = std::set<std::string>(mainUserTables.begin(), mainUserTables.end());
 	}
 
 	try
@@ -1581,6 +1591,26 @@ void MemoryDB::onDDL(const char* sql, const char* table)
 	std::string normalized = addIfExistsClause(sql);
 
 	Poco::FastMutex::ScopedLock l(_stateMutex);
+	CreateTarget ct = parseCreateTarget(sql);
+	// Backstop for a CREATE VIRTUAL TABLE that bypassed operator<< and claims
+	// existing tables into its shadow namespace: those tables would silently
+	// vanish from persistence, and SQLite has already executed the CREATE.
+	// The forward direction (a plain CREATE TABLE inside an existing shadow
+	// namespace) is poisoned in onStatement(); this is the reverse one. No SQL
+	// can run here (trace-hook context), so the check uses _tableNames.
+	if (ct.valid && ct.isVirtual && ct.object == "table")
+	{
+		const std::string prefix = ct.name + "_";
+		auto it = _tableNames.lower_bound(prefix);
+		if (it != _tableNames.end() && it->compare(0, prefix.size(), prefix) == 0)
+		{
+			_poisoned.store(true, std::memory_order_release);
+			static const std::string kMsg =
+				"MemoryDB: virtual table name claims existing tables in its shadow-table namespace";
+			try { if (_rejected.empty()) _rejected = kMsg; } catch (...) {} // _poisoned is already set
+			return;
+		}
+	}
 	// push_back BEFORE ++_schemaVersion so a bad_alloc on vector growth leaves
 	// _schemaVersion consistent with _schemaLog.size(). If we incremented first
 	// and push_back threw, the catalog write at the next flush would persist
@@ -1590,12 +1620,17 @@ void MemoryDB::onDDL(const char* sql, const char* table)
 	_schemaLog.push_back(std::move(normalized));
 	++_schemaVersion;
 	_columnCopyCache.clear();
-	// Track virtual-table names for shadow-prefix checks and historyView. An
-	// unclassified DROP (table == nullptr) can leave a stale entry, which only
-	// over-rejects new tables until the next reopen.
-	CreateTarget ct = parseCreateTarget(sql);
+	// Track table names for shadow-prefix checks (both directions) and
+	// historyView. An unclassified DROP (table == nullptr) can leave a stale
+	// entry, which only over-rejects (or, for the reverse backstop above,
+	// poisons) until the next reopen.
 	if (ct.valid && ct.isVirtual && ct.object == "table") _virtualNames.insert(ct.name);
-	else if (table != nullptr && firstKeyword(sql) == "DROP") _virtualNames.erase(table);
+	else if (ct.valid && !ct.isVirtual && ct.object == "table") _tableNames.insert(ct.name);
+	else if (table != nullptr && firstKeyword(sql) == "DROP")
+	{
+		_virtualNames.erase(table);
+		_tableNames.erase(table);
+	}
 	if (table) markTableDirty(table);
 	else if (ShardInfo* a = activeShard()) a->dirty = true;
 }

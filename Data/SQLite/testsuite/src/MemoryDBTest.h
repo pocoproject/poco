@@ -42,6 +42,7 @@ public:
 	void testIndexPreservedAcrossReload();
 	void testDropTableClassified();
 	void testAlterTableClassified();
+	void testRequiresSerializedThreadMode();
 	void testVecPersistAndReload();
 	void testVecStaysInActiveShard();
 	void testVecDirtyTracking();

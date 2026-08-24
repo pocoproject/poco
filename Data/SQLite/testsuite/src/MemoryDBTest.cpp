@@ -35,6 +35,7 @@
 
 using namespace Poco::Data::Keywords;
 using Poco::Data::SQLite::MemoryDB;
+using Poco::Data::SQLite::Utility;
 using Poco::Timespan;
 
 
@@ -1403,6 +1404,36 @@ void MemoryDBTest::testAlterTableClassified()
 }
 
 
+void MemoryDBTest::testRequiresSerializedThreadMode()
+{
+	// In THREAD_MODE_MULTI connections have no mutex, which would turn every
+	// DbMutexGuard into a silent no-op; the constructor must refuse to run
+	// that way. setThreadMode() fails while other connections are open - skip
+	// the test then.
+	if (!Utility::setThreadMode(Utility::THREAD_MODE_MULTI))
+	{
+		std::cout << "cannot switch SQLite thread mode, test not executed." << std::endl;
+		return;
+	}
+	bool threw = false;
+	try
+	{
+		MemoryDB db(_dir);
+	}
+	catch (Poco::NotImplementedException&)
+	{
+		threw = true;
+	}
+	catch (...)
+	{
+		Utility::setThreadMode(Utility::THREAD_MODE_SERIAL);
+		throw;
+	}
+	Utility::setThreadMode(Utility::THREAD_MODE_SERIAL);
+	assertTrue (threw);
+}
+
+
 void MemoryDBTest::testVecPersistAndReload()
 {
 #ifdef POCO_ENABLE_SQLITE_VEC
@@ -1592,6 +1623,21 @@ void MemoryDBTest::testVecShadowNameCollisionRejected()
 		fail ("must be poisoned after bypassing CREATE");
 	}
 	catch (Poco::NotImplementedException&) { }
+
+	// backstop, reverse direction: a virtual-table CREATE that bypasses
+	// operator<< and claims existing tables poisons the db (fresh instance;
+	// the one above is already poisoned)
+	{
+		MemoryDB db2(Poco::Path(_dir, "rev").toString());
+		db2 << "CREATE TABLE t_x(id INTEGER PRIMARY KEY, v TEXT)", now;
+		db2.session() << "CREATE VIRTUAL TABLE t USING vec0(embedding float[2])", now;
+		try
+		{
+			db2 << "SELECT 1", now;
+			fail ("must be poisoned after bypassing virtual-table CREATE");
+		}
+		catch (Poco::NotImplementedException&) { }
+	}
 #else
 	std::cout << "sqlite-vec not enabled, test not executed." << std::endl;
 #endif
@@ -1656,6 +1702,7 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testIndexPreservedAcrossReload);
 	CppUnit_addTest(pSuite, MemoryDBTest, testDropTableClassified);
 	CppUnit_addTest(pSuite, MemoryDBTest, testAlterTableClassified);
+	CppUnit_addTest(pSuite, MemoryDBTest, testRequiresSerializedThreadMode);
 	CppUnit_addTest(pSuite, MemoryDBTest, testVecPersistAndReload);
 	CppUnit_addTest(pSuite, MemoryDBTest, testVecStaysInActiveShard);
 	CppUnit_addTest(pSuite, MemoryDBTest, testVecDirtyTracking);

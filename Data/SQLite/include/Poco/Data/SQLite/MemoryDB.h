@@ -93,6 +93,10 @@ class SQLite_API MemoryDB
 	///     backstop, statements that bypass operator<< (e.g. by going through session()
 	///     directly) are caught reactively via the SQLite trace hook and poison the
 	///     instance: every subsequent call throws until the instance is discarded.
+	///   * SQLite must run in serialized threading mode (the default). Under
+	///     Utility::THREAD_MODE_MULTI connections have no mutex, so the statement-boundary
+	///     snapshots used by historyView() and virtual-table persistence could not be
+	///     guaranteed; the constructor throws Poco::NotImplementedException in that mode.
 	///   * The sharding scheme is most efficient when older data stops changing; correctness
 	///     is preserved if it does not, but modifying rows in many sealed shards causes those
 	///     shards to be rewritten.
@@ -505,6 +509,7 @@ private:
 	// every DDL in onDDL().
 	std::unordered_map<std::string, ColumnCopy> _columnCopyCache;
 	std::set<std::string>      _virtualNames;  // virtual-table names, for shadow-prefix checks
+	std::set<std::string>      _tableNames;    // ordinary table names, for reverse shadow-prefix checks
 	                                           // and historyView; load()/onDDL(), _stateMutex
 
 	Poco::Timer                _timer;
