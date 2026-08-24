@@ -266,7 +266,7 @@ int SSLManager::privateKeyPassphraseCallback(char* pBuf, int size, int flag, voi
 
 int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 {
-	const long OCSP_VALIDITY_LEEWAY = 5*60;
+	constexpr long OCSP_VALIDITY_LEEWAY = 5*60;
 
 	Poco::Net::Context* pContext = static_cast<Poco::Net::Context*>(arg);
 

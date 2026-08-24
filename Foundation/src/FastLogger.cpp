@@ -1764,7 +1764,7 @@ std::string FastLogger::format(const std::string& fmt, const std::string& arg0, 
 
 void FastLogger::formatDump(std::string& message, const void* buffer, std::size_t length)
 {
-	const int BYTES_PER_LINE = 16;
+	constexpr int BYTES_PER_LINE = 16;
 	const unsigned char* base = reinterpret_cast<const unsigned char*>(buffer);
 	message.reserve(message.size() + length * 6);
 	if (!message.empty()) message.append("\n");

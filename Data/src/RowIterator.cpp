@@ -14,8 +14,6 @@
 
 #include "Poco/Data/RowIterator.h"
 #include "Poco/Data/RecordSet.h"
-#undef min
-#undef max
 
 
 namespace Poco::Data {

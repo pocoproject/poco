@@ -35,7 +35,7 @@ class Prometheus_API MetricsServer
 	/// requests, based on Poco::Net::HTTPServer.
 {
 public:
-	static constexpr Poco::UInt16 DEFAULT_PORT {9100};
+	static constexpr Poco::UInt16 DEFAULT_PORT = 9100;
 	static const std::string DEFAULT_PATH;  /// "/metrics"
 
 	MetricsServer(Poco::UInt16 port = DEFAULT_PORT, const std::string& path = DEFAULT_PATH);

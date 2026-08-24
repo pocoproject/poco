@@ -13,8 +13,6 @@
 
 
 #include "Poco/JSON/Parser.h"
-#undef min
-#undef max
 #include <clocale>
 
 

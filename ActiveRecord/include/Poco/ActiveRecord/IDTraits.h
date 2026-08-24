@@ -20,6 +20,10 @@
 #include "Poco/Types.h"
 #include "Poco/UUID.h"
 #include "Poco/NumberFormatter.h"
+#include <limits>
+
+
+POCO_CHECK_MINMAX_MACROS
 
 
 namespace Poco::ActiveRecord {

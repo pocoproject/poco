@@ -24,6 +24,9 @@
 #include <limits>
 
 
+POCO_CHECK_MINMAX_MACROS
+
+
 namespace Poco::Dynamic {
 
 

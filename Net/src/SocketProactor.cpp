@@ -17,11 +17,6 @@
 #include "Poco/Net/DatagramSocketImpl.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
-#ifdef POCO_OS_FAMILY_WINDOWS
-#ifdef max
-#undef max
-#endif // max
-#endif // POCO_OS_FAMILY_WINDOWS
 
 
 using Poco::Exception;

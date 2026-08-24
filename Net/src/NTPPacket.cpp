@@ -147,7 +147,7 @@ Poco::Timestamp NTPPacket::transmitTime() const
 
 Poco::Timestamp NTPPacket::convertTime(Poco::Int64 tm) const
 {
-	const unsigned long seventyYears = 2208988800UL;
+	constexpr unsigned long seventyYears = 2208988800UL;
 	Poco::UInt64 ntpTime = Poco::ByteOrder::toLittleEndian(tm);
 	Poco::UInt64 secs = ((ntpTime >> 32) - seventyYears) * 1000000;
 	Poco::UInt64 frac = ((ntpTime & 0xFFFFFFFF) * 1000000) >> 32;

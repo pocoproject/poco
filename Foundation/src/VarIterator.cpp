@@ -14,8 +14,6 @@
 
 #include "Poco/Dynamic/VarIterator.h"
 #include "Poco/Dynamic/Var.h"
-#undef min
-#undef max
 
 
 namespace Poco::Dynamic {

@@ -114,6 +114,32 @@ using namespace std::literals;
 
 
 //
+// Guard for headers that use std::numeric_limits<>::min()/max().
+//
+// A function-like min() or max() macro breaks those headers, and the compiler
+// diagnostic does not say why. Most often the macro comes from <windows.h>
+// included without NOMINMAX -- Poco/UnWindows.h sets it, but a consumer that
+// reaches <windows.h> before any POCO header never goes through it. Any other
+// header, on any platform, can define the same macros. Affected headers invoke
+// POCO_CHECK_MINMAX_MACROS once, below their includes, to report the cause.
+//
+// The condition is evaluated here, when this header is first processed, so the
+// check reports a macro that is already in scope by then -- the case above. A
+// macro defined after the first POCO include is not reported, but neither is it
+// reachable via Poco/UnWindows.h, which defines NOMINMAX before <windows.h>.
+//
+#if defined(min) || defined(max)
+	#define POCO_CHECK_MINMAX_MACROS \
+		static_assert(false, \
+			"A min() or max() macro is defined, which breaks this header. " \
+			"Undefine it; on Windows, define NOMINMAX or include a POCO " \
+			"header before <windows.h>.");
+#else
+	#define POCO_CHECK_MINMAX_MACROS
+#endif
+
+
+//
 // Include alignment settings early
 //
 #include "Poco/Alignment.h"

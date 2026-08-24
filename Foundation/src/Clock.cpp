@@ -27,8 +27,6 @@
 #include "Poco/UnWindows.h"
 #endif
 #include <algorithm>
-#undef min
-#undef max
 
 
 #ifndef POCO_HAVE_CLOCK_GETTIME

@@ -34,7 +34,7 @@
 #include "Poco/TextEncoding.h"
 #include "Poco/Exception.h"
 #ifdef POCO_OS_FAMILY_WINDOWS
-	#include <windows.h>
+	#include "Poco/UnWindows.h"
 #endif
 
 #include <sqltypes.h>

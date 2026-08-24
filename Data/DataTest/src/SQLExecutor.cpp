@@ -3080,7 +3080,7 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 
 void SQLExecutor::nullBulk(const std::string& blobPlaceholder)
 {
-	const int sz = 10;
+	constexpr int sz = 10;
 
 	{
 		std::vector<NullData> lastName(sz, null);

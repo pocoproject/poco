@@ -16,8 +16,6 @@
 #include "Poco/Timespan.h"
 #include "Poco/Exception.h"
 #include <algorithm>
-#undef min
-#undef max
 #if defined(POCO_OS_FAMILY_UNIX)
 #include <time.h>
 #include <unistd.h>

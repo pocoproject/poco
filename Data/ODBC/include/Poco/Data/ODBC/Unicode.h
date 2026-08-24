@@ -21,7 +21,7 @@
 #include "Poco/Exception.h"
 #include <cstring>
 #ifdef POCO_OS_FAMILY_WINDOWS
-	#include <windows.h>
+	#include "Poco/UnWindows.h"
 #endif
 #ifndef SQL_NOUNICODEMAP
 	#define SQL_NOUNICODEMAP

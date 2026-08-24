@@ -14,8 +14,6 @@
 #include "Poco/Util/WinRegistryKey.h"
 #include "Poco/Environment.h"
 #include "Poco/Exception.h"
-#undef min
-#undef max
 #include <limits>
 
 #if defined(POCO_HAVE_INT64)

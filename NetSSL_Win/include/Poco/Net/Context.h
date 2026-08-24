@@ -25,7 +25,7 @@
 #include "Poco/Mutex.h"
 #include <vector>
 #if defined(POCO_OS_FAMILY_WINDOWS)
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #include <wincrypt.h>
 #include <subauth.h>
 #include <schannel.h>

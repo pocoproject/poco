@@ -26,7 +26,7 @@
 #include "Poco/SharedPtr.h"
 #include "Poco/Mutex.h"
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 #include <sqltypes.h>
 

@@ -18,9 +18,12 @@
 #define Data_Constants_INCLUDED
 
 
-#undef max
+#include "Poco/Foundation.h"
 #include <limits>
 #include <cstddef>
+
+
+POCO_CHECK_MINMAX_MACROS
 
 
 namespace Poco::Data {

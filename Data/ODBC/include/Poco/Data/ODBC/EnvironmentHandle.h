@@ -20,7 +20,7 @@
 
 #include "Poco/Data/ODBC/ODBC.h"
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 #include <sqltypes.h>
 

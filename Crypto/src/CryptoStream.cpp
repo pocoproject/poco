@@ -19,10 +19,6 @@
 #include <algorithm>
 
 
-#undef min
-#undef max
-
-
 namespace Poco::Crypto {
 
 

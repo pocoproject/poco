@@ -20,8 +20,6 @@
 
 #include "Poco/Foundation.h"
 #include <string>
-#undef min
-#undef max
 #include <limits>
 
 

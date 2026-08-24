@@ -18,6 +18,10 @@
 #include "Poco/Dynamic/VarIterator.h"
 #include "Poco/Exception.h"
 #include "CppUnit/TestCase.h"
+#include <limits>
+
+
+POCO_CHECK_MINMAX_MACROS
 
 
 class VarTest: public CppUnit::TestCase
