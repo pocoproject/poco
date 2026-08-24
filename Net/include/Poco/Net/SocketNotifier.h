@@ -48,22 +48,22 @@ public:
 	void removeObserver(SocketReactor* pReactor, const Poco::AbstractObserver& observer);
 		/// Removes the given observer.
 
-	bool hasObserver(const Poco::AbstractObserver& observer) const;
+	[[nodiscard]] bool hasObserver(const Poco::AbstractObserver& observer) const;
 		/// Returns true if the given observer is registered.
 
-	bool accepts(SocketNotification* pNotification);
+	[[nodiscard]] bool accepts(SocketNotification* pNotification);
 		/// Returns true if there is at least one observer for the given notification.
 
 	void dispatch(SocketNotification* pNotification);
 		/// Dispatches the notification to all observers.
 
-	bool hasObservers() const;
+	[[nodiscard]] bool hasObservers() const;
 		/// Returns true if there are subscribers.
 
-	std::size_t countObservers() const;
+	[[nodiscard]] std::size_t countObservers() const;
 		/// Returns the number of subscribers
 
-	Socket socket() const;
+	[[nodiscard]] Socket socket() const;
 		/// Returns the socket.
 
 	void disableObservers();

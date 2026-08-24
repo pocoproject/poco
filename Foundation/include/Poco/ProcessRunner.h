@@ -48,7 +48,7 @@ public:
 	using Args = Poco::Process::Args;
 	using PID = Poco::ProcessHandle::PID;
 
-	static const int NO_OUT = Poco::PROCESS_CLOSE_STDOUT|Poco::PROCESS_CLOSE_STDERR;
+	static constexpr int NO_OUT = Poco::PROCESS_CLOSE_STDOUT|Poco::PROCESS_CLOSE_STDERR;
 		/// Constant to prevent std out and err from being received from the process.
 
 	ProcessRunner(const std::string& cmd,
@@ -84,17 +84,17 @@ public:
 	~ProcessRunner() override;
 		/// Destroys the ProcessRunner.
 
-	PID pid() const;
+	[[nodiscard]] PID pid() const;
 		/// Returns the process PID.
 
-	const std::string& pidFile() const;
+	[[nodiscard]] const std::string& pidFile() const;
 		/// Returns the process PID filename.
 		/// Returns empty string when pid filename
 		/// is not specified at construction, either
 		/// explicitly, or implicitly through
 		/// command line argument.
 
-	bool running() const;
+	[[nodiscard]] bool running() const;
 		/// Returns true if process is running.
 
 	void start();
@@ -112,28 +112,28 @@ public:
 		///
 		/// Calling stop() on a stopped process is a no-op.
 
-	std::string cmdLine() const;
+	[[nodiscard]] std::string cmdLine() const;
 		/// Returns process full command line.
 
-	int result() const;
+	[[nodiscard]] int result() const;
 		/// Returns process return code.
 
-	int runCount() const;
+	[[nodiscard]] int runCount() const;
 		/// Returns the number of times the process has been executed.
 
-	const std::string& error() const;
+	[[nodiscard]] const std::string& error() const;
 		/// Returns the error message.
 
 private:
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	// On Windows, 0 is the invalid/error value returned by GetProcessId()
-	static const Poco::ProcessHandle::PID INVALID_PID = 0;
+	static constexpr Poco::ProcessHandle::PID INVALID_PID = 0;
 #else
-	static const Poco::ProcessHandle::PID INVALID_PID = -1;
+	static constexpr Poco::ProcessHandle::PID INVALID_PID = -1;
 #endif
-	static const int RESULT_UNKNOWN = -1;
+	static constexpr int RESULT_UNKNOWN = -1;
 
-	static Args pidArgFormat()
+	[[nodiscard]] static Args pidArgFormat()
 	{
 #if defined(POCO_OS_FAMILY_WINDOWS)
 		return Args{"-p", "--pidfile=", "/p", "/pidfile="};

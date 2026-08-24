@@ -72,16 +72,16 @@ public:
 		/// Throws a NotFoundException if no instantiator has been registered
 		/// for the given protocol.
 
-	bool supportsProtocol(const std::string& protocol);
+	[[nodiscard]] bool supportsProtocol(const std::string& protocol);
 		/// Returns true if a session instantiator for the given protocol has been registered.
 
-	HTTPClientSession* createClientSession(const Poco::URI& uri);
+	[[nodiscard]] HTTPClientSession* createClientSession(const Poco::URI& uri);
 		/// Creates a client session for the given uri scheme. Throws exception if no factory is registered for the given scheme
 
-	const std::string& proxyHost() const;
+	[[nodiscard]] const std::string& proxyHost() const;
 		/// Returns the proxy host, if one has been set, or an empty string otherwise.
 
-	Poco::UInt16 proxyPort() const;
+	[[nodiscard]] Poco::UInt16 proxyPort() const;
 		/// Returns the proxy port number, if one has been set, or zero otherwise.
 
 	void setProxy(const std::string& proxyHost, Poco::UInt16 proxyPort);
@@ -90,19 +90,19 @@ public:
 	void setProxyCredentials(const std::string& username, const std::string& password);
 		/// Sets the username and password for proxy authorization (Basic auth only).
 
-	const std::string& proxyUsername() const;
+	[[nodiscard]] const std::string& proxyUsername() const;
 		/// Returns the username for proxy authorization.
 
-	const std::string& proxyPassword() const;
+	[[nodiscard]] const std::string& proxyPassword() const;
 		/// Returns the password for proxy authorization.
 
 	void setProxyConfig(const ProxyConfig& proxyConfig);
 		/// Sets the proxy configuration.
 
-	const ProxyConfig& getProxyConfig() const;
+	[[nodiscard]] const ProxyConfig& getProxyConfig() const;
 		/// Returns the proxy configuration.
 
-	static HTTPSessionFactory& defaultFactory();
+	[[nodiscard]] static HTTPSessionFactory& defaultFactory();
 		/// Returns the default HTTPSessionFactory.
 
 private:

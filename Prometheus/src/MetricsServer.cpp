@@ -70,7 +70,6 @@ private:
 };
 
 
-const Poco::UInt16 MetricsServer::DEFAULT_PORT{9100};
 const std::string MetricsServer::DEFAULT_PATH{"/metrics"s};
 
 

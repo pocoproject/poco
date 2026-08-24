@@ -67,13 +67,13 @@ public:
 	~Encoder() override;
 		/// Destroys the encoder.
 
-	Type getType() const;
+	[[nodiscard]] Type getType() const;
 		/// Returns the type of an encoding object.
 
-	ByteType getByteType(const std::string& text, int index = 0) const;
+	[[nodiscard]] ByteType getByteType(const std::string& text, int index = 0) const;
 		/// Returns the type of byte in the text at position index
 
-	WriteMode writeMode();
+	[[nodiscard]] WriteMode writeMode();
 		/// Returns the writing mode for the encoding object.
 };
 

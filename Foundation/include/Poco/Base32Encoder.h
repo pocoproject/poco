@@ -105,7 +105,7 @@ public:
 	Base32EncoderIOS(std::ostream& ostr, int options = BASE32_USE_PADDING);
 	~Base32EncoderIOS() override;
 	int close();
-	Base32EncoderBuf* rdbuf();
+	[[nodiscard]] Base32EncoderBuf* rdbuf();
 
 protected:
 	Base32EncoderBuf _buf;

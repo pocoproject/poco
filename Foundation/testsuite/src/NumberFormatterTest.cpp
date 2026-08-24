@@ -319,14 +319,14 @@ void NumberFormatterTest::testFormatFloat()
 
 	try
 	{
-		Poco::NumberFormatter::format(0.1, -1);
+		(void) Poco::NumberFormatter::format(0.1, -1);
 		fail ("NumberFormatter::format() must throw on negative precision");
 	}
 	catch(Poco::InvalidArgumentException&){}
 
 	try
 	{
-		Poco::NumberFormatter::format(0.1, 2, -1);
+		(void) Poco::NumberFormatter::format(0.1, 2, -1);
 		fail ("NumberFormatter::format() must throw on negative precision");
 	}
 	catch(Poco::InvalidArgumentException&){}

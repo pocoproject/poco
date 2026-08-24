@@ -71,7 +71,7 @@ const Token* StreamTokenizer::next()
 {
 	poco_check_ptr (_pIstr);
 
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	int first = _pIstr->get();
 	TokenVec::const_iterator it = _tokens.begin();

@@ -120,46 +120,46 @@ public:
 	void setSource(const std::string& src);
 		/// Sets the source of the message.
 
-	const std::string& getSource() const;
+	[[nodiscard]] const std::string& getSource() const;
 		/// Returns the source of the message.
 
 	void setText(const std::string& text);
 		/// Sets the text of the message.
 
-	const std::string& getText() const;
+	[[nodiscard]] const std::string& getText() const;
 		/// Returns the text of the message.
 
 	void setPriority(Priority prio);
 		/// Sets the priority of the message.
 
-	Priority getPriority() const;
+	[[nodiscard]] Priority getPriority() const;
 		/// Returns the priority of the message.
 
 	void setTime(const Timestamp& time);
 		/// Sets the time of the message.
 
-	const Timestamp& getTime() const;
+	[[nodiscard]] const Timestamp& getTime() const;
 		/// Returns the time of the message.
 
 	void setThread(const std::string& thread);
 		/// Sets the thread identifier for the message.
 
-	const std::string& getThread() const;
+	[[nodiscard]] const std::string& getThread() const;
 		/// Returns the thread identifier for the message.
 
 	void setTid(long pid);
 		/// Sets the numeric thread identifier for the message.
 
-	long getTid() const;
+	[[nodiscard]] long getTid() const;
 		/// Returns the numeric thread identifier for the message.
 
-	long getOsTid() const;
+	[[nodiscard]] long getOsTid() const;
 		/// Returns the numeric thread identifier for the message.
 
 	void setPid(long pid);
 		/// Sets the process identifier for the message.
 
-	long getPid() const;
+	[[nodiscard]] long getPid() const;
 		/// Returns the process identifier for the message.
 
 	void setSourceFile(const char* file);
@@ -170,7 +170,7 @@ public:
 		/// the __FILE__ macro. The string is not copied
 		/// internally for performance reasons.
 
-	const char* getSourceFile() const;
+	[[nodiscard]] const char* getSourceFile() const;
 		/// Returns the source file path of the code creating
 		/// the message. May be 0 if not set.
 
@@ -181,37 +181,37 @@ public:
 		/// This is usually the result of the __LINE__
 		/// macro.
 
-	LineNumber getSourceLine() const;
+	[[nodiscard]] LineNumber getSourceLine() const;
 		/// Returns the source file line of the statement
 		/// generating the log message. May be 0
 		/// if not set.
 
-	bool has(const std::string& param) const;
+	[[nodiscard]] bool has(const std::string& param) const;
 		/// Returns true if a parameter with the given name exists.
 
-	const std::string& get(const std::string& param) const;
+	[[nodiscard]] const std::string& get(const std::string& param) const;
 		/// Returns a const reference to the value of the parameter
 		/// with the given name. Throws a NotFoundException if the
 		/// parameter does not exist.
 
-	std::string get(const std::string& param, const std::string& defaultValue) const;
+	[[nodiscard]] std::string get(const std::string& param, const std::string& defaultValue) const;
 		/// Returns the value of the parameter with the given name.
 		/// If the parameter with the given name does not exist,
 		/// then defaultValue is returned.
 
-	const StringMap& getAll() const;
+	[[nodiscard]] const StringMap& getAll() const;
 		/// Returns a const reference to all the values
 
 	void set(const std::string& param, const std::string& value);
 		/// Sets the value for a parameter. If the parameter does
 		/// not exist, then it is created.
 
-	const std::string& operator [] (const std::string& param) const;
+	[[nodiscard]] const std::string& operator [] (const std::string& param) const;
 		/// Returns a const reference to the value of the parameter
 		/// with the given name. Throws a NotFoundException if the
 		/// parameter does not exist.
 
-	std::string& operator [] (const std::string& param);
+	[[nodiscard]] std::string& operator [] (const std::string& param);
 		/// Returns a reference to the value of the parameter with the
 		/// given name. This can be used to set the parameter's value.
 		/// If the parameter does not exist, it is created with an

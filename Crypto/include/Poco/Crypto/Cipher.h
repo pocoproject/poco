@@ -97,7 +97,7 @@ public:
 	virtual ~Cipher();
 		/// Destroys the Cipher.
 
-	virtual const std::string& name() const = 0;
+	[[nodiscard]] virtual const std::string& name() const = 0;
 		/// Returns the name of the Cipher.
 
 	virtual CryptoTransform::Ptr createEncryptor() = 0;
@@ -106,10 +106,10 @@ public:
 	virtual CryptoTransform::Ptr createDecryptor() = 0;
 		/// Creates a decryptor object to be used with a CryptoStream.
 
-	virtual std::string encryptString(const std::string& str, Encoding encoding = ENC_NONE, bool padding = true);
+	[[nodiscard]] virtual std::string encryptString(const std::string& str, Encoding encoding = ENC_NONE, bool padding = true);
 		/// Directly encrypt a string and encode it using the given encoding.
 
-	virtual std::string decryptString(const std::string& str, Encoding encoding = ENC_NONE, bool padding = true);
+	[[nodiscard]] virtual std::string decryptString(const std::string& str, Encoding encoding = ENC_NONE, bool padding = true);
 		/// Directly decrypt a string that is encoded with the given encoding.
 
 	virtual void encrypt(std::istream& source, std::ostream& sink, Encoding encoding = ENC_NONE, bool padding = true);

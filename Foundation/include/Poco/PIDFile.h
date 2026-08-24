@@ -33,7 +33,7 @@ class Foundation_API PIDFile
 public:
 	using Ptr = std::unique_ptr<PIDFile>;
 
-	static const int INVALID_PID = -1;
+	static constexpr int INVALID_PID = -1;
 
 	PIDFile();
 		/// Creates the PIDFile.
@@ -47,7 +47,7 @@ public:
 		/// Destroys the PIDFile.
 		/// If fileName is not empty, deletes the PID file.
 
-	const std::string& getName() const;
+	[[nodiscard]] const std::string& getName() const;
 		/// Returns the file name.
 
 	void setName(const std::string& fileName);
@@ -59,14 +59,14 @@ public:
 	void destroy();
 		/// Deletes the PID file and invalidates the held PID.
 
-	int getPID() const;
+	[[nodiscard]] int getPID() const;
 		/// Returns the PID.
 
-	bool exists() const;
+	[[nodiscard]] bool exists() const;
 		/// Returns true if PID file exists and its content is
 		/// equal to the held PID.
 
-	static bool contains(const std::string& fileName, int pid);
+	[[nodiscard]] static bool contains(const std::string& fileName, int pid);
 		/// Returns true if the `fileName` contains the given `pid`.
 
 	static std::string& getFileName(std::string& pidFile);

@@ -1159,7 +1159,7 @@ void JSONTest::testQuery()
 
 	Object address;
 	address.set("dummy", 123);
-	query.findObject("bad address", address);
+	(void) query.findObject("bad address", address);
 	assertTrue (!address.has("dummy"));
 	Object& rAddress = query.findObject("address", address);
 	assertTrue (rAddress.getValue<int>("number") == 123);
@@ -1176,7 +1176,7 @@ void JSONTest::testQuery()
 
 	Array children;
 	children.add("dummy");
-	query.findArray("no children", children);
+	(void) query.findArray("no children", children);
 	assertTrue (children.size() == 0);
 	Array& rChildren = query.findArray("children", children);
 	assertTrue (rChildren.getElement<std::string>(1) == "Ellen");
@@ -1849,7 +1849,7 @@ void JSONTest::testBasicJson()
 		}
 	)";
     Poco::JSON::Parser jsonParser;
-    Poco::Dynamic::Var jsonObject = jsonParser.parse(json);
+    Var jsonObject = jsonParser.parse(json);
 
     Poco::JSON::Object::Ptr jsonPtr = jsonObject.extract<Poco::JSON::Object::Ptr>();
 

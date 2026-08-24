@@ -206,7 +206,7 @@ public:
 		///   * rotateOnOpen: Specifies whether an existing log file should be
 		///                   rotated and archived when the channel is opened.
 
-	std::string getProperty(const std::string& name) const override;
+	[[nodiscard]] std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.
 		/// See setProperty() for a description of the supported
 		/// properties.
@@ -214,22 +214,22 @@ public:
 	void setRotationStrategy(RotateStrategy* strategy);
 		/// Set a rotation strategy. 
 		/// FileChannel will take ownership of the pointer
-	
+
 	void setArchiveStrategy(ArchiveStrategy* strategy);
 		/// Set an archive strategy. 
 		/// FileChannel will take ownership of the pointer
-		
+
 	void setPurgeStrategy(PurgeStrategy* strategy);
 		/// Set a purge strategy. 
 		/// FileChannel will take ownership of the pointer
-		
-	Timestamp creationDate() const;
+
+	[[nodiscard]] Timestamp creationDate() const;
 		/// Returns the log file's creation date.
 
-	UInt64 size() const;
+	[[nodiscard]] UInt64 size() const;
 		/// Returns the log file's current size in bytes.
 
-	const std::string& path() const;
+	[[nodiscard]] const std::string& path() const;
 		/// Returns the log file's path.
 
 	static const std::string PROP_PATH;
@@ -256,11 +256,11 @@ protected:
 
 private:
 	bool setNoPurge(const std::string& value);
-	int extractDigit(const std::string& value, std::string::const_iterator* nextToDigit = nullptr) const;
-	Timespan::TimeDiff extractFactor(const std::string& value, std::string::const_iterator start) const;
+	[[nodiscard]] int extractDigit(const std::string& value, std::string::const_iterator* nextToDigit = nullptr) const;
+	[[nodiscard]] Timespan::TimeDiff extractFactor(const std::string& value, std::string::const_iterator start) const;
 
-	RotateStrategy* createRotationStrategy(const std::string& rotation, const std::string& times) const;
-	ArchiveStrategy* createArchiveStrategy(const std::string& archive, const std::string& times) const;
+	[[nodiscard]] RotateStrategy* createRotationStrategy(const std::string& rotation, const std::string& times) const;
+	[[nodiscard]] ArchiveStrategy* createArchiveStrategy(const std::string& archive, const std::string& times) const;
 
 	std::string      _path;
 	std::string      _times;

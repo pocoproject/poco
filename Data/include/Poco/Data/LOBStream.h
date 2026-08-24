@@ -88,7 +88,7 @@ public:
 	{
 	}
 
-	LOBStreamBuf<T>* rdbuf()
+	[[nodiscard]] LOBStreamBuf<T>* rdbuf()
 		/// Returns a pointer to the internal LOBStreamBuf.
 	{
 		return &_buf;

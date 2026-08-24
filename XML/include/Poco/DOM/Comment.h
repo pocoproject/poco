@@ -34,15 +34,15 @@ class XML_API Comment: public CharacterData
 {
 public:
 	// Node
-	const XMLString& nodeName() const;
-	unsigned short nodeType() const;
+	[[nodiscard]] const XMLString& nodeName() const;
+	[[nodiscard]] unsigned short nodeType() const;
 
 protected:
 	Comment(Document* pOwnerDocument, const XMLString& data);
 	Comment(Document* pOwnerDocument, const Comment& comment);
 	~Comment();
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	[[nodiscard]] Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:
 	static const XMLString NODE_NAME;

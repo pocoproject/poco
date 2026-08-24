@@ -30,11 +30,11 @@ class NetSSL_Win_API Utility
 	/// Various helper functions.
 {
 public:
-	static Context::VerificationMode convertVerificationMode(const std::string& verMode);
+	[[nodiscard]] static Context::VerificationMode convertVerificationMode(const std::string& verMode);
 		/// Non-case sensitive conversion of a string to a VerificationMode enum.
 		/// If verMode is illegal an OptionException is thrown.
 
-	static std::string formatError(long errCode);
+	[[nodiscard]] static std::string formatError(long errCode);
 		/// Converts an winerror.h code into human readable form.
 
 private:

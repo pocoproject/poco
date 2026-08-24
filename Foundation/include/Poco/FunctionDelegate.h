@@ -129,13 +129,13 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<TArgs>& other) const
+	[[nodiscard]] bool equals(const AbstractDelegate<TArgs>& other) const
 	{
 		const FunctionDelegate* pOtherDelegate = dynamic_cast<const FunctionDelegate*>(other.unwrap());
 		return pOtherDelegate && _function == pOtherDelegate->_function;
 	}
 
-	AbstractDelegate<TArgs>* clone() const
+	[[nodiscard]] AbstractDelegate<TArgs>* clone() const
 	{
 		return new FunctionDelegate(*this);
 	}
@@ -208,13 +208,13 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const override
+	[[nodiscard]] bool equals(const AbstractDelegate<void>& other) const override
 	{
 		const FunctionDelegate* pOtherDelegate = dynamic_cast<const FunctionDelegate*>(other.unwrap());
 		return pOtherDelegate && _function == pOtherDelegate->_function;
 	}
 
-	AbstractDelegate<void>* clone() const override
+	[[nodiscard]] AbstractDelegate<void>* clone() const override
 	{
 		return new FunctionDelegate(*this);
 	}

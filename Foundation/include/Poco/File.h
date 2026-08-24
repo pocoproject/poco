@@ -102,10 +102,10 @@ public:
 	void swap(File& file) noexcept;
 		/// Swaps the file with another one.
 
-	const std::string& path() const;
+	[[nodiscard]] const std::string& path() const;
 		/// Returns the path.
 
-	std::string absolutePath() const;
+	[[nodiscard]] std::string absolutePath() const;
 		/// Returns the absolute path.
 		///
 		/// If the path is already absolute, returns it unchanged.
@@ -136,18 +136,18 @@ public:
 		/// filenames. This is a Windows API limitation, not a Poco limitation.
 		/// Workaround: Use the full UNC path including the executable name.
 
-	bool exists() const;
+	[[nodiscard]] bool exists() const;
 		/// Returns true iff the file exists.
 
-	bool existsAnywhere() const;
+	[[nodiscard]] bool existsAnywhere() const;
 		/// Returns true iff the file exists anywhere in the
 		/// file system, including in directories listed in
 		/// the PATH environment variable.
 
-	bool canRead() const;
+	[[nodiscard]] bool canRead() const;
 		/// Returns true iff the file is readable.
 
-	bool canWrite() const;
+	[[nodiscard]] bool canWrite() const;
 		/// Returns true iff the file is writeable.
 
 	bool canExecute() const;
@@ -156,19 +156,19 @@ public:
 		/// Resolves the executable path using getExecutablePath().
 		/// If the resolved path is empty, returns false.
 
-	bool isFile() const;
+	[[nodiscard]] bool isFile() const;
 		/// Returns true iff the file is a regular file.
 
-	bool isLink() const;
+	[[nodiscard]] bool isLink() const;
 		/// Returns true iff the file is a symbolic link.
 
-	bool isDirectory() const;
+	[[nodiscard]] bool isDirectory() const;
 		/// Returns true iff the file is a directory.
 
-	bool isDevice() const;
+	[[nodiscard]] bool isDevice() const;
 		/// Returns true iff the file is a device.
 
-	bool isHidden() const;
+	[[nodiscard]] bool isHidden() const;
 		/// Returns true if the file is hidden.
 		///
 		/// On Windows platforms, the file's hidden
@@ -177,7 +177,7 @@ public:
 		/// On Unix platforms, the file name must
 		/// begin with a period for this to be true.
 
-	Timestamp created() const;
+	[[nodiscard]] Timestamp created() const;
 		/// Returns the creation date of the file.
 		///
 		/// Not all platforms or filesystems (e.g. Linux and most Unix
@@ -186,13 +186,13 @@ public:
 		/// On such platforms, created() returns
 		/// the time of the last inode modification.
 
-	Timestamp getLastModified() const;
+	[[nodiscard]] Timestamp getLastModified() const;
 		/// Returns the modification date of the file.
 
 	File& setLastModified(const Timestamp& ts);
 		/// Sets the modification date of the file.
 
-	FileSize getSize() const;
+	[[nodiscard]] FileSize getSize() const;
 		/// Returns the size of the file in bytes.
 
 	File& setSize(FileSize size);
@@ -248,13 +248,13 @@ public:
 		/// file is a directory, recursively deletes all
 		/// files in the directory.
 
-	bool createFile();
+	[[nodiscard]] bool createFile();
 		/// Creates a new, empty file in an atomic operation.
 		/// Returns true if the file has been created and false
 		/// if the file already exists. Throws an exception if
 		/// an error occurs.
 
-	bool createDirectory();
+	[[nodiscard]] bool createDirectory();
 		/// Creates a directory. Returns true if the directory
 		/// has been created and false if it already exists.
 		/// Throws an exception if an error occurs.
@@ -271,21 +271,21 @@ public:
 		/// Fills the vector with the names of all
 		/// files in the directory.
 
-	FileSize totalSpace() const;
+	[[nodiscard]] FileSize totalSpace() const;
 		/// Returns the total size in bytes of the partition containing this path.
 
-	FileSize usableSpace() const;
+	[[nodiscard]] FileSize usableSpace() const;
 		/// Returns the number of usable free bytes on the partition containing this path.
 
-	FileSize freeSpace() const;
+	[[nodiscard]] FileSize freeSpace() const;
 		/// Returns the number of free bytes on the partition containing this path.
 
-	bool operator == (const File& file) const;
-	bool operator != (const File& file) const;
-	bool operator <  (const File& file) const;
-	bool operator <= (const File& file) const;
-	bool operator >  (const File& file) const;
-	bool operator >= (const File& file) const;
+	[[nodiscard]] bool operator == (const File& file) const;
+	[[nodiscard]] bool operator != (const File& file) const;
+	[[nodiscard]] bool operator <  (const File& file) const;
+	[[nodiscard]] bool operator <= (const File& file) const;
+	[[nodiscard]] bool operator >  (const File& file) const;
+	[[nodiscard]] bool operator >= (const File& file) const;
 
 	static void handleLastError(const std::string& path);
 		/// For internal use only. Throws an appropriate

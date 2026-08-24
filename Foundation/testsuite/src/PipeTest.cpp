@@ -176,7 +176,7 @@ void PipeTest::testCloseRace()
 		// Write some data
 		const char* data = "x";
 		for (int j = 0; j < 10; ++j)
-			pipe.writeBytes(data, 1);
+			(void) pipe.writeBytes(data, 1);
 
 		// Small delay to let reader start
 		Thread::sleep(1);
@@ -201,7 +201,7 @@ void PipeTest::testCloseBlockedWrite()
 	{
 		// Write enough data to fill the pipe buffer and block.
 		const std::string buffer(100'000, 'A');
-		pipe.writeBytes(buffer.data(), static_cast<int>(buffer.size()));
+		(void) pipe.writeBytes(buffer.data(), static_cast<int>(buffer.size()));
 		writeFinished.store(true, std::memory_order_release);
 	});
 
@@ -224,7 +224,7 @@ void PipeTest::testCloseBlockedRead()
 	readerThread.startFunc([&pipe, &readFinished]()
 	{
 		char buffer[64];
-		pipe.readBytes(buffer, sizeof(buffer));
+		(void) pipe.readBytes(buffer, sizeof(buffer));
 		readFinished.store(true, std::memory_order_release);
 	});
 

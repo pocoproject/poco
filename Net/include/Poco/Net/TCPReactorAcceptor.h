@@ -20,7 +20,8 @@ public:
 		Poco::Net::ServerSocket& socket, Poco::Net::SocketReactor& reactor, TCPServerParams::Ptr pParams);
 
 	~TCPReactorAcceptor();
-	SocketReactor& reactor();
+	
+	[[nodiscard]] SocketReactor& reactor();
 	void stop();
 
 	void setRecvMessageCallback(const RecvMessageCallback& cb)

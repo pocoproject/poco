@@ -32,7 +32,7 @@ class Foundation_API FileStreamBuf: public BufferedBidirectionalStreamBuf
 {
 public:
 	using NativeHandle = int;
-	
+
 	FileStreamBuf();
 		/// Creates a FileStreamBuf.
 
@@ -64,10 +64,10 @@ public:
 	void flushToDisk();
 		/// Forces buffered data to be written to the disk
 
-	NativeHandle nativeHandle() const;
+	[[nodiscard]] NativeHandle nativeHandle() const;
 		/// Returns native file descriptor handle
-	
-	UInt64 size() const;
+
+	[[nodiscard]] UInt64 size() const;
 		/// Returns file size
 
 protected:

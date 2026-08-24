@@ -87,14 +87,14 @@ public:
 		_event.set();
 	}
 
-	bool failed() const
+	[[nodiscard]] bool failed() const
 		/// Returns true if the active method failed (and threw an exception).
 		/// Information about the exception can be obtained by calling error().
 	{
 		return _pExc != nullptr;
 	}
 
-	std::string error() const
+	[[nodiscard]] std::string error() const
 		/// If the active method threw an exception, a textual representation
 		/// of the exception is returned. An empty string is returned if the
 		/// active method completed successfully.
@@ -105,7 +105,7 @@ public:
 			return std::string();
 	}
 
-	Exception* exception() const
+	[[nodiscard]] Exception* exception() const
 		/// If the active method threw an exception, a clone of the exception
 		/// object is returned, otherwise null.
 	{
@@ -180,14 +180,14 @@ public:
 		_event.set();
 	}
 
-	bool failed() const
+	[[nodiscard]] bool failed() const
 		/// Returns true if the active method failed (and threw an exception).
 		/// Information about the exception can be obtained by calling error().
 	{
 		return _pExc != nullptr;
 	}
 
-	std::string error() const
+	[[nodiscard]] std::string error() const
 		/// If the active method threw an exception, a textual representation
 		/// of the exception is returned. An empty string is returned if the
 		/// active method completed successfully.
@@ -198,7 +198,7 @@ public:
 			return std::string();
 	}
 
-	Exception* exception() const
+	[[nodiscard]] Exception* exception() const
 		/// If the active method threw an exception, a clone of the exception
 		/// object is returned, otherwise null.
 	{
@@ -277,7 +277,7 @@ public:
 		swap(_pHolder, result._pHolder);
 	}
 
-	ResultType& data() const
+	[[nodiscard]] ResultType& data() const
 		/// Returns a reference to the result data.
 	{
 		return _pHolder->data();
@@ -310,20 +310,20 @@ public:
 		_pHolder->wait(milliseconds);
 	}
 
-	bool available() const
+	[[nodiscard]] bool available() const
 		/// Returns true if a result is available.
 	{
 		return _pHolder->tryWait(0);
 	}
 
-	bool failed() const
+	[[nodiscard]] bool failed() const
 		/// Returns true if the active method failed (and threw an exception).
 		/// Information about the exception can be obtained by calling error().
 	{
 		return _pHolder->failed();
 	}
 
-	std::string error() const
+	[[nodiscard]] std::string error() const
 		/// If the active method threw an exception, a textual representation
 		/// of the exception is returned. An empty string is returned if the
 		/// active method completed successfully.
@@ -331,7 +331,7 @@ public:
 		return _pHolder->error();
 	}
 
-	Exception* exception() const
+	[[nodiscard]] Exception* exception() const
 		/// If the active method threw an exception, a clone of the exception
 		/// object is returned, otherwise null.
 	{
@@ -345,7 +345,7 @@ public:
 		_pHolder->notify();
 	}
 
-	ResultType& data()
+	[[nodiscard]] ResultType& data()
 		/// Returns a non-const reference to the result data. For internal
 		/// use only.
 	{
@@ -437,20 +437,20 @@ public:
 		_pHolder->wait(milliseconds);
 	}
 
-	bool available() const
+	[[nodiscard]] bool available() const
 		/// Returns true if a result is available.
 	{
 		return _pHolder->tryWait(0);
 	}
 
-	bool failed() const
+	[[nodiscard]] bool failed() const
 		/// Returns true if the active method failed (and threw an exception).
 		/// Information about the exception can be obtained by calling error().
 	{
 		return _pHolder->failed();
 	}
 
-	std::string error() const
+	[[nodiscard]] std::string error() const
 		/// If the active method threw an exception, a textual representation
 		/// of the exception is returned. An empty string is returned if the
 		/// active method completed successfully.
@@ -458,7 +458,7 @@ public:
 		return _pHolder->error();
 	}
 
-	Exception* exception() const
+	[[nodiscard]] Exception* exception() const
 		/// If the active method threw an exception, a clone of the exception
 		/// object is returned, otherwise null.
 	{

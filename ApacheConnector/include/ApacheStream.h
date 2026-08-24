@@ -59,7 +59,7 @@ public:
 		///
 		/// Flushes the buffer, but does not close the socket.
 
-	ApacheStreamBuf* rdbuf();
+	[[nodiscard]] ApacheStreamBuf* rdbuf();
 		/// Returns a pointer to the internal ApacheStreamBuf.
 
 	void close();

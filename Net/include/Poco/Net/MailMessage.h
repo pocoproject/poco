@@ -276,8 +276,8 @@ protected:
 	void readMultipart(std::istream& istr, PartHandler& handler);
 	void readPart(std::istream& istr, const MessageHeader& header, PartHandler& handler);
 	void handlePart(std::istream& istr, const MessageHeader& header, PartHandler& handler);
-	static const std::string& contentTransferEncodingToString(ContentTransferEncoding encoding);
-	static int lineLength(const std::string& str);
+	[[nodiscard]] static const std::string& contentTransferEncodingToString(ContentTransferEncoding encoding);
+	[[nodiscard]] static int lineLength(const std::string& str);
 	static void appendRecipient(const MailRecipient& recipient, std::string& str);
 
 	MailMessage(const MailMessage&) = delete;
@@ -324,7 +324,7 @@ public:
 		/// use RFC 2047 word encoding (see encodeWord()).
 
 	// PartSource
-	std::istream& stream();
+	[[nodiscard]] std::istream& stream();
 
 protected:
 	static std::string contentTypeWithBoundary(const std::string& contentType);

@@ -276,7 +276,7 @@ int UUID::compare(const UUID& uuid) const
 
 void UUID::appendHex(std::string& str, UInt8 n)
 {
-	static const char* digits = "0123456789abcdef";
+	static constexpr const char* digits = "0123456789abcdef";
 	str += digits[(n >> 4) & 0xF];
 	str += digits[n & 0xF];
 }

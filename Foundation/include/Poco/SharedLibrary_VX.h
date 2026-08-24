@@ -35,12 +35,12 @@ protected:
 	~SharedLibraryImpl();
 	void loadImpl(const std::string& path, int flags);
 	void unloadImpl();
-	bool isLoadedImpl() const;
-	void* findSymbolImpl(const std::string& name);
-	const std::string& getPathImpl() const;
-	static std::string suffixImpl();
+	[[nodiscard]] bool isLoadedImpl() const;
+	[[nodiscard]] void* findSymbolImpl(const std::string& name);
+	[[nodiscard]] const std::string& getPathImpl() const;
+	[[nodiscard]] static std::string suffixImpl();
 	static bool setSearchPathImpl(const std::string& path);
-	static std::vector<std::string> findMissingDependenciesImpl(const std::string& path);
+	[[nodiscard]] static std::vector<std::string> findMissingDependenciesImpl(const std::string& path);
 
 private:
 	std::string _path;

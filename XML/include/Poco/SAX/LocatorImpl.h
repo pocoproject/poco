@@ -49,16 +49,16 @@ public:
 	LocatorImpl& operator = (const Locator& loc);
 		/// Assignment operator.
 
-	XMLString getPublicId() const;
+	[[nodiscard]] XMLString getPublicId() const;
 		/// Return the saved public identifier.
 
-	XMLString getSystemId() const;
+	[[nodiscard]] XMLString getSystemId() const;
 		/// Return the saved system identifier.
 
-	int getLineNumber() const;
+	[[nodiscard]] int getLineNumber() const;
 		/// Return the saved line number (1-based).
 
-	int getColumnNumber() const;
+	[[nodiscard]] int getColumnNumber() const;
 		/// Return the saved column number (1-based).
 
 	void setPublicId(const XMLString& publicId);

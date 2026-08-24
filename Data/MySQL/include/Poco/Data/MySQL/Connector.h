@@ -37,10 +37,10 @@ public:
 	~Connector() override;
 		/// Destroys the Connector.
 
-	const std::string& name() const override;
+	[[nodiscard]] const std::string& name() const override;
 		/// Returns the name associated with this connector.
 
-	Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString,
+	[[nodiscard]] Poco::AutoPtr<Poco::Data::SessionImpl> createSession(const std::string& connectionString,
 		std::size_t timeout = Poco::Data::SessionImpl::LOGIN_TIMEOUT_DEFAULT) override;
 		/// Creates a MySQL SessionImpl object and initializes it with the given connectionString.
 

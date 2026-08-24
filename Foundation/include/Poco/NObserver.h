@@ -154,19 +154,19 @@ public:
 		return handleSync(NotificationPtr(static_cast<N*>(pNf), true));
 	}
 
-	bool equals(const AbstractObserver& abstractObserver) const override
+	[[nodiscard]] bool equals(const AbstractObserver& abstractObserver) const override
 	{
 		const auto* pObs = dynamic_cast<const NObserver*>(&abstractObserver);
 		return pObs && pObs->_pObject == _pObject && pObs->_handler == _handler;
 	}
 
-	POCO_DEPRECATED("use `bool accepts(const Notification::Ptr&)` instead with matcher function if needed")
+	[[nodiscard]] POCO_DEPRECATED("use `bool accepts(const Notification::Ptr&)` instead with matcher function if needed")
 	bool accepts(Notification* pNf, const char* pName) const override
 	{
 		return (!pName || pNf->name() == pName) && dynamic_cast<N*>(pNf) != nullptr;
 	}
 
-	bool accepts(const Notification::Ptr& pNf) const override
+	[[nodiscard]] bool accepts(const Notification::Ptr& pNf) const override
 	{
 		if (hasMatcher())
 			return match(pNf);
@@ -174,12 +174,12 @@ public:
 			return pNf.template cast<N>() != nullptr;
 	}
 
-	bool acceptsSync() const override
+	[[nodiscard]] bool acceptsSync() const override
 	{
 		return _pObject != nullptr && _syncHandler != nullptr;
 	}
 
-	AbstractObserver* clone() const override
+	[[nodiscard]] AbstractObserver* clone() const override
 	{
 		return new NObserver(*this);
 	}

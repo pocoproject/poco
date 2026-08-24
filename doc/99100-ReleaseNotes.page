@@ -1,6 +1,41 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 2.0.0
+
+!!Summary of Changes
+
+In-class <*static const*> members with constant initialisers are now
+<*static constexpr*>, which removes their out-of-class definitions and the
+exported symbols that went with them. Headers using
+<*std::numeric_limits<>::min()*> / <*max()*> now require that no function-like
+<*min()*> or <*max()*> macro is in scope.
+
+!!Breaking Changes
+
+  - In-class <*static const*> members with constant initialisers are now <*static constexpr*>.
+    Their out-of-class definitions are gone, which removes 37+ exported symbols from the shipped
+    libraries (Foundation, Net, Util, Data, DataSQLite, MongoDB, XML, CppUnit, Zip, NetSSL and
+    Prometheus) -- for example <*Timespan::SECONDS*>, <*Timestamp::TIMEVAL_MAX*>,
+    <*IPAddress::IPv4*> and <*HTTPMessage::UNKNOWN_CONTENT_LENGTH*>. The change is
+    source-compatible but binary-incompatible; recompile against the new headers. (PR #5453)
+  - <*Poco::Net::ICMPv4PacketImpl::MAX_PACKET_SIZE*> is removed. It shadowed
+    <*ICMPPacketImpl::MAX_PACKET_SIZE*> and was never defined in libPocoNet, so any odr-use of
+    it was a link error. The name now resolves to the inherited member, which has the same
+    value. (PR #5453)
+  - Headers that use <*std::numeric_limits<>::min()*> / <*max()*> no longer tolerate a
+    function-like <*min()*> or <*max()*> macro in scope. POCO's own scattered <*#undef min*> /
+    <*#undef max*> guards are replaced by a single <*POCO_CHECK_MINMAX_MACROS*> check, defined in
+    <*Poco/Foundation.h*>, which reports the cause as a static assertion instead of an opaque
+    preprocessor error. On Windows this means defining <*NOMINMAX*>, or including any POCO header
+    before <windows.h> -- <*Poco/UnWindows.h*>, now the only route to <windows.h> within POCO,
+    does both. Affected headers: <*Poco/Timestamp.h*>, <*Poco/Clock.h*>,
+    <*Poco/NumericString.h*>, <*Poco/Dynamic/VarHolder.h*>, <*Poco/Dynamic/VarIterator.h*>,
+    <*Poco/OrderedSet.h*>, <*Poco/OrderedMap.h*>, <*Poco/Net/SocketProactor.h*>,
+    <*Poco/Data/Constants.h*>, <*Poco/Data/RecordSet.h*>, <*Poco/Data/RowIterator.h*>,
+    <*Poco/MongoDB/ServerDescription.h*> and <*Poco/ActiveRecord/IDTraits.h*>. (PR #5453)
+
+
 !!!Release 1.15.3
 
 !!Summary of Changes

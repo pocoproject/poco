@@ -244,7 +244,7 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 	// On some systems, sysconf(_SC_OPEN_MAX) returns a ridiculously high number,
 	// which would closing all file descriptors up to that number extremely slow.
 	// We therefore limit the maximum number of file descriptors we close.
-	const long CLOSE_FD_MAX = 100000;
+	constexpr long CLOSE_FD_MAX = 100000;
 
 	do
 	{

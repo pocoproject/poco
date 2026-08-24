@@ -35,18 +35,19 @@ public:
 	~Image() override;
 		/// Destroys the image.
 
-	Point size() const;
+	[[nodiscard]] Point size() const;
 		/// Returns the size of the image.
-	float width() const;
+
+	[[nodiscard]] float width() const;
 		/// Returns the width of the image.
 
-	float height() const;
+	[[nodiscard]] float height() const;
 		/// Returns the height of the image.
 
-	Poco::UInt32 bitsPerColor() const;
+	[[nodiscard]] Poco::UInt32 bitsPerColor() const;
 		/// Returns the number of bits per color.
 
-	std::string colorSpace() const;
+	[[nodiscard]] std::string colorSpace() const;
 		/// Returns the name of the image's color space.
 
 	void colorMask(Poco::UInt32 redMin,

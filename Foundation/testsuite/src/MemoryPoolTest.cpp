@@ -51,7 +51,7 @@ void MemoryPoolTest::testMemoryPool()
 
 	try
 	{
-		pool1.get();
+		(void) pool1.get();
 		fail("pool exhausted - must throw exception");
 	}
 	catch (Poco::OutOfMemoryException&)

@@ -63,7 +63,7 @@ class Net_API HTTPChunkedIOS: public virtual std::ios
 public:
 	HTTPChunkedIOS(HTTPSession& session, HTTPChunkedStreamBuf::openmode mode, MessageHeader* pTrailer = nullptr);
 	~HTTPChunkedIOS();
-	HTTPChunkedStreamBuf* rdbuf();
+	[[nodiscard]] HTTPChunkedStreamBuf* rdbuf();
 
 protected:
 	HTTPChunkedStreamBuf _buf;

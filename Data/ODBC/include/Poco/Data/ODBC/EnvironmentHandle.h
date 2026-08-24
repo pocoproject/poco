@@ -20,7 +20,7 @@
 
 #include "Poco/Data/ODBC/ODBC.h"
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 #include <sqltypes.h>
 
@@ -38,17 +38,17 @@ public:
 	~EnvironmentHandle();
 		/// Destroys the EnvironmentHandle.
 
-	operator const SQLHENV& () const;
+	[[nodiscard]] operator const SQLHENV& () const;
 		/// Const conversion operator into reference to native type.
 
-	const SQLHENV& handle() const;
+	[[nodiscard]] const SQLHENV& handle() const;
 		/// Returns const reference to handle.
 
 private:
-	operator SQLHENV& ();
+	[[nodiscard]] operator SQLHENV& ();
 		/// Conversion operator into reference to native type.
 
-	SQLHENV& handle();
+	[[nodiscard]] SQLHENV& handle();
 		/// Returns reference to handle.
 
 	EnvironmentHandle(const EnvironmentHandle&) = delete;

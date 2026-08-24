@@ -96,8 +96,8 @@ public:
 		/// Returns true if verification succeeded, or false otherwise.
 
 protected:
-	static bool containsWildcards(const std::string& commonName);
-	static bool matchWildcard(const std::string& alias, const std::string& hostName);
+	[[nodiscard]] static bool containsWildcards(const std::string& commonName);
+	[[nodiscard]] static bool matchWildcard(const std::string& alias, const std::string& hostName);
 
 private:
 	enum

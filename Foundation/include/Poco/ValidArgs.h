@@ -42,14 +42,14 @@ public:
 
 	~ValidArgs() = default;
 
-	ValidArgs &operator=(const ValidArgs& args) = delete;
+	ValidArgs& operator=(const ValidArgs& args) = delete;
 
-	const TKey&	key() const
+	[[nodiscard]] const TKey&	key() const
 	{
 		return _key;
 	}
 
-	bool isValid() const
+	[[nodiscard]] bool isValid() const
 	{
 		return _isValid;
 	}

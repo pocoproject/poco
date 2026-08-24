@@ -95,13 +95,13 @@ public:
 	TextBufferIterator operator ++ (int);
 		/// Postfix increment operator.
 
-	bool operator == (const TextBufferIterator& it) const;
+	[[nodiscard]] bool operator == (const TextBufferIterator& it) const;
 		/// Compares two iterators for equality.
 
-	bool operator != (const TextBufferIterator& it) const;
+	[[nodiscard]] bool operator != (const TextBufferIterator& it) const;
 		/// Compares two iterators for inequality.
 
-	TextBufferIterator end() const;
+	[[nodiscard]] TextBufferIterator end() const;
 		/// Returns the end iterator for the range handled
 		/// by the iterator.
 

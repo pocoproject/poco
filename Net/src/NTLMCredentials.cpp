@@ -58,7 +58,7 @@ std::vector<unsigned char> NTLMCredentials::createNonce()
 
 Poco::UInt64 NTLMCredentials::createTimestamp()
 {
-	const Poco::UInt64 EPOCH_DELTA_SECONDS = 11644473600; // seconds between January 1, 1970 and January 1, 1601
+	constexpr Poco::UInt64 EPOCH_DELTA_SECONDS = 11644473600; // seconds between January 1, 1970 and January 1, 1601
 
 	Poco::Timestamp now;
 	Poco::UInt64 ts = now.epochMicroseconds();

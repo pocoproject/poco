@@ -122,7 +122,7 @@ protected:
 		_mode = mode;
 	}
 
-	openmode getMode() const
+	[[nodiscard]] openmode getMode() const
 	{
 		return _mode;
 	}

@@ -292,10 +292,6 @@ const std::string SQLExecutor::MULTI_SELECT =
 	"SELECT * FROM Test WHERE First = '5';";
 
 
-const float SQLExecutor::EPSILON_FLOAT = 1e-5f;
-const double SQLExecutor::EPSILON_DOUBLE = 1e-9;
-
-
 SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession, bool numberedPlaceHolders):
 	CppUnit::TestCase(name),
 	_pSession(pSession),
@@ -410,10 +406,10 @@ void SQLExecutor::sessionPool(const std::string& connector, const std::string& c
 	{
 		SessionPool pool(connector, connectString, 1, 4, 2, 10);
 
-		try { pool.getFeature("g1"); fail ("getting an unsuported feature must fail", __LINE__, __FILE__); }
+		try { (void) pool.getFeature("g1"); fail ("getting an unsuported feature must fail", __LINE__, __FILE__); }
 		catch ( Poco::NotFoundException& ) { }
 
-		try { pool.getProperty("r1"); fail ("getting an unsuported property must fail", __LINE__, __FILE__); }
+		try { (void) pool.getProperty("r1"); fail ("getting an unsuported property must fail", __LINE__, __FILE__); }
 		catch ( Poco::NotFoundException& ) { }
 
 		assertTrue (pool.capacity() == 4);
@@ -426,12 +422,12 @@ void SQLExecutor::sessionPool(const std::string& connector, const std::string& c
 		Session ss1(pool.get());
 
 		try { pool.setFeature("f1", true); fail ("setting an unsuported feature must fail", __LINE__, __FILE__); }
-		catch (Poco::InvalidAccessException&) { }
+		catch (InvalidAccessException&) { }
 		catch (Poco::NotImplementedException&) { }
 		catch (Poco::Data::NotSupportedException&) { }
 
 		try { pool.setProperty("p1", 1); fail ("setting an unsuported property must fail", __LINE__, __FILE__); }
-		catch (Poco::InvalidAccessException&) { }
+		catch (InvalidAccessException&) { }
 		catch (Poco::NotImplementedException&) { }
 		catch (Poco::Data::NotSupportedException&) { }
 
@@ -2970,16 +2966,16 @@ void SQLExecutor::internalExtraction()
 		s = rset.value("cnt", 0).convert<std::string>();
 		assertTrue ("4" == s);
 
-		try { rset.column<std::deque<int> >(100); fail ("must fail"); }
+		try { (void) rset.column<std::deque<int> >(100); fail ("must fail"); }
 		catch (RangeException&) { }
 
-		try	{ rset.value<std::string>(0,0); fail ("must fail"); }
+		try	{ (void) rset.value<std::string>(0,0); fail ("must fail"); }
 		catch (BadCastException&) {	}
 
 		stmt = (session() << "DELETE FROM Vectors", now);
 		rset = stmt;
 
-		try { rset.column<std::deque<int> >(0); fail ("must fail"); }
+		try { (void) rset.column<std::deque<int> >(0); fail ("must fail"); }
 		catch (RangeException&) { }
 	}
 	catch(DataException& ce)
@@ -3084,7 +3080,7 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 
 void SQLExecutor::nullBulk(const std::string& blobPlaceholder)
 {
-	const int sz = 10;
+	constexpr int sz = 10;
 
 	{
 		std::vector<NullData> lastName(sz, null);

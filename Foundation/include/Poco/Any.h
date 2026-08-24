@@ -102,12 +102,12 @@ public:
 		destruct(true);
 	}
 
-	bool isEmpty() const
+	[[nodiscard]] bool isEmpty() const
 	{
 		return holder[SizeV] == Allocation::POCO_ANY_EMPTY;
 	}
 
-	bool isLocal() const
+	[[nodiscard]] bool isLocal() const
 	{
 		return holder[SizeV] == Allocation::POCO_ANY_LOCAL;
 	}
@@ -132,7 +132,7 @@ public:
 		return pHolder;
 	}
 
-	PlaceholderT* content() const
+	[[nodiscard]] PlaceholderT* content() const
 	{
 		if (isLocal())
 			return reinterpret_cast<PlaceholderT*>(holder);
@@ -219,12 +219,12 @@ private:
 		pHolder = nullptr;
 	}
 
-	bool isEmpty() const
+	[[nodiscard]] bool isEmpty() const
 	{
 		return nullptr == pHolder;
 	}
 
-	bool isLocal() const
+	[[nodiscard]] bool isLocal() const
 	{
 		return false;
 	}
@@ -236,7 +236,7 @@ private:
 		return pHolder = new T(value);
 	}
 
-	PlaceholderT* content() const
+	[[nodiscard]] PlaceholderT* content() const
 	{
 		return pHolder;
 	}
@@ -357,13 +357,13 @@ public:
 		return *this;
 	}
 
-	bool empty() const
+	[[nodiscard]] bool empty() const
 		/// Returns true if the Any is empty.
 	{
 		return _valueHolder.isEmpty();
 	}
 
-	const std::type_info& type() const
+	[[nodiscard]] const std::type_info& type() const
 		/// Returns the type information of the stored content.
 		/// If the Any is empty typeid(void) is returned.
 		/// It is recommended to always query an Any for its type info before
@@ -372,7 +372,7 @@ public:
 		return empty() ? typeid(void) : content()->type();
 	}
 
-	bool local() const
+	[[nodiscard]] bool local() const
 		/// Returns true if data is held locally (ie. not allocated on the heap).
 		/// If POCO_NO_SOO is defined, it always return false.
 		/// The main purpose of this function is use for testing.
@@ -386,7 +386,7 @@ private:
 	public:
 		virtual ~ValueHolder() = default;
 
-		virtual const std::type_info & type() const = 0;
+		[[nodiscard]] virtual const std::type_info & type() const = 0;
 		virtual void clone(Placeholder<ValueHolder>*) const = 0;
 	};
 
@@ -400,7 +400,7 @@ private:
 
 		Holder & operator = (const Holder &) = delete;
 
-		const std::type_info& type() const override
+		[[nodiscard]] const std::type_info& type() const override
 		{
 			return typeid(ValueType);
 		}
@@ -413,12 +413,12 @@ private:
 		ValueType _held;
 	};
 
-	ValueHolder* content() const
+	[[nodiscard]] ValueHolder* content() const
 	{
 		return _valueHolder.content();
 	}
 
-	template<typename ValueType>
+	template <typename ValueType>
 	void construct(const ValueType& value)
 	{
 		_valueHolder.assign<Holder<ValueType>, ValueType>(value);
@@ -455,7 +455,7 @@ private:
 
 
 template <typename ValueType>
-ValueType* AnyCast(Any* operand)
+[[nodiscard]] ValueType* AnyCast(Any* operand)
 	/// AnyCast operator used to extract the ValueType from an Any*. Will return a pointer
 	/// to the stored value.
 	///
@@ -470,7 +470,7 @@ ValueType* AnyCast(Any* operand)
 
 
 template <typename ValueType>
-const ValueType* AnyCast(const Any* operand)
+[[nodiscard]] const ValueType* AnyCast(const Any* operand)
 	/// AnyCast operator used to extract a const ValueType pointer from an const Any*. Will return a const pointer
 	/// to the stored value.
 	///
@@ -485,7 +485,7 @@ const ValueType* AnyCast(const Any* operand)
 
 
 template <typename ValueType>
-ValueType AnyCast(Any& operand)
+[[nodiscard]] ValueType AnyCast(Any& operand)
 	/// AnyCast operator used to extract a copy of the ValueType from an Any&.
 	///
 	/// Example Usage:
@@ -517,7 +517,7 @@ ValueType AnyCast(Any& operand)
 
 
 template <typename ValueType>
-ValueType AnyCast(const Any& operand)
+[[nodiscard]] ValueType AnyCast(const Any& operand)
 	/// AnyCast operator used to extract a copy of the ValueType from an const Any&.
 	///
 	/// Example Usage:
@@ -534,7 +534,7 @@ ValueType AnyCast(const Any& operand)
 
 
 template <typename ValueType>
-const ValueType& RefAnyCast(const Any & operand)
+[[nodiscard]] const ValueType& RefAnyCast(const Any & operand)
 	/// AnyCast operator used to return a const reference to the internal data.
 	///
 	/// Example Usage:
@@ -560,7 +560,7 @@ const ValueType& RefAnyCast(const Any & operand)
 
 
 template <typename ValueType>
-ValueType& RefAnyCast(Any& operand)
+[[nodiscard]] ValueType& RefAnyCast(Any& operand)
 	/// AnyCast operator used to return a reference to the internal data.
 	///
 	/// Example Usage:
@@ -586,7 +586,7 @@ ValueType& RefAnyCast(Any& operand)
 
 
 template <typename ValueType>
-ValueType* UnsafeAnyCast(Any* operand)
+[[nodiscard]] ValueType* UnsafeAnyCast(Any* operand)
 	/// The "unsafe" versions of AnyCast are not part of the
 	/// public interface and may be removed at any time. They are
 	/// required where we know what type is stored in the any and can't
@@ -598,7 +598,7 @@ ValueType* UnsafeAnyCast(Any* operand)
 
 
 template <typename ValueType>
-const ValueType* UnsafeAnyCast(const Any* operand)
+[[nodiscard]] const ValueType* UnsafeAnyCast(const Any* operand)
 	/// The "unsafe" versions of AnyCast are not part of the
 	/// public interface and may be removed at any time. They are
 	/// required where we know what type is stored in the any and can't
@@ -610,7 +610,7 @@ const ValueType* UnsafeAnyCast(const Any* operand)
 
 
 template <typename ValueType>
-bool AnyHoldsNullPtr(const Any& any)
+[[nodiscard]] bool AnyHoldsNullPtr(const Any& any)
 	/// Returns true if any holds a null pointer.
 	/// Fails to compile if `ValueType` is not a pointer.
 {
@@ -620,7 +620,7 @@ bool AnyHoldsNullPtr(const Any& any)
 
 
 template <typename ValueType>
-bool AnyHoldsNullPtr(const Any* pAny)
+[[nodiscard]] bool AnyHoldsNullPtr(const Any* pAny)
 	/// Returns true if the Any pointed to holds a null pointer.
 	/// Returns false if `pAny` is a null pointer.
 {

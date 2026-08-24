@@ -47,29 +47,29 @@ public:
 		/// Destroys the SQLiteStatementImpl.
 
 protected:
-	std::size_t columnsReturned() const override;
+	[[nodiscard]] std::size_t columnsReturned() const override;
 		/// Returns number of columns returned by query.
 
-	int affectedRowCount() const override;
+	[[nodiscard]] int affectedRowCount() const override;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 		/// All changes are counted, even if they are later undone by a ROLLBACK or ABORT.
 		/// Changes associated with creating and dropping tables are not counted.
 
-	const MetaColumn& metaColumn(std::size_t pos) const override;
+	[[nodiscard]] const MetaColumn& metaColumn(std::size_t pos) const override;
 		/// Returns column meta data.
 
-	bool hasNext() override;
+	[[nodiscard]] bool hasNext() override;
 		/// Returns true if a call to next() will return data.
 
-	std::size_t next() override;
+	[[nodiscard]] std::size_t next() override;
 		/// Retrieves the next row from the resultset and returns 1.
 		/// Will throw, if the resultset is empty.
 
-	bool canBind() const override;
+	[[nodiscard]] bool canBind() const override;
 		/// Returns true if a valid statement is set and we can bind.
 
-	bool canCompile() const override;
+	[[nodiscard]] bool canCompile() const override;
 		/// Returns true if statement can compile.
 
 	void compileImpl() override;
@@ -83,10 +83,10 @@ protected:
 	void bindImpl() override;
 		/// Binds parameters
 
-	AbstractExtraction::ExtractorPtr extractor() override;
+	[[nodiscard]] AbstractExtraction::ExtractorPtr extractor() override;
 		/// Returns the concrete extractor used by the statement.
 
-	AbstractBinding::BinderPtr binder() override;
+	[[nodiscard]] AbstractBinding::BinderPtr binder() override;
 		/// Returns the concrete binder used by the statement.
 
 private:
@@ -116,7 +116,7 @@ private:
 	bool             _isExtracted;
 	bool             _canCompile;
 
-	static const int POCO_SQLITE_INV_ROW_CNT;
+	static constexpr int POCO_SQLITE_INV_ROW_CNT = -1;
 };
 
 

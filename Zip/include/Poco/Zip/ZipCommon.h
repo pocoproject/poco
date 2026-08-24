@@ -33,9 +33,9 @@ public:
 		HEADER_SIZE = 4
 	};
 
-	static const Poco::UInt16 ZIP64_EXTRA_ID	= 0x1;		  // Extra data id tag for Zip64 data (in extension for ZipLocalFileHeader and ZipFileInfo)
-	static const Poco::UInt16 ZIP64_MAGIC_SHORT = 0xFFFF;
-	static const Poco::UInt32 ZIP64_MAGIC		= 0xFFFFFFFF;
+	static constexpr Poco::UInt16 ZIP64_EXTRA_ID	= 0x1;		  // Extra data id tag for Zip64 data (in extension for ZipLocalFileHeader and ZipFileInfo)
+	static constexpr Poco::UInt16 ZIP64_MAGIC_SHORT = 0xFFFF;
+	static constexpr Poco::UInt32 ZIP64_MAGIC		= 0xFFFFFFFF;
 
 	enum CompressionMethod
 	{
@@ -107,7 +107,7 @@ public:
 		FT_ASCII = 1
 	};
 
-	static bool isValidPath(const std::string& path);
+	[[nodiscard]] static bool isValidPath(const std::string& path);
 		/// Checks whether the given path is valid (does
 		/// not contain ".." path segments).
 };

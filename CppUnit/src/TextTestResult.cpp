@@ -89,7 +89,7 @@ void TextTestResult::ignoring(const std::string ignore)
 {
 	std::string::const_iterator it = ignore.begin();
 	std::string::const_iterator end = ignore.end();
-	for (;;)
+	while (true)
 	{
 		while (it != end && (std::isspace(*it) || *it == '"' || *it == ',' || *it == '\'')) ++it;
 		if (it == end)

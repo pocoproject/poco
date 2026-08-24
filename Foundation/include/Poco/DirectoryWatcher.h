@@ -158,19 +158,19 @@ public:
 	void resumeEvents();
 		/// Resumes events, after they have been suspended with a call to suspendEvents().
 
-	bool eventsSuspended() const;
+	[[nodiscard]] bool eventsSuspended() const;
 		/// Returns true iff events are suspended.
 
-	int eventMask() const;
+	[[nodiscard]] int eventMask() const;
 		/// Returns the value of the eventMask passed to the constructor.
 
-	int scanInterval() const;
+	[[nodiscard]] int scanInterval() const;
 		/// Returns the scan interval in seconds.
 
-	const File& directory() const;
+	[[nodiscard]] const File& directory() const;
 		/// Returns the directory being watched.
 
-	bool supportsMoveEvents() const;
+	[[nodiscard]] bool supportsMoveEvents() const;
 		/// Returns true iff the platform supports DW_ITEM_MOVED_FROM/itemMovedFrom and
 		/// DW_ITEM_MOVED_TO/itemMovedTo events.
 

@@ -36,31 +36,31 @@ public:
 	~Font() override;
 		/// Destroys the font.
 
-	std::string encodingName() const;
+	[[nodiscard]] std::string encodingName() const;
 		/// Returns the name of the encoding.
 
-	int unicodeWidth(Poco::UInt16 ch) const;
+	[[nodiscard]] int unicodeWidth(Poco::UInt16 ch) const;
 		/// Returns the screen width of 16-bit Unicode character.
 
-	Rectangle boundingBox() const;
+	[[nodiscard]] Rectangle boundingBox() const;
 		/// Returns the font's bounding box.
 
-	int ascent() const;
+	[[nodiscard]] int ascent() const;
 		/// Returns the vertical ascent of the font.
 
-	int descent() const;
+	[[nodiscard]] int descent() const;
 		/// Returns the vertical ascent of the font.
 
-	int lowerHeight() const;
+	[[nodiscard]] int lowerHeight() const;
 		/// Returns the distance from the baseline of lowercase letters.
 
-	int upperHeight() const;
+	[[nodiscard]] int upperHeight() const;
 		/// Returns the distance from the baseline of uppercase letters.
 
-	TextWidth textWidth(const std::string& text);
+	[[nodiscard]] TextWidth textWidth(const std::string& text);
 		/// Returns total width of the text, number of characters and number of the words.
 
-	int measureText(const std::string& text,
+	[[nodiscard]] int measureText(const std::string& text,
 		float width,
 		float fontSize,
 		float charSpace,

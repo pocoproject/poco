@@ -84,13 +84,13 @@ public:
 		else return false;
 	}
 
-	bool equals(const AbstractDelegate<TArgs>& other) const
+	[[nodiscard]] bool equals(const AbstractDelegate<TArgs>& other) const
 	{
 		const Delegate* pOtherDelegate = dynamic_cast<const Delegate*>(other.unwrap());
 		return pOtherDelegate && _receiverObject == pOtherDelegate->_receiverObject && _receiverMethod == pOtherDelegate->_receiverMethod;
 	}
 
-	AbstractDelegate<TArgs>* clone() const
+	[[nodiscard]] AbstractDelegate<TArgs>* clone() const
 	{
 		return new Delegate(*this);
 	}

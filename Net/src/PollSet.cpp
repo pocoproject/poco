@@ -505,7 +505,7 @@ public:
 		if (_pollfds[0].revents & POLLIN)
 		{
 			char c;
-			_pipe.readBytes(&c, 1);
+			(void) _pipe.readBytes(&c, 1);
 		}
 
 		Poco::FastMutex::ScopedLock lock(_mutex);
@@ -533,10 +533,10 @@ public:
 
 	void wakeUp()
 	{
-		static const char c = 1;
+		static constexpr char c = 1;
 		if (_pollLock.isClosed())
 			return;
-		_pipe.writeBytes(&c, 1);
+		(void) _pipe.writeBytes(&c, 1);
 	}
 
 	std::size_t size() const

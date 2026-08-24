@@ -2229,7 +2229,7 @@ void SQLiteTest::testInternalExtraction()
 	const Column<IntDeq>& col = rset.column<IntDeq>(0);
 	assertTrue (col[0] == 1);
 
-	try { rset.column<IntDeq>(100); fail ("must fail"); }
+	try { (void) rset.column<IntDeq>(100); fail ("must fail"); }
 	catch (RangeException&) { }
 
 	const Column<IntDeq>& col1 = rset.column<IntDeq>(0);
@@ -2247,7 +2247,7 @@ void SQLiteTest::testInternalExtraction()
 	stmt = (tmp << "DELETE FROM Vectors", now);
 	rset = stmt;
 
-	try { rset.column<IntDeq>(0); fail ("must fail"); }
+	try { (void) rset.column<IntDeq>(0); fail ("must fail"); }
 	catch (RangeException&) { }
 }
 

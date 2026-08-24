@@ -38,21 +38,18 @@ class XMLStreamSerializer;
 template <typename T>
 struct DefaultValueTraits
 {
-	static T
-	parse(std::string, const XMLStreamParser&);
+	[[nodiscard]] static T parse(std::string, const XMLStreamParser&);
 
-	static std::string
-	serialize(const T&, const XMLStreamSerializer&);
+	[[nodiscard]] static std::string serialize(const T&, const XMLStreamSerializer&);
 };
 
 
 template <>
 struct XML_API DefaultValueTraits<bool>
 {
-	static bool
-	parse(std::string, const XMLStreamParser&);
+	[[nodiscard]] static bool parse(std::string, const XMLStreamParser&);
 
-	static std::string serialize(bool v, const XMLStreamSerializer&)
+	[[nodiscard]] static std::string serialize(bool v, const XMLStreamSerializer&)
 	{
 		return v ? "true" : "false";
 	}
@@ -62,12 +59,12 @@ struct XML_API DefaultValueTraits<bool>
 template <>
 struct XML_API DefaultValueTraits<std::string>
 {
-	static std::string parse(std::string s, const XMLStreamParser&)
+	[[nodiscard]] static std::string parse(std::string s, const XMLStreamParser&)
 	{
 		return s;
 	}
 
-	static std::string serialize(const std::string& v, const XMLStreamSerializer&)
+	[[nodiscard]] static std::string serialize(const std::string& v, const XMLStreamSerializer&)
 	{
 		return v;
 	}

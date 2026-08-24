@@ -92,7 +92,7 @@ void RWLockImpl::readLockImpl()
 
 bool RWLockImpl::tryReadLockImpl()
 {
-	for (;;)
+	while (true)
 	{
 		if (_writers != 0 || _writersWaiting != 0)
 			return false;

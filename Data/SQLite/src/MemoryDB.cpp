@@ -935,7 +935,7 @@ void MemoryDB::detachArchived(Poco::UInt32 shardId)
 	// _attachMutex, re-checks the refcount (another caller may have brought
 	// it above 1), attempts DETACH, and either succeeds or sleeps. Bounded
 	// by maxAttempts so a pathological hold cannot loop forever.
-	const int maxAttempts = 100;
+	constexpr int maxAttempts = 100;
 	for (int attempt = 0; ; ++attempt)
 	{
 		{

@@ -106,18 +106,18 @@ public:
 	void parse(std::istream& in);
 		/// Parse a template from an input stream.
 
-	Timestamp parseTime() const;
+	[[nodiscard]] Timestamp parseTime() const;
 		/// Returns the time when the template was parsed.
 
 	void render(const Dynamic::Var& data, std::ostream& out) const;
 		/// Renders the template and send the output to the stream.
 
 private:
-	std::string readText(std::istream& in);
-	std::string readWord(std::istream& in);
-	std::string readQuery(std::istream& in);
-	std::string readTemplateCommand(std::istream& in);
-	std::string readString(std::istream& in);
+	[[nodiscard]] std::string readText(std::istream& in);
+	[[nodiscard]] std::string readWord(std::istream& in);
+	[[nodiscard]] std::string readQuery(std::istream& in);
+	[[nodiscard]] std::string readTemplateCommand(std::istream& in);
+	[[nodiscard]] std::string readString(std::istream& in);
 	void readWhiteSpace(std::istream& in);
 
 	MultiPart* _parts;

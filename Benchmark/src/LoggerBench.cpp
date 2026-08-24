@@ -1188,7 +1188,7 @@ BENCHMARK(FastLogger_ToFile);
 //
 
 // Common configuration templates for fair comparison
-static const char* asyncChannelFileConfig =
+static constexpr const char* asyncChannelFileConfig =
 	"logging.loggers.l1.name = BenchComparison.Async.File\n"
 	"logging.loggers.l1.level = trace\n"
 	"logging.loggers.l1.channel = c1\n"
@@ -1200,7 +1200,7 @@ static const char* asyncChannelFileConfig =
 	"logging.formatters.f1.class = PatternFormatter\n"
 	"logging.formatters.f1.pattern = %s\n";
 
-static const char* fastLoggerFileConfig =
+static constexpr const char* fastLoggerFileConfig =
 	"logging.loggers.l1.name = BenchComparison.Fast.File\n"
 	"logging.loggers.l1.type = fast\n"
 	"logging.loggers.l1.level = trace\n"
@@ -1261,7 +1261,7 @@ BENCHMARK(Loggers_FastLogger_File);
 // Short messages test minimum overhead; long messages test memory/copy costs.
 //
 
-static const char* asyncChannelNullConfig =
+static constexpr const char* asyncChannelNullConfig =
 	"logging.loggers.l1.name = %s\n"
 	"logging.loggers.l1.level = trace\n"
 	"logging.loggers.l1.channel = c1\n"
@@ -1269,7 +1269,7 @@ static const char* asyncChannelNullConfig =
 	"logging.channels.c1.channel = c2\n"
 	"logging.channels.c2.class = NullChannel\n";
 
-static const char* fastLoggerNullConfig =
+static constexpr const char* fastLoggerNullConfig =
 	"logging.loggers.l1.name = %s\n"
 	"logging.loggers.l1.type = fast\n"
 	"logging.loggers.l1.level = trace\n";

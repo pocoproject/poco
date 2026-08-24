@@ -59,7 +59,7 @@ public:
 	~EscapeHTMLIOS();
 		/// Destroys the stream.
 
-	EscapeHTMLStreamBuf* rdbuf();
+	[[nodiscard]] EscapeHTMLStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
 
 protected:

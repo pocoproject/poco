@@ -46,13 +46,13 @@ public:
 
 	KeyValueArgs& operator=(const KeyValueArgs& args) = delete;
 
-	const TKey& key() const
+	[[nodiscard]] const TKey& key() const
 		/// Returns a reference to the key,
 	{
 		return _key;
 	}
 
-	const TValue& value() const
+	[[nodiscard]] const TValue& value() const
 		/// Returns a Reference to the value.
 	{
 		return _value;

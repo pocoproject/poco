@@ -31,30 +31,30 @@ class Net_API PartSource
 	/// to mail messages, as well as for uploading files as part of a HTML form.
 {
 public:
-	virtual std::istream& stream() = 0;
+	[[nodiscard]] virtual std::istream& stream() = 0;
 		/// Returns an input stream for reading the
 		/// part data.
 		///
 		/// Subclasses must override this method.
 
-	virtual const std::string& filename() const;
+	[[nodiscard]] virtual const std::string& filename() const;
 		/// Returns the filename for the part or attachment.
 		///
 		/// May be overridden by subclasses. The default
 		/// implementation returns an empty string.
 
-	const std::string& mediaType() const;
+	[[nodiscard]] const std::string& mediaType() const;
 		/// Returns the MIME media type for this part or attachment.
 
-	MessageHeader& headers();
+	[[nodiscard]] MessageHeader& headers();
 		/// Returns a MessageHeader containing additional header
 		/// fields for the part.
 
-	const MessageHeader& headers() const;
+	[[nodiscard]] const MessageHeader& headers() const;
 		/// Returns a MessageHeader containing additional header
 		/// fields for the part.
 
-	virtual std::streamsize getContentLength() const;
+	[[nodiscard]] virtual std::streamsize getContentLength() const;
 		/// Returns the content length for this part
 		/// which may be UNKNOWN_CONTENT_LENGTH if
 		/// not available.
@@ -62,7 +62,7 @@ public:
 	virtual ~PartSource();
 		/// Destroys the PartSource.
 
-	static const int UNKNOWN_CONTENT_LENGTH;
+	static constexpr int UNKNOWN_CONTENT_LENGTH = -1;
 
 protected:
 	PartSource();

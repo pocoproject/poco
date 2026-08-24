@@ -50,39 +50,39 @@ public:
 	~HTTPServerRequestImpl();
 		/// Destroys the HTTPServerRequestImpl.
 
-	std::istream& stream();
+	[[nodiscard]] std::istream& stream();
 		/// Returns the input stream for reading
 		/// the request body.
 		///
 		/// The stream is valid until the HTTPServerRequestImpl
 		/// object is destroyed.
 
-	const SocketAddress& clientAddress() const;
+	[[nodiscard]] const SocketAddress& clientAddress() const;
 		/// Returns the client's address.
 
-	const SocketAddress& serverAddress() const;
+	[[nodiscard]] const SocketAddress& serverAddress() const;
 		/// Returns the server's address.
 
-	const HTTPServerParams& serverParams() const;
+	[[nodiscard]] const HTTPServerParams& serverParams() const;
 		/// Returns a reference to the server parameters.
 
-	HTTPServerResponse& response() const;
+	[[nodiscard]] HTTPServerResponse& response() const;
 		/// Returns a reference to the associated response.
 
-	bool secure() const;
+	[[nodiscard]] bool secure() const;
 		/// Returns true if the request is using a secure
 		/// connection. Returns false if no secure connection
 		/// is used, or if it is not known whether a secure
 		/// connection is used.
 
-	StreamSocket& socket();
+	[[nodiscard]] StreamSocket& socket();
 		/// Returns a reference to the underlying socket.
 
 	StreamSocket detachSocket();
 		/// Returns the underlying socket after detaching
 		/// it from the server session.
 
-	HTTPSession& session();
+	[[nodiscard]] HTTPSession& session();
 		/// Returns the underlying HTTPServerSession.
 
 private:

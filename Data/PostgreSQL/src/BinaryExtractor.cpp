@@ -122,7 +122,7 @@ namespace
 
 	bool readDate(const OutputParameter& param, Poco::Data::Date& date)
 	{
-		const Poco::Int64 PG_EPOCH = 946684800000000; // Microseconds between Postgres Epoch (2000-01-01) and Unix Epoch (1970-01-01)
+		constexpr Poco::Int64 PG_EPOCH = 946684800000000; // Microseconds between Postgres Epoch (2000-01-01) and Unix Epoch (1970-01-01)
 		Poco::Int32 pgDate; // days since 2000-01-01
 		if (readBinaryValue(param, pgDate))
 		{
@@ -149,7 +149,7 @@ namespace
 
 	bool readDateTime(const OutputParameter& param, Poco::DateTime& dateTime)
 	{
-		const Poco::Int64 PG_EPOCH = 946684800000000; // Microseconds between Postgres Epoch (2000-01-01) and Unix Epoch (1970-01-01)
+		constexpr Poco::Int64 PG_EPOCH = 946684800000000; // Microseconds between Postgres Epoch (2000-01-01) and Unix Epoch (1970-01-01)
 		Poco::Int64 pgDateTime;
 		if (readBinaryValue(param, pgDateTime))
 		{

@@ -21,8 +21,7 @@
 #include "Poco/SharedLibrary.h"
 #include "Poco/UnicodeConverter.h"
 #include <vector>
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #define SECURITY_WIN32
 #include <security.h>
 

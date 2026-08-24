@@ -43,7 +43,6 @@ namespace Poco::Net {
 
 const std::string HTMLForm::ENCODING_URL           = "application/x-www-form-urlencoded";
 const std::string HTMLForm::ENCODING_MULTIPART     = "multipart/form-data";
-const int         HTMLForm::UNKNOWN_CONTENT_LENGTH = -1;
 
 
 class HTMLFormCountingOutputStream: public CountingOutputStream
@@ -288,7 +287,7 @@ void HTMLForm::write(std::ostream& ostr)
 
 void HTMLForm::readUrl(std::istream& istr)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	int fields = 0;
 	int ch = istr.get();
@@ -340,7 +339,7 @@ void HTMLForm::readUrl(std::istream& istr)
 
 void HTMLForm::readMultipart(std::istream& istr, PartHandler& handler)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	int fields = 0;
 	MultipartReader reader(istr, _boundary);

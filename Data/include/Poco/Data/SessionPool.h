@@ -82,7 +82,7 @@ public:
 	~SessionPool();
 		/// Destroys the SessionPool.
 
-	Session get();
+	[[nodiscard]] Session get();
 		/// Returns a Session.
 		///
 		/// If there are unused sessions available, one of the
@@ -94,7 +94,7 @@ public:
 		/// is thrown.
 
 	template <typename T>
-	Session get(const std::string& name, const T& value)
+	[[nodiscard]] Session get(const std::string& name, const T& value)
 		/// Returns a Session with requested property set.
 		/// The property can be different from the default pool
 		/// value, in which case it is reset back to the pool
@@ -108,56 +108,56 @@ public:
 		return s;
 	}
 
-	Session get(const std::string& name, bool value);
+	[[nodiscard]] Session get(const std::string& name, bool value);
 		/// Returns a Session with requested feature set.
 		/// The feature can be different from the default pool
 		/// value, in which case it is reset back to the pool
 		/// value when the session is reclaimed by the pool.
 
-	int capacity() const;
+	[[nodiscard]] int capacity() const;
 		/// Returns the maximum number of sessions the SessionPool will manage.
 
-	int used() const;
+	[[nodiscard]] int used() const;
 		/// Returns the number of sessions currently in use.
 
-	int idle() const;
+	[[nodiscard]] int idle() const;
 		/// Returns the number of idle sessions.
 
-	int connTimeout() const;
+	[[nodiscard]] int connTimeout() const;
 		/// Returns the connection timeout.
 
-	int dead();
+	[[nodiscard]] int dead();
 		/// Returns the number of not connected active sessions.
 
-	int allocated() const;
+	[[nodiscard]] int allocated() const;
 		/// Returns the number of allocated sessions.
 
-	int available() const;
+	[[nodiscard]] int available() const;
 		/// Returns the number of available (idle + remaining capacity) sessions.
 
-	std::string name() const;
+	[[nodiscard]] std::string name() const;
 		/// Returns the name for this pool.
 
-	static std::string name(const std::string& connector,
+	[[nodiscard]] static std::string name(const std::string& connector,
 		const std::string& connectionString);
 	/// Returns the name formatted from supplied arguments as "connector:///connectionString".
 
 	void setFeature(const std::string& name, bool state);
 		/// Sets feature for all the sessions.
 
-	bool getFeature(const std::string& name) const;
+	[[nodiscard]] bool getFeature(const std::string& name) const;
 		/// Returns the requested feature.
 
 	void setProperty(const std::string& name, const Poco::Any& value);
 		/// Sets property for all sessions.
 
-	Poco::Any getProperty(const std::string& name) const;
+	[[nodiscard]] Poco::Any getProperty(const std::string& name) const;
 		/// Returns the requested property.
 
 	void shutdown();
 		/// Shuts down the session pool.
 
-	bool isActive() const;
+	[[nodiscard]] bool isActive() const;
 		/// Returns true if session pool is active (not shut down).
 
 protected:

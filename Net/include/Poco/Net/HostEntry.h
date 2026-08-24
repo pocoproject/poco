@@ -63,14 +63,14 @@ public:
 	~HostEntry();
 		/// Destroys the HostEntry.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns the canonical host name.
 
-	const AliasList& aliases() const;
+	[[nodiscard]] const AliasList& aliases() const;
 		/// Returns a vector containing alias names for
 		/// the host name.
 
-	const AddressList& addresses() const;
+	[[nodiscard]] const AddressList& addresses() const;
 		/// Returns a vector containing the IPAddresses
 		/// for the host.
 

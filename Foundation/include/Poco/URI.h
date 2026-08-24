@@ -118,13 +118,13 @@ public:
 	void clear();
 		/// Clears all parts of the URI.
 
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Returns a string representation of the URI.
 		///
 		/// Characters in the path, query and fragment parts will be
 		/// percent-encoded as necessary.
 
-	const std::string& getScheme() const;
+	[[nodiscard]] const std::string& getScheme() const;
 		/// Returns the scheme part of the URI.
 
 	void setScheme(const std::string& scheme);
@@ -134,19 +134,19 @@ public:
 		/// A list of registered URI schemes can be found
 		/// at <http://www.iana.org/assignments/uri-schemes>.
 
-	const std::string& getUserInfo() const;
+	[[nodiscard]] const std::string& getUserInfo() const;
 		/// Returns the user-info part of the URI.
 
 	void setUserInfo(const std::string& userInfo);
 		/// Sets the user-info part of the URI.
 
-	const std::string& getHost() const;
+	[[nodiscard]] const std::string& getHost() const;
 		/// Returns the host part of the URI.
 
 	void setHost(const std::string& host);
 		/// Sets the host part of the URI.
 
-	unsigned short getPort() const;
+	[[nodiscard]] unsigned short getPort() const;
 		/// Returns the port number part of the URI.
 		///
 		/// If no port number (0) has been specified, the
@@ -157,13 +157,13 @@ public:
 	void setPort(unsigned short port);
 		/// Sets the port number part of the URI.
 
-	unsigned short getSpecifiedPort() const;
+	[[nodiscard]] unsigned short getSpecifiedPort() const;
 		/// Returns the port number part of the URI.
 		///
 		/// If no explicit port number has been specified,
 		/// returns 0.
 
-	std::string getAuthority() const;
+	[[nodiscard]] std::string getAuthority() const;
 		/// Returns the authority part (userInfo, host and port)
 		/// of the URI.
 		///
@@ -175,13 +175,13 @@ public:
 		/// Parses the given authority part for the URI and sets
 		/// the user-info, host, port components accordingly.
 
-	const std::string& getPath() const;
+	[[nodiscard]] const std::string& getPath() const;
 		/// Returns the decoded path part of the URI.
 
 	void setPath(const std::string& path);
 		/// Sets the path part of the URI.
 
-	std::string getQuery() const;
+	[[nodiscard]] std::string getQuery() const;
 		/// Returns the decoded query part of the URI.
 		///
 		/// Note that encoded ampersand characters ('&', "%26")
@@ -214,7 +214,7 @@ public:
 		/// In addition to regular encoding, function also encodes '&' and '=',
 		/// if found in param or val.
 
-	const std::string& getRawQuery() const;
+	[[nodiscard]] const std::string& getRawQuery() const;
 		/// Returns the query string in raw form, which usually
 		/// means percent encoded.
 
@@ -223,7 +223,7 @@ public:
 		///
 		/// The given query string must be properly percent-encoded.
 
-	QueryParameters getQueryParameters(bool plusIsSpace = true) const;
+	[[nodiscard]] QueryParameters getQueryParameters(bool plusIsSpace = true) const;
 		/// Returns the decoded query string parameters as a vector
 		/// of name-value pairs.
 
@@ -233,13 +233,13 @@ public:
 		///
 		/// Calls addQueryParameter() for each parameter name and value.
 
-	std::string getFragment() const;
+	[[nodiscard]] std::string getFragment() const;
 		/// Returns the fragment part of the URI.
 
 	void setFragment(const std::string& fragment);
 		/// Sets the fragment part of the URI.
 
-	std::string getRawFragment() const;
+	[[nodiscard]] std::string getRawFragment() const;
 		/// Returns the fragment part of the URI in raw form.
 
 	void setRawFragment(const std::string& fragment);
@@ -250,10 +250,10 @@ public:
 	void setPathEtc(const std::string& pathEtc);
 		/// Sets the path, query and fragment parts of the URI.
 
-	std::string getPathEtc() const;
+	[[nodiscard]] std::string getPathEtc() const;
 		/// Returns the encoded path, query and fragment parts of the URI.
 
-	std::string getPathAndQuery() const;
+	[[nodiscard]] std::string getPathAndQuery() const;
 		/// Returns the encoded path and query parts of the URI.
 
 	void resolve(const std::string& relativeURI);
@@ -264,30 +264,30 @@ public:
 		/// Resolves the given relative URI against the base URI.
 		/// See section 5.2 of RFC 3986 for the algorithm used.
 
-	bool isRelative() const;
+	[[nodiscard]] bool isRelative() const;
 		/// Returns true if the URI is a relative reference, false otherwise.
 		///
 		/// A relative reference does not contain a scheme identifier.
 		/// Relative references are usually resolved against an absolute
 		/// base reference.
 
-	bool empty() const;
+	[[nodiscard]] bool empty() const;
 		/// Returns true if the URI is empty, false otherwise.
 
-	bool operator == (const URI& uri) const;
+	[[nodiscard]] bool operator == (const URI& uri) const;
 		/// Returns true if both URIs are identical, false otherwise.
 		///
 		/// Two URIs are identical if their scheme, authority,
 		/// path, query and fragment part are identical.
 
-	bool operator == (const std::string& uri) const;
+	[[nodiscard]] bool operator == (const std::string& uri) const;
 		/// Parses the given URI and returns true if both URIs are identical,
 		/// false otherwise.
 
-	bool operator != (const URI& uri) const;
+	[[nodiscard]] bool operator != (const URI& uri) const;
 		/// Returns true if both URIs are identical, false otherwise.
 
-	bool operator != (const std::string& uri) const;
+	[[nodiscard]] bool operator != (const std::string& uri) const;
 		/// Parses the given URI and returns true if both URIs are identical,
 		/// false otherwise.
 
@@ -315,14 +315,14 @@ public:
 		/// (http://www.w3.org/TR/html401/interact/forms.html#h-17.13.4.1)
 
 protected:
-	bool equals(const URI& uri) const;
+	[[nodiscard]] bool equals(const URI& uri) const;
 		/// Returns true if both uri's are equivalent.
 
-	bool isWellKnownPort() const;
+	[[nodiscard]] bool isWellKnownPort() const;
 		/// Returns true if the URI's port number is a well-known one
 		/// (for example, 80, if the scheme is http).
 
-	unsigned short getWellKnownPort() const;
+	[[nodiscard]] unsigned short getWellKnownPort() const;
 		/// Returns the well-known port number for the URI's scheme,
 		/// or 0 if the port number is not known.
 

@@ -60,9 +60,9 @@ public:
 	using Iterator = typename List::iterator;
 	using DFMutex = TMutex;
 
-	static const MsgSizeT BUF_STATUS_IDLE  = 0;
-	static const MsgSizeT BUF_STATUS_BUSY  = -1;
-	static const MsgSizeT BUF_STATUS_ERROR = -2;
+	static constexpr MsgSizeT BUF_STATUS_IDLE  = 0;
+	static constexpr MsgSizeT BUF_STATUS_BUSY  = -1;
+	static constexpr MsgSizeT BUF_STATUS_ERROR = -2;
 
 	UDPHandlerImpl(std::size_t bufListSize = 1000, std::ostream* pErr = nullptr):
 		_thread("UDPHandlerImpl"),
@@ -84,13 +84,13 @@ public:
 		_thread.join();
 	}
 
-	std::size_t blockSize() const
+	[[nodiscard]] std::size_t blockSize() const
 		/// Returns the memory block size.
 	{
 		return _blockSize;
 	}
 
-	char* next(poco_socket_t sock)
+	[[nodiscard]] char* next(poco_socket_t sock)
 		/// Creates the next BufList entry, and returns
 		/// the pointers to the newly created guard/buffer.
 		/// If mutex lock times out, returns null pointer.
@@ -192,13 +192,13 @@ public:
 		_dataReady.set();
 	}
 
-	bool stopped() const
+	[[nodiscard]] bool stopped() const
 		/// Returns true if the handler was signalled to stop.
 	{
 		return _stop == true;
 	}
 
-	bool done() const
+	[[nodiscard]] bool done() const
 		/// Returns true if handler is done (ie. run() thread
 		/// entrypoint end was reached).
 	{
@@ -242,39 +242,39 @@ public:
 		return --_errorBacklog;
 	}
 
-	bool hasData(char*& pBuf)
+	[[nodiscard]] bool hasData(char*& pBuf)
 		/// Returns true if buffer contains data.
 	{
 		typename DFMutex::ScopedLock l(_dfMutex);
 		return *reinterpret_cast<MsgSizeT*>(pBuf) > 0;
 	}
 
-	bool isError(char*& pBuf)
+	[[nodiscard]] bool isError(char*& pBuf)
 		/// Returns true if buffer contains error.
 	{
 		typename DFMutex::ScopedLock l(_dfMutex);
 		return *reinterpret_cast<MsgSizeT*>(pBuf) == BUF_STATUS_ERROR;
 	}
 
-	static Poco::UInt16 offset()
+	[[nodiscard]] static Poco::UInt16 offset()
 		/// Returns buffer data offset.
 	{
 		return sizeof(MsgSizeT) + sizeof(poco_socklen_t) + SocketAddress::MAX_ADDRESS_LENGTH;
 	}
 
-	static MsgSizeT payloadSize(char* buf)
+	[[nodiscard]] static MsgSizeT payloadSize(char* buf)
 	{
 		return *((MsgSizeT*) buf);
 	}
 
-	static SocketAddress address(char* buf)
+	[[nodiscard]] static SocketAddress address(char* buf)
 	{
 		auto* len = reinterpret_cast<poco_socklen_t*>(buf + sizeof(MsgSizeT));
 		auto* pSA = reinterpret_cast<struct sockaddr*>(buf + sizeof(MsgSizeT) + sizeof(poco_socklen_t));
 		return {pSA, *len};
 	}
 
-	static char* payload(char* buf)
+	[[nodiscard]] static char* payload(char* buf)
 		/// Returns pointer to payload.
 		///
 		/// Total message size is S.
@@ -288,7 +288,7 @@ public:
 		return buf + offset();
 	}
 
-	static Poco::StringTokenizer payload(char* buf, char delimiter)
+	[[nodiscard]] static Poco::StringTokenizer payload(char* buf, char delimiter)
 		/// Returns tokenized payload.
 		/// Used when multiple logical messages are contained in a
 		/// single physical message. Messages must be ASCII, as well as
@@ -297,7 +297,7 @@ public:
 		return Poco::StringTokenizer(payload(buf), std::string(1, delimiter), StringTokenizer::TOK_IGNORE_EMPTY);
 	}
 
-	static char* error(char* buf)
+	[[nodiscard]] static char* error(char* buf)
 		/// Returns pointer to the erro message payload.
 		///
 		/// Total message size is S.

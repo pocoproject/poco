@@ -151,7 +151,7 @@ void MongoDBTest::testOpCmdFind()
 			const auto& birthDateTimestamp = doc->get<Poco::Timestamp>("birthdate");
 			Poco::DateTime birthDate(birthDateTimestamp);
 			assertTrue (birthDate.year() == 1969 && birthDate.month() == 3 && birthDate.day() == 9);
-			[[maybe_unused]] const auto& lastupdatedTimestamp = doc->get<Poco::Timestamp>("lastupdated");
+			(void) doc->get<Poco::Timestamp>("lastupdated");
 			assertTrue (doc->isType<NullValue>("unknown"));
 			bool active = doc->get<bool>("active");
 			assertEquals (false, active);

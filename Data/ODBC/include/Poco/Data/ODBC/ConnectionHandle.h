@@ -22,7 +22,7 @@
 #include "Poco/Data/ODBC/EnvironmentHandle.h"
 #include "Poco/Data/ODBC/Error.h"
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 #include <sqltypes.h>
 
@@ -54,41 +54,41 @@ public:
 	bool disconnect();
 		/// Disconnects the handle from database.
 
-	bool isConnected() const;
+	[[nodiscard]] bool isConnected() const;
 		/// Returns true if connected.
 
 	void setTimeout(int timeout);
 		/// Sets the connection timeout in seconds.
 
-	int getTimeout() const;
+	[[nodiscard]] int getTimeout() const;
 		/// Returns the connection timeout in seconds.
 
 	void setLoginTimeout(SQLULEN timeout);
 		/// Sets the login timeout in seconds.
 		/// Must be called before the connection attempt.
 
-	int getLoginTimeout() const;
+	[[nodiscard]] int getLoginTimeout() const;
 		/// Returns the login timeout in seconds.
 		/// Must be called before the connection attempt.
 
-	const SQLHDBC& handle() const;
+	[[nodiscard]] const SQLHDBC& handle() const;
 		/// Returns const reference to handle;
 
-	const SQLHDBC* pHandle() const;
+	[[nodiscard]] const SQLHDBC* pHandle() const;
 		/// Returns const pointer to handle;
 
-	operator const SQLHDBC& () const;
+	[[nodiscard]] operator const SQLHDBC& () const;
 		/// Const conversion operator into reference to native type.
 
-	operator bool();
+	[[nodiscard]] operator bool();
 		/// Returns true if handles are not null.
 		/// True value is not a guarantee that the connection is valid.
 
 private:
-	operator SQLHDBC& ();
+	[[nodiscard]] operator SQLHDBC& ();
 		/// Conversion operator into reference to native type.
 
-	SQLHDBC& handle();
+	[[nodiscard]] SQLHDBC& handle();
 		/// Returns reference to handle;
 
 	void alloc();
@@ -100,20 +100,20 @@ private:
 	void setTimeoutImpl(SQLULEN timeout, SQLINTEGER attribute);
 		/// Sets the timeout for the attribute.
 
-	int getTimeoutImpl(SQLINTEGER attribute) const;
+	[[nodiscard]] int getTimeoutImpl(SQLINTEGER attribute) const;
 		/// Returns the timeout for the attribute.
 
 	void setTimeouts(SQLULEN loginTimeout, SQLULEN timeout);
 
-	bool isUnsupported(const ConnectionError& e) const;
+	[[nodiscard]] bool isUnsupported(const ConnectionError& e) const;
 		/// Returns true if SQLSTATE is "HYC000"
 		/// (Optional feature not implemented)
 
-	bool isGenError(const ConnectionError& e) const;
+	[[nodiscard]] bool isGenError(const ConnectionError& e) const;
 		/// Returns true if SQLSTATE is "HY000"
 		/// (General error)
 
-	bool cantSetAttr(const ConnectionError& e) const;
+	[[nodiscard]] bool cantSetAttr(const ConnectionError& e) const;
 		/// Returns true if SQLSTATE is "HY011"
 		/// (Can't set attribute)
 

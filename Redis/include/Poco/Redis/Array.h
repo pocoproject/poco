@@ -100,7 +100,7 @@ public:
 	Array& addSimpleString(const std::string& value);
 		/// Adds a simple string (can't contain newline characters!).
 
-	const_iterator begin() const;
+	[[nodiscard]] const_iterator begin() const;
 		/// Returns an iterator to the start of the array.
 		///
 		/// Note: this can throw a NullValueException when this is a Null array.
@@ -108,13 +108,13 @@ public:
 	void clear();
 		/// Removes all elements from the array.
 
-	const_iterator end() const;
+	[[nodiscard]] const_iterator end() const;
 		/// Returns an iterator to the end of the array.
 		///
 		/// Note: this can throw a NullValueException when this is a Null array.
 
 	template<typename T>
-	T get(size_t pos) const
+	[[nodiscard]] T get(size_t pos) const
 		/// Returns the element on the given position and tries to convert
 		/// to the template type. A Poco::BadCastException will be thrown when the
 		/// the conversion fails. An Poco::InvalidArgumentException will be thrown
@@ -136,23 +136,23 @@ public:
 		throw BadCastException();
 	}
 
-	int getType(size_t pos) const;
+	[[nodiscard]] int getType(size_t pos) const;
 		/// Returns the type of the element. This can throw a Poco::NullValueException
 		/// when this array is a Null array. An Poco::InvalidArgumentException will
 		/// be thrown when the index is out of range.
 
-	bool isNull() const;
+	[[nodiscard]] bool isNull() const;
 		/// Returns true when this is a Null array.
 
 	void makeNull();
 		/// Turns the array into a Null array. When the array already has some
 		/// elements, the array will be cleared.
 
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Returns the String representation as specified in the
 		/// Redis Protocol specification.
 
-	size_t size() const;
+	[[nodiscard]] size_t size() const;
 		/// Returns the size of the array.
 		///
 		/// Note: this can throw a NullValueException when this is a Null array.
@@ -276,7 +276,7 @@ struct RedisTypeTraits<Array>
 {
 	enum { TypeId = RedisType::REDIS_ARRAY };
 
-	static const char marker = '*';
+	static constexpr char marker = '*';
 
 	static std::string toString(const Array& value)
 	{

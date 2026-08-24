@@ -70,7 +70,7 @@ public:
 	~SessionImpl() override;
 		/// Destroys the SessionImpl.
 
-	Poco::SharedPtr<Poco::Data::StatementImpl> createStatementImpl() override;
+	[[nodiscard]] Poco::SharedPtr<Poco::Data::StatementImpl> createStatementImpl() override;
 		/// Returns an MySQL StatementImpl
 
 	void open(const std::string& connection = "") override;
@@ -82,10 +82,10 @@ public:
 	void reset() override;
 		/// Reset connection with dababase and clears session state, but without disconnecting
 
-	bool isConnected() const override;
+	[[nodiscard]] bool isConnected() const override;
 		/// Returns true if connected, false otherwise.
 
-	bool isGood() const override;
+	[[nodiscard]] bool isGood() const override;
 		/// Returns true iff the database session is good.
 		/// For the session to be considered good:
 		///   - it must be connected
@@ -100,7 +100,7 @@ public:
 	void setConnectionTimeout(std::size_t timeout) override;
 		/// Sets the session connection timeout value.
 
-	std::size_t getConnectionTimeout() const override;
+	[[nodiscard]] std::size_t getConnectionTimeout() const override;
 		/// Returns the session connection timeout value.
 
 	void begin() override;
@@ -112,67 +112,67 @@ public:
 	void rollback() override;
 		/// Aborts a transaction
 
-	bool canTransact() const override;
+	[[nodiscard]] bool canTransact() const override;
 		/// Returns true if session has transaction capabilities.
 
-	bool isTransaction() const override;
+	[[nodiscard]] bool isTransaction() const override;
 		/// Returns true iff a transaction is a transaction is in progress, false otherwise.
 
 	void setTransactionIsolation(Poco::UInt32 ti) override;
 		/// Sets the transaction isolation level.
 
-	Poco::UInt32 getTransactionIsolation() const override;
+	[[nodiscard]] Poco::UInt32 getTransactionIsolation() const override;
 		/// Returns the transaction isolation level.
 
-	bool hasTransactionIsolation(Poco::UInt32 ti) const override;
+	[[nodiscard]] bool hasTransactionIsolation(Poco::UInt32 ti) const override;
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	bool isTransactionIsolation(Poco::UInt32 ti) const override;
+	[[nodiscard]] bool isTransactionIsolation(Poco::UInt32 ti) const override;
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
 	void autoCommit(const std::string&, bool val);
 		/// Sets autocommit property for the session.
 
-	bool isAutoCommit(const std::string& name="") const;
+	[[nodiscard]] bool isAutoCommit(const std::string& name="") const;
 		/// Returns autocommit property value.
 
 	void setInsertId(const std::string&, const Poco::Any&);
 		/// Try to set insert id - do nothing.
 
-	Poco::Any getInsertId(const std::string&) const;
+	[[nodiscard]] Poco::Any getInsertId(const std::string&) const;
 		/// Get insert id
 
 	void setFailIfInnoReadOnly(const std::string&, bool value);
 		/// Sets the "failIfInnoReadOnly" feature. If set, isGood() will
 		/// return false if the database is in read-only mode.
 
-	bool getFailIfInnoReadOnly(const std::string&) const;
+	[[nodiscard]] bool getFailIfInnoReadOnly(const std::string&) const;
 		/// Returns the state of the "failIfInnoReadOnly" feature.
 
 	void setLastError(int err);
 		/// Sets an error code. If a non-zero error code is set, the session
 		/// is considered bad.
 
-	int getLastError() const;
+	[[nodiscard]] int getLastError() const;
 		/// Returns the last set error code.
 
-	SessionHandle& handle();
+	[[nodiscard]] SessionHandle& handle();
 		// Get handle
 
-	const std::string& connectorName() const override;
+	[[nodiscard]] const std::string& connectorName() const override;
 		/// Returns the name of the connector.
 
 private:
 	template <typename T>
-	static inline T& getValue(MYSQL_BIND* pResult, T& val)
+	[[nodiscard]] static inline T& getValue(MYSQL_BIND* pResult, T& val)
 	{
 		return val = *((T*) pResult->buffer);
 	}
 
 	template <typename T>
-	T& getSetting(const std::string& name, T& val) const
+	[[nodiscard]] T& getSetting(const std::string& name, T& val) const
 		/// Returns required setting.
 		/// Limited to one setting at a time.
 	{
@@ -187,7 +187,8 @@ private:
 		else
 			throw InvalidArgumentException("No data returned.");
 
-		ex.execute(); ex.fetch();
+		ex.execute();
+		(void) ex.fetch();
 		MYSQL_BIND* pResult = metadata.row();
 		return getValue<T>(pResult, val);
 	}

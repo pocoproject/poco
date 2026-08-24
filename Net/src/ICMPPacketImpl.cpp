@@ -32,11 +32,6 @@ using Poco::Int32;
 namespace Poco::Net {
 
 
-const UInt16 ICMPPacketImpl::MAX_PACKET_SIZE  = 65535;
-const UInt16 ICMPPacketImpl::MAX_PAYLOAD_SIZE = 65507;
-const UInt16 ICMPPacketImpl::MAX_SEQ_VALUE    = 65535;
-
-
 ICMPPacketImpl::ICMPPacketImpl(int dataSize):
 	_seq(0),
 	_pPacket(new UInt8[MAX_PACKET_SIZE]),

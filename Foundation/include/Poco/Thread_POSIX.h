@@ -61,43 +61,43 @@ public:
 	ThreadImpl();
 	~ThreadImpl();
 
-	TIDImpl tidImpl() const;
+	[[nodiscard]] TIDImpl tidImpl() const;
 	void setNameImpl(const std::string& threadName);
-	std::string getNameImpl() const;
+	[[nodiscard]] std::string getNameImpl() const;
 #ifndef POCO_NO_THREADNAME
-	std::string getOSThreadNameImpl();
+	[[nodiscard]] std::string getOSThreadNameImpl();
 		/// Returns the thread's name, expressed as an operating system
 		/// specific name value. Return empty string if thread is not running.
 		/// For test used only.
 #endif
 	void setPriorityImpl(int prio);
-	int getPriorityImpl() const;
+	[[nodiscard]] int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio, int policy = SCHED_OTHER);
-	int getOSPriorityImpl() const;
-	static int getMinOSPriorityImpl(int policy);
-	static int getMaxOSPriorityImpl(int policy);
+	[[nodiscard]] int getOSPriorityImpl() const;
+	[[nodiscard]] static int getMinOSPriorityImpl(int policy);
+	[[nodiscard]] static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
-	int getStackSizeImpl() const;
+	[[nodiscard]] int getStackSizeImpl() const;
 	void setSignalMaskImpl(uint32_t sigMask);
 	void startImpl(SharedPtr<Runnable> pTarget);
 	void joinImpl();
 	bool joinImpl(long milliseconds);
-	bool isRunningImpl() const;
+	[[nodiscard]] bool isRunningImpl() const;
 	static void yieldImpl();
-	static ThreadImpl* currentImpl();
-	static TIDImpl currentTidImpl();
-	static long currentOsTidImpl();
+	[[nodiscard]] static ThreadImpl* currentImpl();
+	[[nodiscard]] static TIDImpl currentTidImpl();
+	[[nodiscard]] static long currentOsTidImpl();
 #ifndef POCO_NO_THREADNAME
 	static void setCurrentNameImpl(const std::string& name);
-	static std::string getCurrentNameImpl();
+	[[nodiscard]] static std::string getCurrentNameImpl();
 #endif
 	bool setAffinityImpl(int coreID);
-	int getAffinityImpl() const;
+	[[nodiscard]] int getAffinityImpl() const;
 
 protected:
-	static void* runnableEntry(void* pThread);
-	static int mapPrio(int prio, int policy = SCHED_OTHER);
-	static int reverseMapPrio(int osPrio, int policy = SCHED_OTHER);
+	[[nodiscard]] static void* runnableEntry(void* pThread);
+	[[nodiscard]] static int mapPrio(int prio, int policy = SCHED_OTHER);
+	[[nodiscard]] static int reverseMapPrio(int osPrio, int policy = SCHED_OTHER);
 
 private:
 	class CurrentThreadHolder
@@ -112,7 +112,7 @@ private:
 		{
 			pthread_key_delete(_key);
 		}
-		ThreadImpl* get() const
+		[[nodiscard]] ThreadImpl* get() const
 		{
 			return reinterpret_cast<ThreadImpl*>(pthread_getspecific(_key));
 		}

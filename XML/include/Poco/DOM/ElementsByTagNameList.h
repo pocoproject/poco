@@ -32,8 +32,8 @@ class XML_API ElementsByTagNameList: public NodeList
 	// Element::getElementsByTagName().
 {
 public:
-	Node* item(unsigned long index) const;
-	unsigned long length() const;
+	[[nodiscard]] Node* item(unsigned long index) const;
+	[[nodiscard]] unsigned long length() const;
 	void autoRelease();
 
 protected:
@@ -58,8 +58,8 @@ class XML_API ElementsByTagNameListNS: public NodeList
 	// Element::getElementsByTagNameNS().
 {
 public:
-	virtual Node* item(unsigned long index) const;
-	virtual unsigned long length() const;
+	[[nodiscard]] virtual Node* item(unsigned long index) const;
+	[[nodiscard]] virtual unsigned long length() const;
 	virtual void autoRelease();
 
 protected:

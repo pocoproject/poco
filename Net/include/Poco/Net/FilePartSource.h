@@ -54,13 +54,13 @@ public:
 	~FilePartSource();
 		/// Destroys the FilePartSource.
 
-	std::istream& stream();
+	[[nodiscard]] std::istream& stream();
 		/// Returns a file input stream for the given file.
 
-	const std::string& filename() const;
+	[[nodiscard]] const std::string& filename() const;
 		/// Returns the filename portion of the path.
 
-	std::streamsize getContentLength() const;
+	[[nodiscard]] std::streamsize getContentLength() const;
 		/// Returns the file size.
 
 private:

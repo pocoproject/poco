@@ -66,7 +66,7 @@ private:
 };
 
 
-static const char* parserEventStrings[] =
+static constexpr const char* parserEventStrings[] =
 {
 	"start element",
 	"end element",

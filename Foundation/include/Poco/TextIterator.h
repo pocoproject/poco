@@ -91,13 +91,13 @@ public:
 	TextIterator operator ++ (int);
 		/// Postfix increment operator.
 
-	bool operator == (const TextIterator& it) const;
+	[[nodiscard]] bool operator == (const TextIterator& it) const;
 		/// Compares two iterators for equality.
 
-	bool operator != (const TextIterator& it) const;
+	[[nodiscard]] bool operator != (const TextIterator& it) const;
 		/// Compares two iterators for inequality.
 
-	TextIterator end() const;
+	[[nodiscard]] TextIterator end() const;
 		/// Returns the end iterator for the range handled
 		/// by the iterator.
 

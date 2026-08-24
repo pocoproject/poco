@@ -57,7 +57,7 @@ public:
 protected:
 	int readFromDevice();
 	int writeToDevice(char c);
-	int readOne();
+	[[nodiscard]] int readOne();
 
 private:
 	enum State
@@ -101,7 +101,7 @@ public:
 		/// Writes the terminating period, followed by
 		/// CR-LF.
 
-	MailStreamBuf* rdbuf();
+	[[nodiscard]] MailStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
 
 protected:

@@ -60,10 +60,10 @@ public:
 		///
 		/// Can only be used if no labels have been defined.
 
-	HistogramData data() const;
+	[[nodiscard]] HistogramData data() const;
 		/// Returns the histogram's data.
 
-	const std::vector<double>& bucketBounds() const;
+	[[nodiscard]] const std::vector<double>& bucketBounds() const;
 		/// Returns the buckets upper bounds
 
 private:
@@ -156,7 +156,7 @@ public:
 		/// Must only be set once, immediately after creating
 		/// the Histogram.
 
-	const std::vector<double> buckets() const;
+	[[nodiscard]] const std::vector<double> buckets() const;
 		/// Returns the configured bucket upper bounds.
 
 	void observe(double value);
@@ -170,11 +170,11 @@ public:
 		///
 		/// Can only be used if no labels have been defined.
 
-	HistogramData data() const;
+	[[nodiscard]] HistogramData data() const;
 		/// Returns the histogram's data.
 
 	// LabeledMetricImpl
-	std::unique_ptr<HistogramSample> createSample() const override;
+	[[nodiscard]] std::unique_ptr<HistogramSample> createSample() const override;
 
 	// Collector
 	void exportTo(Exporter& exporter) const override;

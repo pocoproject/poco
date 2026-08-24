@@ -46,7 +46,7 @@ struct Content
 	{
 	}
 
-	operator value() const
+	[[nodiscard]] operator value() const
 	{
 		return _v;
 	}

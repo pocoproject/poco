@@ -73,7 +73,7 @@ public:
 		///
 		/// Flushes the buffer, but does not close the pipe.
 
-	PipeStreamBuf* rdbuf();
+	[[nodiscard]] PipeStreamBuf* rdbuf();
 		/// Returns a pointer to the internal PipeStreamBuf.
 
 	void close();

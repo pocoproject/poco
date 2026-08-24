@@ -93,15 +93,15 @@ extern "C"	\
 
 
 #define POCO_EXPORT_CLASS(cls) \
-	pManifest->insert(new Poco::MetaObject<cls, BaseType>(#cls));
+	(void) pManifest->insert(new Poco::MetaObject<cls, BaseType>(#cls));
 
 
 #define POCO_EXPORT_INTERFACE(cls, itf) \
-	pManifest->insert(new Poco::MetaObject<cls, BaseType>(itf));
+	(void) pManifest->insert(new Poco::MetaObject<cls, BaseType>(itf));
 
 
 #define POCO_EXPORT_SINGLETON(cls) \
-	pManifest->insert(new Poco::MetaSingleton<cls, BaseType>(#cls));
+	(void) pManifest->insert(new Poco::MetaSingleton<cls, BaseType>(#cls));
 
 
 #endif // Foundation_ClassLibrary_INCLUDED

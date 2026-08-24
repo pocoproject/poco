@@ -42,13 +42,13 @@ public:
 	~LoggingRegistry();
 		/// Destroys the LoggingRegistry.
 
-	Channel::Ptr channelForName(const std::string& name) const;
+	[[nodiscard]] Channel::Ptr channelForName(const std::string& name) const;
 		/// Returns the Channel object which has been registered
 		/// under the given name.
 		///
 		/// Throws a NotFoundException if the name is unknown.
 
-	Formatter::Ptr formatterForName(const std::string& name) const;
+	[[nodiscard]] Formatter::Ptr formatterForName(const std::string& name) const;
 		/// Returns the Formatter object which has been registered
 		/// under the given name.
 		///
@@ -85,7 +85,7 @@ public:
 	void clear();
 		/// Unregisters all registered channels and formatters.
 
-	static LoggingRegistry& defaultRegistry();
+	[[nodiscard]] static LoggingRegistry& defaultRegistry();
 		/// Returns a reference to the default
 		/// LoggingRegistry.
 

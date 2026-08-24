@@ -35,7 +35,7 @@ class ActiveRecordLib_API ActiveRecordBase: public Poco::RefCountedObject
 public:
 	using Ptr = Poco::AutoPtr<ActiveRecordBase>;
 
-	virtual std::string toString() const = 0;
+	[[nodiscard]] virtual std::string toString() const = 0;
 		/// Returns a string representation of the object for
 		/// debugging purposes. The default implementation returns the ID.
 
@@ -59,15 +59,15 @@ public:
 	void detach();
 		/// Detaches the object from its Context.
 
-	Context::Ptr context() const;
+	[[nodiscard]] Context::Ptr context() const;
 		/// Returns the Context this object is attached to,
 		/// or a null pointer if the object has not been
 		/// attached to a Context.
 
-	virtual bool isValid() const;
+	[[nodiscard]] virtual bool isValid() const;
 		/// Returns true iff the object is valid ID, otherwise false.
 
-	bool isAttached() const;
+	[[nodiscard]] bool isAttached() const;
 		/// Returns true iff the object has been attached to a Context, otherwise false.
 
 protected:

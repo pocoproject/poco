@@ -111,43 +111,43 @@ public:
 	void setEscapeUnicode(bool escape = true);
 		/// Sets the flag for escaping unicode.
 
-	bool getEscapeUnicode() const;
+	[[nodiscard]] bool getEscapeUnicode() const;
 		/// Returns the flag for escaping unicode.
-	
+
 	void setLowercaseHex(bool lowercaseHex);
 		/// Sets the flag for using lowercase hex numbers
 
-	bool getLowercaseHex() const;
+	[[nodiscard]] bool getLowercaseHex() const;
 		/// Returns the flag for using lowercase hex numbers
-	
-	Iterator begin();
+
+	[[nodiscard]] Iterator begin();
 		/// Returns begin iterator for values.
 
-	ConstIterator begin() const;
+	[[nodiscard]] ConstIterator begin() const;
 		/// Returns const begin iterator for values.
 
-	Iterator end();
+	[[nodiscard]] Iterator end();
 		/// Returns end iterator for values.
 
-	ConstIterator end() const;
+	[[nodiscard]] ConstIterator end() const;
 		/// Returns const end iterator for values.
 
-	Dynamic::Var get(const std::string& key) const;
+	[[nodiscard]] Dynamic::Var get(const std::string& key) const;
 		/// Retrieves a property. An empty value is
 		/// returned when the property doesn't exist.
 
-	Array::Ptr getArray(const std::string& key) const;
+	[[nodiscard]] Array::Ptr getArray(const std::string& key) const;
 		/// Returns a SharedPtr to an array when the property
 		/// is an array. An empty SharedPtr is returned when
 		/// the element doesn't exist or is not an array.
 
-	Object::Ptr getObject(const std::string& key) const;
+	[[nodiscard]] Object::Ptr getObject(const std::string& key) const;
 		/// Returns a SharedPtr to an object when the property
 		/// is an object. An empty SharedPtr is returned when
 		/// the property doesn't exist or is not an object
 
-	template<typename T>
-	T getValue(const std::string& key) const
+	template <typename T>
+	[[nodiscard]] T getValue(const std::string& key) const
 		/// Retrieves the property with the given name and will
 		/// try to convert the value to the given template type.
 		/// The convert<T>() method of Var is called
@@ -158,8 +158,8 @@ public:
 		return value.convert<T>();
 	}
 
-	template<typename T>
-	Poco::Nullable<T> getNullableValue(const std::string& key) const
+	template <typename T>
+	[[nodiscard]] Poco::Nullable<T> getNullableValue(const std::string& key) const
 		/// Retrieves the property with the given name and will
 		/// try to convert the value to the given template type.
 		///
@@ -177,29 +177,29 @@ public:
 	void getNames(NameList& names) const;
 		/// Fills the supplied vector with all property names.
 
-	NameList getNames() const;
+	[[nodiscard]] NameList getNames() const;
 		/// Returns all property names.
 
-	bool has(const std::string& key) const;
+	[[nodiscard]] bool has(const std::string& key) const;
 		/// Returns true when the given property exists.
 
-	bool isArray(const std::string& key) const;
+	[[nodiscard]] bool isArray(const std::string& key) const;
 		/// Returns true when the given property contains an array.
 
-	bool isArray(const ConstIterator& it) const;
+	[[nodiscard]] bool isArray(const ConstIterator& it) const;
 		/// Returns true when the given property contains an array.
 
-	bool isNull(const std::string& key) const;
+	[[nodiscard]] bool isNull(const std::string& key) const;
 		/// Returns true when the given property contains a null value.
 
-	bool isObject(const std::string& key) const;
+	[[nodiscard]] bool isObject(const std::string& key) const;
 		/// Returns true when the given property contains an object.
 
-	bool isObject(const ConstIterator& it) const;
+	[[nodiscard]] bool isObject(const ConstIterator& it) const;
 		/// Returns true when the given property contains an object.
 
-	template<typename T>
-	T optValue(const std::string& key, const T& def) const
+	template <typename T>
+	[[nodiscard]] T optValue(const std::string& key, const T& def) const
 		/// Returns the value of a property when the property exists
 		/// and can be converted to the given type. Otherwise
 		/// def will be returned.
@@ -220,7 +220,7 @@ public:
 		return value;
 	}
 
-	std::size_t size() const;
+	[[nodiscard]] std::size_t size() const;
 		/// Returns the number of properties.
 
 	Object& set(const std::string& key, const Dynamic::Var& value);
@@ -235,16 +235,16 @@ public:
 	void remove(const std::string& key);
 		/// Removes the property with the given key.
 
-	static Poco::DynamicStruct makeStruct(const Object::Ptr& obj);
+	[[nodiscard]] static Poco::DynamicStruct makeStruct(const Object::Ptr& obj);
 		/// Utility function for creation of struct.
 
-	static Poco::OrderedDynamicStruct makeOrderedStruct(const Object::Ptr& obj);
+	[[nodiscard]] static Poco::OrderedDynamicStruct makeOrderedStruct(const Object::Ptr& obj);
 		/// Utility function for creation of ordered struct.
 
-	operator const Poco::OrderedDynamicStruct& () const;
+	[[nodiscard]] operator const Poco::OrderedDynamicStruct& () const;
 		/// Cast operator to Poco::OrderedDynamiStruct.
 
-	operator const Poco::DynamicStruct& () const;
+	[[nodiscard]] operator const Poco::DynamicStruct& () const;
 		/// Cast operator to Poco::DynamiStruct.
 
 	void clear();
@@ -303,7 +303,7 @@ private:
 	}
 
 	template <typename S>
-	static S makeStructImpl(const Object::Ptr& obj)
+	[[nodiscard]] static S makeStructImpl(const Object::Ptr& obj)
 	{
 		S ds;
 

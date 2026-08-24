@@ -142,7 +142,7 @@ public:
 		/// attaches the SocketImpl from the other socket and
 		/// increments the reference count of the SocketImpl.
 
-	bool havePeerCertificate() const;
+	[[nodiscard]] bool havePeerCertificate() const;
 		/// Returns true iff the peer has presented a
 		/// certificate.
 
@@ -155,7 +155,7 @@ public:
 	void setPeerHostName(const std::string& hostName);
 		/// Sets the peer's host name used for certificate validation.
 
-	const std::string& getPeerHostName() const;
+	[[nodiscard]] const std::string& getPeerHostName() const;
 		/// Returns the peer's host name used for certificate validation.
 
 	static SecureStreamSocket attach(const StreamSocket& streamSocket);
@@ -196,7 +196,7 @@ public:
 		/// caching is enabled for the given Context, and the server
 		/// agrees to reuse the session).
 
-	Context::Ptr context() const;
+	[[nodiscard]] Context::Ptr context() const;
 		/// Returns the SSL context used by this socket.
 
 	void setLazyHandshake(bool flag = true);
@@ -204,7 +204,7 @@ public:
 		/// will be performed the first time date is sent or
 		/// received over the connection.
 
-	bool getLazyHandshake() const;
+	[[nodiscard]] bool getLazyHandshake() const;
 		/// Returns true if setLazyHandshake(true) has been called.
 
 	void verifyPeerCertificate();
@@ -234,7 +234,7 @@ public:
 		/// handshake. In this case, completeHandshake() should be called
 		/// again, after the necessary condition has been met.
 
-	Session::Ptr currentSession();
+	[[nodiscard]] Session::Ptr currentSession();
 		/// Returns the SSL session of the current connection,
 		/// for reuse in a future connection (if session caching
 		/// is enabled).
@@ -251,7 +251,7 @@ public:
 		///
 		/// Must be called before connect() to be effective.
 
-	bool sessionWasReused();
+	[[nodiscard]] bool sessionWasReused();
 		/// Returns true iff a reused session was negotiated during
 		/// the handshake.
 

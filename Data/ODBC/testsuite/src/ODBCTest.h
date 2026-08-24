@@ -227,7 +227,7 @@ protected:
 
 private:
 	static Drivers    _drivers;
-	static const bool _bindValues[8];
+	static constexpr bool _bindValues[8] = {true, true, true, false, false, true, false, false};
 	SessionPtr        _pSession;
 	ExecPtr           _pExecutor;
 	std::string&      _rDSN;

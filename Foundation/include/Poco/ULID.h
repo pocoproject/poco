@@ -57,13 +57,13 @@ public:
 	void parse(const std::string& ulid);
 		/// Parses the ULID from its string representation.
 
-	bool tryParse(const std::string& ulid);
+	[[nodiscard]] bool tryParse(const std::string& ulid);
 		/// Tries to interpret the given string as an ULID.
 		/// If the ULID is syntactically valid, assigns the
 		/// members and returns true. Otherwise leaves the
 		/// object unchanged and returns false.
 
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Returns a string representation of the ULID, 
 		/// using Crockford's Base 32 encoding.
 
@@ -79,37 +79,37 @@ public:
 		/// The buffer need not be aligned.
 		/// There must have room for at least 16 bytes.
 
-	Poco::UInt64 time() const;
+	[[nodiscard]] Poco::UInt64 time() const;
 		/// Returns the 48-bit time part of the ULID
 		/// (milliseconds since Unix epoch).
 
-	Poco::UInt16 randomHigh() const;
+	[[nodiscard]] Poco::UInt16 randomHigh() const;
 		/// Returns the most significant 16 bits of the 80-bit
 		/// random part of the ULID.
 
-	Poco::UInt64 randomLow() const;
+	[[nodiscard]] Poco::UInt64 randomLow() const;
 		/// Returns the least significant 64 bits of the 80-bit
 		/// random part of the ULID.
 
-	bool operator == (const ULID& ulid) const;
-	bool operator != (const ULID& ulid) const;
-	bool operator <  (const ULID& ulid) const;
-	bool operator <= (const ULID& ulid) const;
-	bool operator >  (const ULID& ulid) const;
-	bool operator >= (const ULID& ulid) const;
+	[[nodiscard]] bool operator == (const ULID& ulid) const;
+	[[nodiscard]] bool operator != (const ULID& ulid) const;
+	[[nodiscard]] bool operator <  (const ULID& ulid) const;
+	[[nodiscard]] bool operator <= (const ULID& ulid) const;
+	[[nodiscard]] bool operator >  (const ULID& ulid) const;
+	[[nodiscard]] bool operator >= (const ULID& ulid) const;
 
-	bool isNull() const;
+	[[nodiscard]] bool isNull() const;
 		/// Returns true iff the ULID is nil (in other words,
 		/// consists of all zeros).
 
-	static const ULID& null();
+	[[nodiscard]] static const ULID& null();
 		/// Returns a null/nil ULID.
 
 protected:
-	int compare(const ULID& ulid) const;
+	[[nodiscard]] int compare(const ULID& ulid) const;
 
 	template <typename T>
-	static T decode(char c)
+	[[nodiscard]] static T decode(char c)
 	{
 		return static_cast<T>(REVERSE_ENCODING[static_cast<unsigned char>(c)]);
 	}

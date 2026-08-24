@@ -54,17 +54,17 @@ public:
 	void checkConsistency();
 		/// Check archive's consistency
 
-	FileInfos::const_iterator fileInfoBegin() const;
+	[[nodiscard]] FileInfos::const_iterator fileInfoBegin() const;
 
-	FileInfos::const_iterator fileInfoEnd() const;
+	[[nodiscard]] FileInfos::const_iterator fileInfoEnd() const;
 
-	FileHeaders::const_iterator findHeader(const std::string& fileName) const;
+	[[nodiscard]] FileHeaders::const_iterator findHeader(const std::string& fileName) const;
 
-	FileHeaders::const_iterator headerBegin() const;
+	[[nodiscard]] FileHeaders::const_iterator headerBegin() const;
 
-	FileHeaders::const_iterator headerEnd() const;
+	[[nodiscard]] FileHeaders::const_iterator headerEnd() const;
 
-	const std::string& getZipComment() const;
+	[[nodiscard]] const std::string& getZipComment() const;
 
 private:
 	void parse(std::istream& in, ParseCallback& pc);

@@ -36,18 +36,18 @@ class Util_API AbstractConfigurationView: public AbstractConfiguration
 public:
 	AbstractConfigurationView(const std::string& prefix, AbstractConfiguration::Ptr pConfig);
 
-	const std::string& prefix() const { return _prefix; }
+	[[nodiscard]] const std::string& prefix() const { return _prefix; }
 
 protected:
 	void setRaw(const std::string& key, const std::string& value) override;
 	void enumerate(const std::string& key, Keys& range) const override;
 	void removeRaw(const std::string& key) override;
 
-	std::string translateKey(const std::string& key) const;
+	[[nodiscard]] std::string translateKey(const std::string& key) const;
 
 	~AbstractConfigurationView();
 
-	const AbstractConfiguration::Ptr& pConfig() const { return _pConfig; }
+	[[nodiscard]] const AbstractConfiguration::Ptr& pConfig() const { return _pConfig; }
 
 private:
 	std::string _prefix;
@@ -89,7 +89,7 @@ public:
 	~ConfigurationView();
 
 protected:
-	bool getRaw(const std::string& key, std::string& value) const override;
+	[[nodiscard]] bool getRaw(const std::string& key, std::string& value) const override;
 };
 
 

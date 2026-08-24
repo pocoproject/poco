@@ -323,7 +323,7 @@ private:
 	float _maximumAmplificationFactor;
 	Poco::UInt64 _activationThresholdBytes;
 
-	static const int PARSE_BUFFER_SIZE;
+	static constexpr int PARSE_BUFFER_SIZE = 4096;
 	static const XMLString EMPTY_STRING;
 };
 

@@ -676,7 +676,7 @@ void PropertyFileConfigurationTest::testSaveRemovesLastIncludedKey()
 	AutoPtr<PropertyFileConfiguration> pReloaded = new PropertyFileConfiguration(rootFile.path());
 	try
 	{
-		pReloaded->getString("extra.prop1");
+		(void) pReloaded->getString("extra.prop1");
 		fail("Expected NotFoundException");
 	}
 	catch (Poco::NotFoundException&) {}
@@ -732,7 +732,7 @@ void PropertyFileConfigurationTest::testSaveRemovesRootKey()
 	assertTrue (pReloaded->getString("root.keep") == "keepValue");
 	try
 	{
-		pReloaded->getString("root.drop");
+		(void) pReloaded->getString("root.drop");
 		fail("Expected NotFoundException");
 	}
 	catch (Poco::NotFoundException&) {}
@@ -1064,7 +1064,7 @@ void PropertyFileConfigurationTest::testIncludeManagement()
 	// Keys should be removed
 	try
 	{
-		pConf->getString("extra.key3");
+		(void) pConf->getString("extra.key3");
 		fail("Expected NotFoundException");
 	}
 	catch (Poco::NotFoundException&) {}

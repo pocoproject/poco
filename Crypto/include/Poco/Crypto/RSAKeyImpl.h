@@ -78,10 +78,10 @@ public:
 		/// Destroys the RSAKeyImpl.
 
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
-	EVP_PKEY* getEVPPKey();
+	[[nodiscard]] EVP_PKEY* getEVPPKey();
 		/// Returns the OpenSSL EVP_PKEY object.
 
-	const EVP_PKEY* getEVPPKey() const;
+	[[nodiscard]] const EVP_PKEY* getEVPPKey() const;
 		/// Returns the OpenSSL EVP_PKEY object.
 #endif
 
@@ -89,26 +89,26 @@ public:
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	POCO_DEPRECATED("use getEVPPKey() instead")
 #endif
-	RSA* getRSA();
+	[[nodiscard]] RSA* getRSA();
 		/// Returns the OpenSSL RSA object.
 
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	POCO_DEPRECATED("use getEVPPKey() instead")
 #endif
-	const RSA* getRSA() const;
+	[[nodiscard]] const RSA* getRSA() const;
 		/// Returns the OpenSSL RSA object.
 #endif
 
-	int size() const;
+	[[nodiscard]] int size() const;
 		/// Returns the RSA modulus size.
 
-	ByteVec modulus() const;
+	[[nodiscard]] ByteVec modulus() const;
 		/// Returns the RSA modulus.
 
-	ByteVec encryptionExponent() const;
+	[[nodiscard]] ByteVec encryptionExponent() const;
 		/// Returns the RSA encryption exponent.
 
-	ByteVec decryptionExponent() const;
+	[[nodiscard]] ByteVec decryptionExponent() const;
 		/// Returns the RSA decryption exponent.
 
 	void save(const std::string& publicKeyFile,
@@ -136,12 +136,12 @@ private:
 	static void ensureRSAKey(EVP_PKEY* pKey, const std::string& context);
 		/// Verifies pKey is an RSA key; frees pKey and throws if not.
 
-	ByteVec keyParam(const char* name, bool clearFree = false) const;
+	[[nodiscard]] ByteVec keyParam(const char* name, bool clearFree = false) const;
 		/// Extracts a BIGNUM parameter from _pEVPPKey and returns it as ByteVec.
 
 	EVP_PKEY* _pEVPPKey;
 #else
-	static ByteVec convertToByteVec(const BIGNUM* bn);
+	[[nodiscard]] static ByteVec convertToByteVec(const BIGNUM* bn);
 
 	RSA* _pRSA;
 #endif

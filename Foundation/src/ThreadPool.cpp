@@ -154,7 +154,7 @@ void PooledThread::activate()
 
 void PooledThread::release()
 {
-	const long JOIN_TIMEOUT = 10000;
+	constexpr long JOIN_TIMEOUT = 10000;
 
 	_mutex.lock();
 	_pTarget = nullptr;
@@ -175,7 +175,7 @@ void PooledThread::release()
 void PooledThread::run()
 {
 	_started.set();
-	for (;;)
+	while (true)
 	{
 		_targetReady.wait();
 		_mutex.lock();

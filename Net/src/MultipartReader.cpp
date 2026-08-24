@@ -198,7 +198,7 @@ std::streamsize MultipartStreamBuf::readFromDevice(char* buffer, std::streamsize
 
 std::streamsize MultipartStreamBuf::readContent(char* buffer, std::streamsize length)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 	std::streambuf& buf = *_istr.rdbuf();
 
 	// Content-Length fast path: bulk read
@@ -581,7 +581,7 @@ void MultipartReader::guessBoundary()
 {
 	// Read directly from _istr -- the ReadWindow is not yet created
 	// (boundary length needed for putback area sizing)
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 	int ch = _istr.get();
 	while (Poco::Ascii::isSpace(ch))
 		ch = _istr.get();
@@ -620,8 +620,8 @@ void MultipartReader::parseHeader(MessageHeader& messageHeader)
 bool MultipartReader::readLine(std::string& line, std::string::size_type n)
 {
 	// Called before window creation (during findFirstBoundary) -- read from _istr
-	static const int eof = std::char_traits<char>::eof();
-	static const int maxLength = 1024;
+	static constexpr int eof = std::char_traits<char>::eof();
+	static constexpr int maxLength = 1024;
 
 	line.clear();
 	int ch = _istr.peek();

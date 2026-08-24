@@ -122,12 +122,12 @@ public:
 			}
 		}
 
-		bool operator == (const ConstIterator& it) const
+		[[nodiscard]] bool operator == (const ConstIterator& it) const
 		{
 			return _vecIt == it._vecIt && (_vecIt == _endIt || _buckIt == it._buckIt);
 		}
 
-		bool operator != (const ConstIterator& it) const
+		[[nodiscard]] bool operator != (const ConstIterator& it) const
 		{
 			return _vecIt != it._vecIt || (_vecIt != _endIt && _buckIt != it._buckIt);
 		}
@@ -272,7 +272,7 @@ public:
 		swap(_size, table._size);
 	}
 
-	ConstIterator begin() const
+	[[nodiscard]] ConstIterator begin() const
 		/// Returns an iterator pointing to the first entry, if one exists.
 	{
 		BucketVecIterator it(_buckets.begin());
@@ -287,13 +287,13 @@ public:
 			return ConstIterator(it, itEnd, it->begin());
 	}
 
-	ConstIterator end() const
+	[[nodiscard]] ConstIterator end() const
 		/// Returns an iterator pointing to the end of the table.
 	{
 		return ConstIterator(_buckets.end(), _buckets.end(), _buckets.front().end());
 	}
 
-	Iterator begin()
+	[[nodiscard]] Iterator begin()
 		/// Returns an iterator pointing to the first entry, if one exists.
 	{
 		BucketVecIterator it(_buckets.begin());
@@ -308,13 +308,13 @@ public:
 			return Iterator(it, itEnd, it->begin());
 	}
 
-	Iterator end()
+	[[nodiscard]] Iterator end()
 		/// Returns an iterator pointing to the end of the table.
 	{
 		return Iterator(_buckets.end(), _buckets.end(), _buckets.front().end());
 	}
 
-	ConstIterator find(const Value& value) const
+	[[nodiscard]] ConstIterator find(const Value& value) const
 		/// Finds an entry in the table.
 	{
 		std::size_t addr = bucketAddress(value);
@@ -326,7 +326,7 @@ public:
 			return end();
 	}
 
-	Iterator find(const Value& value)
+	[[nodiscard]] Iterator find(const Value& value)
 		/// Finds an entry in the table.
 	{
 		std::size_t addr = bucketAddress(value);
@@ -338,7 +338,7 @@ public:
 			return end();
 	}
 
-	std::size_t count(const Value& value) const
+	[[nodiscard]] std::size_t count(const Value& value) const
 		/// Returns the number of elements with the given
 		/// value, with is either 1 or 0.
 	{
@@ -399,26 +399,26 @@ public:
 		swap(emptyTable);
 	}
 
-	std::size_t size() const
+	[[nodiscard]] std::size_t size() const
 		/// Returns the number of elements in the table.
 	{
 		return _size;
 	}
 
-	bool empty() const
+	[[nodiscard]] bool empty() const
 		/// Returns true iff the table is empty.
 	{
 		return _size == 0;
 	}
 
-	std::size_t buckets() const
+	[[nodiscard]] std::size_t buckets() const
 		/// Returns the number of allocated buckets.
 	{
 		return _buckets.size();
 	}
 
 protected:
-	std::size_t bucketAddress(const Value& value) const
+	[[nodiscard]] std::size_t bucketAddress(const Value& value) const
 	{
 		std::size_t n = _hash(value);
 		if (n % _front >= _split)
@@ -427,7 +427,7 @@ protected:
 			return n % (2*_front);
 	}
 
-	std::size_t bucketAddressForHash(std::size_t hash)
+	[[nodiscard]] std::size_t bucketAddressForHash(std::size_t hash)
 	{
 		if (hash % _front >= _split)
 			return hash % _front;
@@ -476,7 +476,7 @@ protected:
 		}
 	}
 
-	static std::size_t calcSize(std::size_t initialSize)
+	[[nodiscard]] static std::size_t calcSize(std::size_t initialSize)
 	{
 		std::size_t size = 32;
 		while (size < initialSize) size *= 2;

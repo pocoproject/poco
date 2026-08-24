@@ -45,7 +45,7 @@ public:
 	virtual ~HTTPRequestHandlerFactory();
 		/// Destroys the HTTPRequestHandlerFactory.
 
-	virtual HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request) = 0;
+	[[nodiscard]] virtual HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request) = 0;
 		/// Must be overridden by subclasses.
 		///
 		/// Creates a new request handler for the given HTTP request.

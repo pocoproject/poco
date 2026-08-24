@@ -36,7 +36,7 @@ class XML_API DocumentEvent
 	/// Event model.
 {
 public:
-	virtual Event* createEvent(const XMLString& eventType) const = 0;
+	[[nodiscard]] virtual Event* createEvent(const XMLString& eventType) const = 0;
 		/// Creates an event of the specified type.
 		///
 		/// The eventType parameter specifies the type of Event interface to be created.

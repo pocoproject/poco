@@ -32,7 +32,7 @@ DigestEngine::~DigestEngine()
 
 std::string DigestEngine::digestToHex(const Digest& bytes, std::size_t length)
 {
-	static const char digits[] = "0123456789abcdef";
+	static constexpr char digits[] = "0123456789abcdef";
 	const std::size_t fullLen = bytes.size()*2;
 	std::size_t len = length ? length*2 : fullLen;
 	if (len > fullLen)

@@ -23,7 +23,7 @@
 #include "Poco/Foundation.h"
 #include <cstddef>
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 
 

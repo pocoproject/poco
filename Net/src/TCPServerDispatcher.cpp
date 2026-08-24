@@ -100,7 +100,7 @@ void TCPServerDispatcher::run()
 
 	int idleTime = (int) _pParams->getThreadIdleTime().totalMilliseconds();
 
-	for (;;)
+	while (true)
 	{
 		try
 		{

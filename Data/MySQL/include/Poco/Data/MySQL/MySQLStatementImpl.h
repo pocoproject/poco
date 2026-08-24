@@ -43,27 +43,27 @@ public:
 		/// Destroys the MySQLStatementImpl.
 
 protected:
-	std::size_t columnsReturned() const override;
+	[[nodiscard]] std::size_t columnsReturned() const override;
 		/// Returns number of columns returned by query.
 
-	int affectedRowCount() const override;
+	[[nodiscard]] int affectedRowCount() const override;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 
-	const MetaColumn& metaColumn(std::size_t pos) const override;
+	[[nodiscard]] const MetaColumn& metaColumn(std::size_t pos) const override;
 		/// Returns column meta data.
 
-	bool hasNext() override;
+	[[nodiscard]] bool hasNext() override;
 		/// Returns true if a call to next() will return data.
 
-	std::size_t next() override;
+	[[nodiscard]] std::size_t next() override;
 		/// Retrieves the next row from the resultset.
 		/// Will throw, if the resultset is empty.
 
-	bool canBind() const override;
+	[[nodiscard]] bool canBind() const override;
 		/// Returns true if a valid statement is set and we can bind.
 
-	bool canCompile() const override;
+	[[nodiscard]] bool canCompile() const override;
 		/// Returns true if another compile is possible.
 
 	void compileImpl() override;
@@ -72,10 +72,10 @@ protected:
 	void bindImpl() override;
 		/// Binds parameters
 
-	Poco::Data::AbstractExtractor::Ptr extractor() override;
+	[[nodiscard]] Poco::Data::AbstractExtractor::Ptr extractor() override;
 		/// Returns the concrete extractor used by the statement.
 
-	Poco::Data::AbstractBinder::Ptr binder() override;
+	[[nodiscard]] Poco::Data::AbstractBinder::Ptr binder() override;
 		/// Returns the concrete binder used by the statement.
 
 private:

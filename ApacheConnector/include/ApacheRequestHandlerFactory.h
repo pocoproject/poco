@@ -28,10 +28,10 @@ public:
 	~ApacheRequestHandlerFactory();
 		/// Destructor of the ApacheRequestHandlerFactory
 
-	Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+	[[nodiscard]] Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 		/// Creates a new request handler for the given HTTP request.
 
-	bool mustHandle(const std::string& uri);
+	[[nodiscard]] bool mustHandle(const std::string& uri);
 		/// Returns 1 if the given uri must be handled by the
 		/// poco_mapper module, 0 otherwise.
 

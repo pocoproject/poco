@@ -62,10 +62,10 @@ public:
 	virtual ~DirectoryIterator();
 		/// Destroys the DirectoryIterator.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns the current filename.
 
-	const Path& path() const;
+	[[nodiscard]] const Path& path() const;
 		/// Returns the current path.
 
 	DirectoryIterator& operator = (const DirectoryIterator& it);
@@ -84,8 +84,8 @@ public:
 	const File* operator -> () const;
 	File* operator -> ();
 
-	bool operator == (const DirectoryIterator& iterator) const;
-	bool operator != (const DirectoryIterator& iterator) const;
+	[[nodiscard]] bool operator == (const DirectoryIterator& iterator) const;
+	[[nodiscard]] bool operator != (const DirectoryIterator& iterator) const;
 
 protected:
 	Path _path;

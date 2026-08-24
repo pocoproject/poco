@@ -53,7 +53,7 @@ public:
 	void close();
 		/// Flushes a writing streambuf
 
-	Poco::UInt64 bytesWritten() const;
+	[[nodiscard]] Poco::UInt64 bytesWritten() const;
 
 protected:
 	std::streamsize readFromDevice(char* buffer, std::streamsize length);

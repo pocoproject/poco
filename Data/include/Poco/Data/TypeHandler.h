@@ -128,7 +128,7 @@ public:
 		pBinder->bind(pos, obj, dir);
 	}
 
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return 1u;
 	}
@@ -158,7 +158,7 @@ public:
 		pBinder->bind(pos, obj, dir);
 	}
 
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return 1u;
 	}
@@ -189,7 +189,7 @@ public:
 		pBinder->bind(pos, obj, dir);
 	}
 
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return 1u;
 	}
@@ -220,7 +220,7 @@ public:
 		pBinder->bind(pos, obj, dir);
 	}
 
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return 1u;
 	}
@@ -260,7 +260,7 @@ public:
 		tuplePrepare<0>(pos, t, pPrepare);
 	}
 
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		std::size_t sz = 0;
 		tupleSize<0>(sz);
@@ -347,7 +347,7 @@ public:
 			pPreparator->prepare(pos++, T()); //Poco::Data::Keywords::null);
 	}
 
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return 1u;
 	}
@@ -387,7 +387,7 @@ public:
 			pPreparator->prepare(pos++, obj.value());
 	}
 
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return 1u;
 	}
@@ -419,7 +419,7 @@ public:
 		TypeHandler<TupleType>::prepare(pos, static_cast<const TupleType&>(tuple), pPreparator);
 	}
 
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return TypeHandler<TupleType>::size();
 	}
@@ -442,7 +442,7 @@ public:
 		TypeHandler<V>::bind(pos, obj.second, pBinder, dir);
 	}
 
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return TypeHandler<K>::size() + TypeHandler<V>::size();
 	}
@@ -474,7 +474,7 @@ public:
 		TypeHandler<T>::bind(pos, *obj, pBinder, dir);
 	}
 
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return TypeHandler<T>::size();
 	}
@@ -510,7 +510,7 @@ public:
 		TypeHandler<T>::bind(pos, *obj, pBinder, dir);
 	}
 
-	static std::size_t size()
+	[[nodiscard]] static std::size_t size()
 	{
 		return TypeHandler<T>::size();
 	}

@@ -117,7 +117,7 @@ public:
 		return *this;
 	}
 
-	Sample value() const
+	[[nodiscard]] Sample value() const
 		/// Invokes the callback function and returns the
 		/// value returned by it.
 	{

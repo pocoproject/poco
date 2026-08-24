@@ -59,13 +59,13 @@ public:
 	Time(const Time & ) = default;
 	Time(Time && ) = default;
 
-	int hour() const;
+	[[nodiscard]] int hour() const;
 		/// Returns the hour.
 
-	int minute() const;
+	[[nodiscard]] int minute() const;
 		/// Returns the minute.
 
-	int second() const;
+	[[nodiscard]] int second() const;
 		/// Returns the second.
 
 	void assign(int hour, int minute, int second);
@@ -80,16 +80,16 @@ public:
 	Time& operator = (const Poco::Dynamic::Var& var);
 		/// Assignment operator for Var.
 
-	bool operator == (const Time& time) const;
+	[[nodiscard]] bool operator == (const Time& time) const;
 		/// Equality operator.
 
-	bool operator != (const Time& time) const;
+	[[nodiscard]] bool operator != (const Time& time) const;
 		/// Inequality operator.
 
-	bool operator < (const Time& time) const;
+	[[nodiscard]] bool operator < (const Time& time) const;
 		/// Less then operator.
 
-	bool operator > (const Time& time) const;
+	[[nodiscard]] bool operator > (const Time& time) const;
 		/// Greater then operator.
 
 private:

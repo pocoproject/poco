@@ -7,7 +7,7 @@
 namespace Poco::Net {
 
 
-const int BUFFER_SIZE = 4096;
+constexpr int BUFFER_SIZE = 4096;
 
 
 TCPReactorServerConnection::TCPReactorServerConnection(StreamSocket socket, SocketReactor& reactor)

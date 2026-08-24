@@ -105,16 +105,16 @@ public:
 	RSAKey& operator = (RSAKey&& other) noexcept;
 		/// Move assignment.
 
-	RSAKeyImpl::ByteVec modulus() const;
+	[[nodiscard]] RSAKeyImpl::ByteVec modulus() const;
 		/// Returns the RSA modulus.
 
-	RSAKeyImpl::ByteVec encryptionExponent() const;
+	[[nodiscard]] RSAKeyImpl::ByteVec encryptionExponent() const;
 		/// Returns the RSA encryption exponent.
 
-	RSAKeyImpl::ByteVec decryptionExponent() const;
+	[[nodiscard]] RSAKeyImpl::ByteVec decryptionExponent() const;
 		/// Returns the RSA decryption exponent.
 
-	RSAKeyImpl::Ptr impl() const;
+	[[nodiscard]] RSAKeyImpl::Ptr impl() const;
 		/// Returns the impl object.
 };
 

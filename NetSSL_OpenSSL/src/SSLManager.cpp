@@ -39,11 +39,8 @@ const std::string SSLManager::CFG_PRIV_KEY_FILE("privateKeyFile");
 const std::string SSLManager::CFG_CERTIFICATE_FILE("certificateFile");
 const std::string SSLManager::CFG_CA_LOCATION("caConfig");
 const std::string SSLManager::CFG_VER_MODE("verificationMode");
-const Context::VerificationMode SSLManager::VAL_VER_MODE(Context::VERIFY_RELAXED);
 const std::string SSLManager::CFG_VER_DEPTH("verificationDepth");
-const int         SSLManager::VAL_VER_DEPTH(9);
 const std::string SSLManager::CFG_ENABLE_DEFAULT_CA("loadDefaultCAFile");
-const bool        SSLManager::VAL_ENABLE_DEFAULT_CA(true);
 const std::string SSLManager::CFG_CIPHER_LIST("cipherList");
 const std::string SSLManager::CFG_CYPHER_LIST("cypherList");
 const std::string SSLManager::VAL_CIPHER_LIST("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH");
@@ -68,7 +65,6 @@ const std::string SSLManager::CFG_DH_PARAMS_FILE("dhParamsFile");
 const std::string SSLManager::CFG_ECDH_CURVE("ecdhCurve");
 #ifdef OPENSSL_FIPS
 const std::string SSLManager::CFG_FIPS_MODE("openSSL.fips");
-const bool        SSLManager::VAL_FIPS_MODE(false);
 #endif
 
 
@@ -270,7 +266,7 @@ int SSLManager::privateKeyPassphraseCallback(char* pBuf, int size, int flag, voi
 
 int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 {
-	const long OCSP_VALIDITY_LEEWAY = 5*60;
+	constexpr long OCSP_VALIDITY_LEEWAY = 5*60;
 
 	Poco::Net::Context* pContext = static_cast<Poco::Net::Context*>(arg);
 
@@ -301,7 +297,11 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 		return 0;
 	}
 
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	X509* pPeerCert = SSL_get1_peer_certificate(pSSL);
+#else
 	X509* pPeerCert = SSL_get_peer_certificate(pSSL);
+#endif
 	if (!pPeerCert)
 	{
 		OCSP_BASICRESP_free(pBasicResp);

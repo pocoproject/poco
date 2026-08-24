@@ -107,7 +107,7 @@ void MD4Engine::reset()
 
 const DigestEngine::Digest& MD4Engine::digest()
 {
-	static const unsigned char PADDING[64] =
+	static constexpr unsigned char PADDING[64] =
 	{
 		0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

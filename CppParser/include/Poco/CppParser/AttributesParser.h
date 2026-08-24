@@ -62,10 +62,11 @@ protected:
 	const Poco::Token* parseComplexAttribute(const Token* pNext, const std::string& id);
 	const Poco::Token* parseIdentifier(const Poco::Token* pNext, std::string& id);
 	const Poco::Token* next();
-	static bool isIdentifier(const Poco::Token* pToken);
-	static bool isOperator(const Poco::Token* pToken, int kind);
-	static bool isLiteral(const Poco::Token* pToken);
-	static bool isEOF(const Poco::Token* pToken);
+
+	[[nodiscard]] static bool isIdentifier(const Poco::Token* pToken);
+	[[nodiscard]] static bool isOperator(const Poco::Token* pToken, int kind);
+	[[nodiscard]] static bool isLiteral(const Poco::Token* pToken);
+	[[nodiscard]] static bool isEOF(const Poco::Token* pToken);
 
 private:
 	Attributes& _attrs;

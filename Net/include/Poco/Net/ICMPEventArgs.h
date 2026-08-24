@@ -40,47 +40,47 @@ public:
 	virtual ~ICMPEventArgs();
 		/// Destroys ICMPEventArgs.
 
-	std::string hostName() const;
+	[[nodiscard]] std::string hostName() const;
 		/// Tries to resolve the target IP address into host name.
 		/// If unsuccessful, all exceptions are silently ignored and
 		///	the IP address is returned.
 
-	std::string hostAddress() const;
+	[[nodiscard]] std::string hostAddress() const;
 		/// Returns the target IP address.
 
-	int repetitions() const;
+	[[nodiscard]] int repetitions() const;
 		/// Returns the number of repetitions for the ping operation.
 
-	int dataSize() const;
+	[[nodiscard]] int dataSize() const;
 		/// Returns the packet data size in bytes.
 
-	int ttl() const;
+	[[nodiscard]] int ttl() const;
 		/// Returns time to live.
 
-	int sent() const;
+	[[nodiscard]] int sent() const;
 		/// Returns the number of packets sent.
 
-	int received() const;
+	[[nodiscard]] int received() const;
 		/// Returns the number of packets received.
 
-	int replyTime(int index = -1) const;
+	[[nodiscard]] int replyTime(int index = -1) const;
 		/// Returns the reply time for the request specified with index.
 		/// If index == -1 (default), returns the most recent reply time.
 
-	const std::string& error(int index = -1) const;
+	[[nodiscard]] const std::string& error(int index = -1) const;
 		/// Returns the error string for the request specified with index.
 		/// If index == -1 (default), returns the most recent error string.
 
-	int minRTT() const;
+	[[nodiscard]] int minRTT() const;
 		/// Returns the minimum round trip time for a sequence of requests.
 
-	int maxRTT() const;
+	[[nodiscard]] int maxRTT() const;
 		/// Returns the maximum round trip time for a sequence of requests.
 
-	int avgRTT() const;
+	[[nodiscard]] int avgRTT() const;
 		/// Returns the average round trip time for a sequence of requests.
 
-	float percent() const;
+	[[nodiscard]] float percent() const;
 		/// Returns the success percentage for a sequence of requests.
 
 private:

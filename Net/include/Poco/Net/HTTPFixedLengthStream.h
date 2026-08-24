@@ -66,7 +66,7 @@ class Net_API HTTPFixedLengthIOS: public virtual std::ios
 public:
 	HTTPFixedLengthIOS(HTTPSession& session, HTTPFixedLengthStreamBuf::ContentLength length, HTTPFixedLengthStreamBuf::openmode mode);
 	~HTTPFixedLengthIOS();
-	HTTPFixedLengthStreamBuf* rdbuf();
+	[[nodiscard]] HTTPFixedLengthStreamBuf* rdbuf();
 
 protected:
 	HTTPFixedLengthStreamBuf _buf;

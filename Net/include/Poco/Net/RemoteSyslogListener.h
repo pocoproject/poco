@@ -84,7 +84,7 @@ public:
 		///     * buffer: The UDP socket receive buffer size in bytes. If not
 		///       specified, the system default is used.
 
-	std::string getProperty(const std::string& name) const;
+	[[nodiscard]] std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
 
 	void open();

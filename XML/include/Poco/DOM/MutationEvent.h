@@ -49,18 +49,18 @@ public:
 		/// the changed node. In the case of the DOMAttrModified
 		/// event it indicates the Attr node which was modified, added, or removed.
 
-	const XMLString& prevValue() const;
+	[[nodiscard]] const XMLString& prevValue() const;
 		/// prevValue indicates the previous value of the Attr node in DOMAttrModified
 		/// events, and of the CharacterData node in DOMCharDataModified events.
 
-	const XMLString& newValue() const;
+	[[nodiscard]] const XMLString& newValue() const;
 		/// newValue indicates the new value of the Attr node in DOMAttrModified
 		/// events, and of the CharacterData node in DOMCharDataModified events.
 
-	const XMLString& attrName() const;
+	[[nodiscard]] const XMLString& attrName() const;
 		/// attrName indicates the name of the changed Attr node in a DOMAttrModified event.
 
-	AttrChangeType attrChange() const;
+	[[nodiscard]] AttrChangeType attrChange() const;
 		/// attrChange indicates the type of change which triggered the
 		/// DOMAttrModified event. The values can be MODIFICATION,
 		/// ADDITION, or REMOVAL.

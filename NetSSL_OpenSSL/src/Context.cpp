@@ -613,7 +613,27 @@ void Context::createSSLContext()
 void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 {
 #ifndef OPENSSL_NO_DH
-	static const unsigned char dh1024_p[] =
+
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	// In FIPS mode, EVP_PKEY_fromdata() rejects custom p/g parameters
+	// (error:0280007F:Diffie-Hellman routines::bad ffc parameters).
+	// Use FIPS-approved RFC 7919 named ffdhe groups via SSL_CTX_set1_groups_list() instead.
+	if (SSLManager::isFIPSEnabled())
+	{
+		// ffdhe groups are approved in FIPS 140-3 / SP 800-56Ar3.
+		// They will only be used when a DHE cipher suite is actually negotiated.
+		const char* fipsGroups = "ffdhe2048:ffdhe3072:ffdhe4096:ffdhe6144:ffdhe8192";
+		if (!SSL_CTX_set1_groups_list(_pSSLContext, fipsGroups))
+		{
+			std::string err = "Context::initDH():SSL_CTX_set1_groups_list(ffdhe)\n";
+			throw SSLContextException(Poco::Crypto::getError(err));
+		}
+		SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);
+		return;
+	}
+#endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+
+	static constexpr unsigned char dh1024_p[] =
 	{
 		0xB1,0x0B,0x8F,0x96,0xA0,0x80,0xE0,0x1D,0xDE,0x92,0xDE,0x5E,
 		0xAE,0x5D,0x54,0xEC,0x52,0xC9,0x9F,0xBC,0xFB,0x06,0xA3,0xC6,
@@ -628,7 +648,7 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 		0xDF,0x1F,0xB2,0xBC,0x2E,0x4A,0x43,0x71,
 	};
 
-	static const unsigned char dh1024_g[] =
+	static constexpr unsigned char dh1024_g[] =
 	{
 		0xA4,0xD1,0xCB,0xD5,0xC3,0xFD,0x34,0x12,0x67,0x65,0xA4,0x42,
 		0xEF,0xB9,0x99,0x05,0xF8,0x10,0x4D,0xD2,0x58,0xAC,0x50,0x7F,
@@ -643,7 +663,7 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 		0x85,0x5E,0x6E,0xEB,0x22,0xB3,0xB2,0xE5,
 	};
 
-	static const unsigned char dh2048_p[] =
+	static constexpr unsigned char dh2048_p[] =
 	{
 		0x87,0xA8,0xE6,0x1D,0xB4,0xB6,0x66,0x3C,0xFF,0xBB,0xD1,0x9C,
 		0x65,0x19,0x59,0x99,0x8C,0xEE,0xF6,0x08,0x66,0x0D,0xD0,0xF2,
@@ -669,7 +689,7 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 		0x1E,0x1A,0x15,0x97,
 	};
 
-	static const unsigned char dh2048_g[] =
+	static constexpr unsigned char dh2048_g[] =
 	{
 		0x3F,0xB3,0x2C,0x9B,0x73,0x13,0x4D,0x0B,0x2E,0x77,0x50,0x66,
 		0x60,0xED,0xBD,0x48,0x4C,0xA7,0xB1,0x8F,0x21,0xEF,0x20,0x54,
@@ -806,7 +826,7 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 			throw SSLContextException(Poco::Crypto::getError(err));
 		}
 
-		if (1 != EVP_PKEY_fromdata(pKeyCtx, &pKey, EVP_PKEY_KEYPAIR, params))
+		if (1 != EVP_PKEY_fromdata(pKeyCtx, &pKey, EVP_PKEY_KEY_PARAMETERS, params))
 		{
 			EVP_PKEY_CTX_free(pKeyCtx);
 			std::string err = "Context::initDH():EVP_PKEY_fromdata()\n";
@@ -932,7 +952,12 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 void Context::initECDH(const std::string& curve)
 {
 #ifndef OPENSSL_NO_ECDH
-	const std::string groups(curve.empty() ? "X448:X25519:P-521:P-384:P-256" : curve);
+	const std::string groups(curve.empty() 
+		? (SSLManager::isFIPSEnabled()
+					? "P-521:P-384:P-256"              // FIPS 140-2 + 140-3 safe
+					: "X448:X25519:P-521:P-384:P-256") // full list for non-FIPS
+		: curve);
+
 	if (SSL_CTX_set1_curves_list(_pSSLContext, groups.c_str()) == 0)
 	{
 		throw SSLContextException("Cannot set ECDH groups", groups);

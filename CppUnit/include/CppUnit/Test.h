@@ -38,9 +38,9 @@ public:
 
 	virtual ~Test() = 0;
 	virtual void run(TestResult* result, const Callback& callback = nullptr) = 0;
-	virtual int countTestCases() const = 0;
-	virtual std::string toString() const = 0;
-	virtual Test::Type getType() const = 0;
+	[[nodiscard]] virtual int countTestCases() const = 0;
+	[[nodiscard]] virtual std::string toString() const = 0;
+	[[nodiscard]] virtual Test::Type getType() const = 0;
 
 	void addSetup(const std::vector<std::string>& setup);
 	const std::vector<std::string>& setup() const;

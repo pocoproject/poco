@@ -70,7 +70,7 @@ void MessageHeader::write(std::ostream& ostr) const
 
 void MessageHeader::read(std::istream& istr)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 	std::streambuf& buf = *istr.rdbuf();
 
 	std::string name;

@@ -66,7 +66,7 @@ public:
 	void run()
 	{
 		Poco::Random rnd;
-		for (;;)
+		while (true)
 		{
 			Notification::Ptr pNf(_queue.waitDequeueNotification());
 			if (pNf)

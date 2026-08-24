@@ -76,7 +76,7 @@ public:
 		/// before passing the JSON on to the parser. This will impact performance,
 		/// especially when reading from a std::istream.
 
-	bool getAllowComments() const;
+	[[nodiscard]] bool getAllowComments() const;
 		/// Returns true if comments are allowed, false otherwise.
 		///
 		/// By default, comments are not allowed.
@@ -90,7 +90,7 @@ public:
 		/// before passing the JSON on to the parser. This will impact performance,
 		/// especially when reading from a std::istream.
 
-	bool getAllowNullByte() const;
+	[[nodiscard]] bool getAllowNullByte() const;
 		/// Returns true if null byte is allowed, false otherwise.
 		///
 		/// By default, null bytes are allowed.
@@ -102,7 +102,7 @@ public:
 		/// may result in a stack overflow when parsing a (malicious)
 		/// JSON document.
 
-	std::size_t getDepth() const;
+	[[nodiscard]] std::size_t getDepth() const;
 		/// Returns the allowed JSON depth.
 
 	Dynamic::Var parse(const std::string& json);
@@ -114,13 +114,13 @@ public:
 	void setHandler(const Handler::Ptr& pHandler);
 		/// Set the Handler.
 
-	const Handler::Ptr& getHandler();
+	[[nodiscard]] const Handler::Ptr& getHandler();
 		/// Returns the Handler.
 
-	Dynamic::Var asVar() const;
+	[[nodiscard]] Dynamic::Var asVar() const;
 		/// Returns the result of parsing
 
-	Dynamic::Var result() const;
+	[[nodiscard]] Dynamic::Var result() const;
 		/// Returns the result of parsing as Dynamic::Var
 
 private:

@@ -74,12 +74,12 @@ public:
 			return false;
 	}
 
-	bool equals(const AbstractDelegate<TArgs>& other) const
+	[[nodiscard]] bool equals(const AbstractDelegate<TArgs>& other) const
 	{
 		return other.equals(*_pDelegate);
 	}
 
-	AbstractDelegate<TArgs>* clone() const
+	[[nodiscard]] AbstractDelegate<TArgs>* clone() const
 	{
 		return new Expire(*this);
 	}
@@ -89,13 +89,13 @@ public:
 		_pDelegate->disable();
 	}
 
-	const AbstractDelegate<TArgs>* unwrap() const
+	[[nodiscard]] const AbstractDelegate<TArgs>* unwrap() const
 	{
 		return this->_pDelegate;
 	}
 
 protected:
-	bool expired() const
+	[[nodiscard]] bool expired() const
 	{
 		return _creationTime.isElapsed(_expire);
 	}
@@ -154,12 +154,12 @@ public:
 			return false;
 	}
 
-	bool equals(const AbstractDelegate<void>& other) const override
+	[[nodiscard]] bool equals(const AbstractDelegate<void>& other) const override
 	{
 		return other.equals(*_pDelegate);
 	}
 
-	AbstractDelegate<void>* clone() const override
+	[[nodiscard]] AbstractDelegate<void>* clone() const override
 	{
 		return new Expire(*this);
 	}
@@ -169,13 +169,13 @@ public:
 		_pDelegate->disable();
 	}
 
-	const AbstractDelegate<void>* unwrap() const override
+	[[nodiscard]] const AbstractDelegate<void>* unwrap() const override
 	{
 		return this->_pDelegate;
 	}
 
 protected:
-	bool expired() const
+	[[nodiscard]] bool expired() const
 	{
 		return _creationTime.isElapsed(_expire);
 	}

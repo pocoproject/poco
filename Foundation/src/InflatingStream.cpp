@@ -157,7 +157,7 @@ std::streamsize InflatingStreamBuf::readFromDevice(char* buffer, std::streamsize
 	}
 	_pZstr->next_out  = (unsigned char*) buffer;
 	_pZstr->avail_out = static_cast<unsigned>(length);
-	for (;;)
+	while (true)
 	{
 		int rc = inflate(_pZstr, Z_NO_FLUSH);
 		if (rc == Z_DATA_ERROR && !_check)
@@ -205,7 +205,7 @@ std::streamsize InflatingStreamBuf::writeToDevice(const char* buffer, std::strea
 	_pZstr->avail_in  = static_cast<unsigned>(length);
 	_pZstr->next_out  = (unsigned char*) _buffer;
 	_pZstr->avail_out = INFLATE_BUFFER_SIZE;
-	for (;;)
+	while (true)
 	{
 		int rc = inflate(_pZstr, Z_NO_FLUSH);
 		if (rc == Z_STREAM_END)

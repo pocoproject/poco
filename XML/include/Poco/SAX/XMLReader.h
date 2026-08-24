@@ -54,7 +54,7 @@ public:
 		/// Applications may register a new or different resolver in the middle of a
 		/// parse, and the SAX parser must begin using the new resolver immediately.
 
-	virtual EntityResolver* getEntityResolver() const = 0;
+	[[nodiscard]] virtual EntityResolver* getEntityResolver() const = 0;
 		/// Return the current entity resolver.
 
 	virtual void setDTDHandler(DTDHandler* pDTDHandler) = 0;
@@ -66,7 +66,7 @@ public:
 		/// Applications may register a new or different handler in the middle of a parse,
 		/// and the SAX parser must begin using the new handler immediately.
 
-	virtual DTDHandler* getDTDHandler() const = 0;
+	[[nodiscard]] virtual DTDHandler* getDTDHandler() const = 0;
 		/// Return the current DTD handler.
 
 	virtual void setContentHandler(ContentHandler* pContentHandler) = 0;
@@ -78,7 +78,7 @@ public:
 		/// Applications may register a new or different handler in the middle of a parse,
 		/// and the SAX parser must begin using the new handler immediately.
 
-	virtual ContentHandler* getContentHandler() const = 0;
+	[[nodiscard]] virtual ContentHandler* getContentHandler() const = 0;
 		/// Return the current content handler.
 
 	virtual void setErrorHandler(ErrorHandler* pErrorHandler) = 0;
@@ -92,7 +92,7 @@ public:
 		/// Applications may register a new or different handler in the middle of a parse, and the
 		/// SAX parser must begin using the new handler immediately.
 
-	virtual ErrorHandler* getErrorHandler() const = 0;
+	[[nodiscard]] virtual ErrorHandler* getErrorHandler() const = 0;
 		/// Return the current error handler.
 
 	virtual void setFeature(const XMLString& featureId, bool state) = 0;
@@ -106,7 +106,7 @@ public:
 		/// All XMLReaders are required to support setting http://xml.org/sax/features/namespaces
 		/// to true and http://xml.org/sax/features/namespace-prefixes to false.
 
-	virtual bool getFeature(const XMLString& featureId) const = 0;
+	[[nodiscard]] virtual bool getFeature(const XMLString& featureId) const = 0;
 		/// Look up the value of a feature.
 		///
 		/// The feature name is any fully-qualified URI. It is possible for an XMLReader
@@ -140,7 +140,7 @@ public:
 		/// Set the value of a property.
 		/// See also setProperty(const XMLString&, const XMLString&).
 
-	virtual void* getProperty(const XMLString& propertyId) const = 0;
+	[[nodiscard]] virtual void* getProperty(const XMLString& propertyId) const = 0;
 		/// Look up the value of a property.
 		/// String values are returned as XMLChar*
 		/// The property name is any fully-qualified URI. It is possible for an XMLReader to

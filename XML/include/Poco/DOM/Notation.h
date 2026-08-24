@@ -41,26 +41,26 @@ class XML_API Notation: public AbstractNode
 	/// A Notation node does not have any parent.
 {
 public:
-	const XMLString& publicId() const;
+	[[nodiscard]] const XMLString& publicId() const;
 		/// Returns the public identifier of this notation.
 		/// If not specified, this is an empty string (and not null,
 		/// as in the DOM specification).
 
-	const XMLString& systemId() const;
+	[[nodiscard]] const XMLString& systemId() const;
 		/// Returns the system identifier of this notation.
 		/// If not specified, this is an empty string (and not null,
 		/// as in the DOM specification).
 
 	// Node
-	const XMLString& nodeName() const;
-	unsigned short nodeType() const;
+	[[nodiscard]] const XMLString& nodeName() const;
+	[[nodiscard]] unsigned short nodeType() const;
 
 protected:
 	Notation(Document* pOwnerDocument, const XMLString& name, const XMLString& publicId, const XMLString& systemId);
 	Notation(Document* pOwnerDocument, const Notation& notation);
 	~Notation();
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	[[nodiscard]] Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:
 	XMLString _name;

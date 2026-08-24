@@ -35,8 +35,8 @@ public:
 	~BuiltIn();
 		/// Destroys the BuiltIn.
 
-	Symbol::Kind kind() const;
-	std::string toString() const;
+	[[nodiscard]] Symbol::Kind kind() const;
+	[[nodiscard]] std::string toString() const;
 };
 
 

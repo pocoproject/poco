@@ -428,7 +428,7 @@ std::string ECKeyImpl::getCurveName(int nid)
 	}
 
 	if (-1 == nid) nid = pCurves[0].nid;
-	const int bufLen = 128;
+	constexpr int bufLen = 128;
 	char buf[bufLen];
 	std::memset(buf, 0, bufLen);
 	OBJ_obj2txt(buf, bufLen, OBJ_nid2obj(nid), 0);
@@ -453,7 +453,7 @@ int ECKeyImpl::getCurveNID(std::string& name)
 	}
 
 	int nid = -1;
-	const int bufLen = 128;
+	constexpr int bufLen = 128;
 	char buf[bufLen];
 	if (name.empty())
 	{

@@ -59,7 +59,7 @@ class Net_API HTTPIOS: public virtual std::ios
 public:
 	HTTPIOS(HTTPSession& session, HTTPStreamBuf::openmode mode);
 	~HTTPIOS();
-	HTTPStreamBuf* rdbuf();
+	[[nodiscard]] HTTPStreamBuf* rdbuf();
 
 protected:
 	HTTPStreamBuf _buf;

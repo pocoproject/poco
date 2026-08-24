@@ -112,7 +112,7 @@ void SpinlockMutex::lock()
 	}
 
 	// Sleep phase
-	for (;;)
+	while (true)
 	{
 		std::this_thread::sleep_for(std::chrono::microseconds(100));
 		if (tryAcquire(_flag))

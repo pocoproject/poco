@@ -21,12 +21,7 @@
 #include "Poco/Foundation.h"
 
 
-#ifdef min
-#undef min
-#endif
-#ifdef max
-#undef max
-#endif
+POCO_CHECK_MINMAX_MACROS
 
 #include "Poco/ordered_set.h"
 
