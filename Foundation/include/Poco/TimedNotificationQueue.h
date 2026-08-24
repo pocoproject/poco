@@ -78,7 +78,7 @@ public:
 		///     notificationQueue.enqueueNotification(new MyNotification, someTime);
 		/// does not result in a memory leak.
 
-	Notification* dequeueNotification();
+	[[nodiscard]] Notification* dequeueNotification();
 		/// Dequeues the next pending notification with a timestamp
 		/// less than or equal to the current time.
 		/// Returns 0 (null) if no notification is available.
@@ -99,7 +99,7 @@ public:
 		/// assigned to a Notification::Ptr, to avoid potential
 		/// memory management issues.
 
-	Notification* waitDequeueNotification();
+	[[nodiscard]] Notification* waitDequeueNotification();
 		/// Dequeues the next pending notification.
 		/// If no notification is available, waits for a notification
 		/// to be enqueued.
@@ -110,7 +110,7 @@ public:
 		/// assigned to a Notification::Ptr, to avoid potential
 		/// memory management issues.
 
-	Notification* waitDequeueNotification(long milliseconds);
+	[[nodiscard]] Notification* waitDequeueNotification(long milliseconds);
 		/// Dequeues the next pending notification.
 		/// If no notification is available, waits for a notification
 		/// to be enqueued up to the specified time.
@@ -122,10 +122,10 @@ public:
 		/// assigned to a Notification::Ptr, to avoid potential
 		/// memory management issues.
 
-	bool empty() const;
+	[[nodiscard]] bool empty() const;
 		/// Returns true iff the queue is empty.
 
-	int size() const;
+	[[nodiscard]] int size() const;
 		/// Returns the number of notifications in the queue.
 
 	void clear();

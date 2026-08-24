@@ -42,13 +42,13 @@ class PoolableObjectFactory
 	/// shrunk.
 {
 public:
-	P createObject()
+	[[nodiscard]] P createObject()
 		/// Create and return a new object.
 	{
 		return new C;
 	}
 
-	bool validateObject(P pObject)
+	[[nodiscard]] bool validateObject(P pObject)
 		/// Checks whether the object is still valid
 		/// and can be reused.
 		///
@@ -93,12 +93,12 @@ template <class C>
 class PoolableObjectFactory <C, Poco::AutoPtr<C>>
 {
 public:
-	Poco::AutoPtr<C> createObject()
+	[[nodiscard]] Poco::AutoPtr<C> createObject()
 	{
 		return new C;
 	}
 
-	bool validateObject(Poco::AutoPtr<C> pObject)
+	[[nodiscard]] bool validateObject(Poco::AutoPtr<C> pObject)
 	{
 		return true;
 	}
@@ -121,12 +121,12 @@ template <class C>
 class PoolableObjectFactory <C, Poco::SharedPtr<C>>
 {
 public:
-	Poco::SharedPtr<C> createObject()
+	[[nodiscard]] Poco::SharedPtr<C> createObject()
 	{
 		return new C;
 	}
 
-	bool validateObject(Poco::SharedPtr<C> pObject)
+	[[nodiscard]] bool validateObject(Poco::SharedPtr<C> pObject)
 	{
 		return true;
 	}
@@ -210,7 +210,7 @@ public:
 	ObjectPool(const ObjectPool&) = delete;
 	ObjectPool& operator=(const ObjectPool&) = delete;
 
-	P borrowObject(long timeoutMilliseconds = 0)
+	[[nodiscard]] P borrowObject(long timeoutMilliseconds = 0)
 		/// Obtains an object from the pool, or creates a new object if
 		/// possible.
 		///
@@ -279,24 +279,24 @@ public:
 		_availableCondition.signal();
 	}
 
-	std::size_t capacity() const
+	[[nodiscard]] std::size_t capacity() const
 	{
 		return _capacity;
 	}
 
-	std::size_t peakCapacity() const
+	[[nodiscard]] std::size_t peakCapacity() const
 	{
 		return _peakCapacity;
 	}
 
-	std::size_t size() const
+	[[nodiscard]] std::size_t size() const
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 
 		return _size;
 	}
 
-	std::size_t available() const
+	[[nodiscard]] std::size_t available() const
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
 

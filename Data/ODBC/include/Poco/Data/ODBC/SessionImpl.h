@@ -84,13 +84,13 @@ public:
 	void close() override;
 		/// Closes the connection
 
-	bool isConnected() const override;
+	[[nodiscard]] bool isConnected() const override;
 		/// Returns true if session is connected
 
 	void setConnectionTimeout(std::size_t timeout) override;
 		/// Sets the session connection timeout value.
 
-	std::size_t getConnectionTimeout() const override;
+	[[nodiscard]] std::size_t getConnectionTimeout() const override;
 		/// Returns the session connection timeout value.
 
 	void begin() override;
@@ -105,61 +105,61 @@ public:
 	void reset() override;
 		/// Do nothing
 
-	bool isTransaction() const override;
+	[[nodiscard]] bool isTransaction() const override;
 		/// Returns true iff a transaction is in progress.
 
-	const std::string& connectorName() const override;
+	[[nodiscard]] const std::string& connectorName() const override;
 		/// Returns the name of the connector.
 
-	bool canTransact() const override;
+	[[nodiscard]] bool canTransact() const override;
 		/// Returns true if connection is transaction-capable.
 
 	void setTransactionIsolation(Poco::UInt32 ti) override;
 		/// Sets the transaction isolation level.
 
-	Poco::UInt32 getTransactionIsolation() const override;
+	[[nodiscard]] Poco::UInt32 getTransactionIsolation() const override;
 		/// Returns the transaction isolation level.
 
-	bool hasTransactionIsolation(Poco::UInt32) const override;
+	[[nodiscard]] bool hasTransactionIsolation(Poco::UInt32) const override;
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	bool isTransactionIsolation(Poco::UInt32) const override;
+	[[nodiscard]] bool isTransactionIsolation(Poco::UInt32) const override;
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
 	void autoCommit(const std::string&, bool val);
 		/// Sets autocommit property for the session.
 
-	bool isAutoCommit(const std::string& name="") const;
+	[[nodiscard]] bool isAutoCommit(const std::string& name="") const;
 		/// Returns autocommit property value.
 
 	void autoBind(const std::string&, bool val);
 		/// Sets automatic binding for the session.
 
-	bool isAutoBind(const std::string& name="") const;
+	[[nodiscard]] bool isAutoBind(const std::string& name="") const;
 		/// Returns true if binding is automatic for this session.
 
 	void autoExtract(const std::string&, bool val);
 		/// Sets automatic extraction for the session.
 
-	bool isAutoExtract(const std::string& name="") const;
+	[[nodiscard]] bool isAutoExtract(const std::string& name="") const;
 		/// Returns true if extraction is automatic for this session.
 
 	void setMaxFieldSize(const std::string& rName, const Poco::Any& rValue);
 		/// Sets the max field size (the default used when column size is unknown).
 
-	Poco::Any getMaxFieldSize(const std::string& rName="") const;
+	[[nodiscard]] Poco::Any getMaxFieldSize(const std::string& rName="") const;
 		/// Returns the max field size (the default used when column size is unknown).
 
-	int maxStatementLength() const;
+	[[nodiscard]] int maxStatementLength() const;
 		/// Returns maximum length of SQL statement allowed by driver.
 
 	void setQueryTimeout(const std::string&, const Poco::Any& value);
 		/// Sets the timeout (in seconds) for queries.
 		/// Value must be of type int.
 
-	Poco::Any getQueryTimeout(const std::string&) const;
+	[[nodiscard]] Poco::Any getQueryTimeout(const std::string&) const;
 		/// Returns the timeout (in seconds) for queries,
 		/// or -1 if no timeout has been set.
 
@@ -169,7 +169,7 @@ public:
 		///   - SQL_CUR_USE_IF_NEEDED - if needed
 		///   - SQL_CUR_USE_DRIVER - never
 
-	Poco::Any getCursorUse(const std::string&) const;
+	[[nodiscard]] Poco::Any getCursorUse(const std::string&) const;
 		/// Returns the use of cursors.
 
 	int queryTimeout() const;
@@ -180,24 +180,24 @@ public:
 		/// Sets the database encoding.
 		/// Value must be of type std::string.
 
-	Poco::Any getDBEncoding(const std::string&) const;
+	[[nodiscard]] Poco::Any getDBEncoding(const std::string&) const;
 		/// Returns the database encoding.
 
-	const std::string& dbEncoding() const;
+	[[nodiscard]] const std::string& dbEncoding() const;
 		/// Returns the database encoding.
 
 	void setMultiActiveResultset(const std::string&, bool value);
 		/// Sets the multiple active resultset capability, if available.
 		/// Does nothing, if feature is not available.
 
-	bool getMultiActiveResultset(const std::string&) const;
+	[[nodiscard]] bool getMultiActiveResultset(const std::string&) const;
 		/// Returns the multiple active resultset capability, if available.
 		/// Returns false, if feature is not available.
 
-	const ConnectionHandle& dbc() const;
+	[[nodiscard]] const ConnectionHandle& dbc() const;
 		/// Returns the connection handle.
 
-	Poco::Any dataTypeInfo(const std::string& rName="") const;
+	[[nodiscard]] Poco::Any dataTypeInfo(const std::string& rName="") const;
 		/// Returns the data types information.
 
 private:
@@ -208,9 +208,9 @@ private:
 
 	void checkError(SQLRETURN rc, const std::string& msg="") const;
 
-	Poco::UInt32 getDefaultTransactionIsolation() const;
+	[[nodiscard]] Poco::UInt32 getDefaultTransactionIsolation() const;
 
-	static Poco::UInt32 transactionIsolation(SQLULEN isolation);
+	[[nodiscard]] static Poco::UInt32 transactionIsolation(SQLULEN isolation);
 
 	void setTransactionIsolationImpl(Poco::UInt32 ti) const;
 		/// Sets the transaction isolation level.

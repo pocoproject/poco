@@ -39,9 +39,9 @@ public:
 	TestFailure(Test* failedTest, CppUnitException* thrownException);
 	~TestFailure();
 
-	Test* failedTest();
-	CppUnitException* thrownException();
-	std::string toString();
+	[[nodiscard]] Test* failedTest();
+	[[nodiscard]] CppUnitException* thrownException();
+	[[nodiscard]] std::string toString();
 
 protected:
 	Test* _failedTest;

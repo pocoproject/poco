@@ -56,62 +56,62 @@ public:
 		ACP_PRINT    = 0x0200
 	};
 
-	static int properties(int ch);
+	[[nodiscard]] static int properties(int ch);
 		/// Return the ASCII character properties for the
 		/// character with the given ASCII value.
 		///
 		/// If the character is outside the ASCII range
 		/// (0 .. 127), 0 is returned.
 
-	static bool hasSomeProperties(int ch, int properties);
+	[[nodiscard]] static bool hasSomeProperties(int ch, int properties);
 		/// Returns true if the given character is
 		/// within the ASCII range and has at least one of
 		/// the given properties.
 
-	static bool hasProperties(int ch, int properties);
+	[[nodiscard]] static bool hasProperties(int ch, int properties);
 		/// Returns true if the given character is
 		/// within the ASCII range and has all of
 		/// the given properties.
 
-	static bool isAscii(int ch);
+	[[nodiscard]] static bool isAscii(int ch);
 		/// Returns true iff the given character code is within
 		/// the ASCII range (0 .. 127).
 
-	static bool isSpace(int ch);
+	[[nodiscard]] static bool isSpace(int ch);
 		/// Returns true iff the given character is a whitespace.
 
-	static bool isDigit(int ch);
+	[[nodiscard]] static bool isDigit(int ch);
 		/// Returns true iff the given character is a digit.
 
-	static bool isHexDigit(int ch);
+	[[nodiscard]] static bool isHexDigit(int ch);
 		/// Returns true iff the given character is a hexadecimal digit.
 
-	static bool isPunct(int ch);
+	[[nodiscard]] static bool isPunct(int ch);
 		/// Returns true iff the given character is a punctuation character.
 
-	static bool isAlpha(int ch);
+	[[nodiscard]] static bool isAlpha(int ch);
 		/// Returns true iff the given character is an alphabetic character.
 
-	static bool isAlphaNumeric(int ch);
+	[[nodiscard]] static bool isAlphaNumeric(int ch);
 		/// Returns true iff the given character is an alphabetic character.
 
-	static bool isLower(int ch);
+	[[nodiscard]] static bool isLower(int ch);
 		/// Returns true iff the given character is a lowercase alphabetic
 		/// character.
 
-	static bool isUpper(int ch);
+	[[nodiscard]] static bool isUpper(int ch);
 		/// Returns true iff the given character is an uppercase alphabetic
 		/// character.
 
-	static bool isPrintable(int ch);
+	[[nodiscard]] static bool isPrintable(int ch);
 		/// Returns true iff the given character is printable.
 
-	static int toLower(int ch);
+	[[nodiscard]] static int toLower(int ch);
 		/// If the given character is an uppercase character,
 		/// return its lowercase counterpart, otherwise return
 		/// the character.
 
-	static int toUpper(int ch);
+	[[nodiscard]] static int toUpper(int ch);
 		/// If the given character is a lowercase character,
 		/// return its uppercase counterpart, otherwise return
 		/// the character.

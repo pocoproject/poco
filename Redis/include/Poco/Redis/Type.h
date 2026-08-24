@@ -52,31 +52,31 @@ public:
 	virtual ~RedisType();
 		/// Destroys the RedisType.
 
-	bool isArray() const;
+	[[nodiscard]] bool isArray() const;
 		/// Returns true when the value is a Redis array.
 
-	bool isBulkString() const;
+	[[nodiscard]] bool isBulkString() const;
 		/// Returns true when the value is a Redis bulkstring.
 
-	bool isError() const;
+	[[nodiscard]] bool isError() const;
 		/// Returns true when the value is a Redis error.
 
-	bool isInteger() const;
+	[[nodiscard]] bool isInteger() const;
 		/// Returns true when the value is a Redis integer (64 bit integer).
 
-	bool isSimpleString() const;
+	[[nodiscard]] bool isSimpleString() const;
 		/// Returns true when the value is a simple string.
 
-	virtual int type() const = 0;
+	[[nodiscard]] virtual int type() const = 0;
 		/// Returns the type of the value.
 
 	virtual void read(RedisInputStream& input) = 0;
 		/// Reads the value from the stream.
 
-	virtual std::string toString() const = 0;
+	[[nodiscard]] virtual std::string toString() const = 0;
 		/// Converts the value to a RESP (REdis Serialization Protocol) string.
 
-	static RedisType::Ptr createRedisType(char marker);
+	[[nodiscard]] static RedisType::Ptr createRedisType(char marker);
 		/// Create a Redis type based on the marker:
 		///
 		///     - '+': a simple string (std::string)
@@ -219,7 +219,7 @@ struct RedisTypeTraits<BulkString>
 			input.read(s.data(), static_cast<std::streamsize>(length));
 			value.assign(s);
 
-			input.getline(); // Read and ignore \r\n
+			(void) input.getline(); // Read and ignore \r\n
 		}
 	}
 };

@@ -60,19 +60,19 @@ public:
 		return *this;
 	}
 
-	const Diagnostics<H, handleType>& diagnostics() const
+	[[nodiscard]] const Diagnostics<H, handleType>& diagnostics() const
 		/// Returns the associated diagnostics.
 	{
 		return *_pDiag;
 	}
 
-	int count() const
+	[[nodiscard]] int count() const
 		/// Returns the count of diagnostic records.
 	{
-		return (int) _pDiag->count();
+		return static_cast<int>(_pDiag->count());
 	}
 
-	std::string& toString(int index, std::string& str) const
+	[[nodiscard]] std::string& toString(int index, std::string& str) const
 		/// Generates the string for the diagnostic record.
 	{
 		if ((index < 0) || (index > (count() - 1)))
@@ -94,7 +94,7 @@ public:
 		return str;
 	}
 
-	std::string toString() const
+	[[nodiscard]] std::string toString() const
 		/// Generates the string for the diagnostic record collection.
 	{
 		std::string str;

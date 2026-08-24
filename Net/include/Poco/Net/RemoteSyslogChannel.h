@@ -125,13 +125,13 @@ public:
 		///                  IP address will be used.
 		///     * buffer:    UDP socket send buffer size in bytes. If not specified, the system default is used.
 
-	std::string getProperty(const std::string& name) const;
+	[[nodiscard]] std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
 
 	static void registerChannel();
 		/// Registers the channel with the global LoggingFactory.
 
-	static const char* facilityToString(Facility facility);
+	[[nodiscard]] static const char* facilityToString(Facility facility);
 		/// Returns the string describing the SyslogFacility
 
 	static const std::string PROP_NAME;
@@ -144,7 +144,7 @@ public:
 
 protected:
 	~RemoteSyslogChannel();
-	static int getPrio(const Message& msg);
+	[[nodiscard]] static int getPrio(const Message& msg);
 
 private:
 	std::string _logHost;

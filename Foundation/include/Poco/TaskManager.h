@@ -65,7 +65,7 @@ public:
 	~TaskManager();
 		/// Destroys the TaskManager.
 
-	bool start(Task* pTask);
+	[[nodiscard]] bool start(Task* pTask);
 		/// Starts the given task in a thread obtained
 		/// from the thread pool; returns true if successful.
 		///
@@ -92,10 +92,10 @@ public:
 		/// facilities, these threads must also complete
 		/// before joinAll() can return.
 
-	TaskList taskList() const;
+	[[nodiscard]] TaskList taskList() const;
 		/// Returns a copy of the internal task list.
 
-	int count() const;
+	[[nodiscard]] int count() const;
 		/// Returns the number of tasks in the internal task list.
 
 	void addObserver(const AbstractObserver& observer);

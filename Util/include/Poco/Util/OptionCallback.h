@@ -31,7 +31,7 @@ public:
 	virtual void invoke(const std::string& name, const std::string& value) const = 0;
 		/// Invokes the callback member function.
 
-	virtual AbstractOptionCallback* clone() const = 0;
+	[[nodiscard]] virtual AbstractOptionCallback* clone() const = 0;
 		/// Creates and returns a copy of the object.
 
 	virtual ~AbstractOptionCallback();
@@ -89,7 +89,7 @@ public:
 		(_pObject->*_method)(name, value);
 	}
 
-	AbstractOptionCallback* clone() const
+	[[nodiscard]] AbstractOptionCallback* clone() const
 	{
 		return new OptionCallback(_pObject, _method);
 	}

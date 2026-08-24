@@ -87,7 +87,7 @@ public:
 	void addStream(std::ostream& ostr);
 		/// Adds the given output stream.
 
-	TeeStreamBuf* rdbuf();
+	[[nodiscard]] TeeStreamBuf* rdbuf();
 		/// Returns a pointer to the underlying streambuf.
 
 protected:

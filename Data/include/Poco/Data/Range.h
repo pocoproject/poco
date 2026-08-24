@@ -35,10 +35,10 @@ public:
 	~Range();
 		/// Destroys the Limit.
 
-	const Limit& lower() const;
+	[[nodiscard]] const Limit& lower() const;
 		/// Returns the lower limit
 
-	const Limit& upper() const;
+	[[nodiscard]] const Limit& upper() const;
 		/// Returns the upper limit
 
 private:
@@ -66,7 +66,7 @@ namespace Keywords {
 
 
 template <typename T>
-Limit limit(T lim, bool hard = false)
+[[nodiscard]] Limit limit(T lim, bool hard = false)
 	/// Creates an upperLimit
 {
 	return Limit(static_cast<Limit::SizeT>(lim), hard, false);
@@ -74,21 +74,21 @@ Limit limit(T lim, bool hard = false)
 
 
 template <typename T>
-Limit upperLimit(T lim, bool hard = false)
+[[nodiscard]] Limit upperLimit(T lim, bool hard = false)
 {
 	return limit(lim, hard);
 }
 
 
 template <typename T>
-Limit lowerLimit(T lim)
+[[nodiscard]] Limit lowerLimit(T lim)
 {
 	return Limit(static_cast<Limit::SizeT>(lim), true, true);
 }
 
 
 template <typename T>
-Range range(T low, T upp, bool hard = false)
+[[nodiscard]] Range range(T low, T upp, bool hard = false)
 {
 	return Range(static_cast<Limit::SizeT>(low), static_cast<Limit::SizeT>(upp), hard);
 }

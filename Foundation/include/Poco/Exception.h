@@ -50,32 +50,32 @@ public:
 	Exception& operator = (const Exception& exc);
 		/// Assignment operator.
 
-	virtual const char* name() const noexcept;
+	[[nodiscard]] virtual const char* name() const noexcept;
 		/// Returns a static string describing the exception.
 
-	virtual const char* className() const noexcept;
+	[[nodiscard]] virtual const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
-	const char* what() const noexcept override;
+	[[nodiscard]] const char* what() const noexcept override;
 		/// Returns a static string describing the exception.
 		///
 		/// Same as name(), but for compatibility with std::exception.
 
-	const Exception* nested() const;
+	[[nodiscard]] const Exception* nested() const;
 		/// Returns a pointer to the nested exception, or
 		/// null if no nested exception exists.
 
-	const std::string& message() const;
+	[[nodiscard]] const std::string& message() const;
 		/// Returns the message text.
 
-	int code() const;
+	[[nodiscard]] int code() const;
 		/// Returns the exception code if defined.
 
-	std::string displayText() const;
+	[[nodiscard]] std::string displayText() const;
 		/// Returns a string consisting of the
 		/// message name and the message text.
 
-	virtual Exception* clone() const;
+	[[nodiscard]] virtual Exception* clone() const;
 		/// Creates an exact copy of the exception.
 		///
 		/// The copy can later be thrown again by
@@ -155,8 +155,11 @@ inline int Exception::code() const
 		CLS(const CLS& exc);														\
 		~CLS() noexcept;																\
 		CLS& operator = (const CLS& exc);											\
+		[[nodiscard]]                                                               \
 		const char* name() const noexcept;											\
+		[[nodiscard]]                                                               \
 		const char* className() const noexcept;										\
+		[[nodiscard]]                                                               \
 		Poco::Exception* clone() const;												\
 		void rethrow() const;														\
 	};
@@ -188,14 +191,17 @@ inline int Exception::code() const
 		BASE::operator = (exc);																		\
 		return *this;																				\
 	}																								\
+	[[nodiscard]]                                                                                   \
 	const char* CLS::name() const noexcept															\
 	{																								\
 		return NAME;																				\
 	}																								\
+	[[nodiscard]]                                                                                   \
 	const char* CLS::className() const noexcept														\
 	{																								\
 		return typeid(*this).name();																\
 	}																								\
+	[[nodiscard]]                                                                                   \
 	Poco::Exception* CLS::clone() const																\
 	{																								\
 		return new CLS(*this);																		\

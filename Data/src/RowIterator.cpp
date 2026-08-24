@@ -173,7 +173,7 @@ const RowIterator& RowIterator::operator ++ () const
 }
 
 
-RowIterator RowIterator::operator ++ (int) const
+RowIterator RowIterator::operator ++ ([[maybe_unused]] int n) const
 {
 	RowIterator old(*this);
 	increment();
@@ -188,7 +188,7 @@ const RowIterator& RowIterator::operator -- () const
 }
 
 
-RowIterator RowIterator::operator -- (int) const
+RowIterator RowIterator::operator -- ([[maybe_unused]] int n) const
 {
 	RowIterator old(*this);
 	decrement();

@@ -65,10 +65,10 @@ public:
 		/// sent yet, sends a 500 (Internal Server Error) response with
 		/// the exception's display text.
 
-	HTTPServerRequest& request();
+	[[nodiscard]] HTTPServerRequest& request();
 		/// Returns the request.
 
-	HTTPServerResponse& response();
+	[[nodiscard]] HTTPServerResponse& response();
 		/// Returns the response.
 
 	HTMLForm& form();
@@ -95,7 +95,7 @@ protected:
 		///
 		/// Handles the given request.
 
-	virtual bool authenticate();
+	[[nodiscard]] virtual bool authenticate();
 		/// Check authentication; returns true if okay, false if failed to authenticate.
 		/// The default implementation always returns true.
 		///

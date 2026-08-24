@@ -246,7 +246,7 @@ public:
 	}
 
 	template <class Other>
-	SharedPtr<Other, RC, RP> cast() const
+	[[nodiscard]] SharedPtr<Other, RC, RP> cast() const
 		/// Casts the SharedPtr via a dynamic cast to the given type.
 		/// Returns an SharedPtr containing nullptr if the cast fails.
 		/// Example: (assume class Sub: public Super)
@@ -261,7 +261,7 @@ public:
 	}
 
 	template <class Other>
-	SharedPtr<Other, RC, RP> unsafeCast() const
+	[[nodiscard]] SharedPtr<Other, RC, RP> unsafeCast() const
 		/// Casts the SharedPtr via a static cast to the given type.
 		/// Example: (assume class Sub: public Super)
 		///    SharedPtr<Super> super(new Sub());
@@ -292,143 +292,143 @@ public:
 		return *deref();
 	}
 
-	C* get()
+	[[nodiscard]] C* get()
 	{
 		return _ptr;
 	}
 
-	const C* get() const
+	[[nodiscard]] const C* get() const
 	{
 		return _ptr;
 	}
 
-	operator C* ()
+	[[nodiscard]] operator C* ()
 	{
 		return _ptr;
 	}
 
-	operator const C* () const
+	[[nodiscard]] operator const C* () const
 	{
 		return _ptr;
 	}
 
-	bool operator ! () const
+	[[nodiscard]] bool operator ! () const
 	{
 		return _ptr == nullptr;
 	}
 
-	bool isNull() const
+	[[nodiscard]] bool isNull() const
 	{
 		return _ptr == nullptr;
 	}
 
-	bool operator == (const SharedPtr& ptr) const
+	[[nodiscard]] bool operator == (const SharedPtr& ptr) const
 	{
 		return get() == ptr.get();
 	}
 
-	bool operator == (const C* ptr) const
+	[[nodiscard]] bool operator == (const C* ptr) const
 	{
 		return get() == ptr;
 	}
 
-	bool operator == (C* ptr) const
+	[[nodiscard]] bool operator == (C* ptr) const
 	{
 		return get() == ptr;
 	}
 
-	bool operator == (std::nullptr_t ptr) const
+	[[nodiscard]] bool operator == (std::nullptr_t ptr) const
 	{
 		return get() == ptr;
 	}
 
-	bool operator != (const SharedPtr& ptr) const
+	[[nodiscard]] bool operator != (const SharedPtr& ptr) const
 	{
 		return get() != ptr.get();
 	}
 
-	bool operator != (const C* ptr) const
+	[[nodiscard]] bool operator != (const C* ptr) const
 	{
 		return get() != ptr;
 	}
 
-	bool operator != (C* ptr) const
+	[[nodiscard]] bool operator != (C* ptr) const
 	{
 		return get() != ptr;
 	}
 
-	bool operator != (std::nullptr_t ptr) const
+	[[nodiscard]] bool operator != (std::nullptr_t ptr) const
 	{
 		return get() != ptr;
 	}
 
-	bool operator < (const SharedPtr& ptr) const
+	[[nodiscard]] bool operator < (const SharedPtr& ptr) const
 	{
 		return get() < ptr.get();
 	}
 
-	bool operator < (const C* ptr) const
+	[[nodiscard]] bool operator < (const C* ptr) const
 	{
 		return get() < ptr;
 	}
 
-	bool operator < (C* ptr) const
+	[[nodiscard]] bool operator < (C* ptr) const
 	{
 		return get() < ptr;
 	}
 
-	bool operator <= (const SharedPtr& ptr) const
+	[[nodiscard]] bool operator <= (const SharedPtr& ptr) const
 	{
 		return get() <= ptr.get();
 	}
 
-	bool operator <= (const C* ptr) const
+	[[nodiscard]] bool operator <= (const C* ptr) const
 	{
 		return get() <= ptr;
 	}
 
-	bool operator <= (C* ptr) const
+	[[nodiscard]] bool operator <= (C* ptr) const
 	{
 		return get() <= ptr;
 	}
 
-	bool operator > (const SharedPtr& ptr) const
+	[[nodiscard]] bool operator > (const SharedPtr& ptr) const
 	{
 		return get() > ptr.get();
 	}
 
-	bool operator > (const C* ptr) const
+	[[nodiscard]] bool operator > (const C* ptr) const
 	{
 		return get() > ptr;
 	}
 
-	bool operator > (C* ptr) const
+	[[nodiscard]] bool operator > (C* ptr) const
 	{
 		return get() > ptr;
 	}
 
-	bool operator >= (const SharedPtr& ptr) const
+	[[nodiscard]] bool operator >= (const SharedPtr& ptr) const
 	{
 		return get() >= ptr.get();
 	}
 
-	bool operator >= (const C* ptr) const
+	[[nodiscard]] bool operator >= (const C* ptr) const
 	{
 		return get() >= ptr;
 	}
 
-	bool operator >= (C* ptr) const
+	[[nodiscard]] bool operator >= (C* ptr) const
 	{
 		return get() >= ptr;
 	}
 
-	int referenceCount() const
+	[[nodiscard]] int referenceCount() const
 	{
 		return _pCounter ? _pCounter->referenceCount() : 0;
 	}
 
 private:
-	C* deref() const
+	[[nodiscard]] C* deref() const
 	{
 		if (!_ptr)
 			throw NullPointerException();
@@ -471,14 +471,14 @@ inline void swap(SharedPtr<C, RC, RP>& p1, SharedPtr<C, RC, RP>& p2)
 
 
 template <typename T, typename... Args>
-SharedPtr<T> makeShared(Args&&... args)
+[[nodiscard]] SharedPtr<T> makeShared(Args&&... args)
 {
 	return SharedPtr<T>(new T(std::forward<Args>(args)...));
 }
 
 
 template <typename T>
-SharedPtr<T, ReferenceCounter, ReleaseArrayPolicy<T>> makeSharedArray(std::size_t size)
+[[nodiscard]] SharedPtr<T, ReferenceCounter, ReleaseArrayPolicy<T>> makeSharedArray(std::size_t size)
 {
 	return SharedPtr<T, ReferenceCounter, ReleaseArrayPolicy<T>>(new T[size]);
 }

@@ -52,21 +52,21 @@ public:
 	~StringTokenizer();
 		/// Destroys the tokenizer.
 
-	Iterator begin() const;
-	Iterator end() const;
+	[[nodiscard]] Iterator begin() const;
+	[[nodiscard]] Iterator end() const;
 
-	const std::string& operator [] (std::size_t index) const;
+	[[nodiscard]] const std::string& operator [] (std::size_t index) const;
 		/// Returns const reference the index'th token.
 		/// Throws a RangeException if the index is out of range.
 
-	std::string& operator [] (std::size_t index);
+	[[nodiscard]] std::string& operator [] (std::size_t index);
 		/// Returns reference to the index'th token.
 		/// Throws a RangeException if the index is out of range.
 
-	bool has(const std::string& token) const;
+	[[nodiscard]] bool has(const std::string& token) const;
 		/// Returns true if token exists, false otherwise.
 
-	std::string::size_type find(const std::string& token, std::string::size_type pos = 0) const;
+	[[nodiscard]] std::string::size_type find(const std::string& token, std::string::size_type pos = 0) const;
 		/// Returns the index of the first occurrence of the token
 		/// starting at position pos.
 		/// Throws a NotFoundException if the token is not found.
@@ -76,10 +76,10 @@ public:
 		/// equal to oldToken with newToken.
 		/// Returns the number of modified tokens.
 
-	std::size_t count() const;
+	[[nodiscard]] std::size_t count() const;
 		/// Returns the total number of tokens.
 
-	std::size_t count(const std::string& token) const;
+	[[nodiscard]] std::size_t count(const std::string& token) const;
 		/// Returns the number of tokens equal to the specified token.
 
 private:

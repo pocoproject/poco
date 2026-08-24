@@ -159,7 +159,7 @@ public:
 	void onConnect()
 	{
 		_socket.setBlocking(true);
-		createServiceHandler();
+		(void) createServiceHandler();
 	}
 
 protected:
@@ -178,7 +178,7 @@ protected:
 	{
 	}
 
-	SocketReactor* reactor()
+	[[nodiscard]] SocketReactor* reactor()
 		/// Returns a pointer to the SocketReactor where
 		/// this SocketConnector is registered.
 		///
@@ -187,7 +187,7 @@ protected:
 		return _pReactor;
 	}
 
-	StreamSocket& socket()
+	[[nodiscard]] StreamSocket& socket()
 		/// Returns a reference to the SocketConnector's socket.
 	{
 		return _socket;

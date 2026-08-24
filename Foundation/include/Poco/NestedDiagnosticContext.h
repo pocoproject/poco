@@ -76,10 +76,10 @@ public:
 	void pop();
 		/// Pops the top-most context off the stack.
 
-	int depth() const;
+	[[nodiscard]] int depth() const;
 		/// Returns the depth (number of contexts) of the stack.
 
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Returns the stack as a string with entries
 		/// delimited by colons. The string does not contain
 		/// line numbers and filenames.
@@ -98,7 +98,7 @@ public:
 	void clear();
 		/// Clears the NDC stack.
 
-	static NestedDiagnosticContext& current();
+	[[nodiscard]] static NestedDiagnosticContext& current();
 		/// Returns the current thread's NDC.
 
 private:
@@ -121,10 +121,10 @@ class Foundation_API NDCScope
 	/// the context at the end of the scope.
 {
 public:
-	NDCScope(const std::string& info);
+	POCO_NODISCARD_CTOR NDCScope(const std::string& info);
 		/// Pushes a context on the stack.
 
-	NDCScope(const std::string& info, LineNumber line, const char* filename);
+	POCO_NODISCARD_CTOR NDCScope(const std::string& info, LineNumber line, const char* filename);
 		/// Pushes a context on the stack.
 
 	~NDCScope();

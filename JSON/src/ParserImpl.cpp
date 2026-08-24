@@ -68,7 +68,7 @@ void ParserImpl::handle(const std::string& json)
 	try
 	{
 		json_open_buffer(_pJSON, json.data(), json.size());
-		checkError();
+		(void) checkError();
 		//////////////////////////////////
 		// Underlying parser is capable of parsing multiple consecutive JSONs;
 		// we do not currently support this feature; to force error on
@@ -78,7 +78,7 @@ void ParserImpl::handle(const std::string& json)
 		json_set_streaming(_pJSON, false);
 		/////////////////////////////////
 		handle();
-		checkError();
+		(void) checkError();
 		if (JSON_DONE != json_next(_pJSON))
 			throw JSONException("Excess characters found after JSON end.");
 		json_close(_pJSON);
@@ -96,10 +96,10 @@ void ParserImpl::handle(std::istream& json)
 	try
 	{
 		json_open_user(_pJSON, istream_get, istream_peek, json.rdbuf());
-		checkError();
+		(void) checkError();
 		json_set_streaming(_pJSON, false);
 		handle();
-		checkError();
+		(void) checkError();
 		if (JSON_DONE != json_next(_pJSON))
 			throw JSONException("Excess characters found after JSON end.");
 		json_close(_pJSON);

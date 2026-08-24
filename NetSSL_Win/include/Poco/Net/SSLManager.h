@@ -142,7 +142,7 @@ public:
 		/// Fired when a encrypted certificate is loaded. Not setting the password
 		/// in the event parameter will result in a failure to load the certificate.
 
-	static SSLManager& instance();
+	[[nodiscard]] static SSLManager& instance();
 		/// Returns the instance of the SSLManager singleton.
 
 	void initializeServer(PrivateKeyPassphraseHandlerPtr ptrPassphraseHandler, InvalidCertificateHandlerPtr pCertificateHandler, Context::Ptr pContext);
@@ -175,39 +175,39 @@ public:
 		///     Context::Ptr pContext = new Context(Context::CLIENT_USE, "");
 		///     SSLManager::instance().initializeClient(pInvalidCertHandler, pContext);
 
-	Context::Ptr defaultServerContext();
+	[[nodiscard]] Context::Ptr defaultServerContext();
 		/// Returns the default Context used by the server.
 		///
 		/// Unless initializeServer() has been called, the first call to this method initializes the default Context
 		/// from the application configuration.
 
-	Context::Ptr defaultClientContext();
+	[[nodiscard]] Context::Ptr defaultClientContext();
 		/// Returns the default Context used by the client.
 		///
 		/// Unless initializeClient() has been called, the first call to this method initializes the default Context
 		/// from the application configuration.
 
-	PrivateKeyPassphraseHandlerPtr serverPassphraseHandler();
+	[[nodiscard]] PrivateKeyPassphraseHandlerPtr serverPassphraseHandler();
 		/// Returns the configured passphrase handler of the server. If none is set, the method will create a default one
 		/// from an application configuration.
 
-	InvalidCertificateHandlerPtr serverCertificateHandler();
+	[[nodiscard]] InvalidCertificateHandlerPtr serverCertificateHandler();
 		/// Returns an initialized certificate handler (used by the server to verify client cert) which determines how invalid certificates are treated.
 		/// If none is set, it will try to auto-initialize one from an application configuration.
 
-	PrivateKeyPassphraseHandlerPtr clientPassphraseHandler();
+	[[nodiscard]] PrivateKeyPassphraseHandlerPtr clientPassphraseHandler();
 		/// Returns the configured passphrase handler of the client. If none is set, the method will create a default one
 		/// from an application configuration.
 
-	InvalidCertificateHandlerPtr clientCertificateHandler();
+	[[nodiscard]] InvalidCertificateHandlerPtr clientCertificateHandler();
 		/// Returns an initialized certificate handler (used by the client to verify server cert) which determines how invalid certificates are treated.
 		/// If none is set, it will try to auto-initialize one from an application configuration.
 
-	PrivateKeyFactoryMgr& privateKeyFactoryMgr();
+	[[nodiscard]] PrivateKeyFactoryMgr& privateKeyFactoryMgr();
 		/// Returns the private key factory manager which stores the
 		/// factories for the different registered passphrase handlers for private keys.
 
-	CertificateHandlerFactoryMgr& certificateHandlerFactoryMgr();
+	[[nodiscard]] CertificateHandlerFactoryMgr& certificateHandlerFactoryMgr();
 		/// Returns the CertificateHandlerFactoryMgr which stores the
 		/// factories for the different registered certificate handlers.
 
@@ -224,7 +224,7 @@ public:
 	static const std::string CFG_CLIENT_PREFIX;
 
 protected:
-	SecurityFunctionTableW& securityFunctions();
+	[[nodiscard]] SecurityFunctionTableW& securityFunctions();
 
 private:
 	SSLManager();
@@ -251,7 +251,7 @@ private:
 	void unloadSecurityLibrary();
 		/// Unloads the Windows security DLL.
 
-	static Poco::Util::AbstractConfiguration& appConfig();
+	[[nodiscard]] static Poco::Util::AbstractConfiguration& appConfig();
 		/// Returns the application configuration.
 		///
 		/// Throws a InvalidStateException if not application instance

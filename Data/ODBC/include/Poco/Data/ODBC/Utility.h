@@ -42,13 +42,13 @@ public:
 	typedef std::map<std::string, std::string> DSNMap;
 	typedef DSNMap DriverMap;
 
-	static bool isError(SQLRETURN rc);
+	[[nodiscard]] static bool isError(SQLRETURN rc);
 		/// Returns true if return code is error
 
-	static DriverMap& drivers(DriverMap& driverMap);
+	[[nodiscard]] static DriverMap& drivers(DriverMap& driverMap);
 		/// Returns driver-attributes map of available ODBC drivers.
 
-	static DSNMap& dataSources(DSNMap& dsnMap);
+	[[nodiscard]] static DSNMap& dataSources(DSNMap& dsnMap);
 		/// Returns DSN-description map of available ODBC data sources.
 
 	template<typename MapType, typename KeyArgType, typename ValueArgType>
@@ -68,10 +68,10 @@ public:
 		}
 	}
 
-	static int cDataType(int sqlDataType);
+	[[nodiscard]] static int cDataType(int sqlDataType);
 		/// Returns C data type corresponding to supplied SQL data type.
 
-	static int sqlDataType(int cDataType);
+	[[nodiscard]] static int sqlDataType(int cDataType);
 		/// Returns SQL data type corresponding to supplied C data type.
 
 	static void dateSync(Date& dt, const SQL_DATE_STRUCT& ts);
@@ -164,27 +164,27 @@ public:
 		for (; it != end; ++it, ++tIt) dateTimeSync(*tIt, *it);
 	}
 
-	static std::string sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type);
+	[[nodiscard]] static std::string sqlGetInfo(const ConnectionHandle& db, SQLUSMALLINT type);
 		/// Returns the requested info about the DBMS or ODBC driver.
 		/// On error, returns "unknown".
 
-	static std::string dbmsName(const ConnectionHandle& db);
+	[[nodiscard]] static std::string dbmsName(const ConnectionHandle& db);
 		/// Returns the back end DBMS name.
 
-	std::string dbmsVersion(const ConnectionHandle& db);
+	[[nodiscard]] std::string dbmsVersion(const ConnectionHandle& db);
 		/// Returns the back end DBMS version.
 
-	std::string driverName(const ConnectionHandle& db);
+	[[nodiscard]] std::string driverName(const ConnectionHandle& db);
 		/// Returns the driver name.
 
-	std::string driverVersion(const ConnectionHandle& db);
+	[[nodiscard]] std::string driverVersion(const ConnectionHandle& db);
 		/// Returns the driver version.
 
-	std::string driverODBCVersion(const ConnectionHandle& db);
+	[[nodiscard]] std::string driverODBCVersion(const ConnectionHandle& db);
 		/// Returns the driver ODBC standard version.
 
 	template <typename T>
-	static constexpr SQLINTEGER sizeOf()
+	[[nodiscard]] static constexpr SQLINTEGER sizeOf()
 		/// Returns size of the data type.
 	{
 		static_assert (
@@ -202,7 +202,7 @@ public:
 	}
 
 	template <typename T>
-	static constexpr SQLINTEGER sizeOf(const T&)
+	[[nodiscard]] static constexpr SQLINTEGER sizeOf(const T&)
 		/// Returns size of the data type.
 	{
 		return sizeOf<std::remove_const_t<std::remove_reference_t<T>>>();

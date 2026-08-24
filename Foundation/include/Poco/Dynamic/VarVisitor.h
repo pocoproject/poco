@@ -31,14 +31,14 @@ namespace Poco::Details {
 
 struct TypeInfoHash
 {
-	inline std::size_t operator()(std::type_info const& t) const { return t.hash_code(); }
+	[[nodiscard]] inline std::size_t operator()(std::type_info const& t) const { return t.hash_code(); }
 };
 
 
 struct EqualRef
 {
 	template <typename T>
-	bool operator()(std::reference_wrapper<T> a, std::reference_wrapper<T> b) const
+	[[nodiscard]] bool operator()(std::reference_wrapper<T> a, std::reference_wrapper<T> b) const
 	{
 		return a.get() == b.get();
 	}

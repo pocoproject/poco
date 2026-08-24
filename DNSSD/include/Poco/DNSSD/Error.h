@@ -45,13 +45,13 @@ public:
 	~Error();
 		/// Destroys the ServiceError.
 
-	Poco::Int32 networkInterface() const;
+	[[nodiscard]] Poco::Int32 networkInterface() const;
 		/// Returns the network interface on which the error occurred.
 
-	Poco::Int32 code() const;
+	[[nodiscard]] Poco::Int32 code() const;
 		/// Returns the implementation-specific error code.
 
-	const std::string& message() const;
+	[[nodiscard]] const std::string& message() const;
 		/// Returns the human-readable error message.
 
 private:

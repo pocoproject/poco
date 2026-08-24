@@ -37,7 +37,7 @@ public:
 	~Error();
 		/// Destroys the Error.
 
-	const std::string& getMessage() const;
+	[[nodiscard]] const std::string& getMessage() const;
 		/// Returns the error message.
 
 	void setMessage(const std::string& message);
@@ -65,7 +65,7 @@ inline void Error::setMessage(const std::string& message)
 }
 
 
-template<>
+template <>
 struct RedisTypeTraits<Error>
 {
 	enum { TypeId = RedisType::REDIS_ERROR };

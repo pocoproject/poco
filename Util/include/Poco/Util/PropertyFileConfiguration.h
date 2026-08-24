@@ -203,15 +203,15 @@ private:
 		/// Resolves and loads one include directive's file (cycle-guarded).
 		/// optional = the ?include form: a missing file is silently skipped.
 	static void saveToFile(const std::string& path, const std::map<std::string, std::string>& values);
-	std::string resolveIncludePath(const std::string& rawPath, const std::string& basePath) const;
-	static std::string extractIncludePath(const std::string& line, bool* pOptional = nullptr);
+	[[nodiscard]] std::string resolveIncludePath(const std::string& rawPath, const std::string& basePath) const;
+	[[nodiscard]] static std::string extractIncludePath(const std::string& line, bool* pOptional = nullptr);
 		/// If line is an !include or ?include directive, returns the raw path
 		/// (and sets *pOptional to true for the ?include form); otherwise
 		/// returns empty.
-	std::vector<std::string> scanIncludeFiles(const std::string& filePath) const;
+	[[nodiscard]] std::vector<std::string> scanIncludeFiles(const std::string& filePath) const;
 		/// Scans the given file for !include / ?include directives. Caller must hold the lock.
 	static int readChar(std::istream& istr);
-	static std::string escapeValue(const std::string& value);
+	[[nodiscard]] static std::string escapeValue(const std::string& value);
 
 	AbstractConfiguration* _pParentConfig = nullptr;
 		/// Non-owning back-pointer to the parent configuration used for

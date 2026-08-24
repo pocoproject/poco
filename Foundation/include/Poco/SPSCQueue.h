@@ -95,14 +95,14 @@ public:
 	SPSCQueue(SPSCQueue&&) = delete;
 	SPSCQueue& operator=(SPSCQueue&&) = delete;
 
-	bool tryPush(const T& item)
+	[[nodiscard]] bool tryPush(const T& item)
 		/// Attempts to push a copy of item onto the queue.
 		/// Returns true if successful, false if the queue is full.
 	{
 		return emplace(item);
 	}
 
-	bool tryPush(T&& item)
+	[[nodiscard]] bool tryPush(T&& item)
 		/// Attempts to push item onto the queue using move semantics.
 		/// Returns true if successful, false if the queue is full.
 	{
@@ -136,7 +136,7 @@ public:
 		return true;
 	}
 
-	bool tryPop(T& item)
+	[[nodiscard]] bool tryPop(T& item)
 		/// Attempts to pop an item from the queue.
 		/// If successful, moves the item into the provided reference
 		/// and returns true. Returns false if the queue is empty.
@@ -163,7 +163,7 @@ public:
 		return true;
 	}
 
-	std::size_t size() const
+	[[nodiscard]] std::size_t size() const
 		/// Returns an approximate count of items in the queue.
 		/// This is approximate because the producer and consumer
 		/// may be modifying the queue concurrently.
@@ -173,21 +173,21 @@ public:
 		return head - tail;
 	}
 
-	bool empty() const
+	[[nodiscard]] bool empty() const
 		/// Returns true if the queue appears to be empty.
 		/// This is approximate for the same reason as size().
 	{
 		return size() == 0;
 	}
 
-	std::size_t capacity() const
+	[[nodiscard]] std::size_t capacity() const
 		/// Returns the capacity of the queue.
 	{
 		return _capacity;
 	}
 
 private:
-	static std::size_t nextPowerOfTwo(std::size_t n)
+	[[nodiscard]] static std::size_t nextPowerOfTwo(std::size_t n)
 	{
 		if (n == 0) return 1;
 		--n;
@@ -203,7 +203,7 @@ private:
 		return n + 1;
 	}
 
-	std::size_t index(std::size_t pos) const
+	[[nodiscard]] std::size_t index(std::size_t pos) const
 	{
 		return pos & _mask;
 	}

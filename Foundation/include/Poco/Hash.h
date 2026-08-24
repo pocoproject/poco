@@ -35,23 +35,22 @@
 
 namespace Poco {
 
-
-std::size_t Foundation_API hash(Int8 n);
-std::size_t Foundation_API hash(UInt8 n);
-std::size_t Foundation_API hash(Int16 n);
-std::size_t Foundation_API hash(UInt16 n);
-std::size_t Foundation_API hash(Int32 n);
-std::size_t Foundation_API hash(UInt32 n);
-std::size_t Foundation_API hash(Int64 n);
-std::size_t Foundation_API hash(UInt64 n);
-std::size_t Foundation_API hash(const std::string& str);
+[[nodiscard]] std::size_t Foundation_API hash(Int8 n);
+[[nodiscard]] std::size_t Foundation_API hash(UInt8 n);
+[[nodiscard]] std::size_t Foundation_API hash(Int16 n);
+[[nodiscard]] std::size_t Foundation_API hash(UInt16 n);
+[[nodiscard]] std::size_t Foundation_API hash(Int32 n);
+[[nodiscard]] std::size_t Foundation_API hash(UInt32 n);
+[[nodiscard]] std::size_t Foundation_API hash(Int64 n);
+[[nodiscard]] std::size_t Foundation_API hash(UInt64 n);
+[[nodiscard]] std::size_t Foundation_API hash(const std::string& str);
 
 
 template <class T>
 struct Hash
 	/// A generic hash function.
 {
-	std::size_t operator () (T value) const
+	[[nodiscard]] std::size_t operator () (T value) const
 		/// Returns the hash for the given value.
 	{
 		return Poco::hash(value);
@@ -171,7 +170,7 @@ inline void hashCombine(std::size_t& seed, T const& v)
 
 
 template <class It>
-inline std::size_t hashRange(It first, It last)
+[[nodiscard]] inline std::size_t hashRange(It first, It last)
 {
 	std::size_t seed = 0;
 

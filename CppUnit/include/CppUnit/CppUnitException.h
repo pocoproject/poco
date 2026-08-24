@@ -37,12 +37,12 @@ public:
 
 	CppUnitException& operator = (const CppUnitException& other);
 
-	const char* what() const noexcept override;
+	[[nodiscard]] const char* what() const noexcept override;
 
-	long lineNumber() const;
-	long data1LineNumber() const;
-	long data2LineNumber() const;
-	const std::string& fileName() const;
+	[[nodiscard]] long lineNumber() const;
+	[[nodiscard]] long data1LineNumber() const;
+	[[nodiscard]] long data2LineNumber() const;
+	[[nodiscard]] const std::string& fileName() const;
 
 	static const std::string CPPUNIT_UNKNOWNFILENAME;
 	static constexpr int CPPUNIT_UNKNOWNLINENUMBER = -1;

@@ -46,17 +46,17 @@ protected:
 	using StringMap = std::map<std::string, std::string>;
 	using iterator = StringMap::const_iterator;
 
-	bool getRaw(const std::string& key, std::string& value) const override;
+	[[nodiscard]] bool getRaw(const std::string& key, std::string& value) const override;
 	void setRaw(const std::string& key, const std::string& value) override;
 	void enumerate(const std::string& key, Keys& range) const override;
 	void removeRaw(const std::string& key) override;
 
-	iterator begin() const
+	[[nodiscard]] iterator begin() const
 	{
 		return _map.begin();
 	}
 
-	iterator end() const
+	[[nodiscard]] iterator end() const
 	{
 		return _map.end();
 	}

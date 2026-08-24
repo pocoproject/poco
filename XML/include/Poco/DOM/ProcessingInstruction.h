@@ -32,17 +32,17 @@ class XML_API ProcessingInstruction: public AbstractNode
 	/// of the document.
 {
 public:
-	const XMLString& target() const;
+	[[nodiscard]] const XMLString& target() const;
 		/// Returns the target of this processing instruction.
 		/// XML defines this as being the first token following
 		/// the markup that begins the processing instruction.
 
-	const XMLString& data() const;
+	[[nodiscard]] const XMLString& data() const;
 		/// Returns the content of this processing instruction. This is from the first non
 		/// white space character after the target to the character immediately preceding
 		/// the ?>.
 
-	const XMLString& getData() const;
+	[[nodiscard]] const XMLString& getData() const;
 		/// Returns the content of this processing instruction. This is from the first non
 		/// white space character after the target to the character immediately preceding
 		/// the ?>.
@@ -51,17 +51,17 @@ public:
 		/// Sets the content of this processing instruction.
 
 	// Node
-	const XMLString& nodeName() const;
-	const XMLString& getNodeValue() const;
+	[[nodiscard]] const XMLString& nodeName() const;
+	[[nodiscard]] const XMLString& getNodeValue() const;
 	void setNodeValue(const XMLString& data);
-	unsigned short nodeType() const;
+	[[nodiscard]] unsigned short nodeType() const;
 
 protected:
 	ProcessingInstruction(Document* pOwnerDocument, const XMLString& target, const XMLString& data);
 	ProcessingInstruction(Document* pOwnerDocument, const ProcessingInstruction& processingInstruction);
 	~ProcessingInstruction();
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	[[nodiscard]] Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:
 	XMLString _target;

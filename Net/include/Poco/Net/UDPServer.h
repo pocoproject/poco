@@ -69,14 +69,14 @@ public:
 		_thread.join();
 	}
 
-	Poco::UInt16 port() const
+	[[nodiscard]] Poco::UInt16 port() const
 		/// Returns the port the server is
 		/// listening on.
 	{
 		return _poller.port();
 	}
 
-	Poco::Net::SocketAddress address() const
+	[[nodiscard]] Poco::Net::SocketAddress address() const
 		/// Returns the address of the server.
 	{
 		return _poller.address();

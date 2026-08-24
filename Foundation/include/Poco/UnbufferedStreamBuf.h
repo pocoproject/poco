@@ -60,7 +60,7 @@ public:
 	BasicUnbufferedStreamBuf(const BasicUnbufferedStreamBuf&) = delete;
 	BasicUnbufferedStreamBuf& operator=(const BasicUnbufferedStreamBuf&) = delete;
 
-	int_type overflow(int_type c) override
+	[[nodiscard]] int_type overflow(int_type c) override
 	{
 		if (c != char_traits::eof())
 			return writeToDevice(char_traits::to_char_type(c));
@@ -68,7 +68,7 @@ public:
 			return c;
 	}
 
-	int_type underflow() override
+	[[nodiscard]] int_type underflow() override
 	{
 		if (_ispb)
 		{
@@ -86,7 +86,7 @@ public:
 		}
 	}
 
-	int_type uflow() override
+	[[nodiscard]] int_type uflow() override
 	{
 		if (_ispb)
 		{
@@ -104,7 +104,7 @@ public:
 		}
 	}
 
-	int_type pbackfail(int_type c) override
+	[[nodiscard]] int_type pbackfail(int_type c) override
 	{
 		if (_ispb)
 		{
@@ -118,7 +118,7 @@ public:
 		}
 	}
 
-	std::streamsize xsgetn(char_type* p, std::streamsize count) override
+	[[nodiscard]] std::streamsize xsgetn(char_type* p, std::streamsize count) override
 		/// Some platforms (for example, Compaq C++) have buggy implementations of
 		/// xsgetn that handle null buffers incorrectly.
 		/// Anyway, it does not hurt to provide an optimized implementation
@@ -137,7 +137,7 @@ public:
 	}
 
 protected:
-	static int_type charToInt(char_type c)
+	[[nodiscard]] static int_type charToInt(char_type c)
 	{
 		return char_traits::to_int_type(c);
 	}

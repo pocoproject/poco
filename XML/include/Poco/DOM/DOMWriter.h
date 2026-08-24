@@ -46,7 +46,7 @@ public:
 	void setEncoding(const std::string& encodingName, Poco::TextEncoding& textEncoding);
 		/// Sets the encoding, which will be reflected in the written XML declaration.
 
-	const std::string& getEncoding() const;
+	[[nodiscard]] const std::string& getEncoding() const;
 		/// Returns the encoding name set with setEncoding.
 
 	void setOptions(int options);
@@ -54,7 +54,7 @@ public:
 		///
 		/// See class XMLWriter for available options.
 
-	int getOptions() const;
+	[[nodiscard]] int getOptions() const;
 		/// Returns the options for the internal XMLWriter.
 
 	void setNewLine(const std::string& newLine);
@@ -62,7 +62,7 @@ public:
 		/// XMLWriter. See XMLWriter::setNewLine() for a list
 		/// of supported values.
 
-	const std::string& getNewLine() const;
+	[[nodiscard]] const std::string& getNewLine() const;
 		/// Returns the line ending characters used by the
 		/// internal XMLWriter.
 
@@ -74,7 +74,7 @@ public:
 		/// characters (e.g., a single TAB character, or
 		/// two to four SPACE characters).
 
-	const std::string& getIndent() const;
+	[[nodiscard]] const std::string& getIndent() const;
 		/// Returns the string used for one indentation step.
 
 	void writeNode(XMLByteOutputStream& ostr, const Node* pNode);

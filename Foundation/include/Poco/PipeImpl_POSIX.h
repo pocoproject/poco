@@ -38,8 +38,8 @@ public:
 	~PipeImpl() override;
 	int writeBytes(const void* buffer, int length);
 	int readBytes(void* buffer, int length);
-	Handle readHandle() const;
-	Handle writeHandle() const;
+	[[nodiscard]] Handle readHandle() const;
+	[[nodiscard]] Handle writeHandle() const;
 	void close();
 	void closeRead();
 	void closeWrite();

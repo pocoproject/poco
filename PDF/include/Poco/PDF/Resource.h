@@ -62,13 +62,13 @@ public:
 		return *this;
 	}
 
-	operator const Type& () const
+	[[nodiscard]] operator const Type& () const
 		/// Const conversion operator into reference to native type.
 	{
 		return _resource;
 	}
 
-	bool operator == (const Resource& other) const
+	[[nodiscard]] bool operator == (const Resource& other) const
 		/// Equality operator.
 	{
 		return _pPDF == other._pPDF && _resource == other._resource;
@@ -83,13 +83,13 @@ public:
 		swap(_name, other._name);
 	}
 
-	virtual const std::string& name() const
+	[[nodiscard]] virtual const std::string& name() const
 	{
 		return _name;
 	}
 
 protected:
-	const R& handle() const
+	[[nodiscard]] const R& handle() const
 	{
 		return _resource;
 	}

@@ -58,25 +58,25 @@ public:
 	void setExtractor(ExtractorPtr pExtractor);
 		/// Sets the class used for extracting the data. Does not take ownership of the pointer.
 
-	ExtractorPtr getExtractor() const;
+	[[nodiscard]] ExtractorPtr getExtractor() const;
 		/// Retrieves the extractor object
 
-	Poco::UInt32 position() const;
+	[[nodiscard]] Poco::UInt32 position() const;
 		/// Returns the extraction position.
 
-	virtual std::size_t numOfColumnsHandled() const = 0;
+	[[nodiscard]] virtual std::size_t numOfColumnsHandled() const = 0;
 		/// Returns the number of columns that the extraction handles.
 		///
 		/// The trivial case will be one single column but when
 		/// complex types are used this value can be larger than one.
 
-	virtual std::size_t numOfRowsHandled() const = 0;
+	[[nodiscard]] virtual std::size_t numOfRowsHandled() const = 0;
 		/// Returns the number of rows that the extraction handles.
 		///
 		/// The trivial case will be one single row but
 		/// for collection data types (ie vector) it can be larger.
 
-	virtual std::size_t numOfRowsAllowed() const = 0;
+	[[nodiscard]] virtual std::size_t numOfRowsAllowed() const = 0;
 		/// Returns the upper limit on number of rows that the extraction will handle.
 
 	virtual std::size_t extract(std::size_t pos) = 0;
@@ -88,19 +88,19 @@ public:
 		/// Does nothing in this implementation.
 		/// Implementations should override it for different behavior.
 
-	virtual bool canExtract() const;
+	[[nodiscard]] virtual bool canExtract() const;
 		/// Returns true. Implementations should override it for different behavior.
 
-	virtual AbstractPreparation::Ptr createPreparation(PreparatorPtr& pPrep, std::size_t pos) = 0;
+	[[nodiscard]] virtual AbstractPreparation::Ptr createPreparation(PreparatorPtr& pPrep, std::size_t pos) = 0;
 		/// Creates and returns shared pointer to Preparation object for the extracting object.
 
 	void setLimit(Poco::UInt32 limit);
 		/// Sets the limit.
 
-	Poco::UInt32 getLimit() const;
+	[[nodiscard]] Poco::UInt32 getLimit() const;
 		/// Gets the limit.
 
-	virtual bool isNull(std::size_t row) const;
+	[[nodiscard]] virtual bool isNull(std::size_t row) const;
 		/// In implementations, this function returns true if value at row is null,
 		/// false otherwise.
 		/// Normal behavior is to replace nulls with default values.
@@ -108,23 +108,23 @@ public:
 		/// null values and be able to later provide information about them.
 		/// Here, this function throws NotImplementedException.
 
-	bool isBulk() const;
+	[[nodiscard]] bool isBulk() const;
 		/// Returns true if this is bulk extraction.
 
 	void setEmptyStringIsNull(bool emptyStringIsNull);
 		/// Sets the empty string handling flag.
 
-	bool getEmptyStringIsNull() const;
+	[[nodiscard]] bool getEmptyStringIsNull() const;
 		/// Returns the empty string handling flag.
 
 	void setForceEmptyString(bool forceEmptyString);
 		/// Sets the force empty string flag.
 
-	bool getForceEmptyString() const;
+	[[nodiscard]] bool getForceEmptyString() const;
 		/// Returns the force empty string flag.
 
 	template <typename T>
-	bool isValueNull(const T& /*str*/, bool deflt)
+	[[nodiscard]] bool isValueNull([[maybe_unused]] const T& str, bool deflt)
 		/// Utility function to determine the nullness of the value.
 		/// This generic version always returns default value
 		/// (i.e. does nothing). The std::string overload does
@@ -134,7 +134,7 @@ public:
 		return deflt;
 	}
 
-	bool isValueNull(const std::string& str, bool deflt);
+	[[nodiscard]] bool isValueNull(const std::string& str, bool deflt);
 		/// Overload for const reference to std::string.
 		///
 		/// Returns true when folowing conditions are met:
@@ -142,7 +142,7 @@ public:
 		/// - string is empty
 		/// - getEmptyStringIsNull() returns true
 
-	bool isValueNull(const Poco::UTF16String& str, bool deflt);
+	[[nodiscard]] bool isValueNull(const Poco::UTF16String& str, bool deflt);
 		/// Overload for const reference to UTF16String.
 		///
 		/// Returns true when folowing conditions are met:
@@ -150,7 +150,7 @@ public:
 		/// - string is empty
 		/// - getEmptyStringIsNull() returns true
 
-	std::string getHeldType() const
+	[[nodiscard]] std::string getHeldType() const
 		/// Returns the held type name, if set.
 		/// If held type name is not set, returns empty string.
 		/// Held type is optionally set by calling setHeldType<T>()
@@ -171,7 +171,7 @@ protected:
 
 private:
 	template <typename S>
-	bool isStringNull(const S& str, bool deflt)
+	[[nodiscard]] bool isStringNull(const S& str, bool deflt)
 	{
 		if (getForceEmptyString()) return false;
 
@@ -226,7 +226,7 @@ inline Poco::UInt32 AbstractExtraction::getLimit() const
 }
 
 
-inline bool AbstractExtraction::isNull(std::size_t /*row*/) const
+inline bool AbstractExtraction::isNull([[maybe_unused]] std::size_t row) const
 {
 	throw NotImplementedException("Check for null values not implemented.");
 }

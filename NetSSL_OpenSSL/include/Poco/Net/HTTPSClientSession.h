@@ -124,16 +124,16 @@ public:
 		/// Destroys the HTTPSClientSession and closes
 		/// the underlying socket.
 
-	bool secure() const;
+	[[nodiscard]] bool secure() const;
 		/// Return true iff the session uses SSL or TLS,
 		/// or false otherwise.
 
-	X509Certificate serverCertificate();
+	[[nodiscard]] X509Certificate serverCertificate();
 		/// Returns the server's certificate.
 		///
 		/// The certificate is available after the first request has been sent.
 
-	Session::Ptr sslSession();
+	[[nodiscard]] Session::Ptr sslSession();
 		/// Returns the SSL Session object for the current
 		/// connection, if session caching has been enabled for
 		/// the HTTPSClientSession's Context. A null pointer is
@@ -147,7 +147,7 @@ public:
 
 protected:
 	void connect(const SocketAddress& address);
-	std::string proxyRequestPrefix() const;
+	[[nodiscard]] std::string proxyRequestPrefix() const;
 	void proxyAuthenticate(HTTPRequest& request);
 	int read(char* buffer, std::streamsize length);
 

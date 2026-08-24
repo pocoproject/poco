@@ -47,7 +47,7 @@ protected:
 	void setAllowCommentsImpl(bool comments);
 		/// Allow or disallow comments. By default, comments are not allowed.
 
-	bool getAllowCommentsImpl() const;
+	[[nodiscard]] bool getAllowCommentsImpl() const;
 		/// Returns true if comments are allowed, false otherwise.
 		///
 		/// By default, comments are not allowed.
@@ -57,7 +57,7 @@ protected:
 		///
 		/// By default, null byte is allowed.
 
-	bool getAllowNullByteImpl() const;
+	[[nodiscard]] bool getAllowNullByteImpl() const;
 		/// Returns true if null byte is allowed, false otherwise.
 		///
 		/// By default, null bytes are allowed.
@@ -65,25 +65,25 @@ protected:
 	void setDepthImpl(std::size_t depth);
 		/// Sets the allowed JSON depth.
 
-	std::size_t getDepthImpl() const;
+	[[nodiscard]] std::size_t getDepthImpl() const;
 		/// Returns the allowed JSON depth.
 
-	Dynamic::Var parseImpl(const std::string& json);
+	[[nodiscard]] Dynamic::Var parseImpl(const std::string& json);
 		/// Parses JSON from a string.
 
-	Dynamic::Var parseImpl(std::istream& in);
+	[[nodiscard]] Dynamic::Var parseImpl(std::istream& in);
 		/// Parses JSON from an input stream.
 
 	void setHandlerImpl(const Handler::Ptr& pHandler);
 		/// Set the Handler.
 
-	const Handler::Ptr& getHandlerImpl();
+	[[nodiscard]] const Handler::Ptr& getHandlerImpl();
 		/// Returns the Handler.
 
-	Dynamic::Var asVarImpl() const;
+	[[nodiscard]] Dynamic::Var asVarImpl() const;
 		/// Returns the result of parsing
 
-	Dynamic::Var resultImpl() const;
+	[[nodiscard]] Dynamic::Var resultImpl() const;
 		/// Returns the result of parsing as Dynamic::Var
 
 private:

@@ -60,7 +60,7 @@ public:
 	void key(const std::string& k) override;
 		/// A key is read
 
-	Dynamic::Var asVar() const override;
+	[[nodiscard]] Dynamic::Var asVar() const override;
 		/// Returns the result of the parser (an object or an array).
 
 	void value(int v) override;

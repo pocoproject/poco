@@ -75,7 +75,7 @@ public:
 	AtomicFlag(AtomicFlag&&) = delete;
 	AtomicFlag& operator = (AtomicFlag&&) = delete;
 
-	bool set();
+	[[nodiscard]] bool set();
 		/// Sets the flag to true and returns previously
 		/// held value.
 

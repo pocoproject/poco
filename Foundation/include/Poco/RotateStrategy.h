@@ -39,7 +39,7 @@ public:
 	RotateStrategy();
 	virtual ~RotateStrategy();
 
-	virtual bool mustRotate(LogFile* pFile) = 0;
+	[[nodiscard]] virtual bool mustRotate(LogFile* pFile) = 0;
 		/// Returns true if the given log file must
 		/// be rotated, false otherwise.
 
@@ -52,7 +52,7 @@ private:
 class Foundation_API NullRotateStrategy : public RotateStrategy
 {
 public:
-	bool mustRotate(LogFile *pFile) override;
+	[[nodiscard]] bool mustRotate(LogFile *pFile) override;
 };
 
 
@@ -99,7 +99,7 @@ public:
 
 	~RotateAtTimeStrategy() override = default;
 
-	bool mustRotate(LogFile* /*pFile*/) override
+	[[nodiscard]] bool mustRotate([[maybe_unused]] LogFile* pFile) override
 	{
 		if (DT() >= _threshold)
 		{
@@ -143,7 +143,7 @@ class Foundation_API RotateByIntervalStrategy: public RotateStrategy
 public:
 	RotateByIntervalStrategy(const Timespan& span);
 	~RotateByIntervalStrategy() override;
-	bool mustRotate(LogFile* pFile) override;
+	[[nodiscard]] bool mustRotate(LogFile* pFile) override;
 
 private:
 	Timespan _span;
@@ -159,7 +159,7 @@ class Foundation_API RotateBySizeStrategy: public RotateStrategy
 public:
 	RotateBySizeStrategy(UInt64 size);
 	~RotateBySizeStrategy() override;
-	bool mustRotate(LogFile* pFile) override;
+	[[nodiscard]] bool mustRotate(LogFile* pFile) override;
 
 private:
 	UInt64 _size;

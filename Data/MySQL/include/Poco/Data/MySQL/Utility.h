@@ -30,25 +30,25 @@ class MySQL_API Utility
 	/// Various utility functions for MySQL.
 {
 public:
-	static std::string serverInfo(MYSQL* pHandle);
+	[[nodiscard]] static std::string serverInfo(MYSQL* pHandle);
 		/// Returns server info.
 
-	static std::string serverInfo(Poco::Data::Session& session);
+	[[nodiscard]] static std::string serverInfo(Poco::Data::Session& session);
 		/// Returns server info.
 
-	static unsigned long serverVersion(MYSQL* pHandle);
+	[[nodiscard]] static unsigned long serverVersion(MYSQL* pHandle);
 		/// Returns server version.
 
-	static unsigned long serverVersion(Poco::Data::Session& session);
+	[[nodiscard]] static unsigned long serverVersion(Poco::Data::Session& session);
 		/// Returns server version.
 
-	static std::string hostInfo(MYSQL* pHandle);
+	[[nodiscard]] static std::string hostInfo(MYSQL* pHandle);
 		/// Returns host info.
 
-	static std::string hostInfo(Poco::Data::Session& session);
+	[[nodiscard]] static std::string hostInfo(Poco::Data::Session& session);
 		/// Returns host info.
 
-	static MYSQL* handle(Poco::Data::Session& session);
+	[[nodiscard]] static MYSQL* handle(Poco::Data::Session& session);
 		/// Returns native MySQL handle for the session.
 };
 

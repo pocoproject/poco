@@ -574,7 +574,7 @@ void FileChannelTest::testCompressedRotation()
 	if (logsDir.exists())
 		logsDir.remove(true);
 
-	logsDir.createDirectory();
+	(void) logsDir.createDirectory();
 	logsPath.append("test.log");
 
 	Poco::AutoPtr<Poco::FileChannel> fileChannel = new Poco::FileChannel("ABC");

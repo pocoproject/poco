@@ -479,9 +479,9 @@ namespace
 
 			// Query reactor state while holding Observer mutex
 			// This would deadlock if NC held lock while calling observer methods
-			_reactor.hasEventHandler(_socket, _or);
-			_reactor.hasEventHandler(_socket, _ow);
-			_reactor.has(_socket);
+			(void) _reactor.hasEventHandler(_socket, _or);
+			(void) _reactor.hasEventHandler(_socket, _ow);
+			(void) _reactor.has(_socket);
 
 			// Every 3rd call, remove a handler from within the notification
 			// This is the exact scenario from the bug report
@@ -500,7 +500,7 @@ namespace
 		void onWritable(const AutoPtr<WritableNotification>& pNf)
 		{
 			// Query reactor while in handler
-			_reactor.hasEventHandler(_socket, _or);
+			(void) _reactor.hasEventHandler(_socket, _or);
 		}
 
 	private:

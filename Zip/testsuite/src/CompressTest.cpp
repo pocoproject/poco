@@ -54,7 +54,7 @@ void CompressTest::testDirectory()
 	Poco::File aDir2("some/other/recursive/dir/");
 	aDir2.createDirectories();
 	Poco::File aF("some/recursive/dir/test.file");
-	aF.createFile();
+	(void) aF.createFile();
 	Poco::FileOutputStream fos(aF.path());
 	fos << "just some test data";
 	fos.close();

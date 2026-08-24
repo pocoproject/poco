@@ -90,20 +90,20 @@ public:
 		/// Enables or disables automatic conversion of HTTP header values
 		/// when reading HTTP header.
 
-	bool getAutoDecode() const;
+	[[nodiscard]] bool getAutoDecode() const;
 		/// Returns true if automatic conversion of HTTP header values
 		/// when reading HTTP header.
 
-	std::string getDecoded(const std::string& name) const;
+	[[nodiscard]] std::string getDecoded(const std::string& name) const;
 		/// Get decoded header value. It does conversion if it was not
 		/// automatically converted when reading.
 
-	std::string getDecoded(const std::string& name, const std::string& defaultValue) const;
+	[[nodiscard]] std::string getDecoded(const std::string& name, const std::string& defaultValue) const;
 		/// Get decoded header value. It does conversion if it was not
 		/// automatically converted when reading.
 		/// Default value is returned if the name does not exist.
 
-	int getFieldLimit() const;
+	[[nodiscard]] int getFieldLimit() const;
 		/// Returns the maximum number of header fields
 		/// allowed.
 		///
@@ -117,7 +117,7 @@ public:
 		///
 		/// The default limit is 100.
 
-	int getNameLengthLimit() const;
+	[[nodiscard]] int getNameLengthLimit() const;
 		/// Returns the maximum length of a field name.
 		///
 		/// See setNameLengthLimit() for more information.
@@ -127,7 +127,7 @@ public:
 		///
 		/// The default limit is 256.
 
-	int getValueLengthLimit() const;
+	[[nodiscard]] int getValueLengthLimit() const;
 		/// Returns the maximum length of a field value.
 		///
 		/// See setValueLengthLimit() for more information.
@@ -137,7 +137,7 @@ public:
 		///
 		/// The default limit is 8192.
 
-	bool hasToken(const std::string& fieldName, const std::string& token) const;
+	[[nodiscard]] bool hasToken(const std::string& fieldName, const std::string& token) const;
 		/// Returns true if the field with the given fieldName contains
 		/// the given token. Tokens in a header field are expected to be
 		/// comma-separated and are case insensitive.
@@ -182,7 +182,7 @@ public:
 		/// Otherwise, the value is appended to result as-is.
 
 	static void decodeRFC2047(const std::string& ins, std::string& outs, const std::string& charset = "UTF-8");
-	static std::string decodeWord(const std::string& text, const std::string& charset = "UTF-8");
+	[[nodiscard]] static std::string decodeWord(const std::string& text, const std::string& charset = "UTF-8");
 			/// Decode RFC2047 string.
 
 

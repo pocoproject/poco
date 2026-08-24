@@ -181,7 +181,7 @@ Optional<bool> Statement::parse()
 {
 	Optional<bool> result;
 #ifndef POCO_DATA_NO_SQL_PARSER
-	if (_stmtString.empty()) toString();
+	if (_stmtString.empty()) (void) toString();
 	if (!_stmtString.empty())
 	{
 		_pParseResult->reset();

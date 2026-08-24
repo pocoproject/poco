@@ -207,7 +207,7 @@ public:
 		///
 		/// The timeout is passed to the PollSet::poll() method.
 
-	const Poco::Timespan& getTimeout() const;
+	[[nodiscard]] const Poco::Timespan& getTimeout() const;
 		/// Returns the timeout.
 
 	void addEventHandler(const Socket& socket, const Poco::AbstractObserver& observer);
@@ -217,7 +217,7 @@ public:
 		///     Poco::NObserver<MyEventHandler, SocketNotification> obs(*this, &MyEventHandler::handleMyEvent);
 		///     reactor.addEventHandler(socket, obs);
 
-	bool hasEventHandler(const Socket& socket, const Poco::AbstractObserver& observer);
+	[[nodiscard]] bool hasEventHandler(const Socket& socket, const Poco::AbstractObserver& observer);
 		/// Returns true if the observer is registered with SocketReactor for the given socket.
 
 	void removeEventHandler(const Socket& socket, const Poco::AbstractObserver& observer);
@@ -234,7 +234,7 @@ public:
 		/// socket are being removed. Use remove() instead to atomically remove
 		/// all handlers for a socket.
 
-	bool has(const Socket& socket) const;
+	[[nodiscard]] bool has(const Socket& socket) const;
 		/// Returns true if socket is registered with this reactor.
 
 	void remove(const Socket& socket);
@@ -282,13 +282,13 @@ protected:
 	void dispatch(SocketNotification* pNotification);
 		/// Dispatches the given notification to all observers.
 
-	bool hasSocketHandlers();
+	[[nodiscard]] bool hasSocketHandlers();
 
-	const Params& getParams() const;
-	int getThreadAffinity() const;
-	const std::atomic<bool>& mustStop() const;
-	const EventHandlerMap& getHandlers() const;
-	const PollSet& getPollSet() const;
+	[[nodiscard]] const Params& getParams() const;
+	[[nodiscard]] int getThreadAffinity() const;
+	[[nodiscard]] const std::atomic<bool>& mustStop() const;
+	[[nodiscard]] const EventHandlerMap& getHandlers() const;
+	[[nodiscard]] const PollSet& getPollSet() const;
 	Notification* getReadableNotification();
 	Notification* getWritableNotification();
 	Notification* getErrorNotification();
@@ -297,7 +297,7 @@ protected:
 
 private:
 
-	NotifierPtr getNotifier(const Socket& socket, bool makeNew = false);
+	[[nodiscard]] NotifierPtr getNotifier(const Socket& socket, bool makeNew = false);
 
 	void sleep();
 

@@ -46,7 +46,7 @@ public:
 	~StatementExecutor();
 		/// Destroys the StatementExecutor.
 
-	int state() const;
+	[[nodiscard]] int state() const;
 		/// Returns the current state.
 
 	void prepare(const std::string& query);
@@ -61,15 +61,15 @@ public:
 	void execute();
 		/// Executes the statement.
 
-	bool fetch();
+	[[nodiscard]] bool fetch();
 		/// Fetches the data.
 
-	bool fetchColumn(std::size_t n, MYSQL_BIND *bind);
+	[[nodiscard]] bool fetchColumn(std::size_t n, MYSQL_BIND *bind);
 		/// Fetches the column.
 
-	int getAffectedRowCount() const;
+	[[nodiscard]] int getAffectedRowCount() const;
 
-	operator MYSQL_STMT* ();
+	[[nodiscard]] operator MYSQL_STMT* ();
 		/// Cast operator to native handle type.
 
 private:

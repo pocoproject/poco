@@ -96,7 +96,7 @@ public:
 		/// The host must not be changed once there is an
 		/// open connection to the server.
 
-	const std::string& getHost() const;
+	[[nodiscard]] const std::string& getHost() const;
 		/// Returns the host name of the target HTTP server.
 
 	void setPort(Poco::UInt16 port);
@@ -105,7 +105,7 @@ public:
 		/// The port number must not be changed once there is an
 		/// open connection to the server.
 
-	Poco::UInt16 getPort() const;
+	[[nodiscard]] Poco::UInt16 getPort() const;
 		/// Returns the port number of the target HTTP server.
 
 	void setSourceAddress(const SocketAddress& address);
@@ -159,13 +159,13 @@ public:
 	void setProxyTunnel(bool tunnel);
 		/// If 'true' proxy will be used as tunnel.
 
-	const std::string& getProxyHost() const;
+	[[nodiscard]] const std::string& getProxyHost() const;
 		/// Returns the proxy host name.
 
-	Poco::UInt16 getProxyPort() const;
+	[[nodiscard]] Poco::UInt16 getProxyPort() const;
 		/// Returns the proxy port number.
 
-	const std::string& getProxyProtocol() const;
+	[[nodiscard]] const std::string& getProxyProtocol() const;
 		/// Returns the proxy protocol.
 
 	bool isProxyTunnel() const;
@@ -179,14 +179,14 @@ public:
 		/// Sets the username for proxy authentication.
 		/// Only Basic authentication is supported.
 
-	const std::string& getProxyUsername() const;
+	[[nodiscard]] const std::string& getProxyUsername() const;
 		/// Returns the username for proxy authentication.
 
 	void setProxyPassword(const std::string& password);
 		/// Sets the password for proxy authentication.
 		/// Only Basic authentication is supported.
 
-	const std::string& getProxyPassword() const;
+	[[nodiscard]] const std::string& getProxyPassword() const;
 		/// Returns the password for proxy authentication.
 
 	void setProxyConfig(const ProxyConfig& config);
@@ -220,7 +220,7 @@ public:
 	void setKeepAliveTimeout(const Poco::Timespan& timeout);
 		/// Sets the connection timeout for HTTP connections.
 
-	const Poco::Timespan& getKeepAliveTimeout() const;
+	[[nodiscard]] const Poco::Timespan& getKeepAliveTimeout() const;
 		/// Returns the connection timeout for HTTP connections.
 
 	virtual std::ostream& sendRequest(HTTPRequest& request);
@@ -313,8 +313,9 @@ public:
 		/// Returns true if the proxy should be bypassed
 		/// for the current host.
 
-	SocketAddress clientAddress() {return _sourceAddress;}
-	SocketAddress serverAddress() {return SocketAddress(IPAddress(_host), _port);}
+	[[nodiscard]] SocketAddress clientAddress() {return _sourceAddress;}
+
+	[[nodiscard]] SocketAddress serverAddress() {return SocketAddress(IPAddress(_host), _port);}
 protected:
 	enum
 	{
@@ -330,7 +331,7 @@ protected:
 	std::ostream& sendRequestImpl(const HTTPRequest& request);
 		/// Sends the given HTTPRequest over an existing connection.
 
-	virtual std::string proxyRequestPrefix() const;
+	[[nodiscard]] virtual std::string proxyRequestPrefix() const;
 		/// Returns the prefix prepended to the URI for proxy requests
 		/// (e.g., "http://myhost.com").
 

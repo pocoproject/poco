@@ -36,10 +36,10 @@ public:
 	~GaugeSample();
 		/// Destroys the GaugeSample.
 
-	double value() const;
+	[[nodiscard]] double value() const;
 		/// Returns the Gauge's current value.
 
-	Poco::Timestamp timestamp() const;
+	[[nodiscard]] Poco::Timestamp timestamp() const;
 		/// Returns the sample's timestamp, which in this
 		/// implementation is always 0.
 
@@ -132,7 +132,7 @@ public:
 		/// Must only be set once, immediately after creating
 		/// the Gauge.
 
-	double value() const;
+	[[nodiscard]] double value() const;
 		/// Returns the Gauge's current value.
 		///
 		/// Can only be used if no labels have been defined.

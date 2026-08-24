@@ -69,7 +69,7 @@ public:
 		/// Must only be set once, immediately after creating
 		/// the IntCounter.
 
-	Sample value() const;
+	[[nodiscard]] Sample value() const;
 		/// Returns the IntCounter's current value.
 
 	void inc();

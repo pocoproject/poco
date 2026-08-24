@@ -190,7 +190,7 @@ public:
 	bool extract(std::size_t pos, Poco::Nullable<Poco::Dynamic::Var>& val) override;
 		/// Extracts a nullable Var.
 
-	bool isNull(std::size_t col, std::size_t row) override;
+	[[nodiscard]] bool isNull(std::size_t col, std::size_t row) override;
 		/// Returns true if the value at [col,row] position is null.
 
 	void reset() override;
@@ -401,8 +401,8 @@ public:
 		/// Extracts a Dynamic::Var list.
 
 private:
-	const OutputParameter& extractPreamble(std::size_t aPosition) const;
-	bool isColumnNull(const OutputParameter& anOutputParameter) const;
+	[[nodiscard]] const OutputParameter& extractPreamble(std::size_t aPosition) const;
+	[[nodiscard]] bool isColumnNull(const OutputParameter& anOutputParameter) const;
 
 	template <typename T>
 	bool extractStringImpl(std::size_t pos, T& val)

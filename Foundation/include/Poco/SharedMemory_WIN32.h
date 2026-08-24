@@ -49,10 +49,10 @@ public:
 		/// is actually honored is, however, up to the system. Windows platform
 		/// will generally ignore the hint.
 
-	char* begin() const;
+	[[nodiscard]] char* begin() const;
 		/// Returns the begin address of the SharedMemory segment. Will be null for illegal segments.
 
-	char* end() const;
+	[[nodiscard]] char* end() const;
 		/// Points past the last byte of the end address of the SharedMemory segment. Will be null for illegal segments.
 
 protected:

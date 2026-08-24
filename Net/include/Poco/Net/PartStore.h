@@ -57,10 +57,10 @@ public:
 	~FilePartStore();
 		/// Destroys the FilePartStore.
 
-	std::istream& stream();
+	[[nodiscard]] std::istream& stream();
 		/// Returns a file input stream for the given file.
 
-	const std::string& filename() const;
+	[[nodiscard]] const std::string& filename() const;
 		/// Returns the filename portion of the path.
 		/// This is the name under which the file is known
 		/// to the user of this class (typically, MailMessage
@@ -68,7 +68,7 @@ public:
 		/// to the filesystem can be obtained by calling
 		/// path() member function.
 
-	const std::string& path() const;
+	[[nodiscard]] const std::string& path() const;
 		/// Returns the full path to the file as saved
 		/// to the file system. For security reasons,
 		/// file is not saved under the real file name
@@ -85,7 +85,7 @@ class PartStoreFactory
 	/// Parent factory class for part stores creation.
 {
 public:
-	virtual PartSource* createPartStore(const std::string& content, const std::string& mediaType, const std::string& filename = "") = 0;
+	[[nodiscard]] virtual PartSource* createPartStore(const std::string& content, const std::string& mediaType, const std::string& filename = "") = 0;
 
 	virtual ~PartStoreFactory() = default;
 };
@@ -94,7 +94,7 @@ public:
 class FilePartStoreFactory: public PartStoreFactory
 {
 public:
-	PartSource* createPartStore(const std::string& content, const std::string& mediaType, const std::string& filename = "")
+	[[nodiscard]] PartSource* createPartStore(const std::string& content, const std::string& mediaType, const std::string& filename = "")
 	{
 		return new FilePartStore(content, mediaType, filename);
 	}

@@ -39,30 +39,30 @@ class XML_API AbstractNode: public Node
 {
 public:
 	// Node
-	const XMLString& nodeName() const;
-	const XMLString& getNodeValue() const;
+	[[nodiscard]] const XMLString& nodeName() const;
+	[[nodiscard]] const XMLString& getNodeValue() const;
 	void setNodeValue(const XMLString& value);
-	Node* parentNode() const;
-	NodeList* childNodes() const;
-	Node* firstChild() const;
-	Node* lastChild() const;
-	Node* previousSibling() const;
-	Node* nextSibling() const;
-	NamedNodeMap* attributes() const;
-	Document* ownerDocument() const;
+	[[nodiscard]] Node* parentNode() const;
+	[[nodiscard]] NodeList* childNodes() const;
+	[[nodiscard]] Node* firstChild() const;
+	[[nodiscard]] Node* lastChild() const;
+	[[nodiscard]] Node* previousSibling() const;
+	[[nodiscard]] Node* nextSibling() const;
+	[[nodiscard]] NamedNodeMap* attributes() const;
+	[[nodiscard]] Document* ownerDocument() const;
 	Node* insertBefore(Node* newChild, Node* refChild);
 	Node* insertAfterNP(Node* newChild, Node* refChild);
 	Node* replaceChild(Node* newChild, Node* oldChild);
 	Node* removeChild(Node* oldChild);
 	Node* appendChild(Node* newChild);
-	bool hasChildNodes() const;
-	Node* cloneNode(bool deep) const;
+	[[nodiscard]] bool hasChildNodes() const;
+	[[nodiscard]] Node* cloneNode(bool deep) const;
 	void normalize();
-	bool isSupported(const XMLString& feature, const XMLString& version) const;
+	[[nodiscard]] bool isSupported(const XMLString& feature, const XMLString& version) const;
 	const XMLString& namespaceURI() const;
-	XMLString prefix() const;
-	const XMLString& localName() const;
-	bool hasAttributes() const;
+	[[nodiscard]] XMLString prefix() const;
+	[[nodiscard]] const XMLString& localName() const;
+	[[nodiscard]] bool hasAttributes() const;
 
 	// EventTarget
 	void addEventListener(const XMLString& type, EventListener* listener, bool useCapture);
@@ -70,9 +70,9 @@ public:
 	bool dispatchEvent(Event* evt);
 
 	// Extensions
-	XMLString innerText() const;
-	Node* getNodeByPath(const XMLString& path) const;
-	Node* getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const;
+	[[nodiscard]] XMLString innerText() const;
+	[[nodiscard]] Node* getNodeByPath(const XMLString& path) const;
+	[[nodiscard]] Node* getNodeByPathNS(const XMLString& path, const NSMap& nsMap) const;
 
 	virtual void autoRelease();
 
@@ -81,10 +81,10 @@ protected:
 	AbstractNode(Document* pOwnerDocument, const AbstractNode& node);
 	~AbstractNode();
 
-	virtual Node* copyNode(bool deep, Document* pOwnerDocument) const = 0;
+	[[nodiscard]] virtual Node* copyNode(bool deep, Document* pOwnerDocument) const = 0;
 
-	virtual bool events() const;
-	virtual bool eventsSuspended() const;
+	[[nodiscard]] virtual bool events() const;
+	[[nodiscard]] virtual bool eventsSuspended() const;
 	void captureEvent(Event* evt);
 	void bubbleEvent(Event* evt);
 	void dispatchSubtreeModified();

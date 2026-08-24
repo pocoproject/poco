@@ -39,15 +39,15 @@ public:
 	virtual ~NTPEventArgs();
 		/// Destroys NTPEventArgs.
 
-	std::string hostName() const;
+	[[nodiscard]] std::string hostName() const;
 		/// Tries to resolve the target IP address into host name.
 		/// If unsuccessful, all exceptions are silently ignored and
 		///	the IP address is returned.
 
-	std::string hostAddress() const;
+	[[nodiscard]] std::string hostAddress() const;
 		/// Returns the target IP address.
 
-	const NTPPacket &packet();
+	[[nodiscard]] const NTPPacket& packet();
 		/// Returns the NTP packet.
 
 private:
@@ -65,7 +65,7 @@ private:
 //
 // inlines
 //
-inline const NTPPacket &NTPEventArgs::packet()
+inline const NTPPacket& NTPEventArgs::packet()
 {
 	return _packet;
 }

@@ -67,10 +67,10 @@ public:
 	void addBase(const std::string&, Symbol::Access access, bool isVirtual);
 		/// Adds a base class.
 
-	BaseIterator baseBegin() const;
+	[[nodiscard]] BaseIterator baseBegin() const;
 		/// Returns an iterator for iterating over all base classes.
 
-	BaseIterator baseEnd() const;
+	[[nodiscard]] BaseIterator baseEnd() const;
 		/// Returns an iterator for iterating over all base classes.
 
 	void fixupBases();
@@ -79,16 +79,16 @@ public:
 	void addDerived(Struct* pClass);
 		/// Adds a derived class.
 
-	DerivedIterator derivedBegin() const;
+	[[nodiscard]] DerivedIterator derivedBegin() const;
 		/// Returns an iterator for iterating over all derived classes.
 
-	DerivedIterator derivedEnd() const;
+	[[nodiscard]] DerivedIterator derivedEnd() const;
 		/// Returns an iterator for iterating over all derived classes.
 
-	const std::string& declaration() const;
+	[[nodiscard]] const std::string& declaration() const;
 		/// Returns the declaration.
 
-	int flags() const;
+	[[nodiscard]] int flags() const;
 		/// Returns the struct's flags.
 
 	void makeInline();
@@ -97,16 +97,16 @@ public:
 	void makeFinal();
 		/// Makes the class final.
 
-	bool isInline() const;
+	[[nodiscard]] bool isInline() const;
 		/// Returns true if the complete class is inlined in a cpp file.
 
-	bool isFinal() const;
+	[[nodiscard]] bool isFinal() const;
 		/// Returns true if the class is final.
 
 	void constructors(Functions& functions) const;
 		/// Returns all constructors, sorted by their parameter count.
 
-	Function* destructor() const;
+	[[nodiscard]] Function* destructor() const;
 		/// Returns the destructor, or NULL if no
 		/// destructor is defined.
 
@@ -122,24 +122,24 @@ public:
 	void derived(StructSet& derived) const;
 		/// Returns all derived classes.
 
-	Function* findFunction(const std::string& signature) const;
+	[[nodiscard]] Function* findFunction(const std::string& signature) const;
 		/// Finds a function with the given signature.
 
-	bool hasVirtualDestructor() const;
+	[[nodiscard]] bool hasVirtualDestructor() const;
 		/// Returns true if the class CppParser_API or one if its base classes
 		/// has a virtual destructor.
 
-	bool isClass() const;
+	[[nodiscard]] bool isClass() const;
 		/// Returns true iff the struct was declared as class.
 
-	bool isDerived() const;
+	[[nodiscard]] bool isDerived() const;
 		/// Returns true iff the struct or class is derived from another struct or class.
 
-	Symbol::Kind kind() const;
-	std::string toString() const;
+	[[nodiscard]] Symbol::Kind kind() const;
+	[[nodiscard]] std::string toString() const;
 
 	// Namespace
-	Symbol* lookup(const std::string& name) const;
+	[[nodiscard]] Symbol* lookup(const std::string& name) const;
 	
 private:
 	std::string _decl;

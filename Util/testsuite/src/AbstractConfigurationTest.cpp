@@ -24,7 +24,9 @@ using Poco::Util::AbstractConfiguration;
 using Poco::Util::MapConfiguration;
 using Poco::NumberFormatter;
 using Poco::AutoPtr;
+using Poco::Int16;
 using Poco::Int64;
+using Poco::UInt16;
 using Poco::UInt64;
 
 
@@ -90,7 +92,7 @@ void AbstractConfigurationTest::testGetInt()
 
 	try
 	{
-		pConf->getInt("prop1");
+		(void) pConf->getInt("prop1");
 		fail("not a number - must throw");
 	}
 	catch (Poco::SyntaxException&)
@@ -115,7 +117,7 @@ void AbstractConfigurationTest::testGetInt16()
 	
 	try
 	{
-		pConf->getInt16("prop1");
+		(void) pConf->getInt16("prop1");
 		fail("not a number - must throw");
 	}
 	catch (Poco::SyntaxException&)
@@ -124,7 +126,7 @@ void AbstractConfigurationTest::testGetInt16()
 
 	try
 	{
-		pConf->getInt16("prop4.notint16");
+		(void) pConf->getInt16("prop4.notint16");
 		fail("too big for UInt16 - must throw");
 	}
 	catch (Poco::RangeException&)
@@ -133,7 +135,7 @@ void AbstractConfigurationTest::testGetInt16()
 
 	try
 	{
-		pConf->getUInt16("prop4.notuint16");
+		(void) pConf->getUInt16("prop4.notuint16");
 		fail("too big for UInt16 - must throw");
 	}
 	catch (Poco::RangeException&)
@@ -160,7 +162,7 @@ void AbstractConfigurationTest::testGetInt64()
 
 	try
 	{
-		[[maybe_unused]] Int64 x = pConf->getInt64("prop1");
+		(void) pConf->getInt64("prop1");
 		fail("not a number - must throw");
 	}
 	catch (Poco::SyntaxException&)
@@ -183,7 +185,7 @@ void AbstractConfigurationTest::testGetDouble()
 
 	try
 	{
-		pConf->getDouble("prop1");
+		(void) pConf->getDouble("prop1");
 		fail("not a number - must throw");
 	}
 	catch (Poco::SyntaxException&)
@@ -211,7 +213,7 @@ void AbstractConfigurationTest::testGetBool()
 
 	try
 	{
-		pConf->getBool("prop1");
+		(void) pConf->getBool("prop1");
 		fail("not a boolean - must throw");
 	}
 	catch (Poco::SyntaxException&)
@@ -234,7 +236,7 @@ void AbstractConfigurationTest::testExpand()
 
 	try
 	{
-		std::string s = pConf->getString("ref3");
+		(void) pConf->getString("ref3");
 		fail("circular reference - must throw");
 	}
 	catch (Poco::CircularReferenceException&)

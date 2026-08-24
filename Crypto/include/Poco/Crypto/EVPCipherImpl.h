@@ -44,13 +44,13 @@ public:
 	virtual ~EVPCipherImpl();
 		/// Destroys the EVPCipherImpl.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns the name of the Cipher.
 
-	CryptoTransform::Ptr createEncryptor();
+	[[nodiscard]] CryptoTransform::Ptr createEncryptor();
 		/// Creates an encryptor object.
 
-	CryptoTransform::Ptr createDecryptor();
+	[[nodiscard]] CryptoTransform::Ptr createDecryptor();
 		/// Creates a decryptor object.
 
 private:

@@ -78,7 +78,7 @@ public:
 	BasicBufferedStreamBuf(const BasicBufferedStreamBuf&) = delete;
 	BasicBufferedStreamBuf& operator=(const BasicBufferedStreamBuf&) = delete;
 
-	int_type overflow(int_type c) override
+	[[nodiscard]] int_type overflow(int_type c) override
 	{
 		if (!(_mode & IOS::out)) return char_traits::eof();
 
@@ -92,7 +92,7 @@ public:
 		return c;
 	}
 
-	int_type underflow() override
+	[[nodiscard]] int_type underflow() override
 	{
 		if (!(_mode & IOS::in)) return char_traits::eof();
 
@@ -158,7 +158,7 @@ protected:
 		_mode = mode;
 	}
 
-	openmode getMode() const
+	[[nodiscard]] openmode getMode() const
 	{
 		return _mode;
 	}

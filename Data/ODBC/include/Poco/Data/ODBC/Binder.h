@@ -372,10 +372,10 @@ public:
 	void setDataBinding(ParameterBinding binding);
 		/// Set data binding type.
 
-	ParameterBinding getDataBinding() const;
+	[[nodiscard]] ParameterBinding getDataBinding() const;
 		/// Return data binding type.
 
-	std::size_t parameterSize(SQLPOINTER pAddr) const;
+	[[nodiscard]] std::size_t parameterSize(SQLPOINTER pAddr) const;
 		/// Returns bound data size for parameter at specified position.
 
 	void synchronize();
@@ -415,7 +415,7 @@ private:
 		/// This is a private no-op in this implementation
 		/// due to security risk.
 
-	SQLSMALLINT toODBCDirection(Direction dir) const;
+	[[nodiscard]] SQLSMALLINT toODBCDirection(Direction dir) const;
 		/// Returns ODBC parameter direction based on the parameter binding direction
 		/// specified by user.
 
@@ -1117,7 +1117,7 @@ private:
 		/// size should be set to some default value prior to calling this
 		/// function in order to avoid undefined size value.
 
-	std::size_t getParamSizeDirect(std::size_t pos, SQLINTEGER& size);
+	[[nodiscard]] std::size_t getParamSizeDirect(std::size_t pos, SQLINTEGER& size);
 		/// A "last ditch" attempt" to obtain parameter size directly from the driver.
 
 	void freeMemory();

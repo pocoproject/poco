@@ -37,8 +37,8 @@ public:
 	ProcessHandleImpl(HANDLE _hProcess, UInt32 pid);
 	~ProcessHandleImpl();
 
-	UInt32 id() const;
-	HANDLE process() const;
+	[[nodiscard]] UInt32 id() const;
+	[[nodiscard]] HANDLE process() const;
 	int wait() const;
 	int tryWait() const;
 	void closeHandle();
@@ -59,7 +59,7 @@ public:
 	typedef std::vector<std::string> ArgsImpl;
 	typedef std::map<std::string, std::string> EnvImpl;
 
-	static PIDImpl idImpl();
+	[[nodiscard]] static PIDImpl idImpl();
 	static void timesImpl(long& userTime, long& kernelTime);
 	static void timesMicrosecondsImpl(Poco::Int64& userTime, Poco::Int64& kernelTime);
 	static ProcessHandleImpl* launchImpl(
@@ -73,12 +73,12 @@ public:
 		int options = 0);
 	static void killImpl(ProcessHandleImpl& handle);
 	static void killImpl(PIDImpl pid);
-	static bool isRunningImpl(const ProcessHandleImpl& handle);
-	static bool isRunningImpl(PIDImpl pid);
+	[[nodiscard]] static bool isRunningImpl(const ProcessHandleImpl& handle);
+	[[nodiscard]] static bool isRunningImpl(PIDImpl pid);
 	static void requestTerminationImpl(PIDImpl pid);
-	static std::string terminationEventName(PIDImpl pid);
-	static bool mustEscapeArg(const std::string& arg);
-	static std::string escapeArg(const std::string& arg);
+	[[nodiscard]] static std::string terminationEventName(PIDImpl pid);
+	[[nodiscard]] static bool mustEscapeArg(const std::string& arg);
+	[[nodiscard]] static std::string escapeArg(const std::string& arg);
 };
 
 

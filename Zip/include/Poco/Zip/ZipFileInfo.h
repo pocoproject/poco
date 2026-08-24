@@ -44,35 +44,35 @@ public:
 	~ZipFileInfo();
 		/// Destroys the ZipFileInfo.
 
-	ZipCommon::CompressionMethod getCompressionMethod() const;
+	[[nodiscard]] ZipCommon::CompressionMethod getCompressionMethod() const;
 
-	bool isEncrypted() const;
+	[[nodiscard]] bool isEncrypted() const;
 
-	const Poco::DateTime& lastModifiedAt() const;
+	[[nodiscard]] const Poco::DateTime& lastModifiedAt() const;
 
-	Poco::UInt32 getCRC() const;
+	[[nodiscard]] Poco::UInt32 getCRC() const;
 
-	Poco::UInt32 getHeaderSize() const;
+	[[nodiscard]] Poco::UInt32 getHeaderSize() const;
 		/// Returns the total size of the header including filename + other additional fields
 
-	Poco::UInt64 getCompressedSize() const;
+	[[nodiscard]] Poco::UInt64 getCompressedSize() const;
 
-	Poco::UInt64 getUncompressedSize() const;
+	[[nodiscard]] Poco::UInt64 getUncompressedSize() const;
 
-	Poco::UInt64 getOffset() const;
+	[[nodiscard]] Poco::UInt64 getOffset() const;
 		/// Where on the disk starts the localheader. Combined with the disk number gives the exact location of the header
 
-	const std::string& getFileName() const;
+	[[nodiscard]] const std::string& getFileName() const;
 
-	bool isFile() const;
+	[[nodiscard]] bool isFile() const;
 
-	bool isDirectory() const;
+	[[nodiscard]] bool isDirectory() const;
 
-	bool hasExtraField() const;
+	[[nodiscard]] bool hasExtraField() const;
 
-	const std::string& getExtraField() const;
+	[[nodiscard]] const std::string& getExtraField() const;
 
-	const std::string& getFileComment() const;
+	[[nodiscard]] const std::string& getFileComment() const;
 
 	void getVersionMadeBy(int& major, int& minor) const;
 		/// The ZIP version used to create the file
@@ -80,19 +80,19 @@ public:
 	void getRequiredVersion(int& major, int& minor) const;
 		/// The minimum version required to extract the data
 
-	ZipCommon::HostSystem getHostSystem() const;
+	[[nodiscard]] ZipCommon::HostSystem getHostSystem() const;
 
-	Poco::UInt16 getDiskNumberStart() const;
+	[[nodiscard]] Poco::UInt16 getDiskNumberStart() const;
 		/// The number of the disk on which this file begins (multidisk archives)
 
-	ZipCommon::FileType getFileType() const;
+	[[nodiscard]] ZipCommon::FileType getFileType() const;
 		/// Binary or ASCII file?
 
-	std::string createHeader() const;
+	[[nodiscard]] std::string createHeader() const;
 
 	void setOffset(Poco::UInt64 val);
 
-	bool needsZip64() const;
+	[[nodiscard]] bool needsZip64() const;
 
 	void setZip64Data();
 
@@ -126,21 +126,21 @@ private:
 
 	void parseDateTime();
 
-	Poco::UInt32 getCRCFromHeader() const;
+	[[nodiscard]] Poco::UInt32 getCRCFromHeader() const;
 
-	Poco::UInt32 getCompressedSizeFromHeader() const;
+	[[nodiscard]] Poco::UInt32 getCompressedSizeFromHeader() const;
 
-	Poco::UInt32 getUncompressedSizeFromHeader() const;
+	[[nodiscard]] Poco::UInt32 getUncompressedSizeFromHeader() const;
 
-	Poco::UInt32 getOffsetFromHeader() const;
+	[[nodiscard]] Poco::UInt32 getOffsetFromHeader() const;
 
-	Poco::UInt16 getFileNameLength() const;
+	[[nodiscard]] Poco::UInt16 getFileNameLength() const;
 
-	Poco::UInt16 getExtraFieldLength() const;
+	[[nodiscard]] Poco::UInt16 getExtraFieldLength() const;
 
-	Poco::UInt16 getFileCommentLength() const;
+	[[nodiscard]] Poco::UInt16 getFileCommentLength() const;
 
-	Poco::UInt32 getExternalFileAttributes() const;
+	[[nodiscard]] Poco::UInt32 getExternalFileAttributes() const;
 
 	void setUnixAttributes();
 

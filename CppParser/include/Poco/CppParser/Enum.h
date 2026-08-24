@@ -64,20 +64,20 @@ public:
 	void addValue(EnumValue* pValue);
 		/// Adds an enum value. The Enum takes ownership of the value.
 
-	Iterator begin() const;
+	[[nodiscard]] Iterator begin() const;
 		/// Returns an iterator for iterating over the Enum's EnumValue's.
 
-	Iterator end() const;
+	[[nodiscard]] Iterator end() const;
 		/// Returns an iterator for iterating over the Enum's EnumValue's.
 
-	const std::string& baseType() const;
+	[[nodiscard]] const std::string& baseType() const;
 		/// Returns the base type or an empty string if no base type has been specified.
 
-	int flags() const;
+	[[nodiscard]] int flags() const;
 		/// Returns the flags.
 
-	Symbol::Kind kind() const;
-	std::string toString() const;
+	[[nodiscard]] Symbol::Kind kind() const;
+	[[nodiscard]] std::string toString() const;
 
 protected:
 	static std::string processName(const std::string& name);

@@ -50,19 +50,19 @@ public:
 	virtual void archive() = 0;
 		/// Archives the rows.
 
-	const std::string& getSource() const;
+	[[nodiscard]] const std::string& getSource() const;
 		/// Returns the name of the source table containing rows to be archived.
 
 	void setSource(const std::string& source);
 		/// Sets the name of the source table.
 
-	const std::string& getDestination() const;
+	[[nodiscard]] const std::string& getDestination() const;
 		/// Returns the name of the destination table for rows to be archived.
 
 	void setDestination(const std::string& destination);
 		/// Sets the name of the destination table.
 
-	virtual const std::string& getThreshold() const = 0;
+	[[nodiscard]] virtual const std::string& getThreshold() const = 0;
 		/// Returns the archive threshold.
 
 	virtual void setThreshold(const std::string& threshold) = 0;
@@ -72,15 +72,15 @@ protected:
 	using SessionPtr = Poco::SharedPtr<Session>;
 	using StatementPtr = Poco::SharedPtr<Statement>;
 
-	Session& session();
+	[[nodiscard]] Session& session();
 
 	void setCopyStatement();
 	void setDeleteStatement();
 	void setCountStatement();
 
-	Statement& getCopyStatement();
-	Statement& getDeleteStatement();
-	Statement& getCountStatement();
+	[[nodiscard]] Statement& getCopyStatement();
+	[[nodiscard]] Statement& getDeleteStatement();
+	[[nodiscard]] Statement& getCountStatement();
 private:
 
 	ArchiveStrategy();

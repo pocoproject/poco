@@ -104,15 +104,15 @@ public:
 		/// Should be implemented to format the row fields values.
 		/// The default implementation does nothing.
 
-	virtual const std::string& toString();
+	[[nodiscard]] virtual const std::string& toString();
 		/// Throws NotImplementedException. Formatters operating in bulk mode should
 		/// implement this member function to return valid pointer to the formatted result.
 
-	virtual int rowCount() const;
+	[[nodiscard]] virtual int rowCount() const;
 		/// Returns INVALID_ROW_COUNT. Must be implemented by inheriting classes
 		/// which maintain count of processed rows.
 
-	int getTotalRowCount() const;
+	[[nodiscard]] int getTotalRowCount() const;
 		/// Returns zero. Must be implemented by inheriting classes.
 		/// Typically, total row count shall be set up front through
 		/// setTotalRowCount() call.
@@ -120,17 +120,17 @@ public:
 	void setTotalRowCount(int count);
 		/// Sets total row count.
 
-	virtual const std::string& prefix() const;
+	[[nodiscard]] virtual const std::string& prefix() const;
 		/// Returns prefix string;
 
-	virtual const std::string& postfix() const;
+	[[nodiscard]] virtual const std::string& postfix() const;
 		/// Returns postfix string;
 
 	void reset();
 		/// Resets the formatter by setting prefix and postfix
 		/// to empty strings and row count to INVALID_ROW_COUNT.
 
-	Mode getMode() const;
+	[[nodiscard]] Mode getMode() const;
 		/// Returns the formater mode.
 
 	void setMode(Mode mode);

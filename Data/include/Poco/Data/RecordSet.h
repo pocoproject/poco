@@ -126,7 +126,7 @@ public:
 	RecordSet& operator = (RecordSet&& other) noexcept;
 		/// Move assignment.
 
-	std::size_t rowCount() const;
+	[[nodiscard]] std::size_t rowCount() const;
 		/// Returns the number of rows in the RecordSet.
 		/// The number of rows reported is dependent on filtering.
 		/// Due to the need for filter conditions checking,
@@ -134,10 +134,10 @@ public:
 		/// for large recordsets, so it should be used judiciously.
 		/// Use totalRowCount() to obtain the total number of rows.
 
-	std::size_t affectedRowCount() const;
+	[[nodiscard]] std::size_t affectedRowCount() const;
 		/// Returns the number of rows affected by the statement execution.
 
-	std::size_t extractedRowCount() const;
+	[[nodiscard]] std::size_t extractedRowCount() const;
 		/// Returns the number of rows extracted during the last statement
 		/// execution.
 		/// The number of rows reported is independent of filtering.
@@ -145,7 +145,7 @@ public:
 	POCO_DEPRECATED("Replaced with subTotalRowCount() and getTotalRowCount()")
 	std::size_t totalRowCount() const;
 
-	std::size_t getTotalRowCount() const;
+	[[nodiscard]] std::size_t getTotalRowCount() const;
 		/// Returns the total number of rows in the RecordSet.
 		/// The number of rows reported is independent of filtering.
 		/// If the total row count has not been set externally
@@ -162,36 +162,36 @@ public:
 		/// and one row. The returned value must be an unsigned
 		/// integer. The value is set as the total number of rows.
 
-	std::size_t columnCount() const;
+	[[nodiscard]] std::size_t columnCount() const;
 		/// Returns the number of columns in the recordset.
 
 	template <class C>
-	const Column<C>& column(const std::string& name) const;
+	[[nodiscard]] const Column<C>& column(const std::string& name) const;
 		/// Returns the reference to the first Column with the specified name.
 
 	template <class C>
-	const Column<C>& column(std::size_t pos) const;
+	[[nodiscard]] const Column<C>& column(std::size_t pos) const;
 
-	Row& row(std::size_t pos);
+	[[nodiscard]] Row& row(std::size_t pos);
 		/// Returns reference to row at position pos.
 		/// Rows are lazy-created and cached.
 
 	template <class T>
-	const T& value(std::size_t col, std::size_t row, bool useFilter = true) const;
+	[[nodiscard]] const T& value(std::size_t col, std::size_t row, bool useFilter = true) const;
 		/// Returns the reference to data value at [col, row] location.
 
 	template <class T>
-	const T& value(const std::string& name, std::size_t row, bool useFilter = true) const;
+	[[nodiscard]] const T& value(const std::string& name, std::size_t row, bool useFilter = true) const;
 		/// Returns the reference to data value at named column, row location.
 
-	Poco::Dynamic::Var value(std::size_t col, std::size_t row, bool checkFiltering = true) const;
+	[[nodiscard]] Poco::Dynamic::Var value(std::size_t col, std::size_t row, bool checkFiltering = true) const;
 		/// Returns the data value at column, row location.
 
-	Poco::Dynamic::Var value(const std::string& name, std::size_t row, bool checkFiltering = true) const;
+	[[nodiscard]] Poco::Dynamic::Var value(const std::string& name, std::size_t row, bool checkFiltering = true) const;
 		/// Returns the data value at named column, row location.
 
 	template <typename T>
-	Poco::Dynamic::Var nvl(const std::string& name, const T& deflt = T()) const
+	[[nodiscard]] Poco::Dynamic::Var nvl(const std::string& name, const T& deflt = T()) const
 		/// Returns the value in the named column of the current row
 		/// if the value is not NULL, or deflt otherwise.
 	{
@@ -212,16 +212,16 @@ public:
 			return value(index, _currentRow);
 	}
 
-	ConstIterator& begin() const;
+	[[nodiscard]] ConstIterator& begin() const;
 		/// Returns the const row iterator.
 
-	ConstIterator& end() const;
+	[[nodiscard]] ConstIterator& end() const;
 		/// Returns the const row iterator.
 
-	Iterator begin();
+	[[nodiscard]] Iterator begin();
 		/// Returns the row iterator.
 
-	Iterator end();
+	[[nodiscard]] Iterator end();
 		/// Returns the row iterator.
 
 	bool moveFirst();
@@ -259,42 +259,42 @@ public:
 		///
 		/// Does not remove the associated RowFilter or RowFormatter.
 
-	Poco::Dynamic::Var value(const std::string& name);
+	[[nodiscard]] Poco::Dynamic::Var value(const std::string& name);
 		/// Returns the value in the named column of the current row.
 
-	Poco::Dynamic::Var value(std::size_t index);
+	[[nodiscard]] Poco::Dynamic::Var value(std::size_t index);
 		/// Returns the value in the given column of the current row.
 
-	Poco::Dynamic::Var operator [] (const std::string& name);
+	[[nodiscard]] Poco::Dynamic::Var operator [] (const std::string& name);
 		/// Returns the value in the named column of the current row.
 
-	Poco::Dynamic::Var operator [] (std::size_t index);
+	[[nodiscard]] Poco::Dynamic::Var operator [] (std::size_t index);
 		/// Returns the value in the named column of the current row.
 
-	MetaColumn::ColumnDataType columnType(std::size_t pos) const;
+	[[nodiscard]] MetaColumn::ColumnDataType columnType(std::size_t pos) const;
 		/// Returns the type for the column at specified position.
 
-	MetaColumn::ColumnDataType columnType(const std::string& name) const;
+	[[nodiscard]] MetaColumn::ColumnDataType columnType(const std::string& name) const;
 		/// Returns the type for the column with specified name.
 
-	const std::string& columnName(std::size_t pos) const;
+	[[nodiscard]] const std::string& columnName(std::size_t pos) const;
 		/// Returns column name for the column at specified position.
 
-	std::size_t columnLength(std::size_t pos) const;
+	[[nodiscard]] std::size_t columnLength(std::size_t pos) const;
 		/// Returns column maximum length for the column at specified position.
 
-	std::size_t columnLength(const std::string& name) const;
+	[[nodiscard]] std::size_t columnLength(const std::string& name) const;
 		/// Returns column maximum length for the column with specified name.
 
-	std::size_t columnPrecision(std::size_t pos) const;
+	[[nodiscard]] std::size_t columnPrecision(std::size_t pos) const;
 		/// Returns column precision for the column at specified position.
 		/// Valid for floating point fields only (zero for other data types).
 
-	std::size_t columnPrecision(const std::string& name) const;
+	[[nodiscard]] std::size_t columnPrecision(const std::string& name) const;
 		/// Returns column precision for the column with specified name.
 		/// Valid for floating point fields only (zero for other data types).
 
-	bool isNull(const std::string& name) const;
+	[[nodiscard]] bool isNull(const std::string& name) const;
 		/// Returns true if column value of the current row is null.
 
 	std::ostream& copyNames(std::ostream& os) const;
@@ -329,12 +329,12 @@ public:
 		/// Copies the column names and values to the target output stream.
 		/// Copied strings are formatted by the current RowFormatter.
 
-	bool isFiltered() const;
+	[[nodiscard]] bool isFiltered() const;
 		/// Returns true if recordset is filtered.
 
 private:
-	template<class C, class E>
-	std::size_t columnPosition(const std::string& name) const
+	template <class C, class E>
+	[[nodiscard]] std::size_t columnPosition(const std::string& name) const
 		/// Returns the position of the column with specified name.
 	{
 		using T = typename C::value_type;
@@ -366,14 +366,14 @@ private:
 	}
 
 	template <class C, class E>
-	const Column<C>& columnImpl(const std::string& name) const
+	[[nodiscard]] const Column<C>& columnImpl(const std::string& name) const
 		/// Returns the reference to the first Column with the specified name.
 	{
 		return columnImpl<C,E>(columnPosition<C,E>(name));
 	}
 
 	template <class C, class E>
-	const Column<C>& columnImpl(std::size_t pos) const
+	[[nodiscard]] const Column<C>& columnImpl(std::size_t pos) const
 		/// Returns the reference to column at specified position.
 	{
 		const AbstractExtractionVec& rExtractions = extractions();
@@ -394,14 +394,14 @@ private:
 		return pExtraction->column();
 	}
 
-	bool isAllowed(std::size_t row) const;
+	[[nodiscard]] bool isAllowed(std::size_t row) const;
 		/// Returns true if the specified row is allowed by the
 		/// currently active filter.
 
 	void filter(const Poco::AutoPtr<RowFilter>& pFilter);
 		/// Sets the filter for the RecordSet.
 
-	const Poco::AutoPtr<RowFilter>& getFilter() const;
+	[[nodiscard]] const Poco::AutoPtr<RowFilter>& getFilter() const;
 		/// Returns the filter associated with the RecordSet.
 
 	std::size_t  _currentRow;

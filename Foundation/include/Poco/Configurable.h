@@ -57,7 +57,7 @@ public:
 		/// If a property with the given name is not supported, a
 		/// PropertyNotSupportedException is thrown.
 
-	virtual std::string getProperty(const std::string& name) const = 0;
+	[[nodiscard]] virtual std::string getProperty(const std::string& name) const = 0;
 		/// Returns the value of the property with the given name.
 		/// If a property with the given name is not supported, a
 		/// PropertyNotSupportedException is thrown.

@@ -66,22 +66,22 @@ public:
 	VarIterator& operator = (VarIterator&& other) noexcept;
 		/// Assigns the other VarIterator.
 
-	bool operator == (const VarIterator& other) const;
+	[[nodiscard]] bool operator == (const VarIterator& other) const;
 		/// Equality operator.
 
-	bool operator != (const VarIterator& other) const;
+	[[nodiscard]] bool operator != (const VarIterator& other) const;
 		/// Inequality operator.
 
-	bool operator < (const VarIterator& other) const;
+	[[nodiscard]] bool operator < (const VarIterator& other) const;
 		/// Less than operator.
 
-	bool operator > (const VarIterator& other) const;
+	[[nodiscard]] bool operator > (const VarIterator& other) const;
 		/// Greater than operator.
 
-	bool operator <= (const VarIterator& other) const;
+	[[nodiscard]] bool operator <= (const VarIterator& other) const;
 		/// Less than or equal to operator.
 
-	bool operator >= (const VarIterator& other) const;
+	[[nodiscard]] bool operator >= (const VarIterator& other) const;
 		/// Greater than or equal to operator.
 
 	Var& operator * () const;

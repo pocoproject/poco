@@ -68,13 +68,13 @@ public:
 		///
 		/// Does not close the underlying stream.
 
-	std::ostream& stream();
+	[[nodiscard]] std::ostream& stream();
 		/// Returns the writer's stream.
 
-	const std::string& boundary() const;
+	[[nodiscard]] const std::string& boundary() const;
 		/// Returns the multipart boundary used by this writer.
 
-	static std::string createBoundary();
+	[[nodiscard]] static std::string createBoundary();
 		/// Creates a random boundary string.
 		///
 		/// The string always has the form

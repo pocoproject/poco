@@ -170,30 +170,30 @@ public:
 	SocketAddress& operator = (SocketAddress&& socketAddress);
 		/// Move-assigns another SocketAddress.
 
-	IPAddress host() const;
+	[[nodiscard]] IPAddress host() const;
 		/// Returns the host IP address.
 
-	Poco::UInt16 port() const;
+	[[nodiscard]] Poco::UInt16 port() const;
 		/// Returns the port number.
 
-	poco_socklen_t length() const;
+	[[nodiscard]] poco_socklen_t length() const;
 		/// Returns the length of the internal native socket address.
 
-	const struct sockaddr* addr() const;
+	[[nodiscard]] const struct sockaddr* addr() const;
 		/// Returns a pointer to the internal native socket address.
 
-	int af() const;
+	[[nodiscard]] int af() const;
 		/// Returns the address family (AF_INET or AF_INET6) of the address.
 
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Returns a string representation of the address.
 
-	Family family() const;
+	[[nodiscard]] Family family() const;
 		/// Returns the address family of the host's address.
 
-	bool operator < (const SocketAddress& socketAddress) const;
-	bool operator == (const SocketAddress& socketAddress) const;
-	bool operator != (const SocketAddress& socketAddress) const;
+	[[nodiscard]] bool operator < (const SocketAddress& socketAddress) const;
+	[[nodiscard]] bool operator == (const SocketAddress& socketAddress) const;
+	[[nodiscard]] bool operator != (const SocketAddress& socketAddress) const;
 
 	enum
 	{
@@ -223,7 +223,7 @@ private:
 	typedef Poco::Net::Impl::SocketAddressImpl Impl;
 	typedef Poco::AutoPtr<Impl> Ptr;
 
-	Ptr pImpl() const;
+	[[nodiscard]] Ptr pImpl() const;
 
 	void newIPv4();
 	void newIPv4(const sockaddr_in*);

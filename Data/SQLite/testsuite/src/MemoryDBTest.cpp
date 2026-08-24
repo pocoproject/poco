@@ -71,7 +71,7 @@ void MemoryDBTest::testConnectorRegistrationBalanced()
 	// create() throws NotFoundException when the connector is absent.
 	auto registered = []() -> bool
 	{
-		try { SessionFactory::instance().create(Connector::KEY, ":memory:"); return true; }
+		try { (void)SessionFactory::instance().create(Connector::KEY, ":memory:"); return true; }
 		catch (const Poco::NotFoundException&) { return false; }
 	};
 

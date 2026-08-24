@@ -46,13 +46,13 @@ public:
 	};
 
 	// TextEncoding
-	const char* canonicalName() const;
-	bool isA(const std::string& encodingName) const;
-	const CharacterMap& characterMap() const;
-	int convert(const unsigned char* bytes) const;
-	int convert(int ch, unsigned char* bytes, int length) const;
-	int queryConvert(const unsigned char* bytes, int length) const;
-	int sequenceLength(const unsigned char* bytes, int length) const;
+	[[nodiscard]] const char* canonicalName() const;
+	[[nodiscard]] bool isA(const std::string& encodingName) const;
+	[[nodiscard]] const CharacterMap& characterMap() const;
+	[[nodiscard]] int convert(const unsigned char* bytes) const;
+	[[nodiscard]] int convert(int ch, unsigned char* bytes, int length) const;
+	[[nodiscard]] int queryConvert(const unsigned char* bytes, int length) const;
+	[[nodiscard]] int sequenceLength(const unsigned char* bytes, int length) const;
 
 protected:
 	DoubleByteEncoding(const char** names, const TextEncoding::CharacterMap& charMap, const Mapping mappingTable[], std::size_t mappingTableSize, const Mapping reverseMappingTable[], std::size_t reverseMappingTableSize);
@@ -91,13 +91,13 @@ protected:
 	~DoubleByteEncoding();
 		/// Destroys the DoubleByteEncoding.
 
-	int map(Poco::UInt16 encoded) const;
+	[[nodiscard]] int map(Poco::UInt16 encoded) const;
 		/// Maps a double-byte encoded character to its Unicode code point.
 		///
 		/// Returns the Unicode code point, or -1 if the encoded character is bad
 		/// and cannot be mapped.
 
-	int reverseMap(int cp) const;
+	[[nodiscard]] int reverseMap(int cp) const;
 		/// Maps a Unicode code point to its double-byte representation.
 		///
 		/// Returns -1 if the code point cannot be mapped, otherwise

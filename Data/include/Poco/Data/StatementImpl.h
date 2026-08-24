@@ -119,7 +119,7 @@ public:
 		/// Changes the extractionLimit to extrLimit.
 		/// Per default no limit (EXTRACT_UNLIMITED) is set.
 
-	std::string toString() const;
+	[[nodiscard]] std::string toString() const;
 		/// Create a string version of the SQL statement.
 
 	std::size_t execute(const bool& reset = true);
@@ -138,7 +138,7 @@ public:
 	void reset();
 		/// Resets the statement, so that we can reuse all bindings and re-execute again.
 
-	State getState() const;
+	[[nodiscard]] State getState() const;
 		/// Returns the state of the Statement.
 
 	void setStorage(Storage storage);
@@ -147,21 +147,21 @@ public:
 	void setStorage(const std::string& storage);
 		/// Sets the storage type for this statement;
 
-	Storage getStorage() const;
+	[[nodiscard]] Storage getStorage() const;
 		/// Returns the storage type for this statement.
 
-	std::size_t extractionCount() const;
+	[[nodiscard]] std::size_t extractionCount() const;
 		/// Returns the number of extraction storage buffers associated
 		/// with the statement.
 
-	std::size_t dataSetCount() const;
+	[[nodiscard]] std::size_t dataSetCount() const;
 		/// Returns the number of data sets associated with the statement.
 
 protected:
-	virtual std::size_t columnsReturned() const = 0;
+	[[nodiscard]] virtual std::size_t columnsReturned() const = 0;
 		/// Returns number of columns returned by query.
 
-	virtual int affectedRowCount() const = 0;
+	[[nodiscard]] virtual int affectedRowCount() const = 0;
 		/// Returns the number of affected rows.
 		/// Used to find out the number of rows affected by insert, delete or update.
 		///
@@ -169,30 +169,30 @@ protected:
 		/// some ODBC drivers when this function is called after a select statement
 		/// execution).
 
-	virtual const MetaColumn& metaColumn(std::size_t pos) const = 0;
+	[[nodiscard]] virtual const MetaColumn& metaColumn(std::size_t pos) const = 0;
 		/// Returns column meta data.
 
-	const MetaColumn& metaColumn(const std::string& name) const;
+	[[nodiscard]] const MetaColumn& metaColumn(const std::string& name) const;
 		/// Returns column meta data.
 
-	virtual bool hasNext() = 0;
+	[[nodiscard]] virtual bool hasNext() = 0;
 		/// Returns true if a call to next() will return data.
 		///
 		/// Note that the implementation must support
 		/// several consecutive calls to hasNext without data getting lost,
 		/// ie. hasNext(); hasNext(); next() must be equal to hasNext(); next();
 
-	virtual std::size_t next() = 0;
+	[[nodiscard]] virtual std::size_t next() = 0;
 		/// Retrieves the next row or set of rows from the resultset and
 		/// returns the number of rows retreved.
 		///
 		/// Will throw, if the resultset is empty.
 		/// Expects the statement to be compiled and bound.
 
-	virtual bool canBind() const = 0;
+	[[nodiscard]] virtual bool canBind() const = 0;
 		/// Returns true if another bind is possible.
 
-	virtual bool canCompile() const = 0;
+	[[nodiscard]] virtual bool canCompile() const = 0;
 		/// Returns true if another compile is possible.
 
 	virtual void compileImpl() = 0;
@@ -204,32 +204,32 @@ protected:
 	virtual void execDirectImpl(const std::string& query);
 		/// Execute query directly.
 
-	virtual AbstractExtraction::ExtractorPtr extractor() = 0;
+	[[nodiscard]] virtual AbstractExtraction::ExtractorPtr extractor() = 0;
 		/// Returns the concrete extractor used by the statement.
 
-	const AbstractExtractionVec& extractions() const;
+	[[nodiscard]] const AbstractExtractionVec& extractions() const;
 		/// Returns the const reference to extractions vector.
 
-	AbstractExtractionVec& extractions();
+	[[nodiscard]] AbstractExtractionVec& extractions();
 		/// Returns the reference to extractions vector.
 
 	void fixupExtraction();
 		/// Sets the AbstractExtractor at the extractors.
 
-	Limit::SizeT getExtractionLimit();
+	[[nodiscard]] Limit::SizeT getExtractionLimit();
 		/// Returns the extraction limit value.
 
-	const Limit& extractionLimit() const;
+	[[nodiscard]] const Limit& extractionLimit() const;
 		/// Returns the extraction limit.
 
-	std::size_t columnsExtracted(int dataSet = USE_CURRENT_DATA_SET) const;
+	[[nodiscard]] std::size_t columnsExtracted(int dataSet = USE_CURRENT_DATA_SET) const;
 		/// Returns the number of columns that the extractors handle.
 
-	std::size_t rowsExtracted(int dataSet = USE_CURRENT_DATA_SET) const;
+	[[nodiscard]] std::size_t rowsExtracted(int dataSet = USE_CURRENT_DATA_SET) const;
 		/// Returns the number of rows extracted for current data set.
 		/// Default value (USE_CURRENT_DATA_SET) indicates current data set (if any).
 
-	std::size_t subTotalRowCount(int dataSet = USE_CURRENT_DATA_SET) const;
+	[[nodiscard]] std::size_t subTotalRowCount(int dataSet = USE_CURRENT_DATA_SET) const;
 		/// Returns the number of rows extracted so far for the data set.
 		/// Default value indicates current data set (if any).
 
@@ -255,19 +255,19 @@ protected:
 		/// - std::vector
 		/// - std::list
 
-	SessionImpl& session();
+	[[nodiscard]] SessionImpl& session();
 		/// Rteurns session associated with this statement.
 
-	const SessionImpl& session() const;
+	[[nodiscard]] const SessionImpl& session() const;
 		/// Rteurns session associated with this statement.
 
-	virtual AbstractBinding::BinderPtr binder() = 0;
+	[[nodiscard]] virtual AbstractBinding::BinderPtr binder() = 0;
 		/// Returns the concrete binder used by the statement.
 
-	const AbstractBindingVec& bindings() const;
+	[[nodiscard]] const AbstractBindingVec& bindings() const;
 		/// Returns the const reference to bindings vector.
 
-	AbstractBindingVec& bindings();
+	[[nodiscard]] AbstractBindingVec& bindings();
 		/// Returns the reference to bindings.
 
 	void fixupBinding();
@@ -276,7 +276,7 @@ protected:
 	void resetBinding();
 		/// Resets binding so it can be reused again.
 
-	virtual bool isStoredProcedure() const;
+	[[nodiscard]] virtual bool isStoredProcedure() const;
 		/// Returns true if the statement is stored procedure.
 		/// Used as a help to determine whether to automatically create the
 		/// internal extractions when no outside extraction is supplied.
@@ -290,18 +290,18 @@ protected:
 		/// When connector-specific behavior is desired, it should be overridden
 		/// by the statement implementation.
 
-	std::size_t currentDataSet() const;
+	[[nodiscard]] std::size_t currentDataSet() const;
 		/// Returns the current data set.
 
-	std::size_t activateNextDataSet();
+	[[nodiscard]] std::size_t activateNextDataSet();
 		/// Returns the next data set index, or throws NoDataException if the last
 		/// data set was reached.
 
-	std::size_t activatePreviousDataSet();
+	[[nodiscard]] std::size_t activatePreviousDataSet();
 		/// Returns the previous data set index, or throws NoDataException if the last
 		/// data set was reached.
 
-	bool hasMoreDataSets() const;
+	[[nodiscard]] bool hasMoreDataSets() const;
 		/// Returns true if there are data sets not activated yet.
 
 private:
@@ -311,12 +311,12 @@ private:
 	void bind();
 		/// Binds the statement, if not yet bound.
 
-	std::size_t executeWithLimit();
+	[[nodiscard]] std::size_t executeWithLimit();
 		/// Executes with an upper limit set. Returns the number of rows
 		/// extracted for statements returning data or number of rows
 		/// affected for all other statements (insert, update, delete).
 
-	std::size_t executeWithoutLimit();
+	[[nodiscard]] std::size_t executeWithoutLimit();
 		/// Executes without an upper limit set. Returns the number of rows
 		/// extracted for statements returning data or number of rows
 		/// affected for all other statements (insert, update, delete).
@@ -325,7 +325,7 @@ private:
 		/// Resets extraction so it can be reused again.
 
 	template <class C>
-	SharedPtr<InternalExtraction<C>> createExtract(const MetaColumn& mc)
+	[[nodiscard]] SharedPtr<InternalExtraction<C>> createExtract(const MetaColumn& mc)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
@@ -333,7 +333,7 @@ private:
 	}
 
 	template <class C>
-	SharedPtr<InternalBulkExtraction<C>> createBulkExtract(const MetaColumn& mc)
+	[[nodiscard]] SharedPtr<InternalBulkExtraction<C>> createBulkExtract(const MetaColumn& mc)
 	{
 		C* pData = new C;
 		Column<C>* pCol = new Column<C>(mc, pData);
@@ -396,7 +396,7 @@ private:
 		}
 	}
 
-	bool isNull(std::size_t col, std::size_t row) const;
+	[[nodiscard]] bool isNull(std::size_t col, std::size_t row) const;
 		/// Returns true if the value in [col, row] is null.
 
 	void forbidBulk();
@@ -411,23 +411,23 @@ private:
 	void resetBulk();
 		/// Resets the bulk extraction and binding flag.
 
-	bool bulkBindingAllowed() const;
+	[[nodiscard]] bool bulkBindingAllowed() const;
 		/// Returns true if statement can be set to bind data in bulk.
 		/// Once bulk binding is set for a statement, it can be
 		/// neither altered nor mixed with non-bulk mode binding.
 
-	bool bulkExtractionAllowed() const;
+	[[nodiscard]] bool bulkExtractionAllowed() const;
 		/// Returns true if statement can be set to extract data in bulk.
 		/// Once bulk extraction is set for a statement, it can be
 		/// neither altered nor mixed with non-bulk mode extraction.
 
-	bool isBulkBinding() const;
+	[[nodiscard]] bool isBulkBinding() const;
 		/// Returns true if statement is set to bind data in bulk.
 
-	bool isBulkExtraction() const;
+	[[nodiscard]] bool isBulkExtraction() const;
 		/// Returns true if statement is set to extract data in bulk.
 
-	bool isBulkSupported() const;
+	[[nodiscard]] bool isBulkSupported() const;
 		/// Returns true if connector and session support bulk operation.
 
 	void formatSQL(std::vector<Any>& arguments);

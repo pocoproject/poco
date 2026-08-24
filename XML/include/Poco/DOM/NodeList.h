@@ -40,12 +40,12 @@ class XML_API NodeList: public DOMObject
 	/// release() when no longer needed.
 {
 public:
-	virtual Node* item(unsigned long index) const = 0;
+	[[nodiscard]] virtual Node* item(unsigned long index) const = 0;
 		/// Returns the index'th item in the collection. If index is
 		/// greater than or equal to the number of nodes in the list,
 		/// this returns null.
 
-	virtual unsigned long length() const = 0;
+	[[nodiscard]] virtual unsigned long length() const = 0;
 		/// Returns the number of nodes in the list. The range of valid
 		/// node indices is 0 to length - 1 inclusive.
 

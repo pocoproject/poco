@@ -254,7 +254,7 @@ void TaskManagerTest::testFinish()
 	tm.addObserver(NObserver<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
 	tm.addObserver(NObserver<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
-	tm.start(pTT.duplicate());
+	(void) tm.start(pTT.duplicate());
 	assertTrue (waitForCondition([&]{ return pTT->state() >= Task::TASK_RUNNING; }, 5000));
 	assertTrue (pTT->progress() == 0);
 	Thread::sleep(200);
@@ -297,7 +297,7 @@ void TaskManagerTest::testCancel()
 	tm.addObserver(NObserver<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
 	tm.addObserver(NObserver<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
-	tm.start(pTT.duplicate());
+	(void) tm.start(pTT.duplicate());
 	assertTrue (waitForCondition([&]{ return pTT->state() >= Task::TASK_RUNNING; }, 5000));
 	assertTrue (pTT->progress() == 0);
 	Thread::sleep(200);
@@ -417,7 +417,7 @@ void TaskManagerTest::testCustom()
 			(ti, &CustomTaskObserver<int>::taskCustom));
 
 	AutoPtr<CustomNotificationTask<int> > pCNT1 = new CustomNotificationTask<int>(0);
-	tm.start(pCNT1.duplicate());
+	(void) tm.start(pCNT1.duplicate());
 	assertTrue (ti.custom() == 0);
 
 	for (int i = 1; i < 10; ++i)
@@ -432,7 +432,7 @@ void TaskManagerTest::testCustom()
 			(ts, &CustomTaskObserver<std::string>::taskCustom));
 
 	AutoPtr<CustomNotificationTask<std::string> > pCNT2 = new CustomNotificationTask<std::string>("");
-	tm.start(pCNT2.duplicate());
+	(void) tm.start(pCNT2.duplicate());
 	assertTrue (tm.taskList().size() == 2);
 	assertTrue (ts.custom() == "");
 	std::string str("notify me");
@@ -450,7 +450,7 @@ void TaskManagerTest::testCustom()
 			(ptst, &CustomTaskObserver<S*>::taskCustom));
 
 	AutoPtr<CustomNotificationTask<S*> > pCNT3 = new CustomNotificationTask<S*>(&s);
-	tm.start(pCNT3.duplicate());
+	(void) tm.start(pCNT3.duplicate());
 	assertTrue (tm.taskList().size() == 3);
 	assertTrue (ptst.custom()->i == 0);
 	assertTrue (ptst.custom()->str == "");
@@ -470,7 +470,7 @@ void TaskManagerTest::testCustom()
 			(tst, &CustomTaskObserver<S>::taskCustom));
 
 	AutoPtr<CustomNotificationTask<S> > pCNT4 = new CustomNotificationTask<S>(s);
-	tm.start(pCNT4.duplicate());
+	(void) tm.start(pCNT4.duplicate());
 	assertTrue (tm.taskList().size() == 4);
 	assertTrue (tst.custom().i == 0);
 	assertTrue (tst.custom().str == "");
@@ -481,7 +481,7 @@ void TaskManagerTest::testCustom()
 	assertTrue (tst.custom().str == "123");
 
 	AutoPtr<SimpleTask> pST = new SimpleTask;
-	tm.start(pST.duplicate());
+	(void) tm.start(pST.duplicate());
 	assertTrue (tm.taskList().size() == 5);
 
 	tm.cancelAll();
@@ -523,9 +523,9 @@ void TaskManagerTest::testMultiTasks()
 	AutoPtr<SimpleTask> pTT2 = new SimpleTask;
 	AutoPtr<SimpleTask> pTT3 = new SimpleTask;
 
-	tm.start(pTT1.duplicate());
-	tm.start(pTT2.duplicate());
-	tm.start(pTT3.duplicate());
+	(void) tm.start(pTT1.duplicate());
+	(void) tm.start(pTT2.duplicate());
+	(void) tm.start(pTT3.duplicate());
 
 	assertTrue (pTT1->hasOwner());
 	assertTrue (pTT2->hasOwner());
@@ -556,7 +556,7 @@ void TaskManagerTest::testCustomThreadPool()
 	// fill up the thread pool
 	for (int i=0; i < tp.capacity(); ++i)
 	{
-		tm.start(new SimpleTask);
+		(void) tm.start(new SimpleTask);
 	}
 	assertTrue (tp.allocated() == tp.capacity());
 	assertTrue (tm.count() == tp.allocated());
@@ -564,7 +564,7 @@ void TaskManagerTest::testCustomThreadPool()
 	// the next one should fail
 	try
 	{
-		tm.start(new SimpleTask);
+		(void) tm.start(new SimpleTask);
 		failmsg("thread pool exhausted - must throw exception");
 	}
 	catch (NoThreadAvailableException const&)

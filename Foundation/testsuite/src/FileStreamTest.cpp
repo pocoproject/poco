@@ -169,7 +169,7 @@ void FileStreamTest::testOpenModeIn()
 	{
 	}
 
-	f.createFile();
+	(void) f.createFile();
 	Poco::FileInputStream istr("nonexistent.txt");
 	assertTrue (istr.good());
 }

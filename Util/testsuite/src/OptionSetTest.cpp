@@ -102,7 +102,7 @@ void OptionSetTest::testOptionSet()
 
 	try
 	{
-		set.getOption("in");
+		(void) set.getOption("in");
 		fail("ambiguous - must throw");
 	}
 	catch (Poco::Util::AmbiguousOptionException&)
@@ -111,7 +111,7 @@ void OptionSetTest::testOptionSet()
 
 	try
 	{
-		set.getOption("he");
+		(void) set.getOption("he");
 		fail("ambiguous - must throw");
 	}
 	catch (Poco::Util::AmbiguousOptionException&)
@@ -120,7 +120,7 @@ void OptionSetTest::testOptionSet()
 
 	try
 	{
-		set.getOption("i");
+		(void) set.getOption("i");
 		fail("ambiguous - must throw");
 	}
 	catch (Poco::Util::AmbiguousOptionException&)

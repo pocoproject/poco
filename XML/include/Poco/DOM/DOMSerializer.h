@@ -63,19 +63,19 @@ public:
 
 	// XMLReader
 	void setEntityResolver(EntityResolver* pResolver);
-	EntityResolver* getEntityResolver() const;
+	[[nodiscard]] EntityResolver* getEntityResolver() const;
 	void setDTDHandler(DTDHandler* pDTDHandler);
-	DTDHandler* getDTDHandler() const;
+	[[nodiscard]] DTDHandler* getDTDHandler() const;
 	void setContentHandler(ContentHandler* pContentHandler);
-	ContentHandler* getContentHandler() const;
+	[[nodiscard]] ContentHandler* getContentHandler() const;
 	void setErrorHandler(ErrorHandler* pErrorHandler);
-	ErrorHandler* getErrorHandler() const;
+	[[nodiscard]] ErrorHandler* getErrorHandler() const;
 
 	void setFeature(const XMLString& featureId, bool state);
-	bool getFeature(const XMLString& featureId) const;
+	[[nodiscard]] bool getFeature(const XMLString& featureId) const;
 	void setProperty(const XMLString& propertyId, const XMLString& value);
 	void setProperty(const XMLString& propertyId, void* value);
-	void* getProperty(const XMLString& propertyId) const;
+	[[nodiscard]] void* getProperty(const XMLString& propertyId) const;
 
 protected:
 	void parse(InputSource* pSource);

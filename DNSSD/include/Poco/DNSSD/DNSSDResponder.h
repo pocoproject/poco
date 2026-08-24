@@ -117,7 +117,7 @@ public:
 	~DNSSDResponder();
 		/// Destroys the DNSSDResponder.
 
-	DNSSDBrowser& browser();
+	[[nodiscard]] DNSSDBrowser& browser();
 		/// Returns the DNSServiceBrowser, which is used to
 		/// discover and resolve services and domains.
 

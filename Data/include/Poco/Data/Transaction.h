@@ -40,10 +40,10 @@ class Data_API Transaction
 	/// Transaction be used directly on a default (auto-commit) session.
 {
 public:
-	Transaction(Poco::Data::Session& session, Poco::Logger* pLogger = nullptr);
+	POCO_NODISCARD_CTOR Transaction(Poco::Data::Session& session, Poco::Logger* pLogger = nullptr);
 		/// Creates the Transaction and starts it, using the given database session and logger.
 
-	Transaction(Poco::Data::Session& session, bool start);
+	POCO_NODISCARD_CTOR Transaction(Poco::Data::Session& session, bool start);
 		/// Creates the Transaction, using the given database session.
 		/// If start is true, transaction is started, otherwise begin() must be called
 		/// to start the transaction.
@@ -95,14 +95,14 @@ public:
 	void setIsolation(Poco::UInt32 ti);
 		/// Sets the transaction isolation level.
 
-	Poco::UInt32 getIsolation();
+	[[nodiscard]] Poco::UInt32 getIsolation();
 		/// Returns the transaction isolation level.
 
-	bool hasIsolation(Poco::UInt32 ti);
+	[[nodiscard]] bool hasIsolation(Poco::UInt32 ti);
 		/// Returns true iff the transaction isolation level corresponding
 		/// to the supplied bitmask is supported.
 
-	bool isIsolation(Poco::UInt32 ti);
+	[[nodiscard]] bool isIsolation(Poco::UInt32 ti);
 		/// Returns true iff the transaction isolation level corresponds
 		/// to the supplied bitmask.
 
@@ -142,7 +142,7 @@ public:
 	void rollback();
 		/// Rolls back the current transaction.
 
-	bool isActive();
+	[[nodiscard]] bool isActive();
 		/// Returns false after the transaction has been committed or rolled back,
 		/// true if the transaction is ongoing.
 

@@ -49,22 +49,22 @@ public:
 	using size_type = std::size_t;
 	using difference_type = std::ptrdiff_t;
 
-	iterator begin()
+	[[nodiscard]] iterator begin()
 	{
 		return elems;
 	}
 
-	const_iterator begin() const
+	[[nodiscard]] const_iterator begin() const
 	{
 		return elems;
 	}
 
-	iterator end()
+	[[nodiscard]] iterator end()
 	{
 		return elems+N;
 	}
 
-	const_iterator end() const
+	[[nodiscard]] const_iterator end() const
 	{
 		return elems+N;
 	}
@@ -72,41 +72,41 @@ public:
 	using reverse_iterator = std::reverse_iterator<iterator>;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-	reverse_iterator rbegin()
+	[[nodiscard]] reverse_iterator rbegin()
 	{
 		return reverse_iterator(end());
 	}
 
-	const_reverse_iterator rbegin() const
+	[[nodiscard]] const_reverse_iterator rbegin() const
 	{
 		return const_reverse_iterator(end());
 	}
 
-	reverse_iterator rend()
+	[[nodiscard]] reverse_iterator rend()
 	{
 		return reverse_iterator(begin());
 	}
 
-	const_reverse_iterator rend() const
+	[[nodiscard]] const_reverse_iterator rend() const
 	{
 		return const_reverse_iterator(begin());
 	}
 
-	reference operator[](size_type i)
+	[[nodiscard]] reference operator[](size_type i)
 		/// Element access without range check. If the index is not small than the given size, the behavior is undefined.
 	{
 		poco_assert_dbg(i < N && "out of range");
 		return elems[i];
 	}
 
-	const_reference operator[](size_type i) const
+	[[nodiscard]] const_reference operator[](size_type i) const
 		/// Element access without range check. If the index is not small than the given size, the behavior is undefined.
 	{
 		poco_assert_dbg(i < N && "out of range");
 		return elems[i];
 	}
 
-	reference at(size_type i)
+	[[nodiscard]] reference at(size_type i)
 		/// Element access with range check. Throws Poco::InvalidArgumentException if the index is over range.
 	{
 		if(i>=size())
@@ -114,7 +114,7 @@ public:
 		return elems[i];
 	}
 
-	const_reference at(size_type i) const
+	[[nodiscard]] const_reference at(size_type i) const
 		/// Element access with range check. Throws Poco::InvalidArgumentException if the index is over range.
 	{
 		if(i>=size())
@@ -122,37 +122,37 @@ public:
 		return elems[i];
 	}
 
-	reference front()
+	[[nodiscard]] reference front()
 	{
 		return elems[0];
 	}
 
-	const_reference front() const
+	[[nodiscard]] const_reference front() const
 	{
 		return elems[0];
 	}
 
-	reference back()
+	[[nodiscard]] reference back()
 	{
 		return elems[N-1];
 	}
 
-	const_reference back() const
+	[[nodiscard]] const_reference back() const
 	{
 		return elems[N-1];
 	}
 
-	static size_type size()
+	[[nodiscard]] static size_type size()
 	{
 		return N;
 	}
 
-	static bool empty()
+	[[nodiscard]] static bool empty()
 	{
 		return false;
 	}
 
-	static size_type max_size()
+	[[nodiscard]] static size_type max_size()
 	{
 		return N;
 	}
@@ -164,18 +164,18 @@ public:
 		std::swap_ranges(begin(),end(),y.begin());
 	}
 
-	const T* data() const
+	[[nodiscard]] const T* data() const
 		/// Direct access to data (read-only)
 	{
 		return elems;
 	}
 
-	T* data()
+	[[nodiscard]] T* data()
 	{
 		return elems;
 	}
 
-	T* c_array()
+	[[nodiscard]] T* c_array()
 	{
 		/// Use array as C array (direct read/write access to data)
 		return elems;
@@ -203,49 +203,49 @@ public:
 
 
 // comparisons
-template<class T, std::size_t N>
-bool operator== (const Array<T,N>& x, const Array<T,N>& y)
+template <class T, std::size_t N>
+[[nodiscard]] bool operator== (const Array<T,N>& x, const Array<T,N>& y)
 {
 	return std::equal(x.begin(), x.end(), y.begin());
 }
 
 
-template<class T, std::size_t N>
-bool operator< (const Array<T,N>& x, const Array<T,N>& y)
+template <class T, std::size_t N>
+[[nodiscard]] bool operator< (const Array<T,N>& x, const Array<T,N>& y)
 {
 	return std::lexicographical_compare(x.begin(),x.end(),y.begin(),y.end());
 }
 
 
-template<class T, std::size_t N>
-bool operator!= (const Array<T,N>& x, const Array<T,N>& y)
+template <class T, std::size_t N>
+[[nodiscard]] bool operator!= (const Array<T,N>& x, const Array<T,N>& y)
 {
 	return !(x==y);
 }
 
 
-template<class T, std::size_t N>
-bool operator> (const Array<T,N>& x, const Array<T,N>& y)
+template  <class T, std::size_t N>
+[[nodiscard]] bool operator> (const Array<T,N>& x, const Array<T,N>& y)
 {
 	return y<x;
 }
 
 
-template<class T, std::size_t N>
-bool operator<= (const Array<T,N>& x, const Array<T,N>& y)
+template <class T, std::size_t N>
+[[nodiscard]] bool operator<= (const Array<T,N>& x, const Array<T,N>& y)
 {
 	return !(y<x);
 }
 
 
-template<class T, std::size_t N>
-bool operator>= (const Array<T,N>& x, const Array<T,N>& y)
+template <class T, std::size_t N>
+[[nodiscard]] bool operator>= (const Array<T,N>& x, const Array<T,N>& y)
 {
 	return !(x<y);
 }
 
 
-template<class T, std::size_t N>
+template <class T, std::size_t N>
 inline void swap (Array<T,N>& x, Array<T,N>& y) noexcept
 	/// global swap()
 {

@@ -55,7 +55,7 @@ public:
 		///
 		/// Specify 0 for an unlimited line length.
 
-	int getLineLength() const;
+	[[nodiscard]] int getLineLength() const;
 		/// Returns the currently set line length.
 
 	void setUppercase(bool flag = true);
@@ -81,7 +81,7 @@ public:
 	HexBinaryEncoderIOS(std::ostream& ostr);
 	~HexBinaryEncoderIOS() override;
 	int close();
-	HexBinaryEncoderBuf* rdbuf();
+	[[nodiscard]] HexBinaryEncoderBuf* rdbuf();
 
 protected:
 	HexBinaryEncoderBuf _buf;

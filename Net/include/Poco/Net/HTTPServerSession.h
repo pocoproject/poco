@@ -41,16 +41,16 @@ public:
 	virtual ~HTTPServerSession();
 		/// Destroys the HTTPServerSession.
 
-	bool hasMoreRequests();
+	[[nodiscard]] bool hasMoreRequests();
 		/// Returns true if there are requests available.
 
-	bool canKeepAlive() const;
+	[[nodiscard]] bool canKeepAlive() const;
 		/// Returns true if the session can be kept alive.
 
-	SocketAddress clientAddress();
+	[[nodiscard]] SocketAddress clientAddress();
 		/// Returns the client's address.
 
-	SocketAddress serverAddress();
+	[[nodiscard]] SocketAddress serverAddress();
 		/// Returns the server's address.
 
 private:

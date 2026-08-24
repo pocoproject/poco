@@ -68,7 +68,7 @@ public:
 	HMACEngine(const HMACEngine&) = delete;
 	HMACEngine& operator=(const HMACEngine&) = delete;
 
-	std::size_t digestLength() const override { return DIGEST_SIZE; }
+	[[nodiscard]] std::size_t digestLength() const override { return DIGEST_SIZE; }
 
 	void reset() override
 	{
@@ -76,7 +76,7 @@ public:
 		_engine.update(_ipad, BLOCK_SIZE);
 	}
 
-	const DigestEngine::Digest& digest() override
+	[[nodiscard]] const DigestEngine::Digest& digest() override
 	{
 		const DigestEngine::Digest& d = _engine.digest();
 		poco_assert (d.size() == DIGEST_SIZE);

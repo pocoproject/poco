@@ -75,13 +75,13 @@ public:
 	~WinService();
 		/// Destroys the WinService.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns the service name.
 
-	std::string displayName() const;
+	[[nodiscard]] std::string displayName() const;
 		/// Returns the service's display name.
 
-	std::string path() const;
+	[[nodiscard]] std::string path() const;
 		/// Returns the path to the service executable.
 		///
 		/// Throws a NotFoundException if the service has not been registered.
@@ -103,13 +103,13 @@ public:
 		///
 		/// Throws a NotFoundException if the service has not been registered.
 
-	bool isRegistered() const;
+	[[nodiscard]] bool isRegistered() const;
 		/// Returns true if the service has been registered with the Service Control Manager.
 
-	bool isRunning() const;
+	[[nodiscard]] bool isRunning() const;
 		/// Returns true if the service is currently running.
 
-	bool isStopped() const;
+	[[nodiscard]] bool isStopped() const;
 		/// Returns true if the service is currently stopped.
 
 	void start();
@@ -127,7 +127,7 @@ public:
 	void setStartup(Startup startup);
 		/// Sets the startup mode for the service.
 
-	Startup getStartup() const;
+	[[nodiscard]] Startup getStartup() const;
 		/// Returns the startup mode for the service.
 
 	void setFailureActions(FailureActionVector failureActions, const std::string& command = "", const std::string& rebootMessage = "");
@@ -135,13 +135,13 @@ public:
 		/// If one of the Actions is SVC_RUN_COMMAND the command Parameter is added.
 		/// If one of the Actions is SVC_REBOOT the Reboot Message is set.
 
-	FailureActionTypeVector getFailureActions() const;
+	[[nodiscard]] FailureActionTypeVector getFailureActions() const;
 		/// Returns the Failure Actions for the service.
 
 	void setDescription(const std::string& description);
 		/// Sets the service description in the registry.
 
-	std::string getDescription() const;
+	[[nodiscard]] std::string getDescription() const;
 		/// Returns the service description from the registry.
 
 	static constexpr int STARTUP_TIMEOUT = 30000;
@@ -152,9 +152,9 @@ protected:
 
 private:
 	void open() const;
-	bool tryOpen() const;
+	[[nodiscard]] bool tryOpen() const;
 	void close() const;
-	POCO_LPQUERY_SERVICE_CONFIG config() const;
+	[[nodiscard]] POCO_LPQUERY_SERVICE_CONFIG config() const;
 
 	WinService();
 	WinService(const WinService&);

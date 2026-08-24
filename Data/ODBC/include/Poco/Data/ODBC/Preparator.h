@@ -380,41 +380,41 @@ public:
 	void prepare(std::size_t pos, const std::list<Poco::Dynamic::Var>& val) override;
 		/// Prepares a Dynamic::Var list.
 
-	std::size_t columns() const;
+	[[nodiscard]] std::size_t columns() const;
 		/// Returns the number of columns.
 		/// Resizes the internal storage iff the size is zero.
 
-	Poco::Any& operator [] (std::size_t pos);
+	[[nodiscard]] Poco::Any& operator [] (std::size_t pos);
 		/// Returns reference to column data.
 
-	Poco::Any& at(std::size_t pos);
+	[[nodiscard]] Poco::Any& at(std::size_t pos);
 		/// Returns reference to column data.
 
 	void setMaxFieldSize(std::size_t size);
 		/// Sets maximum supported field size.
 
-	std::size_t getMaxFieldSize() const;
+	[[nodiscard]] std::size_t getMaxFieldSize() const;
 		// Returns maximum supported field size.
 
-	std::size_t maxDataSize(std::size_t pos) const;
+	[[nodiscard]] std::size_t maxDataSize(std::size_t pos) const;
 		/// Returns max supported size for column at position pos.
 		/// Returned length for variable length fields is the one
 		/// supported by this implementation, not the underlying DB.
 
-	std::size_t actualDataSize(std::size_t col, std::size_t row = POCO_DATA_INVALID_ROW) const;
+	[[nodiscard]] std::size_t actualDataSize(std::size_t col, std::size_t row = POCO_DATA_INVALID_ROW) const;
 		/// Returns the returned length for the column and row specified.
 		/// This is usually equal to the column size, except for
 		/// variable length fields (BLOB and variable length strings).
 		/// For null values, the return value is -1 (SQL_NO_DATA)
 
-	std::size_t bulkSize(std::size_t col = 0) const;
+	[[nodiscard]] std::size_t bulkSize(std::size_t col = 0) const;
 		/// Returns bulk size. Column argument is optional
 		/// since all columns must be the same size.
 
 	void setDataExtraction(DataExtraction ext);
 		/// Set data extraction mode.
 
-	DataExtraction getDataExtraction() const;
+	[[nodiscard]] DataExtraction getDataExtraction() const;
 		/// Returns data extraction mode.
 
 private:

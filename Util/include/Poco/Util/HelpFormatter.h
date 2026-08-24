@@ -47,25 +47,25 @@ public:
 	void setCommand(const std::string& command);
 		/// Sets the command name.
 
-	const std::string& getCommand() const;
+	[[nodiscard]] const std::string& getCommand() const;
 		/// Returns the command name.
 
 	void setUsage(const std::string& usage);
 		/// Sets the usage string.
 
-	const std::string& getUsage() const;
+	[[nodiscard]] const std::string& getUsage() const;
 		/// Returns the usage string.
 
 	void setHeader(const std::string& header);
 		/// Sets the header string.
 
-	const std::string& getHeader() const;
+	[[nodiscard]] const std::string& getHeader() const;
 		/// Returns the header string.
 
 	void setFooter(const std::string& footer);
 		/// Sets the footer string.
 
-	const std::string& getFooter() const;
+	[[nodiscard]] const std::string& getFooter() const;
 		/// Returns the footer string.
 
 	void format(std::ostream& ostr) const;
@@ -74,7 +74,7 @@ public:
 	void setWidth(int width);
 		/// Sets the line width for the formatted help text.
 
-	int getWidth() const;
+	[[nodiscard]] int getWidth() const;
 		/// Returns the line width for the formatted help text.
 		///
 		/// The default width is 72.
@@ -82,7 +82,7 @@ public:
 	void setIndent(int indent);
 		/// Sets the indentation for description continuation lines.
 
-	int getIndent() const;
+	[[nodiscard]] int getIndent() const;
 		/// Returns the indentation for description continuation lines.
 
 	void setAutoIndent();
@@ -97,19 +97,19 @@ public:
 		/// After calling setUnixStyle(), setAutoIndent() should be called
 		/// as well to ensure proper help text formatting.
 
-	bool isUnixStyle() const;
+	[[nodiscard]] bool isUnixStyle() const;
 		/// Returns if Unix-style options are set.
 
-	std::string shortPrefix() const;
+	[[nodiscard]] std::string shortPrefix() const;
 		/// Returns the platform-specific prefix for short options.
 		/// "-" on Unix, "/" on Windows and OpenVMS.
 
-	std::string longPrefix() const;
+	[[nodiscard]] std::string longPrefix() const;
 		/// Returns the platform-specific prefix for long options.
 		/// "--" on Unix, "/" on Windows and OpenVMS.
 
 protected:
-	int calcIndent() const;
+	[[nodiscard]] int calcIndent() const;
 		/// Calculates the indentation for the option descriptions
 		/// from the given options.
 

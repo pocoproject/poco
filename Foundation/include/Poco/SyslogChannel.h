@@ -86,7 +86,7 @@ public:
 		///     * facility: The facility added to each log message. See the Facility enumeration for a list of supported values.
 		///     * options:  The logging options. See the Option enumeration for a list of supported values.
 
-	std::string getProperty(const std::string& name) const override;
+	[[nodiscard]] std::string getProperty(const std::string& name) const override;
 		/// Returns the value of the property with the given name.
 
 	static const std::string PROP_NAME;
@@ -95,7 +95,7 @@ public:
 
 protected:
 	~SyslogChannel() override;
-	static int getPrio(const Message& msg);
+	[[nodiscard]] static int getPrio(const Message& msg);
 
 private:
 	std::string _name;

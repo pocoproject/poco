@@ -65,8 +65,7 @@ class Var;
 
 namespace Impl {
 
-
-bool Foundation_API isJSONString(const Var& any);
+[[nodiscard]] bool Foundation_API isJSONString(const Var& any);
 	/// Returns true for values that should be JSON-formatted as string.
 
 
@@ -309,7 +308,7 @@ protected:
 		/// Creates the VarHolder.
 
 	template <typename T>
-	VarHolder* cloneHolder(Placeholder<VarHolder>* pVarHolder, const T& val) const
+	[[nodiscard]] VarHolder* cloneHolder(Placeholder<VarHolder>* pVarHolder, const T& val) const
 		/// Instantiates value holder wrapper.
 		///
 		/// Called from clone() member function of the implementation.
@@ -431,7 +430,7 @@ protected:
 private:
 
 	template <typename F, typename T>
-	static std::string rangeExcCastStr(const F& from)
+	[[nodiscard]] static std::string rangeExcCastStr(const F& from)
 		/// Returns a string representation of 'from' cast to the largest
 		/// integer type matching T's signedness. Used in range exception messages.
 		///
@@ -453,13 +452,13 @@ private:
 	}
 
 	template <typename T, std::enable_if_t<std::is_same_v<T, bool>, bool> = true>
-	static constexpr int numValDigits(const T& value)
+	[[nodiscard]] static constexpr int numValDigits(const T& value)
 	{
 		return 1;
 	}
 
 	template <typename T, std::enable_if_t<std::is_integral_v<T> && !std::is_same_v<T, bool>, bool> = true>
-	static constexpr int numValDigits(const T& value)
+	[[nodiscard]] static constexpr int numValDigits(const T& value)
 		/// Returns the number of binary digits (bits) needed to represent
 		/// the magnitude of the given integer value.
 		///
@@ -485,7 +484,7 @@ private:
 	}
 
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	static int numValDigits(T value)
+	[[nodiscard]] static int numValDigits(T value)
 		/// Returns approximate number of binary digits for a floating point value.
 		/// Uses ilogb() to get the exponent, which represents the bit position
 		/// of the most significant bit. This avoids undefined behavior when
@@ -498,13 +497,13 @@ private:
 	}
 
 	template <typename T, std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	static constexpr int numTypeDigits()
+	[[nodiscard]] static constexpr int numTypeDigits()
 	{
 		return std::numeric_limits<T>::digits;
 	}
 
 	template <typename T, std::enable_if_t<std::is_integral_v<T>, bool> = true>
-	static constexpr int numTypeDigits()
+	[[nodiscard]] static constexpr int numTypeDigits()
 	{
 		return numValDigits(std::numeric_limits<T>::max());
 	}
@@ -512,7 +511,7 @@ private:
 	template <typename F, typename T,
 		std::enable_if_t<std::is_integral_v<F>, bool> = true,
 		std::enable_if_t<std::is_floating_point_v<T>, bool> = true>
-	static bool isPrecisionLost(const F& from)
+	[[nodiscard]] static bool isPrecisionLost(const F& from)
 		// Checks for loss of precision in integral -> floating point conversion.
 	{
 		return numValDigits(from) > numTypeDigits<T>();

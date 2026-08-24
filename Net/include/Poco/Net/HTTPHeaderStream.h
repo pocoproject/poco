@@ -58,7 +58,7 @@ class Net_API HTTPHeaderIOS: public virtual std::ios
 public:
 	HTTPHeaderIOS(HTTPSession& session, HTTPHeaderStreamBuf::openmode mode);
 	~HTTPHeaderIOS();
-	HTTPHeaderStreamBuf* rdbuf();
+	[[nodiscard]] HTTPHeaderStreamBuf* rdbuf();
 
 protected:
 	HTTPHeaderStreamBuf _buf;

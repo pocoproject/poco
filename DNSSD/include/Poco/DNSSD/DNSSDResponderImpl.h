@@ -40,7 +40,7 @@ public:
 	virtual ~DNSSDResponderImpl();
 		/// Destroys the DNSSDResponderImpl.
 
-	virtual DNSSDBrowser& browser() = 0;
+	[[nodiscard]] virtual DNSSDBrowser& browser() = 0;
 		/// Returns the DNSSDBrowser, which is used to
 		/// discover and resolve services and domains.
 
@@ -104,7 +104,7 @@ class DNSSD_API DNSSDResponderImplFactory
 	/// implementations and registered with the DNSSDResponder class.
 {
 public:
-	virtual DNSSDResponderImpl* createResponderImpl(DNSSDResponder& owner) = 0;
+	[[nodiscard]] virtual DNSSDResponderImpl* createResponderImpl(DNSSDResponder& owner) = 0;
 		/// Creates a new DNSSDResponderImpl.
 
 protected:
