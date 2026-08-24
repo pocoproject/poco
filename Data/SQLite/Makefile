@@ -51,7 +51,7 @@ ifdef POCO_ENABLE_SQLITE_VEC
 			# per file), so the whole library requires an AVX2-capable CPU.
 			SYSFLAGS += -mavx -mavx2 -DSQLITE_VEC_ENABLE_AVX
 		else
-			$(warning POCO_ENABLE_SQLITE_VEC_AVX ignored: target architecture $(OSARCH) is not x86_64)
+$(warning POCO_ENABLE_SQLITE_VEC_AVX ignored: target architecture $(OSARCH) is not x86_64)
 		endif
 	endif
 	SYSLIBS += -lm
