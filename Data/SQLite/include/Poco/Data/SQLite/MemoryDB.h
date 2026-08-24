@@ -425,8 +425,8 @@ private:
 	void maybeSeal(const std::vector<std::string>& tables,
 		const std::map<std::string, Poco::Int64>& maxRowids); // caller holds _stateMutex
 	void migrateShardFile(ShardInfo& shard, int toVersion, const std::vector<std::string>& schemaLog);
-	std::vector<std::string> userTables(Session& s);    // ordinary rowid tables (no virtual, no shadow)
-	std::vector<std::string> virtualTables(Session& s, const std::string& schema = "main");
+	[[nodiscard]] std::vector<std::string> userTables(Session& s); // ordinary rowid tables (no virtual, no shadow)
+	[[nodiscard]] std::vector<std::string> virtualTables(Session& s, const std::string& schema = "main");
 		// CREATE VIRTUAL TABLE objects in the given schema
 	void copyVirtualTables(const std::string& filePath, const std::string& alias,
 		bool intoFile, const std::vector<std::string>& vtabs);
@@ -434,9 +434,9 @@ private:
 		// attached file; always runs on _persist (see impl comment for why)
 	void checkStatementAllowed(std::string_view sql);
 		// operator<< pre-filter: throws NotImplementedException for prohibited SQL
-	bool collidesWithVirtualPrefix(const std::string& name); // takes _stateMutex
+	[[nodiscard]] bool collidesWithVirtualPrefix(const std::string& name); // takes _stateMutex
 	Poco::Int64 maxRowid(const std::string& table);
-	ColumnCopy columnCopy(Session& s, const std::string& table, bool isVirtual = false); // cached by table name
+	[[nodiscard]] ColumnCopy columnCopy(Session& s, const std::string& table, bool isVirtual = false); // cached by table name
 	void markTableDirty(const std::string& table);      // caller holds _stateMutex
 	ShardInfo* activeShard();                            // caller holds _stateMutex
 	ShardInfo* owningShard(const std::string& table, Poco::Int64 row); // caller holds _stateMutex
