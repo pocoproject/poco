@@ -20,10 +20,6 @@
 namespace Poco::Util {
 
 
-const int HelpFormatter::TAB_WIDTH  = 4;
-const int HelpFormatter::LINE_WIDTH = 78;
-
-
 HelpFormatter::HelpFormatter(const OptionSet& options):
 	_options(options),
 	_width(LINE_WIDTH),

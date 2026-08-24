@@ -117,7 +117,7 @@ inline std::string Foundation_API demangle(const char* typeName)
 	}
 #elif defined(_MSC_VER)
 	// MSVC prefixes types with "class ", "struct ", "enum ", or "union "
-	static const char* prefixes[] = {"class ", "struct ", "enum ", "union "};
+	static constexpr const char* prefixes[] = {"class ", "struct ", "enum ", "union "};
 	for (const char* prefix : prefixes)
 	{
 		std::size_t len = std::strlen(prefix);

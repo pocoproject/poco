@@ -59,8 +59,8 @@ public:
 
 	using RawIP = std::vector<unsigned char>;
 
-	static const unsigned IPv4Size = sizeof(in_addr);
-	static const unsigned IPv6Size = sizeof(in6_addr);
+	static constexpr unsigned IPv4Size = sizeof(in_addr);
+	static constexpr unsigned IPv6Size = sizeof(in6_addr);
 	using RawIPv4 = std::array<unsigned char, IPv4Size>;
 	using RawIPv6 = std::array<unsigned char, IPv6Size>;
 
@@ -68,9 +68,9 @@ public:
 	// backwards compatible with the previously used
 	// enum declaration.
 	using Family = AddressFamily::Family;
-	static const Family IPv4 = AddressFamily::IPv4;
+	static constexpr Family IPv4 = AddressFamily::IPv4;
 #if defined(POCO_HAVE_IPv6)
-	static const Family IPv6 = AddressFamily::IPv6;
+	static constexpr Family IPv6 = AddressFamily::IPv6;
 #endif
 
 	IPAddress();

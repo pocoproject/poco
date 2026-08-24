@@ -15,9 +15,6 @@
 #include <Poco/JSON/JSONException.h>
 #include <Poco/StreamCopier.h>
 
-#undef min
-#undef max
-
 #include <istream>
 #include <streambuf>
 #include <clocale>

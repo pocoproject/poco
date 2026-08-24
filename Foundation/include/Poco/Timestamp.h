@@ -20,6 +20,10 @@
 
 #include "Poco/Foundation.h"
 #include <ctime>
+#include <limits>
+
+
+POCO_CHECK_MINMAX_MACROS
 
 
 namespace Poco {
@@ -58,8 +62,8 @@ public:
 	using TimeDiff = Int64;
 		/// Difference between two TimeVal values in microseconds.
 
-	static const TimeVal TIMEVAL_MIN; /// Minimum timestamp value.
-	static const TimeVal TIMEVAL_MAX; /// Maximum timestamp value.
+	static constexpr TimeVal TIMEVAL_MIN = std::numeric_limits<TimeVal>::min(); /// Minimum timestamp value.
+	static constexpr TimeVal TIMEVAL_MAX = std::numeric_limits<TimeVal>::max(); /// Maximum timestamp value.
 
 	Timestamp();
 		/// Creates a timestamp with the current time.

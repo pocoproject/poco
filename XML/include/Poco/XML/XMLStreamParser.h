@@ -107,12 +107,12 @@ public:
 		/// If both receive_attributes_event and RECEIVE_ATTRIBUTE_MAP are
 		/// specified, then RECEIVE_ATTRIBUTES_EVENT is assumed.
 
-	static const FeatureType RECEIVE_ELEMENTS = 0x0001;
-	static const FeatureType RECEIVE_CHARACTERS = 0x0002;
-	static const FeatureType RECEIVE_ATTRIBUTE_MAP = 0x0004;
-	static const FeatureType RECEIVE_ATTRIBUTES_EVENT = 0x0008;
-	static const FeatureType RECEIVE_NAMESPACE_DECLS = 0x0010;
-	static const FeatureType RECEIVE_DEFAULT = RECEIVE_ELEMENTS | RECEIVE_CHARACTERS | RECEIVE_ATTRIBUTE_MAP;
+	static constexpr FeatureType RECEIVE_ELEMENTS = 0x0001;
+	static constexpr FeatureType RECEIVE_CHARACTERS = 0x0002;
+	static constexpr FeatureType RECEIVE_ATTRIBUTE_MAP = 0x0004;
+	static constexpr FeatureType RECEIVE_ATTRIBUTES_EVENT = 0x0008;
+	static constexpr FeatureType RECEIVE_NAMESPACE_DECLS = 0x0010;
+	static constexpr FeatureType RECEIVE_DEFAULT = RECEIVE_ELEMENTS | RECEIVE_CHARACTERS | RECEIVE_ATTRIBUTE_MAP;
 
 	struct AttributeValueType
 	{

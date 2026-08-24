@@ -32,7 +32,7 @@ class Zip_API ZipFileInfo
 	/// Stores a Zip directory entry of a file
 {
 public:
-	static const char HEADER[ZipCommon::HEADER_SIZE];
+	static constexpr char HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x01', '\x02'};
 
 	ZipFileInfo(const ZipLocalFileHeader& header);
 		/// Creates a ZipFileInfo from a ZipLocalFileHeader

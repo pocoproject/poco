@@ -30,9 +30,6 @@ using Poco::UTF16String;
 namespace Poco::Data {
 
 
-const std::size_t RecordSet::UNKNOWN_TOTAL_ROW_COUNT = std::numeric_limits<std::size_t>::max();
-
-
 RecordSet::RecordSet(const Statement& rStatement,
 	RowFormatter::Ptr pRowFormatter):
 	Statement(rStatement),

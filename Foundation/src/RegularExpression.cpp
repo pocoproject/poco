@@ -71,7 +71,7 @@ RegularExpression::RegularExpression(const std::string& pattern, int options, bo
 	pcre2_compile_context* context = pcre2_compile_context_create(nullptr);
 	if (!context) throw Poco::RegularExpressionException("cannot create compile context");
 
-	const unsigned RE_NEWLINE_MASK = 0x00f00000;
+	constexpr unsigned RE_NEWLINE_MASK = 0x00f00000;
 	if ((options & RE_NEWLINE_MASK) == RE_NEWLINE_LF)
 		pcre2_set_newline(context, PCRE2_NEWLINE_LF);
 	else if ((options & RE_NEWLINE_MASK) == RE_NEWLINE_CRLF)

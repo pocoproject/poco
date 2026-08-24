@@ -28,6 +28,10 @@
 #include "Poco/Exception.h"
 #include "Poco/AutoPtr.h"
 #include <ostream>
+#include <limits>
+
+
+POCO_CHECK_MINMAX_MACROS
 
 
 namespace Poco::Data {
@@ -71,7 +75,7 @@ public:
 	using Statement::isNull;
 	using Statement::subTotalRowCount;
 
-	static const std::size_t UNKNOWN_TOTAL_ROW_COUNT;
+	static constexpr std::size_t UNKNOWN_TOTAL_ROW_COUNT = std::numeric_limits<std::size_t>::max();
 
 	explicit RecordSet(const Statement& rStatement,
 		RowFormatter::Ptr pRowFormatter = nullptr);

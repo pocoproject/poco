@@ -59,8 +59,8 @@ void HexBinaryEncoderBuf::setUppercase(bool flag)
 
 int HexBinaryEncoderBuf::writeToDevice(char c)
 {
-	static const int eof = std::char_traits<char>::eof();
-	static const char digits[] = "0123456789abcdef0123456789ABCDEF";
+	static constexpr int eof = std::char_traits<char>::eof();
+	static constexpr char digits[] = "0123456789abcdef0123456789ABCDEF";
 
 	if (_buf.sputc(digits[_uppercase + ((c >> 4) & 0xF)]) == eof) return eof;
 	++_pos;

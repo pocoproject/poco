@@ -45,7 +45,7 @@ private:
 	DigestEngine& _eng;
 	std::istream* _pIstr;
 	std::ostream* _pOstr;
-	static const int BUFFER_SIZE;
+	static constexpr int BUFFER_SIZE = 256;
 };
 
 

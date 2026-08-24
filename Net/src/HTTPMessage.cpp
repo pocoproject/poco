@@ -31,7 +31,6 @@ const std::string HTTPMessage::HTTP_1_0                   = "HTTP/1.0";
 const std::string HTTPMessage::HTTP_1_1                   = "HTTP/1.1";
 const std::string HTTPMessage::IDENTITY_TRANSFER_ENCODING = "identity";
 const std::string HTTPMessage::CHUNKED_TRANSFER_ENCODING  = "chunked";
-const int         HTTPMessage::UNKNOWN_CONTENT_LENGTH     = -1;
 const std::string HTTPMessage::UNKNOWN_CONTENT_TYPE;
 const std::string HTTPMessage::CONTENT_LENGTH             = "Content-Length";
 const std::string HTTPMessage::CONTENT_TYPE               = "Content-Type";

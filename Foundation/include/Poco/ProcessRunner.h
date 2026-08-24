@@ -48,7 +48,7 @@ public:
 	using Args = Poco::Process::Args;
 	using PID = Poco::ProcessHandle::PID;
 
-	static const int NO_OUT = Poco::PROCESS_CLOSE_STDOUT|Poco::PROCESS_CLOSE_STDERR;
+	static constexpr int NO_OUT = Poco::PROCESS_CLOSE_STDOUT|Poco::PROCESS_CLOSE_STDERR;
 		/// Constant to prevent std out and err from being received from the process.
 
 	ProcessRunner(const std::string& cmd,
@@ -127,11 +127,11 @@ public:
 private:
 #if defined(POCO_OS_FAMILY_WINDOWS)
 	// On Windows, 0 is the invalid/error value returned by GetProcessId()
-	static const Poco::ProcessHandle::PID INVALID_PID = 0;
+	static constexpr Poco::ProcessHandle::PID INVALID_PID = 0;
 #else
-	static const Poco::ProcessHandle::PID INVALID_PID = -1;
+	static constexpr Poco::ProcessHandle::PID INVALID_PID = -1;
 #endif
-	static const int RESULT_UNKNOWN = -1;
+	static constexpr int RESULT_UNKNOWN = -1;
 
 	static Args pidArgFormat()
 	{

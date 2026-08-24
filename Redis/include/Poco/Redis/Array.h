@@ -276,7 +276,7 @@ struct RedisTypeTraits<Array>
 {
 	enum { TypeId = RedisType::REDIS_ARRAY };
 
-	static const char marker = '*';
+	static constexpr char marker = '*';
 
 	static std::string toString(const Array& value)
 	{

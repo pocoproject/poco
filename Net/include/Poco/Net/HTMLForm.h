@@ -203,7 +203,7 @@ public:
 
 	static const std::string ENCODING_URL;       /// "application/x-www-form-urlencoded"
 	static const std::string ENCODING_MULTIPART; /// "multipart/form-data"
-	static const int         UNKNOWN_CONTENT_LENGTH;
+	static constexpr int     UNKNOWN_CONTENT_LENGTH = -1;
 
 protected:
 	void readUrl(std::istream& istr);

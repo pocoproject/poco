@@ -42,9 +42,10 @@
 #include <typeinfo>
 #include <type_traits>
 #include <string_view>
-#undef min
-#undef max
 #include <limits>
+
+
+POCO_CHECK_MINMAX_MACROS
 
 
 // Throws RangeException with diagnostic info about the failed conversion.

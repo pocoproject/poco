@@ -274,7 +274,7 @@ void HTTPResponse::write(std::ostream& ostr) const
 
 void HTTPResponse::read(std::istream& istr)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	std::string version;
 	std::string status;

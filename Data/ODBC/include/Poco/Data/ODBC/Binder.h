@@ -30,7 +30,7 @@
 #include <list>
 #include <map>
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 #include <sqlext.h>
 
@@ -60,7 +60,7 @@ public:
 	typedef AbstractBinder::Direction Direction;
 	typedef std::map<SQLPOINTER, SQLLEN> ParamMap;
 
-	static const size_t DEFAULT_PARAM_SIZE = 1024;
+	static constexpr size_t DEFAULT_PARAM_SIZE = 1024;
 
 	enum ParameterBinding
 	{

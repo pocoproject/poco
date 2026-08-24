@@ -23,7 +23,7 @@
 #include <vector>
 #include <cstring>
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 #include <sqlext.h>
 

@@ -30,7 +30,7 @@ class Zip_API ZipDataInfo
 	/// A ZipDataInfo stores a Zip data descriptor
 {
 public:
-	static const char HEADER[ZipCommon::HEADER_SIZE];
+	static constexpr char HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x07', '\x08'};
 
 	ZipDataInfo();
 	/// Creates a header with all fields (except the header field) set to 0
@@ -81,7 +81,7 @@ class Zip_API ZipDataInfo64
 	/// A ZipDataInfo64 stores a Zip data descriptor for a Zip64 file
 {
 public:
-	static const char HEADER[ZipCommon::HEADER_SIZE];
+	static constexpr char HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x07', '\x08'};
 
 	ZipDataInfo64();
 	/// Creates a header with all fields (except the header field) set to 0

@@ -21,12 +21,6 @@
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
 #include "Poco/FPEnvironment.h"
-#ifdef min
-	#undef min
-#endif
-#ifdef max
-	#undef max
-#endif
 #include <cctype>
 #include <charconv>
 #include <cstdint>
@@ -37,6 +31,9 @@
 #endif
 #include <string>
 #include <type_traits>
+
+
+POCO_CHECK_MINMAX_MACROS
 
 /// Maximum length of an integer formatted as a string.
 /// 64 binary digits + sign + NUL + padding margin = 67.

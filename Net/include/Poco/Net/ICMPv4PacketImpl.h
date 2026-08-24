@@ -157,13 +157,12 @@ public:
 	virtual std::string typeDescription(int typeId);
 		/// Returns the description of the packet type.
 
-	static const Poco::UInt16 MAX_PACKET_SIZE;
 	static const std::string MESSAGE_TYPE[MESSAGE_TYPE_LENGTH];
-	static const Poco::UInt8 DESTINATION_UNREACHABLE_TYPE; // 3
-	static const Poco::UInt8 SOURCE_QUENCH_TYPE;           // 4
-	static const Poco::UInt8 REDIRECT_MESSAGE_TYPE;        // 5
-	static const Poco::UInt8 TIME_EXCEEDED_TYPE;           // 11
-	static const Poco::UInt8 PARAMETER_PROBLEM_TYPE;       // 12
+	static constexpr Poco::UInt8 DESTINATION_UNREACHABLE_TYPE =  3;
+	static constexpr Poco::UInt8 SOURCE_QUENCH_TYPE           =  4;
+	static constexpr Poco::UInt8 REDIRECT_MESSAGE_TYPE        =  5;
+	static constexpr Poco::UInt8 TIME_EXCEEDED_TYPE           = 11;
+	static constexpr Poco::UInt8 PARAMETER_PROBLEM_TYPE       = 12;
 
 private:
 	void initPacket();

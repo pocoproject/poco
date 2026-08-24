@@ -22,7 +22,7 @@
 #include "Poco/Data/ODBC/Handle.h"
 #include "Poco/Data/MetaColumn.h"
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 #include <sqlext.h>
 
@@ -52,7 +52,7 @@ public:
 private:
 	ODBCMetaColumn() = delete;
 
-	static const int NAME_BUFFER_LENGTH = 2048;
+	static constexpr int NAME_BUFFER_LENGTH = 2048;
 
 	struct ColumnDescription
 	{

@@ -18,9 +18,6 @@
 namespace Poco::Net {
 
 
-const int         PartSource::UNKNOWN_CONTENT_LENGTH     = -1;
-
-
 PartSource::PartSource():
 	_mediaType("application/octet-stream")
 {

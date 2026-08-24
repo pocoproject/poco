@@ -26,7 +26,7 @@
 #include "Poco/SharedPtr.h"
 #include "Poco/Mutex.h"
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 #include <sqltypes.h>
 
@@ -38,7 +38,7 @@ class ODBC_API SessionImpl: public Poco::Data::AbstractSessionImpl<SessionImpl>
 	/// Implements SessionImpl interface
 {
 public:
-	static const std::size_t ODBC_MAX_FIELD_SIZE = 1024u;
+	static constexpr std::size_t ODBC_MAX_FIELD_SIZE = 1024u;
 
 	enum TransactionCapability
 	{
@@ -204,7 +204,7 @@ private:
 	void setDataTypeInfo(const std::string& rName, const Poco::Any& rValue);
 		/// No-op. Throws InvalidAccessException.
 
-	static const int FUNCTIONS = SQL_API_ODBC3_ALL_FUNCTIONS_SIZE;
+	static constexpr int FUNCTIONS = SQL_API_ODBC3_ALL_FUNCTIONS_SIZE;
 
 	void checkError(SQLRETURN rc, const std::string& msg="") const;
 

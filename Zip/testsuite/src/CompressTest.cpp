@@ -18,7 +18,6 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include <iostream>
-#undef min
 #include <algorithm>
 
 

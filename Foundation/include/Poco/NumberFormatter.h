@@ -54,8 +54,8 @@ public:
 			/// formatHex: Use lowercase letters for hexadecimal values
 	};
 
-	static const unsigned NF_MAX_INT_STRING_LEN = 32; // increase for 64-bit binary formatting support
-	static const unsigned NF_MAX_FLT_STRING_LEN = POCO_MAX_FLT_STRING_LEN;
+	static constexpr unsigned NF_MAX_INT_STRING_LEN = 32; // increase for 64-bit binary formatting support
+	static constexpr unsigned NF_MAX_FLT_STRING_LEN = POCO_MAX_FLT_STRING_LEN;
 
 	static std::string format(int value);
 		/// Formats an integer value in decimal notation.

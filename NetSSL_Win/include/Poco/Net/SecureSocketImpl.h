@@ -29,7 +29,7 @@
 #include "Poco/Net/X509Certificate.h"
 #include "Poco/Buffer.h"
 #include <winsock2.h>
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #include <wincrypt.h>
 #include <schannel.h>
 #ifndef SECURITY_WIN32

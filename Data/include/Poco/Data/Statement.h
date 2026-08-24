@@ -104,7 +104,7 @@ public:
 	using AsyncExecMethodPtr = SharedPtr<AsyncExecMethod>;
 	using State = StatementImpl::State;
 
-	static const int WAIT_FOREVER = -1;
+	static constexpr int WAIT_FOREVER = -1;
 
 	enum Storage
 	{

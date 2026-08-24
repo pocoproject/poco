@@ -70,7 +70,7 @@ struct RedisTypeTraits<Error>
 {
 	enum { TypeId = RedisType::REDIS_ERROR };
 
-	static const char marker = '-';
+	static constexpr char marker = '-';
 
 	static std::string toString(const Error& value)
 	{

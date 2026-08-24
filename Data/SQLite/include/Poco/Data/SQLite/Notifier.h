@@ -61,9 +61,9 @@ public:
 	Event rollback;
 
 	// Event types.
-	static const EnabledEventType SQLITE_NOTIFY_UPDATE   = 1;
-	static const EnabledEventType SQLITE_NOTIFY_COMMIT   = 2;
-	static const EnabledEventType SQLITE_NOTIFY_ROLLBACK = 4;
+	static constexpr EnabledEventType SQLITE_NOTIFY_UPDATE   = 1;
+	static constexpr EnabledEventType SQLITE_NOTIFY_COMMIT   = 2;
+	static constexpr EnabledEventType SQLITE_NOTIFY_ROLLBACK = 4;
 
 	Notifier(const Session& session,
 		EnabledEventType enabled = SQLITE_NOTIFY_UPDATE | SQLITE_NOTIFY_COMMIT | SQLITE_NOTIFY_ROLLBACK);

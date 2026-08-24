@@ -24,9 +24,6 @@
 namespace Poco::Zip {
 
 
-const char ZipLocalFileHeader::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x03', '\x04'};
-
-
 ZipLocalFileHeader::ZipLocalFileHeader(const Poco::Path& fileName,
     const Poco::DateTime& lastModifiedAt,
     ZipCommon::CompressionMethod cm,

@@ -292,10 +292,6 @@ const std::string SQLExecutor::MULTI_SELECT =
 	"SELECT * FROM Test WHERE First = '5';";
 
 
-const float SQLExecutor::EPSILON_FLOAT = 1e-5f;
-const double SQLExecutor::EPSILON_DOUBLE = 1e-9;
-
-
 SQLExecutor::SQLExecutor(const std::string& name, Poco::Data::Session* pSession, Poco::Data::Session* pEncSession, bool numberedPlaceHolders):
 	CppUnit::TestCase(name),
 	_pSession(pSession),
@@ -3084,7 +3080,7 @@ void SQLExecutor::filter(const std::string& query, const std::string& intFldName
 
 void SQLExecutor::nullBulk(const std::string& blobPlaceholder)
 {
-	const int sz = 10;
+	constexpr int sz = 10;
 
 	{
 		std::vector<NullData> lastName(sz, null);

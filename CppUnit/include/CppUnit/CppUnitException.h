@@ -45,7 +45,7 @@ public:
 	const std::string& fileName() const;
 
 	static const std::string CPPUNIT_UNKNOWNFILENAME;
-	static const int CPPUNIT_UNKNOWNLINENUMBER;
+	static constexpr int CPPUNIT_UNKNOWNLINENUMBER = -1;
 
 private:
 	std::string _message;

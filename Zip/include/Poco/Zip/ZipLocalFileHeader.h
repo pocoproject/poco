@@ -36,7 +36,7 @@ class Zip_API ZipLocalFileHeader
 	/// Stores a Zip local file header
 {
 public:
-	static const char HEADER[ZipCommon::HEADER_SIZE];
+	static constexpr char HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x03', '\x04'};
 
 	ZipLocalFileHeader(const Poco::Path& fileName, const Poco::DateTime& lastModifiedAt, ZipCommon::CompressionMethod cm, ZipCommon::CompressionLevel cl, bool forceZip64 = false);
 		/// Creates a zip file header from an absoluteFile. fileName is the name of the file in the zip, outputIsSeekable determines if we write

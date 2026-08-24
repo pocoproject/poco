@@ -145,8 +145,8 @@ private:
 	std::string _footer;
 	bool _unixStyle;
 
-	static const int TAB_WIDTH;
-	static const int LINE_WIDTH;
+	static constexpr int TAB_WIDTH  = 4;
+	static constexpr int LINE_WIDTH = 78;
 };
 
 

@@ -142,11 +142,11 @@ public:
 	TimeDiff totalMicroseconds() const;
 		/// Returns the total number of microseconds.
 
-	static const TimeDiff MILLISECONDS; /// The number of microseconds in a millisecond.
-	static const TimeDiff SECONDS;      /// The number of microseconds in a second.
-	static const TimeDiff MINUTES;      /// The number of microseconds in a minute.
-	static const TimeDiff HOURS;        /// The number of microseconds in a hour.
-	static const TimeDiff DAYS;         /// The number of microseconds in a day.
+	static constexpr TimeDiff MILLISECONDS = 1000;              /// The number of microseconds in a millisecond.
+	static constexpr TimeDiff SECONDS      = 1000*MILLISECONDS; /// The number of microseconds in a second.
+	static constexpr TimeDiff MINUTES      = 60*SECONDS;        /// The number of microseconds in a minute.
+	static constexpr TimeDiff HOURS        = 60*MINUTES;        /// The number of microseconds in a hour.
+	static constexpr TimeDiff DAYS         = 24*HOURS;          /// The number of microseconds in a day.
 
 private:
 	TimeDiff _span;

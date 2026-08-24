@@ -383,8 +383,8 @@ public:
 private:
 	static const std::string MULTI_INSERT;
 	static const std::string MULTI_SELECT;
-	static const float EPSILON_FLOAT;
-	static const double EPSILON_DOUBLE;
+	static constexpr float  EPSILON_FLOAT  = 1e-5f;
+	static constexpr double EPSILON_DOUBLE = 1e-9;
 
 	Poco::Data::Session* _pSession;
 	Poco::Data::Session* _pEncSession;

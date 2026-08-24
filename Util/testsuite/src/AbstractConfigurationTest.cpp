@@ -17,8 +17,6 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Types.h"
 #include <algorithm>
-#undef min
-#undef max
 #include <limits>
 
 

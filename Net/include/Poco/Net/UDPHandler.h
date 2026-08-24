@@ -60,9 +60,9 @@ public:
 	using Iterator = typename List::iterator;
 	using DFMutex = TMutex;
 
-	static const MsgSizeT BUF_STATUS_IDLE  = 0;
-	static const MsgSizeT BUF_STATUS_BUSY  = -1;
-	static const MsgSizeT BUF_STATUS_ERROR = -2;
+	static constexpr MsgSizeT BUF_STATUS_IDLE  = 0;
+	static constexpr MsgSizeT BUF_STATUS_BUSY  = -1;
+	static constexpr MsgSizeT BUF_STATUS_ERROR = -2;
 
 	UDPHandlerImpl(std::size_t bufListSize = 1000, std::ostream* pErr = nullptr):
 		_thread("UDPHandlerImpl"),

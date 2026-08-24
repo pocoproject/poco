@@ -16,8 +16,6 @@
 #include "Poco/Exception.h"
 #include "Poco/PDF/Document.h"
 #include <hpdf.h>
-#undef min
-#undef max
 #include <limits>
 
 

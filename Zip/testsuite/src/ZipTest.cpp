@@ -26,7 +26,6 @@
 #include "Poco/Environment.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
-#undef min
 #include <algorithm>
 #include <iostream>
 #include <sstream>

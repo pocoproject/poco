@@ -187,9 +187,6 @@ void writeTimestamp(JSONWriter& w, const char* key, const Poco::Timestamp& ts)
 } // anonymous namespace
 
 
-const std::size_t MemoryDBInspector::DEFAULT_MAX_ROWS;
-
-
 MemoryDBInspector::MemoryDBInspector(MemoryDB& db, SQLPolicy policy):
 	_db(db),
 	_policy(policy),

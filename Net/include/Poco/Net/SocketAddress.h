@@ -48,12 +48,12 @@ public:
 	// backwards compatible with the previously used
 	// enum declaration.
 	using Family = AddressFamily::Family;
-	static const Family IPv4 = AddressFamily::IPv4;
+	static constexpr Family IPv4 = AddressFamily::IPv4;
 #if defined(POCO_HAVE_IPv6)
-	static const Family IPv6 = AddressFamily::IPv6;
+	static constexpr Family IPv6 = AddressFamily::IPv6;
 #endif
 #if defined(POCO_HAS_UNIX_SOCKET)
-	static const Family UNIX_LOCAL = AddressFamily::UNIX_LOCAL;
+	static constexpr Family UNIX_LOCAL = AddressFamily::UNIX_LOCAL;
 #endif
 
 	SocketAddress();

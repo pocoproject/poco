@@ -157,11 +157,11 @@ class Data_API Session
 	/// For more information, see Transation class documentation.
 {
 public:
-	static const std::size_t LOGIN_TIMEOUT_DEFAULT = SessionImpl::LOGIN_TIMEOUT_DEFAULT;
-	static const Poco::UInt32 TRANSACTION_READ_UNCOMMITTED = 0x00000001L;
-	static const Poco::UInt32 TRANSACTION_READ_COMMITTED   = 0x00000002L;
-	static const Poco::UInt32 TRANSACTION_REPEATABLE_READ  = 0x00000004L;
-	static const Poco::UInt32 TRANSACTION_SERIALIZABLE     = 0x00000008L;
+	static constexpr std::size_t LOGIN_TIMEOUT_DEFAULT = SessionImpl::LOGIN_TIMEOUT_DEFAULT;
+	static constexpr Poco::UInt32 TRANSACTION_READ_UNCOMMITTED = 0x00000001L;
+	static constexpr Poco::UInt32 TRANSACTION_READ_COMMITTED   = 0x00000002L;
+	static constexpr Poco::UInt32 TRANSACTION_REPEATABLE_READ  = 0x00000004L;
+	static constexpr Poco::UInt32 TRANSACTION_SERIALIZABLE     = 0x00000008L;
 
 	Session(Poco::AutoPtr<SessionImpl> ptrImpl);
 		/// Creates the Session from SessionImpl.
