@@ -147,6 +147,20 @@ std::string quoteIdent(const std::string& name)
 }
 
 
+std::string quoteLit(const std::string& value)
+	/// SQLite string literal quoting: wrap in single quotes, double any embedded one.
+{
+	std::string out("'");
+	for (const char c: value)
+	{
+		if (c == '\'') out += '\'';
+		out += c;
+	}
+	out += '\'';
+	return out;
+}
+
+
 const char* columnTypeName(MetaColumn::ColumnDataType type)
 {
 	switch (type)
@@ -361,6 +375,34 @@ std::vector<MemoryDBInspector::TableInfo> MemoryDBInspector::schemaObjects(
 	std::vector<std::pair<std::string, IndexInfo> > indexes; // (owning table, index)
 	try
 	{
+		// pragma_table_list refines sqlite_master's 'table' into table/
+		// virtual/shadow. Multi-underscore shadow names come back as plain
+		// 'table', so any "<vtabname>_..." name is treated as shadow too.
+		std::map<std::string, std::string> kinds;
+		std::vector<std::string> vtabNames;
+		{
+			Statement kstmt = (_db.session() <<
+				("SELECT name, type FROM pragma_table_list WHERE schema = " + quoteLit(database)));
+			kstmt.execute();
+			RecordSet krs(kstmt);
+			for (bool more = krs.moveFirst(); more; more = krs.moveNext())
+			{
+				const std::string n = krs[0].convert<std::string>();
+				const std::string k = krs[1].convert<std::string>();
+				kinds[n] = k;
+				if (k == "virtual") vtabNames.push_back(n);
+			}
+		}
+		// Keep in sync with shadowExclusion() in MemoryDB.cpp (the SQL form of
+		// the same rule).
+		const auto isShadowName = [&vtabNames](const std::string& n)
+		{
+			for (const auto& v: vtabNames)
+				if (n.size() > v.size() && n[v.size()] == '_' && n.compare(0, v.size(), v) == 0)
+					return true;
+			return false;
+		};
+
 		Statement stmt = (_db.session() <<
 			("SELECT type, name, tbl_name, ifnull(sql, '') FROM " + quoteIdent(database) +
 			 ".sqlite_master ORDER BY type, name"));
@@ -381,6 +423,9 @@ std::vector<MemoryDBInspector::TableInfo> MemoryDBInspector::schemaObjects(
 				TableInfo t;
 				t.name = rs[1].convert<std::string>();
 				t.type = type;
+				auto k = kinds.find(t.name);
+				if ((k != kinds.end() && k->second == "shadow") || isShadowName(t.name)) continue;
+				if (k != kinds.end() && k->second == "virtual") t.type = "virtual";
 				t.sql  = rs[3].convert<std::string>();
 				tables.push_back(t);
 			}

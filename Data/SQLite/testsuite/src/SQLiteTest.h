@@ -143,6 +143,7 @@ public:
 	void testTransactor();
 
 	void testFTS();
+	void testVec();
 
 	void testIllegalFilePath();
 	void testTransactionTypeProperty();

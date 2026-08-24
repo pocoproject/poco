@@ -3955,6 +3955,50 @@ void SQLiteTest::testFTS()
 }
 
 
+void SQLiteTest::testVec()
+{
+#ifdef POCO_ENABLE_SQLITE_VEC
+	std::string version;
+	{
+		Session session(Poco::Data::SQLite::Connector::KEY, ":memory:");
+		assertTrue(session.isConnected());
+
+		session << "SELECT vec_version()", into(version), now;
+		assertTrue(!version.empty());
+		assertTrue(version[0] == 'v');
+
+		session << "CREATE VIRTUAL TABLE docs USING vec0(embedding float[4])", now;
+		session << "INSERT INTO docs(rowid, embedding) VALUES(1, '[1.0, 0.0, 0.0, 0.0]')", now;
+		session << "INSERT INTO docs(rowid, embedding) VALUES(2, '[0.0, 1.0, 0.0, 0.0]')", now;
+		session << "INSERT INTO docs(rowid, embedding) VALUES(3, '[0.9, 0.1, 0.0, 0.0]')", now;
+
+		std::vector<int> ids;
+		session << "SELECT rowid FROM docs WHERE embedding MATCH '[1.0, 0.0, 0.0, 0.0]' "
+			"ORDER BY distance LIMIT 2", into(ids), now;
+		assertTrue(ids.size() == 2);
+		assertTrue(ids[0] == 1);
+		assertTrue(ids[1] == 3);
+
+		double dist = -1.0;
+		session << "SELECT vec_distance_l2('[0.0, 0.0]', '[3.0, 4.0]')", into(dist), now;
+		assertTrue(dist > 4.999 && dist < 5.001);
+	}
+
+	// setThreadMode() calls sqlite3_shutdown(), which drops registered auto
+	// extensions; a session opened afterwards must still have sqlite-vec.
+	// All sessions must be closed across a shutdown (see testThreadModes).
+	int mode = Utility::getThreadMode();
+	assertTrue(Utility::setThreadMode(mode));
+	Session session2(Poco::Data::SQLite::Connector::KEY, ":memory:");
+	std::string version2;
+	session2 << "SELECT vec_version()", into(version2), now;
+	assertTrue(version2 == version);
+#else
+	std::cout << "sqlite-vec not enabled, test not executed." << std::endl;
+#endif
+}
+
+
 void SQLiteTest::testIllegalFilePath()
 {
 	try
@@ -4183,6 +4227,7 @@ CppUnit::Test* SQLiteTest::suite()
 	CppUnit_addTest(pSuite, SQLiteTest, testTransaction);
 	CppUnit_addTest(pSuite, SQLiteTest, testTransactor);
 	CppUnit_addTest(pSuite, SQLiteTest, testFTS);
+	CppUnit_addTest(pSuite, SQLiteTest, testVec);
 	CppUnit_addTest(pSuite, SQLiteTest, testIllegalFilePath);
 	CppUnit_addTest(pSuite, SQLiteTest, testTransactionTypeProperty);
 	CppUnit_addTest(pSuite, SQLiteTest, testRecordsetCopyMove);

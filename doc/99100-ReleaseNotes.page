@@ -11,6 +11,17 @@ exported symbols that went with them. Headers using
 <*std::numeric_limits<>::min()*> / <*max()*> now require that no function-like
 <*min()*> or <*max()*> macro is in scope.
 
+Data/SQLite can now optionally bundle the sqlite-vec vector search extension
+(disabled by default).
+
+!!Features
+
+  - GH #5440 <*Data/SQLite*>: sqlite-vec vector search extension -- optional bundled
+    <*sqlite-vec*> 0.1.9 with <*vec0*> virtual tables, KNN queries and distance functions,
+    available in every SQLite session including <*MemoryDB*>. Disabled by default; enable
+    with cmake <*ENABLE_DATA_SQLITE_VEC*>, gnu make <*POCO_ENABLE_SQLITE_VEC*> or
+    <*./configure --sqlite-vec*>. (PR #5459)
+
 !!Breaking Changes
 
   - In-class <*static const*> members with constant initialisers are now <*static constexpr*>.

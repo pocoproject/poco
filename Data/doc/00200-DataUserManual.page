@@ -118,6 +118,24 @@ parameter contains the connection string.
 
 In the case of SQLite, the path of the database file is sufficient as connection string.
 
+SQLite sessions can optionally provide vector search through the bundled
+<*sqlite-vec*> extension (<[https://github.com/asg017/sqlite-vec]>). It is
+enabled at build time with the CMake option <[ENABLE_DATA_SQLITE_VEC]> (or
+<[./configure --sqlite-vec]> for the GNU make build) and is then registered
+automatically for every SQLite session, including Poco::Data::SQLite::MemoryDB.
+No additional API is involved; the extension is used through SQL:
+
+    session << "CREATE VIRTUAL TABLE docs USING vec0(embedding float[4])", now;
+    session << "INSERT INTO docs(rowid, embedding) VALUES(1, '[1.0, 0.0, 0.0, 0.0]')", now;
+    std::vector<int> ids;
+    session << "SELECT rowid FROM docs WHERE embedding MATCH '[1.0, 0.0, 0.0, 0.0]' "
+        "ORDER BY distance LIMIT 2", into(ids), now;
+----
+
+The availability of the extension can be checked with <[SELECT vec_version()]>.
+With an unbundled SQLite (POCO_SQLITE_UNBUNDLED), the extension requires
+SQLite 3.37.0 or newer.
+
 For ODBC, the connection string may be a simple "DSN=MyDSNName" when a DSN is configured or
 a complete ODBC driver-specific connection string defining all the necessary connection parameters
 (for details, consult your ODBC driver documentation).

@@ -27,6 +27,21 @@ Breaking Changes:
   Poco/Data/Constants.h, Poco/Data/RecordSet.h, Poco/Data/RowIterator.h,
   Poco/MongoDB/ServerDescription.h and Poco/ActiveRecord/IDTraits.h.
 
+Bundled Third-Party Library Upgrades:
+
+- sqlite-vec 0.1.9 -- new optional bundled dependency (MIT OR Apache-2.0): vector search
+  extension for Data/SQLite, compiled as a separate translation unit next to SQLite with
+  SQLITE_CORE and SQLITE_VEC_STATIC; disabled by default
+
+Features:
+
+- GH #5440 Data/SQLite: integrate the sqlite-vec vector search extension (PR #5459) -- vec0
+  virtual tables, vec_distance_* functions and KNN MATCH ... ORDER BY distance queries in every
+  SQLite session, including MemoryDB (virtual tables are persisted whole in the always-in-memory
+  active shard). Disabled by default; enable with ENABLE_DATA_SQLITE_VEC (cmake),
+  POCO_ENABLE_SQLITE_VEC (gnu make) or ./configure --sqlite-vec. Works with bundled and
+  unbundled SQLite (3.37 or newer required); optional AVX2/NEON SIMD kernels.
+
 
 Release 1.15.3 (2026-05-13)
 ===========================

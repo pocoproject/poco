@@ -32,6 +32,7 @@ public:
 
 	// schema
 	void testSchemaTablesColumnsIndexes();
+	void testSchemaVirtualTables();
 	void testSchemaRowCountsOmittedByDefault();
 	void testSchemaSpansAttachedShards();
 	void testRowCountOnDemand();

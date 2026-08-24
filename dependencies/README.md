@@ -23,6 +23,7 @@ are replaced with system-installed versions via `find_package()` or `-l` flags.
 | [hpdf](hpdf/) (libharu) | 2.4.6 | Zlib-like | PDF (PDF document generation) | No | https://github.com/libharu/libharu |
 | [7zip](7zip/) (LZMA SDK) | 26.01 | Public Domain | SevenZip (7z archive support) | No | https://github.com/ip7z/7zip |
 | [cpptrace](cpptrace/) | 1.0.4 | MIT | Foundation (stack trace support, optional) | No | https://github.com/jeremy-rifkin/cpptrace |
+| [sqlite-vec](sqlite-vec/) | 0.1.9 | MIT OR Apache-2.0 | Data/SQLite (vector search, optional) | No | https://github.com/asg017/sqlite-vec |
 | [quill](quill/) | 11.1.0 | MIT | Foundation (high-performance async logging, optional) | No | https://github.com/odygrd/quill |
 | [wepoll](wepoll/) | 1.5.8 | BSD-2-Clause | Net (epoll emulation, Windows only) | No | https://github.com/piscisaureus/wepoll |
 
@@ -45,5 +46,7 @@ and not practical to extract as separate libraries.
 | PostgreSQL large object header | `Data/PostgreSQL/include/libpq/libpq-fs.h` | PostgreSQL License | PostgreSQL Global Development Group | Minimal header for large object definitions |
 
 ## Additional Notes
+* `sqlite-vec` maps `__builtin_popcountl` to the MSVC intrinsic `__popcnt64`, which does not exist on 32-bit x86; `sqlite-vec/popcnt64_win32.c` supplies the symbol there so the bundled source stays unmodified.
+* `sqlite-vec` is bundled from the upstream release *amalgamation* archive (`sqlite-vec-<ver>-amalgamation.tar.gz`), which does not include license files; `LICENSE-MIT` and `LICENSE-APACHE` are copied from the upstream repository tag. The extension is always compiled from the bundled sources, also when SQLite itself is unbundled (`POCO_SQLITE_UNBUNDLED`); an unbundled SQLite must be version 3.37 or newer. NEON SIMD kernels are enabled only under Clang (GCC rejects the upstream intrinsic conversions). sqlite-vec is pre-v1; expect breaking upstream changes when updating.
 * `tessil/ordered-map` is modified so that `tsl::detail_ordered_hash::numeric_cast()` and `tsl::detail_ordered_hash::deserialize_value()` have external linkage. These functions originally have internal linkage (marked `static`), which prevented the `Poco` module from being built as all exported symbols require external linkage. This should remain until [Tessil/ordered-map#54](https://github.com/Tessil/ordered-map/pull/54) is merged.
 * `quill` only supports specific OS and CPU architecture combinations. `ENABLE_FASTLOGGER` is auto-disabled on unsupported platforms via a whitelist in the top-level `CMakeLists.txt` (derived from `ThreadUtilities.h`, `BackendWorkerLock.h`, and `Rdtsc.h`). When updating quill from upstream, re-assess the whitelist against the new version's platform support.
