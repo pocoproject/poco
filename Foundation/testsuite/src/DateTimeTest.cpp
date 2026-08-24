@@ -648,28 +648,21 @@ void DateTimeTest::testSetYearDay()
 	const int num_data = sizeof data / sizeof *data;
 	for (int di = 0; di < num_data; ++di)
 	{
-		[[maybe_unused]] const int line = data[di].d_lineNum;
+		const int line = data[di].d_lineNum;
 		const int year = data[di].d_year;
-		[[maybe_unused]] const unsigned int day = data[di].d_day;
+		const unsigned int day = data[di].d_day;
 
 		const int exp_month = data[di].d_expMonth;
 		const unsigned int exp_day   = data[di].d_expDay;
 		const DateTime r(year, exp_month, exp_day);
-		DateTime x;
-		[[maybe_unused]] const DateTime& X = x;
 
-#if 0
-		// TODO - need to be able to assign a day number in the year
-		// but POCO is not able to do this.
+		// DateTime cannot be set from (year, day-of-year) directly;
+		// start at January 1 and add the day offset.
+		DateTime x(year, 1, 1);
+		x += Timespan(static_cast<int>(day) - 1, 0, 0, 0, 0);
 
-		x.assign(year, day);
-
-		// TODO - need to be able to assert with the loop counter
-		// but cppUnit is not able to do this.
-
-		assertTrue (r   == x);
-		assertTrue (day == X.dayOfYear());
-#endif
+		if (x != r) fail("(year, day-of-year) does not produce the expected date", line, __FILE__);
+		if (x.dayOfYear() != static_cast<int>(day)) fail("dayOfYear() mismatch", line, __FILE__);
 	}
 
 	static const struct
@@ -701,20 +694,16 @@ void DateTimeTest::testSetYearDay()
 	const int num_data2 = sizeof data2 / sizeof *data2;
 	for (int di = 0; di < num_data2; ++di)
 	{
-		[[maybe_unused]] const int line  = data2[di].d_lineNum;
-		[[maybe_unused]] const int year  = data2[di].d_year;
-		[[maybe_unused]] const int day   = data2[di].d_day;
-		const int exp   = data2[di].d_exp;
-		DateTime x;
-		[[maybe_unused]] const DateTime& X = x;
-		if (1 == exp)
-		{
-			DateTime r;
-			[[maybe_unused]] const DateTime& r2 = r;
-#if 0
-			r.set(year, day);
-#endif
-		}
+		const int line = data2[di].d_lineNum;
+		const int year = data2[di].d_year;
+		const int day  = data2[di].d_day;
+		const int exp  = data2[di].d_exp;
+
+		// A (year, day-of-year) pair is representable iff the year is within
+		// the supported range and the day fits the year's length.
+		const int daysInYear = DateTime::isLeapYear(year) ? 366 : 365;
+		const bool valid = year >= 0 && year <= 9999 && day >= 1 && day <= daysInYear;
+		if (valid != (1 == exp)) fail("day-of-year validity mismatch", line, __FILE__);
 	}
 }
 
