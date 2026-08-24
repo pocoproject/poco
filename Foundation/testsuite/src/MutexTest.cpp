@@ -58,6 +58,42 @@ namespace
 		Event _locked;
 		Event _release;
 	};
+
+
+	class TryLocker: public Runnable
+	{
+	public:
+		TryLocker(FastMutex& mutex): _mutex(mutex)
+		{
+		}
+
+		void run()
+		{
+			_locked = _mutex.tryLock();
+			if (_locked) _mutex.unlock();
+		}
+
+		bool locked() const
+		{
+			return _locked;
+		}
+
+	private:
+		FastMutex& _mutex;
+		bool _locked = false;
+	};
+
+
+	bool tryLockFromOtherThread(FastMutex& mutex)
+		/// FastMutex is recursive on Windows, so a locked mutex can only be
+		/// observed as locked from a thread that does not already own it.
+	{
+		TryLocker locker(mutex);
+		Thread thread;
+		thread.start(locker);
+		thread.join();
+		return locker.locked();
+	}
 }
 
 
@@ -77,11 +113,15 @@ void MutexTest::testScopedLockWithUnlockTryLock()
 
 	{
 		ScopedLockWithUnlock<FastMutex> lock(mutex, std::defer_lock);
+		assertFalse (lock.ownsLock());
+
 		assertTrue (lock.tryLock());
-		assertFalse (mutex.tryLock());
+		assertTrue (lock.ownsLock());
+		assertFalse (tryLockFromOtherThread(mutex));
+
 		lock.unlock();
-		assertTrue (mutex.tryLock());
-		mutex.unlock();
+		assertFalse (lock.ownsLock());
+		assertTrue (tryLockFromOtherThread(mutex));
 	}
 
 	{
@@ -92,15 +132,16 @@ void MutexTest::testScopedLockWithUnlockTryLock()
 
 		ScopedLockWithUnlock<FastMutex> lock(mutex, std::defer_lock);
 		assertFalse (lock.tryLock());
+		assertFalse (lock.ownsLock());
 
 		holder.release();
 		thread.join();
 
 		assertTrue (lock.tryLock());
+		assertTrue (lock.ownsLock());
 	}
 
-	assertTrue (mutex.tryLock());
-	mutex.unlock();
+	assertTrue (tryLockFromOtherThread(mutex));
 }
 
 
