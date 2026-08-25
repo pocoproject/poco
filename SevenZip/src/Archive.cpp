@@ -23,6 +23,9 @@
 #include "Poco/File.h"
 #include "Poco/Path.h"
 #include "Poco/Mutex.h"
+#include "Poco/Exception.h"
+#include "Poco/StringTokenizer.h"
+#include <algorithm>
 #include "7z.h"
 #include "7zAlloc.h"
 #include "7zCrc.h"
@@ -31,6 +34,51 @@
 
 namespace Poco {
 namespace SevenZip {
+
+
+namespace
+{
+	// Poco::Path copies a ".." into the built path verbatim, so it is resolved
+	// by the file system, not by Poco::Path. The name is therefore checked as a
+	// raw string with both '/' and '\' as separators, since Windows honours
+	// either, and components that Windows canonicalizes to ".." by stripping
+	// trailing dots and spaces are rejected as well.
+	bool isSafeEntryPath(const std::string& entryPath)
+	{
+		if (entryPath.empty()) return false;
+
+		try
+		{
+			if (Poco::Path(entryPath, Poco::Path::PATH_UNIX).isAbsolute() ||
+				Poco::Path(entryPath, Poco::Path::PATH_WINDOWS).isAbsolute())
+				return false;
+		}
+		catch (const Poco::PathSyntaxException&)
+		{
+			return false;
+		}
+
+		const Poco::StringTokenizer components(entryPath, "/\\", Poco::StringTokenizer::TOK_IGNORE_EMPTY);
+		for (const auto& component: components)
+		{
+			if (component.find_first_not_of(". ") == std::string::npos &&
+				std::count(component.begin(), component.end(), '.') > 1)
+				return false;
+		}
+		return true;
+	}
+
+
+	// Second layer behind isSafeEntryPath(). baseDir is a directory path, so the
+	// prefix compare includes the trailing separator and "/tmp/dest-evil" cannot
+	// match base "/tmp/dest/".
+	bool isContainedIn(const Poco::Path& baseDir, const Poco::Path& target)
+	{
+		const std::string base(baseDir.toString());
+		const std::string resolved(Poco::Path(target.toString(), Poco::Path::PATH_NATIVE).toString());
+		return resolved.size() >= base.size() && resolved.compare(0, base.size(), base) == 0;
+	}
+}
 
 
 class ArchiveImpl
@@ -87,10 +135,15 @@ public:
 			basePath = destPath;
 		}
 		basePath.makeDirectory();
+		basePath.makeAbsolute();
+		if (!isSafeEntryPath(entry.path()))
+			throw Poco::InvalidArgumentException("7-Zip entry path escapes the destination directory", entry.path());
 		Poco::Path entryPath(entry.path(), Poco::Path::PATH_UNIX);
 		Poco::Path extractedPath(basePath);
 		extractedPath.append(entryPath);
 		extractedPath.makeAbsolute();
+		if (!isContainedIn(basePath, extractedPath))
+			throw Poco::InvalidArgumentException("7-Zip entry path escapes the destination directory", entry.path());
 
 		if (entry.isFile())
 		{
