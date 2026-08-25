@@ -20,7 +20,19 @@
 #include "Poco/Exception.h"
 
 
+using namespace std::string_literals;
+
+
 namespace Poco {
+
+
+namespace
+{
+	bool isWebScheme(const std::string& scheme)
+	{
+		return scheme == "http"s || scheme == "https"s;
+	}
+}
 
 
 URIStreamOpener::URIStreamOpener()
@@ -192,8 +204,19 @@ std::istream* URIStreamOpener::openURI(const std::string& scheme, const URI& uri
 		}
 		catch (URIRedirection& redir)
 		{
-			actualURI = redir.uri();
-			actualScheme = actualURI.getScheme();
+			URI redirectedURI(redir.uri());
+			const std::string& redirectedScheme(redirectedURI.getScheme());
+			// A redirect must stay within the web schemes. Following it into a
+			// more privileged scheme (e.g. file: or data:) would let an
+			// attacker-controlled HTTP redirect read local files.
+			//
+			// UnknownURISchemeException, not URISyntaxException: open(const std::string&)
+			// catches the latter and retries the input as a filesystem path, which would
+			// turn this rejection into an attacker-influenced local file open.
+			if (!isWebScheme(redirectedScheme))
+				throw UnknownURISchemeException(redirectedURI.toString() + "; cross-scheme redirect from "s + uri.toString());
+			actualURI = redirectedURI;
+			actualScheme = redirectedScheme;
 			++redirects;
 		}
 	}

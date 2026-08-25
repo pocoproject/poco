@@ -19,6 +19,7 @@
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPCredentials.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Exception.h"
 #include "Poco/URI.h"
 #include "Poco/URIStreamOpener.h"
 #include "Poco/UnbufferedStreamBuf.h"
@@ -132,6 +133,12 @@ std::istream* HTTPSStreamFactory::open(const URI& uri)
 			if (moved)
 			{
 				resolvedURI.resolve(res.get("Location"));
+				// A redirect must stay within the web schemes; anything else is
+				// treated as https below and would be requested against a host
+				// taken from an unrelated scheme.
+				const std::string& redirectedScheme(resolvedURI.getScheme());
+				if (redirectedScheme != "http" && redirectedScheme != "https")
+					throw UnknownURISchemeException(resolvedURI.toString() + "; cross-scheme redirect from " + uri.toString());
 				if (!username.empty())
 				{
 					resolvedURI.setUserInfo(username + ":" + password);
