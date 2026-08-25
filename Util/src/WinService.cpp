@@ -28,7 +28,6 @@ using Poco::OutOfMemoryException;
 namespace Poco::Util {
 
 
-const int WinService::STARTUP_TIMEOUT = 30000;
 const std::string WinService::REGISTRY_KEY("SYSTEM\\CurrentControlSet\\Services\\");
 const std::string WinService::REGISTRY_DESCRIPTION("Description");
 

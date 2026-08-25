@@ -80,7 +80,7 @@ public:
 	PBKDF2Engine(const PBKDF2Engine&) = delete;
 	PBKDF2Engine& operator=(const PBKDF2Engine&) = delete;
 
-	std::size_t digestLength() const override
+	[[nodiscard]] std::size_t digestLength() const override
 	{
 		return _dkLen;
 	}
@@ -91,7 +91,7 @@ public:
 		_result.clear();
 	}
 
-	const DigestEngine::Digest& digest() override
+	[[nodiscard]] const DigestEngine::Digest& digest() override
 	{
 		Poco::UInt32 i = 1;
 		while (_result.size() < _dkLen)

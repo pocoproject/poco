@@ -93,28 +93,28 @@ public:
 	static void clearFlags();
 		/// Resets all flags.
 
-	static bool isFlag(Flag flag);
+	[[nodiscard]] static bool isFlag(Flag flag);
 		/// Returns true iff the given flag is set.
 
 	static void setRoundingMode(RoundingMode mode);
 		/// Sets the rounding mode.
 
-	static RoundingMode getRoundingMode();
+	[[nodiscard]] static RoundingMode getRoundingMode();
 		/// Returns the current rounding mode.
 
-	static bool isInfinite(float value);
-	static bool isInfinite(double value);
-	static bool isInfinite(long double value);
+	[[nodiscard]] static bool isInfinite(float value);
+	[[nodiscard]] static bool isInfinite(double value);
+	[[nodiscard]] static bool isInfinite(long double value);
 		/// Returns true iff the given number is infinite.
 
-	static bool isNaN(float value);
-	static bool isNaN(double value);
-	static bool isNaN(long double value);
+	[[nodiscard]] static bool isNaN(float value);
+	[[nodiscard]] static bool isNaN(double value);
+	[[nodiscard]] static bool isNaN(long double value);
 		/// Returns true iff the given number is NaN.
 
-	static float copySign(float target, float source);
-	static double copySign(double target, double source);
-	static long double copySign(long double target, long double source);
+	[[nodiscard]] static float copySign(float target, float source);
+	[[nodiscard]] static double copySign(double target, double source);
+	[[nodiscard]] static long double copySign(long double target, long double source);
 		/// Copies the sign from source to target.
 };
 

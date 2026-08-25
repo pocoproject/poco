@@ -1,6 +1,48 @@
 This is the changelog file for the POCO C++ Libraries.
 
 
+Release 2.0.0 (unreleased)
+==========================
+
+Breaking Changes:
+
+- PR #5453 chore: constexpr-ify static constants -- in-class `static const` members with
+  constant initialisers are now `static constexpr`. Their out-of-class definitions are gone,
+  which removes 37+ exported symbols from the shipped libraries (Foundation, Net, Util, Data,
+  DataSQLite, MongoDB, XML, CppUnit, Zip, NetSSL and Prometheus) -- for example
+  Timespan::SECONDS, Timestamp::TIMEVAL_MAX, IPAddress::IPv4 and
+  HTTPMessage::UNKNOWN_CONTENT_LENGTH. Source-compatible, binary-incompatible: recompile
+  against the new headers.
+- PR #5453 Poco::Net::ICMPv4PacketImpl::MAX_PACKET_SIZE is removed. It shadowed
+  ICMPPacketImpl::MAX_PACKET_SIZE and was never defined in libPocoNet, so any odr-use of it
+  was a link error. The name now resolves to the inherited member, which has the same value.
+- PR #5453 Headers that use std::numeric_limits<>::min()/max() no longer tolerate a
+  function-like min() or max() macro in scope. POCO's own scattered `#undef min` / `#undef max`
+  guards are replaced by a single POCO_CHECK_MINMAX_MACROS check (defined in Poco/Foundation.h)
+  that reports the cause as a static assertion instead of an opaque preprocessor error. On
+  Windows this means defining NOMINMAX, or including any POCO header before <windows.h> --
+  Poco/UnWindows.h, now the only route to <windows.h> within POCO, does both. Affects
+  Poco/Timestamp.h, Poco/Clock.h, Poco/NumericString.h, Poco/Dynamic/VarHolder.h,
+  Poco/Dynamic/VarIterator.h, Poco/OrderedSet.h, Poco/OrderedMap.h, Poco/Net/SocketProactor.h,
+  Poco/Data/Constants.h, Poco/Data/RecordSet.h, Poco/Data/RowIterator.h,
+  Poco/MongoDB/ServerDescription.h and Poco/ActiveRecord/IDTraits.h.
+
+Bundled Third-Party Library Upgrades:
+
+- sqlite-vec 0.1.9 -- new optional bundled dependency (MIT OR Apache-2.0): vector search
+  extension for Data/SQLite, compiled as a separate translation unit next to SQLite with
+  SQLITE_CORE and SQLITE_VEC_STATIC; disabled by default
+
+Features:
+
+- GH #5440 Data/SQLite: integrate the sqlite-vec vector search extension (PR #5459) -- vec0
+  virtual tables, vec_distance_* functions and KNN MATCH ... ORDER BY distance queries in every
+  SQLite session, including MemoryDB (virtual tables are persisted whole in the always-in-memory
+  active shard). Disabled by default; enable with ENABLE_DATA_SQLITE_VEC (cmake),
+  POCO_ENABLE_SQLITE_VEC (gnu make) or ./configure --sqlite-vec. Works with bundled and
+  unbundled SQLite (3.37 or newer required); optional AVX2/NEON SIMD kernels.
+
+
 Release 1.15.3 (2026-05-13)
 ===========================
 

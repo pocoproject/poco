@@ -33,7 +33,7 @@ public:
 	virtual void printHeader(std::ostream& stream);
 
 protected:
-	std::string shortName(const std::string& testName);
+	[[nodiscard]] std::string shortName(const std::string& testName);
 	void setup();
 	void ignoring(const std::string ignore);
 

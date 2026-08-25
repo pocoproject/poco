@@ -14,15 +14,9 @@
 
 #include "Poco/Data/RowIterator.h"
 #include "Poco/Data/RecordSet.h"
-#undef min
-#undef max
-#include <limits>
 
 
 namespace Poco::Data {
-
-
-const std::size_t RowIterator::POSITION_END = std::numeric_limits<std::size_t>::max();
 
 
 RowIterator::RowIterator(RecordSet* pRecordSet, bool positionEnd):
@@ -179,7 +173,7 @@ const RowIterator& RowIterator::operator ++ () const
 }
 
 
-RowIterator RowIterator::operator ++ (int) const
+RowIterator RowIterator::operator ++ ([[maybe_unused]] int n) const
 {
 	RowIterator old(*this);
 	increment();
@@ -194,7 +188,7 @@ const RowIterator& RowIterator::operator -- () const
 }
 
 
-RowIterator RowIterator::operator -- (int) const
+RowIterator RowIterator::operator -- ([[maybe_unused]] int n) const
 {
 	RowIterator old(*this);
 	decrement();

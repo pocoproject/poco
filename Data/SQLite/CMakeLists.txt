@@ -24,6 +24,19 @@ else()
 	target_link_libraries(DataSQLite PRIVATE "$<BUILD_LOCAL_INTERFACE:SQLite::SQLite3>")
 endif()
 
+if(ENABLE_DATA_SQLITE_VEC)
+	target_link_libraries(DataSQLite PRIVATE "$<BUILD_LOCAL_INTERFACE:SQLiteVec::SQLiteVec>")
+	target_compile_definitions(DataSQLite PUBLIC POCO_ENABLE_SQLITE_VEC)
+endif()
+
+# The bundled sqlite3 object library carries SQLITE_ENABLE_FTS5 PUBLIC, but is
+# linked through $<BUILD_LOCAL_INTERFACE:...> PRIVATE, so the define would never
+# reach consumers (e.g. the testsuite's testFTS guard). Re-export it here, like
+# POCO_ENABLE_SQLITE_VEC above, so consumers can detect FTS5 availability.
+if(ENABLE_DATA_SQLITE_FTS5 AND NOT POCO_SQLITE_UNBUNDLED)
+	target_compile_definitions(DataSQLite PUBLIC SQLITE_ENABLE_FTS5)
+endif()
+
 add_library(Poco::DataSQLite ALIAS DataSQLite)
 set_target_properties(DataSQLite
 	PROPERTIES

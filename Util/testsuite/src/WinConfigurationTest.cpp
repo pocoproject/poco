@@ -16,8 +16,6 @@
 #include "Poco/Environment.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Types.h"
-#undef min
-#undef max
 #include <limits>
 
 

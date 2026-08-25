@@ -157,10 +157,10 @@ public:
 	Page& operator = (const Page& page);
 		/// Assignment operator.
 
-	operator const Type& () const;
+	[[nodiscard]] operator const Type& () const;
 		/// Const conversion operator into reference to native type.
 
-	bool operator == (const Page& other) const;
+	[[nodiscard]] bool operator == (const Page& other) const;
 		/// Equality operator.
 
 	void swap(Page& other) noexcept;
@@ -169,25 +169,25 @@ public:
 	void setWidth(float value);
 		/// Sets the page width.
 
-	float getWidth() const;
+	[[nodiscard]] float getWidth() const;
 		/// Gets the page width.
 
 	void setHeight(float value);
 		/// Sets the page height.
 
-	float getHeight() const;
+	[[nodiscard]] float getHeight() const;
 		/// Gets the page height.
 
 	void setSize(Size size);
 		/// Sets the page size.
 
-	Size getSize() const;
+	[[nodiscard]] Size getSize() const;
 		/// Returns the page size.
 
 	void setOrientation(Orientation orientation);
 		/// Sets the page orientation.
 
-	Orientation getOrientation() const;
+	[[nodiscard]] Orientation getOrientation() const;
 		/// Returns the page orientation.
 
 	void setSizeAndOrientation(Size size, Orientation orientation);
@@ -210,7 +210,7 @@ public:
 	float textWidth(const std::string& text);
 		/// Returns the width of the supplied text.
 
-	void  beginText();
+	void beginText();
 		/// Begins a text object and sets the current text position to the point (0,0).
 
 	void endText();
@@ -254,29 +254,29 @@ public:
 	void drawImage(Image image, float x, float y, float width, float height);
 		/// Draws an image in one operation.
 
-	const Destination& createDestination(const std::string& name);
-		/// Creates ad returns reference to destination.
+	[[nodiscard]] const Destination& createDestination(const std::string& name);
+		/// Creates and returns reference to destination.
 
-	const TextAnnotation& createTextAnnotation(const std::string& name,
+	[[nodiscard]] const TextAnnotation& createTextAnnotation(const std::string& name,
 		const Rectangle& rect,
 		const std::string& text,
 		const Encoder& encoder);
-		/// Creates ad returns reference to text annotation.
+		/// Creates and returns reference to text annotation.
 
-	const LinkAnnotation& createLinkAnnotation(const std::string& name,
+	[[nodiscard]] const LinkAnnotation& createLinkAnnotation(const std::string& name,
 		const Rectangle& rect,
 		const Destination& dest);
-		/// Creates ad returns reference to destination link annotation.
+		/// Creates and returns reference to destination link annotation.
 
-	const LinkAnnotation& createURILinkAnnotation(const std::string& name,
+	[[nodiscard]] const LinkAnnotation& createURILinkAnnotation(const std::string& name,
 		const Rectangle& rect,
 		const std::string& uri);
-		/// Creates ad returns reference to URI annotation.
+		/// Creates and returns reference to URI annotation.
 
-	int getGraphicsMode() const;
+	[[nodiscard]] int getGraphicsMode() const;
 		/// Returns current graphics mode.
 
-	int getGraphicStateDepth() const;
+	[[nodiscard]] int getGraphicStateDepth() const;
 		/// Returns current graphics mode.
 
 	void setExtGraphicsState(ExtGraphicsState state);
@@ -363,10 +363,10 @@ public:
 	void eoClip();
 		///
 
-	Point getPos() const;
+	[[nodiscard]] Point getPos() const;
 		/// Returns the current position.
 
-	Point getTextPos() const;
+	[[nodiscard]] Point getTextPos() const;
 		/// Returns the current position for text showing.
 
 	void moveTextPos(float x, float y);
@@ -390,127 +390,127 @@ public:
 		/// invoke HPDF_Page_SetTextLeading() before HPDF_Page_MoveTextPos2() to set
 		/// text leading.
 
-	const Font& getFont() const;
+	[[nodiscard]] const Font& getFont() const;
 		/// Returns the current font.
 
-	float getFontSize() const;
+	[[nodiscard]] float getFontSize() const;
 		/// Returns the current Font size.
 
-	TransMatrix getTransMatrix() const;
+	[[nodiscard]] TransMatrix getTransMatrix() const;
 		/// Returns the current transformation matrix.
 
-	TransMatrix getTextMatrix() const;
+	[[nodiscard]] TransMatrix getTextMatrix() const;
 		/// Returns the current text transformation matrix.
 
-	float getLineWidth() const;
+	[[nodiscard]] float getLineWidth() const;
 		/// Returns the current line width.
 
 	void setLineWidth(float width);
 		/// Sets the line width.
 
-	LineCap getLineCap() const;
+	[[nodiscard]] LineCap getLineCap() const;
 		/// Returns the current line cap.
 
 	void setLineCap(LineCap cap) const;
 		/// Sets the line cap.
 
-	LineJoin getLineJoin() const;
+	[[nodiscard]] LineJoin getLineJoin() const;
 		/// Returns the current line join.
 
 	void setLineJoin(LineJoin join) const;
 		/// Returns the current line join.
 
-	float getMiterLimit() const;
+	[[nodiscard]] float getMiterLimit() const;
 		/// Returns the current miter limit.
 
 	void setMiterLimit(float limit) const;
 		/// Sets the miter limit.
 
-	DashMode getDashMode() const;
+	[[nodiscard]] DashMode getDashMode() const;
 		/// Returns current dash mode.
 
 	void setDashMode(const PatternVec& pattern, int paramNo, int phase) const;
 		/// Sets teh dash mode.
 
-	float getFlatness() const;
+	[[nodiscard]] float getFlatness() const;
 		/// Returns the current flatness.
 
-	float getCharSpace() const;
+	[[nodiscard]] float getCharSpace() const;
 		/// Returns the current character space.
 
 	void setCharSpace(float value);
 		/// Sets the current character space.
 
-	float getWordSpace() const;
+	[[nodiscard]] float getWordSpace() const;
 		/// Returns the current word space.
 
 	void setWordSpace(float value);
 		/// Sets the current word space.
 
-	float getHorizontalScale() const;
+	[[nodiscard]] float getHorizontalScale() const;
 		/// Returns the current horizontal scaling.
 
 	void setHorizontalScale(float value);
 		/// Sets the current horizontal scaling.
 
-	float getTextLead() const;
+	[[nodiscard]] float getTextLead() const;
 		/// Returns the current text leading.
 
 	void setTextLead(float value);
 		/// Sets the current text leading.
 
-	RenderMode getTextRenderMode() const;
+	[[nodiscard]] RenderMode getTextRenderMode() const;
 		/// Returns the current text rendering mode.
 
 	void setTextRenderMode(RenderMode value);
 		/// Sets the current text rendering mode.
 
-	float getTextRise() const;
+	[[nodiscard]] float getTextRise() const;
 		/// Returns the current text leading.
 
 	void setTextRise(float value);
 		/// Sets the current text leading.
 
-	RGBColor getRGBFill() const;
+	[[nodiscard]] RGBColor getRGBFill() const;
 		/// Returns current RGB fill.
 
 	void setRGBFill(RGBColor value);
 		/// Sets current RGB fill.
 
-	RGBColor getRGBStroke() const;
+	[[nodiscard]] RGBColor getRGBStroke() const;
 		/// Returns current RGB stroke.
 
 	void setRGBStroke(RGBColor value);
 		/// Sets current RGB stroke.
 
-	CMYKColor getCMYKFill() const;
+	[[nodiscard]] CMYKColor getCMYKFill() const;
 		/// Returns current CMYK fill.
 
 	void setCMYKFill(CMYKColor value);
 		/// Sets current CMYK fill.
 
-	CMYKColor getCMYKStroke() const;
+	[[nodiscard]] CMYKColor getCMYKStroke() const;
 		/// Returns current CMYK stroke.
 
 	void setCMYKStroke(CMYKColor value);
 		/// Returns current CMYK stroke.
 
-	float getGreyFill() const;
+	[[nodiscard]] float getGreyFill() const;
 		/// Returns current grey fill.
 
 	void setGreyFill(float value);
 		/// Sets current grey fill.
 
-	float getGreyStroke() const;
+	[[nodiscard]] float getGreyStroke() const;
 		/// Returns current grey stroke.
 
 	void setGreyStroke(float value);
 		/// Sets current grey stroke.
 
-	ColorSpace getStrokeColorSpace() const;
+	[[nodiscard]] ColorSpace getStrokeColorSpace() const;
 		/// Returns current stroking color space.
 
-	ColorSpace getFillColorSpace() const;
+	[[nodiscard]] ColorSpace getFillColorSpace() const;
 		/// Returns current filling color space.
 
 	void setSlideShow(TransitionStyle type, float displayTime, float transitionTime);

@@ -92,41 +92,41 @@ public:
 		/// Destroys the Socket and releases the
 		/// SocketImpl.
 
-	bool operator == (const Socket& socket) const;
+	[[nodiscard]] bool operator == (const Socket& socket) const;
 		/// Returns true if both sockets share the same
 		/// SocketImpl, false otherwise.
 
-	bool operator != (const Socket& socket) const;
+	[[nodiscard]] bool operator != (const Socket& socket) const;
 		/// Returns false if both sockets share the same
 		/// SocketImpl, true otherwise.
 
-	bool operator <  (const Socket& socket) const;
+	[[nodiscard]] bool operator <  (const Socket& socket) const;
 		/// Compares the SocketImpl pointers.
 
-	bool operator <= (const Socket& socket) const;
+	[[nodiscard]] bool operator <= (const Socket& socket) const;
 		/// Compares the SocketImpl pointers.
 
-	bool operator >  (const Socket& socket) const;
+	[[nodiscard]] bool operator >  (const Socket& socket) const;
 		/// Compares the SocketImpl pointers.
 
-	bool operator >= (const Socket& socket) const;
+	[[nodiscard]] bool operator >= (const Socket& socket) const;
 		/// Compares the SocketImpl pointers.
 
-	bool isNull() const;
+	[[nodiscard]] bool isNull() const;
 		/// Returns true if pointer to implementation is null.
 
-	Type type() const;
+	[[nodiscard]] Type type() const;
 		/// Returns the socket type.
 
-	bool isStream() const;
+	[[nodiscard]] bool isStream() const;
 		/// Returns true if socket is a stream socket,
 		/// false otherwise.
 
-	bool isDatagram() const;
+	[[nodiscard]] bool isDatagram() const;
 		/// Returns true if socket is a datagram socket,
 		/// false otherwise.
 
-	bool isRaw() const;
+	[[nodiscard]] bool isRaw() const;
 		/// Returns true if socket is a raw socket,
 		/// false otherwise.
 
@@ -181,17 +181,17 @@ public:
 		/// Returns true if the next operation corresponding to
 		/// mode will not block, false otherwise.
 
-	int available() const;
+	[[nodiscard]] int available() const;
 		/// Returns the number of bytes available that can be read
 		/// without causing the socket to block.
 
-	int getError() const;
+	[[nodiscard]] int getError() const;
 		/// Returns the socket error.
 
 	void setSendBufferSize(int size);
 		/// Sets the size of the send buffer.
 
-	int getSendBufferSize() const;
+	[[nodiscard]] int getSendBufferSize() const;
 		/// Returns the size of the send buffer.
 		///
 		/// The returned value may be different than the
@@ -201,7 +201,7 @@ public:
 	void setReceiveBufferSize(int size);
 		/// Sets the size of the receive buffer.
 
-	int getReceiveBufferSize() const;
+	[[nodiscard]] int getReceiveBufferSize() const;
 		/// Returns the size of the receive buffer.
 		///
 		/// The returned value may be different than the
@@ -211,7 +211,7 @@ public:
 	void setSendTimeout(const Poco::Timespan& timeout);
 		/// Sets the send timeout for the socket.
 
-	Poco::Timespan getSendTimeout() const;
+	[[nodiscard]] Poco::Timespan getSendTimeout() const;
 		/// Returns the send timeout for the socket.
 		///
 		/// The returned timeout may be different than the
@@ -224,7 +224,7 @@ public:
 		/// On systems that do not support SO_RCVTIMEO, a
 		/// workaround using poll() is provided.
 
-	Poco::Timespan getReceiveTimeout() const;
+	[[nodiscard]] Poco::Timespan getReceiveTimeout() const;
 		/// Returns the receive timeout for the socket.
 		///
 		/// The returned timeout may be different than the
@@ -280,7 +280,7 @@ public:
 	void setNoDelay(bool flag);
 		/// Sets the value of the TCP_NODELAY socket option.
 
-	bool getNoDelay() const;
+	[[nodiscard]] bool getNoDelay() const;
 		/// Returns the value of the TCP_NODELAY socket option.
 
 	void setKeepAlive(bool flag, int idleSeconds = 0, int intervalSeconds = 0, int probeCount = 0);
@@ -308,13 +308,13 @@ public:
 		/// it has one while the connection actually sits at the two hour
 		/// default. Catch it where best effort tuning is what is wanted.
 
-	bool getKeepAlive() const;
+	[[nodiscard]] bool getKeepAlive() const;
 		/// Returns the value of the SO_KEEPALIVE socket option.
 
 	void setReuseAddress(bool flag);
 		/// Sets the value of the SO_REUSEADDR socket option.
 
-	bool getReuseAddress() const;
+	[[nodiscard]] bool getReuseAddress() const;
 		/// Returns the value of the SO_REUSEADDR socket option.
 
 	void setReusePort(bool flag);
@@ -322,7 +322,7 @@ public:
 		/// Does nothing if the socket implementation does not
 		/// support SO_REUSEPORT.
 
-	bool getReusePort() const;
+	[[nodiscard]] bool getReusePort() const;
 		/// Returns the value of the SO_REUSEPORT socket option.
 		///
 		/// Returns false if the socket implementation does not
@@ -331,35 +331,35 @@ public:
 	void setOOBInline(bool flag);
 		/// Sets the value of the SO_OOBINLINE socket option.
 
-	bool getOOBInline() const;
+	[[nodiscard]] bool getOOBInline() const;
 		/// Returns the value of the SO_OOBINLINE socket option.
 
 	void setBlocking(bool flag);
 		/// Sets the socket in blocking mode if flag is true,
 		/// disables blocking mode if flag is false.
 
-	bool getBlocking() const;
+	[[nodiscard]] bool getBlocking() const;
 		/// Returns the blocking mode of the socket.
 		/// This method will only work if the blocking modes of
 		/// the socket are changed via the setBlocking method!
 
-	SocketAddress address() const;
+	[[nodiscard]] SocketAddress address() const;
 		/// Returns the IP address and port number of the socket.
 
-	SocketAddress peerAddress() const;
+	[[nodiscard]] SocketAddress peerAddress() const;
 		/// Returns the IP address and port number of the peer socket.
 
-	SocketImpl* impl() const;
+	[[nodiscard]] SocketImpl* impl() const;
 		/// Returns the SocketImpl for this socket.
 
-	bool secure() const;
+	[[nodiscard]] bool secure() const;
 		/// Returns true iff the socket's connection is secure
 		/// (using SSL or TLS).
 
-	static bool supportsIPv4();
+	[[nodiscard]] static bool supportsIPv4();
 		/// Returns true if the system supports IPv4.
 
-	static bool supportsIPv6();
+	[[nodiscard]] static bool supportsIPv6();
 		/// Returns true if the system supports IPv6.
 
 	void init(int af);
@@ -372,11 +372,11 @@ public:
 		/// of the Socket object makes sense. One example is setting
 		/// a socket option before calling bind() on a ServerSocket.
 
-	static SocketBuf makeBuffer(void* buffer, std::size_t length);
+	[[nodiscard]] static SocketBuf makeBuffer(void* buffer, std::size_t length);
 		/// Creates and returns buffer. Suitable for creating
 		/// the appropriate buffer for the platform.
 
-	static SocketBufVec makeBufVec(std::size_t size, std::size_t bufLen);
+	[[nodiscard]] static SocketBufVec makeBufVec(std::size_t size, std::size_t bufLen);
 		/// Creates and returns a vector of requested size, with
 		/// allocated buffers and lengths set accordingly.
 		/// This utility function works well when all buffers are
@@ -387,7 +387,7 @@ public:
 		/// and shrinks the vector to size 0.
 		/// The vector must be created by makeBufVec(size_t, size_t).
 
-	static SocketBufVec makeBufVec(const std::vector<char*>& vec);
+	[[nodiscard]] static SocketBufVec makeBufVec(const std::vector<char*>& vec);
 		/// Creates and returns a vector of requested size, with
 		/// buffers pointing to the supplied data (so, `vec` must
 		/// remain available at the time of use) and lengths set
@@ -401,7 +401,7 @@ public:
 		///     to string literals will result in undefined behavior,
 		///     in best case an I/O error and subsequent exception
 
-	static SocketBufVec makeBufVec(const std::vector<std::string>& vec);
+	[[nodiscard]] static SocketBufVec makeBufVec(const std::vector<std::string>& vec);
 		/// Creates and returns a vector of requested size, with
 		/// buffers pointing to the supplied data (so, `vec` must
 		/// remain available at the time of use) and lengths set
@@ -410,10 +410,10 @@ public:
 		/// of buffers used for writing (ie. reading from socket
 		/// into buffers).
 
-	static int lastError();
+	[[nodiscard]] static int lastError();
 		/// Returns the last error code.
 
-	static std::string lastErrorDesc();
+	[[nodiscard]] static std::string lastErrorDesc();
 		/// Returns the last error description.
 
 	static void error();
@@ -424,7 +424,7 @@ protected:
 		/// Creates the Socket and attaches the given SocketImpl.
 		/// The socket takes ownership of the SocketImpl.
 
-	poco_socket_t sockfd() const;
+	[[nodiscard]] poco_socket_t sockfd() const;
 		/// Returns the socket descriptor for this socket.
 
 private:
@@ -438,7 +438,7 @@ public:
 	FDCompare(int fd): _fd(fd) { }
 	FDCompare() = delete;
 
-	inline bool operator()(const Socket& socket) const
+	[[nodiscard]] inline bool operator()(const Socket& socket) const
 	{ return socket.sockfd() == _fd; }
 
 private:

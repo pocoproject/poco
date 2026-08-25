@@ -27,6 +27,9 @@
 #include <string>
 
 
+POCO_CHECK_MINMAX_MACROS
+
+
 namespace Poco::MongoDB {
 
 

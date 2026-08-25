@@ -59,17 +59,17 @@ public:
 		{
 		}
 
-		const std::string& key() const
+		[[nodiscard]] const std::string& key() const
 		{
 			return _key;
 		}
 
-		const std::string& value() const
+		[[nodiscard]] const std::string& value() const
 		{
 			return _value;
 		}
 
-		std::string& value()
+		[[nodiscard]] std::string& value()
 		{
 			return _value;
 		}
@@ -112,42 +112,42 @@ public:
 
 	AbstractConfiguration& operator = (const AbstractConfiguration&) = delete;
 
-	bool hasProperty(const std::string& key) const;
+	[[nodiscard]] bool hasProperty(const std::string& key) const;
 		/// Returns true iff the property with the given key exists.
 
-	bool hasOption(const std::string& key) const;
-		/// Returns true iff the property with the given key exists.
-		///
-		/// Same as hasProperty().
-
-	bool has(const std::string& key) const;
+	[[nodiscard]] bool hasOption(const std::string& key) const;
 		/// Returns true iff the property with the given key exists.
 		///
 		/// Same as hasProperty().
 
-	std::string getString(const std::string& key) const;
+	[[nodiscard]] bool has(const std::string& key) const;
+		/// Returns true iff the property with the given key exists.
+		///
+		/// Same as hasProperty().
+
+	[[nodiscard]] std::string getString(const std::string& key) const;
 		/// Returns the string value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	std::string getString(const std::string& key, const std::string& defaultValue) const;
+	[[nodiscard]] std::string getString(const std::string& key, const std::string& defaultValue) const;
 		/// If a property with the given key exists, returns the property's string value,
 		/// otherwise returns the given default value.
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	std::string getRawString(const std::string& key) const;
+	[[nodiscard]] std::string getRawString(const std::string& key) const;
 		/// Returns the raw string value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// References to other properties are not expanded.
 
-	std::string getRawString(const std::string& key, const std::string& defaultValue) const;
+	[[nodiscard]] std::string getRawString(const std::string& key, const std::string& defaultValue) const;
 		/// If a property with the given key exists, returns the property's raw string value,
 		/// otherwise returns the given default value.
 		/// References to other properties are not expanded.
 
-	int getInt(const std::string& key) const;
+	[[nodiscard]] int getInt(const std::string& key) const;
 		/// Returns the int value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// Throws a SyntaxException if the property can not be converted
@@ -156,7 +156,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	unsigned int getUInt(const std::string& key) const;
+	[[nodiscard]] unsigned int getUInt(const std::string& key) const;
 		/// Returns the unsigned int value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// Throws a SyntaxException if the property can not be converted
@@ -165,7 +165,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	int getInt(const std::string& key, int defaultValue) const;
+	[[nodiscard]] int getInt(const std::string& key, int defaultValue) const;
 		/// If a property with the given key exists, returns the property's int value,
 		/// otherwise returns the given default value.
 		/// Throws a SyntaxException if the property can not be converted
@@ -174,7 +174,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	unsigned int getUInt(const std::string& key, unsigned int defaultValue) const;
+	[[nodiscard]] unsigned int getUInt(const std::string& key, unsigned int defaultValue) const;
 		/// If a property with the given key exists, returns the property's unsigned int
 		/// value, otherwise returns the given default value.
 		/// Throws a SyntaxException if the property can not be converted
@@ -183,7 +183,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	Poco::Int32 getInt32(const std::string& key) const;
+	[[nodiscard]] Poco::Int32 getInt32(const std::string& key) const;
 		/// Returns the 32-bit int value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// Throws a SyntaxException if the property can not be converted
@@ -192,7 +192,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	Poco::UInt32 getUInt32(const std::string& key) const;
+	[[nodiscard]] Poco::UInt32 getUInt32(const std::string& key) const;
 		/// Returns the 32-bit unsigned int value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// Throws a SyntaxException if the property can not be converted
@@ -201,7 +201,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	Poco::Int32 getInt32(const std::string& key, Poco::Int32 defaultValue) const;
+	[[nodiscard]] Poco::Int32 getInt32(const std::string& key, Poco::Int32 defaultValue) const;
 		/// If a property with the given key exists, returns the property's 32-bit int value,
 		/// otherwise returns the given default value.
 		/// Throws a SyntaxException if the property can not be converted
@@ -210,7 +210,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	Poco::UInt32 getUInt32(const std::string& key, Poco::UInt32 defaultValue) const;
+	[[nodiscard]] Poco::UInt32 getUInt32(const std::string& key, Poco::UInt32 defaultValue) const;
 		/// If a property with the given key exists, returns the property's 32-bit unsigned int
 		/// value, otherwise returns the given default value.
 		/// Throws a SyntaxException if the property can not be converted
@@ -219,7 +219,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	Poco::Int16 getInt16(const std::string& key) const;
+	[[nodiscard]] Poco::Int16 getInt16(const std::string& key) const;
 		/// Returns the 16-bit int value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// Throws a SyntaxException or a RangeException if the property can not be converted
@@ -228,7 +228,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	Poco::UInt16 getUInt16(const std::string& key) const;
+	[[nodiscard]] Poco::UInt16 getUInt16(const std::string& key) const;
 		/// Returns the unsigned 16-bit int value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// Throws a SyntaxException or a RangeException if the property can not be converted
@@ -237,7 +237,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	Poco::Int16 getInt16(const std::string& key, Poco::Int16 defaultValue) const;
+	[[nodiscard]] Poco::Int16 getInt16(const std::string& key, Poco::Int16 defaultValue) const;
 		/// If a property with the given key exists, returns the property's 16-bit int value,
 		/// otherwise returns the given default value.
 		/// Throws a SyntaxException or a RangeException if the property can not be converted
@@ -246,7 +246,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	Poco::UInt16 getUInt16(const std::string& key, Poco::UInt16 defaultValue) const;
+	[[nodiscard]] Poco::UInt16 getUInt16(const std::string& key, Poco::UInt16 defaultValue) const;
 		/// If a property with the given key exists, returns the property's unsigned 16-bit int
 		/// value, otherwise returns the given default value.
 		/// Throws a SyntaxException or a RangeException if the property can not be converted
@@ -257,7 +257,7 @@ public:
 
 #if defined(POCO_HAVE_INT64)
 
-	Int64 getInt64(const std::string& key) const;
+	[[nodiscard]] Int64 getInt64(const std::string& key) const;
 		/// Returns the Int64 value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// Throws a SyntaxException if the property can not be converted
@@ -266,7 +266,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	UInt64 getUInt64(const std::string& key) const;
+	[[nodiscard]] UInt64 getUInt64(const std::string& key) const;
 		/// Returns the UInt64 value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// Throws a SyntaxException if the property can not be converted
@@ -275,7 +275,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	Int64 getInt64(const std::string& key, Int64 defaultValue) const;
+	[[nodiscard]] Int64 getInt64(const std::string& key, Int64 defaultValue) const;
 		/// If a property with the given key exists, returns the property's Int64 value,
 		/// otherwise returns the given default value.
 		/// Throws a SyntaxException if the property can not be converted
@@ -284,7 +284,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	UInt64 getUInt64(const std::string& key, UInt64 defaultValue) const;
+	[[nodiscard]] UInt64 getUInt64(const std::string& key, UInt64 defaultValue) const;
 		/// If a property with the given key exists, returns the property's UInt64
 		/// value, otherwise returns the given default value.
 		/// Throws a SyntaxException if the property can not be converted
@@ -295,7 +295,7 @@ public:
 
 #endif // defined(POCO_HAVE_INT64)
 
-	double getDouble(const std::string& key) const;
+	[[nodiscard]] double getDouble(const std::string& key) const;
 		/// Returns the double value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// Throws a SyntaxException if the property can not be converted
@@ -303,7 +303,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	double getDouble(const std::string& key, double defaultValue) const;
+	[[nodiscard]] double getDouble(const std::string& key, double defaultValue) const;
 		/// If a property with the given key exists, returns the property's double value,
 		/// otherwise returns the given default value.
 		/// Throws a SyntaxException if the property can not be converted
@@ -311,7 +311,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	bool getBool(const std::string& key) const;
+	[[nodiscard]] bool getBool(const std::string& key) const;
 		/// Returns the boolean value of the property with the given name.
 		/// Throws a NotFoundException if the key does not exist.
 		/// Throws a SyntaxException if the property can not be converted
@@ -319,7 +319,7 @@ public:
 		/// If the value contains references to other properties (${<property>}, or
 		/// ${<property>:-<default>}), these are expanded (see expand()).
 
-	bool getBool(const std::string& key, bool defaultValue) const;
+	[[nodiscard]] bool getBool(const std::string& key, bool defaultValue) const;
 		/// If a property with the given key exists, returns the property's boolean value,
 		/// otherwise returns the given default value.
 		/// Throws a SyntaxException if the property can not be converted
@@ -380,7 +380,7 @@ public:
 		/// An already existing value for the key is overwritten.
 
 
-	Keys keys(const std::string& key = std::string()) const;
+	[[nodiscard]] Keys keys(const std::string& key = std::string()) const;
 		/// Returns the names of all subkeys under the given key.
 		/// If an empty key is passed, all root level keys are returned.
 
@@ -411,7 +411,7 @@ public:
 		/// The returned Ptr must be assigned to an AbstractConfiguration::Ptr,
 		/// not a raw pointer, to prevent use-after-free.
 
-	std::string expand(const std::string& value) const;
+	[[nodiscard]] std::string expand(const std::string& value) const;
 		/// Replaces all occurrences of ${<property>} in value with the
 		/// value of the <property>. If <property> does not exist,
 		/// nothing is changed.
@@ -433,7 +433,7 @@ public:
 	void enableEvents(bool enable = true);
 		/// Enables (or disables) events.
 
-	bool eventsEnabled() const;
+	[[nodiscard]] bool eventsEnabled() const;
 		/// Returns true iff events are enabled.
 
 protected:
@@ -468,7 +468,7 @@ protected:
 		const AbstractConfiguration& _c;
 	};
 
-	virtual bool getRaw(const std::string& key, std::string& value) const = 0;
+	[[nodiscard]] virtual bool getRaw(const std::string& key, std::string& value) const = 0;
 		/// If the property with the given key exists, stores the property's value
 		/// in value and returns true. Otherwise, returns false.
 		///
@@ -492,35 +492,35 @@ protected:
 		/// Should be overridden by subclasses; the default
 		/// implementation throws a Poco::NotImplementedException.
 
-	static int parseInt(const std::string& value);
+	[[nodiscard]] static int parseInt(const std::string& value);
 		/// Returns string as signed integer.
 		/// Decimal and hexadecimal notation is supported.
 
-	static unsigned parseUInt(const std::string& value);
+	[[nodiscard]] static unsigned int parseUInt(const std::string& value);
 		/// Returns string as unsigned integer.
 		/// Decimal and hexadecimal notation is supported.
 
-	static Poco::Int16 parseInt16(const std::string& value);
+	[[nodiscard]] static Poco::Int16 parseInt16(const std::string& value);
 		/// Returns string as signed 16-bit integer.
 		/// Decimal and hexadecimal notation is supported.
 
-	static Poco::UInt16 parseUInt16(const std::string& value);
+	[[nodiscard]] static Poco::UInt16 parseUInt16(const std::string& value);
 		/// Returns string as unsigned 16-bit integer.
 		/// Decimal and hexadecimal notation is supported.
 
 #if defined(POCO_HAVE_INT64)
 
-	static Int64 parseInt64(const std::string& value);
+	[[nodiscard]] static Int64 parseInt64(const std::string& value);
 		/// Returns string as 64-bit signed integer.
 		/// Decimal and hexadecimal notation is supported.
 
-	static UInt64 parseUInt64(const std::string& value);
+	[[nodiscard]] static UInt64 parseUInt64(const std::string& value);
 		/// Returns string as 64-bit unsigned integer.
 		/// Decimal and hexadecimal notation is supported.
 
 #endif // defined(POCO_HAVE_INT64)
 
-	static bool parseBool(const std::string& value);
+	[[nodiscard]] static bool parseBool(const std::string& value);
 	void setRawWithEvent(const std::string& key, std::string value);
 
 	~AbstractConfiguration() override;

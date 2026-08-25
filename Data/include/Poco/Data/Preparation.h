@@ -28,7 +28,7 @@
 namespace Poco::Data {
 
 
-template<typename T>
+template <typename T>
 class Preparation: public AbstractPreparation
 	/// Class for calling the appropriate AbstractPreparator method.
 {

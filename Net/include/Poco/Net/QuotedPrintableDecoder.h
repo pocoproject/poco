@@ -56,7 +56,7 @@ class Net_API QuotedPrintableDecoderIOS: public virtual std::ios
 public:
 	QuotedPrintableDecoderIOS(std::istream& istr);
 	~QuotedPrintableDecoderIOS();
-	QuotedPrintableDecoderBuf* rdbuf();
+	[[nodiscard]] QuotedPrintableDecoderBuf* rdbuf();
 
 protected:
 	QuotedPrintableDecoderBuf _buf;

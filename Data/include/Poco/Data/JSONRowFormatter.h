@@ -73,10 +73,10 @@ class Data_API JSONRowFormatter: public Poco::Data::RowFormatter
 	/// If the total row count is preset on the formatter, the Data framework shall not interfere.
 {
 public:
-	static const int JSON_FMT_MODE_SMALL        = 1;
-	static const int JSON_FMT_MODE_ROW_COUNT    = 2;
-	static const int JSON_FMT_MODE_COLUMN_NAMES = 4;
-	static const int JSON_FMT_MODE_FULL         = 8;
+	static constexpr int JSON_FMT_MODE_SMALL        = 1;
+	static constexpr int JSON_FMT_MODE_ROW_COUNT    = 2;
+	static constexpr int JSON_FMT_MODE_COLUMN_NAMES = 4;
+	static constexpr int JSON_FMT_MODE_FULL         = 8;
 
 	JSONRowFormatter(int mode = (JSON_FMT_MODE_COLUMN_NAMES | JSON_FMT_MODE_SMALL));
 		/// Creates a new JSONRowFormatter.
@@ -105,11 +105,11 @@ public:
 		/// Returns true if column names printing is enabled,
 		/// false otherwise.
 
-	bool isSmall() const;
+	[[nodiscard]] bool isSmall() const;
 		/// Returns true if compact mode formatting is enabled,
 		/// false otherwise.
 
-	bool isFull() const;
+	[[nodiscard]] bool isFull() const;
 		/// Returns true if full mode formatting is enabled,
 		/// false otherwise.
 

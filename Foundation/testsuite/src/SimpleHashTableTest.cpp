@@ -50,7 +50,7 @@ void SimpleHashTableTest::testInsert()
 	catch (Exception&){}
 	try
 	{
-		hashTable.get(s2);
+		(void) hashTable.get(s2);
 		failmsg ("getting a non inserted item must fail");
 	}
 	catch (Exception&){}
@@ -103,9 +103,9 @@ void SimpleHashTableTest::testSize()
 {
 	SimpleHashTable<std::string, int> hashTable(13);
 	assertTrue (hashTable.size() == 0);
-	Poco::UInt32 POCO_UNUSED h1 = hashTable.insert("1", 1);
+	(void) hashTable.insert("1", 1);
 	assertTrue (hashTable.size() == 1);
-	Poco::UInt32 POCO_UNUSED h2 = hashTable.update("2", 2);
+	(void) hashTable.update("2", 2);
 	assertTrue (hashTable.size() == 2);
 	hashTable.clear();
 	assertTrue (hashTable.size() == 0);

@@ -57,13 +57,13 @@ public:
 	virtual ~DOMBuilder();
 		/// Destroys the DOMBuilder.
 
-	virtual Document* parse(const XMLString& uri);
+	[[nodiscard]] virtual Document* parse(const XMLString& uri);
 		/// Parse an XML document from a location identified by an URI.
 
-	virtual Document* parse(InputSource* pInputSource);
+	[[nodiscard]] virtual Document* parse(InputSource* pInputSource);
 		/// Parse an XML document from a location identified by an InputSource.
 
-	virtual Document* parseMemoryNP(const char* xml, std::size_t size);
+	[[nodiscard]] virtual Document* parseMemoryNP(const char* xml, std::size_t size);
 		/// Parses an XML document from memory.
 
 protected:

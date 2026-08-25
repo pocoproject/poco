@@ -276,6 +276,37 @@ void MemoryDBInspectorTest::testSchemaTablesColumnsIndexes()
 }
 
 
+void MemoryDBInspectorTest::testSchemaVirtualTables()
+{
+#ifdef POCO_ENABLE_SQLITE_VEC
+	// A vec0 table is reported as type "virtual"; its shadow tables are
+	// module internals and must not be listed as user tables.
+	MemoryDB db(_dir);
+	MemoryDBInspector insp(db);
+
+	db << "CREATE VIRTUAL TABLE vecs USING vec0(embedding float[2])", now;
+	db << "INSERT INTO vecs(rowid, embedding) VALUES(1, '[1.0, 0.0]')", now;
+
+	const MemoryDBInspector::Schema s = insp.schema();
+	const MemoryDBInspector::DatabaseInfo* main = nullptr;
+	for (const auto& d: s.databases) if (d.name == "main") main = &d;
+	assertTrue (main != nullptr);
+
+	const MemoryDBInspector::TableInfo* vecs = nullptr;
+	for (const auto& o: main->objects)
+	{
+		assertTrue (o.name.find("vecs_") != 0); // no shadow tables listed
+		if (o.name == "vecs") vecs = &o;
+	}
+	assertTrue (vecs != nullptr);
+	assertTrue (vecs->type == "virtual");
+	assertTrue (contains(vecs->sql, "vec0"));
+#else
+	std::cout << "sqlite-vec not enabled, test not executed." << std::endl;
+#endif
+}
+
+
 void MemoryDBInspectorTest::testSchemaRowCountsOmittedByDefault()
 {
 	MemoryDB db(_dir);
@@ -1038,6 +1069,7 @@ CppUnit::Test* MemoryDBInspectorTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBInspectorTest, testStatusShardsAndBytes);
 	CppUnit_addTest(pSuite, MemoryDBInspectorTest, testStatusAttachedFlag);
 	CppUnit_addTest(pSuite, MemoryDBInspectorTest, testSchemaTablesColumnsIndexes);
+	CppUnit_addTest(pSuite, MemoryDBInspectorTest, testSchemaVirtualTables);
 	CppUnit_addTest(pSuite, MemoryDBInspectorTest, testSchemaRowCountsOmittedByDefault);
 	CppUnit_addTest(pSuite, MemoryDBInspectorTest, testSchemaSpansAttachedShards);
 	CppUnit_addTest(pSuite, MemoryDBInspectorTest, testRowCountOnDemand);

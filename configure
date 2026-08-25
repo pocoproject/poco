@@ -90,6 +90,16 @@ $(ls -C "$base"/build/config/)
     Compile with -DPOCO_DATA_SQLITE_FTS.
     Compile SQLite with Full Text Search support.
 
+  --sqlite-vec
+    Build the bundled sqlite-vec extension (vector search) into
+    Data/SQLite and register it for all SQLite sessions.
+
+  --sqlite-vec-avx
+    Compile sqlite-vec with AVX2 SIMD kernels (-mavx -mavx2).
+    In the make build the flags apply to the whole PocoDataSQLite
+    library, which then requires an AVX2-capable x86-64 CPU.
+    Ignored on other architectures. Implies --sqlite-vec.
+
   --sqlite-thread-safe=<value>
     Compile with -DSQLITE_THREADSAFE=<value>.
     Valid values are:
@@ -180,6 +190,8 @@ odbcinclude=""
 mssqlinclude=""
 unbundled=""
 trace=""
+sqlitevec=""
+sqlitevecavx=""
 static=""
 shared=""
 nosqlparser=
@@ -277,6 +289,13 @@ while [ $# -ge 1 ]; do
 
 	--sqlite-fts)
 		flags="$flags -DSQLITE_ENABLE_FTS5" ;;
+
+	--sqlite-vec)
+		sqlitevec=1 ;;
+
+	--sqlite-vec-avx)
+		sqlitevec=1
+		sqlitevecavx=1 ;;
 
 	--poquito)
 		flags="$flags -DPOCO_NO_FILECHANNEL -DPOCO_NO_SPLITTERCHANNEL -DPOCO_NO_SYSLOGCHANNEL -DPOCO_UTIL_NO_INIFILECONFIGURATION -DPOCO_UTIL_NO_JSONCONFIGURATION -DPOCO_UTIL_NO_XMLCONFIGURATION" ;;
@@ -415,6 +434,12 @@ fi
 if [ -n "$trace" ] ; then
 	echo "POCO_ENABLE_TRACE = 1" >>"$build"/config.make
 fi
+if [ -n "$sqlitevec" ] ; then
+	echo "POCO_ENABLE_SQLITE_VEC = 1" >>"$build"/config.make
+fi
+if [ -n "$sqlitevecavx" ] ; then
+	echo "POCO_ENABLE_SQLITE_VEC_AVX = 1" >>"$build"/config.make
+fi
 if [ -n "$linkmode" ] ; then
 	echo "LINKMODE = $linkmode" >>"$build"/config.make
 fi
@@ -471,6 +496,12 @@ if [ -n "$unbundled" ] ; then
 fi
 if [ -n "$trace" ] ; then
 	echo "export POCO_ENABLE_TRACE" >>"$build"/config.make
+fi
+if [ -n "$sqlitevec" ] ; then
+	echo "export POCO_ENABLE_SQLITE_VEC" >>"$build"/config.make
+fi
+if [ -n "$sqlitevecavx" ] ; then
+	echo "export POCO_ENABLE_SQLITE_VEC_AVX" >>"$build"/config.make
 fi
 if [ -n "$linkmode" ] ; then
 	echo "export LINKMODE" >>"$build"/config.make

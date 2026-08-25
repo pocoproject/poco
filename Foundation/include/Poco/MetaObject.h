@@ -54,20 +54,20 @@ public:
 	AbstractMetaObject(const AbstractMetaObject&) = delete;
 	AbstractMetaObject& operator=(const AbstractMetaObject&) = delete;
 
-	const char* name() const
+	[[nodiscard]] const char* name() const
 	{
 		return _name;
 	}
 
-	virtual B* create() const = 0;
+	[[nodiscard]] virtual B* create() const = 0;
 		/// Create a new instance of a class.
 		/// Cannot be used for singletons.
 
-	virtual B& instance() const = 0;
+	[[nodiscard]] virtual B& instance() const = 0;
 		/// Returns a reference to the only instance
 		/// of the class. Used for singletons only.
 
-	virtual bool canCreate() const = 0;
+	[[nodiscard]] virtual bool canCreate() const = 0;
 		/// Returns true iff the create method can be used
 		/// to create instances of the class.
 		/// Returns false if the class is a singleton.
@@ -103,7 +103,7 @@ public:
 		return pObject;
 	}
 
-	virtual bool isAutoDelete(B* pObject) const
+	[[nodiscard]] virtual bool isAutoDelete(B* pObject) const
 		/// Returns true if the object is owned
 		/// by meta object.
 		///
@@ -136,17 +136,17 @@ public:
 
 	~MetaObject() = default;
 
-	B* create() const
+	[[nodiscard]] B* create() const
 	{
 		return new C;
 	}
 
-	B& instance() const
+	[[nodiscard]] B& instance() const
 	{
 		throw InvalidAccessException("Not a singleton. Use create() to create instances of", this->name());
 	}
 
-	bool canCreate() const
+	[[nodiscard]] bool canCreate() const
 	{
 		return true;
 	}
@@ -166,22 +166,22 @@ public:
 
 	~MetaSingleton() = default;
 
-	B* create() const
+	[[nodiscard]] B* create() const
 	{
 		throw InvalidAccessException("Cannot create instances of a singleton class. Use instance() to obtain a", this->name());
 	}
 
-	bool canCreate() const
+	[[nodiscard]] bool canCreate() const
 	{
 		return false;
 	}
 
-	B& instance() const
+	[[nodiscard]] B& instance() const
 	{
 		return *_object.get();
 	}
 
-	bool isAutoDelete(B* /*pObject*/) const
+	[[nodiscard]] bool isAutoDelete([[maybe_unused]] B* pObject) const
 	{
 		return true;
 	}

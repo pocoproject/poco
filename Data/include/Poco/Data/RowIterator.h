@@ -23,6 +23,10 @@
 #include "Poco/Dynamic/Var.h"
 #include <iterator>
 #include <algorithm>
+#include <limits>
+
+
+POCO_CHECK_MINMAX_MACROS
 
 
 namespace Poco::Data {
@@ -41,7 +45,7 @@ public:
 	using pointer = Row*;
 	using reference = Row&;
 
-	static const std::size_t POSITION_END;
+	static constexpr std::size_t POSITION_END = std::numeric_limits<std::size_t>::max();
 		/// End position indicator.
 
 	RowIterator(RecordSet* pRecordSet, bool positionEnd);
@@ -64,10 +68,10 @@ public:
 	RowIterator& operator = (RowIterator&& other) noexcept;
 		/// Move assignment.
 
-	bool operator == (const RowIterator& other) const;
+	[[nodiscard]] bool operator == (const RowIterator& other) const;
 		/// Equality operator.
 
-	bool operator != (const RowIterator& other) const;
+	[[nodiscard]] bool operator != (const RowIterator& other) const;
 		/// Inequality operator.
 
 	Row& operator * () const;
@@ -142,7 +146,7 @@ inline bool RowIterator::operator != (const RowIterator& other) const
 
 namespace std
 {
-	template<>
+	template <>
 	inline void swap<Poco::Data::RowIterator>(Poco::Data::RowIterator& s1, Poco::Data::RowIterator& s2) noexcept
 		/// Full template specalization of std:::swap for RowIterator
 	{

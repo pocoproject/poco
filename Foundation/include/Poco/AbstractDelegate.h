@@ -41,16 +41,16 @@ public:
 		/// Returns true if successful, or false if the delegate
 		/// has been disabled or has expired.
 
-	virtual bool equals(const AbstractDelegate& other) const = 0;
+	[[nodiscard]] virtual bool equals(const AbstractDelegate& other) const = 0;
 		/// Compares the AbstractDelegate with the other one for equality.
 
-	virtual AbstractDelegate* clone() const = 0;
+	[[nodiscard]] virtual AbstractDelegate* clone() const = 0;
 		/// Returns a deep copy of the AbstractDelegate.
 
 	virtual void disable() = 0;
 		/// Disables the delegate, which is done prior to removal.
 
-	virtual const AbstractDelegate* unwrap() const
+	[[nodiscard]] virtual const AbstractDelegate* unwrap() const
 		/// Returns the unwrapped delegate. Must be overridden by decorators
 		/// like Expire.
 	{
@@ -76,16 +76,16 @@ public:
 		/// Returns true if successful, or false if the delegate
 		/// has been disabled or has expired.
 
-	virtual bool equals(const AbstractDelegate& other) const = 0;
+	[[nodiscard]] virtual bool equals(const AbstractDelegate& other) const = 0;
 		/// Compares the AbstractDelegate with the other one for equality.
 
-	virtual AbstractDelegate* clone() const = 0;
+	[[nodiscard]] virtual AbstractDelegate* clone() const = 0;
 		/// Returns a deep copy of the AbstractDelegate.
 
 	virtual void disable() = 0;
 		/// Disables the delegate, which is done prior to removal.
 
-	virtual const AbstractDelegate* unwrap() const
+	[[nodiscard]] virtual const AbstractDelegate* unwrap() const
 		/// Returns the unwrapped delegate. Must be overridden by decorators
 		/// like Expire.
 	{

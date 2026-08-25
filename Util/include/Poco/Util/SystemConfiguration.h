@@ -63,7 +63,7 @@ public:
 		/// Creates the SystemConfiguration.
 
 protected:
-	bool getRaw(const std::string& key, std::string& value) const override;
+	[[nodiscard]] bool getRaw(const std::string& key, std::string& value) const override;
 	void setRaw(const std::string& key, const std::string& value) override;
 	void enumerate(const std::string& key, Keys& range) const override;
 	void removeRaw(const std::string& key) override;
@@ -71,8 +71,8 @@ protected:
 	~SystemConfiguration();
 
 private:
-	static bool getEnv(const std::string& name, std::string& value);
-	static std::string getNodeId();
+	[[nodiscard]] static bool getEnv(const std::string& name, std::string& value);
+	[[nodiscard]] static std::string getNodeId();
 
 	using SystemProperty = std::function<std::string ()>;
 	static std::map<std::string, SystemProperty> _functions;

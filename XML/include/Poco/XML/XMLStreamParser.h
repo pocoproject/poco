@@ -107,12 +107,12 @@ public:
 		/// If both receive_attributes_event and RECEIVE_ATTRIBUTE_MAP are
 		/// specified, then RECEIVE_ATTRIBUTES_EVENT is assumed.
 
-	static const FeatureType RECEIVE_ELEMENTS = 0x0001;
-	static const FeatureType RECEIVE_CHARACTERS = 0x0002;
-	static const FeatureType RECEIVE_ATTRIBUTE_MAP = 0x0004;
-	static const FeatureType RECEIVE_ATTRIBUTES_EVENT = 0x0008;
-	static const FeatureType RECEIVE_NAMESPACE_DECLS = 0x0010;
-	static const FeatureType RECEIVE_DEFAULT = RECEIVE_ELEMENTS | RECEIVE_CHARACTERS | RECEIVE_ATTRIBUTE_MAP;
+	static constexpr FeatureType RECEIVE_ELEMENTS = 0x0001;
+	static constexpr FeatureType RECEIVE_CHARACTERS = 0x0002;
+	static constexpr FeatureType RECEIVE_ATTRIBUTE_MAP = 0x0004;
+	static constexpr FeatureType RECEIVE_ATTRIBUTES_EVENT = 0x0008;
+	static constexpr FeatureType RECEIVE_NAMESPACE_DECLS = 0x0010;
+	static constexpr FeatureType RECEIVE_DEFAULT = RECEIVE_ELEMENTS | RECEIVE_CHARACTERS | RECEIVE_ATTRIBUTE_MAP;
 
 	struct AttributeValueType
 	{
@@ -146,13 +146,13 @@ public:
 			return *this;
 		}
 
-		bool operator == (Iterator y) const
+		[[nodiscard]] bool operator == (Iterator y) const
 			/// Comparison only makes sense when comparing to end (eof).
 		{
 			return _e == EV_EOF && y._e == EV_EOF;
 		}
 
-		bool operator != (Iterator y) const
+		[[nodiscard]] bool operator != (Iterator y) const
 			/// Comparison only makes sense when comparing to end (eof).
 		{
 			return !(*this == y);
@@ -163,12 +163,12 @@ public:
 		EventType _e;
 	};
 
-	Iterator begin()
+	[[nodiscard]] Iterator begin()
 	{
 		return Iterator(this, next());
 	}
 
-	Iterator end()
+	[[nodiscard]] Iterator end()
 	{
 		return Iterator(this, EV_EOF);
 	}
@@ -203,38 +203,39 @@ public:
 	void nextExpect(EventType, const QName& qname);
 	void nextExpect(EventType, const std::string& ns, const std::string& name);
 
-	EventType peek();
-	EventType event();
+	[[nodiscard]] EventType peek();
+	[[nodiscard]] EventType event();
 		/// Return the event that was last returned by the call to next() or peek().
 
-	const std::string& inputName() const;
-	const QName& getQName() const;
-	const std::string& namespaceURI() const;
-	const std::string& localName() const;
-	const std::string& prefix() const;
-	std::string& value();
-	const std::string& value() const;
-	template <typename T> T value() const;
-	Poco::UInt64 line() const;
-	Poco::UInt64 column() const;
-	const std::string& attribute(const std::string& name) const;
+	[[nodiscard]] const std::string& inputName() const;
+	[[nodiscard]] const QName& getQName() const;
+	[[nodiscard]] const std::string& namespaceURI() const;
+	[[nodiscard]] const std::string& localName() const;
+	[[nodiscard]] const std::string& prefix() const;
+	[[nodiscard]] std::string& value();
+	[[nodiscard]] const std::string& value() const;
 	template <typename T>
-	T attribute(const std::string& name) const;
-	std::string attribute(const std::string& name, const std::string& deflt) const;
+	[[nodiscard]] T value() const;
+	[[nodiscard]] Poco::UInt64 line() const;
+	[[nodiscard]] Poco::UInt64 column() const;
+	[[nodiscard]] const std::string& attribute(const std::string& name) const;
 	template <typename T>
-	T attribute(const std::string& name, const T& deflt) const;
-	const std::string& attribute(const QName& qname) const;
+	[[nodiscard]] T attribute(const std::string& name) const;
+	[[nodiscard]] std::string attribute(const std::string& name, const std::string& deflt) const;
 	template <typename T>
-	T attribute(const QName& qname) const;
-	std::string attribute(const QName& qname, const std::string& deflt) const;
+	[[nodiscard]] T attribute(const std::string& name, const T& deflt) const;
+	[[nodiscard]] const std::string& attribute(const QName& qname) const;
 	template <typename T>
-	T attribute(const QName& qname, const T& deflt) const;
-	bool attributePresent(const std::string& name) const;
-	bool attributePresent(const QName& qname) const;
-	const AttributeMapType& attributeMap() const;
+	[[nodiscard]] T attribute(const QName& qname) const;
+	[[nodiscard]] std::string attribute(const QName& qname, const std::string& deflt) const;
+	template <typename T>
+	[[nodiscard]] T attribute(const QName& qname, const T& deflt) const;
+	[[nodiscard]] bool attributePresent(const std::string& name) const;
+	[[nodiscard]] bool attributePresent(const QName& qname) const;
+	[[nodiscard]] const AttributeMapType& attributeMap() const;
 
 	void content(Content);
-	Content content() const;
+	[[nodiscard]] Content content() const;
 
 	void nextExpect(EventType, const std::string& name, Content);
 	void nextExpect(EventType, const QName& qname, Content);
@@ -246,22 +247,22 @@ public:
 	//
 	// Note also that as with attribute(), there is no (namespace,name)
 	// overload since it would conflicts with (namespace,deflt).
-	std::string element();
+	[[nodiscard]] std::string element();
 
 	template <typename T>
-	T element();
-	std::string element(const std::string& name);
-	std::string element(const QName& qname);
+	[[nodiscard]] T element();
+	[[nodiscard]] std::string element(const std::string& name);
+	[[nodiscard]] std::string element(const QName& qname);
 	template <typename T>
-	T element(const std::string& name);
+	[[nodiscard]] T element(const std::string& name);
 	template <typename T>
-	T element(const QName& qname);
-	std::string element(const std::string& name, const std::string& deflt);
-	std::string element(const QName& qname, const std::string& deflt);
+	[[nodiscard]] T element(const QName& qname);
+	[[nodiscard]] std::string element(const std::string& name, const std::string& deflt);
+	[[nodiscard]] std::string element(const QName& qname, const std::string& deflt);
 	template <typename T>
-	T element(const std::string& name, const T& deflt);
+	[[nodiscard]] T element(const std::string& name, const T& deflt);
 	template <typename T>
-	T element(const QName& qname, const T& deflt);
+	[[nodiscard]] T element(const QName& qname, const T& deflt);
 
 private:
 	XMLStreamParser(const XMLStreamParser&);
@@ -274,8 +275,8 @@ private:
 	static void handleEndNamespaceDecl(void*, const XMLChar*);
 
 	void init();
-	EventType nextImpl(bool peek);
-	EventType nextBody();
+	[[nodiscard]] EventType nextImpl(bool peek);
+	[[nodiscard]] EventType nextBody();
 	void handleError();
 
 #ifndef POCO_DOC
@@ -346,8 +347,8 @@ private:
 
 	const AttributeMapType _emptyAttrMap;
 
-	const ElementEntry* getElement() const;
-	const ElementEntry* getElementImpl() const;
+	[[nodiscard]] const ElementEntry* getElement() const;
+	[[nodiscard]] const ElementEntry* getElementImpl() const;
 	void popElement();
 };
 
@@ -574,7 +575,7 @@ inline T XMLStreamParser::element(const std::string& n, const T& dv)
 }
 
 
-inline void XMLStreamParser::content(Content c)
+inline void XMLStreamParser::content([[maybe_unused]] Content c)
 {
 	poco_assert(_parserState == state_next);
 

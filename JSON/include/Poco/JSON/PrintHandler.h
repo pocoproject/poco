@@ -35,7 +35,7 @@ class JSON_API PrintHandler: public Handler
 public:
 	using Ptr = SharedPtr<PrintHandler>;
 
-	static const unsigned JSON_PRINT_FLAT = 0;
+	static constexpr unsigned JSON_PRINT_FLAT = 0;
 
 	PrintHandler(unsigned indent = 0, int options = Poco::JSON_WRAP_STRINGS);
 		/// Creates the PrintHandler.
@@ -102,11 +102,11 @@ public:
 		/// Sets indentation.
 
 private:
-	const char* endLine() const;
-	unsigned indent();
-	bool printFlat() const;
+	[[nodiscard]] const char* endLine() const;
+	[[nodiscard]] unsigned int indent();
+	[[nodiscard]] bool printFlat() const;
 	void arrayValue();
-	bool array() const;
+	[[nodiscard]] bool array() const;
 
 	std::ostream& _out;
 	unsigned      _indent;

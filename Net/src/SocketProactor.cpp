@@ -17,12 +17,6 @@
 #include "Poco/Net/DatagramSocketImpl.h"
 #include "Poco/Thread.h"
 #include "Poco/Exception.h"
-#ifdef POCO_OS_FAMILY_WINDOWS
-#ifdef max
-#undef max
-#endif // max
-#endif // POCO_OS_FAMILY_WINDOWS
-#include <limits>
 
 
 using Poco::Exception;
@@ -223,9 +217,6 @@ private:
 //
 // SocketProactor
 //
-
-const Timestamp::TimeDiff SocketProactor::PERMANENT_COMPLETION_HANDLER =
-	std::numeric_limits<Timestamp::TimeDiff>::max();
 
 
 SocketProactor::SocketProactor(bool worker):

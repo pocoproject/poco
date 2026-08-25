@@ -45,7 +45,7 @@ public:
 		/// for the current part, enabling bulk-read optimization.
 
 	~MultipartStreamBuf();
-	bool lastPart() const;
+	[[nodiscard]] bool lastPart() const;
 
 protected:
 	std::streamsize readFromDevice(char* buffer, std::streamsize length);
@@ -82,8 +82,8 @@ public:
 	MultipartIOS(std::istream& istr, const std::string& boundary);
 	MultipartIOS(std::istream& istr, const std::string& boundary, std::streamsize contentLength);
 	~MultipartIOS();
-	MultipartStreamBuf* rdbuf();
-	bool lastPart() const;
+	[[nodiscard]] MultipartStreamBuf* rdbuf();
+	[[nodiscard]] bool lastPart() const;
 
 protected:
 	MultipartStreamBuf _buf;
@@ -144,13 +144,13 @@ public:
 		/// available, or if no boundary line can be found in
 		/// the input stream.
 
-	bool hasNextPart();
+	[[nodiscard]] bool hasNextPart();
 		/// Returns true iff more parts are available.
 		///
 		/// Before the first call to nextPart(), returns
 		/// always true.
 
-	std::istream& stream() const;
+	[[nodiscard]] std::istream& stream() const;
 		/// Returns a reference to the reader's stream that
 		/// can be used to read the current part.
 		///
@@ -158,14 +158,14 @@ public:
 		/// nextPart() is called or the MultipartReader
 		/// object is destroyed.
 
-	const std::string& boundary() const;
+	[[nodiscard]] const std::string& boundary() const;
 		/// Returns the multipart boundary used by this reader.
 
 protected:
 	void findFirstBoundary();
 	void guessBoundary();
 	void parseHeader(MessageHeader& messageHeader);
-	bool readLine(std::string& line, std::string::size_type n);
+	[[nodiscard]] bool readLine(std::string& line, std::string::size_type n);
 
 	MultipartReader() = delete;
 	MultipartReader(const MultipartReader&) = delete;

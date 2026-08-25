@@ -23,9 +23,6 @@ using namespace std::string_literals;
 namespace Poco::MongoDB {
 
 
-const Poco::Int64 ReadPreference::NO_MAX_STALENESS;
-
-
 ReadPreference::ReadPreference(Mode mode):
 	_mode(mode)
 {

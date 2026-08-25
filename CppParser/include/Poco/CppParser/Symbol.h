@@ -68,13 +68,13 @@ public:
 	virtual ~Symbol();
 		/// Destroys the Symbol.
 
-	int id() const;
+	[[nodiscard]] int id() const;
 		/// Returns the symbol's unique ID.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns the symbol's (local) name.
 
-	NameSpace* nameSpace() const;
+	[[nodiscard]] NameSpace* nameSpace() const;
 		/// Returns the symbol's namespace which
 		/// may be null.
 
@@ -87,7 +87,7 @@ public:
 	void setAttributeList(const std::string& attrs);
 		/// Sets the C++11 attribute list, e.g. "[[noreturn]]".
 
-	const std::string& getAttributeList() const;
+	[[nodiscard]] const std::string& getAttributeList() const;
 		/// Returns the C++11 attribute list, or an empty string
 		/// if the symbol does not have one.
 
@@ -97,31 +97,31 @@ public:
 	void addDocumentation(const std::string& text);
 		/// Adds text to the symbol's documentation.
 
-	const std::string& getDocumentation() const;
+	[[nodiscard]] const std::string& getDocumentation() const;
 		/// Returns the symbol's documentation.
 
 	void setFile(const std::string& path);
 		/// Sets the file where the symbol is declared.
 
-	const std::string& getFile() const;
+	[[nodiscard]] const std::string& getFile() const;
 		/// Returns the file where the symbol is defined.
 
 	void setLineNumber(int line);
 		/// Sets the line number of the symbol's declaration.
 
-	int getLineNumber() const;
+	[[nodiscard]] int getLineNumber() const;
 		/// Returns the line number of the symbol's declaration.
 
 	void setPackage(const std::string& package);
 		/// Sets the symbol's package.
 
-	const std::string& getPackage() const;
+	[[nodiscard]] const std::string& getPackage() const;
 		/// Returns the symbol's package.
 
 	void setLibrary(const std::string& library);
 		/// Sets the symbol's library.
 
-	const std::string& getLibrary() const;
+	[[nodiscard]] const std::string& getLibrary() const;
 		/// Returns the symbol's library.
 
 	void setOrder(std::size_t order);
@@ -129,13 +129,13 @@ public:
 		///
 		/// Currently only used for struct/class members.
 
-	std::size_t getOrder() const;
+	[[nodiscard]] std::size_t getOrder() const;
 		/// Returns the order of the symbol within its container.
 
-	const Attributes& attrs() const;
+	[[nodiscard]] const Attributes& attrs() const;
 		/// Returns the symbol's attributes.
 
-	Attributes& attrs();
+	[[nodiscard]] Attributes& attrs();
 		/// Returns the symbol's attributes.
 
 	const Attributes& getAttributes() const;
@@ -144,30 +144,30 @@ public:
 	void setAttributes(const Attributes& attrs);
 		/// Sets the symbol's attributes.
 
-	std::string fullName() const;
+	[[nodiscard]] std::string fullName() const;
 		/// Returns the symbol's fully qualified name.
 
-	static std::string extractName(const std::string& decl);
+	[[nodiscard]] static std::string extractName(const std::string& decl);
 		/// Extracts the name from the declaration.
 
-	virtual Kind kind() const = 0;
+	[[nodiscard]] virtual Kind kind() const = 0;
 		/// Returns the symbol's kind.
 
-	virtual std::string toString() const = 0;
+	[[nodiscard]] virtual std::string toString() const = 0;
 		/// Returns a string representation of the symbol.
 
-	bool isPublic() const;
+	[[nodiscard]] bool isPublic() const;
 		/// Returns true iff the symbol is public.
 
-	bool isProtected() const;
+	[[nodiscard]] bool isProtected() const;
 		/// Returns true iff the symbol is public.
 
-	bool isPrivate() const;
+	[[nodiscard]] bool isPrivate() const;
 		/// Returns true iff the symbol is public.
 
 protected:
-	static bool isIdent(char c);
-	static bool hasAttr(const std::string& decl, const std::string& attr);
+	[[nodiscard]] static bool isIdent(char c);
+	[[nodiscard]] static bool hasAttr(const std::string& decl, const std::string& attr);
 
 private:
 	Symbol(const Symbol&);

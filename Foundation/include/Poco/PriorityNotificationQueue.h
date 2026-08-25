@@ -75,7 +75,7 @@ public:
 		///     notificationQueue.enqueueNotification(new MyNotification, 1);
 		/// does not result in a memory leak.
 
-	Notification* dequeueNotification();
+	[[nodiscard]] Notification* dequeueNotification();
 		/// Dequeues the next pending notification.
 		/// Returns 0 (null) if no notification is available.
 		/// The caller gains ownership of the notification and
@@ -85,7 +85,7 @@ public:
 		/// assigned to a Notification::Ptr, to avoid potential
 		/// memory management issues.
 
-	Notification* waitDequeueNotification();
+	[[nodiscard]] Notification* waitDequeueNotification();
 		/// Dequeues the next pending notification.
 		/// If no notification is available, waits for a notification
 		/// to be enqueued.
@@ -98,7 +98,7 @@ public:
 		/// assigned to a Notification::Ptr, to avoid potential
 		/// memory management issues.
 
-	Notification* waitDequeueNotification(long milliseconds);
+	[[nodiscard]] Notification* waitDequeueNotification(long milliseconds);
 		/// Dequeues the next pending notification.
 		/// If no notification is available, waits for a notification
 		/// to be enqueued up to the specified time.
@@ -117,16 +117,16 @@ public:
 	void wakeUpAll();
 		/// Wakes up all threads that wait for a notification.
 
-	bool empty() const;
+	[[nodiscard]] bool empty() const;
 		/// Returns true iff the queue is empty.
 
-	int size() const;
+	[[nodiscard]] int size() const;
 		/// Returns the number of notifications in the queue.
 
 	void clear();
 		/// Removes all notifications from the queue.
 
-	bool hasIdleThreads() const;
+	[[nodiscard]] bool hasIdleThreads() const;
 		/// Returns true if the queue has at least one thread waiting
 		/// for a notification.
 

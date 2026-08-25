@@ -21,9 +21,6 @@
 namespace Poco::Zip {
 
 
-const char ZipDataInfo::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x07', '\x08'};
-
-
 ZipDataInfo::ZipDataInfo():
 	_rawInfo(),
 	_valid(true)
@@ -59,9 +56,6 @@ ZipDataInfo::ZipDataInfo(std::istream& in, bool assumeHeaderRead):
 ZipDataInfo::~ZipDataInfo()
 {
 }
-
-
-const char ZipDataInfo64::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x07', '\x08'};
 
 
 ZipDataInfo64::ZipDataInfo64():

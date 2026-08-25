@@ -42,17 +42,17 @@ class Foundation_API Environment
 public:
 	using NodeId = UInt8[6]; /// Ethernet address.
 
-	static std::string get(const std::string& name);
+	[[nodiscard]] static std::string get(const std::string& name);
 		/// Returns the value of the environment variable
 		/// with the given name. Throws a NotFoundException
 		/// if the variable does not exist.
 
-	static std::string get(const std::string& name, const std::string& defaultValue);
+	[[nodiscard]] static std::string get(const std::string& name, const std::string& defaultValue);
 		/// Returns the value of the environment variable
 		/// with the given name. If the environment variable
 		/// is undefined, returns defaultValue instead.
 
-	static bool has(const std::string& name);
+	[[nodiscard]] static bool has(const std::string& name);
 		/// Returns true iff an environment variable
 		/// with the given name is defined.
 
@@ -60,10 +60,10 @@ public:
 		/// Sets the environment variable with the given name
 		/// to the given value.
 
-	static std::string osName();
+	[[nodiscard]] static std::string osName();
 		/// Returns the operating system name.
 
-	static std::string osDisplayName();
+	[[nodiscard]] static std::string osDisplayName();
 		/// Returns the operating system name in a
 		/// "user-friendly" way.
 		///
@@ -73,13 +73,13 @@ public:
 		/// On other platforms, returns the same as
 		/// osName().
 
-	static std::string osVersion();
+	[[nodiscard]] static std::string osVersion();
 		/// Returns the operating system version.
 
-	static std::string osArchitecture();
+	[[nodiscard]] static std::string osArchitecture();
 		/// Returns the operating system architecture.
 
-	static std::string nodeName();
+	[[nodiscard]] static std::string nodeName();
 		/// Returns the node (or host) name.
 
 	static void nodeId(NodeId& id);
@@ -88,18 +88,18 @@ public:
 		///
 		/// Throws a SystemException if no Ethernet adapter is available.
 
-	static std::string nodeId();
+	[[nodiscard]] static std::string nodeId();
 		/// Returns the Ethernet address (format "xx:xx:xx:xx:xx:xx")
 		/// of the first Ethernet adapter found on the system.
 		///
 		/// Throws a SystemException if no Ethernet adapter is available.
 
-	static unsigned processorCount();
+	[[nodiscard]] static unsigned int processorCount();
 		/// Returns the number of processors installed in the system.
 		///
 		/// If the number of processors cannot be determined, returns 1.
 
-	static Poco::UInt32 libraryVersion();
+	[[nodiscard]] static Poco::UInt32 libraryVersion();
 		/// Returns the POCO C++ Libraries version as a hexadecimal
 		/// number in format 0xAABBCCDD, where
 		///    - AA is the major version number,
@@ -112,18 +112,18 @@ public:
 		///    - Ax mark alpha releases, and
 		///    - Bx mark beta releases.
 
-	static Poco::Int32 os();
+	[[nodiscard]] static Poco::Int32 os();
 		/// Return the operating system as defined
 		/// in the include Foundation/Platform.h (POCO_OS)
 
-	static Poco::Int32 arch();
+	[[nodiscard]] static Poco::Int32 arch();
 		/// Return the underlying cpu architecture that runs this operating system
 		/// as defined in Foundation/Platform (POCO_ARCH)
 
-	static bool isUnix();
+	[[nodiscard]] static bool isUnix();
 		/// Return true if the operating system belongs to the Linux family
 
-	static bool isWindows();
+	[[nodiscard]] static bool isWindows();
 		/// Return true if the operating system belongs to the Windows family
 };
 

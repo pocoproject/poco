@@ -233,7 +233,7 @@ void HTTPRequest::write(std::ostream& ostr) const
 
 void HTTPRequest::read(std::istream& istr)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	std::string method;
 	std::string uri;

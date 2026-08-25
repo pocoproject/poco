@@ -14,6 +14,10 @@ ifndef POCO_DATA_NO_SQL_PARSER
 	objects += MemoryDBTest MemoryDBInspectorTest
 endif
 
+ifdef POCO_ENABLE_SQLITE_VEC
+	SYSFLAGS += -DPOCO_ENABLE_SQLITE_VEC
+endif
+
 target         = testrunner
 target_version = 1
 target_libs    = PocoDataSQLite PocoData PocoFoundation CppUnit

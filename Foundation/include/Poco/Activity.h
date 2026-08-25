@@ -163,13 +163,13 @@ public:
 		}
 	}
 
-	bool isStopped() const
+	[[nodiscard]] bool isStopped() const
 		/// Returns true if the activity has been requested to stop.
 	{
 		return _stopped;
 	}
 
-	bool isRunning() const
+	[[nodiscard]] bool isRunning() const
 		/// Returns true if the activity is running.
 	{
 		return _running;

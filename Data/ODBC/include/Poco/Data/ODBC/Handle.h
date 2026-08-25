@@ -23,7 +23,7 @@
 #include "Poco/Data/ODBC/ODBCException.h"
 #include "Poco/Data/ODBC/Utility.h"
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 #include <sqltypes.h>
 
@@ -66,19 +66,19 @@ public:
 		}
 	}
 
-	operator const H& () const
+	[[nodiscard]] operator const H& () const
 		/// Const conversion operator into reference to native type.
 	{
 		return handle();
 	}
 
-	const H& handle() const
+	[[nodiscard]] const H& handle() const
 		/// Returns const reference to native type.
 	{
 		return _handle;
 	}
 
-	const ConnectionHandle& connection() const
+	[[nodiscard]] const ConnectionHandle& connection() const
 		/// Returns the connection handle.
 	{
 		return _rConnection;
@@ -88,13 +88,13 @@ private:
 	Handle(const Handle&) = delete;
 	const Handle& operator=(const Handle&) = delete;
 
-	operator H& ()
+	[[nodiscard]] operator H& ()
 		/// Conversion operator into reference to native type.
 	{
 		return handle();
 	}
 
-	H& handle()
+	[[nodiscard]] H& handle()
 		/// Returns reference to native type.
 	{
 		return _handle;

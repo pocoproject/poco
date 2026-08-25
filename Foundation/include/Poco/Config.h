@@ -235,6 +235,21 @@
 	#define POCO_DEPRECATED(reason)
 #endif
 
+// [[nodiscard]] on constructors (C++20, P1771). Used to flag discarded
+// temporaries of RAII types (scoped locks, transactions etc.).
+// Note that [[nodiscard]] cannot be applied to the class itself when the
+// class also carries an export/visibility attribute (eg. Foundation_API),
+// because GCC does not allow standard and GNU attributes to be mixed in a
+// class head; annotate the constructors with POCO_NODISCARD_CTOR instead.
+#if defined(__has_cpp_attribute)
+	#if __has_cpp_attribute(nodiscard) >= 201907L
+		#define POCO_NODISCARD_CTOR [[nodiscard]]
+	#endif
+#endif
+#ifndef POCO_NODISCARD_CTOR
+	#define POCO_NODISCARD_CTOR
+#endif
+
 // Uncomment to explicitly disable SQLParser
 // #define POCO_DATA_NO_SQL_PARSER
 

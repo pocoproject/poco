@@ -214,7 +214,7 @@ void LinearHashTableTest::testPerformanceInt()
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
-			lht.find(i);
+			(void) lht.find(i);
 		}
 		sw.stop();
 		std::cout << "Find LHT: " << sw.elapsedSeconds() << std::endl;
@@ -236,7 +236,7 @@ void LinearHashTableTest::testPerformanceInt()
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
-			ht.exists(i);
+			(void) ht.exists(i);
 		}
 		sw.stop();
 		std::cout << "Find HT: " << sw.elapsedSeconds() << std::endl;
@@ -292,7 +292,7 @@ void LinearHashTableTest::testPerformanceStr()
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
-			lht.find(values[i]);
+			(void) lht.find(values[i]);
 		}
 		sw.stop();
 		std::cout << "Find LHT: " << sw.elapsedSeconds() << std::endl;
@@ -314,7 +314,7 @@ void LinearHashTableTest::testPerformanceStr()
 		sw.start();
 		for (int i = 0; i < N; ++i)
 		{
-			ht.exists(values[i]);
+			(void) ht.exists(values[i]);
 		}
 		sw.stop();
 		std::cout << "Find HT: " << sw.elapsedSeconds() << std::endl;

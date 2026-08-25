@@ -118,24 +118,24 @@ public:
 		/// Throws a RegularExpressionException in case of an error.
 		/// Returns the number of matches.
 
-	bool match(const std::string& subject, std::string::size_type offset = 0) const;
+	[[nodiscard]] bool match(const std::string& subject, std::string::size_type offset = 0) const;
 		/// Returns true if and only if the subject matches the regular expression.
 		///
 		/// Internally, this method sets the RE_ANCHORED and RE_NOTEMPTY options for
 		/// matching, which means that the empty string will never match and
 		/// the pattern is treated as if it starts with a ^.
 
-	bool match(const std::string& subject, std::string::size_type offset, int options) const;
+	[[nodiscard]] bool match(const std::string& subject, std::string::size_type offset, int options) const;
 		/// Returns true if and only if the subject matches the regular expression.
 
-	bool operator == (const std::string& subject) const;
+	[[nodiscard]] bool operator == (const std::string& subject) const;
 		/// Returns true if and only if the subject matches the regular expression.
 		///
 		/// Internally, this method sets the RE_ANCHORED and RE_NOTEMPTY options for
 		/// matching, which means that the empty string will never match and
 		/// the pattern is treated as if it starts with a ^.
 
-	bool operator != (const std::string& subject) const;
+	[[nodiscard]] bool operator != (const std::string& subject) const;
 		/// Returns true if and only if the subject does not match the regular expression.
 		///
 		/// Internally, this method sets the RE_ANCHORED and RE_NOTEMPTY options for
@@ -190,7 +190,7 @@ public:
 		/// $0 is the captured substring. $1 ... $n are the substrings matching the subpatterns.
 		/// Returns the number of replaced occurrences.
 
-	static bool match(const std::string& subject, const std::string& pattern, int options = 0);
+	[[nodiscard]] static bool match(const std::string& subject, const std::string& pattern, int options = 0);
 		/// Matches the given subject string against the regular expression given in pattern,
 		/// using the given options.
 

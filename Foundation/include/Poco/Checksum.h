@@ -63,10 +63,10 @@ public:
 	void update(char data);
 		/// Updates the checksum with the given data.
 
-	Poco::UInt32 checksum() const;
+	[[nodiscard]] Poco::UInt32 checksum() const;
 		/// Returns the calculated checksum.
 
-	Type type() const;
+	[[nodiscard]] Type type() const;
 		/// Which type of checksum are we calulcating
 
 private:

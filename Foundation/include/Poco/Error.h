@@ -31,20 +31,20 @@ class Foundation_API Error
 public:
 
 #ifdef POCO_OS_FAMILY_WINDOWS
-	static DWORD last();
+	[[nodiscard]] static DWORD last();
 		/// Utility function returning the last error.
 
-	static std::string getMessage(DWORD errorCode);
+	[[nodiscard]] static std::string getMessage(DWORD errorCode);
 		/// Utility function translating numeric error code to string.
 #else
-	static int last();
+	[[nodiscard]] static int last();
 		/// Utility function returning the last error.
 
-	static std::string getMessage(int errorCode);
+	[[nodiscard]] static std::string getMessage(int errorCode);
 		/// Utility function translating numeric error code to string.
 #endif
 
-	static std::string getLastMessage();
+	[[nodiscard]] static std::string getLastMessage();
 		/// Utility function returning the last error message.
 };
 

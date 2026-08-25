@@ -65,7 +65,7 @@ public:
 	~TaskManager();
 		/// Destroys the TaskManager.
 
-	bool start(Task* pTask);
+	[[nodiscard]] bool start(Task* pTask);
 		/// Starts the given task in a thread obtained
 		/// from the thread pool; returns true if successful.
 		///
@@ -92,10 +92,10 @@ public:
 		/// facilities, these threads must also complete
 		/// before joinAll() can return.
 
-	TaskList taskList() const;
+	[[nodiscard]] TaskList taskList() const;
 		/// Returns a copy of the internal task list.
 
-	int count() const;
+	[[nodiscard]] int count() const;
 		/// Returns the number of tasks in the internal task list.
 
 	void addObserver(const AbstractObserver& observer);
@@ -107,7 +107,7 @@ public:
 	void removeObserver(const AbstractObserver& observer);
 		/// Unregisters an observer with the NotificationCenter.
 
-	static const int MIN_PROGRESS_NOTIFICATION_INTERVAL;
+	static constexpr int MIN_PROGRESS_NOTIFICATION_INTERVAL = 100000; // 100 milliseconds
 
 protected:
 	void postNotification(const Notification::Ptr& pNf);

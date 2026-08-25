@@ -65,7 +65,7 @@ public:
 	static const int OPERATION_DELETE;
 	static const int OPERATION_UPDATE;
 
-	static sqlite3* dbHandle(const Session& session);
+	[[nodiscard]] static sqlite3* dbHandle(const Session& session);
 		/// Returns native DB handle.
 
 	static int setAttachedLimit(Session& session, int newVal);
@@ -83,16 +83,16 @@ public:
 		/// hard ceiling 125); requests above the compile-time cap are
 		/// silently clamped to it by SQLite. Returns the previous value.
 
-	static std::string lastError(sqlite3* pDB);
+	[[nodiscard]] static std::string lastError(sqlite3* pDB);
 		/// Retreives the last error code from sqlite and converts it to a string.
 
-	static std::string lastError(const Session& session);
+	[[nodiscard]] static std::string lastError(const Session& session);
 		/// Retreives the last error code from sqlite and converts it to a string.
 
 	static void throwException(sqlite3* pDB, int rc, const std::string& addErrMsg = std::string());
 		/// Throws for an error code the appropriate exception
 
-	static MetaColumn::ColumnDataType getColumnType(sqlite3_stmt* pStmt, std::size_t pos);
+	[[nodiscard]] static MetaColumn::ColumnDataType getColumnType(sqlite3_stmt* pStmt, std::size_t pos);
 		/// Returns column data type.
 
 	static bool fileToMemory(sqlite3* pInMemory, const std::string& fileName);
@@ -119,7 +119,7 @@ public:
 		///
 		/// Returns true if succesful.
 
-	static bool isThreadSafe();
+	[[nodiscard]] static bool isThreadSafe();
 		/// Returns true if SQLite was compiled in multi-thread or serialized mode.
 		/// See http://www.sqlite.org/c3ref/threadsafe.html for details.
 		///
@@ -131,7 +131,7 @@ public:
 		///
 		/// Returns true if succesful
 
-	static int getThreadMode();
+	[[nodiscard]] static int getThreadMode();
 		/// Returns the thread mode.
 
 	typedef void(*UpdateCallbackType)(void*, int, const char*, const char*, long long);

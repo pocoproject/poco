@@ -62,10 +62,10 @@ public:
 	void flushToDisk();
 		/// Forces buffered data to be written to the disk
 
-	NativeHandle nativeHandle() const;
+	[[nodiscard]] NativeHandle nativeHandle() const;
 		/// Returns native file descriptor handle
 
-	Poco::UInt64 size() const;
+	[[nodiscard]] Poco::UInt64 size() const;
 		/// Returns file size
 
 protected:

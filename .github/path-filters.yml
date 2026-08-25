@@ -31,6 +31,8 @@ data:
   - 'Data/**'
   - 'Redis/**'
   - 'MongoDB/**'
+  - 'dependencies/sqlite3/**'
+  - 'dependencies/sqlite-vec/**'
 
 sqlparser:
   - 'Data/SQLParser/**'

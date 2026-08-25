@@ -180,10 +180,10 @@ public:
 	};
 
 	struct TableInfo
-		/// A table or a view; type says which.
+		/// A table, view or virtual table; type says which.
 	{
 		std::string             name;
-		std::string             type;        // "table" or "view"
+		std::string             type;        // "table", "view" or "virtual"
 		std::string             sql;         // DDL from sqlite_master
 		std::vector<ColumnInfo> columns;
 		std::vector<IndexInfo>  indexes;
@@ -262,7 +262,7 @@ public:
 		Poco::UInt64 count = 0;      // enforceRetention -> shards dropped
 	};
 
-	static const std::size_t DEFAULT_MAX_ROWS = 500;
+	static constexpr std::size_t DEFAULT_MAX_ROWS = 500;
 
 	MemoryDBInspector(MemoryDB& db, SQLPolicy policy = SQLPolicy::READ_ONLY);
 		/// Creates an inspector over db, which must outlive the inspector.

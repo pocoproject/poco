@@ -147,13 +147,13 @@ public:
 	void swap(LocalDateTime& dateTime);
 		/// Swaps the LocalDateTime with another one.
 
-	int year() const;
+	[[nodiscard]] int year() const;
 		/// Returns the year.
 
-	int month() const;
+	[[nodiscard]] int month() const;
 		/// Returns the month (1 to 12).
 
-	int week(int firstDayOfWeek = DateTime::MONDAY) const;
+	[[nodiscard]] int week(int firstDayOfWeek = DateTime::MONDAY) const;
 		/// Returns the week number within the year.
 		/// FirstDayOfWeek should be either SUNDAY (0) or MONDAY (1).
 		/// The returned week number will be from 0 to 53. Week number 1 is the week
@@ -166,62 +166,62 @@ public:
 		/// For 2007, which starts on a Monday, week 1 will be the week starting on Monday, January 1.
 		/// There will be no week 0 in 2007.
 
-	int day() const;
+	[[nodiscard]] int day() const;
 		/// Returns the day within the month (1 to 31).
 
-	int dayOfWeek() const;
+	[[nodiscard]] int dayOfWeek() const;
 		/// Returns the weekday (0 to 6, where
 		/// 0 = Sunday, 1 = Monday, ..., 6 = Saturday).
 
-	int dayOfYear() const;
+	[[nodiscard]] int dayOfYear() const;
 		/// Returns the number of the day in the year.
 		/// January 1 is 1, February 1 is 32, etc.
 
-	int hour() const;
+	[[nodiscard]] int hour() const;
 		/// Returns the hour (0 to 23).
 
-	int hourAMPM() const;
+	[[nodiscard]] int hourAMPM() const;
 		/// Returns the hour (0 to 12).
 
-	bool isAM() const;
+	[[nodiscard]] bool isAM() const;
 		/// Returns true if hour < 12;
 
-	bool isPM() const;
+	[[nodiscard]] bool isPM() const;
 		/// Returns true if hour >= 12.
 
-	int minute() const;
+	[[nodiscard]] int minute() const;
 		/// Returns the minute (0 to 59).
 
-	int second() const;
+	[[nodiscard]] int second() const;
 		/// Returns the second (0 to 59).
 
-	int millisecond() const;
+	[[nodiscard]] int millisecond() const;
 		/// Returns the millisecond (0 to 999)
 
-	int microsecond() const;
+	[[nodiscard]] int microsecond() const;
 		/// Returns the microsecond (0 to 999)
 
-	double julianDay() const;
+	[[nodiscard]] double julianDay() const;
 		/// Returns the Julian day for the date.
 
-	int tzd() const;
+	[[nodiscard]] int tzd() const;
 		/// Returns the time zone differential.
 
-	DateTime utc() const;
+	[[nodiscard]] DateTime utc() const;
 		/// Returns the UTC equivalent for the local date and time.
 
-	Timestamp timestamp() const;
+	[[nodiscard]] Timestamp timestamp() const;
 		/// Returns the date and time expressed as a Timestamp.
 
-	Timestamp::UtcTimeVal utcTime() const;
+	[[nodiscard]] Timestamp::UtcTimeVal utcTime() const;
 		/// Returns the UTC equivalent for the local date and time.
 
-	bool operator == (const LocalDateTime& dateTime) const;
-	bool operator != (const LocalDateTime& dateTime) const;
-	bool operator <  (const LocalDateTime& dateTime) const;
-	bool operator <= (const LocalDateTime& dateTime) const;
-	bool operator >  (const LocalDateTime& dateTime) const;
-	bool operator >= (const LocalDateTime& dateTime) const;
+	[[nodiscard]] bool operator == (const LocalDateTime& dateTime) const;
+	[[nodiscard]] bool operator != (const LocalDateTime& dateTime) const;
+	[[nodiscard]] bool operator <  (const LocalDateTime& dateTime) const;
+	[[nodiscard]] bool operator <= (const LocalDateTime& dateTime) const;
+	[[nodiscard]] bool operator >  (const LocalDateTime& dateTime) const;
+	[[nodiscard]] bool operator >= (const LocalDateTime& dateTime) const;
 
 	LocalDateTime  operator +  (const Timespan& span) const;
 	LocalDateTime  operator -  (const Timespan& span) const;

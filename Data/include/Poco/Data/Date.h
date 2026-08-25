@@ -59,13 +59,13 @@ public:
 	Date(const Date & ) = default;
 	Date(Date && ) = default;
 
-	int year() const;
+	[[nodiscard]] int year() const;
 		/// Returns the year.
 
-	int month() const;
+	[[nodiscard]] int month() const;
 		/// Returns the month.
 
-	int day() const;
+	[[nodiscard]] int day() const;
 		/// Returns the day.
 
 	void assign(int year, int month, int day);
@@ -80,16 +80,16 @@ public:
 	Date& operator = (const Poco::Dynamic::Var& var);
 		/// Assignment operator for Var.
 
-	bool operator == (const Date& date) const;
+	[[nodiscard]] bool operator == (const Date& date) const;
 		/// Equality operator.
 
-	bool operator != (const Date& date) const;
+	[[nodiscard]] bool operator != (const Date& date) const;
 		/// Inequality operator.
 
-	bool operator < (const Date& date) const;
+	[[nodiscard]] bool operator < (const Date& date) const;
 		/// Less then operator.
 
-	bool operator > (const Date& date) const;
+	[[nodiscard]] bool operator > (const Date& date) const;
 		/// Greater then operator.
 
 private:

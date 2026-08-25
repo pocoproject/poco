@@ -45,7 +45,7 @@ class Prometheus_API Collector
 	/// during the run time of the process.
 {
 public:
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns the metric's name.
 
 	virtual void exportTo(Exporter& exporter) const = 0;
@@ -69,7 +69,7 @@ protected:
 		/// The name must be a valid metric name and match the regular
 		/// expression [a-zA-Z_:][a-zA-Z0-9_:]*.
 
-	static const std::string& validateName(const std::string& name);
+	[[nodiscard]] static const std::string& validateName(const std::string& name);
 
 private:
 	const std::string _name;

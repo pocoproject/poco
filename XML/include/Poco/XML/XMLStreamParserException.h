@@ -34,11 +34,11 @@ public:
 	XMLStreamParserException(const XMLStreamParser&, const std::string& description);
 	virtual ~XMLStreamParserException() noexcept;
 
-	const char* name() const noexcept;
-	Poco::UInt64 line() const;
-	Poco::UInt64 column() const;
-	const std::string& description() const;
-	virtual const char* what() const noexcept;
+	[[nodiscard]] const char* name() const noexcept;
+	[[nodiscard]] Poco::UInt64 line() const;
+	[[nodiscard]] Poco::UInt64 column() const;
+	[[nodiscard]] const std::string& description() const;
+	[[nodiscard]] virtual const char* what() const noexcept;
 
 private:
 	void init();

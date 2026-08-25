@@ -284,7 +284,7 @@ protected:
 	}
 
 private:
-	static const std::size_t LOOK_STREAM_BUF_SIZE = (1 << 14); // 16 KB buffer
+	static constexpr std::size_t LOOK_STREAM_BUF_SIZE = (1 << 14); // 16 KB buffer
 	std::string _path;
 	Archive::EntryVec _entries;
 	CFileInStream _archiveStream;

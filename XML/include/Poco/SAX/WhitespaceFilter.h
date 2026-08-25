@@ -44,7 +44,7 @@ public:
 	// XMLReader
 	void setProperty(const XMLString& propertyId, const XMLString& value);
 	void setProperty(const XMLString& propertyId, void* value);
-	void* getProperty(const XMLString& propertyId) const;
+	[[nodiscard]] void* getProperty(const XMLString& propertyId) const;
 
 	// ContentHandler
 	void startDocument();

@@ -44,7 +44,7 @@
 
 
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #else
 #include <csignal>
 #endif

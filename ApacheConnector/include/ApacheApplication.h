@@ -31,10 +31,10 @@ public:
 		/// Initializes the application if called for the first
 		/// time; does nothing in later calls.
 
-	ApacheRequestHandlerFactory& factory();
+	[[nodiscard]] ApacheRequestHandlerFactory& factory();
 		/// Returns the ApacheRequestHandlerFactory.
 
-	static ApacheApplication& instance();
+	[[nodiscard]] static ApacheApplication& instance();
 		/// Returns the application instance.
 
 private:

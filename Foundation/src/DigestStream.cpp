@@ -18,9 +18,6 @@
 namespace Poco {
 
 
-const int DigestBuf::BUFFER_SIZE = 256;
-
-
 DigestBuf::DigestBuf(DigestEngine& eng):
 	BufferedStreamBuf(BUFFER_SIZE, std::ios::out),
 	_eng(eng),

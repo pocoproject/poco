@@ -46,13 +46,13 @@ public:
 	~StringPartSource();
 		/// Destroys the StringPartSource.
 
-	std::istream& stream();
+	[[nodiscard]] std::istream& stream();
 		/// Returns a string input stream for the string.
 
-	const std::string& filename() const;
+	[[nodiscard]] const std::string& filename() const;
 		/// Returns the filename portion of the path.
 
-	std::streamsize getContentLength() const;
+	[[nodiscard]] std::streamsize getContentLength() const;
 		/// Returns the string size.
 
 private:

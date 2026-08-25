@@ -59,31 +59,31 @@ public:
 	~PKCS12Container();
 		/// Destroys the PKCS12Container.
 
-	bool hasKey() const;
+	[[nodiscard]] bool hasKey() const;
 		/// Returns true if container contains the key.
 
-	EVPPKey getKey() const;
+	[[nodiscard]] EVPPKey getKey() const;
 		/// Return key as openssl EVP_PKEY wrapper object.
 
-	bool hasX509Certificate() const;
+	[[nodiscard]] bool hasX509Certificate() const;
 		/// Returns true if container has X509 certificate.
 
-	const X509Certificate& getX509Certificate() const;
+	[[nodiscard]] const X509Certificate& getX509Certificate() const;
 		/// Returns the X509 certificate.
 		/// Throws NotFoundException if there is no certificate.
 
-	const CAList& getCACerts() const;
+	[[nodiscard]] const CAList& getCACerts() const;
 		/// Returns the list of CA certificates in this container.
 
-	const std::string& getFriendlyName() const;
+	[[nodiscard]] const std::string& getFriendlyName() const;
 		/// Returns the friendly name of the certificate bag.
 
-	const CANameList& getFriendlyNamesCA() const;
+	[[nodiscard]] const CANameList& getFriendlyNamesCA() const;
 		/// Returns a list of CA certificates friendly names.
 
 private:
 	void load(PKCS12* pPKCS12, const std::string& password = "");
-	std::string extractFriendlyName(X509* pCert);
+	[[nodiscard]] std::string extractFriendlyName(X509* pCert);
 
 	using CertPtr = std::unique_ptr<X509Certificate>;
 

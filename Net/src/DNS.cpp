@@ -474,7 +474,7 @@ static unsigned decode_digit(int cp)
 /*** Platform-specific constants ***/
 
 /* maxint is the maximum value of a punycode_uint variable: */
-static const punycode_uint maxint = -1;
+static constexpr punycode_uint maxint = -1;
 /* Because maxint is unsigned, -1 becomes the maximum value. */
 
 /*** Bias adaptation function ***/

@@ -84,11 +84,11 @@ public:
 	void swap(SharedMemory& other) noexcept;
 		/// Swaps the SharedMemory object with another one.
 
-	char* begin() const;
+	[[nodiscard]] char* begin() const;
 		/// Returns the start address of the shared memory segment.
 		/// Will be nullptr for illegal segments.
 
-	char* end() const;
+	[[nodiscard]] char* end() const;
 		/// Returns the one-past-end end address of the shared memory segment.
 		/// Will be nullptr for illegal segments.
 

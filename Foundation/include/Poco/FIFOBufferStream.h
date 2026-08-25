@@ -52,7 +52,7 @@ public:
 	~FIFOBufferStreamBuf() override;
 	/// Destroys the FIFOBufferStreamBuf.
 
-	FIFOBuffer& fifoBuffer();
+	[[nodiscard]] FIFOBuffer& fifoBuffer();
 		/// Returns the underlying FIFO buffer reference.
 
 protected:
@@ -95,7 +95,7 @@ public:
 	///
 	/// Flushes the buffer.
 
-	FIFOBufferStreamBuf* rdbuf();
+	[[nodiscard]] FIFOBufferStreamBuf* rdbuf();
 		/// Returns a pointer to the internal FIFOBufferStreamBuf.
 
 	void close();

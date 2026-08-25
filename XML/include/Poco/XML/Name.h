@@ -71,34 +71,34 @@ public:
 	void assign(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName);
 		/// Assigns new values to the name.
 
-	bool equals(const Name& name) const;
+	[[nodiscard]] bool equals(const Name& name) const;
 		/// Returns true if both names are equal.
 
-	bool equals(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName) const;
+	[[nodiscard]] bool equals(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Returns true if all the name's components are equal to the given ones.
 
-	bool equalsWeakly(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName) const;
+	[[nodiscard]] bool equalsWeakly(const XMLString& qname, const XMLString& namespaceURI, const XMLString& localName) const;
 		/// Returns true if either the qnames are identical or the namespaceURIs and the localNames are identical.
 
-	const XMLString& qname() const;
+	[[nodiscard]] const XMLString& qname() const;
 		/// Returns the qualified name.
 
-	const XMLString& namespaceURI() const;
+	[[nodiscard]] const XMLString& namespaceURI() const;
 		/// Returns the namespace URI.
 
-	const XMLString& localName() const;
+	[[nodiscard]] const XMLString& localName() const;
 		/// Returns the local name.
 
-	XMLString prefix() const;
+	[[nodiscard]] XMLString prefix() const;
 		/// Returns the namespace prefix.
 
 	static void split(const XMLString& qname, XMLString& prefix, XMLString& localName);
 		/// Splits the given qualified name into its prefix and localName parts.
 
-	static XMLString localName(const XMLString& qname);
+	[[nodiscard]] static XMLString localName(const XMLString& qname);
 		/// Returns the local name part of the given qualified name.
 
-	static XMLString prefix(const XMLString& qname);
+	[[nodiscard]] static XMLString prefix(const XMLString& qname);
 		/// Returns the prefix part of the given qualified name.
 
 	static const XMLString EMPTY_NAME;

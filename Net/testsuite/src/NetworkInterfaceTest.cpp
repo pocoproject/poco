@@ -172,7 +172,7 @@ void NetworkInterfaceTest::testForAddress()
 			{
 				try
 				{
-					it->second.firstAddress(IPAddress::IPv4);
+					(void) it->second.firstAddress(IPAddress::IPv4);
 					fail ("must throw");
 				}
 				catch (NotFoundException&) { }

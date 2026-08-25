@@ -22,9 +22,6 @@
 namespace Poco::Zip {
 
 
-const char ZipArchiveInfo::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x05', '\x06'};
-
-
 ZipArchiveInfo::ZipArchiveInfo(std::istream& in, bool assumeHeaderRead):
 	_rawInfo(),
 	_startPos(in.tellg()),
@@ -98,10 +95,6 @@ void ZipArchiveInfo::setZipComment(const std::string& comment)
 	// Now change our internal comment
 	_comment = comment;
 }
-
-
-const char ZipArchiveInfo64::HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x06', '\x06'};
-const char ZipArchiveInfo64::LOCATOR_HEADER[ZipCommon::HEADER_SIZE] = {'\x50', '\x4b', '\x06', '\x07'};
 
 
 ZipArchiveInfo64::ZipArchiveInfo64(std::istream& in, bool assumeHeaderRead):

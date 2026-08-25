@@ -37,7 +37,7 @@ class Util_API LoggingSubsystem: public Subsystem
 public:
 	LoggingSubsystem();
 
-	const char* name() const override;
+	[[nodiscard]] const char* name() const override;
 
 protected:
 	void initialize(Application& self) override;

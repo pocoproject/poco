@@ -70,7 +70,7 @@ void HTTPChunkedStreamBuf::close()
 
 std::streamsize HTTPChunkedStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	if (_chunk == 0)
 	{

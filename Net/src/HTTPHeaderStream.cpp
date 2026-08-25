@@ -40,7 +40,7 @@ HTTPHeaderStreamBuf::~HTTPHeaderStreamBuf()
 std::streamsize HTTPHeaderStreamBuf::readFromDevice(char* buffer, std::streamsize length)
 {
 	// read line-by-line; an empty line denotes the end of the headers.
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	if (_end) return 0;
 

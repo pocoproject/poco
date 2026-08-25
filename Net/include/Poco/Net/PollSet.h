@@ -86,16 +86,17 @@ public:
 		///
 		/// shall result in the socket being monitored for write only.
 
-	bool has(const Socket& socket) const;
+	[[nodiscard]] bool has(const Socket& socket) const;
 		/// Returns true if socket is registered for polling.
 
-	bool empty() const;
+	[[nodiscard]] bool empty() const;
 		/// Returns true if no socket is registered for polling.
 
-	std::size_t size() const;
+	[[nodiscard]] std::size_t size() const;
 		/// Returns the number of sockets monitored.
 
-	POCO_DEPRECATED("Use size() instead") int count() const;
+	POCO_DEPRECATED("Use size() instead")
+	[[nodiscard]] int count() const;
 		/// Returns the number of sockets monitored.
 		/// This method is deprecated. Use size() instead.
 

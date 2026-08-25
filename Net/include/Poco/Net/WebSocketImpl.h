@@ -73,24 +73,24 @@ public:
 	virtual int sendTo(const void* buffer, int length, const SocketAddress& address, int flags = 0);
 	virtual int receiveFrom(void* buffer, int length, SocketAddress& address, int flags = 0);
 	virtual void sendUrgent(unsigned char data);
-	virtual int available();
-	virtual bool secure() const;
+	[[nodiscard]] virtual int available();
+	[[nodiscard]] virtual bool secure() const;
 	virtual void setSendBufferSize(int size);
-	virtual int getSendBufferSize();
+	[[nodiscard]] virtual int getSendBufferSize();
 	virtual void setReceiveBufferSize(int size);
-	virtual int getReceiveBufferSize();
+	[[nodiscard]] virtual int getReceiveBufferSize();
 	virtual void setSendTimeout(const Poco::Timespan& timeout);
-	virtual Poco::Timespan getSendTimeout();
+	[[nodiscard]] virtual Poco::Timespan getSendTimeout();
 	virtual void setReceiveTimeout(const Poco::Timespan& timeout);
-	virtual Poco::Timespan getReceiveTimeout();
+	[[nodiscard]] virtual Poco::Timespan getReceiveTimeout();
 	virtual void setBlocking(bool flag);
-	virtual bool getBlocking() const;
+	[[nodiscard]] virtual bool getBlocking() const;
 
 	// Internal
-	int frameFlags() const;
+	[[nodiscard]] int frameFlags() const;
 		/// Returns the frame flags of the most recently received frame.
 
-	bool mustMaskPayload() const;
+	[[nodiscard]] bool mustMaskPayload() const;
 		/// Returns true if the payload must be masked.
 
 	void setMaxPayloadSize(int maxPayloadSize);
@@ -98,7 +98,7 @@ public:
 		///
 		/// The default is std::numeric_limits<int>::max().
 
-	int getMaxPayloadSize() const;
+	[[nodiscard]] int getMaxPayloadSize() const;
 		/// Returns the maximum payload size for receiveFrame().
 		///
 		/// The default is std::numeric_limits<int>::max().
@@ -131,12 +131,12 @@ protected:
 		Poco::Buffer<char> payload{0};
 	};
 
-	int peekHeader(ReceiveState& receiveState);
+	[[nodiscard]] int peekHeader(ReceiveState& receiveState);
 	void skipHeader(int headerLength);
-	int receivePayload(char *buffer, int payloadLength, char mask[MASK_LENGTH], bool useMask, int maskOffset);
-	int receiveNBytes(void* buffer, int length);
-	int receiveSomeBytes(char* buffer, int length);
-	int peekSomeBytes(char* buffer, int length);
+	[[nodiscard]] int receivePayload(char *buffer, int payloadLength, char mask[MASK_LENGTH], bool useMask, int maskOffset);
+	[[nodiscard]] int receiveNBytes(void* buffer, int length);
+	[[nodiscard]] int receiveSomeBytes(char* buffer, int length);
+	[[nodiscard]] int peekSomeBytes(char* buffer, int length);
 	virtual ~WebSocketImpl();
 
 private:

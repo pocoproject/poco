@@ -35,13 +35,6 @@ using Poco::Int32;
 namespace Poco::Net {
 
 
-const UInt8 ICMPv4PacketImpl::DESTINATION_UNREACHABLE_TYPE = 3;
-const Poco::UInt8 ICMPv4PacketImpl::SOURCE_QUENCH_TYPE     = 4;
-const Poco::UInt8 ICMPv4PacketImpl::REDIRECT_MESSAGE_TYPE  = 5;
-const UInt8 ICMPv4PacketImpl::TIME_EXCEEDED_TYPE           = 11;
-const Poco::UInt8 ICMPv4PacketImpl::PARAMETER_PROBLEM_TYPE = 12;
-
-
 const std::string ICMPv4PacketImpl::MESSAGE_TYPE[] =
 {
 	"Echo Reply",

@@ -257,7 +257,7 @@ public:
 		strategy.notify(pSender, args);
 	}
 
-	bool hasDelegates() const
+	[[nodiscard]] bool hasDelegates() const
 		/// Returns true if there are registered delegates.
 	{
 		return !empty();
@@ -307,7 +307,7 @@ public:
 		_enabled = false;
 	}
 
-	bool isEnabled() const
+	[[nodiscard]] bool isEnabled() const
 		/// Returns true if event is enabled.
 	{
 		typename TMutex::ScopedLock lock(_mutex);
@@ -330,7 +330,7 @@ public:
 		}
 	}
 
-	bool empty() const
+	[[nodiscard]] bool empty() const
 		/// Checks if any delegates are registered at the delegate.
 	{
 		typename TMutex::ScopedLock lock(_mutex);
@@ -524,7 +524,7 @@ public:
 		_enabled = false;
 	}
 
-	bool isEnabled() const
+	[[nodiscard]] bool isEnabled() const
 	{
 		typename TMutex::ScopedLock lock(_mutex);
 		return _enabled;
@@ -546,7 +546,7 @@ public:
 		}
 	}
 
-	bool empty() const
+	[[nodiscard]] bool empty() const
 		/// Checks if any delegates are registered at the delegate.
 	{
 		typename TMutex::ScopedLock lock(_mutex);

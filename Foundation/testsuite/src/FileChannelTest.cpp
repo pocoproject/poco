@@ -562,9 +562,9 @@ void FileChannelTest::testCompress()
 
 void FileChannelTest::testCompressedRotation()
 {
-	static const uint32_t MAX_ROLLOVER_TIMES = 8;
-	static const uint32_t LONG_MESSAGE_LENGTH = 1024;
-	static const uint32_t LONG_MAX_FILESIZE = 1024;
+	static constexpr uint32_t MAX_ROLLOVER_TIMES = 8;
+	static constexpr uint32_t LONG_MESSAGE_LENGTH = 1024;
+	static constexpr uint32_t LONG_MAX_FILESIZE = 1024;
 
 	std::vector<uint8_t> longMessage(LONG_MESSAGE_LENGTH, '&');
 	longMessage.push_back(0);
@@ -574,7 +574,7 @@ void FileChannelTest::testCompressedRotation()
 	if (logsDir.exists())
 		logsDir.remove(true);
 
-	logsDir.createDirectory();
+	(void) logsDir.createDirectory();
 	logsPath.append("test.log");
 
 	Poco::AutoPtr<Poco::FileChannel> fileChannel = new Poco::FileChannel("ABC");

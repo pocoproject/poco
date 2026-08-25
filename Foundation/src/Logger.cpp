@@ -253,7 +253,7 @@ std::string Logger::format(const std::string& fmt, int argc, std::string argv[])
 
 void Logger::formatDump(std::string& message, const void* buffer, std::size_t length)
 {
-	const int BYTES_PER_LINE = 16;
+	constexpr int BYTES_PER_LINE = 16;
 
 	message.reserve(message.size() + length*6);
 	if (!message.empty()) message.append("\n");

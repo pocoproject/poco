@@ -43,7 +43,7 @@ class XML_API Text: public CharacterData
 	/// Text objects into a single node for each block of text.
 {
 public:
-	Text* splitText(unsigned long offset);
+	[[nodiscard]] Text* splitText(unsigned long offset);
 		/// Breaks this node into two nodes at the specified offset, keeping both in
 		/// the tree as siblings. This node then only contains all the content up to
 		/// the offset point. A new node of the same type, which is inserted as the
@@ -52,18 +52,18 @@ public:
 		/// has no data.
 
 	// Node
-	const XMLString& nodeName() const;
-	unsigned short nodeType() const;
+	[[nodiscard]] const XMLString& nodeName() const;
+	[[nodiscard]] unsigned short nodeType() const;
 
 	// Non-standard extensions
-	XMLString innerText() const;
+	[[nodiscard]] XMLString innerText() const;
 
 protected:
 	Text(Document* pOwnerDocument, const XMLString& data);
 	Text(Document* pOwnerDocument, const Text& text);
 	~Text();
 
-	Node* copyNode(bool deep, Document* pOwnerDocument) const;
+	[[nodiscard]] Node* copyNode(bool deep, Document* pOwnerDocument) const;
 
 private:
 	static const XMLString NODE_NAME;

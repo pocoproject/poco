@@ -112,7 +112,7 @@ void HTTPBasicCredentials::proxyAuthenticate(HTTPRequest& request) const
 
 void HTTPBasicCredentials::parseAuthInfo(const std::string& authInfo)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	std::istringstream istr(authInfo);
 	Base64Decoder decoder(istr);

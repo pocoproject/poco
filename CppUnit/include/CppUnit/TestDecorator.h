@@ -33,11 +33,11 @@ public:
 
 	~TestDecorator() override;
 
-	int countTestCases() const override;
+	[[nodiscard]] int countTestCases() const override;
 
 	void run(TestResult* result, const Test::Callback& callback = nullptr) override;
 
-	std::string toString() const override;
+	[[nodiscard]] std::string toString() const override;
 
 protected:
 	Test* _test;

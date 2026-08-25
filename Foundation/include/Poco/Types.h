@@ -77,7 +77,7 @@ using UIntPtr = std::uintptr_t;
 #endif
 
 
-inline std::string Foundation_API demangle(const char* typeName)
+[[nodiscard]] inline std::string Foundation_API demangle(const char* typeName)
 	/// Returns a human-readable type name from a mangled type name.
 	///
 	/// Takes the output of typeid(T).name() and returns a demangled,
@@ -117,7 +117,7 @@ inline std::string Foundation_API demangle(const char* typeName)
 	}
 #elif defined(_MSC_VER)
 	// MSVC prefixes types with "class ", "struct ", "enum ", or "union "
-	static const char* prefixes[] = {"class ", "struct ", "enum ", "union "};
+	static constexpr const char* prefixes[] = {"class ", "struct ", "enum ", "union "};
 	for (const char* prefix : prefixes)
 	{
 		std::size_t len = std::strlen(prefix);
@@ -133,7 +133,7 @@ inline std::string Foundation_API demangle(const char* typeName)
 
 
 template <typename T>
-std::string demangle()
+[[nodiscard]] std::string demangle()
 	/// Returns a human-readable name for type T.
 {
 	return demangle(typeid(T).name());
@@ -141,7 +141,7 @@ std::string demangle()
 
 
 template <typename T>
-std::string demangle(const T& t)
+[[nodiscard]] std::string demangle(const T& t)
 	/// Returns a human-readable name for the type of instance t.
 {
 	return demangle(typeid(std::remove_const_t<std::remove_reference_t<decltype(t)>>).name());

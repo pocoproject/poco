@@ -286,15 +286,15 @@ int SecureSocketImpl::shutdown()
 					{
 						int err = ::SSL_get_error(_pSSL, rc);
 						if (err == SSL_ERROR_WANT_READ)
-							_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
+							(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
 						else if (err == SSL_ERROR_WANT_WRITE)
-							_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
+							(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
 						else
 							break;
 					}
 					else
 					{
-						_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
+						(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
 					}
 				} while (!tsStart.isElapsed(recvTimeout.totalMicroseconds()));
 				if (rc < 0)
@@ -572,14 +572,14 @@ bool SecureSocketImpl::mustRetry(int rc)
 		case SSL_ERROR_WANT_READ:
 			if (_pSocket->getBlocking())
 			{
-				_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
+				(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_READ);
 				return true;
 			}
 			break;
 		case SSL_ERROR_WANT_WRITE:
 			if (_pSocket->getBlocking())
 			{
-				_pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
+				(void) _pSocket->poll(pollTimeout, Poco::Net::Socket::SELECT_WRITE);
 				return true;
 			}
 			break;

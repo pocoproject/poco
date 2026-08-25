@@ -458,6 +458,12 @@ if(ENABLE_TESTS)
 
 endif()
 
+# ENABLE_DATA_SQLITE_VEC is declared in dependencies/sqlite-vec; a
+# command-line -D already exists in the cache at this point.
+if(ENABLE_DATA_SQLITE_VEC)
+	set(ENABLE_DATA_SQLITE ON CACHE BOOL "Enable Data SQlite" FORCE)
+endif()
+
 if(ENABLE_DATA_SQLITE)
 	set(ENABLE_DATA ON CACHE BOOL "Enable Data" FORCE)
 endif()
@@ -760,8 +766,11 @@ if(ENABLE_TRACE)
 endif()
 
 if(POCO_UNBUNDLED)
-	# All bundled deps become external
+	# All bundled deps become external (sqlite-vec is always bundled)
 	message(STATUS "Using external zlib, pcre2, utf8proc${_opt_deps}")
+	if(ENABLE_DATA_SQLITE_VEC)
+		message(STATUS "Using internal sqlite-vec")
+	endif()
 elseif(POCO_SQLITE_UNBUNDLED)
 	# Only sqlite is external; rebuild the internal list without it
 	if(ENABLE_DATA_SQLITE)
@@ -774,9 +783,15 @@ elseif(POCO_SQLITE_UNBUNDLED)
 	if(ENABLE_PDF)
 		string(APPEND _int_deps ", libpng")
 	endif()
+	if(ENABLE_DATA_SQLITE_VEC)
+		string(APPEND _int_deps ", sqlite-vec")
+	endif()
 	message(STATUS "Using internal zlib, pcre2, utf8proc${_int_deps}")
 else()
 	# Fully bundled
+	if(ENABLE_DATA_SQLITE_VEC)
+		string(APPEND _opt_deps ", sqlite-vec")
+	endif()
 	message(STATUS "Using internal zlib, pcre2, utf8proc${_opt_deps}")
 endif()
 

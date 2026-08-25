@@ -41,7 +41,7 @@ public:
 	virtual ~CipherFactory();
 		/// Destroys the CipherFactory.
 
-	Cipher* createCipher(const CipherKey& key);
+	[[nodiscard]] Cipher* createCipher(const CipherKey& key);
 		/// Creates a Cipher object for the given Cipher name. Valid cipher
 		/// names depend on the OpenSSL version the library is linked with;
 		/// see the output of
@@ -56,15 +56,15 @@ public:
 		///   * DES: "des", "des3"
 		///   * Blowfish: "bf"
 
-	Cipher* createCipher(const RSAKey& key, RSAPaddingMode paddingMode = RSA_PADDING_PKCS1);
+	[[nodiscard]] Cipher* createCipher(const RSAKey& key, RSAPaddingMode paddingMode = RSA_PADDING_PKCS1);
 		/// Creates a RSACipher using the given RSA key and padding mode
 		/// for public key encryption/private key decryption.
 
-	Cipher* createCipher(const EVPPKey& key);
+	[[nodiscard]] Cipher* createCipher(const EVPPKey& key);
 		/// Creates an EVPCipher using the given EVP key
 		/// for public key encryption/private key decryption.
 
-	static CipherFactory& defaultFactory();
+	[[nodiscard]] static CipherFactory& defaultFactory();
 		/// Returns the default CipherFactory.
 
 private:

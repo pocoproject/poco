@@ -103,7 +103,7 @@ public:
 	virtual ~Client();
 		/// Destroys the Client.
 
-	Net::SocketAddress address() const;
+	[[nodiscard]] Net::SocketAddress address() const;
 		/// Returns the address of the Redis connection.
 
 	void connect(const std::string& hostAndPort);
@@ -134,10 +134,10 @@ public:
 	void disconnect();
 		/// Disconnects from the Redis server.
 
-	bool isConnected() const;
+	[[nodiscard]] bool isConnected() const;
 		/// Returns true iff the Client is connected to a Redis server.
 
-	template<typename T>
+	template <typename T>
 	T execute(const Array& command)
 		/// Sends the Redis Command to the server. It gets the reply
 		/// and tries to convert it to the given template type.
@@ -168,7 +168,7 @@ public:
 	RedisType::Ptr readReply();
 		/// Read a reply from the Redis server.
 
-	template<typename T>
+	template <typename T>
 	void readReply(T& result)
 		/// Read a reply from the Redis server and tries to convert that reply
 		/// to the template type. When the reply is a Redis error, it will
@@ -199,7 +199,7 @@ public:
 	void setReceiveTimeout(const Timespan& timeout);
 		/// Sets a receive timeout.
 
-	NotificationCenterPtr notificationCenter();
+	[[nodiscard]] NotificationCenterPtr notificationCenter();
 		/// Returns the notification center for this client.
 
 private:

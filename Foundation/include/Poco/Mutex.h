@@ -74,12 +74,12 @@ public:
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
-	bool tryLock();
+	[[nodiscard]] bool tryLock();
 		/// Tries to lock the mutex. Returns false immediately
 		/// if the mutex is already held by another thread.
 		/// Returns true if the mutex was successfully locked.
 
-	bool tryLock(long milliseconds);
+	[[nodiscard]] bool tryLock(long milliseconds);
 		/// Locks the mutex. Blocks up to the given number of milliseconds
 		/// if the mutex is held by another thread.
 		/// Returns true if the mutex was successfully locked.
@@ -130,12 +130,12 @@ public:
 		/// implemented using a loop calling (the equivalent of) tryLock() and Thread::sleep().
 		/// On POSIX platforms that support pthread_mutex_timedlock(), this is used.
 
-	bool tryLock();
+	[[nodiscard]] bool tryLock();
 		/// Tries to lock the mutex. Returns false immediately
 		/// if the mutex is already held by another thread.
 		/// Returns true if the mutex was successfully locked.
 
-	bool tryLock(long milliseconds);
+	[[nodiscard]] bool tryLock(long milliseconds);
 		/// Locks the mutex. Blocks up to the given number of milliseconds
 		/// if the mutex is held by another thread.
 		/// Returns true if the mutex was successfully locked.
@@ -191,12 +191,12 @@ public:
 		/// if the mutex is held by another thread. Throws a TimeoutException
 		/// if the mutex can not be locked within the given timeout.
 
-	bool tryLock();
+	[[nodiscard]] bool tryLock();
 		/// Tries to lock the mutex. Returns immediately, false
 		/// if the mutex is already held by another thread, true
 		/// if the mutex was successfully locked.
 
-	bool tryLock(long milliseconds);
+	[[nodiscard]] bool tryLock(long milliseconds);
 		/// Locks the mutex. Blocks up to the given number of milliseconds
 		/// if the mutex is held by another thread.
 		/// Returns true if the mutex was successfully locked.
@@ -237,13 +237,13 @@ public:
 	{
 	}
 
-	bool tryLock()
+	[[nodiscard]] bool tryLock()
 		/// Does nothing and always returns true.
 	{
 		return true;
 	}
 
-	bool tryLock(long)
+	[[nodiscard]] bool tryLock(long)
 		/// Does nothing and always returns true.
 	{
 		return true;

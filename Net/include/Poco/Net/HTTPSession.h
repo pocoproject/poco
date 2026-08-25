@@ -49,7 +49,7 @@ public:
 		/// If the keep-alive flag is enabled, persistent
 		/// HTTP/1.1 connections are supported.
 
-	bool getKeepAlive() const;
+	[[nodiscard]] bool getKeepAlive() const;
 		/// Returns the value of the keep-alive flag for
 		/// this session.
 
@@ -59,35 +59,35 @@ public:
 	void setTimeout(const Poco::Timespan& connectionTimeout, const Poco::Timespan& sendTimeout, const Poco::Timespan& receiveTimeout);
 		/// Sets different timeouts for the HTTP session.
 
-	Poco::Timespan getTimeout() const;
+	[[nodiscard]] Poco::Timespan getTimeout() const;
 		/// Returns the timeout for the HTTP session.
 
 	void setConnectTimeout(const Poco::Timespan& timeout);
 		/// Sets the connect timeout.
 
-	Poco::Timespan getConnectTimeout() const;
+	[[nodiscard]] Poco::Timespan getConnectTimeout() const;
 		/// Gets the connect timeout.
 
 	void setSendTimeout(const Poco::Timespan& timeout);
 		/// Sets the send timeout.
 
-	Poco::Timespan getSendTimeout() const;
+	[[nodiscard]] Poco::Timespan getSendTimeout() const;
 		/// Gets the send timeout.
 
 	void setReceiveTimeout(const Poco::Timespan& timeout);
 		/// Sets the receive timeout.
 
-	Poco::Timespan getReceiveTimeout() const;
+	[[nodiscard]] Poco::Timespan getReceiveTimeout() const;
 		/// Gets the receive timeout.
 
-	bool connected() const;
+	[[nodiscard]] bool connected() const;
 		/// Returns true if the underlying socket is connected.
 
 	virtual void abort();
 		/// Aborts a session in progress by shutting down
 		/// and closing the underlying socket.
 
-	const Poco::Exception* networkException() const;
+	[[nodiscard]] const Poco::Exception* networkException() const;
 		/// If sending or receiving data over the underlying
 		/// socket connection resulted in an exception, a
 		/// pointer to this exception is returned.
@@ -103,7 +103,7 @@ public:
 		/// lifetime of a persistent connection (that is,
 		/// multiple requests sent over the same connection).
 
-	const Poco::Any& sessionData() const;
+	[[nodiscard]] const Poco::Any& sessionData() const;
 		/// Returns the data attached with attachSessionData(),
 		/// or an empty Poco::Any if no user data has been
 		/// attached.
@@ -119,7 +119,7 @@ public:
 		/// The socket is returned, and a new, uninitialized socket is
 		/// attached to the session.
 
-	StreamSocket& socket();
+	[[nodiscard]] StreamSocket& socket();
 		/// Returns a reference to the underlying socket.
 
 	void drainBuffer(Poco::Buffer<char>& buffer);
@@ -130,27 +130,28 @@ public:
 		/// obtain any data already read from the socket, but not
 		/// yet processed.
 
-	const MessageHeader& requestTrailer() const;
+	[[nodiscard]] const MessageHeader& requestTrailer() const;
 		/// Returns the trailer for a request sent using chunked
 		/// transfer encoding. This method must be called after
 		/// the entire content of the message has been read.
 
-	MessageHeader& requestTrailer();
+	[[nodiscard]] MessageHeader& requestTrailer();
 		/// Returns the trailer for a request sent using chunked
 		/// transfer encoding. The trailer fields to be sent must be set
 		/// before the request body has been fully written.
 
-	const MessageHeader& responseTrailer() const;
+	[[nodiscard]] const MessageHeader& responseTrailer() const;
 		/// Returns the trailer for a response sent using chunked
 		/// transfer encoding. This method must be called after
 		/// the entire content of the message has been read.
 
-	MessageHeader& responseTrailer();
+	[[nodiscard]] MessageHeader& responseTrailer();
 		/// Returns the trailer for a response sent using chunked
 		/// transfer encoding. The trailer fields to be sent must be set
 		/// before the response body has been fully written.
-	virtual SocketAddress clientAddress() = 0;
-	virtual SocketAddress serverAddress() = 0;
+
+	[[nodiscard]] virtual SocketAddress clientAddress() = 0;
+	[[nodiscard]] virtual SocketAddress serverAddress() = 0;
 protected:
 	HTTPSession();
 		/// Creates a HTTP session using an
@@ -172,12 +173,12 @@ protected:
 		/// Destroys the HTTPSession and closes the
 		/// underlying socket.
 
-	virtual int get();
+	[[nodiscard]] virtual int get();
 		/// Returns the next byte in the buffer.
 		/// Reads more data from the socket if there are
 		/// no bytes left in the buffer.
 
-	virtual int peek();
+	[[nodiscard]] virtual int peek();
 		/// Peeks at the next character in the buffer.
 		/// Reads more data from the socket if there are
 		/// no bytes left in the buffer.

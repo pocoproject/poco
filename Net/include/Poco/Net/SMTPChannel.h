@@ -63,7 +63,7 @@ public:
 		///     * throw:      Boolean value indicating whether to throw
 		///                   exception upon failure.
 
-	std::string getProperty(const std::string& name) const;
+	[[nodiscard]] std::string getProperty(const std::string& name) const;
 		/// Returns the value of the property with the given name.
 
 	static void registerChannel();
@@ -82,7 +82,7 @@ protected:
 	~SMTPChannel();
 
 private:
-	bool isTrue(const std::string& value) const;
+	[[nodiscard]] bool isTrue(const std::string& value) const;
 
 	std::string _mailHost;
 	std::string _sender;

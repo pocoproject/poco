@@ -352,18 +352,18 @@ public:
 	virtual void reset();
 		/// Resets a binder. No-op by default. Implement for binders that cache data.
 
-	static bool isOutBound(Direction dir);
+	[[nodiscard]] static bool isOutBound(Direction dir);
 		/// Returns true if direction is out bound;
 
-	static bool isInBound(Direction dir);
+	[[nodiscard]] static bool isInBound(Direction dir);
 		/// Returns true if direction is in bound;
 
 protected:
-	bool transcodeRequired() const;
+	[[nodiscard]] bool transcodeRequired() const;
 	void transcode(const std::string& from, std::string& to);
 	void reverseTranscode(const std::string& from, std::string& to);
 
-	const std::string& toString(const UUID& uuid);
+	[[nodiscard]] const std::string& toString(const UUID& uuid);
 	    /// Stores a string representation of uuid and returns a reference to it
 
 private:

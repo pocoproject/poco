@@ -39,7 +39,7 @@ public:
 	~FileStreamFactory() override;
 		/// Destroys the FileStreamFactory.
 
-	std::istream *open(const URI &uri) override;
+	std::istream* open(const URI &uri) override;
 	/// Creates and opens a file stream in binary mode for the given URI.
 	/// The URI must be either a file URI or a relative URI reference
 	/// containing a path to a local file.

@@ -50,7 +50,7 @@ public:
 		/// Add a path for resolving template paths.
 		/// The order of check is FIFO.
 
-	Template::Ptr getTemplate(const Path& path);
+	[[nodiscard]] Template::Ptr getTemplate(const Path& path);
 		/// Returns a template from the cache.
 		/// When the template file is not yet loaded
 		/// or when the file has changed, the template
@@ -59,7 +59,7 @@ public:
 		/// even when the template isn't stored anymore in
 		/// the cache.
 
-	static TemplateCache* instance();
+	[[nodiscard]] static TemplateCache* instance();
 		/// Returns the only instance of this cache.
 
 	void setLogger(Logger& logger);
@@ -67,7 +67,7 @@ public:
 
 private:
 	void setup();
-	Path resolvePath(const Path& path) const;
+	[[nodiscard]] Path resolvePath(const Path& path) const;
 
 	static TemplateCache*                _pInstance;
 	std::vector<Path>                    _includePaths;

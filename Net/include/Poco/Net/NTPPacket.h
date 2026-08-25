@@ -50,58 +50,58 @@ public:
 		///
 		/// Assumed to have exactly 48 bytes.
 
-	Poco::Int8 leapIndicator() const;
+	[[nodiscard]] Poco::Int8 leapIndicator() const;
 		/// Returns the leap indicator.
 
-	Poco::Int8 version() const;
+	[[nodiscard]] Poco::Int8 version() const;
 		/// Returns the version.
 
-	Poco::Int8 mode() const;
+	[[nodiscard]] Poco::Int8 mode() const;
 		/// Returns the mode.
 
-	Poco::Int8 stratum() const;
+	[[nodiscard]] Poco::Int8 stratum() const;
 		/// Returns the stratum.
 
-	Poco::Int8 pool() const;
+	[[nodiscard]] Poco::Int8 pool() const;
 		/// Returns the pool.
 
-	Poco::Int8 precision() const;
+	[[nodiscard]] Poco::Int8 precision() const;
 		/// Returns the precision
 
-	Poco::Int32 rootDelay() const;
+	[[nodiscard]] Poco::Int32 rootDelay() const;
 		/// Returns the root delay
 
-	Poco::Int32 rootDispersion() const;
+	[[nodiscard]] Poco::Int32 rootDispersion() const;
 		/// Returns the root dispersion
 
-	Poco::Int32 referenceId() const;
+	[[nodiscard]] Poco::Int32 referenceId() const;
 		/// Returns the reference id
 
-	Poco::Int64 referenceTimestamp() const;
+	[[nodiscard]] Poco::Int64 referenceTimestamp() const;
 		/// Returns the reference timestamp
 
-	Poco::Int64 originateTimestamp() const;
+	[[nodiscard]] Poco::Int64 originateTimestamp() const;
 		/// Returns the originate timestamp
 
-	Poco::Int64 receiveTimestamp() const;
+	[[nodiscard]] Poco::Int64 receiveTimestamp() const;
 		/// Returns the receive timestamp
 
-	Poco::Int64 transmitTimestamp() const;
+	[[nodiscard]] Poco::Int64 transmitTimestamp() const;
 		/// Returns the transmit timestamp
 
-	Poco::Timestamp referenceTime() const;
+	[[nodiscard]] Poco::Timestamp referenceTime() const;
 		/// Returns the reference time
 
-	Poco::Timestamp originateTime() const;
+	[[nodiscard]] Poco::Timestamp originateTime() const;
 		/// Returns the originate time
 
-	Poco::Timestamp receiveTime() const;
+	[[nodiscard]] Poco::Timestamp receiveTime() const;
 		/// Returns the receive time
 
-	Poco::Timestamp transmitTime() const;
+	[[nodiscard]] Poco::Timestamp transmitTime() const;
 		/// Returns the transmit time
 private:
-	Poco::Timestamp convertTime(Poco::Int64 tm) const;
+	[[nodiscard]] Poco::Timestamp convertTime(Poco::Int64 tm) const;
 
 	Poco::Int8 _leapIndicator;
 	Poco::Int8 _version;

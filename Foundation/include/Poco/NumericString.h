@@ -21,12 +21,6 @@
 #include "Poco/Foundation.h"
 #include "Poco/Exception.h"
 #include "Poco/FPEnvironment.h"
-#ifdef min
-	#undef min
-#endif
-#ifdef max
-	#undef max
-#endif
 #include <cctype>
 #include <charconv>
 #include <cstdint>
@@ -37,6 +31,9 @@
 #endif
 #include <string>
 #include <type_traits>
+
+
+POCO_CHECK_MINMAX_MACROS
 
 /// Maximum length of an integer formatted as a string.
 /// 64 binary digits + sign + NUL + padding margin = 67.
@@ -54,8 +51,8 @@ inline constexpr char POCO_FLT_EXP = 'e';
 namespace Poco {
 
 
-template<typename T>
-inline bool isNegative(T x)
+template <typename T>
+[[nodiscard]] inline bool isNegative(T x)
 {
 	if constexpr (std::is_signed_v<T>)
 		return x < 0;
@@ -64,8 +61,8 @@ inline bool isNegative(T x)
 }
 
 
-template<typename To, typename From>
-inline bool isIntOverflow(From val)
+template <typename To, typename From>
+[[nodiscard]] inline bool isIntOverflow(From val)
 {
 	poco_assert_dbg (std::numeric_limits<From>::is_integer);
 	poco_assert_dbg (std::numeric_limits<To>::is_integer);
@@ -84,7 +81,7 @@ inline bool isIntOverflow(From val)
 }
 
 
-template<typename R, typename F, typename S>
+template <typename R, typename F, typename S>
 [[nodiscard]] bool safeMultiply(R& result, F f, S s)
 {
 	using CT = std::common_type_t<R, F, S>;
@@ -146,7 +143,7 @@ template <typename To, typename From>
 
 
 template <typename To, typename From>
-inline To& safeIntCast(From from, To& to)
+[[nodiscard]] inline To& safeIntCast(From from, To& to)
 	/// Returns cast value if it is safe
 	/// to cast integer from From to To,
 	/// otherwise throws BadCastException.
@@ -159,7 +156,7 @@ inline To& safeIntCast(From from, To& to)
 	throw BadCastException("safeIntCast: Integer overflow");
 }
 
-inline char decimalSeparator()
+[[nodiscard]] inline char decimalSeparator()
 	/// Returns decimal separator from global locale or
 	/// default '.' for platforms where locale is unavailable.
 {
@@ -171,7 +168,7 @@ inline char decimalSeparator()
 }
 
 
-inline char thousandSeparator()
+[[nodiscard]] inline char thousandSeparator()
 	/// Returns thousand separator from global locale or
 	/// default ',' for platforms where locale is unavailable.
 {
@@ -318,12 +315,12 @@ namespace Impl {
 			return _cur -= decr;
 		}
 
-		operator char* () const
+		[[nodiscard]] operator char* () const
 		{
 			return _cur;
 		}
 
-		std::size_t span() const
+		[[nodiscard]] std::size_t span() const
 		{
 			return _end - _beg;
 		}

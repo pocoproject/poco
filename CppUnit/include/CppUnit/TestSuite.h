@@ -42,14 +42,14 @@ public:
 	~TestSuite() override;
 
 	void run(TestResult* result, const Test::Callback& callback = nullptr) override;
-	int countTestCases() const override;
+	[[nodiscard]] int countTestCases() const override;
 	void addTest(Test* test);
-	std::string toString() const override;
-	Test::Type getType() const override;
+	[[nodiscard]] std::string toString() const override;
+	[[nodiscard]] Test::Type getType() const override;
 
 	virtual void deleteContents();
 
-	const std::vector<Test*> tests() const;
+	[[nodiscard]] const std::vector<Test*> tests() const;
 
 private:
 	std::vector<Test*> _tests;

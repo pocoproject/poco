@@ -41,16 +41,16 @@ public:
 	~PooledSessionHolder();
 		/// Destroys the PooledSessionHolder.
 
-	SessionImpl* session();
+	[[nodiscard]] SessionImpl* session();
 		/// Returns a pointer to the SessionImpl.
 
-	SessionPool& owner();
+	[[nodiscard]] SessionPool& owner();
 		/// Returns a reference to the SessionHolder's owner.
 
 	void access();
 		/// Updates the last access timestamp.
 
-	int idle() const;
+	[[nodiscard]] int idle() const;
 		/// Returns the number of seconds the session has not been used.
 
 private:

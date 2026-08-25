@@ -192,37 +192,37 @@ public:
 	}
 
 	template <typename OV, typename OU>
-	bool operator == (const Value<OV, OU>& other) const
+	[[nodiscard]] bool operator == (const Value<OV, OU>& other) const
 	{
 		return get() == Value(other).get();
 	}
 
 	template <typename OV, typename OU>
-	bool operator != (const Value<OV, OU>& other) const
+	[[nodiscard]] bool operator != (const Value<OV, OU>& other) const
 	{
 		return get() != Value(other).get();
 	}
 
 	template <typename OV, typename OU>
-	bool operator < (const Value<OV, OU>& other) const
+	[[nodiscard]] bool operator < (const Value<OV, OU>& other) const
 	{
 		return get() < Value(other).get();
 	}
 
 	template <typename OV, typename OU>
-	bool operator <= (const Value<OV, OU>& other) const
+	[[nodiscard]] bool operator <= (const Value<OV, OU>& other) const
 	{
 		return get() <= Value(other).get();
 	}
 
 	template <typename OV, typename OU>
-	bool operator > (const Value<OV, OU>& other) const
+	[[nodiscard]] bool operator > (const Value<OV, OU>& other) const
 	{
 		return get() > Value(other).get();
 	}
 
 	template <typename OV, typename OU>
-	bool operator >= (const Value<OV, OU>& other) const
+	[[nodiscard]] bool operator >= (const Value<OV, OU>& other) const
 	{
 		return get() >= Value(other).get();
 	}
@@ -233,7 +233,7 @@ public:
 		return *this;
 	}
 
-	Value operator ++ (int)
+	Value operator ++ ([[maybe_unused]] int n)
 	{
 		Value v = *this;
 		++_rep;
@@ -246,7 +246,7 @@ public:
 		return *this;
 	}
 
-	Value operator -- (int)
+	Value operator -- ([[maybe_unused]] int n)
 	{
 		Value v = *this;
 		--_rep;
@@ -273,35 +273,35 @@ Value<V, U > operator * (const V& a, const Value<V, U>& b)
 
 
 template <typename V, typename U>
-Value<V, U> abs(const Value<V, U>& a)
+[[nodiscard]] Value<V, U> abs(const Value<V, U>& a)
 {
     return Value<V, U>(std::abs(a.get()));
 }
 
 
 template <typename V, typename U>
-Value<V, Power<U, 1, 2> > sqrt(const Value<V, U>& a)
+[[nodiscard]] Value<V, Power<U, 1, 2> > sqrt(const Value<V, U>& a)
 {
 	return Value<V, Power<U, 1, 2> >(std::sqrt(a.get()));
 }
 
 
 template <typename V, typename U>
-Value<V, Power<U, 2, 1> > square(const Value<V, U>& a)
+[[nodiscard]] Value<V, Power<U, 2, 1> > square(const Value<V, U>& a)
 {
 	return Value<V, Power<U, 2, 1> >(std::pow(a.get(), 2));
 }
 
 
 template <typename V, typename U>
-Value<V, Power<U, 3, 1> > cube(const Value<V, U>& a)
+[[nodiscard]] Value<V, Power<U, 3, 1> > cube(const Value<V, U>& a)
 {
 	return Value<V, Power<U, 3, 1> >(std::pow(a.get(), 3));
 }
 
 
 template <int Num, int Den, typename V, typename U>
-Value<V, Power<U, Num, Den> > raise(const Value<V, U>& a)
+[[nodiscard]] Value<V, Power<U, Num, Den> > raise(const Value<V, U>& a)
 {
 	return Value<V, Power<U, Num, Den> >(Internal::FixedPower<Num, Den>::Power(a.get()));
 }
@@ -427,15 +427,15 @@ namespace Internal
 		/// Returns a rational num/den of the power of term Term in List.
 		/// The default assumes that Term is not found (num/den=0).
 	{
-		static const int num = 0;
-		static const int den = 1;
+		static constexpr int num = 0;
+		static constexpr int den = 1;
 	};
 
 	template <typename Term>
 	struct CountTerms<Term, Term>
 	{
-		static const int num = 1;
-		static const int den = 1;
+		static constexpr int num = 1;
+		static constexpr int den = 1;
 	};
 
 	template <typename Term, typename U, int N, int D>
@@ -443,8 +443,8 @@ namespace Internal
 		// CountTerms ignores scaling factors - that is taken care of by ScalingFactor.
 	{
 		typedef CountTerms<Term, U> result;
-		static const int num = result::num;
-		static const int den = result::den;
+		static constexpr int num = result::num;
+		static constexpr int den = result::den;
 	};
 
 	template <typename Term, typename U, int N, int D>
@@ -452,8 +452,8 @@ namespace Internal
 		// CountTerms ignores translation.
 	{
 		typedef CountTerms<Term, U> result;
-		static const int num = result::num;
-		static const int den = result::den;
+		static constexpr int num = result::num;
+		static constexpr int den = result::den;
 	};
 
 	template <typename Term, typename T1, typename T2>
@@ -462,8 +462,8 @@ namespace Internal
 	{
 		typedef CountTerms<Term, T1> result1;
 		typedef CountTerms<Term, T2> result2;
-		static const int num = result1::num * result2::den + result1::den * result2::num;
-		static const int den = result1::den * result2::den;
+		static constexpr int num = result1::num * result2::den + result1::den * result2::num;
+		static constexpr int den = result1::den * result2::den;
 	};
 
 	template <typename Term, typename U, int N, int D>
@@ -471,8 +471,8 @@ namespace Internal
 		// Multiplication of fractions.
 	{
 		typedef CountTerms<Term, U> result;
-		static const int num = N * result::num;
-		static const int den = D * result::den;
+		static constexpr int num = N * result::num;
+		static constexpr int den = D * result::den;
 	};
 
 	template <typename Term, typename T1, typename T2>
@@ -485,7 +485,7 @@ namespace Internal
 		typedef CountTerms<Term, T1> count1;
 		typedef CountTerms<Term, T2> count2;
 
-		static const bool Value =
+		static constexpr bool Value =
 			count1::num * count2::den ==
 			count1::den * count2::num;
 	};
@@ -493,25 +493,25 @@ namespace Internal
 	template <typename U, int N, int D, typename T1, typename T2>
 	struct CheckTermsEqual<Power<U, N, D>, T1, T2 >
 	{
-		static const bool Value = CheckTermsEqual<U, T1, T2>::Value;
+		static constexpr bool Value = CheckTermsEqual<U, T1, T2>::Value;
 	};
 
 	template <typename U, int N, int D, typename T1, typename T2>
 	struct CheckTermsEqual<Scale<U, N, D>, T1, T2 >
 	{
-		static const bool Value = CheckTermsEqual<U, T1, T2>::Value;
+		static constexpr bool Value = CheckTermsEqual<U, T1, T2>::Value;
 	};
 
 	template <typename U, int N, int D, typename T1, typename T2>
 	struct CheckTermsEqual<Translate<U, N, D>, T1, T2 >
 	{
-		static const bool Value = CheckTermsEqual<U, T1, T2>::Value;
+		static constexpr bool Value = CheckTermsEqual<U, T1, T2>::Value;
 	};
 
 	template <typename T1, typename T2, typename T3, typename T4>
 	struct CheckTermsEqual<Compose<T1,T2>,T3,T4>
 	{
-		static const bool Value =
+		static constexpr bool Value =
 			CheckTermsEqual<T1, T3, T4>::Value &&
 			CheckTermsEqual<T2, T3, T4>::Value;
 	};
@@ -521,7 +521,7 @@ namespace Internal
 		/// Determines whether two types are Convertible.
 		/// Counts the powers in the LHS and RHS and ensures they are equal.
 	{
-		static const bool Value =
+		static constexpr bool Value =
 			CheckTermsEqual<T1,T1,T2>::Value &&
 			CheckTermsEqual<T2,T1,T2>::Value;
 	};

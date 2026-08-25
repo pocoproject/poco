@@ -16,7 +16,7 @@
 #include "Poco/String.h"
 #include "Poco/NumberFormatter.h"
 #include "Poco/Util/OptionException.h"
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #include <winerror.h>
 
 

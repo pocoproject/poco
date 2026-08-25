@@ -35,7 +35,7 @@ Usage: $0 <library> <new_version>
 Updates a bundled third-party dependency in dependencies/<library>/.
 
 Supported libraries:
-  zlib pcre2 utf8proc expat sqlite3 png hpdf
+  zlib pcre2 utf8proc expat sqlite3 sqlite-vec png hpdf
   v8_double_conversion cpptrace quill wepoll 7zip
 
 Examples:
@@ -122,6 +122,11 @@ case "$LIB" in
 			echo "Override with SQLITE_URL=<full URL>" >&2
 			exit 1
 		}
+		bundle_root=src ;;
+	sqlite-vec)
+		# Amalgamation archive; LICENSE-MIT/LICENSE-APACHE are not in it and
+		# must be refreshed from the repository tag when they change upstream.
+		url="https://github.com/asg017/sqlite-vec/releases/download/v$V/sqlite-vec-$V-amalgamation.tar.gz"
 		bundle_root=src ;;
 	png)
 		url="https://github.com/pnggroup/libpng/archive/refs/tags/v$V.tar.gz"
@@ -245,6 +250,11 @@ if [ -f "$cml" ]; then
 						gsub(/sqlite-amalgamation-[0-9]+\.zip/,
 							"sqlite-amalgamation-" packed ".zip")
 					}
+				}
+				if (lib == "sqlite-vec") {
+					# version appears in the filename too, not only in the /vX.Y.Z tag
+					gsub(/sqlite-vec-[0-9][0-9A-Za-z.-]*-amalgamation/,
+						"sqlite-vec-" new "-amalgamation")
 				}
 			}
 			{ print }

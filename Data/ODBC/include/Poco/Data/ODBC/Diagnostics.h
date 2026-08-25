@@ -23,7 +23,7 @@
 #include <vector>
 #include <cstring>
 #ifdef POCO_OS_FAMILY_WINDOWS
-#include <windows.h>
+#include "Poco/UnWindows.h"
 #endif
 #include <sqlext.h>
 
@@ -65,7 +65,7 @@ public:
 	{
 		std::memset(_connectionName, 0, sizeof(_connectionName));
 		std::memset(_serverName, 0, sizeof(_serverName));
-		diagnostics();
+		(void)diagnostics();
 	}
 
 	~Diagnostics()
@@ -73,28 +73,28 @@ public:
 	{
 	}
 
-	std::string sqlState(int index) const
+	[[nodiscard]] std::string sqlState(int index) const
 		/// Returns SQL state.
 	{
 		poco_assert (index < count());
 		return std::string((char*) _fields[index]._sqlState);
 	}
 
-	std::string message(int index) const
+	[[nodiscard]] std::string message(int index) const
 		/// Returns error message.
 	{
 		poco_assert (index < count());
 		return std::string((char*) _fields[index]._message);
 	}
 
-	long nativeError(int index) const
+	[[nodiscard]] long nativeError(int index) const
 		/// Returns native error code.
 	{
 		poco_assert (index < count());
 		return _fields[index]._nativeError;
 	}
 
-	std::string connectionName() const
+	[[nodiscard]] std::string connectionName() const
 		/// Returns the connection name.
 		/// If there is no active connection, connection name defaults to NONE.
 		/// If connection name is not applicable for query context (such as when querying environment handle),
@@ -103,7 +103,7 @@ public:
 		return std::string((char*) _connectionName);
 	}
 
-	std::string serverName() const
+	[[nodiscard]] std::string serverName() const
 		/// Returns the server name.
 		/// If the connection has not been established, server name defaults to NONE.
 		/// If server name is not applicable for query context (such as when querying environment handle),
@@ -112,7 +112,7 @@ public:
 		return std::string((char*) _serverName);
 	}
 
-	int count() const
+	[[nodiscard]] int count() const
 		/// Returns the number of contained diagnostic records.
 	{
 		return (int) _fields.size();
@@ -124,22 +124,22 @@ public:
 		_fields.clear();
 	}
 
-	const FieldVec& fields() const
+	[[nodiscard]] const FieldVec& fields() const
 	{
 		return _fields;
 	}
 
-	Iterator begin() const
+	[[nodiscard]] Iterator begin() const
 	{
 		return _fields.begin();
 	}
 
-	Iterator end() const
+	[[nodiscard]] Iterator end() const
 	{
 		return _fields.end();
 	}
 
-	const Diagnostics& diagnostics()
+	[[nodiscard]] const Diagnostics& diagnostics()
 	{
 		if (POCO_ODBC_NULL_HANDLE == _handle) return *this;
 
@@ -217,7 +217,7 @@ public:
 	}
 
 protected:
-	const H& handle() const
+	[[nodiscard]] const H& handle() const
 	{
 		return _handle;
 	}

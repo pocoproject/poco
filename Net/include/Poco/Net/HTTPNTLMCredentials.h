@@ -58,16 +58,16 @@ public:
 	void setUsername(const std::string& username);
 		/// Sets the username.
 
-	const std::string& getUsername() const;
+	[[nodiscard]] const std::string& getUsername() const;
 		/// Returns the username.
 
 	void setPassword(const std::string& password);
 		/// Sets the password.
 
-	const std::string& getPassword() const;
+	[[nodiscard]] const std::string& getPassword() const;
 		/// Returns the password.
 
-	bool empty() const;
+	[[nodiscard]] bool empty() const;
 		/// Returns true if both username and password are empty, otherwise false.
 
 	void setHost(const std::string& host);
@@ -75,7 +75,7 @@ public:
 		///
 		/// Used for SSPI-based NTLM authentication only.
 
-	const std::string& getHost() const;
+	[[nodiscard]] const std::string& getHost() const;
 		/// Returns the target host.
 
 	void authenticate(HTTPRequest& request, const HTTPResponse& response);

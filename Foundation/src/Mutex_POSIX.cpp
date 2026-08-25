@@ -133,7 +133,7 @@ bool MutexImpl::tryLockImpl(long milliseconds)
 	else
 		throw SystemException("cannot lock mutex", Error::getMessage(rc));
 #else
-	const int sleepMillis = 5;
+	constexpr int sleepMillis = 5;
 	Timestamp now;
 	Timestamp::TimeDiff diff(Timestamp::TimeDiff(milliseconds)*1000);
 	do

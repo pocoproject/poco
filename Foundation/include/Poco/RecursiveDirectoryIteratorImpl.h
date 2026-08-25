@@ -60,21 +60,22 @@ public:
 			delete this;
 	}
 
-	inline UInt16 depth() const
+	[[nodiscard]] inline UInt16 depth() const
 	{
 		return depthFun(_itStack);
 	}
 
-	inline UInt16 maxDepth() const
+	[[nodiscard]] inline UInt16 maxDepth() const
 	{
 		return _maxDepth;
 	}
 
-	inline const std::string& get() const
+	[[nodiscard]] inline const std::string& get() const
 	{
 		return _current;
 	}
-	const std::string& next()
+
+	[[nodiscard]] const std::string& next()
 	{
 		if (_isFinished)
 			return _current;
@@ -87,7 +88,7 @@ public:
 private:
 	using Stack = std::stack<DirectoryIterator>;
 
-	static UInt16 depthFun(const Stack& stack)
+	[[nodiscard]] static UInt16 depthFun(const Stack& stack)
 		/// Function which implements the logic of determining
 		/// recursion depth.
 	{

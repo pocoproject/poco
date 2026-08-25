@@ -80,13 +80,13 @@ public:
 		///
 		/// Flushes the buffer, but does not close the socket.
 
-	SocketStreamBuf* rdbuf();
+	[[nodiscard]] SocketStreamBuf* rdbuf();
 		/// Returns a pointer to the internal SocketStreamBuf.
 
 	void close();
 		/// Flushes the stream and closes the socket.
 
-	StreamSocket socket() const;
+	[[nodiscard]] StreamSocket socket() const;
 		/// Returns the underlying socket.
 
 protected:

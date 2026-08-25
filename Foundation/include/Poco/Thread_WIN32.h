@@ -56,39 +56,39 @@ public:
 	ThreadImpl();
 	~ThreadImpl();
 
-	TIDImpl tidImpl() const;
+	[[nodiscard]] TIDImpl tidImpl() const;
 	void setNameImpl(const std::string& threadName);
-	std::string getNameImpl() const;
-	std::string getOSThreadNameImpl();
+	[[nodiscard]] std::string getNameImpl() const;
+	[[nodiscard]] std::string getOSThreadNameImpl();
 		/// Returns the thread's name, expressed as an operating system
 		/// specific name value. Return empty string if thread is not running.
 		/// For test used only.
 	void setPriorityImpl(int prio);
-	int getPriorityImpl() const;
+	[[nodiscard]] int getPriorityImpl() const;
 	void setOSPriorityImpl(int prio, int policy = 0);
-	int getOSPriorityImpl() const;
-	static int getMinOSPriorityImpl(int policy);
-	static int getMaxOSPriorityImpl(int policy);
+	[[nodiscard]] int getOSPriorityImpl() const;
+	[[nodiscard]] static int getMinOSPriorityImpl(int policy);
+	[[nodiscard]] static int getMaxOSPriorityImpl(int policy);
 	void setStackSizeImpl(int size);
-	int getStackSizeImpl() const;
+	[[nodiscard]] int getStackSizeImpl() const;
 	void startImpl(SharedPtr<Runnable> pTarget);
 	void joinImpl();
 	bool joinImpl(long milliseconds);
-	bool isRunningImpl() const;
+	[[nodiscard]] bool isRunningImpl() const;
 	static void yieldImpl();
-	static ThreadImpl* currentImpl();
-	static TIDImpl currentTidImpl();
-	static long currentOsTidImpl();
+	[[nodiscard]] static ThreadImpl* currentImpl();
+	[[nodiscard]] static TIDImpl currentTidImpl();
+	[[nodiscard]] static long currentOsTidImpl();
 	static void setCurrentNameImpl(const std::string& name);
-	static std::string getCurrentNameImpl();
+	[[nodiscard]] static std::string getCurrentNameImpl();
 	bool setAffinityImpl(int);
-	int getAffinityImpl() const;
+	[[nodiscard]] int getAffinityImpl() const;
 
 protected:
 #if defined(_DLL)
-	static DWORD WINAPI runnableEntry(LPVOID pThread);
+	[[nodiscard]] static DWORD WINAPI runnableEntry(LPVOID pThread);
 #else
-	static unsigned __stdcall runnableEntry(void* pThread);
+	[[nodiscard]] static unsigned int __stdcall runnableEntry(void* pThread);
 #endif
 
 	void createImpl(Entry ent, void* pData);

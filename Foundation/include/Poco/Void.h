@@ -55,13 +55,13 @@ public:
 };
 
 
-inline bool Void::operator ==(const Void& /*v*/) const
+inline bool Void::operator == ([[maybe_unused]] const Void& v) const
 {
 	return true;
 }
 
 
-inline bool Void::operator !=(const Void& /*v*/) const
+inline bool Void::operator != ([[maybe_unused]] const Void& v) const
 {
 	return false;
 }

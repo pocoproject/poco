@@ -24,9 +24,6 @@
 namespace Poco::Data::SQLite {
 
 
-const int SQLiteStatementImpl::POCO_SQLITE_INV_ROW_CNT = -1;
-
-
 SQLiteStatementImpl::SQLiteStatementImpl(Poco::Data::SessionImpl& rSession, sqlite3* pDB):
 	StatementImpl(rSession),
 	_pDB(pDB),
@@ -123,7 +120,7 @@ void SQLiteStatementImpl::compileImpl()
 		//during previous step, switch to the next set if there is one provided
 		if (hasMoreDataSets())
 		{
-			activateNextDataSet();
+			(void)activateNextDataSet();
 			_isExtracted = false;
 		}
 	}

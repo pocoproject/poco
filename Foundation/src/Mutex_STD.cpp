@@ -40,7 +40,7 @@ namespace Poco {
 
 	bool MutexImpl::tryLockImpl(long milliseconds)
 	{
-		const int sleepMillis = 5;
+		constexpr int sleepMillis = 5;
 		Timestamp now;
 		Timestamp::TimeDiff diff(Timestamp::TimeDiff(milliseconds)*1000);
 		do
@@ -85,7 +85,7 @@ namespace Poco {
 
 	bool FastMutexImpl::tryLockImpl(long milliseconds)
 	{
-		const int sleepMillis = 5;
+		constexpr int sleepMillis = 5;
 		Timestamp now;
 		Timestamp::TimeDiff diff(Timestamp::TimeDiff(milliseconds)*1000);
 		do

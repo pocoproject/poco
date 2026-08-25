@@ -20,6 +20,9 @@
 #include <limits>
 
 
+POCO_CHECK_MINMAX_MACROS
+
+
 class StringTest: public CppUnit::TestCase
 {
 public:

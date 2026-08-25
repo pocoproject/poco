@@ -40,7 +40,7 @@ env:
     -DENABLE_ENCODINGS=ON -DENABLE_PDF=ON
     -DENABLE_ZIP=ON -DENABLE_SEVENZIP=ON
     -DENABLE_REDIS=ON -DENABLE_MONGODB=ON -DENABLE_SSH=ON
-    -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON
+    -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_SQLITE_VEC=ON
     -DENABLE_PROMETHEUS=ON
     -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON
     -DENABLE_CPPPARSER=ON
@@ -58,7 +58,7 @@ env:
     -DPOCO_MINIMAL_BUILD=ON -DENABLE_TESTS=ON -DENABLE_TRACE=ON
     -DENABLE_XML=ON -DENABLE_JSON=ON -DENABLE_NET=ON -DENABLE_UTIL=ON
     -DENABLE_CRYPTO=ON -DENABLE_NETSSL=ON -DENABLE_NETSSL_WIN=ON -DENABLE_JWT=ON
-    -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_ODBC=ON
+    -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_SQLITE_VEC=ON -DENABLE_DATA_ODBC=ON
     -DENABLE_ZIP=ON -DENABLE_ENCODINGS=ON -DENABLE_SSH=ON
     -DENABLE_PDF=ON -DENABLE_PROMETHEUS=ON
     -DENABLE_ACTIVERECORD=ON -DENABLE_ACTIVERECORD_COMPILER=ON
@@ -68,7 +68,7 @@ env:
     -DPOCO_MINIMAL_BUILD=ON -DENABLE_TESTS=ON
     -DENABLE_XML=ON -DENABLE_JSON=ON -DENABLE_NET=ON -DENABLE_UTIL=ON
     -DENABLE_NETSSL_WIN=ON
-    -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_ODBC=ON
+    -DENABLE_DATA=ON -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_SQLITE_VEC=ON -DENABLE_DATA_ODBC=ON
   POCO_CMAKE_WARNINGS_EXTRA: >-
     -DENABLE_COMPILER_WARNINGS=ON
     -DENABLE_ENCODINGS_COMPILER=ON
@@ -332,6 +332,7 @@ jobs:
           cmake -S. -Bcmake-build -GNinja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
           -DENABLE_TESTS=ON -DPOCO_UNBUNDLED=ON -DBUILD_SHARED_LIBS=OFF
           -DENABLE_DATA_MYSQL=ON -DENABLE_PDF=ON -DENABLE_XML=ON
+          -DENABLE_DATA_SQLITE_VEC=ON
       - run: cmake --build cmake-build --target all --parallel $(nproc)
       - uses: ./.github/actions/retry-action
         with:
@@ -341,7 +342,7 @@ jobs:
           command: >-
             cd cmake-build &&
             PWD=`pwd`
-            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Util|XML|JSON|Zip)$"
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Util|XML|JSON|Zip|DataSQLite)$"
       - uses: ./.github/actions/upload-test-report
 
   # Clang toolchain exception + C++ modules probe: Foundation + Util smoke.
@@ -402,7 +403,7 @@ jobs:
           sudo apt -y update &&
           sudo apt -y install libssl-dev unixodbc-dev libltdl-dev libmysqlclient-dev libpq-dev
       - name: Configure (classic make, C++20)
-        run: ./configure --config=Linux-c++20 --everything --no-samples
+        run: ./configure --config=Linux-c++20 --everything --no-samples --sqlite-vec
       - name: Build libraries and testsuites
         run: make -s -j$(nproc)
 
@@ -1290,6 +1291,36 @@ jobs:
       - run: sudo apt -y update && sudo apt -y install bison flex valgrind
       - run: cd Data/SQLParser && make -j$(nproc)
       - run: cd Data/SQLParser && make test
+
+  # sqlite-vec + FTS5 extension probe: DataSQLite with both bundled SQLite
+  # extension options enabled (neither is exercised by the default jobs'
+  # sanitizer matrix on x86 AVX paths; this one also covers FTS5).
+  linux-gcc-cmake-sqlite-extensions:
+    runs-on: ubuntu-24.04
+    needs: changes
+    if: |
+      needs.changes.outputs.data == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - run: sudo apt -y update
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
+          ${{ env.POCO_CMAKE_FOUNDATION_ONLY }}
+          -DENABLE_DATA_SQLITE=ON -DENABLE_DATA_SQLITE_VEC=ON -DENABLE_DATA_SQLITE_VEC_AVX=ON
+          -DENABLE_DATA_SQLITE_FTS5=ON
+      - run: cmake --build cmake-build --target DataSQLite-testrunner --parallel $(nproc)
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            PWD=`pwd`
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^DataSQLite$"
+      - uses: ./.github/actions/upload-test-report
 
   linux-gcc-cmake-sqlite-no-sqlparser:
     runs-on: ubuntu-24.04

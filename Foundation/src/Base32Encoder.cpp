@@ -68,7 +68,7 @@ Base32EncoderBuf::~Base32EncoderBuf()
 
 int Base32EncoderBuf::writeToDevice(char c)
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	_group[_groupLength++] = (unsigned char) c;
 	if (_groupLength == 5)
@@ -98,7 +98,7 @@ int Base32EncoderBuf::writeToDevice(char c)
 
 int Base32EncoderBuf::close()
 {
-	static const int eof = std::char_traits<char>::eof();
+	static constexpr int eof = std::char_traits<char>::eof();
 
 	if (sync() == eof) return eof;
 	if (_groupLength == 1)
