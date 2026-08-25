@@ -35,6 +35,7 @@ public:
 	void testShutdownWithoutDataTLS13();
 	void testContextInvalidCertificateHandler();
 	void testAddCertificateAuthority();
+	void testConfigDefaultsToExtendedVerification();
 
 	void setUp();
 	void tearDown();
