@@ -47,6 +47,11 @@ public:
 		/// Creates an FTPSClientSession using the given
 		/// connected socket for the control connection.
 		///
+		/// If readWelcomeMessage is true (the default), the welcome reply
+		/// sent by the server on connect is read from the socket. Pass false
+		/// only if the welcome reply has already been read from the socket;
+		/// see FTPClientSession for the implications.
+		///
 		/// Passive mode will be used for data transfers.
 
 	FTPSClientSession(const std::string& host, Poco::UInt16 port = FTP_PORT, const std::string& username = "", const std::string& password = "", Context::Ptr pContext = nullptr);

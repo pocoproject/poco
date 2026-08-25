@@ -68,6 +68,17 @@ public:
 		/// Creates an FTPClientSession using the given
 		/// connected socket for the control connection.
 		///
+		/// If readWelcomeMessage is true (the default), the welcome reply
+		/// sent by the server on connect is read from the socket and made
+		/// available through welcomeMessage().
+		///
+		/// Pass false only if the welcome reply has already been read from
+		/// the socket. The session then considers the server ready and sends
+		/// the next command without waiting for a reply. Passing false while
+		/// the welcome reply is still pending desynchronizes the session,
+		/// because that reply is then taken as the response to the next
+		/// command sent.
+		///
 		/// Passive mode will be used for data transfers.
 
 	FTPClientSession(const std::string& host, Poco::UInt16 port = FTP_PORT,
@@ -307,9 +318,18 @@ public:
 
 	const std::string& welcomeMessage();
 		/// Returns the welcome message.
+		///
+		/// Empty if the session was created with readWelcomeMessage
+		/// set to false, as the welcome reply is then read by the caller.
 
 protected:
 	virtual void receiveServerReadyReply();
+		/// Reads the welcome reply sent by the server on connect and
+		/// marks the server ready.
+		///
+		/// Does nothing if the server is already marked ready, which is
+		/// the case after the reply has been read once, and after
+		/// construction with readWelcomeMessage set to false.
 
 	enum StatusClass
 	{
