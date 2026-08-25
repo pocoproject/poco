@@ -142,12 +142,13 @@ public:
 		_bOwns = true;
 	}
 
-	bool tryLock()
+	[[nodiscard]] bool tryLock()
 	{
 		poco_assert(_pMutex != nullptr);
 		poco_assert(_bOwns == false);
 
 		_bOwns = _pMutex->tryLock();
+		return _bOwns;
 	}
 
 	void unlock()
