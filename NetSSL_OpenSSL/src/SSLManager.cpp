@@ -60,6 +60,7 @@ const std::string SSLManager::CFG_SESSION_ID_CONTEXT("sessionIdContext");
 const std::string SSLManager::CFG_SESSION_CACHE_SIZE("sessionCacheSize");
 const std::string SSLManager::CFG_SESSION_TIMEOUT("sessionTimeout");
 const std::string SSLManager::CFG_EXTENDED_VERIFICATION("extendedVerification");
+const bool        SSLManager::VAL_EXTENDED_VERIFICATION(true);
 const std::string SSLManager::CFG_REQUIRE_TLSV1("requireTLSv1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_1("requireTLSv1_1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_2("requireTLSv1_2");
@@ -533,7 +534,11 @@ void SSLManager::initDefaultContext(bool server)
 	{
 		_ptrDefaultClientContext->enableSessionCache(cacheSessions);
 	}
-	bool extendedVerification = config.getBool(prefix + CFG_EXTENDED_VERIFICATION, false);
+	// Extended verification matches the peer certificate against a host name.
+	// A server has no host name for its peer, so enabling it there would match
+	// the client certificate against the client's address and break mutual TLS.
+	const bool defaultExtendedVerification = server ? false : VAL_EXTENDED_VERIFICATION;
+	bool extendedVerification = config.getBool(prefix + CFG_EXTENDED_VERIFICATION, defaultExtendedVerification);
 	if (server)
 		_ptrDefaultServerContext->enableExtendedCertificateVerification(extendedVerification);
 	else
