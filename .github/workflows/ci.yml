@@ -229,6 +229,76 @@ jobs:
             PWD=`pwd`
             ctest --output-on-failure --parallel 4 -R "^(Crypto|NetSSL|JWT)$"
 
+  # Minimum supported OpenSSL (1.1.1, enforced by Crypto.h). ubuntu-24.04 ships
+  # OpenSSL 3, so 1.1.1 is built from source and cached. This is the only job
+  # that compiles the pre-3.0 preprocessor branches in Crypto and NetSSL;
+  # -Werror=return-type turns a mis-nested #if/#else in those branches into a
+  # build failure instead of a warning nobody reads.
+  linux-gcc-cmake-openssl111:
+    runs-on: ubuntu-24.04
+    env:
+      OPENSSL111_VERSION: 1.1.1w
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set OpenSSL ${{ env.OPENSSL111_VERSION }} paths
+        run: |
+          prefix="${GITHUB_WORKSPACE}/.openssl-${OPENSSL111_VERSION}"
+          echo "OPENSSL111_PREFIX=${prefix}" >> "$GITHUB_ENV"
+          echo "LD_LIBRARY_PATH=${prefix}/lib" >> "$GITHUB_ENV"
+      - name: Cache OpenSSL ${{ env.OPENSSL111_VERSION }}
+        id: openssl111-cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.OPENSSL111_PREFIX }}
+          key: openssl111-${{ env.OPENSSL111_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+      - name: Build OpenSSL ${{ env.OPENSSL111_VERSION }}
+        if: steps.openssl111-cache.outputs.cache-hit != 'true'
+        run: |
+          sudo apt -y update && sudo apt -y install build-essential curl perl
+          curl -fsSL -O "https://www.openssl.org/source/old/1.1.1/openssl-${OPENSSL111_VERSION}.tar.gz"
+          tar xzf "openssl-${OPENSSL111_VERSION}.tar.gz"
+          cd "openssl-${OPENSSL111_VERSION}"
+          ./config --prefix="${OPENSSL111_PREFIX}" --openssldir="${OPENSSL111_PREFIX}/ssl" shared
+          make -j"$(nproc)"
+          make install_sw install_ssldirs
+      - name: Verify OpenSSL ${{ env.OPENSSL111_VERSION }}
+        run: |
+          "${OPENSSL111_PREFIX}/bin/openssl" version
+          "${OPENSSL111_PREFIX}/bin/openssl" version | grep -q "^OpenSSL 1[.]1[.]1" || {
+            echo "expected OpenSSL 1.1.1" >&2
+            exit 1
+          }
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja
+          -DCMAKE_CXX_FLAGS="-Werror=return-type"
+          -DPOCO_MINIMAL_BUILD=ON -DENABLE_TESTS=ON
+          -DENABLE_CRYPTO=ON -DENABLE_NETSSL=ON -DENABLE_JWT=ON
+          -DOPENSSL_ROOT_DIR=${{ env.OPENSSL111_PREFIX }}
+          -DCMAKE_BUILD_RPATH=${{ env.OPENSSL111_PREFIX }}/lib
+          -DCMAKE_INSTALL_RPATH=${{ env.OPENSSL111_PREFIX }}/lib
+      # NetSSL is built but its tests are not run here: TCPServerTest's
+      # testClientClosesWithoutReadingTLS13 is flaky against 1.1.1 (it passes
+      # consistently against OpenSSL 3). Compiling NetSSL is what this job is
+      # for; the flake is tracked separately.
+      - run: cmake --build cmake-build --target all --parallel 4
+      - name: Verify Poco linked against OpenSSL 1.1.1
+        run: |
+          ldd cmake-build/lib/libPocoCrypto.so
+          ldd cmake-build/lib/libPocoCrypto.so | grep -q "libcrypto[.]so[.]1[.]1" || {
+            echo "PocoCrypto did not link against OpenSSL 1.1.1" >&2
+            exit 1
+          }
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 30
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            PWD=`pwd`
+            ctest --output-on-failure --parallel 4 -R "^(Crypto|JWT)$"
+
   linux-gcc-cmake-asan:
     runs-on: ubuntu-24.04
     steps:
