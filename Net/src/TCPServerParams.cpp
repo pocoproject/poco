@@ -28,7 +28,8 @@ TCPServerParams::TCPServerParams():
 	_reactorMode(false),
 	_acceptorNum(1),
 	_useSelfReactor(false),
-	_sendTimeout(0)
+	_sendTimeout(0),
+	_maxPendingRequestSize(10*1024*1024)
 {
 }
 

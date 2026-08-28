@@ -23,6 +23,7 @@
 #include "Poco/Timespan.h"
 #include "Poco/Thread.h"
 #include "Poco/AutoPtr.h"
+#include <cstddef>
 
 
 namespace Poco {
@@ -133,6 +134,18 @@ public:
 		///
 		/// Zero (the default) preserves the historical no-timeout behavior.
 
+	std::size_t getMaxPendingRequestSize() const;
+		/// Returns the maximum size of a not yet completely received request,
+		/// in bytes.
+
+	void setMaxPendingRequestSize(std::size_t size);
+		/// Sets the maximum number of bytes buffered per connection while a
+		/// request is still incomplete; a connection exceeding it is closed.
+		/// Default 10 MB, 0 disables the limit. Reactor mode only.
+		///
+		/// The same buffer holds the request body, so the limit must cover the
+		/// largest body the server is expected to accept.
+
 protected:
 	virtual ~TCPServerParams();
 		/// Destroys the TCPServerParams.
@@ -147,6 +160,7 @@ private:
 	int _acceptorNum;
 	bool _useSelfReactor;
 	Poco::Timespan _sendTimeout;
+	std::size_t _maxPendingRequestSize;
 };
 
 
@@ -186,6 +200,18 @@ inline const Poco::Timespan& TCPServerParams::getSendTimeout() const
 inline void TCPServerParams::setSendTimeout(const Poco::Timespan& timeout)
 {
 	_sendTimeout = timeout;
+}
+
+
+inline std::size_t TCPServerParams::getMaxPendingRequestSize() const
+{
+	return _maxPendingRequestSize;
+}
+
+
+inline void TCPServerParams::setMaxPendingRequestSize(std::size_t size)
+{
+	_maxPendingRequestSize = size;
 }
 
 
