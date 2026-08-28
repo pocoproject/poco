@@ -1,7 +1,12 @@
 #include "Poco/Net/HTTPReactorServerSession.h"
 #include "Poco/Net/HTTPMessage.h"
+#include "Poco/Net/MessageHeader.h"
 #include "Poco/String.h"
+#include "Poco/NumberParser.h"
+#include "Poco/Ascii.h"
+#include <algorithm>
 #include <cstddef>
+#include <sstream>
 
 namespace Poco {
 namespace Net {
@@ -99,49 +104,47 @@ bool HTTPReactorServerSession::checkRequestComplete()
 bool HTTPReactorServerSession::parseHeaders(
 	std::size_t pos, std::size_t& bodyStart, std::size_t& contentLength, bool& isChunked)
 {
-	std::size_t headerEnd = _buf.find("\r\n\r\n", pos);
+	const std::size_t headerEnd = _buf.find("\r\n\r\n", pos);
 	if (headerEnd == std::string::npos)
 	{
 		return false; // Incomplete headers
 	}
 
 	bodyStart = headerEnd + 4; // "\r\n\r\n" is 4 characters
-	std::size_t chunkedPos = _buf.find(HTTPMessage::TRANSFER_ENCODING, pos);
-	if (chunkedPos == std::string::npos)
-	{
-		chunkedPos = _buf.find(toLower(HTTPMessage::TRANSFER_ENCODING), pos);
-	}
-	std::size_t chunkedVal = _buf.find(HTTPMessage::CHUNKED_TRANSFER_ENCODING, chunkedPos);
-	std::size_t chunkedLineEnd = _buf.find("\r\n", chunkedPos);
-	if (chunkedPos != std::string::npos && chunkedVal != std::string::npos &&
-		chunkedLineEnd != std::string::npos && chunkedVal < chunkedLineEnd)
-	{
-		isChunked = true;
-		return true;
-	}
-	std::size_t contentLengthPos = _buf.find(HTTPMessage::CONTENT_LENGTH, pos);
-	if(contentLengthPos == std::string::npos)
-	{
-		contentLengthPos = _buf.find(toLower(HTTPMessage::CONTENT_LENGTH), pos);
-	}
-	if (contentLengthPos != std::string::npos)
-	{
-		std::size_t valueStart = contentLengthPos + 15; // "Content-Length:" is 15 characters
-		std::size_t valueEnd = _buf.find("\r\n", valueStart);
-		if (valueEnd != std::string::npos)
-		{
-			contentLength = std::stoi(_buf.substr(valueStart, valueEnd - valueStart));
-			isChunked = false;
-			return true;
-		} else
-		{
-			return false; // Incomplete Content-Length header
-		}
-	}
 	contentLength = 0;
 	isChunked = false;
+
+	// The byte boundary computed here has to agree with the message the request
+	// handler is given, so the same parser decides both. A substring search over
+	// the raw buffer does not agree: a spelling such as "TRANSFER-ENCODING"
+	// would be missed and the body left to be read as a new request.
+	const std::size_t fieldsStart = _buf.find("\r\n", pos);
+	if (fieldsStart == std::string::npos || fieldsStart >= headerEnd) return true;
+
+	MessageHeader header;
+	try
+	{
+		std::istringstream fields(_buf.substr(fieldsStart + 2, headerEnd + 2 - fieldsStart - 2));
+		header.read(fields);
+	}
+	catch (const Poco::Exception&)
+	{
+		return false; // Malformed, wait rather than guess a boundary
+	}
+
+	isChunked = Poco::icompare(header.get(HTTPMessage::TRANSFER_ENCODING, ""s),
+		HTTPMessage::CHUNKED_TRANSFER_ENCODING) == 0;
+	if (isChunked) return true;
+
+	const std::string& length = header.get(HTTPMessage::CONTENT_LENGTH, ""s);
+	if (length.empty()) return true;
+	if (!std::all_of(length.begin(), length.end(),
+			[](char c) { return Poco::Ascii::isDigit(c); }))
+		return false;
+	contentLength = static_cast<std::size_t>(Poco::NumberParser::parseUnsigned64(length));
 	return true;
 }
+
 
 bool HTTPReactorServerSession::parseChunkSize(std::size_t& pos, std::size_t& chunkSize, int& complete)
 {
