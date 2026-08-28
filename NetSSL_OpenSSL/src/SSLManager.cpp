@@ -28,6 +28,7 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/OptionException.h"
+#include <openssl/err.h>
 #include <openssl/ocsp.h>
 #include <openssl/tls1.h>
 
@@ -315,21 +316,30 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 		return 0;
 	}
 
+	// The chain is supplied by the peer, and X509_check_issued() only matches
+	// names and key identifiers. Without also checking the signature an attacker
+	// can add a self-signed certificate carrying the real issuer's subject name
+	// and have the response accepted as if the genuine issuer had produced it.
 	X509* pPeerIssuerCert = nullptr;
 	STACK_OF(X509)* pCertChain = SSL_get_peer_cert_chain(pSSL);
 	unsigned certChainLen = sk_X509_num(pCertChain);
 	for (unsigned i = 0; i < certChainLen; i++)
 	{
-		if (!pPeerIssuerCert)
+		X509* pIssuerCert = sk_X509_value(pCertChain, i);
+		if (X509_check_issued(pIssuerCert, pPeerCert) != X509_V_OK) continue;
+
+		EVP_PKEY* pIssuerKey = X509_get0_pubkey(pIssuerCert);
+		if (pIssuerKey != nullptr && X509_verify(pPeerCert, pIssuerKey) == 1)
 		{
-			X509* pIssuerCert = sk_X509_value(pCertChain, i);
-			if (X509_check_issued(pIssuerCert, pPeerCert) == X509_V_OK)
-			{
-				pPeerIssuerCert = pIssuerCert;
-				break;
-			}
+			pPeerIssuerCert = pIssuerCert;
+			break;
 		}
 	}
+	// Candidates that are not the issuer fail X509_verify() and leave entries on
+	// the thread error queue. SSL_get_error() consults it before the want-read
+	// and want-write states, so a later read would be reported as a fatal error.
+	ERR_clear_error();
+
 	if (!pPeerIssuerCert)
 	{
 		X509_free(pPeerCert);
@@ -352,7 +362,9 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 
 	X509_STORE* pStore = SSL_CTX_get_cert_store(SSL_get_SSL_CTX(pSSL));
 
-	int verifyStatus = OCSP_basic_verify(pBasicResp, pCerts, pStore, OCSP_TRUSTOTHER);
+	// No OCSP_TRUSTOTHER: the responder certificate has to chain to the store
+	// rather than being trusted just because the peer sent it.
+	int verifyStatus = OCSP_basic_verify(pBasicResp, pCerts, pStore, 0);
 
 	sk_X509_pop_free(pCerts, X509_free);
 
