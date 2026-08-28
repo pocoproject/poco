@@ -416,6 +416,103 @@ void ZipTest::tearDown()
 }
 
 
+void ZipTest::testMalformedZip64()
+{
+	// A ZIP64 end of central directory record whose declared size is far larger
+	// than the data present must not drive an allocation from that number, and a
+	// truncated ZIP64 extra field must not be read past the bytes available.
+	{
+		std::string data;
+		data.append("PK\x06\x06", 4);                        // ZIP64 end of central directory
+		const char hugeSize[8] = { '\xff', '\xff', '\xff', '\xff', '\xff', '\xff', '\xff', '\x7f' };
+		data.append(hugeSize, 8);                             // record size: ~2^63
+		data.append(16, '\0');                                // a little payload, then EOF
+		std::istringstream istr(data);
+		try
+		{
+			ZipArchive arch(istr);
+			fail("malformed ZIP64 record must be rejected");
+		}
+		catch (Poco::Exception&)
+		{
+		}
+	}
+
+	// A central directory header whose ZIP64 extra field declares more bytes
+	// than the field actually holds must not be read past that field.
+	{
+		std::string data;
+		data.append("PK\x01\x02", 4);                          // central directory header
+		data.append(2, '\0');                                  // version made by
+		data.append("\x2d\x00", 2);                            // version needed 4.5
+		data.append(2, '\0');                                  // general purpose flags
+		data.append(2, '\0');                                  // compression method
+		data.append(4, '\0');                                  // time and date
+		data.append(4, '\0');                                  // crc32
+		const char magic[4] = { '\xff', '\xff', '\xff', '\xff' };
+		data.append(magic, 4);                                 // compressed size
+		data.append(magic, 4);                                 // uncompressed size
+		data.append("\x01\x00", 2);                            // file name length
+		data.append("\x08\x00", 2);                            // extra field length: 8
+		data.append(2, '\0');                                  // file comment length
+		data.append(2, '\0');                                  // disk number start
+		data.append(2, '\0');                                  // internal attributes
+		data.append(4, '\0');                                  // external attributes
+		data.append(magic, 4);                                 // local header offset
+		data.append("a", 1);                                   // file name
+		data.append("\x01\x00", 2);                            // extra field id: ZIP64
+		data.append("\x18\x00", 2);                            // declared size 24, 4 present
+		data.append(4, '\0');
+		std::istringstream istr(data);
+		try
+		{
+			ZipArchive arch(istr);
+		}
+		catch (Poco::Exception&)
+		{
+			// Rejecting the archive is fine, reading out of bounds is not. Under
+			// AddressSanitizer this is what catches a regression.
+		}
+	}
+
+	// The same mismatch in a local file header. The compressed size is left at
+	// zero so the entry is skipped normally and the extra field is the only
+	// thing under test.
+	{
+		std::string data;
+		data.append("PK\x03\x04", 4);
+		data.append("\x2d\x00", 2);                            // version needed 4.5
+		data.append(2, '\0');                                  // general purpose flags
+		data.append(2, '\0');                                  // compression method: store
+		data.append(4, '\0');                                  // time and date
+		data.append(4, '\0');                                  // crc32
+		data.append(4, '\0');                                  // compressed size: 0
+		const char magic[4] = { '\xff', '\xff', '\xff', '\xff' };
+		data.append(magic, 4);                                 // uncompressed size: magic
+		data.append("\x01\x00", 2);                            // file name length
+		data.append("\x08\x00", 2);                            // extra field length: 8
+		data.append("a", 1);                                   // file name
+		data.append("\x01\x00", 2);                            // extra field id: ZIP64
+		data.append("\x10\x00", 2);                            // declared size 16, 4 present
+		data.append(4, '\0');
+		std::istringstream istr(data);
+		try
+		{
+			ZipArchive arch(istr);
+			// The declared ZIP64 size exceeds the field, so no value may have
+			// been taken from beyond it: the header value stays untouched.
+			auto it = arch.headerBegin();
+			if (it != arch.headerEnd())
+				assertTrue (it->second.getUncompressedSize() == ZipCommon::ZIP64_MAGIC);
+		}
+		catch (Poco::Exception&)
+		{
+		}
+	}
+
+}
+
+
 CppUnit::Test* ZipTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ZipTest");
@@ -432,6 +529,7 @@ CppUnit::Test* ZipTest::suite()
 	CppUnit_addTest(pSuite, ZipTest, testCrcAndSizeAfterDataEncapsulated);
 	CppUnit_addTest(pSuite, ZipTest, testDecompressZip64);
 	CppUnit_addTest(pSuite, ZipTest, testValidPath);
+	CppUnit_addTest(pSuite, ZipTest, testMalformedZip64);
 	CppUnit_addTest(pSuite, ZipTest, testDecompressConsistency);
 
 	return pSuite;

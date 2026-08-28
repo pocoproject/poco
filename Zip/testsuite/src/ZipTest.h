@@ -42,6 +42,7 @@ public:
 	void verifyDataFile(const std::string& path, Poco::UInt64 size);
 	void testDecompressZip64();
 	void testValidPath();
+	void testMalformedZip64();
 
 	void setUp();
 	void tearDown();
