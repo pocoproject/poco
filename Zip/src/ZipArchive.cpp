@@ -162,20 +162,13 @@ void ZipArchive::parse(std::istream& in, ParseCallback& pc)
 
 const std::string& ZipArchive::getZipComment() const
 {
-	// It seems that only the "first" disk is populated (look at Compress::close()), so getting the first ZipArchiveInfo
+	// Only the "first" disk is populated (see Compress::close()). A ZIP64 end of
+	// central directory record carries no comment field, so an archive that has
+	// only that record has no comment to return.
 	DirectoryInfos::const_iterator it = _disks.begin();
 	if (it != _disks.end())
-	{
 		return it->second.getZipComment();
-	}
-	else
-	{
-		DirectoryInfos64::const_iterator it64 = _disks64.begin();
-		if (it64 != _disks64.end())
-			return it->second.getZipComment();
-		else
-			return EMPTY_COMMENT;
-	}
+	return EMPTY_COMMENT;
 }
 
 

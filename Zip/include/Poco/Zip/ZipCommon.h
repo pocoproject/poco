@@ -34,6 +34,8 @@ public:
 	};
 
 	static constexpr Poco::UInt16 ZIP64_EXTRA_ID	= 0x1;		  // Extra data id tag for Zip64 data (in extension for ZipLocalFileHeader and ZipFileInfo)
+	static constexpr Poco::UInt16 EXTRA_FIELD_HEADER_SIZE = 4;	  // Extra field header: id and data size
+	static constexpr Poco::UInt16 ZIP64_VALUE_SIZE	= 8;		  // One 64-bit value in a Zip64 extra field
 	static constexpr Poco::UInt16 ZIP64_MAGIC_SHORT = 0xFFFF;
 	static constexpr Poco::UInt32 ZIP64_MAGIC		= 0xFFFFFFFF;
 
