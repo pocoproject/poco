@@ -152,34 +152,44 @@ Dynamic::Var ParserImpl::parseImpl(std::istream& json)
 
 void ParserImpl::stripComments(std::string& json)
 {
-	if (_allowComments)
+	if (!_allowComments) return;
+
+	// The bundled parser has no notion of comments, so they have to be removed
+	// before it sees the document. That means repeating its string lexing here,
+	// and any disagreement with it is a defect: text inside a string is data,
+	// never a comment. Compacting in place because erasing per character is
+	// quadratic, which one long comment turns into a denial of service.
+	std::string::iterator out = json.begin();
+	bool inString = false;
+	bool escaped = false;
+	for (std::string::const_iterator it = json.cbegin(); it != json.cend(); ++it)
 	{
-		bool inString = false;
-		bool inComment = false;
-		char prevChar = 0;
-		std::string::iterator it = json.begin();
-		for (; it != json.end();)
+		if (inString)
 		{
-			inString = *it == '"' && !inString;
-			if (!inString)
-			{
-				if (*it == '/' && it + 1 != json.end() && *(it + 1) == '*')
-					inComment = true;
-			}
-			if (inComment)
-			{
-				char c = *it;
-				it = json.erase(it);
-				if (prevChar == '*' && c == '/')
-				{
-					inComment = false;
-					prevChar = 0;
-				}
-				else prevChar = c;
-			}
-			else ++it;
+			// Only an unescaped quote ends the string, so a comment delimiter
+			// inside a value is never taken for a real comment.
+			if (escaped) escaped = false;
+			else if (*it == '\\') escaped = true;
+			else if (*it == '"') inString = false;
 		}
+		else if (*it == '"')
+		{
+			inString = true;
+		}
+		else if (*it == '/' && it + 1 != json.cend() && *(it + 1) == '*')
+		{
+			// Skip to the closing delimiter. "/*/" does not close the comment:
+			// the '/' is part of the opening delimiter.
+			it += 2;
+			while (it != json.cend() && !(*it == '*' && it + 1 != json.cend() && *(it + 1) == '/'))
+				++it;
+			if (it == json.cend()) break;
+			++it;
+			continue;
+		}
+		*out++ = *it;
 	}
+	json.erase(out, json.end());
 }
 
 
@@ -212,7 +222,14 @@ void ParserImpl::handleObject()
 	while (tok != JSON_OBJECT_END && checkError())
 	{
 		json_next(_pJSON);
-		if (_pHandler) _pHandler->key(std::string(json_get_string(_pJSON, nullptr)));
+		if (_pHandler)
+		{
+			// Read the key with its length: the C string form stops at an
+			// embedded NUL, which would silently merge distinct keys.
+			std::size_t length = 0;
+			const char* key = json_get_string(_pJSON, &length);
+			_pHandler->key(std::string(key, length == 0 ? 0 : length - 1));
+		}
 		handle();
 		tok = json_peek(_pJSON);
 	}
