@@ -33,6 +33,7 @@ public:
 	void testStopClosesMultipleConnections();
 	void testStopClosesConnectionsSelfReactor();
 	void testReactorErrorClosesConnection();
+	void testIncompleteRequestSizeLimit();
 
 	void setUp();
 	void tearDown();
