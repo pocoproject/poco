@@ -117,38 +117,35 @@ void ZipFileInfo::parse(std::istream& inp, bool assumeHeaderRead)
 			Poco::Buffer<char> xtra(len);
 			inp.read(xtra.begin(), len);
 			_extraField = std::string(xtra.begin(), len);
+			// The field sizes come from the archive, so every read is bounded by
+			// the buffer that was actually read rather than by the declared size.
+			const char* const end = xtra.begin() + len;
 			char* ptr = xtra.begin();
-			while (ptr <= xtra.begin() + len - 4)
+			while (end - ptr >= ZipCommon::EXTRA_FIELD_HEADER_SIZE)
 			{
-				Poco::UInt16 id = ZipUtil::get16BitValue(ptr, 0);
-				ptr += 2;
-				Poco::UInt16 size = ZipUtil::get16BitValue(ptr, 0);
-				ptr += 2;
+				const Poco::UInt16 id = ZipUtil::get16BitValue(ptr, 0);
+				const Poco::UInt16 size = ZipUtil::get16BitValue(ptr, 2);
+				ptr += ZipCommon::EXTRA_FIELD_HEADER_SIZE;
+				if (size > end - ptr) break;
 				if (id == ZipCommon::ZIP64_EXTRA_ID)
 				{
-					if (size >= 8 && getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
+					char* field = ptr;
+					Poco::UInt16 remaining = size;
+					const auto readNext = [&field, &remaining]()
 					{
-						setUncompressedSize(ZipUtil::get64BitValue(ptr, 0));
-						size -= 8;
-						ptr += 8;
-					}
-					if (size >= 8 && getCompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
-					{
-						setCompressedSize(ZipUtil::get64BitValue(ptr, 0));
-						size -= 8;
-						ptr += 8;
-					}
-					if (size >= 8 && getOffsetFromHeader() == ZipCommon::ZIP64_MAGIC)
-					{
-						setOffset(ZipUtil::get64BitValue(ptr, 0));
-						size -= 8;
-						ptr += 8;
-					}
+						const Poco::UInt64 value = ZipUtil::get64BitValue(field, 0);
+						field += ZipCommon::ZIP64_VALUE_SIZE;
+						remaining -= ZipCommon::ZIP64_VALUE_SIZE;
+						return value;
+					};
+					if (remaining >= ZipCommon::ZIP64_VALUE_SIZE && getUncompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
+						setUncompressedSize(readNext());
+					if (remaining >= ZipCommon::ZIP64_VALUE_SIZE && getCompressedSizeFromHeader() == ZipCommon::ZIP64_MAGIC)
+						setCompressedSize(readNext());
+					if (remaining >= ZipCommon::ZIP64_VALUE_SIZE && getOffsetFromHeader() == ZipCommon::ZIP64_MAGIC)
+						setOffset(readNext());
 				}
-				else
-				{
-					ptr += size;
-				}
+				ptr += size;
 			}
 		}
 	}
