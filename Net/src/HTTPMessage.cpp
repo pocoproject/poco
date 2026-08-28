@@ -146,9 +146,13 @@ std::string HTTPMessage::getTransferEncoding() const
 void HTTPMessage::setChunkedTransferEncoding(bool flag)
 {
 	if (flag)
+	{
 		setTransferEncoding(CHUNKED_TRANSFER_ENCODING);
-	else
-		setTransferEncoding(IDENTITY_TRANSFER_ENCODING);
+		// The two together make the message length ambiguous, and a recipient is
+		// entitled to reject it.
+		erase(CONTENT_LENGTH);
+	}
+	else setTransferEncoding(IDENTITY_TRANSFER_ENCODING);
 }
 
 
