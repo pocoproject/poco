@@ -98,6 +98,7 @@ void FTPSClientSessionTest::testLogin1()
 	DialogServer server;
 	server.addResponse("220 localhost FTP ready");
 	FTPSClientSession session("127.0.0.1", server.port());
+	session.allowPlaintextFallback(true); // DialogServer denies AUTH
 	assertTrue (session.isOpen());
 	assertTrue (!session.isLoggedIn());
 	login(server, session);
@@ -131,7 +132,11 @@ void FTPSClientSessionTest::testLogin2()
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
 	Poco::UInt16 serverPort = server.port();
-	FTPSClientSession session("127.0.0.1", serverPort, "user", "password");
+	// The credentials cannot go through the constructor here: that form always
+	// requires TLS, and this server offers none.
+	FTPSClientSession session("127.0.0.1", serverPort);
+	session.allowPlaintextFallback(true);
+	session.login("user", "password");
 	assertTrue (session.isOpen());
 	assertTrue (session.isLoggedIn());
 	server.addResponse("221 Good Bye");
@@ -165,6 +170,7 @@ void FTPSClientSessionTest::testLogin3()
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
 	FTPSClientSession session;
+	session.allowPlaintextFallback(true); // DialogServer denies AUTH
 	assertTrue (!session.isOpen());
 	assertTrue (!session.isLoggedIn());
 	session.open("127.0.0.1", server.port(), "user", "password");
@@ -181,6 +187,7 @@ void FTPSClientSessionTest::testLoginFailed1()
 	DialogServer server;
 	server.addResponse("421 localhost FTP not ready");
 	FTPSClientSession session("127.0.0.1", server.port());
+	session.allowPlaintextFallback(true); // DialogServer denies AUTH
 	try
 	{
 		session.login("user", "password");
@@ -201,6 +208,7 @@ void FTPSClientSessionTest::testLoginFailed2()
 	server.addResponse("331 Password required");
 	server.addResponse("530 Login incorrect");
 	FTPSClientSession session("127.0.0.1", server.port());
+	session.allowPlaintextFallback(true); // DialogServer denies AUTH
 	try
 	{
 		session.login("user", "password");
@@ -274,6 +282,7 @@ void FTPSClientSessionTest::testCommands()
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
 	FTPSClientSession session("127.0.0.1", server.port());
+	session.allowPlaintextFallback(true); // DialogServer denies AUTH
 	session.login("user", "password");
 	std::string cmd = server.popCommand();
 	assertTrue (cmd == "USER user");
@@ -403,6 +412,7 @@ void FTPSClientSessionTest::testDownloadPORT()
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
 	FTPSClientSession session("127.0.0.1", server.port());
+	session.allowPlaintextFallback(true); // DialogServer denies AUTH
 	session.setPassive(false);
 	session.login("user", "password");
 	server.clearCommands();
@@ -458,6 +468,7 @@ void FTPSClientSessionTest::testDownloadEPRT()
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
 	FTPSClientSession session("127.0.0.1", server.port());
+	session.allowPlaintextFallback(true); // DialogServer denies AUTH
 	session.setPassive(false);
 	session.login("user", "password");
 	server.clearCommands();
@@ -506,6 +517,7 @@ void FTPSClientSessionTest::testDownloadPASV()
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
 	FTPSClientSession session("127.0.0.1", server.port());
+	session.allowPlaintextFallback(true); // DialogServer denies AUTH
 	session.login("user", "password");
 	server.clearCommands();
 
@@ -539,6 +551,7 @@ void FTPSClientSessionTest::testDownloadEPSV()
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
 	FTPSClientSession session("127.0.0.1", server.port());
+	session.allowPlaintextFallback(true); // DialogServer denies AUTH
 	session.login("user", "password");
 	server.clearCommands();
 
@@ -574,6 +587,7 @@ void FTPSClientSessionTest::testUpload()
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
 	FTPSClientSession session("127.0.0.1", server.port());
+	session.allowPlaintextFallback(true); // DialogServer denies AUTH
 	session.login("user", "password");
 	server.clearCommands();
 
@@ -643,6 +657,7 @@ void FTPSClientSessionTest::testList()
 	server.addResponse("230 Welcome");
 	server.addResponse("200 Type set to I");
 	FTPSClientSession session("127.0.0.1", server.port());
+	session.allowPlaintextFallback(true); // DialogServer denies AUTH
 	session.login("user", "password");
 	server.clearCommands();
 
@@ -680,11 +695,67 @@ void FTPSClientSessionTest::tearDown()
 }
 
 
+void FTPSClientSessionTest::testNoPlaintextFallback()
+{
+	DialogServer server;
+	server.addResponse("220 localhost FTP ready");
+	FTPSClientSession session("127.0.0.1", server.port());
+	assertTrue (session.isOpen());
+	assertTrue (!session.isSecure());
+
+	// DialogServer answers 501 to AUTH, so login must fail rather than send the
+	// credentials over the plaintext connection.
+	try
+	{
+		session.login("user", "password");
+		fail("login over a refused TLS connection must throw");
+	}
+	catch (Poco::Net::FTPException&)
+	{
+	}
+	assertTrue (!session.isLoggedIn());
+
+	session.allowPlaintextFallback(true);
+	server.addResponse("331 Password required");
+	server.addResponse("230 Welcome");
+	server.addResponse("200 Type set to I");
+	session.login("user", "password");
+	assertTrue (session.isLoggedIn());
+
+	// Closing a logged-in session sends QUIT and blocks for the reply, so the
+	// response has to be queued or teardown hangs.
+	server.addResponse("221 Good Bye");
+	session.close();
+}
+
+
+void FTPSClientSessionTest::testCredentialConstructorRequiresTLS()
+{
+	// This form must offer AUTH before sending the credentials: the base
+	// constructor logs in before the FTPS override is in effect.
+	DialogServer server;
+	server.addResponse("220 localhost FTP ready");
+	server.addResponse("331 Password required");
+	server.addResponse("230 Welcome");
+	server.addResponse("200 Type set to I");
+	try
+	{
+		FTPSClientSession session("127.0.0.1", server.port(), "user", "password");
+		fail("credentials must not be sent when the server refuses TLS");
+	}
+	catch (Poco::Net::FTPException&)
+	{
+	}
+}
+
+
 CppUnit::Test* FTPSClientSessionTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("FTPSClientSessionTest");
 
 	CppUnit_addTest(pSuite, FTPSClientSessionTest, testLogin1);
+	CppUnit_addTest(pSuite, FTPSClientSessionTest, testNoPlaintextFallback);
+	CppUnit_addTest(pSuite, FTPSClientSessionTest, testCredentialConstructorRequiresTLS);
 	CppUnit_addTest(pSuite, FTPSClientSessionTest, testLogin2);
 	CppUnit_addTest(pSuite, FTPSClientSessionTest, testLogin3);
 	CppUnit_addTest(pSuite, FTPSClientSessionTest, testLoginFailed1);
