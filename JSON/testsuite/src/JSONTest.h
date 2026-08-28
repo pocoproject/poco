@@ -87,6 +87,8 @@ public:
 	void testRemove();
 
 	void testEnum();
+	void testEmbeddedNulKey();
+	void testCommentsInStrings();
 
 	void setUp();
 	void tearDown();
