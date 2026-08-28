@@ -43,9 +43,13 @@ FTPSClientSession::FTPSClientSession(const StreamSocket& socket, bool readWelcom
 
 
 FTPSClientSession::FTPSClientSession(const std::string& host, Poco::UInt16 port, const std::string& username, const std::string& password, Context::Ptr pContext):
-	FTPClientSession(host, port, username, password),
+	FTPClientSession(host, port),
 	_pContext(pContext)
 {
+	// Not passed to the base constructor: it logs in from its own body, where
+	// the dynamic type is still FTPClientSession, so AUTH would never be sent.
+	if (!username.empty())
+		login(username, password);
 }
 
 
@@ -103,9 +107,16 @@ void FTPSClientSession::afterCreateControlSocket()
 			throw;
 		}
 	}
-	else
+	else if (_allowPlaintextFallback)
 	{
 		_enableFTPS = false;
+	}
+	else
+	{
+		// A man in the middle can force this by denying both commands, and the
+		// session would then carry the credentials passed to login() in the
+		// clear. Fail instead, unless the caller opted into the downgrade.
+		throw FTPException("Server refused to start TLS", sResponse, status);
 	}
 }
 

@@ -35,6 +35,8 @@ public:
 	~FTPSClientSessionTest();
 
 	void testLogin1();
+	void testNoPlaintextFallback();
+	void testCredentialConstructorRequiresTLS();
 	void testLogin2();
 	void testLogin3();
 	void testLoginFailed1();

@@ -71,6 +71,21 @@ public:
 	void forceSessionReuse(bool force = true);
 		/// Enable or disable session reusing
 
+	void allowPlaintextFallback(bool allow = true);
+		/// Allow the session to continue unencrypted if the server refuses both
+		/// AUTH TLS and AUTH SSL. Must be set before the first command, so it
+		/// cannot be combined with the constructor that takes credentials:
+		/// that form logs in immediately and always requires TLS.
+		///
+		/// Disabled by default: otherwise a server that simply denies both
+		/// commands downgrades the session, and the credentials passed to
+		/// login() are then sent in the clear.
+
+	bool isPlaintextFallbackAllowed() const;
+		/// Returns true if the session may continue unencrypted when the server
+		/// refuses to start TLS.
+
+
 protected:
 	virtual StreamSocket establishDataConnection(const std::string& command, const std::string& arg);
 		/// Create secure data connection
@@ -88,6 +103,7 @@ private:
 	bool _enableFTPS = true;
 	bool _secureDataConnection = false;
 	bool _forceSessionReuse = false;
+	bool _allowPlaintextFallback = false;
 	Context::Ptr _pContext;
 };
 
@@ -106,6 +122,18 @@ inline bool FTPSClientSession::isSecure() const
 inline void FTPSClientSession::forceSessionReuse(bool force)
 {
 	_forceSessionReuse = force;
+}
+
+
+inline void FTPSClientSession::allowPlaintextFallback(bool allow)
+{
+	_allowPlaintextFallback = allow;
+}
+
+
+inline bool FTPSClientSession::isPlaintextFallbackAllowed() const
+{
+	return _allowPlaintextFallback;
 }
 
 
