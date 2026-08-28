@@ -1,5 +1,7 @@
 #include "Poco/Net/TCPReactorServerConnection.h"
 #include "Poco/Net/HTTPObserver.h"
+#include "Poco/ErrorHandler.h"
+#include "Poco/Format.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Exception.h"
 #include "Poco/Logger.h"
@@ -67,6 +69,22 @@ void TCPReactorServerConnection::onRead(const AutoPtr<ReadableNotification>& pNf
 		}
 		else
 		{
+			// The buffer is only reclaimed once a request is complete, so a peer
+			// that never completes one could otherwise grow it without bound.
+			if (_maxPendingRequestSize > 0 && _buf.size() + static_cast<std::size_t>(n) > _maxPendingRequestSize)
+			{
+				Poco::ErrorHandler::handle(MessageException(
+					Poco::format("incomplete request exceeds %z bytes", _maxPendingRequestSize)));
+				// Deregistering only removes the handlers; the reactor's most recent
+				// poll result still holds a copy of the socket, so the descriptor
+				// would stay open until that map is replaced. The local copy outlives
+				// handleClose(), which may destroy this, so nothing below touches a
+				// member.
+				StreamSocket socket = _socket;
+				handleClose();
+				socket.close();
+				return;
+			}
 			_buf.append(tmp, n);
 			_rcvCallback(shared_from_this());
 		}
@@ -180,6 +198,12 @@ std::string& TCPReactorServerConnection::buffer()
 void TCPReactorServerConnection::setRecvMessageCallback(const RecvMessageCallback& cb)
 {
 	_rcvCallback = cb;
+}
+
+
+void TCPReactorServerConnection::setMaxPendingRequestSize(std::size_t size)
+{
+	_maxPendingRequestSize = size;
 }
 
 } // namespace Poco::Net

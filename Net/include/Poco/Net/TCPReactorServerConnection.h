@@ -33,11 +33,16 @@ public:
 
 	void setRecvMessageCallback(const RecvMessageCallback& cb);
 
+	void setMaxPendingRequestSize(std::size_t size);
+		/// Sets the maximum number of bytes buffered while the request is
+		/// still incomplete. 0 disables the limit.
+
 private:
 	Poco::Net::SocketReactor& _reactor;
 	Poco::Net::StreamSocket   _socket;
 	RecvMessageCallback       _rcvCallback;
 	std::string               _buf;
+	std::size_t               _maxPendingRequestSize {0};
 };
 
 } // namespace Poco::Net

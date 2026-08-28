@@ -4,13 +4,13 @@
 #include "Poco/Net/HTTPRequestHandler.h"
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPClientSession.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
-#include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
-#include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/SocketReactor.h"
 #include "Poco/Net/TCPReactorServerConnection.h"
 #include "Poco/Net/NetException.h"
@@ -935,6 +935,65 @@ void HTTPReactorServerTest::testReactorErrorClosesConnection()
 	reactor.stop();
 	thread.join();
 }
+void HTTPReactorServerTest::testIncompleteRequestSizeLimit()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(false);
+	pParams->setMaxThreads(1);
+	pParams->setReactorMode(true);
+	pParams->setMaxPendingRequestSize(64*1024);
+
+	Poco::Net::HTTPReactorServer srv(0, pParams, new RequestHandlerFactory);
+	srv.start();
+
+	// A header that never terminates must not grow the connection buffer
+	// indefinitely: the server closes the connection once the limit is passed.
+	Poco::Net::StreamSocket ss(Poco::Net::SocketAddress("127.0.0.1", srv.port()));
+	const std::string header("GET / HTTP/1.1\r\nHost: test\r\nX-Padding: ");
+	ss.sendBytes(header.data(), static_cast<int>(header.size()));
+	const std::string chunk(8*1024, 'A');
+	// The server must drop the connection close to the limit, not merely at some
+	// point: a bound well above it still catches a server that buffers everything.
+	const std::size_t bound = 256*1024;
+	std::size_t sent = header.size();
+	bool closed = false;
+	try
+	{
+		while (!closed && sent < bound)
+		{
+			ss.sendBytes(chunk.data(), static_cast<int>(chunk.size()));
+			sent += chunk.size();
+			char discard[256];
+			if (ss.poll(Poco::Timespan(0, 100*1000), Poco::Net::Socket::SELECT_READ))
+			{
+				if (ss.receiveBytes(discard, sizeof(discard)) == 0) closed = true;
+			}
+		}
+	}
+	catch (Poco::Exception&)
+	{
+		closed = true; // peer reset while sending
+	}
+	ss.close();
+	assertTrue (closed);
+	assertTrue (sent < bound);
+
+	// A well-formed request on a fresh connection must still be served.
+	HTTPClientSession cs("127.0.0.1", srv.port());
+	HTTPRequest request(HTTPRequest::HTTP_POST, "/echo", HTTPMessage::HTTP_1_1);
+	std::string body("hello");
+	request.setContentLength(static_cast<int>(body.length()));
+	cs.sendRequest(request) << body;
+	HTTPResponse response;
+	std::string rbody;
+	std::istream& rs = cs.receiveResponse(response);
+	StreamCopier::copyToString(rs, rbody);
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_OK);
+	assertTrue (rbody == body);
+
+	srv.stop();
+}
+
 
 void HTTPReactorServerTest::setUp()
 {
@@ -972,6 +1031,7 @@ CppUnit::Test* HTTPReactorServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testStopClosesMultipleConnections);
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testStopClosesConnectionsSelfReactor);
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testReactorErrorClosesConnection);
+	CppUnit_addTest(pSuite, HTTPReactorServerTest, testIncompleteRequestSizeLimit);
 
 	return pSuite;
 }
