@@ -27,6 +27,7 @@
 #if defined(POCO_OS_FAMILY_UNIX)
 #include <sys/stat.h>
 #include <unistd.h>
+#include <dirent.h>
 #endif
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include <Windows.h>
@@ -45,14 +46,60 @@ using Poco::Thread;
 namespace {
 
 
-class FileImplTest: public Poco::FileImpl
+gid_t findSupplementaryGroup()
+	/// Returns a group the effective user belongs to that is neither the effective
+	/// GID nor the file's owner group, or 0 if there is none. Changing a file's
+	/// group requires membership in the target group, so only such a GID can be
+	/// used to build the fixture below.
 {
-public:
-	static bool isGroupMember(gid_t gid)
+	int count = ::getgroups(0, nullptr);
+	if (count <= 0) return 0;
+
+	std::vector<gid_t> groups(count);
+	count = ::getgroups(count, groups.data());
+
+	for (int i = 0; i < count; ++i)
 	{
-		return isGroupMemberImpl(gid);
+		if (groups[i] != ::getegid() && groups[i] != 0) return groups[i];
 	}
-};
+	return 0;
+}
+
+
+std::string findUnownedFileInGroup(gid_t group)
+	/// Best-effort search for a regular file owned by another user whose group is
+	/// group. The group branch of the permission checks is reachable only through
+	/// such a file: for a file the caller owns, the owner branch answers first, and
+	/// a test cannot create a file owned by someone else without privilege.
+	/// Returns an empty string when the machine has no suitable file.
+{
+	static const char* dirs[] = { "/usr/bin", "/usr/sbin", "/etc", "/usr/lib" };
+
+	for (std::size_t d = 0; d < sizeof(dirs) / sizeof(dirs[0]); ++d)
+	{
+		DIR* dir = ::opendir(dirs[d]);
+		if (!dir) continue;
+
+		int examined = 0;
+		struct dirent* entry;
+		while ((entry = ::readdir(dir)) != nullptr && examined < 512)
+		{
+			++examined;
+			const std::string path = std::string(dirs[d]) + "/" + entry->d_name;
+
+			struct stat st;
+			if (::lstat(path.c_str(), &st) != 0) continue;
+			if (!S_ISREG(st.st_mode)) continue;
+			if (st.st_uid == ::geteuid()) continue;
+			if (st.st_gid != group) continue;
+
+			::closedir(dir);
+			return path;
+		}
+		::closedir(dir);
+	}
+	return std::string();
+}
 
 
 } // namespace
@@ -297,27 +344,55 @@ void FileTest::testFileAttributes3()
 
 
 #if defined(POCO_OS_FAMILY_UNIX)
-void FileTest::testGroupMembership()
+void FileTest::testPermissionsMatchAccess()
 {
-	const int count = ::getgroups(0, nullptr);
-	assertTrue (count >= 0);
+	// access(2) is the kernel answering exactly the question canRead(), canWrite()
+	// and canExecute() ask, so it is the oracle for them. Comparing against it
+	// exercises the three call sites, which a direct test of the group-membership
+	// helper cannot do: that only checks the helper against the same getgroups()
+	// list the helper itself reads.
+	//
+	// Every mode below is asserted in whichever direction the kernel decides, so
+	// both a wrongly granted and a wrongly denied permission fail here.
 
-	std::vector<gid_t> groups(count);
-	const int actualCount = ::getgroups(count, groups.data());
-	assertTrue (actualCount >= 0);
+	TemporaryFile tf;
+	assertTrue (tf.createFile());
+	const std::string path = tf.path();
 
-	assertTrue (FileImplTest::isGroupMember(::getegid()));
-	for (int i = 0; i < actualCount; ++i)
+	static const mode_t modes[] =
 	{
-		assertTrue (FileImplTest::isGroupMember(groups[i]));
+		0000, 0400, 0200, 0100, 0040, 0020, 0010, 0004, 0002, 0001,
+		0600, 0060, 0006, 0604, 0640, 0064, 0046, 0620, 0602, 0700, 0644, 0755
+	};
+
+	for (std::size_t i = 0; i < sizeof(modes) / sizeof(modes[0]); ++i)
+	{
+		assertTrue (::chmod(path.c_str(), modes[i]) == 0);
+
+		File f(path);
+		assertTrue ((::access(path.c_str(), R_OK) == 0) == f.canRead());
+		assertTrue ((::access(path.c_str(), W_OK) == 0) == f.canWrite());
+		assertTrue ((::access(path.c_str(), X_OK) == 0) == f.canExecute());
 	}
 
-	gid_t nonMember = 0;
-	while (nonMember == ::getegid() || std::find(groups.begin(), groups.begin() + actualCount, nonMember) != groups.begin() + actualCount)
-	{
-		++nonMember;
-	}
-	assertFalse (FileImplTest::isGroupMember(nonMember));
+	// Restore something deletable for TemporaryFile's cleanup.
+	::chmod(path.c_str(), 0600);
+
+	// The group branch needs a file the caller does not own. Root is excluded
+	// because it never reaches that branch. Both are skipped rather than faked
+	// when the machine cannot supply the fixture.
+	if (::geteuid() == 0) return;
+
+	const gid_t group = findSupplementaryGroup();
+	if (group == 0) return;
+
+	const std::string unowned = findUnownedFileInGroup(group);
+	if (unowned.empty()) return;
+
+	File f(unowned);
+	assertTrue ((::access(unowned.c_str(), R_OK) == 0) == f.canRead());
+	assertTrue ((::access(unowned.c_str(), W_OK) == 0) == f.canWrite());
+	assertTrue ((::access(unowned.c_str(), X_OK) == 0) == f.canExecute());
 }
 #endif
 
@@ -1065,7 +1140,7 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathRelative);
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathPATHEXT);
 #if defined(POCO_OS_FAMILY_UNIX)
-	CppUnit_addTest(pSuite, FileTest, testGroupMembership);
+	CppUnit_addTest(pSuite, FileTest, testPermissionsMatchAccess);
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathThreadSafety);
 #endif
 

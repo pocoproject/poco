@@ -38,6 +38,9 @@
 #include <utime.h>
 #include <cstring>
 #include <vector>
+#if POCO_OS == POCO_OS_MAC_OS_X
+#include <membership.h>
+#endif
 
 #if (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
 #define STATFSFN ::statvfs
@@ -134,22 +137,67 @@ bool FileImpl::existsImpl() const
 }
 
 
-bool FileImpl::isGroupMemberImpl(gid_t gid)
+namespace
 {
-	if (gid == ::getegid()) return true;
-
-	for (int attempt = 0; attempt < 2; ++attempt)
+	bool isGroupMember(gid_t gid)
+		/// Returns true if the effective user belongs to gid, counting supplementary
+		/// groups. This mirrors access(2): the kernel tests the effective GID and every
+		/// supplementary group, not the effective GID alone.
 	{
-		const int count = ::getgroups(0, nullptr);
-		if (count <= 0) return false;
+		if (gid == ::getegid()) return true;
 
-		std::vector<gid_t> groups(count);
-		const int actualCount = ::getgroups(count, groups.data());
-		if (actualCount >= 0)
-			return std::find(groups.begin(), groups.begin() + actualCount, gid) != groups.begin() + actualCount;
-		if (errno != EINVAL) return false;
+		// A permission query must not disturb the caller's errno.
+		const int savedErrno = errno;
+		bool member = false;
+
+#if POCO_OS == POCO_OS_MAC_OS_X
+		// getgroups() is capped at NGROUPS_MAX (16) on Darwin and truncates silently,
+		// so a user in more groups than that would look like a non-member. The
+		// membership resolver consults Directory Services and has no such cap.
+		uuid_t userUuid;
+		uuid_t groupUuid;
+		int isMember = 0;
+		if (::mbr_uid_to_uuid(::geteuid(), userUuid) == 0
+			&& ::mbr_gid_to_uuid(gid, groupUuid) == 0
+			&& ::mbr_check_membership(userUuid, groupUuid, &isMember) == 0)
+		{
+			errno = savedErrno;
+			return isMember != 0;
+		}
+		// Resolver unavailable: fall through to getgroups().
+#endif
+
+		enum { INLINE_GROUPS = 64 };
+		gid_t inlineGroups[INLINE_GROUPS];
+
+		// getgroups() reports a group set that grew between the sizing call and the
+		// fetch as EINVAL. One retry is enough: losing that race twice yields false,
+		// the same answer further attempts would settle on.
+		for (int attempt = 0; attempt < 2; ++attempt)
+		{
+			const int count = ::getgroups(0, nullptr);
+			if (count <= 0) break;
+
+			gid_t* groups = inlineGroups;
+			std::vector<gid_t> heapGroups;
+			if (count > INLINE_GROUPS)
+			{
+				heapGroups.resize(count);
+				groups = heapGroups.data();
+			}
+
+			const int actualCount = ::getgroups(count, groups);
+			if (actualCount >= 0)
+			{
+				member = std::find(groups, groups + actualCount, gid) != groups + actualCount;
+				break;
+			}
+			if (errno != EINVAL) break;
+		}
+
+		errno = savedErrno;
+		return member;
 	}
-	return false;
 }
 
 
@@ -160,12 +208,16 @@ bool FileImpl::canReadImpl() const
 	struct stat st;
 	if (::stat(_path.c_str(), &st) == 0)
 	{
-		if (st.st_uid == ::geteuid())
+		if (::geteuid() == 0)
+			return true;
+		else if (st.st_uid == ::geteuid())
 			return (st.st_mode & S_IRUSR) != 0;
-		else if (isGroupMemberImpl(st.st_gid))
+		else if (((st.st_mode & S_IRGRP) != 0) == ((st.st_mode & S_IROTH) != 0))
+			return (st.st_mode & S_IROTH) != 0;
+		else if (isGroupMember(st.st_gid))
 			return (st.st_mode & S_IRGRP) != 0;
 		else
-			return (st.st_mode & S_IROTH) != 0 || ::geteuid() == 0;
+			return (st.st_mode & S_IROTH) != 0;
 	}
 	else if (const auto err = errno; err == ENOENT)
 		return false;
@@ -182,12 +234,16 @@ bool FileImpl::canWriteImpl() const
 	struct stat st;
 	if (::stat(_path.c_str(), &st) == 0)
 	{
-		if (st.st_uid == ::geteuid())
+		if (::geteuid() == 0)
+			return true;
+		else if (st.st_uid == ::geteuid())
 			return (st.st_mode & S_IWUSR) != 0;
-		else if (isGroupMemberImpl(st.st_gid))
+		else if (((st.st_mode & S_IWGRP) != 0) == ((st.st_mode & S_IWOTH) != 0))
+			return (st.st_mode & S_IWOTH) != 0;
+		else if (isGroupMember(st.st_gid))
 			return (st.st_mode & S_IWGRP) != 0;
 		else
-			return (st.st_mode & S_IWOTH) != 0 || ::geteuid() == 0;
+			return (st.st_mode & S_IWOTH) != 0;
 	}
 	else if (const auto err = errno; err == ENOENT)
 		return false;
@@ -209,7 +265,9 @@ bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 		return (st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0;
 	else if (st.st_uid == ::geteuid())
 		return (st.st_mode & S_IXUSR) != 0;
-	else if (isGroupMemberImpl(st.st_gid))
+	else if (((st.st_mode & S_IXGRP) != 0) == ((st.st_mode & S_IXOTH) != 0))
+		return (st.st_mode & S_IXOTH) != 0;
+	else if (isGroupMember(st.st_gid))
 		return (st.st_mode & S_IXGRP) != 0;
 	else
 		return (st.st_mode & S_IXOTH) != 0;
