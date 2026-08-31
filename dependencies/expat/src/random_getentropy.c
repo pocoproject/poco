@@ -54,7 +54,7 @@
 bool
 writeRandomBytes_getentropy(void *target, size_t count) {
   errno = 0;
-  const bool success = getentropy(target, count);
+  const bool success = (getentropy(target, count) == 0);
   // MSan does not understand `getentropy`, so explain its effects
   if (success)
     MSAN_UNPOISON(target, count);
