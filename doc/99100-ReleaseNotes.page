@@ -1,6 +1,40 @@
 POCO C++ Libraries Release Notes
 AAAIntroduction
 
+!!!Release 1.15.4
+
+!!Summary of Changes
+
+Security release. Bundled Expat is updated 2.8.1 -> 2.8.4 and 7-Zip (LZMA
+SDK) 26.01 -> 26.02, closing 18 Expat CVEs and the vulnerabilities fixed
+upstream in 7-Zip 26.02. Also included are OpenSSL build and FIPS fixes for
+Crypto and NetSSL, and bug fixes in Foundation, Net and Data.
+
+!!Security Fixes
+
+  - GH #5468 Expat 2.8.4 (CVE-2026-66046, CVE-2026-76641, CVE-2026-76956, CVE-2026-76957)
+  - GH #5434 Upgrade bundled expat to 2.8.3 (CVE-2026-72522) (PR #5435)
+  - GH #5432 Upgrade bundled 7zip (LZMA SDK) to 26.02 (PR #5437)
+  - GH #5395 Expat 2.8.2 update (13 CVEs) (PR #5396)
+
+Bundled Third-Party Library Upgrades:
+  - expat 2.8.1 -> 2.8.4 (18 CVEs; see Security Fixes)
+  - 7zip (LZMA SDK) 26.01 -> 26.02 (bug and vulnerability fixes)
+
+!!Bug Fixes and Improvements
+
+  - GH #5415 OpenSSL no_deprecated (PR #5416)
+  - GH #5413 FTPClientSession(socket, readWelcomeMessage=false) sets _serverReady=true without reading welcome reply (PR #5418)
+  - GH #5409 Backtrace not thread safe (PR #5408)
+  - GH #5407 HTTPReactorServer: client abort leaks the connection and hot-spins the reactor (PR #5408, PR #5410)
+  - GH #5393 ProcessRunner heap-use-after-free on failed start (PR #5394)
+  - GH #5389 HTTP header parsing fails for header lines > 4096 bytes (PR #5390)
+  - GH #5383 Poco::Data::Transaction unusable on an auto-commit session (PR #5384)
+  - PR #5464 fix(Crypto,NetSSL): restore missing #else in isFIPSEnabled(), add OpenSSL 1.1.1 CI job
+  - PR #5460 fix(NetSSL): FIPS fixes for NetSSL_OpenSSL
+  - PR #5445 fix(Foundation): return value from ScopedLockWithUnlock::tryLock
+
+
 !!!Release 1.15.3
 
 !!Summary of Changes
