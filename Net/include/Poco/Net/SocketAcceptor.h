@@ -146,8 +146,13 @@ public:
 		}
 	}
 
-	void onAccept(const AutoPtr<ReadableNotification>& pNotification)
+	virtual void onAccept(const AutoPtr<ReadableNotification>& pNotification)
 		/// Accepts connection and creates event handler.
+		///
+		/// Subclasses can override this method, e.g. to contain exceptions
+		/// thrown by the accept path; an escaping exception is re-dispatched
+		/// by the SocketReactor as an ErrorNotification broadcast to all
+		/// registered handlers.
 	{
 		StreamSocket sock = _socket.acceptConnection();
 		_pReactor->wakeUp();

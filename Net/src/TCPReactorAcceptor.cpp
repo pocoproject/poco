@@ -1,4 +1,5 @@
 #include "Poco/Net/TCPReactorAcceptor.h"
+#include "Poco/ErrorHandler.h"
 #include <atomic>
 
 
@@ -48,6 +49,32 @@ void TCPReactorAcceptor::stop()
 	if (_threadPool)
 	{
 		_threadPool->joinAll();
+	}
+}
+
+void TCPReactorAcceptor::onAccept(const AutoPtr<ReadableNotification>& pNf)
+{
+	// An exception escaping the accept path is re-dispatched by the reactor
+	// as an ErrorNotification broadcast, closing every connection registered
+	// for it on this reactor (all of them in self-reactor mode). Accept
+	// failures (ECONNABORTED, EMFILE, a failing setsockopt on the accepted
+	// socket) concern only the pending connection, so contain them here,
+	// like TCPServer::run() does.
+	try
+	{
+		SocketAcceptor<TCPReactorServerConnection>::onAccept(pNf);
+	}
+	catch (Poco::Exception& exc)
+	{
+		ErrorHandler::handle(exc);
+	}
+	catch (std::exception& exc)
+	{
+		ErrorHandler::handle(exc);
+	}
+	catch (...)
+	{
+		ErrorHandler::handle();
 	}
 }
 
