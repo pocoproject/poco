@@ -23,23 +23,27 @@ TCPReactorServerConnection::~TCPReactorServerConnection()
 
 void TCPReactorServerConnection::initialize()
 {
-	_reactor.addEventHandler(
-		_socket,
-		HTTPObserver<TCPReactorServerConnection, ReadableNotification>(
-			shared_from_this(), &TCPReactorServerConnection::onRead));
-	// Registering for ErrorNotification also makes the reactor include
-	// POLL_ERROR in the poll mask for this socket; without it socket errors
-	// surface only when a later read fails.
-	_reactor.addEventHandler(
-		_socket,
-		HTTPObserver<TCPReactorServerConnection, ErrorNotification>(
-			shared_from_this(), &TCPReactorServerConnection::onError));
 	// ShutdownNotification is dispatched when the reactor stops; without it
 	// the connection (and its socket) outlives the reactor's run loop.
 	_reactor.addEventHandler(
 		_socket,
 		HTTPObserver<TCPReactorServerConnection, ShutdownNotification>(
 			shared_from_this(), &TCPReactorServerConnection::onShutdown));
+	// Without a registered ErrorNotification observer the reactor's error
+	// dispatch is dropped by the NotificationCenter, so socket errors would
+	// surface only when a later read fails.
+	_reactor.addEventHandler(
+		_socket,
+		HTTPObserver<TCPReactorServerConnection, ErrorNotification>(
+			shared_from_this(), &TCPReactorServerConnection::onError));
+	// Readable must come last: this may run on the acceptor's thread while
+	// the reactor polls, and once the socket is readable an immediately
+	// disconnecting client could run handleClose() on the reactor thread
+	// before registration completes, leaving a half-registered connection.
+	_reactor.addEventHandler(
+		_socket,
+		HTTPObserver<TCPReactorServerConnection, ReadableNotification>(
+			shared_from_this(), &TCPReactorServerConnection::onRead));
 }
 
 void TCPReactorServerConnection::onRead(const AutoPtr<ReadableNotification>& pNf)
@@ -119,10 +123,16 @@ void TCPReactorServerConnection::onRead(const AutoPtr<ReadableNotification>& pNf
 void TCPReactorServerConnection::onError(const AutoPtr<ErrorNotification>& pNf)
 {
 	// Copy the payload before handleClose(): it may destroy this, so only
-	// locals may be touched afterwards (same rule as in onRead).
+	// locals may be touched afterwards (same rule as in onRead). Guard the
+	// close: a throw would abort the reactor's notification loop for the
+	// remaining connections.
 	int code = pNf->code();
 	std::string description = pNf->description();
-	handleClose();
+	try
+	{
+		handleClose();
+	}
+	catch (...) {}
 	try
 	{
 		Poco::Logger& log = Poco::Logger::get("Poco.Net.TCPReactorServer");
@@ -133,19 +143,24 @@ void TCPReactorServerConnection::onError(const AutoPtr<ErrorNotification>& pNf)
 
 void TCPReactorServerConnection::onShutdown(const AutoPtr<ShutdownNotification>& pNf)
 {
-	handleClose();
+	// A throw here would abort the reactor's shutdown broadcast, leaving the
+	// remaining connections open.
+	try
+	{
+		handleClose();
+	}
+	catch (...) {}
 }
 
 void TCPReactorServerConnection::handleClose()
 {
-	// here must keep _socket to delay the _socket destrcutor
+	// keepSocket delays the socket close until the removals are done
 	StreamSocket keepSocket = _socket;
-	// The reactor's observers hold the only owning shared_ptrs, so the last
-	// removal deletes this (at the end of its full-expression, once the
-	// temporary observer argument releases its reference). Remove Readable
-	// last: removeEventHandler drops the socket from the pollset only with the
-	// last observer, so the intermediate poll-mask updates never pass mode 0,
-	// and no member is touched after the final removal.
+	// The reactor's observers hold the only owning shared_ptrs; removing them
+	// ends this object's lifetime (the dispatching NotificationCenter keeps
+	// it alive until the current handler returns). Remove Readable last so
+	// the intermediate poll-mask updates never pass mode 0, and touch no
+	// member after the removals.
 	_reactor.removeEventHandler(
 		_socket,
 		HTTPObserver<TCPReactorServerConnection, ErrorNotification>(
