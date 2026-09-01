@@ -30,11 +30,11 @@ Bug Fixes and Improvements:
 - GH #5409 Backtrace not thread safe (PR #5408)
 - GH #5407 HTTPReactorServer: client abort leaks the connection and hot-spins the reactor (PR #5408, PR #5410)
 - GH #5393 ProcessRunner heap-use-after-free on failed start (PR #5394)
-- GH #5389 HTTP header parsing fails for header lines > 4096 bytes (PR #5390)
 - GH #5383 Poco::Data::Transaction unusable on an auto-commit session (PR #5384)
 - PR #5464 fix(Crypto,NetSSL): restore missing #else in isFIPSEnabled(), add OpenSSL 1.1.1 CI job
 - PR #5460 fix(NetSSL): FIPS fixes for NetSSL_OpenSSL
 - PR #5445 fix(Foundation): return value from ScopedLockWithUnlock::tryLock
+- PR #5390 Net/testsuite: register MessageHeader tests that were never run; cover long header values
 
 
 Release 1.15.3 (2026-05-20)
