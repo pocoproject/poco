@@ -55,15 +55,17 @@ void TCPReactorServer::stop()
 	{
 		return;
 	}
-	for (auto& acceptor : _acceptors)
-	{
-		acceptor->stop();
-	}
+	// Stop accepting first: a connection accepted after a worker reactor has
+	// dispatched its shutdown notification would never be closed.
 	for (auto& reactor : _reactors)
 	{
 		reactor.stop();
 	}
 	_threadPool.joinAll();
+	for (auto& acceptor : _acceptors)
+	{
+		acceptor->stop();
+	}
 }
 
 }} // namespace Poco::Net
