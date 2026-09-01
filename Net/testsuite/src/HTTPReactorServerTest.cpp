@@ -208,7 +208,7 @@ void HTTPReactorServerTest::testBodyReadTwice()
 	istr.read(buffer1, 10);
 	int n1 = istr.gcount();
 	char buffer2[32];
-	istr.read(buffer2, 50);
+	istr.read(buffer2, sizeof(buffer2));
 	int n2 = istr.gcount();
 
 	std::string fullBody = std::string(buffer1, n1) + std::string(buffer2, n2);
