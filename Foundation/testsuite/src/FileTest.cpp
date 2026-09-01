@@ -26,6 +26,15 @@
 #if defined(POCO_OS_FAMILY_UNIX)
 #include <sys/stat.h>
 #include <unistd.h>
+#include <fcntl.h>
+#if !defined(POCO_VXWORKS)
+#include <dirent.h>
+#endif
+#if POCO_OS == POCO_OS_LINUX
+#include <sys/xattr.h>
+#elif POCO_OS == POCO_OS_MAC_OS_X
+#include <sys/acl.h>
+#endif
 #endif
 #if defined(POCO_OS_FAMILY_WINDOWS)
 #include <Windows.h>
@@ -38,6 +47,116 @@ using Poco::Path;
 using Poco::Exception;
 using Poco::Timestamp;
 using Poco::Thread;
+
+
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+namespace {
+
+
+bool kernelGrants(const std::string& path, int what)
+	/// Asks the kernel the question canRead()/canWrite()/canExecute() answer.
+	/// faccessat(AT_EACCESS) checks the effective IDs like the implementation;
+	/// plain access(2) would check the real IDs instead.
+{
+#if defined(AT_EACCESS)
+	return ::faccessat(AT_FDCWD, path.c_str(), what, AT_EACCESS) == 0;
+#else
+	return ::access(path.c_str(), what) == 0;
+#endif
+}
+
+
+bool hasExtendedAcl(const std::string& path)
+	/// The kernel honors ACLs, the mode-bit model cannot, so ACL-carrying files
+	/// are unusable as comparison fixtures.
+{
+#if POCO_OS == POCO_OS_LINUX
+	return ::getxattr(path.c_str(), "system.posix_acl_access", nullptr, 0) >= 0;
+#elif POCO_OS == POCO_OS_MAC_OS_X
+	acl_t acl = ::acl_get_file(path.c_str(), ACL_TYPE_EXTENDED);
+	if (acl != nullptr)
+	{
+		::acl_free(acl);
+		return true;
+	}
+	return false;
+#else
+	return false;
+#endif
+}
+
+
+bool comparableFixture(const std::string& path, struct stat& st)
+	/// A fixture usable for kernel comparison: a regular, ACL-free file owned by
+	/// another user. Only such a file reaches the non-owner branches of the
+	/// permission checks -- for a file the caller owns, the owner branch answers
+	/// first, and a test cannot create a file owned by someone else without
+	/// privilege.
+{
+	if (::lstat(path.c_str(), &st) != 0) return false;
+	if (!S_ISREG(st.st_mode)) return false;
+	if (st.st_uid == ::geteuid()) return false;
+	return !hasExtendedAcl(path);
+}
+
+
+gid_t findSupplementaryGroup()
+	/// Returns a supplementary group of the effective user other than the
+	/// effective GID, or 0 when there is none (0 doubles as the not-found
+	/// sentinel, which is safe: testing membership of gid 0 is uninteresting).
+{
+	int count = ::getgroups(0, nullptr);
+	if (count <= 0) return 0;
+
+	std::vector<gid_t> groups(count);
+	count = ::getgroups(count, groups.data());
+
+	for (int i = 0; i < count; ++i)
+	{
+		if (groups[i] != ::getegid() && groups[i] != 0) return groups[i];
+	}
+	return 0;
+}
+
+
+std::string findUnownedFileInGroup(gid_t group)
+	/// Best-effort search for a comparison fixture whose group is group and whose
+	/// group bits differ from its other bits for read or write: only such a mode
+	/// makes the permission checks consult group membership at all (equal bits
+	/// short-circuit). Returns an empty string when the machine has none.
+{
+	static const char* dirs[] = { "/var/log", "/usr/bin", "/usr/sbin", "/etc", "/usr/lib" };
+
+	for (std::size_t d = 0; d < sizeof(dirs) / sizeof(dirs[0]); ++d)
+	{
+		DIR* dir = ::opendir(dirs[d]);
+		if (!dir) continue;
+
+		int examined = 0;
+		struct dirent* entry;
+		while ((entry = ::readdir(dir)) != nullptr && examined < 512)
+		{
+			++examined;
+			const std::string path = std::string(dirs[d]) + "/" + entry->d_name;
+
+			struct stat st;
+			if (!comparableFixture(path, st)) continue;
+			if (st.st_gid != group) continue;
+			const bool rAsym = ((st.st_mode & S_IRGRP) != 0) != ((st.st_mode & S_IROTH) != 0);
+			const bool wAsym = ((st.st_mode & S_IWGRP) != 0) != ((st.st_mode & S_IWOTH) != 0);
+			if (!rAsym && !wAsym) continue;
+
+			::closedir(dir);
+			return path;
+		}
+		::closedir(dir);
+	}
+	return std::string();
+}
+
+
+} // namespace
+#endif
 
 
 FileTest::FileTest(const std::string& name): CppUnit::TestCase(name)
@@ -246,7 +365,14 @@ void FileTest::testFileAttributes2()
 	assertTrue (tsm - ts >= -2000000 && tsm - ts <= 2000000);
 
 	f.setWriteable(false);
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+	// Root writes regardless of the mode bits, so the read-only expectation
+	// only holds for ordinary users.
+	if (::geteuid() != 0)
+		assertTrue (!f.canWrite());
+#else
 	assertTrue (!f.canWrite());
+#endif
 	assertTrue (f.canRead());
 
 	f.setReadOnly(false);
@@ -275,6 +401,84 @@ void FileTest::testFileAttributes3()
 	assertTrue (!f.isFile());
 	assertTrue (!f.isDirectory());
 }
+
+
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+void FileTest::testPermissionsMatchAccess()
+{
+	// faccessat(AT_EACCESS) is the kernel answering exactly the question
+	// canRead(), canWrite() and canExecute() ask, so the test compares each
+	// result against it. Every mode below is asserted in whichever direction the
+	// kernel decides, so both a wrongly granted and a wrongly denied permission
+	// fail here.
+	//
+	// Root is excluded from the whole test: the mode model cannot see capability
+	// restrictions (containers without CAP_DAC_OVERRIDE), fakeroot fakes
+	// geteuid() without fooling the kernel, and root X_OK semantics are
+	// platform-defined.
+	if (::geteuid() == 0) return;
+
+	TemporaryFile tf;
+	assertTrue (tf.createFile());
+	const std::string path = tf.path();
+
+	// On a noexec mount the kernel denies X_OK regardless of the mode bits,
+	// so the X_OK comparison is only meaningful when the kernel can grant it.
+	assertTrue (::chmod(path.c_str(), 0700) == 0);
+	const bool execComparable = kernelGrants(path, X_OK);
+
+	static const mode_t modes[] =
+	{
+		0000, 0400, 0200, 0100, 0040, 0020, 0010, 0004, 0002, 0001,
+		0600, 0060, 0006, 0604, 0640, 0064, 0046, 0620, 0602, 0700, 0644, 0755
+	};
+
+	for (std::size_t i = 0; i < sizeof(modes) / sizeof(modes[0]); ++i)
+	{
+		assertTrue (::chmod(path.c_str(), modes[i]) == 0);
+
+		File f(path);
+		loop_1_assert (modes[i], kernelGrants(path, R_OK) == f.canRead());
+		loop_1_assert (modes[i], kernelGrants(path, W_OK) == f.canWrite());
+		if (execComparable)
+			loop_1_assert (modes[i], kernelGrants(path, X_OK) == f.canExecute());
+	}
+
+	// Restore something deletable for TemporaryFile's cleanup.
+	::chmod(path.c_str(), 0600);
+
+	// Non-owned fixtures reach the non-owner branches. Well-known system files
+	// cover the group/other classes deterministically where they exist; the
+	// search below additionally looks for a file with asymmetric group/other
+	// bits whose group the caller holds, which drives the membership query
+	// itself. Whatever the machine cannot supply is skipped rather than faked.
+	static const char* wellKnown[] =
+	{
+		"/etc/passwd", "/etc/sudoers", "/etc/shadow", "/etc/master.passwd", "/var/log/syslog"
+	};
+
+	for (std::size_t i = 0; i < sizeof(wellKnown) / sizeof(wellKnown[0]); ++i)
+	{
+		const std::string p(wellKnown[i]);
+		struct stat st;
+		if (!comparableFixture(p, st)) continue;
+
+		File f(p);
+		loop_1_assert (static_cast<int>(i), kernelGrants(p, R_OK) == f.canRead());
+		loop_1_assert (static_cast<int>(i), kernelGrants(p, W_OK) == f.canWrite());
+	}
+
+	const gid_t group = findSupplementaryGroup();
+	if (group == 0) return;
+
+	const std::string unowned = findUnownedFileInGroup(group);
+	if (unowned.empty()) return;
+
+	File f(unowned);
+	assertTrue (kernelGrants(unowned, R_OK) == f.canRead());
+	assertTrue (kernelGrants(unowned, W_OK) == f.canWrite());
+}
+#endif
 
 
 void FileTest::testCompare()
@@ -409,7 +613,14 @@ void FileTest::testCopy()
 	TemporaryFile f2;
 	f1.setReadOnly().copyTo(f2.path());
 	assertTrue (f2.exists());
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+	// Root writes regardless of the mode bits, so the read-only expectation
+	// only holds for ordinary users.
+	if (::geteuid() != 0)
+		assertTrue (!f2.canWrite());
+#else
 	assertTrue (!f2.canWrite());
+#endif
 	assertTrue (f1.getSize() == f2.getSize());
 	f1.setWriteable().remove();
 }
@@ -1020,6 +1231,9 @@ CppUnit::Test* FileTest::suite()
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathRelative);
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathPATHEXT);
 #if defined(POCO_OS_FAMILY_UNIX)
+#if !defined(POCO_VXWORKS)
+	CppUnit_addTest(pSuite, FileTest, testPermissionsMatchAccess);
+#endif
 	CppUnit_addTest(pSuite, FileTest, testGetExecutablePathThreadSafety);
 #endif
 

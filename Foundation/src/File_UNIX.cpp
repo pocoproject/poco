@@ -37,6 +37,10 @@
 #include <stdio.h>
 #include <utime.h>
 #include <cstring>
+#include <vector>
+#if POCO_OS == POCO_OS_MAC_OS_X
+#include <membership.h>
+#endif
 
 #if (POCO_OS == POCO_OS_SOLARIS) || (POCO_OS == POCO_OS_QNX)
 #define STATFSFN ::statvfs
@@ -133,6 +137,90 @@ bool FileImpl::existsImpl() const
 }
 
 
+namespace
+{
+	bool isGroupMember(gid_t gid)
+		/// Returns true if the effective user belongs to gid, counting supplementary
+		/// groups. Mirrors the kernel's access(2) order: the process credential list
+		/// is consulted first, a directory-service resolver (where one exists) only
+		/// on a miss.
+	{
+		if (gid == ::getegid()) return true;
+
+		// A permission query must not disturb the caller's errno.
+		const int savedErrno = errno;
+		bool member = false;
+
+		enum { INLINE_GROUPS = 64 };
+		gid_t inlineGroups[INLINE_GROUPS];
+
+		// getgroups() reports a group set that grew between the sizing call and the
+		// fetch as EINVAL. Retry once; losing the race twice means the set is
+		// churning and the query gives up, treating the gid as not held.
+		for (int attempt = 0; attempt < 2; ++attempt)
+		{
+			const int count = ::getgroups(0, nullptr);
+			if (count <= 0) break;
+
+			gid_t* groups = inlineGroups;
+			std::vector<gid_t> heapGroups;
+			if (count > INLINE_GROUPS)
+			{
+				heapGroups.resize(count);
+				groups = heapGroups.data();
+			}
+
+			const int actualCount = ::getgroups(count, groups);
+			if (actualCount >= 0)
+			{
+				member = std::find(groups, groups + actualCount, gid) != groups + actualCount;
+				break;
+			}
+			if (errno != EINVAL) break;
+		}
+
+#if POCO_OS == POCO_OS_MAC_OS_X
+		// The credential list getgroups() returns is capped at NGROUPS_MAX (16) on
+		// Darwin and omits nested directory-service memberships, so a miss there is
+		// not final. Ask the membership resolver, as the kernel itself does after a
+		// credential miss.
+		if (!member)
+		{
+			uuid_t userUuid;
+			uuid_t groupUuid;
+			int isMember = 0;
+			if (::mbr_uid_to_uuid(::geteuid(), userUuid) == 0
+				&& ::mbr_gid_to_uuid(gid, groupUuid) == 0
+				&& ::mbr_check_membership(userUuid, groupUuid, &isMember) == 0)
+			{
+				member = isMember != 0;
+			}
+		}
+#endif
+
+		errno = savedErrno;
+		return member;
+	}
+
+
+	bool accessAllowed(const struct stat& st, mode_t usrBit, mode_t grpBit, mode_t othBit)
+		/// Applies the mode bits the way the kernel does for a non-root caller:
+		/// exactly one of the owner, group and other classes answers, with the group
+		/// class selected by membership in the file's group. The membership query is
+		/// skipped when it cannot change the outcome.
+	{
+		if (st.st_uid == ::geteuid())
+			return (st.st_mode & usrBit) != 0;
+		else if (((st.st_mode & grpBit) != 0) == ((st.st_mode & othBit) != 0))
+			return (st.st_mode & othBit) != 0;
+		else if (isGroupMember(st.st_gid))
+			return (st.st_mode & grpBit) != 0;
+		else
+			return (st.st_mode & othBit) != 0;
+	}
+}
+
+
 bool FileImpl::canReadImpl() const
 {
 	poco_assert (!_path.empty());
@@ -140,12 +228,9 @@ bool FileImpl::canReadImpl() const
 	struct stat st;
 	if (::stat(_path.c_str(), &st) == 0)
 	{
-		if (st.st_uid == ::geteuid())
-			return (st.st_mode & S_IRUSR) != 0;
-		else if (st.st_gid == ::getegid())
-			return (st.st_mode & S_IRGRP) != 0;
-		else
-			return (st.st_mode & S_IROTH) != 0 || ::geteuid() == 0;
+		if (::geteuid() == 0)
+			return true;
+		return accessAllowed(st, S_IRUSR, S_IRGRP, S_IROTH);
 	}
 	else if (const auto err = errno; err == ENOENT)
 		return false;
@@ -162,12 +247,9 @@ bool FileImpl::canWriteImpl() const
 	struct stat st;
 	if (::stat(_path.c_str(), &st) == 0)
 	{
-		if (st.st_uid == ::geteuid())
-			return (st.st_mode & S_IWUSR) != 0;
-		else if (st.st_gid == ::getegid())
-			return (st.st_mode & S_IWGRP) != 0;
-		else
-			return (st.st_mode & S_IWOTH) != 0 || ::geteuid() == 0;
+		if (::geteuid() == 0)
+			return true;
+		return accessAllowed(st, S_IWUSR, S_IWGRP, S_IWOTH);
 	}
 	else if (const auto err = errno; err == ENOENT)
 		return false;
@@ -187,12 +269,7 @@ bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 
 	if (::geteuid() == 0)
 		return (st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0;
-	else if (st.st_uid == ::geteuid())
-		return (st.st_mode & S_IXUSR) != 0;
-	else if (st.st_gid == ::getegid())
-		return (st.st_mode & S_IXGRP) != 0;
-	else
-		return (st.st_mode & S_IXOTH) != 0;
+	return accessAllowed(st, S_IXUSR, S_IXGRP, S_IXOTH);
 }
 
 
