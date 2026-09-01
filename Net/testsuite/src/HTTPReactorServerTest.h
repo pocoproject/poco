@@ -30,6 +30,9 @@ public:
 	void testOnErrorPreservesExceptionType();
 	void testSendTimeoutClosesStalledClient();
 	void testStopClosesConnections();
+	void testStopClosesMultipleConnections();
+	void testStopClosesConnectionsSelfReactor();
+	void testReactorErrorClosesConnection();
 
 	void setUp();
 	void tearDown();
