@@ -141,8 +141,9 @@ namespace
 {
 	bool isGroupMember(gid_t gid)
 		/// Returns true if the effective user belongs to gid, counting supplementary
-		/// groups. This mirrors access(2): the kernel tests the effective GID and every
-		/// supplementary group, not the effective GID alone.
+		/// groups. Mirrors the kernel's access(2) order: the process credential list
+		/// is consulted first, a directory-service resolver (where one exists) only
+		/// on a miss.
 	{
 		if (gid == ::getegid()) return true;
 
@@ -150,29 +151,12 @@ namespace
 		const int savedErrno = errno;
 		bool member = false;
 
-#if POCO_OS == POCO_OS_MAC_OS_X
-		// getgroups() is capped at NGROUPS_MAX (16) on Darwin and truncates silently,
-		// so a user in more groups than that would look like a non-member. The
-		// membership resolver consults Directory Services and has no such cap.
-		uuid_t userUuid;
-		uuid_t groupUuid;
-		int isMember = 0;
-		if (::mbr_uid_to_uuid(::geteuid(), userUuid) == 0
-			&& ::mbr_gid_to_uuid(gid, groupUuid) == 0
-			&& ::mbr_check_membership(userUuid, groupUuid, &isMember) == 0)
-		{
-			errno = savedErrno;
-			return isMember != 0;
-		}
-		// Resolver unavailable: fall through to getgroups().
-#endif
-
 		enum { INLINE_GROUPS = 64 };
 		gid_t inlineGroups[INLINE_GROUPS];
 
 		// getgroups() reports a group set that grew between the sizing call and the
-		// fetch as EINVAL. One retry is enough: losing that race twice yields false,
-		// the same answer further attempts would settle on.
+		// fetch as EINVAL. Retry once; losing the race twice means the set is
+		// churning and the query gives up, treating the gid as not held.
 		for (int attempt = 0; attempt < 2; ++attempt)
 		{
 			const int count = ::getgroups(0, nullptr);
@@ -195,8 +179,44 @@ namespace
 			if (errno != EINVAL) break;
 		}
 
+#if POCO_OS == POCO_OS_MAC_OS_X
+		// The credential list getgroups() returns is capped at NGROUPS_MAX (16) on
+		// Darwin and omits nested directory-service memberships, so a miss there is
+		// not final. Ask the membership resolver, as the kernel itself does after a
+		// credential miss.
+		if (!member)
+		{
+			uuid_t userUuid;
+			uuid_t groupUuid;
+			int isMember = 0;
+			if (::mbr_uid_to_uuid(::geteuid(), userUuid) == 0
+				&& ::mbr_gid_to_uuid(gid, groupUuid) == 0
+				&& ::mbr_check_membership(userUuid, groupUuid, &isMember) == 0)
+			{
+				member = isMember != 0;
+			}
+		}
+#endif
+
 		errno = savedErrno;
 		return member;
+	}
+
+
+	bool accessAllowed(const struct stat& st, mode_t usrBit, mode_t grpBit, mode_t othBit)
+		/// Applies the mode bits the way the kernel does for a non-root caller:
+		/// exactly one of the owner, group and other classes answers, with the group
+		/// class selected by membership in the file's group. The membership query is
+		/// skipped when it cannot change the outcome.
+	{
+		if (st.st_uid == ::geteuid())
+			return (st.st_mode & usrBit) != 0;
+		else if (((st.st_mode & grpBit) != 0) == ((st.st_mode & othBit) != 0))
+			return (st.st_mode & othBit) != 0;
+		else if (isGroupMember(st.st_gid))
+			return (st.st_mode & grpBit) != 0;
+		else
+			return (st.st_mode & othBit) != 0;
 	}
 }
 
@@ -210,14 +230,7 @@ bool FileImpl::canReadImpl() const
 	{
 		if (::geteuid() == 0)
 			return true;
-		else if (st.st_uid == ::geteuid())
-			return (st.st_mode & S_IRUSR) != 0;
-		else if (((st.st_mode & S_IRGRP) != 0) == ((st.st_mode & S_IROTH) != 0))
-			return (st.st_mode & S_IROTH) != 0;
-		else if (isGroupMember(st.st_gid))
-			return (st.st_mode & S_IRGRP) != 0;
-		else
-			return (st.st_mode & S_IROTH) != 0;
+		return accessAllowed(st, S_IRUSR, S_IRGRP, S_IROTH);
 	}
 	else if (const auto err = errno; err == ENOENT)
 		return false;
@@ -236,14 +249,7 @@ bool FileImpl::canWriteImpl() const
 	{
 		if (::geteuid() == 0)
 			return true;
-		else if (st.st_uid == ::geteuid())
-			return (st.st_mode & S_IWUSR) != 0;
-		else if (((st.st_mode & S_IWGRP) != 0) == ((st.st_mode & S_IWOTH) != 0))
-			return (st.st_mode & S_IWOTH) != 0;
-		else if (isGroupMember(st.st_gid))
-			return (st.st_mode & S_IWGRP) != 0;
-		else
-			return (st.st_mode & S_IWOTH) != 0;
+		return accessAllowed(st, S_IWUSR, S_IWGRP, S_IWOTH);
 	}
 	else if (const auto err = errno; err == ENOENT)
 		return false;
@@ -263,14 +269,7 @@ bool FileImpl::canExecuteImpl(const std::string& absolutePath) const
 
 	if (::geteuid() == 0)
 		return (st.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)) != 0;
-	else if (st.st_uid == ::geteuid())
-		return (st.st_mode & S_IXUSR) != 0;
-	else if (((st.st_mode & S_IXGRP) != 0) == ((st.st_mode & S_IXOTH) != 0))
-		return (st.st_mode & S_IXOTH) != 0;
-	else if (isGroupMember(st.st_gid))
-		return (st.st_mode & S_IXGRP) != 0;
-	else
-		return (st.st_mode & S_IXOTH) != 0;
+	return accessAllowed(st, S_IXUSR, S_IXGRP, S_IXOTH);
 }
 
 

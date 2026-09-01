@@ -55,7 +55,9 @@ public:
 	void testGetExecutablePathRelative();
 	void testGetExecutablePathPATHEXT();
 #if defined(POCO_OS_FAMILY_UNIX)
+#if !defined(POCO_VXWORKS)
 	void testPermissionsMatchAccess();
+#endif
 	void testGetExecutablePathThreadSafety();
 #endif
 
