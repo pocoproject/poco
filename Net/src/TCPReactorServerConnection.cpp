@@ -122,21 +122,14 @@ void TCPReactorServerConnection::onRead(const AutoPtr<ReadableNotification>& pNf
 
 void TCPReactorServerConnection::onError(const AutoPtr<ErrorNotification>& pNf)
 {
-	// Copy the payload before handleClose(): it may destroy this, so only
-	// locals may be touched afterwards (same rule as in onRead). Guard the
-	// close: a throw would abort the reactor's notification loop for the
-	// remaining connections.
-	int code = pNf->code();
-	std::string description = pNf->description();
+	// A throw would abort the reactor's notification loop for the remaining
+	// connections. The payload is deliberately not reported: the POLL_ERROR
+	// dispatch carries none (code 0, empty description), and on the exception
+	// paths SocketReactor::run() has already passed the exception itself to
+	// the ErrorHandler.
 	try
 	{
 		handleClose();
-	}
-	catch (...) {}
-	try
-	{
-		Poco::Logger& log = Poco::Logger::get("Poco.Net.TCPReactorServer");
-		if (log.debug()) log.debug("connection closed on socket error: code=%d %s", code, description);
 	}
 	catch (...) {}
 }
