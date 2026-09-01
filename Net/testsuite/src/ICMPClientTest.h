@@ -41,6 +41,13 @@ public:
 	void onEnd(const void* pSender, Poco::Net::ICMPEventArgs& args);
 
 private:
+	static bool icmpAvailable();
+		/// ICMP sockets are raw sockets and need elevated privileges on most
+		/// platforms; returns false when they cannot be created, so the tests
+		/// skip instead of reporting an environment limitation as a failure.
+
+	static bool _probed;
+	static bool _available;
 	void registerDelegates(const Poco::Net::ICMPClient& icmpClient);
 	void unregisterDelegates(const Poco::Net::ICMPClient& icmpClient);
 	static Poco::FastMutex _mutex;

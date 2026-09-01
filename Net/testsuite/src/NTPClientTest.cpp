@@ -49,9 +49,19 @@ NTPClientTest::~NTPClientTest()
 void NTPClientTest::testTimeSync()
 {
 #if POCO_OS != POCO_OS_ANDROID
-	if (ICMPClient::pingIPv4("pool.ntp.org") <= 0)
+	// pingIPv4 throws when ICMP (raw) sockets are unavailable, which the
+	// <= 0 check alone does not cover.
+	bool reachable = false;
+	try
 	{
-		std::cerr << "pool.ntp.org not accessibe, test skipped" << std::endl;
+		reachable = ICMPClient::pingIPv4("pool.ntp.org") > 0;
+	}
+	catch (Poco::Exception&)
+	{
+	}
+	if (!reachable)
+	{
+		std::cerr << "pool.ntp.org not accessible, test skipped" << std::endl;
 		return;
 	}
 #endif
