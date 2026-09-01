@@ -311,6 +311,18 @@ namespace
 			reactor()->stop();
 		}
 
+		void onError(int errorCode) override
+			/// A connect can fail immediately (ENETUNREACH, ECONNREFUSED)
+			/// instead of timing out. SocketConnector unregisters itself on
+			/// ErrorNotification, leaving the reactor with no handlers, and
+			/// SocketReactor::run() dispatches TimeoutNotification only while
+			/// handlers are registered -- so without this the reactor would
+			/// never be stopped and run() would block forever.
+		{
+			_failed = true;
+			reactor()->stop();
+		}
+
 		bool failed() const
 		{
 			return _failed;
@@ -590,7 +602,8 @@ void SocketReactorTest::testSocketConnectorFail()
 {
 	SocketReactor reactor;
 	reactor.setTimeout(Poco::Timespan(3, 0));
-	SocketAddress sa("192.168.168.192", 12345);
+	// RFC 5737 TEST-NET-1: reserved for documentation, never routed.
+	SocketAddress sa("192.0.2.1", 12345);
 	FailConnector connector(sa, reactor);
 	assertTrue (!connector.failed());
 	assertTrue (!connector.shutdown());
