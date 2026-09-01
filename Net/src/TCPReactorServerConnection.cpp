@@ -23,6 +23,23 @@ TCPReactorServerConnection::~TCPReactorServerConnection()
 
 void TCPReactorServerConnection::initialize()
 {
+	// ShutdownNotification is dispatched when the reactor stops; without it
+	// the connection (and its socket) outlives the reactor's run loop.
+	_reactor.addEventHandler(
+		_socket,
+		HTTPObserver<TCPReactorServerConnection, ShutdownNotification>(
+			shared_from_this(), &TCPReactorServerConnection::onShutdown));
+	// Without a registered ErrorNotification observer the reactor's error
+	// dispatch is dropped by the NotificationCenter, so socket errors would
+	// surface only when a later read fails.
+	_reactor.addEventHandler(
+		_socket,
+		HTTPObserver<TCPReactorServerConnection, ErrorNotification>(
+			shared_from_this(), &TCPReactorServerConnection::onError));
+	// Readable must come last: this may run on the acceptor's thread while
+	// the reactor polls, and once the socket is readable an immediately
+	// disconnecting client could run handleClose() on the reactor thread
+	// before registration completes, leaving a half-registered connection.
 	_reactor.addEventHandler(
 		_socket,
 		HTTPObserver<TCPReactorServerConnection, ReadableNotification>(
@@ -105,19 +122,46 @@ void TCPReactorServerConnection::onRead(const AutoPtr<ReadableNotification>& pNf
 
 void TCPReactorServerConnection::onError(const AutoPtr<ErrorNotification>& pNf)
 {
-	handleClose();
+	// A throw would abort the reactor's notification loop for the remaining
+	// connections. The payload is deliberately not reported: the POLL_ERROR
+	// dispatch carries none (code 0, empty description), and on the exception
+	// paths SocketReactor::run() has already passed the exception itself to
+	// the ErrorHandler.
+	try
+	{
+		handleClose();
+	}
+	catch (...) {}
 }
 
 void TCPReactorServerConnection::onShutdown(const AutoPtr<ShutdownNotification>& pNf)
 {
-	handleClose();
+	// A throw here would abort the reactor's shutdown broadcast, leaving the
+	// remaining connections open.
+	try
+	{
+		handleClose();
+	}
+	catch (...) {}
 }
 
 void TCPReactorServerConnection::handleClose()
 {
-	// here must keep _socket to delay the _socket destrcutor
+	// keepSocket delays the socket close until the removals are done
 	StreamSocket keepSocket = _socket;
-	// here will delete this, so memberships' destructor will be invoked
+	// The reactor's observers hold the only owning shared_ptrs; removing them
+	// ends this object's lifetime (the dispatching NotificationCenter keeps
+	// it alive until the current handler returns). Remove Readable last so
+	// the intermediate poll-mask updates never pass mode 0, and touch no
+	// member after the removals.
+	_reactor.removeEventHandler(
+		_socket,
+		HTTPObserver<TCPReactorServerConnection, ErrorNotification>(
+			shared_from_this(), &TCPReactorServerConnection::onError));
+	_reactor.removeEventHandler(
+		_socket,
+		HTTPObserver<TCPReactorServerConnection, ShutdownNotification>(
+			shared_from_this(), &TCPReactorServerConnection::onShutdown));
 	_reactor.removeEventHandler(
 		_socket,
 		HTTPObserver<TCPReactorServerConnection, ReadableNotification>(

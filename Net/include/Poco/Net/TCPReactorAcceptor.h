@@ -24,6 +24,8 @@ public:
 	SocketReactor& reactor();
 	void stop();
 
+	void onAccept(const AutoPtr<ReadableNotification>& pNf) override;
+
 	void setRecvMessageCallback(const RecvMessageCallback& cb)
 	{
 		_recvMessageCallback = cb;

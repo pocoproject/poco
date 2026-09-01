@@ -353,13 +353,17 @@ inline bool SocketReactor::has(const Socket& socket) const
 
 inline void SocketReactor::onError(const Socket& socket, int code, const std::string& description)
 {
-	dispatch(new ErrorNotification(this, socket, code, description));
+	// dispatch() does not take ownership (it is also called with borrowed
+	// member notifications), so a holder must release the initial reference.
+	Poco::AutoPtr<ErrorNotification> pNf(new ErrorNotification(this, socket, code, description));
+	dispatch(pNf);
 }
 
 
 inline void SocketReactor::onError(int code, const std::string& description)
 {
-	dispatch(new ErrorNotification(this, code, description));
+	Poco::AutoPtr<ErrorNotification> pNf(new ErrorNotification(this, code, description));
+	dispatch(pNf);
 }
 
 

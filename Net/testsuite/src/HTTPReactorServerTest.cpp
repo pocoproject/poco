@@ -9,7 +9,10 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/SocketReactor.h"
+#include "Poco/Net/TCPReactorServerConnection.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Thread.h"
@@ -18,6 +21,7 @@
 #include "CppUnit/TestSuite.h"
 #include "CppUnit/TestCaller.h"
 #include <stdexcept>
+#include <vector>
 
 
 using Poco::Net::HTTPServerParams;
@@ -116,6 +120,49 @@ namespace
 			return new EchoBodyRequestHandler;
 		}
 	};
+
+	// Opens a raw keep-alive connection and completes the given number of
+	// request/response round trips, proving the connection is open and
+	// reusable when the caller proceeds (e.g. to stop the server).
+	Poco::Net::StreamSocket openKeepAliveConnection(int port, int roundTrips)
+	{
+		Poco::Net::StreamSocket s;
+		s.connect(Poco::Net::SocketAddress("127.0.0.1", port));
+		s.setReceiveTimeout(Poco::Timespan(5, 0));
+		for (int i = 0; i < roundTrips; ++i)
+		{
+			std::string req("POST / HTTP/1.1\r\nHost: x\r\nContent-Length: 4\r\n\r\nping");
+			s.sendBytes(req.data(), static_cast<int>(req.size()));
+			std::string resp;
+			char buf[4096];
+			while (resp.find("ping") == std::string::npos)
+			{
+				int n = s.receiveBytes(buf, sizeof(buf));
+				if (n <= 0) throw Poco::IOException("connection closed before stop");
+				resp.append(buf, n);
+			}
+		}
+		return s;
+	}
+
+	// True if the connection is closed (EOF or reset), false on a receive
+	// timeout, i.e. a connection left open.
+	bool connectionClosed(Poco::Net::StreamSocket& s)
+	{
+		char buf[256];
+		try
+		{
+			return s.receiveBytes(buf, sizeof(buf)) == 0;
+		}
+		catch (const Poco::TimeoutException&)
+		{
+			return false;
+		}
+		catch (const Poco::Net::NetException&)
+		{
+			return true;
+		}
+	}
 }
 
 HTTPReactorServerTest::HTTPReactorServerTest(const std::string& name): CppUnit::TestCase(name)
@@ -208,7 +255,7 @@ void HTTPReactorServerTest::testBodyReadTwice()
 	istr.read(buffer1, 10);
 	int n1 = istr.gcount();
 	char buffer2[32];
-	istr.read(buffer2, 50);
+	istr.read(buffer2, sizeof(buffer2));
 	int n2 = istr.gcount();
 
 	std::string fullBody = std::string(buffer1, n1) + std::string(buffer2, n2);
@@ -773,6 +820,122 @@ void HTTPReactorServerTest::testSendTimeoutClosesStalledClient()
 	srv.stop();
 }
 
+void HTTPReactorServerTest::testStopClosesConnections()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(true);
+	pParams->setMaxThreads(1);
+	pParams->setReactorMode(true);
+
+	Poco::Net::HTTPReactorServer srv(0, pParams, new RequestHandlerFactory);
+	srv.start();
+	int port = srv.port();
+
+	// Two round trips prove the keep-alive connection is open and reusable
+	// at the moment the server stops, so the EOF below can only come from
+	// the shutdown path.
+	Poco::Net::StreamSocket s = openKeepAliveConnection(port, 2);
+
+	// stop() joins the reactor threads, so the ShutdownNotification has been
+	// dispatched by the time it returns. The connection must be closed then:
+	// expect EOF (or a reset), not a receive timeout, while the server object
+	// is still alive.
+	srv.stop();
+	assertTrue(connectionClosed(s));
+}
+
+void HTTPReactorServerTest::testStopClosesMultipleConnections()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(true);
+	pParams->setMaxThreads(2);
+	pParams->setReactorMode(true);
+
+	Poco::Net::HTTPReactorServer srv(0, pParams, new RequestHandlerFactory);
+	srv.start();
+	int port = srv.port();
+
+	// The shutdown broadcast iterates the notifier list while each closing
+	// connection removes itself from it; several connections make that
+	// erase-while-dispatching path observable.
+	std::vector<Poco::Net::StreamSocket> sockets;
+	for (int i = 0; i < 4; ++i)
+	{
+		sockets.push_back(openKeepAliveConnection(port, 1));
+	}
+
+	srv.stop();
+	for (auto& s : sockets)
+	{
+		assertTrue(connectionClosed(s));
+	}
+}
+
+void HTTPReactorServerTest::testStopClosesConnectionsSelfReactor()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(true);
+	pParams->setReactorMode(true);
+	pParams->setUseSelfReactor(true);
+
+	Poco::Net::HTTPReactorServer srv(0, pParams, new RequestHandlerFactory);
+	srv.start();
+	int port = srv.port();
+
+	// In self-reactor mode the connections share the acceptor's reactor, so
+	// the shutdown broadcast also visits the acceptor's own notifier.
+	std::vector<Poco::Net::StreamSocket> sockets;
+	for (int i = 0; i < 2; ++i)
+	{
+		sockets.push_back(openKeepAliveConnection(port, 1));
+	}
+
+	srv.stop();
+	for (auto& s : sockets)
+	{
+		assertTrue(connectionClosed(s));
+	}
+}
+
+namespace
+{
+	// Exposes the protected error broadcast, standing in for an exception
+	// escaping a handler on the reactor.
+	class ErrorBroadcastReactor: public Poco::Net::SocketReactor
+	{
+	public:
+		using Poco::Net::SocketReactor::onError;
+	};
+}
+
+void HTTPReactorServerTest::testReactorErrorClosesConnection()
+{
+	ErrorBroadcastReactor reactor;
+	Poco::Thread thread;
+	thread.start(reactor);
+
+	Poco::Net::ServerSocket ss(Poco::Net::SocketAddress("127.0.0.1", 0));
+	Poco::Net::StreamSocket client;
+	client.connect(ss.address());
+	client.setReceiveTimeout(Poco::Timespan(5, 0));
+	Poco::Net::StreamSocket accepted = ss.acceptConnection();
+
+	auto conn = std::make_shared<Poco::Net::TCPReactorServerConnection>(accepted, reactor);
+	conn->initialize();
+	// Drop the local socket and connection references: only the reactor's
+	// observers keep the connection (and its fd) alive, as in the server.
+	accepted = Poco::Net::StreamSocket();
+	conn.reset();
+
+	// The error broadcast must reach the connection through the registered
+	// ErrorNotification observer and close it.
+	reactor.onError(0, "simulated reactor error");
+	assertTrue(connectionClosed(client));
+
+	reactor.stop();
+	thread.join();
+}
+
 void HTTPReactorServerTest::setUp()
 {
 }
@@ -805,6 +968,10 @@ CppUnit::Test* HTTPReactorServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testHandlerExceptionKeepsServerAlive);
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testOnErrorPreservesExceptionType);
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testSendTimeoutClosesStalledClient);
+	CppUnit_addTest(pSuite, HTTPReactorServerTest, testStopClosesConnections);
+	CppUnit_addTest(pSuite, HTTPReactorServerTest, testStopClosesMultipleConnections);
+	CppUnit_addTest(pSuite, HTTPReactorServerTest, testStopClosesConnectionsSelfReactor);
+	CppUnit_addTest(pSuite, HTTPReactorServerTest, testReactorErrorClosesConnection);
 
 	return pSuite;
 }
