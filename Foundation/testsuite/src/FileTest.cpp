@@ -400,9 +400,10 @@ void FileTest::testFileAttributes3()
 void FileTest::testPermissionsMatchAccess()
 {
 	// faccessat(AT_EACCESS) is the kernel answering exactly the question
-	// canRead(), canWrite() and canExecute() ask, so it is the oracle for them.
-	// Every mode below is asserted in whichever direction the kernel decides, so
-	// both a wrongly granted and a wrongly denied permission fail here.
+	// canRead(), canWrite() and canExecute() ask, so the test compares each
+	// result against it. Every mode below is asserted in whichever direction the
+	// kernel decides, so both a wrongly granted and a wrongly denied permission
+	// fail here.
 	//
 	// Root is excluded from the whole test: the mode model cannot see capability
 	// restrictions (containers without CAP_DAC_OVERRIDE), fakeroot fakes
@@ -414,9 +415,10 @@ void FileTest::testPermissionsMatchAccess()
 	assertTrue (tf.createFile());
 	const std::string path = tf.path();
 
-	// On a noexec mount the kernel denies X_OK regardless of the mode bits.
+	// On a noexec mount the kernel denies X_OK regardless of the mode bits,
+	// so the X_OK comparison is only meaningful when the kernel can grant it.
 	assertTrue (::chmod(path.c_str(), 0700) == 0);
-	const bool execOracleUsable = kernelGrants(path, X_OK);
+	const bool execComparable = kernelGrants(path, X_OK);
 
 	static const mode_t modes[] =
 	{
@@ -431,7 +433,7 @@ void FileTest::testPermissionsMatchAccess()
 		File f(path);
 		loop_1_assert (modes[i], kernelGrants(path, R_OK) == f.canRead());
 		loop_1_assert (modes[i], kernelGrants(path, W_OK) == f.canWrite());
-		if (execOracleUsable)
+		if (execComparable)
 			loop_1_assert (modes[i], kernelGrants(path, X_OK) == f.canExecute());
 	}
 
