@@ -100,7 +100,7 @@ private:
 
 	[[nodiscard]] int ivSize() const;
 	[[nodiscard]] int blockSize() const;
-	void handleErrors(std::string&& msg);
+	[[noreturn]] void handleErrors(std::string&& msg);
 
 	const EVP_CIPHER* _pCipher;
 	EVP_CIPHER_CTX*   _pCtx;

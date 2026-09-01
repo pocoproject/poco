@@ -104,7 +104,7 @@ public:
 		return new HandleException(*this);
 	}
 
-	void rethrow() const
+	[[noreturn]] void rethrow() const
 		/// Re-throws the HandleException.
 	{
 		throw *this;

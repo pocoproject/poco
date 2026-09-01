@@ -67,7 +67,7 @@ protected:
 	[[nodiscard]] FileSizeImpl totalSpaceImpl() const;
 	[[nodiscard]] FileSizeImpl usableSpaceImpl() const;
 	[[nodiscard]] FileSizeImpl freeSpaceImpl() const;
-	static void handleLastErrorImpl(const std::string& path);
+	[[noreturn]] static void handleLastErrorImpl(const std::string& path);
 	static void convertPath(const std::string& utf8Path, std::wstring& utf16Path);
 
 private:

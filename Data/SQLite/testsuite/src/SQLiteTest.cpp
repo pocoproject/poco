@@ -3822,7 +3822,7 @@ struct TestCommitTransactor
 
 struct TestRollbackTransactor
 {
-	void operator () (Session& session) const
+	[[noreturn]] void operator () (Session& session) const
 	{
 		session << "INSERT INTO Person VALUES ('lastName','firstName','address',10)", now;
 		throw Poco::Exception("test");

@@ -28,7 +28,7 @@ public:
 	void stop();
 	int port() const { return _tcpReactorServer.port(); }
 	void onMessage(const TcpReactorConnectionPtr& conn);
-	void onError(const Poco::Exception& ex);
+	[[noreturn]] void onError(const Poco::Exception& ex);
 		/// Rethrows ex preserving its dynamic type, so callers up the stack can
 		/// classify the failure. Handlers run inline on the reactor worker
 		/// thread, so this propagates into TCPReactorServerConnection::onRead.

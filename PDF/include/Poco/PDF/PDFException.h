@@ -26,7 +26,7 @@
 namespace Poco::PDF {
 
 
-void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_data);
+[[noreturn]] void HPDF_Error_Handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_data);
 	/// HARU library error handler function.
 	/// Throws appropriate exception.
 

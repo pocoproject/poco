@@ -23,7 +23,7 @@
 
 namespace
 {
-	void throwError()
+	[[noreturn]] void throwError()
 	{
 		unsigned long err;
 		std::string msg;

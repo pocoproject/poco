@@ -211,7 +211,7 @@ protected:
 					long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 					const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
-	void fail(const std::string& message = "",
+	[[noreturn]] void fail(const std::string& message = "",
 			  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 			  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 

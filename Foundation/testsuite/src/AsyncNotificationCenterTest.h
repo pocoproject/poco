@@ -95,7 +95,7 @@ protected:
 	void handleAuto(const Poco::AutoPtr<Poco::Notification>& pNf);
 	void handleCount(const Poco::AutoPtr<Poco::Notification>& pNf);
 	Poco::NotificationResult handleSync(const Poco::AutoPtr<Poco::Notification>& pNf);
-	void handleThrow(const Poco::AutoPtr<Poco::Notification>& pNf);
+	[[noreturn]] void handleThrow(const Poco::AutoPtr<Poco::Notification>& pNf);
 	void handleThreadSafe(const Poco::AutoPtr<Poco::Notification>& pNf);
 	bool matchAsync(const std::string& name) const;
 

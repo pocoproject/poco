@@ -26,7 +26,7 @@ namespace Poco::Crypto {
 
 namespace
 {
-	void throwError(std::string&& msg)
+	[[noreturn]] void throwError(std::string&& msg)
 	{
 		unsigned long err;
 		while ((err = ERR_get_error()))
