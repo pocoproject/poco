@@ -34,6 +34,13 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	static bool rawSocketsAvailable();
+		/// Raw sockets need elevated privileges on most platforms; returns
+		/// false when they cannot be created, so the tests skip instead of
+		/// reporting an environment limitation as a failure.
+
+	static bool _probed;
+	static bool _available;
 };
 
 
