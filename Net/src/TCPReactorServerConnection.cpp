@@ -27,6 +27,19 @@ void TCPReactorServerConnection::initialize()
 		_socket,
 		HTTPObserver<TCPReactorServerConnection, ReadableNotification>(
 			shared_from_this(), &TCPReactorServerConnection::onRead));
+	// Registering for ErrorNotification also makes the reactor include
+	// POLL_ERROR in the poll mask for this socket; without it socket errors
+	// surface only when a later read fails.
+	_reactor.addEventHandler(
+		_socket,
+		HTTPObserver<TCPReactorServerConnection, ErrorNotification>(
+			shared_from_this(), &TCPReactorServerConnection::onError));
+	// ShutdownNotification is dispatched when the reactor stops; without it
+	// the connection (and its socket) outlives the reactor's run loop.
+	_reactor.addEventHandler(
+		_socket,
+		HTTPObserver<TCPReactorServerConnection, ShutdownNotification>(
+			shared_from_this(), &TCPReactorServerConnection::onShutdown));
 }
 
 void TCPReactorServerConnection::onRead(const AutoPtr<ReadableNotification>& pNf)
@@ -105,7 +118,17 @@ void TCPReactorServerConnection::onRead(const AutoPtr<ReadableNotification>& pNf
 
 void TCPReactorServerConnection::onError(const AutoPtr<ErrorNotification>& pNf)
 {
+	// Copy the payload before handleClose(): it may destroy this, so only
+	// locals may be touched afterwards (same rule as in onRead).
+	int code = pNf->code();
+	std::string description = pNf->description();
 	handleClose();
+	try
+	{
+		Poco::Logger& log = Poco::Logger::get("Poco.Net.TCPReactorServer");
+		if (log.debug()) log.debug("connection closed on socket error: code=%d %s", code, description);
+	}
+	catch (...) {}
 }
 
 void TCPReactorServerConnection::onShutdown(const AutoPtr<ShutdownNotification>& pNf)
@@ -117,7 +140,20 @@ void TCPReactorServerConnection::handleClose()
 {
 	// here must keep _socket to delay the _socket destrcutor
 	StreamSocket keepSocket = _socket;
-	// here will delete this, so memberships' destructor will be invoked
+	// The reactor's observers hold the only owning shared_ptrs, so the last
+	// removal deletes this (at the end of its full-expression, once the
+	// temporary observer argument releases its reference). Remove Readable
+	// last: removeEventHandler drops the socket from the pollset only with the
+	// last observer, so the intermediate poll-mask updates never pass mode 0,
+	// and no member is touched after the final removal.
+	_reactor.removeEventHandler(
+		_socket,
+		HTTPObserver<TCPReactorServerConnection, ErrorNotification>(
+			shared_from_this(), &TCPReactorServerConnection::onError));
+	_reactor.removeEventHandler(
+		_socket,
+		HTTPObserver<TCPReactorServerConnection, ShutdownNotification>(
+			shared_from_this(), &TCPReactorServerConnection::onShutdown));
 	_reactor.removeEventHandler(
 		_socket,
 		HTTPObserver<TCPReactorServerConnection, ReadableNotification>(

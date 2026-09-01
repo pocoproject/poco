@@ -773,6 +773,55 @@ void HTTPReactorServerTest::testSendTimeoutClosesStalledClient()
 	srv.stop();
 }
 
+void HTTPReactorServerTest::testStopClosesConnections()
+{
+	HTTPServerParams* pParams = new HTTPServerParams;
+	pParams->setKeepAlive(true);
+	pParams->setMaxThreads(1);
+	pParams->setReactorMode(true);
+
+	Poco::Net::HTTPReactorServer srv(0, pParams, new RequestHandlerFactory);
+	srv.start();
+	int port = srv.port();
+
+	// One keep-alive request over a raw socket, so the connection is idle but
+	// open when the server stops.
+	Poco::Net::StreamSocket s;
+	s.connect(Poco::Net::SocketAddress("127.0.0.1", port));
+	s.setReceiveTimeout(Poco::Timespan(5, 0));
+	std::string req("POST / HTTP/1.1\r\nHost: x\r\nContent-Length: 4\r\n\r\nping");
+	s.sendBytes(req.data(), static_cast<int>(req.size()));
+	std::string resp;
+	char buf[4096];
+	while (resp.find("ping") == std::string::npos)
+	{
+		int n = s.receiveBytes(buf, sizeof(buf));
+		assertTrue(n > 0);
+		resp.append(buf, n);
+	}
+
+	// stop() joins the reactor threads, so the ShutdownNotification has been
+	// dispatched by the time it returns. The connection must be closed then:
+	// expect EOF (or a reset), not a receive timeout, while the server object
+	// is still alive.
+	srv.stop();
+
+	bool closed = false;
+	try
+	{
+		closed = (s.receiveBytes(buf, sizeof(buf)) == 0);
+	}
+	catch (const Poco::TimeoutException&)
+	{
+		closed = false;    // connection left open: shutdown never reached it
+	}
+	catch (const Poco::Net::NetException&)
+	{
+		closed = true;
+	}
+	assertTrue(closed);
+}
+
 void HTTPReactorServerTest::setUp()
 {
 }
@@ -805,6 +854,7 @@ CppUnit::Test* HTTPReactorServerTest::suite()
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testHandlerExceptionKeepsServerAlive);
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testOnErrorPreservesExceptionType);
 	CppUnit_addTest(pSuite, HTTPReactorServerTest, testSendTimeoutClosesStalledClient);
+	CppUnit_addTest(pSuite, HTTPReactorServerTest, testStopClosesConnections);
 
 	return pSuite;
 }
