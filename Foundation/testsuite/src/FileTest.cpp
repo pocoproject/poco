@@ -365,7 +365,14 @@ void FileTest::testFileAttributes2()
 	assertTrue (tsm - ts >= -2000000 && tsm - ts <= 2000000);
 
 	f.setWriteable(false);
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+	// Root writes regardless of the mode bits, so the read-only expectation
+	// only holds for ordinary users.
+	if (::geteuid() != 0)
+		assertTrue (!f.canWrite());
+#else
 	assertTrue (!f.canWrite());
+#endif
 	assertTrue (f.canRead());
 
 	f.setReadOnly(false);
@@ -606,7 +613,14 @@ void FileTest::testCopy()
 	TemporaryFile f2;
 	f1.setReadOnly().copyTo(f2.path());
 	assertTrue (f2.exists());
+#if defined(POCO_OS_FAMILY_UNIX) && !defined(POCO_VXWORKS)
+	// Root writes regardless of the mode bits, so the read-only expectation
+	// only holds for ordinary users.
+	if (::geteuid() != 0)
+		assertTrue (!f2.canWrite());
+#else
 	assertTrue (!f2.canWrite());
+#endif
 	assertTrue (f1.getSize() == f2.getSize());
 	f1.setWriteable().remove();
 }
