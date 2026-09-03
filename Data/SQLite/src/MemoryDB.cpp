@@ -880,30 +880,37 @@ namespace
 bool MemoryDB::tryDetach(Poco::UInt32 shardId)
 {
 	std::string alias = "arc_" + Poco::NumberFormatter::format(shardId);
-	try
-	{
-		InternalGuard guard;
-		DbMutexGuard dbm(_memHandle);
-		_session << ("DETACH DATABASE " + alias), now;
-		return true;
-	}
-	catch (const Poco::Exception&)
-	{
-		return false;
-	}
+	InternalGuard guard;
+	DbMutexGuard dbm(_memHandle);
+	// The held connection mutex keeps other threads' statements from starting
+	// or completing, so the observed state cannot change before the DETACH.
+	const int txn = sqlite3_txn_state(_memHandle, alias.c_str());
+	if (txn < 0)
+		return true;  // not attached (e.g. detached out-of-band via
+		              // session()); the end state holds, resync
+	if (txn != SQLITE_TXN_NONE)
+		return false; // a busy statement holds a transaction; defer
+	_session << ("DETACH DATABASE " + alias), now; // unexpected failures propagate
+	return true;
 }
 
 
 void MemoryDB::sweepDetached()
 {
 	// Complete deferred detaches (refcount 0, see detachArchived). Failures
-	// leave the entry for a later sweep.
+	// leave the entry for a later sweep; unexpected DETACH errors are not
+	// propagated here because the sweep runs on behalf of unrelated
+	// attach/detach calls.
 	for (auto it = _attached.begin(); it != _attached.end(); )
 	{
-		if (it->second == 0 && tryDetach(it->first))
-			it = _attached.erase(it);
-		else
-			++it;
+		bool detached = false;
+		if (it->second == 0)
+		{
+			try { detached = tryDetach(it->first); }
+			catch (const Poco::Exception&) { }
+		}
+		if (detached) it = _attached.erase(it);
+		else ++it;
 	}
 }
 

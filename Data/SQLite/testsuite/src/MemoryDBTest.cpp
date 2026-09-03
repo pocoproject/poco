@@ -1089,6 +1089,17 @@ void MemoryDBTest::testDetachDeferredUnderReadTxn()
 	db << ("SELECT count(*) FROM " + alias + ".t"), into(n), now;
 	assertTrue (n == 5);
 	db.detachArchived(ids[0]);
+
+	// an out-of-band DETACH through session() must not strand the
+	// bookkeeping: detachArchived resyncs and a fresh attach works
+	assertTrue (db.attachArchived(ids[0]) == alias);
+	db.session() << ("DETACH DATABASE " + alias), now;
+	db.detachArchived(ids[0]);
+	assertTrue (db.attachArchived(ids[0]) == alias);
+	n = 0;
+	db << ("SELECT count(*) FROM " + alias + ".t"), into(n), now;
+	assertTrue (n == 5);
+	db.detachArchived(ids[0]);
 }
 
 
