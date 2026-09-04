@@ -14,11 +14,17 @@
 #include "Poco/PatternFormatter.h"
 #include "Poco/Message.h"
 #include "Poco/DateTime.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/Timestamp.h"
+#include "Poco/Timezone.h"
 
 
 using Poco::PatternFormatter;
 using Poco::Message;
 using Poco::DateTime;
+using Poco::DateTimeFormatter;
+using Poco::Timestamp;
+using Poco::Timezone;
 
 
 PatternFormatterTest::PatternFormatterTest(const std::string& name): CppUnit::TestCase(name)
@@ -65,7 +71,11 @@ void PatternFormatterTest::testPatternFormatter()
 	assertTrue (fmt.getProperty("times") == "UTC");
 	fmt.setProperty("times", "local");
 	fmt.format(msg, result);
-	assertTrue (result.find("2005-01-01 ") == 0);
+	// Mirrors the conversion in PatternFormatter::format(); hard-coding the date
+	// fails wherever the local offset pushes the message past midnight.
+	Timestamp localTime = msg.getTime();
+	localTime += (Timezone::utcOffset() + Timezone::dst()) * Timestamp::resolution();
+	assertTrue (result.find(DateTimeFormatter::format(localTime, "%Y-%m-%d %H:%M:%S [")) == 0);
 	assertTrue (result.find(":TestSource]3-Test message text") != std::string::npos);
 
 	result.clear();

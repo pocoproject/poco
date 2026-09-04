@@ -29,6 +29,7 @@ public:
 
 	void testSession();
 	void testStatementFormatting();
+	void testStatementMoveAssignment();
 	void testFeatures();
 	void testProperties();
 	void testLOB();

@@ -564,9 +564,16 @@ private:
 		/// Returns true if the statement is of the argument type.
 
 	Poco::SharedPtr<Parser::SQLParserResult> _pParseResult;
-	std::string _parseError;
+
+#else
+
+	// Layout placeholder, always null: SharedPtr is two pointers whatever it
+	// points to, so Statement has the same size and offsets in both builds.
+	Poco::SharedPtr<char> _pParseResult;
 
 #endif // POCO_DATA_NO_SQL_PARSER
+
+	std::string _parseError;
 
 	StatementImpl::Ptr _pImpl;
 

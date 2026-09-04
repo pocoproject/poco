@@ -285,7 +285,7 @@ option(ENABLE_TESTS
 option(ENABLE_TEST_DEPRECATED
 	"Set to OFF|ON (default is OFF) to enable build of tests for deprecated functionality" OFF)
 
-option(POCO_DATA_NO_SQL_PARSER "Disable SQL parser" OFF)
+option(POCO_DATA_NO_SQL_PARSER "Set to OFF|ON (default is OFF) to build Poco::Data without the SQL parser" OFF)
 
 option(ENABLE_COMPILER_WARNINGS
 	"Set to OFF|ON (default is OFF) to enable additional compiler warnings. Intended primarily for maintainers." OFF)
@@ -331,11 +331,7 @@ if(POCO_NO_FORK_EXEC)
 	add_definitions(-DPOCO_NO_FORK_EXEC=1)
 endif()
 
-option(POCO_ENABLE_STD_MUTEX "Set to OFF|NO using mutex from standard library (default OFF)" OFF)
-
-if (POCO_ENABLE_STD_MUTEX)
-	add_compile_definitions(POCO_ENABLE_STD_MUTEX)
-endif ()
+option(POCO_ENABLE_STD_MUTEX "Set to OFF|ON (default is OFF) to implement Poco::Mutex and Poco::FastMutex with std::recursive_mutex and std::mutex" OFF)
 
 if(ENABLE_TRACE)
 	add_compile_definitions(POCO_ENABLE_TRACE)
@@ -571,9 +567,6 @@ endif(OPENSSL_FOUND)
 
 
 if(EXISTS ${PROJECT_SOURCE_DIR}/Data AND ENABLE_DATA)
-	if(POCO_DATA_NO_SQL_PARSER)
-		add_compile_definitions(POCO_DATA_NO_SQL_PARSER=1)
-	endif()
 	add_subdirectory(Data)
 	list(APPEND Poco_COMPONENTS "Data")
 endif()

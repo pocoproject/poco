@@ -153,6 +153,25 @@ void DataTest::testStatementFormatting()
 }
 
 
+void DataTest::testStatementMoveAssignment()
+{
+	Session sess(SessionFactory::instance().create("test", "cs"));
+
+	Statement source = (sess << "SELEC * FROM Person");
+	source.parse();
+	const std::string parseError = source.parseError();
+#ifndef POCO_DATA_NO_SQL_PARSER
+	assertTrue (!parseError.empty());
+#endif
+
+	Statement target(sess);
+	target = std::move(source);
+	assertTrue (target.toString() == "SELEC * FROM Person");
+	assertTrue (target.parseError() == parseError);
+	assertTrue (source.parseError().empty());
+}
+
+
 void DataTest::testFeatures()
 {
 	Session sess(SessionFactory::instance().create("test", "cs"));
@@ -1723,6 +1742,7 @@ CppUnit::Test* DataTest::suite()
 
 	CppUnit_addTest(pSuite, DataTest, testSession);
 	CppUnit_addTest(pSuite, DataTest, testStatementFormatting);
+	CppUnit_addTest(pSuite, DataTest, testStatementMoveAssignment);
 	CppUnit_addTest(pSuite, DataTest, testFeatures);
 	CppUnit_addTest(pSuite, DataTest, testProperties);
 	CppUnit_addTest(pSuite, DataTest, testLOB);
