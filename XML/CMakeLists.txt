@@ -16,6 +16,10 @@ add_library(XML ${SRCS})
 if (POCO_UNBUNDLED)
 	target_link_libraries(XML PRIVATE EXPAT::EXPAT)
 	target_compile_definitions(XML PUBLIC POCO_UNBUNDLED)
+	# expat.h declares the billion laughs protection only under XML_DTD (2.4,
+	# 2.5, 2.6.1 onwards) or XML_GE == 1 (2.6.0), so the system header needs
+	# both. The bundled build gets XML_DTD from _BUNDLED_EXPAT.
+	target_compile_definitions(XML PRIVATE XML_DTD XML_GE=1)
 else()
 	target_link_libraries(XML PRIVATE "$<BUILD_LOCAL_INTERFACE:EXPAT::EXPAT>")
 endif()

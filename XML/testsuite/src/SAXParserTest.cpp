@@ -167,6 +167,36 @@ void SAXParserTest::testInternalEntity()
 }
 
 
+void SAXParserTest::testBillionLaughsProtection()
+{
+	// Expands to ~40 kB from ~300 bytes of source. The default expat threshold
+	// (8 MiB) never fires for a document this small, so reaching the limit below
+	// proves the explicitly configured limits were actually handed to expat.
+	const std::string bomb(
+		"<?xml version='1.0'?>"
+		"<!DOCTYPE root ["
+		"<!ENTITY a '0123456789012345678901234567890123456789'>"
+		"<!ENTITY b '&a;&a;&a;&a;&a;&a;&a;&a;&a;&a;'>"
+		"<!ENTITY c '&b;&b;&b;&b;&b;&b;&b;&b;&b;&b;'>"
+		"<!ENTITY d '&c;&c;&c;&c;&c;&c;&c;&c;&c;&c;'>"
+		"]>"
+		"<root>&d;</root>");
+
+	SAXParser parser;
+	parser.setProperty(SAXParser::PROPERTY_BLA_MAXIMUM_AMPLIFICATION, std::string("1.5"));
+	parser.setProperty(SAXParser::PROPERTY_BLA_ACTIVATION_THRESHOLD, std::string("64"));
+
+	try
+	{
+		parse(parser, XMLWriter::CANONICAL, bomb);
+		fail("entity expansion beyond the amplification limit must be rejected");
+	}
+	catch (XMLException&)
+	{
+	}
+}
+
+
 void SAXParserTest::testNotation()
 {
 	SAXParser parser;
@@ -426,6 +456,7 @@ CppUnit::Test* SAXParserTest::suite()
 	CppUnit_addTest(pSuite, SAXParserTest, testPI);
 	CppUnit_addTest(pSuite, SAXParserTest, testDTD);
 	CppUnit_addTest(pSuite, SAXParserTest, testInternalEntity);
+	CppUnit_addTest(pSuite, SAXParserTest, testBillionLaughsProtection);
 	CppUnit_addTest(pSuite, SAXParserTest, testNotation);
 	CppUnit_addTest(pSuite, SAXParserTest, testExternalUnparsed);
 	CppUnit_addTest(pSuite, SAXParserTest, testExternalParsed);
