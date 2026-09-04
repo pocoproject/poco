@@ -108,21 +108,14 @@ Statement& Statement::operator = (Statement&& stmt) noexcept
 {
 	_pParseResult = std::move(stmt._pParseResult);
 	_parseError = std::move(stmt._parseError);
-	_parseError.clear();
 	_pImpl = std::move(stmt._pImpl);
-	stmt._pImpl = nullptr;
-	_async = std::move(stmt._async);
-	stmt._async = false;
+	_async = stmt._async;
 	_pResult = std::move(stmt._pResult);
-	stmt._pResult = nullptr;
 	_pAsyncExec = std::move(stmt._pAsyncExec);
-	stmt._pAsyncExec = nullptr;
 	_arguments = std::move(stmt._arguments);
-	stmt._arguments.clear();
 	_pRowFormatter = std::move(stmt._pRowFormatter);
-	stmt._pRowFormatter = nullptr;
 	_stmtString = std::move(stmt._stmtString);
-	stmt._stmtString.clear();
+	stmt.clear();
 
 	return *this;
 }
