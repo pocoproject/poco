@@ -108,6 +108,12 @@ if (NOT POCO_SOO)
 	target_compile_definitions(Foundation PUBLIC POCO_NO_SOO)
 endif()
 
+# Selects MutexImpl in Mutex.h, so it must reach consumers of the installed
+# headers as well; otherwise they disagree with the library about Mutex.
+if (POCO_ENABLE_STD_MUTEX)
+	target_compile_definitions(Foundation PUBLIC POCO_ENABLE_STD_MUTEX)
+endif()
+
 target_compile_definitions(Foundation PUBLIC POCO_CMAKE)
 
 target_include_directories(Foundation
