@@ -17,7 +17,6 @@ CppUnit::TestCaller<TimerTest>.testScheduleAtFixedRate
 CppUnit::TestCaller<TimerTest>.testScheduleInterval
 CppUnit::TestCaller<TimerTest>.testScheduleIntervalClock
 CppUnit::TestCaller<TimerTest>.testScheduleIntervalTimestamp
-CppUnit::TestCaller<TimerTest>.testTimer
 CppUnit::TestCaller<TimestampTest>.testTimestamp
 CppUnit::TestCaller<SocketAddressTest>.testSocketAddress
 CppUnit::TestCaller<RawSocketTest>.testEchoIPv4
