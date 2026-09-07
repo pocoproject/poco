@@ -482,7 +482,12 @@ int WebSocketImpl::receiveSomeBytes(char* buffer, int length)
 	}
 	else
 	{
-		return _pStreamSocketImpl->receiveBytes(buffer, length);
+		int rc = _pStreamSocketImpl->receiveBytes(buffer, length);
+		if (rc == 0)
+		{
+			_peerClosed = true;
+		}
+		return rc;
 	}
 }
 
