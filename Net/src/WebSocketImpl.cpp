@@ -181,11 +181,17 @@ int WebSocketImpl::sendBytes(const void* buffer, int length, int flags)
 
 int WebSocketImpl::incompleteHeader(ReceiveState& receiveState)
 {
-	receiveState.frameFlags = 0;
 	// The bytes seen so far do not make a complete header. Once the peer has
 	// closed the connection the rest of that header can never arrive, so the
 	// close is reported instead of asking the caller to peek again, which it
 	// would otherwise do forever.
+	//
+	// Clearing the flags is not redundant with the reset at the top of
+	// peekHeader(): three of the four places that come here run after the
+	// flags have been taken from the header, and a return of 0 with flags
+	// left set tells the caller it received an empty frame rather than a
+	// closed connection.
+	receiveState.frameFlags = 0;
 	return _peerClosed ? 0 : -1;
 }
 

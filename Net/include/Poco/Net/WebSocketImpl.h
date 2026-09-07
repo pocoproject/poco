@@ -137,6 +137,9 @@ protected:
 		/// complete frame header. Returns 0 if the peer has closed the
 		/// connection, so that the caller reports the close, and -1
 		/// otherwise, so that the caller waits for the rest of the header.
+		///
+		/// Clears the frame flags, which the caller may already have taken
+		/// from the part of the header it did receive.
 	void skipHeader(int headerLength);
 	[[nodiscard]] int receivePayload(char *buffer, int payloadLength, char mask[MASK_LENGTH], bool useMask, int maskOffset);
 	[[nodiscard]] int receiveNBytes(void* buffer, int length);
