@@ -38,7 +38,8 @@ WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, HTTPSession& s
 	_maxPayloadSize(std::numeric_limits<int>::max()),
 	_buffer(0),
 	_bufferOffset(0),
-	_mustMaskPayload(mustMaskPayload)
+	_mustMaskPayload(mustMaskPayload),
+	_peerClosed(false)
 {
 	poco_check_ptr(pStreamSocketImpl);
 	_pStreamSocketImpl->duplicate();
@@ -179,6 +180,23 @@ int WebSocketImpl::sendBytes(const void* buffer, int length, int flags)
 }
 
 
+int WebSocketImpl::incompleteHeader(ReceiveState& receiveState)
+{
+	// The bytes seen so far do not make a complete header. Once the peer has
+	// closed the connection the rest of that header can never arrive, so the
+	// close is reported instead of asking the caller to peek again, which it
+	// would otherwise do forever.
+	//
+	// Clearing the flags is not redundant with the reset at the top of
+	// peekHeader(): three of the four places that come here run after the
+	// flags have been taken from the header, and a return of 0 with flags
+	// left set tells the caller it received an empty frame rather than a
+	// closed connection.
+	receiveState.frameFlags = 0;
+	return _peerClosed ? 0 : -1;
+}
+
+
 int WebSocketImpl::peekHeader(ReceiveState& receiveState)
 {
 	char header[MAX_HEADER_LENGTH];
@@ -193,7 +211,7 @@ int WebSocketImpl::peekHeader(ReceiveState& receiveState)
 	if (n == 0)
 		return 0;
 	else if (n < 2)
-		return -1;
+		return incompleteHeader(receiveState);
 
 	Poco::UInt8 flags = static_cast<Poco::UInt8>(header[0]);
 	receiveState.frameFlags = flags;
@@ -205,8 +223,7 @@ int WebSocketImpl::peekHeader(ReceiveState& receiveState)
 	{
 		if (n < 10)
 		{
-			receiveState.frameFlags = 0;
-			return -1;
+			return incompleteHeader(receiveState);
 		}
 		Poco::MemoryInputStream istr(header + 2, 8);
 		Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
@@ -220,8 +237,7 @@ int WebSocketImpl::peekHeader(ReceiveState& receiveState)
 	{
 		if (n < 4)
 		{
-			receiveState.frameFlags = 0;
-			return -1;
+			return incompleteHeader(receiveState);
 		}
 		Poco::MemoryInputStream istr(header + 2, 2);
 		Poco::BinaryReader reader(istr, Poco::BinaryReader::NETWORK_BYTE_ORDER);
@@ -242,8 +258,7 @@ int WebSocketImpl::peekHeader(ReceiveState& receiveState)
 	{
 		if (n < maskOffset + MASK_LENGTH)
 		{
-			receiveState.frameFlags = 0;
-			return -1;
+			return incompleteHeader(receiveState);
 		}
 		std::memcpy(receiveState.mask, header + maskOffset, MASK_LENGTH);
 		receiveState.headerLength = maskOffset + MASK_LENGTH;
@@ -469,12 +484,17 @@ int WebSocketImpl::receiveSomeBytes(char* buffer, int length)
 	{
 		if (length < n) n = length;
 		std::memcpy(buffer, _buffer.begin() + _bufferOffset, n);
-		_bufferOffset += length;
+		_bufferOffset += n;
 		return n;
 	}
 	else
 	{
-		return _pStreamSocketImpl->receiveBytes(buffer, length);
+		int rc = _pStreamSocketImpl->receiveBytes(buffer, length);
+		if (rc == 0)
+		{
+			_peerClosed = true;
+		}
+		return rc;
 	}
 }
 
@@ -496,6 +516,10 @@ int WebSocketImpl::peekSomeBytes(char* buffer, int length)
 				std::memcpy(_buffer.begin() + currentSize, buffer + n, rc);
 				n += rc;
 			}
+			else if (rc == 0)
+			{
+				_peerClosed = true;
+			}
 		}
 		return n;
 	}
@@ -507,6 +531,10 @@ int WebSocketImpl::peekSomeBytes(char* buffer, int length)
 			_buffer.resize(rc);
 			std::memcpy(_buffer.begin(), buffer, rc);
 			_bufferOffset = 0;
+		}
+		else if (rc == 0)
+		{
+			_peerClosed = true;
 		}
 		return rc;
 	}

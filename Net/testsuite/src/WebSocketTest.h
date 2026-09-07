@@ -28,6 +28,8 @@ public:
 	void testWebSocketLarge();
 	void testWebSocketLargeInOneFrame();
 	void testWebSocketNB();
+	void testPeerCloseAfterPartialHeader();
+	void testPeerCloseAfterPartialHeaderNB();
 
 	void setUp();
 	void tearDown();
@@ -36,6 +38,7 @@ public:
 
 private:
 	void testOneLargeFrame(int msgSize);
+	void peerCloseAfterPartialHeader(bool blocking);
 };
 
 
