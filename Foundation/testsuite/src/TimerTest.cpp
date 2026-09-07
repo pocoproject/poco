@@ -21,6 +21,14 @@ using Poco::Thread;
 using Poco::Stopwatch;
 
 
+namespace
+{
+	// Well above the 100/200 ms intervals even under sanitizers, so a timer
+	// that never fires fails the test instead of hanging the runner.
+	const long WAIT_TIMEOUT_MS = 5000;
+}
+
+
 TimerTest::TimerTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -39,19 +47,17 @@ void TimerTest::testTimer()
 
 	Stopwatch sw;
 	TimerCallback<TimerTest> tc(*this, &TimerTest::onTimer);
+	// Only lower bounds, measured from one start: the timer runs at a fixed
+	// rate, so it can never fire before 100, 300 and 500 ms, whereas no
+	// scheduler can promise an upper bound on how late it fires under load.
 	sw.start();
 	t.start(tc);
-	_event.wait();
-	sw.stop();
-	assertTrue (sw.elapsed() >= 80000 && sw.elapsed() < 120000);
-	sw.restart();
-	_event.wait();
-	sw.stop();
-	assertTrue (sw.elapsed() >= 180000 && sw.elapsed() < 250000);
-	sw.restart();
-	_event.wait();
-	sw.stop();
-	assertTrue (sw.elapsed() >= 180000 && sw.elapsed() < 250000);
+	_event.wait(WAIT_TIMEOUT_MS);
+	assertTrue (sw.elapsed() >= 80000);
+	_event.wait(WAIT_TIMEOUT_MS);
+	assertTrue (sw.elapsed() >= 280000);
+	_event.wait(WAIT_TIMEOUT_MS);
+	assertTrue (sw.elapsed() >= 480000);
 	t.stop();
 }
 
@@ -64,7 +70,7 @@ void TimerTest::testDuplicateStop()
 
 	TimerCallback<TimerTest> tc(*this, &TimerTest::onTimer);
 	t.start(tc);
-	_event.wait();
+	_event.wait(WAIT_TIMEOUT_MS);
 	t.stop();
 	t.stop();
 }

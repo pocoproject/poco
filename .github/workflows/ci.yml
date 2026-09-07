@@ -365,6 +365,26 @@ jobs:
             PWD=`pwd`
             ctest -V
 
+  # POCO_ENABLE_STD_MUTEX=ON probe: Foundation only.
+  linux-gcc-cmake-std-mutex:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build
+      - run: >-
+          cmake -S. -Bcmake-build -GNinja -DENABLE_TESTS=ON -DPOCO_MINIMAL_BUILD=ON
+          -DENABLE_FOUNDATION=ON -DPOCO_ENABLE_STD_MUTEX=ON
+      - run: cmake --build cmake-build --target Foundation-testrunner --parallel 4
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 90
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            PWD=`pwd`
+            ctest -V -R "^Foundation$"
+
   linux-gcc-cmake-ubsan:
     runs-on: ubuntu-24.04
     steps:
