@@ -49,10 +49,8 @@ Statement::Statement(Session& session):
 
 
 Statement::Statement(const Statement& stmt):
-#ifndef POCO_DATA_NO_SQL_PARSER
 	_pParseResult(stmt._pParseResult),
 	_parseError(stmt._parseError),
-#endif
 	_pImpl(stmt._pImpl),
 	_async(stmt._async),
 	_pResult(stmt._pResult),
@@ -65,10 +63,8 @@ Statement::Statement(const Statement& stmt):
 
 
 Statement::Statement(Statement&& stmt) noexcept:
-#ifndef POCO_DATA_NO_SQL_PARSER
 	_pParseResult(std::move(stmt._pParseResult)),
 	_parseError(std::move(stmt._parseError)),
-#endif
 	_pImpl(std::move(stmt._pImpl)),
 	_async(stmt._async),
 	_pResult(std::move(stmt._pResult)),
@@ -95,10 +91,8 @@ void Statement::clear() noexcept
 	_arguments.clear();
 	_pRowFormatter = nullptr;
 	_stmtString.clear();
-#ifndef POCO_DATA_NO_SQL_PARSER
 	_pParseResult = nullptr;
 	_parseError.clear();
-#endif
 }
 
 
@@ -112,25 +106,16 @@ Statement& Statement::operator = (const Statement& stmt)
 
 Statement& Statement::operator = (Statement&& stmt) noexcept
 {
-#ifndef POCO_DATA_NO_SQL_PARSER
 	_pParseResult = std::move(stmt._pParseResult);
 	_parseError = std::move(stmt._parseError);
-	_parseError.clear();
-#endif
 	_pImpl = std::move(stmt._pImpl);
-	stmt._pImpl = nullptr;
-	_async = std::move(stmt._async);
-	stmt._async = false;
+	_async = stmt._async;
 	_pResult = std::move(stmt._pResult);
-	stmt._pResult = nullptr;
 	_pAsyncExec = std::move(stmt._pAsyncExec);
-	stmt._pAsyncExec = nullptr;
 	_arguments = std::move(stmt._arguments);
-	stmt._arguments.clear();
 	_pRowFormatter = std::move(stmt._pRowFormatter);
-	stmt._pRowFormatter = nullptr;
 	_stmtString = std::move(stmt._stmtString);
-	stmt._stmtString.clear();
+	stmt.clear();
 
 	return *this;
 }
@@ -138,10 +123,8 @@ Statement& Statement::operator = (Statement&& stmt) noexcept
 void Statement::swap(Statement& other) noexcept
 {
 	using std::swap;
-#ifndef POCO_DATA_NO_SQL_PARSER
 	swap(_pParseResult, other._pParseResult);
 	swap(_parseError, other._parseError);
-#endif
 	swap(_pImpl, other._pImpl);
 	swap(_async, other._async);
 	swap(_pResult, other._pResult);
@@ -237,12 +220,7 @@ bool Statement::hasType(unsigned int type) const
 
 const std::string& Statement::parseError()
 {
-#ifdef POCO_DATA_NO_SQL_PARSER
-	static std::string empty;
-	return empty;
-#else
 	return _parseError;
-#endif
 }
 
 

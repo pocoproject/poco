@@ -4,7 +4,8 @@
 
 if(POCO_UNBUNDLED)
 	if (ENABLE_XML)
-		find_package(EXPAT REQUIRED)
+		# 2.4 added the billion laughs protection that Poco::XML exposes.
+		find_package(EXPAT 2.4 REQUIRED)
 		set_target_properties(EXPAT::EXPAT PROPERTIES IMPORTED_GLOBAL TRUE)
 	endif()
 else()

@@ -78,6 +78,10 @@ $(ls -C "$base"/build/config/)
     Compile with -DPOCO_NO_SOO.
     Disables small object optimization.
 
+  --std-mutex
+    Compile with -DPOCO_ENABLE_STD_MUTEX.
+    Implements Poco::Mutex and Poco::FastMutex with std::recursive_mutex and std::mutex.
+
   --no-sqlparser
     Compile with -DPOCO_DATA_NO_SQL_PARSER
     Disables compilation of the SQLParser.
@@ -261,6 +265,9 @@ while [ $# -ge 1 ]; do
 
 	--no-soo)
 		flags="$flags -DPOCO_NO_SOO" ;;
+
+	--std-mutex)
+		flags="$flags -DPOCO_ENABLE_STD_MUTEX" ;;
 
 	--no-sqlparser)
 		flags="$flags -DPOCO_DATA_NO_SQL_PARSER"
