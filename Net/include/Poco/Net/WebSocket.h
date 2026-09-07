@@ -278,6 +278,13 @@ public:
 		/// A WebSocketException will also be thrown if a malformed
 		/// or incomplete frame is received.
 		///
+		/// A connection closed in the middle of a frame header is reported
+		/// as a closed connection rather than as an incomplete frame: the
+		/// header can never be completed, and RFC 6455 treats a transport
+		/// close without a Close frame as an abnormal closure whether or
+		/// not a partial frame preceded it. A frame whose payload is cut
+		/// short by the close still throws.
+		///
 		/// Returns the number of payload bytes received.
 		/// A return value of 0, with flags also 0, means that the peer has
 		/// shut down or closed the connection.
