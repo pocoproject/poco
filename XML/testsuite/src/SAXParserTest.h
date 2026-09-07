@@ -33,6 +33,7 @@ public:
 	void testPI();
 	void testDTD();
 	void testInternalEntity();
+	void testBillionLaughsProtection();
 	void testNotation();
 	void testExternalUnparsed();
 	void testExternalParsed();
