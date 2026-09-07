@@ -132,6 +132,11 @@ protected:
 	};
 
 	[[nodiscard]] int peekHeader(ReceiveState& receiveState);
+	[[nodiscard]] int incompleteHeader(ReceiveState& receiveState);
+		/// Called by peekHeader() when the bytes available do not make a
+		/// complete frame header. Returns 0 if the peer has closed the
+		/// connection, so that the caller reports the close, and -1
+		/// otherwise, so that the caller waits for the rest of the header.
 	void skipHeader(int headerLength);
 	[[nodiscard]] int receivePayload(char *buffer, int payloadLength, char mask[MASK_LENGTH], bool useMask, int maskOffset);
 	[[nodiscard]] int receiveNBytes(void* buffer, int length);
@@ -147,6 +152,9 @@ private:
 	Poco::Buffer<char> _buffer;
 	int _bufferOffset;
 	bool _mustMaskPayload;
+	bool _peerClosed;
+		/// Set once a receive on the underlying socket has reported the end
+		/// of the connection.
 	ReceiveState _receiveState;
 	SendState _sendState;
 	Poco::Random _rnd;

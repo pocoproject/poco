@@ -21,9 +21,14 @@
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Thread.h"
 #include "Poco/Buffer.h"
+#include "Poco/Event.h"
+#include "Poco/Mutex.h"
+#include "Poco/SharedPtr.h"
+#include <atomic>
 
 
 using Poco::Net::HTTPClientSession;
@@ -104,6 +109,71 @@ namespace
 
 	private:
 		std::size_t _bufSize;
+	};
+
+	struct SingleFrameState
+		/// Shared with SingleFrameRequestHandler: the WebSocket it reads from,
+		/// so that a reader which does not return can still be released, and
+		/// the outcome of that read.
+	{
+		Poco::FastMutex mutex;
+		Poco::SharedPtr<WebSocket> pWebSocket;
+		Poco::Event upgraded;
+		Poco::Event done;
+		std::atomic<int> received{-1};
+		std::atomic<int> flags{-1};
+	};
+
+	class SingleFrameRequestHandler: public Poco::Net::HTTPRequestHandler
+		/// Upgrades the connection, then reads one frame and reports what
+		/// that read returned.
+	{
+	public:
+		SingleFrameRequestHandler(SingleFrameState& state): _state(state)
+		{
+		}
+
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		{
+			Poco::SharedPtr<WebSocket> pWebSocket = new WebSocket(request, response);
+			{
+				Poco::FastMutex::ScopedLock lock(_state.mutex);
+				_state.pWebSocket = pWebSocket;
+			}
+			_state.upgraded.set();
+
+			char buffer[64];
+			int flags = 0;
+			try
+			{
+				_state.received = pWebSocket->receiveFrame(buffer, sizeof(buffer), flags);
+				_state.flags = flags;
+			}
+			catch (Poco::Exception&)
+			{
+				_state.received = -1;
+			}
+			_state.done.set();
+		}
+
+	private:
+		SingleFrameState& _state;
+	};
+
+	class SingleFrameRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFactory
+	{
+	public:
+		SingleFrameRequestHandlerFactory(SingleFrameState& state): _state(state)
+		{
+		}
+
+		Poco::Net::HTTPRequestHandler* createRequestHandler(const HTTPServerRequest& request)
+		{
+			return new SingleFrameRequestHandler(_state);
+		}
+
+	private:
+		SingleFrameState& _state;
 	};
 }
 
@@ -287,6 +357,55 @@ void WebSocketTest::testWebSocketLargeInOneFrame()
 }
 
 
+void WebSocketTest::testPeerCloseAfterPartialHeader()
+{
+	SingleFrameState state;
+	Poco::Net::ServerSocket ss(0);
+	Poco::Net::HTTPServer server(new SingleFrameRequestHandlerFactory(state), ss, new Poco::Net::HTTPServerParams);
+	server.start();
+
+	// The handshake is done by hand so that the frame following it can be
+	// sent in pieces.
+	HTTPClientSession cs("127.0.0.1", ss.address().port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
+	request.set("Connection", "Upgrade");
+	request.set("Upgrade", "websocket");
+	request.set("Sec-WebSocket-Version", WebSocket::WEBSOCKET_VERSION);
+	request.set("Sec-WebSocket-Key", "dGhlIHNhbXBsZSBub25jZQ==");
+	cs.setKeepAlive(true);
+	cs.sendRequest(request);
+	HTTPResponse response;
+	cs.receiveResponse(response);
+	assertTrue (response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS);
+	Poco::Net::StreamSocket ws = cs.detachSocket();
+	assertTrue (state.upgraded.tryWait(10000));
+
+	// The first two bytes of a masked text frame carrying four bytes of
+	// payload. The four mask bytes that would complete its header never
+	// arrive, because the peer closes instead.
+	const char partialHeader[2] = {'\x81', '\x84'};
+	ws.sendBytes(partialHeader, sizeof(partialHeader));
+	ws.close();
+
+	// The peer is gone, so the header can never be completed: the read must
+	// report the closed connection rather than wait for the rest of it.
+	bool returned = state.done.tryWait(10000);
+	if (!returned)
+	{
+		// Release the reader, so that neither this server's shutdown nor
+		// the rest of the suite waits for a thread that never returns.
+		Poco::FastMutex::ScopedLock lock(state.mutex);
+		if (state.pWebSocket) state.pWebSocket->close();
+		state.done.tryWait(10000);
+	}
+	assertTrue (returned);
+	assertTrue (state.received == 0);
+	assertTrue (state.flags == 0);
+
+	server.stop();
+}
+
+
 void WebSocketTest::testWebSocketNB()
 {
 	Poco::Net::ServerSocket ss(0);
@@ -373,6 +492,7 @@ CppUnit::Test* WebSocketTest::suite()
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketLarge);
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketLargeInOneFrame);
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketNB);
+	CppUnit_addTest(pSuite, WebSocketTest, testPeerCloseAfterPartialHeader);
 
 	return pSuite;
 }
