@@ -477,7 +477,7 @@ int WebSocketImpl::receiveSomeBytes(char* buffer, int length)
 	{
 		if (length < n) n = length;
 		std::memcpy(buffer, _buffer.begin() + _bufferOffset, n);
-		_bufferOffset += length;
+		_bufferOffset += n;
 		return n;
 	}
 	else
