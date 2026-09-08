@@ -1714,6 +1714,24 @@ void DataTest::testTransactionAutoCommit()
 }
 
 
+void DataTest::testExecuteDirectNotImplemented()
+{
+	// The Test connector does not override StatementImpl::execDirectImpl(); a
+	// backend without direct execution must report that instead of silently
+	// doing nothing with the query.
+	Session sess(SessionFactory::instance().create("test", "cs"));
+	Statement stmt(sess);
+	try
+	{
+		stmt.executeDirect("SELECT 1");
+		failmsg("executeDirect() must throw NotImplementedException");
+	}
+	catch (NotImplementedException&)
+	{
+	}
+}
+
+
 void DataTest::setUp()
 {
 }
@@ -1750,6 +1768,7 @@ CppUnit::Test* DataTest::suite()
 	CppUnit_addTest(pSuite, DataTest, testSQLChannel);
 	CppUnit_addTest(pSuite, DataTest, testNullableExtract);
 	CppUnit_addTest(pSuite, DataTest, testTransactionAutoCommit);
+	CppUnit_addTest(pSuite, DataTest, testExecuteDirectNotImplemented);
 
 	return pSuite;
 }

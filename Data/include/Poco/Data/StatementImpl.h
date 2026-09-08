@@ -203,6 +203,9 @@ protected:
 
 	virtual void execDirectImpl(const std::string& query);
 		/// Execute query directly.
+		///
+		/// The default implementation throws NotImplementedException;
+		/// connectors that support direct execution override it.
 
 	[[nodiscard]] virtual AbstractExtraction::ExtractorPtr extractor() = 0;
 		/// Returns the concrete extractor used by the statement.

@@ -391,9 +391,9 @@ const MetaColumn& StatementImpl::metaColumn(const std::string& name) const
 	throw NotFoundException(format("Invalid column name: %s", name));
 }
 
-void StatementImpl::execDirectImpl(const std::string& query)
+void StatementImpl::execDirectImpl(const std::string& /*query*/)
 {
-	poco_assert("Not implemented");
+	throw NotImplementedException("executeDirect() is not supported by the connector", _rSession.connectorName());
 }
 
 
