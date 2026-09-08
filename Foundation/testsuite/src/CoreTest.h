@@ -40,6 +40,7 @@ public:
 	void testSrcLoc();
 	void testDemangle();
 	void testDemangleDot();
+	void testWarnMsg();
 
 	void setUp();
 	void tearDown();

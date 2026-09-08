@@ -1315,6 +1315,14 @@ void CoreTest::testDemangleDot()
 }
 
 
+void CoreTest::testWarnMsg()
+{
+	// warnmsg() reports a warning and lets the test continue; only failmsg() aborts it.
+	warnmsg("expected warning from CoreTest::testWarnMsg()");
+	assertTrue (true);
+}
+
+
 void CoreTest::onReadable(bool& b)
 {
 	if (b) ++_notToReadable;
@@ -1362,6 +1370,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testSrcLoc);
 	CppUnit_addTest(pSuite, CoreTest, testDemangle);
 	CppUnit_addTest(pSuite, CoreTest, testDemangleDot);
+	CppUnit_addTest(pSuite, CoreTest, testWarnMsg);
 
 	return pSuite;
 }
