@@ -331,7 +331,7 @@ inline void TestCase::setType(Test::Type testType)
 	(this->fail(msg, __LINE__, __FILE__))
 
 #define warnmsg(msg) \
-	(this->fail(msg, __LINE__, __FILE__))
+	(this->warn(msg, __LINE__, __FILE__))
 
 
 } // namespace CppUnit
