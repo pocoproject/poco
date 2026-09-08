@@ -278,8 +278,8 @@ protected:
 	void initCommon();
 	void cleanup();
 
-	void stateIllegal();
-	void stateError();
+	[[noreturn]] void stateIllegal();
+	[[noreturn]] void stateError();
 
 	void stateClientConnected();
 	void stateClientHandshakeStart();

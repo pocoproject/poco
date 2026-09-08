@@ -166,7 +166,7 @@ protected:
 	[[nodiscard]] std::string key() const;
 	[[nodiscard]] std::string key(const std::string& valueName) const;
 	[[nodiscard]] HKEY handle();
-	void handleSetError(const std::string& name);
+	[[noreturn]] void handleSetError(const std::string& name);
 	static HKEY handleFor(const std::string& rootKey);
 
 private:

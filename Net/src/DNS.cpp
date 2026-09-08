@@ -381,7 +381,6 @@ void DNS::aierror(int code, const std::string& arg)
 #if defined(EAI_SYSTEM)
 	case EAI_SYSTEM:
 		error(lastError(), arg);
-		break;
 #endif
 #if defined(_WIN32)
 	case WSANO_DATA: // may happen on XP
@@ -390,6 +389,8 @@ void DNS::aierror(int code, const std::string& arg)
 	default:
 		throw DNSException("EAI", NumberFormatter::format(code));
 	}
+#else
+	throw DNSException("EAI", NumberFormatter::format(code));
 #endif // POCO_HAVE_IPv6 || defined(POCO_HAVE_ADDRINFO)
 }
 
