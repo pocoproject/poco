@@ -8,11 +8,15 @@ Summary of Changes:
 
 Security release. Bundled Expat is updated 2.8.1 -> 2.8.4 and 7-Zip (LZMA
 SDK) 26.01 -> 26.02, closing 18 Expat CVEs and the vulnerabilities fixed
-upstream in 7-Zip 26.02. Also included are OpenSSL build and FIPS fixes for
-Crypto and NetSSL, and bug fixes in Foundation, Net and Data.
+upstream in 7-Zip 26.02. A remotely triggerable WebSocket busy-loop and
+inactive billion laughs protection in unbundled builds are also fixed.
+Also included are OpenSSL build and FIPS fixes for Crypto and NetSSL, and
+bug fixes in Foundation, Net and Data.
 
 Security Fixes:
 
+- GH #5472 Net: WebSocket::receiveFrame() busy-loops forever when the peer closes after a partial frame header (PR #5473)
+- GH #5470 Billion laughs protection inactive when unbundled; ABI-affecting build options (PR #5471)
 - GH #5468 Expat 2.8.4 (CVE-2026-66046, CVE-2026-76641, CVE-2026-76956, CVE-2026-76957)
 - GH #5434 Upgrade bundled expat to 2.8.3 (CVE-2026-72522) (PR #5435)
 - GH #5432 Upgrade bundled 7zip (LZMA SDK) to 26.02 (PR #5437)
@@ -25,12 +29,14 @@ Bundled Third-Party Library Upgrades:
 
 Bug Fixes and Improvements:
 
+- GH #5466 fix(Net): TCPReactorServerConnection registers no error or shutdown handler (PR #5469)
 - GH #5415 OpenSSL no_deprecated (PR #5416)
 - GH #5413 FTPClientSession(socket, readWelcomeMessage=false) sets _serverReady=true without reading welcome reply (PR #5418)
 - GH #5409 Backtrace not thread safe (PR #5408)
 - GH #5407 HTTPReactorServer: client abort leaks the connection and hot-spins the reactor (PR #5408, PR #5410)
 - GH #5393 ProcessRunner heap-use-after-free on failed start (PR #5394)
 - GH #5383 Poco::Data::Transaction unusable on an auto-commit session (PR #5384)
+- PR #5474 fix(CppUnit, Data): warnmsg() must warn instead of fail; execDirectImpl() must throw NotImplementedException
 - PR #5464 fix(Crypto,NetSSL): restore missing #else in isFIPSEnabled(), add OpenSSL 1.1.1 CI job
 - PR #5460 fix(NetSSL): FIPS fixes for NetSSL_OpenSSL
 - PR #5445 fix(Foundation): return value from ScopedLockWithUnlock::tryLock
