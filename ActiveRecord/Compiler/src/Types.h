@@ -41,6 +41,8 @@ struct Class
 {
 	std::string name;
 	std::string nameSpace;
+	std::string dllExport;
+	std::string precompiledHeader;
 	std::string table;
 	std::string key;
 	bool autoIncrementID = false;
