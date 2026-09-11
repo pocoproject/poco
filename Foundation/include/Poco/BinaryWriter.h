@@ -23,6 +23,7 @@
 #include "Poco/MemoryStream.h"
 #include <vector>
 #include <ostream>
+#include <memory>
 
 
 namespace Poco {
@@ -65,6 +66,8 @@ public:
 		///
 		/// Strings will be converted from the currently set global encoding
 		/// (see Poco::TextEncoding::global()) to the specified encoding.
+		/// A copy of the BinaryWriter writes to the same stream and
+		/// shares the converter.
 
 	~BinaryWriter();
 		/// Destroys the BinaryWriter.
@@ -165,7 +168,8 @@ public:
 private:
 	std::ostream&  _ostr;
 	bool           _flipBytes;
-	TextConverter* _pTextConverter;
+	std::shared_ptr<TextConverter> _pTextConverter;
+		/// Shared, so that a copy of the writer does not delete it a second time.
 };
 
 

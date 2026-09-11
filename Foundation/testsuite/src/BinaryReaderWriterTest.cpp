@@ -14,6 +14,7 @@
 #include "Poco/BinaryWriter.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/Buffer.h"
+#include "Poco/Latin1Encoding.h"
 #include <sstream>
 
 
@@ -258,6 +259,35 @@ void BinaryReaderWriterTest::testWrappers()
 }
 
 
+void BinaryReaderWriterTest::testCopyWithTextEncoding()
+{
+	// A copy shares the TextConverter: the original still converts strings after
+	// the copy is destroyed, and neither deletes the converter a second time.
+	Poco::Latin1Encoding latin1;
+	const std::string text("\xC3\xA4pfel");
+	std::stringstream stream;
+
+	BinaryWriter writer(stream, latin1);
+	{
+		BinaryWriter copy(writer);
+		copy << text;
+	}
+	writer << text;
+	writer.flush();
+	assertTrue (stream.str() == "\x05\xE4pfel\x05\xE4pfel");
+
+	BinaryReader reader(stream, latin1);
+	std::string value;
+	{
+		BinaryReader copy(reader);
+		copy >> value;
+	}
+	assertTrue (value == text);
+	reader >> value;
+	assertTrue (value == text);
+}
+
+
 void BinaryReaderWriterTest::setUp()
 {
 }
@@ -276,6 +306,7 @@ CppUnit::Test* BinaryReaderWriterTest::suite()
 	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testBigEndian);
 	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testLittleEndian);
 	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testWrappers);
+	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testCopyWithTextEncoding);
 
 	return pSuite;
 }

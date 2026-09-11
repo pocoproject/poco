@@ -23,6 +23,7 @@
 #include "Poco/MemoryStream.h"
 #include <vector>
 #include <istream>
+#include <memory>
 
 
 namespace Poco {
@@ -58,6 +59,8 @@ public:
 		///
 		/// Strings will be converted from the specified encoding
 		/// to the currently set global encoding (see Poco::TextEncoding::global()).
+		/// A copy of the BinaryReader reads from the same stream and
+		/// shares the converter.
 
 	~BinaryReader();
 		/// Destroys the BinaryReader.
@@ -154,7 +157,8 @@ public:
 private:
 	std::istream&  _istr;
 	bool           _flipBytes;
-	TextConverter* _pTextConverter;
+	std::shared_ptr<TextConverter> _pTextConverter;
+		/// Shared, so that a copy of the reader does not delete it a second time.
 };
 
 
