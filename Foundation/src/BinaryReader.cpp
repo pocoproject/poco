@@ -36,7 +36,7 @@ BinaryReader::BinaryReader(std::istream& istr, StreamByteOrder byteOrder):
 
 BinaryReader::BinaryReader(std::istream& istr, TextEncoding& encoding, StreamByteOrder byteOrder):
 	_istr(istr),
-	_pTextConverter(new TextConverter(encoding, Poco::TextEncoding::global()))
+	_pTextConverter(std::make_shared<TextConverter>(encoding, Poco::TextEncoding::global()))
 {
 #if defined(POCO_ARCH_BIG_ENDIAN)
 	_flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);
@@ -46,10 +46,7 @@ BinaryReader::BinaryReader(std::istream& istr, TextEncoding& encoding, StreamByt
 }
 
 
-BinaryReader::~BinaryReader()
-{
-	delete _pTextConverter;
-}
+BinaryReader::~BinaryReader() = default;
 
 
 BinaryReader& BinaryReader::operator >> (bool& value)
