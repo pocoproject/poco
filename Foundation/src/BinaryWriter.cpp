@@ -36,7 +36,7 @@ BinaryWriter::BinaryWriter(std::ostream& ostr, StreamByteOrder byteOrder):
 
 BinaryWriter::BinaryWriter(std::ostream& ostr, TextEncoding& encoding, StreamByteOrder byteOrder):
 	_ostr(ostr),
-	_pTextConverter(new TextConverter(Poco::TextEncoding::global(), encoding))
+	_pTextConverter(std::make_shared<TextConverter>(Poco::TextEncoding::global(), encoding))
 {
 #if defined(POCO_ARCH_BIG_ENDIAN)
 	_flipBytes = (byteOrder == LITTLE_ENDIAN_BYTE_ORDER);
@@ -46,10 +46,7 @@ BinaryWriter::BinaryWriter(std::ostream& ostr, TextEncoding& encoding, StreamByt
 }
 
 
-BinaryWriter::~BinaryWriter()
-{
-	delete _pTextConverter;
-}
+BinaryWriter::~BinaryWriter() = default;
 
 
 BinaryWriter& BinaryWriter::operator << (bool value)

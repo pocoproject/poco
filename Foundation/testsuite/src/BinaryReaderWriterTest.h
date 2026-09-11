@@ -30,6 +30,7 @@ public:
 	void testBigEndian();
 	void testLittleEndian();
 	void testWrappers();
+	void testCopyWithTextEncoding();
 	void write(Poco::BinaryWriter& writer);
 	void read(Poco::BinaryReader& reader);
 
