@@ -288,6 +288,49 @@ void BinaryReaderWriterTest::testCopyWithTextEncoding()
 }
 
 
+void BinaryReaderWriterTest::testReadRawString()
+{
+	std::string data(200000, ' ');
+	for (std::string::size_type i = 0; i < data.size(); ++i)
+		data[i] = static_cast<char>('a' + i % 26);
+	std::istringstream istr(data);
+	BinaryReader reader(istr);
+
+	// More than one read chunk, then a stream that ends before the requested length
+	std::string value;
+	reader.readRaw(150000, value);
+	assertTrue (value == data.substr(0, 150000));
+	reader.readRaw(100000, value);
+	assertTrue (value == data.substr(150000));
+	assertTrue (reader.eof());
+
+	reader.readRaw(0, value);
+	assertTrue (value.empty());
+}
+
+
+void BinaryReaderWriterTest::testReadRawStringWithExceptions()
+{
+	// With exceptions enabled on the stream the read throws; the string must hold
+	// only the bytes that actually arrived.
+	const std::string data("12345");
+	std::istringstream istr(data);
+	BinaryReader reader(istr);
+	reader.setExceptions(std::istream::failbit | std::istream::eofbit);
+
+	std::string value;
+	try
+	{
+		reader.readRaw(10, value);
+		fail("readRaw past the end of the stream did not throw");
+	}
+	catch (std::ios_base::failure&)
+	{
+	}
+	assertTrue (value == data);
+}
+
+
 void BinaryReaderWriterTest::setUp()
 {
 }
@@ -307,6 +350,8 @@ CppUnit::Test* BinaryReaderWriterTest::suite()
 	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testLittleEndian);
 	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testWrappers);
 	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testCopyWithTextEncoding);
+	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testReadRawString);
+	CppUnit_addTest(pSuite, BinaryReaderWriterTest, testReadRawStringWithExceptions);
 
 	return pSuite;
 }

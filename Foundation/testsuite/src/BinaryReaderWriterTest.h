@@ -31,6 +31,8 @@ public:
 	void testLittleEndian();
 	void testWrappers();
 	void testCopyWithTextEncoding();
+	void testReadRawString();
+	void testReadRawStringWithExceptions();
 	void write(Poco::BinaryWriter& writer);
 	void read(Poco::BinaryReader& reader);
 

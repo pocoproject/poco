@@ -116,6 +116,7 @@ public:
 
 	void readRaw(std::streamsize length, std::string& value);
 		/// Reads length bytes of raw data into value.
+		/// If the stream ends earlier, value contains the bytes that were read.
 
 	void readRaw(char* buffer, std::streamsize length);
 		/// Reads length bytes of raw data into buffer.
