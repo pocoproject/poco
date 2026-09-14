@@ -36,6 +36,7 @@ public:
 	void testNestedDocuments();
 	void testDuplicateDocumentMembers();
 	void testDocumentAddElementMerge();
+	void testLargeDocumentAddElement();
 
 	// Array tests
 	void testArray();
@@ -102,6 +103,8 @@ public:
 	void testInvalidObjectID();
 	void testEmptyDocument();
 
+	void testDocumentRemoveDuplicateName();
+	void testLargeDocumentRemoveAndAdd();
 	static CppUnit::Test* suite();
 };
 

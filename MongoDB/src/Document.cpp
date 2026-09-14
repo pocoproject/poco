@@ -29,6 +29,18 @@
 namespace Poco::MongoDB {
 
 
+namespace {
+
+
+// Below this size a linear scan for a duplicate name is faster than the index;
+// above it addElement() keeps the index current, so that building large arrays
+// is not quadratic.
+constexpr std::size_t MAX_LINEAR_SCAN_ELEMENTS = 128;
+
+
+} // namespace
+
+
 Document::Document()
 {
 }
@@ -267,21 +279,39 @@ Document& Document::addElement(Element::Ptr element)
 {
 	const std::string& name = element->name();
 
-	// Linear scan for duplicate check (faster for typical document sizes)
-	auto it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
-	if (it != _elements.end())
+	if (_elements.size() < MAX_LINEAR_SCAN_ELEMENTS)
 	{
-		// Replace existing element
-		*it = element;
+		auto it = std::find_if(_elements.begin(), _elements.end(), ElementFindByName(name));
+		if (it != _elements.end())
+			*it = element;
+		else
+			_elements.push_back(element);
+
+		// Invalidate set - will be rebuilt lazily on first get()
+		_elementSetValid = false;
+		return *this;
+	}
+
+	if (!_elementSetValid)
+		rebuildElementSet();
+	auto it = _elementSet.find(name);
+	// Stays invalid if an allocation below throws, so that get() rebuilds the set.
+	_elementSetValid = false;
+	if (it != _elementSet.end())
+	{
+		auto pos = std::find(_elements.begin(), _elements.end(), *it);
+		if (pos != _elements.end())
+			*pos = element;
+		else
+			_elements.push_back(element);
+		_elementSet.erase(it);
 	}
 	else
 	{
-		// New element: add to vector
 		_elements.push_back(element);
 	}
-
-	// Invalidate set - will be rebuilt lazily on first get()
-	_elementSetValid = false;
+	_elementSet.insert(element);
+	_elementSetValid = true;
 	return *this;
 }
 
@@ -293,10 +323,20 @@ bool Document::remove(const std::string& name)
 	if (it == _elements.end())
 		return false;
 
-	_elements.erase(it);
+	if (_elementSetValid)
+	{
+		// Keeping the index current is cheaper than rebuilding it for every removal.
+		// A document read from a stream may hold a name twice; the index then
+		// has to point at the remaining occurrence.
+		const auto indexed = _elementSet.find(name);
+		if (indexed != _elementSet.end())
+			_elementSet.erase(indexed);
+		const auto next = std::find_if(it + 1, _elements.end(), ElementFindByName(name));
+		if (next != _elements.end())
+			_elementSet.insert(*next);
+	}
 
-	// Invalidate set - will be rebuilt lazily on first get()
-	_elementSetValid = false;
+	_elements.erase(it);
 	return true;
 }
 

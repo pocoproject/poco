@@ -37,6 +37,15 @@ using namespace std::string_literals;
 
 namespace
 {
+	std::string int32LE(Poco::Int32 value)
+	{
+		std::ostringstream os;
+		Poco::BinaryWriter writer(os, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
+		writer << value;
+		writer.flush();
+		return os.str();
+	}
+
 	std::string serialize(const Document& doc)
 	{
 		std::ostringstream os;
@@ -286,6 +295,47 @@ void BSONTest::testDocumentAddElementMerge()
 	assertFalse(partial.isNull());
 	assertEqual(static_cast<Poco::Int32>(18), partial->get<Poco::Int32>("age"));
 	assertEqual(true, base->get<bool>("hidden"));
+}
+
+
+void BSONTest::testLargeDocumentAddElement()
+{
+	// Large enough for addElement() to look names up in the index.
+	constexpr int count = 1000;
+	Array::Ptr array = new Array();
+	for (int i = 0; i < count; ++i)
+		array->add(i);
+	assertEqual(static_cast<std::size_t>(count), array->size());
+	for (int i = 0; i < count; ++i)
+		assertEqual(i, array->get<Poco::Int32>(i));
+
+	// Replacing an element keeps its position.
+	array->add("500"s, -1);
+	std::vector<std::string> names;
+	array->elementNames(names);
+	assertEqual(static_cast<std::size_t>(count), names.size());
+	assertEqual("500"s, names[500]);
+	assertEqual(-1, array->get<Poco::Int32>(500));
+
+	// A name that was removed is appended again.
+	assertTrue(array->remove("10"s));
+	array->add("10"s, 10);
+	names.clear();
+	array->elementNames(names);
+	assertEqual(static_cast<std::size_t>(count), names.size());
+	assertEqual("10"s, names.back());
+	assertEqual(10, array->get<Poco::Int32>(10));
+
+	// Elements read from a stream are found when adding to the document.
+	std::istringstream stream(serialize(*array));
+	Document restored;
+	Poco::BinaryReader reader(stream, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	restored.read(reader);
+	restored.add("999"s, 1);
+	restored.add("new"s, 2);
+	assertEqual(static_cast<std::size_t>(count + 1), restored.size());
+	assertEqual(1, restored.get<Poco::Int32>("999"s));
+	assertEqual(2, restored.get<Poco::Int32>("new"s));
 }
 
 
@@ -1589,6 +1639,69 @@ void BSONTest::testEmptyDocument()
 }
 
 
+namespace
+{
+	std::string element(char type, const std::string& name, const std::string& value)
+	{
+		return std::string(1, type) + name + std::string(1, '\0') + value;
+	}
+
+	std::string bsonDocument(const std::string& elements)
+	{
+		return int32LE(static_cast<Poco::Int32>(4 + elements.size() + 1)) + elements + std::string(1, '\0');
+	}
+}
+
+
+void BSONTest::testDocumentRemoveDuplicateName()
+{
+	// A document read from a stream may hold a name twice: remove() takes the
+	// first occurrence and get() then finds the second.
+	std::istringstream istr(bsonDocument(element('\x10', "a"s, int32LE(1)) + element('\x10', "a"s, int32LE(2))));
+	Poco::BinaryReader reader(istr, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	Document d;
+	d.read(reader);
+	assertEqual(static_cast<std::size_t>(2), d.size());
+	assertEqual(1, d.get<Poco::Int32>("a"s));
+
+	assertTrue(d.remove("a"s));
+	assertTrue(d.exists("a"s));
+	assertEqual(2, d.get<Poco::Int32>("a"s));
+
+	assertTrue(d.remove("a"s));
+	assertFalse(d.exists("a"s));
+	assertTrue(d.get("a"s).isNull());
+	assertFalse(d.remove("a"s));
+}
+
+
+void BSONTest::testLargeDocumentRemoveAndAdd()
+{
+	// Large enough for remove() and addElement() to work through the name index.
+	constexpr int count = 300;
+	constexpr int changes = 50;
+	Document doc;
+	for (int i = 0; i < count; ++i)
+		doc.add("n"s + std::to_string(i), i);
+	assertFalse(doc.get("n0"s).isNull());
+
+	for (int i = 0; i < changes; ++i)
+	{
+		assertTrue(doc.remove("n"s + std::to_string(i)));
+		doc.add("x"s + std::to_string(i), i);
+	}
+
+	for (int i = 0; i < changes; ++i)
+	{
+		assertTrue(doc.get("n"s + std::to_string(i)).isNull());
+		assertEqual(i, doc.get<Poco::Int32>("x"s + std::to_string(i)));
+	}
+	for (int i = changes; i < count; ++i)
+		assertEqual(i, doc.get<Poco::Int32>("n"s + std::to_string(i)));
+	assertEqual(static_cast<std::size_t>(count), doc.size());
+}
+
+
 CppUnit::Test* BSONTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("BSONTest");
@@ -1603,6 +1716,7 @@ CppUnit::Test* BSONTest::suite()
 	CppUnit_addTest(pSuite, BSONTest, testNestedDocuments);
 	CppUnit_addTest(pSuite, BSONTest, testDuplicateDocumentMembers);
 	CppUnit_addTest(pSuite, BSONTest, testDocumentAddElementMerge);
+	CppUnit_addTest(pSuite, BSONTest, testLargeDocumentAddElement);
 
 	// Array tests
 	CppUnit_addTest(pSuite, BSONTest, testArray);
@@ -1666,5 +1780,7 @@ CppUnit::Test* BSONTest::suite()
 	CppUnit_addTest(pSuite, BSONTest, testInvalidObjectID);
 	CppUnit_addTest(pSuite, BSONTest, testEmptyDocument);
 
+	CppUnit_addTest(pSuite, BSONTest, testDocumentRemoveDuplicateName);
+	CppUnit_addTest(pSuite, BSONTest, testLargeDocumentRemoveAndAdd);
 	return pSuite;
 }

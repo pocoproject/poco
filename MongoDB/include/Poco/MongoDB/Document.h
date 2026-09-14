@@ -96,7 +96,7 @@ public:
 		/// Destroys the Document.
 
 	Document& addElement(Element::Ptr element);
-		/// Add an element to the document.
+		/// Adds an element to the document, replacing an element with the same name.
 		///
 		/// The active document is returned to allow chaining of the add methods.
 
@@ -255,7 +255,7 @@ protected:
 
 private:
 	void rebuildElementSet() const;
-		/// Rebuilds _elementSet from _elements. Called lazily on first get() after modifications.
+		/// Rebuilds _elementSet from _elements when it is out of date.
 
 	LinearContainer _elements;
 		/// Vector of elements in insertion order.
@@ -264,7 +264,8 @@ private:
 		/// Ordered set for O(log n) element lookups by name.
 		/// Uses heterogeneous lookup (C++14+) - can search by string without creating Element.
 		/// Stores Element::Ptr directly, no string duplication.
-		/// Built lazily on first get() call after modifications.
+		/// Built lazily on first get() call after modifications; addElement()
+		/// keeps it current for larger documents.
 
 	mutable bool _elementSetValid = false;
 		/// Flag indicating whether _elementSet is in sync with _elements.
