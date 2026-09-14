@@ -564,6 +564,29 @@ void MongoDBTest::testOpCmdCursorLargeBatch()
 }
 
 
+void MongoDBTest::testOpCmdInsertExceedsMaxMessageSize()
+{
+	// The server closes the connection on a message larger than maxMessageSizeBytes,
+	// so such a request is rejected before it is sent.
+	Database db(largeRepliesDb);
+	Poco::SharedPtr<OpMsgMessage> insert = db.createOpMsgMessage("large"s);
+	insert->setCommandName(OpMsgMessage::CMD_INSERT);
+	for (Poco::Int32 i = 0; i < 3; ++i)
+		insert->documents().push_back(sizedDocument(i, 16000000));
+
+	OpMsgMessage response;
+	try
+	{
+		_mongo->sendRequest(*insert, response);
+		fail("request larger than MAX_MESSAGE_SIZE_BYTES sent");
+	}
+	catch (Poco::InvalidArgumentException&)
+	{
+	}
+	assertFalse(Database(largeRepliesDb).queryServerHello(*_mongo).isNull());
+}
+
+
 void MongoDBTest::testOpCmdDropDatabase()
 {
 	Database db("team");

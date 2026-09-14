@@ -157,6 +157,13 @@ public:
 
 	void send(std::ostream& ostr);
 		/// Writes the request to stream.
+		///
+		/// Throws InvalidArgumentException, before anything is written, if the
+		/// message exceeds MAX_MESSAGE_SIZE_BYTES, a document of the document
+		/// sequence exceeds BSON_MAX_DOCUMENT_SIZE + 16 KiB, nesting is too deep,
+		/// a name contains a null character or MSG_CHECKSUM_PRESENT is set, which
+		/// is not supported, and RangeException for a BSONTimestamp outside
+		/// 1970-2106. Other limits are left to the server.
 
 	void read(std::istream& istr);
 		/// Reads the response from the stream. The message is cleared first, so

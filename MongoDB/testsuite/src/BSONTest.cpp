@@ -2149,6 +2149,79 @@ void BSONTest::testBinaryReadTruncated()
 }
 
 
+void BSONTest::testDocumentWriteRejectsInvalidStructure()
+{
+	auto rejected = [](const Document& doc)
+		/// Returns true if writing doc throws InvalidArgumentException without output.
+	{
+		std::ostringstream ostr;
+		Poco::BinaryWriter writer(ostr, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
+		try
+		{
+			doc.write(writer);
+		}
+		catch (Poco::InvalidArgumentException&)
+		{
+			return ostr.str().empty();
+		}
+		return false;
+	};
+
+	// A null character would end a name early and the rest would be read as the value.
+	Document name;
+	name.add("a\0b"s, 1);
+	assertTrue(rejected(name));
+	Document regex;
+	regex.add("r"s, RegularExpression::Ptr(new RegularExpression("a\0b"s, ""s)));
+	assertTrue(rejected(regex));
+	// An element that should hold a document holds none.
+	Document empty;
+	empty.add("d"s, Document::Ptr());
+	assertTrue(rejected(empty));
+	// Nesting deeper than a document can be read
+	Document deep;
+	Document* current = &deep;
+	for (int i = 0; i < 513; ++i)
+		current = &current->addNewDocument("d"s);
+	assertTrue(rejected(deep));
+
+	// A string value may contain null characters: its length is written first.
+	Document string;
+	string.add("s"s, "a\0b"s);
+	std::istringstream istr(serialize(string));
+	Poco::BinaryReader reader(istr, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	Document copy;
+	copy.read(reader);
+	assertEqual("a\0b"s, copy.get<std::string>("s"s));
+}
+
+
+void BSONTest::testOpMsgSendRejectsOversizedSequenceDocument()
+{
+	// A write command statement may exceed maxBsonObjectSize by 16 KiB; the server
+	// rejects a larger document in a document sequence.
+	Database db("db"s);
+	Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage("c"s);
+	request->setCommandName(OpMsgMessage::CMD_INSERT);
+	request->documents().push_back(sizedDocument(0, BSON_MAX_DOCUMENT_SIZE + 16 * 1024));
+	std::ostringstream largest;
+	request->send(largest);
+	assertFalse(largest.str().empty());
+
+	request->documents().back() = sizedDocument(0, BSON_MAX_DOCUMENT_SIZE + 16 * 1024 + 1);
+	std::ostringstream tooLarge;
+	try
+	{
+		request->send(tooLarge);
+		fail("document larger than BSON_MAX_DOCUMENT_SIZE plus 16 KiB sent");
+	}
+	catch (Poco::InvalidArgumentException&)
+	{
+	}
+	assertTrue(tooLarge.str().empty());
+}
+
+
 void BSONTest::testConnectionClosedAfterUnreadableReply()
 {
 	// The rest of a reply that cannot be read may still arrive, so the connection is
@@ -2215,6 +2288,165 @@ void BSONTest::testConnectionKeptAfterUnsupportedType()
 	{
 	}
 	assertTrue(connection->isConnected());
+}
+
+
+void BSONTest::testSendAfterDisconnectThrows()
+{
+	// SocketOutputStream reports a failed write only through the stream state.
+	Poco::Net::ServerSocket server(Poco::Net::SocketAddress("127.0.0.1"s, 0));
+	Connection::Ptr connection = new Connection("127.0.0.1"s, server.address().port());
+	Poco::Net::StreamSocket peer = server.acceptConnection();
+
+	Database db("db"s);
+	Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage();
+	request->setCommandName(OpMsgMessage::CMD_PING);
+
+	connection->disconnect();
+	try
+	{
+		connection->sendRequest(*request);
+		fail("one-way request sent over a closed connection");
+	}
+	catch (Poco::IOException&)
+	{
+	}
+
+	OpMsgMessage response;
+	try
+	{
+		connection->sendRequest(*request, response);
+		fail("request sent over a closed connection");
+	}
+	catch (Poco::IOException&)
+	{
+	}
+}
+
+
+void BSONTest::testOpMsgSendRejectsOversizedMessage()
+{
+	Database db("db"s);
+	Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage("c"s);
+	request->setCommandName(OpMsgMessage::CMD_INSERT);
+
+	// Header, flags, body section and the header of the "documents" sequence
+	const auto overhead = static_cast<Poco::Int32>(16 + 4 + 1 + serialize(request->body()).size() + 1 + 4 + 10);
+	const Poco::Int32 documents = MAX_MESSAGE_SIZE_BYTES - overhead;
+	request->documents().push_back(sizedDocument(0, documents / 3));
+	request->documents().push_back(sizedDocument(1, documents / 3));
+	request->documents().push_back(sizedDocument(2, documents - 2 * (documents / 3)));
+
+	std::ostringstream largest;
+	request->send(largest);
+	assertEqual(MAX_MESSAGE_SIZE_BYTES, static_cast<int>(largest.str().size()));
+
+	request->documents().back() = sizedDocument(2, documents - 2 * (documents / 3) + 1);
+	std::ostringstream tooLarge;
+	try
+	{
+		request->send(tooLarge);
+		fail("message larger than MAX_MESSAGE_SIZE_BYTES sent");
+	}
+	catch (Poco::InvalidArgumentException&)
+	{
+	}
+	assertTrue(tooLarge.str().empty());
+}
+
+
+void BSONTest::testResponseClearedBeforeSend()
+{
+	// The response is cleared before the request is sent, so that a request that
+	// cannot be sent does not leave the previous response in place.
+	Document ok;
+	ok.add("ok"s, 1.0);
+	ok.add("marker"s, "first"s);
+	const std::string reply = opMsg(bodySection(serialize(ok)));
+
+	Poco::Net::ServerSocket server(Poco::Net::SocketAddress("127.0.0.1"s, 0));
+	Connection::Ptr connection = new Connection("127.0.0.1"s, server.address().port());
+	Poco::Net::StreamSocket peer = server.acceptConnection();
+	peer.sendBytes(reply.data(), static_cast<int>(reply.size()));
+
+	Database db("db"s);
+	Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage("c"s);
+	request->setCommandName(OpMsgMessage::CMD_PING);
+	OpMsgMessage response;
+	connection->sendRequest(*request, response);
+	assertEqual("first"s, response.body().get<std::string>("marker"s));
+
+	Poco::SharedPtr<OpMsgMessage> oversized = db.createOpMsgMessage("c"s);
+	oversized->setCommandName(OpMsgMessage::CMD_INSERT);
+	oversized->documents().push_back(sizedDocument(0, BSON_MAX_DOCUMENT_SIZE + 16 * 1024 + 1));
+	try
+	{
+		connection->sendRequest(*oversized, response);
+		fail("document larger than BSON_MAX_DOCUMENT_SIZE plus 16 KiB sent");
+	}
+	catch (Poco::InvalidArgumentException&)
+	{
+	}
+	assertEqual(static_cast<std::size_t>(0), response.body().size());
+	assertTrue(response.documents().empty());
+}
+
+
+void BSONTest::testOpMsgSendReadRoundTrip()
+{
+	// What send() writes must be what read() accepts, body and document sequence.
+	OpMsgMessage request("db"s, "c"s);
+	request.setCommandName(OpMsgMessage::CMD_INSERT);
+	Document::Ptr first = new Document();
+	first->add("_id"s, 1);
+	Document::Ptr second = new Document();
+	second->add("_id"s, 2);
+	request.documents().push_back(first);
+	request.documents().push_back(second);
+
+	std::ostringstream ostr;
+	request.send(ostr);
+
+	OpMsgMessage response;
+	std::istringstream istr(ostr.str());
+	response.read(istr);
+	assertEqual("c"s, response.body().get<std::string>("insert"s));
+	assertEqual("db"s, response.body().get<std::string>("$db"s));
+	assertEqual(static_cast<std::size_t>(2), response.documents().size());
+	assertEqual(1, response.documents()[0]->get<Poco::Int32>("_id"s));
+	assertEqual(2, response.documents()[1]->get<Poco::Int32>("_id"s));
+
+	// A message that carries only a body
+	OpMsgMessage ping("db"s, "c"s);
+	ping.setCommandName(OpMsgMessage::CMD_PING);
+	std::ostringstream pingStream;
+	ping.send(pingStream);
+
+	OpMsgMessage pingResponse;
+	std::istringstream pingIstr(pingStream.str());
+	pingResponse.read(pingIstr);
+	assertEqual("c"s, pingResponse.body().get<std::string>("ping"s));
+	assertEqual("db"s, pingResponse.body().get<std::string>("$db"s));
+	assertTrue(pingResponse.documents().empty());
+}
+
+
+void BSONTest::testOpMsgSendRejectsChecksumFlag()
+{
+	// The checksum is not computed, so a message that announces one is not sent.
+	OpMsgMessage request("db"s, "c"s, OpMsgMessage::MSG_CHECKSUM_PRESENT);
+	request.setCommandName(OpMsgMessage::CMD_PING);
+
+	std::ostringstream ostr;
+	try
+	{
+		request.send(ostr);
+		fail("message with MSG_CHECKSUM_PRESENT sent");
+	}
+	catch (Poco::InvalidArgumentException&)
+	{
+	}
+	assertTrue(ostr.str().empty());
 }
 
 
@@ -2407,8 +2639,15 @@ CppUnit::Test* BSONTest::suite()
 	CppUnit_addTest(pSuite, BSONTest, testRegularExpressionAndJavaScriptRoundTrip);
 	CppUnit_addTest(pSuite, BSONTest, testBinaryReadTruncated);
 
+	CppUnit_addTest(pSuite, BSONTest, testDocumentWriteRejectsInvalidStructure);
+	CppUnit_addTest(pSuite, BSONTest, testOpMsgSendRejectsOversizedMessage);
+	CppUnit_addTest(pSuite, BSONTest, testOpMsgSendRejectsOversizedSequenceDocument);
 	CppUnit_addTest(pSuite, BSONTest, testConnectionClosedAfterUnreadableReply);
 	CppUnit_addTest(pSuite, BSONTest, testConnectionKeptAfterUnsupportedType);
+	CppUnit_addTest(pSuite, BSONTest, testSendAfterDisconnectThrows);
+	CppUnit_addTest(pSuite, BSONTest, testResponseClearedBeforeSend);
+	CppUnit_addTest(pSuite, BSONTest, testOpMsgSendReadRoundTrip);
+	CppUnit_addTest(pSuite, BSONTest, testOpMsgSendRejectsChecksumFlag);
 	CppUnit_addTest(pSuite, BSONTest, testLargeDocumentRemoveAndAdd);
 	CppUnit_addTest(pSuite, BSONTest, testBSONReaderBounds);
 

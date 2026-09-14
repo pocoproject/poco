@@ -156,11 +156,21 @@ public:
 	void sendRequest(OpMsgMessage& request, OpMsgMessage& response);
 		/// Sends a request to the MongoDB server and receives the response
 		/// using OP_MSG wire protocol.
+		///
+		/// Throws IOException if the request cannot be sent.
+		///
+		/// The connection is closed if the request cannot be sent, or if the
+		/// response cannot be received or is malformed, so that the rest of it
+		/// is not read as the next response. It stays open when the response is
+		/// complete but holds an unsupported element type.
 
 	void sendRequest(OpMsgMessage& request);
 		/// Sends an unacknowledged request to the MongoDB server using
 		/// OP_MSG wire protocol.
 		/// No response is sent by the server.
+		///
+		/// Throws IOException if the request cannot be sent; the connection is
+		/// closed in that case.
 
 	void readResponse(OpMsgMessage& response);
 		/// Reads additional response data when previous message's flag moreToCome
@@ -175,6 +185,9 @@ protected:
 	void connect();
 
 private:
+	void writeRequest(OpMsgMessage& request);
+		/// Writes the request; closes the connection and throws IOException if it cannot be sent.
+
 	Poco::Net::SocketAddress _address;
 	Poco::Net::StreamSocket _socket;
 };

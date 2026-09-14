@@ -50,6 +50,7 @@ public:
 	void testOpCmdFindShowRecordId();
 	void testOpCmdAggregateOutputAbove16MB();
 	void testOpCmdCursorLargeBatch();
+	void testOpCmdInsertExceedsMaxMessageSize();
 	void testOpCmdDropDatabase();
 	void testOpCmdDropIndex();
 	void testDBCount();

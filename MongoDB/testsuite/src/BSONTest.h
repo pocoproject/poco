@@ -120,8 +120,16 @@ public:
 	void testRegularExpressionAndJavaScriptRoundTrip();
 	void testBinaryReadTruncated();
 
+	// Requests
+	void testDocumentWriteRejectsInvalidStructure();
+	void testOpMsgSendRejectsOversizedMessage();
+	void testOpMsgSendRejectsOversizedSequenceDocument();
 	void testConnectionClosedAfterUnreadableReply();
 	void testConnectionKeptAfterUnsupportedType();
+	void testSendAfterDisconnectThrows();
+	void testResponseClearedBeforeSend();
+	void testOpMsgSendReadRoundTrip();
+	void testOpMsgSendRejectsChecksumFlag();
 	void testLargeDocumentRemoveAndAdd();
 	void testBSONReaderBounds();
 

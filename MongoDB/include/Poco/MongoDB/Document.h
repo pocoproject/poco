@@ -259,7 +259,12 @@ public:
 		/// Returns a String representation of the document.
 
 	void write(BinaryWriter& writer) const;
-		/// Writes a document to the reader
+		/// Writes a document to the writer.
+		///
+		/// Throws InvalidArgumentException if the document is nested too deeply,
+		/// an element that should hold a document holds none, or an element name
+		/// contains a null character, and RangeException for a BSONTimestamp
+		/// outside 1970-2106.
 
 protected:
 
@@ -275,6 +280,9 @@ private:
 	[[nodiscard]] static Element::Ptr readValue(unsigned char type, std::string&& name, BSONReader& reader, Int32& available);
 		/// Reads the value of an element that is not a document or an array;
 		/// kept out of readImpl to keep its recursive stack frame small.
+
+	void writeImpl(BinaryWriter& writer, int depth) const;
+		/// Writes a document nested depth levels deep.
 
 	void rebuildElementSet() const;
 		/// Rebuilds _elementSet from _elements when it is out of date.

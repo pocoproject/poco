@@ -87,6 +87,53 @@ template <typename T>
 }
 
 
+[[noreturn]] void throwNoDocument(const std::string& name)
+{
+	throw InvalidArgumentException("BSON element " + name + " holds no document");
+}
+
+
+[[nodiscard]] const Document* nestedDocument(const Element& element)
+	/// Returns the document of a document or array element, or nullptr for other types.
+{
+	const Document* nested = nullptr;
+	if (element.type() == ElementTraits<Document::Ptr>::TypeId)
+		nested = static_cast<const ConcreteElement<Document::Ptr>&>(element).value().get();
+	else if (element.type() == ElementTraits<Array::Ptr>::TypeId)
+		nested = static_cast<const ConcreteElement<Array::Ptr>&>(element).value().get();
+	else
+		return nullptr;
+	if (nested == nullptr)
+		throwNoDocument(element.name());
+	return nested;
+}
+
+
+// The size of a document is patched in once its end is known. Stream positions are
+// large objects on some platforms, so they stay out of the recursive writeImpl.
+
+
+[[nodiscard]] std::streamoff beginDocument(BinaryWriter& writer)
+	/// Writes a placeholder for the size of a document and returns where it starts.
+{
+	const std::streamoff start = writer.stream().tellp();
+	writer << static_cast<Int32>(0);
+	return start;
+}
+
+
+void endDocument(BinaryWriter& writer, std::streamoff start)
+	/// Writes the terminator of the document that starts at start, then its size.
+{
+	writer << '\0';
+	std::ostream& stream = writer.stream();
+	const std::streamoff end = stream.tellp();
+	stream.seekp(start, std::ios_base::beg);
+	writer << static_cast<Int32>(end - start);
+	stream.seekp(end, std::ios_base::beg);
+}
+
+
 } // namespace
 
 
@@ -312,27 +359,32 @@ std::string Document::toString(int indent) const
 
 void Document::write(BinaryWriter& writer) const
 {
-	if (_elements.empty())
-	{
-		writer << 5;
-	}
-	else
-	{
-		std::stringstream sstream;
-		Poco::BinaryWriter tempWriter(sstream, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
-		for (const auto& element : _elements)
-		{
-			tempWriter << static_cast<unsigned char>(element->type());
-			BSONWriter(tempWriter).writeCString(element->name());
-			element->write(tempWriter);
-		}
-		tempWriter.flush();
+	// One stream for all levels, so that nested documents are not copied level by level.
+	std::stringstream stream;
+	BinaryWriter streamWriter(stream, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
+	writeImpl(streamWriter, 0);
+	writer.writeRaw(stream.str());
+}
 
-		Poco::Int32 len = static_cast<Poco::Int32>(5 + sstream.tellp()); /* 5 = sizeof(len) + 0-byte */
-		writer << len;
-		writer.writeRaw(sstream.str());
+
+void Document::writeImpl(BinaryWriter& writer, int depth) const
+{
+	if (depth > BSON_MAX_DEPTH)
+		throwNestingTooDeep();
+
+	const std::streamoff start = beginDocument(writer);
+	for (const auto& element : _elements)
+	{
+		writer << static_cast<unsigned char>(element->type());
+		BSONWriter(writer).writeCString(element->name());
+		// Nested documents are written here: their elements do not know the depth.
+		const Document* nested = nestedDocument(*element);
+		if (nested != nullptr)
+			nested->writeImpl(writer, depth + 1);
+		else
+			element->write(writer);
 	}
-	writer << '\0';
+	endDocument(writer, start);
 }
 
 

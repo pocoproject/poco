@@ -196,8 +196,10 @@ inline void BSONReader::read<std::string>(std::string& to)
 template<>
 inline void BSONWriter::write<std::string>(const std::string& from)
 {
+	// Unlike a cstring, a string may contain null characters: its length is written first.
 	_writer << static_cast<Poco::Int32>(from.length() + 1);
-	writeCString(from);
+	_writer.writeRaw(from);
+	_writer << static_cast<unsigned char>(0x00);
 }
 
 

@@ -238,6 +238,7 @@ CppUnit::Test* MongoDBTest::suite()
 		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdFindShowRecordId);
 		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdAggregateOutputAbove16MB);
 		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdCursorLargeBatch);
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdInsertExceedsMaxMessageSize);
 
 		CppUnit_addTest(pSuite, MongoDBTest, testDBCount);
 

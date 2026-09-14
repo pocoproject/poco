@@ -286,9 +286,12 @@ void OpMsgMessage::clear()
 
 void OpMsgMessage::send(std::ostream& ostr)
 {
+	if (_flags & MSG_CHECKSUM_PRESENT)
+		throw Poco::InvalidArgumentException("MongoDB message checksums are not supported");
+
 	BinaryWriter socketWriter(ostr, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
 
-	// Serialise the body
+	// One stream for the flags, the body and the document sequence
 	std::stringstream ss;
 	BinaryWriter writer(ss, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
 	writer << _flags;
@@ -296,30 +299,47 @@ void OpMsgMessage::send(std::ostream& ostr)
 	writer << PAYLOAD_TYPE_0;
 	_body.write(writer);
 
+	auto tooLarge = [](std::streamoff size)
+	{
+		return Poco::InvalidArgumentException("MongoDB request of " + std::to_string(size) +
+			" bytes exceeds the maximum message size of " + std::to_string(MAX_MESSAGE_SIZE_BYTES) + " bytes");
+	};
+
 	if (!_documents.empty())
 	{
-		// Serialise attached documents directly to main stream to avoid extra buffer copy
 		const std::string& identifier = commandIdentifier(_commandName);
 
-		// Write documents to temporary buffer (still needed to calculate size)
-		std::stringstream ssdoc;
-		BinaryWriter wdoc(ssdoc, BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
+		writer << PAYLOAD_TYPE_1;
+		// The size of the section is patched in once its end is known.
+		const std::streamoff sizePos = ss.tellp();
+		writer << static_cast<Poco::Int32>(0);
+		writer.writeCString(identifier.c_str());
 		for (auto& doc: _documents)
 		{
-			doc->write(wdoc);
+			const std::streamoff start = ss.tellp();
+			doc->write(writer);
+			const std::streamoff size = ss.tellp() - start;
+			if (size > MAX_SEQUENCE_DOCUMENT_SIZE)
+			{
+				throw Poco::InvalidArgumentException("MongoDB document of " + std::to_string(size) +
+					" bytes exceeds the maximum of " + std::to_string(MAX_SEQUENCE_DOCUMENT_SIZE) + " bytes");
+			}
+			// Checked per document, so that the stream cannot grow past what an Int32 holds.
+			const std::streamoff written = ss.tellp();
+			if (written + MessageHeader::MSG_HEADER_SIZE > MAX_MESSAGE_SIZE_BYTES)
+				throw tooLarge(written + MessageHeader::MSG_HEADER_SIZE);
 		}
-		wdoc.flush();
-
-		const Poco::Int32 size = static_cast<Poco::Int32>(sizeof(size) + identifier.size() + 1 + ssdoc.tellp());
-		writer << PAYLOAD_TYPE_1;
-		writer << size;
-		writer.writeCString(identifier.c_str());
-
-		// Use writeRaw instead of copyStream for better performance
-		const std::string& docData = ssdoc.str();
-		ss.write(docData.data(), docData.size());
+		const std::streamoff end = ss.tellp();
+		ss.seekp(sizePos, std::ios_base::beg);
+		writer << static_cast<Poco::Int32>(end - sizePos);
+		ss.seekp(end, std::ios_base::beg);
 	}
-	writer.flush();
+
+	// Checked before the serialised data is copied. The server closes the connection
+	// instead of replying to a larger message.
+	const std::streamoff payloadSize = ss.tellp();
+	if (payloadSize + MessageHeader::MSG_HEADER_SIZE > MAX_MESSAGE_SIZE_BYTES)
+		throw tooLarge(payloadSize + MessageHeader::MSG_HEADER_SIZE);
 
 #if POCO_MONGODB_DUMP
 	const std::string section = ss.str();
@@ -328,13 +348,11 @@ void OpMsgMessage::send(std::ostream& ostr)
 	std::cout << dump << std::endl;
 #endif
 
-	messageLength(static_cast<Poco::Int32>(ss.tellp()));
+	messageLength(static_cast<Poco::Int32>(payloadSize));
 
 	_header.write(socketWriter);
 
-	// Write directly instead of using StreamCopier for better performance
-	const std::string& msgData = ss.str();
-	ostr.write(msgData.data(), msgData.size());
+	Poco::StreamCopier::copyStream(ss, ostr);
 	ostr.flush();
 }
 
