@@ -51,6 +51,7 @@ public:
 	void testTimestamp();
 	void testNull();
 	void testBSONTimestamp();
+	void testBSONTimestampSerializeDocument();
 
 	// Binary tests
 	void testBinaryGeneric();

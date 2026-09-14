@@ -35,6 +35,19 @@ using namespace Poco::MongoDB;
 using namespace std::string_literals;
 
 
+namespace
+{
+	std::string serialize(const Document& doc)
+	{
+		std::ostringstream os;
+		Poco::BinaryWriter writer(os, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
+		doc.write(writer);
+		writer.flush();
+		return os.str();
+	}
+}
+
+
 BSONTest::BSONTest(const std::string& name):
 	CppUnit::TestCase("BSON")
 {
@@ -553,6 +566,71 @@ void BSONTest::testBSONTimestamp()
 	assertEqual(retrieved2.inc, 42);
 
 	assertTrue(doc->isType<BSONTimestamp>("ts1"));
+}
+
+
+void BSONTest::testBSONTimestampSerializeDocument()
+{
+	const struct
+	{
+		Poco::UInt32 seconds;
+		Poco::Int32 increment;
+	} values[] = {
+		{0, 0},
+		{1700000000, 42},
+		// Above INT32_MAX seconds; the increment must not change the seconds.
+		{4000000000u, -1},
+	};
+	for (const auto& value: values)
+	{
+		BSONTimestamp timestamp;
+		timestamp.ts = Poco::Timestamp(static_cast<Poco::Timestamp::TimeVal>(value.seconds) * Poco::Timestamp::resolution());
+		timestamp.inc = value.increment;
+
+		Document::Ptr doc = new Document();
+		doc->add("ts"s, timestamp);
+		const std::string bytes = serialize(*doc);
+
+		// The value follows the document size, the type and "ts\0":
+		// the increment, then the seconds, each a little-endian uint32.
+		std::istringstream wire(bytes.substr(8, 8));
+		Poco::BinaryReader wireReader(wire, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+		Poco::UInt32 wireIncrement = 0;
+		Poco::UInt32 wireSeconds = 0;
+		wireReader >> wireIncrement >> wireSeconds;
+		assertEqual(static_cast<Poco::UInt32>(value.increment), wireIncrement);
+		assertEqual(value.seconds, wireSeconds);
+
+		std::istringstream stream(bytes);
+		Document::Ptr restored = new Document();
+		Poco::BinaryReader reader(stream, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+		restored->read(reader);
+		const BSONTimestamp& result = restored->get<BSONTimestamp>("ts"s);
+		assertEqual(timestamp.ts.epochMicroseconds(), result.ts.epochMicroseconds());
+		assertEqual(value.increment, result.inc);
+	}
+
+	// Times before 1970 or after 2106 do not fit the unsigned 32-bit seconds.
+	const Poco::Timestamp::TimeVal outOfRange[] = {
+		-Poco::Timestamp::resolution(),
+		(static_cast<Poco::Timestamp::TimeVal>(0xFFFFFFFF) + 1) * Poco::Timestamp::resolution()
+	};
+	for (const auto time: outOfRange)
+	{
+		BSONTimestamp timestamp;
+		timestamp.ts = Poco::Timestamp(time);
+		timestamp.inc = 1;
+		Document doc;
+		doc.add("ts"s, timestamp);
+		try
+		{
+			(void) serialize(doc);
+			failmsg("expected RangeException for " + std::to_string(time));
+		}
+		catch (const Poco::RangeException&)
+		{
+		}
+	}
 }
 
 
@@ -1540,6 +1618,7 @@ CppUnit::Test* BSONTest::suite()
 	CppUnit_addTest(pSuite, BSONTest, testTimestamp);
 	CppUnit_addTest(pSuite, BSONTest, testNull);
 	CppUnit_addTest(pSuite, BSONTest, testBSONTimestamp);
+	CppUnit_addTest(pSuite, BSONTest, testBSONTimestampSerializeDocument);
 
 	// Binary tests
 	CppUnit_addTest(pSuite, BSONTest, testBinaryGeneric);

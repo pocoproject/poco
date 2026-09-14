@@ -30,6 +30,7 @@
 #include "Poco/SharedPtr.h"
 #include "Poco/Timestamp.h"
 #include <cstdio>
+#include <limits>
 #include <string>
 #include <utility>
 
@@ -324,7 +325,7 @@ struct BSONTimestamp
 
 
 // BSON Timestamp
-// spec: int64
+// spec: uint64, increment in the low 32 bits, seconds since the epoch in the high 32 bits
 template<>
 struct ElementTraits<BSONTimestamp>
 {
@@ -344,24 +345,26 @@ struct ElementTraits<BSONTimestamp>
 };
 
 
+// Not Timestamp::fromEpochTime()/epochTime(): the seconds are unsigned 32-bit,
+// which std::time_t cannot hold where it is a signed 32-bit type.
 template<>
 inline void BSONReader::read<BSONTimestamp>(BSONTimestamp& to)
 {
-	Poco::Int64 value;
+	Poco::UInt64 value = 0;
 	_reader >> value;
-	to.inc = value & 0xffffffff;
-	value >>= 32;
-	to.ts = Timestamp::fromEpochTime(static_cast<std::time_t>(value));
+	to.inc = static_cast<Poco::Int32>(value & 0xFFFFFFFF);
+	to.ts = Timestamp(static_cast<Timestamp::TimeVal>(value >> 32) * Timestamp::resolution());
 }
 
 
 template<>
 inline void BSONWriter::write<BSONTimestamp>(const BSONTimestamp& from)
 {
-	Poco::Int64 value = from.ts.epochMicroseconds() / 1000;
-	value <<= 32;
-	value += from.inc;
-	_writer << value;
+	const Timestamp::TimeVal time = from.ts.epochMicroseconds();
+	if (time < 0 || time / Timestamp::resolution() > std::numeric_limits<Poco::UInt32>::max())
+		throw Poco::RangeException("BSON timestamp must be between 1970-01-01T00:00:00Z and 2106-02-07T06:28:15Z");
+	const auto seconds = static_cast<Poco::UInt64>(time / Timestamp::resolution());
+	_writer << ((seconds << 32) | static_cast<Poco::UInt32>(from.inc));
 }
 
 
