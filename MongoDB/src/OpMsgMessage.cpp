@@ -16,13 +16,22 @@
 #include "Poco/MongoDB/MessageHeader.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
-#include "Poco/Bugcheck.h"
+#include "Poco/ByteOrder.h"
+#include "Poco/MemoryStream.h"
+#include "Poco/StreamCopier.h"
+#include <algorithm>
+#include <cstring>
 #include <istream>
 #include <map>
 #include <ostream>
 #include <sstream>
 
 #define POCO_MONGODB_DUMP	false
+
+#if POCO_MONGODB_DUMP
+#include "Poco/Logger.h"
+#include <iostream>
+#endif
 
 namespace Poco::MongoDB {
 
@@ -91,6 +100,32 @@ static const std::string keyBatchSize	{ "batchSize"s };
 
 constexpr static Poco::UInt8 PAYLOAD_TYPE_0 { 0 };
 constexpr static Poco::UInt8 PAYLOAD_TYPE_1 { 1 };
+
+// Smallest message that can be parsed: the header and the flags.
+constexpr static Poco::Int32 OP_MSG_MIN_SIZE { MessageHeader::MSG_HEADER_SIZE + 4 };
+
+// The server rejects a larger document in a document sequence: a write command
+// statement may exceed maxBsonObjectSize by 16 KiB.
+constexpr static Poco::Int32 MAX_SEQUENCE_DOCUMENT_SIZE { BSON_MAX_DOCUMENT_SIZE + 16 * 1024 };
+
+
+[[nodiscard]] static Poco::Int32 int32At(const std::string& message, std::size_t pos)
+{
+	Poco::Int32 value;
+	std::memcpy(&value, message.data() + pos, sizeof(value));
+	return ByteOrder::fromLittleEndian(value);
+}
+
+
+[[nodiscard]] static std::size_t readSectionDocument(const std::string& message, std::size_t pos, std::size_t end, Document& doc)
+	/// Reads the document at pos, which must end before end, and returns its size.
+{
+	// The size and minimum checks happen once, in Document.
+	MemoryInputStream istr(message.data() + pos, static_cast<std::streamsize>(end - pos));
+	BinaryReader reader(istr, BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	return static_cast<std::size_t>(doc.read(reader,
+		static_cast<Poco::Int32>(std::min<std::size_t>(end - pos, MAX_MESSAGE_SIZE_BYTES))));
+}
 
 OpMsgMessage::OpMsgMessage() :
 	Message(MessageHeader::OP_MSG)
@@ -306,28 +341,37 @@ void OpMsgMessage::send(std::ostream& ostr)
 
 void OpMsgMessage::read(std::istream& istr)
 {
+	clear();
+
 	std::string message;
 	{
 		BinaryReader reader(istr, BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
 		_header.read(reader);
 
-		poco_assert_dbg(_header.opCode() == _header.OP_MSG);
-
-		const std::streamsize remainingSize { static_cast<std::streamsize>(_header.getMessageLength() - _header.MSG_HEADER_SIZE) };
-		if (remainingSize <= 0)
-			throw Poco::ProtocolException("Invalid MongoDB message: remaining size is " + std::to_string(remainingSize));
-		if (remainingSize > OP_MSG_MAX_SIZE)
-			throw Poco::ProtocolException("MongoDB message exceeds maximum size: " + std::to_string(remainingSize));
-		message.reserve(remainingSize);
+		// Only bounds are checked (see Document::read). The errors are DataFormatException:
+		// an IOException would make ReplicaSetConnection send the request again.
+		const Poco::Int32 length = _header.getMessageLength();
+		if (length < OP_MSG_MIN_SIZE || length > MAX_MESSAGE_SIZE_BYTES)
+			throw Poco::DataFormatException("Invalid MongoDB message length: " + std::to_string(length));
+		const auto payloadSize = static_cast<std::size_t>(length - MessageHeader::MSG_HEADER_SIZE);
 
 #if POCO_MONGODB_DUMP
 		std::cout
-			<< "Message hdr: " << _header.getMessageLength() << ' ' << remainingSize << ' '
+			<< "Message hdr: " << _header.getMessageLength() << ' ' << payloadSize << ' '
 			<< _header.opCode() << ' ' << _header.getRequestID() << ' ' << _header.responseTo()
 			<< std::endl;
 #endif
 
-		reader.readRaw(remainingSize, message);
+		reader.readRaw(static_cast<std::streamsize>(payloadSize), message);
+		if (message.size() != payloadSize)
+		{
+			throw Poco::IOException("Incomplete MongoDB message: expected " + std::to_string(payloadSize) +
+				" bytes, received " + std::to_string(message.size()));
+		}
+
+		// Checked after the payload, so that the stream stays in sync.
+		if (_header.opCode() != MessageHeader::OP_MSG)
+			throw Poco::DataFormatException("Unexpected MongoDB message opcode: " + std::to_string(static_cast<Poco::Int32>(_header.opCode())));
 
 #if POCO_MONGODB_DUMP
 		std::string dump;
@@ -335,65 +379,58 @@ void OpMsgMessage::read(std::istream& istr)
 		std::cout << dump << std::endl;
 #endif
 	}
-	// Read complete message and then interpret it.
 
-	std::istringstream msgss(message);
-	BinaryReader reader(msgss, BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	// Each section and document must fit in the bytes left; documents may exceed 16 MiB.
+	_flags = static_cast<UInt32>(int32At(message, 0));
 
-	Poco::UInt8 payloadType {0xFF};
-
-	reader >> _flags;
-	reader >> payloadType;
-	poco_assert_dbg(payloadType == PAYLOAD_TYPE_0);
-
-	_body.read(reader);
-
-	// Read next sections from the buffer
-	while (msgss.good())
+	std::size_t end = message.size();
+	if (_flags & MSG_CHECKSUM_PRESENT)
 	{
-		// NOTE: Not tested yet with database, because it returns everything in the body.
-		// Does MongoDB ever return documents as Payload type 1?
-		reader >> payloadType;
-		if (!msgss.good())
+		// CRC-32C of the message; not verified.
+		end -= sizeof(Poco::UInt32);
+	}
+
+	std::size_t pos = sizeof(_flags);
+	bool haveBody = false;
+	while (pos < end)
+	{
+		const auto payloadType = static_cast<Poco::UInt8>(message[pos++]);
+		if (payloadType == PAYLOAD_TYPE_0)
 		{
-			break;
+			if (haveBody)
+				throw Poco::DataFormatException("MongoDB message has more than one body section");
+			haveBody = true;
+			pos += readSectionDocument(message, pos, end, _body);
 		}
-		poco_assert_dbg(payloadType == PAYLOAD_TYPE_1);
-#if POCO_MONGODB_DUMP
-		std::cout << "section payload: " << payloadType << std::endl;
-#endif
-
-		Poco::Int32 sectionSize {0};
-		reader >> sectionSize;
-		poco_assert_dbg(sectionSize > 0);
-
-#if POCO_MONGODB_DUMP
-		std::cout << "section size: " << sectionSize << std::endl;
-#endif
-		std::streamoff offset = sectionSize - sizeof(sectionSize);
-		std::streampos endOfSection = msgss.tellg() + offset;
-
-		std::string identifier;
-		reader.readCString(identifier);
-#if POCO_MONGODB_DUMP
-		std::cout << "section identifier: " << identifier << std::endl;
-#endif
-
-		// Loop to read documents from this section.
-		while (msgss.tellg() < endOfSection)
+		else if (payloadType == PAYLOAD_TYPE_1)
 		{
-#if POCO_MONGODB_DUMP
-			std::cout << "section doc: " << msgss.tellg() << ' ' << endOfSection << std::endl;
-#endif
-			Document::Ptr doc = new Document();
-			doc->read(reader);
-			_documents.push_back(doc);
-			if (!msgss.good())
+			if (end - pos < sizeof(Poco::Int32))
+				throw Poco::DataFormatException("Truncated MongoDB message section");
+			const Poco::Int32 sectionSize = int32At(message, pos);
+			if (sectionSize < static_cast<Poco::Int32>(sizeof(Poco::Int32) + 1) || static_cast<std::size_t>(sectionSize) > end - pos)
+				throw Poco::DataFormatException("Invalid MongoDB message section size: " + std::to_string(sectionSize));
+			const std::size_t sectionEnd = pos + static_cast<std::size_t>(sectionSize);
+
+			const std::size_t identifierEnd = message.find('\0', pos + sizeof(Poco::Int32));
+			if (identifierEnd == std::string::npos || identifierEnd >= sectionEnd)
+				throw Poco::DataFormatException("MongoDB message section identifier is not terminated");
+
+			pos = identifierEnd + 1;
+			while (pos < sectionEnd)
 			{
-				break;
+				Document::Ptr doc = new Document();
+				pos += readSectionDocument(message, pos, sectionEnd, *doc);
+				_documents.push_back(doc);
 			}
 		}
+		else
+		{
+			throw Poco::DataFormatException("Unsupported MongoDB message section kind: " + std::to_string(payloadType));
+		}
 	}
+
+	if (!haveBody)
+		throw Poco::DataFormatException("MongoDB message has no body section");
 
 	// Extract documents from the cursor batch if they are there.
 	MongoDB::Array::Ptr batch;

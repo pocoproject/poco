@@ -147,25 +147,33 @@ struct ElementTraits<Binary::Ptr>
 };
 
 
+inline Binary::Ptr BSONReader::readBinary(Int32& available)
+{
+	need(5, available, "binary header");
+	Int32 size = 0;
+	unsigned char subtype = 0;
+	_reader >> size >> subtype;
+	checkStream();
+	available -= 5;
+	if (size < 0)
+		throw DataFormatException("Invalid BSON binary size: " + std::to_string(size));
+	need(size, available, "binary");
+	Binary::Ptr binary = new Binary(size, subtype);
+	if (size > 0)
+	{
+		_reader.readRaw(reinterpret_cast<char*>(binary->buffer().begin()), size);
+		checkStream();
+	}
+	available -= size;
+	return binary;
+}
+
+
 template<>
 inline void BSONReader::read<Binary::Ptr>(Binary::Ptr& to)
 {
-	Poco::Int32 size;
-	_reader >> size;
-
-	if (size < 0)
-		throw Poco::DataFormatException("Invalid BSON binary size: " + std::to_string(size));
-	if (size > BSON_MAX_DOCUMENT_SIZE)
-		throw Poco::DataFormatException("BSON binary size exceeds maximum: " + std::to_string(size));
-
-	to->buffer().resize(size);
-
-	unsigned char subtype;
-	_reader >> subtype;
-	to->subtype(subtype);
-
-	if (size > 0)
-		_reader.readRaw(reinterpret_cast<char*>(to->buffer().begin()), size);
+	Int32 available = MAX_MESSAGE_SIZE_BYTES;
+	to = readBinary(available);
 }
 
 

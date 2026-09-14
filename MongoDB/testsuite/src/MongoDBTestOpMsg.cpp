@@ -19,6 +19,7 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/UUIDGenerator.h"
 #include "MongoDBTest.h"
+#include "TestDocuments.h"
 
 #include <iostream>
 #include <sstream>
@@ -436,6 +437,130 @@ void MongoDBTest::testOpCmdConnectionPool()
 
 	const auto& doc = response.body();
 	assertEquals (1, doc.getInteger("n"));
+}
+
+
+namespace
+{
+	const std::string largeRepliesDb {"largeReplies"s};
+
+	void dropLargeRepliesDatabase(Connection& connection)
+	{
+		Database db(largeRepliesDb);
+		Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage();
+		request->setCommandName(OpMsgMessage::CMD_DROP_DATABASE);
+		OpMsgMessage response;
+		connection.sendRequest(*request, response);
+	}
+
+	void insertDocuments(Connection& connection, const std::string& collection, const Document::Vector& documents)
+	{
+		dropLargeRepliesDatabase(connection);
+		Database db(largeRepliesDb);
+		Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage(collection);
+		request->setCommandName(OpMsgMessage::CMD_INSERT);
+		request->documents() = documents;
+		OpMsgMessage response;
+		connection.sendRequest(*request, response);
+		if (!response.responseOk() || response.body().exists("writeErrors"s))
+			throw Poco::RuntimeException("insert failed: " + response.body().toString());
+	}
+}
+
+
+void MongoDBTest::testOpCmdFindMaxSizeDocument()
+{
+	// The reply body of a find that returns a 16 MiB document is larger than 16 MiB.
+	insertDocuments(*_mongo, "large"s, {sizedDocument(1, BSON_MAX_DOCUMENT_SIZE)});
+
+	Database db(largeRepliesDb);
+	Poco::SharedPtr<OpMsgMessage> find = db.createOpMsgMessage("large"s);
+	find->setCommandName(OpMsgMessage::CMD_FIND);
+	find->body().addNewDocument("filter"s).add("_id"s, 1);
+	OpMsgMessage response;
+	_mongo->sendRequest(*find, response);
+	assertTrue(response.responseOk());
+	assertEquals (1, response.documents().size());
+	assertEquals (BSON_MAX_DOCUMENT_SIZE - 22, response.documents()[0]->get<Binary::Ptr>("p"s)->buffer().size());
+	assertFalse(Database(largeRepliesDb).queryServerHello(*_mongo).isNull());
+
+	dropLargeRepliesDatabase(*_mongo);
+}
+
+
+void MongoDBTest::testOpCmdFindShowRecordId()
+{
+	// showRecordId adds $recordId to the stored document, so the returned document exceeds 16 MiB.
+	insertDocuments(*_mongo, "large"s, {sizedDocument(1, BSON_MAX_DOCUMENT_SIZE)});
+
+	Database db(largeRepliesDb);
+	Poco::SharedPtr<OpMsgMessage> find = db.createOpMsgMessage("large"s);
+	find->setCommandName(OpMsgMessage::CMD_FIND);
+	find->body().addNewDocument("filter"s).add("_id"s, 1);
+	find->body().add("showRecordId"s, true);
+	OpMsgMessage response;
+	_mongo->sendRequest(*find, response);
+	assertTrue(response.responseOk());
+	assertEquals (1, response.documents().size());
+	assertTrue(response.documents()[0]->exists("$recordId"s));
+
+	dropLargeRepliesDatabase(*_mongo);
+}
+
+
+void MongoDBTest::testOpCmdAggregateOutputAbove16MB()
+{
+	// Aggregation can return documents of up to 16 MiB + 16 KiB.
+	insertDocuments(*_mongo, "large"s, {sizedDocument(1, BSON_MAX_DOCUMENT_SIZE)});
+
+	Database db(largeRepliesDb);
+	Poco::SharedPtr<OpMsgMessage> aggregate = db.createOpMsgMessage("large"s);
+	aggregate->setCommandName(OpMsgMessage::CMD_AGGREGATE);
+	Array& pipeline = aggregate->body().addNewArray("pipeline"s);
+	pipeline.addNewDocument("0"s).addNewDocument("$match"s).add("_id"s, 1);
+	pipeline.addNewDocument("1"s).addNewDocument("$addFields"s).add("padding"s, std::string(1024, 'x'));
+	aggregate->body().addNewDocument("cursor"s);
+	OpMsgMessage response;
+	_mongo->sendRequest(*aggregate, response);
+	assertTrue(response.responseOk());
+	assertEquals (1, response.documents().size());
+	assertEquals (1024, response.documents()[0]->get<std::string>("padding"s).size());
+
+	dropLargeRepliesDatabase(*_mongo);
+}
+
+
+void MongoDBTest::testOpCmdCursorLargeBatch()
+{
+	// The server fills a batch while the reply buffer stays within 16 MiB and then appends
+	// the cursor id and namespace, so a getMore with both documents has a body above 16 MiB.
+	// They leave 16 bytes to the limit of MongoDB 6.0 to 9.0; a server that counts more
+	// overhead returns them in two batches.
+	const std::string collection(100, 'c');
+	insertDocuments(*_mongo, collection, {sizedDocument(0, 22), sizedDocument(1, 16777118)});
+
+	Database db(largeRepliesDb);
+	Poco::SharedPtr<OpMsgCursor> cursor = db.createOpMsgCursor(collection);
+	cursor->query().setCommandName(OpMsgMessage::CMD_FIND);
+	cursor->query().body().addNewDocument("sort"s).add("_id"s, 1);
+	cursor->setEmptyFirstBatch(true);
+
+	assertEquals (0, cursor->next(*_mongo).documents().size());
+	std::size_t documents = 0;
+	int batches = 0;
+	do
+	{
+		const OpMsgMessage& batch = cursor->next(*_mongo);
+		assertTrue(batch.responseOk());
+		documents += batch.documents().size();
+		++batches;
+	}
+	while (cursor->cursorID() != 0);
+	assertEquals (2, documents);
+	if (batches > 1)
+		warnmsg("The server returned the documents in " + std::to_string(batches) + " batches: no reply above 16 MiB was read.");
+
+	dropLargeRepliesDatabase(*_mongo);
 }
 
 

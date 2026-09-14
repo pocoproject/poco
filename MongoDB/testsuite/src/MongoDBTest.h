@@ -46,6 +46,10 @@ public:
 	void testOpCmdDelete();
 	void testOpCmdUnaknowledgedInsert();
 	void testOpCmdConnectionPool();
+	void testOpCmdFindMaxSizeDocument();
+	void testOpCmdFindShowRecordId();
+	void testOpCmdAggregateOutputAbove16MB();
+	void testOpCmdCursorLargeBatch();
 	void testOpCmdDropDatabase();
 	void testOpCmdDropIndex();
 	void testDBCount();

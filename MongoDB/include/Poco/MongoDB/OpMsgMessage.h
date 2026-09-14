@@ -159,7 +159,14 @@ public:
 		/// Writes the request to stream.
 
 	void read(std::istream& istr);
-		/// Reads the response from the stream.
+		/// Reads the response from the stream. The message is cleared first, so
+		/// that a reused message never holds parts of two responses. The message
+		/// must carry an OP_MSG opcode and exactly one body section.
+		///
+		/// Only bounds are checked (see Document::read); documents may exceed
+		/// BSON_MAX_DOCUMENT_SIZE, as the server returns larger ones. Throws
+		/// DataFormatException if a check fails, NotImplementedException for an
+		/// unsupported element type, and IOException if the stream ends early.
 
 private:
 

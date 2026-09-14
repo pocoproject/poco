@@ -103,8 +103,28 @@ public:
 	void testInvalidObjectID();
 	void testEmptyDocument();
 
+	// Large and malformed server replies
+	void testOpMsgReadBodyAbove16MB();
+	void testOpMsgReadDocumentAbove16MB();
+	void testOpMsgReadSectionOrderAndChecksum();
+	void testDocumentReadLargeStandalone();
+	void testOpMsgReadRejectsMalformedLengths();
+	void testOpMsgReadRejectsBadFraming();
+	void testOpMsgReadClearsMessage();
+	void testDocumentReadStandaloneBounds();
+	void testDocumentReadFailureKeepsIndexConsistent();
 	void testDocumentRemoveDuplicateName();
+	void testDocumentReadDepth();
+	void testDocumentReadWithTextEncoding();
+	void testDateTimeOutsideTimestampRange();
+	void testRegularExpressionAndJavaScriptRoundTrip();
+	void testBinaryReadTruncated();
+
+	void testConnectionClosedAfterUnreadableReply();
+	void testConnectionKeptAfterUnsupportedType();
 	void testLargeDocumentRemoveAndAdd();
+	void testBSONReaderBounds();
+
 	static CppUnit::Test* suite();
 };
 

@@ -20,6 +20,7 @@
 
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
+#include "Poco/DateTime.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/Exception.h"
 #include "Poco/MongoDB/BSONReader.h"
@@ -187,14 +188,8 @@ struct ElementTraits<std::string>
 template<>
 inline void BSONReader::read<std::string>(std::string& to)
 {
-	Poco::Int32 size;
-	_reader >> size;
-	if (size < BSON_MIN_STRING_SIZE)
-		throw Poco::DataFormatException("Invalid BSON string size: " + std::to_string(size));
-	if (size > BSON_MAX_DOCUMENT_SIZE)
-		throw Poco::DataFormatException("BSON string size exceeds maximum: " + std::to_string(size));
-	_reader.readRaw(size, to);
-	to.erase(to.end() - 1); // remove terminating 0
+	Int32 available = MAX_MESSAGE_SIZE_BYTES;
+	to = readString(available);
 }
 
 
@@ -274,10 +269,18 @@ struct ElementTraits<Timestamp>
 template<>
 inline void BSONReader::read<Timestamp>(Timestamp& to)
 {
-	Poco::Int64 value;
+	Poco::Int64 value = 0;
 	_reader >> value;
-	to = Timestamp::fromEpochTime(static_cast<std::time_t>(value / 1000));
-	to += (value % 1000 * 1000);
+	// Milliseconds, clamped to the range DateTime accepts, so that formatting a
+	// parsed document cannot fail.
+	static const Timestamp::TimeVal minTime = DateTime(-4713, 1, 1).timestamp().epochMicroseconds();
+	static const Timestamp::TimeVal maxTime = DateTime(9999, 12, 31, 23, 59, 59, 999, 999).timestamp().epochMicroseconds();
+	if (value > maxTime / 1000)
+		to = Timestamp(maxTime);
+	else if (value < minTime / 1000)
+		to = Timestamp(minTime);
+	else
+		to = Timestamp(value * 1000);
 }
 
 

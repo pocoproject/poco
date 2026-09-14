@@ -247,7 +247,22 @@ void Connection::sendRequest(OpMsgMessage& request)
 void Connection::readResponse(OpMsgMessage& response)
 {
 	Poco::Net::SocketInputStream sis(_socket);
-	response.read(sis);
+	try
+	{
+		response.read(sis);
+	}
+	catch (const Poco::NotImplementedException&)
+	{
+		// Thrown while parsing a fully received response: the socket is still in sync.
+		throw;
+	}
+	catch (...)
+	{
+		// The rest of the response, or a response arriving after a timeout, would
+		// be read as the response to the next request.
+		disconnect();
+		throw;
+	}
 }
 
 

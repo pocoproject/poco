@@ -46,7 +46,8 @@ class MongoDB_API MessageHeader
 public:
 	static constexpr Int32 MSG_HEADER_SIZE = 16;
 
-	enum OpCode
+	enum OpCode : Int32
+		/// Fixed underlying type: MessageHeader::read() stores any value received.
 	{
 		/// Opcodes supported in MongoDB 5.1 and later
 		OP_COMPRESSED = 2012,

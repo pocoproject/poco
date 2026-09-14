@@ -150,6 +150,9 @@ public:
 	void disconnect();
 		/// Disconnects from the MongoDB server.
 
+	[[nodiscard]] bool isConnected() const noexcept;
+		/// Returns true if the socket is open.
+
 	void sendRequest(OpMsgMessage& request, OpMsgMessage& response);
 		/// Sends a request to the MongoDB server and receives the response
 		/// using OP_MSG wire protocol.
@@ -163,6 +166,9 @@ public:
 		/// Reads additional response data when previous message's flag moreToCome
 		/// indicates that server will send more data.
 		/// NOTE: See comments in OpMsgCursor code.
+		///
+		/// The connection is closed if the response cannot be received or is
+		/// malformed, but not for an unsupported element type.
 
 
 protected:
@@ -180,6 +186,12 @@ private:
 inline Net::SocketAddress Connection::address() const
 {
 	return _address;
+}
+
+
+inline bool Connection::isConnected() const noexcept
+{
+	return !_socket.isNull() && _socket.impl()->initialized();
 }
 
 

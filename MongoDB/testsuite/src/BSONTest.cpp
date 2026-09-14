@@ -9,6 +9,7 @@
 
 
 #include "BSONTest.h"
+#include "TestDocuments.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/MongoDB/Document.h"
@@ -20,15 +21,22 @@
 #include "Poco/MongoDB/MaxKey.h"
 #include "Poco/MongoDB/MinKey.h"
 #include "Poco/MongoDB/ObjectId.h"
+#include "Poco/MongoDB/OpMsgMessage.h"
+#include "Poco/MongoDB/PoolableConnectionFactory.h"
 #include "Poco/MongoDB/RegularExpression.h"
 #include "Poco/MongoDB/JavaScriptCode.h"
+#include "Poco/Net/ServerSocket.h"
+#include "Poco/Net/StreamSocket.h"
 #include "Poco/BinaryReader.h"
 #include "Poco/BinaryWriter.h"
 #include "Poco/Exception.h"
 #include "Poco/DateTime.h"
+#include "Poco/UTF8Encoding.h"
 #include "Poco/UUIDGenerator.h"
+#include <limits>
 #include <sstream>
 #include <iostream>
+#include <typeinfo>
 
 
 using namespace Poco::MongoDB;
@@ -38,6 +46,15 @@ using namespace std::string_literals;
 namespace
 {
 	std::string int32LE(Poco::Int32 value)
+	{
+		std::ostringstream os;
+		Poco::BinaryWriter writer(os, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
+		writer << value;
+		writer.flush();
+		return os.str();
+	}
+
+	std::string int64LE(Poco::Int64 value)
 	{
 		std::ostringstream os;
 		Poco::BinaryWriter writer(os, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
@@ -1650,6 +1667,332 @@ namespace
 	{
 		return int32LE(static_cast<Poco::Int32>(4 + elements.size() + 1)) + elements + std::string(1, '\0');
 	}
+
+	std::string opMsgWithLength(Poco::Int32 length, const std::string& payload, Poco::Int32 opCode = 2013)
+	{
+		return int32LE(length) + int32LE(1) + int32LE(0) + int32LE(opCode) + payload;
+	}
+
+	std::string opMsg(const std::string& sections, Poco::UInt32 flags = 0, Poco::Int32 opCode = 2013)
+	{
+		const std::string payload = int32LE(static_cast<Poco::Int32>(flags)) + sections;
+		return opMsgWithLength(static_cast<Poco::Int32>(16 + payload.size()), payload, opCode);
+	}
+
+	std::string bodySection(const std::string& document)
+	{
+		return std::string(1, '\0') + document;
+	}
+
+	std::string sequenceSection(const std::string& identifier, const std::string& documents)
+	{
+		return std::string(1, '\1') + int32LE(static_cast<Poco::Int32>(4 + identifier.size() + 1 + documents.size())) +
+			identifier + std::string(1, '\0') + documents;
+	}
+
+	template <typename E>
+	std::string readFailure(const std::string& message)
+		/// Returns an empty string if reading the message throws exactly E,
+		/// otherwise a description of what happened.
+	{
+		OpMsgMessage response;
+		std::istringstream istr(message);
+		try
+		{
+			response.read(istr);
+		}
+		catch (const Poco::Exception& e)
+		{
+			if (typeid(e) == typeid(E))
+				return std::string();
+			return std::string("unexpected ") + e.name() + ": " + e.displayText();
+		}
+		return "accepted"s;
+	}
+}
+
+
+void BSONTest::testOpMsgReadBodyAbove16MB()
+{
+	// The largest two-document getMore batch the server builds (16,777,156 bytes of
+	// documents) with a namespace of 255 bytes: the reply body is 16,777,484 bytes.
+	Document body;
+	Document& cursor = body.addNewDocument("cursor"s);
+	Array& batch = cursor.addNewArray("nextBatch"s);
+	batch.add(sizedDocument(0, 22));
+	batch.add(sizedDocument(1, 16777156 - 22));
+	cursor.add("id"s, static_cast<Poco::Int64>(0));
+	cursor.add("ns"s, std::string(255, 'n'));
+	body.add("ok"s, 1.0);
+	const std::string bodyBytes = serialize(body);
+	assertEqual(16777484, static_cast<int>(bodyBytes.size()));
+
+	OpMsgMessage response;
+	std::istringstream istr(opMsg(bodySection(bodyBytes)));
+	response.read(istr);
+	assertTrue(response.responseOk());
+	assertEqual(2, static_cast<int>(response.documents().size()));
+	assertEqual(16777156 - 44, static_cast<int>(response.documents()[1]->get<Binary::Ptr>("p"s)->buffer().size()));
+}
+
+
+void BSONTest::testOpMsgReadDocumentAbove16MB()
+{
+	// Oplog entries and documents stored with allowDocumentsGreaterThanMaxUserSize reach
+	// 16 MiB + 16 KiB; a standalone MongoDB 8.2 with that parameter stores and returns
+	// documents of 20 MiB.
+	for (const Poco::Int32 size: {16793600, 20 * 1024 * 1024})
+	{
+		Document body;
+		Document& cursor = body.addNewDocument("cursor"s);
+		cursor.addNewArray("firstBatch"s).add(sizedDocument(1, size));
+		cursor.add("id"s, static_cast<Poco::Int64>(0));
+		cursor.add("ns"s, "db.c"s);
+		body.add("ok"s, 1.0);
+
+		OpMsgMessage response;
+		std::istringstream istr(opMsg(bodySection(serialize(body))));
+		response.read(istr);
+		assertEqual(1, static_cast<int>(response.documents().size()));
+		assertEqual(size - 22, static_cast<int>(response.documents()[0]->get<Binary::Ptr>("p"s)->buffer().size()));
+	}
+
+	Document body;
+	body.add("s"s, std::string(32 * 1024 * 1024, 'x'));
+	body.add("ok"s, 1.0);
+	OpMsgMessage response;
+	std::istringstream istr(opMsg(bodySection(serialize(body))));
+	response.read(istr);
+	assertEqual(32 * 1024 * 1024, static_cast<int>(response.body().get<std::string>("s"s).size()));
+}
+
+
+void BSONTest::testOpMsgReadSectionOrderAndChecksum()
+{
+	Document one;
+	one.add("a"s, 1);
+	const std::string doc = serialize(one);
+	Document ok;
+	ok.add("ok"s, 1.0);
+	const std::string body = bodySection(serialize(ok));
+
+	// A document sequence may precede the body.
+	OpMsgMessage response;
+	std::istringstream istr(opMsg(sequenceSection("documents"s, doc + doc) + body));
+	response.read(istr);
+	assertTrue(response.responseOk());
+	assertEqual(2, static_cast<int>(response.documents().size()));
+
+	// The checksum follows the sections and is not parsed as one.
+	OpMsgMessage withChecksum;
+	std::istringstream istr2(opMsg(body + int32LE(0x12345678), OpMsgMessage::MSG_CHECKSUM_PRESENT));
+	withChecksum.read(istr2);
+	assertTrue(withChecksum.responseOk());
+}
+
+
+void BSONTest::testDocumentReadLargeStandalone()
+{
+	std::istringstream istr(serialize(*sizedDocument(1, 20 * 1024 * 1024)));
+	Poco::BinaryReader reader(istr, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	Document copy;
+	copy.read(reader);
+	assertEqual(20 * 1024 * 1024 - 22, static_cast<int>(copy.get<Binary::Ptr>("p"s)->buffer().size()));
+
+	std::istringstream tooLarge(int32LE(MAX_MESSAGE_SIZE_BYTES + 1) + std::string(1, '\0'));
+	Poco::BinaryReader tooLargeReader(tooLarge, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	Document rejected;
+	try
+	{
+		rejected.read(tooLargeReader);
+		fail("document larger than MAX_MESSAGE_SIZE_BYTES accepted");
+	}
+	catch (Poco::DataFormatException&)
+	{
+	}
+}
+
+
+void BSONTest::testOpMsgReadRejectsMalformedLengths()
+{
+	using Poco::DataFormatException;
+	const std::string none;
+	const std::string nul(1, '\0');
+	const std::string int32Element = element('\x10', "i"s, int32LE(1));
+	auto reply = [](const std::string& document) { return opMsg(bodySection(document)); };
+
+	// Document size below the minimum, beyond the message, beyond the parent document
+	assertEqual(none, readFailure<DataFormatException>(reply(int32LE(4) + nul)));
+	assertEqual(none, readFailure<DataFormatException>(reply(int32LE(100) + int32Element + nul)));
+	assertEqual(none, readFailure<DataFormatException>(reply(bsonDocument(element('\x03', "d"s, int32LE(50) + nul)))));
+	// Terminator before the declared size, or missing at it
+	assertEqual(none, readFailure<DataFormatException>(reply(int32LE(13) + int32Element + nul + nul)));
+	assertEqual(none, readFailure<DataFormatException>(reply(int32LE(12) + int32Element + "X"s)));
+	// String of length 0, beyond its document, of 2 GiB, without terminating null character
+	assertEqual(none, readFailure<DataFormatException>(reply(bsonDocument(element('\x02', "s"s, int32LE(0) + nul)))));
+	assertEqual(none, readFailure<DataFormatException>(reply(bsonDocument(element('\x02', "s"s, int32LE(100) + "ab"s + nul)))));
+	assertEqual(none, readFailure<DataFormatException>(reply(bsonDocument(element('\x02', "s"s, int32LE(0x7FFFFFFF) + "ab"s + nul)))));
+	assertEqual(none, readFailure<DataFormatException>(reply(bsonDocument(element('\x02', "s"s, int32LE(3) + "abc"s)))));
+	// Binary of negative length or beyond its document
+	assertEqual(none, readFailure<DataFormatException>(reply(bsonDocument(element('\x05', "b"s, int32LE(-1) + nul)))));
+	assertEqual(none, readFailure<DataFormatException>(reply(bsonDocument(element('\x05', "b"s, int32LE(100) + nul + "xy"s)))));
+	// Element name and regular expression without terminating null character
+	assertEqual(none, readFailure<DataFormatException>(reply(bsonDocument("\x10" "abc"s))));
+	assertEqual(none, readFailure<DataFormatException>(reply(bsonDocument(element('\x0B', "r"s, "pattern"s)))));
+	// Value shorter than its type
+	assertEqual(none, readFailure<DataFormatException>(reply(bsonDocument(element('\x12', "l"s, int32LE(1))))));
+}
+
+
+void BSONTest::testOpMsgReadRejectsBadFraming()
+{
+	// Only what would make parsing read past the message or allocate without bound is
+	// rejected; replies are otherwise expected to be valid.
+	using Poco::DataFormatException;
+	const std::string none;
+	const std::string nul(1, '\0');
+	Document ok;
+	ok.add("ok"s, 1.0);
+	const std::string doc = serialize(ok);
+	const std::string body = bodySection(doc);
+
+	// Message length below the header and the flags, negative, above MAX_MESSAGE_SIZE_BYTES
+	assertEqual(none, readFailure<DataFormatException>(opMsgWithLength(19, int32LE(0) + body)));
+	assertEqual(none, readFailure<DataFormatException>(opMsgWithLength(-1, int32LE(0) + body)));
+	assertEqual(none, readFailure<DataFormatException>(opMsgWithLength(MAX_MESSAGE_SIZE_BYTES + 1, int32LE(0) + body)));
+	// Stream ends before the declared length
+	assertEqual(none, readFailure<Poco::IOException>(opMsgWithLength(100, int32LE(0) + body)));
+	// Unknown section kind, whose size cannot be known
+	assertEqual(none, readFailure<DataFormatException>(opMsg(body + std::string(1, '\x02') + doc)));
+	// Document sequence too small, beyond the message, not filled by its documents,
+	// with an unterminated identifier
+	assertEqual(none, readFailure<DataFormatException>(opMsg(body + std::string(1, '\x01') + int32LE(4))));
+	assertEqual(none, readFailure<DataFormatException>(opMsg(body + std::string(1, '\x01') + int32LE(1000) + "documents"s + nul + doc)));
+	assertEqual(none, readFailure<DataFormatException>(opMsg(body + sequenceSection("documents"s, doc + "xyz"s))));
+	assertEqual(none, readFailure<DataFormatException>(opMsg(body + std::string(1, '\x01') + int32LE(8) + "docu"s)));
+	// The body, or the last document of a sequence, reaching into the checksum
+	assertEqual(none, readFailure<DataFormatException>(opMsg(body, OpMsgMessage::MSG_CHECKSUM_PRESENT)));
+	assertEqual(none, readFailure<DataFormatException>(opMsg(body + sequenceSection("documents"s, doc), OpMsgMessage::MSG_CHECKSUM_PRESENT)));
+	// An opcode other than OP_MSG
+	assertEqual(none, readFailure<DataFormatException>(opMsg(body, 0, 2012)));
+	// No section at all, and a document sequence without a body section
+	assertEqual(none, readFailure<DataFormatException>(opMsg(""s)));
+	assertEqual(none, readFailure<DataFormatException>(opMsg(sequenceSection("documents"s, doc))));
+	// More than one body section
+	assertEqual(none, readFailure<DataFormatException>(opMsg(body + body)));
+	// A document sequence kind byte followed by too few bytes for its size
+	assertEqual(none, readFailure<DataFormatException>(opMsg(body + "\x01"s)));
+	assertEqual(none, readFailure<DataFormatException>(opMsg(body + "\x01"s + "a"s)));
+	assertEqual(none, readFailure<DataFormatException>(opMsg(body + "\x01"s + "ab"s)));
+	// An identifier that is terminated outside its own section
+	assertEqual(none, readFailure<DataFormatException>(opMsg("\x01"s + int32LE(13) + "documents"s + nul + body)));
+}
+
+
+void BSONTest::testOpMsgReadClearsMessage()
+{
+	// A reused message must never hold parts of two responses.
+	Document one;
+	one.add("a"s, 1);
+	Document ok;
+	ok.add("ok"s, 1.0);
+
+	OpMsgMessage response;
+	response.body().add("stale"s, 2);
+	response.documents().push_back(new Document());
+
+	std::istringstream istr(opMsg(bodySection(serialize(ok)) + sequenceSection("documents"s, serialize(one))));
+	response.read(istr);
+
+	assertEqual(static_cast<std::size_t>(1), response.body().size());
+	assertTrue(response.responseOk());
+	assertFalse(response.body().exists("stale"s));
+	assertEqual(static_cast<std::size_t>(1), response.documents().size());
+	assertEqual(1, response.documents()[0]->get<Poco::Int32>("a"s));
+}
+
+
+void BSONTest::testDocumentReadStandaloneBounds()
+{
+	// Every length is checked against the bytes left in its document, not against the
+	// stream, which here continues with zeros: without the checks each document would
+	// be read to the end of a longer one and accepted.
+	const std::string zeros(64, '\0');
+	const std::string int32Element = element('\x10', "i"s, int32LE(1));
+	std::vector<std::string> documents = {
+		// String, binary and int64 reaching past the document
+		bsonDocument(element('\x02', "s"s, int32LE(20) + "ab"s + std::string(1, '\0'))),
+		bsonDocument(element('\x05', "b"s, int32LE(20) + std::string(1, '\0') + "xy"s)),
+		bsonDocument(element('\x12', "l"s, int32LE(1))),
+		// Name without its null character inside the document
+		bsonDocument("\x10" "abc"s),
+		// Declared size below the minimum, or negative
+		int32LE(0) + "\0"s,
+		int32LE(4) + "\0"s,
+		int32LE(-1000) + "\0"s,
+		// String length reaching past a document that ends right after it
+		int32LE(14) + "\x02"s + "s\0"s + int32LE(3),
+		// Null value whose name is not terminated inside the document
+		bsonDocument("\x0A" "abc"s)
+	};
+	// Nested document and array of 19 bytes in a parent that holds only their first
+	// element; the parent's terminator position holds the type of their second element.
+	for (const char type: {'\x03', '\x04'})
+	{
+		documents.push_back(int32LE(19) + std::string(1, type) + "d"s + std::string(1, '\0') + int32LE(19) + int32Element + "\x10"s +
+			"j"s + std::string(1, '\0') + int32LE(2) + std::string(1, '\0'));
+	}
+	for (const auto& data: documents)
+	{
+		std::istringstream istr(data + zeros);
+		Poco::BinaryReader reader(istr, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+		Document doc;
+		try
+		{
+			doc.read(reader);
+			fail("document read past its end: " + doc.toString());
+		}
+		catch (Poco::DataFormatException&)
+		{
+		}
+	}
+
+	// Stream ending inside a string that fits its document
+	std::istringstream truncated(int32LE(15) + "\x02"s + "s\0"s + int32LE(3));
+	Poco::BinaryReader truncatedReader(truncated, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	Document doc;
+	try
+	{
+		doc.read(truncatedReader);
+		fail("truncated document accepted");
+	}
+	catch (Poco::DataFormatException&)
+	{
+	}
+}
+
+
+void BSONTest::testDocumentReadFailureKeepsIndexConsistent()
+{
+	// The name index is invalidated before the elements are read, so that a read
+	// that throws does not leave the index describing a different element list.
+	Document d;
+	d.add("a"s, 1);
+	(void) d.getInteger("a"s);
+
+	std::istringstream istr(bsonDocument(element('\x10', "b"s, int32LE(2)) + element('\x20', "c"s, ""s)));
+	Poco::BinaryReader reader(istr, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	try
+	{
+		d.read(reader);
+		fail("element of an unsupported type accepted");
+	}
+	catch (Poco::NotImplementedException&)
+	{
+	}
+
+	assertTrue(d.exists("b"s) == !d.get("b"s).isNull());
+	assertTrue(d.exists("c"s) == !d.get("c"s).isNull());
 }
 
 
@@ -1672,6 +2015,206 @@ void BSONTest::testDocumentRemoveDuplicateName()
 	assertFalse(d.exists("a"s));
 	assertTrue(d.get("a"s).isNull());
 	assertFalse(d.remove("a"s));
+}
+
+
+void BSONTest::testDocumentReadDepth()
+{
+	// Nesting is limited, so that a document cannot exhaust the stack.
+	for (const char type: {'\x03', '\x04'})
+	{
+		std::string atLimit = bsonDocument(""s);
+		for (int i = 0; i < 512; ++i)
+			atLimit = bsonDocument(element(type, "d"s, atLimit));
+		std::istringstream istr(atLimit);
+		Poco::BinaryReader reader(istr, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+		Document doc;
+		doc.read(reader);
+
+		std::istringstream tooDeep(bsonDocument(element(type, "d"s, atLimit)));
+		Poco::BinaryReader tooDeepReader(tooDeep, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+		Document rejected;
+		try
+		{
+			rejected.read(tooDeepReader);
+			fail("document nested 513 levels deep accepted");
+		}
+		catch (Poco::DataFormatException&)
+		{
+		}
+	}
+}
+
+
+void BSONTest::testDocumentReadWithTextEncoding()
+{
+	// BSONReader and BSONWriter copy the given reader and writer; the copies
+	// share their TextConverter instead of deleting it a second time.
+	Document doc;
+	doc.add("i"s, 1);
+	doc.add("j"s, 2);
+	Poco::UTF8Encoding encoding;
+
+	std::istringstream istr(serialize(doc));
+	Poco::BinaryReader reader(istr, encoding, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	Document copy;
+	copy.read(reader);
+	assertEqual(2, copy.get<Poco::Int32>("j"s));
+
+	std::ostringstream ostr;
+	const Poco::BinaryWriter writer(ostr, encoding, Poco::BinaryWriter::LITTLE_ENDIAN_BYTE_ORDER);
+	BSONWriter(writer).write(Document::Ptr(new Document(doc)));
+	assertEqual(serialize(doc), ostr.str());
+}
+
+
+void BSONTest::testDateTimeOutsideTimestampRange()
+{
+	// A BSON datetime holds milliseconds; values outside the range Poco::DateTime
+	// accepts are clamped, so that formatting the parsed document cannot fail.
+	const Poco::Timestamp::TimeVal minTime = Poco::DateTime(-4713, 1, 1).timestamp().epochMicroseconds();
+	const Poco::Timestamp::TimeVal maxTime = Poco::DateTime(9999, 12, 31, 23, 59, 59, 999, 999).timestamp().epochMicroseconds();
+	const struct
+	{
+		Poco::Int64 milliseconds;
+		Poco::Timestamp::TimeVal microseconds;
+	} values[] = {
+		{std::numeric_limits<Poco::Int64>::max(), maxTime},
+		{std::numeric_limits<Poco::Int64>::min(), minTime},
+		{Poco::Timestamp::TIMEVAL_MAX / 1000, maxTime},
+		{-1500, -1500000},
+		{1700000000123, 1700000000123000},
+	};
+	for (const auto& value: values)
+	{
+		std::istringstream istr(bsonDocument(element('\x09', "t"s, int64LE(value.milliseconds))));
+		Poco::BinaryReader reader(istr, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+		Document doc;
+		doc.read(reader);
+		assertEqual(value.microseconds, doc.get<Poco::Timestamp>("t"s).epochMicroseconds());
+		// Formatting must work for every value, including the clamped extremes.
+		assertFalse(doc.toString().empty());
+	}
+
+	std::istringstream high(bsonDocument(element('\x09', "t"s, int64LE(std::numeric_limits<Poco::Int64>::max()))));
+	Poco::BinaryReader highReader(high, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	Document highDoc;
+	highDoc.read(highReader);
+	assertEqual(9999, Poco::DateTime(highDoc.get<Poco::Timestamp>("t"s)).year());
+
+	std::istringstream low(bsonDocument(element('\x09', "t"s, int64LE(std::numeric_limits<Poco::Int64>::min()))));
+	Poco::BinaryReader lowReader(low, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	Document lowDoc;
+	lowDoc.read(lowReader);
+	assertEqual(-4713, Poco::DateTime(lowDoc.get<Poco::Timestamp>("t"s)).year());
+}
+
+
+void BSONTest::testRegularExpressionAndJavaScriptRoundTrip()
+{
+	Document doc;
+	doc.add("r"s, RegularExpression::Ptr(new RegularExpression("^a.*z$"s, "im"s)));
+	JavaScriptCode::Ptr code = new JavaScriptCode();
+	code->setCode("function() { return 1; }"s);
+	doc.add("c"s, code);
+
+	std::istringstream istr(serialize(doc));
+	Poco::BinaryReader reader(istr, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	Document copy;
+	copy.read(reader);
+	assertEqual("^a.*z$"s, copy.get<RegularExpression::Ptr>("r"s)->getPattern());
+	assertEqual("im"s, copy.get<RegularExpression::Ptr>("r"s)->getOptions());
+	assertEqual("function() { return 1; }"s, copy.get<JavaScriptCode::Ptr>("c"s)->getCode());
+}
+
+
+void BSONTest::testBinaryReadTruncated()
+{
+	// The length of a binary that is not there must not size the buffer.
+	for (const std::string& data: {""s, "\xff\xff\xff"s})
+	{
+		std::istringstream istr(data);
+		Poco::BinaryReader reader(istr, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+		Binary::Ptr binary = new Binary();
+		try
+		{
+			BSONReader(reader).read(binary);
+			fail("truncated binary accepted");
+		}
+		catch (Poco::DataFormatException&)
+		{
+		}
+		assertEqual(0, static_cast<int>(binary->buffer().size()));
+	}
+}
+
+
+void BSONTest::testConnectionClosedAfterUnreadableReply()
+{
+	// The rest of a reply that cannot be read may still arrive, so the connection is
+	// closed, and a pool does not hand it out again.
+	Document ok;
+	ok.add("ok"s, 1.0);
+	const std::string replies[] = {
+		// Stream ends before the declared length
+		opMsgWithLength(100, int32LE(0)),
+		// Unknown section kind
+		opMsg(bodySection(serialize(ok)) + "\x02"s)
+	};
+	for (const auto& reply: replies)
+	{
+		Poco::Net::ServerSocket server(Poco::Net::SocketAddress("127.0.0.1"s, 0));
+		Connection::Ptr connection = new Connection("127.0.0.1"s, server.address().port());
+		Poco::Net::StreamSocket peer = server.acceptConnection();
+		peer.sendBytes(reply.data(), static_cast<int>(reply.size()));
+		peer.shutdownSend();
+
+		Database db("db"s);
+		Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage();
+		request->setCommandName(OpMsgMessage::CMD_PING);
+		OpMsgMessage response;
+		assertTrue(connection->isConnected());
+		try
+		{
+			connection->sendRequest(*request, response);
+			fail("unreadable reply accepted");
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		assertFalse(connection->isConnected());
+
+		Poco::PoolableObjectFactory<Connection, Connection::Ptr> factory(server.address().toString());
+		assertFalse(factory.validateObject(connection));
+	}
+}
+
+
+void BSONTest::testConnectionKeptAfterUnsupportedType()
+{
+	// A complete reply that holds an element Poco cannot represent leaves the socket
+	// in sync, so the connection stays usable.
+	const std::string reply = opMsg(bodySection(bsonDocument(
+		element('\x0E', "s"s, int32LE(2) + "a\0"s) + element('\x10', "ok"s, int32LE(1)))));
+
+	Poco::Net::ServerSocket server(Poco::Net::SocketAddress("127.0.0.1"s, 0));
+	Connection::Ptr connection = new Connection("127.0.0.1"s, server.address().port());
+	Poco::Net::StreamSocket peer = server.acceptConnection();
+	peer.sendBytes(reply.data(), static_cast<int>(reply.size()));
+
+	Database db("db"s);
+	Poco::SharedPtr<OpMsgMessage> request = db.createOpMsgMessage();
+	request->setCommandName(OpMsgMessage::CMD_PING);
+	OpMsgMessage response;
+	try
+	{
+		connection->sendRequest(*request, response);
+		fail("unsupported element type accepted");
+	}
+	catch (Poco::NotImplementedException&)
+	{
+	}
+	assertTrue(connection->isConnected());
 }
 
 
@@ -1699,6 +2242,73 @@ void BSONTest::testLargeDocumentRemoveAndAdd()
 	for (int i = changes; i < count; ++i)
 		assertEqual(i, doc.get<Poco::Int32>("n"s + std::to_string(i)));
 	assertEqual(static_cast<std::size_t>(count), doc.size());
+}
+
+
+void BSONTest::testBSONReaderBounds()
+{
+	// The public readers bound every length, also outside a document.
+	const std::string strings[] = {
+		// Shorter than its length, without a terminator, of 2 GiB
+		int32LE(8) + "abcdef\0"s,
+		int32LE(3) + "abc"s,
+		int32LE(0x7FFFFFFF) + "ab"s
+	};
+	for (const auto& data: strings)
+	{
+		std::istringstream istr(data);
+		Poco::BinaryReader reader(istr, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+		std::string value;
+		try
+		{
+			BSONReader(reader).read(value);
+			fail("malformed BSON string accepted: " + value);
+		}
+		catch (Poco::DataFormatException&)
+		{
+		}
+	}
+
+	const std::string binaries[] = {
+		// Longer than a message, and shorter than its length
+		int32LE(MAX_MESSAGE_SIZE_BYTES + 1) + "\0ab"s,
+		int32LE(16) + "\0abc"s
+	};
+	for (const auto& data: binaries)
+	{
+		std::istringstream istr(data);
+		Poco::BinaryReader reader(istr, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+		Binary::Ptr binary;
+		try
+		{
+			BSONReader(reader).read(binary);
+			fail("malformed BSON binary accepted");
+		}
+		catch (Poco::DataFormatException&)
+		{
+		}
+	}
+
+	// A null target is allocated when the binary is complete.
+	std::istringstream complete(int32LE(2) + "\0ab"s);
+	Poco::BinaryReader completeReader(complete, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	Binary::Ptr binary;
+	BSONReader(completeReader).read(binary);
+	assertFalse(binary.isNull());
+	assertEqual("ab"s, binary->toRawString());
+
+	// A cstring that is not terminated before the end of the stream
+	std::istringstream cstring("abc"s);
+	Poco::BinaryReader cstringReader(cstring, Poco::BinaryReader::LITTLE_ENDIAN_BYTE_ORDER);
+	BSONReader bsonReader(cstringReader);
+	try
+	{
+		(void) bsonReader.readCString();
+		fail("unterminated BSON cstring accepted");
+	}
+	catch (Poco::DataFormatException&)
+	{
+	}
 }
 
 
@@ -1780,7 +2390,27 @@ CppUnit::Test* BSONTest::suite()
 	CppUnit_addTest(pSuite, BSONTest, testInvalidObjectID);
 	CppUnit_addTest(pSuite, BSONTest, testEmptyDocument);
 
+	// Large and malformed server replies
+	CppUnit_addTest(pSuite, BSONTest, testOpMsgReadBodyAbove16MB);
+	CppUnit_addTest(pSuite, BSONTest, testOpMsgReadDocumentAbove16MB);
+	CppUnit_addTest(pSuite, BSONTest, testOpMsgReadSectionOrderAndChecksum);
+	CppUnit_addTest(pSuite, BSONTest, testDocumentReadLargeStandalone);
+	CppUnit_addTest(pSuite, BSONTest, testOpMsgReadRejectsMalformedLengths);
+	CppUnit_addTest(pSuite, BSONTest, testOpMsgReadRejectsBadFraming);
+	CppUnit_addTest(pSuite, BSONTest, testOpMsgReadClearsMessage);
+	CppUnit_addTest(pSuite, BSONTest, testDocumentReadStandaloneBounds);
+	CppUnit_addTest(pSuite, BSONTest, testDocumentReadFailureKeepsIndexConsistent);
 	CppUnit_addTest(pSuite, BSONTest, testDocumentRemoveDuplicateName);
+	CppUnit_addTest(pSuite, BSONTest, testDocumentReadDepth);
+	CppUnit_addTest(pSuite, BSONTest, testDocumentReadWithTextEncoding);
+	CppUnit_addTest(pSuite, BSONTest, testDateTimeOutsideTimestampRange);
+	CppUnit_addTest(pSuite, BSONTest, testRegularExpressionAndJavaScriptRoundTrip);
+	CppUnit_addTest(pSuite, BSONTest, testBinaryReadTruncated);
+
+	CppUnit_addTest(pSuite, BSONTest, testConnectionClosedAfterUnreadableReply);
+	CppUnit_addTest(pSuite, BSONTest, testConnectionKeptAfterUnsupportedType);
 	CppUnit_addTest(pSuite, BSONTest, testLargeDocumentRemoveAndAdd);
+	CppUnit_addTest(pSuite, BSONTest, testBSONReaderBounds);
+
 	return pSuite;
 }
