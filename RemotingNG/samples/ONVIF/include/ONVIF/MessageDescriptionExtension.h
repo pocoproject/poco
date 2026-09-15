@@ -1,0 +1,41 @@
+// 
+// MessageDescriptionExtension.h
+// 
+// This file has been generated.
+// Warning: All changes to this will be lost when the file is re-generated.
+// 
+// 
+
+
+#ifndef ONVIF_MessageDescriptionExtension_INCLUDED
+#define ONVIF_MessageDescriptionExtension_INCLUDED
+
+
+#include "ONVIF/ONVIF.h"
+#include "Poco/Nullable.h"
+#include "Poco/Optional.h"
+#include "Poco/SharedPtr.h"
+#include <string>
+#include <vector>
+
+
+namespace ONVIF {
+
+
+//@ name=MessageDescriptionExtension
+//@ namespace="http://www.onvif.org/ver10/schema"
+//@ serialize
+class ONVIF_API MessageDescriptionExtension
+{
+public:
+	MessageDescriptionExtension();
+
+	virtual ~MessageDescriptionExtension();
+
+};
+
+
+} // ONVIF
+
+
+#endif // ONVIF_MessageDescriptionExtension_INCLUDED

@@ -1,0 +1,16 @@
+<AppConfig>
+	<XSDGen>
+		<default>
+			<include>include/CheckVat</include>
+			<src>src</src>
+			<includeRoot>include</includeRoot>
+		</default>
+		<schema targetNamespace="urn:ec.europa.eu:taxud:vies:services:checkVat:types">
+			<include>include/CheckVat/Types</include>
+			<namespace>CheckVat::Types</namespace>
+		</schema>
+		<schema targetNamespace="urn:ec.europa.eu:taxud:vies:services:checkVat">
+			<namespace>CheckVat</namespace>
+		</schema>
+	</XSDGen>
+</AppConfig>

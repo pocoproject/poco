@@ -1,0 +1,1265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../ver20/util/onvif-wsdl-viewer.xsl"?>
+<!--
+Copyright (c) 2012 by ONVIF: Open Network Video Interface Forum. All rights reserved.
+
+Recipients of this document may copy, distribute, publish, or display this document so long as this copyright notice, license and disclaimer are retained with all copies of the document. No license is granted to modify this document.
+
+THIS DOCUMENT IS PROVIDED "AS IS," AND THE CORPORATION AND ITS MEMBERS AND THEIR AFFILIATES, MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THIS DOCUMENT ARE SUITABLE FOR ANY PURPOSE; OR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+IN NO EVENT WILL THE CORPORATION OR ITS MEMBERS OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT, WHETHER OR NOT (1) THE CORPORATION, MEMBERS OR THEIR AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, OR (2) SUCH DAMAGES WERE REASONABLY FORESEEABLE, AND ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT.  THE FOREGOING DISCLAIMER AND LIMITATION ON LIABILITY DO NOT APPLY TO, INVALIDATE, OR LIMIT REPRESENTATIONS AND WARRANTIES MADE BY THE MEMBERS AND THEIR RESPECTIVE AFFILIATES TO THE CORPORATION AND OTHER MEMBERS IN CERTAIN WRITTEN POLICIES OF THE CORPORATION.
+-->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tt="http://www.onvif.org/ver10/schema" xmlns:tae="http://www.onvif.org/ver10/actionengine/wsdl" targetNamespace="http://www.onvif.org/ver10/actionengine/wsdl">
+	<wsdl:types>
+		<xs:schema targetNamespace="http://www.onvif.org/ver10/actionengine/wsdl" xmlns:tt="http://www.onvif.org/ver10/schema" xmlns:wsnt="http://docs.oasis-open.org/wsn/b-2" elementFormDefault="qualified" version="1.0">
+			<xs:import namespace="http://www.onvif.org/ver10/schema" schemaLocation="../ver10/schema/onvif.xsd"/>
+			<xs:import namespace="http://docs.oasis-open.org/wsn/b-2" schemaLocation="http://docs.oasis-open.org/wsn/b-2.xsd"/>
+			<!--  Message Request/Responses elements  -->
+			<!--===============================-->
+			<xs:element name="GetSupportedActions">
+				<xs:complexType/>
+			</xs:element>
+			<xs:element name="GetSupportedActionsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="SupportedActions" type="tae:SupportedActions">
+							<xs:annotation>
+								<xs:documentation>Array of supported Action types</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetActions">
+				<xs:complexType/>
+			</xs:element>
+			<xs:element name="GetActionsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Action" type="tae:Action" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Array of current Action configurations</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="CreateActions">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Action" type="tae:ActionConfiguration" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Array of Actions to be configured on service provider</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CreateActionsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Action" type="tae:Action" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Array of configured Actions with service provider assigned unique identifiers</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DeleteActions">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="tt:ReferenceToken" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Array of tokens referencing existing Action configurations to be removed</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="DeleteActionsResponse">
+				<xs:complexType/>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="ModifyActions">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Action" type="tae:Action" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Array of Action configurations to update the existing action configurations</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ModifyActionsResponse">
+				<xs:complexType/>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetServiceCapabilities">
+				<xs:complexType/>
+			</xs:element>
+			<xs:element name="GetServiceCapabilitiesResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Capabilities" type="tae:ActionEngineCapabilities"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Capabilities" type="tae:ActionEngineCapabilities"/>
+			<!--===============================-->
+			<xs:element name="GetActionTriggers">
+				<xs:complexType/>
+			</xs:element>
+			<xs:element name="GetActionTriggersResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ActionTrigger" type="tae:ActionTrigger" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Array of current Action Trigger configurations</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="CreateActionTriggers">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ActionTrigger" type="tae:ActionTriggerConfiguration" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Action Triggers to be configured</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="CreateActionTriggersResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ActionTrigger" type="tae:ActionTrigger" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Returns configured Action Triggers with service provider assigned unique identifers</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="ModifyActionTriggers">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ActionTrigger" type="tae:ActionTrigger" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Array of Action Trigger configurations to be updated.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="ModifyActionTriggersResponse">
+				<xs:complexType/>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DeleteActionTriggers">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="tt:ReferenceToken" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Array of tokens referencing existing Action Trigger configurations to be removed</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="DeleteActionTriggersResponse">
+				<xs:complexType/>
+			</xs:element>
+			<!--===============================-->
+			<!--         Action Engine Types         -->
+			<!--===============================-->
+			<!--===============================-->
+			<xs:complexType name="ActionConfigDescription">
+				<xs:annotation>
+					<xs:documentation>Describes the configuration parameters of an action.</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="ParameterDescription" type="tt:ItemListDescription">
+						<xs:annotation>
+							<xs:documentation>Action configuration parameter descriptions </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="Name" type="xs:QName" use="required">
+					<xs:annotation>
+						<xs:documentation>Action type name</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="SupportedActions">
+				<xs:annotation>
+					<xs:documentation>SupportedActions data structure lists the available action types that service provider supports. For each action type, data structure contains the action configuration parameters.</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="ActionContentSchemaLocation" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>
+            	      Lists the location of all schemas that are referenced in the supported actions. If the action descriptions reference data types in the ONVIF schema file,the ONVIF schema file MUST be explicitly listed.
+            	      </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ActionDescription" type="tae:ActionConfigDescription" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>List of actions supported by Action Engine Service provider.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tae:SupportedActionsExtension" minOccurs="0"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="SupportedActionsExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="ActionEngineCapabilities">
+				<xs:annotation>
+					<xs:documentation>Action Engine Capabilities data structure contains the maximum number of supported actions and number of actions in use for generic as well as specific action types</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="ActionCapabilities" type="tae:ActionTypeLimits" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Limits for each action type </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tae:ActionEngineCapabilitiesExtension" minOccurs="0"/>
+				</xs:sequence>
+				<xs:attribute name="MaximumTriggers" type="xs:positiveInteger">
+					<xs:annotation>
+						<xs:documentation>The maximum number of trigger configurations that the service provider can concurrently support</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="MaximumActions" type="xs:positiveInteger">
+					<xs:annotation>
+						<xs:documentation>The maximum number of actions that the service provider can concurrently support</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="ActionEngineCapabilitiesExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="ActionTypeLimits">
+				<xs:annotation>
+					<xs:documentation>ActionTypeLimits data structure contains maximum and current usage information for a specific action type in the service provider</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="Type" type="xs:QName" use="required">
+					<xs:annotation>
+						<xs:documentation>Action Type</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="Maximum" type="xs:positiveInteger" use="required">
+					<xs:annotation>
+						<xs:documentation>For the specific action type, the maximum number of actions that could be concurrently supported by the service provider </xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="InUse" type="xs:nonNegativeInteger" use="optional" default="0">
+					<xs:annotation>
+						<xs:documentation>For the specific action type, the number of actions in use by the service provider </xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="ActionConfiguration">
+				<xs:annotation>
+					<xs:documentation>Action Configuration data type contains the configuration settings of action configuration parameters, service requester given action Name, and service provider supported action type value</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="Parameters" type="tt:ItemList">
+						<xs:annotation>
+							<xs:documentation>Action configuration parameter settings.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="Name" type="xs:string" use="required">
+					<xs:annotation>
+						<xs:documentation>User given name. </xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="Type" type="xs:QName" use="required">
+					<xs:annotation>
+						<xs:documentation>Denotes the action type. </xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="Action">
+				<xs:annotation>
+					<xs:documentation>Action data type contains the configuration settings of one action instance and service provider assigned unique identifier for this action configuration.</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="Configuration" type="tae:ActionConfiguration">
+						<xs:annotation>
+							<xs:documentation>Action configuration contains action type, user given action name, and configuratin parameter settings.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="Token" type="tt:ReferenceToken" use="required">
+					<xs:annotation>
+						<xs:documentation>Unique Action identifier that service provider assigned to the action configuration. </xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="ActionTriggerConfiguration">
+				<xs:annotation>
+					<xs:documentation>Action Trigger configuration data type contains mandatory Topic Expression (Section Topic Filter in [Core Specification]), optional Message content expression (Section Message Content Filter in [Core Specification]), and set of actions to be triggered.</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="TopicExpression" type="wsnt:TopicExpressionType">
+						<xs:annotation>
+							<xs:documentation>Topic expression, for example, to trigger only for relays. Trigger based on event topic. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ContentExpression" type="wsnt:QueryExpressionType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Content expression, for example, to trigger only when the relay value is on. Trigger based on content data in event.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ActionToken" type="tt:ReferenceToken" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Reference to actions to be triggered when the conditions are satisfied. </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tae:ActionTriggerConfigurationExtension" minOccurs="0"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="ActionTriggerConfigurationExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="ActionTrigger">
+				<xs:annotation>
+					<xs:documentation>Action Trigger data type contains the service provider assigned unique identifier for the configuration and action trigger configuration data.</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="Configuration" type="tae:ActionTriggerConfiguration">
+						<xs:annotation>
+							<xs:documentation>Action Trigger Configuration</xs:documentation>
+							<xs:documentation>Action Trigger Configuration</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="Token" type="tt:ReferenceToken" use="required">
+					<xs:annotation>
+						<xs:documentation>Unique Action Trigger identifier that service provider assigned to the action trigger configuration. </xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--==========================================-->
+			<!--  Action Configuration Data Types         -->
+			<!--==========================================-->
+			<xs:complexType name="onvif_action">
+				<xs:sequence>
+					<xs:element name="ActionDescription" type="tae:ActionConfigDescription" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="EMailServerConfiguration">
+				<xs:sequence>
+					<xs:element name="SMTPConfig" type="tae:SMTPConfig">
+						<xs:annotation>
+							<xs:documentation>SMTP EMail Server configuration</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="POPConfig" type="tae:POPConfig">
+						<xs:annotation>
+							<xs:documentation>POP EMail Server configuration</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AuthenticationConfig" type="tae:AuthenticationConfig">
+						<xs:annotation>
+							<xs:documentation>Credentials configuration</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="SMTPConfig">
+				<xs:sequence>
+					<xs:element name="HostAddress" type="tae:HostAddress">
+						<xs:annotation>
+							<xs:documentation>Destination SMTP Address configuration</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="portNo" type="xs:positiveInteger">
+					<xs:annotation>
+						<xs:documentation/>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="POPConfig">
+				<xs:sequence>
+					<xs:element name="HostAddress" type="tae:HostAddress">
+						<xs:annotation>
+							<xs:documentation>Destination POP Server Address configuration</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="HostAddress">
+				<xs:sequence>
+					<xs:element name="Value" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>IP Address</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="formatType" type="tae:AddressFormatType" use="required">
+					<xs:annotation>
+						<xs:documentation>IP Address format type such as IPv4 or IPv6</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:simpleType name="AddressFormatType">
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="hostname"/>
+					<xs:enumeration value="ipv4"/>
+					<xs:enumeration value="ipv6"/>
+					<xs:enumeration value="Extended"/>
+				</xs:restriction>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:complexType name="UserCredentials">
+				<xs:sequence>
+					<xs:element name="username" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Username</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="password" type="xs:base64Binary" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Password</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tae:UserCredentialsExtension" minOccurs="0"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="UserCredentialsExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="AuthenticationConfig">
+				<xs:sequence>
+					<xs:element name="User" type="tae:UserCredentials">
+						<xs:annotation>
+							<xs:documentation>Username-password</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="mode" type="tae:EMailAuthenticationMode" use="required">
+					<xs:annotation>
+						<xs:documentation>Email server authentication mode</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:simpleType name="EMailAuthenticationMode">
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="none"/>
+					<xs:enumeration value="SMTP"/>
+					<xs:enumeration value="POPSMTP"/>
+					<xs:enumeration value="Extended"/>
+				</xs:restriction>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:complexType name="EMailReceiverConfiguration">
+				<xs:sequence>
+					<xs:element name="TO" type="xs:string" minOccurs="1" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Configuration for E-mail TO</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="CC" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Configuration for E-mail CC</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tae:EMailReceiverConfigurationExtension" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation/>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="EMailReceiverConfigurationExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="EMailAttachmentConfiguration">
+				<xs:sequence>
+					<xs:element name="FileName" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation/>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="doSuffix" type="tae:FileSuffixType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation/>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tae:EMailAttachmentConfigurationExtension" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation/>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="EMailAttachmentConfigurationExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="EMailBodyTextConfiguration">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="includeEvent" type="xs:boolean" use="optional">
+					<xs:annotation>
+						<xs:documentation>Whether content of E-mail message contains event data</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="type" type="xs:string" use="optional">
+					<xs:annotation>
+						<xs:documentation/>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="MediaSource">
+				<xs:sequence>
+					<xs:element name="ProfileToken" type="tt:ReferenceToken">
+						<xs:annotation>
+							<xs:documentation>MediaSource profile reference token</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="HttpHostConfigurations">
+				<xs:sequence>
+					<xs:element name="HttpDestination" type="tae:HttpDestinationConfiguration" minOccurs="1" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Destination HTTP Server configuration</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tae:HttpHostConfigurationsExtension" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation/>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="HttpHostConfigurationsExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="HttpDestinationConfiguration">
+				<xs:sequence>
+					<xs:element name="HostAddress" type="tae:HttpHostAddress">
+						<xs:annotation>
+							<xs:documentation>Destination HTTP Server address configuration</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="HttpAuthentication" type="tae:HttpAuthenticationConfiguration" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>User Credentials configuration for destination HTTP Server</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tae:HttpDestinationConfigurationExtension" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation/>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="uri" type="xs:string" use="optional" default="/">
+					<xs:annotation>
+						<xs:documentation>URI for POST Message destination</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="protocol" type="tae:HttpProtocolType" use="optional" default="http">
+					<xs:annotation>
+						<xs:documentation>HTTP/HTTPS protocol selection (default is http)</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:simpleType name="HttpProtocolType">
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="http"/>
+					<xs:enumeration value="https"/>
+					<xs:enumeration value="Extended"/>
+				</xs:restriction>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:complexType name="HttpDestinationConfigurationExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="HttpAuthenticationConfiguration">
+				<xs:sequence>
+					<xs:element name="User" type="tae:UserCredentials" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>User credentials</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tae:HttpAuthenticationConfigurationExtension" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation/>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="method" type="tae:HttpAuthenticationMethodType" use="optional" default="none">
+					<xs:annotation>
+						<xs:documentation>HTTP Authentication Method</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="HttpAuthenticationConfigurationExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:simpleType name="HttpAuthenticationMethodType">
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="none"/>
+					<xs:enumeration value="MD5Digest"/>
+					<xs:enumeration value="Extended"/>
+				</xs:restriction>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:complexType name="HttpHostAddress">
+				<xs:sequence>
+					<xs:element name="Value" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Destination HTTP Server IP Address</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="formatType" type="tae:AddressFormatType" use="required">
+					<xs:annotation>
+						<xs:documentation>IPv4 or IPv6</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="portNo" type="xs:integer" use="optional" default="80">
+					<xs:annotation>
+						<xs:documentation>Port Number if different from 80</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="PostContentConfiguration">
+				<xs:sequence>
+					<xs:element name="MediaReference" type="tae:MediaSource" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>MediaSource reference when the media is attached to POST message</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="PostBody" type="tae:PostBodyConfiguration">
+						<xs:annotation>
+							<xs:documentation>Configuration for POST Message content</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="PostBodyConfiguration">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="formData" type="xs:string" use="optional">
+					<xs:annotation>
+						<xs:documentation/>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="includeEvent" type="xs:boolean" use="optional">
+					<xs:annotation>
+						<xs:documentation>Whether include event into POST message</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="includeMedia" type="xs:boolean" use="optional">
+					<xs:annotation>
+						<xs:documentation>Whether attach media into POST message</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="FtpHostConfigurations">
+				<xs:sequence>
+					<xs:element name="FtpDestination" type="tae:FtpDestinationConfiguration" minOccurs="1" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>FTP Action destination configuration</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tae:FtpHostConfigurationsExtension" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation/>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="FtpHostConfigurationsExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="FtpDestinationConfiguration">
+				<xs:sequence>
+					<xs:element name="HostAddress" type="tae:FtpHostAddress">
+						<xs:annotation>
+							<xs:documentation>FTP Server IP Address</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="UploadPath" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Upload Directory Path</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="FtpAuthentication" type="tae:FtpAuthenticationConfiguration">
+						<xs:annotation>
+							<xs:documentation>User credentials confguration for target FTP Server</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tae:FtpDestinationConfigurationExtension" minOccurs="0"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="FtpDestinationConfigurationExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="FtpAuthenticationConfiguration">
+				<xs:sequence>
+					<xs:element name="User" type="tae:UserCredentials" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>User Credentials</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tae:FtpAuthenticationConfigurationExtension" minOccurs="0"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="FtpAuthenticationConfigurationExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="FtpHostAddress">
+				<xs:sequence>
+					<xs:element name="Value" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>FTP Server IP Address</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="formatType" type="tae:AddressFormatType" use="required">
+					<xs:annotation>
+						<xs:documentation>IPv4 or IPv6</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="portNo" type="xs:integer" use="optional" default="21">
+					<xs:annotation>
+						<xs:documentation>Port Number</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="FtpContent">
+				<xs:sequence>
+					<xs:element name="FtpContentConfig" type="tae:FtpContentConfiguration">
+						<xs:annotation>
+							<xs:documentation/>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="FtpFileNameConfigurations">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="file_name" type="xs:string" use="optional">
+					<xs:annotation>
+						<xs:documentation>Name of file</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="suffix" type="tae:FileSuffixType" use="optional" default="none">
+					<xs:annotation>
+						<xs:documentation>Suffix of file</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:simpleType name="FileSuffixType">
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="none"/>
+					<xs:enumeration value="sequence"/>
+					<xs:enumeration value="dateTime"/>
+					<xs:enumeration value="Extended"/>
+				</xs:restriction>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:complexType name="FtpContentConfiguration">
+				<xs:sequence>
+					<xs:choice>
+						<xs:element name="UploadImages" type="tae:FtpContentConfigurationUploadImages">
+							<xs:annotation>
+								<xs:documentation>Upload Images action configuration</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="UploadFile" type="tae:FtpContentConfigurationUploadFile">
+							<xs:annotation>
+								<xs:documentation>Upload files action configuration</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:choice>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:attribute name="Type" type="xs:string" use="required">
+					<xs:annotation>
+						<xs:documentation>Type of FTP Upload action</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="FtpContentConfigurationUploadImages">
+				<xs:sequence>
+					<xs:element name="HowLong" type="xs:duration">
+						<xs:annotation>
+							<xs:documentation>Upload Image action; how long?</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="SampleInterval" type="xs:duration">
+						<xs:annotation>
+							<xs:documentation>Upload Image action; sample interval?</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="FileName" type="tae:FtpFileNameConfigurations">
+						<xs:annotation>
+							<xs:documentation>Upload Image action; name of destination file</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="FtpContentConfigurationUploadFile">
+				<xs:sequence>
+					<xs:element name="sourceFileName" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Name of source file</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="destinationFileName" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Name of destination file</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="SMSProviderConfiguration">
+				<xs:sequence>
+					<xs:element name="ProviderURL" type="xs:anyURI">
+						<xs:annotation>
+							<xs:documentation>SMS Provider's URL </xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="User" type="tae:UserCredentials">
+						<xs:annotation>
+							<xs:documentation>Username and password</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="SMSSenderConfiguration">
+				<xs:sequence>
+					<xs:element name="EMail" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Sender's e-mail address</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="SMSMessage">
+				<xs:sequence>
+					<xs:element name="Text" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>Text Message</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="TriggeredRecordingConfiguration">
+				<xs:sequence>
+					<xs:element name="PreRecordDuration" type="xs:duration">
+						<xs:annotation>
+							<xs:documentation>Length of recording time before the triggering event</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="PostRecordDuration" type="xs:duration">
+						<xs:annotation>
+							<xs:documentation>Recording after alarm recording duration</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="RecordDuration" type="xs:duration">
+						<xs:annotation>
+							<xs:documentation>Record duration</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="RecordFrameRate" type="xs:positiveInteger" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Recording frame rate</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DoRecordAudio" type="xs:boolean">
+						<xs:annotation>
+							<xs:documentation>Whether Audio recording on/off</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="RecordingActionConfiguration">
+				<xs:sequence>
+					<xs:element name="RecordConfig" type="tae:TriggeredRecordingConfiguration">
+						<xs:annotation>
+							<xs:documentation>Recording configuration</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--=========================================-->
+			<!--  End, Action Configuration Data Types   -->
+			<!--=========================================-->
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:message name="GetSupportedActionsRequest">
+		<wsdl:part name="parameters" element="tae:GetSupportedActions"/>
+	</wsdl:message>
+	<wsdl:message name="GetSupportedActionsResponse">
+		<wsdl:part name="parameters" element="tae:GetSupportedActionsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetActionsRequest">
+		<wsdl:part name="parameters" element="tae:GetActions"/>
+	</wsdl:message>
+	<wsdl:message name="GetActionsResponse">
+		<wsdl:part name="parameters" element="tae:GetActionsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="CreateActionsRequest">
+		<wsdl:part name="parameters" element="tae:CreateActions"/>
+	</wsdl:message>
+	<wsdl:message name="CreateActionsResponse">
+		<wsdl:part name="parameters" element="tae:CreateActionsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteActionsRequest">
+		<wsdl:part name="parameters" element="tae:DeleteActions"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteActionsResponse">
+		<wsdl:part name="parameters" element="tae:DeleteActionsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="ModifyActionsRequest">
+		<wsdl:part name="parameters" element="tae:ModifyActions"/>
+	</wsdl:message>
+	<wsdl:message name="ModifyActionsResponse">
+		<wsdl:part name="parameters" element="tae:ModifyActionsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetServiceCapabilitiesRequest">
+		<wsdl:part name="parameters" element="tae:GetServiceCapabilities"/>
+	</wsdl:message>
+	<wsdl:message name="GetServiceCapabilitiesResponse">
+		<wsdl:part name="parameters" element="tae:GetServiceCapabilitiesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetActionTriggersRequest">
+		<wsdl:part name="parameters" element="tae:GetActionTriggers"/>
+	</wsdl:message>
+	<wsdl:message name="GetActionTriggersResponse">
+		<wsdl:part name="parameters" element="tae:GetActionTriggersResponse"/>
+	</wsdl:message>
+	<wsdl:message name="CreateActionTriggersRequest">
+		<wsdl:part name="parameters" element="tae:CreateActionTriggers"/>
+	</wsdl:message>
+	<wsdl:message name="CreateActionTriggersResponse">
+		<wsdl:part name="parameters" element="tae:CreateActionTriggersResponse"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteActionTriggersRequest">
+		<wsdl:part name="parameters" element="tae:DeleteActionTriggers"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteActionTriggersResponse">
+		<wsdl:part name="parameters" element="tae:DeleteActionTriggersResponse"/>
+	</wsdl:message>
+	<wsdl:message name="ModifyActionTriggersRequest">
+		<wsdl:part name="parameters" element="tae:ModifyActionTriggers"/>
+	</wsdl:message>
+	<wsdl:message name="ModifyActionTriggersResponse">
+		<wsdl:part name="parameters" element="tae:ModifyActionTriggersResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="ActionEnginePort">
+		<wsdl:operation name="GetSupportedActions">
+			<wsdl:documentation> The service provider returns the supported action types. 
+		            <br/>The response returns a list of Action Descriptions according to the Action Description Language. 
+		            <br/>The response also contains a list of URLs that provide the location of the schema files. These schema files describe the types and elements used in the Action Descriptions. If action descriptions reference types or elements of the ONVIF schema file, the ONVIF schema file shall be explicitly listed.</wsdl:documentation>
+			<wsdl:input message="tae:GetSupportedActionsRequest"/>
+			<wsdl:output message="tae:GetSupportedActionsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetActions">
+			<wsdl:documentation> The service provider returns currently installed Actions.</wsdl:documentation>
+			<wsdl:input message="tae:GetActionsRequest"/>
+			<wsdl:output message="tae:GetActionsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="CreateActions">
+			<wsdl:documentation> The create action operation adds actions to configuration. The create action operation is atomic. If a service provider can not create all of requested actions, the service provider responds with a fault message.</wsdl:documentation>
+			<wsdl:input message="tae:CreateActionsRequest"/>
+			<wsdl:output message="tae:CreateActionsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteActions">
+			<wsdl:documentation>The delete operation deletes actions. The delete action operation is atomic. If a service provider can not delete all of requested actions, the service provider responds with a fault message. </wsdl:documentation>
+			<wsdl:input message="tae:DeleteActionsRequest"/>
+			<wsdl:output message="tae:DeleteActionsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="ModifyActions">
+			<wsdl:documentation>The modify action operation modifies action configurations. <br/> The modify action operation is atomic. If a service provider can not modify all of requested action configurations, the service provider responds with a fault message. <br/>All action parameters, except the action type, can be modified. The service provider shall return InvalidAction error if the request attempts to change the action type with modify action request.  </wsdl:documentation>
+			<wsdl:input message="tae:ModifyActionsRequest"/>
+			<wsdl:output message="tae:ModifyActionsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetServiceCapabilities">
+			<wsdl:documentation> The get capabilities operation returns the Action Engine capabilities</wsdl:documentation>
+			<wsdl:input message="tae:GetServiceCapabilitiesRequest"/>
+			<wsdl:output message="tae:GetServiceCapabilitiesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetActionTriggers">
+			<wsdl:documentation>The service provider returns existing action triggers </wsdl:documentation>
+			<wsdl:input message="tae:GetActionTriggersRequest"/>
+			<wsdl:output message="tae:GetActionTriggersResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="CreateActionTriggers">
+			<wsdl:documentation> Creates action triggers. The create action triggers operation is atomic. If a service provider can not create all of requested action triggers, the service provider responds with a fault message.</wsdl:documentation>
+			<wsdl:input message="tae:CreateActionTriggersRequest"/>
+			<wsdl:output message="tae:CreateActionTriggersResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteActionTriggers">
+			<wsdl:documentation>Deletes action triggers. The delete action triggers operation is atomic. If a service provider can not delete all of requested action triggers, the service provider responds with a fault message.</wsdl:documentation>
+			<wsdl:input message="tae:DeleteActionTriggersRequest"/>
+			<wsdl:output message="tae:DeleteActionTriggersResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="ModifyActionTriggers">
+			<wsdl:documentation>Modifies existing action triggers. The modify action triggers operation is atomic. If a service provider can not modify all of requested action trigger configurations, the service provider responds with a fault message.</wsdl:documentation>
+			<wsdl:input message="tae:ModifyActionTriggersRequest"/>
+			<wsdl:output message="tae:ModifyActionTriggersResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="ActionEngineBinding" type="tae:ActionEnginePort">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="GetSupportedActions">
+			<soap:operation soapAction="http://www.onvif.org/ver10/actionengine/wsdl/GetSupportedActions"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetActions">
+			<soap:operation soapAction="http://www.onvif.org/ver10/actionengine/wsdl/GetActions"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="CreateActions">
+			<soap:operation soapAction="http://www.onvif.org/ver10/actionengine/wsdl/CreateActions"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteActions">
+			<soap:operation soapAction="http://www.onvif.org/ver10/actionengine/wsdl/DeleteActions"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="ModifyActions">
+			<soap:operation soapAction="http://www.onvif.org/ver10/actionengine/wsdl/ModifyActions"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetServiceCapabilities">
+			<soap:operation soapAction="http://www.onvif.org/ver10/actionengine/wsdl/GetServiceCapabilities"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetActionTriggers">
+			<soap:operation soapAction="http://www.onvif.org/ver10/actionengine/wsdl/GetActionTriggers"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="CreateActionTriggers">
+			<soap:operation soapAction="http://www.onvif.org/ver10/actionengine/wsdl/CreateActionTriggers"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteActionTriggers">
+			<soap:operation soapAction="http://www.onvif.org/ver10/actionengine/wsdl/DeleteActionTriggers"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="ModifyActionTriggers">
+			<soap:operation soapAction="http://www.onvif.org/ver10/actionengine/wsdl/ModifyActionTriggers"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+</wsdl:definitions>
