@@ -32,6 +32,12 @@ EventDispatcher::~EventDispatcher()
 }
 
 
+void EventDispatcher::setOwner(Poco::AutoPtr<Poco::RefCountedObject> pOwner)
+{
+	_pOwner = pOwner;
+}
+
+
 void EventDispatcher::subscribe(const std::string& subscriberURI, const std::string& endpointURI, Poco::Clock expireTime)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
