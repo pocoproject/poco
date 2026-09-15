@@ -95,7 +95,10 @@ void ReplicaSetConnection::sendRequest(OpMsgMessage& request)
 
 void ReplicaSetConnection::readResponse(OpMsgMessage& response)
 {
-	ensureConnection();
+	// A continuation of a reply can only come from the connection that carries it,
+	// so a new connection must not be opened here.
+	if (!isConnected())
+		throw Poco::IOException("No MongoDB connection to read the response from");
 	_connection->readResponse(response);
 }
 
@@ -129,7 +132,7 @@ void ReplicaSetConnection::reconnect()
 
 bool ReplicaSetConnection::isConnected() const noexcept
 {
-	return !_connection.isNull();
+	return !_connection.isNull() && _connection->isConnected();
 }
 
 
@@ -171,6 +174,11 @@ bool ReplicaSetConnection::matchesReadPreference() const noexcept
 
 void ReplicaSetConnection::ensureConnection()
 {
+	// Connection closes itself when a response cannot be read. The server is not
+	// marked as failed for that: the response may only be one Poco cannot parse.
+	if (!_connection.isNull() && !_connection->isConnected())
+		_connection = nullptr;
+
 	if (_connection.isNull())
 	{
 		if (_hasTimeouts)

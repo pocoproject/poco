@@ -20,6 +20,7 @@
 
 #include "Poco/MongoDB/MongoDB.h"
 #include "Poco/BinaryWriter.h"
+#include "Poco/Exception.h"
 
 
 namespace Poco {
@@ -52,6 +53,9 @@ public:
 	void writeCString(const std::string& value);
 		/// Writes a cstring to the writer. A cstring is a string
 		/// terminated a null character.
+		///
+		/// Throws InvalidArgumentException if value contains a null
+		/// character, which would end the cstring early.
 
 private:
 	Poco::BinaryWriter _writer;
@@ -63,6 +67,8 @@ private:
 //
 inline void BSONWriter::writeCString(const std::string& value)
 {
+	if (value.find('\0') != std::string::npos)
+		throw Poco::InvalidArgumentException("BSON name contains a null character");
 	_writer.writeRaw(value);
 	_writer << static_cast<unsigned char>(0x00);
 }
