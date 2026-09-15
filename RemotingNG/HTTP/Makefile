@@ -11,6 +11,6 @@ objects = Listener Transport TransportFactory \
 
 target         = PocoRemotingNGHTTP
 target_version = $(LIBVERSION)
-target_libs    = PocoRemotingNG PocoNet PocoFoundation $(POCO_LICENSING)
+target_libs    = PocoRemotingNG PocoNet PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib

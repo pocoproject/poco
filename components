@@ -22,6 +22,14 @@ PageCompiler/File2Page
 JWT
 PDF
 CppParser
+CodeGeneration
+RemotingNG
+RemotingNG/TCP
+RemotingNG/HTTP
+RemotingNG/JSONRPC
+RemotingNG/REST
+RemotingNG/SOAP
+RemotingNG/RemoteGen
 MongoDB
 Redis
 Prometheus
