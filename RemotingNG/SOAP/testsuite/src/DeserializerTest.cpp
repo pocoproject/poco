@@ -175,7 +175,7 @@ void DeserializerTest::testFault11()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.displayText() == "SOAP Fault: Some Error");
+		assertMessageEqual ("SOAP Fault: Some Error", exc.displayText());
 	}
 	catch (CppUnit::CppUnitException&)
 	{
@@ -330,7 +330,7 @@ void DeserializerTest::testFault12()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.displayText() == "SOAP Fault: Some Error");
+		assertMessageEqual ("SOAP Fault: Some Error", exc.displayText());
 	}
 	catch (CppUnit::CppUnitException&)
 	{

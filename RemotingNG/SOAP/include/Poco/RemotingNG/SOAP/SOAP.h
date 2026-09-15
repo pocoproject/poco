@@ -41,7 +41,11 @@
 
 
 #if !defined(RemotingNGSOAP_API)
-	#define RemotingNGSOAP_API
+	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
+		#define RemotingNGSOAP_API __attribute__ ((visibility ("default")))
+	#else
+		#define RemotingNGSOAP_API
+	#endif
 #endif
 
 

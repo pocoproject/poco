@@ -41,7 +41,11 @@
 
 
 #if !defined(RemotingNG_API)
-	#define RemotingNG_API
+	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
+		#define RemotingNG_API __attribute__ ((visibility ("default")))
+	#else
+		#define RemotingNG_API
+	#endif
 #endif
 
 
