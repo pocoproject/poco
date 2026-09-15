@@ -1,0 +1,5 @@
+include(CMakeFindDependencyMacro)
+find_dependency(PocoFoundation)
+find_dependency(PocoNet)
+find_dependency(PocoRemotingNG)
+include("${CMAKE_CURRENT_LIST_DIR}/PocoRemotingNGTCPTargets.cmake")

@@ -1,0 +1,1382 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="../../../ver20/util/onvif-wsdl-viewer.xsl"?>
+<!--
+Copyright (c) 2010-2019 by ONVIF: Open Network Video Interface Forum. All rights reserved.
+
+Recipients of this document may copy, distribute, publish, or display this
+document so long as this copyright notice, license and disclaimer are
+retained with all copies of the document.
+
+THIS DOCUMENT IS PROVIDED "AS IS," AND THE CORPORATION AND ITS MEMBERS AND
+THEIR AFFILIATES, MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THIS DOCUMENT ARE SUITABLE FOR ANY PURPOSE;
+OR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY PATENTS,
+COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+IN NO EVENT WILL THE CORPORATION OR ITS MEMBERS OR THEIR AFFILIATES BE LIABLE
+FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES, ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS
+DOCUMENT, WHETHER OR NOT (1) THE CORPORATION, MEMBERS OR THEIR AFFILIATES
+HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, OR (2) SUCH DAMAGES
+WERE REASONABLY FORESEEABLE, AND ARISING OUT OF OR RELATING TO ANY USE OR
+DISTRIBUTION OF THIS DOCUMENT.
+THE FOREGOING DISCLAIMER AND LIMITATION ON LIABILITY DO NOT APPLY TO,
+INVALIDATE, OR LIMIT REPRESENTATIONS AND WARRANTIES MADE BY THE MEMBERS
+AND THEIR RESPECTIVE AFFILIATES TO THE CORPORATION AND OTHER MEMBERS IN
+CERTAIN WRITTEN POLICIES OF THE CORPORATION.
+-->
+<wsdl:definitions name="AuthenticationBehaviorService"
+				  targetNamespace="http://www.onvif.org/ver10/authenticationbehavior/wsdl"
+				  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+				  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/"
+				  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				  xmlns:tab="http://www.onvif.org/ver10/authenticationbehavior/wsdl">
+	<!-- The data types definition for the 'Authentication Behavior Service' -->
+	<wsdl:types>
+		<xs:schema targetNamespace="http://www.onvif.org/ver10/authenticationbehavior/wsdl"
+				   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				   xmlns:pt="http://www.onvif.org/ver10/pacs"
+				   xmlns:tab="http://www.onvif.org/ver10/authenticationbehavior/wsdl"
+				   elementFormDefault="qualified"
+				   version="19.12">
+			<xs:import namespace="http://www.onvif.org/ver10/pacs" schemaLocation="../../pacs/types.xsd"/>
+			<!--ServiceCapabilities definitions-->
+			<xs:complexType name="ServiceCapabilities">
+				<xs:annotation>
+					<xs:documentation>
+						The service capabilities reflect optional functionality of a service. The information is static
+						and does not change during device operation. The following capabilities are available:
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:attribute name="MaxLimit" type="pt:PositiveInteger" use="required">
+					<xs:annotation>
+						<xs:documentation>
+							The maximum number of entries returned by a single Get&lt;Entity&gt;List or Get&lt;Entity&gt;
+							request.
+							The device shall never return more than this number of entities in a single response.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="MaxAuthenticationProfiles" type="pt:PositiveInteger" use="required">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates the maximum number of authentication profiles the device supports. The device
+							shall
+							support at least one authentication profile.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="MaxPoliciesPerAuthenticationProfile" type="pt:PositiveInteger" use="required">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates the maximum number of authentication policies per authentication profile supported
+							by the device.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="MaxSecurityLevels" type="pt:PositiveInteger" use="required">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates the maximum number of security levels the device supports. The device shall
+							support at least one
+							security level.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="MaxRecognitionGroupsPerSecurityLevel" type="pt:PositiveInteger" use="required">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates the maximum number of recognition groups per security level supported by the
+							device.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="MaxRecognitionMethodsPerRecognitionGroup" type="pt:PositiveInteger" use="required">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates the maximum number of recognition methods per recognition group supported by the
+							device.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="ClientSuppliedTokenSupported" type="xs:boolean" default="false">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates that the client is allowed to supply the token when creating authentication
+							profiles and
+							security levels. To enable the use of the commands SetAuthenticationProfile and
+							SetSecurityLevel, the
+							value must be set to true.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="SupportedAuthenticationModes" type="pt:StringList">
+					<xs:annotation>
+						<xs:documentation>
+							A list of supported authentication modes (including custom modes).
+							This field is optional, and when omitted, the client shall assume that the
+							device supports "pt:SingleCredential" only.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<xs:element name="Capabilities" type="tab:ServiceCapabilities"/>
+			<!-- End of definition -->
+			<!--AuthenticationProfileInfo definitions-->
+			<xs:complexType name="AuthenticationProfileInfo">
+				<xs:annotation>
+					<xs:documentation>
+						The AuthenticationProfileInfo structure contains information of a specific authentication
+						profile instance.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+					<xs:extension base="pt:DataEntity">
+						<xs:sequence>
+							<xs:element name="Name" type="pt:Name">
+								<xs:annotation>
+									<xs:documentation>
+										A user readable name. It shall be up to 64 characters.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Description" type="pt:Description" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>
+										User readable description for the access profile. It shall be up
+										to 1024 characters.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:extension>
+				</xs:complexContent>
+			</xs:complexType>
+			<!-- End of definition -->
+			
+			<!--AuthenticationProfile definitions-->
+			<xs:complexType name="AuthenticationProfile">
+				<xs:annotation>
+					<xs:documentation>
+						The AuthenticationProfile structure shall include all properties of the
+						AuthenticationProfileInfo structure
+						and also a default security level, an authentication mode, and a list of AuthenticationProfile
+						instances.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+					<xs:extension base="tab:AuthenticationProfileInfo">
+						<xs:sequence>
+							<xs:element name="DefaultSecurityLevelToken" type="pt:ReferenceToken">
+								<xs:annotation>
+									<xs:documentation>
+										The default security level is used if none of the authentication policies
+										has a schedule covering the time of access (or if no authentication policies
+										are defined).
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="AuthenticationPolicy" type="tab:AuthenticationPolicy"
+										minOccurs="0" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>
+										Each authentication policy associates a security level with a schedule (during
+										which the specified security level will be required at the access point).
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Extension" type="tab:AuthenticationProfileExtension" minOccurs="0"/>
+						</xs:sequence>
+						<xs:anyAttribute processContents="lax"/>
+					</xs:extension>
+				</xs:complexContent>
+			</xs:complexType>
+			<xs:complexType name="AuthenticationProfileExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+			</xs:complexType>
+			<!-- End of definition -->
+			
+			<!--AuthenticationPolicy definitions-->
+			<xs:complexType name="AuthenticationPolicy">
+				<xs:annotation>
+					<xs:documentation>
+						The authentication policy is an association of a security level and a schedule. It defines when
+						a certain security level is required to grant access to a credential holder. Each security 
+						level is given a unique priority. If authentication policies have overlapping schedules, 
+						the security level with the highest priority is used.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="ScheduleToken" type="pt:ReferenceToken">
+						<xs:annotation>
+							<xs:documentation>Reference to the schedule used by the authentication policy.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="SecurityLevelConstraint" type="tab:SecurityLevelConstraint" minOccurs="1" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>
+								A list of security level constraint structures defining the conditions
+								for what security level to use.
+								Minimum one security level constraint must be specified.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tab:AuthenticationPolicyExtension" minOccurs="0"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<xs:complexType name="AuthenticationPolicyExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+			</xs:complexType>
+			<!-- End of definition -->
+			
+			<!--SecurityLevelConstraint definitions-->
+			<xs:complexType name="SecurityLevelConstraint">
+				<xs:annotation>
+					<xs:documentation>
+						This structure defines what security level should be active depending on the state of the
+						schedule.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="ActiveRegularSchedule" type="xs:boolean">
+						<xs:annotation>
+							<xs:documentation>
+								Corresponds to the Active field in the ScheduleState structure in
+								[ONVIF Schedule Service Specification].
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ActiveSpecialDaySchedule" type="xs:boolean">
+						<xs:annotation>
+							<xs:documentation>
+								Corresponds to the SpecialDay field in the ScheduleState structure in
+								[ONVIF Schedule Service Specification].
+								This field will be ignored if the device do not support special days.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AuthenticationMode" type="pt:Name" minOccurs="0" default="pt:SingleCredential">
+						<xs:annotation>
+							<xs:documentation>
+								Defines the mode of authentication. Authentication modes starting with the prefix
+								pt: are reserved to define ONVIF-specific authentication modes. For custom defined
+								authentication modes, free text can be used.
+								The following authentication modes are defined by ONVIF:
+								pt:SingleCredential - Normal mode where only one credential holder is required to be granted access.
+								pt:DualCredential - Two credential holders are required to be granted access
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="SecurityLevelToken" type="pt:ReferenceToken">
+						<xs:annotation>
+							<xs:documentation>
+								Reference to the security level used by the authentication policy.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tab:SecurityLevelConstraintExtension" minOccurs="0"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<xs:complexType name="SecurityLevelConstraintExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+			</xs:complexType>
+			<!-- End of definition -->
+			
+			<!--RecognitionMethod definitions-->
+			<xs:complexType name="RecognitionMethod">
+				<xs:annotation>
+					<xs:documentation>
+						Recognition is the action of identifying authorized users requesting access by the comparison of
+						presented
+						credential data with recorded credential data. A recognition method is either memorized,
+						biometric or held
+						within a physical credential. A recognition type is either a recognition method or a physical
+						input such as
+						a request-to-exit button.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="RecognitionType" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>
+								The requested type of recognition. Is of type text.
+								Recognition types starting with the prefix pt: are reserved to define 
+								ONVIF-specific types as defined in pt:RecognitionType. For custom defined 
+								identifier types, free text can be used.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Order" type="xs:int">
+						<xs:annotation>
+							<xs:documentation>
+								The order value defines when this recognition method will be requested in relation 
+								to the other recognition methods in the same security level. A lower number indicates 
+								that the recognition method will be requested before recognition methods with a higher number.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tab:RecognitionMethodExtension" minOccurs="0"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<xs:complexType name="RecognitionMethodExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+			</xs:complexType>
+			<!-- End of definition -->
+			<!--RecognitionGroup definitions-->
+			<xs:complexType name="RecognitionGroup">
+				<xs:annotation>
+					<xs:documentation>
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="RecognitionMethod" type="tab:RecognitionMethod"
+								minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>A list of recognition methods to request for at the access point.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tab:RecognitionGroupExtension" minOccurs="0"/>
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<xs:complexType name="RecognitionGroupExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+			</xs:complexType>
+			<!-- End of definition -->
+			<!--SecurityLevelInfo definitions-->
+			<xs:complexType name="SecurityLevelInfo">
+				<xs:annotation>
+					<xs:documentation>
+						The SecurityLevelInfo structure contains information of a specific security level instance.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+					<xs:extension base="pt:DataEntity">
+						<xs:sequence>
+							<xs:element name="Name" type="pt:Name">
+								<xs:annotation>
+									<xs:documentation>
+										A user readable name. It shall be up to 64 characters.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Priority" type="xs:int">
+								<xs:annotation>
+									<xs:documentation>
+										A higher number indicates that the security level is considered more secure
+										than security levels with lower priorities. The priority is used when an
+										authentication profile have overlapping schedules with different security
+										levels. When an access point is accessed, the authentication policies are
+										walked through in priority order (highest priority first). When a schedule is
+										found covering the time of access, the associated security level is used and
+										processing stops. Two security levels cannot have the same priority.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Description" type="pt:Description" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>
+										User readable description for the access profile. It shall be up
+										to 1024 characters.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:extension>
+				</xs:complexContent>
+			</xs:complexType>
+			<!-- End of definition -->
+			<!--SecurityLevel definitions-->
+			<xs:complexType name="SecurityLevel">
+				<xs:annotation>
+					<xs:documentation>
+						The SecurityLevel structure shall include all properties of the SecurityLevelInfo structure and
+						also a set
+						of recognition groups.
+
+						The recognition groups are used to define a logical OR between the groups. Each recognition
+						group consists
+						of one or more recognition methods.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+					<xs:extension base="tab:SecurityLevelInfo">
+						<xs:sequence>
+							<xs:element name="RecognitionGroup" type="tab:RecognitionGroup"
+										minOccurs="0" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>
+										The recognition groups are used to define a logical OR between the groups. Each
+										recognition group consists of one or more recognition methods.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Extension" type="tab:SecurityLevelExtension" minOccurs="0"/>
+						</xs:sequence>
+						<xs:anyAttribute processContents="lax"/>
+					</xs:extension>
+				</xs:complexContent>
+			</xs:complexType>
+			<xs:complexType name="SecurityLevelExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+			</xs:complexType>
+			<!-- End of data types definition -->
+			<!-- #################-->
+			<!-- Message request / response elements-->
+			<xs:element name="GetServiceCapabilities">
+				<xs:complexType>
+					<xs:sequence/>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetServiceCapabilitiesResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Capabilities" type="tab:ServiceCapabilities">
+							<xs:annotation>
+								<xs:documentation>The capability response message contains the requested access rules
+									service capabilities using a hierarchical XML capability structure.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAuthenticationProfileInfo">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Tokens of AuthenticationProfileInfo items to get.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAuthenticationProfileInfoResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AuthenticationProfileInfo" type="tab:AuthenticationProfileInfo" minOccurs="0"
+									maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of AuthenticationProfileInfo items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAuthenticationProfileInfoList">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Limit" type="xs:int" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Maximum number of entries to return. If not specified, less than one
+									or higher than what the device supports, the number of items is determined by the
+									device.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Start returning entries from this start reference. If not specified,
+									entries shall start from the beginning of the dataset.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAuthenticationProfileInfoListResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="NextStartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>StartReference to use in next call to get the following items. If
+									absent, no more items to get.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="AuthenticationProfileInfo" type="tab:AuthenticationProfileInfo" minOccurs="0"
+									maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of AuthenticationProfileInfo items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAuthenticationProfiles">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Tokens of AuthenticationProfile items to get.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAuthenticationProfilesResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AuthenticationProfile" type="tab:AuthenticationProfile" minOccurs="0"
+									maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of AuthenticationProfile items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAuthenticationProfileList">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Limit" type="xs:int" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Maximum number of entries to return. If not specified, less than one
+									or higher than what the device supports, the number of items is determined by the
+									device.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Start returning entries from this start reference. If not specified,
+									entries shall start from the beginning of the dataset.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAuthenticationProfileListResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="NextStartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>StartReference to use in next call to get the following items. If
+									absent, no more items to get.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="AuthenticationProfile" type="tab:AuthenticationProfile" minOccurs="0"
+									maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of AuthenticationProfile items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="CreateAuthenticationProfile">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AuthenticationProfile" type="tab:AuthenticationProfile">
+							<xs:annotation>
+								<xs:documentation>The AuthenticationProfile to create.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="CreateAuthenticationProfileResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>The Token of created AuthenticationProfile.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetAuthenticationProfile">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AuthenticationProfile" type="tab:AuthenticationProfile">
+							<xs:annotation>
+								<xs:documentation>The AuthenticationProfile to create or modify.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetAuthenticationProfileResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="ModifyAuthenticationProfile">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AuthenticationProfile" type="tab:AuthenticationProfile">
+							<xs:annotation>
+								<xs:documentation>The AuthenticationProfile to modify.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="ModifyAuthenticationProfileResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DeleteAuthenticationProfile">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>The token of the AuthenticationProfile to delete.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DeleteAuthenticationProfileResponse">
+				<xs:complexType>
+					<xs:sequence/>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetSecurityLevelInfo">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Tokens of SecurityLevelInfo items to get.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetSecurityLevelInfoResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="SecurityLevelInfo" type="tab:SecurityLevelInfo" minOccurs="0"
+									maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of SecurityLevelInfo items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetSecurityLevelInfoList">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Limit" type="xs:int" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Maximum number of entries to return. If not specified, less than one
+									or higher than what the device supports, the number of items is determined by the
+									device.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Start returning entries from this start reference. If not specified,
+									entries shall start from the beginning of the dataset.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetSecurityLevelInfoListResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="NextStartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>StartReference to use in next call to get the following items. If
+									absent, no more items to get.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="SecurityLevelInfo" type="tab:SecurityLevelInfo" minOccurs="0"
+									maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of SecurityLevelInfo items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetSecurityLevels">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken" minOccurs="1" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Tokens of SecurityLevel items to get.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetSecurityLevelsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="SecurityLevel" type="tab:SecurityLevel" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of SecurityLevel items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetSecurityLevelList">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Limit" type="xs:int" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Maximum number of entries to return. If not specified, less than one
+									or higher than what the device supports, the number of items is determined by the
+									device.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Start returning entries from this start reference. If not specified,
+									entries shall start from the beginning of the dataset.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetSecurityLevelListResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="NextStartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>StartReference to use in next call to get the following items. If
+									absent, no more items to get.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="SecurityLevel" type="tab:SecurityLevel" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of SecurityLevel items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="CreateSecurityLevel">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="SecurityLevel" type="tab:SecurityLevel">
+							<xs:annotation>
+								<xs:documentation>The SecurityLevel to create.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="CreateSecurityLevelResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>The Token of created SecurityLevel.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetSecurityLevel">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="SecurityLevel" type="tab:SecurityLevel">
+							<xs:annotation>
+								<xs:documentation>The SecurityLevel to create or modify.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetSecurityLevelResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="ModifySecurityLevel">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="SecurityLevel" type="tab:SecurityLevel">
+							<xs:annotation>
+								<xs:documentation>The SecurityLevel to modify.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="ModifySecurityLevelResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DeleteSecurityLevel">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>The token of the SecurityLevel to delete.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DeleteSecurityLevelResponse">
+				<xs:complexType>
+					<xs:sequence/>
+				</xs:complexType>
+			</xs:element>
+			<!-- #################-->
+		</xs:schema>
+	</wsdl:types>
+	<!--Definition of 'GetServiceCapabilities' message-->
+	<wsdl:message name="GetServiceCapabilitiesRequest">
+		<wsdl:part name="parameters" element="tab:GetServiceCapabilities"/>
+	</wsdl:message>
+	<wsdl:message name="GetServiceCapabilitiesResponse">
+		<wsdl:part name="parameters" element="tab:GetServiceCapabilitiesResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'GetAuthenticationProfileInfo' message-->
+	<wsdl:message name="GetAuthenticationProfileInfoRequest">
+		<wsdl:part name="parameters" element="tab:GetAuthenticationProfileInfo"/>
+	</wsdl:message>
+	<wsdl:message name="GetAuthenticationProfileInfoResponse">
+		<wsdl:part name="parameters" element="tab:GetAuthenticationProfileInfoResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'GetAuthenticationProfileInfoList' message-->
+	<wsdl:message name="GetAuthenticationProfileInfoListRequest">
+		<wsdl:part name="parameters" element="tab:GetAuthenticationProfileInfoList"/>
+	</wsdl:message>
+	<wsdl:message name="GetAuthenticationProfileInfoListResponse">
+		<wsdl:part name="parameters" element="tab:GetAuthenticationProfileInfoListResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'GetAuthenticationProfiles' message-->
+	<wsdl:message name="GetAuthenticationProfilesRequest">
+		<wsdl:part name="parameters" element="tab:GetAuthenticationProfiles"/>
+	</wsdl:message>
+	<wsdl:message name="GetAuthenticationProfilesResponse">
+		<wsdl:part name="parameters" element="tab:GetAuthenticationProfilesResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'GetAuthenticationProfileList' message-->
+	<wsdl:message name="GetAuthenticationProfileListRequest">
+		<wsdl:part name="parameters" element="tab:GetAuthenticationProfileList"/>
+	</wsdl:message>
+	<wsdl:message name="GetAuthenticationProfileListResponse">
+		<wsdl:part name="parameters" element="tab:GetAuthenticationProfileListResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'CreateAuthenticationProfile' message-->
+	<wsdl:message name="CreateAuthenticationProfileRequest">
+		<wsdl:part name="parameters" element="tab:CreateAuthenticationProfile"/>
+	</wsdl:message>
+	<wsdl:message name="CreateAuthenticationProfileResponse">
+		<wsdl:part name="parameters" element="tab:CreateAuthenticationProfileResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'SetAuthenticationProfile' message-->
+	<wsdl:message name="SetAuthenticationProfileRequest">
+		<wsdl:part name="parameters" element="tab:SetAuthenticationProfile"/>
+	</wsdl:message>
+	<wsdl:message name="SetAuthenticationProfileResponse">
+		<wsdl:part name="parameters" element="tab:SetAuthenticationProfileResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'ModifyAuthenticationProfile' message-->
+	<wsdl:message name="ModifyAuthenticationProfileRequest">
+		<wsdl:part name="parameters" element="tab:ModifyAuthenticationProfile"/>
+	</wsdl:message>
+	<wsdl:message name="ModifyAuthenticationProfileResponse">
+		<wsdl:part name="parameters" element="tab:ModifyAuthenticationProfileResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'DeleteAuthenticationProfile' message-->
+	<wsdl:message name="DeleteAuthenticationProfileRequest">
+		<wsdl:part name="parameters" element="tab:DeleteAuthenticationProfile"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteAuthenticationProfileResponse">
+		<wsdl:part name="parameters" element="tab:DeleteAuthenticationProfileResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'GetSecurityLevelInfo' message-->
+	<wsdl:message name="GetSecurityLevelInfoRequest">
+		<wsdl:part name="parameters" element="tab:GetSecurityLevelInfo"/>
+	</wsdl:message>
+	<wsdl:message name="GetSecurityLevelInfoResponse">
+		<wsdl:part name="parameters" element="tab:GetSecurityLevelInfoResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'GetSecurityLevelInfoList' message-->
+	<wsdl:message name="GetSecurityLevelInfoListRequest">
+		<wsdl:part name="parameters" element="tab:GetSecurityLevelInfoList"/>
+	</wsdl:message>
+	<wsdl:message name="GetSecurityLevelInfoListResponse">
+		<wsdl:part name="parameters" element="tab:GetSecurityLevelInfoListResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'GetSecurityLevels' message-->
+	<wsdl:message name="GetSecurityLevelsRequest">
+		<wsdl:part name="parameters" element="tab:GetSecurityLevels"/>
+	</wsdl:message>
+	<wsdl:message name="GetSecurityLevelsResponse">
+		<wsdl:part name="parameters" element="tab:GetSecurityLevelsResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'GetSecurityLevelList' message-->
+	<wsdl:message name="GetSecurityLevelListRequest">
+		<wsdl:part name="parameters" element="tab:GetSecurityLevelList"/>
+	</wsdl:message>
+	<wsdl:message name="GetSecurityLevelListResponse">
+		<wsdl:part name="parameters" element="tab:GetSecurityLevelListResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'CreateSecurityLevel' message-->
+	<wsdl:message name="CreateSecurityLevelRequest">
+		<wsdl:part name="parameters" element="tab:CreateSecurityLevel"/>
+	</wsdl:message>
+	<wsdl:message name="CreateSecurityLevelResponse">
+		<wsdl:part name="parameters" element="tab:CreateSecurityLevelResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'SetSecurityLevel' message-->
+	<wsdl:message name="SetSecurityLevelRequest">
+		<wsdl:part name="parameters" element="tab:SetSecurityLevel"/>
+	</wsdl:message>
+	<wsdl:message name="SetSecurityLevelResponse">
+		<wsdl:part name="parameters" element="tab:SetSecurityLevelResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'ModifySecurityLevel' message-->
+	<wsdl:message name="ModifySecurityLevelRequest">
+		<wsdl:part name="parameters" element="tab:ModifySecurityLevel"/>
+	</wsdl:message>
+	<wsdl:message name="ModifySecurityLevelResponse">
+		<wsdl:part name="parameters" element="tab:ModifySecurityLevelResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<!--Definition of 'DeleteSecurityLevel' message-->
+	<wsdl:message name="DeleteSecurityLevelRequest">
+		<wsdl:part name="parameters" element="tab:DeleteSecurityLevel"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteSecurityLevelResponse">
+		<wsdl:part name="parameters" element="tab:DeleteSecurityLevelResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:portType name="AuthenticationBehaviorPort">
+		<wsdl:operation name="GetServiceCapabilities">
+			<wsdl:documentation>This operation returns the capabilities of the authentication behavior service.
+			</wsdl:documentation>
+			<wsdl:input message="tab:GetServiceCapabilitiesRequest"/>
+			<wsdl:output message="tab:GetServiceCapabilitiesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAuthenticationProfileInfo">
+			<wsdl:documentation>
+				This operation requests a list of AuthenticationProfileInfo items matching the given tokens.
+				The device shall ignore tokens it cannot resolve and shall return an empty list if there are no items
+				matching the specified tokens. The device shall not return a fault in this case.
+			</wsdl:documentation>
+			<wsdl:input message="tab:GetAuthenticationProfileInfoRequest"/>
+			<wsdl:output message="tab:GetAuthenticationProfileInfoResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAuthenticationProfileInfoList">
+			<wsdl:documentation>
+				This operation requests a list of all of AuthenticationProfileInfo items provided by the device.
+				A call to this method shall return a StartReference when not all data is returned and more data is
+				available. The reference shall be valid for retrieving the next set of data. Please refer Access Control
+				Service Specification for more details.
+				The number of items returned shall not be greater than Limit parameter.
+			</wsdl:documentation>
+			<wsdl:input message="tab:GetAuthenticationProfileInfoListRequest"/>
+			<wsdl:output message="tab:GetAuthenticationProfileInfoListResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAuthenticationProfiles">
+			<wsdl:documentation>
+				This operation returns the specified AuthenticationProfile item matching the given tokens.
+				The device shall ignore tokens it cannot resolve and shall return an empty list if there are no items
+				matching specified tokens. The device shall not return a fault in this case.
+			</wsdl:documentation>
+			<wsdl:input message="tab:GetAuthenticationProfilesRequest"/>
+			<wsdl:output message="tab:GetAuthenticationProfilesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAuthenticationProfileList">
+			<wsdl:documentation>
+				This operation requests a list of all of AuthenticationProfile items provided by the device.
+				A call to this method shall return a StartReference when not all data is returned and more data is
+				available. The reference shall be valid for retrieving the next set of data. Please refer Access Control
+				Service Specification for more details.
+				The number of items returned shall not be greater the Limit parameter.
+			</wsdl:documentation>
+			<wsdl:input message="tab:GetAuthenticationProfileListRequest"/>
+			<wsdl:output message="tab:GetAuthenticationProfileListResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="CreateAuthenticationProfile">
+			<wsdl:documentation>
+				This operation creates the specified authentication profile in the device.
+				The token field of the AuthenticationProfile structure shall be empty and the device shall allocate a
+				token for the authentication profile. The allocated token shall be returned in the response.
+				If the client sends any value in the token field, the device shall return InvalidArgVal as a generic
+				fault code.
+			</wsdl:documentation>
+			<wsdl:input message="tab:CreateAuthenticationProfileRequest"/>
+			<wsdl:output message="tab:CreateAuthenticationProfileResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetAuthenticationProfile">
+			<wsdl:documentation>
+				This method is used to synchronize an authentication profile in a client with the device.
+				If an authentication profile with the specified token does not exist in the device, the authentication
+				profile is
+				created. If an authentication profile with the specified token exists, then the authentication profile
+				is modified.
+				A call to this method takes an AuthenticationProfile structure as input parameter. The token field of
+				the
+				AuthenticationProfile shall not be empty.
+				A device that signals support for the ClientSuppliedTokenSupported capability shall implement this
+				command.
+			</wsdl:documentation>
+			<wsdl:input message="tab:SetAuthenticationProfileRequest"/>
+			<wsdl:output message="tab:SetAuthenticationProfileResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="ModifyAuthenticationProfile">
+			<wsdl:documentation>
+				This operation modifies the specified authentication profile.
+				The token of the authentication profile to modify is specified in the token field of the
+				AuthenticationProfile
+				structure and shall not be empty. All other fields in the structure shall overwrite the fields in the
+				specified authentication profile.
+			</wsdl:documentation>
+			<wsdl:input message="tab:ModifyAuthenticationProfileRequest"/>
+			<wsdl:output message="tab:ModifyAuthenticationProfileResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteAuthenticationProfile">
+			<wsdl:documentation>
+				This operation deletes the specified authentication profile.
+				If the authentication profile is deleted, all authentication policies associated with the authentication
+				profile
+				will also be deleted.
+				If it is associated with one or more entities some devices may not be able to delete the authentication
+				profile,
+				and consequently a ReferenceInUse fault shall be generated.
+			</wsdl:documentation>
+			<wsdl:input message="tab:DeleteAuthenticationProfileRequest"/>
+			<wsdl:output message="tab:DeleteAuthenticationProfileResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetSecurityLevelInfo">
+			<wsdl:documentation>
+				This operation requests a list of SecurityLevelInfo items matching the given tokens.
+				The device shall ignore tokens it cannot resolve and shall return an empty list if there are no items
+				matching the specified tokens. The device shall not return a fault in this case.
+			</wsdl:documentation>
+			<wsdl:input message="tab:GetSecurityLevelInfoRequest"/>
+			<wsdl:output message="tab:GetSecurityLevelInfoResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetSecurityLevelInfoList">
+			<wsdl:documentation>
+				This operation requests a list of all of SecurityLevelInfo items provided by the device.
+				A call to this method shall return a StartReference when not all data is returned and more data is
+				available. The reference shall be valid for retrieving the next set of data. Please refer Access Control
+				Service Specification for more details.
+				The number of items returned shall not be greater than Limit parameter.
+			</wsdl:documentation>
+			<wsdl:input message="tab:GetSecurityLevelInfoListRequest"/>
+			<wsdl:output message="tab:GetSecurityLevelInfoListResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetSecurityLevels">
+			<wsdl:documentation>
+				This operation returns the specified SecurityLevel item matching the given tokens.
+				The device shall ignore tokens it cannot resolve and shall return an empty list if there are no items
+				matching specified tokens. The device shall not return a fault in this case.
+			</wsdl:documentation>
+			<wsdl:input message="tab:GetSecurityLevelsRequest"/>
+			<wsdl:output message="tab:GetSecurityLevelsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetSecurityLevelList">
+			<wsdl:documentation>
+				This operation requests a list of all of SecurityLevel items provided by the device.
+				A call to this method shall return a StartReference when not all data is returned and more data is
+				available. The reference shall be valid for retrieving the next set of data. Please refer Access Control
+				Service Specification for more details.
+				The number of items returned shall not be greater the Limit parameter.
+			</wsdl:documentation>
+			<wsdl:input message="tab:GetSecurityLevelListRequest"/>
+			<wsdl:output message="tab:GetSecurityLevelListResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="CreateSecurityLevel">
+			<wsdl:documentation>
+				This operation creates the specified security level in the device.
+				The token field of the SecurityLevel structure shall be empty and the device shall allocate a
+				token for the security level. The allocated token shall be returned in the response.
+				If the client sends any value in the token field, the device shall return InvalidArgVal as a generic
+				fault code.
+			</wsdl:documentation>
+			<wsdl:input message="tab:CreateSecurityLevelRequest"/>
+			<wsdl:output message="tab:CreateSecurityLevelResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetSecurityLevel">
+			<wsdl:documentation>
+				This method is used to synchronize an security level in a client with the device.
+				If an security level with the specified token does not exist in the device, the security level is
+				created. If an security level with the specified token exists, then the security level is modified.
+				A call to this method takes an SecurityLevel structure as input parameter. The token field of the
+				SecurityLevel shall not be empty.
+				A device that signals support for the ClientSuppliedTokenSupported capability shall implement this
+				command.
+			</wsdl:documentation>
+			<wsdl:input message="tab:SetSecurityLevelRequest"/>
+			<wsdl:output message="tab:SetSecurityLevelResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="ModifySecurityLevel">
+			<wsdl:documentation>
+				This operation modifies the specified security level.
+				The token of the security level to modify is specified in the token field of the SecurityLevel
+				structure and shall not be empty. All other fields in the structure shall overwrite the fields in the
+				specified security level.
+			</wsdl:documentation>
+			<wsdl:input message="tab:ModifySecurityLevelRequest"/>
+			<wsdl:output message="tab:ModifySecurityLevelResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteSecurityLevel">
+			<wsdl:documentation>
+				This operation deletes the specified security level.
+				If the security level is deleted, all authentication policies associated with the security level
+				will also be deleted.
+				If it is associated with one or more entities some devices may not be able to delete the security level,
+				and consequently a ReferenceInUse fault shall be generated.
+			</wsdl:documentation>
+			<wsdl:input message="tab:DeleteSecurityLevelRequest"/>
+			<wsdl:output message="tab:DeleteSecurityLevelResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<!--Protocol & data format for the operations and messages for the port type 'AuthenticationBehaviorPort'-->
+	<wsdl:binding name="AuthenticationBehaviorBinding" type="tab:AuthenticationBehaviorPort">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="GetServiceCapabilities">
+			<soap:operation soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/GetServiceCapabilities"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetAuthenticationProfileInfo">
+			<soap:operation
+					soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/GetAuthenticationProfileInfo"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetAuthenticationProfileInfoList">
+			<soap:operation
+					soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/GetAuthenticationProfileInfoList"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetAuthenticationProfiles">
+			<soap:operation
+					soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/GetAuthenticationProfiles"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetAuthenticationProfileList">
+			<soap:operation
+					soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/GetAuthenticationProfileList"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="CreateAuthenticationProfile">
+			<soap:operation
+					soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/CreateAuthenticationProfile"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="SetAuthenticationProfile">
+			<soap:operation
+					soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/SetAuthenticationProfile"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="ModifyAuthenticationProfile">
+			<soap:operation
+					soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/ModifyAuthenticationProfile"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteAuthenticationProfile">
+			<soap:operation
+					soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/DeleteAuthenticationProfile"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetSecurityLevelInfo">
+			<soap:operation soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/GetSecurityLevelInfo"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetSecurityLevelInfoList">
+			<soap:operation
+					soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/GetSecurityLevelInfoList"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetSecurityLevels">
+			<soap:operation soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/GetSecurityLevels"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetSecurityLevelList">
+			<soap:operation soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/GetSecurityLevelList"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="CreateSecurityLevel">
+			<soap:operation soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/CreateSecurityLevel"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="SetSecurityLevel">
+			<soap:operation soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/SetSecurityLevel"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="ModifySecurityLevel">
+			<soap:operation soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/ModifySecurityLevel"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteSecurityLevel">
+			<soap:operation soapAction="http://www.onvif.org/ver10/authenticationbehavior/wsdl/DeleteSecurityLevel"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+</wsdl:definitions>
