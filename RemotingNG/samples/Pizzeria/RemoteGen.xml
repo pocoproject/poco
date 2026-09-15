@@ -1,0 +1,35 @@
+<AppConfig>
+	<RemoteGen>
+		<files>
+			<include>
+				../Pizzeria/include/Pizzeria/PizzaDeliveryService.h
+				../Pizzeria/include/Pizzeria/PizzaPickupService.h
+				../Pizzeria/include/Pizzeria/Pizza.h
+				../Pizzeria/include/Pizzeria/Topping.h
+				../Pizzeria/include/Pizzeria/DeliveryAddress.h
+			</include>
+			<include-paths>
+				include
+				../Pizzeria/include
+			</include-paths>
+		</files>
+		<output>
+			<include>include/Pizzeria</include>
+			<includeRoot>include</includeRoot>
+			<src>src</src>
+			<namespace>Pizzeria</namespace>
+			<schema>wsdl</schema>
+			<copyright>Copyright (c) 2006-2020, Applied Informatics Software Engineering GmbH.</copyright>
+			<mode>server</mode>
+			<timestamps>false</timestamps>
+		</output>
+		<schema>
+			<PizzaDeliveryService>
+				<serviceLocation>http://localhost:8080/soap/PizzaDeliveryService/ThePizzeria</serviceLocation>
+			</PizzaDeliveryService>
+			<PizzaPickupService>
+				<serviceLocation>http://localhost:8080/soap/PizzaPickupService/ThePizzeria</serviceLocation>
+			</PizzaPickupService>
+		</schema>
+	</RemoteGen>
+</AppConfig>

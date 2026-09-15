@@ -1,0 +1,20 @@
+<AppConfig>
+	<RemoteGen>
+		<files>
+			<include>
+				../TimeServer/include/TimeService.h
+			</include>
+			<include-paths>
+				include
+				../TimeServer/include
+			</include-paths>
+		</files>
+		<output>
+			<include>include</include>
+			<src>src</src>
+			<copyright>Copyright (c) 2006-2020, Applied Informatics Software Engineering GmbH.</copyright>
+			<mode>client</mode>
+			<timestamps>false</timestamps>
+		</output>
+	</RemoteGen>
+</AppConfig>

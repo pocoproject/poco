@@ -1,0 +1,620 @@
+Remoting NG Tutorial Part 1: Remoting Basics
+Remoting NG
+
+!!!Welcome
+
+Welcome to the Remoting tutorial.
+This tutorial will familiarize you with the basic concepts and techniques required for
+implementing remote services with Remoting.
+Part one of the tutorial covers the Remoting basics. In part two,
+we will take a look at advanced Remoting programming concepts.
+
+This tuturial assumes that you are familiar with basic POCO C++ Libraries
+programming techniques. You should also have read the [[00100-RemotingNGOverview.html Remoting Overview]]
+and be familiar with basic Remoting concepts.
+
+
+!!!Writing a Service Class
+
+The first step in creating a remote service is designing and implementing the
+service class -- the class that implements the actual remote service.
+For this example, we will implement a simple service that just reports
+the current time. To keep things simple in the beginning, the time
+will be returned as a string, in the format HH:MM:SS (hour, minute, second).
+Later on we will see how we can return the time in other formats, using other
+data types (even user defined ones) as well.
+
+So, let's start with the class definition:
+
+    class TimeService
+    {
+    public:
+        TimeService();
+        ~TimeService();
+
+        std::string currentTimeAsString() const;
+    };
+----
+
+So far, our class looks like any other ordinary C++ class. To turn the class into
+a remote service, we have to add the <[remote]> attribute, either to the class,
+or to the <[currentTimeAsString()]> member function.
+The complete header file (<*TimeService.h*>) for the class is shown below. The <[remote]> attribute
+has been added at class level, which means that all public member functions of
+the class will be available remotely.
+
+
+    #ifndef TimeService_INCLUDED
+    #define TimeService_INCLUDED
+
+
+    #include <string>
+
+
+    namespace Sample {
+
+
+    //@ remote
+    class TimeService
+    {
+    public:
+        TimeService();
+            /// Creates the TimeService.
+
+        ~TimeService();
+            /// Destroys the TimeService.
+
+        std::string currentTimeAsString() const;
+            /// Returns the current time, formatted
+            /// as a string (HH:MM::SS).
+    };
+
+
+    } // namespace Sample
+
+
+    #endif // TimeService_INCLUDED
+----
+
+The actual implementation of the class is straightforward. We simply use the
+Poco::DateTime class to obtain the current time (and date), as well as the
+Poco::DateTimeFormatter to format the time into a string.
+
+    #include "TimeService.h"
+    #include "Poco/DateTime.h"
+    #include "Poco/DateTimeFormatter.h"
+
+
+    namespace Sample {
+
+
+    TimeService::TimeService()
+    {
+    }
+
+
+    TimeService::~TimeService()
+    {
+    }
+
+
+    std::string TimeService::currentTimeAsString() const
+    {
+        Poco::DateTime now;
+        return Poco::DateTimeFormatter::format(now, "%H:%M:%S);
+    }
+
+
+    } // namespace Sample
+----
+
+
+!!!Generating The Server Code
+
+After writing the service class, the next step is running the RemotingNG
+code generator (RemoteGenNG) on the service class. To run the code
+generator, a configuration file for the code generator must be
+crafted first. The configuration file tells the code generator
+which classes to generate code for, as well as what code should
+be generated. The code generator needs to invoke the C++ compiler's
+preprocessor before parsing each header file, so the configuration
+file also contains information on how to invoke the preprocessor.
+The configuration file uses the XML format.
+
+!!Configuring The Code Generator
+
+The following configuration file configures the code generator
+to create the server code for our TimeService remote service.
+It uses the preprocessor from the C++ compiler.
+
+    <AppConfig>
+        <RemoteGen>
+            <files>
+                <include>
+                    include/TimeService.h
+                </include>
+            </files>
+            <output>
+                <mode>server</mode>
+                <include>include</include>
+                <src>src</src>
+                <namespace>Sample</namespace>
+                <copyright>Copyright (c) 2020</copyright>
+            </output>
+        </RemoteGen>
+    </AppConfig>
+----
+
+Following is a brief discussion of the XML elements present in
+the configuration file.
+
+!AppConfig
+
+The name of the root element is actually not relevant. We have
+chosen <[AppConfig]>, but any other valid element name would
+do as well.
+
+!RemoteGen
+
+This element is required. Its child elements contain the
+configuration data for the code generator.
+
+!files/include
+
+The content of this element is a list of paths (or Glob expressions,
+exactly) that tell the code generator which header files to parse. The paths
+specified here can be relative (as in the example) or absolute.
+Paths must be separated by either a newline, a comma or a semicolon.
+We have used the configuration variable <[${POCO_BASE}]> to specify
+the path to the POCO base directory. For this to work, a value for that
+variable must be passed to the code generator when invoking it.
+
+There are three header files that always must be specified here.
+These are <*Poco/RemotingNG/RemoteObject.h*>, <*Poco/RemotingNG/Proxy.h*>
+and <*Poco/RemotingNG/Skeleton.h*>. Failing to include these files
+will result in the code generator reporting an error. If events are used,
+the header files <*Poco/RemotingNG/EventDispatcher.h*> and
+<*Poco/RemotingNG/EventSubscriber.h*> must be included as well.
+
+!output/mode
+
+This specifies what code the generator should generate.
+For server code, we specify "server". Other valid values
+would be "client", "both" (generates both client and
+server code) and "interface" (generates only the interface
+class).
+
+!output/include
+
+This specifies the directory where generated header files are
+written to.
+
+!output/src
+
+This specifies the directory where generated implementation files
+are written to.
+
+!output/namespace
+
+This specifies the C++ namespace, where generated classes will
+be in.
+
+!output/copyright
+
+This specifies a copyright (or other) message that will be added
+to the header comment section of each generated file.
+
+
+!!Invoking The Code Generator
+
+Assuming that both the RemoteGen executable and the C++ compiler are in
+your executable search path (%PATH% or $PATH), and that the configuration
+file is named <*TimeServer.xml*>, you can start the code
+generator from a Windows shell with:
+
+    RemoteGenNG TimeServer.xml /D:POCO_BASE=c:\poco
+----
+
+From a Unix shell, use:
+
+    RemoteGenNG TimeServer.xml -DPOCO_BASE=/path/to/poco
+----
+
+For this to work, we assume the following directory layout for
+our source and header files:
+
+    TimeServer/
+        include/
+            TimeService.h
+        src/
+            TimeService.cpp
+        TimeServer.xml
+----
+
+The current working directory when starting the code generator
+should be the TimeServer directory.
+
+The code generator takes a few seconds to run the preprocessor,
+parse the preprocessed header files and generate the code.
+After the code generator has finished its work, the following
+source and header files can be found in our project directory:
+
+    TimeServer/
+        include/
+            TimeService.h
+            ITimeService.h
+            TimeServiceRemoteObject.h
+            TimeServiceSkeleton.h
+            TimeServiceServerHelper.h
+        src/
+            TimeService.cpp
+            ITimeService.cpp
+            TimeServiceRemoteObject.cpp
+            TimeServiceSkeleton.cpp
+            TimeServiceServerHelper.cpp
+        TimeServer.xml
+----
+
+As can be seen from the file names, the code generator has
+generated the following classes:
+
+  * the interface class (<[ITimeService]>),
+  * the remote object class (<[TimeServiceRemoteObject]>),
+  * the server skeleton class (<[TimeServiceSkeleton]>),
+  * and the server helper class (<[TimeServiceServerHelper]>).
+
+The most important class for us on the server side is the server
+helper class, as this class will do most of the work required
+for making our service object available remotely.
+
+
+!!!Writing The Server Application
+
+Now that all the necessary remoting code has been generated,
+the last step in creating a server application is to write
+the code that sets up the server.
+
+For this example, we are using the Poco::Util::ServerApplication
+class from the POCO Util library as a base class for our application.
+
+Setting up the Remoting machinery involves the following steps:
+
+  1. Setting up and registering with the ORB the Listener objects, which
+     are listening for incoming client connections.
+  2. Creating the service object, and
+  3. Registering our service object with the ORB, using the server
+     helper class.
+
+The code for the server application is shown below.
+
+    #include "Poco/Util/ServerApplication.h"
+    #include "Poco/RemotingNG/TCP/Listener.h"
+    #include "Poco/RemotingNG/ORB.h"
+    #include "TimeService.h"
+    #include "TimeServiceServerHelper.h"
+    #include <iostream>
+
+
+    class TimeServer: public Poco::Util::ServerApplication
+    {
+        int main(const std::vector<std::string>& args)
+        {
+            // 1. Create and register TCP listener.
+            std::string listener = Poco::RemotingNG::ORB::instance().registerListener(
+                new Poco::RemotingNG::TCP::Listener("localhost:9999")
+            );
+
+            // 2. Create the service object.
+            Poco::SharedPtr<Sample::TimeService> pTimeService = new Sample::TimeService;
+
+            // 3. Register service object with ORB.
+            std::string uri = Sample::TimeServiceServerHelper::registerObject(pTimeService, "TheTimeService", listener);
+            std::cout << "TimeService URI is: " << uri << std::endl;
+
+            // Wait for CTRL-C or kill.
+            waitForTerminationRequest();
+
+            // Stop the remoting machinery.
+            Poco::RemotingNG::ORB::instance().shutdown();
+
+            return Application::EXIT_OK;
+        }
+    };
+
+
+    POCO_SERVER_MAIN(TimeServer)
+----
+
+
+The first statement creates and registers a listener for the TCP Transport.
+
+    std::string listener = Poco::RemotingNG::ORB::instance().registerListener(
+        new Poco::RemotingNG::TCP::Listener("localhost:9999")
+    );
+----
+
+The Listener for the TCP transport will set up a TCP server on the
+given port number (9999), which waits for and accepts incoming client
+connections. The <[registerListener()]> method returns a listener ID string,
+which will be needed when the service object is registered.
+
+The next lines create our service object, assigning it to a Poco::SharedPtr.
+
+    Poco::SharedPtr<Sample::TimeService> pTimeService = new Sample::TimeService;
+----
+
+Use of a shared pointer is mandatory for service objects.
+The shared pointer is then passed to the static <[registerObject()]> function
+of the server helper class, along with a few more arguments.
+
+    std::string uri = Sample::TimeServiceServerHelper::registerObject(
+        pTimeService, "TheTimeService", listener);
+----
+
+The second argument specifies the name under which the service object is known
+on the server. The name of the service class, together with this name, forms a
+unique identifier for the service object on the server.
+The third argument specifies the ID of the listener, which should handle requests
+for this object. The listener ID has been obtained previously in the
+<[registerListener()]> call.
+
+The <[registerObject()]> method returns a string containing the URI of
+our server object. This URI can be used by clients to access the
+service object on the server.
+
+After registering our service object, the server is ready to accept connections.
+The listener runs and processes incoming requests in its own thread, so all
+that remains to do in the main function is to wait until someone tells
+the application to shut down. We do this with a call to
+Poco::Util::ServerApplication::waitForTerminationRequest().
+
+When shutting down, we also explicitely shut down the ORB. This will take
+care of shutting down the listener, as well as unregistering and
+destroying the service object.
+
+For building the server application, ensure that all the source files
+generated by the code generator are included in the build process.
+Furthermore, the application must be linked with the following
+libraries:
+
+  * PocoFoundation
+  * PocoXML (for PocoUtil)
+  * PocoUtil (for the Poco::Util::ServerApplication class)
+  * PocoNet (network classes required by the TCP transport)
+  * PocoRemotingNG (the RemotingNG core framework)
+  * PocoRemotingNGTCP (the TCP Transport implementation)
+
+This is all there is to do to implement a Remoting server application.
+Next, we will look at the client.
+
+
+!!!Generating The Client Code
+
+Before we start writing the actual client application, we must again
+invoke the Remoting code generator to generate the client-side
+Remoting code for our TimeService service class.
+
+!!Configuring The Code Generator
+
+The following configuration file configures the code generator
+to create the client code for our TimeService remote service.
+
+    <AppConfig>
+        <RemoteGen>
+            <files>
+                <include>
+                    ../TimeServer/include/TimeService.h
+                </include>
+            </files>
+            <output>
+                <mode>client</mode>
+                <include>include</include>
+                <src>src</src>
+                <namespace>Sample</namespace>
+                <copyright>Copyright (c) 2020</copyright>
+            </output>
+        </RemoteGen>
+    </AppConfig>
+----
+
+The configuration file for the client is remarkably similar to the
+one for the server. In fact, the only significant difference is the
+value of the <*mode*> element, which is set to "client"
+instead of "server". We also specify a different path to the
+<*TimeService.h*> header file, but this is only so that the
+code generator picks up the header file from the server
+project directory. Again, this configuration file is for
+Visual C++, but it can be easily converted for use with
+GCC, by simply changing the <*compiler*> element or adding
+additional <*compiler*> elements.
+
+It is even possible to use the same configuration file for both
+the server and the client. The only thing that needs to be
+done is to change the <*mode*> setting accordingly. This is straightforward,
+as the RemoteGenNG application supports a command-line argument
+to override this setting.
+
+!!Invoking The Code Generator
+
+Assuming that our (currently empty) client project directory lies beneath the
+server project directory, as shown below, we can now invoke the
+code generator.
+
+    TimeServer/
+        include/
+            TimeService.h
+            ...
+        src/
+            TimeService.cpp
+            ...
+        TimeServer.xml
+    TimeClient/
+        include/
+        src/
+        TimeClient.xml
+----
+
+Start the code generator from a shell with:
+
+    RemoteGen TimeClient.xml /D:POCO_BASE=c:\poco
+----
+
+If the code generator config file is shared between
+the client and server, we can also invoke the code
+generator with:
+
+    RemoteGen /mode=client ..\TimeServer\TimeServer.xml /D:POCO_BASE=c:\poco
+----
+
+from a Windows shell, or:
+
+    RemoteGen --mode=client ../TimeServer/TimeServer.xml -DPOCO_BASE=/path/to/poco
+----
+
+from a Unix shell, respectively.
+
+Like with the server code, the code generator takes a few
+seconds to run the preprocessor, parse the preprocessed header files and
+generate the client code.
+After the code generator has finished its work, the following
+source and header files can be found in our project directory:
+
+    TimeClient/
+        include/
+            ITimeService.h
+            TimeServiceProxy.h
+            TimeServiceProxyFactory.h
+            TimeServiceClientHelper.h
+        src/
+            ITimeService.cpp
+            TimeServiceProxy.cpp
+            TimeServiceProxyFactory.cpp
+            TimeServiceClientHelper.cpp
+        TimeClient.xml
+----
+
+As can be seen from the file names, the code generator has
+generated the following classes:
+
+  * the interface class (<[ITimeService]>),
+  * the proxy class (<[TimeServiceProxy]>),
+  * the proxy factory class (<[TimeServiceProxyFactory]>),
+  * and the client helper class (<[TimeServiceClientHelper]>).
+
+The two most important classes on the client side are the
+interface class and the client helper class. The interface
+class is the class we work with whenever we want to invoke
+a method on the remote object. The client helper class helps
+us setting up the Remoting machinery, by registering the
+proxy factory class with the local ORB.
+
+If you look at the header file for the interface class,
+you will notice that this file includes the header file
+for the service class. Therefore, the header file for
+the service class must be available to clients as well.
+The header file of the service class is required because
+it might contain type or class definitions needed by the
+interface class. It is not necessary to make
+the implementation of the service class available to
+clients, though (or even link the client with the code
+for the service class).
+
+
+!!!Writing The Client Application
+
+Writing the client application is even simpler than writing
+the server application. All one has to do is to register
+the transport factory for the given Remoting Transport we
+are going to use (the TCP Transport in this case), and
+to register the proxy factory with the ORB, which is conveniently done
+by the client helper class. After this has been done,
+an interface object can be obtained from the ORB, again
+with the help from the client helper class.
+
+Following is the source code for the client application.
+
+    #include "TimeServiceProxy.h"
+    #include "TimeServiceClientHelper.h"
+    #include "Poco/RemotingNG/TCP/TransportFactory.h"
+    #include <iostream>
+
+
+    int main(int argc, char** argv)
+    {
+        try
+        {
+            // Register TCP transport.
+            Poco::RemotingNG::TCP::TransportFactory::registerFactory();
+
+            // Get proxy for remote TimeService.
+            std::string uri("remoting.tcp://localhost:9999/tcp/TimeService/TheTimeService");
+            Sample::ITimeService::Ptr pTimeService = Sample::TimeServiceClientHelper::find(uri);
+
+            // Invoke methods on remote object.
+            std::string currentTime = pTimeService->currentTimeAsString();
+            std::cout << "Current time: " << currentTime << std::endl;
+        }
+        catch (Poco::Exception& exc)
+        {
+            std::cerr << exc.displayText() << std::endl;
+            return 1;
+        }
+        return 0;
+    }
+----
+
+Once we have obtained the interface object from the ORB, we can use it like
+any ordinary C++ object. The ORB will actually give us an instance of
+the <[TimeServiceProxy]> object (which is a subclass of <[ITimeService]>),
+and the methods of the proxy will transparently forward any method
+calls to the server.
+
+For building the client application, ensure that all the source files
+generated by the code generator are included in the build process.
+Furthermore, the application must be linked with the following
+libraries:
+
+  * PocoFoundation
+  * PocoNet (network classes required by the TCP transport)
+  * PocoRemotingNG (the RemotingNG core framework)
+  * PocoRemotingNGTCP (the TCP Transport implementation)
+
+
+!!!Testing Server And Client
+
+Now that we have completed both the server and the client, it's time
+to test our system.
+
+!!Starting The Server
+
+First, we start the server, by simple starting the server executable.
+There's no need to pass any command line arguments.
+Once started, the server will output the URI of the remote service class:
+
+    C:\poco\RemotingNG\tutorials\TimeServer>bin\TimeServer
+    TimeService URI is: remoting.tcp://localhost:9999/tcp/TimeService/TheTimeService
+----
+
+The server is then ready to accept requests from clients.
+To stop the server, simply type CTRL-C (or, on Windows, close the console window).
+
+!!Starting the Client
+
+The client can also be started by simply executing the client executable.
+No command line arguments must be passed.
+Once started, the client will connect to the server, obtain the current
+time, and quit.
+
+    C:\poco\RemotingNG\tutorials\TimeClient>bin\TimeClient
+    Current time: 12:30:09
+----
+
+If the client is started with no server running, the client will display
+an error message and exit.
+
+    C:\poco\RemotingNG\tutorials\TimeClient>bin\TimeClient
+    Connection refused: 127.0.0.1:8080
+----
+
+Congratulations, you now have completed your first Remoting project.
+This concludes part one of the tutorial.

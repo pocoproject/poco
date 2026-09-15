@@ -42,6 +42,14 @@ Features:
   POCO_ENABLE_SQLITE_VEC (gnu make) or ./configure --sqlite-vec. Works with bundled and
   unbundled SQLite (3.37 or newer required); optional AVX2/NEON SIMD kernels.
 
+New Components:
+
+- GH #5447 RemotingNG (remote objects framework with TCP, HTTP, JSON-RPC, REST and SOAP
+  transports and the RemoteGenNG code generator) and CodeGeneration moved from macchina.io into
+  POCO. CMake options ENABLE_REMOTINGNG, ENABLE_REMOTINGNG_{TCP,HTTP,JSONRPC,REST,SOAP},
+  ENABLE_REMOTINGNG_REMOTEGEN, ENABLE_CODEGENERATION; make components CodeGeneration,
+  RemotingNG, RemotingNG/{TCP,HTTP,JSONRPC,REST,SOAP,RemoteGen}.
+
 
 Release 1.15.3 (2026-05-13)
 ===========================

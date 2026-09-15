@@ -1,0 +1,502 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="../../../ver20/util/onvif-wsdl-viewer.xsl"?>
+<!--
+Copyright (c) 2008-2022 by ONVIF: Open Network Video Interface Forum. All rights reserved.
+
+Recipients of this document may copy, distribute, publish, or display this document so long as this copyright notice, license and disclaimer are retained with all copies of the document. No license is granted to modify this document.
+
+THIS DOCUMENT IS PROVIDED "AS IS," AND THE CORPORATION AND ITS MEMBERS AND THEIR AFFILIATES, MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THIS DOCUMENT ARE SUITABLE FOR ANY PURPOSE; OR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+IN NO EVENT WILL THE CORPORATION OR ITS MEMBERS OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT, WHETHER OR NOT (1) THE CORPORATION, MEMBERS OR THEIR AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, OR (2) SUCH DAMAGES WERE REASONABLY FORESEEABLE, AND ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT.  THE FOREGOING DISCLAIMER AND LIMITATION ON LIABILITY DO NOT APPLY TO, INVALIDATE, OR LIMIT REPRESENTATIONS AND WARRANTIES MADE BY THE MEMBERS AND THEIR RESPECTIVE AFFILIATES TO THE CORPORATION AND OTHER MEMBERS IN CERTAIN WRITTEN POLICIES OF THE CORPORATION.
+-->
+<wsdl:definitions
+        xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/"
+        xmlns:tt="http://www.onvif.org/ver10/schema"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:ans="http://www.onvif.org/ver10/appmgmt/wsdl"
+        targetNamespace="http://www.onvif.org/ver10/appmgmt/wsdl">
+
+    <wsdl:types>
+        <xs:schema targetNamespace="http://www.onvif.org/ver10/appmgmt/wsdl" version="22.12">
+            <xs:import namespace="http://www.onvif.org/ver10/schema" schemaLocation="http://www.onvif.org/ver10/schema/onvif.xsd"/>
+
+            <xs:simpleType name="AppState">
+                <xs:restriction base="xs:string">
+                    <xs:enumeration value="Active"/>
+                    <xs:enumeration value="Inactive"/>
+                    <xs:enumeration value="Installing"/>
+                    <xs:enumeration value="Uninstalling"/>
+                    <xs:enumeration value="Removed"/>
+                    <xs:enumeration value="InstallationFailed"/>
+                </xs:restriction>
+            </xs:simpleType>
+
+            <!--===============================-->
+
+            <xs:element name="Uninstall">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="AppID" type="xs:string">
+                            <xs:annotation>
+                                <xs:documentation>
+                                    App to be uninstalled. Possible failures during deinstallation will be delivered via an event.
+                                </xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="UninstallResponse">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+
+
+            <!--===============================-->
+
+            <xs:element name="GetAppsInfo">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="AppID" type="xs:string" minOccurs="0">
+                            <xs:annotation><xs:documentation>Optional ID to only retrieve information for a single application.</xs:documentation></xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:complexType name="AppInfo">
+                <xs:sequence>
+                    <xs:element name="AppID" type="xs:string">
+                        <xs:annotation><xs:documentation>Unique app identifier of the application instance.</xs:documentation></xs:annotation>
+                    </xs:element>
+                    <xs:element name="Name" type="xs:string">
+                        <xs:annotation><xs:documentation>User readable application name</xs:documentation></xs:annotation>
+                    </xs:element>
+                    <xs:element name="Version" type="xs:string">
+                        <xs:annotation><xs:documentation>Version of the installed application. The details of the format are outside of the scope of this specificaton.</xs:documentation></xs:annotation>
+                    </xs:element>
+                    <xs:element name="Licenses" type="ans:LicenseInfo" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation><xs:documentation>Licenses associated with the application.</xs:documentation></xs:annotation>
+                    </xs:element>
+                    <xs:element name="Privileges" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation><xs:documentation>List of privileges granted to the application.</xs:documentation></xs:annotation>
+                    </xs:element>
+                    <xs:element name="InstallationDate" type="xs:dateTime">
+                        <xs:annotation><xs:documentation>Date and time when the application has been installed.</xs:documentation></xs:annotation>
+                    </xs:element>
+                    <xs:element name="LastUpdate" type="xs:dateTime">
+                        <xs:annotation>
+                            <xs:documentation>Time of last update to this app, i.e. the time when this particular version was installed.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="State" type="ans:AppState">
+                        <xs:annotation>
+                            <xs:documentation>InstallationFailed state shall not be used here.</xs:documentation>
+                        </xs:annotation>
+                    </xs:element>
+                    <xs:element name="Status" type="xs:string">
+                        <xs:annotation><xs:documentation>Supplemental information why the application is in the current state. In error cases this field contains the error reason.</xs:documentation></xs:annotation>
+                    </xs:element>
+                    <xs:element name="Autostart" type="xs:boolean">
+                        <xs:annotation><xs:documentation>If set the application will start automatically after booting of the device.</xs:documentation></xs:annotation>
+                    </xs:element>
+                    <xs:element name="Website" type="xs:anyURI">
+                        <xs:annotation><xs:documentation>Link to supplementary information about the application or its vendor.</xs:documentation></xs:annotation>
+                    </xs:element>
+                    <xs:element name="OpenSource" type="xs:anyURI" minOccurs="0">
+                        <xs:annotation><xs:documentation>Link to a list of open source licenses used by the application.</xs:documentation></xs:annotation>
+                    </xs:element>
+                    <xs:element name="Configuration" type="xs:anyURI" minOccurs="0">
+                        <xs:annotation><xs:documentation>Optional Uri for backup and restore of the application configuration.</xs:documentation></xs:annotation>
+                    </xs:element>
+                    <xs:element name="InterfaceDescription" type="xs:anyURI" minOccurs="0" maxOccurs="unbounded">
+                        <xs:annotation><xs:documentation>Optional reference to the interface definition of the application.</xs:documentation></xs:annotation>
+                    </xs:element>
+                    <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+                </xs:sequence>
+                <xs:anyAttribute/>
+            </xs:complexType>
+            
+            <xs:complexType name="LicenseInfo">
+                <xs:sequence>
+                    <xs:element name="Name" type="xs:string">
+                        <xs:annotation><xs:documentation>Textual name of the license</xs:documentation></xs:annotation>
+                    </xs:element>
+                    <xs:element name="ValidFrom" type="xs:dateTime" minOccurs="0">
+                        <xs:annotation><xs:documentation>Start time of validity</xs:documentation></xs:annotation>
+                    </xs:element>
+                    <xs:element name="ValidUntil" type="xs:dateTime" minOccurs="0">
+                        <xs:annotation><xs:documentation>End time of validity</xs:documentation></xs:annotation>
+                    </xs:element>
+                    <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+                </xs:sequence>
+                <xs:anyAttribute/>
+            </xs:complexType>
+            
+            <xs:element name="GetAppsInfoResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Info" type="ans:AppInfo" minOccurs="0" maxOccurs="unbounded">
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <!--===============================-->
+
+            <xs:element name="GetInstalledApps">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="GetInstalledAppsResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="App" minOccurs="0" maxOccurs="unbounded">
+                            <xs:annotation>
+                                <xs:documentation>List of installed apps providing both user readable name and token.</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="Name" type="xs:string"/>
+                                    <xs:element name="AppID" type="xs:string"/>
+                                    <xs:any minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+                                </xs:sequence>
+                                <xs:anyAttribute/>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <!--===============================-->
+
+            <xs:element name="Activate">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="AppID" type="xs:string">
+                            <xs:annotation><xs:documentation>App identifier.</xs:documentation></xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+
+            <xs:element name="ActivateResponse">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+
+            <!--===============================-->
+
+            <xs:element name="Deactivate">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="AppID" type="xs:string">
+                            <xs:annotation><xs:documentation>App identifier.</xs:documentation></xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+
+            <xs:element name="DeactivateResponse">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+
+            <!--======= LICENSING ======-->
+
+            <xs:element name="InstallLicense">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="AppID" type="xs:string" minOccurs="0">
+                            <xs:annotation><xs:documentation>Application the license shall be associated to.</xs:documentation></xs:annotation>
+                        </xs:element>
+                        <xs:element name="License" type="xs:string">
+                            <xs:annotation><xs:documentation>
+                                Opaque machine readable license string.
+                            </xs:documentation></xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="InstallLicenseResponse">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="GetServiceCapabilities">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="GetServiceCapabilitiesResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Capabilities" type="ans:Capabilities">
+                            <xs:annotation>
+                                <xs:documentation>The capabilities of the service.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <!--===============================-->
+            <xs:complexType name="Capabilities">
+                <xs:sequence>
+                    <xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>	 <!-- first Vendor then ONVIF -->
+                </xs:sequence>
+                <xs:attribute name="FormatsSupported" type="tt:StringAttrList">
+                    <xs:annotation>
+                        <xs:documentation>List of supported app container formats that can be uploaded via this service.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="Licensing" type="xs:boolean">
+                    <xs:annotation>
+                        <xs:documentation>Signals support for licensing of applications.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="UploadPath" type="xs:anyURI">
+                    <xs:annotation>
+                        <xs:documentation>Path part of the URI to which applications can be uploaded via http POST. 
+                            Clients shall use protocol, hostname and port of the service address since the device may e.g. reside behind NAT translation firewall.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="EventTopicPrefix" type="xs:string">
+                    <xs:annotation>
+                        <xs:documentation>Optional Event Topic prefix used when delivering app events in eventservice.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:anyAttribute processContents="lax"/>
+            </xs:complexType>
+            <xs:element name="Capabilities" type="ans:Capabilities"/>
+            <!--===============================-->
+
+            <xs:element name="GetDeviceId">
+                <xs:complexType>
+                    <xs:sequence/>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="GetDeviceIdResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="DeviceId" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+
+        </xs:schema>
+
+
+    </wsdl:types>
+
+    <!--======= MESSAGES======-->
+
+    <wsdl:message name="UninstallRequest">
+        <wsdl:part name="parameters" element="ans:Uninstall"/>
+    </wsdl:message>
+    <wsdl:message name="UninstallResponse">
+        <wsdl:part name="parameters" element="ans:UninstallResponse"/>
+    </wsdl:message>
+
+    <wsdl:message name="GetInstalledAppsRequest">
+        <wsdl:part name="parameters" element="ans:GetInstalledApps"/>
+    </wsdl:message>
+    <wsdl:message name="GetInstalledAppsResponse">
+        <wsdl:part name="parameters" element="ans:GetInstalledAppsResponse"/>
+    </wsdl:message>
+
+    <wsdl:message name="GetAppsInfoRequest">
+        <wsdl:part name="parameters" element="ans:GetAppsInfo"/>
+    </wsdl:message>
+    <wsdl:message name="GetAppsInfoResponse">
+        <wsdl:part name="parameters" element="ans:GetAppsInfoResponse"/>
+    </wsdl:message>
+
+    <wsdl:message name="ActivateRequest">
+        <wsdl:part name="parameters" element="ans:Activate"/>
+    </wsdl:message>
+    <wsdl:message name="ActivateResponse">
+        <wsdl:part name="parameters" element="ans:ActivateResponse"/>
+    </wsdl:message>
+
+    <wsdl:message name="DeactivateRequest">
+        <wsdl:part name="parameters" element="ans:Deactivate"/>
+    </wsdl:message>
+    <wsdl:message name="DeactivateResponse">
+        <wsdl:part name="parameters" element="ans:DeactivateResponse"/>
+    </wsdl:message>
+
+    <wsdl:message name="GetServiceCapabilitiesRequest">
+        <wsdl:part name="parameters" element="ans:GetServiceCapabilities"/>
+    </wsdl:message>
+    <wsdl:message name="GetServiceCapabilitiesResponse">
+        <wsdl:part name="parameters" element="ans:GetServiceCapabilitiesResponse"/>
+    </wsdl:message>
+    
+    <!--====== LICENSING =============-->
+
+    <wsdl:message name="InstallLicenseRequest">
+        <wsdl:part name="parameters" element="ans:InstallLicense"/>
+    </wsdl:message>
+    <wsdl:message name="InstallLicenseResponse">
+        <wsdl:part name="parameters" element="ans:InstallLicenseResponse"/>
+    </wsdl:message>
+    <wsdl:message name="GetDeviceIdRequest">
+        <wsdl:part name="parameters" element="ans:GetDeviceId"/>
+    </wsdl:message>
+    <wsdl:message name="GetDeviceIdResponse">
+        <wsdl:part name="parameters" element="ans:GetDeviceIdResponse"/>
+    </wsdl:message>
+
+    <!--======= PORTS ======-->
+    <wsdl:portType name="AppManagement">
+        <wsdl:operation name="Uninstall">
+            <wsdl:documentation>
+                Removes an app from a device. This method shall return immedeiately and not wait until the application is completely removed. 
+                On completion or failure the method shall generate an UninstallCompletion event.
+            </wsdl:documentation>
+            <wsdl:input message="ans:UninstallRequest"/>
+            <wsdl:output message="ans:UninstallResponse"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="GetInstalledApps">
+            <wsdl:documentation>List installed apps on the device.</wsdl:documentation>
+            <wsdl:input message="ans:GetInstalledAppsRequest"/>
+            <wsdl:output message="ans:GetInstalledAppsResponse"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="GetAppsInfo">
+            <wsdl:documentation>The caller may provide an application ID to retrieve the information for a single application. 
+                If no application ID is provided the device shall report the information for all installed applications.</wsdl:documentation>
+            <wsdl:input message="ans:GetAppsInfoRequest"/>
+            <wsdl:output message="ans:GetAppsInfoResponse"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="Activate">
+            <wsdl:documentation>Starts an application.</wsdl:documentation>
+            <wsdl:input message="ans:ActivateRequest"/>
+            <wsdl:output message="ans:ActivateResponse"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="Deactivate">
+            <wsdl:documentation>Stops an application.</wsdl:documentation>
+            <wsdl:input message="ans:DeactivateRequest"/>
+            <wsdl:output message="ans:DeactivateResponse"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="GetServiceCapabilities">
+            <wsdl:documentation>Returns the capabilities of the uplink service.</wsdl:documentation>
+            <wsdl:input message="ans:GetServiceCapabilitiesRequest"/>
+            <wsdl:output message="ans:GetServiceCapabilitiesResponse"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="InstallLicense">
+            <wsdl:documentation>Installs a license to the device. If the device requires PerApp licensing than the AppID parameter shall be provided.</wsdl:documentation>
+            <wsdl:input message="ans:InstallLicenseRequest"/>
+            <wsdl:output message="ans:InstallLicenseResponse"/>
+        </wsdl:operation>
+
+        <wsdl:operation name="GetDeviceId">
+            <wsdl:documentation>Get the unique device id to which the licenses are issued.</wsdl:documentation>
+            <wsdl:input message="ans:GetDeviceIdRequest"/>
+            <wsdl:output message="ans:GetDeviceIdResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+
+
+    <!--======= BINDINGS ======-->
+
+    <wsdl:binding name="AppManagementBinding" type="ans:AppManagement">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+        <wsdl:operation name="Uninstall">
+            <soap:operation soapAction="http://www.onvif.org/ver10/appmgmt/wsdl/Uninstall"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="GetInstalledApps">
+            <soap:operation soapAction="http://www.onvif.org/ver10/appmgmt/wsdl/GetInstalledApps"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="GetAppsInfo">
+            <soap:operation soapAction="http://www.onvif.org/ver10/appmgmt/wsdl/GetAppsInfo"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="Activate">
+            <soap:operation soapAction="http://www.onvif.org/ver10/appmgmt/wsdl/Activate"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="Deactivate">
+            <soap:operation soapAction="http://www.onvif.org/ver10/appmgmt/wsdl/Deactivate"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        
+        <wsdl:operation name="GetServiceCapabilities">
+            <soap:operation soapAction="http://www.onvif.org/ver10/appmgmt/wsdl/GetServiceCapabilities"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        
+        <wsdl:operation name="InstallLicense">
+            <soap:operation soapAction="http://www.onvif.org/ver10/appmgmt/wsdl/InstallLicense"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+
+        <wsdl:operation name="GetDeviceId">
+            <soap:operation soapAction="http://www.onvif.org/ver10/appmgmt/wsdl/GetDeviceId"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+</wsdl:definitions>

@@ -1,0 +1,16 @@
+<AppConfig>
+	<XSDGen>
+		<default>
+			<include>include/Pizzeria</include>
+			<src>src</src>
+			<includeRoot>include</includeRoot>
+			<timestamps>false</timestamps>
+		</default>
+		<schema targetNamespace="http://www.appinf.com/webservices/PizzaDeliveryService/">
+			<namespace>Pizzeria</namespace>
+		</schema>
+		<schema targetNamespace="http://www.appinf.com/remoting">
+			<namespace>Pizzeria</namespace>
+		</schema>	
+	</XSDGen>
+</AppConfig>
