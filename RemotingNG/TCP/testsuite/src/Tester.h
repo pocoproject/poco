@@ -6,7 +6,7 @@
 // Copyright (c) 2009-2012, Applied Informatics Software Engineering GmbH.
 // All rights reserved.
 //
-// License: Applied Informatics Software and Source Code License Agreement
+// SPDX-License-Identifier:	BSL-1.0
 //
 
 
