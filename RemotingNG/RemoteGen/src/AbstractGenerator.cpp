@@ -31,9 +31,6 @@
 #include "Poco/Util/HelpFormatter.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include <stack>
-#if defined(POCO_REQUIRE_LICENSE)
-#include "Poco/Licensing/License.h"
-#endif
 
 
 using Poco::CodeGeneration::Utility;
@@ -50,9 +47,6 @@ AbstractGenerator::AbstractGenerator(Poco::CodeGeneration::CppGenerator& cppGen)
 	_pStructIn(0),
 	_pNs(0)
 {
-#if defined(POCO_REQUIRE_LICENSE)
-	poco_verify_license(RemoteGen);
-#endif
 	Poco::CppParser::Symbol* pS = Poco::CppParser::NameSpace::root();
 	if (!_cppGen.nameSpace().empty())
 	{
