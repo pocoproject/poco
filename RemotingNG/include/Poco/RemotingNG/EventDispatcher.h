@@ -34,6 +34,9 @@ namespace Poco {
 namespace RemotingNG {
 
 
+class ORB;
+
+
 class RemotingNG_API EventDispatcher: public Poco::RefCountedObject
 	/// The EventDispatcher is responsible for delivering
 	/// events fired by service objects to remote subscribers.
@@ -63,13 +66,6 @@ public:
 
 	virtual ~EventDispatcher();
 		/// Destroys the EventDispatcher.
-
-	void setOwner(Poco::AutoPtr<Poco::RefCountedObject> pOwner);
-		/// Keeps the object whose events this dispatcher forwards alive for the
-		/// lifetime of the dispatcher. The ORB calls this when the dispatcher is
-		/// registered: generated dispatchers hold the remote object by plain pointer
-		/// and unsubscribe from its events in their destructor, so the object must
-		/// not be destroyed while a dispatcher reference is held elsewhere.
 
 	void subscribe(const std::string& subscriberURI, const std::string& endpointURI, Poco::Clock expireTime = 0);
 		/// Registers a remote EventSubscriber identified by
@@ -159,8 +155,17 @@ private:
 	EventDispatcher(const EventDispatcher&);
 	EventDispatcher& operator = (const EventDispatcher&);
 
+	void setOwner(const Poco::AutoPtr<Poco::RefCountedObject>& pOwner);
+		/// Keeps the object whose events this dispatcher forwards alive for the
+		/// lifetime of the dispatcher. The ORB calls this when the dispatcher is
+		/// registered: generated dispatchers hold the remote object by plain pointer
+		/// and unsubscribe from its events in their destructor, so the object must
+		/// not be destroyed while a dispatcher reference is held elsewhere.
+
 	std::string _protocol;
 	Poco::AutoPtr<Poco::RefCountedObject> _pOwner;
+
+	friend class ORB;
 };
 
 
