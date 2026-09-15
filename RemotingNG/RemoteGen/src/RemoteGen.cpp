@@ -53,9 +53,6 @@
 #include "ExtensionsGenerator.h"
 #include "EventDispatcherGenerator.h"
 #include "EventSubscriberGenerator.h"
-#if defined(POCO_REQUIRE_LICENSE)
-#include "Poco/Licensing/License.h"
-#endif
 #include <set>
 #include <fstream>
 #include <iostream>
@@ -1063,9 +1060,6 @@ protected:
 		{
 			try
 			{
-				#if defined(POCO_REQUIRE_LICENSE)
-				poco_verify_license(RemoteGen);
-				#endif
 
 				for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
 				{
