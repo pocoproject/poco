@@ -395,9 +395,13 @@ RemotingNG-libexec: Foundation-libexec
 RemotingNG-tests: RemotingNG-libexec cppunit
 	$(MAKE) -C $(POCO_BASE)/RemotingNG/testsuite
 
+RemotingNG-samples: RemotingNG/TCP-libexec RemotingNG/REST-libexec RemotingNG/SOAP-libexec NetSSL_OpenSSL-libexec Util-libexec
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/samples
+
 RemotingNG-clean:
 	$(MAKE) -C $(POCO_BASE)/RemotingNG clean
 	$(MAKE) -C $(POCO_BASE)/RemotingNG/testsuite clean
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/samples clean
 
 RemotingNG/TCP-libexec: Net-libexec RemotingNG-libexec
 	$(MAKE) -C $(POCO_BASE)/RemotingNG/TCP
@@ -454,9 +458,6 @@ RemotingNG/RemoteGen-libexec: RemotingNG-libexec CodeGeneration-libexec CppParse
 
 RemotingNG/RemoteGen-clean:
 	$(MAKE) -C $(POCO_BASE)/RemotingNG/RemoteGen clean
-
-RemotingNG-samples: RemotingNG/TCP-libexec RemotingNG/REST-libexec RemotingNG/SOAP-libexec NetSSL_OpenSSL-libexec Util-libexec
-	$(MAKE) -C $(POCO_BASE)/RemotingNG/samples
 
 PDF-libexec: Util-libexec XML-libexec JSON-libexec Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/PDF
