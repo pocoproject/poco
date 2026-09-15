@@ -124,17 +124,14 @@ private:
 	void ensureConnection();
 		/// Ensures we have an active connection, creating one if needed.
 
-	void executeWithRetry(std::function<void()> operation);
-		/// Executes an operation with automatic retry on retriable errors.
+	Connection::Ptr selectConnection(bool waitForServer);
+		/// Returns a new connection to a server that matches the read preference,
+		/// or null if there is none. If waitForServer is true, waits for a server
+		/// to become available before giving up. Connect errors propagate.
 
-	bool isRetriableError(const std::exception& e);
-		/// Returns true if the exception represents a retriable error.
-
-	bool isRetriableMongoDBError(const OpMsgMessage& response);
-		/// Returns true if the MongoDB response contains a retriable error code.
-
-	void markServerFailed();
-		/// Marks the current server as failed in the topology.
+	void executeWithRetry(OpMsgMessage& request, OpMsgMessage& response);
+		/// Sends the request and reads the response. Retries only when that cannot
+		/// apply the command twice or skip data; a retry may reach the same server.
 
 	ReplicaSet& _replicaSet;
 	ReadPreference _readPreference;
