@@ -85,8 +85,8 @@ struct ElementTraits<JavaScriptCode::Ptr>
 template<>
 inline void BSONReader::read<JavaScriptCode::Ptr>(JavaScriptCode::Ptr& to)
 {
-	std::string code;
-	BSONReader(_reader).read(code);
+	Int32 available = MAX_MESSAGE_SIZE_BYTES;
+	const std::string code = readString(available);
 	to = new JavaScriptCode();
 	to->setCode(code);
 }

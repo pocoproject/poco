@@ -96,6 +96,9 @@ public:
 
 	void readResponse(OpMsgMessage& response);
 		/// Reads a response for a previously sent request.
+		///
+		/// Throws Poco::IOException if the connection that carries the reply is
+		/// gone; no other connection can continue it.
 
 	[[nodiscard]] Net::SocketAddress address() const;
 		/// Returns the address of the currently connected server.

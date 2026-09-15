@@ -47,6 +47,17 @@ MongoDBTest::~MongoDBTest()
 
 void MongoDBTest::setUp()
 {
+	// A connection that closed itself after an unreadable reply would otherwise
+	// fail every later test.
+	if (!_mongo.isNull() && !_mongo->isConnected())
+	{
+#if POCO_OS == POCO_OS_ANDROID
+		const std::string host = "10.0.2.2";
+#else
+		const std::string host = "127.0.0.1";
+#endif
+		_mongo = new Poco::MongoDB::Connection(host, 27017);
+	}
 }
 
 
@@ -221,6 +232,13 @@ CppUnit::Test* MongoDBTest::suite()
 		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdCursorAggregate);
 		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdKillCursor);
 		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdCursorEmptyFirstBatch);
+
+		// Replies larger than 16 MiB and requests larger than maxMessageSizeBytes
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdFindMaxSizeDocument);
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdFindShowRecordId);
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdAggregateOutputAbove16MB);
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdCursorLargeBatch);
+		CppUnit_addTest(pSuite, MongoDBTest, testOpCmdInsertExceedsMaxMessageSize);
 
 		CppUnit_addTest(pSuite, MongoDBTest, testDBCount);
 

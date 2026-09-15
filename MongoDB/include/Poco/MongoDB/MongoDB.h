@@ -58,8 +58,8 @@
 namespace Poco {
 namespace MongoDB {
 
-/// Maximum BSON document size (16 MB) per MongoDB specification.
-/// Applies to documents, strings, binary data, and cstrings.
+/// Maximum size of a document a client can insert or update (hello.maxBsonObjectSize).
+/// Replies can contain larger documents, such as oplog entries.
 static constexpr Poco::Int32 BSON_MAX_DOCUMENT_SIZE = 16 * 1024 * 1024;
 
 /// Minimum BSON document size (5 bytes): 4-byte size field + 1-byte null terminator.
@@ -68,8 +68,14 @@ static constexpr Poco::Int32 BSON_MIN_DOCUMENT_SIZE = 5;
 /// Minimum BSON string size (1 byte for the null terminator).
 static constexpr Poco::Int32 BSON_MIN_STRING_SIZE = 1;
 
-/// Maximum OP_MSG message size (48 MB) per MongoDB specification.
+/// No longer used; MAX_MESSAGE_SIZE_BYTES limits messages in both directions.
+POCO_DEPRECATED("use MAX_MESSAGE_SIZE_BYTES")
 static constexpr Poco::Int32 OP_MSG_MAX_SIZE = 48 * 1024 * 1024;
+
+/// Maximum size of a message in either direction, header included
+/// (hello.maxMessageSizeBytes). The server closes the connection on a larger
+/// request. It also bounds every document and value that is read.
+static constexpr Poco::Int32 MAX_MESSAGE_SIZE_BYTES = 48000000;
 
 /// Default local threshold for "nearest" read preference (15 ms = 15000 µs).
 /// Servers within this threshold of the minimum RTT are eligible for selection.
