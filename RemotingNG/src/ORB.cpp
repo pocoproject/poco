@@ -538,6 +538,7 @@ void ORB::registerEventDispatcher(const std::string& uri, EventDispatcher::Ptr p
 	if (itRO != _remoteObjectURIs.end())
 	{
 		itRO->second->eventDispatchers[pDispatcher->protocol()] = pDispatcher;
+		pDispatcher->setOwner(itRO->second->pRemoteObject);
 	}
 	else throw Poco::NotFoundException("remote object", uri);
 }

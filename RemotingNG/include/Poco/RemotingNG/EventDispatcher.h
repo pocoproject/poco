@@ -64,6 +64,13 @@ public:
 	virtual ~EventDispatcher();
 		/// Destroys the EventDispatcher.
 
+	void setOwner(Poco::AutoPtr<Poco::RefCountedObject> pOwner);
+		/// Keeps the object whose events this dispatcher forwards alive for the
+		/// lifetime of the dispatcher. The ORB calls this when the dispatcher is
+		/// registered: generated dispatchers hold the remote object by plain pointer
+		/// and unsubscribe from its events in their destructor, so the object must
+		/// not be destroyed while a dispatcher reference is held elsewhere.
+
 	void subscribe(const std::string& subscriberURI, const std::string& endpointURI, Poco::Clock expireTime = 0);
 		/// Registers a remote EventSubscriber identified by
 		/// the given subscriberURI. Events will be sent to the
@@ -153,6 +160,7 @@ private:
 	EventDispatcher& operator = (const EventDispatcher&);
 
 	std::string _protocol;
+	Poco::AutoPtr<Poco::RefCountedObject> _pOwner;
 };
 
 
