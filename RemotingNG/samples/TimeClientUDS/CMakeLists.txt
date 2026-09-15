@@ -1,4 +1,4 @@
-set(SAMPLE "TimeClientTCP")
+set(SAMPLE "TimeClientUDS")
 
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
