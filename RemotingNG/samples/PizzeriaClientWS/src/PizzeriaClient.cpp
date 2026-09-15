@@ -4,9 +4,7 @@
 // Copyright (c) 2006-2012, Applied Informatics Software Engineering GmbH.
 // All rights reserved.
 //
-// This is unpublished proprietary source code of Applied Informatics.
-// The contents of this file may not be disclosed to third parties,
-// copied or duplicated in any form, in whole or in part.
+// SPDX-License-Identifier:	BSL-1.0
 //
 // NOTE: The code for invoking the PizzaDeliveryService web service has been
 // generated from the WSDL document for PizzaDeliveryService using the
