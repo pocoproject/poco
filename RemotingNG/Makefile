@@ -21,6 +21,6 @@ objects = SerializerBase Serializer Deserializer \
 
 target         = PocoRemotingNG
 target_version = $(LIBVERSION)
-target_libs    = PocoFoundation $(POCO_LICENSING)
+target_libs    = PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib

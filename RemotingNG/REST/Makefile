@@ -20,6 +20,6 @@ objects = Listener Transport TransportFactory CookieStore \
 
 target         = PocoRemotingNGREST
 target_version = $(LIBVERSION)
-target_libs    = PocoRemotingNG PocoNet PocoFoundation $(POCO_LICENSING)
+target_libs    = PocoRemotingNG PocoNet PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib

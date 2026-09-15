@@ -8,8 +8,8 @@ POCO_HEADERS_AUTO(SRCS_SOAP ${HDRS_G})
 
 # Version Resource
 if(MSVC AND BUILD_SHARED_LIBS)
-	source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/ProDLLVersion.rc)
-	list(APPEND SRCS_SOAP ${PROJECT_SOURCE_DIR}/ProDLLVersion.rc)
+	source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
+	list(APPEND SRCS_SOAP ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
 add_library(RemotingNGSOAP ${SRCS_SOAP})
@@ -25,7 +25,7 @@ target_link_libraries(RemotingNGSOAP PUBLIC Poco::Foundation Poco::XML Poco::Net
 target_include_directories(RemotingNGSOAP
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-		$<INSTALL_INTERFACE:include>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 

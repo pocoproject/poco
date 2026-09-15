@@ -81,7 +81,7 @@ poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
-COMPONENTS = Foundation Encodings XML JSON Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL ActiveRecord ActiveRecord/Compiler Zip PageCompiler PageCompiler/File2Page JWT CppParser PDF MongoDB Redis Prometheus
+COMPONENTS = Foundation Encodings XML JSON Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL ActiveRecord ActiveRecord/Compiler Zip PageCompiler PageCompiler/File2Page JWT CppParser CodeGeneration RemotingNG RemotingNG/TCP RemotingNG/HTTP RemotingNG/JSONRPC RemotingNG/REST RemotingNG/SOAP RemotingNG/RemoteGen PDF MongoDB Redis Prometheus
 
 cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit
@@ -378,6 +378,82 @@ CppParser-tests: CppParser-libexec cppunit
 CppParser-clean:
 	$(MAKE) -C $(POCO_BASE)/CppParser clean
 	$(MAKE) -C $(POCO_BASE)/CppParser/testsuite clean
+
+CodeGeneration-libexec: Foundation-libexec CppParser-libexec
+	$(MAKE) -C $(POCO_BASE)/CodeGeneration
+
+CodeGeneration-tests: CodeGeneration-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/CodeGeneration/testsuite
+
+CodeGeneration-clean:
+	$(MAKE) -C $(POCO_BASE)/CodeGeneration clean
+	$(MAKE) -C $(POCO_BASE)/CodeGeneration/testsuite clean
+
+RemotingNG-libexec: Foundation-libexec
+	$(MAKE) -C $(POCO_BASE)/RemotingNG
+
+RemotingNG-tests: RemotingNG-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/testsuite
+
+RemotingNG-clean:
+	$(MAKE) -C $(POCO_BASE)/RemotingNG clean
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/testsuite clean
+
+RemotingNG/TCP-libexec: Net-libexec RemotingNG-libexec
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/TCP
+
+RemotingNG/TCP-tests: RemotingNG/TCP-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/TCP/testsuite
+
+RemotingNG/TCP-clean:
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/TCP clean
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/TCP/testsuite clean
+
+RemotingNG/HTTP-libexec: Net-libexec RemotingNG-libexec
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/HTTP
+
+RemotingNG/HTTP-tests: RemotingNG/HTTP-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/HTTP/testsuite
+
+RemotingNG/HTTP-clean:
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/HTTP clean
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/HTTP/testsuite clean
+
+RemotingNG/JSONRPC-libexec: Net-libexec RemotingNG-libexec
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/JSONRPC
+
+RemotingNG/JSONRPC-tests: RemotingNG/JSONRPC-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/JSONRPC/testsuite
+
+RemotingNG/JSONRPC-clean:
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/JSONRPC clean
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/JSONRPC/testsuite clean
+
+RemotingNG/REST-libexec: Net-libexec RemotingNG-libexec
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/REST
+
+RemotingNG/REST-tests: RemotingNG/REST-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/REST/testsuite
+
+RemotingNG/REST-clean:
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/REST clean
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/REST/testsuite clean
+
+RemotingNG/SOAP-libexec: XML-libexec Net-libexec RemotingNG-libexec
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/SOAP
+
+RemotingNG/SOAP-tests: RemotingNG/SOAP-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/SOAP/testsuite
+
+RemotingNG/SOAP-clean:
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/SOAP clean
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/SOAP/testsuite clean
+
+RemotingNG/RemoteGen-libexec: RemotingNG-libexec CodeGeneration-libexec CppParser-libexec Util-libexec XML-libexec JSON-libexec Net-libexec
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/RemoteGen
+
+RemotingNG/RemoteGen-clean:
+	$(MAKE) -C $(POCO_BASE)/RemotingNG/RemoteGen clean
 
 PDF-libexec: Util-libexec XML-libexec JSON-libexec Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/PDF
