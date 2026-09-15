@@ -35,13 +35,14 @@ class ReplicaSet;
 
 
 class MongoDB_API ReplicaSetConnection
-	/// Wrapper around Connection that provides automatic retry and failover
-	/// for MongoDB replica set operations.
-	///
-	/// This class wraps a Connection and automatically retries failed operations
-	/// on different replica set members. It detects retriable errors (network
-	/// failures, "not master" errors, etc.) and seamlessly fails over to another
-	/// suitable server.
+	/// Wrapper around Connection that selects a replica set server by read
+	/// preference and re-sends a failed request when that is safe. The
+	/// connection is opened on first use and reused while it stays open; a
+	/// failed attempt drops it, so the next attempt selects a server again.
+	/// Safe reads are re-sent after a network error, a timeout or a listed
+	/// error reply; getMore and killCursors are never re-sent; every other
+	/// command only after a not-primary reply, which means it was not
+	/// executed. MongoDB/README-ReplicaSet.md lists the commands and replies.
 	///
 	/// Usage example:
 	///   ReplicaSet rs(config);
@@ -52,7 +53,7 @@ class MongoDB_API ReplicaSetConnection
 	///   request.body().add("filter", filterDoc);
 	///
 	///   OpMsgMessage response;
-	///   conn->sendRequest(request, response);  // Automatic retry on failure
+	///   conn->sendRequest(request, response);  // find is re-sent after a network error
 	///
 	/// THREAD SAFETY:
 	/// This class is NOT thread-safe, just like Connection. Each thread must
@@ -67,31 +68,36 @@ public:
 
 	ReplicaSetConnection(ReplicaSet& replicaSet, const ReadPreference& readPref);
 		/// Creates a ReplicaSetConnection for the given replica set and read preference.
-		/// Timeouts and retries are inherited from the ReplicaSet's configuration.
-		/// The connection is established lazily on first use.
+		/// Timeouts and the wait for an available server come from the ReplicaSet
+		/// configuration. Connects on first use.
 
 	ReplicaSetConnection(ReplicaSet& replicaSet, const ReadPreference& readPref,
 		Poco::Timespan connectTimeout, Poco::Timespan socketTimeout = 0);
-		/// Creates a ReplicaSetConnection for the given replica set and read preference,
-		/// with explicit connect and socket timeouts.
-		/// These timeouts override the ReplicaSet's configured timeouts for
-		/// connections created through this ReplicaSetConnection instance.
-		/// The connection is established lazily on first use.
+		/// Creates a ReplicaSetConnection with explicit timeouts for its own
+		/// connections; topology refreshes keep the configured ones. socketTimeout
+		/// defaults to 0, which means no socket timeout. Connects on first use.
 
 	~ReplicaSetConnection();
 		/// Destroys the ReplicaSetConnection.
 
 	void sendRequest(OpMsgMessage& request, OpMsgMessage& response);
-		/// Sends a request and reads the response.
-		/// Automatically retries on retriable errors with failover.
-		///
-		/// Throws Poco::IOException if all retry attempts fail.
+		/// Sends a request and reads the response, re-sending as described above.
+		/// Makes at most max(number of servers in the topology, 5) attempts; a
+		/// failed connect counts as one. An error reply not listed in
+		/// MongoDB/README-ReplicaSet.md is returned in response.
+		/// Throws Poco::IOException or Poco::TimeoutException when a network
+		/// failure is not re-sent or the last attempt fails; IOException("MongoDB
+		/// server error: ...") for a listed reply that is not re-sent or ends the
+		/// last attempt, which response holds; IOException("No suitable server
+		/// found in replica set"), with the previous failure, if any, nested;
+		/// DataFormatException or NotImplementedException for a malformed reply
+		/// or an unsupported BSON element type.
 
 	void sendRequest(OpMsgMessage& request);
 		/// Sends a one-way request (fire-and-forget).
 		/// Sets MSG_MORE_TO_COME flag and acknowledged=false.
 		///
-		/// Note: One-way requests are not retried on failure.
+		/// Note: One-way requests are not re-sent on failure.
 
 	void readResponse(OpMsgMessage& response);
 		/// Reads a response for a previously sent request.
@@ -109,7 +115,7 @@ public:
 
 	void reconnect();
 		/// Forces reconnection by selecting a new server from the replica set.
-		/// Useful if you detect an error and want to explicitly retry.
+		/// Useful if you detect an error and want to send the request again.
 
 	[[nodiscard]] bool isConnected() const noexcept;
 		/// Returns true if currently connected to a server.
@@ -124,17 +130,14 @@ private:
 	void ensureConnection();
 		/// Ensures we have an active connection, creating one if needed.
 
-	void executeWithRetry(std::function<void()> operation);
-		/// Executes an operation with automatic retry on retriable errors.
+	Connection::Ptr selectConnection(bool waitForServer);
+		/// Returns a new connection to a server that matches the read preference,
+		/// or null if there is none. If waitForServer is true, waits for a server
+		/// to become available before giving up. Connect errors propagate.
 
-	bool isRetriableError(const std::exception& e);
-		/// Returns true if the exception represents a retriable error.
-
-	bool isRetriableMongoDBError(const OpMsgMessage& response);
-		/// Returns true if the MongoDB response contains a retriable error code.
-
-	void markServerFailed();
-		/// Marks the current server as failed in the topology.
+	void executeWithRetry(OpMsgMessage& request, OpMsgMessage& response);
+		/// Sends the request and reads the response. Re-sends only when that cannot
+		/// apply the command twice or skip data; a re-send may reach the same server.
 
 	ReplicaSet& _replicaSet;
 	ReadPreference _readPreference;

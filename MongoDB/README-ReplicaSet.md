@@ -81,12 +81,11 @@ Main entry point for replica set operations:
 #### 6. ReplicaSetConnection
 **Location**: `MongoDB/include/Poco/MongoDB/ReplicaSetConnection.h`
 
-Transparent failover wrapper:
-- Automatic retry on retriable errors (network failures, "not master" errors)
-- Seamless failover to different replica set members
+Connection wrapper with bounded, command-aware re-sends:
+- Selects a server by read preference; at most max(number of servers in the topology, 5) attempts per request
+- Re-sends a request only when repeating the command is safe (see "Error Handling")
 - Same API as Connection for easy migration
-- Detects MongoDB error codes: NotMaster, PrimarySteppedDown, etc.
-- Per-operation server selection
+- Reuses the connection while it stays open, and selects a server again after it was dropped
 - Connection validation via `matchesReadPreference()` for pool usage
 
 #### 7. ReplicaSetPoolableConnectionFactory
@@ -104,9 +103,9 @@ Connection pooling support:
 
 Cursor support for replica sets:
 - Supports both Connection and ReplicaSetConnection
-- Automatic retry and failover when using ReplicaSetConnection
+- With ReplicaSetConnection, only the initial find or aggregate can be re-sent (see "Error Handling")
 - Same API for both connection types
-- next() and kill() operations benefit from transparent failover
+- kill() always releases the cursor on the client
 - Ideal for large result sets in replica set deployments
 
 #### 9. TopologyChangeNotification
@@ -124,14 +123,14 @@ Event notification for topology changes:
 ✅ **Initial configuration** - Modeled after official MongoDB C++ driver
 ✅ **Topology discovery** - Query actual replica set configuration via `hello` command
 ✅ **Primary switch detection** - Background monitoring detects elections
-✅ **Connection loss detection** - Automatic failover on network failures
-✅ **Transparent retry** - Automatic request retry with server failover
+✅ **Reconnect after failures** - A server is selected again after the connection was dropped
+✅ **Bounded re-send** - A request is re-sent only when repeating the command is safe
 ✅ **Background monitoring** - Configurable heartbeat (default: 10 seconds)
 ✅ **Full read preference support** - All 5 modes with tags and max staleness
 ✅ **Thread-safe** - Replica set management is thread-safe
 ✅ **Connection pooling** - Compatible with existing ConnectionPool pattern
 ✅ **Smart connection validation** - Cached connections automatically invalidated when server role changes
-✅ **OpMsgCursor support** - Cursors work with both Connection and ReplicaSetConnection for automatic failover
+✅ **OpMsgCursor support** - Cursors work with both Connection and ReplicaSetConnection
 ✅ **Topology change notifications** - Automatic notifications via Poco::NotificationCenter when topology changes
 ✅ **URI parsing and generation** - ReplicaSetURI class for parsing, validating, and generating MongoDB URIs
 ✅ **Configuration validation** - Enforces MongoDB SDAM specification constraints (e.g., minimum heartbeat frequency)
@@ -172,7 +171,7 @@ Event notification for topology changes:
 - `MongoDB/include/Poco/MongoDB/ReplicaSet.h` - Complete rewrite with new API
 - `MongoDB/src/ReplicaSet.cpp` - Complete rewrite with background monitoring
 - `MongoDB/include/Poco/MongoDB/OpMsgCursor.h` - Added ReplicaSetConnection support
-- `MongoDB/src/OpMsgCursor.cpp` - Added ReplicaSetConnection support with automatic failover
+- `MongoDB/src/OpMsgCursor.cpp` - Added ReplicaSetConnection support
 - `MongoDB/samples/CMakeLists.txt` - Added ReplicaSet samples
 
 ## Usage Examples
@@ -261,7 +260,7 @@ OpMsgMessage response;
 conn->sendRequest(request, response);
 ```
 
-### Transparent Failover with Retry
+### Failover with Re-send
 
 ```cpp
 #include "Poco/MongoDB/ReplicaSet.h"
@@ -272,19 +271,19 @@ using namespace Poco::MongoDB;
 
 ReplicaSet rs(config);
 
-// Create connection with automatic failover
+// No connection is opened until the first request
 ReplicaSetConnection::Ptr conn = new ReplicaSetConnection(
     rs,
     ReadPreference(ReadPreference::PrimaryPreferred)
 );
 
-// Operations automatically retry on failure with failover
 OpMsgMessage request("mydb", "mycollection");
-request.setCommandName(OpMsgMessage::CMD_INSERT);
-request.documents().push_back(myDocument);
+request.setCommandName(OpMsgMessage::CMD_FIND);
+request.body().add("filter", filterDoc);
 
 OpMsgMessage response;
-conn->sendRequest(request, response);  // Auto-retry on failure
+conn->sendRequest(request, response);  // find is re-sent after a network error
+// An insert is re-sent only after a not-primary reply.
 ```
 
 ### Read Preferences
@@ -342,7 +341,7 @@ ObjectPool<ReplicaSetConnection, ReplicaSetConnection::Ptr>
 }  // Automatically returned to pool
 
 // Pool automatically validates connections before borrowing:
-// - Checks connection is still alive
+// - Checks that the local socket is open
 // - Verifies connected server still matches read preference
 // - If primary becomes secondary (or vice versa), connection is invalidated
 //   and a new one is created automatically
@@ -368,7 +367,7 @@ OpMsgCursor cursor("mydb", "mycollection");
 cursor.query().setCommandName(OpMsgMessage::CMD_FIND);
 cursor.query().body().add("limit", 1000);
 
-// Fetch documents with automatic retry and failover
+// The initial find can be re-sent after a network error
 OpMsgMessage& response = cursor.next(*conn);
 
 while (cursor.isActive() && response.responseOk())
@@ -380,13 +379,18 @@ while (cursor.isActive() && response.responseOk())
         // Process document
     }
 
-    // Fetch next batch - automatic failover on errors
-    response = cursor.next(*conn);
+    // getMore is not re-sent; after a throw, kill() and query again.
+    // next() updates the message that response refers to.
+    cursor.next(*conn);
 }
 
+// The loop also ends on an error reply: check response.responseOk() here.
+
 // Clean up cursor resources
-cursor.kill(*conn);  // Automatic retry if needed
+cursor.kill(*conn);  // Not re-sent; the cursor is released even if this throws
 ```
+
+After the connection was dropped, `kill()` may reach another server, which usually answers `cursorsNotFound`; the cursor may stay open on its original server until the server's cursor timeout.
 
 ### Working with ReplicaSetURI - Parse, Validate, Modify
 
@@ -604,12 +608,9 @@ config.setName = "rs0";
 // Optional: Default read preference
 config.readPreference = ReadPreference(ReadPreference::PrimaryPreferred);
 
-// Optional: Connection timeout (seconds)
-// NOTE: Currently unused - intended for custom SocketFactory implementations
+// Connect and socket timeouts in seconds; 0 means no timeout.
+// A custom SocketFactory applies its own instead (see "Timeouts").
 config.connectTimeoutSeconds = 10;
-
-// Optional: Socket timeout (seconds)
-// NOTE: Currently unused - intended for custom SocketFactory implementations
 config.socketTimeoutSeconds = 30;
 
 // Optional: Heartbeat frequency (seconds)
@@ -627,6 +628,10 @@ config.enableMonitoring = true;
 // Optional: Custom socket factory (for SSL/TLS)
 config.socketFactory = &myCustomSocketFactory;
 ```
+
+**Timeouts**
+
+`Config::connectTimeoutSeconds` and `Config::socketTimeoutSeconds` apply to every connection the ReplicaSet creates, including the ones used for `hello` topology refreshes, and 0 means no timeout. Explicit timeouts passed to `ReplicaSetConnection` or `ReplicaSetPoolableConnectionFactory` replace them for that instance's own connections, while a custom `SocketFactory` applies its own instead.
 
 ### ReplicaSetURI - URI Parsing and Generation
 
@@ -983,12 +988,9 @@ The implementation follows the MongoDB SDAM specification:
    - Nearest: Any available member (primary or secondary)
    - **Note**: Standalone servers are treated as primaries for read preference purposes, allowing the same code to work with both single-server and replica set deployments
 
-4. **Automatic Failover**
-   - Detect retriable errors (network, "not master", etc.)
-   - Mark failed server as Unknown
-   - Trigger immediate topology refresh
-   - Select new server and retry operation
-   - Throw exception if all servers fail
+4. **Failover** (ReplicaSetConnection)
+   - Marks a server that cannot be connected to as Unknown, and refreshes the topology after a listed error reply or an error while sending or reading
+   - Selects a server again and re-sends the request if that is safe; throws otherwise and when the attempts end (see "Error Handling")
 
 5. **Connection Pool Validation**
    - Pool validates connections before borrowing via `validateObject()`
@@ -1067,23 +1069,25 @@ This ensures applications always receive connections to servers that satisfy the
 
 ### Error Handling
 
-**Retriable Errors:**
-- Network exceptions: `Poco::Net::NetException`, `Poco::TimeoutException`
-- MongoDB error codes:
-  - 10107: NotMaster
-  - 13435: NotMasterNoSlaveOk
-  - 11600: InterruptedAtShutdown
-  - 11602: InterruptedDueToReplStateChange
-  - 13436: NotMasterOrSecondary
-  - 189: PrimarySteppedDown
-  - 91: ShutdownInProgress
+`ReplicaSetConnection::sendRequest(request, response)` makes at most max(number of servers in the topology, 5) attempts. The connection is opened on first use and reused while it stays open; a network failure, a malformed reply or a listed error reply drops it, so the next attempt selects a server again, which may be the same one. An error reply that is not listed in the table is returned in `response` without an exception. `Connection` does not re-send.
 
-**Retry Strategy:**
-- Try each available server once
-- No exponential backoff (fast failover)
-- Immediate topology refresh on error
-- Server selection per retry
-- Throw exception after all servers fail
+Safe reads are `find`, `count`, `distinct`, `listCollections`, `listIndexes`, `listDatabases`, `explain`, `hello`, `isMaster` (or `ismaster`), `ping`, `buildInfo`, and `aggregate` without a `$out` or `$merge` stage; `getMore` and `killCursors` belong to the server that created the cursor; every other command, writes included, is "other".
+
+| Failure | Safe reads | getMore / killCursors | Other commands |
+|---|---|---|---|
+| Connect failure (`Poco::IOException`, `Poco::TimeoutException`) | Next attempt | Next attempt | Next attempt |
+| No selectable server | `IOException("No suitable server found in replica set")` | `IOException("No suitable server found in replica set")` | `IOException("No suitable server found in replica set")` |
+| Network error or timeout once sending started (`Poco::IOException`) | Re-sent | Exception rethrown | Exception rethrown |
+| Not-primary reply (codes 10107, 13435, 13436, 10058; not executed) | Re-sent | `IOException("MongoDB server error: ...")` | Re-sent |
+| Interrupted, shutdown or network error reply (codes 11600, 11602, 189, 91, 7, 6, 89, 9001; may have run) | Re-sent | `IOException("MongoDB server error: ...")` | `IOException("MongoDB server error: ...")` |
+
+Exceptions:
+- `Poco::IOException` or `Poco::TimeoutException`, rethrown when the failure is not re-sent and after the last attempt.
+- `Poco::IOException("MongoDB server error: <reply>")` for a listed error reply that is not re-sent, and after the last attempt; `response` holds the reply.
+- `Poco::IOException("No suitable server found in replica set")`, thrown without further attempts; the previous attempt's exception, if any, is nested.
+- `Poco::DataFormatException` (malformed reply) and `Poco::NotImplementedException` (unsupported BSON element type), never re-sent.
+
+Worst case: roughly attempts x (connect timeout + socket timeout + one topology refresh), plus, on each attempt, up to `serverReconnectRetries` x (`serverReconnectDelaySeconds` + one topology refresh) waiting for an available server; a refresh sends one `hello` to each server in turn. There is no exponential backoff.
 
 ## Migration Guide
 
@@ -1104,7 +1108,7 @@ Connection::Ptr conn = rs.getPrimaryConnection();
 conn->sendRequest(request, response);
 ```
 
-**After (replica set, with transparent retry):**
+**After (replica set, with bounded re-send):**
 ```cpp
 ReplicaSet::Config config;
 config.seeds = {Net::SocketAddress("localhost", 27017)};
@@ -1113,7 +1117,7 @@ ReplicaSet rs(config);
 ReplicaSetConnection::Ptr conn = new ReplicaSetConnection(
     rs, ReadPreference(ReadPreference::Primary)
 );
-conn->sendRequest(request, response);  // Auto-retry on failure
+conn->sendRequest(request, response);  // Re-sent only when that is safe (see "Error Handling")
 ```
 
 **Important Note:**
@@ -1234,11 +1238,9 @@ cmake --build . --target MongoDB
 
 ### Current Limitations
 
-1. **Socket Timeouts**: The `Config::connectTimeoutSeconds` and `Config::socketTimeoutSeconds` fields are currently unused by the ReplicaSet implementation. These are intended for use by custom `SocketFactory` implementations. Custom `SocketFactory` implementations can access these values via `ReplicaSet::configuration()` to properly configure socket timeouts. Use `ReplicaSet::setSocketFactory()` to set a custom factory that utilizes these timeout values. See the "Using Custom SocketFactory with Timeout Configuration" section for a complete example. Without a custom `SocketFactory`, socket timeouts cannot be configured for replica set connections.
+1. **No Retryable Writes**: `lsid` and `txnNumber` are not used, so a write is re-sent only after a not-primary reply. After a network error or timeout the exception reaches the application, which decides whether repeating the write is safe.
 
-2. **Write Retry**: Only read operations are automatically retried. Write operations require manual retry logic.
-
-3. **SDAM Compliance Gaps**: Several MongoDB SDAM specification features are not implemented. See the "MongoDB SDAM Specification Compliance" section for detailed information on missing features, their impact, and mitigation strategies. Most notable:
+2. **SDAM Compliance Gaps**: Several MongoDB SDAM specification features are not implemented. See the "MongoDB SDAM Specification Compliance" section for detailed information on missing features, their impact, and mitigation strategies. Most notable:
    - "me" field validation (security risk)
    - setVersion/electionId tracking (split-brain risk)
    - Server removal logic (stale server references)
@@ -1256,7 +1258,7 @@ See the "MongoDB SDAM Specification Compliance" section for the complete list of
 - Server load balancing (connection count awareness)
 - Advanced metrics and observability hooks
 - DNS seedlist support (mongodb+srv://)
-- Automatic retry for write operations (requires transaction support)
+- Retryable writes (`lsid` and `txnNumber`)
 - Extended URI parsing (authentication, TLS options, additional parameters)
 - Compression support (snappy, zlib, zstd)
 - Client-side field level encryption
@@ -1453,7 +1455,7 @@ This implementation follows the [MongoDB Server Discovery and Monitoring (SDAM) 
 - **Read Preference Support** - All 5 read preference modes with tag-based selection
 - **Round-Trip Time Measurement** - Tracks server latency (but not used for server selection, see limitations below)
 - **Server Error Tracking** - Maintains error state and messages for failed servers
-- **Automatic Failover** - Detects and recovers from server failures
+- **Failover** - Marks a failed server Unknown, refreshes the topology and selects a server again; re-sends only what is safe (see "Error Handling")
 - **Mixed Server Type Validation** - Rejects incompatible server type combinations (Mongos+RS, Standalone+RS, multiple Standalones)
 
 ### Missing SDAM Features ⚠️
