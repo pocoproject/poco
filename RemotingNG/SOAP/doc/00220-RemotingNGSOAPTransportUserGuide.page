@@ -1,0 +1,378 @@
+Remoting NG SOAP Transport User Guide
+Remoting NG
+
+!!!Introduction
+
+The SOAP Transport is a Transport implementation supporting the
+[[http://www.w3.org/TR/2000/NOTE-SOAP-20000508/ SOAP 1.1]] and
+[[http://www.w3.org/TR/2007/REC-soap12-part0-20070427/ SOAP 1.2]] protocols over HTTP or HTTPS.
+SOAP messages exchanged over the network are formtted according to the
+Document/Literal (wrapped) or RPC/Literal message format defined in the [[http://www.w3.org/TR/wsdl WSDL 1.1]]
+specification, and the [[http://ws-i.org/Profiles/BasicProfile-1.2-2010-11-09.html WS-I Basic Profile 1.2]].
+
+This transport is a good choice if the remote service provided by a Remoting-based
+C++ application must be accessible by clients written using other frameworks or even
+other programming languages or runtimes, such as Java or .NET.
+
+The SOAP transport supports interoperability with other SOAP 1.1 or SOAP 1.2
+implementations (such as those available for Java or .NET) both directions.
+Java or .NET clients can consume a web service implemented using Remoting
+and the SOAP transport. Also, the SOAP transport can be used to invoke
+web services implemented using other SOAP toolkits. The necessary client code
+can be generated with the <*XSDGen*> and <*RemoteGenNG*> tools from an
+WSDL file.
+
+In addition to basic SOAP 1.1 and SOAP 1.2 support, the following features
+are also supported by the SOAP transport:
+
+  - Message Transport Optimization Mechanism
+    ([[http://www.w3.org/TR/soap12-mtom/ MTOM]]), allowing binary data
+    (std::vector<char>) to be transferred in raw binary form in a separate
+    part of a multipart message instead of being base64-encoded.
+  - HTTP compression using the GZIP content encoding.
+  - HTTP Basic and Digest authentication (client only).
+  - Support for WS-Security Username Token Profile
+
+
+!!!Basic SOAP Transport Usage
+
+!!Server Usage
+
+To use the SOAP Transport in a server, the following four steps must
+be performed:
+
+   1. Create an instance of Poco::RemotingNG::SOAP::Listener,
+   2. Optionally configure the listener (e.g., to enable MTOM),
+   3. Register the Listener with the ORB, and
+   4. Register the individual objects with the ORB.
+
+Furthermore, a <[namespace]> attribute must be added to the service class
+declaration. Otherwise, a run time error will occur when trying to invoke
+the web service.
+
+Following is an example code fragment for setting up a SOAP Listener,
+configuring it to enable MTOM,
+and registering a service object for use with the listener.
+
+    Poco::RemotingNG::SOAP::Listener::Ptr pListener = new Poco::RemotingNG::SOAP::Listener("localhost:8080", "");
+    pListener->enableMTOM(true);
+    std::string listener = Poco::RemotingNG::ORB::instance().registerListener(pListener);
+
+    st::string uri = Sample::TimeServiceServerHelper::registerObject(
+        new Sample::TimeService,
+        "TheTimeService",
+        listener
+    );
+----
+
+The SOAP listener will transparently accept SOAP 1.1 and SOAP 1.2 requests and send the
+response using the appropriate SOAP version.
+
+Please see the Poco::RemotingNG::SOAP::Listener class documentation for detailed information
+about how to setup and configure the listener.
+
+
+!!Client Usage
+
+To use the SOAP Transport in a client, the following two steps
+must be performed:
+
+  1. Register the Poco::RemotingNG::SOAP::TransportFactory with the ORB, and
+  2. Retrieve the interface (proxy) object using the helper class.
+
+Following is an example code fragment for setting up a SOAP Transport,
+and obtaining a Proxy object for invoking methods on the service object.
+
+    Poco::RemotingNG::SOAP::TransportFactory::registerFactory();
+    Sample::ITimeService::Ptr pTimeService = MyProject::MyClassHelper::find(
+        "http://localhost:8080/soap/TimeService/TheTimeService");
+    );
+----
+
+If the URI of the remote service does not match Remoting conventions, or, in other
+words, if it is from a third-party SOAP implementation, a second parameter must
+be passed to <*find()*>, specifying with transport to use. For the SOAP transport,
+this can be one of the following values:
+
+  - <[soap]> or <[soap-1.1]>: use SOAP 1.1
+  - <[soap-1.2]>: use SOAP 1.2.
+
+Example:
+
+    Poco::RemotingNG::SOAP::TransportFactory::registerFactory();
+    Sample::ISampleService::Ptr pService = Sample::SampleServiceClientHelper::find(
+        "http://www.example.com/services/SampleService",
+        "soap-1.2"
+    );
+----
+
+
+!Configuring The Client Transport
+
+To configure the client transport (e.g., to enable MTOM for client requests,
+enable HTTP compression, or HTTP authentication), the Transport object must
+be obtained from the proxy. This is done in two steps. First, the interface
+pointer obtained from the client helper must be casted to a proxy:
+
+    Poco::RemotingNG::Proxy::Ptr pProxy = pTimeService.cast<Poco::RemotingNG::Proxy>();
+----
+
+Second, the Transport object can be obtained from the proxy:
+
+    Poco::RemotingNG::SOAP::Transport& trans = static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport());
+----
+
+These two casts can also be put into a utility function <[transportFromInterface()]>:
+
+    template <class I>
+    Poco::RemotingNG::SOAP::Transport& transportFromInterface(Poco::AutoPtr<I> pInterface)
+    {
+        Poco::RemotingNG::Proxy::Ptr pProxy = pInterface.template cast<Poco::RemotingNG::Proxy>();
+        if (pProxy)
+        {
+            return static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport());
+        }
+        else throw Poco::BadCastException();
+    }
+----
+
+Using the <[transportFromInterface()]> function, we can write:
+
+    Poco::RemotingNG::SOAP::Transport& trans = transportFromInterface(pTimeService);
+----
+
+
+Now that we have access to the Transport object, we can configure it:
+
+    trans.enableCompression(true);
+    trans.enableMTOM(true);
+----
+
+Configuration should be done before the first method is invoked over the proxy.
+
+Please see the Poco::RemotingNG::SOAP::Transport class documentation for other
+configuration options, including timeouts and user-agent string.
+
+
+!Enabling HTTP Authentication
+
+The SOAP Transport supports HTTP Basic and Digest authentication. To enable authentication
+for a proxy object, first obtain the Transport object as shown in the previous section.
+HTTP Basic Authentication can then be enabled with:
+
+    trans.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_BASIC);
+    trans.setUsername("user");
+    trans.setPassword("s3cr3t");
+----
+
+To enable HTTP Digest Authentication:
+
+    trans.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_DIGEST);
+    trans.setUsername("user");
+    trans.setPassword("s3cr3t");
+    trans.enableChunkedTransferEncoding(false);
+----
+
+Please note that chunked transfer encoding must be disabled in order to use HTTP Digest
+Authentication.
+
+It is also possible to enable both Basic and Digest authentication and use whatever
+the server requests:
+
+    trans.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_ANY);
+    trans.setUsername("user");
+    trans.setPassword("s3cr3t");
+    trans.enableChunkedTransferEncoding(false);
+----
+
+
+!Enabling WS-Security Username and Token Profile Authentication
+
+In addition to HTTP-based authentication, the SOAP Transport also supports
+the WS-Security Username and Token Profile for authentication. On the client,
+enabling WS-Security support is done through the transport, by setting the
+authentication mode to `AUTH_WSSE_TEXT` (password is transmitted in plaintext)
+or `AUTH_WSSE_DIGEST` (password is transmitted as digest, along with nonce and timestamp).
+
+    trans.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_WSSE_DIGEST);
+    trans.setUsername("user");
+    trans.setPassword("s3cr3t");
+----
+
+This will add a `Security` element to the request's SOAP envelope header,
+according to the WS-Security Username Token Profile Version 1.1.1.
+
+On the server side, WS-Security can be enabled by calling `enableWSSE()`
+on the Poco::RemotingNG::SOAP::Listener. In addition, a Poco::RemotingNG::Authenticator
+subclass must be created and registered with the Listener.
+The custom WSSE authenticator must inspect the security credentials (Poco::RemotingNG::Credentials), which in case of
+WSSE contains the following attributes:
+
+  - `ATTR_USERNAME`: The value of the username from the Security/UsernameToken/Username element in the SOAP envelope header.
+  - `ATTR_PASSWORD`: The base64-encoded hashed Password value from the Security/UsernameToken element in the SOAP envelope header.
+  - `ATTR_NONCE`: The base64-encoded nonce from the Security/UsernameToken/Nonce element in the SOAP envelope header.
+    Note that this value must be decoded (e.g. with Poco::Base64Decoder) before being used for SHA1 computation to verify the password hash.
+  - `ATTR_CREATED`: The date/time in ISO8601 format used in the password hash from the Security/UsernameToken/Created element.
+  - `ATTR_MECHANISM`: The type of the password. If not specified, empty or the value is "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText",
+    the password is given in plain text. If the value is "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest",
+    the value is the base64-encoded digest computed from password, nonce and creation timestamp.
+
+!Customizing SOAP Serialization
+
+With some servers it is necessary to customize the way the SOAP XML messages
+are generated. For example, some servers do not like the <[encodingStyle]> attribute
+in the SOAP Envelope element. This can be done by setting serialization options
+on the Transport object. For example, to omit the <[encodingStyle]> attribute,
+specify the following:
+
+    trans.setSerializerOptions(Poco::RemotingNG::SOAP::Serializer::OPT_NO_ENCODINGSTYLE_ATTRIBUTE);
+----
+
+Some servers require the declaration of the SOAP Encoding namespace 
+(http://schemas.xmlsoap.org/soap/encoding/) in the envelope. This can be
+enabled by setting the <[Poco::RemotingNG::SOAP::Serializer::OPT_DECLARE_SOAPENC_NAMESPACE]>
+option.
+
+!Handling SOAP Faults
+
+SOAP servers report errors via SOAP Fault messages. On the client side, SOAP Fault messages
+received are reported by throwing a Poco::RemotingNG::SOAP::SOAPFaultException, which is a 
+subclass of Poco::RemotingNG::RemoteException. This exception class gives access to the
+different elements contained in a SOAP Fault element.
+
+The `faultCode()` method returns the value of the `faultcode` (SOAP 1.1) or `Fault/Code/Value` (SOAP 1.2) element.
+The `faultReason()` method returns the value of the `faultstring` (SOAP 1.1) or `Fault/Reason/Text` (SOAP 1.2) element.
+
+The `fault()` method returns the Fault element as a Poco::RemotingNG::SOAP::XMLElement and 
+thus gives access to the entire element content.
+
+!Cookies
+
+The SOAP Transport supports HTTP cookies. Any cookies sent by the server through
+a HTTP response will be sent back to the server with subsequent HTTP requests.
+The lifetime (maximum age) of cookies, if set, will be honored, and expired cookies
+will not be sent back to the server.
+
+Cookies are mostly useful for session-based authentication. The cookies stored
+in a Transport object can be obtained and shared with a different Transport
+object. This is useful if a SOAP server uses session cookies for authentication
+and the same session needs to be used by multiple proxy instances.
+
+Cookies are stored in a Poco::RemotingNG::SOAP::CookieStore object. A pointer
+(Poco::RemotingNG::SOAP::CookieStore::Ptr) to this object can be obtained
+by calling Poco::RemotingNG::SOAP::Transport::getCookieStore(). The cookie
+store can then be shared with a different Transport by calling
+Poco::RemotingNG::SOAP::Transport::setCookieStore().
+
+
+!!Performance Considerations
+
+The performance of the SOAP Transport is considerably lower than
+the that of the TCP Transport. Some of the reasons
+for this are:
+
+  * XML generation and especially XML parsing overhead,
+  * SOAP message overhead (SOAP envelope, header and body elements),
+  * XML uses way more bandwidth than a binary protocol, and
+  * the HTTP overhead is larger than the overhead for a
+    simple socket connection.
+
+Applications for which remote method call performance is critical,
+and which do not need to work with non Remoting applications
+should therefore prefer the TCP transport to the SOAP
+transport.
+
+
+!!Text Encoding Considerations
+
+All strings used in remote interfaces must be properly UTF-8 encoded
+when using the SOAP transport. Encoding errors may lead to failures
+when parsing SOAP request or response messages.
+
+
+!!C++ To XML Schema Type Mappings
+
+The following table shows how C++ (and POCO types) are mapped
+to XML Schema (XSD) types.
+
+    C++ Type              XSD Type
+    -----------------------------------
+    bool                  boolean
+    char                  byte
+    signed char           byte
+    unsigned char         unsignedByte
+    short                 short
+    unsigned short        unsignedShort
+    int                   int
+    unsigned int          unsignedInt
+    long                  int
+    unsigned long         unsignedInt
+    float                 float
+    double                double
+    std::string           string
+    std::vector<T>        sequence
+    std::vector<char>     base64Binary
+    std::set<T>           sequence
+    std::multiset<T>      sequence
+    Poco::Int8            byte
+    Poco::UInt8           unsignedByte
+    Poco::Int16           short
+    Poco::UInt16          unsignedShort
+    Poco::Int32           int
+    Poco::UInt32          unsignedInt
+    Poco::Int64           long
+    Poco::UInt64          unsignedLong
+    Poco::DateTime        dateTime
+    Poco::LocalDateTime   dateTime
+    Poco::Timestamp       dateTime
+    Poco::Timespan        long
+    Poco::URI             string
+----
+
+
+!!!Using The SOAP Transport With HTTPS
+
+The SOAP transport normally uses a plain, unencrypted HTTP
+connection between the client and the server. To make the SOAP Transport use a secure
+HTTP socket connection, the following steps must be performed.
+
+
+!!HTTPS On The Server Side
+
+On the server side, the listener must be created using a
+Poco::Net::SecureServerSocket.
+
+    Poco::Net::SecureServerSocket serverSocket(8443);
+    std::string listener = Poco::RemotingNG::ORB::instance().registerListener(
+        new Poco::RemotingNG::SOAP::Listener("localhost:8443", "", serverSocket)
+    );
+    std::string uri = MyProject::MyClassHelper::registerObject(
+        new MyProject::MyClass,
+        "MyObject",
+        listener
+    );
+----
+
+
+!!HTTPS On The Client Side
+
+On the client side, the SOAP transport uses a private
+Poco::Net::HTTPSessionFactory object to create
+the Poco::Net::HTTPClientSession for talking to the server.
+So, all that needs to be done to enable HTTPS on the
+client is to register the Poco::Net::HTTPSSessionInstantiator
+with the session factory. Then, a https URI can be used to
+access the web service.
+
+    Poco::RemotingNG::SOAP::Transport::httpSessionFactory().registerProtocol(
+        "https",
+        new Poco::Net::HTTPSSessionInstantiator
+    );
+
+    Poco::RemotingNG::SOAP::TransportFactory::registerFactory();
+
+    MyProject::IMyClass::Ptr pObj = MyProject::MyClassHelper::find(
+        "https://localhost:8443/soap/MyClass/TheObject"
+    );
+----
+

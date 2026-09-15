@@ -1,0 +1,29 @@
+<AppConfig>
+	<RemoteGen>
+		<files>
+			<include>
+				include/WeatherWS/Weather.h
+				include/WeatherWS/ArrayOfWeatherDescription.h
+				include/WeatherWS/ArrayOfForecast.h
+				include/WeatherWS/ForecastReturn.h
+				include/WeatherWS/WeatherReturn.h
+				include/WeatherWS/WeatherDescription.h
+				include/WeatherWS/Forecast.h
+				include/WeatherWS/Temp.h
+				include/WeatherWS/POP.h
+			</include>
+			<include-paths>
+				include
+			</include-paths>
+		</files>
+		<output>
+			<mode>client</mode>
+			<namespace>WeatherWS</namespace>
+			<include>include/WeatherWS</include>
+			<src>src</src>
+			<includeRoot>include</includeRoot>
+			<flatIncludes>false</flatIncludes>
+			<timestamps>false</timestamps>
+		</output>
+	</RemoteGen>
+</AppConfig>

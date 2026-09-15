@@ -1,0 +1,777 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../../../ver20/util/onvif-wsdl-viewer.xsl"?>
+<!--
+Copyright (c) 2008-2017 by ONVIF: Open Network Video Interface Forum. All rights reserved.
+
+Recipients of this document may copy, distribute, publish, or display this document so long as this copyright notice, license and disclaimer are retained with all copies of the document. No license is granted to modify this document.
+
+THIS DOCUMENT IS PROVIDED "AS IS," AND THE CORPORATION AND ITS MEMBERS AND THEIR AFFILIATES, MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THIS DOCUMENT ARE SUITABLE FOR ANY PURPOSE; OR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+IN NO EVENT WILL THE CORPORATION OR ITS MEMBERS OR THEIR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT, WHETHER OR NOT (1) THE CORPORATION, MEMBERS OR THEIR AFFILIATES HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, OR (2) SUCH DAMAGES WERE REASONABLY FORESEEABLE, AND ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS DOCUMENT.  THE FOREGOING DISCLAIMER AND LIMITATION ON LIABILITY DO NOT APPLY TO, INVALIDATE, OR LIMIT REPRESENTATIONS AND WARRANTIES MADE BY THE MEMBERS AND THEIR RESPECTIVE AFFILIATES TO THE CORPORATION AND OTHER MEMBERS IN CERTAIN WRITTEN POLICIES OF THE CORPORATION.
+-->
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tth="http://www.onvif.org/ver10/thermal/wsdl" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:tt="http://www.onvif.org/ver10/schema" name="ThermalService" targetNamespace="http://www.onvif.org/ver10/thermal/wsdl">
+	<wsdl:types>
+		<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tt="http://www.onvif.org/ver10/schema" xmlns:tth="http://www.onvif.org/ver10/thermal/wsdl" targetNamespace="http://www.onvif.org/ver10/thermal/wsdl" elementFormDefault="qualified" version="17.06">
+			<xs:import namespace="http://www.onvif.org/ver10/schema" schemaLocation="../../schema/onvif.xsd"/>
+			<!--  Thermal Related Data Types  -->
+			<!--===============================-->	
+			<xs:simpleType name="Polarity">
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="WhiteHot"/>
+					<xs:enumeration value="BlackHot"/>
+				</xs:restriction>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:simpleType name="ColorPaletteType">
+				<xs:annotation>
+					<xs:documentation>Describes standard Color Palette types, used to facilitate Multi-language support and client display.
+					"Custom" Type shall be used when Color Palette Name does not match any of the types included in the standard classification.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Custom"/>
+					<xs:enumeration value="Grayscale"/>
+					<xs:enumeration value="BlackHot"/>
+					<xs:enumeration value="WhiteHot"/>
+					<xs:enumeration value="Sepia"/>
+					<xs:enumeration value="Red"/>
+					<xs:enumeration value="Iron"/>
+					<xs:enumeration value="Rain"/>
+					<xs:enumeration value="Rainbow"/>
+					<xs:enumeration value="Isotherm"/>
+				</xs:restriction>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:complexType name="ColorPalette">
+				<xs:annotation>
+					<xs:documentation>Describes a Color Palette element.</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="Name" type="tt:Name">
+						<xs:annotation>
+							<xs:documentation>
+								User readable Color Palette name.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:attribute name="token" type="tt:ReferenceToken" use="required">
+					<xs:annotation>
+						<xs:documentation>Unique identifier of this Color Palette.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="Type" type="xs:string" use="required">
+					<xs:annotation>
+						<xs:documentation>Indicates Color Palette Type. Use tth:ColorPaletteType. 
+						Used for multi-language support and display.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="NUCTable">
+				<xs:annotation>
+					<xs:documentation>Type describing a NUC Table element.</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="Name" type="tt:Name">
+						<xs:annotation>
+							<xs:documentation>
+								User reabable name for the Non-Uniformity Correction (NUC) Table.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:attribute name="token" type="tt:ReferenceToken" use="required">
+					<xs:annotation>
+						<xs:documentation>Unique identifier of this NUC Table.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="LowTemperature" type="xs:float">
+					<xs:annotation>
+						<xs:documentation>Low Temperature limit for application of NUC Table, in Kelvin.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="HighTemperature" type="xs:float">
+					<xs:annotation>
+						<xs:documentation>High Temperature limit for application of NUC Table, in Kelvin.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="Cooler">
+				<xs:annotation>
+					<xs:documentation>Type describing the Cooler settings.</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="Enabled" type="xs:boolean">
+						<xs:annotation>
+							<xs:documentation>
+								Indicates whether the Cooler is enabled (running) or not.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="RunTime" type="xs:float" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Number of hours the Cooler has been running (unit: hours). Read-only.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="CoolerOptions">
+				<xs:annotation>
+					<xs:documentation>Describes valid ranges for the thermal device cooler settings. 
+					Only applicable to cooled thermal devices. </xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="Enabled" type="xs:boolean" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Indicates the Device allows cooler status to be changed from running (Enabled) to stopped (Disabled), and viceversa.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+			</xs:complexType>
+			<!--===============================-->
+			<!--  Radiometry  -->
+			<xs:complexType name="RadiometryGlobalParameters">
+				<xs:annotation>
+					<xs:documentation>
+						Holds default values that will be used in measurement modules when local parameters are not specified for the module (these are still required for valid temperature calculations). 
+						Having ReflectedAmbientTemperature, Emissivity and DistanceToObject as mandatory ensures minimum parameters are available to obtain valid temperature values.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="ReflectedAmbientTemperature" type="xs:float">
+						<xs:annotation>
+							<xs:documentation>
+								Reflected Ambient Temperature for the environment in which the thermal device and the object being measured is located.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Emissivity" type="xs:float">
+						<xs:annotation>
+							<xs:documentation>
+								Emissivity of the surface of the object on which temperature is being measured.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DistanceToObject" type="xs:float">
+						<xs:annotation>
+							<xs:documentation>
+								Distance from the thermal device to the measured object.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="RelativeHumidity" type="xs:float" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Relative Humidity in the environment in which the measurement is located.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AtmosphericTemperature" type="xs:float" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Temperature of the atmosphere between the thermal device and the object being measured.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AtmosphericTransmittance" type="xs:float" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Transmittance value for the atmosphere between the thermal device and the object being measured.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ExtOpticsTemperature" type="xs:float" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Temperature of the optics elements between the thermal device and the object being measured.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ExtOpticsTransmittance" type="xs:float" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Transmittance value for the optics elements between the thermal device and the object being measured.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="RadiometryGlobalParameterOptions">
+				<xs:annotation>
+					<xs:documentation>
+						Describes valid ranges for the different radiometry parameters required for accurate temperature calculation. 
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="ReflectedAmbientTemperature" type="tt:FloatRange">
+						<xs:annotation>
+							<xs:documentation>Valid range of temperature values, in Kelvin.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Emissivity" type="tt:FloatRange">
+						<xs:annotation>
+							<xs:documentation>Valid range of emissivity values for the objects to measure.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="DistanceToObject" type="tt:FloatRange">
+						<xs:annotation>
+							<xs:documentation>Valid range of distance between camera and object for a valid temperature reading, in meters.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="RelativeHumidity" type="tt:FloatRange" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Valid range of relative humidity values, in percentage.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AtmosphericTemperature" type="tt:FloatRange" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Valid range of temperature values, in Kelvin.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="AtmosphericTransmittance" type="tt:FloatRange" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Valid range of atmospheric transmittance values.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ExtOpticsTemperature" type="tt:FloatRange" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Valid range of temperature values, in Kelvin.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="ExtOpticsTransmittance" type="tt:FloatRange" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Valid range of external optics transmittance.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+
+			<!--===============================-->
+			<!--  Configuration -->
+			<xs:complexType name="Configuration">
+				<xs:sequence>
+					<xs:element name="ColorPalette" type="tth:ColorPalette">
+						<xs:annotation>
+							<xs:documentation>
+								Current Color Palette in use by the Thermal Device.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Polarity" type="tth:Polarity">
+						<xs:annotation>
+							<xs:documentation>
+								Polarity configuration of the Thermal Device.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="NUCTable" type="tth:NUCTable" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Current Non-Uniformity Correction (NUC) Table in use by the Thermal Device.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>	
+					<xs:element name="Cooler" type="tth:Cooler" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Cooler settings of the Thermal Device.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<!--===============================-->
+			<!--  Configurations -->
+			<xs:complexType name="Configurations">
+				<xs:sequence>
+					<xs:element name="Configuration" type="tth:Configuration">
+						<xs:annotation>
+							<xs:documentation>
+								 Current Thermal Settings for the VideoSource.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:attribute name="token" type="tt:ReferenceToken" use="required">
+					<xs:annotation>
+						<xs:documentation>
+							Reference token to the thermal VideoSource.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<!--===============================-->
+			<!-- Radiometry Configuration -->
+			<xs:complexType name="RadiometryConfiguration">
+				<xs:sequence>
+					<xs:element name="RadiometryGlobalParameters" type="tth:RadiometryGlobalParameters" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Global Parameters for Radiometry Measurements. Shall exist if Radiometry Capability is reported, 
+								and Global Parameters are supported by the device.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+
+			<!--===============================-->
+			<!--  Configuration Options-->
+			<xs:complexType name="ConfigurationOptions">
+				<xs:sequence>
+					<xs:element name="ColorPalette" type="tth:ColorPalette" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>
+								List of Color Palettes available for the requested Thermal VideoSource.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="NUCTable" type="tth:NUCTable" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>
+								List of Non-Uniformity Correction (NUC) Tables available for the requested Thermal VideoSource.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="CoolerOptions" type="tth:CoolerOptions" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Specifies Cooler Options for cooled thermal devices.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<!--  Radiometry  -->
+			<xs:complexType name="RadiometryConfigurationOptions">
+				<xs:sequence>
+					<xs:element name="RadiometryGlobalParameterOptions" type="tth:RadiometryGlobalParameterOptions" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>
+								Specifies valid ranges and options for the global radiometry parameters used as default parameter values
+								for temperature measurement modules (spots and boxes).
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			
+			<!--===============================-->
+			<xs:element name="GetServiceCapabilities">
+				<xs:complexType>
+					<xs:sequence/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetServiceCapabilitiesResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Capabilities" type="tth:Capabilities">
+							<xs:annotation>
+								<xs:documentation>The capabilities of the thermal service are returned in the Capabilities element.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:complexType name="Capabilities">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:attribute name="Radiometry" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>Indicates whether or not radiometric thermal measurements are supported by the thermal device.</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<xs:element name="Capabilities" type="tth:Capabilities"/>
+			<!--===============================-->
+			<xs:element name="GetConfigurationOptions">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VideoSourceToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>
+									Reference token to the VideoSource for which the Thermal Configuration Options are requested.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetConfigurationOptionsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ConfigurationOptions" type="tth:ConfigurationOptions">
+							<xs:annotation>
+								<xs:documentation>
+									Valid ranges for the Thermal configuration parameters that are categorized as device specific.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetConfiguration">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VideoSourceToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>
+									Reference token to the VideoSource for which the Thermal Settings are requested.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetConfigurationResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tth:Configuration">
+							<xs:annotation>
+								<xs:documentation>
+									Thermal Settings for the VideoSource that was requested.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<!--===============================-->
+			<xs:element name="GetConfigurations">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetConfigurationsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configurations" type="tth:Configurations" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>
+									This element contains a list of thermal VideoSource configurations.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<!--===============================-->
+			<xs:element name="SetConfiguration">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VideoSourceToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>
+									Reference token to the VideoSource for which the Thermal Settings are configured.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Configuration" type="tth:Configuration">
+							<xs:annotation>
+								<xs:documentation>
+									Thermal Settings to be configured.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SetConfigurationResponse">
+				<xs:complexType/>
+			</xs:element>
+			<!--===============================-->
+			<!-- Radiometry Commands -->
+			<xs:element name="GetRadiometryConfigurationOptions">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VideoSourceToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>
+									Reference token to the VideoSource for which the Thermal Radiometry Options are requested.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetRadiometryConfigurationOptionsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="ConfigurationOptions" type="tth:RadiometryConfigurationOptions">
+							<xs:annotation>
+								<xs:documentation>
+									Valid ranges for the Thermal Radiometry parameters that are categorized as device specific.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetRadiometryConfiguration">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VideoSourceToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>
+									Reference token to the VideoSource for which the Radiometry Configuration is requested.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="GetRadiometryConfigurationResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Configuration" type="tth:RadiometryConfiguration">
+							<xs:annotation>
+								<xs:documentation>
+									Radiometry Configuration for the VideoSource that was requested.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetRadiometryConfiguration">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="VideoSourceToken" type="tt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>
+									Reference token to the VideoSource for which the Radiometry settings are configured.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Configuration" type="tth:RadiometryConfiguration">
+							<xs:annotation>
+								<xs:documentation>
+									Radiometry settings to be configured.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SetRadiometryConfigurationResponse">
+				<xs:complexType/>
+			</xs:element>
+			<!--===============================-->
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:message name="GetServiceCapabilitiesRequest">
+		<wsdl:part name="parameters" element="tth:GetServiceCapabilities"/>
+	</wsdl:message>
+	<wsdl:message name="GetServiceCapabilitiesResponse">
+		<wsdl:part name="parameters" element="tth:GetServiceCapabilitiesResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetConfigurationOptionsRequest">
+		<wsdl:part name="parameters" element="tth:GetConfigurationOptions"/>
+	</wsdl:message>
+	<wsdl:message name="GetConfigurationOptionsResponse">
+		<wsdl:part name="parameters" element="tth:GetConfigurationOptionsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetConfigurationRequest">
+		<wsdl:part name="parameters" element="tth:GetConfiguration"/>
+	</wsdl:message>
+	<wsdl:message name="GetConfigurationResponse">
+		<wsdl:part name="parameters" element="tth:GetConfigurationResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="GetConfigurationsRequest">
+		<wsdl:part name="parameters" element="tth:GetConfigurations"/>
+	</wsdl:message>
+	<wsdl:message name="GetConfigurationsResponse">
+		<wsdl:part name="parameters" element="tth:GetConfigurationsResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="GetRadiometryConfigurationOptionsRequest">
+		<wsdl:part name="parameters" element="tth:GetRadiometryConfigurationOptions"/>
+	</wsdl:message>
+	<wsdl:message name="GetRadiometryConfigurationOptionsResponse">
+		<wsdl:part name="parameters" element="tth:GetRadiometryConfigurationOptionsResponse"/>
+	</wsdl:message>
+	<wsdl:message name="GetRadiometryConfigurationRequest">
+		<wsdl:part name="parameters" element="tth:GetRadiometryConfiguration"/>
+	</wsdl:message>
+	<wsdl:message name="GetRadiometryConfigurationResponse">
+		<wsdl:part name="parameters" element="tth:GetRadiometryConfigurationResponse"/>
+	</wsdl:message>
+	<wsdl:message name="SetConfigurationRequest">
+		<wsdl:part name="parameters" element="tth:SetConfiguration"/>
+	</wsdl:message>
+	<wsdl:message name="SetConfigurationResponse">
+		<wsdl:part name="parameters" element="tth:SetConfigurationResponse"/>
+	</wsdl:message>
+	<wsdl:message name="SetRadiometryConfigurationRequest">
+		<wsdl:part name="parameters" element="tth:SetRadiometryConfiguration"/>
+	</wsdl:message>
+	<wsdl:message name="SetRadiometryConfigurationResponse">
+		<wsdl:part name="parameters" element="tth:SetRadiometryConfigurationResponse"/>
+	</wsdl:message>
+	<wsdl:portType name="ThermalPort">
+		<wsdl:operation name="GetServiceCapabilities">
+			<wsdl:documentation>Returns the capabilities of the thermal service. The result is returned in a typed answer.</wsdl:documentation>
+			<wsdl:input message="tth:GetServiceCapabilitiesRequest"/>
+			<wsdl:output message="tth:GetServiceCapabilitiesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetConfigurationOptions">
+			<wsdl:documentation>Gets the valid ranges for the Thermal parameters that have device specific ranges. 
+			This command is mandatory for all devices implementing the Thermal service. The command shall return all supported parameters 
+			and their ranges, such that these can be applied to the SetConfiguration command.<br/>
+			</wsdl:documentation>
+			<wsdl:input message="tth:GetConfigurationOptionsRequest"/>
+			<wsdl:output message="tth:GetConfigurationOptionsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetConfiguration">
+			<wsdl:documentation>Gets the Thermal Configuration for the requested VideoSource.</wsdl:documentation>
+			<wsdl:input message="tth:GetConfigurationRequest"/>
+			<wsdl:output message="tth:GetConfigurationResponse"/>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="GetConfigurations">
+			<wsdl:documentation>Gets the Thermal Configuration for all thermal VideoSources of the Device.</wsdl:documentation>
+			<wsdl:input message="tth:GetConfigurationsRequest"/>
+			<wsdl:output message="tth:GetConfigurationsResponse"/>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="SetConfiguration">
+			<wsdl:documentation>Sets the Thermal Configuration for the requested VideoSource.</wsdl:documentation>
+			<wsdl:input message="tth:SetConfigurationRequest"/>
+			<wsdl:output message="tth:SetConfigurationResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetRadiometryConfigurationOptions">
+			<wsdl:documentation>Gets the valid ranges for the Radiometry parameters that have device specific ranges. 
+			 The command shall return all supported parameters and their ranges, such that these can be applied 
+			 to the SetRadiometryConfiguration command.<br/>
+			</wsdl:documentation>
+			<wsdl:input message="tth:GetRadiometryConfigurationOptionsRequest"/>
+			<wsdl:output message="tth:GetRadiometryConfigurationOptionsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetRadiometryConfiguration">
+			<wsdl:documentation>Gets the Radiometry Configuration for the requested VideoSource.</wsdl:documentation>
+			<wsdl:input message="tth:GetRadiometryConfigurationRequest"/>
+			<wsdl:output message="tth:GetRadiometryConfigurationResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetRadiometryConfiguration">
+			<wsdl:documentation>Sets the Radiometry Configuration for the requested VideoSource.</wsdl:documentation>
+			<wsdl:input message="tth:SetRadiometryConfigurationRequest"/>
+			<wsdl:output message="tth:SetRadiometryConfigurationResponse"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="ThermalBinding" type="tth:ThermalPort">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<wsdl:operation name="GetServiceCapabilities">
+			<soap:operation soapAction="http://www.onvif.org/ver10/thermal/wsdl/GetServiceCapabilities"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetConfigurationOptions">
+			<soap:operation soapAction="http://www.onvif.org/ver10/thermal/wsdl/GetConfigurationOptions"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetConfiguration">
+			<soap:operation soapAction="http://www.onvif.org/ver10/thermal/wsdl/GetConfiguration"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetConfigurations">
+			<soap:operation soapAction="http://www.onvif.org/ver10/thermal/wsdl/GetConfigurations"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="SetConfiguration">
+			<soap:operation soapAction="http://www.onvif.org/ver10/thermal/wsdl/SetConfiguration"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetRadiometryConfigurationOptions">
+			<soap:operation soapAction="http://www.onvif.org/ver10/thermal/wsdl/GetRadiometryConfigurationOptions"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="GetRadiometryConfiguration">
+			<soap:operation soapAction="http://www.onvif.org/ver10/thermal/wsdl/GetRadiometryConfiguration"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="SetRadiometryConfiguration">
+			<soap:operation soapAction="http://www.onvif.org/ver10/thermal/wsdl/SetRadiometryConfiguration"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+</wsdl:definitions>

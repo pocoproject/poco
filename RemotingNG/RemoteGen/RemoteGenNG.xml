@@ -1,0 +1,64 @@
+<AppConfig>
+	<RemoteGen>
+		<system>
+			<include>
+				${POCOPLUS_BASE}/RemotingNG/include/Poco/RemotingNG/RemoteObject.h
+				${POCOPLUS_BASE}/RemotingNG/include/Poco/RemotingNG/Proxy.h
+				${POCOPLUS_BASE}/RemotingNG/include/Poco/RemotingNG/Skeleton.h
+				${POCOPLUS_BASE}/RemotingNG/include/Poco/RemotingNG/EventDispatcher.h
+				${POCOPLUS_BASE}/RemotingNG/include/Poco/RemotingNG/EventSubscriber.h
+			</include>
+		</system>
+		<internal>
+			<!-- Include list shared by all compiler blocks; -I with forward
+			     slashes is accepted by g++, clang++ and cl alike. -->
+			<commonIncludes>
+				-I
+				${POCO_BASE}/Foundation/include
+				-I
+				${POCO_BASE}/dependencies/tessil/include
+				-I
+				${POCOPLUS_BASE}/RemotingNG/include
+				-I
+				${POCOPLUS_BASE}/OSP/include
+			</commonIncludes>
+		</internal>
+		<compiler id="gcc">
+			<exec>g++</exec>
+			<options>
+				${RemoteGen.internal.commonIncludes}
+				${RemoteGen.internal.gcc.includes}
+				-E
+				-C
+				-DPOCO_NO_GCC_API_ATTRIBUTE
+				-DPOCO_REMOTEGEN
+				-o%.i
+			</options>
+		</compiler>
+		<compiler id="clang">
+			<exec>clang++</exec>
+			<options>
+				${RemoteGen.internal.commonIncludes}
+				${RemoteGen.internal.gcc.includes}
+				-E
+				-C
+				-DPOCO_NO_GCC_API_ATTRIBUTE
+				-DPOCO_REMOTEGEN
+				-xc++
+				-o%.i
+			</options>
+		</compiler>
+		<compiler id="msvc">
+			<exec>cl</exec>
+			<options>
+				${RemoteGen.internal.commonIncludes}
+				${RemoteGen.internal.msvc.includes}
+				-DPOCO_REMOTEGEN
+				/nologo
+				/C
+				/P
+				/TP
+			</options>
+		</compiler>
+	</RemoteGen>
+</AppConfig>

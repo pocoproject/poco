@@ -1,0 +1,41 @@
+<AppConfig>
+	<RemoteGen>
+		<files>
+			<include>
+				../ONVIF/include/ONVIF/*.h
+				../ONVIF/include/ONVIF/Device/*.h
+				../ONVIF/include/ONVIF/DeviceIO/*.h
+				../ONVIF/include/ONVIF/Media/*.h
+				../ONVIF/include/OASIS/WSN/B2/*.h
+				../ONVIF/include/OASIS/WSN/T1/*.h
+				../ONVIF/include/OASIS/WSRF/BF2/*.h
+				../ONVIF/include/W3/Addressing/*.h
+				../ONVIF/include/W3/SOAP/*.h
+				../ONVIF/include/W3/XMLMIME/*.h
+				../ONVIF/include/W3/XOP/*.h
+			</include>
+			<include-paths>
+				../ONVIF/include
+			</include-paths>
+		</files>
+		<output>
+			<mode>client</mode>
+			<include>include</include>
+			<include namespace="ONVIF">include/ONVIF</include>
+			<include namespace="ONVIF::DeviceIO">include/ONVIF/DeviceIO</include>
+			<include namespace="ONVIF::Device">include/ONVIF/Device</include>
+			<include namespace="ONVIF::Media">include/ONVIF/Media</include>
+			<include namespace="W3::Addressing">include/W3/Addressing</include>
+			<include namespace="W3::SOAP">include/W3/SOAP</include>
+			<include namespace="W3::XMLMIME">include/W3/XMLMIME</include>
+			<include namespace="W3::XOP">include/W3/XOP</include>
+			<include namespace="OASIS::WSN::B2">include/OASIS/WSN/B2</include>
+			<include namespace="OASIS::WSN::T1">include/OASIS/WSN/T1</include>
+			<include namespace="OASIS::WSRF::BF2">include/OASIS/WSRF/BF2</include>
+			<src>src</src>
+			<includeRoot>include</includeRoot>
+			<flatIncludes>false</flatIncludes>
+			<timestamps>false</timestamps>
+		</output>
+	</RemoteGen>
+</AppConfig>
