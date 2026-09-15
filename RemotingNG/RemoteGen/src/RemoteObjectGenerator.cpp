@@ -71,8 +71,7 @@ void RemoteObjectGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 	Poco::CppParser::Function* pDestr = new Poco::CppParser::Function(std::string("virtual ~")+_pStruct->name(), _pStruct);
 	pDestr->addDocumentation(	" Destroys the " + _pStruct->name() + ".");
 
-	Poco::CppParser::TypeAlias* pTypeAlias = new Poco::CppParser::TypeAlias("using Ptr = Poco::AutoPtr<" + generateClassName(pStruct) + ">", _pStruct);
-	poco_check_ptr (pTypeAlias); // just avoid unused variable warning
+	[[maybe_unused]] Poco::CppParser::TypeAlias* pTypeAlias = new Poco::CppParser::TypeAlias("using Ptr = Poco::AutoPtr<" + generateClassName(pStruct) + ">", _pStruct); // registers itself with _pStruct
 
 	// adds the member var
 	_cppGen.addIncludeFile("Poco/SharedPtr.h");
