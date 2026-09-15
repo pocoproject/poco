@@ -43,7 +43,7 @@ Connection::Connection(const Poco::Net::StreamSocket& socket, ConnectionMode mod
 	_state(STATE_PRE_HANDSHAKE),
 	_framePool(256, 4096),
 	_nextChannel(1),
-	_ready(false),
+	_ready(Poco::Event::EVENT_MANUALRESET),
 	_logger(Poco::Logger::get("RemotingNG.TCP.Connection"s))
 {
 	_socket.setReceiveTimeout(TIMEOUT_FRAME);
