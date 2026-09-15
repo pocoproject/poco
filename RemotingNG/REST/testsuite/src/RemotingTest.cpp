@@ -157,8 +157,8 @@ RemotingTest::~RemotingTest()
 
 void RemotingTest::setUp()
 {
-	_publicURI = "http://127.0.0.1:2280/tester/{id}";
-	_pListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2280");
+	_publicURI = "http://127.0.0.1:2282/tester/{id}";
+	_pListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2282");
 	_pListener->enableChunkedTransferEncoding(false);
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
 	Poco::RemotingNG::REST::TransportFactory::registerFactory();
@@ -180,7 +180,7 @@ void RemotingTest::tearDown()
 
 void RemotingTest::testRegistration()
 {
-	assert (_objectURI == "http://127.0.0.1:2280/rest/Tester/TheTester");
+	assert (_objectURI == "http://127.0.0.1:2282/rest/Tester/TheTester");
 }
 
 
@@ -471,8 +471,8 @@ RemotingTestRESTAuth::~RemotingTestRESTAuth()
 
 void RemotingTestRESTAuth::setUp()
 {
-	_publicURI = "http://127.0.0.1:2280/tester/{id}";
-	_pListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2280", Poco::RemotingNG::REST::Listener::PROTO_HTTP);
+	_publicURI = "http://127.0.0.1:2282/tester/{id}";
+	_pListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2282", Poco::RemotingNG::REST::Listener::PROTO_HTTP);
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
 	Poco::RemotingNG::REST::TransportFactory::registerFactory();
 	Poco::SharedPtr<Tester> pTester = new Tester;
@@ -480,7 +480,7 @@ void RemotingTestRESTAuth::setUp()
 	pTesterRemoteObject->remoting__setURI(Poco::URI(_publicURI));
 	_objectURI = TesterServerHelper::registerRemoteObject(pTesterRemoteObject, _listener);
 
-	Poco::Net::ServerSocket ss(2280);
+	Poco::Net::ServerSocket ss(2282);
 	_pHTTPServer = new Poco::Net::HTTPServer(new RESTAuthRequestHandlerFactory(*_pListener), ss, new Poco::Net::HTTPServerParams);
 	_pHTTPServer->start();
 }
@@ -560,8 +560,8 @@ RemotingTestAuth::~RemotingTestAuth()
 
 void RemotingTestAuth::setUp()
 {
-	_publicURI = "http://127.0.0.1:2280/authtester/{id}";
-	_pListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2280");
+	_publicURI = "http://127.0.0.1:2282/authtester/{id}";
+	_pListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2282");
 	_pListener->enableChunkedTransferEncoding(false);
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
 	Poco::RemotingNG::REST::TransportFactory::registerFactory();
