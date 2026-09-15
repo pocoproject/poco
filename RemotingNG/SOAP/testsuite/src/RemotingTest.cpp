@@ -275,7 +275,7 @@ RemotingTest::~RemotingTest()
 
 void RemotingTest::setUp()
 {
-	_pListener = new Poco::RemotingNG::SOAP::Listener("127.0.0.1:2280", "");
+	_pListener = new Poco::RemotingNG::SOAP::Listener("127.0.0.1:2283", "");
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
 	Poco::RemotingNG::SOAP::TransportFactory::registerFactory();
 	_objectURI = TesterServerHelper::registerObject(new Tester, "TheTester", _listener);
@@ -293,7 +293,7 @@ void RemotingTest::tearDown()
 
 void RemotingTest::testRegistration()
 {
-	assert (_objectURI == "http://127.0.0.1:2280/soap/Tester/TheTester");
+	assert (_objectURI == "http://127.0.0.1:2283/soap/Tester/TheTester");
 }
 
 
@@ -1307,12 +1307,12 @@ RemotingTestSOAP12Auth::~RemotingTestSOAP12Auth()
 
 void RemotingTestSOAP12Auth::setUp()
 {
-	_pListener = new Poco::RemotingNG::SOAP::Listener("127.0.0.1:2280", Poco::RemotingNG::SOAP::Listener::PROTO_HTTP);
+	_pListener = new Poco::RemotingNG::SOAP::Listener("127.0.0.1:2283", Poco::RemotingNG::SOAP::Listener::PROTO_HTTP);
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
 	Poco::RemotingNG::SOAP::TransportFactory::registerFactory();
 	_objectURI = TesterServerHelper::registerObject(new Tester, "TheTester", _listener);
 
-	Poco::Net::ServerSocket ss(2280);
+	Poco::Net::ServerSocket ss(2283);
 	_pHTTPServer = new Poco::Net::HTTPServer(new SOAPAuthRequestHandlerFactory(*_pListener), ss, new Poco::Net::HTTPServerParams);
 	_pHTTPServer->start();
 }
