@@ -16,6 +16,6 @@ objects = AbstractGenerator ProxyFactoryGenerator SerializerGenerator XSDGenerat
 
 target         = RemoteGenNG
 target_version = 1
-target_libs    = PocoRemotingNG PocoCodeGeneration PocoNet PocoUtil PocoCppParser PocoXML PocoJSON PocoFoundation $(POCO_LICENSING)
+target_libs    = PocoRemotingNG PocoCodeGeneration PocoNet PocoUtil PocoCppParser PocoXML PocoJSON PocoFoundation
 
 include $(POCO_BASE)/build/rules/exec
