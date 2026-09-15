@@ -22,9 +22,6 @@
 #include "Poco/Format.h"
 #include "Poco/URI.h"
 #include "Poco/StringTokenizer.h"
-#if defined(POCO_REQUIRE_LICENSE)
-#include "Poco/Licensing/License.h"
-#endif
 
 
 using namespace std::string_literals;
@@ -49,9 +46,6 @@ ORB::~ORB()
 ORB& ORB::instance()
 {
 	static Poco::SingletonHolder<ORB> sh;
-#if defined(POCO_REQUIRE_LICENSE)
-	poco_verify_license(Remoting);
-#endif
 	return *sh.get();
 }
 
