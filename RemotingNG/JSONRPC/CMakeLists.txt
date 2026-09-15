@@ -1,0 +1,37 @@
+# Sources
+file(GLOB SRCS_JSONRPC_G "src/*.cpp")
+POCO_SOURCES_AUTO(SRCS_JSONRPC ${SRCS_JSONRPC_G})
+
+# Headers
+file(GLOB_RECURSE HDRS_G "include/*.h")
+POCO_HEADERS_AUTO(SRCS_JSONRPC ${HDRS_G})
+
+# Version Resource
+if(MSVC AND BUILD_SHARED_LIBS)
+	source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/ProDLLVersion.rc)
+	list(APPEND SRCS_JSONRPC ${PROJECT_SOURCE_DIR}/ProDLLVersion.rc)
+endif()
+
+add_library(RemotingNGJSONRPC ${SRCS_JSONRPC})
+add_library(Poco::RemotingNGJSONRPC ALIAS RemotingNGJSONRPC)
+set_target_properties(RemotingNGJSONRPC
+	PROPERTIES
+	VERSION ${SHARED_LIBRARY_VERSION} SOVERSION ${SHARED_LIBRARY_VERSION}
+	OUTPUT_NAME PocoRemotingNGJSONRPC
+	DEFINE_SYMBOL RemotingNGJSONRPC_EXPORTS
+)
+
+target_link_libraries(RemotingNGJSONRPC PUBLIC Poco::Foundation Poco::Net Poco::RemotingNG)
+target_include_directories(RemotingNGJSONRPC
+	PUBLIC
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+		$<INSTALL_INTERFACE:include>
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+POCO_INSTALL(RemotingNGJSONRPC)
+POCO_GENERATE_PACKAGE(RemotingNGJSONRPC)
+
+if(ENABLE_TESTS)
+	add_subdirectory(testsuite)
+endif()

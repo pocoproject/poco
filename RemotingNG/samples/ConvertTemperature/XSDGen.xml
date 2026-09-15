@@ -1,0 +1,12 @@
+<AppConfig>
+	<XSDGen>
+		<default>
+			<include>include/WebServiceX</include>
+			<src>src</src>
+			<includeRoot>include</includeRoot>
+		</default>
+		<schema targetNamespace="http://www.webserviceX.NET/">
+			<namespace>WebServiceX</namespace>
+		</schema>
+	</XSDGen>
+</AppConfig>

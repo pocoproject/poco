@@ -1,0 +1,70 @@
+//
+// RelayOutputSettingsDeserializer.h
+//
+// Package: Generated
+// Module:  TypeDeserializer
+//
+// This file has been generated.
+// Warning: All changes to this will be lost when the file is re-generated.
+//
+
+
+#ifndef TypeDeserializer_ONVIF_RelayOutputSettings_INCLUDED
+#define TypeDeserializer_ONVIF_RelayOutputSettings_INCLUDED
+
+
+#include "ONVIF/RelayOutputSettings.h"
+#include "Poco/RemotingNG/TypeDeserializer.h"
+
+
+namespace Poco {
+namespace RemotingNG {
+
+
+template <>
+class TypeDeserializer<ONVIF::RelayOutputSettings>
+{
+public:
+	static bool deserialize(const std::string& name, bool isMandatory, Deserializer& deser, ONVIF::RelayOutputSettings& value)
+	{
+		using namespace std::string_literals;
+		
+		static const std::string REMOTING__NAMESPACE("http://www.onvif.org/ver10/schema"s);
+		bool ret = deser.deserializeStructBegin(name, isMandatory);
+		deser.pushProperty(SerializerBase::PROP_NAMESPACE, REMOTING__NAMESPACE);
+		if (ret)
+		{
+			deserializeImpl(deser, value);
+			deser.popProperty(SerializerBase::PROP_NAMESPACE);
+			deser.deserializeStructEnd(name);
+		}
+		else deser.popProperty(SerializerBase::PROP_NAMESPACE);
+		return ret;
+	}
+
+	static void deserializeImpl(Deserializer& deser, ONVIF::RelayOutputSettings& value)
+	{
+		using namespace std::string_literals;
+		
+		static const std::string REMOTING__NAMES[] = {"Mode"s,"DelayTime"s,"IdleState"s};
+		bool ret = false;
+		std::string gen_mode;
+		ret = TypeDeserializer<std::string>::deserialize(REMOTING__NAMES[0], true, deser, gen_mode);
+		if (ret) value.setMode(gen_mode);
+		std::string gen_delayTime;
+		ret = TypeDeserializer<std::string>::deserialize(REMOTING__NAMES[1], true, deser, gen_delayTime);
+		if (ret) value.setDelayTime(gen_delayTime);
+		std::string gen_idleState;
+		ret = TypeDeserializer<std::string>::deserialize(REMOTING__NAMES[2], true, deser, gen_idleState);
+		if (ret) value.setIdleState(gen_idleState);
+	}
+
+};
+
+
+} // namespace RemotingNG
+} // namespace Poco
+
+
+#endif // TypeDeserializer_ONVIF_RelayOutputSettings_INCLUDED
+

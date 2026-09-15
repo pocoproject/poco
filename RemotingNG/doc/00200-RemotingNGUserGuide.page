@@ -1,0 +1,1829 @@
+Remoting NG User Guide
+Remoting NG
+
+!!!Introduction
+
+This document contains detailed technical information for users of the
+Remoting NG framework. Basic familiarity with Remoting programming concepts
+and techniques is expected from the reader.
+
+
+!!!Supported Types
+
+Remoting supports all built-in C++ types as parameter and return value types, with the
+exception of <[wchar_t]> and plain pointers. In addition to the built-in types, the following
+classes and class templates from the STL are supported:
+
+  * <[std::string]>
+  * <[std::vector]>
+  * <[std::set]>
+  * <[std::multiset]>
+  * <[std::unordered_set]>
+  * <[std::unordered_multiset]>
+  * <[std::array]>
+  * <[std::shared_ptr]>
+  * <[std::unique_ptr]>
+  * <[std::optional]> (C++17)
+
+Note: For `std::optional` support, the compiler must identify itself as C++17 compiler
+by defining the `__cplusplus` built-in macro to a value >= `201703L`. For Visual C++,
+the `/Zc:__cplusplus` option must be passed to the compiler to enable this.
+
+The following types from the POCO C++ Libraries are supported as well:
+
+  * Poco::AutoPtr
+  * Poco::SharedPtr
+  * Poco::Array
+  * Poco::DateTime
+  * Poco::LocalDateTime
+  * Poco::Timestamp
+  * Poco::Timespan
+  * Poco::URI
+  * Poco::UUID
+  * Poco::Nullable
+  * Poco::Optional
+
+Enumerations can also be used, with the restriction that enumerations are
+serialized as integers, and that enumeration types are reduced to
+integer types in SOAP/WSDL and REST interfaces.
+
+Plain C++ pointer types are not supported, due to the complexity they
+incur with regard to object creation and object membership.
+<[std::unique_ptr]> and <[std::shared_ptr]>, as well as Poco::AutoPtr and Poco::SharedPtr are
+supported, and are in virtually all cases better alternatives to using plain C++ pointers.
+
+Note that even arguments passed through a pointer or by reference in the
+service object interface are always passed by value as soon as process
+boundaries are crossed and serialization/deserialization between proxy and
+skeleton becomes necessary.
+This leads to an important restriction: cyclic graph structures cannot be serialized.
+An attempt to serialize a cyclic graph structure will result in an endless
+loop (or endless recursion) in the serializer, as the serializer
+always passes objects by value, even if a Poco::SharedPtr or a Poco::AutoPtr is used.
+
+
+!!!Thread Safety
+
+The Remoting framework itself is completely thread safe, with a few
+restrictions. Proxy objects are normally <!not!> thread safe, unless the
+<[synchronized]> attribute is specified on the service class or on
+individual methods. Nevertheless, it is strongly recommended that
+each thread has its own proxy object for a shared remote object.
+
+Service objects can be invoked by multiple clients, and thus multiple
+threads simultaneously. Therefore, the implementation of a service class
+should be fully thread safe. If a service class is not thread safe,
+again the <[synchronized]> can be used to serialize access to
+the service object at framework level.
+
+
+!!!User-Defined Classes And Structures
+
+Besides the aforementioned types, Remoting also supports user-defined
+classes and structures as parameter types.
+
+!!Serializers And Deserializers
+
+For this to work, a serializer and a deserializer class must be generated for each
+class or structure used as parameter or return value type. Serializers and deserializers
+can be generated automatically by the Remoting code generator.
+The respective class or struct must be annotated with the <[serialize]> attribute.
+
+Serializers and deserializers are implemented as template specializations
+of the Poco::RemotingNG::TypeSerializer (or Poco::RemotingNG::TypeDeserializer, respectively)
+class template, and thus header file only.
+
+For structures or classes with only public data members, the code generator
+automatically takes care of serializing and deserializing every single
+public data member.
+
+Example:
+    //@ serialize
+    struct Time
+    {
+        int hour;
+        int minute;
+        int second;
+    };
+----
+
+Static or const public data members are excluded from serialization.
+
+Classes with non-public data members can be used as well.
+For this to work, such a class must follow a few conventions:
+
+  * The class must support full value semantics (copy constructor and
+    assignment operator), and it must have a public default constructor.
+  * For every non-public data member that should be serialized, there must
+    be both a public setter and a public getter member function.
+  * The name of the setter and getter functions must be derived
+    from the name of the member variable according to certain rules.
+  * Non-public data members that do not have a corresponding public getter and
+    setter member function are not serialized.
+
+Rules for member variable and setter/getter function names are as follows.
+For a member variable named <[var]>, <[_var]>, <[var_]> or <[m_var]>, the getter
+function signature must be:
+
+    <type> getVar() const;
+----
+
+or (if the member variable name is not <[var]>):
+
+    <type> var() const;
+----
+
+The setter function signature must be:
+
+    void setVar(<type> value);
+----
+
+or (if the member variable name is not <[var]>):
+
+    void var(<type> value);
+----
+
+The type of the getter function return value and the setter function parameter
+can also be a const reference of the respective type.
+
+Example:
+    //@ serialize
+    class Time
+    {
+    public:
+        Time();
+        Time(int hour, int minute, int second);
+        Time(const Time& time);
+        ~Time();
+
+        Time& operator = (const Time& time);
+
+        int getHour() const;
+        void setHour(int hour);
+
+        int getMinute() const;
+        void setMinute(int minute);
+
+        int getSecond() const;
+        void setSecond(int second);
+
+    private:
+        int _hour;
+        int _minute;
+        int _second;
+        int _someInternalState; // will NOT be serialized
+    };
+----
+
+Classes used as parameter or return value types should be defined and implemented
+in their own header and implementation files, and these files must be available
+to both the server and the client applications.
+
+!!Serialization And Inheritance
+
+Inheritance is supported as well, provided all base classes of a serializable
+class also have the <[serialize]> attribute set.
+
+Note however, that objects passed as parameters or returned as return values
+will always be truncated to the static parameter type specified in the member function
+signature, even if passed by pointer or by reference.
+
+Multiple inheritance is not supported.
+
+
+!!!Obtaining Transport-Specific Information
+
+A service method can obtain transport-specific information via a thread-local
+Poco::RemotingNG::Context object. The Context object contains key-value pairs
+(attributes), depending on the transport used to deliver the request.
+
+The following attributes are generally available when using the TCP, SOAP,
+JSON-RPC and REST transports:
+
+  - <[transport]>: a std::string specifying the used transport ("tcp", "soap" or "json-rpc")
+  - <[remoteAddress]>: the socket address (Poco::Net::SocketAddress) of the client sending the request
+  - <[localAddress]>: the socket address (Poco::Net::SocketAddress) of the server
+  - <[uri]>: for the SOAP, JSON-RPC and REST transports, the HTTP request URI;
+    for the TCP transport the path the object is registered under with the ORB (std::string).
+
+In addition, the SOAP, JSON-RPC and REST transports support the <[username]> and <[password]>
+attributes (std::string) if the client has provided HTTP Basic credentials. This can be used to
+implement authentication and authorization. In release 2017.1, these two attributes have been
+replaced with a Poco::RemotingNG::Credentials object, which can be obtained by calling
+getCredentials() on the context object. The two attributes are still provided for backwards
+compatibility, though.
+
+The TCP transport supports the <[id]> attribute (Poco::UInt32), returning the unique (within
+the server process) ID of the connection. This can be used to associate clients to sessions.
+
+The following sample shows how to obtain the Context object and its attributes in a service
+method:
+
+    // obtain the thread-local Context object
+    Poco::RemotingNG::Context::Ptr pContext = Poco::RemotingNG::Context::get();
+    // check if a Context object is available
+    if (pContext)
+    {
+        std::cout << pContext->getValue<std::string>("transport") << std::endl;
+        std::cout << pContext->getValue<Poco::Net::SocketAddress>("remoteAddress").toString() << std::endl;
+        std::cout << pContext->getValue<Poco::Net::SocketAddress>("localAddress").toString() << std::endl;
+        const Poco::RemotingNG::Credentials& creds = pContext->getCredentials();
+        if (creds.hasAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME))
+        {
+            std::cout << creds.getAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME) << std::endl;
+        }
+    }
+----
+
+The SOAP, JSON-RPC and REST transports furthermore support the <[httpRequest]> and <[httpResponse]>
+attributes. This can be used to obtain the underlying Poco::Net::HTTPServerRequest and
+Poco::Net::HTTPServerResponse objects (via pointers). A typical use case is to obtain
+a session cookie from the Poco::Net::HTTPServerRequest object, or to set a session
+cookie in the Poco::Net::HTTPServerResponse object.
+
+Given a Poco::RemotingNG::Context::Ptr <[pContext]>, the request and response objects
+can be obtained as follows:
+
+    Poco::Net::HTTPServerRequest* pRequest = pContext->getValue<Poco::Net::HTTPServerRequest*>("httpRequest");
+    Poco::Net::HTTPServerResponse* pResponse = pContext->getValue<Poco::Net::HTTPServerResponse*>("httpResponse");
+----
+
+
+!!!Server-Side Event Filtering
+
+Remoting NG supports server-side filtering of events (Poco::BasicEvent) based on
+client-specific criteria. This can be used to reduce network traffic, by reducing
+the number of event notifications sent out to remote clients. Each client can install its
+own filter for a specific event. To allow clients to install filters, the service object
+must provide remote methods to install (and remove) filters.
+
+Events that should support filtering must have the <[filter]> attribute set to <[true]>.
+Event filtering is done by the generated EventDispatcher subclass.
+
+Events, and therefore, event filtering, are only supported by the TCP transport.
+
+!!Event Filter Types
+
+A couple of filter types are provided by the Remoting NG framework. Filters must be
+subclasses of the Poco::RemotingNG::EventFilter class template, instantiated for
+the event's argument type. The following predefined filter classes are available:
+  * Poco::RemotingNG::IsGreaterThanFilter
+  * Poco::RemotingNG::IsGreaterThanOrEqualToFilter
+  * Poco::RemotingNG::IsLessThanFilter
+  * Poco::RemotingNG::IsLessThanOrEqualToFilter
+  * Poco::RemotingNG::LogicalOrFilter
+  * Poco::RemotingNG::LogicalAndFilter
+  * Poco::RemotingNG::LogicalXorFilter
+  * Poco::RemotingNG::MinimumDeltaFilter
+  * Poco::RemotingNG::MinimumIntervalFilter
+  * Poco::RemotingNG::MinimumIntervalOrDeltaFilter
+  * Poco::RemotingNG::MinimumIntervalAndDeltaFilter
+  * Poco::RemotingNG::HysteresisFilter
+
+Custom filter classes can be defined by subclassing the Poco::RemotingNG::EventFilter
+class template.
+
+!!Installing an Event Filter
+
+To install a filter, an instance of a Poco::RemotingNG::EventFilter subclass must
+be created and registered with Poco::RemotingNG::EventDispatcher::setEventFilter().
+A filter is always installed for a specific client (subscriber), identified by
+its subscriber URI. To allow a client to install a filter, the service object must provide
+one or more methods that manage filters. A client can obtain its subscriber URI from the
+return value of the proxy's remoting__enableEvents() method.
+
+Example:
+    //@ remote
+    class Sensor
+    {
+    public:
+        //@ filter=true
+        Poco::BasicEvent<double> valueChanged;
+            /// Fired when the sensor's measured value changes.
+
+        double value();
+            /// Returns the current value of the sensor.
+
+        void setMinimumDeltaFilter(const std::string subscriberURI, double delta);
+            /// Installs a Poco::RemotingNG::MinimumDeltaFilter for the client
+            /// identified by subscriberURI. The valueChanged event will only be
+            /// dispatched to the client if the sensor value has changed by at
+            /// least the specified delta.
+
+        void removeFilter(const std::string subscriberURI);
+            /// Removes the filter for the client identified by subscriberURI.
+    };
+----
+
+The implementation of Sensor::setMinimumDeltaFilter() looks as follows:
+
+    void Sensor::setMinimumDeltaFilter(const std::string subscriberURI, double delta)
+    {
+        Poco::RemotingNG::ORB& orb = Poco::RemotingNG::ORB::instance();
+        Poco::RemotingNG::Context::Ptr pContext = Poco::RemotingNG::Context::get();
+        std::string uri = pContext->getValue<std::string>("uri");
+        Poco::RemotingNG::EventDispatcher::Ptr pED = orb.findEventDispatcher(uri, "");
+        pED->setEventFilter<double>(subscriberURI, "valueChanged",
+            new Poco::RemotingNG::MinimumDeltaFilter<double>(delta));
+    }
+----
+
+Via the Poco::RemotingNG::ORB, we obtain the Poco::RemotingNG::EventDispatcher instance
+for the Sensor object. The URI/path of the sensor remote object can be obtained
+via the Poco::RemotingNG::Context object's <[uri]> value. The filter for the
+<[valueChanged]> event is installed via Poco::RemotingNG::EventDispatcher::setEventFilter().
+
+An installed event filter can be removed with
+Poco::RemotingNG::EventDispatcher::removeEventFilter(). To do so, the Sensor object
+provides the removeFilter() function to its remote clients:
+
+    void Sensor::removeFilter(const std::string subscriberURI)
+    {
+        Poco::RemotingNG::ORB& orb = Poco::RemotingNG::ORB::instance();
+        Poco::RemotingNG::Context::Ptr pContext = Poco::RemotingNG::Context::get();
+        std::string uri = pContext->getValue<std::string>("uri");
+        Poco::RemotingNG::EventDispatcher::Ptr pED = orb.findEventDispatcher(uri, "");
+        pED->removeEventFilter(subscriberURI, "valueChanged");
+    }
+----
+
+
+!!!Authentication and Authorization
+
+Starting with release 2017.1, Remoting NG includes a generic framework for user
+authentication and authorization. The authentication and authorization framework
+supports transport-specific authentication mechanisms, as well as
+permission-based authorization for individual remote methods.
+
+Authentication means associating user account information (e.g., a
+username) with a request, and verifying that the user account is valid. Along with
+the username, the user has to proof that he's really the rightful owner of the
+username. This is usually done by providing a secret that only the rightful
+owner of the username knows, to the server. Typically this is a password or some
+form of cryptographic signature derived from a secret.
+
+In contrast, authorization means verifying that a specific (properly authenticated)
+user is allowed to perform a specific action.
+
+
+!!Authentication
+
+Authentication support is provided by the new Poco::RemotingNG::Credentials class
+and the Poco::RemotingNG::Authenticator interface. The Credentials class stores
+user credentials in a generic way, using key-value pairs (called attributes).
+A typical example would be a username and a password:
+
+    Credentials creds;
+    creds.setAttribute(Credentials::ATTR_USERNAME, "user");
+    creds.setAttribute(Credentials::ATTR_PASSWORD, "pass");
+----
+
+The client's credentials are passed to the Transport, which then passes them to server
+for validation, using a transport-specific method. All Transport implementations
+supporting authentication provide a <[setCredentials()]> method that accepts a
+Poco::RemotingNG::Credentials object as argument. This also replaces the
+<[setUsername()]> and <[setPassword()]> methods provided previously for that purpose
+by some transport implementations (although these are still provided for backwards compatibility).
+
+
+!Authentication Mechanisms
+
+The Poco::RemotingNG::Authenticator interface supports multi-step challenge-response
+authentication message exchanges for mechanisms such as SCRAM-SHA-1 that do not
+send the plain password to the server. However, this must also be supported by the
+specific Transport implementation.
+
+In the simplest case, using a plain username and password for authentication, the
+conversation between client and server looks like this:
+
+    C > S: authenticate request (username, password)
+    S > C: authenticate response (done or failed)
+----
+
+In such a case, the actual implementation of Poco::RemotingNG::Authenticator is
+quite simple and, in its <[authenticate()]> method, just needs to compare the
+provided credentials against those in a database.
+
+In a secure multi-step (or challenge-response) authentication mechanism such as
+SCRAM-SHA-1, the conversation looks like this:
+
+    C > S: authenticate request (username, clientNonce)
+    S > C: authenticate response (continue, salt, serverNonce, iterations, conversationID)
+    C > S: authenticate request (conversationID, clientFinal)
+    S > C: authenticate response (continue, serverSignature, conversationID)
+    C > S: authenticate request (conversationID)
+    S > C: authenticate response (done)
+----
+
+The authentication message exchange is performed via a transport-specific
+mechanism.
+
+Therefore, in practice, authentication mechanisms are coupled to a specific transport
+implementation. For example, HTTP-based transports such as SOAP, JSON-RPC or REST
+support HTTP Basic Authentication and username and password are sent using the
+HTTP Authorization header in plain text, mandating the use of transport-level security
+(HTTPS). Implementing a multi-step authentication mechanism on top of
+HTTP is currently not supported by the HTTP-based transports.
+
+The TCP transport, in contrast, supports multi-step challenge-response authentication
+schemes, specifically SCRAM-SHA-1.
+
+When implementing a challenge-response authentication mechanism, the
+Poco::RemotingNG::Authenticator subclass must be able to support multiple simultaneous
+conversations and keep separate state information for each conversation (identified
+by a 32 bit unsigned integer).
+
+
+!Enabling Authentication for a Class
+
+Authentication is enabled on a service class or method level. Authentication is
+mandatory if a class or method requires permissions. Authentication can also be
+enforced for a class or method with the <[authenticated]> attribute.
+
+Example: Enforce authentication for all methods of class <[UserManager]>:
+
+    //@ remote
+    //@ authenticated
+    class UserManager
+    {
+    public:
+        UserManager(/* ... */);
+        ~UserManager();
+
+        void addUser(const User& user);
+        void updateUser(const User& user);
+        User getUser(const std::string& username);
+        void deleteUser(const std::string& username);
+
+    private:
+        // ...
+    };
+----
+
+The <[authenticated]> attribute will be reflected in the generated skeleton
+class. Before calling the actual service object method, a call to the
+request's Poco::RemotingNG::ServerTransport will be made to authenticate
+the credentials associated with the request. The ServerTransport will usually
+use the Authenticator registered with the Listener to perform the actual
+authentication. A session-based transport implementation (such as the TCP
+transport) may also perform the authentication during initial connection setup,
+calling the Authenticator's <[authenticate()]> method only once for the entire
+session. The ServerTransport will then only verify that the session has been
+properly authenticated, using an implementation-specific mechanism.
+
+
+!!Authorization
+
+Authorization in Remoting is declarative, using the <[permission]> attribute
+in a service class or method definition to specify the permission required
+to invoke the method or all methods of a class. A permission is a string,
+the format of which is entirely up to a specific application.
+
+Example: Enforce permissions for some methods of class <[UserManager]>:
+
+    //@ remote
+    //@ authenticated
+    class UserManager
+    {
+    public:
+        UserManager(/* ... */);
+        ~UserManager();
+
+        //@ permission = "user.add"
+        void addUser(const User& user);
+
+        //@ permission = "user.update"
+        void updateUser(const User& user);
+
+        User getUser(const std::string& username);
+
+        //@ permission = "user.delete"
+        void deleteUser(const std::string& username);
+
+    private:
+        // ...
+    };
+----
+
+In the above example, calling the methods <[addUser()]>, <[updateUser()]> and
+<[deleteUser()]> will require specific permissions or privileges.
+
+Like the <[authenticated]> attribute, the <[permission]> attribute will be reflected in
+the generated Skeleton class. Before invoking the actual service method, a call to the
+Poco::RemotingNG::ServerTransport will be made to verify that the user associated with the
+request has the required permission. The Transport will use a Poco::RemotingNG::Authorizer
+object to perform the actual permission check.
+
+Note that the permission string is entirely opaque to Remoting NG. It simply passes
+the permission string associated with a method to the Authorizer. How the permission
+string is then interpreted is entirely up the specific Authorizer implementation.
+
+An implementation of Poco::RemotingNG::Authorizer can get information about the user making the
+request via the Poco::RemotingNG::Context associated with the request.
+
+Like an Authenticator, an Authorizer is registered with a Poco::RemotingNG::Listener.
+
+Authorizer implementations are generally independent of the underlying Transport.
+However, an Authorizer must be able to use the Credentials attached by the
+Transport to the current request's Context in order to associate the request with a user.
+If provided, the identity or username of the user associated with the request will
+be available from the <[ATTR_USERNAME]> attribute in the Credentials.
+
+    Poco::RemotingNG::Context::Ptr pContext = Poco::RemotingNG::Context::get();
+    if (pContext)
+    {
+        const Poco::RemotingNG::Credentials& creds = pContext->getCredentials();
+        if (creds.hasAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME))
+        {
+            std::cout << creds.getAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME) << std::endl;
+        }
+    }
+----
+
+
+!!!The Remoting NG Code Generator (RemoteGenNG)
+
+The Remoting NG Code Generator (or <*RemoteGenNG*> or <*RemoteGen*> for short) is a
+very important part of the Remoting NG framework. The code generator
+parses one or more C++ header files defining service classes and
+their parameter and return value types, and generates the necessary
+server and client stub code like proxy, skeleton, serializers,
+deserializers and other helper classes that enable remote
+method calls.
+
+!!Code Generator Configuration
+
+To run the code generator, a configuration file for the code generator must be
+crafted first. The configuration file tells the code generator
+which classes to generate code for, as well as what code should
+be generated. The code generator needs to invoke the C++ compiler's
+preprocessor before parsing each header file, so the configuration
+file also contains information on how to invoke the preprocessor.
+The configuration file uses the XML format.
+
+Following is an example for a typical configuration file.
+
+    <AppConfig>
+        <RemoteGen>
+            <files>
+                <include>
+                    ../TimeServer/include/TimeService.h
+                </include>
+                <include-paths>
+                    ../TimeServer/include
+                </include-paths>
+            </files>
+            <output>
+                <mode>client</mode>
+                <include>include</include>
+                <src>src</src>
+                <schema>wsdl</schema>
+                <namespace>Sample</namespace>
+                <copyright>Copyright (c) 2024</copyright>
+            </output>
+            <schema>
+                <TimeService>
+                    <serviceLocation>http://localhost:8080/soap/TimeService/TheTimeService</serviceLocation>
+                </TimeService>
+            </schema>
+        </RemoteGen>
+    </AppConfig>
+----
+
+Following is a description of all XML elements supported in
+the configuration file.
+
+!AppConfig
+
+The XML root or document element. The name of this element is not relevant.
+A typical element name is <[AppConfig]>, but any other valid element name would
+do as well.
+
+!RemoteGen
+
+This element is required. Its child elements contain the
+configuration data for the code generator.
+
+!files/include
+
+The content of this element is a list of paths (or Glob expressions)
+that tell the code generator which header files to parse. The paths
+specified here can be relative (as in the example) or absolute.
+Paths must be separated by either a newline, a comma or a semicolon.
+
+There are three header files that always must be specified here.
+These are <*Poco/RemotingNG/RemoteObject.h*>, <*Poco/RemotingNG/Proxy.h*>
+and <*Poco/RemotingNG/Skeleton.h*>. Failing to include these files
+will result in the code generator reporting an error. If events are used,
+the header files <*Poco/RemotingNG/EventDispatcher.h*> and
+<*Poco/RemotingNG/EventSubscriber.h*> must be included as well.
+
+
+!files/exclude
+
+The content of this element is a list of paths (or Glob expressions)
+that tell the code generator which header files to exclude
+from parsing. This is only useful if <*files/include*> contains
+a very general Glob expression, and certain files resulting from
+this Glob expression should be excluded. This is not recommended,
+however.
+
+
+!files/include-paths
+
+The content of this element is a list of header file search paths,
+which are passed to the compiler using the compiler's appropriate
+command-line arguments.
+
+
+!system/include
+
+This is similar to <*files/include*> in that it specifies a list of
+files for the code generator to parse. The content of this element
+is merged with the content of <*files/include*>. This element is
+used in the global RemoteGen configuration file to specify the
+RemotingNG header files that need to be parsed by the code generator
+(which are the same for every project):
+
+    - ${POCO_BASE}/RemotingNG/include/Poco/RemotingNG/RemoteObject.h
+    - ${POCO_BASE}/RemotingNG/include/Poco/RemotingNG/Proxy.h
+    - ${POCO_BASE}/RemotingNG/include/Poco/RemotingNG/Skeleton.h
+    - ${POCO_BASE}/RemotingNG/include/Poco/RemotingNG/EventDispatcher.h
+    - ${POCO_BASE}/RemotingNG/include/Poco/RemotingNG/EventSubscriber.h
+
+!output/mode
+
+This specifies what code the code generator should generate.
+The following values are supported:
+
+  * <[server]>: generate server code only (interfaces, serializers, remote objects,
+    skeletons, server helpers)
+  * <[client]>: generate client code only (interfaces, serializers, proxies,
+    proxy factories, client helpers)
+  * <[both]>: generate both client and server code
+  * <[skeleton]>: generate server-side skeleton and serializers, but no interface classes
+  * <[interface]>: generate interface classes only
+
+This element is optional, the default is <[both]>.
+The setting can be overridden with the <*mode*> command
+line option.
+
+!output/include
+
+This element specifies the directory where header files for classes
+generated by the code generator are written to.
+The directory is automatically created if it does not
+already exist.
+
+It is also possible to specify a `namespace` attribute on the `include`
+element, to override the output directory for classes in the
+specified namespace. This is useful for more complex services consisting
+of multiple namespaces.
+
+    <output>
+        <include>include/Sample/Service</include>
+        <include namespace="Sample::Service::Detail">include/Sample/Service/Detail</include>
+    </output>
+----
+
+!output/src
+
+This element specifies the directory where implementation files
+for classes generated by the code generator are written to.
+The directory is automatically created if it does not
+already exist.
+
+!output/schema
+
+This specifies the directory where WSDL files
+for classes generated by the code generator are written to.
+The directory is automatically created if it does not
+already exist.
+
+The element is optional. The default is the current
+working directory. A WSDL file is only generated if
+a <*schema/class/serviceLocation*> element for
+the service class is present, and the service class
+has the <[namespace]> attribute set.
+
+!output/namespace
+
+This element specifies the C++ namespace, where generated classes will
+be in. If not specified, all generated classes will be in
+the same namespace as their respective input classes.
+
+Can be a nested namespace (e.g., <[Sample::Service]>).
+
+Example:
+    <namespace>Sample::Service</namespace>
+----
+
+!output/copyright
+
+This specifies a copyright (or other) message that will be added
+to the header comment section of each generated header
+and implementation file.
+
+!output/includeRoot
+
+Specifies the base directory for all include
+files. This element is only used if <*output/flatIncludes*> is
+also specified and set to <[false]>.
+
+!output/flatIncludes
+
+If specified with a value of <[true]>, which
+is the default, <[#include]> directives for serializer and deserializer
+header files generated by the
+code generator in skeleton and proxy implementation
+files will not include a directory part. Unless header files are
+generated into the same directory as the implementation files, or
+the the header file directory hierarchy is flat, the generated
+proxy and skeleton files will not compile.
+
+To resolve this issue, specify a value of <[false]> for
+<*output/flatIncludes*>, and include an appropriate
+<*output/includeRoot*> element as well.
+
+Example: If the following is specified for a project
+that requires generation of serializers and deserializers:
+
+    <output>
+        <include>include/TimeServer</include>
+        <src>src</src>
+        ...
+    </output>
+----
+
+and <*output/flatIncludes*> is set to <[true]>, then
+the generated skeleton and proxy files will contain
+the following <[#include]> for serializers and
+deserializers:
+
+    #include "TimeSerializer.h"
+    #include "TimeDeserializer.h"
+----
+
+The resulting skeleton and proxy files will likely
+fail to compile, as the resulting project directory
+hierarchy is as follows:
+
+    include/
+        TimeServer/
+            ITimeService.h
+            TimeSerializer.h
+            TimeDeserializer.h
+            ...
+    src/
+        ITimeService.cpp
+        TimeServiceSkeleton.cpp
+        ...
+----
+
+Adding <*output/flastIncludes*> and <*output/includeRoot*>
+elements as follows resolves that issue:
+
+    <output>
+        <include>include/TimeServer</include>
+        <src>src</src>
+        <includeRoot>include</includeRoot>
+        <flatIncludes>false</flatIncludes>
+        ...
+    </output>
+
+
+!output/library
+
+If this element is specified, the code generated by the code
+generator is assumed to be exported from a (shared) library.
+For this to work with Windows DLLs, the classes must be
+defined with a <[__declspec]> directive. Specifying a
+library name will direct the code generator to create
+all class definitions in the form:
+
+    class Library_API IService
+    {
+        ...
+    };
+----
+
+where <[Library]> in <[Library_API]> is replaced with
+the library name given in this element.
+For this to work, the <[Library_API]> macro must be
+defined somewhere.
+
+The definition for this macro typically looks like
+this:
+
+    #if defined(_WIN32) && defined(POCO_DLL)
+        #if defined(Library_EXPORTS)
+            #define Library_API __declspec(dllexport)
+        #else
+            #define Library_API __declspec(dllimport)
+        #endif
+    #endif
+
+
+    #if !defined(Library_API)
+        #define Library_API
+    #endif
+----
+
+!output/alwaysInclude
+
+This element instructs the code generator to always
+include the header file given as content.
+
+Example:
+
+    <alwaysInclude>Sample/Service/Sample.h</alwaysInclude>
+----
+
+will instruct the compiler to include a
+
+    #include "Sample/Service/Sample.h"
+----
+
+directive in each header file it generates.
+
+!output/timestamps
+
+Enable (default) or disable timestamps in generated C++ header and implementation
+files. Valid values are <[true]> to enable (default) and <[false]> to disable timestamps.
+If enabled, every generated header and implementation file will include the
+date and time when the file was generated in its header comment block.
+
+!output/bundle
+
+If code generation for the Open Service Platform has been enabled,
+and code for the client is generated, this element specifies the
+directory where files that go into the client bundle are generated.
+Currently, this only affects the <*extensions.xml*> file generated
+for the <*com.appinf.osp.remoting.service*> extension point.
+
+!output/osp/enable
+
+Specify whether code for Open Service Platform services
+should be generated. If set to <[true]>, the generated interface
+class will be a subclass of Poco::OSP::Service. This allows for
+registering remote services with the OSP Service Registry.
+
+!output/osp/bundleActivator
+
+Specify whether a bundle activator for use with the Open
+Service Platform should be generated. A class name for the
+bundle activator class must be specified.
+
+!output/bridge/enable
+
+Specify whether to generate <[RemoteBridge]> classes for services.
+If set to <[true]>, the bridge class will be generated. 
+Defaults to <[false]>.
+
+!output/bridge/synchronized
+
+Specify whether generated <[RemoteBridge]> classes have their
+service methods synchronized with a mutex. This is necessary for 
+a bridge to be thread safe when used with a non thread-safe <[Proxy]> 
+attached to it. 
+If set to <[true]> (default), this overrides the <[synchronized]> attribute.
+If set to <[false]>, the <[synchronized]> attribute controls whether
+a mutex is used.
+
+!output/openAPI
+
+Under the output/openAPI element, all configuration elements affecting the
+generation of OpenAPI documents are located. At least the <*path*> and
+<*info/title*> elements must be provided to enable creation of an
+OpenAPI document.
+
+!output/openAPI/path
+
+Enable OpenAPI file generation and specify the path to the OpenAPI file.
+Only supported for REST-style remote services implemented with the REST transport.
+OpenAPI, also known as Swagger, is a standard format for formally describing
+REST APIs. This is required to enable generation of an OpenAPI document.
+
+!output/openAPI/info
+
+Specify various informational properties (see below) for the
+generated OpenAPI document. At least the <*title*> must be
+specified.
+
+!output/openAPI/info/title
+
+Specify the title which is written to the <*info*> object of the generated
+OpenAPI document. This element is required when generating an OpenAPI document.
+
+!output/openAPI/info/description
+
+Specify the description which is written to the <*info*> object of the generated
+OpenAPI document.
+
+!output/openAPI/info/version
+
+Specify the API version which is written to the <*info*> object of the generated
+OpenAPI document. If not specified, defaults to "1.0.0". A version is
+required by the OpenAPI specification.
+
+!output/openAPI/info/termsOfService
+
+Specify the optional URL of a Terms of Service document for the API.
+
+!output/openAPI/info/contact
+
+Specify optional contact information (name, URL, email) to be written to the generated OpenAPI
+document.
+
+!output/openAPI/info/contact/name
+
+Specify the optional contact name for the OpenAPI document.
+
+!output/openAPI/info/contact/url
+
+Specify the optional contact URL for the OpenAPI document.
+
+!output/openAPI/info/contact/email
+
+Specify the optional contact email address for the OpenAPI document.
+
+!output/openAPI/info/license
+
+Specify licensing information (name, URL) for the generated OpenAPI document.
+
+!output/openAPI/info/license/name
+
+Specify the optional license name for the OpenAPI document.
+
+!output/openAPI/info/license/url
+
+Specify the optional license URL for the OpenAPI document.
+
+!output/openAPI/server
+
+Specify the server's base URL and optional description for the OpenAPI document.
+At least one server element is required. Can be specified multiple times.
+
+!output/openAPI/server/url
+
+Specify a server's base URL. This element is required.
+
+!output/openAPI/server/description
+
+Specify a server's optional description.
+
+!output/openAPI/json/indent
+
+Specify the indentation width (number of space characters) for the generated OpenAPI JSON
+document. Defaults to 2.
+
+!options/memberSerializationOrder
+
+This setting controls the order in which member variables of a `struct` or `class` are
+serialized. Valid values are:
+
+  - `lexical`: member variables are serialized and deserialized in lexical order, determined by their name.
+    This is also the behavior in all versions of Remoting NG prior to 2024.1.
+  - `as-declared`: member variables are serialized and deserialized in the same order they
+    have been declared in the `struct` or `class`. This is the new default starting with
+    RemotingNG version 2024.1.
+
+!schema/<serviceClass>/serviceLocation
+
+This element enables WSDL document generation for the given service class and
+specifies the service location for use as service port address in the generated WSDL document.
+
+For example, specifying:
+
+    <schema>
+        <TimeService>
+            <serviceLocation>http://localhost:8080/soap/TimeService/TheTimeService</serviceLocation>
+        </TimeService>
+    </schema>
+----
+
+in the code generator configuration will instruct the code generator to
+generate a WSDL file named <*TimeService.wsdl*>, containing the following
+<*service*> element:
+
+    <service name="TimeServiceService">
+        <port binding="wts:TimeServiceSoapBinding" name="TimeService">
+            <soap:address location="http://localhost:8080/soap/TimeService/TheTimeService"/>
+        </port>
+    </service>
+----
+
+The service location specified should always have the form:
+    http://<host>:<port>/soap/<serviceClass>/<objectId>
+----
+
+
+!compiler
+
+RemoteGenNG will invoke the C++ preprocessor on every header file
+prior to parsing it.
+The <*compiler*> element (and its child elements) specify how to invoke the C++
+preprocessor. Multiple <*compiler*> elements can be specified. If this is the case,
+every <*compiler*> element should have an <*id*> attribute, giving it a unique name.
+The <*compiler*> command line option can then be used to specify which compiler to use.
+This way, the same configuration file can be used on multiple platforms.
+The <*compiler*> element and its children are usually used in the global configuration file,
+but can also be used in a project-specific configuration.
+
+!compiler/exec
+
+This element specifies the name of the C++ compiler executable to use.
+In the above example, we use the Visual C++ compiler.
+
+To use GCC, use:
+
+    <exec>g++</exec>
+----
+
+!compiler/options
+
+This element specifies the command line options passed to the compiler.
+The options should direct the compiler to simply run the
+preprocessor, and write the preprocessed output to a
+file named <*header.i*> in the current directory. This
+file is then parsed by the code generator.
+Options must be separated with either a newline, a comma
+or a semicolon.
+
+In the above example, the command line options have the following
+meaning:
+
+  * /I: specify search path for include files. Note that the actual
+    path is passed as separate argument and thus placed on the
+    next line.
+  * /nologo: do not display the startup banner.
+  * /C: preserve comments during preprocessing (important, otherwise
+    the code generator would not see the attributes).
+  * /P: preprocess to a file.
+  * /TP: assume a C++ header file.
+
+To run the code generator on a Linux or Unix platform that uses GCC,
+the compiler options of the configuration file must be changed
+as follows:
+
+    <options>
+        -I${POCO_BASE}/Foundation/include
+        -I${POCO_BASE}/RemotingNG/include
+        -I./include
+        -E
+        -C
+        -o%.i
+    </options>
+----
+
+These options have the following meaning:
+
+  * `-I`: specify search path for include files.
+  * `-E`: run the preprocessor only.
+  * `-C`: preserve comments during preprocessing (important, otherwise
+    the code generator would not see the attributes).
+  * `-o`: specify the file where preprocessor output is written to.
+
+!compiler/path
+
+This element can be used to specify a search path for the C++ compiler
+or preprocessor executable. This is useful if the <[PATH]> environment
+variable does not contain the path of the compiler executable.
+
+
+!!Invoking The Code Generator
+
+!Command Line Usage
+
+The code generator is invoked by running the <*RemoteGenNG*> executable.
+The configuration file must be passed as argument. It is possible to
+specify more than one configuration file in the argument list. In this
+case, settings specified in later files replace settings in earlier ones.
+
+
+!Command Line Options
+
+The Remoting code generator utility (RemoteGenNG) supports the following command
+line options:
+
+  * <[/help]>, <[--help]>, <[-h]>: Display help information on command line arguments.
+  * <[/define:<name>=<value>]>, <[--define=<name>=<value>]>, <[-D<name>=<value>]>: Define a
+    configuration property. A configuration
+    property defined with this option can be referenced in
+    the configuration file, using the following syntax:
+    <[${<name>}]>. A typical example is <[${POCO_BASE}]>, specifying the location
+    of the POCO C++ Libraries base directory.
+  * <[/config:<file>]>, <[--config=<file>]>, <[-c<file>]>: Load configuration from the given file specified by
+    <file>. This option is supported for backwards
+    compatibility only. Configuration file names can be directly given
+    as command line arguments.
+  * <[/mode:<mode>]>, <[--mode=<mode>]>, <[-m<mode>]>: Override generation mode specified in configuration
+    file. Valid values for <[<mode>]> are "client", "server",
+    "both", "skeleton" or "interface".
+  * <[/compiler:<id>]>, <[--compiler=<id>]>, <[-C<id>]>: Specify which compiler definition to use for
+    preprocessing. See the <*compiler*> element in the configuration file. If not specified,
+    the first compiler definition in the configuration will be used.
+  * <[/osp]>, <[--osp]>, <[-o]>: Create services and bundle activator for Open
+    Service Platform.
+  * <[/bridge]}, <[--bridge]>, <[-b]>: Generate remote bridge objects for services.
+
+Command line arguments must be specified using the correct option syntax for the
+respective platform.
+
+For example, on Windows, one would use:
+
+    RemoteGenNG /mode:server TimeServer.xml /D:POCO_BASE=C:\poco
+----
+
+whereas, on a Unix or Linux platform, one would use:
+
+    RemoteGenNG --mode=server TimeServer.xml --define:POCO_BASE=/path/to/poco
+----
+
+or, using the abbreviated options format:
+
+    RemoteGenNG -mserver TimeServer.xml -DPOCO_BASE=/path/to/poco
+----
+
+
+!!Hiding Definitions From RemoteGenNG
+
+Since RemoteGenNG invokes the C++ preprocessor prior to parsing a header file, this
+can be used to hide certain definitions from RemoteGenNG. While RemoteGenNG tries its
+best at parsing C++ definitions, it does not have a full-blown C++ parser. Therefore,
+certain intricate C++ constructs could cause parsing errors or incorrect behavior.
+With the help of the preprocessor, these parts of a header file can be hidden from
+RemotingNG. To do this, define a macro when invoking the preprocessor:
+
+    <options>
+        -I${POCO_BASE}/Foundation/include
+        -I${POCO_BASE}/RemotingNG/include
+        -I./include
+        -E
+        -C
+        -DPOCO_REMOTEGEN
+        -o%.i
+    </options>
+----
+
+When RemoteGenNG invokes the preprocessor, the <[POCO_REMOTEGEN]> macro will be
+defined. This can be used in the header file to hide some parts from RemoteGenNG
+using <[#ifndef]>:
+
+    #ifndef POCO_REMOTEGEN
+    // definitions that should be hidden from RemoteGenNG
+    #endif
+----
+
+
+!!Classes And Files Generated by The Code Generator
+
+Figure 1 shows the classes that the Remoting code generator
+creates. All classes are generated from one input class, the
+Service class which implements the remote service.
+Not shown in the figure are serializer and deserializer classes
+which are generated for every user-defined class used as
+argument or return value.
+
+[[image:images/RemotingClasses.png Figure 1: Classes generated by RemoteGen]]
+
+
+!IService
+
+The interface class has all member functions which are marked as <[remote]> in the
+service class. In the interface class, these methods are pure virtual. The name
+of the interface class is, by convention, the same as the service class, with an
+uppercase I (for <*interface*>) prepended to the name. Therefore, the interface
+class for <[Service]> will be named <[IService]>.
+The interface class is the base class for both the proxy and the remote object
+class generated by the code generator. The interface class is a subclass
+of Poco::RefCountedObject (or Poco::OSP::Service, if OSP support is enabled)
+and thus supports reference counting. Normally, the interface class is
+used with Poco::AutoPtr. The interface class contains a type definition
+that makes a suitable Poco::AutoPtr instantiation available under the
+name <[IService::Ptr]>.
+
+
+!ServiceProxy
+
+The proxy class implements the client part of the remoting machinery. Its task
+is to serialize and deserialize parameters and return values, and, together
+with the transport, send requests over the network to the server
+and receive responses from the server.
+
+The proxy class normally is not thread safe, so a single proxy object should
+only be used by a single thread at any given time. However, there can be more
+than one proxy object in a process, so each thread can have its own proxy
+object. The proxy object can be made thread safe if the service class is
+annotated with the <[synchronized]> attribute.
+
+The proxy class is a subclass of the interface class.
+
+
+!ServiceRemoteObject
+
+The remote object is used on the server side. Like the proxy on the client side,
+it is a subclass of the interface class. Internally, it maintains a pointer
+to the actual service object. Its member functions simply forward all calls
+to the service object.
+
+The ORB has a built-in optimization for the case when the service
+object resides in the same process as the client. In this case,
+instead of the proxy object, the ORB returns the remote object to
+the caller. A method call to the remote object is locally
+forwarded by the remote object to the service object. Therefore,
+no network and marshalling overhead is involved in such a situation.
+
+If the service class has been annotated with the <[synchronized]> attribute,
+calls to the service object are serialized. This useful if the service
+object has not been implemented in a threadsafe manner.
+
+
+!ServiceRemoteBridge
+
+The remote bridge class can be optionally generated for a service. It is a 
+variant of the <[ServiceRemoteObject]> (and like it also a subclass of <[RemoteObject]>), 
+but instead of forwarding method calls directly to the service object, 
+it forwards method calls to an instance of the interface class, e.g. a <[ServiceProxy]>. 
+This can be used to forward method calls to a different server.
+
+Normally, this class is generated in such a way that all calls to
+interface methods are serialized. This can be changed via the 
+`output/bridge/synchronized` configuration option and the `synchronized`
+attribute.
+
+
+!ServiceSkeleton
+
+The skeleton implements the server part of the remoting machinery. Its task
+is to deserialize parameters from client requests, invoke methods on
+the service object (via the remote object), and serialize return values
+and output parameters back to the client.
+
+
+!ServiceProxyFactory
+
+The proxy factory is a simple factory for proxy objects, as its name implies.
+It is used internally by the ORB to create proxy objects.
+
+
+!ServiceEventSubscriber
+
+The EventSubscriber is responsible for deserializing and dispatching event
+messages received from a server via an EventListener to a Proxy object.
+This class is only generated if the service object has events. The Proxy
+generates the EventSubscriber when events are enabled for it with a
+call to <[remoting__enableEvents()]>.
+
+
+!ServiceEventDispatcher
+
+The EventDispatcher is responsible for delivering
+events fired by service objects to remote subscribers. This class is only
+generated if the service object has events. The ServerHelper class will
+create and register the EventDispatcher with the ORB.
+
+
+!ServiceServerHelper
+
+The server helper provides static member functions that simplify the
+registration of a service object (along with its skeleton and remote object)
+with the ORB. It is not needed by the remoting machinery. Everything that
+the server helper does can also be achieved by directly calling the ORB.
+
+
+!ServiceClientHelper
+
+The client helper provides static member functions for obtaining a proxy
+object (or more generatlly speaking, an implementation of the interface)
+from the ORB on the client side. It is not needed by the remoting machinery.
+Everything that the client helper does can also be achieved by directly calling the ORB.
+
+
+!!Using Variables in The Configuration File
+
+The code generator configuration file can contain references to variables
+(or configuration properties) in the form <[${<variable>}]>. Variables
+can be defined directly in the configuration file, directly under the
+XML root element, or they can be passed using a command line option.
+System property values from Poco::Util::SystemConfiguration can be
+used as well.
+
+As an example, we can use the <*output/copyright*> element to not just
+include a copyright message, but also include the name of the host where
+the respective file has been generated:
+
+    <output>
+        ...
+        <copyright>This file has been generated on ${system.nodeName}.
+        Copyright (c) 2024 ...</copyright>
+        ...
+    </output>
+----
+
+A more typical use case is passing the path of the POCO C++ Libraries root directory
+to the code generator so that it can be referenced in the configuration file, as shown
+in the previous examples.
+
+
+!!!Customizing Code Generation
+
+Code generation of proxy, skeleton and serialization code can be customized
+by adding various attributes to the respective class or method.
+
+!!Input, Output and Input/Output Parameters
+
+Whether a parameter is input or input/output is normally determined automatically,
+depending on how the parameter is passed (by value or by const or non-const reference).
+Parameters passed by value or const reference are input, parameters passed by non-const
+reference are input/output. However, a C++ function signature provides no way to designate a
+parameter as output only. The <[direction]> attribute allows to rectify that.
+
+Example:
+
+    //@ $image = {direction = "out"}
+    void retrieveImage(const std::string& id, std::vector<char>& image);
+
+Without the <[direction]> attribute, the <[image]> parameter would be
+first passed to the server, which in this case is unnecessary, and then
+passed back to the client, containing the desired result. Note that "$"
+in front of the parameter name in the attribute definition.
+
+
+!!Controlling Parameter And Member Variable Ordering
+
+Normally, method parameters are serialized in the same order they are
+declared in the method signature, and class/struct member variables
+are serialized in alphabetical order based on their name.
+
+The ordering can be changed by annotating the respective parameter or member variable
+with the <[order]> attribute. For parameters, the <[order]> attribute must be
+nested in another attribute having the same name as the parameter.
+
+Example (struct):
+
+    //@ serialize
+    struct Time
+    {
+        //@ order = 2
+        int hour;
+        //@ order = 1
+        int minute;
+        //@ order = 3
+        int second;
+    };
+----
+
+Example (parameters):
+
+    //@ $hour = {order = 2}, $minute = {order = 1}, $second = {order = 3}
+    void setTime(int hour, int minute, int second);
+----
+
+This is mostly useful for XML based Transport implementations (such as
+the SOAP Transport), if a certain schema must be matched.
+
+
+!!Renaming Methods, Parameters And Variables
+
+Under certain circumstances it might be necessary to change the
+name of methods, parameters or variables in the remote interface
+or wire format. This might be the case if a certain XML schema
+for an XML-based Transport such as the SOAP Transport must
+be matched. To rename a method, parameter or variable, the
+<[name]> attribute can be used. If a method name is renamed,
+it is usually a good idea to also specify the <[replyName]>
+attribute to change the name for the reply message
+accordingly as well.
+
+Example (struct):
+
+    //@ serialize
+    struct Time
+    {
+        //@ name = "h"
+        int hour;
+        //@ name = "m"
+        int minute;
+        //@ name = "s"
+        int second;
+    };
+----
+
+Example (parameters):
+
+    //@ $hour = {name = "h"}, $minute = {name = "m"}, $second = {name = "s"}
+    void setTime(int hour, int minute, int second);
+----
+
+Example (request and response name):
+
+    //@ name = "SetTimeRequest", replyName = "SetTimeReply"
+    void setTime(int hour, int minute, int second);
+----
+
+Parameter ordering and renaming can of course be combined as well:
+
+    //@ name = "SetTimeRequest", replyName = "SetTimeReply"
+    //@ $hour   = {name = "h", order = 3}
+    //@ $minute = {name = "m", order = 2}
+    //@ $second = {name = "s", order = 1}
+    void setTime(int hour, int minute, int second);
+----
+
+This will result in the following WSDL being generated:
+
+    <definitions name="TimeService" ...>
+        <types>
+            <xsd:schema elementFormDefault="qualified"
+                        targetNamespace="http://sample.com/webservices/TimeService"
+                        xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+                <xsd:complexType name="SetTimeRequest">
+                    <xsd:sequence>
+                        <xsd:element name="s" type="xsd:int"/>
+                        <xsd:element name="m" type="xsd:int"/>
+                        <xsd:element name="h" type="xsd:int"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+                <xsd:complexType name="SetTimeReply"/>
+                <xsd:element name="SetTimeReply" type="ts:SetTimeReply"/>
+                <xsd:element name="SetTimeRequest" type="ts:SetTimeRequest"/>
+                ...
+            </xsd:schema>
+        </types>
+        <message name="SetTimeRequestRequestMsg">
+            <part element="ts:SetTimeRequest" name="parameters"/>
+        </message>
+        <message name="SetTimeReplyMsg">
+            <part element="ts:SetTimeReply" name="parameters"/>
+        </message>
+        ...
+        <portType name="TimeServicePortType">
+            <operation name="SetTimeRequest">
+                <input message="wts:SetTimeRequestRequestMsg"/>
+                <output message="wts:SetTimeReplyMsg"/>
+            </operation>
+            ...
+        </portType>
+        <binding name="TimeServiceSoapBinding" type="wts:TimeServicePortType">
+            <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+            <operation name="SetTimeRequest">
+                <soap:operation soapAction="http://sample.com/webservices/TimeService/SetTimeRequest"
+                                style="document"/>
+                <input>
+                    <soap:body parts="parameters" use="literal"/>
+                </input>
+                <output>
+                    <soap:body parts="parameters" use="literal"/>
+                </output>
+            </operation>
+            ...
+        </binding>
+    </definitions>
+----
+
+!!SOAP/XML Serialization Options
+
+There are a few special attributes that change the way parameters and return values are
+serialized with XML-based transports like the SOAP Transport. These attributes
+are described in the following.
+
+!SOAP Header
+
+When the SOAP wire format is used, certain parameters can be
+serialized in the header part of the SOAP message, instead of the body part.
+This can be accomplished by specifying the <[header]> attribute for
+a parameter. Note that the <[header]> attribute can only be
+used on a parameter that has a complex type (user defined class
+or struct). Using <[header]> on a parameter with a scalar type
+will result in an error at runtime, when serializing
+the request.
+
+Example:
+
+    //@ serialize
+    struct Header
+    {
+        int format;
+    };
+
+    //@ $header = {header}
+    std::string currentTimeAsString2(const Header& header) const;
+----
+
+
+!Return Value Serialization
+
+It is also possible to change the way return values are serialized.
+Normally, a return value is enclosed within a <[return]> element.
+By specifying the <[inline]> attribute for the return value, the <[return]>
+element is omitted.
+
+For example a method:
+    Time currentTimeAsStruct() const;
+----
+
+will return the following XML structure if the SOAP Transport is used:
+
+    <currentTimeAsStructReply>
+        <return>
+            <hour>10</hour>
+            <minut>31</minute>
+            <second>22</second>
+        </return>
+    </currentTimeAsStructReply>
+----
+
+To change that structure to:
+
+    <Time>
+        <hour>10</hour>
+        <minut>31</minute>
+        <second>22</second>
+    </Time>
+----
+the <[replyName]> attribute can be specified, along with the <[inline]> attribute on the return value,
+as follows:
+
+    //@ replyName = "Time", return = {inline}
+    Time currentTimeAsStruct() const;
+----
+
+!Parameters as XML Attributes
+
+Finally, a parameter value can be serialized as an XML attribute instead of an XML element.
+This is enabled by specifying the <[type]> attribute for the parameter with the value "attr".
+
+    //@ $format = {type = "attr"}
+    std::string currentTimeAsString2(const std::string& format) const;
+
+The XML for the remote call will look like this:
+
+    <soap:Envelope encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+        <soap:Body>
+            <ns1:currentTimeAsString2 format="%H:%M" xmlns:ns1="http://sample.com/webservices/TimeService"/>
+        </soap:Body>
+    </soap:Envelope>
+----
+
+
+!!One-Way Methods
+
+One-way methods are methods that do not return any values, don't have any output parameters
+and do not throw any exceptions. The remote call to a one-way method can be optimized in such
+a way that no response message needs to be sent from the server to the client. This can help
+reducing the network overhead of a distributed application. However, a one-way methdo has no
+way to signal its caller wheter it was successful or not. This must be taken into consideration
+when using one-way methods. Similar to methods, events can also be one-way.
+
+The <[oneway]> attribute is used to mark a method or event as one-way.
+
+Example:
+    //@ oneway
+    void setTime(int hour, int minute, int second);
+----
+
+
+!!Return Value Caching
+
+Return value caching can help improve the performance of a distributed application
+under certain circumstances. Remoting can cache the return value of a method call.
+When return value caching for a method is enabled, the Remoting framework internally
+stores the return value of the first remote call to that method. For subsequent calls
+to that method, the cached return value is simply returned to the caller, without
+any remote call actually taking place. Return value caching only makes sense for methods
+that do not take any parameters, and that return values that do not change very often.
+
+To enable return value caching, the <[cacheResult]> attribute is specified for
+the respective method. It is also possible to specify the time interval for
+which a return value is cached, using the <[cacheExpire]> attribute.
+
+Example:
+
+    //@ cacheResult, cacheExpire = "500 ms"
+    std::string currentTimeAsString() const;
+----
+
+
+!!Synchronizing Remote Object And Proxy Calls
+
+Service objects can be invoked from multiple clients, and thus multiple threads
+simultaneously. Therefore, service classes should be threadsafe. If a service
+class is not threadsafe, the <[synchronized]> attribute can be used
+to have the Remoting framework synchronize calls to the service object, thus
+guaranteeing that only one thread at a time can invoke a method on the
+service object. The <[synchronized]> can be specified for the entire class,
+or for single methods. At most one thread can call any method marked
+as <[synchronized]> at any given time.
+
+The <[synchronized]> attribute also affects proxy code. Normally, a proxy
+object is not threadsafe, and should not be shared by multiple threads.
+With the <[synchronized]> attribute set, calls to the proxy object
+are serialized as well. Nevertheless, it is not recommended to share
+a proxy object with multiple threads.
+
+Example:
+
+    //@ synchronized
+    std::string currentTimeAsString() const;
+----
+
+The <[synchronized]> attribute also takes optional parameters. This allows to
+control whether only the RemoteObject, only the Proxy or both should have
+synchronization code. Supported values are:
+
+  * `all` (or `true`): Synchronize both RemoteObject and Proxy (default if no value is given).
+  * `proxy`: Synchronize Proxy only.
+  * `remote`: Synchronize RemoteObject and RemoteBridge only.
+  * `bridge`: Synchronize RemoteBridge only.
+  * `none` (or `false`): Don't synchronize anything.
+
+
+!!!Using the SOAP Transport for ONVIF
+
+The SOAP transport, together with the XML schema code generator (`XSDGen`), can be
+used to generate client and server code from the [[https://www.onvif.org ONVIF]] 
+[[https://www.onvif.org/profiles/specifications/ network interface specifications]]
+supported by most network cameras.
+
+!!Code Generation
+
+Due to the complexity of the specification and its reference to third-party
+schemas, configuring the `XSDGen` code generator can be challenging.
+Following is a basic configuration file (`XSDGen.xml`) that can be used to generate code
+for the following ONVIF services (bindings), with C++ classes in namespaces 
+corresponding to the XML schema namespaces. 
+
+  - Device
+  - DeviceIO
+  - Media
+
+
+    <AppConfig>
+        <XSDGen>
+            <options>
+                <namespaceInSourceFileNames>true</namespaceInSourceFileNames>
+                <namespaceInHeaderFileNames>false</namespaceInHeaderFileNames>
+                <alwaysUseOptional>false</alwaysUseOptional>
+                <generateAllBindings>true</generateAllBindings>
+                <amalgamateSources>true</amalgamateSources>
+            </options>
+            <default>
+                <include>include/ONVIF</include>
+                <src>src</src>
+                <includeRoot>include</includeRoot>
+                <alwaysInclude>ONVIF/ONVIF.h</alwaysInclude>
+                <library>ONVIF</library>
+            </default>
+            <schema targetNamespace="http://www.onvif.org/ver10/deviceIO/wsdl">
+                <include>include/ONVIF/DeviceIO</include>
+                <namespace>ONVIF::DeviceIO</namespace>
+            </schema>
+            <schema targetNamespace="http://www.onvif.org/ver10/device/wsdl">
+                <include>include/ONVIF/Device</include>
+                <namespace>ONVIF::Device</namespace>
+            </schema>
+            <schema targetNamespace="http://www.onvif.org/ver10/media/wsdl">
+                <include>include/ONVIF/Media</include>
+                <namespace>ONVIF::Media</namespace>
+            </schema>
+            <schema targetNamespace="http://www.onvif.org/ver10/schema">
+                <include>include/ONVIF</include>
+                <namespace>ONVIF</namespace>
+            </schema>
+            <schema targetNamespace="http://docs.oasis-open.org/wsn/b-2">
+                <include>include/OASIS/WSN/B2</include>
+                <namespace>OASIS::WSN::B2</namespace>
+            </schema>
+            <schema targetNamespace="http://docs.oasis-open.org/wsn/t-1">
+                <include>include/OASIS/WSN/T1</include>
+                <namespace>OASIS::WSN::T1</namespace>
+            </schema>
+            <schema targetNamespace="http://docs.oasis-open.org/wsrf/bf-2">
+                <include>include/OASIS/WSRF/BF2</include>
+                <namespace>OASIS::WSRF::BF2</namespace>
+            </schema>
+            <schema targetNamespace="http://www.w3.org/2003/05/soap-envelope">
+                <include>include/W3/SOAP/Envelope</include>
+                <namespace>W3::SOAP::Envelope</namespace>
+            </schema>
+            <schema targetNamespace="http://www.w3.org/2004/08/xop/include">
+                <include>include/W3/XOP</include>
+                <namespace>W3::XOP</namespace>
+            </schema>
+            <schema targetNamespace="http://www.w3.org/2005/05/xmlmime">
+                <include>include/W3/XMLMIME</include>
+                <namespace>W3::XMLMIME</namespace>
+            </schema>
+            <schema targetNamespace="http://www.w3.org/2005/08/addressing">
+                <include>include/W3/Addressing</include>
+                <namespace>W3::Addressing</namespace>
+            </schema>
+        </XSDGen>
+    </AppConfig>
+----
+
+`XSDGen` can be run with the above configuration with the following command, assuming
+that the ONVIF WSDL and schema files are in the `wsdl` directory.
+
+    XSDGen --config=XSDGen.xml wsdl/ver10/device/wsdl/devicemgmt.wsdl wsdl/ver10/deviceio.wsdl wsdl/ver10/media/wsdl/media.wsdl
+----
+
+The header files generated by `XSDGen` with the above configuration must
+then be processed by `RemoteGenNG` to generate the classes required by
+the RemotingNG framework. The following example configuration (`RemoteGen.xml`)
+can be used together with the above `XSDGen.xml` to generate the code.
+
+    <AppConfig>
+        <RemoteGen>
+            <files>
+                <include>
+                    ../ONVIF/include/ONVIF/*.h
+                    ../ONVIF/include/ONVIF/Device/*.h
+                    ../ONVIF/include/ONVIF/DeviceIO/*.h
+                    ../ONVIF/include/ONVIF/Media/*.h
+                    ../ONVIF/include/OASIS/WSN/B2/*.h
+                    ../ONVIF/include/OASIS/WSN/T1/*.h
+                    ../ONVIF/include/OASIS/WSRF/BF2/*.h
+                    ../ONVIF/include/W3/Addressing/*.h
+                    ../ONVIF/include/W3/SOAP/*.h
+                    ../ONVIF/include/W3/XMLMIME/*.h
+                    ../ONVIF/include/W3/XOP/*.h
+                </include>
+                <include-paths>
+                    ../ONVIF/include
+                </include-paths>
+            </files>
+            <output>
+                <mode>client</mode>
+                <include>include</include>
+                <include namespace="ONVIF">include/ONVIF</include>
+                <include namespace="ONVIF::DeviceIO">include/ONVIF/DeviceIO</include>
+                <include namespace="ONVIF::Device">include/ONVIF/Device</include>
+                <include namespace="ONVIF::Media">include/ONVIF/Media</include>
+                <include namespace="W3::Addressing">include/W3/Addressing</include>
+                <include namespace="W3::SOAP">include/W3/SOAP</include>
+                <include namespace="W3::XMLMIME">include/W3/XMLMIME</include>
+                <include namespace="W3::XOP">include/W3/XOP</include>
+                <include namespace="OASIS::WSN::B2">include/OASIS/WSN/B2</include>
+                <include namespace="OASIS::WSN::T1">include/OASIS/WSN/T1</include>
+                <include namespace="OASIS::WSRF::BF2">include/OASIS/WSRF/BF2</include>
+                <src>src</src>
+                <includeRoot>include</includeRoot>
+                <flatIncludes>false</flatIncludes>
+                <timestamps>false</timestamps>
+            </output>
+        </RemoteGen>
+    </AppConfig>
+----
+
+Note: make sure that `XSDGen` has been built with HTTPS support, as some of the
+external schemas required during processing must be downloaded via HTTPS.
+
+Due to the large number of generated files, it's a good idea to separate the files
+generated by `XSDGen` and `RemoteGenNG` into different directories, and also compile
+them into separate libraries.
+
+Also, the implementation files created by `XSDGen` are amalgamated into a single
+source file, which speeds up compilation and avoids potential issues with 
+build systems due to a very large number of source files.
+
+!!Invoking ONVIF Services
+
+Invoking ONVIF services with the generated code is straightforward.
+ONVIF uses SOAP 1.2, so the appropriate transport must be used.
+The typical entry point is the Device service, which is available
+under a fixed URL on the device.
+
+    auto pDevice = ONVIF::Device::DeviceBindingClientHelper::find("http://192.168.5.6/onvif/device_service"s, "soap-1.2"s);
+----
+
+Other endpoints can then be obtained via the device capabilities.
+
+    ONVIF::Capabilities capabilities;
+    pDevice->getCapabilities({"All"s}, capabilities);
+----
+
+For example, the Media service can be used to obtain the URI for a snapshot.
+The Media service requires authentication, which is done via
+WS-Security.
+
+    if (capabilities.getMedia())
+    {
+        const Poco::URI mediaURI = capabilities.getMedia()->getXAddr();
+        auto pMedia = ONVIF::Media::MediaBindingClientHelper::find(uri.toString(), "soap-1.2"s);
+        auto& mediaTransport = transportFromInterface(pMedia);
+        mediaTransport.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_WSSE_DIGEST);
+        mediaTransport.setUsername("onvif"s);
+        mediaTransport.setPassword("s3cr3t"s);
+    
+        std::vector<ONVIF::Profile> profiles;
+        pMedia->getProfiles(profiles);
+        //...
+    }
+----
+
+Please see the `ONVIFClient` sample project a complete example of how to invoke different
+services, including downloading a snapshot image.
+The `ONVIFClient` sample requires the `ONVIF` sample library, which contains the code
+generated by XSDGen for a subset of the ONVIF services.

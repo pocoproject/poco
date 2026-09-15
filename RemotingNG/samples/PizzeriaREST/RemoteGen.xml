@@ -1,0 +1,44 @@
+<AppConfig>
+	<RemoteGen>
+		<files>
+			<include>
+				../PizzeriaREST/include/Pizzeria/OrderEndpoint.h
+				../PizzeriaREST/include/Pizzeria/OrderCollectionEndpoint.h
+				../PizzeriaREST/include/Pizzeria/PizzaCollectionEndpoint.h
+				../PizzeriaREST/include/Pizzeria/ToppingCollectionEndpoint.h
+				../PizzeriaREST/include/Pizzeria/Pizza.h
+				../PizzeriaREST/include/Pizzeria/Topping.h
+				../PizzeriaREST/include/Pizzeria/Order.h
+				../PizzeriaREST/include/Pizzeria/DeliveryAddress.h
+			</include>
+			<include-paths>
+				include
+				../PizzeriaREST/include
+			</include-paths>
+		</files>
+		<output>
+			<include>include/Pizzeria</include>
+			<includeRoot>include</includeRoot>
+			<src>src</src>
+			<namespace>Pizzeria</namespace>
+			<copyright>Copyright (c) 2016-2020, Applied Informatics Software Engineering GmbH.</copyright>
+			<mode>server</mode>
+			<timestamps>false</timestamps>
+			<openAPI>
+				<path>openapi/Pizzeria.json</path>
+				<info>
+					<title>Sample REST API</title>
+					<description>A REST API for ordering pizzas.</description>
+					<version>1.0.0</version>
+					<contact>
+						<name>Applied Informatics Software Engineering GmbH</name>
+						<url>https://pocoproject.org/pro/</url>
+					</contact>
+				</info>
+				<server>
+					<url>http://localhost:8080/</url>
+				</server>
+			</openAPI>
+		</output>
+	</RemoteGen>
+</AppConfig>

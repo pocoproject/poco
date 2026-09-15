@@ -1,0 +1,76 @@
+// 
+// TopicExpression.h
+// 
+// This file has been generated.
+// Warning: All changes to this will be lost when the file is re-generated.
+// 
+// 
+
+
+#ifndef OASIS_WSN_B2_TopicExpression_INCLUDED
+#define OASIS_WSN_B2_TopicExpression_INCLUDED
+
+
+#include "ONVIF/ONVIF.h"
+#include "Poco/Nullable.h"
+#include "Poco/Optional.h"
+#include "Poco/SharedPtr.h"
+#include "Poco/URI.h"
+#include <string>
+#include <vector>
+
+
+namespace OASIS {
+namespace WSN {
+namespace B2 {
+
+
+//@ name=TopicExpressionType
+//@ namespace="http://docs.oasis-open.org/wsn/b-2"
+//@ serialize
+class ONVIF_API TopicExpression
+{
+public:
+	TopicExpression();
+
+	TopicExpression(const Poco::URI& dialect);
+
+	virtual ~TopicExpression();
+
+	const Poco::URI& getDialect() const;
+
+	void setDialect(const Poco::URI& val);
+
+	void setDialect(Poco::URI&& val);
+
+private:
+	//@ name=Dialect
+	//@ order=0
+	//@ type=attr
+	Poco::URI _dialect;
+
+};
+
+
+inline const Poco::URI& TopicExpression::getDialect() const
+{
+	return _dialect;
+}
+
+
+inline void TopicExpression::setDialect(const Poco::URI& val)
+{
+	_dialect = val;
+}
+
+
+inline void TopicExpression::setDialect(Poco::URI&& val)
+{
+	_dialect = std::move(val);
+}
+
+
+} } } // OASIS::WSN::B2
+
+
+#endif // OASIS_WSN_B2_TopicExpression_INCLUDED

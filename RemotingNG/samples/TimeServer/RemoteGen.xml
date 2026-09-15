@@ -1,0 +1,25 @@
+<AppConfig>
+	<RemoteGen>
+		<files>
+			<include>
+				include/TimeService.h
+			</include>
+			<include-paths>
+				include
+			</include-paths>
+		</files>
+		<output>
+			<include>include</include>
+			<src>src</src>
+			<schema>wsdl</schema>
+			<copyright>Copyright (c) 2006-2020, Applied Informatics Software Engineering GmbH.</copyright>
+			<mode>server</mode>
+			<timestamps>false</timestamps>
+		</output>
+		<schema>
+			<TimeService>
+				<serviceLocation>http://localhost:8080/soap/TimeService/TheClock</serviceLocation>
+			</TimeService>
+		</schema>
+	</RemoteGen>
+</AppConfig>
