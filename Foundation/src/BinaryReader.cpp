@@ -256,13 +256,34 @@ void BinaryReader::read7BitEncoded(UInt64& value)
 
 void BinaryReader::readRaw(std::streamsize length, std::string& value)
 {
+	// Grown chunk by chunk (reserve does not commit memory), so that a declared
+	// length that never arrives does not fill memory.
+	static constexpr std::streamsize CHUNK_SIZE = 64*1024;
+
 	value.clear();
 	value.reserve(static_cast<std::string::size_type>(length));
-	while (length--)
+	while (length > 0)
 	{
-		char c;
-		if (!_istr.read(&c, 1).good()) break;
-		value += c;
+		const std::streamsize n = std::min(length, CHUNK_SIZE);
+		const std::string::size_type offset = value.size();
+		value.resize(offset + static_cast<std::string::size_type>(n));
+		try
+		{
+			_istr.read(&value[offset], n);
+		}
+		catch (...)
+		{
+			// With exceptions enabled on the stream, keep only the bytes that arrived.
+			value.resize(offset + static_cast<std::string::size_type>(_istr.gcount()));
+			throw;
+		}
+		const std::streamsize count = _istr.gcount();
+		if (count < n)
+		{
+			value.resize(offset + static_cast<std::string::size_type>(count));
+			break;
+		}
+		length -= n;
 	}
 }
 

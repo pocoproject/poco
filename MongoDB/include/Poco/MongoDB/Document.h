@@ -96,7 +96,7 @@ public:
 		/// Destroys the Document.
 
 	Document& addElement(Element::Ptr element);
-		/// Add an element to the document.
+		/// Adds an element to the document, replacing an element with the same name.
 		///
 		/// The active document is returned to allow chaining of the add methods.
 
@@ -235,7 +235,22 @@ public:
 	}
 
 	void read(BinaryReader& reader);
-		/// Reads a document from the reader
+		/// Reads a document of at most MAX_MESSAGE_SIZE_BYTES bytes from the reader.
+		///
+		/// BSON is little-endian; the reader's byte order is not used, as in write().
+		///
+		/// Only bounds are checked: every length must fit in the enclosing
+		/// document, strings and documents must end where their length says,
+		/// the size is limited to MAX_MESSAGE_SIZE_BYTES and the nesting depth
+		/// is limited. Throws DataFormatException if a check fails or the data
+		/// ends early, and NotImplementedException for an unsupported element type.
+
+	Int32 read(BinaryReader& reader, Int32 maxSize);
+		/// Reads a document of at most maxSize bytes and returns its size.
+		///
+		/// BSON is little-endian; the reader's byte order is not used, as in write().
+		///
+		/// The checks are those of read(BinaryReader&).
 
 	[[nodiscard]] std::size_t size() const noexcept;
 		/// Returns the number of elements in the document.
@@ -244,7 +259,12 @@ public:
 		/// Returns a String representation of the document.
 
 	void write(BinaryWriter& writer) const;
-		/// Writes a document to the reader
+		/// Writes a document to the writer.
+		///
+		/// Throws InvalidArgumentException if the document is nested too deeply,
+		/// an element that should hold a document holds none, or an element name
+		/// contains a null character, and RangeException for a BSONTimestamp
+		/// outside 1970-2106.
 
 protected:
 
@@ -254,8 +274,18 @@ protected:
 		/// Returns const reference to elements in insertion order for read-only access by derived classes.
 
 private:
+	[[nodiscard]] Int32 readImpl(BinaryReader& reader, Int32 maxSize, int depth);
+		/// Reads a document of at most maxSize bytes and returns its size.
+
+	[[nodiscard]] static Element::Ptr readValue(unsigned char type, std::string&& name, BSONReader& reader, Int32& available);
+		/// Reads the value of an element that is not a document or an array;
+		/// kept out of readImpl to keep its recursive stack frame small.
+
+	void writeImpl(BinaryWriter& writer, int depth) const;
+		/// Writes a document nested depth levels deep.
+
 	void rebuildElementSet() const;
-		/// Rebuilds _elementSet from _elements. Called lazily on first get() after modifications.
+		/// Rebuilds _elementSet from _elements when it is out of date.
 
 	LinearContainer _elements;
 		/// Vector of elements in insertion order.
@@ -264,7 +294,8 @@ private:
 		/// Ordered set for O(log n) element lookups by name.
 		/// Uses heterogeneous lookup (C++14+) - can search by string without creating Element.
 		/// Stores Element::Ptr directly, no string duplication.
-		/// Built lazily on first get() call after modifications.
+		/// Built lazily on first get() call after modifications; addElement()
+		/// keeps it current for larger documents.
 
 	mutable bool _elementSetValid = false;
 		/// Flag indicating whether _elementSet is in sync with _elements.

@@ -226,12 +226,26 @@ void Connection::disconnect()
 }
 
 
-void Connection::sendRequest(OpMsgMessage& request, OpMsgMessage& response)
+void Connection::writeRequest(OpMsgMessage& request)
 {
 	Poco::Net::SocketOutputStream sos(_socket);
 	request.send(sos);
+	// SocketOutputStream reports a failed write only through the stream state.
+	if (!sos.good())
+	{
+		disconnect();
+		throw Poco::IOException("Failed to send the MongoDB request");
+	}
+}
 
+
+void Connection::sendRequest(OpMsgMessage& request, OpMsgMessage& response)
+{
+	// Cleared first, so that a request that cannot be sent leaves no previous response.
 	response.clear();
+
+	writeRequest(request);
+
 	readResponse(response);
 }
 
@@ -239,15 +253,29 @@ void Connection::sendRequest(OpMsgMessage& request, OpMsgMessage& response)
 void Connection::sendRequest(OpMsgMessage& request)
 {
 	request.setAcknowledgedRequest(false);
-	Poco::Net::SocketOutputStream sos(_socket);
-	request.send(sos);
+	writeRequest(request);
 }
 
 
 void Connection::readResponse(OpMsgMessage& response)
 {
 	Poco::Net::SocketInputStream sis(_socket);
-	response.read(sis);
+	try
+	{
+		response.read(sis);
+	}
+	catch (const Poco::NotImplementedException&)
+	{
+		// Thrown while parsing a fully received response: the socket is still in sync.
+		throw;
+	}
+	catch (...)
+	{
+		// The rest of the response, or a response arriving after a timeout, would
+		// be read as the response to the next request.
+		disconnect();
+		throw;
+	}
 }
 
 

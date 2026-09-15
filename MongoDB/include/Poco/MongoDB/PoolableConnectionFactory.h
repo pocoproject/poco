@@ -88,7 +88,8 @@ public:
 
 	bool validateObject(MongoDB::Connection::Ptr pObject)
 	{
-		return true;
+		// A connection whose response could not be read has been closed.
+		return pObject->isConnected();
 	}
 
 	void activateObject(MongoDB::Connection::Ptr pObject)
