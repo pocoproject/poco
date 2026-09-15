@@ -68,7 +68,7 @@ Capabilities expected of any modern MongoDB driver.
 | `mongodb://` URI | Supported | |
 | `mongodb+srv://` DNS seedlist | Missing | Resolve the host list out of band. |
 | `tls=` URI option | Added 1.15.x | Alias for the historical `ssl=`. |
-| Retryable reads / writes | Missing | Transient network errors are not retried. |
+| Retryable reads / writes | Partial | `ReplicaSetConnection` re-sends safe reads, and other commands only after a not-primary reply (no `lsid`/`txnNumber`); `Connection` does not re-send. See [README-ReplicaSet.md](README-ReplicaSet.md). |
 | Network compression (`zstd` / `zlib` / `snappy`) | Missing | `OP_COMPRESSED` opcode present; no codec or handshake. |
 | ClientSession, causal consistency, snapshot reads | Missing | No multi-document transactions. |
 
@@ -158,7 +158,7 @@ The largest remaining gaps for users targeting MongoDB 6.0 / 7.0 / 8.0:
   3. Change streams.
   4. Queryable Encryption.
   5. MONGODB-OIDC and other modern auth mechanisms.
-  6. Retryable reads / writes.
+  6. Retryable writes (`lsid` and `txnNumber`).
   7. Built-in TLS factory.
   8. Stable API opt-in.
   9. Cross-collection `bulkWrite` command.
