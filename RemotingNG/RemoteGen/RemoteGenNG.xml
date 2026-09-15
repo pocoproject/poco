@@ -2,11 +2,11 @@
 	<RemoteGen>
 		<system>
 			<include>
-				${POCOPLUS_BASE}/RemotingNG/include/Poco/RemotingNG/RemoteObject.h
-				${POCOPLUS_BASE}/RemotingNG/include/Poco/RemotingNG/Proxy.h
-				${POCOPLUS_BASE}/RemotingNG/include/Poco/RemotingNG/Skeleton.h
-				${POCOPLUS_BASE}/RemotingNG/include/Poco/RemotingNG/EventDispatcher.h
-				${POCOPLUS_BASE}/RemotingNG/include/Poco/RemotingNG/EventSubscriber.h
+				${POCO_BASE}/RemotingNG/include/Poco/RemotingNG/RemoteObject.h
+				${POCO_BASE}/RemotingNG/include/Poco/RemotingNG/Proxy.h
+				${POCO_BASE}/RemotingNG/include/Poco/RemotingNG/Skeleton.h
+				${POCO_BASE}/RemotingNG/include/Poco/RemotingNG/EventDispatcher.h
+				${POCO_BASE}/RemotingNG/include/Poco/RemotingNG/EventSubscriber.h
 			</include>
 		</system>
 		<internal>
@@ -18,9 +18,7 @@
 				-I
 				${POCO_BASE}/dependencies/tessil/include
 				-I
-				${POCOPLUS_BASE}/RemotingNG/include
-				-I
-				${POCOPLUS_BASE}/OSP/include
+				${POCO_BASE}/RemotingNG/include
 			</commonIncludes>
 		</internal>
 		<compiler id="gcc">
