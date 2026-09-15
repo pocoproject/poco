@@ -32,7 +32,7 @@ EventDispatcher::~EventDispatcher()
 }
 
 
-void EventDispatcher::setOwner(Poco::AutoPtr<Poco::RefCountedObject> pOwner)
+void EventDispatcher::setOwner(const Poco::AutoPtr<Poco::RefCountedObject>& pOwner)
 {
 	_pOwner = pOwner;
 }
