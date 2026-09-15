@@ -22,8 +22,8 @@ set_target_properties(RemotingNGREST
 )
 
 target_link_libraries(RemotingNGREST
-	PUBLIC 
-	Poco::Foundation Poco::Net Poco::RemotingNG Poco::Net
+	PUBLIC
+	Poco::Foundation Poco::Net Poco::RemotingNG
 )
 
 target_include_directories(RemotingNGREST
