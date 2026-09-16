@@ -54,8 +54,10 @@ static const std::string keyCursors		{"cursors"s};
 static const std::string keyBatchSize	{"batchSize"s};
 static const std::string keyId			{"id"s};
 static const std::string keyCursorsKilled {"cursorsKilled"s};
+static const std::string keyCursorsNotFound {"cursorsNotFound"s};
 
 static Poco::Int64 cursorIdFromResponse(const MongoDB::Document& doc);
+static bool containsInt64(const MongoDB::Array::Ptr& arr, Poco::Int64 id);
 
 
 OpMsgCursor::OpMsgCursor(const std::string& db, const std::string& collection):
@@ -152,10 +154,10 @@ OpMsgMessage& OpMsgCursor::nextImpl(ConnType& connection)
 	else
 	{
 #if _MONGODB_EXHAUST_ALLOWED_WORKS
-		std::cout << "Response flags: " << _response.flags() << std::endl;
+		std::cout << "Response flags: "s << _response.flags() << std::endl;
 		if (_response.flags() & OpMsgMessage::MSG_MORE_TO_COME)
 		{
-			std::cout << "More to come. Reading more response: " << std::endl;
+			std::cout << "More to come. Reading more response: "s << std::endl;
 			_response.clear();
 			connection.readResponse(_response);
 		}
@@ -193,23 +195,47 @@ void OpMsgCursor::killImpl(ConnType& connection)
 	_response.clear();
 	if (_cursorID != 0)
 	{
-		_query.setCommandName(OpMsgMessage::CMD_KILL_CURSORS);
+		const Poco::Int64 id = _cursorID;
 
-		MongoDB::Array::Ptr cursors = new MongoDB::Array();
-		cursors->add<Poco::Int64>(_cursorID);
-		_query.body().add(keyCursors, cursors);
-
-		connection.sendRequest(_query, _response);
-
-		const auto killed = _response.body().get<MongoDB::Array::Ptr>(keyCursorsKilled, nullptr);
-		if (!killed || killed->size() != 1 || killed->get<Poco::Int64>(0, -1) != _cursorID)
+		// killCursors is never re-sent by ReplicaSetConnection, so any outcome
+		// here (exception, unconfirmed reply, or success) is final: the cursor
+		// must be released before kill() returns, or the destructor's
+		// assertion fires on a cursor that can no longer be killed.
+		auto release = [this]()
 		{
-			throw Poco::ProtocolException("Cursor not killed as expected: "s + std::to_string(_cursorID));
+			_cursorID = 0;
+			_query.clear();
+			_response.clear();
+		};
+
+		try
+		{
+			_query.setCommandName(OpMsgMessage::CMD_KILL_CURSORS);
+
+			MongoDB::Array::Ptr cursors = new MongoDB::Array();
+			cursors->add<Poco::Int64>(id);
+			_query.body().add(keyCursors, cursors);
+
+			connection.sendRequest(_query, _response);
+		}
+		catch (...)
+		{
+			release();
+			throw;
 		}
 
-		_cursorID = 0;
-		_query.clear();
-		_response.clear();
+		const auto killed = _response.body().get<MongoDB::Array::Ptr>(keyCursorsKilled, nullptr);
+		const auto notFound = _response.body().get<MongoDB::Array::Ptr>(keyCursorsNotFound, nullptr);
+		const bool confirmed = containsInt64(killed, id) || containsInt64(notFound, id);
+
+		if (!confirmed)
+		{
+			const std::string body = _response.body().toString();
+			release();
+			throw Poco::ProtocolException("Cursor "s + std::to_string(id) + " not killed as expected: "s + body);
+		}
+
+		release();
 	}
 }
 
@@ -235,6 +261,17 @@ Poco::Int64 cursorIdFromResponse(const MongoDB::Document& doc)
 		id = cursorDoc->get<Poco::Int64>(keyId, 0);
 	}
 	return id;
+}
+
+
+bool containsInt64(const MongoDB::Array::Ptr& arr, Poco::Int64 id)
+{
+	if (arr.isNull()) return false;
+	for (std::size_t i = 0; i < arr->size(); ++i)
+	{
+		if (arr->get<Poco::Int64>(i, -1) == id) return true;
+	}
+	return false;
 }
 
 
