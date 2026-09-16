@@ -452,6 +452,52 @@ void CoreTest::testBuffer()
 }
 
 
+void CoreTest::testBufferEmpty()
+{
+	// An empty buffer owns no storage; no operation on it may touch memory.
+	Buffer<char> b(0);
+	assertTrue (b.empty());
+	assertTrue (b.size() == 0);
+	assertTrue (b.capacity() == 0);
+	assertTrue (b.begin() == nullptr);
+	assertTrue (b.begin() == b.end());
+
+	b.clear();
+	b.assign("x", 0);
+	b.append("x", 0);
+	b.resize(0);
+	b.setCapacity(0);
+	assertTrue (b.empty());
+	assertTrue (b.capacity() == 0);
+	assertTrue (b.begin() == nullptr);
+
+	Buffer<char> c(b);
+	assertTrue (c.empty());
+	assertTrue (c == b);
+	c = b;
+	assertTrue (c.empty());
+	assertTrue (c == b);
+
+	// A wrapper around no memory behaves the same.
+	Buffer<char> d(static_cast<char*>(nullptr), 0);
+	assertTrue (d.empty());
+	d.clear();
+	assertTrue (d == b);
+
+	// A buffer with capacity but no used elements is not cleared past its size.
+	Buffer<char> e(4);
+	e.resize(0);
+	assertTrue (e.empty());
+	assertTrue (e.capacity() == 4);
+	e.clear();
+	e.append("ab", 2);
+	assertTrue (e.size() == 2);
+	assertTrue ( !std::memcmp(e.begin(), "ab", 2) );
+	e.clear();
+	assertTrue (e[0] == 0 && e[1] == 0);
+}
+
+
 void CoreTest::testFIFOBufferEOFAndError()
 {
 	typedef FIFOBuffer::Type T;
@@ -1361,6 +1407,7 @@ CppUnit::Test* CoreTest::suite()
 	CppUnit_addTest(pSuite, CoreTest, testEnvironment);
 	CppUnit_addTest(pSuite, CoreTest, testEnvironmentMultiThread);
 	CppUnit_addTest(pSuite, CoreTest, testBuffer);
+	CppUnit_addTest(pSuite, CoreTest, testBufferEmpty);
 	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferChar);
 	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferInt);
 	CppUnit_addTest(pSuite, CoreTest, testFIFOBufferEOFAndError);

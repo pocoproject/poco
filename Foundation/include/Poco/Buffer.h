@@ -304,7 +304,11 @@ public:
 	void clear()
 		/// Sets the contents of the buffer to zero.
 	{
-		std::memset(_ptr, 0, _used * sizeof(T));
+		// An empty buffer has no storage; memset must not be called with a null pointer.
+		if (_ptr != nullptr && _used > 0)
+		{
+			std::memset(_ptr, 0, _used * sizeof(T));
+		}
 	}
 
 	std::size_t size() const
