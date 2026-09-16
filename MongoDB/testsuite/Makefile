@@ -6,7 +6,7 @@
 
 include $(POCO_BASE)/build/rules/global
 
-objects = Driver BSONTest MongoDBTest MongoDBTestOpMsg MongoDBTestSuite ReplicaSetTest
+objects = Driver BSONTest MongoDBTest MongoDBTestOpMsg MongoDBTestServer MongoDBTestSuite ReplicaSetConnectionTest ReplicaSetTest
 
 target         = testrunner
 target_version = 1

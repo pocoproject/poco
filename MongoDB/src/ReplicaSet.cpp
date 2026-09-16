@@ -270,7 +270,14 @@ Connection::Ptr ReplicaSet::waitForServerAvailability(const ReadPreference& read
 	for (std::size_t i = 0; i < reconnectRetries; ++i)
 	{
 		std::this_thread::sleep_for(std::chrono::seconds(reconnectDelaySec));
-		refreshTopology();
+		try
+		{
+			refreshTopology();
+		}
+		catch (...)
+		{
+			// A refresh failure (for example from a topology change observer) must not end the wait.
+		}
 
 		Connection::Ptr conn = getConnection(readPref, connectTimeout, socketTimeout);
 		if (!conn.isNull())

@@ -1,6 +1,6 @@
 # MongoDB Replica Set Examples
 
-This directory contains comprehensive examples demonstrating Poco::MongoDB replica set support with automatic failover, read preferences, and connection pooling.
+This directory contains comprehensive examples demonstrating Poco::MongoDB replica set support with server re-selection after a failure, read preferences, and connection pooling.
 
 **Minimum MongoDB Version**: MongoDB 5.1 or later (for replica set features)
 
@@ -24,7 +24,7 @@ A continuous monitoring tool that performs regular read/write operations and dis
 - **Real-time Topology Display**: Shows current replica set status, server roles, and round-trip times
 - **Statistics Tracking**: Monitors success rates for read and write operations
 - **Deployment Verification**: Quickly verify replica set is functioning correctly
-- **Automatic Failover Testing**: Continues working even during primary elections
+- **Failover Testing**: Continues working across primary elections; a request is re-sent only when that is safe
 
 ### Usage
 
@@ -155,7 +155,7 @@ Run the monitor while performing failover operations:
 # In another terminal, step down the primary:
 # mongo --eval "rs.stepDown()"
 
-# Monitor will automatically failover and continue operations
+# Monitor selects another member and continues operations
 ```
 
 #### 4. Continuous Monitoring
@@ -230,7 +230,7 @@ Demonstrates various replica set features with multiple commands.
 |---------|-------------|
 | `basic` | Basic replica set connection and operations |
 | `readpref` | Read preference examples (primary, secondary, nearest) |
-| `failover` | Automatic failover demonstration |
+| `failover` | Failover demonstration |
 | `pool` | Connection pooling example |
 | `topology` | Topology discovery and monitoring |
 
@@ -243,7 +243,7 @@ Demonstrates various replica set features with multiple commands.
 # Try different read preferences
 ./ReplicaSet readpref
 
-# Demonstrate automatic failover
+# Demonstrate failover
 ./ReplicaSet failover
 
 # Show connection pooling
