@@ -34,8 +34,9 @@ class MongoDB_API OpMsgCursor: public Document
 	/// Once all of the data is read with the cursor (see isActive()) it can't be reused.
 	///
 	/// USAGE:
-	/// Supports both Connection and ReplicaSetConnection. When using ReplicaSetConnection,
-	/// cursor operations benefit from automatic retry and failover on retriable errors.
+	/// Supports both Connection and ReplicaSetConnection; with the latter only the
+	/// initial find or aggregate may be re-sent. Use the same connection for the
+	/// whole life of a cursor.
 	///
 	/// RESOURCE MANAGEMENT:
 	/// When a cursor is no longer needed, you should call kill() to release server-side
@@ -82,20 +83,31 @@ public:
 		///
 		/// The cursor must be killed (see kill()) when not all documents are needed.
 		///
-		/// This overload provides automatic retry and failover for replica set deployments.
+		/// The getMore request is not re-sent. After next() throws, call kill() and
+		/// run the query again with a new cursor. After the connection was dropped,
+		/// getMore may reach another server (CursorNotFound); check responseOk()
+		/// before treating an inactive cursor as complete.
 
 	OpMsgMessage& query();
 		/// Returns the associated query.
 
 	void kill(Connection& connection);
-		/// Kills the cursor and resets its internal state.
-		/// Call this method when you don't need all documents to release server resources.
+		/// Kills the cursor and resets its internal state. Call this method when
+		/// you don't need all documents to release server resources.
+		///
+		/// The cursor is always released on the client: the request is not re-sent,
+		/// cursorsNotFound counts as killed, and a reply that lists the cursor as
+		/// neither killed nor not found throws Poco::ProtocolException. A second
+		/// call after a failed kill() sends nothing: the cursor is already released.
 
 	void kill(ReplicaSetConnection& connection);
-		/// Kills the cursor and resets its internal state.
-		/// Call this method when you don't need all documents to release server resources.
+		/// Kills the cursor and resets its internal state. Call this method when
+		/// you don't need all documents to release server resources.
 		///
-		/// This overload provides automatic retry and failover for replica set deployments.
+		/// The cursor is always released on the client: the request is not re-sent,
+		/// cursorsNotFound counts as killed, and a reply that lists the cursor as
+		/// neither killed nor not found throws Poco::ProtocolException. A second
+		/// call after a failed kill() sends nothing: the cursor is already released.
 
 private:
 	template<typename ConnType>
