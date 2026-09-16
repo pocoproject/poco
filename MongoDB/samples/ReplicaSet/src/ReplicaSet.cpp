@@ -40,7 +40,7 @@ void printUsage()
 	std::cout << "Commands:" << std::endl;
 	std::cout << "  basic        - Basic replica set connection example" << std::endl;
 	std::cout << "  readpref     - Read preference examples" << std::endl;
-	std::cout << "  failover     - Automatic failover demonstration" << std::endl;
+	std::cout << "  failover     - Failover demonstration" << std::endl;
 	std::cout << "  pool         - Connection pooling example" << std::endl;
 	std::cout << "  topology     - Topology discovery and monitoring" << std::endl;
 	std::cout << std::endl;
@@ -213,7 +213,7 @@ void readPreferenceExample()
 
 void failoverExample()
 {
-	std::cout << "=== Automatic Failover Demonstration ===" << std::endl;
+	std::cout << "=== Failover Demonstration ===" << std::endl;
 	std::cout << std::endl;
 
 	try
@@ -227,15 +227,16 @@ void failoverExample()
 		config.readPreference = ReadPreference(ReadPreference::PrimaryPreferred);
 		ReplicaSet rs(config);
 
-		// Create a replica set connection with automatic failover
+		// Create a replica set connection; a request is re-sent only when that is safe
 		ReplicaSetConnection::Ptr rsConn = new ReplicaSetConnection(rs, ReadPreference(ReadPreference::PrimaryPreferred));
 
-		std::cout << "Using ReplicaSetConnection for automatic failover" << std::endl;
+		std::cout << "Using ReplicaSetConnection: safe reads are re-sent, an insert only after a not-primary reply" << std::endl;
 		std::cout << "Initial connection: " << rsConn->address().toString() << std::endl;
 		std::cout << std::endl;
 
 		// Perform multiple operations
-		// If a server fails, operations will automatically retry on another server
+		// If the primary fails, an insert is re-sent only after a not-primary reply;
+		// a network error or timeout is reported as an exception
 		for (int i = 0; i < 5; ++i)
 		{
 			std::cout << "Operation " << (i + 1) << ": ";
@@ -272,7 +273,7 @@ void failoverExample()
 
 		std::cout << std::endl;
 		std::cout << "Note: If a server fails during these operations, the connection" << std::endl;
-		std::cout << "will automatically fail over to another replica set member." << std::endl;
+		std::cout << "selects another replica set member for the next request." << std::endl;
 	}
 	catch (const Exception& e)
 	{
