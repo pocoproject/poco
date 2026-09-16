@@ -1,0 +1,150 @@
+<definitions name="TimeService" targetNamespace="http://www.appinf.com/webservices/TimeService/" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:remoting="http://www.appinf.com/remoting" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:ts="http://www.appinf.com/webservices/TimeService/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wts="http://www.appinf.com/webservices/TimeService/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<types>
+		<xsd:schema targetNamespace="http://www.appinf.com/remoting">
+			<xsd:element name="Exception" type="remoting:Exception"/>
+			<xsd:complexType name="Exception">
+				<xsd:sequence>
+					<xsd:element name="Type" type="xsd:string"/>
+					<xsd:element name="Message" type="xsd:string"/>
+					<xsd:element name="Code" type="xsd:int"/>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:schema>
+		<xsd:schema elementFormDefault="qualified" targetNamespace="http://www.appinf.com/webservices/TimeService/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:complexType name="currentTimeRequest"/>
+			<xsd:complexType name="currentTimeReply">
+				<xsd:sequence>
+					<xsd:element name="return" type="xsd:dateTime"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:element name="currentTime" type="ts:currentTimeRequest"/>
+			<xsd:element name="currentTimeReply" type="ts:currentTimeReply"/>
+		</xsd:schema>
+	</types>
+	<message name="ExceptionFaultMsg">
+		<part element="remoting:Exception" name="fault"/>
+	</message>
+	<message name="TimeServiceRequestMsg">
+		<part element="ts:TimeService" name="parameters"/>
+	</message>
+	<message name="TimeServiceReplyMsg">
+		<part element="ts:TimeServiceReply" name="parameters"/>
+	</message>
+	<message name="~TimeServiceRequestMsg">
+		<part element="ts:~TimeService" name="parameters"/>
+	</message>
+	<message name="~TimeServiceReplyMsg">
+		<part element="ts:~TimeServiceReply" name="parameters"/>
+	</message>
+	<message name="currentTimeRequestMsg">
+		<part element="ts:currentTime" name="parameters"/>
+	</message>
+	<message name="currentTimeReplyMsg">
+		<part element="ts:currentTimeReply" name="parameters"/>
+	</message>
+	<portType name="TimeService">
+		<operation name="TimeService">
+			<input message="wts:TimeServiceRequestMsg"/>
+			<output message="wts:TimeServiceReplyMsg"/>
+			<fault message="wts:ExceptionFaultMsg" name="Exception"/>
+		</operation>
+		<operation name="~TimeService">
+			<input message="wts:~TimeServiceRequestMsg"/>
+			<output message="wts:~TimeServiceReplyMsg"/>
+			<fault message="wts:ExceptionFaultMsg" name="Exception"/>
+		</operation>
+		<operation name="currentTime">
+			<input message="wts:currentTimeRequestMsg"/>
+			<output message="wts:currentTimeReplyMsg"/>
+			<fault message="wts:ExceptionFaultMsg" name="Exception"/>
+		</operation>
+	</portType>
+	<binding name="TimeServiceSoapBinding" type="wts:TimeService">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="TimeService">
+			<soap:operation soapAction="http://www.appinf.com/webservices/TimeService/TimeService" style="document"/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="~TimeService">
+			<soap:operation soapAction="http://www.appinf.com/webservices/TimeService/~TimeService" style="document"/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="currentTime">
+			<soap:operation soapAction="http://www.appinf.com/webservices/TimeService/currentTime" style="document"/>
+			<input>
+				<soap:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+	</binding>
+	<binding name="TimeServiceSoap12Binding" type="wts:TimeService">
+		<soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="TimeService">
+			<soap12:operation soapAction="http://www.appinf.com/webservices/TimeService/TimeService" style="document"/>
+			<input>
+				<soap12:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap12:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap12:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="~TimeService">
+			<soap12:operation soapAction="http://www.appinf.com/webservices/TimeService/~TimeService" style="document"/>
+			<input>
+				<soap12:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap12:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap12:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+		<operation name="currentTime">
+			<soap12:operation soapAction="http://www.appinf.com/webservices/TimeService/currentTime" style="document"/>
+			<input>
+				<soap12:body parts="parameters" use="literal"/>
+			</input>
+			<output>
+				<soap12:body parts="parameters" use="literal"/>
+			</output>
+			<fault name="Exception">
+				<soap12:fault name="Exception" use="literal"/>
+			</fault>
+		</operation>
+	</binding>
+	<service name="TimeService">
+		<port binding="wts:TimeServiceSoapBinding" name="TimeService">
+			<soap:address location="http://localhost:8080/soap/TimeService/TheClock"/>
+		</port>
+	</service>
+	<service name="TimeService12">
+		<port binding="wts:TimeServiceSoap12Binding" name="TimeService12">
+			<soap12:address location="http://localhost:8080/soap/TimeService/TheClock"/>
+		</port>
+	</service>
+</definitions>

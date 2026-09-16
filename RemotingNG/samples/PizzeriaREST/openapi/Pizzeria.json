@@ -1,0 +1,558 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Sample REST API",
+    "description": "A REST API for ordering pizzas.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Applied Informatics Software Engineering GmbH",
+      "url": "https://pocoproject.org/pro/"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/"
+    }
+  ],
+  "paths": {
+    "/pizzeria/orders": {
+      "get": {
+        "description": "Returns a vector containing the most recent orders.\n A maximum number of orders to be returned can be specified.",
+        "tags": [
+          "OrderCollectionEndpoint"
+        ],
+        "parameters": [
+          {
+            "name": "maxOrders",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "The response to a successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Pizzeria.Order"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "The response to an invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poco.RemotingNG.Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "The response to a failed request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poco.RemotingNG.Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Creates a new Order.",
+        "tags": [
+          "OrderCollectionEndpoint"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Pizzeria.Order"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "The response to a successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pizzeria.Order"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "The response to an invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poco.RemotingNG.Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "The response to a failed request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poco.RemotingNG.Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pizzeria/orders/{orderNumber}": {
+      "delete": {
+        "description": "Deletes the Order with the given ID.",
+        "tags": [
+          "OrderEndpoint"
+        ],
+        "parameters": [
+          {
+            "name": "orderNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "The response to a successful request."
+          },
+          "4XX": {
+            "description": "The response to an invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poco.RemotingNG.Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "The response to a failed request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poco.RemotingNG.Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "description": "Returns the Order with the given orderId.",
+        "tags": [
+          "OrderEndpoint"
+        ],
+        "parameters": [
+          {
+            "name": "orderNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "The response to a successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pizzeria.Order"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "The response to an invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poco.RemotingNG.Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "The response to a failed request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poco.RemotingNG.Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "Changes the given order.",
+        "tags": [
+          "OrderEndpoint"
+        ],
+        "parameters": [
+          {
+            "name": "orderNumber",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Pizzeria.Order"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "The response to a successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Pizzeria.Order"
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "The response to an invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poco.RemotingNG.Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "The response to a failed request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poco.RemotingNG.Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pizzeria/pizzas": {
+      "get": {
+        "description": "Returns a vector containing the available pizzas.",
+        "tags": [
+          "PizzaCollectionEndpoint"
+        ],
+        "responses": {
+          "default": {
+            "description": "The response to a successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Pizzeria.Pizza"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "The response to an invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poco.RemotingNG.Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "The response to a failed request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poco.RemotingNG.Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pizzeria/toppings": {
+      "get": {
+        "description": "Returns a vector containing the available toppings.",
+        "tags": [
+          "ToppingCollectionEndpoint"
+        ],
+        "responses": {
+          "default": {
+            "description": "The response to a successful request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Pizzeria.ExtTopping"
+                  },
+                  "uniqueItems": true
+                }
+              }
+            }
+          },
+          "4XX": {
+            "description": "The response to an invalid request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poco.RemotingNG.Error"
+                }
+              }
+            }
+          },
+          "5XX": {
+            "description": "The response to a failed request.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poco.RemotingNG.Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Poco.RemotingNG.Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Pizzeria.DeliveryAddress": {
+        "type": "object",
+        "required": [
+          "personName",
+          "streetName",
+          "houseNo",
+          "cityName",
+          "zip",
+          "state"
+        ],
+        "properties": {
+          "personName": {
+            "type": "string"
+          },
+          "streetName": {
+            "type": "string"
+          },
+          "houseNo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cityName": {
+            "type": "string"
+          },
+          "zip": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "phoneNo": {
+            "type": "string",
+            "description": "in case the delivery boy can't find it"
+          },
+          "details": {
+            "$ref": "#/components/schemas/Pizzeria.DeliveryAddress.Details"
+          }
+        }
+      },
+      "Pizzeria.DeliveryAddress.Details": {
+        "type": "object",
+        "required": [
+          "milesAway"
+        ],
+        "properties": {
+          "milesAway": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "Pizzeria.Pizza.Details": {
+        "type": "object",
+        "required": [
+          "calories",
+          "percentFat",
+          "carboHydrates"
+        ],
+        "properties": {
+          "calories": {
+            "type": "number",
+            "format": "double"
+          },
+          "percentFat": {
+            "type": "number",
+            "format": "double"
+          },
+          "carboHydrates": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "Pizzeria.ExtTopping": {
+        "type": "object",
+        "required": [
+          "name",
+          "price",
+          "addInfo"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 48,
+            "minLength": 1,
+            "pattern": "[A-Z][a-z]+"
+          },
+          "price": {
+            "type": "integer",
+            "format": "int32",
+            "exclusiveMinimum": false,
+            "maximum": 500,
+            "minimum": 1
+          },
+          "addInfo": {
+            "type": "string"
+          }
+        }
+      },
+      "Pizzeria.Order": {
+        "type": "object",
+        "required": [
+          "pizza",
+          "deliveryAddress",
+          "deliveryTime"
+        ],
+        "properties": {
+          "orderNumber": {
+            "type": "integer",
+            "format": "int32",
+            "maximum": 100,
+            "minimum": 1
+          },
+          "pizza": {
+            "$ref": "#/components/schemas/Pizzeria.Pizza"
+          },
+          "deliveryAddress": {
+            "$ref": "#/components/schemas/Pizzeria.DeliveryAddress"
+          },
+          "deliveryTime": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "Pizzeria.Pizza": {
+        "description": "Sample Pizza class.",
+        "type": "object",
+        "required": [
+          "name",
+          "toppings",
+          "basePrice",
+          "details"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "toppings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Pizzeria.ExtTopping"
+            },
+            "uniqueItems": true
+          },
+          "basePrice": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "details": {
+            "$ref": "#/components/schemas/Pizzeria.Pizza.Details"
+          }
+        }
+      },
+      "Pizzeria.Topping": {
+        "type": "object",
+        "required": [
+          "name",
+          "price"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 48,
+            "minLength": 1,
+            "pattern": "[A-Z][a-z]+"
+          },
+          "price": {
+            "type": "integer",
+            "format": "int32",
+            "exclusiveMinimum": false,
+            "maximum": 500,
+            "minimum": 1
+          }
+        }
+      }
+    }
+  }
+}

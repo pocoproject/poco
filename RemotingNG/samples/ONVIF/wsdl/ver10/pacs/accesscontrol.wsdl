@@ -1,0 +1,1942 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="../../ver20/util/onvif-wsdl-viewer.xsl"?>
+<!--
+Copyright (c) 2010-2020 by ONVIF: Open Network Video Interface Forum. All rights reserved.
+
+Recipients of this document may copy, distribute, publish, or display this
+document so long as this copyright notice, license and disclaimer are
+retained with all copies of the document.
+
+THIS DOCUMENT IS PROVIDED "AS IS," AND THE CORPORATION AND ITS MEMBERS AND
+THEIR AFFILIATES, MAKE NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO, WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE;
+THAT THE CONTENTS OF THIS DOCUMENT ARE SUITABLE FOR ANY PURPOSE;
+OR THAT THE IMPLEMENTATION OF SUCH CONTENTS WILL NOT INFRINGE ANY PATENTS,
+COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+IN NO EVENT WILL THE CORPORATION OR ITS MEMBERS OR THEIR AFFILIATES BE LIABLE
+FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL
+DAMAGES, ARISING OUT OF OR RELATING TO ANY USE OR DISTRIBUTION OF THIS
+DOCUMENT, WHETHER OR NOT (1) THE CORPORATION, MEMBERS OR THEIR AFFILIATES
+HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES, OR (2) SUCH DAMAGES
+WERE REASONABLY FORESEEABLE, AND ARISING OUT OF OR RELATING TO ANY USE OR
+DISTRIBUTION OF THIS DOCUMENT.
+THE FOREGOING DISCLAIMER AND LIMITATION ON LIABILITY DO NOT APPLY TO,
+INVALIDATE, OR LIMIT REPRESENTATIONS AND WARRANTIES MADE BY THE MEMBERS
+AND THEIR RESPECTIVE AFFILIATES TO THE CORPORATION AND OTHER MEMBERS IN
+CERTAIN WRITTEN POLICIES OF THE CORPORATION.
+-->
+<wsdl:definitions name="PACSService" targetNamespace="http://www.onvif.org/ver10/accesscontrol/wsdl"
+				  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+				  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap12/"
+				  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				  xmlns:tac="http://www.onvif.org/ver10/accesscontrol/wsdl">
+	<wsdl:types>
+		<xs:schema targetNamespace="http://www.onvif.org/ver10/accesscontrol/wsdl"
+				   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				   xmlns:pt="http://www.onvif.org/ver10/pacs"
+				   xmlns:tac="http://www.onvif.org/ver10/accesscontrol/wsdl"
+				   elementFormDefault="qualified"
+				   version="20.12">
+			<xs:import namespace="http://www.onvif.org/ver10/pacs" schemaLocation="types.xsd"/>
+			<!--====== types ======-->
+			<xs:complexType name="ServiceCapabilities">
+				<xs:annotation>
+					<xs:documentation>
+						The service capabilities reflect optional functionality of a service.
+						The information is static and does not change during device operation.
+						The following capabilities are available:
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:attribute name="MaxLimit" type="xs:unsignedInt" use="required">
+					<xs:annotation>
+						<xs:documentation>The maximum number of entries returned by a single Get&lt;Entity&gt;List or
+							Get&lt;Entity&gt; request.
+							The device shall never return more than this number of entities in a single response.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="MaxAccessPoints" type="xs:unsignedInt" default="10">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates the maximum number of access points supported by the device.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="MaxAreas" type="xs:unsignedInt" default="10">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates the maximum number of areas supported by the device.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="ClientSuppliedTokenSupported" type="xs:boolean" default="false">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates that the client is allowed to supply the token when creating access
+							points and areas.
+							To enable the use of the commands SetAccessPoint and SetArea, the value must be set to true.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="AccessPointManagementSupported" type="xs:boolean" default="false">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates that the client can perform CRUD operations (create, read, update and delete)
+							on access points. To enable the use of the commands GetAccessPoints, GetAccessPointList,
+							CreateAccessPoint, ModifyAccessPoint, DeleteAccessPoint, SetAccessPointAuthenticationProfile
+							and DeleteAccessPointAuthenticationProfile, the value must be set to true.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="AreaManagementSupported" type="xs:boolean" default="false">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates that the client can perform CRUD operations (create, read, update and delete)
+							on areas. To enable the use of the commands GetAreas, GetAreaList, CreateArea, ModifyArea
+							and DeleteArea, the value must be set to true.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<xs:element name="Capabilities" type="tac:ServiceCapabilities"/>
+			<!--===============================-->
+			<xs:complexType name="AccessPointInfoBase">
+				<xs:annotation>
+					<xs:documentation>
+						Used as extension base for AccessPointInfo.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+					<xs:extension base="pt:DataEntity">
+						<xs:sequence>
+							<xs:element name="Name" type="pt:Name">
+								<xs:annotation>
+									<xs:documentation>A user readable name. It shall be up to 64 characters.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Description" type="pt:Description" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Optional user readable description for the AccessPoint. It shall
+										be up to 1024 characters.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="AreaFrom" type="pt:ReferenceToken" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Optional reference to the Area from which access is requested.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="AreaTo" type="pt:ReferenceToken" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Optional reference to the Area to which access is requested.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="EntityType" type="xs:QName" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>
+										Optional entity type; if missing, a Door type as defined by [ONVIF Door Control 
+										Service Specification] should be assumed. This can also be represented by the 
+										QName value "tdc:Door" – where tdc is the namespace of the door control service:
+										"http://www.onvif.org/ver10/doorcontrol/wsdl". This field is provided for future 
+										extensions; it will allow an access point being extended to cover entity types 
+										other than doors as well.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Entity" type="pt:ReferenceToken">
+								<xs:annotation>
+									<xs:documentation>Reference to the entity used to control access; the entity type
+										may be specified by the optional EntityType field explained below but is
+										typically a Door.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:extension>
+				</xs:complexContent>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="AccessPointInfo">
+				<xs:annotation>
+					<xs:documentation>
+						The AccessPointInfo structure contains basic information about an access point instance. 
+						An access point defines an entity a credential can be granted or denied access to. 
+						The AccessPointInfo structure provides basic information on how access is controlled 
+						in one direction for a door (from which area to which area).
+						Multiple access points may cover the same door. A typical case is one access point for 
+						entry and another for exit, both referencing the same door. 
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+					<xs:extension base="tac:AccessPointInfoBase">
+						<xs:sequence>
+							<xs:element name="Capabilities" type="tac:AccessPointCapabilities">
+								<xs:annotation>
+									<xs:documentation>The capabilities for the AccessPoint.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>   <!-- first ONVIF then Vendor -->
+						</xs:sequence>
+						<xs:anyAttribute processContents="lax"/>
+					</xs:extension>
+				</xs:complexContent>
+			</xs:complexType>
+
+
+			<!--===============================-->
+
+			<xs:complexType name="AccessPoint">
+				<xs:annotation>
+					<xs:documentation>
+						The AccessPoint structure shall include all properties of the AccessPointInfo structure,
+						a reference to an authentication profile instance, and optionally a number of input and output devices.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+					<xs:extension base="tac:AccessPointInfo">
+						<xs:sequence>
+							<xs:element name="AuthenticationProfileToken" type="pt:ReferenceToken" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>
+										A reference to an authentication profile which defines the authentication
+										behavior of the access point.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Extension" type="tac:AccessPointExtension" minOccurs="0"/>
+						</xs:sequence>
+						<xs:anyAttribute processContents="lax"/>
+					</xs:extension>
+				</xs:complexContent>
+			</xs:complexType>
+			<xs:complexType name="AccessPointExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+			</xs:complexType>
+
+
+			<!--===============================-->
+
+			<xs:complexType name="AccessPointCapabilities">
+				<xs:annotation>
+					<xs:documentation>
+						The AccessPoint capabilities reflect optional functionality of a particular physical entity.
+						Different AccessPoint instances may have different set of capabilities. This information may
+						change during device operation, e.g. if hardware settings are changed.
+						The following capabilities are available:
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="SupportedSecurityLevels" type="pt:ReferenceToken" minOccurs="0"
+								maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>A list of security level tokens that this access point supports.
+								See [Authentication Behavior Service Specification].
+								This field is optional, and if omitted, the device cannot support multi-factor
+								authentication for this access point.
+								Please note that when an access point is updated, then any previously supported
+								security levels are replaced with the new list.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="Extension" type="tac:SupportedSecurityLevelsExtension" minOccurs="0"/>
+					<xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:attribute name="DisableAccessPoint" type="xs:boolean" use="required">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates whether or not this AccessPoint instance supports EnableAccessPoint
+							and DisableAccessPoint commands.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="Duress" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates whether or not this AccessPoint instance supports generation of duress events.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="AnonymousAccess" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates whether or not this AccessPoint has a REX switch or other input that
+							allows anonymous access.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="AccessTaken" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates whether or not this AccessPoint instance supports generation of
+							AccessTaken and AccessNotTaken events. If AnonymousAccess and AccessTaken are both true, it
+							indicates that the Anonymous versions of AccessTaken and AccessNotTaken are supported.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="ExternalAuthorization" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates whether or not this AccessPoint instance supports the
+							ExternalAuthorization operation and the generation of Request events. If AnonymousAccess and
+							ExternalAuthorization are both true, it indicates that the Anonymous version is supported as
+							well.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="SupportedRecognitionTypes" type="pt:StringList">
+					<xs:annotation>
+						<xs:documentation>
+							A list of recognition types that the device supports. This field is only relevant for devices
+							that are not aware of security levels (see [ONVIF Authentication Behavior Service Specification]).
+							Please note that when an access point is updated, then any previously supported recognition types
+							are replaced with the new list.
+							Recognition types starting with the prefix pt: are reserved to define ONVIF-specific
+							types as defined in pt:RecognitionType. For custom defined identifier types, free text 
+							can be used.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="IdentifierAccess" type="xs:boolean">
+					<xs:annotation>
+						<xs:documentation>
+							Indicates whether or not this access point supports the AccessControl/Request/Identifier
+							event to request external authorization.
+							Identfier access requires that ExternalAuthorization is set to true.
+							The IdentifierAccess capability is typically enabled for devices that do not have any 
+							knowledge of credential tokens. When IdentifierAccess is set to true then the device 
+							must support the identifier events.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+				<xs:attribute name="SupportedFeedbackTypes" type="pt:StringList">
+					<xs:annotation>
+						<xs:documentation>
+							List of supported feedback types. Feedback types starting with the prefix pt:
+							are reserved to define ONVIF-specific types as defined in tac:FeedbackType.
+							For custom defined feedback types, free text can be used.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="SupportedSecurityLevelsExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+			</xs:complexType>
+
+
+			<!--===============================-->
+			<xs:complexType name="AreaInfoBase">
+				<xs:annotation>
+					<xs:documentation>
+						Basic information about an Area. Used as extension base.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+					<xs:extension base="pt:DataEntity">
+						<xs:sequence>
+							<xs:element name="Name" type="pt:Name">
+								<xs:annotation>
+									<xs:documentation>User readable name. It shall be up to 64 characters.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="Description" type="pt:Description" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>User readable description for the Area. It shall be up to 1024
+										characters.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:extension>
+				</xs:complexContent>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:complexType name="AreaInfo">
+				<xs:annotation>
+					<xs:documentation>
+						The AreaInfo structure contains basic information about an Area.
+						An ONVIF compliant device shall provide the following fields for each Area:
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+					<xs:extension base="tac:AreaInfoBase">
+						<xs:sequence>
+						</xs:sequence>
+						<xs:anyAttribute processContents="lax"/>
+					</xs:extension>
+				</xs:complexContent>
+			</xs:complexType>
+
+
+			<!--===============================-->
+
+			<xs:complexType name="Area">
+				<xs:annotation>
+					<xs:documentation>
+						The Area structure shall include all properties of the AreaInfo structure and optionally
+						a parent area token, an OccupancyControl structure and/or an Antipassback structure.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexContent>
+					<xs:extension base="tac:AreaInfo">
+						<xs:sequence>
+							<xs:element name="Extension" type="tac:AreaExtension" minOccurs="0"/>
+						</xs:sequence>
+						<xs:anyAttribute processContents="lax"/>
+					</xs:extension>
+				</xs:complexContent>
+			</xs:complexType>
+			<xs:complexType name="AreaExtension">
+				<xs:sequence>
+					<xs:any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+			</xs:complexType>
+
+
+			<!--===============================-->
+			<xs:complexType name="AccessPointState">
+				<xs:annotation>
+					<xs:documentation>
+						The AccessPointState contains state information for an AccessPoint.
+						An ONVIF compliant device shall provide the following fields for each AccessPoint instance:
+					</xs:documentation>
+				</xs:annotation>
+				<xs:sequence>
+					<xs:element name="Enabled" type="xs:boolean">
+						<xs:annotation>
+							<xs:documentation>Indicates that the AccessPoint is enabled. By default this field value
+								shall be True, if the DisableAccessPoint capabilities is not supported.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>   <!-- first ONVIF then Vendor -->
+				</xs:sequence>
+				<xs:anyAttribute processContents="lax"/>
+			</xs:complexType>
+			<!--===============================-->
+			<xs:simpleType name="Decision">
+				<xs:annotation>
+					<xs:documentation>
+						The Decision enumeration represents a choice of two available options for an access request:
+					</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="Granted">
+						<xs:annotation>
+							<xs:documentation>The decision is to grant access.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="Denied">
+						<xs:annotation>
+							<xs:documentation>The decision is to deny access.</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:simpleType name="DenyReason">
+				<xs:annotation>
+					<xs:documentation>
+						Non-normative enum that describes the various reasons for denying access.
+						The following strings shall be used for the reason field:
+					</xs:documentation>
+				</xs:annotation>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="CredentialNotEnabled">
+						<xs:annotation>
+							<xs:documentation>The device shall provide the following event, whenever a valid credential
+								is not enabled or has been disabled (e.g., due to credential being lost etc.) to prevent
+								unauthorized entry.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="CredentialNotActive">
+						<xs:annotation>
+							<xs:documentation>The device shall provide the following event, whenever a valid credential
+								is presented though it is not active yet;: e.g, the credential was presented before the
+								start date.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="CredentialExpired">
+						<xs:annotation>
+							<xs:documentation>The device shall provide the following event, whenever a valid credential
+								was presented after its expiry date.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="InvalidPIN">
+						<xs:annotation>
+							<xs:documentation>The device shall provide the following event, whenever an entered PIN code
+								does not match the credential.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="NotPermittedAtThisTime">
+						<xs:annotation>
+							<xs:documentation>The device shall provide the following event, whenever a valid credential
+								is denied access to the requested AccessPoint because the credential is not permitted at
+								the moment.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="Unauthorized">
+						<xs:annotation>
+							<xs:documentation>The device shall provide the following event, whenever the presented
+								credential is not authorized.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="Other">
+						<xs:annotation>
+							<xs:documentation>The device shall provide the following event, whenever the request is
+								denied and no other specific event matches it or is supported by the service.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			<!--===============================-->
+			<xs:simpleType name="FeedbackType">
+			<xs:annotation>
+				<xs:documentation>
+					Non-normative enumeration that describes the ONVIF defined feedback types.
+					These types are used in string fields where extendibility is desired.
+					Strings starting with the prefix pt: are reserved to define ONVIF-specific types.
+					For custom defined feedback types, free text can be used.
+					The following types are defined by ONVIF:
+				</xs:documentation>
+			</xs:annotation>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="pt:Disabled">
+						<xs:annotation><xs:documentation>Indication that the access point is disabled.</xs:documentation></xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="pt:Idle">
+						<xs:annotation><xs:documentation>Indication of normal idle state. </xs:documentation></xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="pt:DoorLocked">
+						<xs:annotation><xs:documentation>Indication that the door is locked.</xs:documentation></xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="pt:DoorUnlocked">
+						<xs:annotation><xs:documentation>Indication that the door is unlocked.</xs:documentation></xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="pt:DoorOpenTooLong">
+						<xs:annotation><xs:documentation>Indication that the door has been held open too long.</xs:documentation></xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="pt:DoorPreAlarmWarning">
+						<xs:annotation><xs:documentation>Indication that the door must be closed to avoid an alarm. </xs:documentation></xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="pt:RequireIdentifier">
+						<xs:annotation><xs:documentation>Indication that at least one more identifier is required to grant access.</xs:documentation></xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="pt:TextMessage">
+						<xs:annotation><xs:documentation>Display the provided text message. </xs:documentation></xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="pt:Processing">
+						<xs:annotation><xs:documentation>Indication that processing is in progress.</xs:documentation></xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="pt:RetryIdentifier">
+						<xs:annotation><xs:documentation>Indication that the credential holder needs to retry providing the identifier. This could be due to card read failure, face detection problem etc.</xs:documentation></xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="pt:AccessGranted">
+						<xs:annotation><xs:documentation>Indication that access is granted.</xs:documentation></xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="pt:AccessDenied">
+						<xs:annotation><xs:documentation>Indication that access is denied.  </xs:documentation></xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="pt:Ok">
+						<xs:annotation><xs:documentation>Generic ok indication.</xs:documentation></xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="pt:Fault">
+						<xs:annotation><xs:documentation>Generic fault indication.</xs:documentation></xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="pt:Warning">
+						<xs:annotation><xs:documentation>Generic warning indication.</xs:documentation></xs:annotation>
+					</xs:enumeration>
+					<xs:enumeration value="pt:Alarm">
+						<xs:annotation><xs:documentation>Generic alarm indication.</xs:documentation></xs:annotation>
+					</xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+		
+			<!-- End of definition -->
+			<!-- #################-->
+			<!-- Message request / response elements-->
+			<xs:element name="GetServiceCapabilities">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetServiceCapabilitiesResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Capabilities" type="tac:ServiceCapabilities">
+							<xs:annotation>
+								<xs:documentation>The capability response message contains the requested Access Control
+									service capabilities using a hierarchical XML capability structure.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAccessPointInfoList">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Limit" type="xs:int" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Maximum number of entries to return. If not specified, less than one
+									or higher than what the device supports, the number of items is determined by the
+									device.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Start returning entries from this start reference. If not specified,
+									entries shall start from the beginning of the dataset.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAccessPointInfoListResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="NextStartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>StartReference to use in next call to get the following items. If
+									absent, no more items to get.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="AccessPointInfo" type="tac:AccessPointInfo" minOccurs="0"
+									maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of AccessPointInfo items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAccessPointInfo">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Tokens of AccessPointInfo items to get.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAccessPointInfoResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AccessPointInfo" type="tac:AccessPointInfo" minOccurs="0"
+									maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of AccessPointInfo items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+
+			<!--===============================-->
+			<xs:element name="GetAccessPointList">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Limit" type="xs:int" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Maximum number of entries to return. If not specified, less than one
+									or higher than what the device supports, the number of items is determined by the
+									device.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Start returning entries from this start reference. If not specified,
+									entries shall start from the beginning of the dataset.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAccessPointListResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="NextStartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>StartReference to use in next call to get the following items. If
+									absent, no more items to get.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="AccessPoint" type="tac:AccessPoint" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of AccessPoint items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAccessPoints">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Tokens of AccessPoint items to get.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAccessPointsResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AccessPoint" type="tac:AccessPoint" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of AccessPoint items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+
+			<!--===============================-->
+			<xs:element name="CreateAccessPoint">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AccessPoint" type="tac:AccessPoint">
+							<xs:annotation>
+								<xs:documentation>AccessPoint item to create</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="CreateAccessPointResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of created AccessPoint item</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetAccessPoint">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AccessPoint" type="tac:AccessPoint">
+							<xs:annotation>
+								<xs:documentation>AccessPoint item to create or modify</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetAccessPointResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="ModifyAccessPoint">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AccessPoint" type="tac:AccessPoint">
+							<xs:annotation>
+								<xs:documentation>AccessPoint item to modify</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="ModifyAccessPointResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DeleteAccessPoint">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of AccessPoint item to delete.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DeleteAccessPointResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+			<!--===============================-->
+			<xs:element name="SetAccessPointAuthenticationProfile">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the AccessPoint.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="AuthenticationProfileToken" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the AuthenticationProfile.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetAccessPointAuthenticationProfileResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+			<!--===============================-->
+			<xs:element name="DeleteAccessPointAuthenticationProfile">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the AccessPoint.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DeleteAccessPointAuthenticationProfileResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+
+			<!--===============================-->
+			<xs:element name="GetAreaInfoList">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Limit" type="xs:int" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Maximum number of entries to return. If not specified, less than one
+									or higher than what the device supports, the number of items is determined by the
+									device.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Start returning entries from this start reference. If not specified,
+									entries shall start from the beginning of the dataset.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAreaInfoListResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="NextStartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>StartReference to use in next call to get the following items. If
+									absent, no more items to get.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="AreaInfo" type="tac:AreaInfo" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of AreaInfo items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+
+			<!--===============================-->
+			<xs:element name="GetAreaInfo">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Tokens of AreaInfo items to get.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAreaInfoResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AreaInfo" type="tac:AreaInfo" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of AreaInfo items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+
+			<!--===============================-->
+			<xs:element name="GetAreaList">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Limit" type="xs:int" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Maximum number of entries to return. If not specified, less than one
+									or higher than what the device supports, the number of items is determined by the
+									device.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="StartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Start returning entries from this start reference. If not specified,
+									entries shall start from the beginning of the dataset.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAreaListResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="NextStartReference" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>StartReference to use in next call to get the following items. If
+									absent, no more items to get.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Area" type="tac:Area" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of Area items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAreas">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Tokens of Area items to get.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAreasResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Area" type="tac:Area" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>List of Area items.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+
+
+			<!--===============================-->
+			<xs:element name="CreateArea">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Area" type="tac:Area">
+							<xs:annotation>
+								<xs:documentation>Area item to create</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="CreateAreaResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of created Area item</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetArea">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Area" type="tac:Area">
+							<xs:annotation>
+								<xs:documentation>Area item to create or modify</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="SetAreaResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="ModifyArea">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Area" type="tac:Area">
+							<xs:annotation>
+								<xs:documentation>Area item to modify</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="ModifyAreaResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DeleteArea">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of Area item to delete.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DeleteAreaResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+
+
+			<!--===============================-->
+			<xs:element name="GetAccessPointState">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of AccessPoint instance to get AccessPointState for.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="GetAccessPointStateResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AccessPointState" type="tac:AccessPointState">
+							<xs:annotation>
+								<xs:documentation>AccessPointState item.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="EnableAccessPoint">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the AccessPoint instance to enable.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="EnableAccessPointResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DisableAccessPoint">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Token" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the AccessPoint instance to disable.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="DisableAccessPointResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="ExternalAuthorization">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AccessPointToken" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>Token of the Access Point instance.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="CredentialToken" type="pt:ReferenceToken" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Optional token of the Credential involved.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Reason" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Optional reason for decision.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="Decision" type="tac:Decision">
+							<xs:annotation>
+								<xs:documentation>Decision - Granted or Denied.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="ExternalAuthorizationResponse">
+				<xs:complexType>
+					<xs:sequence>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="Feedback">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="AccessPointToken" type="pt:ReferenceToken">
+							<xs:annotation>
+								<xs:documentation>
+									Token of the access point to control.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="FeedbackType" type="xs:string">
+							<xs:annotation>
+								<xs:documentation>
+									The feedback type to use. Feedback types starting with the prefix pt: 
+									are reserved to define ONVIF-specific types as defined in tac:FeedbackType.
+									For custom defined feedback types, free text can be used.
+									If feedback type is set to pt:RequireIdentifier, the RecognitionType field shall provide the required type(s).
+									If the feedback type is not supported, it shall be ignored.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="RecognitionType" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>
+									Optional list of recognition types requested by a client to get closer to making a decision.
+									Used if FeedbackType is set to pt:RequireIdentifier.
+									If a recognition type is not supported, it shall be ignored.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="TextMessage" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>
+									Optional textual feedback message.
+									If not supported by the access point it shall be ignored.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+			<xs:element name="FeedbackResponse">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:any namespace="##any" minOccurs="0" maxOccurs="unbounded" processContents="lax"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<!--===============================-->
+		</xs:schema>
+	</wsdl:types>
+	<!--===============================-->
+	<wsdl:message name="GetServiceCapabilitiesRequest">
+		<wsdl:part name="parameters" element="tac:GetServiceCapabilities"/>
+	</wsdl:message>
+	<wsdl:message name="GetServiceCapabilitiesResponse">
+		<wsdl:part name="parameters" element="tac:GetServiceCapabilitiesResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="GetAccessPointInfoListRequest">
+		<wsdl:part name="parameters" element="tac:GetAccessPointInfoList"/>
+	</wsdl:message>
+	<wsdl:message name="GetAccessPointInfoListResponse">
+		<wsdl:part name="parameters" element="tac:GetAccessPointInfoListResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="GetAccessPointInfoRequest">
+		<wsdl:part name="parameters" element="tac:GetAccessPointInfo"/>
+	</wsdl:message>
+	<wsdl:message name="GetAccessPointInfoResponse">
+		<wsdl:part name="parameters" element="tac:GetAccessPointInfoResponse"/>
+	</wsdl:message>
+
+	<!--===============================-->
+	<wsdl:message name="GetAccessPointListRequest">
+		<wsdl:part name="parameters" element="tac:GetAccessPointList"/>
+	</wsdl:message>
+	<wsdl:message name="GetAccessPointListResponse">
+		<wsdl:part name="parameters" element="tac:GetAccessPointListResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="GetAccessPointsRequest">
+		<wsdl:part name="parameters" element="tac:GetAccessPoints"/>
+	</wsdl:message>
+	<wsdl:message name="GetAccessPointsResponse">
+		<wsdl:part name="parameters" element="tac:GetAccessPointsResponse"/>
+	</wsdl:message>
+
+
+	<!--===============================-->
+	<wsdl:message name="CreateAccessPointRequest">
+		<wsdl:part name="parameters" element="tac:CreateAccessPoint"/>
+	</wsdl:message>
+	<wsdl:message name="CreateAccessPointResponse">
+		<wsdl:part name="parameters" element="tac:CreateAccessPointResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="SetAccessPointRequest">
+		<wsdl:part name="parameters" element="tac:SetAccessPoint"/>
+	</wsdl:message>
+	<wsdl:message name="SetAccessPointResponse">
+		<wsdl:part name="parameters" element="tac:SetAccessPointResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="ModifyAccessPointRequest">
+		<wsdl:part name="parameters" element="tac:ModifyAccessPoint"/>
+	</wsdl:message>
+	<wsdl:message name="ModifyAccessPointResponse">
+		<wsdl:part name="parameters" element="tac:ModifyAccessPointResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="DeleteAccessPointRequest">
+		<wsdl:part name="parameters" element="tac:DeleteAccessPoint"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteAccessPointResponse">
+		<wsdl:part name="parameters" element="tac:DeleteAccessPointResponse"/>
+	</wsdl:message>
+
+	<!--===============================-->
+	<wsdl:message name="SetAccessPointAuthenticationProfileRequest">
+		<wsdl:part name="parameters" element="tac:SetAccessPointAuthenticationProfile"/>
+	</wsdl:message>
+	<wsdl:message name="SetAccessPointAuthenticationProfileResponse">
+		<wsdl:part name="parameters" element="tac:SetAccessPointAuthenticationProfileResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="DeleteAccessPointAuthenticationProfileRequest">
+		<wsdl:part name="parameters" element="tac:DeleteAccessPointAuthenticationProfile"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteAccessPointAuthenticationProfileResponse">
+		<wsdl:part name="parameters" element="tac:DeleteAccessPointAuthenticationProfileResponse"/>
+	</wsdl:message>
+
+	
+	<!--===============================-->
+	<wsdl:message name="GetAreaInfoListRequest">
+		<wsdl:part name="parameters" element="tac:GetAreaInfoList"/>
+	</wsdl:message>
+	<wsdl:message name="GetAreaInfoListResponse">
+		<wsdl:part name="parameters" element="tac:GetAreaInfoListResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="GetAreaInfoRequest">
+		<wsdl:part name="parameters" element="tac:GetAreaInfo"/>
+	</wsdl:message>
+	<wsdl:message name="GetAreaInfoResponse">
+		<wsdl:part name="parameters" element="tac:GetAreaInfoResponse"/>
+	</wsdl:message>
+
+	<!--===============================-->
+	<wsdl:message name="GetAreaListRequest">
+		<wsdl:part name="parameters" element="tac:GetAreaList"/>
+	</wsdl:message>
+	<wsdl:message name="GetAreaListResponse">
+		<wsdl:part name="parameters" element="tac:GetAreaListResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="GetAreasRequest">
+		<wsdl:part name="parameters" element="tac:GetAreas"/>
+	</wsdl:message>
+	<wsdl:message name="GetAreasResponse">
+		<wsdl:part name="parameters" element="tac:GetAreasResponse"/>
+	</wsdl:message>
+
+
+	<!--===============================-->
+	<wsdl:message name="CreateAreaRequest">
+		<wsdl:part name="parameters" element="tac:CreateArea"/>
+	</wsdl:message>
+	<wsdl:message name="CreateAreaResponse">
+		<wsdl:part name="parameters" element="tac:CreateAreaResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="SetAreaRequest">
+		<wsdl:part name="parameters" element="tac:SetArea"/>
+	</wsdl:message>
+	<wsdl:message name="SetAreaResponse">
+		<wsdl:part name="parameters" element="tac:SetAreaResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="ModifyAreaRequest">
+		<wsdl:part name="parameters" element="tac:ModifyArea"/>
+	</wsdl:message>
+	<wsdl:message name="ModifyAreaResponse">
+		<wsdl:part name="parameters" element="tac:ModifyAreaResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="DeleteAreaRequest">
+		<wsdl:part name="parameters" element="tac:DeleteArea"/>
+	</wsdl:message>
+	<wsdl:message name="DeleteAreaResponse">
+		<wsdl:part name="parameters" element="tac:DeleteAreaResponse"/>
+	</wsdl:message>
+
+
+	<!--===============================-->
+	<wsdl:message name="GetAccessPointStateRequest">
+		<wsdl:part name="parameters" element="tac:GetAccessPointState"/>
+	</wsdl:message>
+	<wsdl:message name="GetAccessPointStateResponse">
+		<wsdl:part name="parameters" element="tac:GetAccessPointStateResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="EnableAccessPointRequest">
+		<wsdl:part name="parameters" element="tac:EnableAccessPoint"/>
+	</wsdl:message>
+	<wsdl:message name="EnableAccessPointResponse">
+		<wsdl:part name="parameters" element="tac:EnableAccessPointResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="DisableAccessPointRequest">
+		<wsdl:part name="parameters" element="tac:DisableAccessPoint"/>
+	</wsdl:message>
+	<wsdl:message name="DisableAccessPointResponse">
+		<wsdl:part name="parameters" element="tac:DisableAccessPointResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="ExternalAuthorizationRequest">
+		<wsdl:part name="parameters" element="tac:ExternalAuthorization"/>
+	</wsdl:message>
+	<wsdl:message name="ExternalAuthorizationResponse">
+		<wsdl:part name="parameters" element="tac:ExternalAuthorizationResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+	<wsdl:message name="FeedbackRequest">
+		<wsdl:part name="parameters" element="tac:Feedback"/>
+	</wsdl:message>
+	<wsdl:message name="FeedbackResponse">
+		<wsdl:part name="parameters" element="tac:FeedbackResponse"/>
+	</wsdl:message>
+	<!--===============================-->
+
+	<!--====== Faults messages ========-->
+	<wsdl:portType name="PACSPort">
+		<wsdl:operation name="GetServiceCapabilities">
+			<wsdl:documentation>
+				This operation returns the capabilities of the access control service. 
+				A device which provides the access control service shall implement this method.
+			</wsdl:documentation>
+			<wsdl:input message="tac:GetServiceCapabilitiesRequest"/>
+			<wsdl:output message="tac:GetServiceCapabilitiesResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAccessPointInfo">
+			<wsdl:documentation>
+				This operation requests a list of AccessPointInfo items matching the given tokens.
+				The device shall ignore tokens it cannot resolve and shall return an empty list if 
+				there are no items matching the specified tokens. 
+				The device shall not return a fault in this case.
+				If the number of requested items is greater than MaxLimit, a TooManyItems fault shall be returned.
+			</wsdl:documentation>
+			<wsdl:input message="tac:GetAccessPointInfoRequest"/>
+			<wsdl:output message="tac:GetAccessPointInfoResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAccessPointInfoList">
+			<wsdl:documentation>
+				This operation requests a list of all AccessPointInfo items provided by the device.
+				A call to this method shall return a StartReference when not all data is returned and more 
+				data is available. The reference shall be valid for retrieving the next set of data. 
+				Please refer to section 4.8.3 in [ONVIF PACS Architecture and Design Considerations] for more details. 
+				The number of items returned shall not be greater than the Limit parameter.
+			</wsdl:documentation>
+			<wsdl:input message="tac:GetAccessPointInfoListRequest"/>
+			<wsdl:output message="tac:GetAccessPointInfoListResponse"/>
+		</wsdl:operation>
+
+
+		<wsdl:operation name="GetAccessPoints">
+			<wsdl:documentation>
+				This operation requests a list of AccessPoint items matching the given tokens. 
+				The device shall ignore tokens it cannot resolve and shall return an empty list if there are 
+				no items matching the specified tokens. The device shall not return a fault in this case. 
+				If the number of requested items is greater than MaxLimit, a TooManyItems fault shall be returned.
+			</wsdl:documentation>
+			<wsdl:input message="tac:GetAccessPointsRequest"/>
+			<wsdl:output message="tac:GetAccessPointsResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAccessPointList">
+			<wsdl:documentation>
+				This operation requests a list of all AccessPoint items provided by the device. A call to 
+				this method shall return a StartReference when not all data is returned and more data is available. 
+				The reference shall be valid for retrieving the next set of data. 
+				The number of items returned shall not be greater than the Limit parameter.
+			</wsdl:documentation>
+			<wsdl:input message="tac:GetAccessPointListRequest"/>
+			<wsdl:output message="tac:GetAccessPointListResponse"/>
+		</wsdl:operation>
+
+
+		<wsdl:operation name="CreateAccessPoint">
+			<wsdl:documentation>
+				This operation creates the specified access point in the device. The token field of the 
+				AccessPoint structure shall be empty and the device shall allocate a token for the access point. 
+				The allocated token shall be returned in the response. If the client sends any value in the 
+				token field, the device shall return InvalidArgVal as a generic fault code.
+			</wsdl:documentation>
+			<wsdl:input message="tac:CreateAccessPointRequest"/>
+			<wsdl:output message="tac:CreateAccessPointResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetAccessPoint">
+			<wsdl:documentation>
+				This method is used to synchronize an access point in a client with the device. If an access 
+				point with the specified token does not exist in the device, the access point is created. 
+				If an access point with the specified token exists, then the access point is modified. 
+				A call to this method takes an AccessPoint structure as input parameter. 
+				The token field of the AccessPoint structure shall not be empty.
+				A device that signals support for the ClientSuppliedTokenSupported capability shall implement this command. 
+				If no token was specified in the request, the device shall return InvalidArgs as a generic fault code.
+			</wsdl:documentation>
+			<wsdl:input message="tac:SetAccessPointRequest"/>
+			<wsdl:output message="tac:SetAccessPointResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="ModifyAccessPoint">
+			<wsdl:documentation>
+				This operation modifies the specified access point. The token of the access point to modify 
+				is specified in the token field of the AccessPoint structure and shall not be empty. 
+				All other fields in the structure shall overwrite the fields in the specified access point.
+				If no token was specified in the request, the device shall return InvalidArgs as a generic fault code.
+			</wsdl:documentation>
+			<wsdl:input message="tac:ModifyAccessPointRequest"/>
+			<wsdl:output message="tac:ModifyAccessPointResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteAccessPoint">
+			<wsdl:documentation>
+				This operation deletes the specified access point. If it is associated with one or more 
+				entities some devices may not be able to delete the access point, and consequently a 
+				ReferenceInUse fault shall be generated.
+				If no token was specified in the request, the device shall return InvalidArgs as a generic fault code.
+			</wsdl:documentation>
+			<wsdl:input message="tac:DeleteAccessPointRequest"/>
+			<wsdl:output message="tac:DeleteAccessPointResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="SetAccessPointAuthenticationProfile">
+			<wsdl:documentation>
+				This operation defines the authentication behavior for an access point.
+			</wsdl:documentation>
+			<wsdl:input message="tac:SetAccessPointAuthenticationProfileRequest"/>
+			<wsdl:output message="tac:SetAccessPointAuthenticationProfileResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteAccessPointAuthenticationProfile">
+			<wsdl:documentation>
+				This operation reverts the authentication behavior for an access point to its default behavior.
+			</wsdl:documentation>
+			<wsdl:input message="tac:DeleteAccessPointAuthenticationProfileRequest"/>
+			<wsdl:output message="tac:DeleteAccessPointAuthenticationProfileResponse"/>
+		</wsdl:operation>
+
+		
+		
+		<wsdl:operation name="GetAreaInfo">
+			<wsdl:documentation>
+				This operation requests a list of AreaInfo items matching the given tokens. The device shall 
+				ignore tokens it cannot resolve and shall return an empty list if there are no items 
+				matching the specified tokens. The device shall not return a fault in this case.
+				If the number of requested items is greater than MaxLimit, a TooManyItems fault shall be returned.
+			</wsdl:documentation>
+			<wsdl:input message="tac:GetAreaInfoRequest"/>
+			<wsdl:output message="tac:GetAreaInfoResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAreaInfoList">
+			<wsdl:documentation>
+				This operation requests a list of all AreaInfo items provided by the device. A call to this 
+				method shall return a StartReference when not all data is returned and more data is available. 
+				The reference shall be valid for retrieving the next set of data. 
+				The number of items returned shall not be greater than the Limit parameter.
+			</wsdl:documentation>
+			<wsdl:input message="tac:GetAreaInfoListRequest"/>
+			<wsdl:output message="tac:GetAreaInfoListResponse"/>
+		</wsdl:operation>
+
+
+		<wsdl:operation name="GetAreas">
+			<wsdl:documentation>
+				This operation requests a list of Area items matching the given tokens. The device shall 
+				ignore tokens it cannot resolve and shall return an empty list if there are no items 
+				matching the specified tokens. The device shall not return a fault in this case.
+				If the number of requested items is greater than MaxLimit, a TooManyItems fault shall be returned.
+			</wsdl:documentation>
+			<wsdl:input message="tac:GetAreasRequest"/>
+			<wsdl:output message="tac:GetAreasResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="GetAreaList">
+			<wsdl:documentation>
+				This operation requests a list of all Area items provided by the device. A call to this 
+				method shall return a StartReference when not all data is returned and more data is available. 
+				The reference shall be valid for retrieving the next set of data. 
+				The number of items returned shall not be greater than the Limit parameter.
+			</wsdl:documentation>
+			<wsdl:input message="tac:GetAreaListRequest"/>
+			<wsdl:output message="tac:GetAreaListResponse"/>
+		</wsdl:operation>
+
+
+		<wsdl:operation name="CreateArea">
+			<wsdl:documentation>
+				This operation creates the specified area in the device. The token field of the Area 
+				structure shall be empty and the device shall allocate a token for the area. 
+				The allocated token shall be returned in the response. 
+				If the client sends any value in the token field, the device shall return InvalidArgVal as a generic fault code.
+			</wsdl:documentation>
+			<wsdl:input message="tac:CreateAreaRequest"/>
+			<wsdl:output message="tac:CreateAreaResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="SetArea">
+			<wsdl:documentation>
+				This method is used to synchronize an area in a client with the device. If an area with the 
+				specified token does not exist in the device, the area is created. If an area with the 
+				specified token exists, then the area is modified. A call to this method takes an Area 
+				structure as input parameter. The token field of the Area structure shall not be empty. 
+				A device that signals support for the ClientSuppliedTokenSupported capability shall 
+				implement this command. 
+				If no token was specified in the request, the device shall return 
+				InvalidArgs as a generic fault code.
+			</wsdl:documentation>
+			<wsdl:input message="tac:SetAreaRequest"/>
+			<wsdl:output message="tac:SetAreaResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="ModifyArea">
+			<wsdl:documentation>
+				This operation modifies the specified area. The token of the area to modify is specified in 
+				the token field of the Area structure and shall not be empty. All other fields in the 
+				structure shall overwrite the fields in the specified area.
+				If no token was specified in the request, the device shall return InvalidArgs as a generic fault code.
+			</wsdl:documentation>
+			<wsdl:input message="tac:ModifyAreaRequest"/>
+			<wsdl:output message="tac:ModifyAreaResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DeleteArea">
+			<wsdl:documentation>
+				This operation deletes the specified area. If it is associated with one or more entities 
+				some devices may not be able to delete the area, and consequently a ReferenceInUse fault shall be generated.
+				If no token was specified in the request, the device shall return InvalidArgs as a generic fault code.
+			</wsdl:documentation>
+			<wsdl:input message="tac:DeleteAreaRequest"/>
+			<wsdl:output message="tac:DeleteAreaResponse"/>
+		</wsdl:operation>
+
+		<wsdl:operation name="GetAccessPointState">
+			<wsdl:documentation>
+				This operation requests the AccessPointState for the access point instance specified by the token.
+			</wsdl:documentation>
+			<wsdl:input message="tac:GetAccessPointStateRequest"/>
+			<wsdl:output message="tac:GetAccessPointStateResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="EnableAccessPoint">
+			<wsdl:documentation>
+				This operation allows enabling an access point. A device that signals support for 
+				DisableAccessPoint capability for a particular access point instance shall implement this command.
+			</wsdl:documentation>
+			<wsdl:input message="tac:EnableAccessPointRequest"/>
+			<wsdl:output message="tac:EnableAccessPointResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="DisableAccessPoint">
+			<wsdl:documentation>
+				This operation allows disabling an access point. A device that signals support for the 
+				DisableAccessPoint capability for a particular access point instance shall implement this command.
+			</wsdl:documentation>
+			<wsdl:input message="tac:DisableAccessPointRequest"/>
+			<wsdl:output message="tac:DisableAccessPointResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="ExternalAuthorization">
+			<wsdl:documentation>
+				This operation allows to deny or grant decision at an access point instance. A device that 
+				signals support for ExternalAuthorization capability for a particular access point instance 
+				shall implement this method.
+			</wsdl:documentation>
+			<wsdl:input message="tac:ExternalAuthorizationRequest"/>
+			<wsdl:output message="tac:ExternalAuthorizationResponse"/>
+		</wsdl:operation>
+		<wsdl:operation name="Feedback">
+			<wsdl:documentation>				
+				This operation controls how the specified access point should indicate feedback.
+				A client can instruct the access point about the door status or that one or more identifiers are needed to
+				grant access, etc. It is typically used in conjunction with the AccessControl/Request/Identifier event and the
+				ExternalAuthorization operation to indicate progress and required recognition methods.
+				The supported feedback types are indicated in the SupportedFeedbackTypes field in the access point capabilities.
+				In cases where multiple combinations of recognition methods are possible, the RecognitionType field can contain multiple values.
+				E.g. for the security level "Card+PIN or Card+Fingerprint", the feedback command for requesting the second recognition
+				method would contain both pt:PIN and pt:Fingerprint in the RecognitionType field.
+				If the device supports at least one feedback type the device shall implement this command.
+			</wsdl:documentation>
+			<wsdl:input message="tac:FeedbackRequest"/>
+			<wsdl:output message="tac:FeedbackResponse"/>
+		</wsdl:operation>
+
+	</wsdl:portType>
+	<!--===============================-->
+	<wsdl:binding name="PACSBinding" type="tac:PACSPort">
+		<wsdl:documentation>
+			Copyright (c) 2010-2017 by ONVIF: Open Network Video Interface Forum. All rights reserved.
+			<br/>
+			The AccessControl service implements the Authentication and
+			Authorization functionality and controls the actions to get
+			access to various Access Points controlling access to Doors and Areas.
+			<br/>
+			The basic data structures used by the service are:
+			* CredentialInfo holding basic information of a credential.
+			<br/>
+			* AccessPointInfo holding basic information on how access is controlled in
+			one direction for a door (from which area to which area) defined in the DoorControl service.
+			<br/>
+		</wsdl:documentation>
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<!--===============================-->
+		<wsdl:operation name="GetServiceCapabilities">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/GetServiceCapabilities"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="GetAccessPointInfoList">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/GetAccessPointInfoList"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="GetAccessPointInfo">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/GetAccessPointInfo"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+
+
+		<!--===============================-->
+		<wsdl:operation name="GetAccessPointList">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/GetAccessPointList"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="GetAccessPoints">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/GetAccessPoints"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+
+
+		<!--===============================-->
+		<wsdl:operation name="CreateAccessPoint">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/CreateAccessPoint"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="SetAccessPoint">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/SetAccessPoint"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="ModifyAccessPoint">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/ModifyAccessPoint"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="DeleteAccessPoint">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/DeleteAccessPoint"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+
+		<!--===============================-->
+		<wsdl:operation name="SetAccessPointAuthenticationProfile">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/SetAccessPointAuthenticationProfile"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="DeleteAccessPointAuthenticationProfile">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/DeleteAccessPointAuthenticationProfile"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		
+
+		<!--===============================-->
+		<wsdl:operation name="GetAreaInfoList">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/GetAreaInfoList"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="GetAreaInfo">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/GetAreaInfo"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+
+
+		<!--===============================-->
+		<wsdl:operation name="GetAreaList">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/GetAreaList"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="GetAreas">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/GetAreas"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+
+
+		<!--===============================-->
+		<wsdl:operation name="CreateArea">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/CreateArea"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="SetArea">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/SetArea"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="ModifyArea">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/ModifyArea"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="DeleteArea">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/DeleteArea"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+
+
+		<!--===============================-->
+		<wsdl:operation name="GetAccessPointState">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/GetAccessPointState"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="EnableAccessPoint">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/EnableAccessPoint"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="DisableAccessPoint">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/DisableAccessPoint"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="ExternalAuthorization">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/ExternalAuthorization"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+		<wsdl:operation name="Feedback">
+			<soap:operation soapAction="http://www.onvif.org/ver10/accesscontrol/wsdl/Feedback"/>
+			<wsdl:input>
+				<soap:body use="literal"/>
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal"/>
+			</wsdl:output>
+		</wsdl:operation>
+		<!--===============================-->
+	</wsdl:binding>
+</wsdl:definitions>

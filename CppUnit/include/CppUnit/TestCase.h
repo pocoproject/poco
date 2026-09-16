@@ -185,6 +185,16 @@ protected:
 					  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
 					  const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
 
+	void assertMessageEquals(const std::string& expected,
+							 const std::string& actual,
+							 long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
+							 const std::string& fileName = CppUnitException::CPPUNIT_UNKNOWNFILENAME);
+		/// Asserts that an exception message equals the expected text.
+		/// With POCO_ENABLE_TRACE, Poco::Exception appends a backtrace, which
+		/// starts with a newline, to the message; only that may follow the text.
+		/// A nested message that is empty apart from its own backtrace shows
+		/// up as ": " before that newline and is accepted as well.
+
 	void assertEquals(const void* expected,
 					  const void* actual,
 					  long lineNumber = CppUnitException::CPPUNIT_UNKNOWNLINENUMBER,
@@ -320,6 +330,9 @@ inline void TestCase::setType(Test::Type testType)
 
 #define assertEqual(expected, actual) \
 	(this->assertEquals((expected), (actual), __LINE__, __FILE__))
+
+#define assertMessageEqual(expected, actual) \
+	(this->assertMessageEquals((expected), (actual), __LINE__, __FILE__))
 
 #define assertNullPtr(ptr) \
 	(this->assertNull((ptr), #ptr, __LINE__, __FILE__))

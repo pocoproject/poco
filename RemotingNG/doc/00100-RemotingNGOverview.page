@@ -1,0 +1,460 @@
+Remoting NG Overview
+Remoting NG
+
+!!!Introduction
+
+Remoting is a framework for implementing distributed (remote) objects and web services in C++.
+It implements mechanisms for C++ objects living in different processes, and even in different machines
+to communicate with each other seamlessly.
+In concept, Remoting is very similar to [[http://en.wikipedia.org/wiki/Java_Remote_Method_Invocation Java RMI]],
+[[http://en.wikipedia.org/wiki/.NET_Remoting .NET Remoting] or
+[[http://en.wikipedia.org/wiki/Windows_Communication_Foundation Windows Communication Foundation]]
+and, to a lesser extent, [[http://en.wikipedia.org/wiki/Common_Object_Request_Broker_Architecture CORBA]]
+or [[http://en.wikipedia.org/wiki/Distributed_Component_Object_Model DCOM]].
+Possible usage scenarios for Remoting are high-level interprocess communication, distributed
+(or client-server) applications, or server applications providing SOAP web services to other applications
+(even applications not built with Remoting, such applications built with Java or .NET).
+Remoting can also be used to invoke third-party SOAP 1.1 and 1.2 web services, with the help
+of the <*XSDGen*> code generator.
+
+Remoting makes implementing remote objects as simple as possible. There is not special
+interface definition language to learn. The basic idea is to take an ordinary C++ class and
+run a code generator over it which produces the necessary code to make objects of this
+class available over the network.
+
+Remoting relies heavily on code generation. The Remoting code generator tool (<*RemoteGenNG*>
+for short) is the central part of Remoting. The <*Remoting*> core library provides features
+such as remote object registration and lookup -- commonly known as Object Request Broker (ORB)
+functionality. Transport implementation libraries such as the <*TCP*> transport and the <*SOAP*>
+transport implement specific network protocols for sending requests and responses over a
+network connection.
+
+As already mentioned, the basic idea behind Remoting is to take an ordinary
+C++ class implementing a certain service (the "service class"), and annotate it with special
+comments. These comments basically tell the code generator (RemoteGenNG) what code to generate.
+Based on these annotations the code generator creates classes for the client stub (proxy),
+the server stub (skeleton), an interface class, serializers and deserializers for parameters and
+return values, as well as various utility classes.
+
+
+!!!How Remoting Works
+
+As a first example, we look at the following C++ class, implementing a very simple
+"Time Service". Its <[currentTime()]> member function simply returns the current
+date and time as a <[std::string]> object.
+
+    class TimeService
+    {
+    public:
+        TimeService();
+        ~TimeService();
+
+        std::string currentTime() const;
+    };
+----
+
+We could also use the more appropriate Poco::DateTime or Poco::Timestamp classes
+as return value, but in order to keep things simpler we'll use <[std::string]> for now.
+
+The actual implementation of the class is not of interest for now.
+To make this class available as a remote object, or, in other words, to make it
+possible to call the <[currentTime()]> member function of an instance of this
+class over the network, we must first annotate the class with a special
+"remote" attribute.
+
+    //@ remote
+    class TimeService
+    {
+    public:
+        TimeService();
+        ~TimeService();
+
+        std::string currentTime() const;
+    };
+----
+
+The <[remote]> attribute can either be placed at class-level, which means that all public
+member functions of the class will be available remotely, or it can be specified for
+each member functions separately. In the latter case, only member functions annotated with
+the <[remote]> attribute will be available remotely.
+
+    class TimeService
+    {
+    public:
+        TimeService();
+        ~TimeService();
+
+        //@ remote
+        std::string currentTime() const;
+    };
+----
+
+Once this annotation has been added, the Remoting code generator (RemoteGenNG) can
+be invoked to process the class, by parsing the header file that defines the class,
+and to generate the necessary code that makes an instance of this class available
+over the network.
+
+
+!!The Interface Class
+
+Among other classes, an important class the code generator generates is the interface
+class. The interface class has, by convention, the same name as the service class,
+only with an uppercase <[I]> character prepended. Therefore, the interface class
+for the <[TimeService]> class will be named <[ITimeService]>. The interface class will
+have all methods of the service class annotated with the <[remote]> attribute, or all
+public methods if the class is annotated with the <[remote]> attribute. In the interface class,
+these methods will be pure virtual. The interface class has a few other methods as well,
+which are used internally by the Remoting framework.
+
+For our example class, the generated interface class looks like this:
+
+    class ITimeService: public virtual Poco::RefCountedObject
+    {
+    public:
+        using Ptr = Poco::AutoPtr<ITimeService>;
+
+        ITimeService();
+        virtual ~ITimeService();
+
+        virtual std::string currentTime() const = 0;
+
+        static const Poco::RemotingNG::Identifiable::TypeId& remoting__typeId();
+    };
+----
+
+It is the interface class that enables true location transparency in Remoting. When a member function
+of the service object is invoked by a client, the client always uses this interface class.
+The interface class enables an important optimization in the Remoting framework. The code generator
+generates two subclasses implementing the interface class. The first one, the <*Proxy*>, is used
+to implement a true remote call, usually involving network communication.
+The second one, the <*RemoteObject*>, simply forwards all
+member function calls locally to the service object. When a remote object is obtained from
+the Object Request Broker, the ORB first checks if the actual service object is known to the
+local ORB. If so, the ORB returns an instance of the <*RemoteObject*> class. Therefore, virtually no
+overhead is incurred if the caller and the service reside in the same process (and therefore use
+the same ORB instance). If the local ORB does not know the service object, it returns a <*Proxy*>,
+which takes care of creating and sending requests over the network, as well as receiving
+responses for method calls.
+
+How do clients obtain either the <*RemoteObject*> or the <*Proxy*> for a certain service?
+The simplest way is to use the <*ClientHelper*> class, which is also generated by the
+code generator.
+
+    std::string uri("http://server:8080/soap/TimeService/TheTimeService");
+    ITimeService::Ptr pTimeService = TimeServiceClientHelper::find(uri);
+    std::string time = pTimeService->currentTime();
+----
+
+
+!!Identifying and Finding Remote Objects
+
+To obtain the interface, the location of the remote object must be known. The location of a remote
+object is specified as a Uniform Resource Identifier (URI). It consists of the network protocol
+used to talk to the remote object, the network address of the server where the remote object (the
+actual service object) resides, the protocol used for serialization, the class name of the
+service object and an object identifier that identifies the specific object.
+If all parts of the URI for a specific remote object are known, it is very easy to build
+the URI from scratch. Usually the URI will be obtained from a configuration file, or from
+another remote object implementing a registry or naming service that maps human-readable
+names to URIs. Such a service is not part of Remoting, but can be easily built from scratch.
+
+The URI for a remote object can also be obtained from the server. When the server registers a
+service object with its ORB, the ORB creates and returns the URI for this object.
+
+
+!!How a Remote Method Call Works
+
+Figure 1 illustrates what happens during a remote method call.
+
+[[image:images/RemoteCall.png Figure 1: How a Remote Method Call Works]]
+
+Once the client has obtained a proxy object from the ORB, it can call a
+method of the remote object via the proxy.
+With help from the transport, the proxy turns the method call
+into a network request, which includes the remote object's class name,
+its object ID and the method name. Then it serializes all parameters and
+sends them to the server, also with the help from the transport.
+
+On the server side, a listener receives the request from the client and passes it
+to the skeleton. The skeleton deserializes all parameters and then invokes
+the remote object, which in turn invokes the actual service object.
+The return value, as well as all output parameters are then serialized
+for sending them back to the client, as response message.
+
+On the client side again, the proxy deserializes the return value
+and output parameters and returns them to the caller.
+
+The ORB has a built-in optimization for the case when the service
+object resides in the same process as the caller. In this case,
+instead of the proxy object, the ORB returns the remote object to
+the caller. A method call to the remote object is immediately
+forwarded by the remote object to the service object, using an ordinary
+C++ method call. Therefore, no network and marshalling overhead is involved
+in such a call.
+
+
+!!Transports
+
+The Remoting core library only implements basic infrastructure for managing and
+finding remote objects, dealing with proxies and skeletons, serialization
+and so on. It does not provide any mechanism to actually transmit data
+over a network. Remoting does not care what network protocol is used to
+send data over the network, or how parameters are serialized for a wire
+protocol. This is the business of the <*Transport*>. A Transport combines
+a network protocol (such as a plain TCP socket connection, or HTTP)
+with a wire (serialization) format. Therefore, the Transport is responsible for
+making sure a remote method call is transported over the network
+from the client to the server, and the response from the server
+is transported back to the client.
+
+A nice feature of Remoting is that remote objects and Transports are completely
+orthogonal. This means that as soon as a remote object has been registered
+with the server ORB, it can be reached via every Transport implementation
+available on the server, even by multiple transports simultaneously.
+
+Remoting comes with multiple Transport implementations: a fast TCP
+transport using a proprietary binary protocol, a HTTP-based transport also
+using the binary serialization protocol, a JSON-RPC transport, a REST
+transport, and a SOAP transport which supports SOAP 1.1 and 1.2, as well as
+the Message Transport Optimization Mechanism (MTOM), and which works with
+SOAP implementations for other platforms.
+
+!The TCP Transport
+
+The TCP Transport uses a persistent TCP connection between client and
+server per proxy. As soon as the first request is sent through the proxy,
+the transport opens a socket connection to the server.
+Parameter and return values are serialized in an efficient binary format. The
+transport takes care of byte order differences between the client and the server,
+so it is possible to call remote objects even if the machine architecture
+and byte order of the client and server systems differ. The serialization
+format is quite efficient, making the TCP Transport a good choice
+where fast communication between Remoting-based applications is required.
+The TCP Transport can also be used over a secure SSL/TLS connection.
+
+!The HTTP Transport
+
+The HTTP Transport is a very lightweight HTTP-based Transport implementation,
+using the Remoting NG binary serialization format with a HTTP connection.
+
+This transport is a good choice if a Remoting NG based C++ application needs
+to communicate with another one if only a HTTP connection is possible between
+them (e.g., due to a proxy server or firewall).
+
+!The JSON-RPC Transport
+
+The JSON-RPC Transport is a very lightweight HTTP-based Transport implementation,
+supporting the [[http://www.jsonrpc.org/specification JSON-RPC 2.0]]
+protocol specification.
+
+This transport is a good choice if web browser-based JavaScript applications
+need to invoke native methods on the server.
+
+! The REST Transport
+
+The REST Transport is a HTTP-based Transport implementation,
+enabling RESTful web services.
+
+!The SOAP Transport
+
+The SOAP Transport uses SOAP 1.1 or 1.2 over HTTP(S). This transport
+is a good choice if the remote service provided by a Remoting-based
+C++ application must be accessible by clients written using other
+frameworks or even other programming languages or runtimes, such
+as Java or .NET. This transport can also be used to invoke third-party
+web services. It also supports the Message Transport Optimization Mechanism
+(MTOM), HTTP compression and HTTP Basic and Digest authentication.
+
+
+!!Classes Generated by RemoteGenNG
+
+Figure 2 shows the classes that the Remoting code generator
+creates. All classes are generated from one input class, the
+Service class which implements the remote service.
+Not shown in the figure are serializer and deserializer classes
+which are generated for every user-defined class used as
+argument or return value.
+
+[[image:images/RemotingClasses.png Figure 2: Classes generated by RemoteGenNG]]
+
+
+!IService
+
+The interface class has all public member functions which are marked as <[remote]> in the
+service class. In the interface class, these methods are pure virtual. The name
+of the interface class is, by convention, the same as the service class, with an
+uppercase I (for <*interface*>) prepended to the name. Therefore, the interface
+class for <[Service]> will be named <[IService]>.
+The interface class is the base class for both the proxy and the remote object
+class generated by the code generator. The interface class is a subclass
+of Poco::RefCountedObject (or Poco::OSP::Service, if OSP support is enabled)
+and thus supports reference counting. Normally, the interface class is
+used with Poco::AutoPtr. The interface class contains a type definition
+that makes a suitable Poco::AutoPtr instantiation available under the
+name <[IService::Ptr]>.
+
+
+!ServiceProxy
+
+The proxy class implements the client part of the remoting machinery. Its task
+is to serialize and deserialize parameters and return values, and, together
+with the transport, send requests over the network to the server
+and receive responses from the server.
+
+The proxy class normally is not thread safe, so a single proxy object should
+only be used by a single thread at any given time. However, there can be more
+than one proxy object in a process, so each thread can have its own proxy
+object. The proxy object can be made thread safe if the service class is
+annotated with the <[synchronized]> attribute.
+
+The proxy class is a subclass of the interface class.
+
+
+!ServiceRemoteObject
+
+The remote object is used on the server side. Like the proxy on the client side,
+it is a subclass of the interface class. Internally, it maintains a pointer
+to the actual service object. Its member functions simply forward all calls
+to the service object.
+
+The ORB has a built-in optimization for the case when the service
+object resides in the same process as the client. In this case,
+instead of the proxy object, the ORB returns the remote object to
+the caller. A method call to the remote object is locally
+forwarded by the remote object to the service object. Therefore,
+no network and marshalling overhead is involved in such a situation.
+
+If the service class has been annotated with the <[synchronized]> attribute,
+calls to the service object are serialized. This useful if the service
+object has not been implemented in a threadsafe manner.
+
+
+!ServiceRemoteBridge
+
+The remote bridge class can be optionally generated for a service. It is a 
+variant of the <[ServiceRemoteObject]> (and like it also a subclass of <[RemoteObject]>), 
+but instead of forwarding method calls directly to the service object, 
+it forwards method calls to an instance of the interface class, e.g. a <[ServiceProxy]>. 
+This can be used to forward method calls to a different server.
+
+
+!ServiceSkeleton
+
+The skeleton implements the server part of the remoting machinery. Its task
+is to deserialize parameters from client requests, invoke methods on
+the service object (via the remote object), and serialize return values
+and output parameters back to the client.
+
+
+!ServiceProxyFactory
+
+The proxy factory is a simple factory for proxy objects, as its name implies.
+It is used internally by the ORB to create proxy objects.
+
+
+!ServiceEventSubscriber
+
+The EventSubscriber is responsible for deserializing and dispatching event
+messages received from a server via an EventListener to a Proxy object.
+This class is only generated if the service object has events. The Proxy
+generates the EventSubscriber when events are enabled for it with a
+call to <[remoting__enableEvents()]>.
+
+
+!ServiceEventDispatcher
+
+The EventDispatcher is responsible for delivering
+events fired by service objects to remote subscribers. This class is only
+generated if the service object has events. The ServerHelper class will
+create and register the EventDispatcher with the ORB.
+The EventDispatcher also supports per-subscriber event filtering, based
+on Poco::RemotingNG::EventFilter.
+
+
+!ServiceServerHelper
+
+The server helper provides static member functions that simplify the
+registration of a service object (along with its skeleton and remote object)
+with the ORB. It is not needed by the remoting machinery and provided for
+convenience only. Everything that the server helper does can also be achieved
+by directly calling ORB methods.
+
+
+!ServiceClientHelper
+
+The client helper provides static member functions for obtaining a proxy
+object (or more generatlly speaking, an implementation of the interface)
+from the ORB on the client side. It is not needed by the remoting machinery and
+provided for convenience only.
+Everything that the client helper does can also be achieved by directly calling ORB
+methods.
+
+
+!!!Remoting Dos and Don'ts
+
+Even though Remoting does its best to make remote calls look like ordinary
+local member function calls, the fact that one is dealing with remote objects
+can never be fully hidden. The reason for this is that there is a network
+connection involved. And with a network connection comes latency, as well
+as a considerable overhead for serialization, deserialization, and
+transferring data over the network.
+
+Because of this, it's almost never a good idea to simply take an existing
+C++ class and turn it into a remote service. A well designed C++ class
+usually has a fine-grained interface -- many member functions, each
+only performing a very small task. This often results in many calls to
+an object to perform a complex task. This is fine for local method calls,
+where the overhead of a call is neglectable. However, for a remote object
+call, this is the worst possible case. A well designed remote interface
+therefore is almost the total opposite of a well designed local interface.
+A well designed remote interface provides very few functions, each taking
+many parameters (or a few parameter objects), and each function does
+as much as possible, with the goal to reduce remote calls to the absolute
+minimum.
+
+Furthermore, since an remote object's methods can be called from multiple
+client simultaneously, a remote object is typically stateless.
+
+Nevertheless it is usually possible to turn an existing C++ class into
+a remote service. This involves the creation of a <*remote facade*> object.
+The remote facade object implements a coarse-grained remote interface,
+using the fine grained interface from the existing C++ class.
+
+As an example, we look at the following C++ class implementing a collection
+of objects, such as a database query result or a playlist.
+
+    class Collection
+    {
+    public:
+        Collection();
+        ~Collection();
+
+        unsigned getSize() const;
+        const Item& getItem(unsigned index) const;
+
+        ...
+    };
+----
+
+Turning this class straight into a remote service would be a bad idea.
+For obtaining all items of the collection of size N, N+1 remote calls
+(one to <*getSize()*>, and N to <*getItem()*> would be necessary.
+This is not an issue for local method calls, but it can be an issue
+for remote calls, due to the remote invocation overhead.
+
+A better way to make the Collection object
+available remotely is to create a remote facade that allows retrieval of
+multiple items with a single call.
+
+    //@ remote
+    class CollectionFacade
+    {
+    public:
+        CollectionFacade(Collection& collection);
+        ~CollectionFacade();
+
+        unsigned getItems(unsigned first, unsigned count, std::vector<Item>& items) const;
+
+        ...
+    };
+----
