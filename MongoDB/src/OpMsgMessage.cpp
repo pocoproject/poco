@@ -68,6 +68,7 @@ const std::string OpMsgMessage::CMD_BUILD_INFO { "buildInfo"s };
 const std::string OpMsgMessage::CMD_COLL_STATS { "collStats"s };
 const std::string OpMsgMessage::CMD_DB_STATS { "dbStats"s };
 const std::string OpMsgMessage::CMD_HOST_INFO { "hostInfo"s };
+const std::string OpMsgMessage::CMD_PING { "ping"s };
 
 
 static const std::string& commandIdentifier(const std::string& command);
