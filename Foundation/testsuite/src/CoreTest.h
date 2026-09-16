@@ -31,6 +31,7 @@ public:
 	void testEnvironment();
 	void testEnvironmentMultiThread();
 	void testBuffer();
+	void testBufferEmpty();
 	void testFIFOBufferChar();
 	void testFIFOBufferInt();
 	void testFIFOBufferEOFAndError();
