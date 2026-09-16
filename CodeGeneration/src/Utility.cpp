@@ -371,7 +371,7 @@ std::string Utility::createInclude(const std::string& filePath, bool flatInclude
 
 	int start = aFile.depth()-1;
 	bool found = false;
-	do
+	while (!found && start >= 0)
 	{
 		std::string directory = Poco::toLower(aFile.directory(start));
 		if (directory.find("include") != std::string::npos)
@@ -379,7 +379,6 @@ std::string Utility::createInclude(const std::string& filePath, bool flatInclude
 		else
 			--start;
 	}
-	while(!found && start >= 0);
 	if (!found)
 		start = aFile.depth();
 	else
