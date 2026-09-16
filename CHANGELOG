@@ -27,8 +27,14 @@ Bundled Third-Party Library Upgrades:
 - expat 2.8.1 -> 2.8.4 (18 CVEs; see Security Fixes)
 - 7zip (LZMA SDK) 26.01 -> 26.02 (bug and vulnerability fixes)
 
+Features, Enhancements and Third Party Updates:
+
+- MongoDB::OpMsgMessage::CMD_PING added (the rest of PR #5404 remains in 2.0)
+
 Bug Fixes and Improvements:
 
+- GH #5476 MongoDB: ReplicaSetConnection re-sends a failing command indefinitely (PR #5482)
+- GH #5475 MongoDB: valid server replies larger than 16 MB are rejected (PR #5478)
 - GH #5466 fix(Net): TCPReactorServerConnection registers no error or shutdown handler (PR #5469)
 - GH #5415 OpenSSL no_deprecated (PR #5416)
 - GH #5413 FTPClientSession(socket, readWelcomeMessage=false) sets _serverReady=true without reading welcome reply (PR #5418)
@@ -36,6 +42,8 @@ Bug Fixes and Improvements:
 - GH #5407 HTTPReactorServer: client abort leaks the connection and hot-spins the reactor (PR #5408, PR #5410)
 - GH #5393 ProcessRunner heap-use-after-free on failed start (PR #5394)
 - GH #5383 Poco::Data::Transaction unusable on an auto-commit session (PR #5384)
+- PR #5484 fix(Foundation): Buffer::clear() on an empty buffer passed a null pointer to memset
+- PR #5479 fix(Foundation): share TextConverter between copies of BinaryReader and BinaryWriter
 - PR #5474 fix(CppUnit, Data): warnmsg() must warn instead of fail; execDirectImpl() must throw NotImplementedException
 - PR #5464 fix(Crypto,NetSSL): restore missing #else in isFIPSEnabled(), add OpenSSL 1.1.1 CI job
 - PR #5460 fix(NetSSL): FIPS fixes for NetSSL_OpenSSL
