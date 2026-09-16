@@ -75,6 +75,7 @@ public:
 	static const std::string CMD_COLL_STATS;
 	static const std::string CMD_DB_STATS;
 	static const std::string CMD_HOST_INFO;
+	static const std::string CMD_PING;
 
 
 	enum Flags : UInt32
