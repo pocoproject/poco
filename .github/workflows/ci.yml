@@ -669,6 +669,39 @@ jobs:
             ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(sysctl -n hw.ncpu) -R "^(Foundation|Util|Crypto)$"
       - uses: ./.github/actions/upload-test-report
 
+  # LibreSSL probe: Crypto/NetSSL/JWT built against brew libressl, which keeps
+  # the non-OpenSSL API divergences (opaque DH since 2.7.0, no X448 in the curve
+  # parser) under CI. NetSSL is build-only: LibreSSL does not resume TLS 1.3
+  # sessions the way TCPServerTest::testReuseSessionTLS13 expects.
+  macos-clang-cmake-libressl:
+    runs-on: macos-latest
+    needs: changes
+    if: |
+      needs.changes.outputs.crypto_netssl == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v5
+      - run: brew install libressl
+      - run: >-
+          cmake -S. -Bcmake-build
+          -DPOCO_MINIMAL_BUILD=ON -DENABLE_TESTS=ON
+          -DENABLE_CRYPTO=ON -DENABLE_NETSSL=ON -DENABLE_JWT=ON
+          -DOPENSSL_ROOT_DIR=$(brew --prefix libressl)
+      - run: cmake --build cmake-build --target all --parallel $(sysctl -n hw.ncpu)
+      - uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 30
+          max_attempts: 3
+          retry_on: any
+          command: >-
+            cd cmake-build &&
+            PWD=`pwd`
+            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(sysctl -n hw.ncpu) -R "^(Crypto|JWT)$"
+      - uses: ./.github/actions/upload-test-report
+        with:
+          suffix: libressl
+
   # Build-only: compile-warnings-as-signal across as many modules as possible.
   macos-clang-cmake-warnings:
     runs-on: macos-latest
