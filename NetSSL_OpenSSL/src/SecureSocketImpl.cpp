@@ -201,7 +201,18 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 	{
 		if (performHandshake && _pSocket->getBlocking())
 		{
-			int ret = ::SSL_connect(_pSSL);
+			int ret;
+			const auto recvTimeout = _pSocket->getReceiveTimeout();
+			Poco::Timestamp tsStart;
+			while (true)
+			{
+				ret = ::SSL_connect(_pSSL);
+				if (!mustRetry(ret))
+					break;
+
+				if (tsStart.isElapsed(recvTimeout.totalMicroseconds()))
+					throw Poco::TimeoutException();
+			};
 			handleError(ret);
 			verifyPeerCertificate();
 		}
