@@ -210,10 +210,21 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 
 		if (performHandshake && _pSocket->getBlocking())
 		{
-			// SSL_get_error() inspects the thread's error queue (OpenSSL < 4.0): an entry
-			// left there by unrelated code would turn a retry condition into a fatal error.
-			::ERR_clear_error();
-			int ret = ::SSL_connect(_pSSL);
+			int ret;
+			const auto recvTimeout = _pSocket->getReceiveTimeout();
+			Poco::Timestamp tsStart;
+			while (true)
+			{
+				// SSL_get_error() inspects the thread's error queue (OpenSSL < 4.0): an entry
+				// left there by unrelated code would turn a retry condition into a fatal error.
+				::ERR_clear_error();
+				ret = ::SSL_connect(_pSSL);
+				if (!mustRetry(ret))
+					break;
+
+				if (tsStart.isElapsed(recvTimeout.totalMicroseconds()))
+					throw Poco::TimeoutException();
+			};
 			handleError(ret);
 			verifyPeerCertificate();
 		}
