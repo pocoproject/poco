@@ -58,7 +58,7 @@ OpenSSL can also be installed via the `vcpkg` package manager.
 
 On Windows, POCO can also use the native Windows TLS APIs (SChannel).
 
-### Installing All Dependencies (Linux and macOS)
+### Installing All Dependencies (Linux, macOS, Windows)
 
 All dependencies can be installed with the following commands:
 
