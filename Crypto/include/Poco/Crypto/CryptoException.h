@@ -30,6 +30,10 @@ POCO_DECLARE_EXCEPTION(Crypto_API, CryptoException, Poco::Exception)
 
 
 class Crypto_API OpenSSLException : public CryptoException
+	/// An exception class for errors reported by OpenSSL.
+	///
+	/// The constructors append the pending errors of the OpenSSL error
+	/// queue to the message and leave the queue empty.
 {
 public:
 	OpenSSLException(int code = 0);

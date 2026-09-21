@@ -110,10 +110,12 @@ inline std::string& getError(std::string& msg)
 	/// returns the augmented error description.
 {
 	unsigned long err;
+	char buf[256]; // ERR_error_string() would format into a buffer shared by all threads
 	while ((err = ERR_get_error()))
 	{
 		if (!msg.empty()) msg.append(1, '\n');
-		msg.append(ERR_error_string(err, nullptr));
+		ERR_error_string_n(err, buf, sizeof(buf));
+		msg.append(buf);
 	}
 	return msg;
 }
