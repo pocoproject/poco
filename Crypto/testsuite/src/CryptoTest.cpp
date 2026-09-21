@@ -21,6 +21,7 @@
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Crypto/CryptoException.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/TemporaryFile.h"
 #include "Poco/Exception.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/HexBinaryEncoder.h"
@@ -80,6 +81,20 @@ static const std::string UTF8_PEM(
 	"Mqz0UGPoGavuMBUGA1UdEQQOMAyHBAqqt7SHBMCo/AEwCgYIKoZIzj0EAwIDSQAw\n"
 	"RgIhANBQnB1HFLHp7t8oZbLYsm8nWI0hshmVQupXV9oFwb4qAiEAg5UqSDnvAax3\n"
 	"LWWgnAZJkUS0AEQXu4Rx9ZiP7wBdFtA=\n"
+	"-----END CERTIFICATE-----\n"
+);
+
+static const std::string SAN_PEM(
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBpTCCAUugAwIBAgIUfiHfNKdSHwtV0Me8XmHXpWS1AncwCgYIKoZIzj0EAwIw\n"
+	"GTEXMBUGA1UEAwwOY24uZXhhbXBsZS5jb20wIBcNMjYwOTIxMTEzODUwWhgPMjEy\n"
+	"NjA4MjgxMTM4NTBaMBkxFzAVBgNVBAMMDmNuLmV4YW1wbGUuY29tMFkwEwYHKoZI\n"
+	"zj0CAQYIKoZIzj0DAQcDQgAEY+C7Dwh2tgrH9WsPN5Y2wKEUrhnGmpBipXkDfR1z\n"
+	"PJWyN8rHiyKftlJwxVkYf13co18hd+4MClD1qsBNTKuoPqNvMG0wHQYDVR0OBBYE\n"
+	"FGAc1IlnVG/NA2uPVHgkUwYPNtWWMB8GA1UdIwQYMBaAFGAc1IlnVG/NA2uPVHgk\n"
+	"UwYPNtWWMA8GA1UdEwEB/wQFMAMBAf8wGgYDVR0RBBMwEYIPc2FuLmV4YW1wbGUu\n"
+	"Y29tMAoGCCqGSM49BAMCA0gAMEUCIG0wXnlgBNCK422Ifbtk9NS96WRfbIwuJmxH\n"
+	"0tcGh5UtAiEAoRlUMD2If9iSGyBNmuO2sptJPs9kHnq2WQAZpAJN2Kw=\n"
 	"-----END CERTIFICATE-----\n"
 );
 
@@ -458,6 +473,84 @@ void CryptoTest::testStreams()
 }
 
 
+void CryptoTest::testCertificateSubjectAltName()
+{
+	ErrorQueueCleaner cleaner;
+	ERR_clear_error();
+
+	std::string commonName;
+	std::set<std::string> domainNames;
+
+	std::istringstream sanStream(SAN_PEM);
+	X509Certificate sanCert(sanStream);
+	sanCert.extractNames(commonName, domainNames);
+	assertTrue (commonName == "cn.example.com");
+	assertTrue (domainNames == std::set<std::string>{"san.example.com"});
+
+	std::istringstream noSANStream(APPINF_PEM);
+	X509Certificate noSANCert(noSANStream);
+	noSANCert.extractNames(commonName, domainNames);
+	assertTrue (domainNames == std::set<std::string>{"appinf.com"});
+
+	// The length of the dNSName changes from 0x0F to 0x7F, beyond the end of the extension.
+	std::string undecodablePEM(SAN_PEM);
+	const std::string::size_type pos = undecodablePEM.find("EYIPc2Fu");
+	assertTrue (pos != std::string::npos);
+	undecodablePEM.replace(pos, 8, "EYJ/c2Fu");
+	std::istringstream undecodableStream(undecodablePEM);
+	X509Certificate undecodableCert(undecodableStream);
+	try
+	{
+		undecodableCert.extractNames(commonName, domainNames);
+		fail("undecodable subjectAltName - must throw");
+	}
+	catch (OpenSSLException&)
+	{
+	}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void CryptoTest::testCertificateDuplicate()
+{
+	ErrorQueueCleaner cleaner;
+
+	std::istringstream certStream(APPINF_PEM);
+	X509Certificate cert(certStream);
+
+	X509Certificate duplicate(cert.dup());
+	assertTrue (cert.equals(duplicate));
+	X509Certificate copy(cert);
+	assertTrue (cert.equals(copy));
+
+	// A moved-from certificate has nothing to duplicate and copying it stays legal.
+	X509Certificate moved(std::move(cert));
+	assertTrue (cert.dup() == nullptr); // NOLINT(bugprone-use-after-move)
+	X509Certificate copyOfMoved(cert); // NOLINT(bugprone-use-after-move)
+	assertTrue (copyOfMoved.certificate() == nullptr);
+	assertTrue (moved.equals(copy));
+}
+
+
+void CryptoTest::testCertificateSaveCannotCreateFile()
+{
+	ErrorQueueCleaner cleaner;
+	ERR_clear_error();
+
+	std::istringstream certStream(APPINF_PEM);
+	X509Certificate cert(certStream);
+	try
+	{
+		cert.save(Poco::TemporaryFile::tempName() + "/cert.pem");
+		fail("directory does not exist - must throw");
+	}
+	catch (Poco::CreateFileException&)
+	{
+	}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
 void CryptoTest::testCertificate()
 {
 	std::istringstream certStream(APPINF_PEM);
@@ -590,6 +683,9 @@ CppUnit::Test* CryptoTest::suite()
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptInterop);
 	CppUnit_addTest(pSuite, CryptoTest, testDecryptInterop);
 	CppUnit_addTest(pSuite, CryptoTest, testStreams);
+	CppUnit_addTest(pSuite, CryptoTest, testCertificateSubjectAltName);
+	CppUnit_addTest(pSuite, CryptoTest, testCertificateDuplicate);
+	CppUnit_addTest(pSuite, CryptoTest, testCertificateSaveCannotCreateFile);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificate);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateUTF8);
 	CppUnit_addTest(pSuite, CryptoTest, testOpenSSLException);
