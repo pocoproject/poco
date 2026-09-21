@@ -105,15 +105,12 @@ void OpenSSLInitializer::uninitialize()
 	if (--_rc == 0)
 	{
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
-		// Provider cleanup is deliberately left to OpenSSL's internal
-		// atexit handler (OPENSSL_cleanup). We must NOT:
-		//  - call OSSL_PROVIDER_unload(): leaks OSSL_LIB_CTX child
-		//    contexts that the unload path does not fully free
-		//  - null the static pointers: makes the provider allocations
-		//    unreachable, causing LeakSanitizer to report them as leaks
-		//    (LSAN runs before atexit handlers on Linux/GCC)
-		// The pointers remain valid and reachable until process exit,
-		// at which point OPENSSL_cleanup frees everything.
+		// The providers stay loaded and referenced until the process exits.
+		// Unloading the default provider leaves the process without one
+		// (OpenSSL does not activate its fallback provider again), and
+		// resetting the pointers without unloading leaks the providers on
+		// the next initialize(). OPENSSL_cleanup() is left to the application:
+		// OpenSSL cannot be initialized again after it.
 		CONF_modules_unload(1);
 #endif
 	}

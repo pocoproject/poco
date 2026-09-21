@@ -30,6 +30,7 @@ public:
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	void testDefaultProvider();
 	void testLegacyProvider();
+	void testReinitialize();
 #endif
 
 	void setUp();

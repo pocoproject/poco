@@ -32,10 +32,19 @@ namespace Poco::Crypto {
 
 
 class Crypto_API OpenSSLInitializer
-	/// Initalizes the OpenSSL library.
+	/// Initializes the OpenSSL library.
 	///
 	/// The class ensures the earliest initialization and the
 	/// latest shutdown of the OpenSSL library.
+	///
+	/// With OpenSSL 3.0 and newer, initialize() loads the default and,
+	/// if available, the legacy provider; they stay loaded until the
+	/// process exits.
+	///
+	/// OPENSSL_cleanup() is never called, because OpenSSL cannot be
+	/// initialized again afterwards. OpenSSL 4.0 no longer frees its
+	/// global data at exit; an application that needs a clean leak
+	/// report can call OPENSSL_cleanup() at the end of main().
 {
 public:
 	OpenSSLInitializer();
@@ -48,7 +57,7 @@ public:
 		/// Initializes the OpenSSL machinery.
 
 	static void uninitialize();
-		/// Shuts down the OpenSSL machinery.
+		/// Shuts down the OpenSSL machinery. The providers stay loaded.
 
 	[[nodiscard]] static bool isFIPSEnabled();
 		/// Returns true if FIPS mode is enabled, false otherwise.
@@ -63,10 +72,8 @@ public:
 		/// file (openssl.cnf), and OpenSSL 3.0 or newer is required.
 		/// Disabling does nothing with older versions.
 		///
-		/// This method is not thread safe, because the underlying OpenSSL
-		/// function is not. Call it during startup, before other threads
-		/// use OpenSSL and before objects that select algorithms when they
-		/// are created, such as Poco::Net::Context, are created.
+		/// Not thread safe. Call it during startup, before other threads
+		/// use OpenSSL and before a Poco::Net::Context is created.
 
 	[[nodiscard]] static bool haveLegacyProvider();
 		/// Returns true if the OpenSSL legacy provider is available, otherwise false.
