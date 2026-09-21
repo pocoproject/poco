@@ -10,13 +10,17 @@
 
 #include "EVPTest.h"
 #include "PKCS12ContainerTest.h"
+#include "ErrorQueueCleaner.h"
 #include "Poco/Crypto/RSAKey.h"
 #include "Poco/Crypto/ECKey.h"
 #include "Poco/Crypto/EVPPKey.h"
 #include "Poco/Crypto/CipherFactory.h"
 #include "Poco/Crypto/Cipher.h"
 #include "Poco/Crypto/X509Certificate.h"
+#include "Poco/Crypto/PKCS12Container.h"
+#include "Poco/Crypto/CryptoException.h"
 #include "Poco/TemporaryFile.h"
+#include "Poco/File.h"
 #include "Poco/Base64Decoder.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/MemoryStream.h"
@@ -28,6 +32,9 @@
 #include <fstream>
 #include <iostream>
 #include <cstring>
+#include <openssl/err.h>
+#include <openssl/bio.h>
+#include <openssl/pkcs12.h>
 
 
 namespace {
@@ -113,6 +120,46 @@ static const std::string anyPemRSA(
 	"+ztfusgWAWiUKuSGTk4S8YB0fsFlmOv0WDr+PyZ4Lui/a8opbyzGE7rqpnF/s0GO\r\n"
 	"M7uLCNNwIN7WhmxcWV0KZU1wTppoSWPJda1yTbBzF9XP\r\n"
 	"-----END CERTIFICATE-----\r\n"
+);
+
+
+static const std::string ecKeyPem(
+	"-----BEGIN PRIVATE KEY-----\n"
+	"MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQg5CvDo2repnprlgOd\n"
+	"IgfpJvJxhOtTN52gxVgGjMWb4EahRANCAARjbG62l9X71ypzvbNCmzZnEuQyh2E4\n"
+	"YeRrBplNWmqG8iwnnZj1t8HodYfV4aOj0ujWBVlxzhTF9X9A5e3hYWyJ\n"
+	"-----END PRIVATE KEY-----\n"
+);
+
+
+static const std::string ecCertPem(
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBhjCCASugAwIBAgIUJpL1rpVCYk3IpNxp0F3zbMadYGYwCgYIKoZIzj0EAwIw\n"
+	"FzEVMBMGA1UEAwwMcG9jby1lYy10ZXN0MCAXDTI2MDkyMTExMzcxNVoYDzIxMjYw\n"
+	"ODI4MTEzNzE1WjAXMRUwEwYDVQQDDAxwb2NvLWVjLXRlc3QwWTATBgcqhkjOPQIB\n"
+	"BggqhkjOPQMBBwNCAARjbG62l9X71ypzvbNCmzZnEuQyh2E4YeRrBplNWmqG8iwn\n"
+	"nZj1t8HodYfV4aOj0ujWBVlxzhTF9X9A5e3hYWyJo1MwUTAdBgNVHQ4EFgQUpiUG\n"
+	"fVoHGsCTyrTKF7ITNAx1c70wHwYDVR0jBBgwFoAUpiUGfVoHGsCTyrTKF7ITNAx1\n"
+	"c70wDwYDVR0TAQH/BAUwAwEB/zAKBggqhkjOPQQDAgNJADBGAiEAwm3XNpSxHnIq\n"
+	"FApUJd61qx0b1waJGBT42tmG46dKJaECIQCTVtHffgGO1kbFiZOKVRAWi0iqc4AJ\n"
+	"3bbrr05RmDfyBg==\n"
+	"-----END CERTIFICATE-----\n"
+);
+
+
+// ecCertPem with the SubjectPublicKeyInfo algorithm OID changed to the unassigned 1.2.840.10045.2.99.
+static const std::string ecCertUnknownAlgPem(
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBhjCCASugAwIBAgIUJpL1rpVCYk3IpNxp0F3zbMadYGYwCgYIKoZIzj0EAwIw\n"
+	"FzEVMBMGA1UEAwwMcG9jby1lYy10ZXN0MCAXDTI2MDkyMTExMzcxNVoYDzIxMjYw\n"
+	"ODI4MTEzNzE1WjAXMRUwEwYDVQQDDAxwb2NvLWVjLXRlc3QwWTATBgcqhkjOPQJj\n"
+	"BggqhkjOPQMBBwNCAARjbG62l9X71ypzvbNCmzZnEuQyh2E4YeRrBplNWmqG8iwn\n"
+	"nZj1t8HodYfV4aOj0ujWBVlxzhTF9X9A5e3hYWyJo1MwUTAdBgNVHQ4EFgQUpiUG\n"
+	"fVoHGsCTyrTKF7ITNAx1c70wHwYDVR0jBBgwFoAUpiUGfVoHGsCTyrTKF7ITNAx1\n"
+	"c70wDwYDVR0TAQH/BAUwAwEB/zAKBggqhkjOPQQDAgNJADBGAiEAwm3XNpSxHnIq\n"
+	"FApUJd61qx0b1waJGBT42tmG46dKJaECIQCTVtHffgGO1kbFiZOKVRAWi0iqc4AJ\n"
+	"3bbrr05RmDfyBg==\n"
+	"-----END CERTIFICATE-----\n"
 );
 
 
@@ -795,6 +842,187 @@ void EVPTest::testEVPKeyByModulus()
 #endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
 
+void EVPTest::testCompareDifferentKeyTypes()
+{
+	ErrorQueueCleaner cleaner;
+
+	EVPPKey rsa(EVP_PKEY_RSA, 2048);
+	EVPPKey ec(EVP_PKEY_EC, NID_X9_62_prime256v1);
+
+	ERR_clear_error();
+	assertTrue (!(rsa == ec));
+	assertTrue (rsa != ec);
+	assertTrue (ERR_peek_error() == 0);
+
+	// An error queued before the comparison belongs to the caller and must survive it.
+	const unsigned char junk[] = { 0xFF };
+	const unsigned char* p = junk;
+	assertTrue (d2i_X509(nullptr, &p, 1) == nullptr);
+	const unsigned long pending = ERR_peek_last_error();
+	assertTrue (pending != 0);
+	assertTrue (!(rsa == ec));
+	assertTrue (ERR_peek_last_error() == pending);
+}
+
+
+void EVPTest::testKeyFromCertificateUnknownAlgorithm()
+{
+	ErrorQueueCleaner cleaner;
+
+	std::istringstream str(ecCertUnknownAlgPem);
+	X509Certificate cert(str);
+
+	ERR_clear_error();
+	try
+	{
+		EVPPKey key(cert);
+		fail("EVPPKey from a certificate with an unknown key algorithm must throw");
+	}
+	catch (const OpenSSLException&) {}
+	assertTrue (ERR_peek_error() == 0);
+
+	ERR_clear_error();
+	try
+	{
+		RSAKey key(cert);
+		fail("RSAKey from a certificate with an unknown key algorithm must throw");
+	}
+	catch (const OpenSSLException&) {}
+	assertTrue (ERR_peek_error() == 0);
+
+	ERR_clear_error();
+	try
+	{
+		ECKey key(cert);
+		fail("ECKey from a certificate with an unknown key algorithm must throw");
+	}
+	catch (const OpenSSLException&) {}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void EVPTest::testSaveCannotCreateFile()
+{
+	ErrorQueueCleaner cleaner;
+
+	EVPPKey key(EVP_PKEY_EC, NID_X9_62_prime256v1);
+	TemporaryFile tmp;
+	const std::string path = tmp.path() + "/key.pem";
+
+	ERR_clear_error();
+	try
+	{
+		key.save(path);
+		fail("Saving the public key into a non-existent directory must throw");
+	}
+	catch (const Poco::CreateFileException&) {}
+	assertTrue (ERR_peek_error() == 0);
+
+	ERR_clear_error();
+	try
+	{
+		key.save("", path);
+		fail("Saving the private key into a non-existent directory must throw");
+	}
+	catch (const Poco::CreateFileException&) {}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void EVPTest::testSaveFlushFailure()
+{
+	// /dev/full accepts the write and fails the flush; it exists on Linux only.
+	if (!Poco::File("/dev/full").exists()) return;
+
+	ErrorQueueCleaner cleaner;
+
+	EVPPKey key(EVP_PKEY_EC, NID_X9_62_prime256v1);
+
+	ERR_clear_error();
+	try
+	{
+		key.save("/dev/full");
+		fail("Saving the public key to a full device must throw");
+	}
+	catch (const Poco::FileException&) {}
+	assertTrue (ERR_peek_error() == 0);
+
+	ERR_clear_error();
+	try
+	{
+		key.save("", "/dev/full");
+		fail("Saving the private key to a full device must throw");
+	}
+	catch (const Poco::FileException&) {}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void EVPTest::testECKeyFromCertificate()
+{
+	ErrorQueueCleaner cleaner;
+
+	std::istringstream str(ecCertPem);
+	X509Certificate cert(str);
+
+	ERR_clear_error();
+	ECKey key(cert);
+	assertTrue (key.size() == 256);
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void EVPTest::testRSAKeyFromECCertificate()
+{
+	ErrorQueueCleaner cleaner;
+
+	std::istringstream str(ecCertPem);
+	X509Certificate cert(str);
+
+	ERR_clear_error();
+	try
+	{
+		RSAKey key(cert);
+		fail("RSAKey from an EC certificate must throw");
+	}
+	catch (const OpenSSLException&) {}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void EVPTest::testRSAKeyFromECPKCS12()
+{
+	ErrorQueueCleaner cleaner;
+
+	std::istringstream keyStream(ecKeyPem);
+	EVPPKey ecKey(nullptr, &keyStream);
+	std::istringstream certStream(ecCertPem);
+	X509Certificate ecCert(certStream);
+
+	std::unique_ptr<PKCS12, decltype(&PKCS12_free)> pPKCS12(PKCS12_create("pass", "ec", static_cast<EVP_PKEY*>(ecKey),
+		const_cast<X509*>(ecCert.certificate()), nullptr, 0, 0, 0, 0, 0), PKCS12_free);
+	assertTrue (pPKCS12 != nullptr);
+	std::unique_ptr<BIO, decltype(&BIO_free)> pBIO(BIO_new(BIO_s_mem()), BIO_free);
+	assertTrue (pBIO != nullptr);
+	assertTrue (i2d_PKCS12_bio(pBIO.get(), pPKCS12.get()) == 1);
+	char* pData = nullptr;
+	const long size = BIO_get_mem_data(pBIO.get(), &pData);
+	assertTrue (size > 0);
+	std::istringstream p12Stream(std::string(pData, static_cast<std::size_t>(size)));
+	PKCS12Container cont(p12Stream, "pass");
+	assertTrue (cont.hasKey());
+
+	ERR_clear_error();
+	try
+	{
+		RSAKey key(cont);
+		fail("RSAKey from a container with an EC key must throw");
+	}
+	catch (const OpenSSLException&) {}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
 void EVPTest::setUp()
 {
 }
@@ -825,6 +1053,13 @@ CppUnit::Test* EVPTest::suite()
 	CppUnit_addTest(pSuite, EVPTest, testECEVPKeyByLength);
 	CppUnit_addTest(pSuite, EVPTest, testEVPKeyByModulus);
 #endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	CppUnit_addTest(pSuite, EVPTest, testCompareDifferentKeyTypes);
+	CppUnit_addTest(pSuite, EVPTest, testKeyFromCertificateUnknownAlgorithm);
+	CppUnit_addTest(pSuite, EVPTest, testSaveCannotCreateFile);
+	CppUnit_addTest(pSuite, EVPTest, testSaveFlushFailure);
+	CppUnit_addTest(pSuite, EVPTest, testECKeyFromCertificate);
+	CppUnit_addTest(pSuite, EVPTest, testRSAKeyFromECCertificate);
+	CppUnit_addTest(pSuite, EVPTest, testRSAKeyFromECPKCS12);
 
 	return pSuite;
 }

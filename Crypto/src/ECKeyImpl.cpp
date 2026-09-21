@@ -23,6 +23,7 @@
 #include <sstream>
 #include <openssl/evp.h>
 #include <openssl/bn.h>
+#include <openssl/err.h>
 
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 #include <openssl/core_names.h>
@@ -163,12 +164,16 @@ void ECKeyImpl::checkEC(const std::string& method, const std::string& func) cons
 	if (_pEVPPKey == nullptr) throw OpenSSLException(Poco::format("%s: %s", method, func));
 	EVP_PKEY_CTX* pCtx = EVP_PKEY_CTX_new(_pEVPPKey, nullptr);
 	if (pCtx == nullptr) throw OpenSSLException(Poco::format("%s: EVP_PKEY_CTX_new()", method));
+	ERR_set_mark();
 	int rc = EVP_PKEY_check(pCtx);
 	if (rc != 1)
 	{
 		// public-key-only: EVP_PKEY_check may fail, try EVP_PKEY_public_check
+		// Discard the errors of the failed full check; the public check queues its own.
+		ERR_pop_to_mark();
 		rc = EVP_PKEY_public_check(pCtx);
 	}
+	else ERR_clear_last_mark();
 	EVP_PKEY_CTX_free(pCtx);
 	if (rc != 1)
 		throw OpenSSLException(Poco::format("%s: EVP_PKEY_check()", method));
@@ -297,7 +302,8 @@ ECKeyImpl::ECKeyImpl(int curve):
 	KeyPairImpl("ec", KT_EC_IMPL),
 	_pEC(EC_KEY_new_by_curve_name(curve))
 {
-	poco_check_ptr(_pEC);
+	if (_pEC == nullptr)
+		throw OpenSSLException("ECKeyImpl(int curve): EC_KEY_new_by_curve_name()");
 	EC_KEY_set_asn1_flag(_pEC, OPENSSL_EC_NAMED_CURVE);
 	if (!(EC_KEY_generate_key(_pEC)))
 		throw OpenSSLException("ECKeyImpl(int curve): EC_KEY_generate_key()");
@@ -431,8 +437,14 @@ std::string ECKeyImpl::getCurveName(int nid)
 	constexpr int bufLen = 128;
 	char buf[bufLen];
 	std::memset(buf, 0, bufLen);
-	OBJ_obj2txt(buf, bufLen, OBJ_nid2obj(nid), 0);
-	curveName = buf;
+	ERR_set_mark();
+	const ASN1_OBJECT* pObj = OBJ_nid2obj(nid);
+	if (pObj != nullptr && OBJ_obj2txt(buf, bufLen, pObj, 0) > 0)
+	{
+		curveName = buf;
+		ERR_clear_last_mark();
+	}
+	else ERR_pop_to_mark(); // an unknown nid is reported by the empty name
 	OPENSSL_free(pCurves);
 	return curveName;
 }
@@ -457,10 +469,8 @@ int ECKeyImpl::getCurveNID(std::string& name)
 	char buf[bufLen];
 	if (name.empty())
 	{
-		std::memset(buf, 0, bufLen);
-		OBJ_obj2txt(buf, bufLen, OBJ_nid2obj(nid), 0);
-		name = buf;
 		nid = pCurves[0].nid;
+		name = getCurveName(nid);
 	}
 	else
 	{

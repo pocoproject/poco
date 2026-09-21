@@ -56,7 +56,10 @@ EVPPKey::EVPPKey(const char* ecCurveName) : _pEVPPKey(nullptr)
 
 EVPPKey::EVPPKey(const X509Certificate& cert): _pEVPPKey(X509_get_pubkey(const_cast<X509*>(cert.certificate())))
 {
-	poco_check_ptr(_pEVPPKey);
+	if (_pEVPPKey == nullptr)
+	{
+		throw OpenSSLException("EVPPKey(const X509Certificate&):X509_get_pubkey()");
+	}
 	checkType();
 }
 
@@ -378,8 +381,17 @@ void EVPPKey::save(const std::string& publicKeyFile, const std::string& privateK
 					msg.append(Poco::format("Failed to write public key '%s' to file", publicKeyFile));
 					throw Poco::WriteFileException(getError(msg));
 				}
+				if (BIO_flush(bio) != 1)
+				{
+					std::string msg = Poco::format("EVPPKey::save(%s):BIO_flush()\n", publicKeyFile);
+					throw Poco::WriteFileException(getError(msg));
+				}
 			}
-			else throw Poco::CreateFileException("Cannot create public key file");
+			else
+			{
+				std::string msg = Poco::format("EVPPKey::save(%s):BIO_write_filename()\n", publicKeyFile);
+				throw Poco::CreateFileException(getError(msg));
+			}
 		}
 		catch (...)
 		{
@@ -418,6 +430,11 @@ void EVPPKey::save(const std::string& publicKeyFile, const std::string& privateK
 					std::string msg = Poco::format(
 						"EVPPKey::save(%s):PEM_write_bio_PrivateKey()\n", privateKeyFile);
 					throw Poco::FileException(getError(msg));
+				}
+				if (BIO_flush(bio) != 1)
+				{
+					std::string msg = Poco::format("EVPPKey::save(%s):BIO_flush()\n", privateKeyFile);
+					throw Poco::WriteFileException(getError(msg));
 				}
 			}
 			else
@@ -520,8 +537,14 @@ EVP_PKEY* EVPPKey::duplicate(const EVP_PKEY* pFromKey, EVP_PKEY** pToKey)
 			RSA* pRSA = EVP_PKEY_get1_RSA(const_cast<EVP_PKEY*>(pFromKey));
 			if (pRSA)
 			{
-				EVP_PKEY_set1_RSA(*pToKey, pRSA);
+				int rc = EVP_PKEY_set1_RSA(*pToKey, pRSA);
 				RSA_free(pRSA);
+				if (rc != 1)
+				{
+					EVP_PKEY_free(*pToKey);
+					*pToKey = nullptr;
+					throw OpenSSLException("EVPPKey::duplicate():EVP_PKEY_set1_RSA()");
+				}
 			}
 			else
 			{

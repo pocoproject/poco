@@ -9,14 +9,15 @@
 
 
 #include "DigestEngineTest.h"
+#include "ErrorQueueCleaner.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Crypto/DigestEngine.h"
 #include "Poco/Crypto/CryptoException.h"
 #include "Poco/Exception.h"
 #include <iostream>
-#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 #include <openssl/err.h>
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 #include <openssl/evp.h>
 #include <openssl/provider.h>
 #endif
@@ -124,11 +125,34 @@ void DigestEngineTest::testUnknownAlgorithm()
 }
 
 
+void DigestEngineTest::testXOFWithoutLength()
+{
+	ErrorQueueCleaner cleaner;
+	ERR_clear_error();
+	// OpenSSL 3.5 and newer report no digest size for a SHAKE digest without an output length.
+	DigestEngine engine("SHAKE256");
+	engine.update("abc");
+	try
+	{
+		const std::size_t length = engine.digestLength();
+		assertTrue (length > 0 && length <= 64);
+		assertTrue (engine.digest().size() == length);
+	}
+	catch (OpenSSLException&)
+	{
+	}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
 
 void DigestEngineTest::testInitFailure()
 {
+	ErrorQueueCleaner cleaner;
+	ERR_clear_error();
+
 	DigestEngine engine("SHA256");
 
 	{
@@ -164,6 +188,9 @@ void DigestEngineTest::testInitFailure()
 
 void DigestEngineTest::testFIPSRefusesMD5()
 {
+	ErrorQueueCleaner cleaner;
+	ERR_clear_error();
+
 	if (OSSL_PROVIDER_available(nullptr, "fips") != 1)
 	{
 		std::cerr << "No FIPS provider, test skipped." << std::endl;
@@ -214,6 +241,7 @@ CppUnit::Test* DigestEngineTest::suite()
 	CppUnit_addTest(pSuite, DigestEngineTest, testMD5);
 	CppUnit_addTest(pSuite, DigestEngineTest, testSHA1);
 	CppUnit_addTest(pSuite, DigestEngineTest, testUnknownAlgorithm);
+	CppUnit_addTest(pSuite, DigestEngineTest, testXOFWithoutLength);
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	CppUnit_addTest(pSuite, DigestEngineTest, testInitFailure);
 	CppUnit_addTest(pSuite, DigestEngineTest, testFIPSRefusesMD5);

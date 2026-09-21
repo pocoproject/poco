@@ -9,6 +9,7 @@
 
 
 #include "CryptoTest.h"
+#include "ErrorQueueCleaner.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Crypto/CipherFactory.h"
@@ -81,19 +82,6 @@ static const std::string UTF8_PEM(
 	"LWWgnAZJkUS0AEQXu4Rx9ZiP7wBdFtA=\n"
 	"-----END CERTIFICATE-----\n"
 );
-
-namespace
-{
-	class ErrorQueueCleaner
-		/// Empties the OpenSSL error queue of the thread, also when an assertion fails.
-	{
-	public:
-		~ErrorQueueCleaner()
-		{
-			ERR_clear_error();
-		}
-	};
-}
 
 
 CryptoTest::CryptoTest(const std::string& name): CppUnit::TestCase(name)

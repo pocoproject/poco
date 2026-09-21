@@ -10,11 +10,14 @@
 
 
 #include "ECTest.h"
+#include "ErrorQueueCleaner.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Crypto/ECKey.h"
 #include "Poco/Crypto/ECDSADigestEngine.h"
+#include "Poco/Crypto/CryptoException.h"
 #include <openssl/pem.h>
+#include <openssl/err.h>
 #include <iostream>
 #include <sstream>
 #include <cstring>
@@ -179,6 +182,47 @@ void ECTest::testECDSASignManipulated()
 
 #endif
 
+
+void ECTest::testCurveNameUnknownNID()
+{
+	ErrorQueueCleaner cleaner;
+
+	ERR_clear_error();
+	assertTrue (ECKey::getCurveName(999999).empty());
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void ECTest::testCurveNIDDefaultName()
+{
+	ErrorQueueCleaner cleaner;
+
+	std::string name;
+	ERR_clear_error();
+	int nid = ECKey::getCurveNID(name);
+	assertTrue (ERR_peek_error() == 0);
+	assertTrue (nid != -1);
+	assertTrue (!name.empty());
+	assertTrue (name == ECKey::getCurveName(nid));
+	assertTrue (name == ECKey::getCurveName());
+}
+
+
+void ECTest::testUnknownCurveName()
+{
+	ErrorQueueCleaner cleaner;
+
+	ERR_clear_error();
+	try
+	{
+		ECKey key("nosuchcurve");
+		fail("An unknown curve name must throw");
+	}
+	catch (const OpenSSLException&) {}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
 void ECTest::setUp()
 {
 }
@@ -201,5 +245,9 @@ CppUnit::Test* ECTest::suite()
 	CppUnit_addTest(pSuite, ECTest, testECDSASignManipulated);
 
 #endif
+	CppUnit_addTest(pSuite, ECTest, testCurveNameUnknownNID);
+	CppUnit_addTest(pSuite, ECTest, testCurveNIDDefaultName);
+	CppUnit_addTest(pSuite, ECTest, testUnknownCurveName);
+
 	return pSuite;
 }
