@@ -30,6 +30,10 @@ namespace Poco::Crypto {
 class Crypto_API DigestEngine: public Poco::DigestEngine
 	/// This class implements a Poco::DigestEngine for all
 	/// digest algorithms supported by OpenSSL.
+	///
+	/// A Poco::Crypto::OpenSSLException is thrown if OpenSSL cannot
+	/// initialize the algorithm or compute the digest, for example
+	/// because FIPS mode excludes the algorithm.
 {
 public:
 	DigestEngine(const std::string& name);
