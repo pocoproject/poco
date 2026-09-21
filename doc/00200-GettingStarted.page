@@ -354,6 +354,8 @@ Here is an overview of POCO build options:
     * ENABLE_COMPILER_WARNINGS         Set to OFF|ON (default is OFF) to enable compiler warnings
     * POCO_UNBUNDLED                   Set to OFF|ON (default is OFF) to control linking dependencies as external
     * POCO_ENABLE_CPP20                Set to OFF|ON (default is ON) to build with C++20 standard
+    * POCO_ENABLE_STD_MUTEX            Set to OFF|ON (default is OFF) to implement Poco::Mutex and Poco::FastMutex with std::recursive_mutex and std::mutex
+    * POCO_DATA_NO_SQL_PARSER          Set to OFF|ON (default is OFF) to build Poco::Data without the SQL parser
 
 Windows only parameters:
 
