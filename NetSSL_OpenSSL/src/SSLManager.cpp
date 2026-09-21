@@ -63,9 +63,7 @@ const std::string SSLManager::CFG_REQUIRE_TLSV1_3("requireTLSv1_3");
 const std::string SSLManager::CFG_DISABLE_PROTOCOLS("disableProtocols");
 const std::string SSLManager::CFG_DH_PARAMS_FILE("dhParamsFile");
 const std::string SSLManager::CFG_ECDH_CURVE("ecdhCurve");
-#ifdef OPENSSL_FIPS
 const std::string SSLManager::CFG_FIPS_MODE("openSSL.fips");
-#endif
 
 
 SSLManager::SSLManager():
@@ -85,6 +83,12 @@ SSLManager::~SSLManager()
 	{
 		poco_unexpected();
 	}
+}
+
+
+bool SSLManager::isFIPSEnabled()
+{
+	return Poco::Crypto::OpenSSLInitializer::isFIPSEnabled();
 }
 
 
@@ -414,13 +418,11 @@ void SSLManager::initDefaultContext(bool server)
 	initEvents(server);
 	Poco::Util::AbstractConfiguration& config = appConfig();
 
-#ifdef OPENSSL_FIPS
 	bool fipsEnabled = config.getBool(CFG_FIPS_MODE, VAL_FIPS_MODE);
 	if (fipsEnabled && !Poco::Crypto::OpenSSLInitializer::isFIPSEnabled())
 	{
 		Poco::Crypto::OpenSSLInitializer::enableFIPSMode(true);
 	}
-#endif
 
 	std::string prefix = server ? CFG_SERVER_PREFIX : CFG_CLIENT_PREFIX;
 

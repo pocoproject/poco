@@ -52,9 +52,21 @@ public:
 
 	[[nodiscard]] static bool isFIPSEnabled();
 		/// Returns true if FIPS mode is enabled, false otherwise.
+		/// Always false with OpenSSL versions before 3.0.
 
 	static void enableFIPSMode(bool enabled);
-		/// Enable or disable FIPS mode. If FIPS is not available, this method doesn't do anything.
+		/// Enables or disables FIPS mode by setting the default property
+		/// query "fips=yes"; the other providers stay loaded.
+		///
+		/// Throws a CryptoException if FIPS mode cannot be enabled: the
+		/// FIPS provider must be activated in the OpenSSL configuration
+		/// file (openssl.cnf), and OpenSSL 3.0 or newer is required.
+		/// Disabling does nothing with older versions.
+		///
+		/// This method is not thread safe, because the underlying OpenSSL
+		/// function is not. Call it during startup, before other threads
+		/// use OpenSSL and before objects that select algorithms when they
+		/// are created, such as Poco::Net::Context, are created.
 
 	[[nodiscard]] static bool haveLegacyProvider();
 		/// Returns true if the OpenSSL legacy provider is available, otherwise false.
@@ -75,27 +87,11 @@ private:
 inline bool OpenSSLInitializer::isFIPSEnabled()
 {
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
-	// OpenSSL 3.x: OPENSSL_FIPS no longer exists. FIPS is now provider-based.
 	return EVP_default_properties_is_fips_enabled(nullptr) ? true : false;
-#elif defined(OPENSSL_FIPS)
-	// OpenSSL 1.x legacy FIPS module
-	return FIPS_mode() ? true : false;
 #else
 	return false;
 #endif
 }
-
-
-#ifdef OPENSSL_FIPS
-inline void OpenSSLInitializer::enableFIPSMode(bool enabled)
-{
-	FIPS_mode_set(enabled);
-}
-#else
-inline void OpenSSLInitializer::enableFIPSMode(bool /*enabled*/)
-{
-}
-#endif
 
 
 inline bool OpenSSLInitializer::haveLegacyProvider()

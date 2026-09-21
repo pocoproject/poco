@@ -120,6 +120,24 @@ void OpenSSLInitializer::uninitialize()
 }
 
 
+void OpenSSLInitializer::enableFIPSMode(bool enabled)
+{
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	// Only the errors of this call belong in the exception message.
+	ERR_clear_error();
+	std::string msg;
+	if (enabled && OSSL_PROVIDER_available(nullptr, "fips") != 1)
+		msg = "Cannot enable FIPS mode: the OpenSSL FIPS provider is not available";
+	else if (EVP_default_properties_enable_fips(nullptr, enabled ? 1 : 0) != 1)
+		msg = "Cannot change the OpenSSL FIPS mode";
+	if (!msg.empty()) throw CryptoException(getError(msg));
+#else
+	if (enabled)
+		throw CryptoException("Cannot enable FIPS mode: OpenSSL 3.0 or newer is required");
+#endif
+}
+
+
 void initializeCrypto()
 {
 	OpenSSLInitializer::initialize();

@@ -19,7 +19,41 @@
 #endif
 
 
+using Poco::Crypto::CryptoException;
 using Poco::Crypto::OpenSSLInitializer;
+
+
+namespace
+{
+	class FIPSModeRestorer
+		/// Restores the FIPS mode, also when an assertion fails.
+	{
+	public:
+		FIPSModeRestorer(): _wasEnabled(OpenSSLInitializer::isFIPSEnabled())
+		{
+		}
+
+		~FIPSModeRestorer()
+		{
+			try
+			{
+				if (OpenSSLInitializer::isFIPSEnabled() != _wasEnabled)
+					OpenSSLInitializer::enableFIPSMode(_wasEnabled);
+			}
+			catch (...)
+			{
+			}
+		}
+
+		bool wasEnabled() const
+		{
+			return _wasEnabled;
+		}
+
+	private:
+		bool _wasEnabled;
+	};
+}
 
 
 OpenSSLInitializerTest::OpenSSLInitializerTest(const std::string& name): CppUnit::TestCase(name)
@@ -64,6 +98,40 @@ void OpenSSLInitializerTest::testInitializeUninitialize()
 	OpenSSLInitializer::initialize();
 	assertTrue(OpenSSL_version_num() > 0);
 	OpenSSLInitializer::uninitialize();
+}
+
+
+void OpenSSLInitializerTest::testFIPSMode()
+{
+	OpenSSLInitializer init;
+	FIPSModeRestorer restorer;
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	const bool haveFIPS = OSSL_PROVIDER_available(nullptr, "fips") == 1;
+#else
+	const bool haveFIPS = false;
+#endif
+
+	if (haveFIPS)
+	{
+		OpenSSLInitializer::enableFIPSMode(true);
+		assertTrue(OpenSSLInitializer::isFIPSEnabled());
+		OpenSSLInitializer::enableFIPSMode(false);
+		assertTrue(!OpenSSLInitializer::isFIPSEnabled());
+	}
+	else
+	{
+		try
+		{
+			OpenSSLInitializer::enableFIPSMode(true);
+			fail("no FIPS provider - must throw");
+		}
+		catch (const CryptoException&)
+		{
+		}
+		assertTrue(OpenSSLInitializer::isFIPSEnabled() == restorer.wasEnabled());
+		if (!restorer.wasEnabled())
+			OpenSSLInitializer::enableFIPSMode(false);
+	}
 }
 
 
@@ -115,6 +183,7 @@ CppUnit::Test* OpenSSLInitializerTest::suite()
 
 	CppUnit_addTest(pSuite, OpenSSLInitializerTest, testMultipleInitialize);
 	CppUnit_addTest(pSuite, OpenSSLInitializerTest, testInitializeUninitialize);
+	CppUnit_addTest(pSuite, OpenSSLInitializerTest, testFIPSMode);
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	CppUnit_addTest(pSuite, OpenSSLInitializerTest, testDefaultProvider);
 	CppUnit_addTest(pSuite, OpenSSLInitializerTest, testLegacyProvider);

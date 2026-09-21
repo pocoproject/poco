@@ -26,6 +26,7 @@ public:
 
 	void testMultipleInitialize();
 	void testInitializeUninitialize();
+	void testFIPSMode();
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	void testDefaultProvider();
 	void testLegacyProvider();
