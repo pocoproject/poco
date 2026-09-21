@@ -200,7 +200,8 @@ ECDSASignature::ByteVec ECDSASignature::toDER() const
 	{
 		ByteVec buffer(size);
 		unsigned char* p = &buffer[0];
-		i2d_ECDSA_SIG(_pSig, &p);
+		if (i2d_ECDSA_SIG(_pSig, &p) != size)
+			throw OpenSSLException("ECDSASignature::toDER(): i2d_ECDSA_SIG()");
 		return buffer;
 	}
 	else throw OpenSSLException();

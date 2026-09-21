@@ -34,6 +34,8 @@ public:
 	void testEncryptDecryptWithSaltSha1();
 	void testEncryptDecryptDESECB();
 	void testEncryptDecryptGCM();
+	void testEncryptDecryptGCMIVLength();
+	void testLegacyProviderErrorQueue();
 	void testStreams();
 	void testPassword();
 	void testPasswordSha1();

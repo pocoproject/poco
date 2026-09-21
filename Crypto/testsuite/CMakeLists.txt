@@ -27,6 +27,17 @@ else()
 		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 		COMMAND Crypto-testrunner -ignore ${CPPIGNORE_FILE} -all
 	)
+	if(OPENSSL_VERSION VERSION_GREATER_EQUAL 3.0)
+		# testLegacyProviderErrorQueue can only fail when the legacy provider cannot be loaded.
+		file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/no-openssl-modules)
+		add_test(
+			NAME Crypto-legacy-provider-unavailable
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			COMMAND Crypto-testrunner CryptoTest::testLegacyProviderErrorQueue
+		)
+		set_tests_properties(Crypto-legacy-provider-unavailable PROPERTIES
+			ENVIRONMENT "OPENSSL_MODULES=${CMAKE_CURRENT_BINARY_DIR}/no-openssl-modules")
+	endif()
 endif()
 target_link_libraries(Crypto-testrunner PUBLIC Poco::Crypto CppUnit)
 if(MSVC)
