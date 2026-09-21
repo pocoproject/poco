@@ -17,6 +17,7 @@
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/Crypto/CryptoStream.h"
 #include "Poco/Crypto/CryptoTransform.h"
+#include "Poco/Crypto/CryptoException.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/HexBinaryEncoder.h"
@@ -78,6 +79,20 @@ static const std::string UTF8_PEM(
 	"LWWgnAZJkUS0AEQXu4Rx9ZiP7wBdFtA=\n"
 	"-----END CERTIFICATE-----\n"
 );
+
+namespace
+{
+	class ErrorQueueCleaner
+		/// Empties the OpenSSL error queue of the thread, also when an assertion fails.
+	{
+	public:
+		~ErrorQueueCleaner()
+		{
+			ERR_clear_error();
+		}
+	};
+}
+
 
 CryptoTest::CryptoTest(const std::string& name): CppUnit::TestCase(name)
 {
@@ -468,6 +483,37 @@ void CryptoTest::testCertificateNameEntries()
 }
 
 
+void CryptoTest::testOpenSSLException()
+{
+	ErrorQueueCleaner cleaner;
+
+	ERR_clear_error();
+	const unsigned char junk[] = { 0xFF };
+	const unsigned char* pJunk = junk;
+	assertTrue (d2i_X509(nullptr, &pJunk, 1) == nullptr);
+	assertTrue (ERR_peek_error() != 0);
+	assertTrue (ERR_peek_error() != ERR_peek_last_error());
+
+	OpenSSLException exc("test");
+	assertTrue (ERR_peek_error() == 0);
+	const std::string message = exc.message();
+	assertTrue (message.compare(0, 4, "test") == 0);
+	const std::string::size_type firstError = message.find("error:");
+	assertTrue (firstError != std::string::npos);
+	assertTrue (message.find("error:", firstError + 1) != std::string::npos);
+
+	OpenSSLException plain("plain");
+	assertTrue (plain.message().substr(0, plain.message().find('\n')) == "plain");
+	assertTrue (plain.displayText().find("error:00000000") == std::string::npos);
+
+	pJunk = junk;
+	assertTrue (d2i_X509(nullptr, &pJunk, 1) == nullptr);
+	OpenSSLException copy(exc);
+	assertTrue (copy.message() == message);
+	assertTrue (ERR_peek_error() != 0);
+}
+
+
 void CryptoTest::setUp()
 {
 }
@@ -495,6 +541,7 @@ CppUnit::Test* CryptoTest::suite()
 	CppUnit_addTest(pSuite, CryptoTest, testCertificate);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateUTF8);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateNameEntries);
+	CppUnit_addTest(pSuite, CryptoTest, testOpenSSLException);
 
 	return pSuite;
 }

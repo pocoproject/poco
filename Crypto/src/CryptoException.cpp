@@ -14,9 +14,7 @@
 
 
 #include "Poco/Crypto/CryptoException.h"
-#include "Poco/NumberFormatter.h"
 #include <typeinfo>
-#include <openssl/err.h>
 
 
 namespace Poco::Crypto {
@@ -51,7 +49,6 @@ OpenSSLException::OpenSSLException(const std::string& msg, const Poco::Exception
 
 OpenSSLException::OpenSSLException(const OpenSSLException& exc): CryptoException(exc)
 {
-	setExtMessage();
 }
 
 
@@ -87,14 +84,8 @@ Poco::Exception* OpenSSLException::clone() const
 
 void OpenSSLException::setExtMessage()
 {
-	Poco::UInt64 e = static_cast<Poco::UInt64>(ERR_get_error());
-	char buf[128] = { 0 };
-	char* pErr = ERR_error_string(static_cast<unsigned long>(e), buf);
-	std::string err;
-	if (pErr) err = pErr;
-	else err = NumberFormatter::format(e);
-
-	extendedMessage(err);
+	std::string msg;
+	extendedMessage(getError(msg));
 }
 
 

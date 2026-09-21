@@ -42,6 +42,7 @@ public:
 	void testCertificate();
 	void testCertificateUTF8();
 	void testCertificateNameEntries();
+	void testOpenSSLException();
 
 	void setUp();
 	void tearDown();
