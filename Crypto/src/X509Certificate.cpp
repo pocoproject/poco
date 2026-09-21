@@ -112,10 +112,8 @@ X509Certificate::X509Certificate(X509* pCert, bool shared):
 {
 	poco_check_ptr(_pCert);
 
-	if (shared)
-	{
-		X509_up_ref(_pCert);
-	}
+	if (shared && X509_up_ref(_pCert) != 1)
+		throw OpenSSLException("X509Certificate: cannot share the certificate");
 
 	init();
 }
@@ -125,9 +123,8 @@ X509Certificate::X509Certificate(const X509Certificate& cert):
 	_issuerName(cert._issuerName),
 	_subjectName(cert._subjectName),
 	_serialNumber(cert._serialNumber),
-	_pCert(cert._pCert)
+	_pCert(cert.dup())
 {
-	_pCert = X509_dup(_pCert);
 }
 
 
@@ -246,12 +243,17 @@ void X509Certificate::save(const std::string& path) const
 	if (!BIO_write_filename(pBIO, const_cast<char*>(path.c_str())))
 	{
 		BIO_free(pBIO);
-		throw Poco::CreateFileException("Cannot create certificate file", path);
+		std::string msg("Cannot create certificate file");
+		throw Poco::CreateFileException(getError(msg), path);
 	}
 	try
 	{
-		if (!PEM_write_bio_X509(pBIO, _pCert))
-			throw Poco::WriteFileException("Failed to write certificate to file", path);
+		// The file BIO buffers, so a write error may be reported only by the flush.
+		if (!PEM_write_bio_X509(pBIO, _pCert) || BIO_flush(pBIO) <= 0)
+		{
+			std::string msg("Failed to write certificate to file");
+			throw Poco::WriteFileException(getError(msg), path);
+		}
 	}
 	catch (...)
 	{
@@ -265,9 +267,16 @@ void X509Certificate::save(const std::string& path) const
 std::string _X509_NAME_oneline_utf8(const X509_NAME *name)
 {
 	BIO * bio_out = BIO_new(BIO_s_mem());
-	X509_NAME_print_ex(bio_out, name, 0, (ASN1_STRFLGS_RFC2253 | XN_FLAG_SEP_COMMA_PLUS | XN_FLAG_FN_SN | XN_FLAG_DUMP_UNKNOWN_FIELDS) & ~ASN1_STRFLGS_ESC_MSB);
-	BUF_MEM *bio_buf;
-	BIO_get_mem_ptr(bio_out, &bio_buf);
+	if (bio_out == nullptr) throw OpenSSLException("X509Certificate: cannot create BIO for the distinguished name");
+	BUF_MEM *bio_buf = nullptr;
+	// X509_NAME_print_ex() returns the number of bytes written, which is 0 for an empty name.
+	if (X509_NAME_print_ex(bio_out, name, 0, (ASN1_STRFLGS_RFC2253 | XN_FLAG_SEP_COMMA_PLUS | XN_FLAG_FN_SN | XN_FLAG_DUMP_UNKNOWN_FIELDS) & ~ASN1_STRFLGS_ESC_MSB) < 0
+		|| BIO_get_mem_ptr(bio_out, &bio_buf) <= 0
+		|| bio_buf == nullptr)
+	{
+		BIO_free(bio_out);
+		throw OpenSSLException("X509Certificate: cannot print the distinguished name");
+	}
 	std::string line = std::string(bio_buf->data, bio_buf->length);
 	BIO_free(bio_out);
 	return line;
@@ -279,16 +288,12 @@ void X509Certificate::init()
 	_issuerName = _X509_NAME_oneline_utf8(X509_get_issuer_name(_pCert));
 	_subjectName = _X509_NAME_oneline_utf8(X509_get_subject_name(_pCert));
 	BIGNUM* pBN = ASN1_INTEGER_to_BN(X509_get_serialNumber(const_cast<X509 *>(_pCert)), nullptr);
-	if (pBN)
-	{
-		char* pSN = BN_bn2hex(pBN);
-		if (pSN)
-		{
-			_serialNumber = pSN;
-			OPENSSL_free(pSN);
-		}
-		BN_free(pBN);
-	}
+	if (pBN == nullptr) throw OpenSSLException("X509Certificate: cannot convert the serial number");
+	char* pSN = BN_bn2hex(pBN);
+	BN_free(pBN);
+	if (pSN == nullptr) throw OpenSSLException("X509Certificate: cannot convert the serial number to text");
+	_serialNumber = pSN;
+	OPENSSL_free(pSN);
 }
 
 
@@ -317,7 +322,8 @@ std::string X509Certificate::subjectName(NID nid) const
 void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& domainNames) const
 {
 	domainNames.clear();
-	if (STACK_OF(GENERAL_NAME) *names = static_cast<STACK_OF(GENERAL_NAME) *>( X509_get_ext_d2i(_pCert, NID_subject_alt_name, nullptr, nullptr))) {
+	int critical = -1;
+	if (STACK_OF(GENERAL_NAME) *names = static_cast<STACK_OF(GENERAL_NAME) *>( X509_get_ext_d2i(_pCert, NID_subject_alt_name, &critical, nullptr))) {
 		for (int i = 0; i < sk_GENERAL_NAME_num(names); ++i)
 		{
 			const GENERAL_NAME* name = sk_GENERAL_NAME_value(names, i);
@@ -329,6 +335,11 @@ void X509Certificate::extractNames(std::string& cmnName, std::set<std::string>& 
 			}
 		}
 		GENERAL_NAMES_free(names);
+	}
+	else if (critical != -1)
+	{
+		// Only -1 means that the certificate has no subjectAltName.
+		throw OpenSSLException("X509Certificate::extractNames(): cannot decode subjectAltName");
 	}
 
 	cmnName = commonName();
@@ -404,8 +415,15 @@ bool X509Certificate::issuedBy(const X509Certificate& issuerCertificate) const
 	X509* pCert = const_cast<X509*>(_pCert);
 	X509* pIssuerCert = const_cast<X509*>(issuerCertificate.certificate());
 	EVP_PKEY* pIssuerPublicKey = X509_get_pubkey(pIssuerCert);
-	if (!pIssuerPublicKey) throw Poco::InvalidArgumentException("Issuer certificate has no public key");
+	if (pIssuerPublicKey == nullptr)
+	{
+		std::string msg("Issuer certificate has no public key");
+		throw Poco::InvalidArgumentException(getError(msg));
+	}
+	// A failed verification is reported through the result, the errors it queued are not needed.
+	ERR_set_mark();
 	int rc = X509_verify(pCert, pIssuerPublicKey);
+	ERR_pop_to_mark();
 	EVP_PKEY_free(pIssuerPublicKey);
 	return rc == 1;
 }
@@ -416,6 +434,16 @@ bool X509Certificate::equals(const X509Certificate& otherCertificate) const
 	X509* pCert = const_cast<X509*>(_pCert);
 	X509* pOtherCert = const_cast<X509*>(otherCertificate.certificate());
 	return X509_cmp(pCert, pOtherCert) == 0;
+}
+
+
+X509* X509Certificate::dup() const
+{
+	if (_pCert == nullptr) return nullptr;
+
+	X509* pCert = X509_dup(_pCert);
+	if (pCert == nullptr) throw OpenSSLException("X509Certificate::dup(): cannot duplicate the certificate");
+	return pCert;
 }
 
 
@@ -443,18 +471,23 @@ X509Certificate::List X509Certificate::readPEM(const std::string& pemFileName)
 	BIO* pBIO = BIO_new_file(pemFileName.c_str(), "r");
 	if (pBIO == nullptr)
 		throw OpenFileException(Poco::format("X509Certificate::readPEM(%s)", pemFileName));
-	X509* x = PEM_read_bio_X509(pBIO, nullptr, nullptr, nullptr);
-	if (!x)
+	for (;;)
 	{
-		BIO_free(pBIO);
-		throw OpenSSLException(Poco::format("X509Certificate::readPEM(%s)", pemFileName));
-	}
-	while (x)
-	{
+		ERR_set_mark();
+		X509* x = PEM_read_bio_X509(pBIO, nullptr, nullptr, nullptr);
+		if (x == nullptr) break;
+		ERR_clear_last_mark();
 		caCertList.push_back(X509Certificate(x));
-		x = PEM_read_bio_X509(pBIO, nullptr, nullptr, nullptr);
 	}
 	BIO_free(pBIO);
+	// Reading always ends with a failed read; only a missing start line means the end of the input.
+	const unsigned long err = ERR_peek_last_error();
+	if (caCertList.empty() || ERR_GET_LIB(err) != ERR_LIB_PEM || ERR_GET_REASON(err) != PEM_R_NO_START_LINE)
+	{
+		ERR_clear_last_mark();
+		throw OpenSSLException(Poco::format("X509Certificate::readPEM(%s)", pemFileName));
+	}
+	ERR_pop_to_mark();
 	return caCertList;
 }
 
@@ -472,6 +505,11 @@ void X509Certificate::writePEM(const std::string& pemFileName, const List& list)
 			BIO_free(pBIO);
 			throw OpenSSLException(Poco::format("X509Certificate::writePEM(%s)", pemFileName));
 		}
+	}
+	if (BIO_flush(pBIO) <= 0)
+	{
+		BIO_free(pBIO);
+		throw OpenSSLException(Poco::format("X509Certificate::writePEM(%s)", pemFileName));
 	}
 	BIO_free(pBIO);
 }

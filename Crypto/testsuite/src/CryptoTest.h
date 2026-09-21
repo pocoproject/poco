@@ -41,6 +41,9 @@ public:
 	void testPasswordSha1();
 	void testEncryptInterop();
 	void testDecryptInterop();
+	void testCertificateSubjectAltName();
+	void testCertificateDuplicate();
+	void testCertificateSaveCannotCreateFile();
 	void testCertificate();
 	void testCertificateUTF8();
 	void testCertificateNameEntries();
