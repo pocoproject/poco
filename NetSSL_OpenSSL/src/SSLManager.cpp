@@ -326,8 +326,10 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 	// and have the response accepted as if the genuine issuer had produced it.
 	X509* pPeerIssuerCert = nullptr;
 	STACK_OF(X509)* pCertChain = SSL_get_peer_cert_chain(pSSL);
-	unsigned certChainLen = sk_X509_num(pCertChain);
-	for (unsigned i = 0; i < certChainLen; i++)
+	// There is no chain for a resumed session, and sk_X509_num() returns -1 for
+	// a null stack.
+	const int certChainLen = (pCertChain != nullptr) ? sk_X509_num(pCertChain) : 0;
+	for (int i = 0; i < certChainLen; i++)
 	{
 		X509* pIssuerCert = sk_X509_value(pCertChain, i);
 		if (X509_check_issued(pIssuerCert, pPeerCert) != X509_V_OK) continue;
