@@ -20,7 +20,10 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/HexBinaryEncoder.h"
+#include <memory>
 #include <sstream>
+#include <openssl/x509.h>
+#include <openssl/err.h>
 
 
 using namespace Poco::Crypto;
@@ -412,6 +415,59 @@ void CryptoTest::testCertificateUTF8()
 }
 
 
+// Raw ASN.1 types: the MBSTRING_* types re-encode the value and limit its length.
+static bool addNameEntry(X509_NAME* pName, int nid, int type, const void* pBytes, std::size_t length)
+{
+	return X509_NAME_add_entry_by_NID(pName, nid, type,
+		reinterpret_cast<const unsigned char*>(pBytes), static_cast<int>(length), -1, 0) == 1;
+}
+
+
+void CryptoTest::testCertificateNameEntries()
+{
+	const std::string commonName("good.com\0.evil.com", 18);
+	const std::string organizationName(300, 'a');
+	// UCS-2 big-endian "Po", U+010D, "o".
+	static const unsigned char LOCALITY_NAME[] = { 0x00, 0x50, 0x00, 0x6F, 0x01, 0x0D, 0x00, 0x6F };
+	// Not valid UTF-8: OpenSSL cannot convert it.
+	static const unsigned char STATE_OR_PROVINCE[] = { 0x41, 0xFF, 0x42 };
+
+	ERR_clear_error();
+
+	std::unique_ptr<X509, decltype(&X509_free)> pX509(X509_new(), X509_free);
+	assertNotNullPtr(pX509.get());
+	// X509_set_subject_name() would reject the invalid UTF-8 value, so the
+	// entries go into the certificate's own name (const since OpenSSL 4.0).
+	X509_NAME* pName = const_cast<X509_NAME*>(X509_get_subject_name(pX509.get()));
+	assertNotNullPtr(pName);
+	assertTrue (addNameEntry(pName, NID_commonName, V_ASN1_UTF8STRING, commonName.data(), commonName.size()));
+	assertTrue (addNameEntry(pName, NID_organizationName, V_ASN1_UTF8STRING, organizationName.data(), organizationName.size()));
+	assertTrue (addNameEntry(pName, NID_localityName, V_ASN1_BMPSTRING, LOCALITY_NAME, sizeof(LOCALITY_NAME)));
+	assertTrue (addNameEntry(pName, NID_stateOrProvinceName, V_ASN1_UTF8STRING, STATE_OR_PROVINCE, sizeof(STATE_OR_PROVINCE)));
+
+	X509Certificate cert(pX509.release());
+
+	assertTrue (cert.commonName().size() == 18);
+	assertTrue (cert.commonName() != "good.com");
+	assertTrue (cert.commonName() == commonName);
+	assertTrue (cert.subjectName(X509Certificate::NID_ORGANIZATION_NAME).size() == 300);
+	assertTrue (cert.subjectName(X509Certificate::NID_LOCALITY_NAME) == "Po\xC4\x8D" "o");
+	assertTrue (cert.subjectName(X509Certificate::NID_STATE_OR_PROVINCE) == std::string("A\xFF" "B", 3));
+	assertTrue (ERR_peek_error() == 0);
+	assertTrue (cert.subjectName(X509Certificate::NID_PKCS9_EMAIL_ADDRESS).empty());
+
+	// A queued error must survive a failed conversion.
+	const unsigned char junk[] = { 0xFF };
+	const unsigned char* pJunk = junk;
+	assertNullPtr(d2i_X509(nullptr, &pJunk, 1));
+	const unsigned long pending = ERR_peek_last_error();
+	assertTrue (pending != 0);
+	assertTrue (cert.subjectName(X509Certificate::NID_STATE_OR_PROVINCE) == std::string("A\xFF" "B", 3));
+	assertTrue (ERR_peek_last_error() == pending);
+	ERR_clear_error();
+}
+
+
 void CryptoTest::setUp()
 {
 }
@@ -438,6 +494,7 @@ CppUnit::Test* CryptoTest::suite()
 	CppUnit_addTest(pSuite, CryptoTest, testStreams);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificate);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateUTF8);
+	CppUnit_addTest(pSuite, CryptoTest, testCertificateNameEntries);
 
 	return pSuite;
 }

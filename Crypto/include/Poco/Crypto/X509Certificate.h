@@ -102,7 +102,8 @@ public:
 	[[nodiscard]] std::string issuerName(NID nid) const;
 		/// Extracts the information specified by the given
 		/// NID (name identifier) from the certificate issuer's
-		/// distinguished name.
+		/// distinguished name, converted to UTF-8 if possible.
+		/// The value can contain NUL characters.
 
 	[[nodiscard]] const std::string& subjectName() const;
 		/// Returns the certificate subject's distinguished name.
@@ -110,11 +111,13 @@ public:
 	[[nodiscard]] std::string subjectName(NID nid) const;
 		/// Extracts the information specified by the given
 		/// NID (name identifier) from the certificate subject's
-		/// distinguished name.
+		/// distinguished name, converted to UTF-8 if possible.
+		/// The value can contain NUL characters.
 
 	[[nodiscard]] std::string commonName() const;
 		/// Returns the common name stored in the certificate
-		/// subject's distinguished name.
+		/// subject's distinguished name, converted to UTF-8 if
+		/// possible. The value can contain NUL characters.
 
 	void extractNames(std::string& commonName, std::set<std::string>& domainNames) const;
 		/// Extracts the common name and the alias domain names from the
@@ -193,11 +196,6 @@ protected:
 		/// Extracts issuer and subject name from the certificate.
 
 private:
-	enum
-	{
-		NAME_BUFFER_SIZE = 256
-	};
-
 	std::string _issuerName;
 	std::string _subjectName;
 	std::string _serialNumber;
