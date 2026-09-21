@@ -469,103 +469,113 @@ jobs:
         with:
           build-dir: build
 
+  # OpenSSL 4.0, built from source and cached (ubuntu-24.04 ships OpenSSL 3).
+  # OpenSSL 4.0 no longer frees its global data at exit, so the job runs with
+  # ASan/LSan to catch memory that Poco leaves unreachable. The FIPS provider
+  # is built for the test of OpenSSLInitializer::enableFIPSMode().
   linux-gcc-cmake-openssl4:
     runs-on: ubuntu-24.04
-    strategy:
-      fail-fast: false
+    needs: changes
+    if: |
+      needs.changes.outputs.crypto_netssl == 'true' ||
+      needs.changes.outputs.ci_core == 'true' ||
+      github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     env:
-      OPENSSL4_VERSION: "4.0.1"
+      OPENSSL4_VERSION: 4.0.2
     steps:
       - uses: actions/checkout@v5
-      - name: Set OpenSSL 4.0 paths
+      - name: Set OpenSSL ${{ env.OPENSSL4_VERSION }} paths
         run: |
-          prefix="${GITHUB_WORKSPACE}/.openssl-4.0.1"
+          prefix="${GITHUB_WORKSPACE}/.openssl-${OPENSSL4_VERSION}"
           echo "OPENSSL4_PREFIX=${prefix}" >> "$GITHUB_ENV"
-          echo "OPENSSL_ROOT_DIR=${prefix}" >> "$GITHUB_ENV"
-      - name: Cache OpenSSL 4.0 build
-        uses: actions/cache@v5
+          echo "LD_LIBRARY_PATH=${prefix}/lib" >> "$GITHUB_ENV"
+      - name: Cache OpenSSL ${{ env.OPENSSL4_VERSION }}
         id: openssl4-cache
+        uses: actions/cache@v5
         with:
-          path: ${{ github.workspace }}/.openssl-4.0.1
-          key: openssl4-${{ env.OPENSSL4_VERSION }}-${{ runner.os }}-${{ runner.arch }}-v2
-      - name: Check OpenSSL 4.0 install
-        id: openssl4-ready
+          path: ${{ env.OPENSSL4_PREFIX }}
+          key: openssl4-fips-${{ env.OPENSSL4_VERSION }}-${{ runner.os }}-${{ runner.arch }}
+      - name: Build OpenSSL ${{ env.OPENSSL4_VERSION }}
+        if: steps.openssl4-cache.outputs.cache-hit != 'true'
         run: |
-          libdir=""
-          for d in "${OPENSSL4_PREFIX}/lib" "${OPENSSL4_PREFIX}/lib64"; do
-            if [ -f "${d}/libssl.so.4" ]; then
-              libdir="$d"
-              break
-            fi
-          done
-          if [ -n "$libdir" ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-            echo "libdir=${libdir}" >> "$GITHUB_OUTPUT"
-            echo "LD_LIBRARY_PATH=${libdir}" >> "$GITHUB_ENV"
-            echo "OPENSSL_MODULES=${libdir}/ossl-modules" >> "$GITHUB_ENV"
-            echo "OPENSSL4_LIBDIR=${libdir}" >> "$GITHUB_ENV"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Build OpenSSL 4.0
-        if: steps.openssl4-ready.outputs.ready != 'true'
-        env:
-          LD_LIBRARY_PATH: ""
-        run: |
-          sudo apt -y update
-          sudo apt -y install build-essential curl perl patchelf
-          curl -fsSL -LO "https://www.openssl.org/source/openssl-${OPENSSL4_VERSION}.tar.gz"
+          sudo apt -y update && sudo apt -y install build-essential curl perl
+          base="https://github.com/openssl/openssl/releases/download/openssl-${OPENSSL4_VERSION}"
+          curl -fsSL -O "${base}/openssl-${OPENSSL4_VERSION}.tar.gz"
+          curl -fsSL -O "${base}/openssl-${OPENSSL4_VERSION}.tar.gz.sha256"
+          # The checksum file is a bare hash or "hash  filename".
+          expected=$(awk '{ print $1 }' "openssl-${OPENSSL4_VERSION}.tar.gz.sha256")
+          echo "${expected}  openssl-${OPENSSL4_VERSION}.tar.gz" | sha256sum --check --strict -
           tar xzf "openssl-${OPENSSL4_VERSION}.tar.gz"
           cd "openssl-${OPENSSL4_VERSION}"
-          ./config --prefix="${OPENSSL4_PREFIX}" --openssldir="${OPENSSL4_PREFIX}/ssl" shared "-Wl,-rpath,${OPENSSL4_PREFIX}/lib"
+          # --libdir=lib: one library directory, never lib64.
+          ./config --prefix="${OPENSSL4_PREFIX}" --openssldir="${OPENSSL4_PREFIX}/ssl" --libdir=lib shared enable-fips
           make -j"$(nproc)"
-          make install_sw
-          libdir="${OPENSSL4_PREFIX}/lib"
-          if [ ! -f "${libdir}/libssl.so.4" ]; then
-            libdir="${OPENSSL4_PREFIX}/lib64"
-          fi
-          if [ ! -f "${libdir}/libssl.so.4" ]; then
-            echo "OpenSSL install incomplete: libssl.so.4 not found under ${OPENSSL4_PREFIX}" >&2
-            find "${OPENSSL4_PREFIX}" -name 'libssl.so*' >&2 || true
-            exit 1
-          fi
-          patchelf --set-rpath "${libdir}" "${OPENSSL4_PREFIX}/bin/openssl"
-          echo "LD_LIBRARY_PATH=${libdir}" >> "$GITHUB_ENV"
-          echo "OPENSSL_MODULES=${libdir}/ossl-modules" >> "$GITHUB_ENV"
-          echo "OPENSSL4_LIBDIR=${libdir}" >> "$GITHUB_ENV"
-      - name: Verify OpenSSL 4.0
+          make install_sw install_ssldirs install_fips
+      - name: Verify OpenSSL ${{ env.OPENSSL4_VERSION }}
         run: |
-          libdir="${OPENSSL4_PREFIX}/lib"
-          if [ ! -f "${libdir}/libssl.so.4" ]; then
-            libdir="${OPENSSL4_PREFIX}/lib64"
-          fi
-          export LD_LIBRARY_PATH="${libdir}:${LD_LIBRARY_PATH:-}"
-          ls -la "${libdir}/libssl.so"* "${libdir}/libcrypto.so"*
           "${OPENSSL4_PREFIX}/bin/openssl" version
-      - name: Install build dependencies
-        run: sudo apt -y update && sudo apt -y install cmake ninja-build
+          "${OPENSSL4_PREFIX}/bin/openssl" version | grep -q "^OpenSSL 4[.]" || {
+            echo "expected OpenSSL 4.0" >&2
+            exit 1
+          }
+      - run: sudo apt -y update && sudo apt -y install cmake ninja-build
+      # Needed by ASan, as in linux-gcc-cmake-sanitizers.
+      - run: sudo sysctl -w vm.mmap_rnd_bits=28
       - run: >-
-          cmake -S. -Bcmake-build -GNinja -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=ON
-          ${{ env.POCO_CMAKE_FOUNDATION_UTIL }}
+          cmake -S. -Bcmake-build -GNinja
+          -DPOCO_SANITIZEFLAGS="-fsanitize=address"
+          -DPOCO_MINIMAL_BUILD=ON -DENABLE_TESTS=ON
           -DENABLE_CRYPTO=ON -DENABLE_NETSSL=ON -DENABLE_JWT=ON
           -DOPENSSL_ROOT_DIR=${{ env.OPENSSL4_PREFIX }}
-          -DCMAKE_BUILD_RPATH=${{ env.OPENSSL4_LIBDIR }}
-          -DCMAKE_INSTALL_RPATH=${{ env.OPENSSL4_LIBDIR }}
-      - run: >-
-          cmake --build cmake-build --parallel $(nproc) --target
-          Foundation-testrunner Util-testrunner Crypto-testrunner NetSSL-testrunner JWT-testrunner
+          -DCMAKE_BUILD_RPATH=${{ env.OPENSSL4_PREFIX }}/lib
+          -DCMAKE_INSTALL_RPATH=${{ env.OPENSSL4_PREFIX }}/lib
+      - run: cmake --build cmake-build --target all --parallel $(nproc)
+      - name: Verify Poco linked against OpenSSL 4.0
+        run: |
+          # Without LD_LIBRARY_PATH, so that the check proves the RUNPATH.
+          env -u LD_LIBRARY_PATH ldd cmake-build/lib/libPocoCrypto.so
+          env -u LD_LIBRARY_PATH ldd cmake-build/lib/libPocoCrypto.so | grep "libcrypto[.]so[.]4 =>" | grep -qF "${OPENSSL4_PREFIX}/lib/" || {
+            echo "PocoCrypto did not link against OpenSSL 4.0 from ${OPENSSL4_PREFIX}" >&2
+            exit 1
+          }
       - uses: ./.github/actions/retry-action
         with:
-          timeout_minutes: 90
+          timeout_minutes: 30
           max_attempts: 3
           retry_on: any
           command: >-
             cd cmake-build &&
             PWD=`pwd`
-            ctest ${{ env.POCO_CTEST_COMMON }} --parallel $(nproc) -R "^(Foundation|Util|Crypto|NetSSL|JWT)$"
+            ctest ${{ env.POCO_CTEST_COMMON }} ${{ env.POCO_CTEST_SANITIZER_EXTRA }} --parallel $(nproc) -R "^(Crypto|NetSSL|JWT)$"
+      - name: FIPS provider check
+        run: |
+          # The FIPS provider is active, but fips=yes is not the default, so
+          # testFIPSMode takes the branch that enables FIPS mode.
+          cat > "${RUNNER_TEMP}/openssl-fips.cnf" <<EOF
+          config_diagnostics = 1
+          openssl_conf = openssl_init
+          .include ${OPENSSL4_PREFIX}/ssl/fipsmodule.cnf
+          [openssl_init]
+          providers = provider_sect
+          [provider_sect]
+          fips = fips_sect
+          base = base_sect
+          default = default_sect
+          [base_sect]
+          activate = 1
+          [default_sect]
+          activate = 1
+          EOF
+          export OPENSSL_CONF="${RUNNER_TEMP}/openssl-fips.cnf"
+          providers=$("${OPENSSL4_PREFIX}/bin/openssl" list -providers)
+          echo "${providers}"
+          grep -qE "^ *fips$" <<< "${providers}" || {
+            echo "the OpenSSL FIPS provider is not active" >&2
+            exit 1
+          }
+          cd cmake-build/bin
+          POCO_BASE="${GITHUB_WORKSPACE}" PATH="${PATH}:$(pwd)" ./Crypto-testrunner OpenSSLInitializerTest
       - uses: ./.github/actions/upload-test-report
-        with:
-          suffix: openssl4
 
   # Classic GNU make build. Not officially supported anymore, but kept as a
   # sanity check so the legacy ./configure + make path keeps compiling. All
