@@ -25,6 +25,7 @@
 #else
 #include <openssl/rsa.h>
 #include <openssl/bn.h>
+#include <openssl/err.h>
 #endif
 
 
@@ -93,12 +94,11 @@ RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent):
 			EVP_PKEY_CTX_free(pCtx);
 			throw OpenSSLException("RSAKeyImpl: BN_new()");
 		}
-		BN_set_word(bn, exponent);
-		if (EVP_PKEY_CTX_set1_rsa_keygen_pubexp(pCtx, bn) != 1)
+		if (BN_set_word(bn, exponent) != 1 || EVP_PKEY_CTX_set1_rsa_keygen_pubexp(pCtx, bn) != 1)
 		{
 			BN_free(bn);
 			EVP_PKEY_CTX_free(pCtx);
-			throw OpenSSLException("RSAKeyImpl: EVP_PKEY_CTX_set1_rsa_keygen_pubexp()");
+			throw OpenSSLException("RSAKeyImpl: BN_set_word()/EVP_PKEY_CTX_set1_rsa_keygen_pubexp()");
 		}
 		BN_free(bn);
 	}
@@ -284,12 +284,12 @@ RSAKeyImpl::RSAKeyImpl(const X509Certificate& cert):
 {
 	const X509* pCert = cert.certificate();
 	EVP_PKEY* pKey = X509_get_pubkey(const_cast<X509*>(pCert));
-	if (pKey)
+	if (pKey != nullptr)
 	{
 		_pRSA = EVP_PKEY_get1_RSA(pKey);
 		EVP_PKEY_free(pKey);
 	}
-	else
+	if (_pRSA == nullptr)
 		throw OpenSSLException("RSAKeyImpl(const X509Certificate&)");
 }
 
@@ -300,6 +300,8 @@ RSAKeyImpl::RSAKeyImpl(const PKCS12Container& cont):
 {
 	EVPPKey key = cont.getKey();
 	_pRSA = EVP_PKEY_get1_RSA(key);
+	if (_pRSA == nullptr)
+		throw OpenSSLException("RSAKeyImpl(const PKCS12Container&)");
 }
 
 
@@ -312,16 +314,23 @@ RSAKeyImpl::RSAKeyImpl(int keyLength, unsigned long exponent) : KeyPairImpl("rsa
 	try
 	{
 		bn = BN_new();
-		BN_set_word(bn, exponent);
+		if (_pRSA == nullptr || bn == nullptr || BN_set_word(bn, exponent) != 1)
+			throw OpenSSLException("RSAKeyImpl: RSA_new()/BN_new()/BN_set_word()");
 		ret = RSA_generate_key_ex(_pRSA, keyLength, bn, nullptr);
 		BN_free(bn);
 	}
 	catch (...)
 	{
 		BN_free(bn);
+		freeRSA();
 		throw;
 	}
-	if (!ret) throw Poco::InvalidArgumentException("Failed to create RSA context");
+	if (!ret)
+	{
+		freeRSA();
+		std::string msg = "Failed to create RSA context";
+		throw Poco::InvalidArgumentException(getError(msg));
+	}
 }
 
 
@@ -332,6 +341,8 @@ RSAKeyImpl::RSAKeyImpl(const std::string& publicKeyFile, const std::string& priv
 	poco_assert_dbg(_pRSA == nullptr);
 
 	_pRSA = RSA_new();
+	if (_pRSA == nullptr)
+		throw OpenSSLException("RSAKeyImpl: RSA_new()");
 	if (!publicKeyFile.empty())
 	{
 		BIO* bio = BIO_new(BIO_s_file());
@@ -339,26 +350,37 @@ RSAKeyImpl::RSAKeyImpl(const std::string& publicKeyFile, const std::string& priv
 		int rc = BIO_read_filename(bio, publicKeyFile.c_str());
 		if (rc)
 		{
+			ERR_set_mark();
 			RSA* pubKey = PEM_read_bio_RSAPublicKey(bio, &_pRSA, nullptr, nullptr);
 			if (!pubKey)
 			{
 				int rc = BIO_reset(bio);
 				// BIO_reset() normally returns 1 for success and 0 or -1 for failure.
 				// File BIOs are an exception, they return 0 for success and -1 for failure.
-				if (rc != 0) throw Poco::FileException("Failed to load public key", publicKeyFile);
+				if (rc != 0)
+				{
+					ERR_clear_last_mark();
+					std::string msg = "Failed to load public key";
+					throw Poco::FileException(getError(msg), publicKeyFile);
+				}
 				pubKey = PEM_read_bio_RSA_PUBKEY(bio, &_pRSA, nullptr, nullptr);
 			}
+			// The errors of the first attempt are expected for a SubjectPublicKeyInfo key.
+			if (pubKey != nullptr) ERR_pop_to_mark();
+			else ERR_clear_last_mark();
 			BIO_free(bio);
 			if (!pubKey)
 			{
 				freeRSA();
-				throw Poco::FileException("Failed to load public key", publicKeyFile);
+				std::string msg = "Failed to load public key";
+				throw Poco::FileException(getError(msg), publicKeyFile);
 			}
 		}
 		else
 		{
 			freeRSA();
-			throw Poco::FileNotFoundException("Public key file", publicKeyFile);
+			std::string msg = "Public key file";
+			throw Poco::FileNotFoundException(getError(msg), publicKeyFile);
 		}
 	}
 
@@ -378,13 +400,15 @@ RSAKeyImpl::RSAKeyImpl(const std::string& publicKeyFile, const std::string& priv
 			if (!privKey)
 			{
 				freeRSA();
-				throw Poco::FileException("Failed to load private key", privateKeyFile);
+				std::string msg = "Failed to load private key";
+				throw Poco::FileException(getError(msg), privateKeyFile);
 			}
 		}
 		else
 		{
 			freeRSA();
-			throw Poco::FileNotFoundException("Private key file", privateKeyFile);
+			std::string msg = "Private key file";
+			throw Poco::FileNotFoundException(getError(msg), privateKeyFile);
 		}
 	}
 }
@@ -397,26 +421,38 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKey
 	poco_assert_dbg(_pRSA == nullptr);
 
 	_pRSA = RSA_new();
+	if (_pRSA == nullptr)
+		throw OpenSSLException("RSAKeyImpl: RSA_new()");
 	if (pPublicKeyStream)
 	{
 		std::string publicKeyData;
 		Poco::StreamCopier::copyToString(*pPublicKeyStream, publicKeyData);
 		BIO* bio = BIO_new_mem_buf(const_cast<char*>(publicKeyData.data()), static_cast<int>(publicKeyData.size()));
 		if (!bio) throw Poco::IOException("Cannot create BIO for reading public key");
+		ERR_set_mark();
 		RSA* publicKey = PEM_read_bio_RSAPublicKey(bio, &_pRSA, nullptr, nullptr);
 		if (!publicKey)
 		{
 			int rc = BIO_reset(bio);
 			// BIO_reset() normally returns 1 for success and 0 or -1 for failure.
 			// File BIOs are an exception, they return 0 for success and -1 for failure.
-			if (rc != 1) throw Poco::FileException("Failed to load public key");
+			if (rc != 1)
+			{
+				ERR_clear_last_mark();
+				std::string msg = "Failed to load public key";
+				throw Poco::FileException(getError(msg));
+			}
 			publicKey = PEM_read_bio_RSA_PUBKEY(bio, &_pRSA, nullptr, nullptr);
 		}
+		// The errors of the first attempt are expected for a SubjectPublicKeyInfo key.
+		if (publicKey != nullptr) ERR_pop_to_mark();
+		else ERR_clear_last_mark();
 		BIO_free(bio);
 		if (!publicKey)
 		{
 			freeRSA();
-			throw Poco::FileException("Failed to load public key");
+			std::string msg = "Failed to load public key";
+			throw Poco::FileException(getError(msg));
 		}
 	}
 
@@ -435,7 +471,8 @@ RSAKeyImpl::RSAKeyImpl(std::istream* pPublicKeyStream, std::istream* pPrivateKey
 		if (!privateKey)
 		{
 			freeRSA();
-			throw Poco::FileException("Failed to load private key");
+			std::string msg = "Failed to load private key";
+			throw Poco::FileException(getError(msg));
 		}
 	}
 }
@@ -503,9 +540,21 @@ void RSAKeyImpl::save(const std::string& publicKeyFile,
 			if (BIO_write_filename(bio, const_cast<char*>(publicKeyFile.c_str())))
 			{
 				if (!PEM_write_bio_RSAPublicKey(bio, _pRSA))
-					throw Poco::WriteFileException("Failed to write public key to file", publicKeyFile);
+				{
+					std::string msg = "Failed to write public key to file";
+					throw Poco::WriteFileException(getError(msg), publicKeyFile);
+				}
+				if (BIO_flush(bio) != 1)
+				{
+					std::string msg = "Failed to flush public key to file";
+					throw Poco::WriteFileException(getError(msg), publicKeyFile);
+				}
 			}
-			else throw Poco::CreateFileException("Cannot create public key file");
+			else
+			{
+				std::string msg = "Cannot create public key file";
+				throw Poco::CreateFileException(getError(msg), publicKeyFile);
+			}
 		}
 		catch (...)
 		{
@@ -530,9 +579,22 @@ void RSAKeyImpl::save(const std::string& publicKeyFile,
 					rc = PEM_write_bio_RSAPrivateKey(bio, _pRSA, EVP_des_ede3_cbc(),
 							 reinterpret_cast<unsigned char *>( const_cast<char *>( privateKeyPassphrase.c_str())),
 							 static_cast<int>(privateKeyPassphrase.length()), nullptr, nullptr);
-				if (!rc) throw Poco::FileException("Failed to write private key to file", privateKeyFile);
+				if (!rc)
+				{
+					std::string msg = "Failed to write private key to file";
+					throw Poco::FileException(getError(msg), privateKeyFile);
+				}
+				if (BIO_flush(bio) != 1)
+				{
+					std::string msg = "Failed to flush private key to file";
+					throw Poco::WriteFileException(getError(msg), privateKeyFile);
+				}
 			}
-			else throw Poco::CreateFileException("Cannot create private key file", privateKeyFile);
+			else
+			{
+				std::string msg = "Cannot create private key file";
+				throw Poco::CreateFileException(getError(msg), privateKeyFile);
+			}
 		}
 		catch (...)
 		{
@@ -555,7 +617,8 @@ void RSAKeyImpl::save(std::ostream* pPublicKeyStream,
 		if (!PEM_write_bio_RSAPublicKey(bio, _pRSA))
 		{
 			BIO_free(bio);
-			throw Poco::WriteFileException("Failed to write public key to stream");
+			std::string msg = "Failed to write public key to stream";
+			throw Poco::WriteFileException(getError(msg));
 		}
 		char* pData;
 		long size = BIO_get_mem_data(bio, &pData);
@@ -578,7 +641,8 @@ void RSAKeyImpl::save(std::ostream* pPublicKeyStream,
 		if (!rc)
 		{
 			BIO_free(bio);
-			throw Poco::FileException("Failed to write private key to stream");
+			std::string msg = "Failed to write private key to stream";
+			throw Poco::FileException(getError(msg));
 		}
 		char* pData;
 		long size = BIO_get_mem_data(bio, &pData);
@@ -590,6 +654,7 @@ void RSAKeyImpl::save(std::ostream* pPublicKeyStream,
 
 RSAKeyImpl::ByteVec RSAKeyImpl::convertToByteVec(const BIGNUM* bn)
 {
+	if (bn == nullptr) return ByteVec();
 	int numBytes = BN_num_bytes(bn);
 	ByteVec byteVector(numBytes);
 

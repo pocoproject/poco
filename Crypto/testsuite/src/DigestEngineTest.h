@@ -27,6 +27,7 @@ public:
 	void testMD5();
 	void testSHA1();
 	void testUnknownAlgorithm();
+	void testXOFWithoutLength();
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 	void testInitFailure();
 	void testFIPSRefusesMD5();

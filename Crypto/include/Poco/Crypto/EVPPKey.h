@@ -27,6 +27,7 @@
 #include <openssl/rsa.h>
 #include <openssl/evp.h>
 #include <openssl/pem.h>
+#include <openssl/err.h>
 #include <sstream>
 #include <map>
 #include <type_traits>
@@ -129,6 +130,8 @@ public:
 		///
 		/// Works as expected when one key contains only public key,
 		/// while the other one contains private (thus also public) key.
+		///
+		/// Throws an OpenSSLException if OpenSSL cannot compare the keys.
 
 	[[nodiscard]] bool operator != (const EVPPKey& other) const;
 		/// Comparison operator.
@@ -137,6 +140,8 @@ public:
 		///
 		/// Works as expected when one key contains only public key,
 		/// while the other one contains private (thus also public) key.
+		///
+		/// Throws an OpenSSLException if OpenSSL cannot compare the keys.
 
 	void save(const std::string& publicKeyFile, const std::string& privateKeyFile = "", const std::string& privateKeyPassphrase = "") const;
 		/// Exports the public and/or private keys to the given files.
@@ -357,11 +362,21 @@ inline bool EVPPKey::operator == (const EVPPKey& other) const
 {
 	poco_check_ptr (other._pEVPPKey);
 	poco_check_ptr (_pEVPPKey);
+	ERR_set_mark();
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
-	return (1 == EVP_PKEY_eq(_pEVPPKey, other._pEVPPKey));
+	const int rc = EVP_PKEY_eq(_pEVPPKey, other._pEVPPKey);
 #else
-	return (1 == EVP_PKEY_cmp(_pEVPPKey, other._pEVPPKey));
+	const int rc = EVP_PKEY_cmp(_pEVPPKey, other._pEVPPKey);
 #endif
+	if (rc == 0 || rc == -1)
+	{
+		// A mismatch is a result, not a failure; OpenSSL 3 queues an error for keys of different types.
+		ERR_pop_to_mark();
+		return false;
+	}
+	ERR_clear_last_mark();
+	if (rc == 1) return true;
+	throw OpenSSLException("EVPPKey::operator ==(): OpenSSL cannot compare the keys");
 }
 
 

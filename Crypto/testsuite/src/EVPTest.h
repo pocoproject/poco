@@ -44,6 +44,14 @@ public:
 	void testEVPKeyByModulus();
 #endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 
+	void testCompareDifferentKeyTypes();
+	void testKeyFromCertificateUnknownAlgorithm();
+	void testSaveCannotCreateFile();
+	void testSaveFlushFailure();
+	void testECKeyFromCertificate();
+	void testRSAKeyFromECCertificate();
+	void testRSAKeyFromECPKCS12();
+
 	void setUp();
 	void tearDown();
 
