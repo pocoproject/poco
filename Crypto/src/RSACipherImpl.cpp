@@ -102,6 +102,11 @@ namespace
 		{
 			if (EVP_PKEY_encrypt_init(_pCtx) != 1) throwError();
 			if (EVP_PKEY_CTX_set_rsa_padding(_pCtx, mapPaddingMode(_paddingMode)) != 1) throwError();
+			if (EVP_PKEY_get_size(_pKey) <= 0)
+			{
+				std::string msg("RSACipherImpl: the size of the RSA key is not available");
+				throw Poco::IOException(getError(msg));
+			}
 			_pBuf = new unsigned char[blockSize()];
 		}
 		catch (...)
@@ -253,6 +258,11 @@ namespace
 		{
 			if (EVP_PKEY_decrypt_init(_pCtx) != 1) throwError();
 			if (EVP_PKEY_CTX_set_rsa_padding(_pCtx, mapPaddingMode(_paddingMode)) != 1) throwError();
+			if (EVP_PKEY_get_size(_pKey) <= 0)
+			{
+				std::string msg("RSACipherImpl: the size of the RSA key is not available");
+				throw Poco::IOException(getError(msg));
+			}
 			_pBuf = new unsigned char[blockSize()];
 		}
 		catch (...)

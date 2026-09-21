@@ -93,18 +93,32 @@ namespace
 	{
 		_pContext = EVP_CIPHER_CTX_new();
 		if (!_pContext) throwError();
-		int rc = EVP_CipherInit(
-			_pContext,
-			_pCipher,
-			&_key[0],
-			_iv.empty() ? nullptr : &_iv[0],
-			(dir == DIR_ENCRYPT) ? 1 : 0);
-		if (rc == 0) throwError();
-
-		if (static_cast<int>(_iv.size()) != EVP_CIPHER_iv_length(_pCipher) && EVP_CIPHER_mode(_pCipher) == EVP_CIPH_GCM_MODE)
+		try
 		{
-			rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_SET_IVLEN, static_cast<int>(_iv.size()), nullptr);
+			const int enc = (dir == DIR_ENCRYPT) ? 1 : 0;
+			// OpenSSL accepts the IV length only after the cipher and before the IV.
+			int rc = EVP_CipherInit_ex(_pContext, _pCipher, nullptr, nullptr, nullptr, enc);
 			if (rc == 0) throwError();
+
+			if (static_cast<int>(_iv.size()) != EVP_CIPHER_iv_length(_pCipher) && EVP_CIPHER_mode(_pCipher) == EVP_CIPH_GCM_MODE)
+			{
+				rc = EVP_CIPHER_CTX_ctrl(_pContext, EVP_CTRL_GCM_SET_IVLEN, static_cast<int>(_iv.size()), nullptr);
+				if (rc == 0) throwError();
+			}
+
+			rc = EVP_CipherInit_ex(
+				_pContext,
+				nullptr,
+				nullptr,
+				&_key[0],
+				_iv.empty() ? nullptr : &_iv[0],
+				enc);
+			if (rc == 0) throwError();
+		}
+		catch (...)
+		{
+			EVP_CIPHER_CTX_free(_pContext);
+			throw;
 		}
 	}
 

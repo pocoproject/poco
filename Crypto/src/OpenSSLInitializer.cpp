@@ -92,7 +92,13 @@ void OpenSSLInitializer::initialize()
 		}
 		if (_legacyProvider == nullptr)
 		{
+			// The legacy provider is optional: a failed load must not leave its errors on the queue.
+			ERR_set_mark();
 			_legacyProvider = OSSL_PROVIDER_load(nullptr, "legacy");
+			if (_legacyProvider == nullptr)
+				ERR_pop_to_mark();
+			else
+				ERR_clear_last_mark();
 			// Note: use haveLegacyProvider() to check if legacy provider has been loaded
 		}
 #endif

@@ -17,10 +17,13 @@
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/Crypto/CryptoStream.h"
 #include "Poco/Crypto/CryptoTransform.h"
+#include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Crypto/CryptoException.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Exception.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/HexBinaryEncoder.h"
+#include "Poco/HexBinaryDecoder.h"
 #include <sstream>
 #include <openssl/err.h>
 #include <openssl/x509.h>
@@ -262,6 +265,119 @@ void CryptoTest::testEncryptDecryptGCM()
 }
 
 
+namespace
+{
+	std::string fromHex(const std::string& hex)
+	{
+		std::istringstream istr(hex);
+		Poco::HexBinaryDecoder decoder(istr);
+		std::string bytes;
+		Poco::StreamCopier::copyToString(decoder, bytes);
+		return bytes;
+	}
+
+
+	struct GCMVector
+	{
+		const char* cipher;
+		std::string key;
+		std::string iv;
+		std::string plaintext;
+		std::string ciphertext;
+		std::string tag;
+	};
+}
+
+
+void CryptoTest::testEncryptDecryptGCMIVLength()
+{
+	// Known answers for IVs shorter and longer than the 12-byte default (OpenSSL evpciph test data).
+	const GCMVector vectors[] =
+	{
+		{
+			"aes-256-gcm",
+			"9473c28f6e978eb15e1967b888282aa6b078d320034fe5f40f8bb68674f1ecda",
+			"0a",
+			"2d2e2798c10bcfcce742e92d3c390fef",
+			"c4e5ab2c6a4316e57c6c37d2c2acb42c",
+			"03337df7e1e68d77706abef9edaf5e07"
+		},
+		{
+			"aes-128-gcm",
+			std::string(32, '0'),
+			"ffffffff" + std::string(120, '0'),
+			std::string(384, '0'),
+			"56b3373ca9ef6e4a2b64fe1e9a17b61425f10d47a75a5fce13efc6bc784af24f"
+			"4141bdd48cf7c770887afd573cca5418a9aeffcd7c5ceddfc6a78397b9a85b49"
+			"9da558257267caab2ad0b23ca476a53cb17fb41c4b8b475cb4f3f7165094c229"
+			"c9e8c4dc0a2a5ff1903e501511221376a1cdb8364c5061a20cae74bc4acd76ce"
+			"b0abc9fd3217ef9f8c90be402ddf6d8697f4f880dff15bfb7a6b28241ec8fe18"
+			"3c2d59e3f9dfff653c7126f0acb9e64211f42bae12af462b1070bef1ab5e3606",
+			"566f8ef683078bfdeeffa869d751a017"
+		}
+	};
+
+	for (const auto& v: vectors)
+	{
+		const std::string keyBytes = fromHex(v.key);
+		const std::string ivBytes = fromHex(v.iv);
+		CipherKey key(v.cipher,
+			CipherKey::ByteVec(keyBytes.begin(), keyBytes.end()),
+			CipherKey::ByteVec(ivBytes.begin(), ivBytes.end()));
+		Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(key);
+
+		std::stringstream str;
+		CryptoTransform::Ptr pEncryptor = pCipher->createEncryptor();
+		CryptoOutputStream encryptorStream(str, pEncryptor);
+		encryptorStream << fromHex(v.plaintext);
+		encryptorStream.close();
+		assertTrue (encryptorStream.good());
+		assertTrue (str.str() == fromHex(v.ciphertext));
+
+		const std::string tag = pEncryptor->getTag();
+		assertTrue (tag == fromHex(v.tag));
+
+		CryptoTransform::Ptr pDecryptor = pCipher->createDecryptor();
+		pDecryptor->setTag(tag);
+		CryptoInputStream decryptorStream(str, pDecryptor);
+		std::string out;
+		Poco::StreamCopier::copyToString(decryptorStream, out);
+		assertTrue (out == fromHex(v.plaintext));
+	}
+
+	CipherKey emptyIVKey("aes-256-gcm", CipherKey::ByteVec(32, 1), CipherKey::ByteVec());
+	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(emptyIVKey);
+	try
+	{
+		CryptoTransform::Ptr pEncryptor = pCipher->createEncryptor();
+		fail("empty GCM IV - must throw");
+	}
+	catch (Poco::IOException&)
+	{
+	}
+}
+
+
+void CryptoTest::testLegacyProviderErrorQueue()
+{
+	ErrorQueueCleaner cleaner;
+
+	// A legacy provider that cannot be loaded must not leave errors behind.
+	ERR_clear_error();
+	CipherFactory factory;
+	assertTrue (ERR_peek_error() == 0);
+
+	// The test driver holds the only other reference: at count zero
+	// initialize() retries a legacy provider that could not be loaded.
+	OpenSSLInitializer::uninitialize();
+	OpenSSLInitializer::initialize();
+	assertTrue (ERR_peek_error() == 0);
+
+	CipherKey key("aes-256-cbc");
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
 void CryptoTest::testPassword()
 {
 	CipherKey key("aes256", "password", "salt");
@@ -479,6 +595,8 @@ CppUnit::Test* CryptoTest::suite()
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptWithSaltSha1);
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptDESECB);
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptGCM);
+	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptGCMIVLength);
+	CppUnit_addTest(pSuite, CryptoTest, testLegacyProviderErrorQueue);
 	CppUnit_addTest(pSuite, CryptoTest, testPassword);
 	CppUnit_addTest(pSuite, CryptoTest, testPasswordSha1);
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptInterop);

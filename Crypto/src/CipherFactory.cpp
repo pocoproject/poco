@@ -19,6 +19,7 @@
 #include "Poco/Crypto/CipherImpl.h"
 #include "Poco/Crypto/RSACipherImpl.h"
 #include "Poco/Crypto/EVPCipherImpl.h"
+#include "Poco/Crypto/CryptoException.h"
 #include "Poco/Exception.h"
 #include <openssl/evp.h>
 #include <openssl/err.h>
@@ -33,8 +34,17 @@ namespace Poco::Crypto {
 CipherFactory::CipherFactory()
 {
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
-	OSSL_PROVIDER_load(nullptr, "default");
-	OSSL_PROVIDER_load(nullptr, "legacy");
+	if (OSSL_PROVIDER_load(nullptr, "default") == nullptr)
+	{
+		std::string msg("Failed to load OpenSSL default provider");
+		throw CryptoException(getError(msg));
+	}
+	// The legacy provider is optional: a failed load must not leave its errors on the queue.
+	ERR_set_mark();
+	if (OSSL_PROVIDER_load(nullptr, "legacy") == nullptr)
+		ERR_pop_to_mark();
+	else
+		ERR_clear_last_mark();
 #endif
 }
 
