@@ -3904,19 +3904,29 @@ void SQLiteTest::testTransactor()
 
 void SQLiteTest::testFTS()
 {
-#if defined(SQLITE_ENABLE_FTS3) || defined(SQLITE_ENABLE_FTS5)
 	Session session(Poco::Data::SQLite::Connector::KEY, "dummy.db");
 	assertTrue(session.isConnected());
 
+	// Ask the library instead of testing SQLITE_ENABLE_FTS* here: the testsuite
+	// does not see the options SQLite was compiled with, and a system SQLite
+	// (POCO_SQLITE_UNBUNDLED) is configured outside the POCO build.
+	int fts5 = 0;
+	int fts3 = 0;
+	session << "SELECT sqlite_compileoption_used('ENABLE_FTS5'), sqlite_compileoption_used('ENABLE_FTS3')",
+		into(fts5), into(fts3), now;
+	if (!fts5 && !fts3)
+	{
+		std::cout << "SQLite FTS not enabled, test not executed." << std::endl;
+		return;
+	}
+
 	session << "DROP TABLE IF EXISTS docs", now;
 
-#if defined(SQLITE_ENABLE_FTS5)
-	session << "CREATE VIRTUAL TABLE docs USING fts5(content)", now;
-	const std::string idColumn = "rowid";
-#elif defined(SQLITE_ENABLE_FTS3)
-	session << "CREATE VIRTUAL TABLE docs USING fts3()", now;
-	const std::string idColumn = "docid";
-#endif
+	const std::string idColumn = fts5 ? "rowid" : "docid";
+	if (fts5)
+		session << "CREATE VIRTUAL TABLE docs USING fts5(content)", now;
+	else
+		session << "CREATE VIRTUAL TABLE docs USING fts3()", now;
 
 	session << "INSERT INTO docs(" << idColumn << ", content) VALUES(1, 'a database is a software system')", now;
 	session << "INSERT INTO docs(" << idColumn << ", content) VALUES(2, 'sqlite is a software system')", now;
@@ -3948,10 +3958,6 @@ void SQLiteTest::testFTS()
 	id = 0;
 	session << "SELECT count(*) FROM docs WHERE docs MATCH 'database and sqlite'", into(id), now;
 	assertTrue(id == 0);
-
-#else
-	std::cout << "SQLite FTS not enabled, test not executed." << std::endl;
-#endif
 }
 
 
