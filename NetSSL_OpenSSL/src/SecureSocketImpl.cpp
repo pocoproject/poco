@@ -190,6 +190,9 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 	{
 		if (performHandshake && _pSocket->getBlocking())
 		{
+			// SSL_get_error() inspects the thread's error queue (OpenSSL < 4.0): an entry
+			// left there by unrelated code would turn a retry condition into a fatal error.
+			::ERR_clear_error();
 			int ret = ::SSL_connect(_pSSL);
 			handleError(ret);
 			verifyPeerCertificate();
@@ -269,6 +272,7 @@ int SecureSocketImpl::shutdown()
 				Poco::Timestamp tsStart;
 				do
 				{
+					::ERR_clear_error();
 					rc = ::SSL_shutdown(_pSSL);
 					if (rc == 1) break;
 					if (rc < 0)
@@ -294,6 +298,7 @@ int SecureSocketImpl::shutdown()
 			else
 			{
 				// For non-blocking sockets, call SSL_shutdown() once.
+				::ERR_clear_error();
 				rc = ::SSL_shutdown(_pSSL);
 				if (rc < 0)
 				{
@@ -357,6 +362,7 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	Poco::Timestamp tsStart;
 	while (true)
 	{
+		::ERR_clear_error();
 		rc = ::SSL_write(_pSSL, buffer, length);
 		if (!mustRetry(rc))
 			break;
@@ -400,6 +406,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 	Poco::Timestamp tsStart;
 	while (true)
 	{
+		::ERR_clear_error();
 		if (flags & MSG_PEEK)
 		{
 			rc = SSL_peek(_pSSL, buffer, length);
@@ -442,6 +449,7 @@ int SecureSocketImpl::completeHandshake()
 	Poco::Timestamp tsStart;
 	while (true)
 	{
+		::ERR_clear_error();
 		rc = ::SSL_do_handshake(_pSSL);
 		if (!mustRetry(rc))
 			break;

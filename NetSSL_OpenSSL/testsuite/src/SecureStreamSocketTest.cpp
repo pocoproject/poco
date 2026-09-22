@@ -9,6 +9,7 @@
 
 
 #include "SecureStreamSocketTest.h"
+#include "ErrorQueueCleaner.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Net/TCPServer.h"
@@ -26,9 +27,13 @@
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Thread.h"
 #include "Poco/Timestamp.h"
+#include "Poco/Timespan.h"
 #include "Poco/File.h"
 #include "Poco/TemporaryFile.h"
 #include "Poco/FileStream.h"
+#include <openssl/bio.h>
+#include <openssl/err.h>
+#include <openssl/pem.h>
 #include <iostream>
 
 
@@ -417,6 +422,41 @@ void SecureStreamSocketTest::testShutdownBidirectional()
 }
 
 
+void SecureStreamSocketTest::testStaleErrorQueue()
+{
+	ErrorQueueCleaner cleaner;
+
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SocketAddress sa("127.0.0.1", svs.address().port());
+	SecureStreamSocket ss1(sa);
+	ss1.setBlocking(false);
+
+	// an unrelated failure leaves an entry in this thread's OpenSSL error queue
+	BIO* pBIO = BIO_new(BIO_s_mem());
+	assertNotNullPtr (pBIO);
+	assertNullPtr (PEM_read_bio_X509(pBIO, nullptr, nullptr, nullptr));
+	BIO_free(pBIO);
+	assertTrue (ERR_peek_error() != 0);
+
+	char buffer[256];
+	int rc = ss1.receiveBytes(buffer, sizeof(buffer));
+	assertEqual (static_cast<int>(SecureStreamSocket::ERR_SSL_WANT_READ), rc);
+	assertTrue (ERR_peek_error() == 0);
+
+	ss1.setBlocking(true);
+	ss1.setReceiveTimeout(Poco::Timespan(10, 0));
+	std::string data("hello, world");
+	ss1.sendBytes(data.data(), static_cast<int>(data.size()));
+	rc = ss1.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (std::string(buffer, rc) == data);
+
+	ss1.close();
+}
+
+
 void SecureStreamSocketTest::setUp()
 {
 }
@@ -438,6 +478,7 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFileLarge);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFileRange);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownBidirectional);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testStaleErrorQueue);
 
 	return pSuite;
 }
