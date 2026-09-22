@@ -81,7 +81,7 @@ public:
 		/// commands downgrades the session, and the credentials passed to
 		/// login() are then sent in the clear.
 
-	bool isPlaintextFallbackAllowed() const;
+	[[nodiscard]] bool isPlaintextFallbackAllowed() const;
 		/// Returns true if the session may continue unencrypted when the server
 		/// refuses to start TLS.
 

@@ -133,7 +133,7 @@ public:
 		///
 		/// Zero (the default) preserves the historical no-timeout behavior.
 
-	std::size_t getMaxPendingRequestSize() const;
+	[[nodiscard]] std::size_t getMaxPendingRequestSize() const;
 		/// Returns the maximum size of a not yet completely received request,
 		/// in bytes.
 
