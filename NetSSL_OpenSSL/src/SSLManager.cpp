@@ -25,6 +25,7 @@
 #include "Poco/Crypto/OpenSSLInitializer.h"
 #include "Poco/Net/SSLException.h"
 #include "Poco/Delegate.h"
+#include "Poco/String.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/OptionException.h"
@@ -70,6 +71,8 @@ SSLManager::SSLManager():
 	_contextIndex(SSL_CTX_get_ex_new_index(0, nullptr, nullptr, nullptr, nullptr)),
 	_socketIndex(SSL_get_ex_new_index(0, nullptr, nullptr, nullptr, nullptr))
 {
+	if (_contextIndex < 0 || _socketIndex < 0)
+		throw SSLException("Cannot allocate an ex_data index", Utility::getLastError());
 }
 
 
@@ -218,6 +221,10 @@ int SSLManager::verifyCallback(bool server, int ok, X509_STORE_CTX* pStore)
 		poco_assert_dbg (pContext);
 
 		X509* pCert = X509_STORE_CTX_get_current_cert(pStore);
+		// Not every verification error has a certificate (e.g. a policy failure);
+		// the handlers require one, so the error cannot be offered to them.
+		if (pCert == nullptr) return 0;
+
 		X509Certificate x509(pCert, true);
 		int depth = X509_STORE_CTX_get_error_depth(pStore);
 		int err = X509_STORE_CTX_get_error(pStore);
@@ -448,6 +455,7 @@ void SSLManager::initDefaultContext(bool server)
 	params.loadDefaultCAs = config.getBool(prefix + CFG_ENABLE_DEFAULT_CA, VAL_ENABLE_DEFAULT_CA);
 	params.cipherList = config.getString(prefix + CFG_CIPHER_LIST, VAL_CIPHER_LIST);
 	params.cipherList = config.getString(prefix + CFG_CYPHER_LIST, params.cipherList); // for backwards compatibility
+	Poco::trimInPlace(params.cipherList);
 	bool requireTLSv1 = config.getBool(prefix + CFG_REQUIRE_TLSV1, false);
 	bool requireTLSv1_1 = config.getBool(prefix + CFG_REQUIRE_TLSV1_1, false);
 	bool requireTLSv1_2 = config.getBool(prefix + CFG_REQUIRE_TLSV1_2, false);
