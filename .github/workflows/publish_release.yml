@@ -13,7 +13,7 @@ on:
 
 jobs:
   mkdoc:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       -
         name: Checkout
@@ -28,6 +28,8 @@ jobs:
           echo '${{ secrets.POCOPROJECT_ORG_SSH_HOST_KEY }}' >~/.ssh/known_hosts
           echo '${{ secrets.POCO_SSH_KEY }}' >~/.ssh/id_rsa
           chmod go-rwx ~/.ssh/id_rsa
+          printf '%s\n' 'Host pocoproject.org' '  ConnectTimeout 30' '  ConnectionAttempts 5' '  ServerAliveInterval 30' >~/.ssh/config
+          chmod go-rwx ~/.ssh/config
       -
         name: Build documentation
         run: |
@@ -36,13 +38,19 @@ jobs:
           mkdoc all
       -
         name: Copy to web server
-        run: |
-          read VERSION <VERSION
-          ssh poco@pocoproject.org mkdir -p staging/releases/poco-$VERSION
-          scp releases/poco-*-doc.tar.gz releases/poco-*-doc.zip poco@pocoproject.org:staging/releases/poco-$VERSION
+        uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 15
+          max_attempts: 5
+          retry_on: any
+          retry_wait_seconds: 60
+          command: >-
+            read VERSION <VERSION &&
+            ssh poco@pocoproject.org mkdir -p staging/releases/poco-$VERSION &&
+            scp releases/poco-*-doc.tar.gz releases/poco-*-doc.zip poco@pocoproject.org:staging/releases/poco-$VERSION
 
   mkrelease_win:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       -
         name: Checkout
@@ -57,6 +65,8 @@ jobs:
           echo '${{ secrets.POCOPROJECT_ORG_SSH_HOST_KEY }}' >~/.ssh/known_hosts
           echo '${{ secrets.POCO_SSH_KEY }}' >~/.ssh/id_rsa
           chmod go-rwx ~/.ssh/id_rsa
+          printf '%s\n' 'Host pocoproject.org' '  ConnectTimeout 30' '  ConnectionAttempts 5' '  ServerAliveInterval 30' >~/.ssh/config
+          chmod go-rwx ~/.ssh/config
       -
         name: Build release package
         run: |
@@ -66,13 +76,19 @@ jobs:
           mkrel -c unix2dos all
       -
         name: Copy to web server
-        run: |
-          read VERSION <VERSION
-          ssh poco@pocoproject.org mkdir -p staging/releases/poco-$VERSION
-          scp releases/poco-*.zip poco@pocoproject.org:staging/releases/poco-$VERSION
+        uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 15
+          max_attempts: 5
+          retry_on: any
+          retry_wait_seconds: 60
+          command: >-
+            read VERSION <VERSION &&
+            ssh poco@pocoproject.org mkdir -p staging/releases/poco-$VERSION &&
+            scp releases/poco-*.zip poco@pocoproject.org:staging/releases/poco-$VERSION
 
   mkrelease:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       -
         name: Checkout
@@ -84,6 +100,8 @@ jobs:
           echo '${{ secrets.POCOPROJECT_ORG_SSH_HOST_KEY }}' >~/.ssh/known_hosts
           echo '${{ secrets.POCO_SSH_KEY }}' >~/.ssh/id_rsa
           chmod go-rwx ~/.ssh/id_rsa
+          printf '%s\n' 'Host pocoproject.org' '  ConnectTimeout 30' '  ConnectionAttempts 5' '  ServerAliveInterval 30' >~/.ssh/config
+          chmod go-rwx ~/.ssh/config
       -
         name: Build release package
         run: |
@@ -93,13 +111,19 @@ jobs:
           mkrel all
       -
         name: Copy to web server
-        run: |
-          read VERSION <VERSION
-          ssh poco@pocoproject.org mkdir -p staging/releases/poco-$VERSION
-          scp releases/poco-*.tar.gz releases/poco-*.tar.bz2 poco@pocoproject.org:staging/releases/poco-$VERSION
+        uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 15
+          max_attempts: 5
+          retry_on: any
+          retry_wait_seconds: 60
+          command: >-
+            read VERSION <VERSION &&
+            ssh poco@pocoproject.org mkdir -p staging/releases/poco-$VERSION &&
+            scp releases/poco-*.tar.gz releases/poco-*.tar.bz2 poco@pocoproject.org:staging/releases/poco-$VERSION
 
   sign_and_publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: ["mkdoc", "mkrelease_win", "mkrelease"]
     steps:
       -
@@ -112,8 +136,16 @@ jobs:
           echo '${{ secrets.POCOPROJECT_ORG_SSH_HOST_KEY }}' >~/.ssh/known_hosts
           echo '${{ secrets.POCO_SSH_KEY }}' >~/.ssh/id_rsa
           chmod go-rwx ~/.ssh/id_rsa
+          printf '%s\n' 'Host pocoproject.org' '  ConnectTimeout 30' '  ConnectionAttempts 5' '  ServerAliveInterval 30' >~/.ssh/config
+          chmod go-rwx ~/.ssh/config
       -
         name: Sign and publish
-        run: |
-          read VERSION <VERSION
-          ssh poco@pocoproject.org ./sign_and_publish.sh $VERSION ${{ inputs.channel }}
+        uses: ./.github/actions/retry-action
+        with:
+          timeout_minutes: 15
+          max_attempts: 5
+          retry_on: any
+          retry_wait_seconds: 60
+          command: >-
+            read VERSION <VERSION &&
+            ssh poco@pocoproject.org ./sign_and_publish.sh $VERSION ${{ inputs.channel }}
