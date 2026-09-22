@@ -29,6 +29,7 @@ public:
 	void testBuiltInDHParameters();
 #endif
 	void testClientContextIgnoresDHParameters();
+	void testVerifyErrorWithoutCertificate();
 
 	void setUp();
 	void tearDown();
