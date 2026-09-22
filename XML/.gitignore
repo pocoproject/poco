@@ -34,5 +34,6 @@ src/random_getrandom.h
 src/random_rand_s.c
 src/random_rand_s.h
 src/fallthrough.h
+src/hash_table.h
 src/memory_sanitizer.h
 src/xcsinc.c
