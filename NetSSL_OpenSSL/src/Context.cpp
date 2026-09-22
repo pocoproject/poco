@@ -32,7 +32,9 @@
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 #include <openssl/core_names.h>
 #include <openssl/decoder.h>
+#include <openssl/param_build.h>
 #endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+#include <memory>
 
 
 namespace Poco::Net {
@@ -822,46 +824,46 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 			throw Poco::NullPointerException(Poco::Crypto::getError(err));
 		}
 
-		size_t keyLength = 0;
-		unsigned char* pDH_p = nullptr;
-		std::size_t sz_p = 0;
-		unsigned char* pDH_g = nullptr;
-		std::size_t sz_g = 0;
+		using BIGNUMPtr = std::unique_ptr<BIGNUM, decltype(&BN_free)>;
+		int keyLength = 0;
+		BIGNUMPtr pDH_p(nullptr, &BN_free);
+		BIGNUMPtr pDH_g(nullptr, &BN_free);
 
 		switch(keyDHGroup)
 		{
 		case KEY_DH_GROUP_1024:
 			keyLength = 160;
-			pDH_p = const_cast<unsigned char*>(dh1024_p);
-			sz_p = sizeof(dh1024_p);
-			pDH_g = const_cast<unsigned char*>(dh1024_g);
-			sz_g = sizeof(dh1024_g);
+			pDH_p.reset(BN_bin2bn(dh1024_p, sizeof(dh1024_p), nullptr));
+			pDH_g.reset(BN_bin2bn(dh1024_g, sizeof(dh1024_g), nullptr));
 			break;
 		case KEY_DH_GROUP_2048:
 			keyLength = 256;
-			pDH_p = const_cast<unsigned char*>(dh2048_p);
-			sz_p = sizeof(dh2048_p);
-			pDH_g = const_cast<unsigned char*>(dh2048_g);
-			sz_g = sizeof(dh2048_g);
+			pDH_p.reset(BN_bin2bn(dh2048_p, sizeof(dh2048_p), nullptr));
+			pDH_g.reset(BN_bin2bn(dh2048_g, sizeof(dh2048_g), nullptr));
 			break;
 		default:
+			EVP_PKEY_CTX_free(pKeyCtx);
 			throw Poco::NotImplementedException(Poco::format(
 				"DH Group: %d", static_cast<int>(keyDHGroup)));
 		}
 
-		poco_assert (keyLength);
-		poco_check_ptr (pDH_p);
-		poco_assert (sz_p);
-		poco_check_ptr (pDH_g);
-		poco_assert (sz_g);
-
-		OSSL_PARAM params[]
+		// The arrays are big-endian, an OSSL_PARAM holds integers in native byte order:
+		// OSSL_PARAM_BLD converts the BIGNUMs.
+		std::unique_ptr<OSSL_PARAM_BLD, decltype(&OSSL_PARAM_BLD_free)> pParamBld(OSSL_PARAM_BLD_new(), &OSSL_PARAM_BLD_free);
+		std::unique_ptr<OSSL_PARAM, decltype(&OSSL_PARAM_free)> pParams(nullptr, &OSSL_PARAM_free);
+		if (pDH_p != nullptr && pDH_g != nullptr && pParamBld != nullptr
+			&& OSSL_PARAM_BLD_push_BN(pParamBld.get(), OSSL_PKEY_PARAM_FFC_P, pDH_p.get()) == 1
+			&& OSSL_PARAM_BLD_push_BN(pParamBld.get(), OSSL_PKEY_PARAM_FFC_G, pDH_g.get()) == 1
+			&& OSSL_PARAM_BLD_push_int(pParamBld.get(), OSSL_PKEY_PARAM_DH_PRIV_LEN, keyLength) == 1)
 		{
-			OSSL_PARAM_size_t(OSSL_PKEY_PARAM_FFC_PBITS, &keyLength),
-			OSSL_PARAM_BN(OSSL_PKEY_PARAM_FFC_P, pDH_p, sz_p),
-			OSSL_PARAM_BN(OSSL_PKEY_PARAM_FFC_G, pDH_g, sz_g),
-			OSSL_PARAM_END
-		};
+			pParams.reset(OSSL_PARAM_BLD_to_param(pParamBld.get()));
+		}
+		if (pParams == nullptr)
+		{
+			EVP_PKEY_CTX_free(pKeyCtx);
+			std::string err = "Context::initDH():cannot build the DH parameters\n";
+			throw SSLContextException(Poco::Crypto::getError(err));
+		}
 
 		if (1 != EVP_PKEY_fromdata_init(pKeyCtx))
 		{
@@ -870,7 +872,7 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 			throw SSLContextException(Poco::Crypto::getError(err));
 		}
 
-		if (1 != EVP_PKEY_fromdata(pKeyCtx, &pKey, EVP_PKEY_KEY_PARAMETERS, params))
+		if (1 != EVP_PKEY_fromdata(pKeyCtx, &pKey, EVP_PKEY_KEY_PARAMETERS, pParams.get()))
 		{
 			EVP_PKEY_CTX_free(pKeyCtx);
 			std::string err = "Context::initDH():EVP_PKEY_fromdata()\n";
