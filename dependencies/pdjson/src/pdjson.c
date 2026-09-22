@@ -24,6 +24,7 @@
                  _TRUNCATE,                                       \
                  format,                                          \
                  __VA_ARGS__);                                    \
+        terminate(json);                                          \
     }                                                             \
 
 #else
@@ -34,9 +35,21 @@
         snprintf(json->errmsg, sizeof(json->errmsg),              \
                  format,                                          \
                  __VA_ARGS__);                                    \
+        terminate(json);                                          \
     }                                                             \
 
 #endif /* _MSC_VER */
+
+/* Terminate a token that was abandoned part way through, so that the
+   accessors see only bytes the parser actually wrote. Tokens that complete
+   normally push a terminator of their own. Called for every error since
+   pushchar() always reserves room for this byte.
+ */
+static void terminate(json_stream *json)
+{
+    if (json->data.string != NULL)
+        json->data.string[json->data.string_fill] = '\0';
+}
 
 /* See also PDJSON_STACK_MAX below. */
 #ifndef PDJSON_STACK_INC
@@ -51,16 +64,18 @@ struct json_stack {
 static enum json_type
 push(json_stream *json, enum json_type type)
 {
-    json->stack_top++;
+    /* Do not commit to the new depth until the push cannot fail, or else
+       stack_top would point at a slot that was never allocated. */
+    size_t top = json->stack_top + 1;
 
 #ifdef PDJSON_STACK_MAX
-    if (json->stack_top > PDJSON_STACK_MAX) {
+    if (top > PDJSON_STACK_MAX) {
         json_error(json, "%s", "maximum depth of nesting reached");
         return JSON_ERROR;
     }
 #endif
 
-    if (json->stack_top >= json->stack_size) {
+    if (top >= json->stack_size) {
         struct json_stack *stack;
         size_t size = (json->stack_size + PDJSON_STACK_INC) * sizeof(*json->stack);
         stack = (struct json_stack *)json->alloc.realloc(json->stack, size);
@@ -73,8 +88,9 @@ push(json_stream *json, enum json_type type)
         json->stack = stack;
     }
 
-    json->stack[json->stack_top].type = type;
-    json->stack[json->stack_top].count = 0;
+    json->stack_top = top;
+    json->stack[top].type = type;
+    json->stack[top].count = 0;
 
     return type;
 }
@@ -94,7 +110,7 @@ pop(json_stream *json, int c, enum json_type expected)
 static int buffer_peek(struct json_source *source)
 {
     if (source->position < source->source.buffer.length)
-        return source->source.buffer.buffer[source->position];
+        return (unsigned char)source->source.buffer.buffer[source->position];
     else
         return EOF;
 }
@@ -163,7 +179,9 @@ is_match(json_stream *json, const char *pattern, enum json_type type)
 
 static int pushchar(json_stream *json, int c)
 {
-    if (json->data.string_fill == json->data.string_size) {
+    /* Keep one byte in reserve so that terminate() always has somewhere
+       to put its terminator. */
+    if (json->data.string_fill + 1 == json->data.string_size) {
         size_t size = json->data.string_size * 2;
         char *buffer = (char *)json->alloc.realloc(json->data.string, size);
         if (buffer == NULL) {
@@ -688,6 +706,21 @@ read_value(json_stream *json, int c)
     }
 }
 
+/* Read an array element, or an object member value, counting it against
+   the enclosing container only once it has actually been produced. Note
+   that read_value() may push, so the container is remembered by index
+   rather than by stack_top.
+ */
+static enum json_type
+read_element(json_stream *json, int c)
+{
+    size_t top = json->stack_top;
+    enum json_type value = read_value(json, c);
+    if (value != JSON_ERROR)
+        json->stack[top].count++;
+    return value;
+}
+
 enum json_type json_peek(json_stream *json)
 {
     enum json_type next;
@@ -744,11 +777,9 @@ enum json_type json_next(json_stream *json)
             if (c == ']') {
                 return pop(json, c, JSON_ARRAY);
             }
-            json->stack[json->stack_top].count++;
-            return read_value(json, c);
+            return read_element(json, c);
         } else if (c == ',') {
-            json->stack[json->stack_top].count++;
-            return read_value(json, next(json));
+            return read_element(json, next(json));
         } else if (c == ']') {
             return pop(json, c, JSON_ARRAY);
         } else {
@@ -799,8 +830,7 @@ enum json_type json_next(json_stream *json)
                 json_error(json, "%s", "expected ':' after member name");
                 return JSON_ERROR;
             } else {
-                json->stack[json->stack_top].count++;
-                return read_value(json, next(json));
+                return read_element(json, next(json));
             }
         }
     }

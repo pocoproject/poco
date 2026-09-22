@@ -18,7 +18,7 @@ are replaced with system-installed versions via `find_package()` or `-l` flags.
 | [sqlite3](sqlite3/) | 3.53.4 | Public Domain | Data/SQLite (embedded database) | Yes | https://www.sqlite.org |
 | [png](png/) | 1.6.58 | libpng License | PDF (PNG image support) | Yes | https://github.com/pnggroup/libpng |
 | [v8_double_conversion](v8_double_conversion/) | 3.4.0 | BSD-3-Clause | Foundation (float-to-string conversion) | No | https://github.com/google/double-conversion |
-| [pdjson](pdjson/) | n/a | Public Domain | JSON (streaming parser) | No | https://github.com/skeeto/pdjson |
+| [pdjson](pdjson/) | git 57eb2c4 | Public Domain | JSON (streaming parser) | No | https://github.com/skeeto/pdjson |
 | [tessil](tessil/) | 1.2.0 | MIT | Foundation (insertion-order-preserving hash containers) | No | https://github.com/Tessil/ordered-map |
 | [hpdf](hpdf/) (libharu) | 2.4.6 | Zlib-like | PDF (PDF document generation) | No | https://github.com/libharu/libharu |
 | [7zip](7zip/) (LZMA SDK) | 26.02 | Public Domain | SevenZip (7z archive support) | No | https://github.com/ip7z/7zip |
