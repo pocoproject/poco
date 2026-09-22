@@ -874,6 +874,41 @@ namespace
 		DbMutexGuard(const DbMutexGuard&) = delete;
 		DbMutexGuard& operator=(const DbMutexGuard&) = delete;
 	};
+
+
+	// The Poco::Data statement path takes SessionImpl's own mutex and then,
+	// inside sqlite3_get_autocommit() (which locks the connection as of SQLite
+	// 3.53.4), the connection mutex. Running such a statement while the
+	// connection mutex is already held inverts that order and deadlocks against
+	// a concurrent user statement, so every DbMutexGuard region below issues its
+	// SQL through these two helpers, which stay on the C API and never take the
+	// session mutex.
+	void execDirect(sqlite3* db, const std::string& sql)
+	{
+		char* pErrMsg = nullptr;
+		int rc = sqlite3_exec(db, sql.c_str(), nullptr, nullptr, &pErrMsg);
+		std::string errMsg(pErrMsg != nullptr ? pErrMsg : "");
+		sqlite3_free(pErrMsg);
+		if (rc != SQLITE_OK) Utility::throwException(db, rc, errMsg);
+	}
+
+
+	bool tableExists(sqlite3* db, const std::string& schema, const std::string& table)
+	{
+		std::string sql = "SELECT count(*) FROM " + schema +
+			".sqlite_master WHERE type='table' AND name=:n";
+		sqlite3_stmt* pStmt = nullptr;
+		int rc = sqlite3_prepare_v2(db, sql.c_str(), -1, &pStmt, nullptr);
+		if (rc == SQLITE_OK)
+		{
+			rc = sqlite3_bind_text(pStmt, 1, table.c_str(), static_cast<int>(table.size()), SQLITE_TRANSIENT);
+			if (rc == SQLITE_OK) rc = sqlite3_step(pStmt);
+		}
+		bool found = (rc == SQLITE_ROW) && (sqlite3_column_int(pStmt, 0) > 0);
+		sqlite3_finalize(pStmt); // no-op on the null statement left by a failed prepare
+		if (rc != SQLITE_ROW && rc != SQLITE_DONE) Utility::throwException(db, rc);
+		return found;
+	}
 }
 
 
@@ -890,7 +925,7 @@ bool MemoryDB::tryDetach(Poco::UInt32 shardId)
 		              // session()); the end state holds, resync
 	if (txn != SQLITE_TXN_NONE)
 		return false; // a busy statement holds a transaction; defer
-	_session << ("DETACH DATABASE " + alias), now; // unexpected failures propagate
+	execDirect(_memHandle, "DETACH DATABASE " + alias); // unexpected failures propagate
 	return true;
 }
 
@@ -961,7 +996,7 @@ std::string MemoryDB::attachArchived(Poco::UInt32 shardId)
 		// thread - safe (we don't currently hold it) but pointless work.
 		InternalGuard guard;
 		DbMutexGuard dbm(_memHandle);
-		_session << ("ATTACH DATABASE " + quoteLit("file:" + path + "?mode=ro") + " AS " + alias), now;
+		execDirect(_memHandle, "ATTACH DATABASE " + quoteLit("file:" + path + "?mode=ro") + " AS " + alias);
 	}
 	_attached[shardId] = 1;
 	return alias;
@@ -1038,7 +1073,7 @@ void MemoryDB::deleteShard(Poco::UInt32 shardId)
 			{
 				InternalGuard guard;
 				DbMutexGuard dbm(_memHandle);
-				_session << ("DETACH DATABASE " + alias), now;
+				execDirect(_memHandle, "DETACH DATABASE " + alias);
 			}
 			_attached.erase(shardId);
 		}
@@ -1260,9 +1295,9 @@ std::string MemoryDB::historyView(const std::string& table)
 		std::string viewName = table + "_history";
 		InternalGuard guard;
 		DbMutexGuard dbm(_memHandle);
-		_session << ("DROP VIEW IF EXISTS " + quoteIdent(viewName)), now;
-		_session << ("CREATE TEMP VIEW " + quoteIdent(viewName) +
-			" AS SELECT * FROM main." + quoteIdent(table)), now;
+		execDirect(_memHandle, "DROP VIEW IF EXISTS " + quoteIdent(viewName));
+		execDirect(_memHandle, "CREATE TEMP VIEW " + quoteIdent(viewName) +
+			" AS SELECT * FROM main." + quoteIdent(table));
 		return viewName;
 	}
 
@@ -1333,17 +1368,12 @@ std::string MemoryDB::buildHistoryView(const std::string& table,
 	if (!isVirtual) for (auto id: shardIds)
 	{
 		std::string alias = "arc_" + Poco::NumberFormatter::format(id);
-		int has = 0;
-		std::string name = table;
-		_session << ("SELECT count(*) FROM " + alias +
-			".sqlite_master WHERE type='table' AND name=:n"),
-			use(name), into(has), now;
-		if (has > 0)
+		if (tableExists(_memHandle, alias, table))
 			sql += " UNION ALL SELECT * FROM " + alias + "." + quoteIdent(table);
 	}
 
-	_session << ("DROP VIEW IF EXISTS " + quoteIdent(viewName)), now;
-	_session << ("CREATE TEMP VIEW " + quoteIdent(viewName) + " AS " + sql), now;
+	execDirect(_memHandle, "DROP VIEW IF EXISTS " + quoteIdent(viewName));
+	execDirect(_memHandle, "CREATE TEMP VIEW " + quoteIdent(viewName) + " AS " + sql);
 	return viewName;
 }
 
@@ -1406,7 +1436,7 @@ void MemoryDB::detachAllArchived()
 			{
 				InternalGuard guard;
 				DbMutexGuard dbm(_memHandle);
-				_session << ("DETACH DATABASE " + alias), now;
+				execDirect(_memHandle, "DETACH DATABASE " + alias);
 			}
 			_attached.erase(id);
 		}
