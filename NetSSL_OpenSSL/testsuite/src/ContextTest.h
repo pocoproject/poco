@@ -31,7 +31,12 @@ public:
 	void testInvalidCipherSuites();
 	void testInvalidECDHGroups();
 	void testDHParametersRejectedBySecurityLevel();
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	void testBuiltInDHParameters();
+#endif
 	void testAddChainCertificateWithoutX509();
+	void testClientContextIgnoresDHParameters();
+	void testVerifyErrorWithoutCertificate();
 
 	void setUp();
 	void tearDown();
@@ -40,6 +45,11 @@ public:
 
 private:
 	void assertRejected(const Poco::Net::Context::Params& params);
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	std::string negotiatedDHGroup(Poco::Net::Context::KeyDHGroup dhGroup);
+		/// Returns the OpenSSL name of the DH group that a server Context with
+		/// the given built-in parameters sends in a TLS 1.2 DHE handshake.
+#endif
 };
 
 
