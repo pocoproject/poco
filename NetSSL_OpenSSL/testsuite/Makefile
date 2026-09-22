@@ -25,7 +25,7 @@ objects = NetSSLTestSuite Driver \
 	HTTPSClientSessionTest HTTPSClientTestSuite HTTPSServerTest HTTPSServerTestSuite \
 	HTTPSStreamFactoryTest HTTPSTestServer TCPServerTest TCPServerTestSuite \
 	WebSocketTest WebSocketTestSuite FTPSClientSessionTest FTPSClientTestSuite \
-	DialogServer SecureStreamSocketTest SecureStreamSocketTestSuite
+	DialogServer SecureStreamSocketTest SecureStreamSocketTestSuite ContextTest
 
 target         = testrunner
 target_version = 1

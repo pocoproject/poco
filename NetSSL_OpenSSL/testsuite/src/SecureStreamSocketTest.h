@@ -31,6 +31,8 @@ public:
 	void testSendFileLarge();
 	void testSendFileRange();
 	void testShutdownBidirectional();
+	void testPeerHostNameTooLong();
+	void testStaleErrorQueue();
 
 	void setUp();
 	void tearDown();
