@@ -17,6 +17,7 @@
 #include <openssl/bio.h>
 #include <openssl/evp.h>
 #include <openssl/ssl.h>
+#include <openssl/x509_vfy.h>
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 #include <openssl/core_names.h>
 #endif
@@ -56,6 +57,28 @@ void ContextTest::testClientContextIgnoresDHParameters()
 	Context::Params params(Context::KEY_DH_GROUP_1024);
 	params.securityLevel = Context::SECURITY_LEVEL_112_BITS;
 	Context::Ptr pContext = new Context(Context::TLS_CLIENT_USE, params);
+}
+
+
+void ContextTest::testVerifyErrorWithoutCertificate()
+{
+	ErrorQueueCleaner cleaner;
+
+	// OpenSSL reports some verification errors, for example a missing explicit
+	// policy, without a current certificate. The callback must reject them.
+	Context::Ptr pContext = new Context(Context::TLS_CLIENT_USE, Context::Params());
+	std::unique_ptr<SSL, decltype(&SSL_free)> pSSL(SSL_new(pContext->sslContext()), &SSL_free);
+	assertNotNullPtr (pSSL.get());
+	std::unique_ptr<X509_STORE_CTX, decltype(&X509_STORE_CTX_free)> pStore(X509_STORE_CTX_new(), &X509_STORE_CTX_free);
+	assertNotNullPtr (pStore.get());
+	assertTrue (X509_STORE_CTX_init(pStore.get(), SSL_CTX_get_cert_store(pContext->sslContext()), nullptr, nullptr) == 1);
+	assertTrue (X509_STORE_CTX_set_ex_data(pStore.get(), SSL_get_ex_data_X509_STORE_CTX_idx(), pSSL.get()) == 1);
+	X509_STORE_CTX_set_error(pStore.get(), X509_V_ERR_NO_EXPLICIT_POLICY);
+	X509_STORE_CTX_set_current_cert(pStore.get(), nullptr);
+
+	SSL_verify_cb verify = SSL_CTX_get_verify_callback(pContext->sslContext());
+	assertTrue (verify != nullptr);
+	assertTrue (verify(0, pStore.get()) == 0);
 }
 
 
@@ -132,6 +155,7 @@ CppUnit::Test* ContextTest::suite()
 	CppUnit_addTest(pSuite, ContextTest, testBuiltInDHParameters);
 #endif
 	CppUnit_addTest(pSuite, ContextTest, testClientContextIgnoresDHParameters);
+	CppUnit_addTest(pSuite, ContextTest, testVerifyErrorWithoutCertificate);
 
 	return pSuite;
 }
