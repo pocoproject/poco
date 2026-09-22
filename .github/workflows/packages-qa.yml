@@ -9,7 +9,7 @@ concurrency:
 
 jobs:
   mkdoc:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       -
         name: Checkout
@@ -25,7 +25,7 @@ jobs:
           mkdoc all
 
   mkrelease_win:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       -
         name: Checkout
@@ -50,7 +50,7 @@ jobs:
           retention-days: 1
 
   mkrelease:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       -
         name: Checkout
