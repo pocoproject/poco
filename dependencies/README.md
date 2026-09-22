@@ -12,7 +12,7 @@ are replaced with system-installed versions via `find_package()` or `-l` flags.
 | Library | Version | License | Used by | Unbundleable | Source |
 |---------|---------|---------|---------|:------------:|--------|
 | [zlib](zlib/) | 1.3.2 | Zlib | Foundation (compression/decompression streams) | Yes | https://github.com/madler/zlib |
-| [pcre2](pcre2/) | 10.47 | BSD-3-Clause | Foundation (regular expressions) | Yes | https://github.com/PCRE2Project/pcre2 |
+| [pcre2](pcre2/) | 10.48 | BSD-3-Clause | Foundation (regular expressions) | Yes | https://github.com/PCRE2Project/pcre2 |
 | [utf8proc](utf8proc/) | 2.11.3 | MIT | Foundation (Unicode normalization) | Yes | https://github.com/JuliaStrings/utf8proc |
 | [expat](expat/) | 2.8.5 | MIT | XML (SAX/DOM parser) | Yes | https://github.com/libexpat/libexpat |
 | [sqlite3](sqlite3/) | 3.53.1 | Public Domain | Data/SQLite (embedded database) | Yes | https://www.sqlite.org |
