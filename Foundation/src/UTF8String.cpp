@@ -274,13 +274,8 @@ std::string UTF8::unescape(const std::string::const_iterator& begin, const std::
 	{
 		Poco::UInt32 ch = (Poco::UInt32) *it++;
 
-		if (ch == '\\')
+		if (ch == '\\' && it != end)
 		{
-			if ( it == end )
-			{
-				//Invalid sequence!
-			}
-
 			switch (*it)
 			{
 			case 'U':

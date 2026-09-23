@@ -104,6 +104,16 @@ void UTF8StringTest::testUnescape()
 }
 
 
+void UTF8StringTest::testUnescapeTrailingBackslash()
+{
+	assertTrue (UTF8::unescape("ab\\") == "ab\\");
+
+	// The range ends after the backslash; the characters that follow must not be read.
+	const std::string s("ab\\nXYZ");
+	assertTrue (UTF8::unescape(s.begin(), s.begin() + 3) == "ab\\");
+}
+
+
 void UTF8StringTest::testNormalize()
 {
 	const std::string INPUT("\303\274\303\266\303\244"); // "u"o"a
@@ -141,6 +151,7 @@ CppUnit::Test* UTF8StringTest::suite()
 	CppUnit_addTest(pSuite, UTF8StringTest, testTransform);
 	CppUnit_addTest(pSuite, UTF8StringTest, testEscape);
 	CppUnit_addTest(pSuite, UTF8StringTest, testUnescape);
+	CppUnit_addTest(pSuite, UTF8StringTest, testUnescapeTrailingBackslash);
 	CppUnit_addTest(pSuite, UTF8StringTest, testNormalize);
 
 	return pSuite;
