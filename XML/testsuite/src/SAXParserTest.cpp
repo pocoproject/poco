@@ -67,6 +67,29 @@ public:
 };
 
 
+class RecordingEntityResolver: public EntityResolver
+	/// Resolves every entity to content that must never reach the document.
+{
+public:
+	InputSource* resolveEntity(const XMLString* publicId, const XMLString& systemId)
+	{
+		++calls;
+		std::istringstream* istr = new std::istringstream(systemId == "leak.ent" ? "<!ENTITY leak \"LEAKED\">" : "LEAKED");
+		InputSource* pIS = new InputSource(*istr);
+		pIS->setSystemId(systemId);
+		return pIS;
+	}
+
+	void releaseInputSource(InputSource* pSource)
+	{
+		delete pSource->getByteStream();
+		delete pSource;
+	}
+
+	int calls = 0;
+};
+
+
 class ThrowingHandler: public DefaultHandler
 {
 public:
@@ -225,6 +248,33 @@ void SAXParserTest::testExternalParsed()
 	parser.setFeature(XMLReader::FEATURE_EXTERNAL_GENERAL_ENTITIES, true);
 	std::string xml = parse(parser, XMLWriter::CANONICAL, EXTERNAL_PARSED);
 	assertTrue (xml == "<!DOCTYPE test><sample>\n\t<elem>\n\tAn external entity.\n</elem>\n\n</sample>");
+}
+
+
+void SAXParserTest::testExternalEntitiesDisabledByDefault()
+{
+	// A resolver is set, so only the disabled features keep its content out.
+	RecordingEntityResolver resolver;
+
+	SAXParser generalParser;
+	generalParser.setEntityResolver(&resolver);
+	try
+	{
+		parse(generalParser, XMLWriter::CANONICAL,
+			"<!DOCTYPE test [<!ENTITY ext SYSTEM \"leak.xml\">]><sample>&ext;</sample>");
+		fail("external general entity must be refused");
+	}
+	catch (SAXParseException&)
+	{
+	}
+
+	SAXParser parameterParser;
+	parameterParser.setEntityResolver(&resolver);
+	std::string xml = parse(parameterParser, XMLWriter::CANONICAL,
+		"<!DOCTYPE test [<!ENTITY % ext SYSTEM \"leak.ent\"> %ext;]><sample>&leak;</sample>");
+	assertTrue (xml.find("LEAKED") == std::string::npos);
+
+	assertTrue (resolver.calls == 0);
 }
 
 
@@ -460,6 +510,7 @@ CppUnit::Test* SAXParserTest::suite()
 	CppUnit_addTest(pSuite, SAXParserTest, testNotation);
 	CppUnit_addTest(pSuite, SAXParserTest, testExternalUnparsed);
 	CppUnit_addTest(pSuite, SAXParserTest, testExternalParsed);
+	CppUnit_addTest(pSuite, SAXParserTest, testExternalEntitiesDisabledByDefault);
 	CppUnit_addTest(pSuite, SAXParserTest, testDefaultNamespace);
 	CppUnit_addTest(pSuite, SAXParserTest, testNamespaces);
 	CppUnit_addTest(pSuite, SAXParserTest, testNamespacesNoPrefixes);

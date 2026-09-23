@@ -37,6 +37,7 @@ public:
 	void testNotation();
 	void testExternalUnparsed();
 	void testExternalParsed();
+	void testExternalEntitiesDisabledByDefault();
 	void testDefaultNamespace();
 	void testNamespaces();
 	void testNamespacesNoPrefixes();
