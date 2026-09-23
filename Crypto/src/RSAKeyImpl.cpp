@@ -527,7 +527,7 @@ void RSAKeyImpl::save(const std::string& publicKeyFile,
 				if (privateKeyPassphrase.empty())
 					rc = PEM_write_bio_RSAPrivateKey(bio, _pRSA, nullptr, nullptr, 0, nullptr, nullptr);
 				else
-					rc = PEM_write_bio_RSAPrivateKey(bio, _pRSA, EVP_des_ede3_cbc(),
+					rc = PEM_write_bio_RSAPrivateKey(bio, _pRSA, EVP_aes_256_cbc(),
 							 reinterpret_cast<unsigned char *>( const_cast<char *>( privateKeyPassphrase.c_str())),
 							 static_cast<int>(privateKeyPassphrase.length()), nullptr, nullptr);
 				if (!rc) throw Poco::FileException("Failed to write private key to file", privateKeyFile);
@@ -572,7 +572,7 @@ void RSAKeyImpl::save(std::ostream* pPublicKeyStream,
 			rc = PEM_write_bio_RSAPrivateKey(bio, _pRSA, nullptr, nullptr, 0, nullptr, nullptr);
 		else
 			rc = PEM_write_bio_RSAPrivateKey(bio,
-					_pRSA, EVP_des_ede3_cbc(),
+					_pRSA, EVP_aes_256_cbc(),
 					reinterpret_cast<unsigned char *>( const_cast<char *>(privateKeyPassphrase.c_str())),
 					static_cast<int>(privateKeyPassphrase.length()), nullptr, nullptr);
 		if (!rc)
