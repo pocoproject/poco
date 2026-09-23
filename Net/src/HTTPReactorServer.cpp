@@ -133,6 +133,14 @@ void HTTPReactorServer::onError(const Poco::Exception& ex)
 	// rethrow() is virtual and each POCO_DECLARE_EXCEPTION class implements it as
 	// `throw *this`, preserving the derived type.
 	ex.rethrow();
+	// [[noreturn]] is not inherited, so an override may omit it and return; GCC
+	// therefore does not carry the attribute of rethrow() across the virtual call
+	// and warns that this function returns. The call cannot come back.
+#if defined(_MSC_VER)
+	__assume(0);
+#elif defined(__GNUC__) || defined(__clang__)
+	__builtin_unreachable();
+#endif
 }
 
 } // namespace Poco::Net
