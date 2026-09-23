@@ -47,6 +47,90 @@ Data/SQLite can now optionally bundle the sqlite-vec vector search extension
     <*Poco/MongoDB/ServerDescription.h*> and <*Poco/ActiveRecord/IDTraits.h*>. (PR #5453)
 
 
+!!!Release 1.15.4
+
+!!Summary of Changes
+
+Security release. Ten security advisories are fixed: host name verification
+disabled by default in SSLManager configurations, OCSP responses accepted from a
+substituted issuer and plaintext fallback in FTPSClientSession (NetSSL),
+redirects into file: and other non-web schemes (Foundation, NetSSL), HTTP
+request framing differences and unbounded buffering of incomplete requests in
+HTTPReactorServer (Net), and parser defects in Zip, SevenZip and JSON.
+
+Bundled expat is updated to 2.8.5, pcre2 to 10.48, SQLite to 3.53.4, 7-Zip
+(LZMA SDK) to 26.02 and pdjson to a current upstream revision. A remotely
+triggerable WebSocket busy-loop and inactive billion laughs protection in
+unbundled builds are also fixed. Also included are OpenSSL build and FIPS
+fixes for Crypto and NetSSL, bug fixes in Foundation, Net, NetSSL, Crypto,
+Data and MongoDB, and two performance improvements.
+
+Behaviour changes: client contexts created from the SSLManager configuration
+verify the host name by default; FTPSClientSession no longer falls back to
+plaintext when the server refuses TLS, unless allowPlaintextFallback() is
+called; HTTP requests with duplicate or conflicting framing headers are
+rejected; URIStreamOpener and HTTPSStreamFactory follow redirects only to
+http and https.
+
+!!Security Fixes
+
+  - GHSA-xmgr-9wvg-r67x NetSSL: SSLManager configuration disabled host name verification for client contexts by default (reported by Dan Birtwhistle)
+  - GHSA-pqw3-rjcp-v354 Foundation, NetSSL: URIStreamOpener and HTTPSStreamFactory followed redirects into file: and other non-web schemes (reported by Dan Birtwhistle)
+  - GHSA-rcrh-846h-22hx SevenZip: path traversal in Archive::extract (reported by Tristan, Talence Security)
+  - GHSA-2pm5-6f5q-c76r Net: HTTPReactorServer buffered incomplete requests without a size limit (reported by EQSTLab, found by 232-323)
+  - GHSA-8gjp-96jp-4wh9 NetSSL: OCSP stapling accepted a response signed by a substituted issuer (reported by Dan Birtwhistle)
+  - GHSA-gjfc-f6f9-rxx6 NetSSL: FTPSClientSession fell back to plaintext when the server refused AUTH TLS and AUTH SSL (reported by Dan Birtwhistle)
+  - GHSA-p4j9-25v2-pp68 Net: header decoding and duplicate headers could change HTTP request framing (reported by Dan Birtwhistle)
+  - GHSA-734q-56c6-xp96 Zip: ZIP64 parsing allowed unbounded allocation and heap over-read (reported by Dan Birtwhistle)
+  - GHSA-7frw-wjhr-x6g8 JSON: comment stripping removed comment delimiters inside strings (reported by tomerbatt)
+  - GHSA-f6vm-f3m6-6v9r JSON: object keys were truncated at an embedded NUL (reported by Dan Birtwhistle)
+  - GH #5489 Upgrade bundled pcre2 to 10.48 (6 CVEs); expat 2.8.5 (CVE-2026-93990) and SQLite 3.53.4 (CVE-2026-11822, CVE-2026-11824) (PR #5492)
+  - GH #5472 Net: WebSocket::receiveFrame() busy-loops forever when the peer closes after a partial frame header (PR #5473)
+  - GH #5470 Billion laughs protection inactive when unbundled; ABI-affecting build options (PR #5471)
+  - GH #5468 Expat 2.8.4 (CVE-2026-66046, CVE-2026-76641, CVE-2026-76956, CVE-2026-76957)
+  - GH #5434 Upgrade bundled expat to 2.8.3 (CVE-2026-72522) (PR #5435)
+  - GH #5432 Upgrade bundled 7zip (LZMA SDK) to 26.02 (PR #5437)
+  - GH #5395 Expat 2.8.2 update (13 CVEs) (PR #5396)
+
+Bundled Third-Party Library Upgrades:
+  - expat 2.8.1 -> 2.8.5 (19 CVEs; see Security Fixes)
+  - pcre2 10.47 -> 10.48 (CVE-2026-89156, CVE-2026-89157, CVE-2026-89158, CVE-2026-89160, CVE-2026-89161, CVE-2026-89162)
+  - SQLite 3.53.1 -> 3.53.4 (CVE-2026-11822, CVE-2026-11824; FTS5 only)
+  - 7zip (LZMA SDK) 26.01 -> 26.02 (bug and vulnerability fixes)
+  - pdjson upstream 78fe04b -> 57eb2c4 (out-of-bounds read after a failed stack push, unterminated tokens after a parse error, byte 0xFF read as end of input)
+
+!!Features, Enhancements and Third Party Updates
+
+  - MongoDB::OpMsgMessage::CMD_PING added (the rest of PR #5404 remains in 2.0)
+  - PR #5390 Net/testsuite: register MessageHeader tests that were never run; cover long header values
+
+!!Performance Improvements
+
+  - MongoDB: Document::addElement() no longer has quadratic cost when large documents and arrays are built (PR #5478)
+  - Foundation: BinaryReader::readRaw() reads in 64 KB chunks instead of byte by byte (PR #5478)
+
+!!Bug Fixes and Improvements
+
+  - GH #5476 MongoDB: ReplicaSetConnection re-sends a failing command indefinitely (PR #5482)
+  - GH #5475 MongoDB: valid server replies larger than 16 MB are rejected (PR #5478)
+  - GH #5466 fix(Net): TCPReactorServerConnection registers no error or shutdown handler (PR #5469)
+  - GH #5415 OpenSSL no_deprecated (PR #5416)
+  - GH #5413 FTPClientSession(socket, readWelcomeMessage=false) sets _serverReady=true without reading welcome reply (PR #5418)
+  - GH #5409 Backtrace not thread safe (PR #5408)
+  - GH #5407 HTTPReactorServer: client abort leaks the connection and hot-spins the reactor (PR #5408, PR #5410)
+  - GH #5393 ProcessRunner heap-use-after-free on failed start (PR #5394)
+  - GH #5383 Poco::Data::Transaction unusable on an auto-commit session (PR #5384)
+  - PR #5491 fix(NetSSL_OpenSSL): built-in DH parameters, stale OpenSSL errors in TLS I/O, verify callback without certificate
+  - PR #5488 fix(Crypto): check the results of the OpenSSL calls in DigestEngine
+  - PR #5484 fix(Foundation): Buffer::clear() on an empty buffer passed a null pointer to memset
+  - PR #5479 fix(Foundation): share TextConverter between copies of BinaryReader and BinaryWriter
+  - PR #5474 fix(CppUnit, Data): warnmsg() must warn instead of fail; execDirectImpl() must throw NotImplementedException
+  - PR #5464 fix(Crypto,NetSSL): restore missing #else in isFIPSEnabled(), add OpenSSL 1.1.1 CI job
+  - PR #5460 fix(NetSSL): FIPS fixes for NetSSL_OpenSSL
+  - PR #5445 fix(Foundation): return value from ScopedLockWithUnlock::tryLock
+  - NetSSL: the OCSP status callback did not handle a missing peer certificate chain
+
+
 !!!Release 1.15.3
 
 !!Summary of Changes
