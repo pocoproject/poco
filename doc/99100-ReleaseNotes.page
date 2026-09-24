@@ -14,6 +14,10 @@ exported symbols that went with them. Headers using
 Data/SQLite can now optionally bundle the sqlite-vec vector search extension
 (disabled by default).
 
+RemotingNG (remote objects framework with TCP, HTTP, JSON-RPC, REST and SOAP transports and
+the RemoteGenNG code generator) and CodeGeneration, previously part of macchina.io, are now
+POCO components.
+
 !!Features
 
   - GH #5440 <*Data/SQLite*>: sqlite-vec vector search extension -- optional bundled
@@ -21,6 +25,13 @@ Data/SQLite can now optionally bundle the sqlite-vec vector search extension
     available in every SQLite session including <*MemoryDB*>. Disabled by default; enable
     with cmake <*ENABLE_DATA_SQLITE_VEC*>, gnu make <*POCO_ENABLE_SQLITE_VEC*> or
     <*./configure --sqlite-vec*>. (PR #5459)
+  - GH #5447 <*RemotingNG*>, <*CodeGeneration*>: the RemotingNG remote objects framework from
+    macchina.io with the TCP, HTTP, JSON-RPC, REST and SOAP transports and the <*RemoteGenNG*>
+    code generator, and the <*CodeGeneration*> library it builds on. Enable with cmake
+    <*ENABLE_REMOTINGNG*>, <*ENABLE_REMOTINGNG_TCP*>, <*ENABLE_REMOTINGNG_HTTP*>,
+    <*ENABLE_REMOTINGNG_JSONRPC*>, <*ENABLE_REMOTINGNG_REST*>, <*ENABLE_REMOTINGNG_SOAP*>,
+    <*ENABLE_REMOTINGNG_REMOTEGEN*> and <*ENABLE_CODEGENERATION*> (all on by default; off with
+    <*POCO_MINIMAL_BUILD*>).
 
 !!Breaking Changes
 
