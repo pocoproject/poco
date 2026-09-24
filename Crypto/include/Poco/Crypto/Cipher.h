@@ -38,7 +38,7 @@ class Crypto_API Cipher: public Poco::RefCountedObject
 	///     CipherFactory& factory = CipherFactory::defaultFactory();
 	///     // Creates a 256-bit AES cipher
 	///     Cipher* pCipher = factory.createCipher(CipherKey("aes-256"));
-	///     Cipher* pRSACipher = factory.createCipher(RSAKey(RSAKey::KL_1024, RSAKey::EXP_SMALL));
+	///     Cipher* pRSACipher = factory.createCipher(RSAKey(RSAKey::KL_2048, RSAKey::EXP_SMALL));
 	///
 	/// Check the different Key constructors on how to initialize/create
 	/// a key. The above example auto-generates random keys.

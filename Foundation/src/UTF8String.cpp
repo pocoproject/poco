@@ -244,7 +244,7 @@ std::string UTF8::escape(const std::string::const_iterator& begin, const std::st
 			result += "\\u";
 			NumberFormatter::appendHex(result, (unsigned short) (ch & 0x03ff ) + 0xdc00, 4, lowerCaseHex);
 		}
-		else if (ch >= 0x80 && ch <= 0xFFFF)
+		else if (ch >= 0x80)
 		{
 			result += "\\u";
 			NumberFormatter::appendHex(result, (unsigned short) ch, 4, lowerCaseHex);
@@ -274,13 +274,8 @@ std::string UTF8::unescape(const std::string::const_iterator& begin, const std::
 	{
 		Poco::UInt32 ch = (Poco::UInt32) *it++;
 
-		if (ch == '\\')
+		if (ch == '\\' && it != end)
 		{
-			if ( it == end )
-			{
-				//Invalid sequence!
-			}
-
 			switch (*it)
 			{
 			case 'U':

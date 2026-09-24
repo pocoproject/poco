@@ -29,6 +29,7 @@ public:
 
 	void testEscape();
 	void testUnescape();
+	void testUnescapeTrailingBackslash();
 
 	void testNormalize();
 

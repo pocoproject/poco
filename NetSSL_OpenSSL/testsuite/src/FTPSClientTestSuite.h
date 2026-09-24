@@ -10,8 +10,8 @@
 //
 
 
-#ifndef FTPClientTestSuite_INCLUDED
-#define FTPClientTestSuite_INCLUDED
+#ifndef FTPSClientTestSuite_INCLUDED
+#define FTPSClientTestSuite_INCLUDED
 
 
 #include "CppUnit/TestSuite.h"
@@ -24,4 +24,4 @@ public:
 };
 
 
-#endif // FTPClientTestSuite_INCLUDED
+#endif // FTPSClientTestSuite_INCLUDED
