@@ -1,4 +1,4 @@
-/*
+/* Hash table related internal API
                             __  __            _
                          ___\ \/ /_ __   __ _| |_
                         / _ \\  /| '_ \ / _` | __|
@@ -31,12 +31,48 @@
    SPDX-License-Identifier: MIT
 */
 
-#if ! defined(RANDOM_DEV_URANDOM_H)
-#  define RANDOM_DEV_URANDOM_H 1
+#if ! defined(HASH_TABLE_H)
+#  define HASH_TABLE_H 1
 
-#  include <stdbool.h>
+#  include "expat.h"    // for XML_Bool, XML_Parser
+#  include "internal.h" // for XML_NONTESTING_STATIC
+
 #  include <stddef.h> // for size_t
 
-bool writeRandomBytes_dev_urandom(void *target, size_t count);
+typedef const XML_Char *KEY;
 
-#endif // ! defined(RANDOM_DEV_URANDOM_H)
+typedef struct {
+  KEY name;
+} NAMED;
+
+typedef struct {
+  NAMED **v;
+  unsigned char power;
+  size_t size;
+  size_t used;
+  XML_Parser parser;
+} HASH_TABLE;
+
+typedef struct {
+  NAMED **p;
+  NAMED **end;
+} HASH_TABLE_ITER;
+
+XML_NONTESTING_STATIC NAMED *lookupWithLength(XML_Parser parser,
+                                              HASH_TABLE *table, KEY name,
+                                              size_t nameLen,
+                                              size_t createSize);
+XML_NONTESTING_STATIC NAMED *lookup(XML_Parser parser, HASH_TABLE *table,
+                                    KEY name, size_t createSize);
+
+XML_NONTESTING_STATIC void hashTableInit(HASH_TABLE *table, XML_Parser parser);
+XML_NONTESTING_STATIC void hashTableClear(HASH_TABLE *table);
+XML_NONTESTING_STATIC void hashTableDestroy(HASH_TABLE *table);
+XML_NONTESTING_STATIC void hashTableIterInit(HASH_TABLE_ITER *iter,
+                                             const HASH_TABLE *table);
+XML_NONTESTING_STATIC NAMED *hashTableIterNext(HASH_TABLE_ITER *iter);
+
+XML_NONTESTING_STATIC XML_Bool keyeq(KEY s1, size_t s1len, KEY s2);
+XML_NONTESTING_STATIC size_t keylen(KEY s);
+
+#endif // ! defined(HASH_TABLE_H)

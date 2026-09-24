@@ -12,16 +12,16 @@ are replaced with system-installed versions via `find_package()` or `-l` flags.
 | Library | Version | License | Used by | Unbundleable | Source |
 |---------|---------|---------|---------|:------------:|--------|
 | [zlib](zlib/) | 1.3.2 | Zlib | Foundation (compression/decompression streams) | Yes | https://github.com/madler/zlib |
-| [pcre2](pcre2/) | 10.47 | BSD-3-Clause | Foundation (regular expressions) | Yes | https://github.com/PCRE2Project/pcre2 |
+| [pcre2](pcre2/) | 10.48 | BSD-3-Clause | Foundation (regular expressions) | Yes | https://github.com/PCRE2Project/pcre2 |
 | [utf8proc](utf8proc/) | 2.11.3 | MIT | Foundation (Unicode normalization) | Yes | https://github.com/JuliaStrings/utf8proc |
-| [expat](expat/) | 2.8.2 | MIT | XML (SAX/DOM parser) | Yes | https://github.com/libexpat/libexpat |
-| [sqlite3](sqlite3/) | 3.53.1 | Public Domain | Data/SQLite (embedded database) | Yes | https://www.sqlite.org |
+| [expat](expat/) | 2.8.5 | MIT | XML (SAX/DOM parser) | Yes | https://github.com/libexpat/libexpat |
+| [sqlite3](sqlite3/) | 3.53.4 | Public Domain | Data/SQLite (embedded database) | Yes | https://www.sqlite.org |
 | [png](png/) | 1.6.58 | libpng License | PDF (PNG image support) | Yes | https://github.com/pnggroup/libpng |
 | [v8_double_conversion](v8_double_conversion/) | 3.4.0 | BSD-3-Clause | Foundation (float-to-string conversion) | No | https://github.com/google/double-conversion |
-| [pdjson](pdjson/) | n/a | Public Domain | JSON (streaming parser) | No | https://github.com/skeeto/pdjson |
+| [pdjson](pdjson/) | git 57eb2c4 | Public Domain | JSON (streaming parser) | No | https://github.com/skeeto/pdjson |
 | [tessil](tessil/) | 1.2.0 | MIT | Foundation (insertion-order-preserving hash containers) | No | https://github.com/Tessil/ordered-map |
 | [hpdf](hpdf/) (libharu) | 2.4.6 | Zlib-like | PDF (PDF document generation) | No | https://github.com/libharu/libharu |
-| [7zip](7zip/) (LZMA SDK) | 26.01 | Public Domain | SevenZip (7z archive support) | No | https://github.com/ip7z/7zip |
+| [7zip](7zip/) (LZMA SDK) | 26.02 | Public Domain | SevenZip (7z archive support) | No | https://github.com/ip7z/7zip |
 | [cpptrace](cpptrace/) | 1.0.4 | MIT | Foundation (stack trace support, optional) | No | https://github.com/jeremy-rifkin/cpptrace |
 | [sqlite-vec](sqlite-vec/) | 0.1.9 | MIT OR Apache-2.0 | Data/SQLite (vector search, optional) | No | https://github.com/asg017/sqlite-vec |
 | [quill](quill/) | 11.1.0 | MIT | Foundation (high-performance async logging, optional) | No | https://github.com/odygrd/quill |

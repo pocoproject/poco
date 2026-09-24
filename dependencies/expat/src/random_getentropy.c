@@ -28,6 +28,8 @@
    DAMAGES OR  OTHER LIABILITY, WHETHER  IN AN  ACTION OF CONTRACT,  TORT OR
    OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
    USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+   SPDX-License-Identifier: MIT
 */
 
 #include "random_getentropy.h"
@@ -52,7 +54,7 @@
 bool
 writeRandomBytes_getentropy(void *target, size_t count) {
   errno = 0;
-  const bool success = getentropy(target, count);
+  const bool success = (getentropy(target, count) == 0);
   // MSan does not understand `getentropy`, so explain its effects
   if (success)
     MSAN_UNPOISON(target, count);
