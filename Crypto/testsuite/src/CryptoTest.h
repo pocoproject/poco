@@ -41,6 +41,7 @@ public:
 	void testDecryptInterop();
 	void testCertificate();
 	void testCertificateUTF8();
+	void testCertificateNameEntries();
 
 	void setUp();
 	void tearDown();

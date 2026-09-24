@@ -147,8 +147,12 @@ class NetSSL_API SSLManager
 	///      If not specified or empty, the default parameters are used.
 	///    - ecdhCurve (string): Specifies the name of the curve to use for ECDH, based
 	///      on the curve names specified in RFC 4492. Defaults to "prime256v1".
-	///    - fips: Enable or disable OpenSSL FIPS mode. Only supported if the OpenSSL version
-	///      that this library is built against supports FIPS mode.
+	///    - fips (boolean): Enable OpenSSL FIPS mode for the whole process when the first
+	///      default context is created. The property name is openSSL.fips, without the
+	///      server or client prefix. Requires OpenSSL 3.0 or newer and a FIPS provider
+	///      activated in openssl.cnf; otherwise creating the context fails with a
+	///      Poco::Crypto::CryptoException. Defaults to false (mode left unchanged).
+	///      Create the context during startup, before other threads use OpenSSL.
 	///
 	/// Please see the Context class documentation regarding TLSv1.3 support.
 {
@@ -238,7 +242,7 @@ public:
 		/// factories for the different registered certificate handlers.
 
 	[[nodiscard]] static bool isFIPSEnabled();
-		// Returns true if FIPS mode is enabled, false otherwise.
+		/// Returns true if FIPS mode is enabled, false otherwise.
 
 	void shutdown();
 		/// Shuts down the SSLManager and releases the default Context
@@ -352,11 +356,8 @@ private:
 	static const std::string CFG_DISABLE_PROTOCOLS;
 	static const std::string CFG_DH_PARAMS_FILE;
 	static const std::string CFG_ECDH_CURVE;
-
-#ifdef OPENSSL_FIPS
 	static const std::string CFG_FIPS_MODE;
 	static constexpr bool    VAL_FIPS_MODE = false;
-#endif
 
 	friend class Poco::SingletonHolder<SSLManager>;
 	friend class Context;
@@ -376,20 +377,6 @@ inline PrivateKeyFactoryMgr& SSLManager::privateKeyFactoryMgr()
 inline CertificateHandlerFactoryMgr& SSLManager::certificateHandlerFactoryMgr()
 {
 	return _certHandlerFactoryMgr;
-}
-
-
-inline bool SSLManager::isFIPSEnabled()
-{
-#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
-	// OpenSSL 3.x: OPENSSL_FIPS no longer exists. FIPS is now provider-based.
-	return EVP_default_properties_is_fips_enabled(nullptr) ? true : false;
-#elif defined(OPENSSL_FIPS)
-	// OpenSSL 1.x legacy FIPS module
-	return FIPS_mode() ? true : false;
-#else
-	return false;
-#endif
 }
 
 

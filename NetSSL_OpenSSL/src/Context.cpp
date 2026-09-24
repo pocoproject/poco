@@ -521,71 +521,64 @@ void Context::createSSLContext()
 {
 	int minTLSVersion = 0;
 
-	if (SSLManager::isFIPSEnabled())
+	switch (_usage)
 	{
-		_pSSLContext = SSL_CTX_new(TLS_method());
-	}
-	else
-	{
-		switch (_usage)
-		{
-		case CLIENT_USE:
-		case TLS_CLIENT_USE:
-			_pSSLContext = SSL_CTX_new(TLS_client_method());
-			minTLSVersion = TLS1_VERSION;
-			break;
+	case CLIENT_USE:
+	case TLS_CLIENT_USE:
+		_pSSLContext = SSL_CTX_new(TLS_client_method());
+		minTLSVersion = TLS1_VERSION;
+		break;
 
-		case SERVER_USE:
-		case TLS_SERVER_USE:
-			_pSSLContext = SSL_CTX_new(TLS_server_method());
-			minTLSVersion = TLS1_VERSION;
-			break;
+	case SERVER_USE:
+	case TLS_SERVER_USE:
+		_pSSLContext = SSL_CTX_new(TLS_server_method());
+		minTLSVersion = TLS1_VERSION;
+		break;
 
-		case TLSV1_CLIENT_USE:
-			_pSSLContext = SSL_CTX_new(TLS_client_method());
-			minTLSVersion = TLS1_VERSION;
-			break;
+	case TLSV1_CLIENT_USE:
+		_pSSLContext = SSL_CTX_new(TLS_client_method());
+		minTLSVersion = TLS1_VERSION;
+		break;
 
-		case TLSV1_SERVER_USE:
-			_pSSLContext = SSL_CTX_new(TLS_server_method());
-			minTLSVersion = TLS1_VERSION;
-			break;
+	case TLSV1_SERVER_USE:
+		_pSSLContext = SSL_CTX_new(TLS_server_method());
+		minTLSVersion = TLS1_VERSION;
+		break;
 
 #if !defined(OPENSSL_NO_TLS1)
-		case TLSV1_1_CLIENT_USE:
-			_pSSLContext = SSL_CTX_new(TLS_client_method());
-			minTLSVersion = TLS1_1_VERSION;
-			break;
+	case TLSV1_1_CLIENT_USE:
+		_pSSLContext = SSL_CTX_new(TLS_client_method());
+		minTLSVersion = TLS1_1_VERSION;
+		break;
 
-		case TLSV1_1_SERVER_USE:
-			_pSSLContext = SSL_CTX_new(TLS_server_method());
-			minTLSVersion = TLS1_1_VERSION;
-			break;
+	case TLSV1_1_SERVER_USE:
+		_pSSLContext = SSL_CTX_new(TLS_server_method());
+		minTLSVersion = TLS1_1_VERSION;
+		break;
 
-		case TLSV1_2_CLIENT_USE:
-			_pSSLContext = SSL_CTX_new(TLS_client_method());
-			minTLSVersion = TLS1_2_VERSION;
-			break;
+	case TLSV1_2_CLIENT_USE:
+		_pSSLContext = SSL_CTX_new(TLS_client_method());
+		minTLSVersion = TLS1_2_VERSION;
+		break;
 
-		case TLSV1_2_SERVER_USE:
-			_pSSLContext = SSL_CTX_new(TLS_server_method());
-			minTLSVersion = TLS1_2_VERSION;
-			break;
+	case TLSV1_2_SERVER_USE:
+		_pSSLContext = SSL_CTX_new(TLS_server_method());
+		minTLSVersion = TLS1_2_VERSION;
+		break;
 
-		case TLSV1_3_CLIENT_USE:
-			_pSSLContext = SSL_CTX_new(TLS_client_method());
-			minTLSVersion = TLS1_3_VERSION;
-			break;
+	case TLSV1_3_CLIENT_USE:
+		_pSSLContext = SSL_CTX_new(TLS_client_method());
+		minTLSVersion = TLS1_3_VERSION;
+		break;
 
-		case TLSV1_3_SERVER_USE:
-			_pSSLContext = SSL_CTX_new(TLS_server_method());
-			minTLSVersion = TLS1_3_VERSION;
-			break;
+	case TLSV1_3_SERVER_USE:
+		_pSSLContext = SSL_CTX_new(TLS_server_method());
+		minTLSVersion = TLS1_3_VERSION;
+		break;
 #endif
 
-		default:
-			throw Poco::InvalidArgumentException("Invalid or unsupported usage");
-		}
+	default:
+		throw Poco::InvalidArgumentException("Invalid or unsupported usage");
 	}
 	if (!_pSSLContext)
 	{

@@ -32,10 +32,19 @@ namespace Poco::Crypto {
 
 
 class Crypto_API OpenSSLInitializer
-	/// Initalizes the OpenSSL library.
+	/// Initializes the OpenSSL library.
 	///
 	/// The class ensures the earliest initialization and the
 	/// latest shutdown of the OpenSSL library.
+	///
+	/// With OpenSSL 3.0 and newer, initialize() loads the default and,
+	/// if available, the legacy provider; they stay loaded until the
+	/// process exits.
+	///
+	/// OPENSSL_cleanup() is never called, because OpenSSL cannot be
+	/// initialized again afterwards. OpenSSL 4.0 no longer frees its
+	/// global data at exit; an application that needs a clean leak
+	/// report can call OPENSSL_cleanup() at the end of main().
 {
 public:
 	OpenSSLInitializer();
@@ -48,13 +57,23 @@ public:
 		/// Initializes the OpenSSL machinery.
 
 	static void uninitialize();
-		/// Shuts down the OpenSSL machinery.
+		/// Shuts down the OpenSSL machinery. The providers stay loaded.
 
 	[[nodiscard]] static bool isFIPSEnabled();
 		/// Returns true if FIPS mode is enabled, false otherwise.
+		/// Always false with OpenSSL versions before 3.0.
 
 	static void enableFIPSMode(bool enabled);
-		/// Enable or disable FIPS mode. If FIPS is not available, this method doesn't do anything.
+		/// Enables or disables FIPS mode by setting the default property
+		/// query "fips=yes"; the other providers stay loaded.
+		///
+		/// Throws a CryptoException if FIPS mode cannot be enabled: the
+		/// FIPS provider must be activated in the OpenSSL configuration
+		/// file (openssl.cnf), and OpenSSL 3.0 or newer is required.
+		/// Disabling does nothing with older versions.
+		///
+		/// Not thread safe. Call it during startup, before other threads
+		/// use OpenSSL and before a Poco::Net::Context is created.
 
 	[[nodiscard]] static bool haveLegacyProvider();
 		/// Returns true if the OpenSSL legacy provider is available, otherwise false.
@@ -75,27 +94,11 @@ private:
 inline bool OpenSSLInitializer::isFIPSEnabled()
 {
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
-	// OpenSSL 3.x: OPENSSL_FIPS no longer exists. FIPS is now provider-based.
 	return EVP_default_properties_is_fips_enabled(nullptr) ? true : false;
-#elif defined(OPENSSL_FIPS)
-	// OpenSSL 1.x legacy FIPS module
-	return FIPS_mode() ? true : false;
 #else
 	return false;
 #endif
 }
-
-
-#ifdef OPENSSL_FIPS
-inline void OpenSSLInitializer::enableFIPSMode(bool enabled)
-{
-	FIPS_mode_set(enabled);
-}
-#else
-inline void OpenSSLInitializer::enableFIPSMode(bool /*enabled*/)
-{
-}
-#endif
 
 
 inline bool OpenSSLInitializer::haveLegacyProvider()

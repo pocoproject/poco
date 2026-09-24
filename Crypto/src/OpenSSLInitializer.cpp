@@ -105,18 +105,33 @@ void OpenSSLInitializer::uninitialize()
 	if (--_rc == 0)
 	{
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
-		// Provider cleanup is deliberately left to OpenSSL's internal
-		// atexit handler (OPENSSL_cleanup). We must NOT:
-		//  - call OSSL_PROVIDER_unload(): leaks OSSL_LIB_CTX child
-		//    contexts that the unload path does not fully free
-		//  - null the static pointers: makes the provider allocations
-		//    unreachable, causing LeakSanitizer to report them as leaks
-		//    (LSAN runs before atexit handlers on Linux/GCC)
-		// The pointers remain valid and reachable until process exit,
-		// at which point OPENSSL_cleanup frees everything.
+		// The providers stay loaded and referenced until the process exits.
+		// Unloading the default provider leaves the process without one
+		// (OpenSSL does not activate its fallback provider again), and
+		// resetting the pointers without unloading leaks the providers on
+		// the next initialize(). OPENSSL_cleanup() is left to the application:
+		// OpenSSL cannot be initialized again after it.
 		CONF_modules_unload(1);
 #endif
 	}
+}
+
+
+void OpenSSLInitializer::enableFIPSMode(bool enabled)
+{
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	// Only the errors of this call belong in the exception message.
+	ERR_clear_error();
+	std::string msg;
+	if (enabled && OSSL_PROVIDER_available(nullptr, "fips") != 1)
+		msg = "Cannot enable FIPS mode: the OpenSSL FIPS provider is not available";
+	else if (EVP_default_properties_enable_fips(nullptr, enabled ? 1 : 0) != 1)
+		msg = "Cannot change the OpenSSL FIPS mode";
+	if (!msg.empty()) throw CryptoException(getError(msg));
+#else
+	if (enabled)
+		throw CryptoException("Cannot enable FIPS mode: OpenSSL 3.0 or newer is required");
+#endif
 }
 
 

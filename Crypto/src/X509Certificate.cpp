@@ -17,6 +17,7 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/DateTimeParser.h"
 #include "Poco/Format.h"
+#include <memory>
 #include <sstream>
 #include <openssl/pem.h>
 #ifdef _WIN32
@@ -38,6 +39,49 @@ namespace {
 const std::string ASN1_UTCTIME_FORMAT("%y%m%d%H%M%S%Z");
 // ASN1 GeneralizedTime format: YYYYMMDDHHMMSSZ (RFC 5280 Section 4.1.2.5.2)
 const std::string ASN1_GENERALIZEDTIME_FORMAT("%Y%m%d%H%M%S%Z");
+
+struct OpenSSLFree
+{
+	void operator () (unsigned char* p) const
+	{
+		OPENSSL_free(p);
+	}
+};
+
+std::string toString(const unsigned char* pData, int length)
+{
+	if (pData == nullptr || length <= 0) return std::string();
+	return std::string(reinterpret_cast<const char*>(pData), static_cast<std::size_t>(length));
+}
+
+// Returns the first entry of pName with the given NID as UTF-8, or as it is
+// stored if OpenSSL cannot convert it; empty if there is no such entry.
+std::string nameEntryText(const X509_NAME* pName, int nid)
+{
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	const int pos = X509_NAME_get_index_by_NID(pName, nid, -1);
+#else
+	// The name parameter is not const before OpenSSL 3.0.
+	const int pos = X509_NAME_get_index_by_NID(const_cast<X509_NAME*>(pName), nid, -1);
+#endif
+	if (pos < 0) return std::string();
+
+	const X509_NAME_ENTRY* pEntry = X509_NAME_get_entry(pName, pos);
+	if (pEntry == nullptr) return std::string();
+	const ASN1_STRING* pData = X509_NAME_ENTRY_get_data(pEntry);
+	if (pData == nullptr) return std::string();
+
+	// Up to OpenSSL 3.x a queued error makes SSL_get_error() report the
+	// next TLS operation of this thread as failed.
+	ERR_set_mark();
+	unsigned char* pConverted = nullptr;
+	const int length = ASN1_STRING_to_UTF8(&pConverted, pData);
+	ERR_pop_to_mark();
+	const std::unique_ptr<unsigned char, OpenSSLFree> pUTF8(pConverted);
+	if (length < 0) return toString(ASN1_STRING_get0_data(pData), ASN1_STRING_length(pData));
+
+	return toString(pUTF8.get(), length);
+}
 
 } // namespace
 
@@ -257,11 +301,7 @@ std::string X509Certificate::commonName() const
 std::string X509Certificate::issuerName(NID nid) const
 {
 	if (auto issuer = X509_get_issuer_name(_pCert))
-	{
-		char buffer[NAME_BUFFER_SIZE];
-		if (X509_NAME_get_text_by_NID(issuer, nid, buffer, sizeof(buffer)) >= 0)
-			return std::string(buffer);
-	}
+		return nameEntryText(issuer, nid);
 	return std::string();
 }
 
@@ -269,11 +309,7 @@ std::string X509Certificate::issuerName(NID nid) const
 std::string X509Certificate::subjectName(NID nid) const
 {
 	if (auto subj = X509_get_subject_name(_pCert))
-	{
-		char buffer[NAME_BUFFER_SIZE];
-		if (X509_NAME_get_text_by_NID(subj, nid, buffer, sizeof(buffer)) >= 0)
-			return std::string(buffer);
-	}
+		return nameEntryText(subj, nid);
 	return std::string();
 }
 
