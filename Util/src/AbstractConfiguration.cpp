@@ -677,4 +677,8 @@ AbstractConfiguration::~AbstractConfiguration() = default;
 
 template class Poco::BasicEvent<Poco::Util::AbstractConfiguration::KeyValue, Poco::FastMutex>;
 template class Poco::BasicEvent<const Poco::Util::AbstractConfiguration::KeyValue, Poco::FastMutex>;
+#if defined(POCO_OS_FAMILY_WINDOWS) && defined(Util_EXPORTS)
+template class Util_API Poco::BasicEvent<const std::string, Poco::FastMutex>;
+#else
 template class Poco::BasicEvent<const std::string, Poco::FastMutex>;
+#endif

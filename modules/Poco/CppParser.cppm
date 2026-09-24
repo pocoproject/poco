@@ -13,6 +13,7 @@ module;
 
 #ifdef ENABLE_CPPPARSER
 #include "Poco/CppParser/Attributes.h"
+#include "Poco/CppParser/AttributesParser.h"
 #include "Poco/CppParser/BuiltIn.h"
 #include "Poco/CppParser/CppParser.h"
 #include "Poco/CppParser/CppToken.h"
