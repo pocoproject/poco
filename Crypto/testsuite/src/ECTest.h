@@ -34,6 +34,10 @@ public:
 
 #endif
 
+	void testCurveNameUnknownNID();
+	void testCurveNIDDefaultName();
+	void testUnknownCurveName();
+
 	void setUp();
 	void tearDown();
 

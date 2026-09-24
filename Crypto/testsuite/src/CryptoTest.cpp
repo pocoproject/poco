@@ -9,6 +9,7 @@
 
 
 #include "CryptoTest.h"
+#include "ErrorQueueCleaner.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/Crypto/CipherFactory.h"
@@ -17,9 +18,14 @@
 #include "Poco/Crypto/X509Certificate.h"
 #include "Poco/Crypto/CryptoStream.h"
 #include "Poco/Crypto/CryptoTransform.h"
+#include "Poco/Crypto/OpenSSLInitializer.h"
+#include "Poco/Crypto/CryptoException.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/Exception.h"
 #include "Poco/Base64Encoder.h"
 #include "Poco/HexBinaryEncoder.h"
+#include "Poco/HexBinaryDecoder.h"
 #include <memory>
 #include <sstream>
 #include <openssl/x509.h>
@@ -78,6 +84,21 @@ static const std::string UTF8_PEM(
 	"LWWgnAZJkUS0AEQXu4Rx9ZiP7wBdFtA=\n"
 	"-----END CERTIFICATE-----\n"
 );
+
+static const std::string SAN_PEM(
+	"-----BEGIN CERTIFICATE-----\n"
+	"MIIBpTCCAUugAwIBAgIUfiHfNKdSHwtV0Me8XmHXpWS1AncwCgYIKoZIzj0EAwIw\n"
+	"GTEXMBUGA1UEAwwOY24uZXhhbXBsZS5jb20wIBcNMjYwOTIxMTEzODUwWhgPMjEy\n"
+	"NjA4MjgxMTM4NTBaMBkxFzAVBgNVBAMMDmNuLmV4YW1wbGUuY29tMFkwEwYHKoZI\n"
+	"zj0CAQYIKoZIzj0DAQcDQgAEY+C7Dwh2tgrH9WsPN5Y2wKEUrhnGmpBipXkDfR1z\n"
+	"PJWyN8rHiyKftlJwxVkYf13co18hd+4MClD1qsBNTKuoPqNvMG0wHQYDVR0OBBYE\n"
+	"FGAc1IlnVG/NA2uPVHgkUwYPNtWWMB8GA1UdIwQYMBaAFGAc1IlnVG/NA2uPVHgk\n"
+	"UwYPNtWWMA8GA1UdEwEB/wQFMAMBAf8wGgYDVR0RBBMwEYIPc2FuLmV4YW1wbGUu\n"
+	"Y29tMAoGCCqGSM49BAMCA0gAMEUCIG0wXnlgBNCK422Ifbtk9NS96WRfbIwuJmxH\n"
+	"0tcGh5UtAiEAoRlUMD2If9iSGyBNmuO2sptJPs9kHnq2WQAZpAJN2Kw=\n"
+	"-----END CERTIFICATE-----\n"
+);
+
 
 CryptoTest::CryptoTest(const std::string& name): CppUnit::TestCase(name)
 {
@@ -248,6 +269,119 @@ void CryptoTest::testEncryptDecryptGCM()
 }
 
 
+namespace
+{
+	std::string fromHex(const std::string& hex)
+	{
+		std::istringstream istr(hex);
+		Poco::HexBinaryDecoder decoder(istr);
+		std::string bytes;
+		Poco::StreamCopier::copyToString(decoder, bytes);
+		return bytes;
+	}
+
+
+	struct GCMVector
+	{
+		const char* cipher;
+		std::string key;
+		std::string iv;
+		std::string plaintext;
+		std::string ciphertext;
+		std::string tag;
+	};
+}
+
+
+void CryptoTest::testEncryptDecryptGCMIVLength()
+{
+	// Known answers for IVs shorter and longer than the 12-byte default (OpenSSL evpciph test data).
+	const GCMVector vectors[] =
+	{
+		{
+			"aes-256-gcm",
+			"9473c28f6e978eb15e1967b888282aa6b078d320034fe5f40f8bb68674f1ecda",
+			"0a",
+			"2d2e2798c10bcfcce742e92d3c390fef",
+			"c4e5ab2c6a4316e57c6c37d2c2acb42c",
+			"03337df7e1e68d77706abef9edaf5e07"
+		},
+		{
+			"aes-128-gcm",
+			std::string(32, '0'),
+			"ffffffff" + std::string(120, '0'),
+			std::string(384, '0'),
+			"56b3373ca9ef6e4a2b64fe1e9a17b61425f10d47a75a5fce13efc6bc784af24f"
+			"4141bdd48cf7c770887afd573cca5418a9aeffcd7c5ceddfc6a78397b9a85b49"
+			"9da558257267caab2ad0b23ca476a53cb17fb41c4b8b475cb4f3f7165094c229"
+			"c9e8c4dc0a2a5ff1903e501511221376a1cdb8364c5061a20cae74bc4acd76ce"
+			"b0abc9fd3217ef9f8c90be402ddf6d8697f4f880dff15bfb7a6b28241ec8fe18"
+			"3c2d59e3f9dfff653c7126f0acb9e64211f42bae12af462b1070bef1ab5e3606",
+			"566f8ef683078bfdeeffa869d751a017"
+		}
+	};
+
+	for (const auto& v: vectors)
+	{
+		const std::string keyBytes = fromHex(v.key);
+		const std::string ivBytes = fromHex(v.iv);
+		CipherKey key(v.cipher,
+			CipherKey::ByteVec(keyBytes.begin(), keyBytes.end()),
+			CipherKey::ByteVec(ivBytes.begin(), ivBytes.end()));
+		Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(key);
+
+		std::stringstream str;
+		CryptoTransform::Ptr pEncryptor = pCipher->createEncryptor();
+		CryptoOutputStream encryptorStream(str, pEncryptor);
+		encryptorStream << fromHex(v.plaintext);
+		encryptorStream.close();
+		assertTrue (encryptorStream.good());
+		assertTrue (str.str() == fromHex(v.ciphertext));
+
+		const std::string tag = pEncryptor->getTag();
+		assertTrue (tag == fromHex(v.tag));
+
+		CryptoTransform::Ptr pDecryptor = pCipher->createDecryptor();
+		pDecryptor->setTag(tag);
+		CryptoInputStream decryptorStream(str, pDecryptor);
+		std::string out;
+		Poco::StreamCopier::copyToString(decryptorStream, out);
+		assertTrue (out == fromHex(v.plaintext));
+	}
+
+	CipherKey emptyIVKey("aes-256-gcm", CipherKey::ByteVec(32, 1), CipherKey::ByteVec());
+	Cipher::Ptr pCipher = CipherFactory::defaultFactory().createCipher(emptyIVKey);
+	try
+	{
+		CryptoTransform::Ptr pEncryptor = pCipher->createEncryptor();
+		fail("empty GCM IV - must throw");
+	}
+	catch (Poco::IOException&)
+	{
+	}
+}
+
+
+void CryptoTest::testLegacyProviderErrorQueue()
+{
+	ErrorQueueCleaner cleaner;
+
+	// A legacy provider that cannot be loaded must not leave errors behind.
+	ERR_clear_error();
+	CipherFactory factory;
+	assertTrue (ERR_peek_error() == 0);
+
+	// The test driver holds the only other reference: at count zero
+	// initialize() retries a legacy provider that could not be loaded.
+	OpenSSLInitializer::uninitialize();
+	OpenSSLInitializer::initialize();
+	assertTrue (ERR_peek_error() == 0);
+
+	CipherKey key("aes-256-cbc");
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
 void CryptoTest::testPassword()
 {
 	CipherKey key("aes256", "password", "salt");
@@ -337,6 +471,84 @@ void CryptoTest::testStreams()
 	assertTrue (badDecryptor.fail());
 	assertTrue (badDecryptor.bad());
 	assertTrue (!badDecryptor.eof());
+}
+
+
+void CryptoTest::testCertificateSubjectAltName()
+{
+	ErrorQueueCleaner cleaner;
+	ERR_clear_error();
+
+	std::string commonName;
+	std::set<std::string> domainNames;
+
+	std::istringstream sanStream(SAN_PEM);
+	X509Certificate sanCert(sanStream);
+	sanCert.extractNames(commonName, domainNames);
+	assertTrue (commonName == "cn.example.com");
+	assertTrue (domainNames == std::set<std::string>{"san.example.com"});
+
+	std::istringstream noSANStream(APPINF_PEM);
+	X509Certificate noSANCert(noSANStream);
+	noSANCert.extractNames(commonName, domainNames);
+	assertTrue (domainNames == std::set<std::string>{"appinf.com"});
+
+	// The length of the dNSName changes from 0x0F to 0x7F, beyond the end of the extension.
+	std::string undecodablePEM(SAN_PEM);
+	const std::string::size_type pos = undecodablePEM.find("EYIPc2Fu");
+	assertTrue (pos != std::string::npos);
+	undecodablePEM.replace(pos, 8, "EYJ/c2Fu");
+	std::istringstream undecodableStream(undecodablePEM);
+	X509Certificate undecodableCert(undecodableStream);
+	try
+	{
+		undecodableCert.extractNames(commonName, domainNames);
+		fail("undecodable subjectAltName - must throw");
+	}
+	catch (OpenSSLException&)
+	{
+	}
+	assertTrue (ERR_peek_error() == 0);
+}
+
+
+void CryptoTest::testCertificateDuplicate()
+{
+	ErrorQueueCleaner cleaner;
+
+	std::istringstream certStream(APPINF_PEM);
+	X509Certificate cert(certStream);
+
+	X509Certificate duplicate(cert.dup());
+	assertTrue (cert.equals(duplicate));
+	X509Certificate copy(cert);
+	assertTrue (cert.equals(copy));
+
+	// A moved-from certificate has nothing to duplicate and copying it stays legal.
+	X509Certificate moved(std::move(cert));
+	assertTrue (cert.dup() == nullptr); // NOLINT(bugprone-use-after-move)
+	X509Certificate copyOfMoved(cert); // NOLINT(bugprone-use-after-move)
+	assertTrue (copyOfMoved.certificate() == nullptr);
+	assertTrue (moved.equals(copy));
+}
+
+
+void CryptoTest::testCertificateSaveCannotCreateFile()
+{
+	ErrorQueueCleaner cleaner;
+	ERR_clear_error();
+
+	std::istringstream certStream(APPINF_PEM);
+	X509Certificate cert(certStream);
+	try
+	{
+		cert.save(Poco::TemporaryFile::tempName() + "/cert.pem");
+		fail("directory does not exist - must throw");
+	}
+	catch (Poco::CreateFileException&)
+	{
+	}
+	assertTrue (ERR_peek_error() == 0);
 }
 
 
@@ -468,6 +680,37 @@ void CryptoTest::testCertificateNameEntries()
 }
 
 
+void CryptoTest::testOpenSSLException()
+{
+	ErrorQueueCleaner cleaner;
+
+	ERR_clear_error();
+	const unsigned char junk[] = { 0xFF };
+	const unsigned char* pJunk = junk;
+	assertTrue (d2i_X509(nullptr, &pJunk, 1) == nullptr);
+	assertTrue (ERR_peek_error() != 0);
+	assertTrue (ERR_peek_error() != ERR_peek_last_error());
+
+	OpenSSLException exc("test");
+	assertTrue (ERR_peek_error() == 0);
+	const std::string message = exc.message();
+	assertTrue (message.compare(0, 4, "test") == 0);
+	const std::string::size_type firstError = message.find("error:");
+	assertTrue (firstError != std::string::npos);
+	assertTrue (message.find("error:", firstError + 1) != std::string::npos);
+
+	OpenSSLException plain("plain");
+	assertTrue (plain.message().substr(0, plain.message().find('\n')) == "plain");
+	assertTrue (plain.displayText().find("error:00000000") == std::string::npos);
+
+	pJunk = junk;
+	assertTrue (d2i_X509(nullptr, &pJunk, 1) == nullptr);
+	OpenSSLException copy(exc);
+	assertTrue (copy.message() == message);
+	assertTrue (ERR_peek_error() != 0);
+}
+
+
 void CryptoTest::setUp()
 {
 }
@@ -487,14 +730,20 @@ CppUnit::Test* CryptoTest::suite()
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptWithSaltSha1);
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptDESECB);
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptGCM);
+	CppUnit_addTest(pSuite, CryptoTest, testEncryptDecryptGCMIVLength);
+	CppUnit_addTest(pSuite, CryptoTest, testLegacyProviderErrorQueue);
 	CppUnit_addTest(pSuite, CryptoTest, testPassword);
 	CppUnit_addTest(pSuite, CryptoTest, testPasswordSha1);
 	CppUnit_addTest(pSuite, CryptoTest, testEncryptInterop);
 	CppUnit_addTest(pSuite, CryptoTest, testDecryptInterop);
 	CppUnit_addTest(pSuite, CryptoTest, testStreams);
+	CppUnit_addTest(pSuite, CryptoTest, testCertificateSubjectAltName);
+	CppUnit_addTest(pSuite, CryptoTest, testCertificateDuplicate);
+	CppUnit_addTest(pSuite, CryptoTest, testCertificateSaveCannotCreateFile);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificate);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateUTF8);
 	CppUnit_addTest(pSuite, CryptoTest, testCertificateNameEntries);
+	CppUnit_addTest(pSuite, CryptoTest, testOpenSSLException);
 
 	return pSuite;
 }

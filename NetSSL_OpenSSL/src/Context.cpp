@@ -32,7 +32,9 @@
 #if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
 #include <openssl/core_names.h>
 #include <openssl/decoder.h>
+#include <openssl/param_build.h>
 #endif // POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+#include <memory>
 
 
 namespace Poco::Net {
@@ -190,14 +192,49 @@ void Context::init(const Params& params)
 
 		if (!params.cipherSuites.empty())
 		{
-			SSL_CTX_set_ciphersuites(_pSSLContext, params.cipherSuites.c_str());
+			errCode = SSL_CTX_set_ciphersuites(_pSSLContext, params.cipherSuites.c_str());
+			if (errCode != 1)
+			{
+				std::string msg = Utility::getLastError();
+				throw SSLContextException(std::string("Cannot set TLS 1.3 cipher suites ") + params.cipherSuites, msg);
+			}
 		}
-		SSL_CTX_set_cipher_list(_pSSLContext, params.cipherList.c_str());
+
+		ERR_set_mark();
+		errCode = SSL_CTX_set_cipher_list(_pSSLContext, params.cipherList.c_str());
+		if (errCode == 1)
+		{
+			ERR_clear_last_mark();
+		}
+		else
+		{
+			// "No cipher match" means that the list was applied and selects no cipher for
+			// TLS 1.2 and earlier, which is valid for a TLS 1.3-only configuration, so its
+			// error is discarded. After every other error the previous list is still active.
+			const unsigned long lastError = ERR_peek_last_error();
+			const bool listApplied = ERR_GET_LIB(lastError) == ERR_LIB_SSL
+				&& ERR_GET_REASON(lastError) == SSL_R_NO_CIPHER_MATCH;
+			if (listApplied)
+			{
+				ERR_pop_to_mark();
+			}
+			else
+			{
+				ERR_clear_last_mark();
+				std::string msg = Utility::getLastError();
+				throw SSLContextException(std::string("Cannot set cipher list ") + params.cipherList, msg);
+			}
+		}
 
 		SSL_CTX_set_verify_depth(_pSSLContext, params.verificationDepth);
 		SSL_CTX_set_mode(_pSSLContext, SSL_MODE_AUTO_RETRY);
 		SSL_CTX_set_session_cache_mode(_pSSLContext, SSL_SESS_CACHE_OFF);
-		SSL_CTX_set_ex_data(_pSSLContext, SSLManager::instance().contextIndex(), this);
+		errCode = SSL_CTX_set_ex_data(_pSSLContext, SSLManager::instance().contextIndex(), this);
+		if (errCode != 1)
+		{
+			std::string msg = Utility::getLastError();
+			throw SSLContextException("Cannot store the Context in the SSL_CTX object", msg);
+		}
 
 		if (!isForServerUse())
 		{
@@ -206,12 +243,17 @@ void Context::init(const Params& params)
 
 		if (!isForServerUse() && params.ocspStaplingVerification)
 		{
+			if (SSL_CTX_set_tlsext_status_cb(_pSSLContext, &SSLManager::verifyOCSPResponseCallback) != 1
+				|| SSL_CTX_set_tlsext_status_arg(_pSSLContext, this) != 1)
+			{
+				std::string msg = Utility::getLastError();
+				throw SSLContextException("Cannot enable OCSP stapling response verification", msg);
+			}
 			_ocspStaplingResponseVerification = true;
-			SSL_CTX_set_tlsext_status_cb(_pSSLContext, &SSLManager::verifyOCSPResponseCallback);
-			SSL_CTX_set_tlsext_status_arg(_pSSLContext, this);
 		}
 
-		initDH(params.dhGroup, params.dhParamsFile);
+		// DH parameters are used only by a server.
+		if (isForServerUse()) initDH(params.dhGroup, params.dhParamsFile);
 		initECDH(params.ecdhCurve);
 	}
 	catch (...)
@@ -262,6 +304,10 @@ void Context::useCertificate(const Poco::Crypto::X509Certificate& certificate)
 void Context::addChainCertificate(const Poco::Crypto::X509Certificate& certificate)
 {
 	X509* pCert = certificate.dup();
+	// SSL_CTX_add_extra_chain_cert() accepts a null pointer and reports success.
+	if (pCert == nullptr)
+		throw Poco::InvalidArgumentException("Cannot add a chain certificate without an X509 object to Context");
+
 	int errCode = SSL_CTX_add_extra_chain_cert(_pSSLContext, pCert);
 	if (errCode != 1)
 	{
@@ -497,8 +543,8 @@ void Context::requireMinimumProtocol(Protocols protocol)
 	}
 	if (!SSL_CTX_set_min_proto_version(_pSSLContext, version))
 	{
-		unsigned long err = ERR_get_error();
-		throw SSLException("Cannot set minimum supported version on SSL_CTX object", ERR_error_string(err, nullptr));
+		std::string msg = Utility::getLastError();
+		throw SSLException("Cannot set minimum supported version on SSL_CTX object", msg);
 	}
 }
 
@@ -771,46 +817,46 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 			throw Poco::NullPointerException(Poco::Crypto::getError(err));
 		}
 
-		size_t keyLength = 0;
-		unsigned char* pDH_p = nullptr;
-		std::size_t sz_p = 0;
-		unsigned char* pDH_g = nullptr;
-		std::size_t sz_g = 0;
+		using BIGNUMPtr = std::unique_ptr<BIGNUM, decltype(&BN_free)>;
+		int keyLength = 0;
+		BIGNUMPtr pDH_p(nullptr, &BN_free);
+		BIGNUMPtr pDH_g(nullptr, &BN_free);
 
 		switch(keyDHGroup)
 		{
 		case KEY_DH_GROUP_1024:
 			keyLength = 160;
-			pDH_p = const_cast<unsigned char*>(dh1024_p);
-			sz_p = sizeof(dh1024_p);
-			pDH_g = const_cast<unsigned char*>(dh1024_g);
-			sz_g = sizeof(dh1024_g);
+			pDH_p.reset(BN_bin2bn(dh1024_p, sizeof(dh1024_p), nullptr));
+			pDH_g.reset(BN_bin2bn(dh1024_g, sizeof(dh1024_g), nullptr));
 			break;
 		case KEY_DH_GROUP_2048:
 			keyLength = 256;
-			pDH_p = const_cast<unsigned char*>(dh2048_p);
-			sz_p = sizeof(dh2048_p);
-			pDH_g = const_cast<unsigned char*>(dh2048_g);
-			sz_g = sizeof(dh2048_g);
+			pDH_p.reset(BN_bin2bn(dh2048_p, sizeof(dh2048_p), nullptr));
+			pDH_g.reset(BN_bin2bn(dh2048_g, sizeof(dh2048_g), nullptr));
 			break;
 		default:
+			EVP_PKEY_CTX_free(pKeyCtx);
 			throw Poco::NotImplementedException(Poco::format(
 				"DH Group: %d", static_cast<int>(keyDHGroup)));
 		}
 
-		poco_assert (keyLength);
-		poco_check_ptr (pDH_p);
-		poco_assert (sz_p);
-		poco_check_ptr (pDH_g);
-		poco_assert (sz_g);
-
-		OSSL_PARAM params[]
+		// The arrays are big-endian, an OSSL_PARAM holds integers in native byte order:
+		// OSSL_PARAM_BLD converts the BIGNUMs.
+		std::unique_ptr<OSSL_PARAM_BLD, decltype(&OSSL_PARAM_BLD_free)> pParamBld(OSSL_PARAM_BLD_new(), &OSSL_PARAM_BLD_free);
+		std::unique_ptr<OSSL_PARAM, decltype(&OSSL_PARAM_free)> pParams(nullptr, &OSSL_PARAM_free);
+		if (pDH_p != nullptr && pDH_g != nullptr && pParamBld != nullptr
+			&& OSSL_PARAM_BLD_push_BN(pParamBld.get(), OSSL_PKEY_PARAM_FFC_P, pDH_p.get()) == 1
+			&& OSSL_PARAM_BLD_push_BN(pParamBld.get(), OSSL_PKEY_PARAM_FFC_G, pDH_g.get()) == 1
+			&& OSSL_PARAM_BLD_push_int(pParamBld.get(), OSSL_PKEY_PARAM_DH_PRIV_LEN, keyLength) == 1)
 		{
-			OSSL_PARAM_size_t(OSSL_PKEY_PARAM_FFC_PBITS, &keyLength),
-			OSSL_PARAM_BN(OSSL_PKEY_PARAM_FFC_P, pDH_p, sz_p),
-			OSSL_PARAM_BN(OSSL_PKEY_PARAM_FFC_G, pDH_g, sz_g),
-			OSSL_PARAM_END
-		};
+			pParams.reset(OSSL_PARAM_BLD_to_param(pParamBld.get()));
+		}
+		if (pParams == nullptr)
+		{
+			EVP_PKEY_CTX_free(pKeyCtx);
+			std::string err = "Context::initDH():cannot build the DH parameters\n";
+			throw SSLContextException(Poco::Crypto::getError(err));
+		}
 
 		if (1 != EVP_PKEY_fromdata_init(pKeyCtx))
 		{
@@ -819,7 +865,7 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 			throw SSLContextException(Poco::Crypto::getError(err));
 		}
 
-		if (1 != EVP_PKEY_fromdata(pKeyCtx, &pKey, EVP_PKEY_KEY_PARAMETERS, params))
+		if (1 != EVP_PKEY_fromdata(pKeyCtx, &pKey, EVP_PKEY_KEY_PARAMETERS, pParams.get()))
 		{
 			EVP_PKEY_CTX_free(pKeyCtx);
 			std::string err = "Context::initDH():EVP_PKEY_fromdata()\n";
@@ -877,14 +923,12 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 		{
 			p = BN_bin2bn(dh2048_p, sizeof(dh2048_p), 0);
 			g = BN_bin2bn(dh2048_g, sizeof(dh2048_g), 0);
-			DH_set0_pqg(dh, p, 0, g);
 			DH_set_length(dh, 256);
 		}
 		else if (keyDHGroup == KEY_DH_GROUP_1024)
 		{
 			p = BN_bin2bn(dh1024_p, sizeof(dh1024_p), 0);
 			g = BN_bin2bn(dh1024_g, sizeof(dh1024_g), 0);
-			DH_set0_pqg(dh, p, 0, g);
 			DH_set_length(dh, 160);
 		}
 		else
@@ -892,10 +936,13 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 			throw Poco::NotImplementedException(Poco::format(
 				"DH Group: %d", static_cast<int>(keyDHGroup)));
 		}
-		if (!p || !g)
+		if (p == nullptr || g == nullptr || !DH_set0_pqg(dh, p, nullptr, g))
 		{
+			BN_free(p);
+			BN_free(g);
 			DH_free(dh);
-			throw SSLContextException("Error creating Diffie-Hellman parameters");
+			std::string msg = Utility::getLastError();
+			throw SSLContextException("Error creating Diffie-Hellman parameters", msg);
 		}
 
 #else // LIBRESSL_VERSION_NUMBER
@@ -926,7 +973,12 @@ void Context::initDH(KeyDHGroup keyDHGroup, const std::string& dhParamsFile)
 #endif // !defined(LIBRESSL_VERSION_NUMBER)
 
 	}
-	SSL_CTX_set_tmp_dh(_pSSLContext, dh);
+	if (!SSL_CTX_set_tmp_dh(_pSSLContext, dh))
+	{
+		DH_free(dh);
+		std::string msg = Utility::getLastError();
+		throw SSLContextException("Cannot set Diffie-Hellman parameters", msg);
+	}
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_DH_USE);
 	DH_free(dh);
 
@@ -953,7 +1005,8 @@ void Context::initECDH(const std::string& curve)
 
 	if (SSL_CTX_set1_curves_list(_pSSLContext, groups.c_str()) == 0)
 	{
-		throw SSLContextException("Cannot set ECDH groups", groups);
+		std::string msg = Utility::getLastError();
+		throw SSLContextException("Cannot set ECDH groups " + groups, msg);
 	}
 	SSL_CTX_set_options(_pSSLContext, SSL_OP_SINGLE_ECDH_USE);
 #endif

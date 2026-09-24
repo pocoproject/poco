@@ -193,20 +193,31 @@ public:
 			/// Note: The cipher list only applies for TLS 1.2 and 
 			/// earlier versions. To configure TLS 1.3 cipher suites, 
 			/// please use the cipherSuites member variable.
+			/// A list with invalid syntax results in an SSLContextException.
+			/// A list that selects no cipher (for example an empty list)
+			/// is accepted; only TLS 1.3 connections are possible then.
 
 		std::string cipherSuites;
 			/// Specifies the supported TLS 1.3 cipher suites.
 			/// If left empty, the OpenSSL default cipher suites
 			/// are used. Please refer to the OpenSSL documentation
 			/// for available cipher suite names.
+			/// A list that OpenSSL rejects results in an SSLContextException.
 
 		std::string dhParamsFile;
 			/// Specifies a file containing Diffie-Hellman parameters.
-			/// If empty, the default parameters are used.
+			/// If empty, the default parameters are used. Only a server uses them.
 
 		KeyDHGroup dhGroup;
-			/// If set to true, will use 2048-bit MODP Group with 256-bit
-			/// prime order subgroup (RFC5114) instead of 1024-bit for DH.
+			/// Selects the built-in Diffie-Hellman parameters (RFC 5114) used if
+			/// dhParamsFile is empty: KEY_DH_GROUP_2048 (default, 2048-bit MODP group
+			/// with 256-bit prime order subgroup) or KEY_DH_GROUP_1024 (1024-bit MODP
+			/// group with 160-bit prime order subgroup). OpenSSL rejects parameters
+			/// that are too small for the security level (KEY_DH_GROUP_1024 above
+			/// SECURITY_LEVEL_80_BITS, KEY_DH_GROUP_2048 above SECURITY_LEVEL_112_BITS);
+			/// a server Context constructor then throws an SSLContextException. Use
+			/// dhParamsFile for larger parameters. In FIPS mode dhGroup and
+			/// dhParamsFile are ignored.
 
 		std::string ecdhCurve;
 			/// OpenSSL 1.0.1 and earlier:

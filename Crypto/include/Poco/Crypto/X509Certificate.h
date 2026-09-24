@@ -122,6 +122,9 @@ public:
 	void extractNames(std::string& commonName, std::set<std::string>& domainNames) const;
 		/// Extracts the common name and the alias domain names from the
 		/// certificate.
+		///
+		/// Throws an OpenSSLException if the subjectAltName extension
+		/// is present more than once or cannot be decoded.
 
 	[[nodiscard]] Poco::DateTime validFrom() const;
 		/// Returns the date and time the certificate is valid from.
@@ -169,6 +172,9 @@ public:
 		/// Duplicates and returns the underlying OpenSSL certificate. Note that
 		/// the caller assumes responsibility for the lifecycle of the created
 		/// certificate.
+		///
+		/// Throws an OpenSSLException if the certificate cannot be duplicated.
+		/// Returns a null pointer for a certificate that has been moved from.
 
 	[[nodiscard]] std::string signatureAlgorithm() const;
 		/// Returns the certificate signature algorithm long name.
@@ -179,6 +185,9 @@ public:
 	static List readPEM(const std::string& pemFileName);
 		/// Reads and returns a list of certificates from
 		/// the specified PEM file.
+		///
+		/// Throws an OpenSSLException if the file contains no certificate
+		/// or an entry that cannot be read.
 
 	static void writePEM(const std::string& pemFileName, const List& list);
 		/// Writes the list of certificates to the specified PEM file.
@@ -239,12 +248,6 @@ inline const std::string& X509Certificate::subjectName() const
 inline const X509* X509Certificate::certificate() const
 {
 	return _pCert;
-}
-
-
-inline X509* X509Certificate::dup() const
-{
-	return X509_dup(_pCert);
 }
 
 

@@ -34,14 +34,20 @@ public:
 	void testEncryptDecryptWithSaltSha1();
 	void testEncryptDecryptDESECB();
 	void testEncryptDecryptGCM();
+	void testEncryptDecryptGCMIVLength();
+	void testLegacyProviderErrorQueue();
 	void testStreams();
 	void testPassword();
 	void testPasswordSha1();
 	void testEncryptInterop();
 	void testDecryptInterop();
+	void testCertificateSubjectAltName();
+	void testCertificateDuplicate();
+	void testCertificateSaveCannotCreateFile();
 	void testCertificate();
 	void testCertificateUTF8();
 	void testCertificateNameEntries();
+	void testOpenSSLException();
 
 	void setUp();
 	void tearDown();

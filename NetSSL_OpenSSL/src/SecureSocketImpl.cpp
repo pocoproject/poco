@@ -118,7 +118,12 @@ void SecureSocketImpl::acceptSSL()
 
 	::SSL_set_bio(_pSSL, pBIO, pBIO);
 	::SSL_set_accept_state(_pSSL);
-	::SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), this);
+	if (1 != ::SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), this))
+	{
+		::SSL_free(_pSSL);
+		_pSSL = nullptr;
+		throw SSLException("Cannot store the socket in the SSL object", Utility::getLastError());
+	}
 	_needHandshake = true;
 }
 
@@ -180,27 +185,34 @@ void SecureSocketImpl::connectSSL(bool performHandshake)
 		throw SSLException("Cannot create SSL object");
 	}
 	::SSL_set_bio(_pSSL, pBIO, pBIO);
-	::SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), this);
-
-	if (!_peerHostName.empty())
-	{
-		SSL_set_tlsext_host_name(_pSSL, _peerHostName.c_str());
-	}
-
-	if(_pContext->ocspStaplingResponseVerificationEnabled())
-	{
-		SSL_set_tlsext_status_type(_pSSL, TLSEXT_STATUSTYPE_ocsp);
-	}
-
-	if (_pSession && _pSession->isResumable())
-	{
-		::SSL_set_session(_pSSL, _pSession->sslSession());
-	}
 
 	try
 	{
+		if (1 != ::SSL_set_ex_data(_pSSL, SSLManager::instance().socketIndex(), this))
+			throw SSLException("Cannot store the socket in the SSL object", Utility::getLastError());
+
+		if (!_peerHostName.empty())
+		{
+			if (1 != SSL_set_tlsext_host_name(_pSSL, _peerHostName.c_str()))
+				throw SSLException("Cannot set the peer host name for SNI", Utility::getLastError());
+		}
+
+		if(_pContext->ocspStaplingResponseVerificationEnabled())
+		{
+			if (1 != SSL_set_tlsext_status_type(_pSSL, TLSEXT_STATUSTYPE_ocsp))
+				throw SSLException("Cannot request an OCSP stapling response", Utility::getLastError());
+		}
+
+		if (_pSession && _pSession->isResumable())
+		{
+			::SSL_set_session(_pSSL, _pSession->sslSession());
+		}
+
 		if (performHandshake && _pSocket->getBlocking())
 		{
+			// SSL_get_error() inspects the thread's error queue (OpenSSL < 4.0): an entry
+			// left there by unrelated code would turn a retry condition into a fatal error.
+			::ERR_clear_error();
 			int ret = ::SSL_connect(_pSSL);
 			handleError(ret);
 			verifyPeerCertificate();
@@ -280,6 +292,7 @@ int SecureSocketImpl::shutdown()
 				Poco::Timestamp tsStart;
 				do
 				{
+					::ERR_clear_error();
 					rc = ::SSL_shutdown(_pSSL);
 					if (rc == 1) break;
 					if (rc < 0)
@@ -305,6 +318,7 @@ int SecureSocketImpl::shutdown()
 			else
 			{
 				// For non-blocking sockets, call SSL_shutdown() once.
+				::ERR_clear_error();
 				rc = ::SSL_shutdown(_pSSL);
 				if (rc < 0)
 				{
@@ -378,6 +392,7 @@ int SecureSocketImpl::sendBytes(const void* buffer, int length, int flags)
 	Poco::Timestamp tsStart;
 	while (true)
 	{
+		::ERR_clear_error();
 		rc = ::SSL_write(_pSSL, buffer, length);
 		if (!mustRetry(rc))
 			break;
@@ -421,6 +436,7 @@ int SecureSocketImpl::receiveBytes(void* buffer, int length, int flags)
 	Poco::Timestamp tsStart;
 	while (true)
 	{
+		::ERR_clear_error();
 		if (flags & MSG_PEEK)
 		{
 			rc = SSL_peek(_pSSL, buffer, length);
@@ -463,6 +479,7 @@ int SecureSocketImpl::completeHandshake()
 	Poco::Timestamp tsStart;
 	while (true)
 	{
+		::ERR_clear_error();
 		rc = ::SSL_do_handshake(_pSSL);
 		if (!mustRetry(rc))
 			break;

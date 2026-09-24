@@ -52,9 +52,16 @@ Envelope::~Envelope()
 
 void Envelope::addKey(const EVPPKey& key)
 {
-	EVP_PKEY* pKey;
-	_pubKeys.push_back(EVPPKey::duplicate((const EVP_PKEY*)key, &pKey));
-	_encKeys.emplace_back(EVP_PKEY_size(_pubKeys.back()));
+	EVP_PKEY* pKey = nullptr;
+	EVPPKey::duplicate((const EVP_PKEY*)key, &pKey);
+	const int keySize = EVP_PKEY_size(pKey);
+	if (keySize <= 0)
+	{
+		EVP_PKEY_free(pKey);
+		handleErrors(std::string("Envelope::addKey():EVP_PKEY_size()"));
+	}
+	_pubKeys.push_back(pKey);
+	_encKeys.emplace_back(keySize);
 }
 
 
