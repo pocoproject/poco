@@ -28,12 +28,13 @@ namespace Poco::Crypto {
 
 
 class Crypto_API DigestEngine: public Poco::DigestEngine
-	/// This class implements a Poco::DigestEngine for all
+	/// This class implements a Poco::DigestEngine for the
 	/// digest algorithms supported by OpenSSL.
 	///
 	/// A Poco::Crypto::OpenSSLException is thrown if OpenSSL cannot
 	/// initialize the algorithm or compute the digest, for example
-	/// because FIPS mode excludes the algorithm.
+	/// because FIPS mode excludes the algorithm or an extendable-output
+	/// function such as SHAKE256 has no fixed digest length.
 {
 public:
 	DigestEngine(const std::string& name);
@@ -50,7 +51,7 @@ public:
 		/// Returns the name of the digest algorithm.
 
 	[[nodiscard]] int nid() const;
-		/// Returns the NID (OpenSSL object identifier) of the digest algorithm.
+		/// Returns the OpenSSL numeric identifier (NID) of the digest algorithm.
 
 	// DigestEngine
 	[[nodiscard]] std::size_t digestLength() const;
