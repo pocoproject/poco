@@ -12,6 +12,7 @@
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/RemotingNG/REST/JSONSerializer.h"
+#include "Poco/JSONString.h"
 #include <sstream>
 
 
@@ -31,17 +32,17 @@ JSONSerializerTest::~JSONSerializerTest()
 
 void JSONSerializerTest::testError()
 {
-	std::string expectedResult(
-		"{\n"
-		"\t\"error\": \"Syntax error\",\n"
-		"\t\"detail\": \"Testing\",\n"
-		"\t\"code\": 1234\n"
-		"}\n"
-	);
+	Poco::SyntaxException exc("Testing"s, 1234);
+	// the detail is taken from the exception, which carries a backtrace with POCO_ENABLE_TRACE
+	std::string expectedResult(R"({
+	"error": "Syntax error",
+	"detail": )" + Poco::toJSON(exc.message()) + R"(,
+	"code": 1234
+}
+)");
 
 	std::ostringstream ostr;
 	JSONSerializer ser(ostr);
-	Poco::SyntaxException exc("Testing"s, 1234);
 	ser.serializeFaultMessage(""s, exc);
 	std::string result = ostr.str();
 	assert (result == expectedResult);

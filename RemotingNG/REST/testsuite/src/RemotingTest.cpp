@@ -155,8 +155,8 @@ RemotingTest::~RemotingTest()
 
 void RemotingTest::setUp()
 {
-	_publicURI = "http://127.0.0.1:2280/tester/{id}";
-	_pListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2280");
+	_publicURI = "http://127.0.0.1:2282/tester/{id}";
+	_pListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2282");
 	_pListener->enableChunkedTransferEncoding(false);
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
 	Poco::RemotingNG::REST::TransportFactory::registerFactory();
@@ -178,7 +178,7 @@ void RemotingTest::tearDown()
 
 void RemotingTest::testRegistration()
 {
-	assert (_objectURI == "http://127.0.0.1:2280/rest/Tester/TheTester");
+	assert (_objectURI == "http://127.0.0.1:2282/rest/Tester/TheTester");
 }
 
 
@@ -229,13 +229,13 @@ void RemotingTest::testGetNotFound()
 	}
 	catch (Poco::RemotingNG::REST::RESTServerException& exc)
 	{
-		assert (exc.displayText() == "REST Server Error: Not Found: Not found");
+		assertMessageEqual ("REST Server Error: Not Found: Not found", exc.displayText());
 		assert (exc.code() == 404);
 
 		assert (exc.reason() == "Not Found");
 		assert (exc.status() == 404);
 		assert (exc.error() == "Not found");
-		assert (exc.detail() == "");
+		assertMessageEqual ("", exc.detail());
 	}
 	catch (Poco::RemotingNG::RemoteException&)
 	{
@@ -272,12 +272,12 @@ void RemotingTest::testFault()
 	}
 	catch (Poco::RemotingNG::REST::RESTServerException& exc)
 	{
-		assert (exc.displayText() == "REST Server Error: Internal Server Error: Application exception: Something went wrong");
+		assertMessageEqual ("REST Server Error: Internal Server Error: Application exception: Something went wrong", exc.displayText());
 
 		assert (exc.reason() == "Internal Server Error");
 		assert (exc.status() == 500);
 		assert (exc.error() == "Application exception");
-		assert (exc.detail() == "Something went wrong");
+		assertMessageEqual ("Something went wrong", exc.detail());
 	}
 	catch (Poco::RemotingNG::RemoteException&)
 	{
@@ -469,8 +469,8 @@ RemotingTestRESTAuth::~RemotingTestRESTAuth()
 
 void RemotingTestRESTAuth::setUp()
 {
-	_publicURI = "http://127.0.0.1:2280/tester/{id}";
-	_pListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2280", Poco::RemotingNG::REST::Listener::PROTO_HTTP);
+	_publicURI = "http://127.0.0.1:2282/tester/{id}";
+	_pListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2282", Poco::RemotingNG::REST::Listener::PROTO_HTTP);
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
 	Poco::RemotingNG::REST::TransportFactory::registerFactory();
 	Poco::SharedPtr<Tester> pTester = new Tester;
@@ -478,7 +478,7 @@ void RemotingTestRESTAuth::setUp()
 	pTesterRemoteObject->remoting__setURI(Poco::URI(_publicURI));
 	_objectURI = TesterServerHelper::registerRemoteObject(pTesterRemoteObject, _listener);
 
-	Poco::Net::ServerSocket ss(2280);
+	Poco::Net::ServerSocket ss(2282);
 	_pHTTPServer = new Poco::Net::HTTPServer(new RESTAuthRequestHandlerFactory(*_pListener), ss, new Poco::Net::HTTPServerParams);
 	_pHTTPServer->start();
 }
@@ -503,7 +503,7 @@ void RemotingTestRESTAuth::testUnauthorized()
 	}
 	catch (Poco::Exception& exc)
 	{
-		assert (exc.message() == "HTTP Error: Unauthorized");
+		assertMessageEqual ("HTTP Error: Unauthorized", exc.message());
 		assert (exc.code() == 401);
 	}
 }
@@ -558,8 +558,8 @@ RemotingTestAuth::~RemotingTestAuth()
 
 void RemotingTestAuth::setUp()
 {
-	_publicURI = "http://127.0.0.1:2280/authtester/{id}";
-	_pListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2280");
+	_publicURI = "http://127.0.0.1:2282/authtester/{id}";
+	_pListener = new Poco::RemotingNG::REST::Listener("127.0.0.1:2282");
 	_pListener->enableChunkedTransferEncoding(false);
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
 	Poco::RemotingNG::REST::TransportFactory::registerFactory();
@@ -619,7 +619,7 @@ void RemotingTestAuth::testAuthenticatedNoCredentials()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "Unauthorized: Authentication failed");
+		assertMessageEqual ("Unauthorized: Authentication failed", exc.message());
 	}
 }
 
@@ -644,7 +644,7 @@ void RemotingTestAuth::testAuthenticatedBadCredentials()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "Unauthorized: Authentication failed");
+		assertMessageEqual ("Unauthorized: Authentication failed", exc.message());
 	}
 }
 
@@ -688,7 +688,7 @@ void RemotingTestAuth::testAuthenticatedBadOAuthCredentials()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "Unauthorized: Authentication failed");
+		assertMessageEqual ("Unauthorized: Authentication failed", exc.message());
 	}
 }
 
@@ -737,7 +737,7 @@ void RemotingTestAuth::testNoPermission()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "Forbidden: No permission: perm1");
+		assertMessageEqual ("Forbidden: No permission: perm1", exc.message());
 	}
 }
 

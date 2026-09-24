@@ -337,7 +337,7 @@ void RemotingTest::testFault()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "Application exception: Something went wrong");
+		assertMessageEqual ("Application exception: Something went wrong", exc.message());
 	}
 }
 
@@ -383,7 +383,7 @@ void RemotingTest::testAuthenticatedBadCredentials()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "Authentication failed");
+		assertMessageEqual ("Authentication failed", exc.message());
 	}
 }
 
@@ -401,7 +401,7 @@ void RemotingTest::testAuthenticatedNoCredentials()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "Authentication failed");
+		assertMessageEqual ("Authentication failed", exc.message());
 	}
 }
 
@@ -449,7 +449,7 @@ void RemotingTest::testNoPermission()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "No permission: perm1");
+		assertMessageEqual ("No permission: perm1", exc.message());
 	}
 }
 
@@ -961,7 +961,7 @@ void RemotingTestHTTPAuth::testUnauthorized()
 	}
 	catch (Poco::Exception& exc)
 	{
-		assert (exc.message() == "HTTP Error: Unauthorized");
+		assertMessageEqual ("HTTP Error: Unauthorized", exc.message());
 	}
 }
 

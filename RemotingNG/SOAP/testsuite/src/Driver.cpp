@@ -1,7 +1,7 @@
 //
 // Driver.cpp
 //
-// Console-based test driver for Poco UPnP SOAP.
+// Console-based test driver for Poco RemotingNG SOAP.
 //
 // Copyright (c) 2006-2011, Applied Informatics Software Engineering GmbH.
 // All rights reserved.

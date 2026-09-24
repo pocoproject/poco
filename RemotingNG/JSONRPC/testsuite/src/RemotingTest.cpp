@@ -211,7 +211,7 @@ RemotingTest::~RemotingTest()
 
 void RemotingTest::setUp()
 {
-	_pListener = new Poco::RemotingNG::JSONRPC::Listener("127.0.0.1:2280");
+	_pListener = new Poco::RemotingNG::JSONRPC::Listener("127.0.0.1:2281");
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
 	Poco::RemotingNG::JSONRPC::TransportFactory::registerFactory();
 	_objectURI = TesterServerHelper::registerObject(new Tester, "TheTester", _listener);
@@ -229,7 +229,7 @@ void RemotingTest::tearDown()
 
 void RemotingTest::testRegistration()
 {
-	assert (_objectURI == "http://127.0.0.1:2280/jsonrpc/Tester/TheTester");
+	assert (_objectURI == "http://127.0.0.1:2281/jsonrpc/Tester/TheTester");
 }
 
 
@@ -337,7 +337,7 @@ void RemotingTest::testFault()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "Application exception: Something went wrong");
+		assertMessageEqual ("Application exception: Something went wrong", exc.message());
 	}
 }
 
@@ -390,7 +390,7 @@ void RemotingTest::testAuthenticatedBadCredentials()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "Authentication failed");
+		assertMessageEqual ("Authentication failed", exc.message());
 	}
 }
 
@@ -408,7 +408,7 @@ void RemotingTest::testAuthenticatedNoCredentials()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "Authentication failed");
+		assertMessageEqual ("Authentication failed", exc.message());
 	}
 }
 
@@ -452,7 +452,7 @@ void RemotingTest::testNoPermission()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "No permission: perm1");
+		assertMessageEqual ("No permission: perm1", exc.message());
 	}
 }
 
@@ -937,12 +937,12 @@ RemotingTestJSONRPCAuth::~RemotingTestJSONRPCAuth()
 
 void RemotingTestJSONRPCAuth::setUp()
 {
-	_pListener = new Poco::RemotingNG::JSONRPC::Listener("127.0.0.1:2280", Poco::RemotingNG::JSONRPC::Listener::PROTO_HTTP);
+	_pListener = new Poco::RemotingNG::JSONRPC::Listener("127.0.0.1:2281", Poco::RemotingNG::JSONRPC::Listener::PROTO_HTTP);
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
 	Poco::RemotingNG::JSONRPC::TransportFactory::registerFactory();
 	_objectURI = TesterServerHelper::registerObject(new Tester, "TheTester", _listener);
 
-	Poco::Net::ServerSocket ss(2280);
+	Poco::Net::ServerSocket ss(2281);
 	_pHTTPServer = new Poco::Net::HTTPServer(new JSONRPCAuthRequestHandlerFactory(*_pListener), ss, new Poco::Net::HTTPServerParams);
 	_pHTTPServer->start();
 }
@@ -967,7 +967,7 @@ void RemotingTestJSONRPCAuth::testUnauthorized()
 	}
 	catch (Poco::Exception& exc)
 	{
-		assert (exc.message() == "HTTP Error: Unauthorized");
+		assertMessageEqual ("HTTP Error: Unauthorized", exc.message());
 	}
 }
 

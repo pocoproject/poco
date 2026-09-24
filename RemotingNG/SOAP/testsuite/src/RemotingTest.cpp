@@ -273,7 +273,7 @@ RemotingTest::~RemotingTest()
 
 void RemotingTest::setUp()
 {
-	_pListener = new Poco::RemotingNG::SOAP::Listener("127.0.0.1:2280", "");
+	_pListener = new Poco::RemotingNG::SOAP::Listener("127.0.0.1:2283", "");
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
 	Poco::RemotingNG::SOAP::TransportFactory::registerFactory();
 	_objectURI = TesterServerHelper::registerObject(new Tester, "TheTester", _listener);
@@ -291,7 +291,7 @@ void RemotingTest::tearDown()
 
 void RemotingTest::testRegistration()
 {
-	assert (_objectURI == "http://127.0.0.1:2280/soap/Tester/TheTester");
+	assert (_objectURI == "http://127.0.0.1:2283/soap/Tester/TheTester");
 }
 
 
@@ -401,9 +401,9 @@ void RemotingTest::testFault()
 	{
 		using Poco::RemotingNG::SOAP::XMLElement;
 
-		assert (exc.message() == "Application exception: Something went wrong");
+		assertMessageEqual ("Application exception: Something went wrong", exc.message());
 
-		assert (exc.faultReason() == "Application exception: Something went wrong");
+		assertMessageEqual ("Application exception: Something went wrong", exc.faultReason());
 
 		if (exc.namespaceURI() == "http://schemas.xmlsoap.org/soap/envelope/")
 		{
@@ -415,7 +415,7 @@ void RemotingTest::testFault()
 			
 			const XMLElement* pFaultString = exc.fault().findChild("faultstring", exc.fault().namespaceURI());
 			assertNotNull (pFaultString);
-			assert (pFaultString->value() == "Application exception: Something went wrong");
+			assertMessageEqual ("Application exception: Something went wrong", pFaultString->value());
 			
 			const XMLElement* pDetail = exc.faultDetail();
 			assertNotNull (pDetail);
@@ -429,7 +429,7 @@ void RemotingTest::testFault()
 
 			const XMLElement* pMessage = pExc->findChild("Message", pExc->namespaceURI());
 			assertNotNull (pMessage);
-			assert (pMessage->value() == "Something went wrong");
+			assertMessageEqual ("Something went wrong", pMessage->value());
 
 			const XMLElement* pCode = pExc->findChild("Code", pExc->namespaceURI());
 			assertNotNull (pCode);
@@ -451,7 +451,7 @@ void RemotingTest::testFault()
 			
 			const XMLElement* pText = pReason->findChild("Text", pReason->namespaceURI());
 			assertNotNull (pText);
-			assert (pText->value() == "Application exception: Something went wrong");
+			assertMessageEqual ("Application exception: Something went wrong", pText->value());
 
 			const XMLElement* pDetail = exc.faultDetail();
 			assertNotNull (pDetail);
@@ -465,7 +465,7 @@ void RemotingTest::testFault()
 
 			const XMLElement* pMessage = pExc->findChild("Message", pExc->namespaceURI());
 			assertNotNull (pMessage);
-			assert (pMessage->value() == "Something went wrong");
+			assertMessageEqual ("Something went wrong", pMessage->value());
 
 			const XMLElement* pExCode = pExc->findChild("Code", pExc->namespaceURI());
 			assertNotNull (pExCode);
@@ -531,7 +531,7 @@ void RemotingTest::testAuthenticatedBadCredentials()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "Authentication failed");
+		assertMessageEqual ("Authentication failed", exc.message());
 	}
 }
 
@@ -549,7 +549,7 @@ void RemotingTest::testAuthenticatedNoCredentials()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "Authentication failed");
+		assertMessageEqual ("Authentication failed", exc.message());
 	}
 }
 
@@ -593,7 +593,7 @@ void RemotingTest::testNoPermission()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "No permission: perm1");
+		assertMessageEqual ("No permission: perm1", exc.message());
 	}
 }
 
@@ -1305,12 +1305,12 @@ RemotingTestSOAP12Auth::~RemotingTestSOAP12Auth()
 
 void RemotingTestSOAP12Auth::setUp()
 {
-	_pListener = new Poco::RemotingNG::SOAP::Listener("127.0.0.1:2280", Poco::RemotingNG::SOAP::Listener::PROTO_HTTP);
+	_pListener = new Poco::RemotingNG::SOAP::Listener("127.0.0.1:2283", Poco::RemotingNG::SOAP::Listener::PROTO_HTTP);
 	_listener = Poco::RemotingNG::ORB::instance().registerListener(_pListener);
 	Poco::RemotingNG::SOAP::TransportFactory::registerFactory();
 	_objectURI = TesterServerHelper::registerObject(new Tester, "TheTester", _listener);
 
-	Poco::Net::ServerSocket ss(2280);
+	Poco::Net::ServerSocket ss(2283);
 	_pHTTPServer = new Poco::Net::HTTPServer(new SOAPAuthRequestHandlerFactory(*_pListener), ss, new Poco::Net::HTTPServerParams);
 	_pHTTPServer->start();
 }
@@ -1335,7 +1335,7 @@ void RemotingTestSOAP12Auth::testUnauthorized()
 	}
 	catch (Poco::Exception& exc)
 	{
-		assert (exc.message() == "HTTP Error: Unauthorized");
+		assertMessageEqual ("HTTP Error: Unauthorized", exc.message());
 	}
 }
 
