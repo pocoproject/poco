@@ -43,7 +43,11 @@
 
 
 #if !defined(CodeGeneration_API)
-	#define CodeGeneration_API
+	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
+		#define CodeGeneration_API __attribute__ ((visibility ("default")))
+	#else
+		#define CodeGeneration_API
+	#endif
 #endif
 
 

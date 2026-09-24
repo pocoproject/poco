@@ -60,6 +60,6 @@ if(ENABLE_TESTS)
 	add_subdirectory(testsuite)
 endif()
 
-if (ENABLE_SAMPLES)
+if(ENABLE_SAMPLES)
 	add_subdirectory(samples)
 endif()

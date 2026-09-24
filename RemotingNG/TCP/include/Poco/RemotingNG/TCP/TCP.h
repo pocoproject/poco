@@ -41,7 +41,11 @@
 
 
 #if !defined(RemotingNGTCP_API)
-	#define RemotingNGTCP_API
+	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
+		#define RemotingNGTCP_API __attribute__ ((visibility ("default")))
+	#else
+		#define RemotingNGTCP_API
+	#endif
 #endif
 
 
