@@ -231,33 +231,37 @@ std::string ORB::registerListener(Listener::Ptr pListener)
 
 void ORB::unregisterListener(const std::string& listenerId, bool autoRemoveObjects)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
-
-	ListenerMap::iterator itListener = _listeners.find(listenerId);
-	if (itListener == _listeners.end()) return;
-	Listener::Ptr pListener = itListener->second;
-
-	RemoteObjects::iterator itRO = _remoteObjects.begin();
-	RemoteObjects::iterator endRO = _remoteObjects.end();
-	while (itRO != endRO)
+	// As in unregisterObject(), the listener is called and the removed objects are
+	// released after the lock has been given up.
+	Listener::Ptr pListener;
+	std::vector<RemoteObjectInfo::Ptr> removedObjects;
 	{
-		if (itRO->second->pListener == pListener)
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+		ListenerMap::iterator itListener = _listeners.find(listenerId);
+		if (itListener == _listeners.end()) return;
+		pListener = itListener->second;
+
+		RemoteObjects::iterator itRO = _remoteObjects.begin();
+		while (itRO != _remoteObjects.end())
 		{
-			if (autoRemoveObjects)
+			if (itRO->second->pListener == pListener)
 			{
-				itRO->second->pListener->unregisterObject(itRO->second->pRemoteObject);
-				RemoteObjects::iterator delIt = itRO;
-				++itRO;
-				_remoteObjectURIs.erase(delIt->second->uri);
-				_remoteObjects.erase(delIt);
-				continue;
+				if (!autoRemoveObjects) throw RemotingException("Listener has registered objects and cannot be unregistered");
+				removedObjects.push_back(itRO->second);
+				_remoteObjectURIs.erase(itRO->second->uri);
+				itRO = _remoteObjects.erase(itRO);
 			}
-			else throw RemotingException("Listener has registered objects and cannot be unregistered");
+			else ++itRO;
 		}
-		++itRO;
+		_listeners.erase(itListener);
+	}
+
+	for (const auto& pInfo: removedObjects)
+	{
+		pListener->unregisterObject(pInfo->pRemoteObject);
 	}
 	pListener->stop();
-	_listeners.erase(itListener);
 }
 
 
@@ -329,30 +333,33 @@ void ORB::registerSkeleton(const Identifiable::TypeId& tid, Skeleton::Ptr pSkele
 
 void ORB::unregisterSkeleton(const Identifiable::TypeId& tid, bool autoRemoveObjects)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
-
-	Skeletons::iterator itSkel = _skeletons.find(tid);
-	if (itSkel == _skeletons.end()) return;
-	Skeleton::Ptr pSkeleton = itSkel->second;
-
-	RemoteObjects::iterator itRO = _remoteObjects.begin();
-	RemoteObjects::iterator endRO = _remoteObjects.end();
-	while (itRO != endRO)
+	// As in unregisterObject(), the listeners are called and the removed objects are
+	// released after the lock has been given up.
+	std::vector<RemoteObjectInfo::Ptr> removedObjects;
 	{
-		if (itRO->second->pSkeleton == pSkeleton)
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+		Skeletons::iterator itSkel = _skeletons.find(tid);
+		if (itSkel == _skeletons.end()) return;
+		Skeleton::Ptr pSkeleton = itSkel->second;
+
+		RemoteObjects::iterator itRO = _remoteObjects.begin();
+		while (itRO != _remoteObjects.end())
 		{
-			if (autoRemoveObjects)
+			if (itRO->second->pSkeleton == pSkeleton)
 			{
-				itRO->second->pListener->unregisterObject(itRO->second->pRemoteObject);
-				RemoteObjects::iterator delIt = itRO;
-				++itRO;
-				_remoteObjectURIs.erase(delIt->second->uri);
-				_remoteObjects.erase(delIt);
-				continue;
+				if (!autoRemoveObjects) throw RemotingException("Skeleton is still in use and cannot be unregistered");
+				removedObjects.push_back(itRO->second);
+				_remoteObjectURIs.erase(itRO->second->uri);
+				itRO = _remoteObjects.erase(itRO);
 			}
-			else throw RemotingException("Skeleton is still in use and cannot be unregistered");
+			else ++itRO;
 		}
-		++itRO;
+	}
+
+	for (auto& pInfo: removedObjects)
+	{
+		pInfo->pListener->unregisterObject(pInfo->pRemoteObject);
 	}
 }
 
@@ -498,34 +505,42 @@ std::string ORB::registerObject(RemoteObject::Ptr pRemoteObject, const std::stri
 
 void ORB::unregisterObject(const std::string& uri)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
-
-	RemoteObjects::iterator itRO = _remoteObjectURIs.find(uri);
-	if (itRO != _remoteObjectURIs.end())
+	// The object's registration is removed under the lock; the listener callback,
+	// the objectUnregistered event and the release of the RemoteObjectInfo (whose
+	// event dispatchers unsubscribe from the object's events in their destructors)
+	// happen after the lock has been given up, so that no other mutex is acquired
+	// while _mutex is held.
+	RemoteObjectInfo::Ptr pInfo;
 	{
-		ObjectRegistration reg;
-		reg.uri = uri;
-		reg.alias = itRO->second->pRemoteObject->remoting__getURI().toString();
-		reg.pRemoteObject = itRO->second->pRemoteObject;
-		reg.pListener = itRO->second->pListener;
+		Poco::FastMutex::ScopedLock lock(_mutex);
 
-		itRO->second->pListener->unregisterObject(itRO->second->pRemoteObject);
-		_remoteObjects.erase(itRO->second->objectPath);
-		URIAliases::iterator itAl = _uriAliases.find(itRO->second->pRemoteObject->remoting__getURI().getPath());
+		RemoteObjects::iterator itRO = _remoteObjectURIs.find(uri);
+		if (itRO == _remoteObjectURIs.end()) return;
+		pInfo = itRO->second;
+
+		_remoteObjects.erase(pInfo->objectPath);
+		URIAliases::iterator itAl = _uriAliases.find(pInfo->pRemoteObject->remoting__getURI().getPath());
 		if (itAl != _uriAliases.end())
 		{
 			_uriAliases.erase(itAl);
 		}
 		_remoteObjectURIs.erase(itRO);
+	}
 
-		try
-		{
-			objectUnregistered(this, reg);
-		}
-		catch (Poco::Exception& exc)
-		{
-			_logger.warning("objectUnegistered event handler leaked exception: %s"s, exc.displayText());
-		}
+	pInfo->pListener->unregisterObject(pInfo->pRemoteObject);
+
+	ObjectRegistration reg;
+	reg.uri = uri;
+	reg.alias = pInfo->pRemoteObject->remoting__getURI().toString();
+	reg.pRemoteObject = pInfo->pRemoteObject;
+	reg.pListener = pInfo->pListener;
+	try
+	{
+		objectUnregistered(this, reg);
+	}
+	catch (Poco::Exception& exc)
+	{
+		_logger.warning("objectUnegistered event handler leaked exception: %s"s, exc.displayText());
 	}
 }
 
@@ -538,6 +553,7 @@ void ORB::registerEventDispatcher(const std::string& uri, EventDispatcher::Ptr p
 	if (itRO != _remoteObjectURIs.end())
 	{
 		itRO->second->eventDispatchers[pDispatcher->protocol()] = pDispatcher;
+		pDispatcher->setOwner(itRO->second->pRemoteObject);
 	}
 	else throw Poco::NotFoundException("remote object", uri);
 }
@@ -545,27 +561,32 @@ void ORB::registerEventDispatcher(const std::string& uri, EventDispatcher::Ptr p
 
 void ORB::unregisterEventDispatcher(const std::string& uri, const std::string& protocol)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
-
-	RemoteObjects::iterator itRO = _remoteObjectURIs.find(uri);
-	if (itRO != _remoteObjectURIs.end())
+	EventDispatcher::Ptr pDispatcher; // released after the lock has been given up
 	{
-		itRO->second->eventDispatchers.erase(protocol);
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+		RemoteObjects::iterator itRO = _remoteObjectURIs.find(uri);
+		if (itRO == _remoteObjectURIs.end()) throw Poco::NotFoundException("remote object", uri);
+		EventDispatchers::iterator itED = itRO->second->eventDispatchers.find(protocol);
+		if (itED != itRO->second->eventDispatchers.end())
+		{
+			pDispatcher = itED->second;
+			itRO->second->eventDispatchers.erase(itED);
+		}
 	}
-	else throw Poco::NotFoundException("remote object", uri);
 }
 
 
 void ORB::unregisterEventDispatchers(const std::string& uri)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
-
-	RemoteObjects::iterator itRO = _remoteObjectURIs.find(uri);
-	if (itRO != _remoteObjectURIs.end())
+	EventDispatchers dispatchers; // released after the lock has been given up
 	{
-		itRO->second->eventDispatchers.clear();
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+		RemoteObjects::iterator itRO = _remoteObjectURIs.find(uri);
+		if (itRO == _remoteObjectURIs.end()) throw Poco::NotFoundException("remote object", uri);
+		dispatchers.swap(itRO->second->eventDispatchers);
 	}
-	else throw Poco::NotFoundException("remote object", uri);
 }
 
 

@@ -507,6 +507,9 @@ void Serializer::serialize(const std::string& name, const std::vector<char>& val
 	if (_mtom && val.size() >= MIN_MTOM_SIZE)
 	{
 		std::string cid(createContentID());
+		// The caller's vector must stay alive until serializeMessageEnd() has written
+		// the parts; generated proxies and skeletons serialize a complete message
+		// within one call, so the parameter outlives the message.
 		_parts[cid] = &val;
 		(this->*handleStartElementComplex)(name);
 		(this->*handleStartElementInclude)(name, cid);
@@ -863,6 +866,7 @@ void Serializer::resetImpl()
 {
 	delete _pMultipartWriter;
 	_pMultipartWriter = 0;
+	_parts.clear();
 	_pXMLWriter.reset(0);
 	_attr.clear();
 	_headerElements.clear();

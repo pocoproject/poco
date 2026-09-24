@@ -23,7 +23,6 @@ class ProxyGenerator: public AbstractGenerator
 	/// ProxyGenerator generates a proxy for a given class definition. C++ specific. 
 {
 public:
-	//static const std::string PARAM_RETURN;
 	struct ExtParam
 	{
 		std::string varName;

@@ -1060,7 +1060,6 @@ protected:
 		{
 			try
 			{
-
 				for (std::vector<std::string>::const_iterator it = args.begin(); it != args.end(); ++it)
 				{
 					loadConfiguration(*it);

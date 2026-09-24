@@ -89,8 +89,7 @@ void InterfaceGenerator::structStart(const Poco::CppParser::Struct* pStruct, con
 	Poco::CppParser::Function* pTypeId = new Poco::CppParser::Function(std::string("static const Poco::RemotingNG::Identifiable::TypeId& remoting__typeId()"), _pStruct);
 	pTypeId->addDocumentation(	" Returns the TypeId of the class.");
 
-	Poco::CppParser::TypeAlias* pTypeAlias = new Poco::CppParser::TypeAlias("using Ptr = Poco::AutoPtr<" + generateClassName(pStruct) + ">", _pStruct);
-	poco_check_ptr (pTypeAlias); // just avoid unused variable warning
+	[[maybe_unused]] Poco::CppParser::TypeAlias* pTypeAlias = new Poco::CppParser::TypeAlias("using Ptr = Poco::AutoPtr<" + generateClassName(pStruct) + ">", _pStruct); // registers itself with _pStruct
 
 	if (_enableOSP)
 	{

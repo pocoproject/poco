@@ -119,8 +119,7 @@ void ProxyGenerator::structStart(const Poco::CppParser::Struct* pStruct, const C
 	Poco::CppParser::Variable* pVar2 = new Poco::CppParser::Variable("static const std::string DEFAULT_NS", _pStruct);
 	pVar2->setAccess(Poco::CppParser::Symbol::ACC_PRIVATE);
 
-	Poco::CppParser::TypeAlias* pTypeAlias = new Poco::CppParser::TypeAlias("using Ptr = Poco::AutoPtr<" + generateClassName(pStruct) + ">", _pStruct);
-	poco_check_ptr (pTypeAlias); // just avoid unused variable warning
+	[[maybe_unused]] Poco::CppParser::TypeAlias* pTypeAlias = new Poco::CppParser::TypeAlias("using Ptr = Poco::AutoPtr<" + generateClassName(pStruct) + ">", _pStruct); // registers itself with _pStruct
 
 	// replicate parent functions
 	handleParentFunctions(pStruct);
