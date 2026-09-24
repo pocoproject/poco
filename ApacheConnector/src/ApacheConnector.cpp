@@ -303,7 +303,7 @@ extern "C" const command_rec ApacheConnector_cmds[] =
 };
 
 
-module AP_MODULE_DECLARE_DATA poco_module =
+extern "C" module AP_MODULE_DECLARE_DATA poco_module =
 {
 	STANDARD20_MODULE_STUFF,
 	nullptr,
