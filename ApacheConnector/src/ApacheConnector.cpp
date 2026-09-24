@@ -14,6 +14,7 @@
 #include "ApacheServerResponse.h"
 #include "ApacheRequestHandlerFactory.h"
 #include "Poco/Net/HTTPRequestHandler.h"
+#include <cstring>
 #include <memory>
 #include "httpd.h"
 #include "http_connection.h"
@@ -133,7 +134,8 @@ int ApacheRequestRec::sendFile(const std::string& path, unsigned int fileSize, c
 
 bool ApacheRequestRec::secure()
 {
-	return DEFAULT_HTTPS_PORT == ap_default_port(_pRec) && ap_http_scheme(_pRec) == "https";
+	const char* scheme = ap_http_scheme(_pRec);
+	return DEFAULT_HTTPS_PORT == ap_default_port(_pRec) && scheme != nullptr && std::strcmp(scheme, "https") == 0;
 }
 
 
@@ -303,7 +305,7 @@ extern "C" const command_rec ApacheConnector_cmds[] =
 };
 
 
-module AP_MODULE_DECLARE_DATA poco_module =
+extern "C" module AP_MODULE_DECLARE_DATA poco_module =
 {
 	STANDARD20_MODULE_STUFF,
 	nullptr,
