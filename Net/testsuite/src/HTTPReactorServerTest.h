@@ -29,6 +29,11 @@ public:
 	void testHandlerExceptionKeepsServerAlive();
 	void testOnErrorPreservesExceptionType();
 	void testSendTimeoutClosesStalledClient();
+	void testStopClosesConnections();
+	void testStopClosesMultipleConnections();
+	void testStopClosesConnectionsSelfReactor();
+	void testReactorErrorClosesConnection();
+	void testIncompleteRequestSizeLimit();
 
 	void setUp();
 	void tearDown();

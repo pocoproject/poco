@@ -858,6 +858,19 @@ void TCPServerTest::testAddCertificateAuthority()
 }
 
 
+void TCPServerTest::testConfigDefaultsToExtendedVerification()
+{
+	// The test configuration omits openSSL.client.extendedVerification, so this
+	// pins the default SSLManager applies rather than a configured value.
+	Context::Ptr pClientContext = SSLManager::instance().defaultClientContext();
+	assertTrue (pClientContext->extendedCertificateVerificationEnabled());
+
+	// A server has no host name for its peer, so the check stays off there.
+	Context::Ptr pServerContext = SSLManager::instance().defaultServerContext();
+	assertTrue (!pServerContext->extendedCertificateVerificationEnabled());
+}
+
+
 void TCPServerTest::setUp()
 {
 }
@@ -883,6 +896,7 @@ CppUnit::Test* TCPServerTest::suite()
 	CppUnit_addTest(pSuite, TCPServerTest, testShutdownWithoutDataTLS13);
 	CppUnit_addTest(pSuite, TCPServerTest, testContextInvalidCertificateHandler);
 	CppUnit_addTest(pSuite, TCPServerTest, testAddCertificateAuthority);
+	CppUnit_addTest(pSuite, TCPServerTest, testConfigDefaultsToExtendedVerification);
 
 	return pSuite;
 }

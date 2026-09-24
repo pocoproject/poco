@@ -25,6 +25,7 @@ public:
 	~HTTPServerTest();
 
 	void testIdentityRequest();
+	void testFramingConflicts();
 	void testPutIdentityRequest();
 	void testChunkedRequest();
 	void testIdentityRequestKeepAlive();

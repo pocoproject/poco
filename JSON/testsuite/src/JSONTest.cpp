@@ -2570,6 +2570,76 @@ void JSONTest::testEnum()
 	}
 }
 
+void JSONTest::testEmbeddedNulKey()
+{
+	// A key containing an escaped NUL must keep its full length: truncating at
+	// the NUL would make two distinct keys collide.
+	std::string json = "{ \"admin\\u0000shadow\" : 1, \"admin\" : 2 }";
+	Parser parser;
+	Var result = parser.parse(json);
+	Object::Ptr object = result.extract<Object::Ptr>();
+	assertTrue (object->size() == 2);
+	assertTrue (object->has(std::string("admin\0shadow", 12)));
+	assertTrue (object->has("admin"));
+	assertTrue (object->getValue<int>("admin") == 2);
+	assertTrue (object->getValue<int>(std::string("admin\0shadow", 12)) == 1);
+}
+
+
+void JSONTest::testCommentsInStrings()
+{
+	// With comment support enabled, a comment delimiter inside a string value is
+	// part of the value and must not remove the text that follows it.
+	std::string json = "{ \"user\" : \"attacker/*\", \"isAdmin\" : false, \"note\" : \"*/\" }";
+	Parser parser;
+	parser.setAllowComments(true);
+	Var result = parser.parse(json);
+	Object::Ptr object = result.extract<Object::Ptr>();
+	assertTrue (object->size() == 3);
+	assertTrue (object->has("isAdmin"));
+	assertTrue (object->getValue<bool>("isAdmin") == false);
+	assertTrue (object->getValue<std::string>("user") == "attacker/*");
+	assertTrue (object->getValue<std::string>("note") == "*/");
+
+	// An escaped quote must not end the string either: the value itself is what
+	// the escape handling protects.
+	std::string escaped = "{ \"a\" : \"x\\\"/*\", \"b\" : 1 }";
+	Parser parser2;
+	parser2.setAllowComments(true);
+	Object::Ptr obj2 = parser2.parse(escaped).extract<Object::Ptr>();
+	assertTrue (obj2->size() == 2);
+	assertTrue (obj2->getValue<std::string>("a") == "x\"/*");
+	assertTrue (obj2->getValue<int>("b") == 1);
+
+	// "/*/" is an opening delimiter, not a complete comment.
+	std::string selfClosing = "{ \"a\" : 1, /*/ \"isAdmin\" : true /*/ }";
+	Parser parser4;
+	parser4.setAllowComments(true);
+	try
+	{
+		parser4.parse(selfClosing);
+		fail("/*/ must not close the comment it opens");
+	}
+	catch (Poco::Exception&)
+	{
+	}
+
+	// An empty key survives the length-bounded read.
+	Parser parser5;
+	Object::Ptr obj5 = parser5.parse("{ \"\" : 7 }").extract<Object::Ptr>();
+	assertTrue (obj5->has(""));
+	assertTrue (obj5->getValue<int>("") == 7);
+
+	// A real comment outside a string is still removed.
+	std::string withComment = "{ /* drop me */ \"a\" : 1 }";
+	Parser parser3;
+	parser3.setAllowComments(true);
+	Object::Ptr obj3 = parser3.parse(withComment).extract<Object::Ptr>();
+	assertTrue (obj3->size() == 1);
+	assertTrue (obj3->getValue<int>("a") == 1);
+}
+
+
 CppUnit::Test* JSONTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("JSONTest");
@@ -2624,6 +2694,8 @@ CppUnit::Test* JSONTest::suite()
 	CppUnit_addTest(pSuite, JSONTest, testMove);
 	CppUnit_addTest(pSuite, JSONTest, testRemove);
 	CppUnit_addTest(pSuite, JSONTest, testEnum);
+	CppUnit_addTest(pSuite, JSONTest, testEmbeddedNulKey);
+	CppUnit_addTest(pSuite, JSONTest, testCommentsInStrings);
 
 	return pSuite;
 }

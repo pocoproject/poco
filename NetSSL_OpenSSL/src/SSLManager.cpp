@@ -29,6 +29,7 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/Util/Application.h"
 #include "Poco/Util/OptionException.h"
+#include <openssl/err.h>
 #include <openssl/ocsp.h>
 #include <openssl/tls1.h>
 
@@ -57,6 +58,7 @@ const std::string SSLManager::CFG_SESSION_ID_CONTEXT("sessionIdContext");
 const std::string SSLManager::CFG_SESSION_CACHE_SIZE("sessionCacheSize");
 const std::string SSLManager::CFG_SESSION_TIMEOUT("sessionTimeout");
 const std::string SSLManager::CFG_EXTENDED_VERIFICATION("extendedVerification");
+const bool        SSLManager::VAL_EXTENDED_VERIFICATION(true);
 const std::string SSLManager::CFG_REQUIRE_TLSV1("requireTLSv1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_1("requireTLSv1_1");
 const std::string SSLManager::CFG_REQUIRE_TLSV1_2("requireTLSv1_2");
@@ -320,21 +322,32 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 		return 0;
 	}
 
+	// The chain is supplied by the peer, and X509_check_issued() only matches
+	// names and key identifiers. Without also checking the signature an attacker
+	// can add a self-signed certificate carrying the real issuer's subject name
+	// and have the response accepted as if the genuine issuer had produced it.
 	X509* pPeerIssuerCert = nullptr;
 	STACK_OF(X509)* pCertChain = SSL_get_peer_cert_chain(pSSL);
-	unsigned certChainLen = sk_X509_num(pCertChain);
-	for (unsigned i = 0; i < certChainLen; i++)
+	// There is no chain for a resumed session, and sk_X509_num() returns -1 for
+	// a null stack.
+	const int certChainLen = (pCertChain != nullptr) ? sk_X509_num(pCertChain) : 0;
+	for (int i = 0; i < certChainLen; i++)
 	{
-		if (!pPeerIssuerCert)
+		X509* pIssuerCert = sk_X509_value(pCertChain, i);
+		if (X509_check_issued(pIssuerCert, pPeerCert) != X509_V_OK) continue;
+
+		EVP_PKEY* pIssuerKey = X509_get0_pubkey(pIssuerCert);
+		if (pIssuerKey != nullptr && X509_verify(pPeerCert, pIssuerKey) == 1)
 		{
-			X509* pIssuerCert = sk_X509_value(pCertChain, i);
-			if (X509_check_issued(pIssuerCert, pPeerCert) == X509_V_OK)
-			{
-				pPeerIssuerCert = pIssuerCert;
-				break;
-			}
+			pPeerIssuerCert = pIssuerCert;
+			break;
 		}
 	}
+	// Candidates that are not the issuer fail X509_verify() and leave entries on
+	// the thread error queue. SSL_get_error() consults it before the want-read
+	// and want-write states, so a later read would be reported as a fatal error.
+	ERR_clear_error();
+
 	if (!pPeerIssuerCert)
 	{
 		X509_free(pPeerCert);
@@ -357,7 +370,9 @@ int SSLManager::verifyOCSPResponseCallback(SSL* pSSL, void* arg)
 
 	X509_STORE* pStore = SSL_CTX_get_cert_store(SSL_get_SSL_CTX(pSSL));
 
-	int verifyStatus = OCSP_basic_verify(pBasicResp, pCerts, pStore, OCSP_TRUSTOTHER);
+	// No OCSP_TRUSTOTHER: the responder certificate has to chain to the store
+	// rather than being trusted just because the peer sent it.
+	int verifyStatus = OCSP_basic_verify(pBasicResp, pCerts, pStore, 0);
 
 	sk_X509_pop_free(pCerts, X509_free);
 
@@ -538,7 +553,11 @@ void SSLManager::initDefaultContext(bool server)
 	{
 		_ptrDefaultClientContext->enableSessionCache(cacheSessions);
 	}
-	bool extendedVerification = config.getBool(prefix + CFG_EXTENDED_VERIFICATION, false);
+	// Extended verification matches the peer certificate against a host name.
+	// A server has no host name for its peer, so enabling it there would match
+	// the client certificate against the client's address and break mutual TLS.
+	const bool defaultExtendedVerification = server ? false : VAL_EXTENDED_VERIFICATION;
+	bool extendedVerification = config.getBool(prefix + CFG_EXTENDED_VERIFICATION, defaultExtendedVerification);
 	if (server)
 		_ptrDefaultServerContext->enableExtendedCertificateVerification(extendedVerification);
 	else

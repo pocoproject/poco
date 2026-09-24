@@ -15,6 +15,7 @@
 #include "Poco/Zip/ZipArchiveInfo.h"
 #include "Poco/Zip/ZipException.h"
 #include "Poco/Buffer.h"
+#include "Poco/Exception.h"
 #include <istream>
 #include <cstring>
 
@@ -156,10 +157,27 @@ void ZipArchiveInfo64::parse(std::istream& inp, bool assumeHeaderRead)
 	{
 		inp.read(_rawInfo + offset, FULL_HEADER_SIZE - offset);
 		len -= (FULL_HEADER_SIZE - offset);
-		Poco::Buffer<char> xtra(len);
-		inp.read(xtra.begin(), len);
-		_extraField = std::string(xtra.begin(), len);
-		ZipUtil::set64BitValue(FULL_HEADER_SIZE + len - offset, _rawInfo, RECORDSIZE_POS);
+		// The record size is read from the archive, so the buffer grows as the
+		// data actually arrives rather than being allocated from the declared
+		// length in one go. StreamCopier bounds a copy only through
+		// copyStreamRange(), which seeks first; once it offers a counted copy
+		// that does not, this loop should use it.
+		const std::size_t CHUNK_SIZE = 8192;
+		Poco::Buffer<char> chunk(CHUNK_SIZE);
+		_extraField.clear();
+		while (len > 0 && inp.good())
+		{
+			const std::streamsize toRead =
+				static_cast<std::streamsize>(len < CHUNK_SIZE ? len : CHUNK_SIZE);
+			inp.read(chunk.begin(), toRead);
+			const std::streamsize read = inp.gcount();
+			if (read <= 0) break;
+			_extraField.append(chunk.begin(), static_cast<std::size_t>(read));
+			len -= static_cast<Poco::UInt64>(read);
+		}
+		if (len > 0)
+			throw Poco::DataFormatException("Truncated ZIP64 end of central directory record");
+		ZipUtil::set64BitValue(FULL_HEADER_SIZE + _extraField.size() - offset, _rawInfo, RECORDSIZE_POS);
 	}
 	inp.read(_locInfo, FULL_LOCATOR_SIZE);
 	if (inp.gcount() != FULL_LOCATOR_SIZE)

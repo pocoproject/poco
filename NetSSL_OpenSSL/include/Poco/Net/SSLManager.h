@@ -136,7 +136,11 @@ class NetSSL_API SSLManager
 	///      Specifying a size of 0 will set an unlimited cache size.
 	///    - sessionTimeout (integer):  Sets the timeout (in seconds) of cached sessions on the server.
 	///    - extendedVerification (boolean): Enable or disable the automatic post-connection
-	///      extended certificate verification.
+	///      extended certificate verification. For openSSL.client this defaults to true,
+	///      matching a programmatically created Context; disabling it also disables the
+	///      check that the peer certificate was issued for the host actually connected to.
+	///      For openSSL.server it defaults to false, because a server has no host name to
+	///      match a client certificate against.
 	///    - requireTLSv1 (boolean): Require a TLSv1 connection.
 	///    - requireTLSv1_1 (boolean): Require a TLSv1.1 connection.
 	///    - requireTLSv1_2 (boolean): Require a TLSv1.2 connection.
@@ -349,6 +353,8 @@ private:
 	static const std::string CFG_SESSION_CACHE_SIZE;
 	static const std::string CFG_SESSION_TIMEOUT;
 	static const std::string CFG_EXTENDED_VERIFICATION;
+	static const bool        VAL_EXTENDED_VERIFICATION;
+		/// Client-side default; servers default to false (see initDefaultContext()).
 	static const std::string CFG_REQUIRE_TLSV1;
 	static const std::string CFG_REQUIRE_TLSV1_1;
 	static const std::string CFG_REQUIRE_TLSV1_2;

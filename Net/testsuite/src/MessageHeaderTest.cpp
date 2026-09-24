@@ -483,6 +483,23 @@ void MessageHeaderTest::tearDown()
 }
 
 
+void MessageHeaderTest::testNoDecodeFramingHeaders()
+{
+	// Auto-decoding must not reach the headers that decide the framing,
+	// otherwise an encoded word becomes "chunked" only after a front-end has
+	// already framed the message on the undecoded value.
+	std::string s("Subject: =?utf-8?B?Y2h1bmtlZA==?=\r\n"
+		"Transfer-Encoding: =?utf-8?B?Y2h1bmtlZA==?=\r\n"
+		"Content-Length: =?utf-8?B?MTA=?=\r\n\r\n");
+	std::istringstream istr(s);
+	MessageHeader mh;
+	mh.read(istr);
+	assertTrue (mh.get("Subject") == "chunked");
+	assertTrue (mh.get("Transfer-Encoding") == "=?utf-8?B?Y2h1bmtlZA==?=");
+	assertTrue (mh.get("Content-Length") == "=?utf-8?B?MTA=?=");
+}
+
+
 CppUnit::Test* MessageHeaderTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("MessageHeaderTest");
@@ -507,6 +524,7 @@ CppUnit::Test* MessageHeaderTest::suite()
 	CppUnit_addTest(pSuite, MessageHeaderTest, testValueLengthLimit);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testLongValue);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testDecodeWord);
+	CppUnit_addTest(pSuite, MessageHeaderTest, testNoDecodeFramingHeaders);
 	CppUnit_addTest(pSuite, MessageHeaderTest, testAutoDecode);
 
 	return pSuite;
