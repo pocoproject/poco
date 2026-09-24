@@ -64,7 +64,10 @@ endif(POCO_UNBUNDLED)
 add_library(Foundation ${SRCS})
 if (POCO_UNBUNDLED)
 	target_link_libraries(Foundation PRIVATE ZLIB::ZLIB Pcre2::Pcre2 Utf8Proc::Utf8Proc)
-	target_include_directories(Foundation PRIVATE ${EMBEDDED_PCRE2_INCLUDE})
+	# Only Unicode.cpp and the embedded tables need pcre2's internal headers;
+	# RegularExpression.cpp must see the system pcre2.h it links against.
+	set_source_files_properties(src/Unicode.cpp ${EMBEDDED_PCRE2_SOURCES}
+		PROPERTIES INCLUDE_DIRECTORIES "${EMBEDDED_PCRE2_INCLUDE}")
 	target_compile_definitions(Foundation PUBLIC POCO_UNBUNDLED PRIVATE HAVE_CONFIG_H)
 else()
 	# BUILD_LOCAL_INTERFACE is used to ensure that the dependent libraries are used
@@ -106,6 +109,12 @@ set_target_properties(Foundation
 
 if (NOT POCO_SOO)
 	target_compile_definitions(Foundation PUBLIC POCO_NO_SOO)
+endif()
+
+# Selects MutexImpl in Mutex.h, so it must reach consumers of the installed
+# headers as well; otherwise they disagree with the library about Mutex.
+if (POCO_ENABLE_STD_MUTEX)
+	target_compile_definitions(Foundation PUBLIC POCO_ENABLE_STD_MUTEX)
 endif()
 
 target_compile_definitions(Foundation PUBLIC POCO_CMAKE)

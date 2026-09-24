@@ -205,16 +205,9 @@ protected:
 			}
 			else
 			{
-				try
+				for (const auto& a: args)
 				{
-					for (const auto& a: args)
-					{
-						compile(a);
-					}
-				}
-				catch (Poco::Exception& exc)
-				{
-					std::cout << exc.displayText() << std::endl;
+					compile(a);
 				}
 			}
 		}
