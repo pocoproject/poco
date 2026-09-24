@@ -65,8 +65,7 @@ void ServerHelperGenerator::structStart(const Poco::CppParser::Struct* pStruct, 
 	std::string iFullName = InterfaceGenerator::generateQualifiedClassName(nameSpace(), pStruct);
 	std::string edFullName = EventDispatcherGenerator::generateQualifiedClassName(nameSpace(), pStruct);
 
-	Poco::CppParser::TypeAlias* pTypeAlias = new Poco::CppParser::TypeAlias("using Service = " + pStruct->fullName(), _pStruct);
-	poco_check_ptr (pTypeAlias); // just avoid unused variable warning
+	[[maybe_unused]] Poco::CppParser::TypeAlias* pTypeAlias = new Poco::CppParser::TypeAlias("using Service = " + pStruct->fullName(), _pStruct); // registers itself with _pStruct
 
 	// add constructor/destructor
 	Poco::CppParser::Function* pConstr = new Poco::CppParser::Function(_pStruct->name(), _pStruct);

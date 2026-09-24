@@ -20,7 +20,7 @@
 
 
 class ExtensionsGenerator
-	/// ExtensionsGenerator generates an extesions.xml file
+	/// ExtensionsGenerator generates an extensions.xml file
 {
 public:
 	ExtensionsGenerator(std::ostream& out);

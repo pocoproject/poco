@@ -529,7 +529,8 @@ Poco::CppParser::Function* XSDGenerator::createGetFct(const Poco::CppParser::Par
 {
 	std::string methodName("get");
 	methodName.append(pParam->name());
-	methodName[3] = (char)std::toupper(methodName[3]);
+	if (methodName.size() > 3)
+		methodName[3] = (char)std::toupper(methodName[3]);
 
 	// we return either by value or by const &
 	std::string decl(createParameterTypeDecl(pParam->declType()));
@@ -547,7 +548,8 @@ Poco::CppParser::Function* XSDGenerator::createSetFct(const Poco::CppParser::Par
 {
 	std::string methodName("set");
 	methodName.append(pParam->name());
-	methodName[3] = (char)std::toupper(methodName[3]);
+	if (methodName.size() > 3)
+		methodName[3] = (char)std::toupper(methodName[3]);
 
 	// we return either by value or by const &
 	std::string decl("void ");
