@@ -25,8 +25,9 @@ public:
 	CodeGenerationTest(const std::string& name);
 	~CodeGenerationTest();
 
-	void testA();
-	void testB();
+	void testGenerateClass();
+	void testStdHeader();
+	void testCreateInclude();
 
 	void setUp();
 	void tearDown();

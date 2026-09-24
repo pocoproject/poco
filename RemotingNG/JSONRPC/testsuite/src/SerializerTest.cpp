@@ -13,6 +13,7 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/RemotingNG/JSONRPC/Serializer.h"
 #include "Poco/RemotingNG/TypeSerializer.h"
+#include "Poco/JSONString.h"
 #include <sstream>
 
 
@@ -220,20 +221,20 @@ void SerializerTest::testComplexRequest()
 
 void SerializerTest::testError()
 {
-	std::string expectedResult(
-		"{\n"
-		"\t\"jsonrpc\": \"2.0\",\n"
-		"\t\"error\":\n"
-		"\t{\n"
-		"\t\t\"code\": 32000,\n"
-		"\t\t\"message\": \"Syntax error\"\n"
-		"\t}\n"
-		"}\n"
-	);
+	Poco::SyntaxException exc;
+	// the message is taken from the exception, which carries a backtrace with POCO_ENABLE_TRACE
+	std::string expectedResult(R"({
+	"jsonrpc": "2.0",
+	"error":
+	{
+		"code": 32000,
+		"message": )" + Poco::toJSON(exc.displayText()) + R"(
+	}
+}
+)");
 
 	Serializer ser;
 	std::ostringstream ostr;
-	Poco::SyntaxException exc;
 	ser.setup(ostr);
 	ser.serializeFaultMessage(""s, exc);
 	std::string result = ostr.str();

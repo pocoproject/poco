@@ -268,7 +268,7 @@ void DeserializerTest::testError()
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
 		assert (exc.code() == 32000);
-		assert (exc.message() == "Syntax error");
+		assertMessageEqual ("Syntax error", exc.message());
 	}
 }
 

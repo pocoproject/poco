@@ -153,7 +153,7 @@ public:
 	{
 	}
 	
-	bool operator == (const Class1& cl)
+	bool operator == (const Class1& cl) const
 	{
 		return _anEnum == cl._anEnum 
 		    && _anInt  == cl._anInt;

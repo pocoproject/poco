@@ -50,7 +50,7 @@ void JSONDeserializerTest::testError()
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
 		assert (exc.code() == 500);
-		assert (exc.message() == "Internal Server Error: Exception: Detail Text");
+		assertMessageEqual ("Internal Server Error: Exception: Detail Text", exc.message());
 	}
 }
 
@@ -293,7 +293,7 @@ void JSONDeserializerTest::testNullValue()
 	}
 	catch (Poco::NullValueException& exc)
 	{
-		assert (exc.message() == "value");
+		assertMessageEqual ("value", exc.message());
 	}
 	deser.deserializeStructEnd("");
 }

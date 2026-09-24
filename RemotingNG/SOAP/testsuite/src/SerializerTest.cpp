@@ -167,6 +167,32 @@ void SerializerTest::testReplyTwoParams11()
 }
 
 
+namespace
+{
+	std::string withoutBacktraces(const std::string& xml)
+		/// Removes the backtraces that Poco::Exception appends to messages with
+		/// POCO_ENABLE_TRACE: each one starts with a newline and, being escaped
+		/// text, ends before the next element tag. Identity without traces.
+	{
+		std::string result;
+		std::string::size_type pos = 0;
+		while (pos < xml.size())
+		{
+			std::string::size_type nl = xml.find('\n', pos);
+			if (nl == std::string::npos)
+			{
+				result.append(xml, pos, std::string::npos);
+				break;
+			}
+			result.append(xml, pos, nl - pos);
+			pos = xml.find('<', nl);
+			if (pos == std::string::npos) break;
+		}
+		return result;
+	}
+}
+
+
 void SerializerTest::testFault11()
 {
 	const std::string expectedResult(
@@ -193,7 +219,7 @@ void SerializerTest::testFault11()
 	Poco::Exception e("Some exception"s, "some arg"s);
 	ser.serializeFaultMessage(""s, e);
 	std::string result = ostr.str();
-	assert (result == expectedResult);
+	assert (withoutBacktraces(result) == expectedResult);
 }
 
 
@@ -317,7 +343,7 @@ void SerializerTest::testFault12()
 	Poco::Exception e("Some exception"s, "some arg"s);
 	ser.serializeFaultMessage("", e);
 	std::string result = ostr.str();
-	assert (result == expectedResult);
+	assert (withoutBacktraces(result) == expectedResult);
 }
 
 

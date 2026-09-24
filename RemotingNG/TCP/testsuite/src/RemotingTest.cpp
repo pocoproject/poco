@@ -357,7 +357,7 @@ void RemotingTest::testFault()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "Application exception: Something went wrong");
+		assertMessageEqual ("Application exception: Something went wrong", exc.message());
 	}
 }
 
@@ -403,7 +403,7 @@ void RemotingTest::testAuthenticatedBadCredentials()
 	}
 	catch (Poco::RemotingNG::AuthenticationFailedException& exc)
 	{
-		assert (exc.message() == "The server refused the provided credentials");
+		assertMessageEqual ("The server refused the provided credentials", exc.message());
 	}
 }
 
@@ -421,7 +421,7 @@ void RemotingTest::testAuthenticatedNoCredentials()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "Authentication failed");
+		assertMessageEqual ("Authentication failed", exc.message());
 	}
 }
 
@@ -465,7 +465,7 @@ void RemotingTest::testAuthenticatedUpdatedCredentials()
 	}
 	catch (Poco::RemotingNG::AuthenticationFailedException& exc)
 	{
-		assert (exc.message() == "The server refused the provided credentials");
+		assertMessageEqual ("The server refused the provided credentials", exc.message());
 	}
 }
 
@@ -511,7 +511,7 @@ void RemotingTest::testAuthenticatedBadSCRAMCredentials()
 	}
 	catch (Poco::RemotingNG::AuthenticationFailedException& exc)
 	{
-		assert (exc.message() == "The server refused the provided credentials");
+		assertMessageEqual ("The server refused the provided credentials", exc.message());
 	}
 }
 
@@ -529,7 +529,7 @@ void RemotingTest::testAuthenticatedNoSCRAMCredentials()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "Authentication failed");
+		assertMessageEqual ("Authentication failed", exc.message());
 	}
 }
 
@@ -573,7 +573,7 @@ void RemotingTest::testAuthenticatedUpdatedSCRAMCredentials()
 	}
 	catch (Poco::RemotingNG::AuthenticationFailedException& exc)
 	{
-		assert (exc.message() == "The server refused the provided credentials");
+		assertMessageEqual ("The server refused the provided credentials", exc.message());
 	}
 }
 
@@ -631,7 +631,7 @@ void RemotingTest::testAuthenticatedMultipleSCRAMCredentials()
 	}
 	catch (Poco::RemotingNG::AuthenticationFailedException& exc)
 	{
-		assert (exc.message() == "The server refused the provided credentials");
+		assertMessageEqual ("The server refused the provided credentials", exc.message());
 	}
 
 	pTester1->testAuthenticated();
@@ -682,7 +682,7 @@ void RemotingTest::testNoPermission()
 	}
 	catch (Poco::RemotingNG::RemoteException& exc)
 	{
-		assert (exc.message() == "No permission: perm1");
+		assertMessageEqual ("No permission: perm1", exc.message());
 	}
 }
 
