@@ -593,7 +593,7 @@ void CppGen::addVarToClass(ClassInfo& ci, const std::string& cppVarName, const s
 		std::vector<Constructor>::iterator it = constr.begin();
 		for (; it != constr.end(); ++it)
 		{
-			std::string val = BuiltinTypes::instance().generateInitializeValue(ci, *it, var, defaultValue);
+			std::string val = BuiltinTypes::instance().generateInitializeValue(ci, *it, var, xsdName, defaultValue);
 			if (recursiveDataStructure)
 			{
 				it->addInitializationCode(var.getName()+ "(new " + var.getType().getFullName() + "("+val+"))");
@@ -1051,11 +1051,13 @@ void CppGen::createHeaderParameters(MethodInfo& mi, const Poco::XML::Name& messa
 	{
 		if (itp->name == partName)
 		{
+			if (!itp->typeName.localName().empty()) throw Poco::NotImplementedException("SOAP header part with a type attribute", partName);
 			const Poco::XML::Name& elemName = itp->elementName;
 
 			Poco::XSD::Types::TypesManager& tm = Poco::XSD::Types::TypesManager::instance();
 			Poco::XSD::Types::QName qname(elemName.localName(), elemName.namespaceURI());
 			const Poco::XSD::Types::Element* pElem = tm.getElement(qname);
+			if (pElem == nullptr) throw Poco::NotFoundException("element", qname.name());
 			const Poco::XSD::Types::Type& type = pElem->type();
 
 			TypeNameMap::const_iterator ittm = _typeNameMap.find(&type);

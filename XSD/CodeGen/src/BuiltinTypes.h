@@ -45,8 +45,12 @@ public:
 	std::string generateInitializeValue(ClassInfo& ci, 
 		Constructor& constr, 
 		const Variable& var,
+		const std::string& xsdName,
 		const std::string& xsdString) const;
-		/// Converts a value from a schema to an initialization value for a cpp type
+		/// Converts the default or fixed value xsdString of the schema declaration xsdName
+		/// to an initialization value for the cpp type of var.
+		/// Throws a Poco::DataFormatException if the value does not fit the type, and a
+		/// Poco::NotImplementedException if the type has no conversion.
 private:
 	void add(const std::string& key, const TypeInfo& val, bool isString);
 

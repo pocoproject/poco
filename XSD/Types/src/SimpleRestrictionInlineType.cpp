@@ -42,7 +42,8 @@ SimpleRestrictionInlineType::~SimpleRestrictionInlineType()
 void SimpleRestrictionInlineType::setType(SimpleType::Ptr ptr)
 {
 	poco_check_ptr (ptr);
-	poco_assert (!_pInlineType);
+	if (_pInlineType != nullptr)
+		throw SchemaException("A restriction must not declare more than one inline simpleType");
 	_pInlineType = ptr;
 	_pInlineType->duplicate();
 	_baseType.clear();
@@ -52,6 +53,8 @@ void SimpleRestrictionInlineType::setType(SimpleType::Ptr ptr)
 
 void SimpleRestrictionInlineType::fixup()
 {
+	if (_pInlineType == nullptr)
+		throw SchemaException("A restriction must have a base attribute or an inline simpleType");
 	_pInlineType->fixup();
 }
 

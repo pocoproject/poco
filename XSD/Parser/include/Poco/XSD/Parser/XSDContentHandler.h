@@ -43,6 +43,7 @@
 #include "Poco/SAX/ContentHandler.h"
 #include "Poco/SAX/NamespaceSupport.h"
 #include "Poco/SAX/Attributes.h"
+#include "Poco/XML/Name.h"
 #include "Poco/URI.h"
 #include "Poco/NestedDiagnosticContext.h"
 #include <vector>
@@ -57,6 +58,8 @@ namespace Types {
 	class ElementImpl;
 	class Any;
 	class Attribute;
+	class Operation;
+	class BindingProperties;
 } } } 
 
 
@@ -67,6 +70,11 @@ namespace Parser {
 
 class XSDParser_API XSDContentHandler: public XML::ContentHandler
 	/// The ContentHandler for processing an XML Schema document.
+	///
+	/// The handler registers the schemas and WSDL definitions it parses in the TypesManager
+	/// singleton, so, like the Types model, it must be used from one thread at a time.
+	/// loadXSD() removes the registrations of a document that fails to parse; a handler given
+	/// to a SAXParser directly leaves them in the TypesManager.
 {
 public:
 	using SchemaNSToLocationMap = std::map<std::string, std::string>;
@@ -81,8 +89,9 @@ public:
 		/// Resolves and normalizes a schemaLocation URI.
 
 	static Poco::XSD::Types::Schema::Ptr loadXSD(const Poco::URI& schemaLocation, const XSDContentHandler::SchemaNSToLocationMap& schemaMap);
-		/// Loads an XSD file from the given schemaLocation, set fixupSchema to false if you include another schema part,
-		/// otherwise set it to true. 
+		/// Loads the XSD document at schemaLocation and returns the schema that the TypesManager holds
+		/// for its target namespace, into which the declarations of all loaded documents of that
+		/// namespace are merged. A document that was already loaded is not parsed again.
 
 	void setDocumentLocator(const XML::Locator* loc);
 	void startDocument();
@@ -261,10 +270,30 @@ private:
 	StateMachine::State getParentState() const;
 		/// Returns the state of the parent
 
-	void splitName(const std::string& qname, std::string& namespaceURI, std::string& localName) const;
-		/// Splits a qualified name from an attribute value into namespace URI and local name.
-		/// An undeclared prefix yields an empty namespace URI; the schema model resolves or
-		/// rejects such a name later, so this is not an error here.
+	XML::Name resolveName(const std::string& qname) const;
+		/// Returns the name for a qualified name from an attribute value, with its prefix
+		/// resolved to a namespace URI.
+
+	Types::BindingProperties& operationBindingProperties(Types::Operation& operation) const;
+		/// Returns the binding properties of the wsdl:input, wsdl:output or wsdl:fault
+		/// element that encloses the current element.
+
+	void revokeRegistrations();
+		/// Removes the schemas and definitions that this handler registered from the
+		/// TypesManager. Called when the document fails to parse.
+
+	void parse();
+		/// Parses the document at the schema location given to the constructor with this handler.
+		/// If parsing fails, removes the registrations this handler made in the TypesManager
+		/// and rethrows the exception.
+
+	static Poco::XSD::Types::Schema::Ptr loadDocument(const Poco::URI& schemaLocation,
+		const SchemaNSToLocationMap& schemaMap);
+		/// Returns the schema of the document at schemaLocation. A document that is not loaded yet
+		/// is parsed, and its own schema is returned, because xs:include takes over the declarations
+		/// of that document only, not those of other documents merged into the same registered schema
+		/// (for example other documents without a target namespace); otherwise the schema the
+		/// TypesManager holds for schemaLocation is returned.
 
 private:
 	Poco::URI _schemaLocation;
@@ -328,6 +357,10 @@ private:
 	Poco::NestedDiagnosticContext _ndc;
 
 	const SchemaNSToLocationMap& _schemaMap;
+
+	std::vector<Poco::XSD::Types::Schema::Ptr> _registeredSchemas;
+	std::vector<Poco::XSD::Types::Definitions::Ptr> _registeredDefinitions;
+		/// The schemas and definitions this handler registered with the TypesManager.
 
 	friend class StateMachine;
 	friend struct StateMachine::StateInfo;

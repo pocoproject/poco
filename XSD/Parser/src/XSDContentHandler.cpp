@@ -107,6 +107,14 @@ void XSDContentHandler::endDocument()
 {
 	_states.pop_back();
 	poco_assert_dbg (_states.back() == StateMachine::ST_INUNINITIALIZED);
+
+	// The SAX parser calls endDocument() only after the whole document parsed without error,
+	// so a document that fails, even after its last end tag, adds nothing to the registered schemas.
+	TypesManager& tm = TypesManager::instance();
+	for (const auto& pSchema: _registeredSchemas)
+	{
+		tm.completeSchema(pSchema);
+	}
 }
 
 
@@ -431,6 +439,9 @@ void XSDContentHandler::stateComplexTypeStart(const std::string& uri, const std:
 	//  {any attributes with non-schema namespace . . .}>
 	//  Content: (annotation?, (simpleContent | complexContent | ((group | all | choice | sequence)?, ((attribute | attributeGroup)*, anyAttribute?))))
 	//</complexType>
+	if (getParentState() == StateMachine::ST_INELEMENT && _elementsImpl.top() == nullptr)
+		throw Types::SchemaException("An element with a type or ref attribute must not declare an inline type");
+
 	CompactAttributes::const_iterator itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	bool mixed = Utility::getBool(itEnd, attrList.find(Constants::XSD_MIXED), false);
@@ -511,6 +522,8 @@ void XSDContentHandler::stateElementStart(const std::string& uri, const std::str
 	bool pushedImpl = false;
 	if (it != itEnd)
 	{
+		if (getParentState() == StateMachine::ST_INSCHEMA)
+			throw Types::SchemaException("A top-level element declaration must not have a ref attribute");
 		// a reference
 		pElem = new ElementRef(id, minOccurs, maxOccurs, createQName(it->second));
 	}
@@ -748,7 +761,7 @@ void XSDContentHandler::stateIncludeStart(const std::string& uri, const std::str
 	// only one single xsd entry! no uri_location pair at includes!
 	Poco::URI url(loc);
 	resolveSchemaLocation(url, Poco::URI(_schemaLocation));
-	Schema::Ptr pSchema = loadXSD(url, _schemaMap);
+	Schema::Ptr pSchema = loadDocument(url, _schemaMap);
 	_pSchema->includeSchema(pSchema);
 
 	// catch content annotation, add dummy entry
@@ -959,6 +972,7 @@ void XSDContentHandler::stateSchemaStart(const std::string& uri, const std::stri
 	if ((_pSchema->targetNamespace() != TypesManager::XSD_NAMESPACE) && (_pSchema->targetNamespace() != TypesManager::XSD_NAMESPACE1998))
 	{
 		tm.addSchema(_pSchema, _schemaLocation); // fails if schema exists and conflicts with the old one
+		_registeredSchemas.push_back(_pSchema);
 	}
 }
 
@@ -1023,6 +1037,19 @@ void XSDContentHandler::stateSimpleTypeStart(const std::string& uri, const std::
 	//  {any attributes with non-schema namespace . . .}>
 	//  Content: (annotation?, (restriction | list | union))
 	//</simpleType>
+	const StateMachine::State parent = getParentState();
+	if (parent == StateMachine::ST_INELEMENT && _elementsImpl.top() == nullptr)
+		throw Types::SchemaException("An element with a type or ref attribute must not declare an inline type");
+	if (parent == StateMachine::ST_INATTRIBUTE && _attributesInline.top() == nullptr)
+		throw Types::SchemaException("An attribute with a type or ref attribute must not declare an inline simpleType");
+	if (parent == StateMachine::ST_INSIMPLETYPERESTRICTION)
+	{
+		const AutoPtr<SimpleRestrictionInlineType> pRestriction = _simpleInheritance.top().cast<SimpleRestrictionInlineType>();
+		if (pRestriction == nullptr)
+			throw Types::SchemaException("A restriction with a base attribute must not declare an inline simpleType");
+		if (pRestriction->hasInlineType())
+			throw Types::SchemaException("A restriction must not declare more than one inline simpleType");
+	}
 
 	bool finalRestriction = false;
 	bool finalList = false;
@@ -1988,6 +2015,7 @@ void XSDContentHandler::stateDefinitionsStart(const std::string& uri, const std:
 	if (tns.empty()) throw Types::SchemaException("No targetNamespace attribute in definitions element");
 	_pDefinitions = new Types::Definitions(tns);
 	Types::TypesManager::instance().addDefinitions(_pDefinitions);
+	_registeredDefinitions.push_back(_pDefinitions);
 }
 
 
@@ -2065,18 +2093,12 @@ void XSDContentHandler::statePartStart(const std::string& uri, const std::string
 		const std::string& typeq = Utility::getString(itEnd, attrList.find(Constants::XSD_TYPE), Constants::XSD_EMPTY_STRING);
 		if (!elemq.empty())
 		{
-			std::string ns;
-			std::string local;
-			splitName(elemq, ns, local);
-			XML::Name element(elemq, ns, local);
+			const XML::Name element = resolveName(elemq);
 			pMessage->addElementPart(name, element);
 		}
 		else if (!typeq.empty())
 		{
-			std::string ns;
-			std::string local;
-			splitName(typeq, ns, local);
-			XML::Name type(typeq, ns, local);
+			const XML::Name type = resolveName(typeq);
 			pMessage->addTypePart(name, type);
 		}
 		else throw Types::SchemaException("Message part has neither element nor type attribute", name);
@@ -2175,10 +2197,7 @@ void XSDContentHandler::stateInputStart(const std::string& uri, const std::strin
 	pOperation->setInputName(name);
 	if (!message.empty())
 	{
-		std::string ns;
-		std::string local;
-		splitName(message, ns, local);
-		XML::Name element(message, ns, local);
+		const XML::Name element = resolveName(message);
 		pOperation->setInputMessage(element);
 	}
 	pOperation->inputBindingProperties().set("wsa.action", wsaAction);
@@ -2203,10 +2222,7 @@ void XSDContentHandler::stateOutputStart(const std::string& uri, const std::stri
 	pOperation->setOutputName(name);
 	if (!message.empty())
 	{
-		std::string ns;
-		std::string local;
-		splitName(message, ns, local);
-		XML::Name element(message, ns, local);
+		const XML::Name element = resolveName(message);
 		pOperation->setOutputMessage(element);
 	}
 	pOperation->outputBindingProperties().set("wsa.action", wsaAction);
@@ -2231,10 +2247,7 @@ void XSDContentHandler::stateFaultStart(const std::string& uri, const std::strin
 	pOperation->setFaultName(name);
 	if (!message.empty())
 	{
-		std::string ns;
-		std::string local;
-		splitName(message, ns, local);
-		XML::Name element(message, ns, local);
+		const XML::Name element = resolveName(message);
 		pOperation->setFaultMessage(element);
 	}
 	pOperation->outputBindingProperties().set("wsa.action", wsaAction);
@@ -2255,14 +2268,12 @@ void XSDContentHandler::stateBindingStart(const std::string& uri, const std::str
 	if (type.empty()) throw Types::SchemaException("No type attribute in binding element");
 	Types::Binding::Ptr pBinding = new Types::Binding(name);
 
-	std::string ns;
-	std::string local;
-	splitName(type, ns, local);
+	const XML::Name portTypeName = resolveName(type);
 
-	const Types::Definitions& defs = Types::TypesManager::instance().getDefinitions(ns);
+	const Types::Definitions& defs = Types::TypesManager::instance().getDefinitions(portTypeName.namespaceURI());
 	const Types::Definitions::PortTypes& portTypes = defs.portTypes();
-	Types::Definitions::PortTypes::const_iterator it = portTypes.find(local);
-	if (it == portTypes.end()) throw Poco::NotFoundException("Port type: " + local + " in namespace: " + ns + " referenced by binding", name);
+	Types::Definitions::PortTypes::const_iterator it = portTypes.find(portTypeName.localName());
+	if (it == portTypes.end()) throw Poco::NotFoundException("Port type: " + portTypeName.localName() + " in namespace: " + portTypeName.namespaceURI() + " referenced by binding", name);
 
 	pBinding->setPortType(it->second);
 
@@ -2329,43 +2340,25 @@ void XSDContentHandler::stateSoapHeaderStart(const std::string& uri, const std::
 
 	CompactAttributes::const_iterator itEnd = attrList.end();
 	const std::string& message = Utility::getString(itEnd, attrList.find(Constants::SOAP_MESSAGE), Constants::XSD_EMPTY_STRING);
-	std::string messageURI;
-	std::string messageLocal;
-	splitName(message, messageURI, messageLocal);
+	const XML::Name messageName = resolveName(message);
 	const std::string& part = Utility::getString(itEnd, attrList.find(Constants::SOAP_PART), Constants::XSD_EMPTY_STRING);
 	const std::string& use = Utility::getString(itEnd, attrList.find(Constants::SOAP_USE), Constants::XSD_EMPTY_STRING);
 	const std::string& encodingStyle = Utility::getString(itEnd, attrList.find(Constants::SOAP_ENCODINGSTYLE), Constants::XSD_EMPTY_STRING);
 	const std::string& nameSpace = Utility::getString(itEnd, attrList.find(Constants::SOAP_NAMESPACE), Constants::XSD_EMPTY_STRING);
 
-	poco_assert (_states.size() > 2);
-	StateMachine::State opState = _states[_states.size() - 2];
-	Types::BindingProperties* pBindingProps = nullptr;
-	switch (opState)
-	{
-	case StateMachine::ST_ININPUT:
-		pBindingProps = &pOperation->inputBindingProperties();
-		break;
-	case StateMachine::ST_INOUTPUT:
-		pBindingProps = &pOperation->outputBindingProperties();
-		break;
-	case StateMachine::ST_INFAULT:
-		pBindingProps = &pOperation->faultBindingProperties();
-		break;
-	default:
-		poco_bugcheck();
-	}
+	Types::BindingProperties& bindingProps = operationBindingProperties(*pOperation);
 
 	int index = 0;
-	while (pBindingProps->has(Poco::format("soap.header[%d].message", index))) index++;
+	while (bindingProps.has(Poco::format("soap.header[%d].message", index))) index++;
 
-	pBindingProps->set(Poco::format("soap.header[%d].message", index), message);
-	pBindingProps->set(Poco::format("soap.header[%d].message.localName", index), messageLocal);
-	pBindingProps->set(Poco::format("soap.header[%d].message.namespaceURI", index), messageURI);
-	pBindingProps->set(Poco::format("soap.header[%d].part", index), part);
-	pBindingProps->set(Poco::format("soap.header[%d].use", index), use);
-	pBindingProps->set(Poco::format("soap.header[%d].encodingStyle", index), encodingStyle);
-	pBindingProps->set(Poco::format("soap.header[%d].namespace", index), nameSpace);
-	pBindingProps->set(Poco::format("soap.header[%d].soapVersion", index), uri);
+	bindingProps.set(Poco::format("soap.header[%d].message", index), message);
+	bindingProps.set(Poco::format("soap.header[%d].message.localName", index), messageName.localName());
+	bindingProps.set(Poco::format("soap.header[%d].message.namespaceURI", index), messageName.namespaceURI());
+	bindingProps.set(Poco::format("soap.header[%d].part", index), part);
+	bindingProps.set(Poco::format("soap.header[%d].use", index), use);
+	bindingProps.set(Poco::format("soap.header[%d].encodingStyle", index), encodingStyle);
+	bindingProps.set(Poco::format("soap.header[%d].namespace", index), nameSpace);
+	bindingProps.set(Poco::format("soap.header[%d].soapVersion", index), uri);
 }
 
 
@@ -2382,43 +2375,27 @@ void XSDContentHandler::stateSoapHeaderFaultStart(const std::string& uri, const 
 
 	CompactAttributes::const_iterator itEnd = attrList.end();
 	const std::string& message = Utility::getString(itEnd, attrList.find(Constants::SOAP_MESSAGE), Constants::XSD_EMPTY_STRING);
-	std::string messageURI;
-	std::string messageLocal;
-	splitName(message, messageURI, messageLocal);
+	const XML::Name messageName = resolveName(message);
 	const std::string& part = Utility::getString(itEnd, attrList.find(Constants::SOAP_PART), Constants::XSD_EMPTY_STRING);
 	const std::string& use = Utility::getString(itEnd, attrList.find(Constants::SOAP_USE), Constants::XSD_EMPTY_STRING);
 	const std::string& encodingStyle = Utility::getString(itEnd, attrList.find(Constants::SOAP_ENCODINGSTYLE), Constants::XSD_EMPTY_STRING);
 	const std::string& nameSpace = Utility::getString(itEnd, attrList.find(Constants::SOAP_NAMESPACE), Constants::XSD_EMPTY_STRING);
 
-	poco_assert (_states.size() > 2);
-	StateMachine::State opState = _states[_states.size() - 2];
-	Types::BindingProperties* pBindingProps = nullptr;
-	switch (opState)
-	{
-	case StateMachine::ST_ININPUT:
-		pBindingProps = &pOperation->inputBindingProperties();
-		break;
-	case StateMachine::ST_INOUTPUT:
-		pBindingProps = &pOperation->outputBindingProperties();
-		break;
-	case StateMachine::ST_INFAULT:
-		pBindingProps = &pOperation->faultBindingProperties();
-		break;
-	default:
-		poco_bugcheck();
-	}
+	Types::BindingProperties& bindingProps = operationBindingProperties(*pOperation);
 
-	int index = 0;
-	while (pBindingProps->has(Poco::format("soap.header[%d].headerfault.message", index))) index++;
+	int headerCount = 0;
+	while (bindingProps.has(Poco::format("soap.header[%d].message", headerCount))) headerCount++;
+	if (headerCount == 0) throw Types::SchemaException("soap:headerfault outside soap:header");
+	const int index = headerCount - 1;
 
-	pBindingProps->set(Poco::format("soap.header[%d].headerfault.message", index), message);
-	pBindingProps->set(Poco::format("soap.header[%d].headerfault.message.localName", index), messageLocal);
-	pBindingProps->set(Poco::format("soap.header[%d].headerfault.message.namespaceURI", index), messageURI);
-	pBindingProps->set(Poco::format("soap.header[%d].headerfault.part", index), part);
-	pBindingProps->set(Poco::format("soap.header[%d].headerfault.use", index), use);
-	pBindingProps->set(Poco::format("soap.header[%d].headerfault.encodingStyle", index), encodingStyle);
-	pBindingProps->set(Poco::format("soap.header[%d].headerfault.namespace", index), nameSpace);
-	pBindingProps->set(Poco::format("soap.header[%d].headerfault.soapVersion", index), uri);
+	bindingProps.set(Poco::format("soap.header[%d].headerfault.message", index), message);
+	bindingProps.set(Poco::format("soap.header[%d].headerfault.message.localName", index), messageName.localName());
+	bindingProps.set(Poco::format("soap.header[%d].headerfault.message.namespaceURI", index), messageName.namespaceURI());
+	bindingProps.set(Poco::format("soap.header[%d].headerfault.part", index), part);
+	bindingProps.set(Poco::format("soap.header[%d].headerfault.use", index), use);
+	bindingProps.set(Poco::format("soap.header[%d].headerfault.encodingStyle", index), encodingStyle);
+	bindingProps.set(Poco::format("soap.header[%d].headerfault.namespace", index), nameSpace);
+	bindingProps.set(Poco::format("soap.header[%d].headerfault.soapVersion", index), uri);
 }
 
 
@@ -2439,27 +2416,11 @@ void XSDContentHandler::stateSoapBodyStart(const std::string& uri, const std::st
 	const std::string& encodingStyle = Utility::getString(itEnd, attrList.find(Constants::SOAP_ENCODINGSTYLE), Constants::XSD_EMPTY_STRING);
 	const std::string& nameSpace = Utility::getString(itEnd, attrList.find(Constants::SOAP_NAMESPACE), Constants::XSD_EMPTY_STRING);
 
-	poco_assert (_states.size() > 2);
-	StateMachine::State opState = _states[_states.size() - 2];
-	Types::BindingProperties* pBindingProps = nullptr;
-	switch (opState)
-	{
-	case StateMachine::ST_ININPUT:
-		pBindingProps = &pOperation->inputBindingProperties();
-		break;
-	case StateMachine::ST_INOUTPUT:
-		pBindingProps = &pOperation->outputBindingProperties();
-		break;
-	case StateMachine::ST_INFAULT:
-		pBindingProps = &pOperation->faultBindingProperties();
-		break;
-	default:
-		poco_bugcheck();
-	}
-	pBindingProps->set("soap.body.parts", parts);
-	pBindingProps->set("soap.body.use", use);
-	pBindingProps->set("soap.body.encodingStyle", encodingStyle);
-	pBindingProps->set("soap.body.namespace", nameSpace);
+	Types::BindingProperties& bindingProps = operationBindingProperties(*pOperation);
+	bindingProps.set("soap.body.parts", parts);
+	bindingProps.set("soap.body.use", use);
+	bindingProps.set("soap.body.encodingStyle", encodingStyle);
+	bindingProps.set("soap.body.namespace", nameSpace);
 }
 
 
@@ -2480,27 +2441,11 @@ void XSDContentHandler::stateSoapFaultStart(const std::string& uri, const std::s
 	const std::string& encodingStyle = Utility::getString(itEnd, attrList.find(Constants::SOAP_ENCODINGSTYLE), Constants::XSD_EMPTY_STRING);
 	const std::string& nameSpace = Utility::getString(itEnd, attrList.find(Constants::SOAP_NAMESPACE), Constants::XSD_EMPTY_STRING);
 
-	poco_assert (_states.size() > 2);
-	StateMachine::State opState = _states[_states.size() - 2];
-	Types::BindingProperties* pBindingProps = nullptr;
-	switch (opState)
-	{
-	case StateMachine::ST_ININPUT:
-		pBindingProps = &pOperation->inputBindingProperties();
-		break;
-	case StateMachine::ST_INOUTPUT:
-		pBindingProps = &pOperation->outputBindingProperties();
-		break;
-	case StateMachine::ST_INFAULT:
-		pBindingProps = &pOperation->faultBindingProperties();
-		break;
-	default:
-		poco_bugcheck();
-	}
-	pBindingProps->set("soap.fault.parts", parts);
-	pBindingProps->set("soap.fault.use", use);
-	pBindingProps->set("soap.fault.encodingStyle", encodingStyle);
-	pBindingProps->set("soap.fault.namespace", nameSpace);
+	Types::BindingProperties& bindingProps = operationBindingProperties(*pOperation);
+	bindingProps.set("soap.fault.parts", parts);
+	bindingProps.set("soap.fault.use", use);
+	bindingProps.set("soap.fault.encodingStyle", encodingStyle);
+	bindingProps.set("soap.fault.namespace", nameSpace);
 }
 
 
@@ -2536,10 +2481,7 @@ void XSDContentHandler::statePortStart(const std::string& uri, const std::string
 	if (name.empty()) throw Types::SchemaException("No name attribute in port element");
 	const std::string& bindingq = Utility::getString(itEnd, attrList.find(Constants::WSDL_BINDING), Constants::XSD_EMPTY_STRING);
 	if (bindingq.empty()) throw Types::SchemaException("No binding attribute in port element");
-	std::string ns;
-	std::string local;
-	splitName(bindingq, ns, local);
-	XML::Name binding(bindingq, ns, local);
+	const XML::Name binding = resolveName(bindingq);
 
 	poco_assert (!_objects.empty());
 	Types::Service::Ptr pService = _objects.top().cast<Types::Service>();
@@ -2632,21 +2574,74 @@ void XSDContentHandler::convertAttributes(const XML::Attributes& attr, CompactAt
 
 QName XSDContentHandler::createQName(const std::string& str) const
 {
-	// either prefix:name or name (last one uses default namespace)
-	size_t idx = str.find(Constants::XSD_COLONCHAR);
-
-	if (idx == std::string::npos)
-	{
-		return QName(str, _namespaces.getURI(Constants::XSD_EMPTY_STRING));
-	}
-	return QName(str.substr(idx+1), _namespaces.getURI(str.substr(0, idx)));
+	const XML::Name name = resolveName(str);
+	return QName(name.localName(), name.namespaceURI());
 }
 
 
-void XSDContentHandler::splitName(const std::string& qname, std::string& namespaceURI, std::string& localName) const
+XML::Name XSDContentHandler::resolveName(const std::string& qname) const
 {
-	if (!_namespaces.processName(qname, namespaceURI, localName, false))
-		namespaceURI.clear();
+	std::string namespaceURI;
+	std::string localName;
+	// an undeclared prefix leaves namespaceURI empty; the schema model rejects
+	// such a name when it resolves the reference
+	static_cast<void>(_namespaces.processName(qname, namespaceURI, localName, false));
+	return XML::Name(qname, namespaceURI, localName);
+}
+
+
+Types::BindingProperties& XSDContentHandler::operationBindingProperties(Types::Operation& operation) const
+{
+	for (StateList::const_reverse_iterator it = _states.rbegin(); it != _states.rend(); ++it)
+	{
+		switch (*it)
+		{
+		case StateMachine::ST_ININPUT:
+			return operation.inputBindingProperties();
+		case StateMachine::ST_INOUTPUT:
+			return operation.outputBindingProperties();
+		case StateMachine::ST_INFAULT:
+			return operation.faultBindingProperties();
+		default:
+			break;
+		}
+	}
+	throw Types::SchemaException("SOAP binding element outside wsdl:input, wsdl:output or wsdl:fault");
+}
+
+
+void XSDContentHandler::revokeRegistrations()
+{
+	Types::TypesManager& tm = Types::TypesManager::instance();
+	for (const auto& pSchema: _registeredSchemas)
+	{
+		tm.removeSchema(pSchema);
+	}
+	for (const auto& pDefinitions: _registeredDefinitions)
+	{
+		tm.removeDefinitions(pDefinitions);
+	}
+}
+
+
+void XSDContentHandler::parse()
+{
+	SharedPtr<std::istream> pIn = URIStreamOpener::defaultOpener().open(_schemaLocation);
+	Poco::XML::InputSource in(*pIn);
+	in.setSystemId(_schemaLocation.toString());
+	Poco::XML::SAXParser parser;
+	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, true);
+	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
+	parser.setContentHandler(this);
+	try
+	{
+		parser.parse(&in);
+	}
+	catch (...)
+	{
+		revokeRegistrations();
+		throw;
+	}
 }
 
 
@@ -2696,18 +2691,22 @@ void XSDContentHandler::resolveSchemaLocation(Poco::URI& schemaLocation, const P
 
 Poco::XSD::Types::Schema::Ptr XSDContentHandler::loadXSD(const Poco::URI& schemaLocation, const XSDContentHandler::SchemaNSToLocationMap& schemaMap)
 {
+	Poco::XSD::Types::Schema::Ptr pSchema = loadDocument(schemaLocation, schemaMap);
+	// endDocument() merged the document into the registered schema of its namespace;
+	// a document of the XML Schema namespace itself is not registered
+	Poco::XSD::Types::Schema::Ptr pRegistered = Types::TypesManager::instance().findSchema(schemaLocation);
+	return pRegistered != nullptr ? pRegistered : pSchema;
+}
+
+
+Poco::XSD::Types::Schema::Ptr XSDContentHandler::loadDocument(const Poco::URI& schemaLocation,
+		const SchemaNSToLocationMap& schemaMap)
+{
 	Poco::XSD::Types::Schema::Ptr pSchema = Types::TypesManager::instance().findSchema(schemaLocation);
-	if (!pSchema)
+	if (pSchema == nullptr)
 	{
-		SharedPtr<std::istream> pIn = URIStreamOpener::defaultOpener().open(schemaLocation);
-		Poco::XML::InputSource in(*pIn);
-		in.setSystemId(schemaLocation.toString());
 		XSDContentHandler xsd(schemaLocation, schemaMap);
-		Poco::XML::SAXParser parser;
-		parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, true);
-		parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
-		parser.setContentHandler(&xsd);
-		parser.parse(&in);
+		xsd.parse();
 		pSchema = xsd._pSchema;
 	}
 	return pSchema;
@@ -2726,15 +2725,8 @@ void XSDContentHandler::importWSDL(const std::string& targetNamespace, const Poc
 	Poco::XSD::Types::Definitions::Ptr pDefinitions = Types::TypesManager::instance().findDefinitions(targetNamespace);
 	if (!pDefinitions)
 	{
-		SharedPtr<std::istream> pIn = URIStreamOpener::defaultOpener().open(schemaLocation);
-		Poco::XML::InputSource in(*pIn);
-		in.setSystemId(schemaLocation.toString());
 		XSDContentHandler xsd(schemaLocation, schemaMap);
-		Poco::XML::SAXParser parser;
-		parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, true);
-		parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
-		parser.setContentHandler(&xsd);
-		parser.parse(&in);
+		xsd.parse();
 	}
 }
 

@@ -31,6 +31,22 @@ public:
 	void testElement();
 	void testElementInline();
 	void testComplexType();
+	void testElementWithTypeAndInlineType();
+	void testRestrictionWithoutBase();
+	void testTopLevelElementRef();
+	void testSoapHeaderFault();
+	void testSameNamespaceDocuments();
+	void testFailedLoadIsRevoked();
+	void testEraseSchemaRemovesLocation();
+	void testAttributeWithTypeAndInlineType();
+	void testRestrictionWithBaseAndInlineType();
+	void testRestrictionWithTwoInlineTypes();
+	void testContentAfterSchemaEndMergesNothing();
+	void testEraseSchemaRemovesMergedLocations();
+	void testIncludeAfterImport();
+	void testIncludeTwice();
+	void testImportSecondDocument();
+	void testIncludeChameleon();
 
 	void setUp();
 	void tearDown();

@@ -12,6 +12,7 @@
 #include "Poco/String.h"
 #include "Poco/XSD/Types/TypesManager.h"
 #include "Poco/Ascii.h"
+#include "Poco/Format.h"
 
 
 using Poco::XSD::Types::TypesManager;
@@ -133,10 +134,17 @@ bool Utility::isReservedName(const std::string& name)
 		"char",
 		"char16_t",
 		"char32_t",
+		"char8_t",
 		"class",
+		"co_await",
+		"co_return",
+		"co_yield",
 		"compl",
+		"concept",
 		"const",
+		"consteval",
 		"constexpr",
+		"constinit",
 		"const_cast",
 		"continue",
 		"decltype",
@@ -174,6 +182,7 @@ bool Utility::isReservedName(const std::string& name)
 		"public",
 		"register",
 		"reinterpret_cast",
+		"requires",
 		"return",
 		"short",
 		"signed",
@@ -194,7 +203,7 @@ bool Utility::isReservedName(const std::string& name)
 		"typename",
 		"union",
 		"unsigned",
-		"using(1)",
+		"using",
 		"virtual",
 		"void",
 		"volatile",
@@ -227,5 +236,30 @@ std::string Utility::cleanupName(const std::string& name)
 		else
 			result += '_';
 	}
+	return result;
+}
+
+
+std::string Utility::cppStringLiteral(const std::string& value)
+{
+	std::string result("\"");
+	for (const char c: value)
+	{
+		const unsigned char byte = static_cast<unsigned char>(c);
+		if (c == '\\' || c == '"' || c == '?')
+		{
+			result += '\\';
+			result += c;
+		}
+		else if (Poco::Ascii::isPrintable(byte))
+		{
+			result += c;
+		}
+		else
+		{
+			result += Poco::format("\\%03o", static_cast<unsigned>(byte));
+		}
+	}
+	result += '"';
 	return result;
 }

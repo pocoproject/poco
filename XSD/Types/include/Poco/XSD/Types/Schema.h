@@ -127,7 +127,7 @@ public:
 		/// Adds an imported schema.
 
 	void includeSchema(Ptr pSchema);
-		/// Includes the given schema.
+		/// Includes the given schema. Including the schema into itself does nothing.
 
 	const Schema::Types& types() const;
 		/// Returns all types of the schema
@@ -146,6 +146,10 @@ public:
 
 	const Schema::Notations& notations() const;
 		/// Returns all notations of the schema
+
+	[[nodiscard]] const Schemas& importedSchemas() const;
+		/// Returns the schemas this schema imports, including the imports of the
+		/// documents of the same namespace that were merged into it.
 		
 	bool qualifiedAttributeForm() const;
 		/// Are attributes qualified?
@@ -296,6 +300,12 @@ inline const Schema::Groups& Schema::groups() const
 inline const Schema::Notations& Schema::notations() const
 {
 	return _notations;
+}
+
+
+inline const Schema::Schemas& Schema::importedSchemas() const
+{
+	return _importedSchemas;
 }
 
 

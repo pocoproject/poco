@@ -34,6 +34,10 @@ namespace Types {
 
 class XSDTypes_API TypesManager
 	/// TypesManager manages all known schemas with types and exported elements.
+	///
+	/// TypesManager is process-wide, and loading, fixing up and generating code from
+	/// schemas is not synchronised as a whole, so the Parser and the Types model are
+	/// used from one thread at a time.
 {
 public:
 	static const std::string XSD_NAMESPACE;
@@ -112,8 +116,24 @@ public:
 		/// Will fail if a schema with the same namespace exists and conflicts with the new one.
 		/// Ignores schemas that reference the builtin schemas.
 		
+	void completeSchema(Schema::Ptr pSchema);
+		/// Merges the declarations and imports of a completely parsed schema document into
+		/// the schema registered for its target namespace, if that is a different object,
+		/// and makes every location entry that refers to pSchema refer to the registered
+		/// schema instead.
+		/// The Parser calls it after every successfully parsed document, because addSchema()
+		/// registers a schema before its content is parsed.
+
+	void removeSchema(const Schema::Ptr& pSchema);
+		/// Removes every namespace and location entry that refers to pSchema.
+		/// The Parser calls it for the schemas of a document that failed to parse.
+
 	void addDefinitions(Definitions::Ptr pDefinitions);
 		/// Adds a WSDL document.
+
+	void removeDefinitions(const Definitions::Ptr& pDefinitions);
+		/// Removes every namespace entry that refers to pDefinitions.
+		/// The Parser calls it for the definitions of a document that failed to parse.
 
 	Schema::Ptr findSchema(const std::string& ns);
 		/// Returns the Schema for the given target namespace
@@ -144,7 +164,8 @@ public:
 		/// Returns all known schemas.
 
 	bool eraseSchema(const std::string& ns);
-		/// Deletes the schema, Returns true if the schema was found and erased.
+		/// Deletes the schema for the given namespace and every location entry
+		/// that refers to it. Returns true if the schema was found and erased.
 
 	const Type* getType(const QName& ref) const;
 		/// Returns a type for the given QName or null if not found.
@@ -165,6 +186,10 @@ private:
 	void setSchemaInternal(Schema::Ptr pSchema, const Poco::URI& schemaLocation);
 		/// Will fail if a schema with the same namespace exists and conflicts with the new one.
 		/// Set fixupSchema to false if are inside an include from another schema file.
+
+	static void mergeSchema(Schema& target, const Schema& source);
+		/// Adds every declaration and imported schema of source that target does not have yet
+		/// to target.
 
 	TypesManager();
 		/// Creates the TypesManager.

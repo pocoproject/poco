@@ -41,13 +41,18 @@ public:
 		/// Destroys the SimpleRestrictionInlineType.
 
 	void setType(AutoPtr<SimpleType> ptr);
-		/// the inline type definition for the restriction can be set here
+		/// the inline type definition for the restriction can be set here.
+		/// Throws a SchemaException if the inline type has already been set.
+
+	bool hasInlineType() const;
+		/// Returns true if the inline type has been set.
 
 	const std::vector<const Type*>& types() const;
 		/// Returns the type that we inherit from
 
 	void fixup();
 		/// Replaces type references with the referenced type object.
+		/// Throws a SchemaException if no inline type has been set.
 
 	bool isRestriction() const;
 		/// True if we inherit by restriction
@@ -72,6 +77,12 @@ private:
 inline const std::vector<const Type*>& SimpleRestrictionInlineType::types() const
 {
 	return _baseType;
+}
+
+
+inline bool SimpleRestrictionInlineType::hasInlineType() const
+{
+	return _pInlineType != nullptr;
 }
 
 

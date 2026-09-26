@@ -14,11 +14,14 @@
 TypeInfo::TypeInfo():
 	_name(),
 	_nameSpace(),
+	_schemaNameSpace(),
 	_fullName(),
+	_xsdType(),
 	_includeFile(),
 	_isSystemInclude(false),
 	_isVector(false),
-	_isNullable(false)
+	_isNullable(false),
+	_isScalar(false)
 {
 }
 
