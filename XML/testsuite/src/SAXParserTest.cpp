@@ -111,6 +111,19 @@ public:
 			throw XMLException("handler failure");
 	}
 
+	void endElement(const XMLString& uri, const XMLString& localName, const XMLString& qname)
+	{
+		++endElementCalls;
+	}
+
+	void endPrefixMapping(const XMLString& prefix)
+	{
+		++endPrefixMappingCalls;
+	}
+
+	int endElementCalls = 0;
+	int endPrefixMappingCalls = 0;
+
 private:
 	Kind _kind;
 };
@@ -439,6 +452,7 @@ void SAXParserTest::testContentHandlerThrows()
 	{
 		assertTrue (std::string(exc.what()) == "handler failure");
 	}
+	assertTrue (stdHandler.endElementCalls == 0);
 
 	ThrowingHandler xmlHandler(ThrowingHandler::THROW_XML);
 	parser.setContentHandler(&xmlHandler);
@@ -450,6 +464,20 @@ void SAXParserTest::testContentHandlerThrows()
 	catch (const SAXParseException&)
 	{
 	}
+	assertTrue (xmlHandler.endElementCalls == 0);
+
+	ThrowingHandler nsHandler(ThrowingHandler::THROW_XML);
+	parser.setContentHandler(&nsHandler);
+	try
+	{
+		parser.parseString("<root xmlns:a=\"urn:a\"/>");
+		fail("must throw");
+	}
+	catch (const SAXParseException&)
+	{
+	}
+	assertTrue (nsHandler.endElementCalls == 0);
+	assertTrue (nsHandler.endPrefixMappingCalls == 0);
 
 	parser.setContentHandler(nullptr);
 	parser.parseString(SIMPLE1);
