@@ -708,6 +708,10 @@ void ParserEngine::resetContext()
 void ParserEngine::handleStartElement(void* userData, const XML_Char* name, const XML_Char** atts)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	// After abortParse() Expat still delivers the remaining callbacks of the
+	// current token (the end tag of an empty element and its namespace
+	// undeclarations); they are dropped until the stored exception is rethrown.
+	if (pThis->_exception) return;
 
 	if (pThis->_pContentHandler)
 	{
@@ -730,6 +734,7 @@ void ParserEngine::handleStartElement(void* userData, const XML_Char* name, cons
 void ParserEngine::handleEndElement(void* userData, const XML_Char* name)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pContentHandler)
 	{
@@ -752,6 +757,7 @@ void ParserEngine::handleEndElement(void* userData, const XML_Char* name)
 void ParserEngine::handleCharacterData(void* userData, const XML_Char* s, int len)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pContentHandler)
 	{
@@ -770,6 +776,7 @@ void ParserEngine::handleCharacterData(void* userData, const XML_Char* s, int le
 void ParserEngine::handleProcessingInstruction(void* userData, const XML_Char* target, const XML_Char* data)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pContentHandler)
 	{
@@ -793,6 +800,7 @@ void ParserEngine::handleDefault(void* userData, const XML_Char* s, int len)
 void ParserEngine::handleUnparsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId, const XML_Char* notationName)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
@@ -813,6 +821,7 @@ void ParserEngine::handleUnparsedEntityDecl(void* userData, const XML_Char* enti
 void ParserEngine::handleNotationDecl(void* userData, const XML_Char* notationName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
@@ -835,6 +844,7 @@ void ParserEngine::handleNotationDecl(void* userData, const XML_Char* notationNa
 int ParserEngine::handleExternalEntityRef(XML_Parser parser, const XML_Char* context, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(XML_GetUserData(parser));
+	if (pThis->_exception) return XML_STATUS_ERROR;
 
 	if (!context && !pThis->_externalParameterEntities) return XML_STATUS_ERROR;
 	if (context && !pThis->_externalGeneralEntities) return XML_STATUS_ERROR;
@@ -929,6 +939,7 @@ int ParserEngine::handleUnknownEncoding(void* encodingHandlerData, const XML_Cha
 void ParserEngine::handleComment(void* userData, const XML_Char* data)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pLexicalHandler)
 	{
@@ -951,6 +962,7 @@ void ParserEngine::handleComment(void* userData, const XML_Char* data)
 void ParserEngine::handleStartCdataSection(void* userData)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pLexicalHandler)
 	{
@@ -969,6 +981,7 @@ void ParserEngine::handleStartCdataSection(void* userData)
 void ParserEngine::handleEndCdataSection(void* userData)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pLexicalHandler)
 	{
@@ -987,6 +1000,7 @@ void ParserEngine::handleEndCdataSection(void* userData)
 void ParserEngine::handleStartNamespaceDecl(void* userData, const XML_Char* prefix, const XML_Char* uri)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pContentHandler)
 	{
@@ -1005,6 +1019,7 @@ void ParserEngine::handleStartNamespaceDecl(void* userData, const XML_Char* pref
 void ParserEngine::handleEndNamespaceDecl(void* userData, const XML_Char* prefix)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pContentHandler)
 	{
@@ -1023,6 +1038,7 @@ void ParserEngine::handleEndNamespaceDecl(void* userData, const XML_Char* prefix
 void ParserEngine::handleStartDoctypeDecl(void* userData, const XML_Char* doctypeName, const XML_Char *systemId, const XML_Char* publicId, int hasInternalSubset)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pLexicalHandler)
 	{
@@ -1043,6 +1059,7 @@ void ParserEngine::handleStartDoctypeDecl(void* userData, const XML_Char* doctyp
 void ParserEngine::handleEndDoctypeDecl(void* userData)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pLexicalHandler)
 	{
@@ -1071,6 +1088,7 @@ void ParserEngine::handleEntityDecl(void *userData, const XML_Char *entityName, 
 void ParserEngine::handleExternalParsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* base, const XML_Char* systemId, const XML_Char* publicId)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	XMLString pubId;
 	if (publicId) pubId.assign(publicId);
@@ -1091,6 +1109,7 @@ void ParserEngine::handleExternalParsedEntityDecl(void* userData, const XML_Char
 void ParserEngine::handleInternalParsedEntityDecl(void* userData, const XML_Char* entityName, const XML_Char* replacementText, int replacementTextLength)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	XMLString replText(replacementText, replacementTextLength);
 	if (pThis->_pDeclHandler)
@@ -1110,6 +1129,7 @@ void ParserEngine::handleInternalParsedEntityDecl(void* userData, const XML_Char
 void ParserEngine::handleSkippedEntity(void* userData, const XML_Char* entityName, int isParameterEntity)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
+	if (pThis->_exception) return;
 
 	if (pThis->_pContentHandler)
 	{

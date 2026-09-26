@@ -318,7 +318,7 @@ private:
 	LexicalHandler* _pLexicalHandler;
 	ErrorHandler*   _pErrorHandler;
 
-	std::exception_ptr _exception;
+	std::exception_ptr _exception; // set by abortParse(); while set, the handle*() callbacks drop further events
 
 	float _maximumAmplificationFactor;
 	Poco::UInt64 _activationThresholdBytes;
