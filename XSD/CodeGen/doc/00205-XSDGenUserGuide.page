@@ -1,0 +1,434 @@
+Remoting NG WSDL/XML Schema Code Generator User Guide
+Remoting NG
+
+!!!Introduction
+
+<*XSDGen*> is a code generator that transforms XML Schema and WSDL files into C++ source code, 
+annotated with Remoting attributes.
+
+C++ code generation from an XML Schema or WSDL document is a two-step process. First, <*XSDGen*>
+parses the XML Schema or WSDL (and any referenced XML Schemas) and generates interface classes
+for the services, as well as classes for all complex types defined in the schema.
+Then, <*RemoteGenNG*> is used to generate the Remoting infrastructure code.
+
+Figure 1 illustrates the code generation process from WSDL to C++ client code.
+
+[[image:images/XSDGen.png Figure 1: WSDL to C++ Code Generation]]
+
+
+!!!Configuring XSDGen
+
+<*XSDGen*> requires an XML-based configuration file that tells the code generator where 
+to put the generated header and implementation files, and how to map XML namespaces to 
+C++ namespaces.
+
+!!Sample Configuration
+
+An example configuration file is shown below:
+
+    <AppConfig>
+        <XSDGen>
+            <default>
+                <include>include/CheckVat</include>
+                <src>src</src>
+                <includeRoot>include</includeRoot>
+            </default>
+            <schema targetNamespace="urn:ec.europa.eu:taxud:vies:services:checkVat:types">
+                <include>include/CheckVat/Types</include>
+                <namespace>CheckVat::Types</namespace>
+            </schema>
+            <schema targetNamespace="urn:ec.europa.eu:taxud:vies:services:checkVat">
+                <namespace>CheckVat</namespace>
+            </schema>
+        </XSDGen>
+    </AppConfig>
+----
+
+The configuration file contains an <*XSDGen*> element, which in contains one
+`default` element containing default settings that apply to all schemas, unless
+explicitly overridden. It also contains a `schema` element for every target
+XML namespace used in the WSDL or XML Schema.
+
+!!Configuration Elements
+
+Following is a description of all XML elements supported in
+the configuration file.
+
+!AppConfig
+
+The XML root or document element. The name of this element is not relevant. 
+A typical element name is `AppConfig`, but any other valid element name would
+do as well.
+
+!XSDGen
+
+This element is required. Its child elements contain the
+configuration data for the code generator.
+
+!options
+
+This element contains elements that control code generation.
+
+!options/namespaceInSourceFileNames
+
+If set to `true`, generated source file names include the full namespace,
+with the namespace components separated by an underscore. 
+If set to `false` (default), source file names only contain the 
+class name. This is helpful if there are multiple schema types
+with the same name, but in different namespaces.
+
+!options/namespaceInHeaderFileNames
+
+If set to `true`, generated header file names include the full namespace,
+with the namespace components separated by an underscore. 
+If set to `false` (default), header file names only contain the 
+class name.
+
+!options/alwaysUseOptional
+
+If set to `true` (default), Poco::Optional is used for elements
+with `minOccurs` of 0. This may lead to generated code that fails
+to compile due to circular header dependencies. The solution is to
+set this to `false`. In this case, Poco::Optional will only be used
+for scalar types and `std::vector` of scalar types. Poco::SharedPtr
+will be used for all other classes. This avoids circular header 
+dependencies by using forward declarations in the generated headers.
+
+!options/generateAllBindings
+
+If set to `true`, service classes for all bindings in the WSDL
+are generated. If set to `false` (default), only service classes for 
+bindings referenced by services in the WSDL are generated.
+Setting this to `true` is required if the WSDL does not define any services.
+
+!options/useStdUtilities
+
+If set to `true`, the code generator uses `std::optional` instead of
+Poco::Optional and `std::shared_ptr` instead of Poco::SharedPtr.
+
+!options/inlineAllMethods
+
+If set to `true`, the code generator will inline all methods and
+not generate an implementation file. Defaults to `false`.
+
+!options/amalgamateSources
+
+If set to `true`, the code generator will combine all generated
+implementation files into a single source file. This can greatly 
+reduce compile times (and avoid other build issues) 
+as only a single source file must be compiled instead of potentially 
+hundreds for large schemas. See also `amalgamatedSourceFileName`.
+Defaults to `false`.
+
+!options/amalgamatedSourceFileName
+
+This setting specifies the base name of the generated source file
+if the `amalgamateSources` option has been enabled. Defaults to 
+`Amalgamated.cpp`. Note that the file extension is always set to `.cpp`.
+
+!default
+
+This element is required. Its child elements contain the
+default settings that apply to all schema namespaces, unless
+explicitly overridden in the schema configuration.
+
+!schema
+
+This element must be present for every XML target namespace defined in the 
+WSDL or XML schema, as well as in referenced schemas. The code generator
+will abort if it encounters a namespace that does not have a corresponding
+`schema` element in the configuration file. The namespace must be specified
+in the `targetNamespace` attribute.
+
+Each `schema` element should at least specify a unique C++ namespace for
+the schema's generated C++ classes, using the `namespace` element.
+Overriding the other default settings is optional.
+
+!namespace
+
+This element is used to specify the C++ namespace for the C++ classes generated
+from types defined in the WSDL or XML Schema.
+Can be a nested namespace (e.g., `Sample::Service`).
+
+Example:
+    <namespace>Sample::Service</namespace>
+----
+
+!include
+
+This element specifies the directory where header files for classes
+generated by the code generator are written to.
+The directory is automatically created if it does not
+already exist.
+
+!src
+
+This element specifies the directory where implementation files
+for classes generated by the code generator are written to.
+The directory is automatically created if it does not
+already exist.
+
+!includeRoot
+
+Specifies the base directory for all include
+files. This is required by the code generator to
+generate the paths for `#include` directives.
+
+!copyright
+
+This specifies a copyright (or other) message that will be added
+to the header comment section of each generated header
+and implementation file.
+
+!library
+
+If this element is specified, the code generated by the code
+generator is assumed to be exported from a (shared) library.
+For this to work with Windows DLLs, the classes must be
+defined with a `__declspec` directive. Specifying a
+library name will direct the code generator to create
+all class definitions in the form:
+
+    class Library_API Service
+    {
+        ...
+    };
+----
+
+where `Library` in `Library_API` is replaced with
+the library name given in this element.
+For this to work, the `Library_API` macro must be
+defined somewhere.
+
+The definition for this macro typically looks like
+this:
+
+    #if defined(_WIN32) && defined(POCO_DLL)
+        #if defined(Library_EXPORTS)
+            #define Library_API __declspec(dllexport)
+        #else
+            #define Library_API __declspec(dllimport)    
+        #endif
+    #endif
+    
+    
+    #if !defined(Library_API)
+        #define Library_API
+    #endif
+----
+
+!alwaysInclude
+
+This element instructs the code generator to always
+include the header file given as content.
+
+Example:
+
+    <alwaysInclude>Sample/Service/Sample.h</alwaysInclude>
+----
+
+will instruct the compiler to include a
+
+    #include "Sample/Service/Sample.h"
+----
+
+directive in each header file it generates.
+
+!timestamps
+
+Enable (default) or disable timestamps in generated C++ header and implementation
+files. Valid values are `true` to enable and `false` to disable timestamps.
+If enabled, every generated header and implementation file will include the
+date and time when the file was generated in its header comment block.
+
+!preserveOptional
+
+This setting controls how XML elements defined in the Schema with both
+`minOccurs="0"` and `nillable="true"` are mapped to C++.
+If `true` is specified, the base type will be wrapped in both a Poco::Nullable
+and Poco::Optional class. For example an element:
+
+    <xsd:element name="aString" xsd:type="xsd:string" minOccurs="0" nillable="true"/>
+----
+
+will be mapped to:
+
+    Poco::Optional<Poco::Nullable<std::string>>
+----
+
+In most cases, this is not wanted, as it makes dealing with those types in code
+rather unpleasant. If `false` is specified for `preserveOptional`
+(which is the default), the element will simply be mapped to:
+
+    Poco::Nullable<std::string>
+----
+
+While it is no longer possible to distinguish between whether the element has been
+left out, or set to NIL (`<aString xsi:nil="true">`), this distinction is 
+irrelevant in most cases.
+
+
+!!!Invoking XSDGen
+
+!!Command Line Usage
+
+The code generator is invoked by running the <*XSDGen*> executable. 
+
+When invoking <*XSDGen*>, the configuration file and the WSDL or XML Schema file must be
+passed as command line parameters. The configuration file is passed using the `config`
+option. The WSDL or XML Schema file is passed as normal argument.
+
+For the WSDL or XML Schema file, either a local filesystem path or a URI can be specified.
+The URI can use the <*http*> or <*ftp*> schema, and <*XSDGen*> will download the file
+from the specified location.
+
+
+On a Unix system, the code generator can be invoked with:
+
+    $ XSDGen --config=XSDGen.xml http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl
+----
+
+On a Windows system, the command syntax is slightly different:
+
+    C:\CheckVat> XSDGen /config=XSDGen.xml http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl
+----
+
+!!Command Line Options
+
+<*XSDGen*> supports the following command line options:
+
+  * `/help`, `--help`, `-h`: Display help information on command line arguments.
+  * `/config:<file>`, `--config=<file>`, `-c<file>`: Load configuration from the given file specified by
+    <file>. 
+
+
+!!!Mapping Of XML Schema Types To C++
+
+The following table shows how XML Schema types are mapped to C++ types.
+
+    XML Schema Type               C++ Type
+    ---------------------------------------------------------
+    anySimpleType                 std::string
+    anyType                       std::string (not supported)
+    anyURI                        Poco::URI
+    base64Binary                  std::vector<char>
+    boolean                       bool
+    byte                          Poco::Int8
+    date                          Poco::DateTime
+    dateTime                      Poco::DateTime
+    decimal                       double
+    double                        double
+    duration                      std::string
+    ENTITIES                      std::string
+    ENTITY                        std::string
+    float                         float
+    gDay                          std::string
+    gMonth                        std::string
+    gMonthDay                     std::string
+    gYear                         std::string
+    gYearMonth                    std::string
+    hexBinary                     std::string
+    ID                            std::string
+    IDREF                         std::string
+    IDREFS                        std::string
+    int                           int
+    integer                       int
+    language                      std::string
+    long                          Poco::Int64
+    name                          std::string
+    NCName                        std::string
+    negativeInteger               Poco::Int32
+    NMTOKEN                       std::string
+    NMTOKENS                      std::string
+    nonNegativeInteger            Poco::UInt32
+    nonPositiveInteger            Poco::Int32
+    normalizedString              std::string
+    NOTATION                      std::string
+    positiveInteger               Poco::UInt32
+    QName                         std::string
+    short                         Poco::Int16
+    string                        std::string
+    time                          Poco::DateTime
+    token                         std::string
+    unsignedByte                  Poco::UInt8
+    unsignedInt                   Poco::UInt32
+    unsignedLong                  Poco::UInt64
+    unsignedShort                 Poco::UInt16
+----
+
+Elements with `maxOccurs` greater than 1 (or `unbounded`) are
+mapped to a `std::vector` of the base type.
+
+Elements with `minOccurs` of 0 are mapped to
+Poco::Optional (alternatively `std::optional`) or Poco::SharedPtr
+(alternatively `std::shared_ptr`), depending on option setting
+`alwaysUseOptional`. If set to `true` (default), Poco::Optional
+is used for all classes. If set to `false`, Poco::Optional is
+only used for scalar types (including std::string), or `std::vector`
+of scalar types. 
+
+Note that the generated code may fail to compile due to circular
+header dependencies if Poco::Optional is always used. In such a case,
+set `alwaysUseOptional` to `false`.
+
+To have the code generator use `std::shared_ptr` instead of Poco::SharedPtr
+and `std::optional` instead of Poco::Optional, enable the `useStdUtilities`
+option.
+
+Nillable elements are mapped to Poco::Nullable for scalar types, 
+or Poco::SharedPtr for schema-defined complex types. 
+
+If an element is nillable and also has
+`minOccurs` of 0, it will be mapped to Poco::Nullable, unless
+the `preserveOptional` configuration setting is set to `true`.
+In the latter case, it will be mapped to `Poco::Optional<Poco::Nullable<baseType>>`,
+or `Poco::Optional<Poco::SharedPtr<baseType>>`, respectively.
+
+Nillable elements having a schema-defined complex type are mapped to Poco::SharedPtr.
+
+
+!!!Code Generator Limitations
+
+When dealing with certain XML Schema and WSDL constructs, the code generator has the following restrictions.
+
+!!WSDL Restrictions
+
+  * Only WSDL 1.1 is supported.
+  * Only Document/Literal Wrapped-style WSDL is supported. This is the most interoperable
+    format and supported by all major SOAP implementations.
+
+
+!!XML Schema Restrictions
+
+  * `all` is treated the same as `sequence`.
+  * `choice`: all elements will be wrapped in Poco::Optional, and it it the responsibility
+    of the application to make sure exactly one element is specified.
+  * `union` is not supported. The code generator will abort with an exception.
+  * Simple types are handled in a simplified manner. If a simple type extends from another type and 
+    restricts it (e.g. to an integer with only two digits), we simply map the type to its parent. 
+    The client code is responsible for making sure the element's value corresponds to the restriction.
+  * Enumerations are simply treated as strings. The application is responsible for providing
+    appropriate values that conform to the enumeration.
+  * `anyType` is not supported. Attributes and elements with type `anyType` will not be included
+    in the generated C++ class and thus cannot be accessed from C++ code.
+  * Indirectly recursive data structures (e.g., class A has members of class B, which again has
+    members of class A) are not fully supported. Code generation will succeed, but the resulting code
+    may not compile, due to circular header file dependencies. Setting the `alwaysUseOptional`
+    configuration setting to `false` may help to mitigate the issue if the `A` elements in `B` have
+    `minOccurs=0`.
+
+
+!!!HTTPS Support
+
+<*XSDGen*> can be built with support for downloading external schemas via HTTPS. This requires
+either OpenSSL or Schannel (on Windows). When building with CMake, HTTPS support will be automatically
+enabled if either the `ENABLE_NETSSL` or `ENABLE_NETSSL_WIN` option has been enabled.
+
+When building with GNU Make, the `POCO_XSD_ENABLE_HTTPS` environment or Make variable must be defined to enable HTTPS support.
+
+When building with the included Visual Studio project files, HTTPS support must be enabled by modifying the
+project settings. The `POCO_XSD_ENABLE_HTTPS` macro must be defined in the <*C/C++ > Preprocessor > Preprocessor Defines*> settings and the
+include search path for either the NetSSL_OpenSSL or NetSSL_Win library must be added (<*C/C++ > General > Additional Include Directories*>).
+
+When run without command-line options, or with the `--help` (or `/help`) command-line option, <*XSDGen*> will print a notice about
+HTTPS support if it has been enabled.

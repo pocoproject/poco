@@ -1,0 +1,54 @@
+//
+// PortType.cpp
+//
+// Library: XSD/Types
+// Package: WSDL
+// Module:  PortType
+//
+// Copyright (c) 2012, Applied Informatics Software Engineering GmbH.
+// All rights reserved.
+//
+// This is unpublished proprietary source code of Applied Informatics.
+// The contents of this file may not be disclosed to third parties, 
+// copied or duplicated in any form, in whole or in part.
+//
+
+
+#include "Poco/XSD/Types/PortType.h"
+#include "Poco/XSD/Types/Visitor.h"
+
+
+namespace Poco {
+namespace XSD {
+namespace Types {
+
+
+PortType::PortType()
+{
+}
+
+
+PortType::PortType(const std::string& name):
+	_name(name)
+{
+}
+
+
+PortType::~PortType()
+{
+}
+
+	
+void PortType::addOperation(const Operation::Ptr pOperation)
+{
+	_operations[pOperation->name()] = pOperation;
+}
+
+
+void PortType::accept(Visitor& v) const
+{
+	v.visit(*this);
+}
+
+
+} } } // namespace Poco::XSD::Types

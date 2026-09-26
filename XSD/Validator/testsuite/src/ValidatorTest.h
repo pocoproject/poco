@@ -1,0 +1,44 @@
+//
+// ValidatorTest.h
+//
+// Definition of the ValidatorTest class.
+//
+// Copyright (c) 2021-2026, Applied Informatics Software Engineering GmbH.,
+// Aleph ONE Software Engineering LLC
+// and Contributors.
+//
+// SPDX-License-Identifier:	BSL-1.0
+//
+
+
+#ifndef ValidatorTest_INCLUDED
+#define ValidatorTest_INCLUDED
+
+
+#include "CppUnit/TestCase.h"
+
+
+class ValidatorTest: public CppUnit::TestCase
+{
+public:
+	ValidatorTest(const std::string& name);
+	~ValidatorTest();
+
+	void testValidateAcceptsValidXml();
+	void testValidateAcceptsNestedStructure();
+	void testValidateAllowsExtraAttributesViaAnyAttribute();
+	void testValidateRejectsInvalidEnumValue();
+	void testValidateRejectsMissingRequiredAttribute();
+	void testValidateRejectsMalformedXml();
+	void testValidateRejectsInvalidSchema();
+	void testValidateThrowsOnEmptySchema();
+	void testValidatorCannotBeInstantiated();
+
+	void setUp();
+	void tearDown();
+
+	static CppUnit::Test* suite();
+};
+
+
+#endif // ValidatorTest_INCLUDED

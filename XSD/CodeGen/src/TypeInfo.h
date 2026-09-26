@@ -1,0 +1,164 @@
+//
+// TypeInfo.h
+//
+// Copyright (c) 2008-2012, Applied Informatics Software Engineering GmbH.
+// All rights reserved.
+//
+// This is unpublished proprietary source code of Applied Informatics.
+// The contents of this file may not be disclosed to third parties, 
+// copied or duplicated in any form, in whole or in part.
+//
+
+
+#ifndef CodeGen_TypeInfo_H_INCLUDED
+#define CodeGen_TypeInfo_H_INCLUDED
+
+
+#include <string>
+
+
+class TypeInfo
+{
+public:
+	TypeInfo();
+		// NULL typeinfo
+
+	TypeInfo(const std::string& name, const std::string& nameSpace, const std::string& schemaNameSpace, const std::string& xsdType, const std::string& includeFile, bool isSystemInclude, bool isVector, bool isScalar);
+
+	~TypeInfo();
+
+	const std::string& name() const;
+
+	const std::string& getNameSpace() const;
+		/// Returns the cpp namespace
+		
+	const std::string& getSchemaNameSpace() const;
+		/// Returns the schema namespace.
+
+	const std::string& getFullName() const;
+
+	const std::string& getIncludeFile() const;
+
+	void setIncludeFile(const std::string& incFile, bool isSystemInclude);
+
+	bool isSystemInclude() const;
+
+	bool isVector() const;
+
+	void setVector(bool isVec);
+	
+	bool isNullable() const;
+	
+	void setNullable(bool isNullable);
+
+	bool isScalar() const;
+
+	const std::string& xsdType() const;
+
+	bool operator < (const TypeInfo& other) const;
+		/// comnpares two types by name and namespace
+
+private:
+	std::string _name;
+	std::string _nameSpace;
+	std::string _schemaNameSpace;
+	std::string _fullName;
+	std::string _xsdType;
+	std::string _includeFile;
+	bool        _isSystemInclude;
+	bool        _isVector;
+	bool        _isNullable;
+	bool        _isScalar;
+};
+
+
+//
+// inlines
+//
+inline const std::string& TypeInfo::name() const
+{
+	return _name;
+}
+
+
+inline const std::string& TypeInfo::getNameSpace() const
+{
+	return _nameSpace;
+}
+
+
+inline const std::string& TypeInfo::getSchemaNameSpace() const
+{
+	return _schemaNameSpace;
+}
+
+
+inline const std::string& TypeInfo::getIncludeFile() const
+{
+	return _includeFile;
+}
+
+
+inline const std::string& TypeInfo::getFullName() const
+{
+	return _fullName;
+}
+
+
+inline void TypeInfo::setIncludeFile(const std::string& incFile, bool isSystemInclude)
+{
+	_includeFile = incFile;
+}
+
+
+inline bool TypeInfo::isSystemInclude() const
+{
+	return _isSystemInclude;
+}
+
+
+inline bool TypeInfo::isVector() const
+{
+	return _isVector;
+}
+
+
+inline void TypeInfo::setVector(bool isVec)
+{
+	_isVector = isVec;
+}
+
+
+inline bool TypeInfo::isNullable() const
+{
+	return _isNullable;
+}
+
+
+inline void TypeInfo::setNullable(bool isNullable)
+{
+	_isNullable = isNullable;
+}
+
+
+inline bool TypeInfo::isScalar() const
+{
+	return _isScalar;
+}
+
+
+inline const std::string& TypeInfo::xsdType() const
+{
+	return _xsdType;
+}
+
+
+inline bool TypeInfo::operator < (const TypeInfo& other) const
+{
+	if (_name == other._name)
+		return _nameSpace < other._nameSpace;
+	return _name < other._name;
+}
+
+
+#endif // CodeGen_TypeInfo_H_INCLUDED
