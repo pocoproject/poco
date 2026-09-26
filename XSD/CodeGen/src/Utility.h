@@ -49,6 +49,12 @@ public:
 	
 	static std::string cleanupName(const std::string& name);
 
+	static std::string cppStringLiteral(const std::string& value);
+		/// Returns value as a C++ string literal: backslash, double quote and question mark
+		/// are escaped (the question mark so that the literal contains no trigraph sequence),
+		/// and every byte outside printable ASCII is written as a three-digit octal escape
+		/// (octal, not \x, because a hex escape would swallow following hex digits).
+
 private:
 	Utility();
 	Utility(const Utility&);

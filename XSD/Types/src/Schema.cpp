@@ -15,6 +15,7 @@
 #include "Poco/XSD/Types/Schema.h"
 #include "Poco/XSD/Types/XSDException.h"
 #include "Poco/XSD/Types/Visitor.h"
+#include <algorithm>
 
 
 namespace Poco {
@@ -216,7 +217,16 @@ void Schema::addImportedSchema(Ptr pSchema)
 
 void Schema::includeSchema(Ptr pSchema)
 {
-	_importedSchemas.insert(_importedSchemas.end(), pSchema->_importedSchemas.begin(), pSchema->_importedSchemas.end());
+	// A document that includes the same schema document twice gets the registered schema, which may be
+	// this one, from the location cache; including a schema into itself adds nothing.
+	if (pSchema.get() == this)
+		return;
+
+	for (const auto& pImported: pSchema->_importedSchemas)
+	{
+		if (pImported.get() != this && std::find(_importedSchemas.begin(), _importedSchemas.end(), pImported) == _importedSchemas.end())
+			_importedSchemas.push_back(pImported);
+	}
 	_declaredTypes.insert(pSchema->_declaredTypes.begin(), pSchema->_declaredTypes.end());
 	_exportedElements.insert(pSchema->_exportedElements.begin(), pSchema->_exportedElements.end());
 	_exportedAttributes.insert(pSchema->_exportedAttributes.begin(), pSchema->_exportedAttributes.end());

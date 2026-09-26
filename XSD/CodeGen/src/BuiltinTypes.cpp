@@ -10,13 +10,89 @@
 
 #include "BuiltinTypes.h"
 #include "ClassInfo.h"
+#include "Utility.h"
 #include "Poco/Exception.h"
 #include "Poco/XSD/Types/TypesManager.h"
 #include "Poco/NumberParser.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/RegularExpression.h"
+#include "Poco/String.h"
+#include <limits>
 
 
 using Poco::XSD::Types::TypesManager;
+
+
+namespace
+{
+	enum class IntegerValue
+		/// The result of checking a default or fixed value of an integer type.
+	{
+		Invalid,
+		Literal,
+		Minimum
+	};
+
+
+	struct IntegerType
+		/// The value check, C++ type and literal suffix of an XSD integer type.
+	{
+		IntegerValue (*format)(const std::string& value, std::string& literal);
+		const char* cppType;  // the C++ type as written in generated code
+		const char* suffix;   // the literal suffix
+	};
+
+
+	bool isIntegerLexical(const std::string& value)
+		/// Returns true if value is an optional "+" or "-" followed by one or more ASCII digits.
+	{
+		const std::size_t firstDigit = (!value.empty() && (value[0] == '+' || value[0] == '-')) ? 1 : 0;
+		return value.size() > firstDigit && value.find_first_not_of("0123456789", firstDigit) == std::string::npos;
+	}
+
+
+	template <typename T>
+	IntegerValue formatInteger(const std::string& value, std::string& literal)
+		/// Checks that value is an XSD integer literal whose value fits into T and writes the value
+		/// to literal in canonical decimal form. Returns Minimum for the minimum of a signed T, which
+		/// has no literal: -2147483648 negates a value that does not fit into int.
+	{
+		// NumberParser also accepts forms that are not XSD integers, such as "+-5"
+		if (!isIntegerLexical(value))
+			return IntegerValue::Invalid;
+		// the XSD integer types have no digit group separators, so none are accepted
+		const char noThousandSeparator = 0;
+		if constexpr (std::numeric_limits<T>::is_signed)
+		{
+			Poco::Int64 number = 0;
+			if (!Poco::NumberParser::tryParse64(value, number, noThousandSeparator)
+				|| number < std::numeric_limits<T>::min() || number > std::numeric_limits<T>::max())
+				return IntegerValue::Invalid;
+			if (number == std::numeric_limits<T>::min())
+				return IntegerValue::Minimum;
+			literal = Poco::NumberFormatter::format(number);
+		}
+		else
+		{
+			// nonNegativeInteger allows a minus sign before a lexical form that denotes zero
+			const bool negative = (value[0] == '-');
+			Poco::UInt64 number = 0;
+			if (!Poco::NumberParser::tryParseUnsigned64(negative ? value.substr(1) : value, number, noThousandSeparator)
+				|| number > std::numeric_limits<T>::max() || (negative && number != 0))
+				return IntegerValue::Invalid;
+			literal = Poco::NumberFormatter::format(number);
+		}
+		return IntegerValue::Literal;
+	}
+
+
+	[[noreturn]] void throwInvalidValue(const std::string& xsdName, const std::string& value)
+		/// Throws the exception for a default or fixed value that is not valid for the type of
+		/// the schema declaration xsdName.
+	{
+		throw Poco::DataFormatException("invalid default or fixed value for " + xsdName, value);
+	}
+}
 
 
 BuiltinTypes::BuiltinTypes():
@@ -141,20 +217,36 @@ bool BuiltinTypes::isStringType(const TypeInfo& info) const
 }
 
 
-std::string BuiltinTypes::generateInitializeValue(ClassInfo& ci, Constructor& constr, const Variable& var, const std::string& xsdString) const
+std::string BuiltinTypes::generateInitializeValue(ClassInfo& ci, Constructor& constr, const Variable& var, const std::string& xsdName, const std::string& xsdString) const
 {
+	static const std::map<std::string, IntegerType> integerTypes = {
+		{"int", {&formatInteger<int>, "int", ""}},
+		{"Int8", {&formatInteger<Poco::Int8>, "Poco::Int8", ""}},
+		{"Int16", {&formatInteger<Poco::Int16>, "Poco::Int16", ""}},
+		{"Int32", {&formatInteger<Poco::Int32>, "Poco::Int32", ""}},
+		{"Int64", {&formatInteger<Poco::Int64>, "Poco::Int64", "ll"}},
+		{"UInt8", {&formatInteger<Poco::UInt8>, "Poco::UInt8", ""}},
+		{"UInt16", {&formatInteger<Poco::UInt16>, "Poco::UInt16", ""}},
+		{"UInt32", {&formatInteger<Poco::UInt32>, "Poco::UInt32", ""}},
+		{"UInt64", {&formatInteger<Poco::UInt64>, "Poco::UInt64", "ull"}}
+	};
+
 	const TypeInfo& info = var.getType();
-	// if we have a Int64 or UInt64, we must guarantee that the const is notlarger than 32 bit, otherwise 
-	// we init with a calculated value
-	if (info.name() == "UInt64")
+	std::string value = Poco::trim(xsdString);
+	const auto itInteger = integerTypes.find(info.name());
+	if (itInteger != integerTypes.end())
 	{
-		Poco::UInt64 val = Poco::NumberParser::parseUnsigned64(xsdString);
-		return Poco::NumberFormatter::format(val) + "ull";
-	}
-	if (info.name() == "Int64")
-	{
-		Poco::Int64 val = Poco::NumberParser::parse64(xsdString);
-		return Poco::NumberFormatter::format(val) + "ll";
+		const IntegerType& type = itInteger->second;
+		std::string literal;
+		const IntegerValue result = type.format(value, literal);
+		if (result == IntegerValue::Invalid)
+			throwInvalidValue(xsdName, xsdString);
+		if (result == IntegerValue::Minimum)
+		{
+			ci.addSrcInclude("limits", true);
+			return std::string("std::numeric_limits<") + type.cppType + ">::min()";
+		}
+		return literal + type.suffix;
 	}
 	if (info.name() == "DateTime")
 	{
@@ -171,15 +263,38 @@ std::string BuiltinTypes::generateInitializeValue(ClassInfo& ci, Constructor& co
 		std::string intName("ltz" + var.getName());
 		constr.addCode("int " + intName + "(0);");
 		std::string code(var.getName() + " = Poco::DateTimeParser::parse(" + fmt + ", ");
-		code += "\"" + xsdString + "\", " + intName + ");";
+		code += Utility::cppStringLiteral(xsdString) + ", " + intName + ");";
 		constr.addCode(code);
 		return "";
 	}
 	if (info.name() == "URI")
 	{
-		return std::string("Poco::URI(\"") + xsdString + "\")";
+		return "Poco::URI(" + Utility::cppStringLiteral(xsdString) + ")";
 	}
 	if (isStringType(info))
-		return std::string("\"") + xsdString + "\"";
-	return xsdString;
+		return Utility::cppStringLiteral(xsdString);
+	if (info.name() == "bool")
+	{
+		if (value == "true" || value == "1")
+			return "true";
+		if (value == "false" || value == "0")
+			return "false";
+		throwInvalidValue(xsdName, xsdString);
+	}
+	if (info.name() == "float" || info.name() == "double")
+	{
+		if (value == "INF" || value == "-INF" || value == "NaN")
+		{
+			ci.addSrcInclude("limits", true);
+			const std::string limits("std::numeric_limits<" + info.name() + ">::");
+			if (value == "NaN")
+				return limits + "quiet_NaN()";
+			return (value == "INF" ? "" : "-") + limits + "infinity()";
+		}
+		static const Poco::RegularExpression floatPattern("^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+)?$");
+		if (!floatPattern.match(value))
+			throwInvalidValue(xsdName, xsdString);
+		return value;
+	}
+	throw Poco::NotImplementedException("default or fixed value for type " + info.name());
 }
