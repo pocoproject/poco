@@ -29,10 +29,10 @@ class RemotingNG_API URIUtility
 	/// This class provides utility methods for parsing and creating RemotingNG URIs.
 {
 public:
-	static std::string createURIPath(const Identifiable::ObjectId& oid, const Identifiable::TypeId& tid, const std::string& protocol);
+	[[nodiscard]] static std::string createURIPath(const Identifiable::ObjectId& oid, const Identifiable::TypeId& tid, const std::string& protocol);
 		/// Creates an URI path from the given input parameters.
 		
-	static std::string createURIAuthority(const std::string& host, Poco::UInt16 port);
+	[[nodiscard]] static std::string createURIAuthority(const std::string& host, Poco::UInt16 port);
 		/// Creates an URI authority (e.g. host:port) from the given parameters.
 
 	static void parseURIPath(const std::string& uri, Identifiable::ObjectId& oid, Identifiable::TypeId& tid, std::string& protocol);
@@ -40,7 +40,7 @@ public:
 		///
 		/// Throws an exception if the URI format is not recognized.
 
-	static bool matchPath(const std::string& path, const std::string& pathTemplate);
+	[[nodiscard]] static bool matchPath(const std::string& path, const std::string& pathTemplate);
 		/// Matches the given path against the path template. A path template can contain
 		/// placeholders for certain path segments. The format of a place holder is {<identifier>},
 		/// an identifier enclosed in curly brackets. For example, the path "/object/12345"
@@ -58,7 +58,7 @@ public:
 		/// Returns true if the path matches the pathTemplate, otherwise false.
 
 private:
-	static bool matchAlternatives(const std::string& segment, std::string::const_iterator& itTempl, std::string::const_iterator endTempl);
+	[[nodiscard]] static bool matchAlternatives(const std::string& segment, std::string::const_iterator& itTempl, std::string::const_iterator endTempl);
 		/// Matches segment against pipe-separated alternatives in template.
 		/// Iterator must point to first alternative (after opening '(').
 		/// On return, iterator points past closing ')'.

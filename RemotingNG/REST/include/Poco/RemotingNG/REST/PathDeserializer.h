@@ -58,7 +58,7 @@ protected:
 	void parsePath(const std::string& pathTemplate, const Poco::Net::HTTPRequest& request);
 
 	// ScalarDeserializer
-	const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found);
+	[[nodiscard]] const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found);
 
 private:
 	std::map<std::string, std::string> _values;

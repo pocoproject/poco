@@ -70,7 +70,7 @@ public:
 	bool deserialize(const std::string& name, bool isMandatory, char& val);
 	bool deserialize(const std::string& name, bool isMandatory, std::string& val);
 	bool deserialize(const std::string& name, bool isMandatory, std::vector<char>& val);
-	int id() const;
+	[[nodiscard]] int id() const;
 	void associateSerializer(Serializer& ser);
 
 protected:
@@ -81,7 +81,7 @@ private:
 	Deserializer(const Deserializer&);
 	Deserializer& operator=(const Deserializer&);
 
-	JSValue::Ptr findValue(const std::string& name, bool isMandatory, bool& found);
+	[[nodiscard]] JSValue::Ptr findValue(const std::string& name, bool isMandatory, bool& found);
 
 private:
 	std::vector<JSValue::Ptr> _objectStack;

@@ -50,7 +50,7 @@ public:
 	SwaggerGenerator(Poco::CodeGeneration::CppGenerator& generator, const Info& info, const std::vector<Server>& servers);
 	~SwaggerGenerator();
 
-	Poco::JSON::Object::Ptr json() const;
+	[[nodiscard]] Poco::JSON::Object::Ptr json() const;
 
 	// AbstractGenerator
 	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
@@ -58,31 +58,31 @@ public:
 	void methodStart(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
 	void methodEnd(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
 	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e);
-	std::string newClassName(const Poco::CppParser::Struct* pStruct);
-	std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
 
 protected:
-	static Poco::JSON::Object::Ptr createInfo(const Info& info);
-	static Poco::JSON::Array::Ptr createServers(const std::vector<Server>& servers);
-	static Poco::JSON::Object::Ptr createErrorSchema();
-	static Poco::JSON::Object::Ptr createSchemaForBasicType(const std::string& basicType);
-	static bool isBasicType(const std::string& type);
-	static bool isValidOperation(const std::string& name);
-	static bool operationCanHaveBody(const std::string& name);
-	static std::string translateTypeName(const std::string& typeName);
-	const Poco::CppParser::Symbol* resolveInnerType(const Poco::CppParser::NameSpace* pNamespace, const Poco::CppParser::Symbol* pSymbol, std::string& resolvedType);
-	Poco::JSON::Object::Ptr createSchemaForType(const Poco::CppParser::NameSpace* pNamespace, const Poco::CppParser::Symbol* pSymbol, const std::string& resolvedType);
-	Poco::JSON::Object::Ptr createSchemaForObject(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static Poco::JSON::Object::Ptr createInfo(const Info& info);
+	[[nodiscard]] static Poco::JSON::Array::Ptr createServers(const std::vector<Server>& servers);
+	[[nodiscard]] static Poco::JSON::Object::Ptr createErrorSchema();
+	[[nodiscard]] static Poco::JSON::Object::Ptr createSchemaForBasicType(const std::string& basicType);
+	[[nodiscard]] static bool isBasicType(const std::string& type);
+	[[nodiscard]] static bool isValidOperation(const std::string& name);
+	[[nodiscard]] static bool operationCanHaveBody(const std::string& name);
+	[[nodiscard]] static std::string translateTypeName(const std::string& typeName);
+	[[nodiscard]] const Poco::CppParser::Symbol* resolveInnerType(const Poco::CppParser::NameSpace* pNamespace, const Poco::CppParser::Symbol* pSymbol, std::string& resolvedType);
+	[[nodiscard]] Poco::JSON::Object::Ptr createSchemaForType(const Poco::CppParser::NameSpace* pNamespace, const Poco::CppParser::Symbol* pSymbol, const std::string& resolvedType);
+	[[nodiscard]] Poco::JSON::Object::Ptr createSchemaForObject(const Poco::CppParser::Struct* pStruct);
 	void createSchemaForObject(const Poco::CppParser::Struct* pStruct, Poco::JSON::Object::Ptr pSchema);
-	Poco::JSON::Object::Ptr createOperation(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
-	Poco::JSON::Object::Ptr createParameter(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Parameter* pParam, const CodeGenerator::Properties& properties, const std::string& in);
-	Poco::JSON::Object::Ptr createFormRequestBody(const Poco::CppParser::Function* pFunc, const std::vector<Poco::CppParser::Parameter*>& params, const PropMap& propMap, const CodeGenerator::Properties& funcProps);
-	Poco::JSON::Object::Ptr createRequestBody(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Parameter* pParam, const CodeGenerator::Properties& paramProps, const CodeGenerator::Properties& funcProps);
-	Poco::JSON::Object::Ptr createResponseBodyContent(const std::string& type, const CodeGenerator::Properties& paramProps, const CodeGenerator::Properties& funcProps);
-	Poco::JSON::Object::Ptr createErrorResponse(const std::string& description);
+	[[nodiscard]] Poco::JSON::Object::Ptr createOperation(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
+	[[nodiscard]] Poco::JSON::Object::Ptr createParameter(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Parameter* pParam, const CodeGenerator::Properties& properties, const std::string& in);
+	[[nodiscard]] Poco::JSON::Object::Ptr createFormRequestBody(const Poco::CppParser::Function* pFunc, const std::vector<Poco::CppParser::Parameter*>& params, const PropMap& propMap, const CodeGenerator::Properties& funcProps);
+	[[nodiscard]] Poco::JSON::Object::Ptr createRequestBody(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Parameter* pParam, const CodeGenerator::Properties& paramProps, const CodeGenerator::Properties& funcProps);
+	[[nodiscard]] Poco::JSON::Object::Ptr createResponseBodyContent(const std::string& type, const CodeGenerator::Properties& paramProps, const CodeGenerator::Properties& funcProps);
+	[[nodiscard]] Poco::JSON::Object::Ptr createErrorResponse(const std::string& description);
 	void variableProperties(const Poco::CppParser::Variable* pVar, bool& isVector, bool& isMandatory, bool& isNullable, std::string& name, std::string& resolvedType);
-	static PropMap parseParameterProperties(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
-	static CodeGenerator::Properties parseParameterProperties(const Poco::CppParser::Parameter* pParam, const CodeGenerator::Properties& funcProps);
+	[[nodiscard]] static PropMap parseParameterProperties(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
+	[[nodiscard]] static CodeGenerator::Properties parseParameterProperties(const Poco::CppParser::Parameter* pParam, const CodeGenerator::Properties& funcProps);
 	void parameterProperties(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Parameter* pParam, bool& isVector, bool& isMandatory, bool& isNullable, std::string& name, std::string& resolvedType);
 	void typeProperties(const std::string& decl, bool& isVector, bool& isMandatory, bool& isNullable, std::string& resolvedType);
 	void fillTypeAttributes(Poco::JSON::Object::Ptr pSchema, const CodeGenerator::Properties& properties, const std::string& name);

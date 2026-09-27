@@ -93,7 +93,7 @@ public:
 		/// Enables or disables chunked transfer encoding for responses.
 		/// Default is enabled.
 
-	bool isChunkedTransferEncodingEnabled() const;
+	[[nodiscard]] bool isChunkedTransferEncodingEnabled() const;
 		/// Returns true iff chunked transfer encoding is enabled for responses.
 
 	void enableCompression(bool enable = true);
@@ -103,7 +103,7 @@ public:
 		/// Note that chunked transfer encoding must also be enabled
 		/// in order to allow compression.
 
-	bool isCompressionEnabled() const;
+	[[nodiscard]] bool isCompressionEnabled() const;
 		/// Returns true iff GZIP compression is enabled for responses.
 
 	void enableMTOM(bool enable = true);
@@ -115,7 +115,7 @@ public:
 		///
 		/// See http://www.w3.org/TR/soap12-mtom/ for more information about MTOM.
 
-	bool isMTOMEnabled() const;
+	[[nodiscard]] bool isMTOMEnabled() const;
 		/// Returns true iff MTOM is enabled.
 
 	void enableWSSE(bool enable = true);
@@ -127,7 +127,7 @@ public:
 		///   - nonce
 		///   - created
 	
-	bool isWSSEEnabled() const;
+	[[nodiscard]] bool isWSSEEnabled() const;
 		/// Returns true if WSSE is enabled.
 
 	void addRequestHeaderInterceptor(RequestHeaderInterceptor::Ptr pInterceptor);
@@ -136,14 +136,14 @@ public:
 	void removeRequestHeaderInterceptor(RequestHeaderInterceptor::Ptr pInterceptor);
 		/// Removes a header interceptor from the request deserializer.
 
-	const std::vector<Deserializer::HeaderInterceptor::Ptr>& requestHeaderInterceptors() const;
+	[[nodiscard]] const std::vector<Deserializer::HeaderInterceptor::Ptr>& requestHeaderInterceptors() const;
 
 	// Poco::RemotingNG::Listener
 	void start();
 	void stop();
-	const std::string& protocol() const;
-	std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId);
-	bool handlesURI(const std::string& uri);
+	[[nodiscard]] const std::string& protocol() const;
+	[[nodiscard]] std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId);
+	[[nodiscard]] bool handlesURI(const std::string& uri);
 	void registerObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject, Poco::RemotingNG::Skeleton::Ptr pSkeleton);
 	void unregisterObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject);
 

@@ -56,11 +56,11 @@ public:
 		/// Destroys the SCRAMClientAuthenticator.
 
 	// ClientAuthenticator
-	std::string startAuthentication(Credentials& clientCredentials);
-	bool continueAuthentication(const Credentials& serverCredentials, Credentials& clientCredentials);
+	[[nodiscard]] std::string startAuthentication(Credentials& clientCredentials);
+	[[nodiscard]] bool continueAuthentication(const Credentials& serverCredentials, Credentials& clientCredentials);
 
 protected:
-	std::string hashCredentials(const Credentials& creds);
+	[[nodiscard]] std::string hashCredentials(const Credentials& creds);
 
 	static const std::string DEFAULT_CRED_MD5_SALT;
 

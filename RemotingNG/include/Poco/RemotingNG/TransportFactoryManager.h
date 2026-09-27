@@ -37,14 +37,14 @@ class RemotingNG_API TransportFactoryManager
 	/// A TransportFactoryManager manages TransportFactory objects.
 {
 public:
-	Transport* createTransport(const std::string& protocol);
+	[[nodiscard]] Transport* createTransport(const std::string& protocol);
 		/// Creates a new Transport for the given protocol. 
 		///
 		/// The newly created Transport is unconnected.
 		///
 		/// Throws an exception if the protocol is unknown
 
-	Transport* createTransport(const std::string& protocol, const std::string& uri);
+	[[nodiscard]] Transport* createTransport(const std::string& protocol, const std::string& uri);
 		/// Creates a new Transport for the given protocol and
 		/// connects it to the endpoint specified by the
 		/// given URI.
@@ -59,10 +59,10 @@ public:
 		/// If for the given protocol no factory is found,
 		/// the error is silently ignored.
 
-	bool hasFactory(const std::string& protocol) const;
+	[[nodiscard]] bool hasFactory(const std::string& protocol) const;
 		/// Returns true if for the protocol a factory was registered.
 
-	static TransportFactoryManager& instance();
+	[[nodiscard]] static TransportFactoryManager& instance();
 		/// Returns a reference to the one and only instance of TransportFactoryManager.
 
 private:

@@ -47,32 +47,32 @@ public:
 	RESTServerException& operator = (const RESTServerException& exc);
 		/// Assignment operator.
 
-	const char* name() const noexcept;
+	[[nodiscard]] const char* name() const noexcept;
 		/// Returns a static string describing the exception.
 
-	const char* className() const noexcept;
+	[[nodiscard]] const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
-	Poco::Exception* clone() const;
+	[[nodiscard]] Poco::Exception* clone() const;
 		/// Creates an exact copy of the exception.
 
-	void rethrow() const;
+	[[noreturn]] void rethrow() const;
 		/// (Re)Throws the exception.
 
-	const std::string& reason() const;
+	[[nodiscard]] const std::string& reason() const;
 		/// Returns the HTTP reason text of the server response.
 
-	int status() const;
+	[[nodiscard]] int status() const;
 		/// Returns the HTTP status code of the server response.
 
-	JSValue::Ptr content() const;
+	[[nodiscard]] JSValue::Ptr content() const;
 		/// Returns the JSON content of the server response.
 
-	std::string error() const;
+	[[nodiscard]] std::string error() const;
 		/// Returns the value of the content's "error" property
 		/// if it exists, otherwise an empty string.
 
-	std::string detail() const;
+	[[nodiscard]] std::string detail() const;
 		/// Returns the value of the content's "detail" property
 		/// if it exists, otherwise an empty string.
 

@@ -92,7 +92,7 @@ public:
 	void serialize(const std::string& name, const std::string& val);
 	void serialize(const std::string& name, const std::vector<char>& val);
 	void resetId(int newId = 0);
-	static std::string escapeString(const std::string& val);
+	[[nodiscard]] static std::string escapeString(const std::string& val);
 
 protected:
 	void resetImpl();

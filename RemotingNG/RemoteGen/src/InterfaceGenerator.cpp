@@ -286,7 +286,6 @@ void InterfaceGenerator::ifaceIsACodeGen(const Poco::CppParser::Function* pFunc,
 std::vector<std::string> InterfaceGenerator::newBaseClasses(const Poco::CppParser::Struct* pStruct)
 {
 	std::vector<std::string> bases;
-	GenUtility::hasAnyRemoteParent(pStruct);
 
 	Poco::CppParser::Struct::BaseIterator itB = pStruct->baseBegin();
 	Poco::CppParser::Struct::BaseIterator itBEnd = pStruct->baseEnd();

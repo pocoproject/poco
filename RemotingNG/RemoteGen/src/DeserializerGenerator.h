@@ -30,10 +30,10 @@ public:
 	~DeserializerGenerator();
 		/// Destroys the DeserializerGenerator.
 
-	static std::string generateClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static std::string generateClassName(const Poco::CppParser::Struct* pStruct);
 		/// Generates for a given class, its interface class name.
 
-	static std::string generateQualifiedClassName(const std::string& ns, const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static std::string generateQualifiedClassName(const std::string& ns, const Poco::CppParser::Struct* pStruct);
 		/// Generates for a given class, its interface class name.
 
 	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
@@ -44,10 +44,10 @@ public:
 
 	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e);
 
-	std::string newClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct);
 		/// generates the new class name based on the old one
 
-	std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
 
 private:
 	void addParameters(Poco::CppParser::Function* pFunc, const std::string& className);
@@ -79,7 +79,7 @@ private:
 
 	static void matchVarsWithFunctionsRecursive(const Poco::CppParser::Struct* pDataType, SerializerGenerator::VarGet& matches);
 
-	static bool hasAttributes(const Poco::CppParser::Struct* pClass);
+	[[nodiscard]] static bool hasAttributes(const Poco::CppParser::Struct* pClass);
 		/// Returns true if the class or any parent has attributes!
 
 	static void generateTypeDeserializerLines(const Poco::CppParser::Struct* pContext, SerializerGenerator::VarGet::const_iterator it, int namePos, const std::string& suffix, std::vector<std::string>& lines, int& retUsageCount);

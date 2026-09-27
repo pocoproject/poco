@@ -50,7 +50,7 @@ public:
 	virtual ~ServerTransport();
 		/// Destroys the ServerTransport.
 
-	virtual bool authenticate(const std::string& method);
+	[[nodiscard]] virtual bool authenticate(const std::string& method);
 		/// Verify that the request is properly authenticated.
 		///
 		/// This method is called if the method or its class has
@@ -68,7 +68,7 @@ public:
 		///
 		/// The default implementation simply returns true.
 
-	virtual bool authorize(const std::string& method, const std::string& permission);
+	[[nodiscard]] virtual bool authorize(const std::string& method, const std::string& permission);
 		/// Verify that an authenticated user has the given permission, which is required
 		/// to invoke the given method.
 		///

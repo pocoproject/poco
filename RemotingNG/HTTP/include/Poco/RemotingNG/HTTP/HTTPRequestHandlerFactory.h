@@ -42,7 +42,7 @@ public:
 		/// Destroys the HTTPRequestHandlerFactory.
 
 	// Poco::Net::HTTPRequestHandlerFactory
-	Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
+	[[nodiscard]] Poco::Net::HTTPRequestHandler* createRequestHandler(const Poco::Net::HTTPServerRequest& request);
 
 private:
 	Listener& _listener;

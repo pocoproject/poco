@@ -39,11 +39,11 @@ public:
 		/// Creates an empty JSObject.
 
 	// JSValue
-	Type type() const;
-	std::size_t size() const;
-	const Ptr& operator [] (const std::string& name) const;
-	Ptr& operator [] (const std::string& name);
-	bool has(const std::string& name) const;
+	[[nodiscard]] Type type() const;
+	[[nodiscard]] std::size_t size() const;
+	[[nodiscard]] const Ptr& operator [] (const std::string& name) const;
+	[[nodiscard]] Ptr& operator [] (const std::string& name);
+	[[nodiscard]] bool has(const std::string& name) const;
 
 protected:
 	~JSObject();

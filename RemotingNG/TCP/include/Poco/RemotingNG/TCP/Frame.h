@@ -180,57 +180,57 @@ public:
 	~Frame();
 		/// Destroys the frame.
 
-	Poco::UInt32 type() const;
+	[[nodiscard]] Poco::UInt32 type() const;
 		/// Returns the frame type.
 
-	Poco::UInt32 channel() const;
+	[[nodiscard]] Poco::UInt32 channel() const;
 		/// Returns the channel.
 
-	Poco::UInt16 flags() const;
+	[[nodiscard]] Poco::UInt16 flags() const;
 		/// Returns the flags.
 
 	void updateFlags(Poco::UInt16 flags);
 		/// Updates the flags.
 
-	Poco::UInt16 getPayloadSize() const;
+	[[nodiscard]] Poco::UInt16 getPayloadSize() const;
 		/// Returns the payload size.
 
 	void setPayloadSize(Poco::UInt16 size);
 		/// Sets the payload size, which must not exceed the
 		/// buffer size minus header size.
 
-	Poco::UInt16 bufferSize() const;
+	[[nodiscard]] Poco::UInt16 bufferSize() const;
 		/// Returns the buffer size.
 
-	Poco::UInt16 maxPayloadSize() const;
+	[[nodiscard]] Poco::UInt16 maxPayloadSize() const;
 		/// Returns the maximum payload size,
 		/// which is buffer size minus header size.
 
-	Poco::UInt16 frameSize() const;
+	[[nodiscard]] Poco::UInt16 frameSize() const;
 		/// Returns the frame size, which is header size plus payload size.
 
-	char* payloadBegin();
+	[[nodiscard]] char* payloadBegin();
 		/// Returns a pointer to the begin of the payload in the buffer.
 
-	const char* payloadBegin() const;
+	[[nodiscard]] const char* payloadBegin() const;
 		/// Returns a pointer to the begin of the payload in the buffer.
 
-	char* payloadEnd();
+	[[nodiscard]] char* payloadEnd();
 		/// Returns a pointer to the end (one past last byte) of the payload in the buffer.
 
-	const char* payloadEnd() const;
+	[[nodiscard]] const char* payloadEnd() const;
 		/// Returns a pointer to the end (one past last byte) of the payload in the buffer.
 
-	char* bufferBegin();
+	[[nodiscard]] char* bufferBegin();
 		/// Returns a pointer to the begin of the buffer.
 
-	const char* bufferBegin() const;
+	[[nodiscard]] const char* bufferBegin() const;
 		/// Returns a pointer to the begin of the buffer.
 
-	char* bufferEnd();
+	[[nodiscard]] char* bufferEnd();
 		/// Returns a pointer to the end (one past last byte) of the buffer.
 
-	const char* bufferEnd() const;
+	[[nodiscard]] const char* bufferEnd() const;
 		/// Returns a pointer to the end (one past last byte) of the buffer.
 
 private:

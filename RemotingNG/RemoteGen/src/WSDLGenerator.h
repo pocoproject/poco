@@ -111,9 +111,9 @@ public:
 	~WSDLGenerator();
 		/// Destroys the WSDLGenerator.
 
-	static std::string generateFileName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static std::string generateFileName(const Poco::CppParser::Struct* pStruct);
 
-	static std::string generateFileName(const std::string& structName);
+	[[nodiscard]] static std::string generateFileName(const std::string& structName);
 
 	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
 		/// Struct Start
@@ -129,12 +129,12 @@ public:
 
 	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e);
 
-	std::string newClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct);
 		/// generates the new class name based on the old one
 
-	std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
 
-	static bool hasSoapHeader(const Poco::CppParser::Function* pFunc, bool request);
+	[[nodiscard]] static bool hasSoapHeader(const Poco::CppParser::Function* pFunc, bool request);
 		/// Checks whether this method has a soapHeader set. Either for request or for response
 
 	static std::multimap<Poco::UInt32, const Poco::CppParser::Parameter*> getSoapHeader(const Poco::CppParser::Function* pFunc, bool request);

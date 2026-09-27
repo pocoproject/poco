@@ -38,27 +38,27 @@ public:
 	~JSONParser();
 		/// Destroys the JSONParser.
 		
-	JSValue::Ptr parse();
+	[[nodiscard]] JSValue::Ptr parse();
 		/// Reads a JSValue from the stream.
 
 	void setMaxDepth(std::size_t maxDepth);
 		/// Sets the maximum allowed depth of the JSON document.
 
-	std::size_t getMaxDepth() const;
+	[[nodiscard]] std::size_t getMaxDepth() const;
 		/// Returns the maximum allowed depth of the JSON document.
 
 	constexpr static std::size_t MAX_DEPTH = 50;
 
 protected:
 	int parseValue(int ch, JSValue::Ptr& pValue);
-	int parseObject(int ch, JSValue::Ptr& pObject);
-	int parseArray(int ch, JSValue::Ptr& pArray);
-	int parseScalar(int ch, JSValue::Ptr& pScalar);
-	int parseString(int ch, std::string& str);
-	int parseUnicode(int ch, std::string& str);
-	int skipWhitespace(int ch);
-	static bool isWhitespace(int ch);
-	static bool isEOF(int ch);
+	[[nodiscard]] int parseObject(int ch, JSValue::Ptr& pObject);
+	[[nodiscard]] int parseArray(int ch, JSValue::Ptr& pArray);
+	[[nodiscard]] int parseScalar(int ch, JSValue::Ptr& pScalar);
+	[[nodiscard]] int parseString(int ch, std::string& str);
+	[[nodiscard]] int parseUnicode(int ch, std::string& str);
+	[[nodiscard]] int skipWhitespace(int ch);
+	[[nodiscard]] static bool isWhitespace(int ch);
+	[[nodiscard]] static bool isEOF(int ch);
 
 private:
 	JSONParser();

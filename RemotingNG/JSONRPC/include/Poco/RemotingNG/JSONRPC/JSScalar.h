@@ -39,9 +39,9 @@ public:
 		/// Creates a JSScalar with the given value and type.
 
 	// JSValue
-	Type type() const;
+	[[nodiscard]] Type type() const;
 	
-	const std::string& stringValue() const;
+	[[nodiscard]] const std::string& stringValue() const;
 
 protected:
 	~JSScalar();

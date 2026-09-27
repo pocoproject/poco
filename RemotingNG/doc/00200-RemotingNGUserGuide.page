@@ -381,9 +381,9 @@ A typical example would be a username and a password:
 The client's credentials are passed to the Transport, which then passes them to server
 for validation, using a transport-specific method. All Transport implementations
 supporting authentication provide a <[setCredentials()]> method that accepts a
-Poco::RemotingNG::Credentials object as argument. This also replaces the
-<[setUsername()]> and <[setPassword()]> methods provided previously for that purpose
-by some transport implementations (although these are still provided for backwards compatibility).
+Poco::RemotingNG::Credentials object as argument. The <[setUsername()]> and
+<[setPassword()]> methods of some transport implementations are deprecated in favor of
+<[setCredentials()]>.
 
 
 !Authentication Mechanisms
@@ -1814,8 +1814,10 @@ WS-Security.
         auto pMedia = ONVIF::Media::MediaBindingClientHelper::find(uri.toString(), "soap-1.2"s);
         auto& mediaTransport = transportFromInterface(pMedia);
         mediaTransport.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_WSSE_DIGEST);
-        mediaTransport.setUsername("onvif"s);
-        mediaTransport.setPassword("s3cr3t"s);
+        Poco::RemotingNG::Credentials creds;
+        creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "onvif"s);
+        creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t"s);
+        mediaTransport.setCredentials(creds);
     
         std::vector<ONVIF::Profile> profiles;
         pMedia->getProfiles(profiles);

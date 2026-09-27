@@ -16,6 +16,7 @@
 #include "Poco/RemotingNG/SOAP/Transport.h"
 #include "Poco/RemotingNG/SOAP/SOAPFaultException.h"
 #include "Poco/RemotingNG/Proxy.h"
+#include "Poco/RemotingNG/Credentials.h"
 #include "Poco/Net/HTTPClientSession.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
@@ -418,8 +419,10 @@ protected:
 		auto pMedia = ONVIF::Media::MediaBindingClientHelper::find(uri.toString(), "soap-1.2"s);
 		auto& mediaTransport = transportFromInterface(pMedia);
 		mediaTransport.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_WSSE_DIGEST);
-		mediaTransport.setUsername(_username);
-		mediaTransport.setPassword(_password);
+		Poco::RemotingNG::Credentials creds;
+		creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, _username);
+		creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, _password);
+		mediaTransport.setCredentials(creds);
 		return pMedia;
 	}
 

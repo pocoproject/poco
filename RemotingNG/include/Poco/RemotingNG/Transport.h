@@ -96,7 +96,7 @@ public:
 	virtual ~Transport();
 		/// Destroys the Transport.
 
-	virtual const std::string& endPoint() const = 0;
+	[[nodiscard]] virtual const std::string& endPoint() const = 0;
 		/// Returns the endpoint to which this Transport is connected.
 		/// If not connected, an empty string will be returned.
 
@@ -109,7 +109,7 @@ public:
 	virtual void disconnect() = 0;
 		/// Disconnects the transport.
 
-	virtual bool connected() const = 0;
+	[[nodiscard]] virtual bool connected() const = 0;
 		/// Returns true iff the Transport is connected to a Listener, false otherwise.
 
 	virtual Serializer& beginMessage(const Identifiable::ObjectId& oid, const Identifiable::TypeId& tid, const std::string& messageName, SerializerBase::MessageType messageType) = 0;

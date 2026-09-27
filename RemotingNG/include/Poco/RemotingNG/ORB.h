@@ -78,14 +78,14 @@ public:
 		/// Fired when an object has been unregistered
 		/// by calling unregisterObject().
 
-	static ORB& instance();
+	[[nodiscard]] static ORB& instance();
 		/// Returns a reference to the global ORB.
 
 	void shutdown();
 		/// Stops all Listener instances and removes them, as well as
 		/// all RemoteObject and Skeleton instances from the ORB.
 
-	bool invoke(const Listener& listener, const std::string& uri, ServerTransport& transport) const;
+	[[nodiscard]] bool invoke(const Listener& listener, const std::string& uri, ServerTransport& transport) const;
 		/// Invoke a method on the object registered for the given Listener and URI.
 		///
 		/// The ORB will look up the Skeleton registered for the object, and perform
@@ -97,7 +97,7 @@ public:
 		/// be considered. The given URI can be an alias URI, which will be matched against
 		/// registered aliases.
 
-	bool invoke(const std::string& objectPath, ServerTransport& transport) const;
+	[[nodiscard]] bool invoke(const std::string& objectPath, ServerTransport& transport) const;
 		/// Invoke a method on the object registered for the given object path.
 		///
 		/// The ORB will look up the Skeleton registered for the object, and perform
@@ -107,7 +107,7 @@ public:
 		///
 		/// The format of objectPath is <protocol>/<endpoint>/<typeId>/<objectId>.
 		
-	Identifiable::Ptr findObject(const std::string& uri) const;
+	[[nodiscard]] Identifiable::Ptr findObject(const std::string& uri) const;
 		/// Return an interface for the service object identified by the given URI.
 		///
 		/// Depending on whether the service object has been registered on the same ORB, or not,
@@ -131,7 +131,7 @@ public:
 		/// (by calling Listener::handlesURI()).
 		/// If so, return the RemoteObject. Otherwise, return a new Proxy object.
 
-	Identifiable::Ptr findObject(const std::string& uri, const Identifiable::TypeId& tid, const std::string& transport) const;
+	[[nodiscard]] Identifiable::Ptr findObject(const std::string& uri, const Identifiable::TypeId& tid, const std::string& transport) const;
 		/// Return an interface for the service object identified by the given URI, TypeID and transport name.
 		/// This is useful for Transport implementations that allow the use of URIs that do
 		/// not conform to the standard Remoting URI format.
@@ -147,7 +147,7 @@ public:
 		/// If the given URI exactly matches one of the URIs registered with the ORB, the corresponding
 		/// RemoteObject instance is returned. Otherwise a new Proxy instance is created and returned.
 
-	std::string registerListener(Listener::Ptr pListener);
+	[[nodiscard]] std::string registerListener(Listener::Ptr pListener);
 		/// Registers the Listener at the ORB. The local endpoint of the Listener
 		/// must be unique. Registration will fail with an exception if it is not.
 		///
@@ -161,17 +161,17 @@ public:
 		/// if autoRemoveObjects is set to true, otherwise it will check if objects are still registered
 		/// and will fail with a RemotingException.
 
-	ListenerVec listeners() const;
+	[[nodiscard]] ListenerVec listeners() const;
 		/// Returns a vector containing all registered Listener objects.
 		
-	std::vector<std::string> listenerIds() const;
+	[[nodiscard]] std::vector<std::string> listenerIds() const;
 		/// Returns a vector containing the IDs of all registered Listener objects.
 
-	std::vector<std::string> listenerIds(const std::string& protocol) const;
+	[[nodiscard]] std::vector<std::string> listenerIds(const std::string& protocol) const;
 		/// Returns a vector containing the IDs of all registered Listener objects
 		/// supporting the given protocol.
 		
-	Listener::Ptr findListener(const std::string& listenerId) const;
+	[[nodiscard]] Listener::Ptr findListener(const std::string& listenerId) const;
 		/// Returns the Listener object with the given ID, or a null pointer
 		/// if no Listener with this ID exists.
 
@@ -185,7 +185,7 @@ public:
 		///
 		/// If objects are still registered and autoRemoveObjects is false, it will fail with a RemotingException.
 
-	Skeleton::Ptr skeletonForClass(const Identifiable::TypeId& tid) const;
+	[[nodiscard]] Skeleton::Ptr skeletonForClass(const Identifiable::TypeId& tid) const;
 		/// Returns a Skeleton for the given type.
 		///
 		/// Throws an exception if no Skeleton exists for the given TypeId.
@@ -208,7 +208,7 @@ public:
 		///
 		/// If objects are still registered and autoRemoveObjects is false, it will fail with a RemotingException.
 
-	std::string registerObject(RemoteObject::Ptr pRemoteObject, const std::string& listenerId);
+	[[nodiscard]] std::string registerObject(RemoteObject::Ptr pRemoteObject, const std::string& listenerId);
 		/// Registers a RemoteObject with the ORB and the Listener instance
 		/// uniquely identified by the Listener ID.
 		///
@@ -242,7 +242,7 @@ public:
 		/// Unregisters all EventDispatcher objects registered for
 		/// the RemoteObject with the given URI.
 		
-	EventDispatcher::Ptr findEventDispatcher(const std::string& uri, const std::string& protocol) const;
+	[[nodiscard]] EventDispatcher::Ptr findEventDispatcher(const std::string& uri, const std::string& protocol) const;
 		/// Return the EventDispatcher handling the given protocol, for the RemoteObject
 		/// identified by URI. The given URI can be a fully-qualified URI (the result
 		/// of registerObject()), or an object path. The format of an object path is 
@@ -276,8 +276,8 @@ private:
 	ORB(const ORB&);
 	ORB& operator = (const ORB&);
 
-	RemoteObjectInfo::Ptr findLocalObject(const Identifiable::TypeId& tid, const Identifiable::ObjectId& oid, const std::string& protocol) const;
-	URIAliases::const_iterator findAlias(const std::string& path) const;
+	[[nodiscard]] RemoteObjectInfo::Ptr findLocalObject(const Identifiable::TypeId& tid, const Identifiable::ObjectId& oid, const std::string& protocol) const;
+	[[nodiscard]] URIAliases::const_iterator findAlias(const std::string& path) const;
 
 	bool                _enabled;
 	ListenerMap         _listeners;         /// Maps endpoints to Listener objects

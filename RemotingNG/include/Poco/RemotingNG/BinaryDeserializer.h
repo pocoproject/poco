@@ -48,7 +48,7 @@ public:
 		/// Serializes the object and type ID of the service object.
 
 	template <typename T>
-	T deserializeToken()
+	[[nodiscard]] T deserializeToken()
 		/// Deserializes the given value, which must be a type directly supported
 		/// by Poco::BinaryReader.
 	{
@@ -91,8 +91,8 @@ protected:
 	void setupImpl(std::istream& istr);
 
 private:
-	bool handleVector();
-	bool checkStream();
+	[[nodiscard]] bool handleVector();
+	[[nodiscard]] bool checkStream();
 	void findMessageImpl();
 
 	using BinaryReaderPtr = std::unique_ptr<Poco::BinaryReader>;

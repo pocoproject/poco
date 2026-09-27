@@ -73,12 +73,12 @@ class ServerHelper
 		using RemoteObject = namespc::clazz##RemoteObject; \
 		using RemoteObjectPtr = Poco::AutoPtr<RemoteObject>; \
 		\
-		static std::string registerObject(ServicePtr pServiceObject, const Poco::RemotingNG::Identifiable::ObjectId& oid, const std::string& listenerId) \
+		[[nodiscard]] static std::string registerObject(ServicePtr pServiceObject, const Poco::RemotingNG::Identifiable::ObjectId& oid, const std::string& listenerId) \
 		{ \
 			return Helper::registerObject(pServiceObject, oid, listenerId); \
 		} \
 		\
-		static std::string registerObject(RemoteObjectPtr pRemoteObject, const std::string listenerId) \
+		[[nodiscard]] static std::string registerObject(RemoteObjectPtr pRemoteObject, const std::string listenerId) \
 		{ \
 			return Helper::registerRemoteObject(pRemoteObject, listenerId); \
 		} \
@@ -88,7 +88,7 @@ class ServerHelper
 			Helper::unregisterObject(uri); \
 		} \
 		\
-		static RemoteObjectPtr createRemoteObject(ServicePtr pService, const Poco::RemotingNG::Identifiable::ObjectId& oid) \
+		[[nodiscard]] static RemoteObjectPtr createRemoteObject(ServicePtr pService, const Poco::RemotingNG::Identifiable::ObjectId& oid) \
 		{ \
 			return Helper::createRemoteObject(pService, oid); \
 		} \

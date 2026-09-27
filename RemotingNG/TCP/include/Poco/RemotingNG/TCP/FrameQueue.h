@@ -44,14 +44,14 @@ public:
 	~FrameQueue();
 		/// Destroys the FrameQueue.
 
-	Frame::Ptr dequeueFrame(Poco::Timespan timeout);
+	[[nodiscard]] Frame::Ptr dequeueFrame(Poco::Timespan timeout);
 		/// If there is at least one frame in the queue, removes
 		/// it from the queue and returns it.
 		/// Otherwise waits until a frame arrives or the
 		/// timeout expires.
 
 	// FrameHandler
-	bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame);
+	[[nodiscard]] bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame);
 
 private:
 	enum

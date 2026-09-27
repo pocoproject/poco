@@ -50,7 +50,7 @@ public:
 		/// run again. If the task is running when this call occurs, the task
 		/// will run to completion, but will never run again.
 
-	bool isCancelled() const;
+	[[nodiscard]] bool isCancelled() const;
 		/// Returns true iff the TimerTask has been cancelled by a call
 		/// to cancel().
 

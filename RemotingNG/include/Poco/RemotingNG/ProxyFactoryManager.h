@@ -47,11 +47,11 @@ public:
 	void unregisterProxyFactory(const Identifiable::TypeId& tid);
 		/// Unregisters the ProxyFactory for the given TypeId if one exists.
 
-	Proxy* createProxy(const Identifiable::TypeId& tid, const RemotingNG::Identifiable::ObjectId& oid, const std::string& protocol, const std::string& uri) const;
+	[[nodiscard]] Proxy* createProxy(const Identifiable::TypeId& tid, const RemotingNG::Identifiable::ObjectId& oid, const std::string& protocol, const std::string& uri) const;
 		/// Creates a Proxy for the given TypeId and ObjectId, and connects it to the endpoint specified 
 		/// by the given URI, using the Transport for the given protocol.
 
-	Proxy* createProxy(const Identifiable::TypeId& tid, const RemotingNG::Identifiable::ObjectId& oid) const;
+	[[nodiscard]] Proxy* createProxy(const Identifiable::TypeId& tid, const RemotingNG::Identifiable::ObjectId& oid) const;
 		/// Creates an unconnected Proxy for the given TypeId and ObjectId.
 
 private:

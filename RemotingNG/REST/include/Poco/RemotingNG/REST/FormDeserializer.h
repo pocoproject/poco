@@ -57,7 +57,7 @@ protected:
 	void handlePart(const std::string& name, std::istream& stream);
 
 	// ScalarDeserializer
-	const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found);
+	[[nodiscard]] const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found);
 	bool deserializeBuffer(const std::string& name, bool isMandatory, std::vector<char>& val);
 
 private:

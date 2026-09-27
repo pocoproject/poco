@@ -44,7 +44,7 @@ public:
 		/// Destroys the TransportFactory.
 
 	// TransportFactory
-	Poco::RemotingNG::Transport* createTransport();
+	[[nodiscard]] Poco::RemotingNG::Transport* createTransport();
 
 	// Helpers
 	static void registerFactory();

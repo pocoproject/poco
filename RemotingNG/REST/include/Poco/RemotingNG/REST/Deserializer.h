@@ -87,7 +87,7 @@ public:
 protected:
 	void resetImpl();
 	void setupImpl(std::istream& inStream);
-	Poco::SharedPtr<Poco::RemotingNG::Deserializer> subDeserializer();
+	[[nodiscard]] Poco::SharedPtr<Poco::RemotingNG::Deserializer> subDeserializer();
 
 private:
 	Deserializer(const Deserializer&);

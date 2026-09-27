@@ -56,11 +56,11 @@ public:
 	~XSDGenerator();
 		/// Destroys the XSDGenerator.
 
-	static std::string generateFileName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static std::string generateFileName(const Poco::CppParser::Struct* pStruct);
 
-	static std::string generateFileName(const std::string& structName);
+	[[nodiscard]] static std::string generateFileName(const std::string& structName);
 
-	static std::string generateComplexTypeName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static std::string generateComplexTypeName(const Poco::CppParser::Struct* pStruct);
 
 	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
 		/// Struct Start
@@ -76,19 +76,19 @@ public:
 
 	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e);
 
-	std::string newClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct);
 		/// generates the new class name based on the old one
 
-	std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
 
-	static const std::string& mapToSchemaType(const std::string& type);
+	[[nodiscard]] static const std::string& mapToSchemaType(const std::string& type);
 
 	void detectProperties(const Poco::CppParser::Variable* pVar, bool& isVector, bool& isMandatory, bool& isNullable, std::string& name, std::string& resolvedType);
 
-	static bool isOutParameter(const Poco::CppParser::Parameter* pParam);
+	[[nodiscard]] static bool isOutParameter(const Poco::CppParser::Parameter* pParam);
 
 protected:
-	static std::map<std::string, std::string> initTypeMapping();
+	[[nodiscard]] static std::map<std::string, std::string> initTypeMapping();
 
 	std::string generateComplexType(const Poco::CppParser::Struct* pType);
 		/// Returns the name of the generated type
@@ -99,16 +99,16 @@ protected:
 
 	void generateTypes(const std::vector<const Poco::CppParser::Struct*>& detectedTypes);
 
-	Poco::CppParser::Struct* convertToStruct(const Poco::CppParser::Function* pFuncOld, bool isResponse);
+	[[nodiscard]] Poco::CppParser::Struct* convertToStruct(const Poco::CppParser::Function* pFuncOld, bool isResponse);
 		/// Creates for parameters of the function a struct with get/set methods. If isResponse is set to true only outParams+return parameter is included.
 
-	Poco::CppParser::Parameter* createParameter(const Poco::CppParser::Parameter* pCopy, Poco::CppParser::Function* pConstructorFull);
+	[[nodiscard]] Poco::CppParser::Parameter* createParameter(const Poco::CppParser::Parameter* pCopy, Poco::CppParser::Function* pConstructorFull);
 		/// Creates a parameter form pCopy, adds it to the constructor.
 
-	std::string createParameterTypeDecl(const std::string& typeDecl);
+	[[nodiscard]] std::string createParameterTypeDecl(const std::string& typeDecl);
 		/// if typeDecl contains a primitive type, we return the typeDecl as value type, otherwise as const& type
 
-	Poco::CppParser::Variable* createVariable(const Poco::CppParser::Parameter* pParam, Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] Poco::CppParser::Variable* createVariable(const Poco::CppParser::Parameter* pParam, Poco::CppParser::Struct* pStruct);
 
 	Poco::CppParser::Function* createGetFct(const Poco::CppParser::Parameter* pParam, Poco::CppParser::Struct* pStruct);
 

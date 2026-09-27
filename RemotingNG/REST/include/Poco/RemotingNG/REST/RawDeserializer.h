@@ -69,7 +69,7 @@ public:
 protected:
 	void resetImpl();
 	void setupImpl(std::istream& inStream);
-	const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found);
+	[[nodiscard]] const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found);
 
 private:
 	RawDeserializer(const RawDeserializer&);

@@ -64,29 +64,29 @@ public:
 		/// Destroys the SCRAMAuthenticator.
 
 	// Authenticator
-	AuthenticateResult authenticate(const Credentials& credentials, Poco::UInt32 conversationID);
+	[[nodiscard]] AuthenticateResult authenticate(const Credentials& credentials, Poco::UInt32 conversationID);
 
 	// Utility methods
-	static std::string createNonce();
-	static std::string digestToBinaryString(Poco::DigestEngine& engine);
-	static std::string digestToHexString(Poco::DigestEngine& engine);
-	static std::string computeClientProof(const std::string& username, const std::string& clientNonce, const std::string& salt, int iterations, const std::string& saltedPassword, const std::string& serverNonce, std::string& clientAuthMessage);
-	static std::string computeServerSignature(const std::string& saltedPassword, const std::string& clientAuthMessage);
+	[[nodiscard]] static std::string createNonce();
+	[[nodiscard]] static std::string digestToBinaryString(Poco::DigestEngine& engine);
+	[[nodiscard]] static std::string digestToHexString(Poco::DigestEngine& engine);
+	[[nodiscard]] static std::string computeClientProof(const std::string& username, const std::string& clientNonce, const std::string& salt, int iterations, const std::string& saltedPassword, const std::string& serverNonce, std::string& clientAuthMessage);
+	[[nodiscard]] static std::string computeServerSignature(const std::string& saltedPassword, const std::string& clientAuthMessage);
 
 protected:
-	virtual std::string saltForUser(const std::string& username, int& iterations) = 0;
+	[[nodiscard]] virtual std::string saltForUser(const std::string& username, int& iterations) = 0;
 		/// Returns the salt for hashing the given user's password, as well as the
 		/// number of iterations for the PBKDF2 algorithm.
 		///
 		/// Returns an empty string if the user does not exist.
 
-	virtual std::string hashForUser(const std::string& username) = 0;
+	[[nodiscard]] virtual std::string hashForUser(const std::string& username) = 0;
 		/// Returns the PBKDF2-hashed password for the given user.
 		///
 		/// Note that the returned string must contain the raw bytes of
 		/// the hash, not the hex-encoded or base64-encoded hash.
 
-	Poco::UInt32 newConversationID();
+	[[nodiscard]] Poco::UInt32 newConversationID();
 		/// Generates a new Conversation ID.
 
 	enum State

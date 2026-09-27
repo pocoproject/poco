@@ -58,29 +58,29 @@ struct RemotingNGSOAP_API XMLElement
 	void setAttribute(const std::string& name, const std::string& namespaceURI, const std::string& value);
 		/// Sets an attribute value.
 
-	const XMLElement* findChild(const std::string& name, const std::string& namespaceURI) const;
+	[[nodiscard]] const XMLElement* findChild(const std::string& name, const std::string& namespaceURI) const;
 		/// Finds a child element with the given local name and namespaceURI.
 		/// Returns a pointer to the XMLElement if found, otherwise nullptr.
 	
-	const std::string& localName() const;
+	[[nodiscard]] const std::string& localName() const;
 		/// Returns the local name of the element.
 
-	const std::string& namespaceURI() const;
+	[[nodiscard]] const std::string& namespaceURI() const;
 		/// Returns the namespace URI of the element.
 
-	const std::string& value() const;
+	[[nodiscard]] const std::string& value() const;
 		/// Returns the text content of the element.
 
-	const Poco::XML::AttributesImpl& attributes() const;
+	[[nodiscard]] const Poco::XML::AttributesImpl& attributes() const;
 		/// Returns the attributes of the element.
 
-	Poco::XML::AttributesImpl& attributes();
+	[[nodiscard]] Poco::XML::AttributesImpl& attributes();
 		/// Returns the attributes of the element.
 
-	const std::vector<XMLElement>& children() const;
+	[[nodiscard]] const std::vector<XMLElement>& children() const;
 		/// Returns the children of the element.
 
-	std::vector<XMLElement>& children();
+	[[nodiscard]] std::vector<XMLElement>& children();
 		/// Returns the children of the element.
 
 	std::string _name;

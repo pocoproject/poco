@@ -49,7 +49,7 @@ public:
 	{
 	}
 
-	virtual bool accept(const T& value) = 0;
+	[[nodiscard]] virtual bool accept(const T& value) = 0;
 		/// Returns true if the event should be delivered,
 		/// false otherwise.
 		
@@ -70,7 +70,7 @@ public:
 	}
 	
 	// EventFilter
-	bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value)
 	{
 		return value > _limit;
 	}
@@ -91,7 +91,7 @@ public:
 	}
 	
 	// EventFilter
-	bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value)
 	{
 		return value >= _limit;
 	}
@@ -112,7 +112,7 @@ public:
 	}
 	
 	// EventFilter
-	bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value)
 	{
 		return value < _limit;
 	}
@@ -133,7 +133,7 @@ public:
 	}
 	
 	// EventFilter
-	bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value)
 	{
 		return value <= _limit;
 	}
@@ -155,7 +155,7 @@ public:
 	}
 	
 	// EventFilter
-	bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value)
 	{
 		return _pFirst->accept(value) || _pSecond->accept(value);
 	}
@@ -178,7 +178,7 @@ public:
 	}
 	
 	// EventFilter
-	bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value)
 	{
 		return _pFirst->accept(value) && _pSecond->accept(value);
 	}
@@ -201,7 +201,7 @@ public:
 	}
 	
 	// EventFilter
-	bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value)
 	{
 		return _pFirst->accept(value) != _pSecond->accept(value);
 	}
@@ -231,7 +231,7 @@ public:
 	}
 
 	// EventFilter
-	bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value)
 	{
 		if (std::abs(value - _lastValue) >= _delta)
 		{
@@ -260,7 +260,7 @@ public:
 	}
 
 	// EventFilter
-	bool accept(const T&)
+	[[nodiscard]] bool accept(const T&)
 	{
 		if (_lastClock.isElapsed(_interval))
 		{
@@ -299,7 +299,7 @@ public:
 	}
 
 	// EventFilter
-	bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value)
 	{
 		if (_lastClock.isElapsed(_interval) || std::abs(value - _lastValue) >= _delta)
 		{
@@ -341,7 +341,7 @@ public:
 	}
 
 	// EventFilter
-	bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value)
 	{
 		if (_lastClock.isElapsed(_interval) && std::abs(value - _lastValue) >= _delta)
 		{
@@ -386,11 +386,11 @@ public:
 		_upperThreshold(upperThreshold),
 		_state(STATE_INITIAL)
 	{
-		accept(currentValue);
+		(void) accept(currentValue);
 	}
 
 	// EventFilter
-	bool accept(const T& value)
+	[[nodiscard]] bool accept(const T& value)
 	{
 		switch (_state)
 		{

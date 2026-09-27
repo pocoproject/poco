@@ -37,7 +37,7 @@ class RemotingNGTCP_API FrameHandler: public Poco::RefCountedObject
 public:
 	using Ptr = Poco::AutoPtr<FrameHandler>;
 
-	virtual bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame) = 0;
+	[[nodiscard]] virtual bool handleFrame(Connection::Ptr pConnection, Frame::Ptr pFrame) = 0;
 		/// Handle the given frame.
 		///
 		/// If the handler accepts the frame, it should return true.

@@ -42,7 +42,7 @@ public:
 	virtual ~TransportFactory();
 		/// Destroys the TransportFactory.
 
-	virtual Transport* createTransport() = 0;
+	[[nodiscard]] virtual Transport* createTransport() = 0;
 		/// Returns an unconnected Transport.
 };
 

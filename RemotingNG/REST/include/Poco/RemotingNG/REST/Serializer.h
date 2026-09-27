@@ -87,7 +87,7 @@ public:
 protected:
 	void resetImpl();
 	void setupImpl(std::ostream& out);
-	Poco::SharedPtr<Poco::RemotingNG::Serializer> subSerializer();
+	[[nodiscard]] Poco::SharedPtr<Poco::RemotingNG::Serializer> subSerializer();
 
 	static const std::string LOCATION_PATH;
 	static const std::string LOCATION_QUERY;

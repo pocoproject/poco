@@ -43,7 +43,7 @@ public:
 	virtual ~ProxyFactory();
 		/// Destroys the ProxyFactory.
 
-	virtual Proxy* createProxy(const RemotingNG::Identifiable::ObjectId& oid) const = 0;
+	[[nodiscard]] virtual Proxy* createProxy(const RemotingNG::Identifiable::ObjectId& oid) const = 0;
 		/// Returns a new unconnected Proxy object for the remote 
 		/// service object with the given ObjectId.
 };

@@ -83,7 +83,7 @@ public:
 		/// Enables or disables chunked transfer encoding for responses.
 		/// Default is enabled.
 
-	bool isChunkedTransferEncodingEnabled() const;
+	[[nodiscard]] bool isChunkedTransferEncodingEnabled() const;
 		/// Returns true iff chunked transfer encoding is enabled for responses.
 
 	void enableCompression(bool enable = true);
@@ -93,14 +93,14 @@ public:
 		/// Note that chunked transfer encoding must also be enabled
 		/// in order to allow compression.
 
-	bool isCompressionEnabled() const;
+	[[nodiscard]] bool isCompressionEnabled() const;
 		/// Returns true iff GZIP compression is enabled for responses.
 
 	void enableCORS(bool enable = true);
 		/// Enables or disables CORS (Cross Origin Resource Sharing).
 		/// Default is disabled.
 
-	bool isCORSEnabled() const;
+	[[nodiscard]] bool isCORSEnabled() const;
 		/// Returns true iff CORS is enabled.
 
 	void setCORSAllowedOrigin(const std::string& origin);
@@ -117,7 +117,7 @@ public:
 		/// If any other origin is given, the origin presented by the client
 		/// must exactly match the specified origin for the request to be accepted.
 
-	const std::string& getCORSAllowedOrigin() const;
+	[[nodiscard]] const std::string& getCORSAllowedOrigin() const;
 		/// Retuns the CORS allowed origin.
 		///
 		/// See setCORSAllowedOrigin() for more information.
@@ -125,9 +125,9 @@ public:
 	// Poco::RemotingNG::Listener
 	void start();
 	void stop();
-	const std::string& protocol() const;
-	std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId);
-	bool handlesURI(const std::string& uri);
+	[[nodiscard]] const std::string& protocol() const;
+	[[nodiscard]] std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId);
+	[[nodiscard]] bool handlesURI(const std::string& uri);
 	void registerObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject, Poco::RemotingNG::Skeleton::Ptr pSkeleton);
 	void unregisterObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject);
 

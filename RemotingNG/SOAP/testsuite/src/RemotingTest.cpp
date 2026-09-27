@@ -501,8 +501,10 @@ void RemotingTest::testAuthenticatedGoodCredentials()
 	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
 	Poco::RemotingNG::SOAP::Transport& trans = static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport());
 
-	trans.setUsername("user");
-	trans.setPassword("pass");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "pass");
+	trans.setCredentials(creds);
 	trans.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_BASIC);
 
 	_pListener->setAuthenticator(new MockAuthenticator);
@@ -518,8 +520,10 @@ void RemotingTest::testAuthenticatedBadCredentials()
 	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
 	Poco::RemotingNG::SOAP::Transport& trans = static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport());
 
-	trans.setUsername("user");
-	trans.setPassword("bad!");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "bad!");
+	trans.setCredentials(creds);
 	trans.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_BASIC);
 
 	_pListener->setAuthenticator(new MockAuthenticator);
@@ -561,8 +565,10 @@ void RemotingTest::testPermission()
 	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
 	Poco::RemotingNG::SOAP::Transport& trans = static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport());
 
-	trans.setUsername("admin");
-	trans.setPassword("s3cr3t");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "admin");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+	trans.setCredentials(creds);
 	trans.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_BASIC);
 
 	_pListener->setAuthenticator(new MockAuthenticator);
@@ -579,8 +585,10 @@ void RemotingTest::testNoPermission()
 	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
 	Poco::RemotingNG::SOAP::Transport& trans = static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport());
 
-	trans.setUsername("user");
-	trans.setPassword("pass");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "pass");
+	trans.setCredentials(creds);
 	trans.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_BASIC);
 
 	_pListener->setAuthenticator(new MockAuthenticator);
@@ -608,8 +616,10 @@ void RemotingTest::testWSSEInterceptor()
 	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
 	Poco::RemotingNG::SOAP::Transport& trans = static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport());
 
-	trans.setUsername("user");
-	trans.setPassword("pass");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "pass");
+	trans.setCredentials(creds);
 	trans.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_WSSE_DIGEST);
 
 	class WSSEServerInterceptor: public Poco::RemotingNG::SOAP::Listener::RequestHeaderInterceptor
@@ -667,8 +677,10 @@ void RemotingTest::testWSSEAuthenticatorPlain()
 	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
 	Poco::RemotingNG::SOAP::Transport& trans = static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport());
 
-	trans.setUsername("user");
-	trans.setPassword("pass");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "pass");
+	trans.setCredentials(creds);
 	trans.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_WSSE_TEXT);
 
 	Poco::AutoPtr<MockWSSEAuthenticator> pAuth = new MockWSSEAuthenticator;
@@ -688,8 +700,10 @@ void RemotingTest::testWSSEAuthenticatorDigest()
 	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
 	Poco::RemotingNG::SOAP::Transport& trans = static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport());
 
-	trans.setUsername("user");
-	trans.setPassword("pass");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "pass");
+	trans.setCredentials(creds);
 	trans.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_WSSE_DIGEST);
 
 	Poco::AutoPtr<MockWSSEAuthenticator> pAuth = new MockWSSEAuthenticator;
@@ -1346,8 +1360,10 @@ ITester::Ptr RemotingTestSOAP12Auth::createProxy(const std::string& uri)
 	pProxy->remoting__connect("soap-1.2", uri);
 	static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport()).enableChunkedTransferEncoding(false);
 	static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport()).setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_ANY);
-	static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport()).setUsername("user");
-	static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport()).setPassword("s3cr3t");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+	static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport()).setCredentials(creds);
 	return pProxy;
 }
 
@@ -1403,8 +1419,10 @@ ITester::Ptr RemotingTestSOAP12AuthChunked::createProxy(const std::string& uri)
 	pProxy->remoting__connect("soap-1.2", uri);
 	static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport()).enableChunkedTransferEncoding(true);
 	static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport()).setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_BASIC);
-	static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport()).setUsername("user");
-	static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport()).setPassword("s3cr3t");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+	static_cast<Poco::RemotingNG::SOAP::Transport&>(pProxy->remoting__transport()).setCredentials(creds);
 	return pProxy;
 }
 

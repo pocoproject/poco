@@ -51,7 +51,7 @@ public:
 	virtual ~Authorizer();
 		/// Destroys the Authorizer.
 		
-	virtual bool authorize(const std::string& method, const std::string& permission) = 0;
+	[[nodiscard]] virtual bool authorize(const std::string& method, const std::string& permission) = 0;
 		/// Verifies that the request is properly authenticated (using a 
 		/// transport-specific authentication mechanism, e.g. HTTP Basic
 		/// Authentication) and checks whether the user account associated

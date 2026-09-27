@@ -67,13 +67,13 @@ public:
 	void setIdleTimeout(Poco::Timespan timeout);
 		/// Sets the timeout after an idle connection is closed.
 
-	Poco::Timespan getIdleTimeout() const;
+	[[nodiscard]] Poco::Timespan getIdleTimeout() const;
 		/// Returns the idle connection timeout.
 
 	void setHandshakeTimeout(Poco::Timespan timeout);
 		/// Sets the timeout for the initial connection handshake.
 
-	Poco::Timespan getHandshakeTimeout() const;
+	[[nodiscard]] Poco::Timespan getHandshakeTimeout() const;
 		/// Returns the timeout for the initial connection handshake.
 
 	void registerConnection(Connection::Ptr pConnection);
@@ -82,13 +82,13 @@ public:
 	void unregisterConnection(Connection::Ptr pConnection);
 		/// Unregisters an existing connection.
 
-	Connection::Ptr findConnection(const Poco::Net::SocketAddress& peerAddress);
+	[[nodiscard]] Connection::Ptr findConnection(const Poco::Net::SocketAddress& peerAddress);
 		/// Searches for a connection to the given peer address.
 		///
 		/// If a connection exists, and the connection is in established state,
 		/// it is returned. Otherwise, a null pointer is returned.
 
-	Connection::Ptr getConnection(const Poco::URI& endpointURI);
+	[[nodiscard]] Connection::Ptr getConnection(const Poco::URI& endpointURI);
 		/// Searches for a connection to the given endpoint.
 		///
 		/// If a connection exists, and the connection is in established state,
@@ -98,14 +98,14 @@ public:
 	void shutdown();
 		/// Closes all connections.
 
-	ThreadPool& threadPool();
+	[[nodiscard]] ThreadPool& threadPool();
 		/// Returns a reference to the ConnectionManager's thread pool.
 
-	static ConnectionManager& defaultManager();
+	[[nodiscard]] static ConnectionManager& defaultManager();
 		/// Returns the default ConnectionManager instance.
 
 protected:
-	Connection::Ptr createConnection(const Poco::URI& endpointURI);
+	[[nodiscard]] Connection::Ptr createConnection(const Poco::URI& endpointURI);
 
 private:
 	enum

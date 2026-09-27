@@ -51,7 +51,7 @@ public:
 	virtual ~EventSubscriber();
 		/// Destroys the EventSubscriber.
 
-	const std::string& uri() const;
+	[[nodiscard]] const std::string& uri() const;
 		/// Returns the URI of the remote object providing the
 		/// events for this EventSubscriber.
 

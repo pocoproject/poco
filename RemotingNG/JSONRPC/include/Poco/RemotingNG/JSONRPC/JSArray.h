@@ -41,10 +41,10 @@ public:
 		/// Creates an empty JSArray.
 
 	// JSValue
-	Type type() const;
-	std::size_t size() const;
-	const Ptr& operator [] (std::size_t index) const;
-	Ptr& operator [] (std::size_t index);
+	[[nodiscard]] Type type() const;
+	[[nodiscard]] std::size_t size() const;
+	[[nodiscard]] const Ptr& operator [] (std::size_t index) const;
+	[[nodiscard]] Ptr& operator [] (std::size_t index);
 
 protected:
 	~JSArray();

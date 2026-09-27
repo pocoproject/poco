@@ -94,7 +94,7 @@ protected:
 private:
 	void serializeData(const std::string& name, const std::string& val);
 	void writeSeparator();
-	std::string escapeString(const std::string& val);
+	[[nodiscard]] std::string escapeString(const std::string& val);
 
 private:
 	std::ostream* _pStream;

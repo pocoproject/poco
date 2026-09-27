@@ -514,8 +514,10 @@ ITester::Ptr RemotingTestRESTAuth::createProxy(const std::string& uri)
 	Poco::AutoPtr<TesterProxy> pProxy = new TesterProxy("TheTester");
 	pProxy->remoting__connect("rest", uri);
 	static_cast<Poco::RemotingNG::REST::Transport&>(pProxy->remoting__transport()).setAuthentication(Poco::RemotingNG::REST::Transport::AUTH_ANY);
-	static_cast<Poco::RemotingNG::REST::Transport&>(pProxy->remoting__transport()).setUsername("user");
-	static_cast<Poco::RemotingNG::REST::Transport&>(pProxy->remoting__transport()).setPassword("s3cr3t");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+	static_cast<Poco::RemotingNG::REST::Transport&>(pProxy->remoting__transport()).setCredentials(creds);
 	return pProxy;
 }
 
@@ -594,8 +596,10 @@ void RemotingTestAuth::testAuthenticatedGoodCredentials()
 	Poco::AutoPtr<AuthTesterProxy> pProxy = pTester.cast<AuthTesterProxy>();
 	Poco::RemotingNG::REST::Transport& trans = static_cast<Poco::RemotingNG::REST::Transport&>(pProxy->remoting__transport());
 
-	trans.setUsername("user");
-	trans.setPassword("pass");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "pass");
+	trans.setCredentials(creds);
 	trans.setAuthentication(Poco::RemotingNG::REST::Transport::AUTH_BASIC);
 
 	_pListener->setAuthenticator(new MockAuthenticator);
@@ -631,8 +635,10 @@ void RemotingTestAuth::testAuthenticatedBadCredentials()
 	Poco::AutoPtr<AuthTesterProxy> pProxy = pTester.cast<AuthTesterProxy>();
 	Poco::RemotingNG::REST::Transport& trans = static_cast<Poco::RemotingNG::REST::Transport&>(pProxy->remoting__transport());
 
-	trans.setUsername("user");
-	trans.setPassword("bAd!");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "bAd!");
+	trans.setCredentials(creds);
 	trans.setAuthentication(Poco::RemotingNG::REST::Transport::AUTH_BASIC);
 
 	_pListener->setAuthenticator(new MockAuthenticator);
@@ -700,8 +706,10 @@ void RemotingTestAuth::testPermission()
 	Poco::AutoPtr<AuthTesterProxy> pProxy = pTester.cast<AuthTesterProxy>();
 	Poco::RemotingNG::REST::Transport& trans = static_cast<Poco::RemotingNG::REST::Transport&>(pProxy->remoting__transport());
 
-	trans.setUsername("admin");
-	trans.setPassword("s3cr3t");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "admin");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+	trans.setCredentials(creds);
 	trans.setAuthentication(Poco::RemotingNG::REST::Transport::AUTH_BASIC);
 
 	_pListener->setAuthenticator(new MockAuthenticator);
@@ -721,8 +729,10 @@ void RemotingTestAuth::testNoPermission()
 	Poco::AutoPtr<AuthTesterProxy> pProxy = pTester.cast<AuthTesterProxy>();
 	Poco::RemotingNG::REST::Transport& trans = static_cast<Poco::RemotingNG::REST::Transport&>(pProxy->remoting__transport());
 
-	trans.setUsername("user");
-	trans.setPassword("pass");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "pass");
+	trans.setCredentials(creds);
 	trans.setAuthentication(Poco::RemotingNG::REST::Transport::AUTH_BASIC);
 
 	_pListener->setAuthenticator(new MockAuthenticator);

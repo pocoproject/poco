@@ -69,18 +69,18 @@ public:
 	virtual void structEnd();
 		/// Must not write the namespace
 
-	virtual Poco::CppParser::Function* methodClone(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
+	[[nodiscard]] virtual Poco::CppParser::Function* methodClone(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
 		/// Clones the function
 
-	virtual Poco::CppParser::Struct* structClone(const Poco::CppParser::Struct* pStructIn, const std::string& newClassName, const std::vector<std::string>& baseClasses = std::vector<std::string>());
+	[[nodiscard]] virtual Poco::CppParser::Struct* structClone(const Poco::CppParser::Struct* pStructIn, const std::string& newClassName, const std::vector<std::string>& baseClasses = std::vector<std::string>());
 		/// Clones the struct without any methods or member variables!
 
 	virtual void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e) = 0;
 
-	virtual std::string newClassName(const Poco::CppParser::Struct* pStruct) = 0;
+	[[nodiscard]] virtual std::string newClassName(const Poco::CppParser::Struct* pStruct) = 0;
 		/// generates the new class name based on the old one
 
-	virtual std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct) = 0;
+	[[nodiscard]] virtual std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct) = 0;
 		/// generates the new base classes
 
 	void writeMethodImplementation(const std::string& code);
@@ -110,10 +110,10 @@ public:
 	static void addParamDocu(Poco::CppParser::Parameter* pParam, const CodeGenerator::Properties& functionProperties);
 		/// Searches the docu for the parameter specific properties and sets them as docu at pParam
 
-	static std::string includePath(const Poco::Util::AbstractConfiguration& config, const std::string& nameSpace);
+	[[nodiscard]] static std::string includePath(const Poco::Util::AbstractConfiguration& config, const std::string& nameSpace);
 		/// Returns the include file output path for the given namespace.
 
-	static std::string includePath(const Poco::Util::AbstractConfiguration& config, const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static std::string includePath(const Poco::Util::AbstractConfiguration& config, const Poco::CppParser::Struct* pStruct);
 
 protected:
 	void handleParentFunctions(const Poco::CppParser::Struct* pStruct);
@@ -137,14 +137,14 @@ protected:
 	static void typeIdCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam);
 		/// Code generator for the getTypeId method
 
-	std::string resolveType(const std::string& decl);
+	[[nodiscard]] std::string resolveType(const std::string& decl);
 		/// Resolves typedefs.
 
-	Poco::CodeGeneration::CppGenerator& cppGen();
+	[[nodiscard]] Poco::CodeGeneration::CppGenerator& cppGen();
 		/// Returns the cpp code generator
 
 private:
-	static const std::set<std::string> initBuiltinTypes();
+	[[nodiscard]] static const std::set<std::string> initBuiltinTypes();
 
 	void handleIncludeTypeSerializers(const Poco::CppParser::Parameter* pParam, bool toHFile, bool writeDirectly);
 		/// Includes serializers/deserializers for the parameters of a function.

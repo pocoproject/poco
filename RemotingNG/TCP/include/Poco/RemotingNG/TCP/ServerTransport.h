@@ -57,8 +57,8 @@ public:
 		/// Waits until the server thread is ready.
 
 	// ServerTransport
-	bool authenticate(const std::string& method);
-	bool authorize(const std::string& method, const std::string& permission);
+	[[nodiscard]] bool authenticate(const std::string& method);
+	[[nodiscard]] bool authorize(const std::string& method, const std::string& permission);
 	Deserializer& beginRequest();
 	Serializer& sendReply(SerializerBase::MessageType messageType);
 	void endRequest();
