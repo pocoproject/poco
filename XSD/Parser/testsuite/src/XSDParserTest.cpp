@@ -27,6 +27,7 @@
 #include "Poco/URI.h"
 #include <algorithm>
 #include <sstream>
+#include <vector>
 
 
 using namespace Poco::XSD::Parser;
@@ -832,6 +833,285 @@ void XSDParserTest::testIncludeChameleon()
 }
 
 
+void XSDParserTest::testReferencedLocationOtherHostRejected()
+{
+	static const std::string ns("urn:XSDParserTest:otherHost");
+	static const std::vector<std::string> locations = {
+		"file://otherhost/share/x.xsd",
+		"//otherhost/share/x.xsd",
+		"\\\\otherhost\\share\\x.xsd",
+		"file:////otherhost/share/x.xsd",
+		"%5C%5Cotherhost%5Cshare%5Cx.xsd"
+	};
+
+	TypesManager& tm = TypesManager::instance();
+	for (const std::string& location: locations)
+	{
+		const std::vector<std::string> documents = {
+			"<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" "
+				"targetNamespace=\"urn:XSDParserTest:otherHost\">"
+				"<xs:include schemaLocation=\"" + location + "\"/>"
+			"</xs:schema>",
+			"<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" "
+				"targetNamespace=\"urn:XSDParserTest:otherHost\">"
+				"<xs:import namespace=\"urn:XSDParserTest:otherHostImported\" "
+					"schemaLocation=\"" + location + "\"/>"
+			"</xs:schema>",
+			"<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" "
+				"targetNamespace=\"urn:XSDParserTest:otherHost\">"
+				"<xs:import namespace=\"urn:XSDParserTest:otherHostImported\" "
+					"schemaLocation=\"urn:XSDParserTest:otherHostImported " + location + "\"/>"
+			"</xs:schema>",
+			"<definitions xmlns=\"http://schemas.xmlsoap.org/wsdl/\" "
+				"targetNamespace=\"urn:XSDParserTest:otherHost\">"
+				"<import namespace=\"urn:XSDParserTest:otherHostImported\" location=\"" + location + "\"/>"
+			"</definitions>"
+		};
+		for (const std::string& xml: documents)
+		{
+			try
+			{
+				parseDocument(xml, "file:///tmp/poco-xsd-test/a.xsd");
+				failmsg("a location that names another host must be rejected: " + location);
+			}
+			catch (SchemaException& exc)
+			{
+				assertTrue (exc.message().find(location) != std::string::npos);
+			}
+			tm.eraseSchema(ns);
+			if (tm.hasDefinitions(ns)) tm.removeDefinitions(tm.findDefinitions(ns));
+		}
+	}
+}
+
+
+void XSDParserTest::testReferencedLocationSameHostAllowed()
+{
+	static const std::string ns("urn:XSDParserTest:sameHost");
+	static const std::string bXml("<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" "
+									"targetNamespace=\"urn:XSDParserTest:sameHost\">"
+									"<xs:complexType name=\"TB\"><xs:sequence/></xs:complexType>"
+								"</xs:schema>");
+	static const std::string cXml("<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" "
+									"targetNamespace=\"urn:XSDParserTest:sameHost\">"
+									"<xs:complexType name=\"TC\"><xs:sequence/></xs:complexType>"
+								"</xs:schema>");
+	static const std::string dXml("<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" "
+									"targetNamespace=\"urn:XSDParserTest:sameHost\">"
+									"<xs:complexType name=\"TD\"><xs:sequence/></xs:complexType>"
+								"</xs:schema>");
+	static const std::string shareXml("<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" "
+										"targetNamespace=\"urn:XSDParserTest:sameHost\">"
+										"<xs:include schemaLocation=\"b.xsd\"/>"
+										"<xs:include schemaLocation=\"//Server/share/c.xsd\"/>"
+									"</xs:schema>");
+	static const std::string localXml("<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" "
+										"targetNamespace=\"urn:XSDParserTest:sameHost\">"
+										"<xs:include schemaLocation=\"file://localhost/tmp/poco-xsd-test/d.xsd\"/>"
+									"</xs:schema>");
+
+	// the included documents are registered for their locations, so the includes do not open
+	// them and the test does not depend on how the platform opens a location on a network host
+	parseDocument(bXml, "file://server/share/b.xsd");
+	parseDocument(cXml, "//Server/share/c.xsd");
+	parseDocument(dXml, "file://localhost/tmp/poco-xsd-test/d.xsd");
+	parseDocument(shareXml, "file://server/share/a.xsd");
+	parseDocument(localXml, "file:///tmp/poco-xsd-test/a.xsd");
+	TypesManager::instance().eraseSchema(ns);
+}
+
+
+void XSDParserTest::testAnyInDocumentation()
+{
+	static const std::string ns("urn:XSDParserTest:anyInDocumentation");
+	static const std::string xml("<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" "
+									"targetNamespace=\"urn:XSDParserTest:anyInDocumentation\">"
+									"<xs:annotation>"
+										"<xs:documentation source=\"http://appinf.com/any.html\">"
+											"Example: <xs:any/>"
+										"</xs:documentation>"
+									"</xs:annotation>"
+								"</xs:schema>");
+
+	parseDocument(xml, "mem://testAnyInDocumentation");
+	Schema& schema = TypesManager::instance().getSchema(ns);
+	assertTrue (schema.getAnnotations().size() == 1);
+	const Annotation& ann = schema.getAnnotations()[0];
+	assertTrue (ann.annotationContent().size() == 1);
+	assertEqual ("http://appinf.com/any.html", ann.annotationContent()[0]->source());
+	assertTrue (ann.annotationContent()[0]->getData().empty());
+	TypesManager::instance().eraseSchema(ns);
+}
+
+
+void XSDParserTest::testListInDocumentation()
+{
+	static const std::string ns("urn:XSDParserTest:listInDocumentation");
+	static const std::string xml("<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" "
+									"targetNamespace=\"urn:XSDParserTest:listInDocumentation\">"
+									"<xs:annotation><xs:documentation><xs:list/></xs:documentation></xs:annotation>"
+								"</xs:schema>");
+
+	parseDocument(xml, "mem://testListInDocumentation");
+	Schema& schema = TypesManager::instance().getSchema(ns);
+	assertTrue (schema.getAnnotations().size() == 1);
+	assertTrue (schema.getAnnotations()[0].annotationContent().size() == 1);
+	TypesManager::instance().eraseSchema(ns);
+}
+
+
+void XSDParserTest::testListInAppInfo()
+{
+	static const std::string ns("urn:XSDParserTest:listInAppInfo");
+	static const std::string xml("<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\" "
+									"targetNamespace=\"urn:XSDParserTest:listInAppInfo\">"
+									"<xs:annotation><xs:appinfo><xs:list/></xs:appinfo></xs:annotation>"
+								"</xs:schema>");
+
+	parseDocument(xml, "mem://testListInAppInfo");
+	Schema& schema = TypesManager::instance().getSchema(ns);
+	assertTrue (schema.getAnnotations().size() == 1);
+	assertTrue (schema.getAnnotations()[0].annotationContent().size() == 1);
+	TypesManager::instance().eraseSchema(ns);
+}
+
+
+void XSDParserTest::testSchemaElementsInWSDLDocumentation()
+{
+	static const std::string ns("urn:XSDParserTest:schemaElementsInWSDLDocumentation");
+	static const std::string xml("<wsdl:definitions xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\" "
+									"xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+									"targetNamespace=\"urn:XSDParserTest:schemaElementsInWSDLDocumentation\">"
+									"<xsd:documentation><xsd:annotation> </xsd:annotation></xsd:documentation>"
+									"<wsdl:documentation><xsd:list/></wsdl:documentation>"
+								"</wsdl:definitions>");
+
+	parseDocument(xml, "mem://testSchemaElementsInWSDLDocumentation");
+	TypesManager& tm = TypesManager::instance();
+	assertTrue (tm.hasDefinitions(ns));
+	tm.removeDefinitions(tm.findDefinitions(ns));
+}
+
+
+void XSDParserTest::testAnyInWSDLServiceRejected()
+{
+	static const std::string ns("urn:XSDParserTest:anyInWSDLService");
+	static const std::string xml("<wsdl:definitions xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\" "
+									"xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+									"targetNamespace=\"urn:XSDParserTest:anyInWSDLService\">"
+									"<wsdl:service name=\"S\"><xsd:any/></wsdl:service>"
+								"</wsdl:definitions>");
+
+	try
+	{
+		parseDocument(xml, "mem://testAnyInWSDLServiceRejected");
+		failmsg("xs:any in wsdl:service must be rejected");
+	}
+	catch (XSDException& exc)
+	{
+		assertTrue (exc.message().find("Illegal Element: xsd:any") != std::string::npos);
+	}
+	TypesManager& tm = TypesManager::instance();
+	tm.removeDefinitions(tm.findDefinitions(ns));
+}
+
+
+void XSDParserTest::testListInWSDLServiceRejected()
+{
+	static const std::string ns("urn:XSDParserTest:listInWSDLService");
+	static const std::string xml("<wsdl:definitions xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\" "
+									"xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+									"targetNamespace=\"urn:XSDParserTest:listInWSDLService\">"
+									"<wsdl:service name=\"S\"><xsd:list/></wsdl:service>"
+								"</wsdl:definitions>");
+
+	try
+	{
+		parseDocument(xml, "mem://testListInWSDLServiceRejected");
+		failmsg("xs:list in wsdl:service must be rejected");
+	}
+	catch (XSDException& exc)
+	{
+		assertTrue (exc.message().find("Illegal Element: xsd:list") != std::string::npos);
+	}
+	TypesManager& tm = TypesManager::instance();
+	tm.removeDefinitions(tm.findDefinitions(ns));
+}
+
+
+void XSDParserTest::testSchemaComponentsInWSDLRejected()
+{
+	static const std::string ns("urn:XSDParserTest:schemaComponentsInWSDL");
+	static const std::vector<std::string> components = {
+		"<xsd:union/>",
+		"<xsd:simpleContent/>",
+		"<xsd:complexContent/>",
+		"<xsd:element name=\"e\" type=\"xsd:string\"/>"
+	};
+
+	TypesManager& tm = TypesManager::instance();
+	for (const std::string& component: components)
+	{
+		const std::vector<std::string> documents = {
+			"<wsdl:definitions xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\" "
+				"xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+				"targetNamespace=\"urn:XSDParserTest:schemaComponentsInWSDL\">"
+				"<wsdl:service name=\"S\">" + component + "</wsdl:service>"
+			"</wsdl:definitions>",
+			"<wsdl:definitions xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\" "
+				"xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+				"xmlns:tns=\"urn:XSDParserTest:schemaComponentsInWSDL\" "
+				"targetNamespace=\"urn:XSDParserTest:schemaComponentsInWSDL\">"
+				"<wsdl:portType name=\"PT\"><wsdl:operation name=\"o\"/></wsdl:portType>"
+				"<wsdl:binding name=\"B\" type=\"tns:PT\">"
+					"<wsdl:operation name=\"o\">" + component + "</wsdl:operation>"
+				"</wsdl:binding>"
+			"</wsdl:definitions>"
+		};
+		for (const std::string& xml: documents)
+		{
+			try
+			{
+				parseDocument(xml, "mem://testSchemaComponentsInWSDLRejected");
+				failmsg("a schema component in a WSDL element must be rejected: " + component);
+			}
+			catch (XSDException& exc)
+			{
+				assertTrue (exc.message().find("Illegal Element") != std::string::npos);
+			}
+			if (tm.hasDefinitions(ns)) tm.removeDefinitions(tm.findDefinitions(ns));
+		}
+	}
+}
+
+
+void XSDParserTest::testAnnotationInWSDLOperation()
+{
+	static const std::string ns("urn:XSDParserTest:annotationInWSDLOperation");
+	static const std::string xml("<wsdl:definitions xmlns:wsdl=\"http://schemas.xmlsoap.org/wsdl/\" "
+									"xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+									"targetNamespace=\"urn:XSDParserTest:annotationInWSDLOperation\">"
+									"<wsdl:portType name=\"PT\">"
+										"<wsdl:operation name=\"o\">"
+											"<xsd:documentation><xsd:list/></xsd:documentation>"
+											"<xsd:appinfo><xsd:element name=\"e\"/></xsd:appinfo>"
+											"<xsd:annotation><xsd:documentation>text</xsd:documentation></xsd:annotation>"
+										"</wsdl:operation>"
+									"</wsdl:portType>"
+								"</wsdl:definitions>");
+
+	parseDocument(xml, "mem://testAnnotationInWSDLOperation");
+	TypesManager& tm = TypesManager::instance();
+	const Definitions& defs = tm.getDefinitions(ns);
+	const auto it = defs.portTypes().find("PT");
+	assertTrue (it != defs.portTypes().end());
+	const Operation::Ptr pOperation = it->second->findOperation("o");
+	assertTrue (!pOperation.isNull());
+	assertTrue (pOperation->getAnnotations().size() == 1);
+	tm.removeDefinitions(tm.findDefinitions(ns));
+}
+
+
 void XSDParserTest::setUp()
 {
 }
@@ -870,6 +1150,16 @@ CppUnit::Test* XSDParserTest::suite()
 	CppUnit_addTest(pSuite, XSDParserTest, testIncludeTwice);
 	CppUnit_addTest(pSuite, XSDParserTest, testImportSecondDocument);
 	CppUnit_addTest(pSuite, XSDParserTest, testIncludeChameleon);
+	CppUnit_addTest(pSuite, XSDParserTest, testReferencedLocationOtherHostRejected);
+	CppUnit_addTest(pSuite, XSDParserTest, testReferencedLocationSameHostAllowed);
+	CppUnit_addTest(pSuite, XSDParserTest, testAnyInDocumentation);
+	CppUnit_addTest(pSuite, XSDParserTest, testListInDocumentation);
+	CppUnit_addTest(pSuite, XSDParserTest, testListInAppInfo);
+	CppUnit_addTest(pSuite, XSDParserTest, testSchemaElementsInWSDLDocumentation);
+	CppUnit_addTest(pSuite, XSDParserTest, testAnyInWSDLServiceRejected);
+	CppUnit_addTest(pSuite, XSDParserTest, testListInWSDLServiceRejected);
+	CppUnit_addTest(pSuite, XSDParserTest, testSchemaComponentsInWSDLRejected);
+	CppUnit_addTest(pSuite, XSDParserTest, testAnnotationInWSDLOperation);
 
 	return pSuite;
 }

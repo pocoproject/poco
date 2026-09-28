@@ -67,9 +67,9 @@ public:
 	void createIterator(std::vector<OrderIterator>& seq) const override;
 
 private:
-	bool _finalRestriction;
-	bool _finalList;
-	bool _finalUnion;
+	bool _finalRestriction = false;
+	bool _finalList = false;
+	bool _finalUnion = false;
 	SimpleTypeInheritance::Ptr _pContent;
 };
 

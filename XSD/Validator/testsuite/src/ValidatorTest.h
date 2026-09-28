@@ -41,6 +41,10 @@ public:
 	void testDocumentTypeDeclarationRejected();
 	void testErrorMessageBounded();
 	void testValidationMessageSingleLine();
+	void testSchemaExternalEntityRejected();
+	void testReferencedLocalSchemaLoaded();
+	void testNestedReferencedLocalSchemasLoaded();
+	void testReferencedSchemaCycle();
 
 	void setUp() override;
 	void tearDown() override;

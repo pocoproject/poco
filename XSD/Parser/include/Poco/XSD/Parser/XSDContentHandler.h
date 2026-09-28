@@ -68,9 +68,16 @@ class XSDParser_API XSDContentHandler: public XML::ContentHandler
 	/// The ContentHandler for processing an XML Schema document.
 	///
 	/// The handler registers the schemas and WSDL definitions it parses in the TypesManager
-	/// singleton, so, like the Types model, it must be used from one thread at a time.
-	/// loadXSD() removes the registrations of a document that fails to parse; a handler given
-	/// to a SAXParser directly leaves them in the TypesManager.
+	/// singleton, so it must be used from one thread at a time. loadXSD() removes the
+	/// registrations of a document that fails to parse; a handler given to a SAXParser directly
+	/// leaves them.
+	///
+	/// The schema and the documents it references are opened through Poco::URIStreamOpener with
+	/// the privileges of the process, so load only schemas and WSDL documents from a trusted
+	/// source. A location without a scheme or with the file scheme in the schemaLocation attribute
+	/// of xs:include or xs:import, or in the location attribute of wsdl:import, that names a network
+	/// host other than localhost and the host of the referencing document is rejected with a
+	/// SchemaException. Locations from the schema map are not checked.
 {
 public:
 	using SchemaNSToLocationMap = std::map<std::string, std::string>;
@@ -289,6 +296,11 @@ private:
 		/// and its own schema is returned, because xs:include takes over the declarations of that
 		/// document only, not those of other documents of its namespace. Otherwise returns the schema
 		/// the TypesManager holds for schemaLocation.
+
+	static void checkReferencedLocation(const std::string& location, const Poco::URI& parentSchemaLocation);
+		/// Applies the host rule of the class documentation to location, named in the document at
+		/// parentSchemaLocation. A location names a host in the authority, or as a network path that
+		/// starts with two path separators.
 
 private:
 	Poco::URI _schemaLocation;

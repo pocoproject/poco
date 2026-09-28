@@ -75,24 +75,19 @@ class XSDValidator_API Validator
 	///
 	/// validate() may be called concurrently from several threads.
 	///
-	/// The document may come from an untrusted source; it is parsed without
-	/// network access, entity references are not expanded, and documents with
-	/// a document type declaration are rejected. The schema must come from a
-	/// trusted source: its entities are expanded (with libxml2 before 2.13 also
-	/// external entities, which can read local files), and schemas that import
-	/// or include other schemas by location are resolved through libxml2's
-	/// default resource loader, which can read local files; with libxml2 before
-	/// 2.13, diagnostics about such included or imported schemas may be written
-	/// to standard error.
+	/// The document may come from an untrusted source: it is parsed without
+	/// network access and without entity expansion, and a document with a
+	/// document type declaration is rejected.
 	///
 	/// The schema is parsed without network access and with its internal
 	/// entities expanded; a schema that names an external DTD or declares
 	/// external entities is rejected. Schemas referenced by xs:include,
-	/// xs:import and xs:redefine, directly or indirectly, must be local files,
-	/// not files on a network host, and must not name an external DTD or
-	/// declare external entities either. They are read with the privileges of
-	/// the process. With libxml2 before 2.13, diagnostics about them may be
-	/// written to standard error.
+	/// xs:import and xs:redefine are loaded by libxml2's default resource
+	/// loader with the privileges of the process; depending on the libxml2
+	/// version and build, it can read network locations and expands the
+	/// external entities of those schemas, so schemas must come from a trusted
+	/// source. With libxml2 before 2.13, diagnostics about them may be written
+	/// to standard error.
 	///
 	/// The document is parsed into memory as a whole, so callers should limit
 	/// the size of the documents they validate.
@@ -107,11 +102,8 @@ public:
 		/// Throws Poco::DataFormatException if:
 		///   - xsdContent is not well-formed XML
 		///     ("XSD: malformed schema document: line N: ..."),
-		///   - xsdContent or a schema it references names an external DTD or
-		///     declares external entities
-		///     ("XSD: external DTDs and external entities are not supported ..."),
-		///   - a schema that xsdContent references is not a local file
-		///     ("XSD: referenced schemas must be local files: ..."),
+		///   - xsdContent names an external DTD or declares external entities
+		///     ("XSD: external DTDs and external entities are not supported in the schema"),
 		///   - xsdContent is not a valid XML Schema ("XSD: invalid schema: ..."),
 		///   - xml is not well-formed XML ("XML: malformed document: line N: ..."),
 		///   - xml contains a document type declaration

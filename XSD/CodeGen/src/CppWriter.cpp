@@ -10,14 +10,40 @@
 
 #include "CppWriter.h"
 #include "BuiltinTypes.h"
+#include "Utility.h"
+#include "Poco/XSD/Types/XSDException.h"
+#include "Poco/Ascii.h"
 #include "Poco/File.h"
 #include "Poco/String.h"
 #include "Poco/StringTokenizer.h"
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/NumberParser.h"
+#include <algorithm>
 #include <fstream>
 #include <iterator>
+
+
+namespace
+{
+	void checkRemotingAttribute(const std::string& key, const std::string& value)
+		/// Throws an XSDException if key or value contains a control character, a backslash or a
+		/// double quote. Keys and values come from the schema or WSDL, often a third-party document:
+		/// a line break would end the //@ comment line and make the rest of the value C++ code in
+		/// the generated header, and a quote or a backslash would change where RemoteGenNG ends a
+		/// quoted value. The //@ syntax has no escape for a line break, so such values are rejected.
+	{
+		const auto isNotAllowed = [](char c)
+		{
+			return c == '\\' || c == '"' || Poco::Ascii::hasProperties(static_cast<unsigned char>(c), Poco::Ascii::ACP_CONTROL);
+		};
+		if (std::any_of(key.begin(), key.end(), isNotAllowed))
+			throw Poco::XSD::Types::XSDException("The Remoting attribute key " + Utility::cppStringLiteral(key) + " contains a character that is not allowed in a Remoting attribute");
+		// CppGen sets the value "" for an empty SOAP action
+		if (value != "\"\"" && std::any_of(value.begin(), value.end(), isNotAllowed))
+			throw Poco::XSD::Types::XSDException("The value " + Utility::cppStringLiteral(value) + " of Remoting attribute " + key + " contains a character that is not allowed in a Remoting attribute");
+	}
+}
 
 
 const std::string CppWriter::EXT_H("h");
@@ -988,6 +1014,7 @@ void CppWriter::writeRemotingAttributes(std::ostream& out, const std::map<std::s
 	{
 		std::string name = it->first;
 		std::string value = it->second;
+		checkRemotingAttribute(name, value);
 		if (value.empty())
 		{
 			if (indent == -1 && it != attrs.begin()) out << ", ";
@@ -1037,6 +1064,7 @@ void CppWriter::writeMethodRemotingAttributes(std::ostream& out, const MethodInf
 	{
 		if (!param.getAll().empty())
 		{
+			checkRemotingAttribute("$" + param.getName(), {});
 			std::string attr("$");
 			attr += param.getName();
 			attr += "={";

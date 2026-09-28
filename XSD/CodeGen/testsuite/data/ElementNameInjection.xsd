@@ -1,0 +1,7 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:XSDGenTest:injection">
+	<xs:complexType name="Person">
+		<xs:sequence>
+			<xs:element name="name&#10;int injected;&#10;//" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

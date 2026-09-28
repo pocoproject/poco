@@ -17,14 +17,20 @@
 #include "Poco/Exception.h"
 #include "Poco/Format.h"
 #include "Poco/String.h"
+#include <libxml/entities.h>
+#include <libxml/hash.h>
 #include <libxml/parser.h>
+#include <libxml/tree.h>
 #include <libxml/xmlerror.h>
+#include <libxml/xmlexports.h>
 #include <libxml/xmlschemas.h>
 #include <libxml/xmlschemastypes.h>
+#include <libxml/xmlstring.h>
 #include <libxml/xmlversion.h>
 #include <cstddef>
 #include <limits>
 #include <memory>
+#include <string>
 #include <vector>
 
 
@@ -73,12 +79,14 @@ using ErrorPtr = xmlErrorPtr;
 #endif
 
 
-// The schema is trusted and its internal entities are expanded, as libxml2's own schema
-// loader does; external entities stay off where libxml2 allows it.
+// The schema is parsed first without entity expansion; only a schema whose document type
+// declaration declares nothing external is parsed again with its internal entities expanded,
+// as libxml2's schema loader does.
+constexpr int SCHEMA_PARSE_OPTIONS = XML_PARSE_NONET;
 #if LIBXML_VERSION >= 21300
-constexpr int SCHEMA_PARSE_OPTIONS = XML_PARSE_NONET | XML_PARSE_NOENT | XML_PARSE_NO_XXE;
+constexpr int SCHEMA_ENTITY_PARSE_OPTIONS = XML_PARSE_NONET | XML_PARSE_NOENT | XML_PARSE_NO_XXE;
 #else
-constexpr int SCHEMA_PARSE_OPTIONS = XML_PARSE_NONET | XML_PARSE_NOENT;
+constexpr int SCHEMA_ENTITY_PARSE_OPTIONS = XML_PARSE_NONET | XML_PARSE_NOENT;
 #endif
 
 // Entities are not expanded; documents with a document type declaration are rejected by validate().
@@ -171,7 +179,7 @@ void XMLCALL onParserError(void* ctx, ErrorPtr pError)
 
 
 DocPtr parseXML(const std::string& text, int options, ErrorCollector& errors)
-	/// Parses text with a parser context of its own and reports its errors to errors.
+	/// Parses text and reports its errors to errors.
 	/// Returns a null pointer if text is not well-formed.
 {
 	if (text.size() > static_cast<std::string::size_type>(std::numeric_limits<int>::max()))
@@ -186,6 +194,28 @@ DocPtr parseXML(const std::string& text, int options, ErrorCollector& errors)
 	pCtxt->_private = &errors;
 #endif
 	return DocPtr(xmlCtxtReadMemory(pCtxt.get(), text.data(), static_cast<int>(text.size()), nullptr, nullptr, options));
+}
+
+
+void XMLCALL markExternalEntity(void* payload, void* data, const xmlChar*)
+	/// Sets the bool given as data if the entity declaration in payload is external.
+{
+	const xmlEntityType type = static_cast<const xmlEntity*>(payload)->etype;
+	if (type == XML_EXTERNAL_GENERAL_PARSED_ENTITY
+		|| type == XML_EXTERNAL_GENERAL_UNPARSED_ENTITY
+		|| type == XML_EXTERNAL_PARAMETER_ENTITY)
+		*static_cast<bool*>(data) = true;
+}
+
+
+bool hasExternalDeclarations(const xmlDtd& dtd)
+	/// Returns true if dtd names an external subset or declares an external entity.
+{
+	if (dtd.ExternalID != nullptr || dtd.SystemID != nullptr) return true;
+	bool external = false;
+	xmlHashScan(static_cast<xmlHashTablePtr>(dtd.entities), markExternalEntity, &external);
+	xmlHashScan(static_cast<xmlHashTablePtr>(dtd.pentities), markExternalEntity, &external);
+	return external;
 }
 
 
@@ -216,6 +246,13 @@ void Validator::validate(const std::string& xml, const std::string& xsdContent)
 
 	// The schema document must outlive the schema compiled from it.
 	DocPtr pSchemaDoc = parseXML(xsdContent, SCHEMA_PARSE_OPTIONS, schemaErrors);
+	if (pSchemaDoc != nullptr && pSchemaDoc->intSubset != nullptr)
+	{
+		if (hasExternalDeclarations(*pSchemaDoc->intSubset))
+			throw Poco::DataFormatException("XSD: external DTDs and external entities are not supported in the schema");
+		schemaErrors = ErrorCollector();
+		pSchemaDoc = parseXML(xsdContent, SCHEMA_ENTITY_PARSE_OPTIONS, schemaErrors);
+	}
 	if (pSchemaDoc == nullptr)
 		throwParseError("XSD: malformed schema document: ", schemaErrors);
 	SchemaParserCtxtPtr pParserCtxt(xmlSchemaNewDocParserCtxt(pSchemaDoc.get()));
