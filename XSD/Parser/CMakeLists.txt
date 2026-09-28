@@ -8,8 +8,8 @@ POCO_HEADERS_AUTO(SRCS ${HDRS_G})
 
 # Version Resource
 if(MSVC AND BUILD_SHARED_LIBS)
-	source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/ProDLLVersion.rc)
-	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/ProDLLVersion.rc)
+	source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
+	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
 add_library(XSDParser ${SRCS})
@@ -21,11 +21,11 @@ set_target_properties(XSDParser
 	DEFINE_SYMBOL XSDParser_EXPORTS
 )
 
-target_link_libraries(XSDParser PUBLIC Poco::Foundation Poco::XSDTypes)
+target_link_libraries(XSDParser PUBLIC Poco::Foundation Poco::XML Poco::XSDTypes)
 target_include_directories(XSDParser
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-		$<INSTALL_INTERFACE:include>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 

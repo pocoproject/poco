@@ -78,7 +78,7 @@ const Type* Schema::getType(const std::string& name) const
 {
 	Types::const_iterator it = _declaredTypes.find(name);
 	if (it == _declaredTypes.end())
-		return 0;
+		return nullptr;
 	return it->second.get();
 }
 
@@ -103,7 +103,7 @@ const Element* Schema::getElement(const std::string& name) const
 {
 	Elements::const_iterator it = _exportedElements.find(name);
 	if (it == _exportedElements.end())
-		return 0;
+		return nullptr;
 	return it->second.get();
 }
 
@@ -128,7 +128,7 @@ const AbstractAttribute* Schema::getAttribute(const std::string& name) const
 {
 	Attributes::const_iterator it = _exportedAttributes.find(name);
 	if (it == _exportedAttributes.end())
-		return 0;
+		return nullptr;
 	return it->second.get();
 }
 
@@ -153,7 +153,7 @@ const AbstractAttributeGroup* Schema::getAttributeGroup(const std::string& name)
 {
 	AttributeGroups::const_iterator it = _exportedAttributeGroups.find(name);
 	if (it == _exportedAttributeGroups.end())
-		return 0;
+		return nullptr;
 	return it->second.get();
 }
 
@@ -178,7 +178,7 @@ const Group* Schema::getGroup(const std::string& name) const
 {
 	Groups::const_iterator it = _exportedGroups.find(name);
 	if (it == _exportedGroups.end())
-		return 0;
+		return nullptr;
 	return it->second.get();
 }
 
@@ -203,7 +203,7 @@ const Notation* Schema::getNotation(const std::string& name) const
 {
 	Notations::const_iterator it = _notations.find(name);
 	if (it == _notations.end())
-		return 0;
+		return nullptr;
 	return it->second.get();
 }
 

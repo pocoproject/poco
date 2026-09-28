@@ -39,7 +39,7 @@ AttributeTypeRef::AttributeTypeRef(const std::string& id,
 	_defaultValue(defaultValue),
 	_qualifiedForm(qualifiedForm),
 	_use(use),
-	_pType(0)
+	_pType(nullptr)
 {
 }
 
@@ -106,11 +106,11 @@ void AttributeTypeRef::fixup()
 	if (!_pType)
 	{
 		const Type* pType = TypesManager::instance().getType(_typeRef);
-		if (pType == 0)
+		if (pType == nullptr)
 			throw NullTypeException("Referenced type not found:" + _typeRef.name());
 
 		_pType = dynamic_cast<const SimpleType*>(pType);
-		if (_pType == 0)
+		if (_pType == nullptr)
 			throw InvalidTypeException("AttributeTypeRef type reference to complex type. Simple type required:" + _typeRef.name());
 	}
 }

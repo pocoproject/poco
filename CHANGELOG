@@ -49,6 +49,20 @@ New Components:
   POCO. CMake options ENABLE_REMOTINGNG, ENABLE_REMOTINGNG_{TCP,HTTP,JSONRPC,REST,SOAP},
   ENABLE_REMOTINGNG_REMOTEGEN, ENABLE_CODEGENERATION; make components CodeGeneration,
   RemotingNG, RemotingNG/{TCP,HTTP,JSONRPC,REST,SOAP,RemoteGen}.
+- GH #5450 XSD (XML Schema object model, XML Schema and WSDL parser, the XSDGen code generator
+  and the libxml2-based Validator) moved from macchina.io into POCO. CMake options
+  ENABLE_XSD_TYPES, ENABLE_XSD_PARSER, ENABLE_XSD_CODEGEN (on by default) and
+  ENABLE_XSD_VALIDATOR (off by default, requires libxml2); make components XSD/Types,
+  XSD/Parser, XSD/CodeGen; XSD/Validator is built with make -C XSD/Validator and its headers
+  are not installed by make install.
+
+Bug Fixes and Improvements:
+
+- GH #5450 Poco::XML::SAXParser and DOMParser: when a content handler throws, the events Expat
+  still delivers for the current token (the end tag of an empty element and its namespace
+  undeclarations) are no longer forwarded to the handlers. Since 1.15.4 the exception is stored
+  and the parse is stopped with XML_StopParser(), so handlers received these events after their
+  own exception.
 
 
 Release 1.15.4 (2026-09-22)

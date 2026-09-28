@@ -261,6 +261,11 @@ private:
 	StateMachine::State getParentState() const;
 		/// Returns the state of the parent
 
+	void splitName(const std::string& qname, std::string& namespaceURI, std::string& localName) const;
+		/// Splits a qualified name from an attribute value into namespace URI and local name.
+		/// An undeclared prefix yields an empty namespace URI; the schema model resolves or
+		/// rejects such a name later, so this is not an error here.
+
 private:
 	Poco::URI _schemaLocation;
 	const XML::Locator*   _pLocator;

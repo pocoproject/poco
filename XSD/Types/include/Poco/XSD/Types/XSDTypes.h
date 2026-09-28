@@ -41,7 +41,11 @@
 
 
 #if !defined(XSDTypes_API)
-	#define XSDTypes_API
+	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
+		#define XSDTypes_API __attribute__ ((visibility ("default")))
+	#else
+		#define XSDTypes_API
+	#endif
 #endif
 
 

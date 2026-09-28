@@ -22,7 +22,7 @@ class ValidatorTest: public CppUnit::TestCase
 {
 public:
 	ValidatorTest(const std::string& name);
-	~ValidatorTest();
+	~ValidatorTest() override;
 
 	void testValidateAcceptsValidXml();
 	void testValidateAcceptsNestedStructure();
@@ -31,11 +31,19 @@ public:
 	void testValidateRejectsMissingRequiredAttribute();
 	void testValidateRejectsMalformedXml();
 	void testValidateRejectsInvalidSchema();
+	void testValidateRejectsMalformedSchema();
 	void testValidateThrowsOnEmptySchema();
 	void testValidatorCannotBeInstantiated();
+	void testSchemaIncludeNamedSchemaXsd();
+	void testSchemaInternalEntities();
+	void testMalformedDocumentFirstError();
+	void testValidationMessageFormat();
+	void testDocumentTypeDeclarationRejected();
+	void testErrorMessageBounded();
+	void testValidationMessageSingleLine();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 };

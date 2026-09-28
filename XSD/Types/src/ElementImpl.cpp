@@ -25,7 +25,7 @@ namespace Types {
 
 ElementImpl::ElementImpl():
 	AbstractElementImpl(),
-	_pType(0)
+	_pType(nullptr)
 {
 }
 
@@ -64,7 +64,7 @@ ElementImpl::ElementImpl(
 		nameSpace,
 		nillable,
 		substitutionGroup),
-	_pType(0)
+	_pType(nullptr)
 {
 }
 

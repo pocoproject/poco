@@ -26,7 +26,7 @@ namespace Types {
 
 ElementTypeRef::ElementTypeRef():
 	AbstractElementImpl(),
-	_pType(0),
+	_pType(nullptr),
 	_typeRef()
 {
 }
@@ -66,7 +66,7 @@ ElementTypeRef::ElementTypeRef(
 		nameSpace,
 		nillable,
 		substitutionGroup),
-	_pType(0),
+	_pType(nullptr),
 	_typeRef(typeRef)
 {
 }
@@ -79,7 +79,7 @@ ElementTypeRef::~ElementTypeRef()
 
 void ElementTypeRef::fixup()
 {
-	if (_pType == 0)
+	if (_pType == nullptr)
 	{
 		// find the element, throw exception if not found
 		_pType = TypesManager::instance().getType(_typeRef);

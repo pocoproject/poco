@@ -27,7 +27,7 @@ namespace Types {
 SimpleRestrictionInlineType::SimpleRestrictionInlineType(const std::string& id):
 	SimpleTypeInheritance(id),
 	_baseType(),
-	_pInlineType(0)
+	_pInlineType(nullptr)
 {
 }
 

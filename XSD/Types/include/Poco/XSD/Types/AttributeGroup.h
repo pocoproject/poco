@@ -77,7 +77,7 @@ inline const AbstractAttributeGroup::Attributes& AttributeGroup::getAttributes()
 
 inline bool AttributeGroup::hasAnyAttribute() const
 {
-	return _pAny.get() != 0;
+	return _pAny.get() != nullptr;
 }
 
 

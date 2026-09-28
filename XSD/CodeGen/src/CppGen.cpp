@@ -54,7 +54,7 @@ CppGen::CppGen(const std::map<std::string, SchemaInfo>& config, const std::strin
 	_options(options),
 	_classes(),
 	_schemas(),
-	_pLastSchema(0),
+	_pLastSchema(nullptr),
 	_logger(Poco::Logger::get("CppGen")),
 	_inChoice(false)
 {
@@ -1194,7 +1194,7 @@ void CppGen::createParameters(MethodInfo& mi, const Poco::XML::Name& messageName
 
 	if (parameterOrder.empty())
 	{
-		for (int part = 0; part < pMessage->parts().size(); part++)
+		for (std::size_t part = 0; part < pMessage->parts().size(); part++)
 		{
 			parameterOrder.push_back(pMessage->parts()[part].name);
 		}
@@ -1208,9 +1208,9 @@ void CppGen::createParameters(MethodInfo& mi, const Poco::XML::Name& messageName
 		parameterOrderMap[*it] = offset;
 	}
 
-	for (int part = 0; part < pMessage->parts().size(); part++)
+	for (std::size_t part = 0; part < pMessage->parts().size(); part++)
 	{
-		const Poco::XSD::Types::Type* pType = 0;
+		const Poco::XSD::Types::Type* pType = nullptr;
 		std::string paramName;
 		std::string cppParamName;
 		TypeInfo typeInfo;

@@ -20,6 +20,7 @@
 
 #include "Poco/XSD/Types/XSDTypes.h"
 #include "Poco/XSD/Types/OrderIteratorImpl.h"
+#include <limits>
 
 
 namespace Poco {
@@ -51,6 +52,9 @@ public:
 
 private:
 	using Iterators = std::vector<OrderIterator>;
+
+	static constexpr Iterators::size_type NO_CHOICE = std::numeric_limits<Iterators::size_type>::max();
+		/// Value of _lastChosenPos while no alternative has been chosen.
 
 	UInt32    _min;
 	UInt32    _max;

@@ -12,6 +12,8 @@ if(MSVC AND BUILD_SHARED_LIBS)
 	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
+find_package(LibXml2 REQUIRED)
+
 add_library(XSDValidator ${SRCS})
 add_library(Poco::XSDValidator ALIAS XSDValidator)
 set_target_properties(XSDValidator
@@ -28,7 +30,7 @@ target_link_libraries(XSDValidator
 target_include_directories(XSDValidator
 	PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-		$<INSTALL_INTERFACE:include>
+		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 

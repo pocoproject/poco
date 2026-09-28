@@ -65,7 +65,7 @@ namespace Parser {
 
 XSDContentHandler::XSDContentHandler(const Poco::URI& schemaLocation, const SchemaNSToLocationMap& schemaMap):
 	_schemaLocation(schemaLocation),
-	_pLocator(0),
+	_pLocator(nullptr),
 	_qualifiedAttributeForm(false),
 	_qualifiedElementForm(false),
 	_blockExtension(false),
@@ -507,7 +507,7 @@ void XSDContentHandler::stateElementStart(const std::string& uri, const std::str
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	Poco::UInt32 maxOccurs = Utility::getMaxOccurs(itEnd, attrList.find(Constants::XSD_MAXOCCURS));
 	Poco::UInt32 minOccurs = Utility::getMinOccurs(itEnd, attrList.find(Constants::XSD_MINOCCURS));
-	Element* pElem = 0;
+	Element* pElem = nullptr;
 	bool pushedImpl = false;
 	if (it != itEnd)
 	{
@@ -583,7 +583,7 @@ void XSDContentHandler::stateElementStart(const std::string& uri, const std::str
 		}
 	}
 	if (!pushedImpl)
-		_elementsImpl.push(0); // for a simpler elementEnd impl
+		_elementsImpl.push(nullptr); // for a simpler elementEnd impl
 	_elements.push(pElem);
 	OrderContent::Ptr ptr = pElem;
 	_orderContents.push(ptr);
@@ -704,7 +704,7 @@ void XSDContentHandler::stateXSDImportStart(const std::string& uri, const std::s
 		else if (tok.count() > 1)
 		{
 			poco_assert (tok.count() % 2 == 0);
-			for (int i = 0; i < tok.count(); i+=2)
+			for (std::size_t i = 0; i < tok.count(); i+=2)
 			{
 				imported = true;
 				url = tok[i+1];
@@ -1993,7 +1993,7 @@ void XSDContentHandler::stateDefinitionsStart(const std::string& uri, const std:
 
 void XSDContentHandler::stateDefinitionsEnd(const std::string& uri, const std::string& localName, const std::string& qname)
 {
-	_pDefinitions = 0;
+	_pDefinitions = nullptr;
 }
 
 
@@ -2067,7 +2067,7 @@ void XSDContentHandler::statePartStart(const std::string& uri, const std::string
 		{
 			std::string ns;
 			std::string local;
-			_namespaces.processName(elemq, ns, local, false);
+			splitName(elemq, ns, local);
 			XML::Name element(elemq, ns, local);
 			pMessage->addElementPart(name, element);
 		}
@@ -2075,7 +2075,7 @@ void XSDContentHandler::statePartStart(const std::string& uri, const std::string
 		{
 			std::string ns;
 			std::string local;
-			_namespaces.processName(typeq, ns, local, false);
+			splitName(typeq, ns, local);
 			XML::Name type(typeq, ns, local);
 			pMessage->addTypePart(name, type);
 		}
@@ -2177,7 +2177,7 @@ void XSDContentHandler::stateInputStart(const std::string& uri, const std::strin
 	{
 		std::string ns;
 		std::string local;
-		_namespaces.processName(message, ns, local, false);
+		splitName(message, ns, local);
 		XML::Name element(message, ns, local);
 		pOperation->setInputMessage(element);
 	}
@@ -2205,7 +2205,7 @@ void XSDContentHandler::stateOutputStart(const std::string& uri, const std::stri
 	{
 		std::string ns;
 		std::string local;
-		_namespaces.processName(message, ns, local, false);
+		splitName(message, ns, local);
 		XML::Name element(message, ns, local);
 		pOperation->setOutputMessage(element);
 	}
@@ -2233,7 +2233,7 @@ void XSDContentHandler::stateFaultStart(const std::string& uri, const std::strin
 	{
 		std::string ns;
 		std::string local;
-		_namespaces.processName(message, ns, local, false);
+		splitName(message, ns, local);
 		XML::Name element(message, ns, local);
 		pOperation->setFaultMessage(element);
 	}
@@ -2257,7 +2257,7 @@ void XSDContentHandler::stateBindingStart(const std::string& uri, const std::str
 
 	std::string ns;
 	std::string local;
-	_namespaces.processName(type, ns, local, false);
+	splitName(type, ns, local);
 
 	const Types::Definitions& defs = Types::TypesManager::instance().getDefinitions(ns);
 	const Types::Definitions::PortTypes& portTypes = defs.portTypes();
@@ -2278,7 +2278,7 @@ void XSDContentHandler::stateBindingEnd(const std::string& uri, const std::strin
 	poco_check_ptr(pBinding);
 	_pDefinitions->addBinding(pBinding);
 	_objects.pop();
-	_pBinding = 0;
+	_pBinding = nullptr;
 }
 
 
@@ -2331,7 +2331,7 @@ void XSDContentHandler::stateSoapHeaderStart(const std::string& uri, const std::
 	const std::string& message = Utility::getString(itEnd, attrList.find(Constants::SOAP_MESSAGE), Constants::XSD_EMPTY_STRING);
 	std::string messageURI;
 	std::string messageLocal;
-	_namespaces.processName(message, messageURI, messageLocal, false);
+	splitName(message, messageURI, messageLocal);
 	const std::string& part = Utility::getString(itEnd, attrList.find(Constants::SOAP_PART), Constants::XSD_EMPTY_STRING);
 	const std::string& use = Utility::getString(itEnd, attrList.find(Constants::SOAP_USE), Constants::XSD_EMPTY_STRING);
 	const std::string& encodingStyle = Utility::getString(itEnd, attrList.find(Constants::SOAP_ENCODINGSTYLE), Constants::XSD_EMPTY_STRING);
@@ -2339,7 +2339,7 @@ void XSDContentHandler::stateSoapHeaderStart(const std::string& uri, const std::
 
 	poco_assert (_states.size() > 2);
 	StateMachine::State opState = _states[_states.size() - 2];
-	Types::BindingProperties* pBindingProps = 0;
+	Types::BindingProperties* pBindingProps = nullptr;
 	switch (opState)
 	{
 	case StateMachine::ST_ININPUT:
@@ -2384,7 +2384,7 @@ void XSDContentHandler::stateSoapHeaderFaultStart(const std::string& uri, const 
 	const std::string& message = Utility::getString(itEnd, attrList.find(Constants::SOAP_MESSAGE), Constants::XSD_EMPTY_STRING);
 	std::string messageURI;
 	std::string messageLocal;
-	_namespaces.processName(message, messageURI, messageLocal, false);
+	splitName(message, messageURI, messageLocal);
 	const std::string& part = Utility::getString(itEnd, attrList.find(Constants::SOAP_PART), Constants::XSD_EMPTY_STRING);
 	const std::string& use = Utility::getString(itEnd, attrList.find(Constants::SOAP_USE), Constants::XSD_EMPTY_STRING);
 	const std::string& encodingStyle = Utility::getString(itEnd, attrList.find(Constants::SOAP_ENCODINGSTYLE), Constants::XSD_EMPTY_STRING);
@@ -2392,7 +2392,7 @@ void XSDContentHandler::stateSoapHeaderFaultStart(const std::string& uri, const 
 
 	poco_assert (_states.size() > 2);
 	StateMachine::State opState = _states[_states.size() - 2];
-	Types::BindingProperties* pBindingProps = 0;
+	Types::BindingProperties* pBindingProps = nullptr;
 	switch (opState)
 	{
 	case StateMachine::ST_ININPUT:
@@ -2441,7 +2441,7 @@ void XSDContentHandler::stateSoapBodyStart(const std::string& uri, const std::st
 
 	poco_assert (_states.size() > 2);
 	StateMachine::State opState = _states[_states.size() - 2];
-	Types::BindingProperties* pBindingProps = 0;
+	Types::BindingProperties* pBindingProps = nullptr;
 	switch (opState)
 	{
 	case StateMachine::ST_ININPUT:
@@ -2482,7 +2482,7 @@ void XSDContentHandler::stateSoapFaultStart(const std::string& uri, const std::s
 
 	poco_assert (_states.size() > 2);
 	StateMachine::State opState = _states[_states.size() - 2];
-	Types::BindingProperties* pBindingProps = 0;
+	Types::BindingProperties* pBindingProps = nullptr;
 	switch (opState)
 	{
 	case StateMachine::ST_ININPUT:
@@ -2538,7 +2538,7 @@ void XSDContentHandler::statePortStart(const std::string& uri, const std::string
 	if (bindingq.empty()) throw Types::SchemaException("No binding attribute in port element");
 	std::string ns;
 	std::string local;
-	_namespaces.processName(bindingq, ns, local, false);
+	splitName(bindingq, ns, local);
 	XML::Name binding(bindingq, ns, local);
 
 	poco_assert (!_objects.empty());
@@ -2640,6 +2640,13 @@ QName XSDContentHandler::createQName(const std::string& str) const
 		return QName(str, _namespaces.getURI(Constants::XSD_EMPTY_STRING));
 	}
 	return QName(str.substr(idx+1), _namespaces.getURI(str.substr(0, idx)));
+}
+
+
+void XSDContentHandler::splitName(const std::string& qname, std::string& namespaceURI, std::string& localName) const
+{
+	if (!_namespaces.processName(qname, namespaceURI, localName, false))
+		namespaceURI.clear();
 }
 
 

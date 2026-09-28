@@ -10,6 +10,6 @@ objects = Constants StateMachine Utility XSDContentHandler
 
 target         = PocoXSDParser
 target_version = $(LIBVERSION)
-target_libs    = PocoXSDTypes PocoUtil PocoNet PocoXML PocoFoundation
+target_libs    = PocoXSDTypes PocoXML PocoFoundation
 
 include $(POCO_BASE)/build/rules/lib

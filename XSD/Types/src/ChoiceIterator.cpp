@@ -27,7 +27,7 @@ ChoiceIterator::ChoiceIterator(const Choice& choice):
 	_min(choice.getMinOccurs()),
 	_max(choice.getMaxOccurs()),
 	_vecIt(),
-	_lastChosenPos(-1),
+	_lastChosenPos(NO_CHOICE),
 	_next(),
 	_chosenElementCnt(0),
 	_dirtyFlag(true)
@@ -50,7 +50,7 @@ ChoiceIterator::~ChoiceIterator()
 
 OrderContent::Ptr ChoiceIterator::next(const std::string& name)
 {
-	if (_lastChosenPos != -1)
+	if (_lastChosenPos != NO_CHOICE)
 	{
 		if (!_vecIt[_lastChosenPos].validNext(name))
 		{
@@ -90,7 +90,7 @@ const std::set<std::string>& ChoiceIterator::validNexts() const
 	_dirtyFlag = false;
 	_next.clear();
 	bool addAllOthers = true;
-	if (_lastChosenPos != -1)
+	if (_lastChosenPos != NO_CHOICE)
 	{
 		const std::set<std::string>& child = _vecIt[_lastChosenPos].validNexts();
 		if (child.empty() && _chosenElementCnt < _max && _vecIt[_lastChosenPos].canClose())
@@ -98,7 +98,7 @@ const std::set<std::string>& ChoiceIterator::validNexts() const
 			// reset
 			_vecIt[_lastChosenPos].close();
 			_vecIt[_lastChosenPos].reset();
-			_lastChosenPos = -1;
+			_lastChosenPos = NO_CHOICE;
 		}
 		else
 		{
@@ -145,7 +145,7 @@ void ChoiceIterator::close()
 
 	_dirtyFlag = true;
 
-	if (_lastChosenPos != -1)
+	if (_lastChosenPos != NO_CHOICE)
 	{
 		_vecIt[_lastChosenPos].close();
 	}
@@ -163,7 +163,7 @@ bool ChoiceIterator::canClose() const
 		return true;
 
 	bool ok = true;
-	if (_lastChosenPos != -1)
+	if (_lastChosenPos != NO_CHOICE)
 	{
 		ok = _vecIt[_lastChosenPos].canClose();
 	}
@@ -175,7 +175,7 @@ bool ChoiceIterator::canClose() const
 
 void ChoiceIterator::reset()
 {
-	_lastChosenPos = -1;
+	_lastChosenPos = NO_CHOICE;
 	_dirtyFlag = true;
 	_chosenElementCnt = 0;
 	Iterators::iterator it = _vecIt.begin();

@@ -39,7 +39,11 @@
 
 
 #if !defined(XSDValidator_API)
-	#define XSDValidator_API
+	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
+		#define XSDValidator_API __attribute__ ((visibility ("default")))
+	#else
+		#define XSDValidator_API
+	#endif
 #endif
 
 
@@ -70,22 +74,48 @@ class XSDValidator_API Validator
 	/// does not retain a compiled schema between calls), so high-frequency
 	/// validation paths should batch where possible or, in the future, use a
 	/// stateful overload that retains a compiled xmlSchemaPtr.
+	///
+	/// validate() may be called concurrently from several threads; every call
+	/// uses its own libxml2 contexts.
+	///
+	/// The document may come from an untrusted source; it is parsed without
+	/// network access, entity references are not expanded, and documents with
+	/// a document type declaration are rejected. The schema must come from a
+	/// trusted source: its entities are expanded (with libxml2 before 2.13 also
+	/// external entities, which can read local files), and schemas that import
+	/// or include other schemas by location are resolved through libxml2's
+	/// default resource loader, which can read local files; with libxml2 before
+	/// 2.13, diagnostics about such included or imported schemas may be written
+	/// to standard error.
+	///
+	/// Error messages list at most the first ten errors. The document is parsed
+	/// into memory as a whole, so callers should limit the size of the documents
+	/// they validate.
 {
 public:
 	Validator() = delete;
-		/// No instantiation — see class documentation.
+		/// Not instantiable; see the class documentation.
 
 	static void validate(const std::string& xml, const std::string& xsdContent);
 		/// Validates the given XML string against the schema in xsdContent.
 		///
 		/// Throws Poco::DataFormatException with the underlying libxml2 error
-		/// messages if:
-		///   - xsdContent does not parse as a valid XML Schema,
-		///   - xml is not well-formed XML,
-		///   - xml does not conform to the schema.
+		/// messages, separated by "; ", if:
+		///   - xsdContent is not well-formed XML
+		///     ("XSD: malformed schema document: line N: ..."),
+		///   - xsdContent is not a valid XML Schema ("XSD: invalid schema: ..."),
+		///   - xml is not well-formed XML ("XML: malformed document: line N: ..."),
+		///   - xml contains a document type declaration
+		///     ("XML: document type declarations are not supported"),
+		///   - xml does not conform to the schema
+		///     ("XML: schema validation failed: ...").
 		///
-		/// Throws Poco::RuntimeException if libxml2 cannot create the parser
-		/// or validation context, or reports an internal error.
+		/// Throws Poco::InvalidArgumentException if xml or xsdContent exceeds
+		/// the libxml2 size limit (INT_MAX bytes).
+		///
+		/// Throws Poco::RuntimeException if libxml2 reports an internal error
+		/// ("XSD: internal schema validator error: ...") or cannot allocate
+		/// memory ("XML: libxml2 could not allocate memory").
 		///
 		/// Throws Poco::IllegalStateException if xsdContent is empty.
 };
