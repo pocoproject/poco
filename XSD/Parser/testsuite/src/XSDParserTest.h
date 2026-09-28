@@ -47,6 +47,16 @@ public:
 	void testIncludeTwice();
 	void testImportSecondDocument();
 	void testIncludeChameleon();
+	void testReferencedLocationOtherHostRejected();
+	void testReferencedLocationSameHostAllowed();
+	void testAnyInDocumentation();
+	void testListInDocumentation();
+	void testListInAppInfo();
+	void testSchemaElementsInWSDLDocumentation();
+	void testAnyInWSDLServiceRejected();
+	void testListInWSDLServiceRejected();
+	void testSchemaComponentsInWSDLRejected();
+	void testAnnotationInWSDLOperation();
 
 	void setUp() override;
 	void tearDown() override;

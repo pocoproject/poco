@@ -1,0 +1,12 @@
+<AppConfig>
+	<XSDGen>
+		<default>
+			<include>include/Injection</include>
+			<src>src</src>
+			<includeRoot>include</includeRoot>
+		</default>
+		<schema targetNamespace="urn:XSDGenTest:injection">
+			<namespace>Injection</namespace>
+		</schema>
+	</XSDGen>
+</AppConfig>

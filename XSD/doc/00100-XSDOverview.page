@@ -31,6 +31,10 @@ application that loads schemas over HTTP or HTTPS registers
 Locations named in <[schemaLocation]> and WSDL import attributes are opened with the
 privileges of the process through every registered URI scheme, so schemas and WSDL documents
 must come from a trusted source.
+A location named in the <[schemaLocation]> attribute of <[xs:include]> or <[xs:import]> or in the
+<[location]> attribute of <[wsdl:import]> that has no scheme or the file scheme and names a
+network host other than localhost and the host of the referencing document is rejected;
+locations from the schema map are not checked.
 
 Dependencies: Types, XML, Foundation.
 
@@ -53,12 +57,14 @@ on the other three parts. <[Validator::validate(xml, xsd)]> throws
 <[Poco::DataFormatException]> when the schema does not parse, the document is not
 well-formed, or the document violates the schema.
 The document may come from an untrusted source; documents with a document type declaration
-are rejected. The schema must not: its entities are expanded (with libxml2 before 2.13 also
-external entities, which can read local files), and schemas that import or include other
-schemas by location are resolved through libxml2's default resource loader, which can read
-local files; with libxml2 before 2.13, diagnostics about such schemas may be written to
-standard error. <[Validator::validate()]> keeps no shared state and may be called
-concurrently.
+are rejected. The schema is parsed without network access; a schema whose document type
+declaration names an external DTD or declares external entities is rejected, and internal
+entities are expanded. Schemas named by <[xs:include]>, <[xs:import]> and <[xs:redefine]> are
+loaded by libxml2's default resource loader with the privileges of the process; depending on the
+libxml2 version and build, it can read network locations and expands the external entities of
+those schemas, so schemas must come from a trusted source. With libxml2 before 2.13, diagnostics
+about referenced schemas may be written to standard error. <[Validator::validate()]> keeps no
+shared state and may be called concurrently.
 
 Dependencies: Foundation, libxml2.
 

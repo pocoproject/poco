@@ -29,3 +29,25 @@ install(
 	TARGETS XSDGen
 	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+if(ENABLE_TESTS)
+	# XSDGen rejects schema values that would end a //@ comment line in the generated code.
+	# Poco::Util::Application takes options in the /name=value form on Windows.
+	if(WIN32)
+		set(XSDGEN_CONFIG_OPTION "/config-file=${CMAKE_CURRENT_SOURCE_DIR}/testsuite/data/XSDGen.xml")
+	else()
+		set(XSDGEN_CONFIG_OPTION "--config-file=${CMAKE_CURRENT_SOURCE_DIR}/testsuite/data/XSDGen.xml")
+	endif()
+	add_test(
+		NAME XSDGen-ElementNameInjection
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND XSDGen ${XSDGEN_CONFIG_OPTION} ${CMAKE_CURRENT_SOURCE_DIR}/testsuite/data/ElementNameInjection.xsd
+	)
+	add_test(
+		NAME XSDGen-SoapActionInjection
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND XSDGen ${XSDGEN_CONFIG_OPTION} ${CMAKE_CURRENT_SOURCE_DIR}/testsuite/data/SoapActionInjection.wsdl
+	)
+	set_tests_properties(XSDGen-ElementNameInjection XSDGen-SoapActionInjection PROPERTIES
+		PASS_REGULAR_EXPRESSION "contains a character that is not allowed in a Remoting attribute")
+endif()

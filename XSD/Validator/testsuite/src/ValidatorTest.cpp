@@ -15,6 +15,11 @@
 #include "Poco/XSD/Validator/Validator.h"
 #include "Poco/Exception.h"
 #include "Poco/Ascii.h"
+#include "Poco/FileStream.h"
+#include "Poco/Path.h"
+#include "Poco/TemporaryFile.h"
+#include "Poco/URI.h"
+#include <type_traits>
 
 
 using Poco::XSD::Validator::Validator;
@@ -61,6 +66,29 @@ const char* const SAMPLE_XSD = R"(<?xml version="1.0" encoding="UTF-8"?>
     </xs:complexType>
   </xs:element>
 </xs:schema>)";
+
+
+// libxml2 parses the entity text without the namespace declarations of the
+// place where it is referenced, so the declaration declares the prefix itself.
+const char* const ELEMENT_B_DECLARATION = R"(<xs:element xmlns:xs="http://www.w3.org/2001/XMLSchema" name="b" type="xs:int"/>)";
+
+
+std::string writeFile(const Poco::TemporaryFile& file, const std::string& content)
+	/// Writes content to file and returns the absolute path of file.
+{
+	{
+		Poco::FileOutputStream out(file.path());
+		out << content;
+	}
+	return Poco::Path(file.path()).absolute().toString();
+}
+
+
+std::string fileURI(const std::string& path)
+	/// Returns the file URI of path.
+{
+	return Poco::URI(Poco::Path(path)).toString();
+}
 
 
 } // namespace
@@ -388,6 +416,117 @@ void ValidatorTest::testValidationMessageSingleLine()
 }
 
 
+void ValidatorTest::testSchemaExternalEntityRejected()
+{
+	Poco::TemporaryFile declarationFile;
+	const std::string declarationURI = fileURI(writeFile(declarationFile, ELEMENT_B_DECLARATION));
+	Poco::TemporaryFile dtdFile;
+	const std::string dtdURI = fileURI(writeFile(dtdFile, std::string("<!ENTITY b '") + ELEMENT_B_DECLARATION + "'>"));
+	const std::string schemaElement = R"(
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="a">
+    <xs:complexType>
+      <xs:sequence>&b;</xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>)";
+	// Some libxml2 versions fail the parse on a reference to an entity declared only in an
+	// unread external parameter entity, before the declarations are checked.
+	const std::string schemaElementWithoutReference = R"(
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="a" type="xs:int"/>
+</xs:schema>)";
+	for (const std::string& schema: {
+		"<!DOCTYPE xs:schema [<!ENTITY b SYSTEM \"" + declarationURI + "\">]>" + schemaElement,
+		"<!DOCTYPE xs:schema [<!ENTITY % d SYSTEM \"" + dtdURI + "\"> %d;]>" + schemaElementWithoutReference,
+		"<!DOCTYPE xs:schema SYSTEM \"" + dtdURI + "\">" + schemaElement})
+	{
+		try
+		{
+			Validator::validate("<a><b>1</b></a>", schema);
+			fail("a schema with an external DTD or an external entity must throw");
+		}
+		catch (const Poco::DataFormatException& exc)
+		{
+			assertTrue (exc.message().find("XSD: external DTDs and external entities are not supported in the schema") != std::string::npos);
+		}
+	}
+}
+
+
+void ValidatorTest::testReferencedLocalSchemaLoaded()
+{
+	Poco::TemporaryFile includedFile;
+	const std::string includedPath = writeFile(includedFile, R"(<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="b" type="xs:int"/>
+</xs:schema>)");
+	// "file://localhost" is followed by the absolute path, which starts with a slash in a file URI.
+	for (const std::string& location: {includedPath, fileURI(includedPath), "file://localhost" + fileURI(includedPath).substr(7)})
+	{
+		const std::string schema = R"(<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation=")" + location + R"("/>
+</xs:schema>)";
+		Validator::validate("<b>1</b>", schema);
+		try
+		{
+			Validator::validate("<b>x</b>", schema);
+			fail("a value that is not an xs:int must fail schema validation");
+		}
+		catch (const Poco::DataFormatException& exc)
+		{
+			assertTrue (exc.message().find("XML: schema validation failed: ") != std::string::npos);
+		}
+	}
+}
+
+
+void ValidatorTest::testNestedReferencedLocalSchemasLoaded()
+{
+	// The last schema is named relative to the schema that includes it; all temporary files
+	// are in the same directory.
+	Poco::TemporaryFile lastFile;
+	const std::string lastPath = writeFile(lastFile, R"(<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="b" type="xs:int"/>
+</xs:schema>)");
+	Poco::TemporaryFile includedFile;
+	const std::string includedPath = writeFile(includedFile, R"(<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation=")" + Poco::Path(lastPath).getFileName() + R"("/>
+</xs:schema>)");
+	const std::string schema = R"(<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation=")" + includedPath + R"("/>
+</xs:schema>)";
+	Validator::validate("<b>1</b>", schema);
+	try
+	{
+		Validator::validate("<b>x</b>", schema);
+		fail("a value that is not an xs:int must fail schema validation");
+	}
+	catch (const Poco::DataFormatException& exc)
+	{
+		assertTrue (exc.message().find("XML: schema validation failed: ") != std::string::npos);
+	}
+}
+
+
+void ValidatorTest::testReferencedSchemaCycle()
+{
+	// File URIs, because libxml2 on Windows cannot resolve a drive-letter path named in an included schema.
+	Poco::TemporaryFile firstFile;
+	Poco::TemporaryFile secondFile;
+	const std::string firstURI = fileURI(Poco::Path(firstFile.path()).absolute().toString());
+	const std::string secondURI = fileURI(writeFile(secondFile, R"(<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation=")" + firstURI + R"("/>
+</xs:schema>)"));
+	writeFile(firstFile, R"(<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation=")" + secondURI + R"("/>
+  <xs:element name="b" type="xs:int"/>
+</xs:schema>)");
+	Validator::validate("<b>1</b>", R"(<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:include schemaLocation=")" + firstURI + R"("/>
+</xs:schema>)");
+}
+
+
 CppUnit::Test* ValidatorTest::suite()
 {
 	CppUnit::TestSuite* pSuite = new CppUnit::TestSuite("ValidatorTest");
@@ -409,6 +548,10 @@ CppUnit::Test* ValidatorTest::suite()
 	CppUnit_addTest(pSuite, ValidatorTest, testDocumentTypeDeclarationRejected);
 	CppUnit_addTest(pSuite, ValidatorTest, testErrorMessageBounded);
 	CppUnit_addTest(pSuite, ValidatorTest, testValidationMessageSingleLine);
+	CppUnit_addTest(pSuite, ValidatorTest, testSchemaExternalEntityRejected);
+	CppUnit_addTest(pSuite, ValidatorTest, testReferencedLocalSchemaLoaded);
+	CppUnit_addTest(pSuite, ValidatorTest, testNestedReferencedLocalSchemasLoaded);
+	CppUnit_addTest(pSuite, ValidatorTest, testReferencedSchemaCycle);
 
 	return pSuite;
 }

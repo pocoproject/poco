@@ -52,6 +52,7 @@
 #include "Poco/StringTokenizer.h"
 #include "Poco/Format.h"
 #include "Poco/NumberFormatter.h"
+#include "Poco/String.h"
 
 
 using namespace Poco::XSD::Types;
@@ -118,10 +119,22 @@ void XSDContentHandler::startElement(const std::string& uri, const std::string& 
 	bool ok = stateMachine().stateInfo(lastState).isValidSuccessor(uri, localName);
 	if (ok)
 	{
-		StateMachine::State newState = stateMachine().state(uri, localName, lastState);
-
-		if (_states.back() == StateMachine::ST_INMETAANY)
-			newState = StateMachine::ST_INMETAANY;
+		// documentation and appinfo have content ({any})*, so an XSD element inside them is not a schema component
+		StateMachine::State newState = StateMachine::ST_INMETAANY;
+		if (lastState != StateMachine::ST_INMETAANY && lastState != StateMachine::ST_INDOCUMENTATION
+			&& lastState != StateMachine::ST_INAPPINFO && lastState != StateMachine::ST_INWSDLDOCUMENTATION)
+		{
+			newState = stateMachine().state(uri, localName, lastState);
+			// the other states with {any} content are WSDL elements: there, xs:annotation is the only
+			// schema component, and the content of xs:documentation and xs:appinfo is ignored
+			if (stateMachine().stateInfo(lastState).containsAny() && uri == Constants::XSD_NAMESPACE_URI)
+			{
+				if (localName == Constants::XSD_DOCUMENTATION || localName == Constants::XSD_APPINFO)
+					newState = StateMachine::ST_INMETAANY;
+				else if (localName != Constants::XSD_ANNOTATION)
+					throw XSDException("Illegal Element: " + qname, location());
+			}
+		}
 		if (newState == StateMachine::ST_INUNINITIALIZED)
 		{
 			if (stateMachine().stateInfo(lastState).containsAny())
@@ -694,6 +707,7 @@ void XSDContentHandler::stateXSDImportStart(const std::string& uri, const std::s
 		if (tok.count() == 1)
 		{
 			imported = true;
+			checkReferencedLocation(tok[0], Poco::URI(_schemaLocation));
 			url = tok[0];
 			resolveSchemaLocation(url, Poco::URI(_schemaLocation));
 			importXSD(url, _schemaMap);
@@ -704,6 +718,7 @@ void XSDContentHandler::stateXSDImportStart(const std::string& uri, const std::s
 			for (std::size_t i = 0; i < tok.count(); i+=2)
 			{
 				imported = true;
+				checkReferencedLocation(tok[i+1], Poco::URI(_schemaLocation));
 				url = tok[i+1];
 				resolveSchemaLocation(url, Poco::URI(_schemaLocation));
 				importXSD(url, _schemaMap);
@@ -742,6 +757,7 @@ void XSDContentHandler::stateIncludeStart(const std::string& uri, const std::str
 	auto itEnd = attrList.end();
 	const std::string& loc = Utility::getString(itEnd, attrList.find(Constants::XSD_SCHEMALOCATION));
 	// only one single xsd entry! no uri_location pair at includes!
+	checkReferencedLocation(loc, Poco::URI(_schemaLocation));
 	Poco::URI url(loc);
 	resolveSchemaLocation(url, Poco::URI(_schemaLocation));
 	Schema::Ptr pSchema = loadDocument(url, _schemaMap);
@@ -1305,7 +1321,7 @@ void XSDContentHandler::stateAllEnd(const std::string& uri, const std::string& l
 void XSDContentHandler::stateAnnotationEnd(const std::string& uri, const std::string& localName, const std::string& qname)
 {
 	poco_assert_dbg (!_annot.empty());
-	poco_assert_dbg (!_objects.empty());
+	if (_objects.empty()) throw Types::SchemaException("xs:annotation outside a schema component", location());
 	_objects.top()->addAnnotation(*_annot.top());
 	_annot.pop();
 }
@@ -1319,7 +1335,8 @@ void XSDContentHandler::stateAnyEnd(const std::string& uri, const std::string& l
 	_objects.pop();
 
 	// valid parents: choice, sequence
-	poco_assert_dbg (getParentState() == StateMachine::ST_INCHOICE || getParentState() ==  StateMachine::ST_INSEQUENCE);
+	if (getParentState() != StateMachine::ST_INCHOICE && getParentState() != StateMachine::ST_INSEQUENCE)
+		throw Types::SchemaException("xs:any outside xs:sequence or xs:choice", location());
 
 	_orders.top()->add(ptr);
 }
@@ -1642,8 +1659,8 @@ void XSDContentHandler::stateListEnd(const std::string& uri, const std::string& 
 	poco_assert_dbg (!_listRef.empty());
 	poco_assert_dbg (!_list.empty());
 	poco_assert_dbg (!_simpleInheritance.empty());
+	if (getParentState() != StateMachine::ST_INSIMPLETYPE) throw Types::SchemaException("xs:list outside xs:simpleType", location());
 	poco_assert_dbg (!_simpleTypes.empty());
-	poco_assert_dbg (getParentState() == StateMachine::ST_INSIMPLETYPE);
 
 	SimpleTypeInheritance::Ptr ptr = _simpleInheritance.top();
 	_simpleInheritance.pop();
@@ -2010,6 +2027,7 @@ void XSDContentHandler::stateWSDLImportStart(const std::string& uri, const std::
 	Poco::URI url(loc);
 	if (!loc.empty())
 	{
+		checkReferencedLocation(loc, Poco::URI(_schemaLocation));
 		resolveSchemaLocation(url, Poco::URI(_schemaLocation));
 		importWSDL(ns, url, _schemaMap);
 	}
@@ -2654,6 +2672,28 @@ void XSDContentHandler::resolveSchemaLocation(Poco::URI& schemaLocation, const P
 			}
 		}
 	}
+}
+
+
+void XSDContentHandler::checkReferencedLocation(const std::string& location, const Poco::URI& parentSchemaLocation)
+{
+	// on Windows, FileStreamFactory opens a location on another host as a UNC path, which
+	// connects to that host and can send the credentials of the user
+	const auto networkHost = [](const Poco::URI& uri) -> std::string
+	{
+		static const std::string SEPARATORS("/\\");
+
+		if (!uri.getScheme().empty() && uri.getScheme() != "file") return {};
+		if (!uri.getHost().empty()) return uri.getHost();
+		const std::string& path = uri.getPath();
+		const std::string::size_type hostBegin = path.find_first_not_of(SEPARATORS);
+		if (hostBegin == std::string::npos || hostBegin < 2) return {};
+		return path.substr(hostBegin, path.find_first_of(SEPARATORS, hostBegin) - hostBegin);
+	};
+
+	const std::string host = networkHost(Poco::URI(location));
+	if (!host.empty() && Poco::icompare(host, "localhost") != 0 && Poco::icompare(host, networkHost(parentSchemaLocation)) != 0)
+		throw Types::SchemaException("Location names a network host other than that of the referencing document", location);
 }
 
 
