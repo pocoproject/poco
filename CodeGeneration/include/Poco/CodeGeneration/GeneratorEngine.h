@@ -136,8 +136,8 @@ private:
 		/// Handle system includes for a given type.
 
 	static void skipWhiteSpace(const std::string& str, std::size_t& startPos);
-	static std::string parseToken(const std::string& str, std::size_t& beginPos);
-	static bool isWhiteSpace(const char c);
+	[[nodiscard]] static std::string parseToken(const std::string& str, std::size_t& beginPos);
+	[[nodiscard]] static bool isWhiteSpace(const char c);
 
 private:
 	Callbacks _callbacks;

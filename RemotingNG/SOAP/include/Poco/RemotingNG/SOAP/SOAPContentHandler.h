@@ -47,7 +47,7 @@ public:
 	~SOAPContentHandler();
 		/// Destroys the SOAPContentHandler.
 
-	const Node& content() const;
+	[[nodiscard]] const Node& content() const;
 		/// Returns the Node representing the document element.
 
 	// ContentHandler

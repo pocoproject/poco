@@ -49,9 +49,9 @@ public:
 
 	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e);
 
-	std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
 
-	std::string newClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct);
 
 private:
 	static void constructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam);
@@ -73,9 +73,9 @@ private:
 	static void registerListenerCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam);
 	static void unregisterListenerCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam);
 
-	static bool requiresClientCode(const std::vector<BundleService>& services);
+	[[nodiscard]] static bool requiresClientCode(const std::vector<BundleService>& services);
 
-	static bool requiresServerCode(const std::vector<BundleService>& services);
+	[[nodiscard]] static bool requiresServerCode(const std::vector<BundleService>& services);
 
 private:
 	std::ostream*              _pImplOut;

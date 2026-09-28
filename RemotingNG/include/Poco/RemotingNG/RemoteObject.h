@@ -46,7 +46,7 @@ public:
 	virtual ~RemoteObject();
 		/// Destroys the RemoteObject.
 
-	virtual bool remoting__hasEvents() const;
+	[[nodiscard]] virtual bool remoting__hasEvents() const;
 		/// Returns true if the service object has events, false otherwise.
 		///
 		/// Must be overridden by subclasses if the service object has events.
@@ -62,7 +62,7 @@ public:
 		/// The default implementation does nothing.
 
 protected:
-	Poco::FastMutex& mutex() const;
+	[[nodiscard]] Poco::FastMutex& mutex() const;
 	
 private:
 	mutable Poco::FastMutex _mutex;

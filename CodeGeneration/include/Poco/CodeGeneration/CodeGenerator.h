@@ -40,7 +40,7 @@ public:
 		std::string className;
 		std::string fullNameSpace;
 		FwdDecl(const std::string& inc, const std::string& cN, const std::string& ns);
-		bool operator<(const FwdDecl& other) const;
+		[[nodiscard]] bool operator<(const FwdDecl& other) const;
 		/// Must guarantee that the primary order is by namespace, then by class
 	};
 
@@ -127,22 +127,22 @@ public:
 	virtual void variablesEnd() = 0;
 		/// Ends variable definitions.
 
-	virtual const CodeGenerator::IncludeSet& includes() const;
+	[[nodiscard]] virtual const CodeGenerator::IncludeSet& includes() const;
 		/// Returns all includes that the CodeGenerator consists of.
 
-	virtual const CodeGenerator::IncludeSet& systemIncludes() const;
+	[[nodiscard]] virtual const CodeGenerator::IncludeSet& systemIncludes() const;
 		/// Returns all system includes that the CodeGenerator consists of.
 
-	virtual const std::string& nameSpace() const;
+	[[nodiscard]] virtual const std::string& nameSpace() const;
 		/// The namespace of the file
 
-	virtual const std::string& libraryName() const;
+	[[nodiscard]] virtual const std::string& libraryName() const;
 		/// The prefix assigned to the namespace.
 
-	virtual bool usePocoIncludeStyle() const;
+	[[nodiscard]] virtual bool usePocoIncludeStyle() const;
 		/// Returns which include style should be used
 
-	virtual const std::string& copyright() const;
+	[[nodiscard]] virtual const std::string& copyright() const;
 		/// Returns the copyright notice, can be empty.
 
 private:

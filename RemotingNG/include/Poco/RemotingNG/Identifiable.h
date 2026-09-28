@@ -45,16 +45,16 @@ public:
 	virtual ~Identifiable();
 		/// Destroys the Identifiable.
 
-	const Identifiable::ObjectId& remoting__objectId() const;
+	[[nodiscard]] const Identifiable::ObjectId& remoting__objectId() const;
 		/// Returns the object's ObjectId.
 
 	void remoting__setURI(const Poco::URI& uri);
 		/// Sets the URI for the object.
 
-	const Poco::URI& remoting__getURI() const;
+	[[nodiscard]] const Poco::URI& remoting__getURI() const;
 		/// Returns the object's URI.
 
-	virtual const Identifiable::TypeId& remoting__typeId() const = 0;
+	[[nodiscard]] virtual const Identifiable::TypeId& remoting__typeId() const = 0;
 		/// Returns the object's TypeId.
 		///
 		/// The TypeId is defined by a subclass and cannot be changed.

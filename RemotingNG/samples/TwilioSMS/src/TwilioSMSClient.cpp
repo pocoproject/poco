@@ -13,6 +13,7 @@
 #include "Poco/RemotingNG/REST/Transport.h"
 #include "Poco/RemotingNG/REST/RESTServerException.h"
 #include "Poco/RemotingNG/Proxy.h"
+#include "Poco/RemotingNG/Credentials.h"
 #include "Poco/Net/HTTPSSessionInstantiator.h"
 #include <iostream>
 
@@ -55,8 +56,10 @@ int main(int argc, char** argv)
 		// authenticate
 		Poco::RemotingNG::REST::Transport& trans = transportFromInterface(pSMSEndpoint);
 		trans.setAuthentication(Poco::RemotingNG::REST::Transport::AUTH_BASIC);
-		trans.setUsername(accountSID);
-		trans.setPassword(authToken);
+		Poco::RemotingNG::Credentials creds;
+		creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, accountSID);
+		creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, authToken);
+		trans.setCredentials(creds);
 
 		// invoke web service
 		Twilio::TwilioSMSResponse response = pSMSEndpoint->post(accountSID, from, to, body);

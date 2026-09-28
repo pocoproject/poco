@@ -77,14 +77,14 @@ public:
 	void removeHeaderInterceptor(HeaderInterceptor::Ptr pInterceptor);
 		/// Removes the given header interceptor.
 
-	Serializer::SOAPVersion soapVersion() const;
+	[[nodiscard]] Serializer::SOAPVersion soapVersion() const;
 		/// Returns the SOAP version (1.1 or 1.2) of the
 		/// most recently processed message.
 
 	void enableMTOM(bool enable);
 		/// Enable MTOM for the next messages.
 
-	bool isMTOMEnabled() const;
+	[[nodiscard]] bool isMTOMEnabled() const;
 		/// Returns true iff MTOM is enabled.
 
 	void parseContentType(const std::string& contentType);
@@ -138,17 +138,12 @@ private:
 	void deserializeMethodStart(const std::string& methodName);
 		/// Throws an exception if the methodName doesn't match.
 
-	const std::string& detectMethodName();
-		/// Deserializes until the method name is found, then returns the name.
-		/// Used on the skeleton side to deserialize incoming requests. You still must call deserializeMethodStart
-		/// when using this method.
-
 	void deserializeMethodEnd(const std::string& mi);
 
 	void handleConditionalError(const std::string& name, bool isMandatory);
 		/// Throws an exception if isMandatory is set to true.
 
-	const std::string& getData(const std::string& name, bool isMandatory, bool& found);
+	[[nodiscard]] const std::string& getData(const std::string& name, bool isMandatory, bool& found);
 		/// Returns the value as string, throws an exception if the entry is not found and isMandatory is true.
 		/// Advances the childposition in the parent
 
@@ -158,7 +153,7 @@ private:
 	void checkHeaderStart(const std::string& name);
 	void checkHeaderEnd(const std::string& name);
 
-	static std::string unbracketContentID(const std::string& cid);
+	[[nodiscard]] static std::string unbracketContentID(const std::string& cid);
 	static void copyToVector(std::istream& istr, std::vector<char>& vec);
 
 private:

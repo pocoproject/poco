@@ -58,10 +58,10 @@ public:
 	~EventDispatcherGenerator();
 		/// Destroys the EventDispatcherGenerator.
 
-	static std::string generateClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static std::string generateClassName(const Poco::CppParser::Struct* pStruct);
 		/// Generates for a given class, its interface class name.
 
-	static std::string generateQualifiedClassName(const std::string& ns, const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static std::string generateQualifiedClassName(const std::string& ns, const Poco::CppParser::Struct* pStruct);
 		/// Generates for a given class, its interface class name.
 
 	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
@@ -72,12 +72,12 @@ public:
 
 	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e);
 
-	std::string newClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct);
 		/// generates the new class name based on the old one
 
-	std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
 
-	static std::string generateStaticIdString(const Poco::CppParser::Function* pFunc, const std::set<std::string>& nameSpaces, OrderedParameters& attrs, OrderedParameters& elems, std::map<std::string, int>& nsIndex);
+	[[nodiscard]] static std::string generateStaticIdString(const Poco::CppParser::Function* pFunc, const std::set<std::string>& nameSpaces, OrderedParameters& attrs, OrderedParameters& elems, std::map<std::string, int>& nsIndex);
 	/// Generates a static ids vector containing as first element the fucntion name, followed by parameter names sorted by order. Set namespacePos and namePos in attrs and elems and converts the namespaces set to a map of namespaces ->stringIdx
 
 	static void doElemAttrSplit(const Poco::CppParser::Function* pFunc, OrderedParameters& attrs, OrderedParameters& elems, std::set<std::string>& nameSpaces);
@@ -92,9 +92,9 @@ public:
 		const std::string& indentation,
 		CodeGenerator& gen);
 
-	static bool hasAnyOutParams(const Poco::CppParser::Function* pFunc);
+	[[nodiscard]] static bool hasAnyOutParams(const Poco::CppParser::Function* pFunc);
 
-	static std::string generateEventFunctionName(const std::string& eventVarname);
+	[[nodiscard]] static std::string generateEventFunctionName(const std::string& eventVarname);
 		/// generates a fct name for an event member
 
 private:
@@ -110,9 +110,9 @@ private:
 
 	static void staticMembersInitializer(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam);
 
-	static std::string generateOutParamName(const Poco::CppParser::Parameter* pParam, const std::string& functionName);
+	[[nodiscard]] static std::string generateOutParamName(const Poco::CppParser::Parameter* pParam, const std::string& functionName);
 
-	static std::string generateRetParamName(const Poco::CppParser::Function* pFunc);
+	[[nodiscard]] static std::string generateRetParamName(const Poco::CppParser::Function* pFunc);
 
 	static void writeSerializingBlock(const Poco::CppParser::Function* pFunc, const OrderedParameters& attrs, const OrderedParameters& elems, const std::map<std::string, int>& nsIdx, CodeGenerator& gen, bool isOneWay, bool isEvent);
 	static void writeTypeSerializer(const Poco::CppParser::Function* pFunc, const OrderedParameters& params, bool isAttr, int funcNsIdx, CodeGenerator& gen);

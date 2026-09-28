@@ -184,7 +184,8 @@ public:
 			_pListener->connectionManager().threadPool().start(*pServerTransport);
 			Poco::Thread::yield();
 			pServerTransport->waitReady();
-			pRequestStream->rdbuf()->queue()->handleFrame(pConnection, pFrame);
+			bool queued = pRequestStream->rdbuf()->queue()->handleFrame(pConnection, pFrame);
+			poco_assert (queued);
 			return true;
 		}
 		else return false;

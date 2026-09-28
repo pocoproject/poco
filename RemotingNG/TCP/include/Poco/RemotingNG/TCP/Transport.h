@@ -54,13 +54,13 @@ public:
 	~Transport();
 		/// Destroys the Transport.
 
-	Poco::Timespan getTimeout() const;
+	[[nodiscard]] Poco::Timespan getTimeout() const;
 		/// Returns the response timeout.
 		
 	void setTimeout(const Poco::Timespan& timeout);
 		/// Sets the response timeout.
 
-	bool isCompressionEnabled() const;
+	[[nodiscard]] bool isCompressionEnabled() const;
 		/// Returns true iff zlib deflate compression is enabled for requests.
 		/// Default is disabled.
 		
@@ -70,20 +70,20 @@ public:
 	void setAuthenticator(ClientAuthenticator::Ptr pAuthenticator);
 		/// Sets the ClientAuthenticator to be used for authentication.
 		
-	ClientAuthenticator::Ptr getAuthenticator() const;
+	[[nodiscard]] ClientAuthenticator::Ptr getAuthenticator() const;
 		/// Returns the ClientAuthenticator.
 
 	void setCredentials(const Credentials& credentials);
 		/// Sets the credentials for authentication.
 		
-	const Credentials& getCredentials() const;
+	[[nodiscard]] const Credentials& getCredentials() const;
 		/// Returns the credentials for authentication.
 	
 	// Poco::RemotingNG::Transport
-	const std::string& endPoint() const;
+	[[nodiscard]] const std::string& endPoint() const;
 	void connect(const std::string& endPoint);
 	void disconnect();
-	bool connected() const;
+	[[nodiscard]] bool connected() const;
 	Poco::RemotingNG::Serializer& beginMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType);
 	void sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType);
 	Poco::RemotingNG::Serializer& beginRequest(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType);
@@ -93,7 +93,7 @@ public:
 protected:
 	void setupSerializer(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, Poco::RemotingNG::SerializerBase::MessageType messageType, Poco::UInt16 frameFlags);
 	void authenticate();
-	static bool verifyCredentials(const Credentials& credentials);
+	[[nodiscard]] static bool verifyCredentials(const Credentials& credentials);
 
 private:
 	Transport();

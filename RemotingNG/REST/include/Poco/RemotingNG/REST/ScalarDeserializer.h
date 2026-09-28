@@ -69,7 +69,7 @@ public:
 protected:
 	void resetImpl();
 	void setupImpl(std::istream& inStream);
-	virtual const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found) = 0;
+	[[nodiscard]] virtual const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found) = 0;
 	virtual bool deserializeBuffer(const std::string& name, bool isMandatory, std::vector<char>& val);
 
 private:

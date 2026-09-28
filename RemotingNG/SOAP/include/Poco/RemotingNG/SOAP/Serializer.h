@@ -162,22 +162,22 @@ public:
 		/// Note that this method must not be called after
 		/// serialization has started.
 
-	SOAPVersion getSOAPVersion() const;
+	[[nodiscard]] SOAPVersion getSOAPVersion() const;
 		/// Returns the SOAP version used for serialization.
 
 	void enableMTOM(bool enable);
 		/// Enables or disables MTOM.
 
-	bool isMTOMEnabled() const;
+	[[nodiscard]] bool isMTOMEnabled() const;
 		/// Returns true iff MTOM is enabled.
 
 	void setOptions(int options);
 		/// Sets the serializer option flags. See the Options enum for supported flags.
 
-	int getOptions() const;
+	[[nodiscard]] int getOptions() const;
 		/// Returns the serializer option flags. See the Options enum for supported flags.
 
-	std::string createMTOMContentType(const std::string& action = EMPTYSTRING);
+	[[nodiscard]] std::string createMTOMContentType(const std::string& action = EMPTYSTRING);
 		/// Creates the Content-Type value for an MTOM message
 		/// containing the MIME boundary and start content ID.
 
@@ -240,7 +240,7 @@ private:
 		DelayedElement(const std::string& n, const std::string& ns);
 		DelayedElement(const std::string& n, const std::string& ns, const std::string& val, bool simpleElem);
 		DelayedElement(const std::string& n, const std::string& ns, const std::string& val, bool simpleElem, const std::map<std::string, std::string>& openAttr);
-		bool valid() const;
+		[[nodiscard]] bool valid() const;
 		void clear();
 	};
 
@@ -264,10 +264,10 @@ private:
 	bool checkHeadersStart(const std::string& name);
 	void writeRoot();
 	void createEnvelope();
-	std::string createContentID();
+	[[nodiscard]] std::string createContentID();
 	void writeParts();
 	void interceptHeaders(DelayedElement& delayedHeader);
-	static DelayedElement delayElement(const XMLElement& element);
+	[[nodiscard]] static DelayedElement delayElement(const XMLElement& element);
 
 private:
 	typedef void (Serializer::*StartElementFunct)(const std::string&, const std::string&);

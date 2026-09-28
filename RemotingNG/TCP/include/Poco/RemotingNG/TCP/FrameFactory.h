@@ -32,12 +32,12 @@ class RemotingNGTCP_API FrameFactory
 	/// Connection's Frame object pool.
 {
 public:
-	Frame::Ptr createObject()
+	[[nodiscard]] Frame::Ptr createObject()
 	{
 		return new Frame(0, 0, 0, Frame::FRAME_MAX_SIZE);
 	}
 	
-	bool validateObject(Frame::Ptr pFrame)
+	[[nodiscard]] bool validateObject(Frame::Ptr pFrame)
 	{
 		return true;
 	}

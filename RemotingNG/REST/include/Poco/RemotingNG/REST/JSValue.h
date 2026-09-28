@@ -47,40 +47,40 @@ public:
 		JS_BOOL
 	};
 
-	virtual Type type() const = 0;
+	[[nodiscard]] virtual Type type() const = 0;
 		/// Returns the type of the object.
 
-	virtual std::size_t size() const;
+	[[nodiscard]] virtual std::size_t size() const;
 		/// Returns the size of the object.
 
-	virtual const std::string& stringValue() const;
+	[[nodiscard]] virtual const std::string& stringValue() const;
 		/// Returns the object's value as string.
 
-	Poco::Int32 asInt32() const;
+	[[nodiscard]] Poco::Int32 asInt32() const;
 		/// Returns the object's value as Int32.
 
-	Poco::Int64 asInt64() const;
+	[[nodiscard]] Poco::Int64 asInt64() const;
 		/// Returns the object's value as Int64.
 
-	Poco::UInt32 asUInt32() const;
+	[[nodiscard]] Poco::UInt32 asUInt32() const;
 		/// Returns the object's value as UInt32.
 
-	Poco::UInt64 asUInt64() const;
+	[[nodiscard]] Poco::UInt64 asUInt64() const;
 		/// Returns the object's value as UInt64.
 
-	double asDouble() const;
+	[[nodiscard]] double asDouble() const;
 		/// Returns the object's value as double.
 
-	bool asBool() const;
+	[[nodiscard]] bool asBool() const;
 		/// Returns the object's value as boolean.
 
-	virtual const Ptr& operator [] (const std::string& name) const;
-	virtual Ptr& operator [] (const std::string& name);
+	[[nodiscard]] virtual const Ptr& operator [] (const std::string& name) const;
+	[[nodiscard]] virtual Ptr& operator [] (const std::string& name);
 
-	virtual const Ptr& operator [] (std::size_t index) const;
-	virtual Ptr& operator [] (std::size_t index);
+	[[nodiscard]] virtual const Ptr& operator [] (std::size_t index) const;
+	[[nodiscard]] virtual Ptr& operator [] (std::size_t index);
 
-	virtual bool has(const std::string& name) const;
+	[[nodiscard]] virtual bool has(const std::string& name) const;
 };
 
 

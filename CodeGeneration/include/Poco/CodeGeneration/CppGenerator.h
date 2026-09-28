@@ -129,10 +129,10 @@ private:
 	void methodEndImpl(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties, std::ostream& out);
 		/// Cloes the method.
 
-	const Poco::CppParser::Parameter* findParameter(const Poco::CppParser::Function* pFunc, const std::string& paramName);
+	[[nodiscard]] const Poco::CppParser::Parameter* findParameter(const Poco::CppParser::Function* pFunc, const std::string& paramName);
 		/// Finds the parameter in the function or returns 0.
 
-	bool findMatchingDecl(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Parameter* pParam);
+	[[nodiscard]] bool findMatchingDecl(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Parameter* pParam);
 		/// Matches fucntion declaration to a parameter declaration. Returns true on success,
 
 private:

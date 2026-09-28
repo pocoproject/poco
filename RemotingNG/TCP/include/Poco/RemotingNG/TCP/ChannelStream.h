@@ -43,8 +43,8 @@ public:
 	~ChannelStreamBuf();
 	
 	void close();
-	FrameQueue::Ptr queue();
-	Connection::Ptr connection();
+	[[nodiscard]] FrameQueue::Ptr queue();
+	[[nodiscard]] Connection::Ptr connection();
 	
 protected:
 	std::streamsize readFromDevice(char* buffer, std::streamsize length);
@@ -66,7 +66,7 @@ public:
 	ChannelIOS(Connection::Ptr pConnection, Poco::UInt32 frameType, Poco::UInt32 channel, Poco::UInt16 flags);
 	~ChannelIOS();
 	void close();
-	ChannelStreamBuf* rdbuf();
+	[[nodiscard]] ChannelStreamBuf* rdbuf();
 	
 protected:
 	ChannelStreamBuf _buf;

@@ -360,8 +360,10 @@ void RemotingTest::testAuthenticatedGoodCredentials()
 	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
 	Poco::RemotingNG::JSONRPC::Transport& trans = static_cast<Poco::RemotingNG::JSONRPC::Transport&>(pProxy->remoting__transport());
 
-	trans.setUsername("user");
-	trans.setPassword("pass");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "pass");
+	trans.setCredentials(creds);
 	trans.setAuthentication(Poco::RemotingNG::JSONRPC::Transport::AUTH_BASIC);
 
 	_pListener->setAuthenticator(new MockAuthenticator);
@@ -377,8 +379,10 @@ void RemotingTest::testAuthenticatedBadCredentials()
 	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
 	Poco::RemotingNG::JSONRPC::Transport& trans = static_cast<Poco::RemotingNG::JSONRPC::Transport&>(pProxy->remoting__transport());
 
-	trans.setUsername("user");
-	trans.setPassword("bad!");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "bad!");
+	trans.setCredentials(creds);
 	trans.setAuthentication(Poco::RemotingNG::JSONRPC::Transport::AUTH_BASIC);
 
 	_pListener->setAuthenticator(new MockAuthenticator);
@@ -420,8 +424,10 @@ void RemotingTest::testPermission()
 	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
 	Poco::RemotingNG::JSONRPC::Transport& trans = static_cast<Poco::RemotingNG::JSONRPC::Transport&>(pProxy->remoting__transport());
 
-	trans.setUsername("admin");
-	trans.setPassword("s3cr3t");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "admin");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+	trans.setCredentials(creds);
 	trans.setAuthentication(Poco::RemotingNG::JSONRPC::Transport::AUTH_BASIC);
 
 	_pListener->setAuthenticator(new MockAuthenticator);
@@ -438,8 +444,10 @@ void RemotingTest::testNoPermission()
 	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
 	Poco::RemotingNG::JSONRPC::Transport& trans = static_cast<Poco::RemotingNG::JSONRPC::Transport&>(pProxy->remoting__transport());
 
-	trans.setUsername("user");
-	trans.setPassword("pass");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "pass");
+	trans.setCredentials(creds);
 	trans.setAuthentication(Poco::RemotingNG::JSONRPC::Transport::AUTH_BASIC);
 
 	_pListener->setAuthenticator(new MockAuthenticator);
@@ -978,8 +986,10 @@ ITester::Ptr RemotingTestJSONRPCAuth::createProxy(const std::string& uri)
 	pProxy->remoting__connect("jsonrpc", uri);
 	static_cast<Poco::RemotingNG::JSONRPC::Transport&>(pProxy->remoting__transport()).enableChunkedTransferEncoding(false);
 	static_cast<Poco::RemotingNG::JSONRPC::Transport&>(pProxy->remoting__transport()).setAuthentication(Poco::RemotingNG::JSONRPC::Transport::AUTH_ANY);
-	static_cast<Poco::RemotingNG::JSONRPC::Transport&>(pProxy->remoting__transport()).setUsername("user");
-	static_cast<Poco::RemotingNG::JSONRPC::Transport&>(pProxy->remoting__transport()).setPassword("s3cr3t");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+	static_cast<Poco::RemotingNG::JSONRPC::Transport&>(pProxy->remoting__transport()).setCredentials(creds);
 	return pProxy;
 }
 
@@ -1035,8 +1045,10 @@ ITester::Ptr RemotingTestJSONRPCAuthChunked::createProxy(const std::string& uri)
 	pProxy->remoting__connect("jsonrpc", uri);
 	static_cast<Poco::RemotingNG::JSONRPC::Transport&>(pProxy->remoting__transport()).enableChunkedTransferEncoding(true);
 	static_cast<Poco::RemotingNG::JSONRPC::Transport&>(pProxy->remoting__transport()).setAuthentication(Poco::RemotingNG::JSONRPC::Transport::AUTH_BASIC);
-	static_cast<Poco::RemotingNG::JSONRPC::Transport&>(pProxy->remoting__transport()).setUsername("user");
-	static_cast<Poco::RemotingNG::JSONRPC::Transport&>(pProxy->remoting__transport()).setPassword("s3cr3t");
+	Poco::RemotingNG::Credentials creds;
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+	creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+	static_cast<Poco::RemotingNG::JSONRPC::Transport&>(pProxy->remoting__transport()).setCredentials(creds);
 	return pProxy;
 }
 

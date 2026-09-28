@@ -40,7 +40,7 @@ public:
 	virtual ~EventListener();
 		/// Destroys the EventListener.
 
-	virtual std::string subscribeToEvents(EventSubscriber::Ptr pEventSubscriber) = 0;
+	[[nodiscard]] virtual std::string subscribeToEvents(EventSubscriber::Ptr pEventSubscriber) = 0;
 		/// Register an EventSubscriber to the EventListener.
 		///
 		/// The EventListener is responsible for sending a protocol-specific

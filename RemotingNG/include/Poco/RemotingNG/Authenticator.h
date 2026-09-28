@@ -65,23 +65,23 @@ public:
 	AuthenticateResult& operator = (const AuthenticateResult& other);
 		/// Assignment operator.
 	
-	State state() const;
+	[[nodiscard]] State state() const;
 		/// Returns the status.
 
-	bool done() const;
+	[[nodiscard]] bool done() const;
 		/// Returns true if authentication has completed successfully.
 		
-	bool cont() const;
+	[[nodiscard]] bool cont() const;
 		/// Returns true if the authentication step was successful and the
 		/// next step must be performed to eventually complete authentication.
 		
-	bool failed() const;
+	[[nodiscard]] bool failed() const;
 		/// Returns true if authentication has failed.
 		
-	const Credentials& credentials() const;
+	[[nodiscard]] const Credentials& credentials() const;
 		/// Returns the credentials.
 		
-	Poco::UInt32 conversationID() const;
+	[[nodiscard]] Poco::UInt32 conversationID() const;
 		/// Returns the conversation ID.
 		
 private:	
@@ -112,7 +112,7 @@ public:
 	virtual ~Authenticator();
 		/// Destroys the Authenticator.
 		
-	virtual AuthenticateResult authenticate(const Credentials& credentials, Poco::UInt32 conversationID = 0) = 0;
+	[[nodiscard]] virtual AuthenticateResult authenticate(const Credentials& credentials, Poco::UInt32 conversationID = 0) = 0;
 		/// Verifies that the given credentials are valid.
 		///
 		/// Returns an AuthenticateResult encapsulating the state of the

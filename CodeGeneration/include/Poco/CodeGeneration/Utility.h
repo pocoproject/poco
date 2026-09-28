@@ -128,13 +128,13 @@ public:
 		/// Takes the fileNameCore (name without extension), appends HFILEEXTENSION, and CPPFILEEXTENSION, and opens both files
 		/// In case of an error an exception is thrown
 
-	static std::string createIncludeGuard(const std::string& libraryName, const std::string& fileName);
+	[[nodiscard]] static std::string createIncludeGuard(const std::string& libraryName, const std::string& fileName);
 		/// Creates an include guard found at the very beginning of the h file.
 
-	static std::string createInclude(const Poco::CppParser::Struct* pStruct, bool usePocoIncludes);
+	[[nodiscard]] static std::string createInclude(const Poco::CppParser::Struct* pStruct, bool usePocoIncludes);
 		/// Creates an include path for the given struct.
 
-	static std::string createInclude(const std::string& filePath, bool flatInclude);
+	[[nodiscard]] static std::string createInclude(const std::string& filePath, bool flatInclude);
 		/// Creates an include path for the given filePath.
 
 	static void handleInclude(const Poco::CppParser::Struct* pStruct, CodeGenerator& gen);
@@ -146,19 +146,19 @@ public:
 	static void handleBaseClassesInclude(const Poco::CppParser::Struct* pStruct, CodeGenerator& gen);
 		/// Includes all files for the parents
 
-	static std::string extractTemplateFromClassDecl(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static std::string extractTemplateFromClassDecl(const Poco::CppParser::Struct* pStruct);
 		/// Extracts the template name from the class.
 
-	static bool hasAnyRemoteProperty(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static bool hasAnyRemoteProperty(const Poco::CppParser::Struct* pStruct);
 		/// Checks if a class or a single PUBLIC method of it has remote properties.
 
-	static std::string resolveType(const Poco::CppParser::NameSpace* pSym, const std::string& name);
+	[[nodiscard]] static std::string resolveType(const Poco::CppParser::NameSpace* pSym, const std::string& name);
 		/// Resolves types by appending namespaces to them
 
-	static std::string resolveTypeImpl(const Poco::CppParser::NameSpace* pSym, const std::string& name);
+	[[nodiscard]] static std::string resolveTypeImpl(const Poco::CppParser::NameSpace* pSym, const std::string& name);
 		/// Resolves types by appending namespaces to them
 
-	static std::string resolveParamDecl(const Poco::CppParser::NameSpace* pNS, const Poco::CppParser::Parameter* pSym);
+	[[nodiscard]] static std::string resolveParamDecl(const Poco::CppParser::NameSpace* pNS, const Poco::CppParser::Parameter* pSym);
 		/// Returns the declaration of a parameter with resolved types.
 
 	static void writeNameSpaceBegin(std::ostream& out, const std::string& nameSpace);
@@ -179,7 +179,7 @@ private:
 };
 
 
-class RecursionGuard
+class [[nodiscard]] RecursionGuard
 {
 public:
 	RecursionGuard(int& counter, const Poco::Exception& exc = Poco::RuntimeException("Recursion limit reached"), int limit = 50):

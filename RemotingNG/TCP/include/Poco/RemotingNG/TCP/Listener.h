@@ -96,31 +96,31 @@ public:
 	void setTimeout(Poco::Timespan timeout);
 		/// Sets the receive timeout for connections.
 
-	Poco::Timespan getTimeout() const;
+	[[nodiscard]] Poco::Timespan getTimeout() const;
 		/// Returns the receive timeout for connections.
 
 	void setHandshakeTimeout(Poco::Timespan timeout);
 		/// Sets the handshake timeout for connections.
 
-	Poco::Timespan getHandshakeTimeout() const;
+	[[nodiscard]] Poco::Timespan getHandshakeTimeout() const;
 		/// Returns the handshake timeout for connections.
 
 	void setEventSubscriptionTimeout(Poco::Timespan timeout);
 		/// Sets the timeout for event subscriptions.
 
-	Poco::Timespan getEventSubscriptionTimeout() const;
+	[[nodiscard]] Poco::Timespan getEventSubscriptionTimeout() const;
 		/// Returns the timeout for event subscriptions.
 
-	ConnectionManager& connectionManager();
+	[[nodiscard]] ConnectionManager& connectionManager();
 		/// Returns the ConnectionManager used by the Listener.
 
-	static Ptr defaultListener();
+	[[nodiscard]] static Ptr defaultListener();
 		/// Returns the Listener instance used for event subscriptions.
 		///
 		/// The first call to this method will create the default Listener
 		/// instance, using the default ConnectionManager.
 
-	static Ptr defaultListener(ConnectionManager& cm);
+	[[nodiscard]] static Ptr defaultListener(ConnectionManager& cm);
 		/// Returns the Listener instance used for event subscriptions.
 		///
 		/// The first call to this method (unless the no-argument version has been
@@ -141,20 +141,20 @@ public:
 		/// already been set.
 
 	// Poco::RemotingNG::EventListener
-	std::string subscribeToEvents(Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber);
+	[[nodiscard]] std::string subscribeToEvents(Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber);
 	void unsubscribeFromEvents(Poco::RemotingNG::EventSubscriber::Ptr pEventSubscriber);
 
 	// Poco::RemotingNG::Listener
 	void start();
 	void stop();
-	const std::string& protocol() const;
-	std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId);
-	bool handlesURI(const std::string& uri);
+	[[nodiscard]] const std::string& protocol() const;
+	[[nodiscard]] std::string createURI(const Poco::RemotingNG::Identifiable::TypeId& typeId, const Poco::RemotingNG::Identifiable::ObjectId& objectId);
+	[[nodiscard]] bool handlesURI(const std::string& uri);
 	void registerObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject, Poco::RemotingNG::Skeleton::Ptr pSkeleton);
 	void unregisterObject(Poco::RemotingNG::RemoteObject::Ptr pRemoteObject);
 
 	// internal
-	Poco::RemotingNG::EventSubscriber::Ptr findEventSubscriber(const std::string& path) const;
+	[[nodiscard]] Poco::RemotingNG::EventSubscriber::Ptr findEventSubscriber(const std::string& path) const;
 
 protected:
 	void registerEventFrameHandler(Connection::Ptr pConnection);
@@ -186,8 +186,8 @@ private:
 
 	using EventSubscriptionsMap = std::map<Poco::RemotingNG::EventSubscriber::Ptr, EventSubscription::Ptr>;
 
-	static Poco::UInt32 nextSubscriberId();
-	static std::string encodeEndPoint(const std::string& endPoint);
+	[[nodiscard]] static Poco::UInt32 nextSubscriberId();
+	[[nodiscard]] static std::string encodeEndPoint(const std::string& endPoint);
 
 	ConnectionManager& _connectionManager;
 	Poco::Timespan _timeout;

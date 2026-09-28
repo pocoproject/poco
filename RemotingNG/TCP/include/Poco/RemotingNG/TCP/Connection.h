@@ -126,17 +126,17 @@ public:
 	~Connection();
 		/// Destroys the Connection.
 
-	Poco::UInt32 id() const;
+	[[nodiscard]] Poco::UInt32 id() const;
 		/// Returns the ID of the connection. This is unique within the
 		/// server or client process among all connections.
 
-	ConnectionMode mode() const;
+	[[nodiscard]] ConnectionMode mode() const;
 		/// Returns the connection mode.
 
-	ConnectionState state() const;
+	[[nodiscard]] ConnectionState state() const;
 		/// Returns the connection state.
 
-	bool secure() const;
+	[[nodiscard]] bool secure() const;
 		/// Returns true iff the connection uses a secure socket.
 
 	void sendFrame(Frame::Ptr pFrame);
@@ -148,10 +148,10 @@ public:
 		///
 		/// This must be done before the connection handshake takes place.
 
-	bool hasCapability(Poco::UInt32 capability);
+	[[nodiscard]] bool hasCapability(Poco::UInt32 capability);
 		/// Returns true if the connection has the given capability.
 
-	bool peerHasCapability(Poco::UInt32 capability);
+	[[nodiscard]] bool peerHasCapability(Poco::UInt32 capability);
 		/// Returns true if the peer has the given capability.
 		///
 		/// Peer capabilities will be available after the connection handshake.
@@ -159,22 +159,22 @@ public:
 	void setIdleTimeout(Poco::Timespan timeout);
 		/// Sets the timeout after an idle connection is closed.
 
-	Poco::Timespan getIdleTimeout() const;
+	[[nodiscard]] Poco::Timespan getIdleTimeout() const;
 		/// Returns the idle connection timeout.
 
 	void setHandshakeTimeout(Poco::Timespan timeout);
 		/// Sets the timeout for the HELO handshake.
 
-	Poco::Timespan getHandshakeTimeout() const;
+	[[nodiscard]] Poco::Timespan getHandshakeTimeout() const;
 		/// Returns the timeout for the HELO handshake.
 
-	Poco::Net::SocketAddress remoteAddress() const;
+	[[nodiscard]] Poco::Net::SocketAddress remoteAddress() const;
 		/// Returns the remote peer's socket address.
 
-	Poco::Net::SocketAddress localAddress() const;
+	[[nodiscard]] Poco::Net::SocketAddress localAddress() const;
 		/// Returns the socket's local address.
 
-	Poco::Net::StreamSocket socket() const;
+	[[nodiscard]] Poco::Net::StreamSocket socket() const;
 		/// Returns the underlying socket.
 
 	void close();
@@ -183,7 +183,7 @@ public:
 	void abort();
 		/// Aborts the connection.
 
-	Poco::UInt32 allocChannel();
+	[[nodiscard]] Poco::UInt32 allocChannel();
 		/// Allocates a channel number.
 
 	void releaseChannel(Poco::UInt32 channel);
@@ -195,7 +195,7 @@ public:
 	void popFrameHandler(Poco::AutoPtr<FrameHandler> pHandler);
 		/// Removes the FrameHandler from the internal stack.
 
-	bool waitReady(Poco::Timespan timeout = 2*TIMEOUT_HELO);
+	[[nodiscard]] bool waitReady(Poco::Timespan timeout = 2*TIMEOUT_HELO);
 		/// Waits until the connection is established, or the
 		/// given timeout expires.
 
@@ -227,7 +227,7 @@ protected:
 	void sendProtocolFrame(Frame::Ptr pFrame);
 		/// Send a single protocol frame.
 
-	Frame::Ptr receiveFrame();
+	[[nodiscard]] Frame::Ptr receiveFrame();
 		/// Receives the next frame from the connection,
 		/// or returns null if no frame has been received
 		/// within a certain time.

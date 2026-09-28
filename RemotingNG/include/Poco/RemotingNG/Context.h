@@ -54,21 +54,21 @@ public:
 	static void set(Context::Ptr pContext);
 		/// Sets the Context object for the current thread.
 		
-	static Context::Ptr get();
+	[[nodiscard]] static Context::Ptr get();
 		/// Returns the Context object for the current thread.
 		/// Result may be null if no Context is available.
 		
-	bool has(const std::string& key) const;
+	[[nodiscard]] bool has(const std::string& key) const;
 		/// Returns true iff the Context has an attribute with the given value.
 
-	const Poco::Any& get(const std::string& key) const;
+	[[nodiscard]] const Poco::Any& get(const std::string& key) const;
 		/// Returns the attribute with the given key. 
 		///
 		/// Throws a Poco::NotFoundException
 		/// if the attribute does not exist.
 		
 	template <typename T>
-	T getValue(const std::string& key) const
+	[[nodiscard]] T getValue(const std::string& key) const
 		/// Convenience function that returns the attribute with the given key,
 		/// casted to the desired type.
 		///
@@ -80,7 +80,7 @@ public:
 	}
 	
 	template <typename T>
-	T getValue(const std::string& key, T deflt) const
+	[[nodiscard]] T getValue(const std::string& key, T deflt) const
 		/// Convenience function that returns the attribute with the given key,
 		/// casted to the desired type. If the attribute does not exist,
 		/// the given default value is returned.
@@ -104,16 +104,16 @@ public:
 		set(key, Poco::Any(value));
 	}
 
-	Attributes::const_iterator find(const std::string& key) const;
+	[[nodiscard]] Attributes::const_iterator find(const std::string& key) const;
 		/// Searches for an attribute. Returns end() if not found.
 
-	Attributes::const_iterator begin() const;
+	[[nodiscard]] Attributes::const_iterator begin() const;
 		/// Returns the begin iterator for attributes.
 
-	Attributes::const_iterator end() const;
+	[[nodiscard]] Attributes::const_iterator end() const;
 		/// Returns the end iterator for attributes.
 		
-	const Credentials& getCredentials() const;
+	[[nodiscard]] const Credentials& getCredentials() const;
 		/// Returns the Credentials associated with the Context.
 		
 	void setCredentials(const Credentials& creds);
@@ -134,7 +134,8 @@ class RemotingNG_API ScopedContext
 	/// Helper class using RAII for Context setup and teardown.
 {
 public:
-	ScopedContext();
+	// [[nodiscard]] is on the constructor because GCC < 12 rejects it before RemotingNG_API in the class head.
+	[[nodiscard]] ScopedContext();
 		/// Creates a Context object and registers it as
 		/// the current thread's Context.
 		
@@ -142,7 +143,7 @@ public:
 		/// Destroys the Context object and removes it
 		/// from the current thread.
 	
-	Context::Ptr context() const;
+	[[nodiscard]] Context::Ptr context() const;
 		/// Returns the Context object.
 
 private:

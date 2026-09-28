@@ -131,16 +131,16 @@ Transport::AuthMode Transport::getAuthentication() const
 
 void Transport::setCredentials(const Credentials& creds)
 {
-	setUsername(creds.getAttribute(Credentials::ATTR_USERNAME));
-	setPassword(creds.getAttribute(Credentials::ATTR_PASSWORD));
+	_creds.setUsername(creds.getAttribute(Credentials::ATTR_USERNAME));
+	_creds.setPassword(creds.getAttribute(Credentials::ATTR_PASSWORD));
 }
 
 
 Credentials Transport::getCredentials() const
 {
 	Credentials creds;
-	creds.setAttribute(Credentials::ATTR_USERNAME, getUsername());
-	creds.setAttribute(Credentials::ATTR_PASSWORD, getPassword());
+	creds.setAttribute(Credentials::ATTR_USERNAME, _creds.getUsername());
+	creds.setAttribute(Credentials::ATTR_PASSWORD, _creds.getPassword());
 	return creds;
 }
 

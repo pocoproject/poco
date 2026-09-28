@@ -54,7 +54,7 @@ public:
 	~SocketFactory();
 		/// Destroys the SocketFactory.
 
-	virtual Poco::Net::StreamSocket createSocket(const Poco::URI& uri);
+	[[nodiscard]] virtual Poco::Net::StreamSocket createSocket(const Poco::URI& uri);
 		/// Create and return a Poco::Net::StreamSocket (or subclass of it,
 		/// such as a Poco::Net::SecureStreamSocket), connected
 		/// to the address given by the authority part of the URI.

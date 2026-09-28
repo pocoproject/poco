@@ -46,8 +46,8 @@ public:
 		/// Destroys the PlainClientAuthenticator.
 
 	// ClientAuthenticator
-	std::string startAuthentication(Credentials& clientCredentials);
-	bool continueAuthentication(const Credentials& serverCredentials, Credentials& clientCredentials);
+	[[nodiscard]] std::string startAuthentication(Credentials& clientCredentials);
+	[[nodiscard]] bool continueAuthentication(const Credentials& serverCredentials, Credentials& clientCredentials);
 };
 
 

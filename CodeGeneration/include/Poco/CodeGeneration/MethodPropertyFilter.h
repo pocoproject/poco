@@ -89,17 +89,17 @@ public:
 
 	void variablesEnd();
 
-	const CodeGenerator::IncludeSet& includes() const;
+	[[nodiscard]] const CodeGenerator::IncludeSet& includes() const;
 
-	const CodeGenerator::IncludeSet& systemIncludes() const;
+	[[nodiscard]] const CodeGenerator::IncludeSet& systemIncludes() const;
 
-	const std::string& nameSpace() const;
+	[[nodiscard]] const std::string& nameSpace() const;
 
-	const std::string& libraryName() const;
+	[[nodiscard]] const std::string& libraryName() const;
 
-	bool usePocoIncludeStyle() const;
+	[[nodiscard]] bool usePocoIncludeStyle() const;
 
-	const std::string& copyright() const;
+	[[nodiscard]] const std::string& copyright() const;
 
 	void endFile();
 
@@ -108,7 +108,7 @@ public:
 	void writeUsing(const Poco::CppParser::TypeAlias* pType);
 
 private:
-	bool matches(const CodeGenerator::Properties& properties) const;
+	[[nodiscard]] bool matches(const CodeGenerator::Properties& properties) const;
 		/// Returns true if it is superset of the internal properties
 
 private:

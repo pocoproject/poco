@@ -41,10 +41,10 @@ public:
 	static void setSerializationOrder(SerializationOrder order);
 		/// Sets the serialization order for struct/class members.
 
-	static std::string generateClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static std::string generateClassName(const Poco::CppParser::Struct* pStruct);
 		/// Generates for a given class, its interface class name.
 
-	static std::string generateQualifiedClassName(const std::string& ns, const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static std::string generateQualifiedClassName(const std::string& ns, const Poco::CppParser::Struct* pStruct);
 		/// Generates for a given class, its interface class name.
 
 	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
@@ -55,14 +55,14 @@ public:
 
 	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e);
 
-	std::string newClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct);
 		/// generates the new class name based on the old one
 
-	std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
 
 	static void doElemAttrSplit(const VarGet& matches, OrderedVars& attrs, OrderedVars& elems);
 
-	static std::string getVariableName(VarGet::const_iterator it);
+	[[nodiscard]] static std::string getVariableName(VarGet::const_iterator it);
 
 	static void appendStaticVarName(const std::string& varName, std::string& result);
 
@@ -72,9 +72,9 @@ public:
 
 	static void matchVarsWithFunctionsRecursive(const Poco::CppParser::Struct* pDataType, VarGet& matches);
 
-	static std::string generateTypeSerializerLine(const Poco::CppParser::Struct* pContext, VarGet::const_iterator it, int namePos, const std::string& suffix);
+	[[nodiscard]] static std::string generateTypeSerializerLine(const Poco::CppParser::Struct* pContext, VarGet::const_iterator it, int namePos, const std::string& suffix);
 
-	static bool hasAttributes(const Poco::CppParser::Struct* pClass);
+	[[nodiscard]] static bool hasAttributes(const Poco::CppParser::Struct* pClass);
 		/// Returns true if the class or any parent has attributes!
 
 	void handleSuperClassCalls(const Poco::CppParser::Struct* pClass, void (SerializerGenerator::*generate)(const Poco::CppParser::Struct*, CodeGenerator&, const std::string&), bool dependsOnAttributes, CodeGenerator& gen);

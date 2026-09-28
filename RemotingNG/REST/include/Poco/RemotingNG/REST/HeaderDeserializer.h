@@ -45,7 +45,7 @@ public:
 
 protected:
 	// ScalarDeserializer
-	const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found);
+	[[nodiscard]] const std::string& deserializeData(const std::string& name, bool isMandatory, bool& found);
 
 private:
 	const Poco::Net::HTTPMessage& _message;

@@ -58,17 +58,17 @@ public:
 	void setAttribute(const std::string& name, const std::string& value);
 		/// Adds or modifies the attribute with the given name.
 		
-	const std::string& getAttribute(const std::string& name) const;
+	[[nodiscard]] const std::string& getAttribute(const std::string& name) const;
 		/// Returns the value of the attribute with the given name.
 		/// Throws a Poco::NotFoundException if no such attribute
 		/// exists.
 		
-	const std::string& getAttribute(const std::string& name, const std::string& deflt) const;
+	[[nodiscard]] const std::string& getAttribute(const std::string& name, const std::string& deflt) const;
 		/// Returns the value of the attribute with the given name,
 		/// or the given default value if no such attribute
 		/// exists.
 	
-	bool hasAttribute(const std::string& name) const;
+	[[nodiscard]] bool hasAttribute(const std::string& name) const;
 		/// Returns true iff an attribute with the given name exists.
 		
 	void removeAttribute(const std::string& name);
@@ -76,10 +76,10 @@ public:
 
 		/// Does nothing if no attribute with the given name exists.
 		
-	std::size_t countAttributes() const;
+	[[nodiscard]] std::size_t countAttributes() const;
 		/// Returns the number of attributes.
 		
-	std::vector<std::string> enumerateAttributes() const;
+	[[nodiscard]] std::vector<std::string> enumerateAttributes() const;
 		/// Returns a vector containing all attribute names.
 		
 	void clearAttributes();

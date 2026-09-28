@@ -80,18 +80,18 @@ public:
 		///
 		/// Throws an exception if the property stack is empty or does not exist.
 
-	const std::string& getProperty(const std::string& name) const;
+	[[nodiscard]] const std::string& getProperty(const std::string& name) const;
 		/// Gets the property with the given name from its stack.
 		///
 		/// Throws an exception if the stack is empty.
 
-	const std::string& getProperty(const std::string& name, const std::string& deflt) const;
+	[[nodiscard]] const std::string& getProperty(const std::string& name, const std::string& deflt) const;
 		/// Gets the property with the given name from its stack. Returns the default value if the stack is empty.
 		///
 		/// Warning: Since this method may return a const reference to the default value, the
 		/// caller must make sure not to pass a temporary object as default value.
 
-	bool hasProperty(const std::string& name) const;
+	[[nodiscard]] bool hasProperty(const std::string& name) const;
 		/// Returns true if a property with the given name exists.
 
 	void reset();

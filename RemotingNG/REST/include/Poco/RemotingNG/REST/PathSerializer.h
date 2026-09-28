@@ -44,7 +44,7 @@ public:
 		/// Writes the complete path to the request.
 	
 protected:
-	const std::string& replaceItem(const std::string& item);
+	[[nodiscard]] const std::string& replaceItem(const std::string& item);
 		/// Replaces the path item with a parameter if it's a placeholder.
 		
 	// ScalarSerializer

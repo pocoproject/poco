@@ -31,10 +31,10 @@ public:
 	~EventSubscriberGenerator();
 		/// Destroys the EventSubscriberGenerator.
 
-	static std::string generateClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static std::string generateClassName(const Poco::CppParser::Struct* pStruct);
 		/// Generates for a given class, its interface class name.
 
-	static std::string generateQualifiedClassName(const std::string& ns, const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static std::string generateQualifiedClassName(const std::string& ns, const Poco::CppParser::Struct* pStruct);
 		/// Generates for a given class, its interface class name.
 
 	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
@@ -47,10 +47,10 @@ public:
 
 	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e);
 
-	std::string newClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct);
 		/// generates the new class name based on the old one
 
-	std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
 
 private:
 	void checkForEventMembers(const Poco::CppParser::Struct* pStruct, std::vector<const Poco::CppParser::Function*>& eventFunctions, const CodeGenerator::Properties& properties);
@@ -60,8 +60,8 @@ private:
 
 	void generateEventFunction(const Poco::CppParser::Function* pFunc, const CodeGenerator::Properties& properties);
 
-	const Poco::CppParser::Function* getCurrentFct() const;
-	bool currentFctHasOneWayProperty() const;
+	[[nodiscard]] const Poco::CppParser::Function* getCurrentFct() const;
+	[[nodiscard]] bool currentFctHasOneWayProperty() const;
 
 	static void constructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam);
 	static void invokeCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam);

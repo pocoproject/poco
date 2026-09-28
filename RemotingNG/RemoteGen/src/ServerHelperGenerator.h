@@ -29,10 +29,10 @@ public:
 	~ServerHelperGenerator();
 		/// Destroys the ServerHelperGenerator.
 
-	static std::string generateClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static std::string generateClassName(const Poco::CppParser::Struct* pStruct);
 		/// Generates for a given class, its interface class name.
 
-	static std::string generateQualifiedClassName(const std::string& ns, const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] static std::string generateQualifiedClassName(const std::string& ns, const Poco::CppParser::Struct* pStruct);
 		/// Generates for a given class, its interface class name.
 
 	void structStart(const Poco::CppParser::Struct* pStruct, const CodeGenerator::Properties& properties);
@@ -43,13 +43,13 @@ public:
 
 	void registerCallbacks(Poco::CodeGeneration::GeneratorEngine& e);
 
-	std::string newClassName(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::string newClassName(const Poco::CppParser::Struct* pStruct);
 		/// generates the new class name based on the old one
 
-	std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] std::vector<std::string> newBaseClasses(const Poco::CppParser::Struct* pStruct);
 
 private:
-	bool hasEvents(const Poco::CppParser::Struct* pStruct);
+	[[nodiscard]] bool hasEvents(const Poco::CppParser::Struct* pStruct);
 	static void constructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam);
 	static void destructorCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam);
 	static void registerSkeletonCodeGen(const Poco::CppParser::Function* pFunc, const Poco::CppParser::Struct* pStruct, CodeGenerator& gen, void* addParam);

@@ -42,7 +42,7 @@ public:
 	~JSONDeserializer();
 		/// Destroys the JSONDeserializer.
 
-	void deserializeError(const std::string& reason, int status);
+	[[noreturn]] void deserializeError(const std::string& reason, int status);
 
 	// Poco::RemotingNG::Deserializer
 	Poco::RemotingNG::SerializerBase::MessageType findMessage(std::string& name);
@@ -84,7 +84,7 @@ private:
 	JSONDeserializer(const JSONDeserializer&);
 	JSONDeserializer& operator = (const JSONDeserializer&);
 
-	JSValue::Ptr findValue(const std::string& name, bool isMandatory, bool& found);
+	[[nodiscard]] JSValue::Ptr findValue(const std::string& name, bool isMandatory, bool& found);
 
 private:
 	std::vector<JSValue::Ptr> _objectStack;

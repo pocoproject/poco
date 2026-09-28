@@ -45,11 +45,11 @@ public:
 	~CredentialsStore();
 		/// Destroys the CredentialsStore.
 
-	Poco::UInt64 addCredentials(const Credentials& creds);
+	[[nodiscard]] Poco::UInt64 addCredentials(const Credentials& creds);
 		/// Adds the credentials and return a new authentication
 		/// token representing them.
 
-	const Credentials& getCredentials(Poco::UInt64 authToken) const;
+	[[nodiscard]] const Credentials& getCredentials(Poco::UInt64 authToken) const;
 		/// Returns the Credentials identified by the given
 		/// authentication token.
 		///
@@ -57,7 +57,7 @@ public:
 		/// are associated with the given authentication token.
 
 protected:
-	Poco::UInt64 generateAuthToken();
+	[[nodiscard]] Poco::UInt64 generateAuthToken();
 
 private:
 	Poco::Random _random;

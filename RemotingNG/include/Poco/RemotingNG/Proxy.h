@@ -52,10 +52,10 @@ public:
 	void remoting__disconnect();
 		/// Disconnects the Proxy from the endpoint.
 
-	bool remoting__isConnected() const;
+	[[nodiscard]] bool remoting__isConnected() const;
 		/// Returns true if the proxy is connected to an endpoint, false otherwise.
 
-	Transport& remoting__transport() const;
+	[[nodiscard]] Transport& remoting__transport() const;
 		/// Returns the Transport used for the connection to the endpoint.
 		///
 		/// Throws an exception if the Proxy is not connected to an endpoint.
@@ -64,12 +64,12 @@ public:
 		/// Sets the URI to be used for sending event subscription and
 		/// unsubscription requests.
 		
-	const Poco::URI& remoting__getEventURI() const;
+	[[nodiscard]] const Poco::URI& remoting__getEventURI() const;
 		/// Returns the URI to be used for sending event subscription and
 		/// unsubscription requests.
 
 protected:
-	Poco::FastMutex& remoting__mutex() const;
+	[[nodiscard]] Poco::FastMutex& remoting__mutex() const;
 		/// Returns the Proxy's internal mutex.
 
 private:

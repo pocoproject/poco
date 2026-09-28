@@ -85,7 +85,7 @@ public:
 	~Transport();
 		/// Destroys the Transport.
 
-	Poco::Timespan getTimeout() const;
+	[[nodiscard]] Poco::Timespan getTimeout() const;
 		/// Returns the HTTP timeout.
 		///
 		/// The Transport must be connected, otherwise a Poco::IllegalStateException
@@ -97,7 +97,7 @@ public:
 		/// The Transport must be connected, otherwise a Poco::IllegalStateException
 		/// will be thrown.
 
-	bool isKeepAliveEnabled() const;
+	[[nodiscard]] bool isKeepAliveEnabled() const;
 		/// Returns true iff HTTP/1.1 persistent connections are enabled.
 		///
 		/// The Transport must be connected, otherwise a Poco::IllegalStateException
@@ -109,7 +109,7 @@ public:
 		/// The Transport must be connected, otherwise a Poco::IllegalStateException
 		/// will be thrown.
 
-	Poco::Timespan getKeepAliveTimeout() const;
+	[[nodiscard]] Poco::Timespan getKeepAliveTimeout() const;
 		/// Returns the timeout for HTTP/1.1 persistent connections.
 		///
 		/// The Transport must be connected, otherwise a Poco::IllegalStateException
@@ -121,7 +121,7 @@ public:
 		/// The Transport must be connected, otherwise a Poco::IllegalStateException
 		/// will be thrown.
 
-	bool isChunkedTransferEncodingEnabled() const;
+	[[nodiscard]] bool isChunkedTransferEncodingEnabled() const;
 		/// Returns true iff chunked transfer encoding is enabled,
 		/// which is the default unless enableChunkedTransferEncoding(false) has
 		/// been called.
@@ -135,7 +135,7 @@ public:
 		/// Regardless of this setting, chunked transfer encoding is always supported
 		/// for responses sent by the server.
 
-	bool isCompressionEnabled() const;
+	[[nodiscard]] bool isCompressionEnabled() const;
 		/// Returns true iff HTTP compression (GZIP) is enabled for requests.
 		/// Default is disabled.
 
@@ -150,7 +150,7 @@ public:
 		/// Regardless of this setting, server responses can always be compressed
 		/// using GZIP Content-Encoding.
 
-	bool isMTOMEnabled() const;
+	[[nodiscard]] bool isMTOMEnabled() const;
 		/// Returns true if MTOM (Message Transport Optimization Mechanism)
 		/// is enabled for requests.
 
@@ -171,7 +171,7 @@ public:
 		/// Please note that for AUTH_DIGEST or AUTH_ANY, chunked
 		/// transfer encoding must be disabled.
 
-	AuthMode getAuthentication() const;
+	[[nodiscard]] AuthMode getAuthentication() const;
 		/// Returns the authentication mode.
 
 	void setCredentials(const Credentials& creds);
@@ -181,11 +181,12 @@ public:
 		/// (Credentials::ATTR_USERNAME, "n") and a password
 		/// (Credentials::ATTR_PASSWORD, "p") attribute.
 
-	Credentials getCredentials() const;
+	[[nodiscard]] Credentials getCredentials() const;
 		/// Returns the credentials, containing username and password
 		/// attributes.
 
 	//@ deprecated
+	POCO_DEPRECATED("use setCredentials() instead")
 	void setUsername(const std::string& username);
 		/// Sets the username for HTTP authentication.
 		///
@@ -193,6 +194,7 @@ public:
 		/// Code should be changed to use setCredentials() instead.
 
 	//@ deprecated
+	[[nodiscard]] POCO_DEPRECATED("use getCredentials() instead")
 	const std::string& getUsername() const;
 		/// Returns the username for HTTP authentication.
 		///
@@ -200,6 +202,7 @@ public:
 		/// Code should be changed to use getCredentials() instead.
 
 	//@ deprecated
+	POCO_DEPRECATED("use setCredentials() instead")
 	void setPassword(const std::string& password);
 		/// Sets the password for HTTP authentication.
 		///
@@ -207,13 +210,14 @@ public:
 		/// Code should be changed to use setCredentials() instead.
 
 	//@ deprecated
+	[[nodiscard]] POCO_DEPRECATED("use getCredentials() instead")
 	const std::string& getPassword() const;
 		/// Returns the password for HTTP authentication.
 		///
 		/// This method is deprecated and may be removed in a future version.
 		/// Code should be changed to use getCredentials() instead.
 
-	const std::string& getUserAgent() const;
+	[[nodiscard]] const std::string& getUserAgent() const;
 		/// Returns the value of the User-Agent header sent with SOAP HTTP
 		/// requests, or an empty string if no User-Agent value has been set.
 
@@ -228,10 +232,10 @@ public:
 	void removeCustomHeader(const std::string& name);
 		/// Removes a custom HTTP header previously added with setCustomHeader().
 
-	bool hasCustomHeader(const std::string& name) const;
+	[[nodiscard]] bool hasCustomHeader(const std::string& name) const;
 		/// Returns true if a custom HTTP header with the given name has been set.
 
-	const std::string& getCustomHeader(const std::string& name) const;
+	[[nodiscard]] const std::string& getCustomHeader(const std::string& name) const;
 		/// Returns the value of the custom HTTP header with the given name.
 		///
 		/// Throws a Poco::NotFoundException if the custom header with the 
@@ -240,10 +244,10 @@ public:
 	void setProxyConfig(const Poco::Net::ProxyConfig& proxyConfig);
 		/// Sets the proxy configuration.
 
-	const Poco::Net::ProxyConfig& getProxyConfig() const;
+	[[nodiscard]] const Poco::Net::ProxyConfig& getProxyConfig() const;
 		/// Returns the proxy configuration.
 
-	CookieStore::Ptr getCookieStore() const;
+	[[nodiscard]] CookieStore::Ptr getCookieStore() const;
 		/// Returns the CookieStore.
 
 	void setCookieStore(CookieStore::Ptr pCookieStore);
@@ -253,7 +257,7 @@ public:
 		/// Sets the options for SOAP/XML serialization. See the Serializer class
 		/// for supported option flags.
 
-	int getSerializerOptions() const;
+	[[nodiscard]] int getSerializerOptions() const;
 		/// Returns the specified serializer options.
 
 	void addRequestHeaderInterceptor(RequestHeaderInterceptor::Ptr pInterceptor);
@@ -268,15 +272,15 @@ public:
 	void removeResponseHeaderInterceptor(ResponseHeaderInterceptor::Ptr pInterceptor);
 		/// Removes a header interceptor from the response deserializer.
 
-	static Poco::Net::HTTPSessionFactory& httpSessionFactory();
+	[[nodiscard]] static Poco::Net::HTTPSessionFactory& httpSessionFactory();
 		/// Returns the Poco::Net::HTTPSessionFactory instance used by
 		/// the transport.
 
 	// Poco::RemotingNG::Transport
-	const std::string& endPoint() const;
+	[[nodiscard]] const std::string& endPoint() const;
 	void connect(const std::string& endPoint);
 	void disconnect();
-	bool connected() const;
+	[[nodiscard]] bool connected() const;
 	Poco::RemotingNG::Serializer& beginMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType);
 	void sendMessage(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType);
 	Poco::RemotingNG::Serializer& beginRequest(const Poco::RemotingNG::Identifiable::ObjectId& oid, const Poco::RemotingNG::Identifiable::TypeId& tid, const std::string& messageName, Poco::RemotingNG::SerializerBase::MessageType messageType);
@@ -284,8 +288,8 @@ public:
 	void endRequest();
 
 protected:
-	const Poco::Net::HTTPClientSession& requireSession() const;
-	Poco::Net::HTTPClientSession& requireSession();
+	[[nodiscard]] const Poco::Net::HTTPClientSession& requireSession() const;
+	[[nodiscard]] Poco::Net::HTTPClientSession& requireSession();
 	void prepareRequest(Poco::Net::HTTPRequest& request, const std::string& messageName);
 
 	static const std::string SOAPACTION;

@@ -44,33 +44,33 @@ public:
 	SOAPFaultException& operator = (const SOAPFaultException& exc);
 		/// Assignment operator.
 
-	const char* name() const noexcept;
+	[[nodiscard]] const char* name() const noexcept;
 		/// Returns a static string describing the exception.
 
-	const char* className() const noexcept;
+	[[nodiscard]] const char* className() const noexcept;
 		/// Returns the name of the exception class.
 
-	Poco::Exception* clone() const;
+	[[nodiscard]] Poco::Exception* clone() const;
 		/// Creates an exact copy of the exception.
 
-	void rethrow() const;
+	[[noreturn]] void rethrow() const;
 		/// (Re)Throws the exception.
 
-	const XMLElement& fault() const;
+	[[nodiscard]] const XMLElement& fault() const;
 		/// Returns the SOAP Fault element.
 
-	const std::string& namespaceURI() const;
+	[[nodiscard]] const std::string& namespaceURI() const;
 		/// Returns the namespace URI of the SOAP Fault element.
 		/// This can be used to distinguish between a SOAP 1.1
 		/// and 1.2 message.
 
-	std::string faultCode() const;
+	[[nodiscard]] std::string faultCode() const;
 		/// Returns the value of the "faultcode" (SOAP 1.1) or "Fault/Code/Value" (SOAP 1.2) element.
 
-	std::string faultReason() const;
+	[[nodiscard]] std::string faultReason() const;
 		/// Returns the value of the "faultstring" (SOAP 1.1) or "Fault/Reason/Text" (SOAP 1.2) element.
 
-	const XMLElement* faultDetail() const;
+	[[nodiscard]] const XMLElement* faultDetail() const;
 		/// Returns a pointer to the "detail" (SOAP 1.1) or "Detail" (SOAP 1.2) element
 		/// if it exists, otherwise nullptr.
 

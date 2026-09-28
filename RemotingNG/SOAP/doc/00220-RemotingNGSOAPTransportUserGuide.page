@@ -161,15 +161,19 @@ for a proxy object, first obtain the Transport object as shown in the previous s
 HTTP Basic Authentication can then be enabled with:
 
     trans.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_BASIC);
-    trans.setUsername("user");
-    trans.setPassword("s3cr3t");
+    Poco::RemotingNG::Credentials creds;
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+    trans.setCredentials(creds);
 ----
 
 To enable HTTP Digest Authentication:
 
     trans.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_DIGEST);
-    trans.setUsername("user");
-    trans.setPassword("s3cr3t");
+    Poco::RemotingNG::Credentials creds;
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+    trans.setCredentials(creds);
     trans.enableChunkedTransferEncoding(false);
 ----
 
@@ -180,8 +184,10 @@ It is also possible to enable both Basic and Digest authentication and use whate
 the server requests:
 
     trans.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_ANY);
-    trans.setUsername("user");
-    trans.setPassword("s3cr3t");
+    Poco::RemotingNG::Credentials creds;
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+    trans.setCredentials(creds);
     trans.enableChunkedTransferEncoding(false);
 ----
 
@@ -195,8 +201,10 @@ authentication mode to `AUTH_WSSE_TEXT` (password is transmitted in plaintext)
 or `AUTH_WSSE_DIGEST` (password is transmitted as digest, along with nonce and timestamp).
 
     trans.setAuthentication(Poco::RemotingNG::SOAP::Transport::AUTH_WSSE_DIGEST);
-    trans.setUsername("user");
-    trans.setPassword("s3cr3t");
+    Poco::RemotingNG::Credentials creds;
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_USERNAME, "user");
+    creds.setAttribute(Poco::RemotingNG::Credentials::ATTR_PASSWORD, "s3cr3t");
+    trans.setCredentials(creds);
 ----
 
 This will add a `Security` element to the request's SOAP envelope header,

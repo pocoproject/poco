@@ -53,14 +53,14 @@ public:
 	virtual void stop() = 0;
 		/// Stop accepting requests.
 
-	virtual const std::string& protocol() const = 0;
+	[[nodiscard]] virtual const std::string& protocol() const = 0;
 		/// Returns the ID of the Transport for which this Listener
 		/// handles requests.
 
-	const std::string& endPoint() const;
+	[[nodiscard]] const std::string& endPoint() const;
 		/// Returns the local endpoint of the Listener, as given in the constructor.
 
-	virtual std::string createURI(const Identifiable::TypeId& typeId, const Identifiable::ObjectId& objectId) = 0;
+	[[nodiscard]] virtual std::string createURI(const Identifiable::TypeId& typeId, const Identifiable::ObjectId& objectId) = 0;
 		/// Create an URI for accessing the object with the given TypeId and ObjectId through
 		/// the Listener.
 		///
@@ -68,7 +68,7 @@ public:
 		/// chosen by the Listener; however the URI path must be in format
 		/// /<protocol>/<typeId>/<objectId>.
 
-	virtual bool handlesURI(const std::string& uri) = 0;
+	[[nodiscard]] virtual bool handlesURI(const std::string& uri) = 0;
 		/// Check whether the given URI can be handled by this Listener instance.
 		///
 		/// This is used by the ORB to check whether a given remote service
@@ -113,7 +113,7 @@ public:
 		/// Can be overridden by subclasses, but overriders should
 		/// call the base class implementation.
 		
-	Authenticator::Ptr getAuthenticator() const;
+	[[nodiscard]] Authenticator::Ptr getAuthenticator() const;
 		/// Returns the Authenticator instance for this Listener.
 
 	virtual void setAuthorizer(Authorizer::Ptr pAuthorizer);
@@ -126,7 +126,7 @@ public:
 		/// Can be overridden by subclasses, but overriders should
 		/// call the base class implementation.
 		
-	Authorizer::Ptr getAuthorizer() const;
+	[[nodiscard]] Authorizer::Ptr getAuthorizer() const;
 		/// Returns the Authorizer instance for this Listener.
 
 private:

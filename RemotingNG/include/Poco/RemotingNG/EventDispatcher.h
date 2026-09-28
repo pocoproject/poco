@@ -101,17 +101,17 @@ public:
 	void removeEventFilter(const std::string& subscriberURI, const std::string& event);
 		/// Removes the event filter for the given subscriber and event.
 
-	const std::string& protocol() const;
+	[[nodiscard]] const std::string& protocol() const;
 		/// Returns the protocol to be used for delivering
 		/// event messages to subscribers.
 
-	AttributedObject& attributes(const std::string& subscriberURI);
+	[[nodiscard]] AttributedObject& attributes(const std::string& subscriberURI);
 		/// Returns the attributes for the subscriber identified
 		/// by the given URI. The attributes are stored in the
 		/// Transport object.
 		
 protected:	
-	Transport& transportForSubscriber(const std::string& subscriberURI);
+	[[nodiscard]] Transport& transportForSubscriber(const std::string& subscriberURI);
 		/// Returns the Transport object for communicating
 		/// with the remote EventSubscriber identified by the 
 		/// given URI.
@@ -126,7 +126,7 @@ protected:
 	using FilterMap = std::map<std::string, Poco::Any>;
 	
 	template <typename T>
-	bool accept(const FilterMap& filters, const std::string& event, const T& value)
+	[[nodiscard]] bool accept(const FilterMap& filters, const std::string& event, const T& value)
 	{
 		FilterMap::const_iterator it = filters.find(event);
 		if (it != filters.end())
