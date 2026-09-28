@@ -16,9 +16,7 @@
 #include "Poco/XSD/Types/Type.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 OrderContent::OrderContent():
@@ -38,9 +36,7 @@ OrderContent::OrderContent(const std::string& id, Poco::UInt32 minOcc, Poco::UIn
 }
 
 
-OrderContent::~OrderContent()
-{
-}
+OrderContent::~OrderContent() = default;
 
 
 const std::vector<const Type*>& OrderContent::types() const
@@ -49,4 +45,4 @@ const std::vector<const Type*>& OrderContent::types() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

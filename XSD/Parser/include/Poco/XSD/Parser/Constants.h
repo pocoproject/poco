@@ -21,15 +21,15 @@
 #include "Poco/XSD/Parser/XSDParser.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Parser {
+namespace Poco::XSD::Parser {
 
 
 class XSDParser_API	Constants
 	/// Constants used by the parser.
 {
 public:
+	Constants() = delete;
+
 	static const std::string XSD_NAMESPACE_URI;
 	static const std::string XSD_ALL;
 	static const std::string XSD_ANNOTATION;
@@ -131,7 +131,7 @@ public:
 
 	// Other
 	static const std::string XSD_COLON;
-	static const char        XSD_COLONCHAR;
+	static constexpr char    XSD_COLONCHAR = ':';
 	static const std::string XSD_EMPTY_STRING;
 	static const std::string XSD_DOUBLEHASH_ANY;
 	static const std::string XSD_SIMPLEEXTENSION;
@@ -183,16 +183,10 @@ public:
 	// WS-Addressing
 	static const std::string WSA_NAMESPACE_URI;
 	static const std::string WSA_ACTION;
-
-private:
-	Constants();
-	~Constants();
-	Constants(const Constants&);
-	Constants& operator=(const Constants&);
 };
 
 
-} } } // namespace Poco::XSD::Parser
+} // namespace Poco::XSD::Parser
 
 
 #endif // XSDParser_Constants_INCLUDED

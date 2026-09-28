@@ -28,15 +28,15 @@
 #include <map>
 
 
-namespace Poco {
-namespace XSD {
-namespace Parser {
+namespace Poco::XSD::Parser {
 
 
-class XSDParser_API Utility
+class Utility
 	/// Utility class, used to extract attribute values.
 {
 public:
+	Utility() = delete;
+
 	static bool getQualified(const CompactAttributes::const_iterator& itEnd, const CompactAttributes::const_iterator& itAttr, bool defaultValue);
 
 	static void getBlock(const CompactAttributes::const_iterator& itEnd, const CompactAttributes::const_iterator& itAttr, bool& blockRestriction, bool& blockExtension, bool& blockSubstitution);
@@ -67,12 +67,6 @@ public:
 	static Poco::XSD::Types::AnyAttribute::ProcessStyle getAnyAttrProcessStyle(const CompactAttributes::const_iterator& itEnd, const CompactAttributes::const_iterator& itAttr);
 
 	static Poco::XSD::Types::AbstractAttribute::Usage getAttrUsage(const CompactAttributes::const_iterator& itEnd, const CompactAttributes::const_iterator& itAttr, Poco::XSD::Types::AbstractAttribute::Usage def);
-
-private:
-	Utility();
-	Utility(const Utility&);
-	Utility& operator=(const Utility&);
-	~Utility();
 };
 
 
@@ -115,7 +109,7 @@ inline const std::string& Utility::getString(const CompactAttributes::const_iter
 }
 
 
-} } } // namespace Poco::XSD::Parser
+} // namespace Poco::XSD::Parser
 
 
 #endif // XSDParser_Utility_INCLUDED

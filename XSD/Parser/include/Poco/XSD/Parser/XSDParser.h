@@ -60,15 +60,13 @@
 #endif
 
 
-namespace Poco {
-namespace XSD {
-namespace Parser {
+namespace Poco::XSD::Parser {
 
 
 using CompactAttributes = std::map<std::string, std::string>; // maps attrname to value
 
 
-} } } // namespace Poco::XSD::Parser
+} // namespace Poco::XSD::Parser
 
 
 #endif // XSDParser_XSDParser_INCLUDED

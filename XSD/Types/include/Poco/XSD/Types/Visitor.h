@@ -21,9 +21,7 @@
 #include "Poco/XSD/Types/XSDTypes.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class All;
@@ -176,7 +174,7 @@ public:
 };
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_Visitor_INCLUDED

@@ -19,9 +19,7 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 List::List(const std::string& id):
@@ -32,9 +30,7 @@ List::List(const std::string& id):
 }
 
 
-List::~List()
-{
-}
+List::~List() = default;
 
 
 void List::fixup()
@@ -60,4 +56,4 @@ void List::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

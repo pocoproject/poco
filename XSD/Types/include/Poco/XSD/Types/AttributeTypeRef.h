@@ -23,9 +23,7 @@
 #include "Poco/XSD/Types/QName.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API AttributeTypeRef: public AbstractAttribute
@@ -44,18 +42,18 @@ public:
 		AbstractAttribute::Usage use = AbstractAttribute::USE_OPTIONAL);
 		/// Creates the AttributeTypeRef.
 
-	virtual ~AttributeTypeRef();
+	~AttributeTypeRef() override;
 		/// Destroys the AttributeTypeRef.
 
 	// AbstractAttribute
-	const std::string& nameSpace() const;
-	const std::string& defaultValue() const;
-	const std::string& fixedValue() const;
-	bool qualifiedForm() const;
-	const SimpleType* type() const;
-	void fixup();
-	AbstractAttribute::Usage usage() const;
-	void accept(Visitor& v) const;
+	[[nodiscard]] const std::string& nameSpace() const override;
+	[[nodiscard]] const std::string& defaultValue() const override;
+	[[nodiscard]] const std::string& fixedValue() const override;
+	[[nodiscard]] bool qualifiedForm() const override;
+	[[nodiscard]] const SimpleType* type() const override;
+	void fixup() override;
+	[[nodiscard]] AbstractAttribute::Usage usage() const override;
+	void accept(Visitor& v) const override;
 
 private:
 	AttributeTypeRef(const std::string& id, 
@@ -80,7 +78,7 @@ private:
 };
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_Attribute_INCLUDED

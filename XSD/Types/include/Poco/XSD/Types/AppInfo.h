@@ -22,9 +22,7 @@
 #include "Poco/XSD/Types/AnnotationContent.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API AppInfo: public AnnotationContent
@@ -51,19 +49,19 @@ class XSDTypes_API AppInfo: public AnnotationContent
 	///    </xsd:annotation>
 {
 public:
-	AppInfo(const std::string& sourceUri);
+	explicit AppInfo(const std::string& sourceUri);
 		/// Creates the AppInfo.
 
-	virtual ~AppInfo();
+	~AppInfo() override;
 		/// Destroys the AppInfo.
 
-	void accept(Visitor& v) const;
+	void accept(Visitor& v) const override;
 
 private:
 };
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_AppInfo_INCLUDED

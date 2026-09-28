@@ -50,47 +50,45 @@ public:
 
 	Variable(const std::string& name, const TypeInfo& type, Utility::Access acc, int order, Modifiers t, bool optional, bool isNillable);
 
-	virtual ~Variable();
-
-	bool isOptional() const;
+	[[nodiscard]] bool isOptional() const;
 		/// Returns if the variable is optional or mandatory.
 		
-	bool isNillable() const;
+	[[nodiscard]] bool isNillable() const;
 		/// Returns true if the variable is nillable.
 
 	void setOptional(bool val);
 	
 	void setNillable(bool vale);
 
-	bool isConst() const;
+	[[nodiscard]] bool isConst() const;
 
-	bool isRef() const;
+	[[nodiscard]] bool isRef() const;
 
-	bool isRVRef() const;
+	[[nodiscard]] bool isRVRef() const;
 
-	bool isPointer() const;
+	[[nodiscard]] bool isPointer() const;
 
-	bool isPointerPointer() const;
+	[[nodiscard]] bool isPointerPointer() const;
 
-	bool isVector() const;
+	[[nodiscard]] bool isVector() const;
 
 	void setModifiers(Variable::Modifiers mod);
 
-	Variable::Modifiers getModifiers() const;
+	[[nodiscard]] Variable::Modifiers getModifiers() const;
 
-	const std::string& getName() const;
+	[[nodiscard]] const std::string& getName() const;
 
 	void setName(const std::string& name);
 
-	const TypeInfo& getType() const;
+	[[nodiscard]] const TypeInfo& getType() const;
 
 	void setType(const TypeInfo& type);
 
-	int getOrder() const;
+	[[nodiscard]] int getOrder() const;
 
 	void setOrder(int order);
 
-	Utility::Access getAccess() const;
+	[[nodiscard]] Utility::Access getAccess() const;
 
 private:
 	std::string _name;

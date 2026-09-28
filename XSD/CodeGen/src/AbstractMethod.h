@@ -25,26 +25,24 @@ class AbstractMethod: public PropertyHolder
 public:
 	AbstractMethod(const std::string& name, Utility::Access acc, bool isConst, bool isStatic, bool isVirtual, bool isAbstract);
 
-	virtual ~AbstractMethod();
-
-	Utility::Access getAccess() const;
+	[[nodiscard]] Utility::Access getAccess() const;
 
 	void setAccess(Utility::Access acc);
 
-	Poco::SharedPtr<Parameter> getReturnParameter() const;
+	[[nodiscard]] Poco::SharedPtr<Parameter> getReturnParameter() const;
 		/// Returns the return parameter which can be null.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 
-	const std::map<int, Parameter>& getParameters() const;
+	[[nodiscard]] const std::map<int, Parameter>& getParameters() const;
 
-	bool isConst() const;
+	[[nodiscard]] bool isConst() const;
 
-	bool isStatic() const;
+	[[nodiscard]] bool isStatic() const;
 
-	bool isVirtual() const;
+	[[nodiscard]] bool isVirtual() const;
 
-	bool isAbstract() const;
+	[[nodiscard]] bool isAbstract() const;
 
 	void addCode(const std::string& line);
 		/// Adds a single code line, strips leading/trailing whitechars
@@ -58,10 +56,10 @@ public:
 	void addDocu(const std::vector<std::string>& line);
 		/// Adds several lines of documentation
 
-	const std::vector<std::string>& getDocu() const;
+	[[nodiscard]] const std::vector<std::string>& getDocu() const;
 		/// Returns the documentation
 
-	const std::vector<std::string>& getCode() const;
+	[[nodiscard]] const std::vector<std::string>& getCode() const;
 		/// Returns the code
 
 protected:

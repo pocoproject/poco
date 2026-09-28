@@ -23,9 +23,7 @@
 #include "Poco/XSD/Types/AttributeContent.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class Type;
@@ -41,24 +39,24 @@ public:
 	Content();
 		/// Creates the Content.
 
-	Content(const std::string& id);
+	explicit Content(const std::string& id);
 		/// Creates the Content.
 
-	virtual ~Content();
+	~Content() override;
 		/// Destroys the Content.
 
-	virtual const std::vector<const Type*>& types() const = 0;
+	[[nodiscard]] virtual const std::vector<const Type*>& types() const = 0;
 		/// Returns the type referenced by the content. Can be null.
 
 	virtual void fixup() = 0;
 		/// Resolves references to actual types.
 	
-	virtual OrderIterator iterator() const = 0;
+	[[nodiscard]] virtual OrderIterator iterator() const = 0;
 		/// Creates an iterator for the given order type.
 };
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_Content_INCLUDED

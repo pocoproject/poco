@@ -20,11 +20,6 @@ Constructor::Constructor(const ClassInfo& owner, Utility::Access acc):
 }
 
 
-Constructor::~Constructor()
-{
-}
-
-
 void Constructor::addInitializationCode(const std::string& line)
 {
 	std::string trimmed = Poco::trim(line);
@@ -36,10 +31,9 @@ void Constructor::addInitializationCode(const std::string& line)
 
 void Constructor::addInitializationCode(const std::vector<std::string>& lines)
 {
-	std::vector<std::string>::const_iterator it = lines.begin();
-	for (; it != lines.end(); ++it)
+	for (const auto& line: lines)
 	{
-		addCode(*it);
+		addCode(line);
 	}
 }
 

@@ -18,9 +18,7 @@
 #include "Poco/XSD/Types/XSDException.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 AttributeRef::AttributeRef(const std::string& id, const QName& ref):
@@ -42,9 +40,7 @@ AttributeRef::AttributeRef(const std::string& id, const QName& ref, const Abstra
 }
 
 
-AttributeRef::~AttributeRef()
-{
-}
+AttributeRef::~AttributeRef() = default;
 
 
 const std::string& AttributeRef::nameSpace() const
@@ -115,4 +111,4 @@ void AttributeRef::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

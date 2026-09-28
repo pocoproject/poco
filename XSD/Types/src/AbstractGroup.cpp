@@ -17,9 +17,7 @@
 #include "Poco/XSD/Types/Sequence.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 AbstractGroup::AbstractGroup(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc):
@@ -28,9 +26,7 @@ AbstractGroup::AbstractGroup(const std::string& id, Poco::UInt32 minOcc, Poco::U
 }
 
 
-AbstractGroup::~AbstractGroup()
-{
-}
+AbstractGroup::~AbstractGroup() = default;
 
 
 OrderIterator AbstractGroup::iterator() const
@@ -45,4 +41,4 @@ OrderIterator AbstractGroup::iterator() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

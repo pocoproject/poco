@@ -16,7 +16,7 @@ add_executable(XSDGen ${SRCS})
 
 target_link_libraries(XSDGen PRIVATE Poco::Foundation Poco::XML Poco::Util Poco::Net Poco::XSDTypes Poco::XSDParser)
 
-# HTTPS schema retrieval when a NetSSL library is part of the build
+# HTTPS schema retrieval
 if(TARGET Poco::NetSSL)
 	target_compile_definitions(XSDGen PRIVATE POCO_XSD_ENABLE_HTTPS)
 	target_link_libraries(XSDGen PRIVATE Poco::NetSSL)

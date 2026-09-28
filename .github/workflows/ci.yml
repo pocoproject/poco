@@ -947,10 +947,9 @@ jobs:
           # places runtime DLLs flat under $root\bin\, including OpenSSL
           # provider modules (legacy.dll, default.dll). If this ever diverges,
           # we want a hard fail, not a silent pick of a wrong copy.
-          # vcpkg's libxml2 default features pull in zlib and libiconv, so
-          # zlib1.dll and the iconv DLLs are also present in that bin
-          # directory; POCO links its bundled zlib statically, so nothing
-          # loads them.
+          # libxml2's default vcpkg features add zlib1.dll and the iconv DLLs to
+          # $root\bin; only libxml2.dll loads them (POCO links its bundled zlib),
+          # so they are not checked here.
           $providerDir = "$root\bin"
           $required = @(
             "$root\bin\libcrypto-3-x64.dll",

@@ -16,9 +16,7 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 Annotation::Annotation(const std::string& id):
@@ -28,9 +26,7 @@ Annotation::Annotation(const std::string& id):
 }
 
 
-Annotation::~Annotation()
-{
-}
+Annotation::~Annotation() = default;
 
 
 Annotation::Annotation(const Annotation& ann):
@@ -66,4 +62,4 @@ void Annotation::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

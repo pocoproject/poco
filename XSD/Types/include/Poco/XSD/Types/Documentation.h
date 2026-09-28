@@ -22,9 +22,7 @@
 #include "Poco/XSD/Types/AnnotationContent.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API Documentation: public AnnotationContent
@@ -34,13 +32,13 @@ public:
 	Documentation(const std::string& sourceUri, const std::string& lang);
 		/// Creates the Documentation.
 
-	virtual ~Documentation();
+	~Documentation() override;
 		/// Destroys the Documentation.
 
-	const std::string& language() const;
+	[[nodiscard]] const std::string& language() const;
 		/// The language of the documentation entry. Can be empty.
 
-	void accept(Visitor& v) const;
+	void accept(Visitor& v) const override;
 
 private:
 	std::string _language;
@@ -56,7 +54,7 @@ inline const std::string& Documentation::language() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_Documentation_INCLUDED

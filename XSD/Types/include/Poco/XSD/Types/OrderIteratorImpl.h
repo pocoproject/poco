@@ -25,9 +25,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API OrderIteratorImpl: public Poco::RefCountedObject
@@ -39,7 +37,7 @@ public:
 	OrderIteratorImpl();
 		/// Creates the OrderIteratorImpl.
 
-	virtual ~OrderIteratorImpl();
+	~OrderIteratorImpl() override;
 		/// Destroys the OrderIteratorImpl.
 
 	virtual OrderContent::Ptr next(const std::string& name) = 0;
@@ -47,19 +45,19 @@ public:
 		/// Will fail with an IllegalOrderException if name is not part of
 		/// the set returned by validNexts().
 
-	virtual const std::set<std::string>& validNexts() const = 0;
+	[[nodiscard]] virtual const std::set<std::string>& validNexts() const = 0;
 		/// Returns the valid names for the next call.
 
-	virtual bool end() const = 0;
+	[[nodiscard]] virtual bool end() const = 0;
 		/// Returns true if at end of iteration. 
 
-	virtual bool validNext(const std::string& name) const = 0;
+	[[nodiscard]] virtual bool validNext(const std::string& name) const = 0;
 		/// Returns true if the element with the given name is a valid next element.
 
-	virtual bool canClose() const = 0;
+	[[nodiscard]] virtual bool canClose() const = 0;
 		/// Checks if it is safe to close the iterator, i.e. minoccurs restriction are satisfied.
 
-	bool closed() const;
+	[[nodiscard]] bool closed() const;
 		/// Returns true if closed was called for this iterator.
 
 	void resetImpl();
@@ -78,7 +76,7 @@ protected:
 		/// and we want to detect that you are at the end of iteration (ie minoccurs restriction are satisified).
 
 private:
-	bool _closed;
+	bool _closed = false;
 };
 
 
@@ -105,7 +103,7 @@ inline void OrderIteratorImpl::closeImpl()
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_OrderIteratorImpl_INCLUDED

@@ -32,19 +32,17 @@ public:
 		const std::string& includeFile, 
 		const std::string& dllExportMacro);
 
-	~ClassInfo();
+	[[nodiscard]] const std::string& name() const;
 
-	const std::string& name() const;
-
-	const std::string& getNameSpace() const;
+	[[nodiscard]] const std::string& getNameSpace() const;
 	
-	const std::string& getSchemaNameSpace() const;
+	[[nodiscard]] const std::string& getSchemaNameSpace() const;
 
-	const std::string& getIncludeFile() const;
+	[[nodiscard]] const std::string& getIncludeFile() const;
 
-	bool isSystemInclude() const;
+	[[nodiscard]] bool isSystemInclude() const;
 
-	const TypeInfo& getTypeInfo() const;
+	[[nodiscard]] const TypeInfo& getTypeInfo() const;
 
 	void setIncludeFile(const std::string& incFile, bool isSystemInclude);
 
@@ -56,33 +54,33 @@ public:
 
 	void setDestructor(Utility::Access acc, bool isVirtual);
 
-	const std::map<int, Variable>& getVariables() const;
+	[[nodiscard]] const std::map<int, Variable>& getVariables() const;
 
-	const std::multimap<std::string, MethodInfo>& getMethods() const;
+	[[nodiscard]] const std::multimap<std::string, MethodInfo>& getMethods() const;
 
-	const std::vector<Constructor>& getConstructors() const;
+	[[nodiscard]] const std::vector<Constructor>& getConstructors() const;
 
-	std::vector<Constructor>& getConstructors();
+	[[nodiscard]] std::vector<Constructor>& getConstructors();
 
-	const Destructor& getDestructor() const;
+	[[nodiscard]] const Destructor& getDestructor() const;
 
-	Destructor& getDestructor();
+	[[nodiscard]] Destructor& getDestructor();
 
-	const std::string& getDllExportMacro() const;
+	[[nodiscard]] const std::string& getDllExportMacro() const;
 
 	void setParent(const TypeInfo& parent);
 
-	const TypeInfo& getParent() const;
+	[[nodiscard]] const TypeInfo& getParent() const;
 
 	void addSrcInclude(const std::string& file, bool isSystemInclude);
 
-	const std::set<std::string>& getSrcIncludes() const;
+	[[nodiscard]] const std::set<std::string>& getSrcIncludes() const;
 
-	const std::set<std::string>& getSrcSystemIncludes() const;
+	[[nodiscard]] const std::set<std::string>& getSrcSystemIncludes() const;
 
 	void addFwdDeclare(const std::string& className, const std::string& nameSpace, const std::string& include);
 
-	const std::set<std::string>& getForwardDeclarations() const;
+	[[nodiscard]] const std::set<std::string>& getForwardDeclarations() const;
 
 private:
 	std::map<int, Variable> _variables;
@@ -145,14 +143,14 @@ inline void ClassInfo::setIncludeFile(const std::string& incFile, bool isSystemI
 
 inline void ClassInfo::addVariable(const Variable& var)
 {
-	bool ok = _variables.insert(std::make_pair(var.getOrder(), var)).second;
+	bool ok = _variables.try_emplace(var.getOrder(), var).second;
 	poco_assert (ok);
 }
 
 
 inline void ClassInfo::addMethod(const MethodInfo& method)
 {
-	_methods.insert(std::make_pair(method.name(), method));
+	_methods.emplace(method.name(), method);
 }
 
 

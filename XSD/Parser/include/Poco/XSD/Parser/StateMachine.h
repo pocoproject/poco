@@ -26,9 +26,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace XSD {
-namespace Parser {
+namespace Poco::XSD::Parser {
 
 
 class XSDContentHandler;
@@ -117,8 +115,8 @@ public:
 		ST_INSIMPLETYPE,
 	};
 
-	typedef void (XSDContentHandler::*StartMethod)(const std::string&, const std::string&, const std::string&, const CompactAttributes&);
-	typedef void (XSDContentHandler::*EndMethod)(const std::string&, const std::string&, const std::string&);
+	using StartMethod = void (XSDContentHandler::*)(const std::string&, const std::string&, const std::string&, const CompactAttributes&);
+	using EndMethod = void (XSDContentHandler::*)(const std::string&, const std::string&, const std::string&);
 
 	using StateSet = std::set<std::string>;
 
@@ -127,13 +125,13 @@ public:
 		State       _state;
 		StartMethod _start;
 		EndMethod   _end;
-		bool        _containsAnySuccessor;
+		bool        _containsAnySuccessor = false;
 		StateSet    _successors;
 		
 		StateInfo();
 		StateInfo(State _state, StartMethod start, EndMethod end, const StateSet& successors);
-		bool isValidSuccessor(const std::string& uri, const std::string& localName) const;
-		bool containsAny() const;
+		[[nodiscard]] bool isValidSuccessor(const std::string& uri, const std::string& localName) const;
+		[[nodiscard]] bool containsAny() const;
 	};
 
 
@@ -151,9 +149,9 @@ public:
 	virtual ~StateMachine();
 		/// Destroys the StateMachine.
 
-	const StateMachine::StateInfo& stateInfo(StateMachine::State aState) const;
+	[[nodiscard]] const StateMachine::StateInfo& stateInfo(StateMachine::State aState) const;
 
-	StateMachine::State state(const std::string& uri, const std::string& elementName, StateMachine::State parent) const;
+	[[nodiscard]] StateMachine::State state(const std::string& uri, const std::string& elementName, StateMachine::State parent) const;
 		/// Returns the state for an xml element name.
 
 private:
@@ -264,7 +262,7 @@ inline bool StateMachine::StateInfo::containsAny() const
 }
 
 
-} } } // namespace Poco::XSD::Parser
+} // namespace Poco::XSD::Parser
 
 
 #endif // XSDParser_StateMachine_INCLUDED

@@ -18,22 +18,17 @@
 #include "Poco/XSD/Types/XSDException.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 AttributeGroupRef::AttributeGroupRef(const std::string& id, const QName& ref):
 	AbstractAttributeGroup(id, ref.name()),
-	_ref(ref),
-	_pGroup(nullptr)
+	_ref(ref)
 {
 }
 
 
-AttributeGroupRef::~AttributeGroupRef()
-{
-}
+AttributeGroupRef::~AttributeGroupRef() = default;
 
 
 const AbstractAttributeGroup::Attributes& AttributeGroupRef::getAttributes() const
@@ -77,4 +72,4 @@ void AttributeGroupRef::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

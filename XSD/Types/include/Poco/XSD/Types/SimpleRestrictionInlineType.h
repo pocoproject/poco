@@ -23,9 +23,7 @@
 #include "Poco/XSD/Types/QName.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class SimpleType;
@@ -34,40 +32,40 @@ class SimpleType;
 class XSDTypes_API SimpleRestrictionInlineType: public SimpleTypeInheritance
 {
 public:
-	SimpleRestrictionInlineType(const std::string& id);
+	explicit SimpleRestrictionInlineType(const std::string& id);
 		/// Creates the SimpleRestrictionInlineType.
 
-	virtual ~SimpleRestrictionInlineType();
+	~SimpleRestrictionInlineType() override;
 		/// Destroys the SimpleRestrictionInlineType.
 
 	void setType(AutoPtr<SimpleType> ptr);
-		/// the inline type definition for the restriction can be set here.
+		/// Sets the inline type definition of the restriction.
 		/// Throws a SchemaException if the inline type has already been set.
 
-	bool hasInlineType() const;
+	[[nodiscard]] bool hasInlineType() const;
 		/// Returns true if the inline type has been set.
 
-	const std::vector<const Type*>& types() const;
+	[[nodiscard]] const std::vector<const Type*>& types() const override;
 		/// Returns the type that we inherit from
 
-	void fixup();
+	void fixup() override;
 		/// Replaces type references with the referenced type object.
 		/// Throws a SchemaException if no inline type has been set.
 
-	bool isRestriction() const;
+	[[nodiscard]] bool isRestriction() const override;
 		/// True if we inherit by restriction
 
-	bool isList() const;
+	[[nodiscard]] bool isList() const override;
 		/// True if we inherit by list, thus returns false
 
-	bool isUnion() const;
+	[[nodiscard]] bool isUnion() const override;
 		/// True if we inherit by Union, thus returns false
 
-	void accept(Visitor& v) const;
+	void accept(Visitor& v) const override;
 
 private:
 	std::vector<const Type*> _baseType;
-	SimpleType* _pInlineType;
+	SimpleType* _pInlineType = nullptr;
 };
 
 
@@ -104,7 +102,7 @@ inline bool SimpleRestrictionInlineType::isUnion() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_SimpleRestrictionInlineType_INCLUDED

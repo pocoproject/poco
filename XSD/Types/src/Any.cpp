@@ -18,9 +18,7 @@
 #include "Poco/XSD/Types/OrderIterator.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 Any::Any(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc, const std::string& ns, ProcessStyle style):
@@ -31,9 +29,7 @@ Any::Any(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc, const 
 }
 
 
-Any::~Any()
-{
-}
+Any::~Any() = default;
 
 
 void Any::fixup()
@@ -53,4 +49,4 @@ OrderIterator Any::iterator() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

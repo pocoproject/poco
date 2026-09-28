@@ -19,9 +19,7 @@
 #include "Poco/XSD/Types/SimpleType.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 Attribute::Attribute(const std::string& id, 
@@ -42,9 +40,7 @@ Attribute::Attribute(const std::string& id,
 }
 
 
-Attribute::~Attribute()
-{
-}
+Attribute::~Attribute() = default;
 
 
 const std::string& Attribute::defaultValue() const
@@ -98,4 +94,4 @@ void Attribute::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

@@ -22,9 +22,7 @@
 #include "Poco/XSD/Types/AttributeContent.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class SimpleType;
@@ -46,34 +44,34 @@ public:
 	AbstractAttribute(const std::string& id, const std::string& name);
 		/// Creates the AbstractAttribute.
 
-	virtual ~AbstractAttribute();
+	~AbstractAttribute() override;
 		/// Destroys the AbstractAttribute.
 
-	virtual const std::string& defaultValue() const = 0;
+	[[nodiscard]] virtual const std::string& defaultValue() const = 0;
 		/// Returns the (optional) default value of the attribute. Empty if none is set.
 
-	virtual const std::string& fixedValue() const = 0;
+	[[nodiscard]] virtual const std::string& fixedValue() const = 0;
 		/// Returns the (optional) fixed value of the attribute. Empty if none is set.
 
-	bool hasDefault() const;
+	[[nodiscard]] bool hasDefault() const;
 		/// Returns true if the attribute contains a default value.
 
-	bool hasFixed() const;
+	[[nodiscard]] bool hasFixed() const;
 		/// Returns true if the attribute contains a fixed value.
 
-	virtual bool qualifiedForm() const = 0;
+	[[nodiscard]] virtual bool qualifiedForm() const = 0;
 		/// Returns true if the attribute must be used qualified.
 
-	virtual const SimpleType* type() const = 0;
+	[[nodiscard]] virtual const SimpleType* type() const = 0;
 		/// Returns the type the attribute uses.
 
-	virtual AbstractAttribute::Usage usage() const = 0;
+	[[nodiscard]] virtual AbstractAttribute::Usage usage() const = 0;
 		/// Returns the usage options for the Attribute.
 		
-	virtual const std::string& nameSpace() const = 0;
+	[[nodiscard]] virtual const std::string& nameSpace() const = 0;
 
 	// AttributeContent
-	bool isAny() const;
+	[[nodiscard]] bool isAny() const override;
 };
 
 
@@ -98,7 +96,7 @@ inline bool AbstractAttribute::hasFixed() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_AbstractAttribute_INCLUDED

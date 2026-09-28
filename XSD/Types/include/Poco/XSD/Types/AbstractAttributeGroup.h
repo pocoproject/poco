@@ -24,9 +24,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API AbstractAttributeGroup: public AttributeContent
@@ -39,16 +37,16 @@ public:
 	AbstractAttributeGroup(const std::string& id, const std::string& name);
 		/// Creates the AbstractAttributeGroup.
 
-	virtual ~AbstractAttributeGroup();
+	~AbstractAttributeGroup() override;
 		/// Destroys the AbstractAttributeGroup.
 
-	virtual const AbstractAttributeGroup::Attributes& getAttributes() const = 0;
+	[[nodiscard]] virtual const AbstractAttributeGroup::Attributes& getAttributes() const = 0;
 		/// Returns all the children.
 
-	virtual bool hasAnyAttribute() const = 0;
+	[[nodiscard]] virtual bool hasAnyAttribute() const = 0;
 		/// Returns true if the any attribute is set.
 
-	virtual AnyAttribute::Ptr getAny() const = 0;
+	[[nodiscard]] virtual AnyAttribute::Ptr getAny() const = 0;
 		/// Returns the any attribute
 
 	virtual void add(AttributeContent::Ptr ptr) = 0;
@@ -57,7 +55,7 @@ public:
 		/// Throws an exception if a child with that name already exists.
 
 	// AttributeContent
-	bool isAny() const;
+	[[nodiscard]] bool isAny() const override;
 };
 
 
@@ -70,7 +68,7 @@ inline bool AbstractAttributeGroup::isAny() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_AbstractAttributeGroup_INCLUDED

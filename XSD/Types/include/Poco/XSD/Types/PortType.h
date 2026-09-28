@@ -25,9 +25,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API PortType: public AnnotatedObject
@@ -42,35 +40,35 @@ public:
 	PortType();
 		/// Creates the PortType.
 
-	PortType(const std::string& name);
+	explicit PortType(const std::string& name);
 		/// Creates the PortType.
 
-	~PortType();
+	~PortType() override;
 		/// Destroys the PortType.
 
 	void setName(const std::string& name);
 		/// Sets the name.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns the name.
 		
 	void addOperation(Operation::Ptr pOperation);
 		/// Adds an Operation to the PortType.
 		
-	Operation::Ptr findOperation(const std::string& name) const;
+	[[nodiscard]] Operation::Ptr findOperation(const std::string& name) const;
 		/// Returns the Operation object with the given name, or
 		/// a null pointer if the operation does not exist.
 	
-	const Operations& operations() const;
+	[[nodiscard]] const Operations& operations() const;
 		/// Returns the Operations map.
 		
-	const BindingProperties& bindingProperties() const;
+	[[nodiscard]] const BindingProperties& bindingProperties() const;
 		/// Returns the binding properties.
 		
-	BindingProperties& bindingProperties();
+	[[nodiscard]] BindingProperties& bindingProperties();
 		/// Returns the binding properties.
 
-	void accept(Visitor& v) const;
+	void accept(Visitor& v) const override;
  		
 private:
 	std::string _name;
@@ -102,11 +100,10 @@ inline const PortType::Operations& PortType::operations() const
 
 inline Operation::Ptr PortType::findOperation(const std::string& name) const
 {
-	Operations::const_iterator it = _operations.find(name);
-	if (it != _operations.end())
+	if (const auto it = _operations.find(name); it != _operations.end())
 		return it->second;
 	else
-		return Operation::Ptr();
+		return {};
 }
 
 
@@ -122,7 +119,7 @@ inline BindingProperties& PortType::bindingProperties()
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_PortType_INCLUDED

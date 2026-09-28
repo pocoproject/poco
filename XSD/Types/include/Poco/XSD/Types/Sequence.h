@@ -23,9 +23,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API Sequence: public Order
@@ -38,20 +36,20 @@ public:
 	Sequence(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc);
 		/// Creates the Sequence.
 
-	virtual ~Sequence();
+	~Sequence() override;
 		/// Destroys the Sequence.
 
-	void add(OrderContent::Ptr pChild);
+	void add(OrderContent::Ptr pChild) override;
 		/// Adds a child to the end of the sequence
 
-	void accept(Visitor& v) const;
+	void accept(Visitor& v) const override;
 
-	const Sequence::Content& getContent() const;
+	[[nodiscard]] const Sequence::Content& getContent() const;
 		/// Returns all the children in the sequence
 
-	void fixup();
+	void fixup() override;
 
-	OrderIterator iterator() const;
+	[[nodiscard]] OrderIterator iterator() const override;
 
 private:
 	Sequence::Content _content;
@@ -67,7 +65,7 @@ inline const Sequence::Content& Sequence::getContent() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_Sequence_INCLUDED

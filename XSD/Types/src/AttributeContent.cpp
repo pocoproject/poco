@@ -15,9 +15,7 @@
 #include "Poco/XSD/Types/AttributeContent.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 AttributeContent::AttributeContent(const std::string& id, const std::string& name):
@@ -27,9 +25,7 @@ AttributeContent::AttributeContent(const std::string& id, const std::string& nam
 }
 
 
-AttributeContent::~AttributeContent()
-{
-}
+AttributeContent::~AttributeContent() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

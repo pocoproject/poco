@@ -25,8 +25,3 @@ Variable::Variable(const std::string& name, const TypeInfo& type, Utility::Acces
 		insert("xsdType", type.xsdType());
 	}
 }
-
-
-Variable::~Variable()
-{
-}

@@ -17,32 +17,26 @@
 #include "Poco/XSD/Types/OrderIterator.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 const std::vector<const Type*> Type::NOPARENTS;
 
 
 Type::Type():
-	_name(),
-	_pSchema(nullptr)
+	_name()
 {
 }
 
 
 Type::Type(const std::string& id, const std::string& name):
 	AnnotatedObject(id),
-	_name(name),
-	_pSchema(nullptr)
+	_name(name)
 {
 }
 
 
-Type::~Type()
-{
-}
+Type::~Type() = default;
 
 
 OrderIterator Type::iterator() const
@@ -56,13 +50,11 @@ OrderIterator Type::iterator() const
 void Type::iteratorRec(std::vector<OrderIterator>& seq) const
 {
 	const std::vector<const Type*> parent = parents();
-	std::vector<const Type*>::const_iterator it = parent.begin();
-	std::vector<const Type*>::const_iterator itEnd = parent.end();
-	for (; it != itEnd; ++it)
-		(*it)->iteratorRec(seq);
+	for (const auto& pParent: parent)
+		pParent->iteratorRec(seq);
 
 	createIterator(seq);
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

@@ -57,11 +57,6 @@ SchemaInfo::SchemaInfo(const std::string& id,
 }
 
 
-SchemaInfo::~SchemaInfo()
-{
-}
-
-
 std::string SchemaInfo::createInclude(const std::string& className) const
 {
  	Poco::Path incFile(_relativeInclude);

@@ -17,9 +17,7 @@
 #include "Poco/XSD/Parser/Constants.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Parser {
+namespace Poco::XSD::Parser {
 
 
 StateMachine::StateMachine():_stateInfos(128)
@@ -28,9 +26,7 @@ StateMachine::StateMachine():_stateInfos(128)
 }
 
 
-StateMachine::~StateMachine()
-{
-}
+StateMachine::~StateMachine() = default;
 
 
 void StateMachine::initialize()
@@ -138,8 +134,7 @@ StateMachine::State StateMachine::state(const std::string& uri, const std::strin
 	}
 	poco_assert_dbg (elementName != Constants::XSD_RESTRICTION);
 	poco_assert_dbg (elementName != Constants::XSD_EXTENSION);
-	StateMap::const_iterator it = _states.find(cat(uri, elementName));
-	if (it == _states.end())
+	if (const auto it = _states.find(cat(uri, elementName)); it == _states.end())
 		return ST_INUNINITIALIZED;
 	else 
 		return it->second;
@@ -152,7 +147,7 @@ void StateMachine::defineStateAll()
 
 	//Content: (annotation?, element*)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ALL), ST_INALL));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ALL), ST_INALL);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -169,7 +164,7 @@ void StateMachine::defineStateAnnotation()
 
 	//Content: (appinfo | documentation)*
 
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION), ST_INANNOTATION));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION), ST_INANNOTATION);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_APPINFO));
@@ -186,7 +181,7 @@ void StateMachine::defineStateAny()
 
 	// Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANY), ST_INANY));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANY), ST_INANY);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -202,7 +197,7 @@ void StateMachine::defineStateAnyAttribute()
 
 	// Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANYATTRIBUTE), ST_INANYATTRIBUTE));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANYATTRIBUTE), ST_INANYATTRIBUTE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -218,7 +213,7 @@ void StateMachine::defineStateAppInfo()
 
 	// Content: ({any})*
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_APPINFO), ST_INAPPINFO));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_APPINFO), ST_INAPPINFO);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_METAANY));
@@ -234,7 +229,7 @@ void StateMachine::defineStateAttribute()
 
 	//Content: (annotation?, simpleType?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ATTRIBUTE), ST_INATTRIBUTE));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ATTRIBUTE), ST_INATTRIBUTE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -251,7 +246,7 @@ void StateMachine::defineStateAttributeGroup()
 
 	//Content: (annotation?, ((attribute | attributeGroup)*, anyAttribute?))
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ATTRIBUTEGROUP), ST_INATTRIBUTEGROUP));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ATTRIBUTEGROUP), ST_INATTRIBUTEGROUP);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -270,7 +265,7 @@ void StateMachine::defineStateChoice()
 
 	//  Content: (annotation?, (element | group | choice | sequence | any)*)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_CHOICE), ST_INCHOICE));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_CHOICE), ST_INCHOICE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -291,7 +286,7 @@ void StateMachine::defineStateComplexContent()
 
 	//  Content: (annotation?, (restriction | extension))
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_COMPLEXCONTENT), ST_INCOMPLEXCONTENT));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_COMPLEXCONTENT), ST_INCOMPLEXCONTENT);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -309,7 +304,7 @@ void StateMachine::defineStateComplexType()
 
 	//  Content: (annotation?, (simpleContent | complexContent | ((group | all | choice | sequence)?, ((attribute | attributeGroup)*, anyAttribute?))))
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_COMPLEXTYPE), ST_INCOMPLEXTYPE));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_COMPLEXTYPE), ST_INCOMPLEXTYPE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -347,7 +342,7 @@ void StateMachine::defineStateDocumentation()
 
 	//  Content: ({any})*
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_DOCUMENTATION), ST_INDOCUMENTATION));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_DOCUMENTATION), ST_INDOCUMENTATION);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_METAANY));
@@ -363,7 +358,7 @@ void StateMachine::defineStateElement()
 
 	//  Content: (annotation?, ((simpleType | complexType)?, (unique | key | keyref)*))
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ELEMENT), ST_INELEMENT));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ELEMENT), ST_INELEMENT);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -385,7 +380,7 @@ void StateMachine::defineStateSimpleExtension()
 	//parent is simpleContent
 	//  Content: (annotation?, ((attribute | attributeGroup)*, anyAttribute?))
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SIMPLEEXTENSION), ST_INSIMPLEEXTENSION));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SIMPLEEXTENSION), ST_INSIMPLEEXTENSION);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -405,7 +400,7 @@ void StateMachine::defineStateComplexExtension()
 	//parent is complexContent:
 	//  Content: (annotation?, ((group | all | choice | sequence)?, ((attribute | attributeGroup)*, anyAttribute?)))
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_COMPLEXEXTENSION), ST_INCOMPLEXEXTENSION));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_COMPLEXEXTENSION), ST_INCOMPLEXEXTENSION);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -428,7 +423,7 @@ void StateMachine::defineStateField()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_FIELD), ST_INFIELD));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_FIELD), ST_INFIELD);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -444,7 +439,7 @@ void StateMachine::defineStateGroup()
 
 	//  Content: (annotation?, (all | choice | sequence)?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_GROUP), ST_INGROUP));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_GROUP), ST_INGROUP);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -463,7 +458,7 @@ void StateMachine::defineStateXSDImport()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_IMPORT), ST_INXSDIMPORT));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_IMPORT), ST_INXSDIMPORT);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -479,7 +474,7 @@ void StateMachine::defineStateInclude()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_INCLUDE), ST_ININCLUDE));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_INCLUDE), ST_ININCLUDE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -495,7 +490,7 @@ void StateMachine::defineStateKey()
 
 	//  Content: (annotation?, (selector, field+))
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_KEY), ST_INKEY));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_KEY), ST_INKEY);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -513,7 +508,7 @@ void StateMachine::defineStateKeyref()
 
 	//  Content: (annotation?, (selector, field+))
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_KEYREF), ST_INKEYREF));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_KEYREF), ST_INKEYREF);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -531,7 +526,7 @@ void StateMachine::defineStateList()
 
 	//  Content: (annotation?, simpleType?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_LIST), ST_INLIST));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_LIST), ST_INLIST);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -548,7 +543,7 @@ void StateMachine::defineStateNotation()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_NOTATION), ST_INNOTATION));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_NOTATION), ST_INNOTATION);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -564,7 +559,7 @@ void StateMachine::defineStateRedefine()
 
 	//  Content: (annotation | (simpleType | complexType | group | attributeGroup))*
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_REDEFINE), ST_INREDEFINE));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_REDEFINE), ST_INREDEFINE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -584,7 +579,7 @@ void StateMachine::defineStateSimpleTypeRestriction()
 
 	// parent is SimpleType
 	//  Content: (annotation?, (simpleType?, (minExclusive | minInclusive | maxExclusive | maxInclusive | totalDigits | fractionDigits | length | minLength | maxLength | enumeration | whiteSpace | pattern)*))
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SIMPLETYPERESTRICTION), ST_INSIMPLETYPERESTRICTION));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SIMPLETYPERESTRICTION), ST_INSIMPLETYPERESTRICTION);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -615,7 +610,7 @@ void StateMachine::defineStateSimpleContentRestriction()
 	//Content: (annotation?, (simpleType?, (minExclusive | minInclusive | maxExclusive | maxInclusive | 
 	//          totalDigits | fractionDigits | length | minLength | maxLength | enumeration | whiteSpace | pattern)*)?, 
 	//          ((attribute | attributeGroup)*, anyAttribute?))
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SIMPLECONTENTRESTRICTION), ST_INSIMPLECONTENTRESTRICTION));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SIMPLECONTENTRESTRICTION), ST_INSIMPLECONTENTRESTRICTION);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -647,7 +642,7 @@ void StateMachine::defineStateComplexRestriction()
 
 	//  Content: (annotation?, ((group | all | choice | sequence)?, ((attribute | attributeGroup)*, anyAttribute?)))
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_COMPLEXRESTRICTION), ST_INCOMPLEXRESTRICTION));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_COMPLEXRESTRICTION), ST_INCOMPLEXRESTRICTION);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -670,7 +665,7 @@ void StateMachine::defineStateSchema()
 
 	//  Content: ((include | import | redefine | annotation)*, (((simpleType | complexType | group | attributeGroup) | element | attribute | notation), annotation*)*)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SCHEMA), ST_INSCHEMA));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SCHEMA), ST_INSCHEMA);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_INCLUDE));
@@ -696,7 +691,7 @@ void StateMachine::defineStateSelector()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SELECTOR), ST_INSELECTOR));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SELECTOR), ST_INSELECTOR);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -712,7 +707,7 @@ void StateMachine::defineStateSequence()
 
 	//  Content: (annotation?, (element | group | choice | sequence | any)*)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SEQUENCE), ST_INSEQUENCE));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SEQUENCE), ST_INSEQUENCE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -733,7 +728,7 @@ void StateMachine::defineStateSimpleContent()
 
 	//  Content: (annotation?, (restriction | extension))
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SIMPLECONTENT), ST_INSIMPLECONTENT));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SIMPLECONTENT), ST_INSIMPLECONTENT);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -751,7 +746,7 @@ void StateMachine::defineStateSimpleType()
 
 	//  Content: (annotation?, (restriction | list | union))
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SIMPLETYPE), ST_INSIMPLETYPE));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SIMPLETYPE), ST_INSIMPLETYPE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -770,7 +765,7 @@ void StateMachine::defineStateUnion()
 
 	//  Content: (annotation?, simpleType*)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_UNION), ST_INUNION));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_UNION), ST_INUNION);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -787,7 +782,7 @@ void StateMachine::defineStateUnique()
 
 	//  Content: (annotation?, (selector, field+))
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_UNIQUE), ST_INUNIQUE));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_UNIQUE), ST_INUNIQUE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -805,7 +800,7 @@ void StateMachine::defineStateEnumeration()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ENUMERATION), ST_INENUMERATION));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ENUMERATION), ST_INENUMERATION);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -821,7 +816,7 @@ void StateMachine::defineStateFractionDigits()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_FRACTIONDIGITS), ST_INFRACTIONDIGITS));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_FRACTIONDIGITS), ST_INFRACTIONDIGITS);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -837,7 +832,7 @@ void StateMachine::defineStateLength()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_LENGTH), ST_INLENGTH));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_LENGTH), ST_INLENGTH);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -853,7 +848,7 @@ void StateMachine::defineStateMaxExclusive()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_MAXEXCLUSIVE), ST_INMAXEXCLUSIVE));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_MAXEXCLUSIVE), ST_INMAXEXCLUSIVE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -869,7 +864,7 @@ void StateMachine::defineStateMaxInclusive()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_MAXINCLUSIVE), ST_INMAXINCLUSIVE));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_MAXINCLUSIVE), ST_INMAXINCLUSIVE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -885,7 +880,7 @@ void StateMachine::defineStateMaxLength()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_MAXLENGTH), ST_INMAXLENGTH));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_MAXLENGTH), ST_INMAXLENGTH);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -901,7 +896,7 @@ void StateMachine::defineStateMinExclusive()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_MINEXCLUSIVE), ST_INMINEXCLUSIVE));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_MINEXCLUSIVE), ST_INMINEXCLUSIVE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -917,7 +912,7 @@ void StateMachine::defineStateMinInclusive()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_MININCLUSIVE), ST_INMININCLUSIVE));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_MININCLUSIVE), ST_INMININCLUSIVE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -933,7 +928,7 @@ void StateMachine::defineStateMinLength()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_MINLENGTH), ST_INMINLENGTH));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_MINLENGTH), ST_INMINLENGTH);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -949,7 +944,7 @@ void StateMachine::defineStatePattern()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_PATTERN), ST_INPATTERN));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_PATTERN), ST_INPATTERN);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -965,7 +960,7 @@ void StateMachine::defineStateTotalDigits()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_TOTALDIGITS), ST_INTOTALDIGITS));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_TOTALDIGITS), ST_INTOTALDIGITS);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -991,7 +986,7 @@ void StateMachine::defineStateWhiteSpace()
 
 	//  Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_WHITESPACE), ST_INWHITESPACE));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_WHITESPACE), ST_INWHITESPACE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_ANNOTATION));
@@ -1008,7 +1003,7 @@ void StateMachine::defineStateMetaAny()
 
 	// Content: (annotation?)
 	
-	_states.insert(std::make_pair(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_METAANY), ST_INMETAANY));
+	_states.try_emplace(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_METAANY), ST_INMETAANY);
 
 	StateSet aSet;
 	
@@ -1021,7 +1016,7 @@ void StateMachine::defineStateDefinitions()
 {
 	poco_assert_dbg(_states.find(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DEFINITIONS)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DEFINITIONS), ST_INDEFINITIONS));
+	_states.try_emplace(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DEFINITIONS), ST_INDEFINITIONS);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_IMPORT));
@@ -1044,7 +1039,7 @@ void StateMachine::defineStateWSDLImport()
 
 	//  Content: (annotation?)
 
-	_states.insert(std::make_pair(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_IMPORT), ST_INWSDLIMPORT));
+	_states.try_emplace(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_IMPORT), ST_INWSDLIMPORT);
 
 	StateSet aSet;
 	StateInfo info(ST_INWSDLIMPORT, &XSDContentHandler::stateWSDLImportStart, &XSDContentHandler::stateWSDLImportEnd, aSet);
@@ -1056,7 +1051,7 @@ void StateMachine::defineStateTypes()
 {
 	poco_assert_dbg(_states.find(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_TYPES)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_TYPES), ST_INTYPES));
+	_states.try_emplace(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_TYPES), ST_INTYPES);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_SCHEMA));
@@ -1071,7 +1066,7 @@ void StateMachine::defineStateMessage()
 {
 	poco_assert_dbg(_states.find(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_MESSAGE)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_MESSAGE), ST_INMESSAGE));
+	_states.try_emplace(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_MESSAGE), ST_INMESSAGE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_PART));
@@ -1086,7 +1081,7 @@ void StateMachine::defineStatePart()
 {
 	poco_assert_dbg(_states.find(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_PART)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_PART), ST_INPART));
+	_states.try_emplace(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_PART), ST_INPART);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DOCUMENTATION));
@@ -1100,7 +1095,7 @@ void StateMachine::defineStatePortType()
 {
 	poco_assert_dbg(_states.find(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_PORTTYPE)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_PORTTYPE), ST_INPORTTYPE));
+	_states.try_emplace(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_PORTTYPE), ST_INPORTTYPE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_OPERATION));
@@ -1115,7 +1110,7 @@ void StateMachine::defineStateOperation()
 {
 	poco_assert_dbg(_states.find(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_OPERATION)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_OPERATION), ST_INOPERATION));
+	_states.try_emplace(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_OPERATION), ST_INOPERATION);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DOCUMENTATION));
@@ -1136,7 +1131,7 @@ void StateMachine::defineStateWSDLDocumentation()
 
 	//  Content: ({any})*
 	
-	_states.insert(std::make_pair(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DOCUMENTATION), ST_INWSDLDOCUMENTATION));
+	_states.try_emplace(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DOCUMENTATION), ST_INWSDLDOCUMENTATION);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_METAANY));
@@ -1150,7 +1145,7 @@ void StateMachine::defineStateInput()
 {
 	poco_assert_dbg(_states.find(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_INPUT)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_INPUT), ST_ININPUT));
+	_states.try_emplace(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_INPUT), ST_ININPUT);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_HEADER));
@@ -1167,7 +1162,7 @@ void StateMachine::defineStateOutput()
 {
 	poco_assert_dbg(_states.find(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_OUTPUT)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_OUTPUT), ST_INOUTPUT));
+	_states.try_emplace(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_OUTPUT), ST_INOUTPUT);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_HEADER));
@@ -1184,7 +1179,7 @@ void StateMachine::defineStateFault()
 {
 	poco_assert_dbg(_states.find(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_FAULT)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_FAULT), ST_INFAULT));
+	_states.try_emplace(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_FAULT), ST_INFAULT);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_FAULT));
@@ -1200,7 +1195,7 @@ void StateMachine::defineStateBinding()
 {
 	poco_assert_dbg(_states.find(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_BINDING)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_BINDING), ST_INBINDING));
+	_states.try_emplace(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_BINDING), ST_INBINDING);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_OPERATION));
@@ -1216,7 +1211,7 @@ void StateMachine::defineStateSoapBinding()
 {
 	poco_assert_dbg(_states.find(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_BINDING)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_BINDING), ST_INSOAPBINDING));
+	_states.try_emplace(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_BINDING), ST_INSOAPBINDING);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DOCUMENTATION));
@@ -1230,7 +1225,7 @@ void StateMachine::defineStateSoapOperation()
 {
 	poco_assert_dbg(_states.find(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_OPERATION)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_OPERATION), ST_INSOAPOPERATION));
+	_states.try_emplace(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_OPERATION), ST_INSOAPOPERATION);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DOCUMENTATION));
@@ -1244,7 +1239,7 @@ void StateMachine::defineStateSoapHeader()
 {
 	poco_assert_dbg(_states.find(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_HEADER)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_HEADER), ST_INSOAPHEADER));
+	_states.try_emplace(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_HEADER), ST_INSOAPHEADER);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_HEADERFAULT));
@@ -1259,7 +1254,7 @@ void StateMachine::defineStateSoapHeaderFault()
 {
 	poco_assert_dbg(_states.find(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_HEADERFAULT)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_HEADERFAULT), ST_INSOAPHEADERFAULT));
+	_states.try_emplace(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_HEADERFAULT), ST_INSOAPHEADERFAULT);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DOCUMENTATION));
@@ -1273,7 +1268,7 @@ void StateMachine::defineStateSoapBody()
 {
 	poco_assert_dbg(_states.find(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_BODY)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_BODY), ST_INSOAPBODY));
+	_states.try_emplace(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_BODY), ST_INSOAPBODY);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DOCUMENTATION));
@@ -1287,7 +1282,7 @@ void StateMachine::defineStateSoapFault()
 {
 	poco_assert_dbg(_states.find(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_FAULT)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_FAULT), ST_INSOAPFAULT));
+	_states.try_emplace(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_FAULT), ST_INSOAPFAULT);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DOCUMENTATION));
@@ -1301,7 +1296,7 @@ void StateMachine::defineStateSoap12Binding()
 {
 	poco_assert_dbg(_states.find(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_BINDING)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_BINDING), ST_INSOAP12BINDING));
+	_states.try_emplace(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_BINDING), ST_INSOAP12BINDING);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DOCUMENTATION));
@@ -1315,7 +1310,7 @@ void StateMachine::defineStateSoap12Operation()
 {
 	poco_assert_dbg(_states.find(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_OPERATION)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_OPERATION), ST_INSOAP12OPERATION));
+	_states.try_emplace(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_OPERATION), ST_INSOAP12OPERATION);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DOCUMENTATION));
@@ -1329,7 +1324,7 @@ void StateMachine::defineStateSoap12Header()
 {
 	poco_assert_dbg(_states.find(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_HEADER)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_HEADER), ST_INSOAPHEADER));
+	_states.try_emplace(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_HEADER), ST_INSOAPHEADER);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_HEADERFAULT));
@@ -1344,7 +1339,7 @@ void StateMachine::defineStateSoap12HeaderFault()
 {
 	poco_assert_dbg(_states.find(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_HEADERFAULT)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_HEADERFAULT), ST_INSOAP12HEADERFAULT));
+	_states.try_emplace(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_HEADERFAULT), ST_INSOAP12HEADERFAULT);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DOCUMENTATION));
@@ -1358,7 +1353,7 @@ void StateMachine::defineStateSoap12Body()
 {
 	poco_assert_dbg(_states.find(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_BODY)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_BODY), ST_INSOAP12BODY));
+	_states.try_emplace(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_BODY), ST_INSOAP12BODY);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DOCUMENTATION));
@@ -1372,7 +1367,7 @@ void StateMachine::defineStateSoap12Fault()
 {
 	poco_assert_dbg(_states.find(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_FAULT)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_FAULT), ST_INSOAP12FAULT));
+	_states.try_emplace(cat(Constants::SOAP12_NAMESPACE_URI, Constants::SOAP_FAULT), ST_INSOAP12FAULT);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DOCUMENTATION));
@@ -1386,7 +1381,7 @@ void StateMachine::defineStateService()
 {
 	poco_assert_dbg(_states.find(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_SERVICE)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_SERVICE), ST_INSERVICE));
+	_states.try_emplace(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_SERVICE), ST_INSERVICE);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_PORT));
@@ -1402,7 +1397,7 @@ void StateMachine::defineStatePort()
 {
 	poco_assert_dbg(_states.find(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_PORT)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_PORT), ST_INPORT));
+	_states.try_emplace(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_PORT), ST_INPORT);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_ADDRESS));
@@ -1418,7 +1413,7 @@ void StateMachine::defineStateSoapAddress()
 {
 	poco_assert_dbg(_states.find(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_ADDRESS)) == _states.end());
 
-	_states.insert(std::make_pair(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_ADDRESS), ST_INSOAPADDRESS));
+	_states.try_emplace(cat(Constants::SOAP_NAMESPACE_URI, Constants::SOAP_ADDRESS), ST_INSOAPADDRESS);
 
 	StateSet aSet;
 	aSet.insert(cat(Constants::WSDL_NAMESPACE_URI, Constants::WSDL_DOCUMENTATION));
@@ -1440,25 +1435,15 @@ StateMachine::StateInfo::StateInfo(StateMachine::State aState, StateMachine::Sta
 	_state(aState), 
 	_start(start), 
 	_end(end), 
-	_containsAnySuccessor(false),
 	_successors(successors)
 {
 	// check if any or anyAttribute is contained in successor, 
 	// note that if the state is any or anyAttribute, they are automatically part of the successor
-	if (_state == StateMachine::ST_INMETAANY)
+	if (_state == StateMachine::ST_INMETAANY || _successors.count(cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_METAANY)) > 0)
 	{
 		_containsAnySuccessor = true;
-	}
-	StateSet::const_iterator it = _successors.begin();
-	StateSet::const_iterator itEnd = _successors.end();
-	for (; it != itEnd && !_containsAnySuccessor; ++it)
-	{
-		if ((*it) == cat(Constants::XSD_NAMESPACE_URI, Constants::XSD_METAANY))
-		{
-			_containsAnySuccessor = true;
-		}
 	}
 }
 
 
-} } } // namespace Poco::XSD::Parser
+} // namespace Poco::XSD::Parser

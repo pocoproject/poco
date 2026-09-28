@@ -16,9 +16,7 @@
 #include <typeinfo>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 POCO_IMPLEMENT_EXCEPTION(XSDException, Exception, "XSD exception")
@@ -34,4 +32,4 @@ POCO_IMPLEMENT_EXCEPTION(InvalidElementException, ElementException, "Invalid Ele
 POCO_IMPLEMENT_EXCEPTION(ElementAlreadyDefinedException, ElementException, "Element already defined")
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

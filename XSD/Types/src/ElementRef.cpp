@@ -18,29 +18,23 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 ElementRef::ElementRef(const QName& ref):
-	_ref(ref),
-	_pElement(nullptr)
+	_ref(ref)
 {
 }
 
 
 ElementRef::ElementRef(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc, const QName& ref):
 	Element(id, minOcc, maxOcc),
-	_ref(ref),
-	_pElement(nullptr)
+	_ref(ref)
 {
 }
 
 
-ElementRef::~ElementRef()
-{
-}
+ElementRef::~ElementRef() = default;
 
 
 const std::string& ElementRef::nameSpace() const
@@ -67,4 +61,4 @@ void ElementRef::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

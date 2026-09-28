@@ -23,9 +23,7 @@
 #include "Poco/XSD/Types/QName.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class Group;
@@ -40,25 +38,25 @@ public:
 	GroupRef(const std::string& id, const QName& ref, Poco::UInt32 minOcc, Poco::UInt32 maxOcc);
 		/// Creates the GroupRef.
 
-	virtual ~GroupRef();
+	~GroupRef() override;
 		/// Destroys the GroupRef.
 
-	void fixup();
+	void fixup() override;
 
-	void accept(Visitor& v) const;
+	void accept(Visitor& v) const override;
 
-	Order::Ptr getChild() const;
+	[[nodiscard]] Order::Ptr getChild() const override;
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const override;
 		/// Returns the non-empty name.
 
 private:
 	QName _ref;
-	const Group* _pGroup;
+	const Group* _pGroup = nullptr;
 };
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_GroupRef_INCLUDED

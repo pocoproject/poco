@@ -22,9 +22,7 @@
 #include "Poco/XSD/Types/OrderIteratorImpl.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class Any;
@@ -34,31 +32,31 @@ class XSDTypes_API AnyIterator: public OrderIteratorImpl
 	/// An iterator for iterating over Any content groups.
 {
 public:
-	AnyIterator(Any& any);
+	explicit AnyIterator(Any& any);
 		/// Creates the AnyIterator.
 
-	virtual ~AnyIterator();
+	~AnyIterator() override;
 		/// Destroys the AnyIterator.
 
 	// OrderIteratorImpl
-	OrderContent::Ptr next(const std::string& name);
-	const std::set<std::string>& validNexts() const;
-	bool end() const;
-	bool validNext(const std::string& name) const;
-	void close();
-	bool canClose() const;
-	void reset();
+	OrderContent::Ptr next(const std::string& name) override;
+	[[nodiscard]] const std::set<std::string>& validNexts() const override;
+	[[nodiscard]] bool end() const override;
+	[[nodiscard]] bool validNext(const std::string& name) const override;
+	void close() override;
+	[[nodiscard]] bool canClose() const override;
+	void reset() override;
 
 private:
 	UInt32 _min;
 	UInt32 _max;
-	UInt32 _cnt;
+	UInt32 _cnt = 0;
 	Any*   _pAny;
 	mutable std::set<std::string> _next;
 };
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_AnyIterator_INCLUDED

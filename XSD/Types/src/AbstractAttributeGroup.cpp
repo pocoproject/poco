@@ -15,9 +15,7 @@
 #include "Poco/XSD/Types/AbstractAttributeGroup.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 AbstractAttributeGroup::AbstractAttributeGroup(const std::string& id, const std::string& name):
@@ -26,9 +24,7 @@ AbstractAttributeGroup::AbstractAttributeGroup(const std::string& id, const std:
 }
 
 
-AbstractAttributeGroup::~AbstractAttributeGroup()
-{
-}
+AbstractAttributeGroup::~AbstractAttributeGroup() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

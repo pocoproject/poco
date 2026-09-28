@@ -19,9 +19,7 @@
 #include "Poco/XSD/Types/AllIterator.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 All::All(const std::string& id, Poco::UInt32 minOcc):
@@ -30,9 +28,7 @@ All::All(const std::string& id, Poco::UInt32 minOcc):
 }
 
 
-All::~All()
-{
-}
+All::~All() = default;
 
 
 void All::add(OrderContent::Ptr pChild)
@@ -49,16 +45,14 @@ void All::add(Element::Ptr pChild)
 
 	poco_assert(!pChild->name().empty());
 
-	_content.insert(std::make_pair(pChild->name(), pChild));
+	_content.try_emplace(pChild->name(), pChild);
 }
 
 
 void All::fixup()
 {
-	All::Content::iterator it = _content.begin();
-	All::Content::iterator itEnd = _content.end();
-	for (; it != itEnd; ++it)
-		it->second->fixup();
+	for (auto& [name, pElem]: _content)
+		pElem->fixup();
 }
 
 
@@ -74,4 +68,4 @@ OrderIterator All::iterator() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

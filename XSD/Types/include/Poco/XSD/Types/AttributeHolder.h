@@ -23,9 +23,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class SimpleType;
@@ -41,18 +39,18 @@ public:
 	virtual ~AttributeHolder();
 		/// Destroys the AttributeHolder.
 
-	virtual const std::vector<AttributeContent::Ptr>& attributeContent() const = 0;
+	[[nodiscard]] virtual const std::vector<AttributeContent::Ptr>& attributeContent() const = 0;
 		/// Returns the attributes defined for the complex type.
 
 	virtual void addAttribute(AttributeContent::Ptr pAttr) = 0;
 		/// Adds the attribute to the set.
 
-	virtual bool hasAnyAttribute() const = 0;
+	[[nodiscard]] virtual bool hasAnyAttribute() const = 0;
 		/// Returns true if the any attribute is allowed.
 };
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_AttributeHolder_INCLUDED

@@ -16,14 +16,10 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
-SimpleType::SimpleType()
-{
-}
+SimpleType::SimpleType() = default;
 
 
 SimpleType::SimpleType(const std::string& id, const std::string& name, bool finalRestriction, bool finalList, bool finalUnion):
@@ -35,9 +31,7 @@ SimpleType::SimpleType(const std::string& id, const std::string& name, bool fina
 }
 
 
-SimpleType::~SimpleType()
-{
-}
+SimpleType::~SimpleType() = default;
 
 
 void SimpleType::fixup()
@@ -74,4 +68,4 @@ void SimpleType::createIterator(std::vector<OrderIterator>& seq) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

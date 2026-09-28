@@ -15,9 +15,7 @@
 #include "Poco/XSD/Types/QName.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 QName::QName(const std::string& name, const std::string& ns):
@@ -27,28 +25,13 @@ QName::QName(const std::string& name, const std::string& ns):
 }
 
 
-QName::~QName()
-{
-}
+QName::~QName() = default;
 
 
-QName::QName(const QName& qname):
-	_name(qname.name()), 
-	_it(qname.getIterator())
-{
-}
+QName::QName(const QName&) = default;
 
 
-QName& QName::operator = (const QName& other)
-{
-	if (&other != this)
-	{
-		_name = other._name;
-		_it = other._it;
-	}
-
-	return *this;
-}
+QName& QName::operator = (const QName&) = default;
 
 
 QName::QName():
@@ -61,4 +44,4 @@ QName::QName():
 const QName QName::INVALID;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

@@ -24,9 +24,7 @@
 #include <set>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API OrderIterator
@@ -38,11 +36,8 @@ public:
 		///
 		/// Note that end() will return true for uninitialized iterators.
 
-	OrderIterator(OrderIteratorImpl::Ptr pImpl);
+	explicit OrderIterator(OrderIteratorImpl::Ptr pImpl);
 		/// Creates the OrderIterator using the given OrderIteratorImpl.
-
-	~OrderIterator();
-		/// Destroys the OrderIterator.
 
 	OrderContent::Ptr next(const std::string& name);
 		/// Returns the next OrderContent with the given name.
@@ -50,14 +45,14 @@ public:
 		/// Will fail with an IllegalOrderException if name is not part of
 		/// the set returned by validNexts().
 
-	const std::set<std::string>& validNexts() const;
+	[[nodiscard]] const std::set<std::string>& validNexts() const;
 		/// Returns the valid names for the next call. If the set contains the string "*",
 		/// it will accept any string.
 
-	bool validNext(const std::string& name) const;
+	[[nodiscard]] bool validNext(const std::string& name) const;
 		/// Returns true if the element with the given name is a valid next element.
 
-	bool end() const;
+	[[nodiscard]] bool end() const;
 		/// Returns true if at end of iteration. This is the only method which
 		/// is safe to call on uninitialized OrderIterators.
 
@@ -67,10 +62,10 @@ public:
 		///
 		/// Will throw an IllegalOrderException when not safe to close.
 
-	bool canClose() const;
+	[[nodiscard]] bool canClose() const;
 		/// Checks if it is safe to close the iterator, i.e. minoccurs restriction are satisfied.
 
-	bool closed() const;
+	[[nodiscard]] bool closed() const;
 		/// Returns true if closed was called for this iterator.
 
 	void reset();
@@ -81,7 +76,7 @@ private:
 };
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_OrderIterator_INCLUDED

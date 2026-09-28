@@ -16,9 +16,7 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 Documentation::Documentation(const std::string& sourceUri, const std::string& lang):
@@ -28,9 +26,7 @@ Documentation::Documentation(const std::string& sourceUri, const std::string& la
 }
 
 
-Documentation::~Documentation()
-{
-}
+Documentation::~Documentation() = default;
 
 
 void Documentation::accept(Visitor& v) const
@@ -39,4 +35,4 @@ void Documentation::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

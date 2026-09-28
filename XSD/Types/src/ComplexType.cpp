@@ -18,9 +18,7 @@
 #include "Poco/XSD/Types/Any.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 ComplexType::ComplexType(const std::string& id, 
@@ -40,15 +38,12 @@ ComplexType::ComplexType(const std::string& id,
 	_mixed(mixed),
 	_pParent(),
 	_pContent(),
-	_attrContent(),
-	_containsAny(false)
+	_attrContent()
 {
 }
 
 
-ComplexType::~ComplexType()
-{
-}
+ComplexType::~ComplexType() = default;
 
 
 void ComplexType::fixup()
@@ -59,10 +54,9 @@ void ComplexType::fixup()
 	if (_pParent)
 		_pParent->fixup();
 
-	std::vector<AttributeContent::Ptr>::iterator it = _attrContent.begin();
-	for (; it != _attrContent.end(); ++it)
+	for (auto& pAttr: _attrContent)
 	{
-		(*it)->fixup();
+		pAttr->fixup();
 	}
 
 	if (!_pContent && !_pParent && !_attrContent.empty())
@@ -95,4 +89,4 @@ void ComplexType::createIterator(std::vector<OrderIterator>& seq) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

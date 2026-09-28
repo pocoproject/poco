@@ -22,9 +22,7 @@
 #include "Poco/XSD/Types/NamespaceManager.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API QName
@@ -43,20 +41,20 @@ public:
 
 	QName& operator = (const QName& other);
 
-	bool operator == (const QName& other) const;
+	[[nodiscard]] bool operator == (const QName& other) const;
 
-	bool operator != (const QName& other) const;
+	[[nodiscard]] bool operator != (const QName& other) const;
 
 	~QName();
 		/// Destroys the QName.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 
-	const std::string& getNamespace() const;
+	[[nodiscard]] const std::string& getNamespace() const;
 
-	NamespaceManager::NamespaceId getNamespaceId() const;
+	[[nodiscard]] NamespaceManager::NamespaceId getNamespaceId() const;
 
-	const NamespaceManager::NamespaceMap::const_iterator& getIterator() const;
+	[[nodiscard]] const NamespaceManager::NamespaceMap::const_iterator& getIterator() const;
 
 private:
 	std::string _name;
@@ -106,7 +104,7 @@ inline const NamespaceManager::NamespaceMap::const_iterator& QName::getIterator(
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_QName_INCLUDED

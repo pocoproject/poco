@@ -15,9 +15,7 @@
 #include "Poco/XSD/Types/OrderIterator.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 OrderIterator::OrderIterator():
@@ -28,11 +26,6 @@ OrderIterator::OrderIterator():
 
 OrderIterator::OrderIterator(OrderIteratorImpl::Ptr pImpl):
 	_pImpl(pImpl)
-{
-}
-
-
-OrderIterator::~OrderIterator()
 {
 }
 
@@ -88,4 +81,4 @@ void OrderIterator::reset()
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

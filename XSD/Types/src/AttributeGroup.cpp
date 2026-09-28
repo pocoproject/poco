@@ -17,9 +17,7 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 AttributeGroup::AttributeGroup(const std::string& id, const std::string& name):
@@ -28,9 +26,7 @@ AttributeGroup::AttributeGroup(const std::string& id, const std::string& name):
 }
 
 
-AttributeGroup::~AttributeGroup()
-{
-}
+AttributeGroup::~AttributeGroup() = default;
 
 
 void AttributeGroup::add(AttributeContent::Ptr ptr)
@@ -57,16 +53,14 @@ void AttributeGroup::accept(Visitor& v) const
 
 void AttributeGroup::fixup()
 {
-	std::vector<AttributeContent::Ptr>::iterator it = _tmp.begin();
-	for (; it != _tmp.end(); ++it)
+	for (auto& pAttr: _tmp)
 	{
-		(*it)->fixup();
-		std::pair<AbstractAttributeGroup::Attributes::iterator, bool> res = _children.insert(std::make_pair((*it)->name(), *it));
-		if (!res.second)
-			throw SchemaException("Duplicate attribute " + (*it)->name());
+		pAttr->fixup();
+		if (!_children.try_emplace(pAttr->name(), pAttr).second)
+			throw SchemaException("Duplicate attribute " + pAttr->name());
 	}
 	_tmp.clear();
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

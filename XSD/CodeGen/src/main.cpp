@@ -64,22 +64,8 @@ using Poco::AutoPtr;
 
 class GenApp: public Application
 {
-public:
-	GenApp():
-		_helpRequested(false),
-		_generateAllBindings(false),
-		_ignoreParameterOrder(true),
-		_namespaceInSourceFileNames(false),
-		_namespaceInHeaderFileNames(false),
-		_alwaysUseOptional(false),
-		_useStd(false),
-		_inlineAll(false),
-		_amalgamateSources(false)
-	{
-	}
-
 protected:
-	void initialize(Application& self)
+	void initialize(Application& self) override
 	{
 		Application::initialize(self);
 		Poco::Net::HTTPStreamFactory::registerFactory();
@@ -89,17 +75,17 @@ protected:
 #endif
 	}
 
-	void uninitialize()
+	void uninitialize() override
 	{
 		Application::uninitialize();
 	}
 
-	void reinitialize(Application& self)
+	void reinitialize(Application& self) override
 	{
 		Application::reinitialize(self);
 	}
 
-	void defineOptions(OptionSet& options)
+	void defineOptions(OptionSet& options) override
 	{
 		Application::defineOptions(options);
 
@@ -186,7 +172,7 @@ protected:
 		_generateAllBindings = config().getBool("XSDGen.options.generateAllBindings", _generateAllBindings);
 
 		SchemaInfo def = parseDefault();
-		_schemas.insert(std::make_pair(def.id(), def));
+		_schemas.try_emplace(def.id(), def);
 
 		int pos = 0;
 		std::string prefix = "XSDGen.schema[";
@@ -195,14 +181,14 @@ protected:
 		while (config().hasProperty(prefix))
 		{
 			SchemaInfo tmp = parseSchema(def, pos++);
-			_schemas.insert(std::make_pair(tmp.id(), tmp));
+			_schemas.try_emplace(tmp.id(), tmp);
 			prefix = "XSDGen.schema[";
 			prefix += NumberFormatter::format(pos);
 			prefix += "][@targetNamespace]";
 		}
 	}
 
-	SchemaInfo parseDefault()
+	[[nodiscard]] SchemaInfo parseDefault()
 	{
 		/*
 		<default>
@@ -236,10 +222,9 @@ protected:
 	{
 		std::vector<std::string> result;
 		StringTokenizer tok(block, "\n", StringTokenizer::TOK_TRIM);
-		StringTokenizer::Iterator it = tok.begin();
-		for (; it != tok.end(); ++it)
+		for (const auto& line: tok)
 		{
-			result.push_back(*it);
+			result.push_back(line);
 		}
 		return result;
 	}
@@ -248,15 +233,14 @@ protected:
 	{
 		std::set<std::string> result;
 		StringTokenizer tok(aList, ",\r\n;", StringTokenizer::TOK_IGNORE_EMPTY | StringTokenizer::TOK_TRIM);
-		StringTokenizer::Iterator it = tok.begin();
-		for (; it != tok.end(); ++it)
+		for (const auto& include: tok)
 		{
-			result.insert(*it);
+			result.insert(include);
 		}
 		return result;
 	}
 
-	SchemaInfo parseSchema(const SchemaInfo& def, int pos)
+	[[nodiscard]] SchemaInfo parseSchema(const SchemaInfo& def, int pos)
 	{
 		/*
 		<schema targetNamespace="tns">
@@ -311,7 +295,7 @@ protected:
 		return SchemaInfo(tns, cppNS, declSpec, Poco::Path(incDir), Poco::Path(srcDir), Poco::Path(rootIncDir), copyright, extraIncludes, remHeaders, preserveOptional, _namespaceInHeaderFileNames, timestamps);
 	}
 
-	int main(const std::vector<std::string>& args)
+	int main(const std::vector<std::string>& args) override
 	{
 		if (!_helpRequested)
 		{
@@ -323,17 +307,16 @@ protected:
 
 			parseConfig();
 
-			std::vector<std::string>::const_iterator it = args.begin();
-			for (; it != args.end(); ++it)
+			for (const auto& arg: args)
 			{
 				URI uri;
-				if (it->find("://") != std::string::npos)
+				if (arg.find("://") != std::string::npos)
 				{
-					uri = *it;
+					uri = arg;
 				}
 				else
 				{
-					Poco::Path p(*it);
+					Poco::Path p(arg);
 					p.makeAbsolute();
 					uri = "file://" + p.toString(Poco::Path::PATH_UNIX);
 				}
@@ -358,65 +341,61 @@ protected:
 			std::string dllExportMacro = config().getString("XSDGen.default.library", "");
 			CppGen gen(_schemas, dllExportMacro, options);
 			const TypesManager::Schemas& allSchemas = tm.getSchemas();
-			TypesManager::Schemas::const_iterator itS = allSchemas.begin();
-			for (; itS != allSchemas.end(); ++itS)
+			for (const auto& [ns, pSchema]: allSchemas)
 			{
-				if (!Utility::isBuiltinNamespace(itS->second->targetNamespace()))
+				if (!Utility::isBuiltinNamespace(pSchema->targetNamespace()))
 				{
-					gen.prepare(*itS->second);
+					gen.prepare(*pSchema);
 				}
 			}
-			itS = allSchemas.begin();
-			for (; itS != allSchemas.end(); ++itS)
+			for (const auto& [ns, pSchema]: allSchemas)
 			{
-				if (!Utility::isBuiltinNamespace(itS->second->targetNamespace()))
+				if (!Utility::isBuiltinNamespace(pSchema->targetNamespace()))
 				{
-					gen.visit(*itS->second);
+					gen.visit(*pSchema);
 				}
 			}
 			const TypesManager::Definitionss& allDefinitions = tm.getDefinitions();
-			TypesManager::Definitionss::const_iterator itD = allDefinitions.begin();
-			for (; itD != allDefinitions.end(); ++itD)
+			for (const auto& [ns, pDefinitions]: allDefinitions)
 			{
-				gen.visit(*itD->second);
+				gen.visit(*pDefinitions);
 			}
 
 			gen.postProcess();
 			const CppGen::Schemas& schemas = gen.getSchemas();
-			CppGen::Schemas::const_iterator itC = schemas.begin();
 			bool isFirstSchema = true;
-			for (; itC != schemas.end(); ++itC)
+			for (const auto& [ns, classes]: schemas)
 			{
-				std::map<std::string, SchemaInfo>::const_iterator itAS = _schemas.find(itC->first);
+				std::map<std::string, SchemaInfo>::const_iterator itAS = _schemas.find(ns);
 				if (itAS == _schemas.end())
-					throw Poco::XSD::Types::XSDException("no schema info for " + itC->first);
+					throw Poco::XSD::Types::XSDException("no schema info for " + ns);
 
-				int options = 0;
+				int writerOptions = 0;
 				if (itAS->second.preserveOptional())
-					options |= CppWriter::OPT_PRESERVE_OPTIONAL;
+					writerOptions |= CppWriter::OPT_PRESERVE_OPTIONAL;
 
 				if (itAS->second.timestamps())
-					options |= CppWriter::OPT_HEADER_TIMESTAMPS;
+					writerOptions |= CppWriter::OPT_HEADER_TIMESTAMPS;
 
 				if (_namespaceInSourceFileNames)
-					options |= CppWriter::OPT_INCLUDE_NAMESPACE_IN_SOURCE_FILENAME;
+					writerOptions |= CppWriter::OPT_INCLUDE_NAMESPACE_IN_SOURCE_FILENAME;
 
 				if (_namespaceInHeaderFileNames)
-					options |= CppWriter::OPT_INCLUDE_NAMESPACE_IN_HEADER_FILENAME;
+					writerOptions |= CppWriter::OPT_INCLUDE_NAMESPACE_IN_HEADER_FILENAME;
 
 				if (_alwaysUseOptional)
-					options |= CppWriter::OPT_ALWAYS_USE_OPTIONAL;
+					writerOptions |= CppWriter::OPT_ALWAYS_USE_OPTIONAL;
 
 				if (_useStd)
-					options |= CppWriter::OPT_USE_STD;
+					writerOptions |= CppWriter::OPT_USE_STD;
 
 				if (_inlineAll)
-					options |= CppWriter::OPT_INLINE_ALL;
+					writerOptions |= CppWriter::OPT_INLINE_ALL;
 
 				if (_amalgamateSources)
-					options |= CppWriter::OPT_AMALGAMATE_SOURCES;
+					writerOptions |= CppWriter::OPT_AMALGAMATE_SOURCES;
 
-				CppWriter writer(itAS->second, options, _amalgamatedSourceFileName);
+				CppWriter writer(itAS->second, writerOptions, _amalgamatedSourceFileName);
 				if (_amalgamateSources && isFirstSchema)
 				{
 					Poco::Path p(itAS->second.sourceDir());
@@ -426,7 +405,7 @@ protected:
 					std::ofstream cppStr(p.toString());
 					writer.writeHeader(cppStr, p.getFileName());
 				}
-				writer.generate(itC->second);
+				writer.generate(classes);
 				isFirstSchema = false;
 			}
 
@@ -436,15 +415,15 @@ protected:
 
 
 private:
-	bool _helpRequested;
-	bool _generateAllBindings;
-	bool _ignoreParameterOrder;
-	bool _namespaceInSourceFileNames;
-	bool _namespaceInHeaderFileNames;
-	bool _alwaysUseOptional;
-	bool _useStd;
-	bool _inlineAll;
-	bool _amalgamateSources;
+	bool _helpRequested = false;
+	bool _generateAllBindings = false;
+	bool _ignoreParameterOrder = true;
+	bool _namespaceInSourceFileNames = false;
+	bool _namespaceInHeaderFileNames = false;
+	bool _alwaysUseOptional = false;
+	bool _useStd = false;
+	bool _inlineAll = false;
+	bool _amalgamateSources = false;
 	std::string _amalgamatedSourceFileName;
 	std::map<std::string, SchemaInfo> _schemas;
 	Poco::XSD::Parser::XSDContentHandler::SchemaNSToLocationMap _schemaMap;

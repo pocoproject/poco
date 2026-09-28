@@ -21,7 +21,7 @@ class XSDTypesTest: public CppUnit::TestCase
 {
 public:
 	XSDTypesTest(const std::string& name);
-	~XSDTypesTest();
+	~XSDTypesTest() override;
 
 	void testEmptySequence();
 	void testSequenceIterator();
@@ -55,8 +55,8 @@ public:
 	void testAllIterator2();
 	void testAllIterator3();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

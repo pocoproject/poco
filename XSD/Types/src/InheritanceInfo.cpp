@@ -18,24 +18,18 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 InheritanceInfo::InheritanceInfo():
 	_ref(),
-	_restriction(false),
-	_simpleContent(false),
 	_parent(),
 	_pSimple()
 {
 }
 
 
-InheritanceInfo::~InheritanceInfo()
-{
-}
+InheritanceInfo::~InheritanceInfo() = default;
 
 
 void InheritanceInfo::fixup()
@@ -88,4 +82,4 @@ void InheritanceInfo::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

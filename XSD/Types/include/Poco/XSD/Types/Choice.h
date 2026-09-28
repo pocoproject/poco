@@ -23,9 +23,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API Choice: public Order
@@ -38,19 +36,19 @@ public:
 	Choice(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc);
 		/// Creates the Choice.
 
-	virtual ~Choice();
+	~Choice() override;
 		/// Destroys the Choice.
 
-	void add(OrderContent::Ptr pChild);
+	void add(OrderContent::Ptr pChild) override;
 
-	const Choice::Content& getContent() const;
+	[[nodiscard]] const Choice::Content& getContent() const;
 		/// Returns the children of the Choice collection.
 
-	void fixup();
+	void fixup() override;
 
-	void accept(Visitor& v) const;
+	void accept(Visitor& v) const override;
 
-	OrderIterator iterator() const;
+	[[nodiscard]] OrderIterator iterator() const override;
 
 private:
 	Choice::Content _content;
@@ -66,7 +64,7 @@ inline const Choice::Content& Choice::getContent() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_Choice_INCLUDED

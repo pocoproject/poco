@@ -21,7 +21,7 @@ class XSDParserTest: public CppUnit::TestCase
 {
 public:
 	XSDParserTest(const std::string& name);
-	~XSDParserTest();
+	~XSDParserTest() override;
 
 	void testAnnotation();
 	void testAnnotation2();
@@ -48,8 +48,8 @@ public:
 	void testImportSecondDocument();
 	void testIncludeChameleon();
 
-	void setUp();
-	void tearDown();
+	void setUp() override;
+	void tearDown() override;
 
 	static CppUnit::Test* suite();
 

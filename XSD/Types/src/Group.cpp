@@ -16,9 +16,7 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 Group::Group(const std::string& id, const std::string& name, Poco::UInt32 minOcc, Poco::UInt32 maxOcc):
@@ -28,9 +26,7 @@ Group::Group(const std::string& id, const std::string& name, Poco::UInt32 minOcc
 }
 
 
-Group::~Group()
-{
-}
+Group::~Group() = default;
 
 
 void Group::fixup()
@@ -48,4 +44,4 @@ void Group::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

@@ -23,8 +23,3 @@ Destructor::Destructor():
 	AbstractMethod(std::string("~"), Utility::AC_PUBLIC, false, false, true, false)
 {
 }
-
-
-Destructor::~Destructor()
-{
-}

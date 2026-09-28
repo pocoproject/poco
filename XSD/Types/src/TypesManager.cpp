@@ -23,9 +23,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 const std::string TypesManager::XSD_NAMESPACE("http://www.w3.org/2001/XMLSchema");
@@ -87,9 +85,9 @@ TypesManager& TypesManager::instance()
 
 void TypesManager::fixupSchemas()
 {
-	for (Schemas::iterator it = _schemas.begin(); it != _schemas.end(); ++it)
+	for (auto& [ns, pSchema]: _schemas)
 	{
-		it->second->fixup();
+		pSchema->fixup();
 	}
 }
 
@@ -111,7 +109,7 @@ bool TypesManager::hasDefinitions(const std::string& ns) const
 bool TypesManager::eraseSchema(const std::string& ns)
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
-	Schemas::iterator it = _schemas.find(ns);
+	auto it = _schemas.find(ns);
 	if (it == _schemas.end())
 		return false;
 
@@ -138,16 +136,16 @@ void TypesManager::completeSchema(Schema::Ptr pSchema)
 	if (pSchema->targetNamespace() == XSD_NAMESPACE || pSchema->targetNamespace() == XSD_NAMESPACE1998)
 		return;
 
-	Schemas::iterator it = _schemas.find(pSchema->targetNamespace());
+	auto it = _schemas.find(pSchema->targetNamespace());
 	if (it == _schemas.end() || it->second == pSchema)
 		return;
 
 	mergeSchema(*it->second, *pSchema);
-	// the locations of pSchema then lead to the registered schema, which eraseSchema() removes
-	for (auto& location: _schemaLocations)
+	// lookups by location then return the registered schema, and eraseSchema() removes the entries
+	for (auto& [location, pLocationSchema]: _schemaLocations)
 	{
-		if (location.second == pSchema)
-			location.second = it->second;
+		if (pLocationSchema == pSchema)
+			pLocationSchema = it->second;
 	}
 }
 
@@ -157,7 +155,7 @@ void TypesManager::removeSchema(const Schema::Ptr& pSchema)
 	Poco::Mutex::ScopedLock lock(_mutex);
 	for (Schemas* pMap: {&_schemas, &_schemaLocations})
 	{
-		for (Schemas::iterator it = pMap->begin(); it != pMap->end();)
+		for (auto it = pMap->begin(); it != pMap->end();)
 		{
 			if (it->second == pSchema)
 				it = pMap->erase(it);
@@ -179,7 +177,7 @@ void TypesManager::addDefinitions(Definitions::Ptr pDefinitions)
 void TypesManager::removeDefinitions(const Definitions::Ptr& pDefinitions)
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
-	for (Definitionss::iterator it = _definitions.begin(); it != _definitions.end();)
+	for (auto it = _definitions.begin(); it != _definitions.end();)
 	{
 		if (it->second == pDefinitions)
 			it = _definitions.erase(it);
@@ -191,9 +189,9 @@ void TypesManager::removeDefinitions(const Definitions::Ptr& pDefinitions)
 
 void TypesManager::setSchemaInternal(Schema::Ptr pSchema, const Poco::URI& schemaLocation)
 {
-	std::pair<Schemas::iterator, bool> res = _schemas.insert(make_pair(pSchema->targetNamespace(), pSchema));
-	Schema& theSchema = *(res.first->second);
-	if (!res.second)
+	const auto [itSchema, inserted] = _schemas.try_emplace(pSchema->targetNamespace(), pSchema);
+	Schema& theSchema = *(itSchema->second);
+	if (!inserted)
 	{
 		if (conflicts(theSchema, *pSchema))
 			throw SchemaException("A different schema for that targetNamespace exists: " + pSchema->targetNamespace());
@@ -206,35 +204,35 @@ void TypesManager::setSchemaInternal(Schema::Ptr pSchema, const Poco::URI& schem
 
 void TypesManager::mergeSchema(Schema& target, const Schema& source)
 {
-	for (const auto& type: source.types())
+	for (const auto& [name, pType]: source.types())
 	{
-		if (target.getType(type.second->name()) == nullptr)
-			target.addType(type.second);
+		if (target.getType(pType->name()) == nullptr)
+			target.addType(pType);
 	}
-	for (const auto& element: source.elements())
+	for (const auto& [name, pElement]: source.elements())
 	{
-		if (target.getElement(element.second->name()) == nullptr)
-			target.addElement(element.second);
+		if (target.getElement(pElement->name()) == nullptr)
+			target.addElement(pElement);
 	}
-	for (const auto& attribute: source.attributes())
+	for (const auto& [name, pAttr]: source.attributes())
 	{
-		if (target.getAttribute(attribute.second->name()) == nullptr)
-			target.addAttribute(attribute.second);
+		if (target.getAttribute(pAttr->name()) == nullptr)
+			target.addAttribute(pAttr);
 	}
-	for (const auto& attributeGroup: source.attributeGroups())
+	for (const auto& [name, pAttrGroup]: source.attributeGroups())
 	{
-		if (target.getAttributeGroup(attributeGroup.second->name()) == nullptr)
-			target.addAttributeGroup(attributeGroup.second);
+		if (target.getAttributeGroup(pAttrGroup->name()) == nullptr)
+			target.addAttributeGroup(pAttrGroup);
 	}
-	for (const auto& group: source.groups())
+	for (const auto& [name, pGroup]: source.groups())
 	{
-		if (target.getGroup(group.second->name()) == nullptr)
-			target.addGroup(group.second);
+		if (target.getGroup(pGroup->name()) == nullptr)
+			target.addGroup(pGroup);
 	}
-	for (const auto& notation: source.notations())
+	for (const auto& [name, pNotation]: source.notations())
 	{
-		if (target.getNotation(notation.second->name()) == nullptr)
-			target.addNotation(notation.second);
+		if (target.getNotation(pNotation->name()) == nullptr)
+			target.addNotation(pNotation);
 	}
 	const Schema::Schemas& imported = target.importedSchemas();
 	for (const auto& pImported: source.importedSchemas())
@@ -248,8 +246,7 @@ void TypesManager::mergeSchema(Schema& target, const Schema& source)
 Schema& TypesManager::getSchema(const std::string& ns)
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
-	Schemas::iterator it = _schemas.find(ns);
-	if (it != _schemas.end())
+	if (const auto it = _schemas.find(ns); it != _schemas.end())
 		return *(it->second);
 	else
 		throw Poco::NotFoundException("schema", ns);
@@ -259,41 +256,37 @@ Schema& TypesManager::getSchema(const std::string& ns)
 Schema::Ptr TypesManager::findSchema(const std::string& ns)
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
-	Schemas::iterator it = _schemas.find(ns);
-	if (it != _schemas.end())
+	if (const auto it = _schemas.find(ns); it != _schemas.end())
 		return it->second;
 	else
-		return Schema::Ptr();
+		return {};
 }
 
 
 Schema::Ptr TypesManager::findSchema(const Poco::URI& schemaLocation)
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
-	Schemas::iterator it = _schemaLocations.find(schemaLocation.toString());
-	if (it != _schemaLocations.end())
+	if (const auto it = _schemaLocations.find(schemaLocation.toString()); it != _schemaLocations.end())
 		return it->second;
 	else
-		return Schema::Ptr();
+		return {};
 }
 
 
 Definitions::Ptr TypesManager::findDefinitions(const std::string& ns)
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
-	Definitionss::iterator it = _definitions.find(ns);
-	if (it != _definitions.end())
+	if (const auto it = _definitions.find(ns); it != _definitions.end())
 		return it->second;
 	else
-		return Definitions::Ptr();
+		return {};
 }
 
 
 Definitions& TypesManager::getDefinitions(const std::string& ns)
 {
 	Poco::Mutex::ScopedLock lock(_mutex);
-	Definitionss::iterator it = _definitions.find(ns);
-	if (it != _definitions.end())
+	if (const auto it = _definitions.find(ns); it != _definitions.end())
 		return *(it->second);
 	else
 		throw Poco::NotFoundException("definitions", ns);
@@ -304,8 +297,7 @@ const Type* TypesManager::getType(const QName& ref) const
 {
 	const Type* pResult = nullptr;
 	Poco::Mutex::ScopedLock lock(_mutex);
-	Schemas::const_iterator it = _schemas.find(ref.getNamespace());
-	if (it != _schemas.end())
+	if (const auto it = _schemas.find(ref.getNamespace()); it != _schemas.end())
 		pResult = it->second->getType(ref.name());
 
 	return pResult;
@@ -316,8 +308,7 @@ const Element* TypesManager::getElement(const QName& ref) const
 {
 	const Element* pResult = nullptr;
 	Poco::Mutex::ScopedLock lock(_mutex);
-	Schemas::const_iterator it = _schemas.find(ref.getNamespace());
-	if (it != _schemas.end())
+	if (const auto it = _schemas.find(ref.getNamespace()); it != _schemas.end())
 		pResult = it->second->getElement(ref.name());
 
 	return pResult;
@@ -328,8 +319,7 @@ const AbstractAttribute* TypesManager::getAttribute(const QName& ref) const
 {
 	const AbstractAttribute* pResult = nullptr;
 	Poco::Mutex::ScopedLock lock(_mutex);
-	Schemas::const_iterator it = _schemas.find(ref.getNamespace());
-	if (it != _schemas.end())
+	if (const auto it = _schemas.find(ref.getNamespace()); it != _schemas.end())
 		pResult = it->second->getAttribute(ref.name());
 
 	return pResult;
@@ -340,8 +330,7 @@ const AbstractAttributeGroup* TypesManager::getAttributeGroup(const QName& ref) 
 {
 	const AbstractAttributeGroup* pResult = nullptr;
 	Poco::Mutex::ScopedLock lock(_mutex);
-	Schemas::const_iterator it = _schemas.find(ref.getNamespace());
-	if (it != _schemas.end())
+	if (const auto it = _schemas.find(ref.getNamespace()); it != _schemas.end())
 		pResult = it->second->getAttributeGroup(ref.name());
 
 	return pResult;
@@ -352,8 +341,7 @@ const Group* TypesManager::getGroup(const QName& ref) const
 {
 	const Group* pResult = nullptr;
 	Poco::Mutex::ScopedLock lock(_mutex);
-	Schemas::const_iterator it = _schemas.find(ref.getNamespace());
-	if (it != _schemas.end())
+	if (const auto it = _schemas.find(ref.getNamespace()); it != _schemas.end())
 		pResult = it->second->getGroup(ref.name());
 
 	return pResult;
@@ -550,9 +538,7 @@ TypesManager::TypesManager()
 }
 
 
-TypesManager::~TypesManager()
-{
-}
+TypesManager::~TypesManager() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

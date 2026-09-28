@@ -23,37 +23,35 @@ public:
 
 	TypeInfo(const std::string& name, const std::string& nameSpace, const std::string& schemaNameSpace, const std::string& xsdType, const std::string& includeFile, bool isSystemInclude, bool isVector, bool isScalar);
 
-	~TypeInfo();
+	[[nodiscard]] const std::string& name() const;
 
-	const std::string& name() const;
-
-	const std::string& getNameSpace() const;
+	[[nodiscard]] const std::string& getNameSpace() const;
 		/// Returns the cpp namespace
 		
-	const std::string& getSchemaNameSpace() const;
+	[[nodiscard]] const std::string& getSchemaNameSpace() const;
 		/// Returns the schema namespace.
 
-	const std::string& getFullName() const;
+	[[nodiscard]] const std::string& getFullName() const;
 
-	const std::string& getIncludeFile() const;
+	[[nodiscard]] const std::string& getIncludeFile() const;
 
 	void setIncludeFile(const std::string& incFile, bool isSystemInclude);
 
-	bool isSystemInclude() const;
+	[[nodiscard]] bool isSystemInclude() const;
 
-	bool isVector() const;
+	[[nodiscard]] bool isVector() const;
 
 	void setVector(bool isVec);
 	
-	bool isNullable() const;
+	[[nodiscard]] bool isNullable() const;
 	
 	void setNullable(bool isNullable);
 
-	bool isScalar() const;
+	[[nodiscard]] bool isScalar() const;
 
-	const std::string& xsdType() const;
+	[[nodiscard]] const std::string& xsdType() const;
 
-	bool operator < (const TypeInfo& other) const;
+	[[nodiscard]] bool operator < (const TypeInfo& other) const;
 		/// comnpares two types by name and namespace
 
 private:
@@ -65,7 +63,7 @@ private:
 	std::string _includeFile;
 	bool        _isSystemInclude;
 	bool        _isVector;
-	bool        _isNullable;
+	bool        _isNullable = false;
 	bool        _isScalar;
 };
 

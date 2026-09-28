@@ -20,8 +20,6 @@ class MethodInfo: public AbstractMethod
 public:
 	MethodInfo(const std::string& name, Utility::Access acc, bool isConst, bool isStatic, bool isVirtual, bool isAbstract);
 
-	virtual ~MethodInfo();
-
 	void setReturnParameter(Poco::SharedPtr<Parameter> pParam);
 		/// Sets the return parameter, set to null for void return.
 
@@ -41,7 +39,7 @@ inline void MethodInfo::setReturnParameter(Poco::SharedPtr<Parameter> pParam)
 
 inline void MethodInfo::addParameter(const Parameter& param)
 {
-	bool ok = _parameters.insert(std::make_pair(param.getOrder(), param)).second;
+	bool ok = _parameters.try_emplace(param.getOrder(), param).second;
 	poco_assert (ok);
 }
 

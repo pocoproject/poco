@@ -15,14 +15,10 @@
 #include "Poco/XSD/Types/Visitable.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
-Visitable::Visitable()
-{
-}
+Visitable::Visitable() = default;
 
 
 Visitable::Visitable(const std::string& id):
@@ -31,9 +27,7 @@ Visitable::Visitable(const std::string& id):
 }
 
 
-Visitable::~Visitable()
-{
-}
+Visitable::~Visitable() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

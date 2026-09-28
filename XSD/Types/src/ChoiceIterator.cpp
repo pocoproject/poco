@@ -18,34 +18,25 @@
 #include "Poco/XSD/Types/XSDException.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 ChoiceIterator::ChoiceIterator(const Choice& choice):
 	_min(choice.getMinOccurs()),
 	_max(choice.getMaxOccurs()),
 	_vecIt(),
-	_lastChosenPos(NO_CHOICE),
-	_next(),
-	_chosenElementCnt(0),
-	_dirtyFlag(true)
+	_next()
 {
-	Choice::Content::const_iterator it = choice.getContent().begin();
-	Choice::Content::const_iterator itEnd = choice.getContent().end();
-	for (; it != itEnd; ++it)
+	for (const auto& pChild: choice.getContent())
 	{
-		OrderIterator itOrd = (*it)->iterator();
+		OrderIterator itOrd = pChild->iterator();
 		if (!itOrd.validNexts().empty())
 			_vecIt.push_back(itOrd);
 	}
 }
 
 
-ChoiceIterator::~ChoiceIterator()
-{
-}
+ChoiceIterator::~ChoiceIterator() = default;
 
 
 OrderContent::Ptr ChoiceIterator::next(const std::string& name)
@@ -112,9 +103,9 @@ const std::set<std::string>& ChoiceIterator::validNexts() const
 
 	if (addAllOthers)
 	{
-		for (Iterators::size_type i = 0; i < _vecIt.size(); ++i)
+		for (const auto& itOrd: _vecIt)
 		{
-			const std::set<std::string>& child = _vecIt[i].validNexts();
+			const std::set<std::string>& child = itOrd.validNexts();
 			_next.insert(child.begin(), child.end());
 		}
 	}
@@ -178,11 +169,9 @@ void ChoiceIterator::reset()
 	_lastChosenPos = NO_CHOICE;
 	_dirtyFlag = true;
 	_chosenElementCnt = 0;
-	Iterators::iterator it = _vecIt.begin();
-	Iterators::iterator itEnd = _vecIt.end();
-	for (; it != itEnd; ++it)
-		it->reset();
+	for (auto& itOrd: _vecIt)
+		itOrd.reset();
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

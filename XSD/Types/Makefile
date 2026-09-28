@@ -42,24 +42,12 @@ objects = \
 	ElementIterator \
 	ElementRef \
 	ElementTypeRef \
-	Enumeration \
-	Field \
-	FractionDigits \
 	Group \
 	GroupRef \
 	InheritanceInfo \
-	Key \
-	Keyref \
-	Length \
 	List \
 	ListTypeRef \
-	MaxExclusive \
-	MaxInclusive \
-	MaxLength \
 	Message \
-	MinExclusive \
-	MinInclusive \
-	MinLength \
 	NamespaceManager \
 	Notation \
 	Operation \
@@ -67,12 +55,9 @@ objects = \
 	OrderContent \
 	OrderIterator \
 	OrderIteratorImpl \
-	Pattern \
 	PortType \
 	QName \
-	Redefine \
 	Schema \
-	Selector \
 	Sequence \
 	SequenceIterator \
 	Service \
@@ -80,14 +65,11 @@ objects = \
 	SimpleRestrictionInlineType \
 	SimpleType \
 	SimpleTypeInheritance \
-	TotalDigits \
 	Type \
 	TypesManager \
 	Union \
-	Unique \
 	Visitable \
 	Visitor \
-	Whitespace \
 	XSDException
 
 target         = PocoXSDTypes

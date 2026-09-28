@@ -25,9 +25,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API AnnotatedObject: public Visitable
@@ -41,19 +39,19 @@ public:
 	AnnotatedObject();
 		/// Creates the AnnotatedObject.
 
-	AnnotatedObject(const std::string& id);
+	explicit AnnotatedObject(const std::string& id);
 		/// Creates the AnnotatedObject.
 
 	AnnotatedObject(const std::string& id, const Annotation& ann);
 		/// Creates the AnnotatedObject.
 
-	virtual ~AnnotatedObject();
+	~AnnotatedObject() override;
 		/// Destroys the AnnotatedObject.
 
 	void addAnnotation(const Annotation& ann);
 		/// Adds the annotation at the object.
 
-	const Annotations& getAnnotations() const;
+	[[nodiscard]] const Annotations& getAnnotations() const;
 		/// Returns the annotation from the object.
 
 private:
@@ -76,7 +74,7 @@ inline const AnnotatedObject::Annotations& AnnotatedObject::getAnnotations() con
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_AnnotatedObject_INCLUDED

@@ -16,14 +16,10 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
-PortType::PortType()
-{
-}
+PortType::PortType() = default;
 
 
 PortType::PortType(const std::string& name):
@@ -32,9 +28,7 @@ PortType::PortType(const std::string& name):
 }
 
 
-PortType::~PortType()
-{
-}
+PortType::~PortType() = default;
 
 	
 void PortType::addOperation(const Operation::Ptr pOperation)
@@ -49,4 +43,4 @@ void PortType::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

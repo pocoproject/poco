@@ -19,9 +19,7 @@
 #include "Poco/XSD/Types/SimpleType.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 AttributeTypeRef::AttributeTypeRef(const std::string& id, 
@@ -66,9 +64,7 @@ AttributeTypeRef::AttributeTypeRef(const std::string& id,
 }
 
 
-AttributeTypeRef::~AttributeTypeRef()
-{
-}
+AttributeTypeRef::~AttributeTypeRef() = default;
 
 
 const std::string& AttributeTypeRef::nameSpace() const
@@ -128,4 +124,4 @@ void AttributeTypeRef::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

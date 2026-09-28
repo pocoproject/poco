@@ -17,14 +17,10 @@
 #include "Poco/XSD/Types/OrderIterator.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
-Element::Element()
-{
-}
+Element::Element() = default;
 
 
 Element::Element(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc):
@@ -33,9 +29,7 @@ Element::Element(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc
 }
 
 
-Element::~Element()
-{
-}
+Element::~Element() = default;
 
 
 OrderIterator Element::iterator() const
@@ -44,4 +38,4 @@ OrderIterator Element::iterator() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

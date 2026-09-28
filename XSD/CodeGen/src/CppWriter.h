@@ -135,7 +135,7 @@ private:
 
 	void writePrefixedLine(std::ostream& out, const std::string& prefix, const std::string& line, int ind = 0);
 
-	bool canForwardDeclare(const Variable& var) const;
+	[[nodiscard]] bool canForwardDeclare(const Variable& var) const;
 
 private:
 	SchemaInfo _info;

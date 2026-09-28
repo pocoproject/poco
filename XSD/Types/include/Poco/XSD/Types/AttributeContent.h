@@ -22,9 +22,7 @@
 #include "Poco/XSD/Types/AnnotatedObject.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API AttributeContent: public AnnotatedObject
@@ -36,13 +34,13 @@ public:
 	AttributeContent(const std::string& id, const std::string& name);
 		/// Creates the AttributeContent.
 
-	virtual ~AttributeContent();
+	~AttributeContent() override;
 		/// Destroys the AttributeContent.
 
-	virtual const std::string& name() const;
+	[[nodiscard]] virtual const std::string& name() const;
 		/// The name of the attribute. Only set for root level attributes.
 
-	virtual bool isAny() const = 0;
+	[[nodiscard]] virtual bool isAny() const = 0;
 		/// Returns true for the any attribute.
 
 	virtual void fixup() = 0;
@@ -62,7 +60,7 @@ inline const std::string& AttributeContent::name() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_AttributeGroupContent_INCLUDED

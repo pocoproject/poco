@@ -23,9 +23,7 @@
 #include "Poco/XSD/Types/QName.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API ElementRef: public Element
@@ -37,93 +35,88 @@ class XSDTypes_API ElementRef: public Element
 	/// the referenced element via the ElementRef. All set methods are ignored.
 {
 public:
-	ElementRef();
-		/// Creates the ElementRef.
-
-	ElementRef(const QName& ref);
+	explicit ElementRef(const QName& ref);
 		/// Creates the ElementRef. The references element needs not to exist yet.
 
 	ElementRef(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc, const QName& ref);
 
-	~ElementRef();
+	~ElementRef() override;
 		/// Destroys the ElementRef.
 
-	void fixup();
+	void fixup() override;
 		/// Checks if the referenced element exists and set the element
 		/// as member.
 
-	const std::string& nameSpace() const;
+	[[nodiscard]] const std::string& nameSpace() const override;
 
-	bool getAbstract() const;
+	[[nodiscard]] bool getAbstract() const override;
 
-	void setAbstract(bool abstr);
+	void setAbstract(bool abstr) override;
 
-	void setBlockAll(bool block);
+	void setBlockAll(bool block) override;
 
-	bool getBlockRestriction() const;
+	[[nodiscard]] bool getBlockRestriction() const override;
 
-	void setBlockRestriction(bool block);
+	void setBlockRestriction(bool block) override;
 
-	bool getBlockExtension() const;
+	[[nodiscard]] bool getBlockExtension() const override;
 
-	void setBlockExtension(bool block);
+	void setBlockExtension(bool block) override;
 
-	bool getBlockSubstitution() const;
+	[[nodiscard]] bool getBlockSubstitution() const override;
 
-	void setBlockSubstitution(bool block);
+	void setBlockSubstitution(bool block) override;
 
-	const std::string& getDefault() const;
+	[[nodiscard]] const std::string& getDefault() const override;
 		/// The default value of the element. Empty if no one exists.
 
-	void setDefault(const std::string& value);
+	void setDefault(const std::string& value) override;
 
-	bool hasDefault() const;
+	[[nodiscard]] bool hasDefault() const override;
 
-	void setFinalAll(bool fin);
+	void setFinalAll(bool fin) override;
 
-	bool getFinalRestriction() const;
+	[[nodiscard]] bool getFinalRestriction() const override;
 
-	void setFinalRestriction(bool fin);
+	void setFinalRestriction(bool fin) override;
 
-	bool getFinalExtension() const;
+	[[nodiscard]] bool getFinalExtension() const override;
 
-	void setFinalExtension(bool fin);
+	void setFinalExtension(bool fin) override;
 
-	const std::string& getFixed() const;
+	[[nodiscard]] const std::string& getFixed() const override;
 		/// The fixed value of the element. Empty if no one exists.
 
-	void setFixed(const std::string& value);
+	void setFixed(const std::string& value) override;
 
-	bool hasFixed() const;
+	[[nodiscard]] bool hasFixed() const override;
 
-	bool getQualified() const;
+	[[nodiscard]] bool getQualified() const override;
 	/// Returns if the element is in qualified form or not
 
-	void setQualified(bool qual);
+	void setQualified(bool qual) override;
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const override;
 
-	void setName(const std::string& name);
+	void setName(const std::string& name) override;
 
-	bool getNillable() const;
+	[[nodiscard]] bool getNillable() const override;
 
-	void setNillable(bool nillable);
+	void setNillable(bool nillable) override;
 
-	const QName& getSubstitutionGroup() const;
+	[[nodiscard]] const QName& getSubstitutionGroup() const override;
 
-	void setSubstitutionGroup(const QName& ref);
+	void setSubstitutionGroup(const QName& ref) override;
 
-	bool hasSubstitutionGroup() const;
+	[[nodiscard]] bool hasSubstitutionGroup() const override;
 
-	const Type& type() const;
-	
-	void setType(const Type& aType);
+	[[nodiscard]] const Type& type() const override;
 
-	void accept(Visitor& v) const;
+	void accept(Visitor& v) const override;
 
 private:
 	QName _ref;
-	const Element* _pElement;
+	const Element* _pElement = nullptr;
 		/// The referenced element.
 };
 
@@ -297,12 +290,7 @@ inline const Type& ElementRef::type() const
 }
 
 
-inline void ElementRef::setType(const Type&)
-{
-}
-
-
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_ElementRef_INCLUDED

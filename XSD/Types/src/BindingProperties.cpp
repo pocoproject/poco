@@ -15,19 +15,13 @@
 #include "Poco/XSD/Types/BindingProperties.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
-BindingProperties::BindingProperties()
-{
-}
+BindingProperties::BindingProperties() = default;
 
 
-BindingProperties::~BindingProperties()
-{
-}
+BindingProperties::~BindingProperties() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

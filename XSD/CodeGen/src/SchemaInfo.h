@@ -35,46 +35,44 @@ public:
 		bool timestamps);
 		//Constructor
 
-	~SchemaInfo();
+	[[nodiscard]] bool operator<(const SchemaInfo& si) const;
 
-	bool operator<(const SchemaInfo& si) const;
-
-	const std::string& id() const;
+	[[nodiscard]] const std::string& id() const;
 		/// The unqiue id for the schemaInfo, typically the xml namespace of the Schema
 
-	const std::string& nameSpace() const;
+	[[nodiscard]] const std::string& nameSpace() const;
 		/// Returns the cpp namespace. Can be empty
 
-	const std::string& dllPrefix() const;
+	[[nodiscard]] const std::string& dllPrefix() const;
 		/// Returns the prefix that defines the declspec macro. Can be empty
 
-	const Poco::Path& includeDir() const;
+	[[nodiscard]] const Poco::Path& includeDir() const;
 		/// Returns the path where header files will be generated to.
 
-	const Poco::Path& sourceDir() const;
+	[[nodiscard]] const Poco::Path& sourceDir() const;
 		/// Returns the path where source files will be generated to.
 
-	const Poco::Path& rootInclude() const;
+	[[nodiscard]] const Poco::Path& rootInclude() const;
 		/// Returns the root path from which files will be included for this project.
 		/// Must be a parent of includeDir
 
-	const std::vector<std::string>& copyright() const;
+	[[nodiscard]] const std::vector<std::string>& copyright() const;
 		/// Returns the copyright notice. Can be empty.
 
-	const std::set<std::string>& extraIncludes() const;
+	[[nodiscard]] const std::set<std::string>& extraIncludes() const;
 		/// Returns extra includes that each generated header file must include.
 		/// Can be empty.
 
-	bool remotingAttributes() const;
+	[[nodiscard]] bool remotingAttributes() const;
 		/// Returns whether remoting headers should be generated.
 		
-	bool preserveOptional() const;
+	[[nodiscard]] bool preserveOptional() const;
 		/// Returns whether Poco::Optional should be used together with Poco::Nullable.
 		
-	bool timestamps() const;
+	[[nodiscard]] bool timestamps() const;
 		/// Returns true whether header timestamps should be generated.
 
-	std::string createInclude(const std::string& className) const;
+	[[nodiscard]] std::string createInclude(const std::string& className) const;
 
 private:
 	std::string              _id;

@@ -23,9 +23,10 @@
 #include <limits>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+POCO_CHECK_MINMAX_MACROS
+
+
+namespace Poco::XSD::Types {
 
 
 class Choice;
@@ -35,20 +36,20 @@ class XSDTypes_API ChoiceIterator: public OrderIteratorImpl
 	/// An iterator for iterating over a Choice's content.
 {
 public:
-	ChoiceIterator(const Choice& choice);
+	explicit ChoiceIterator(const Choice& choice);
 		/// Creates the ChoiceIterator.
 
-	virtual ~ChoiceIterator();
+	~ChoiceIterator() override;
 		/// Destroys the ChoiceIterator.
 
 	// OrderIteratorImpl
-	OrderContent::Ptr next(const std::string& name);
-	const std::set<std::string>& validNexts() const;
-	bool end() const;
-	bool validNext(const std::string& name) const;
-	void close();
-	bool canClose() const;
-	void reset();
+	OrderContent::Ptr next(const std::string& name) override;
+	[[nodiscard]] const std::set<std::string>& validNexts() const override;
+	[[nodiscard]] bool end() const override;
+	[[nodiscard]] bool validNext(const std::string& name) const override;
+	void close() override;
+	[[nodiscard]] bool canClose() const override;
+	void reset() override;
 
 private:
 	using Iterators = std::vector<OrderIterator>;
@@ -59,14 +60,14 @@ private:
 	UInt32    _min;
 	UInt32    _max;
 	mutable Iterators _vecIt;
-	mutable Iterators::size_type _lastChosenPos;
+	mutable Iterators::size_type _lastChosenPos = NO_CHOICE;
 	mutable std::set<std::string> _next;
-	UInt32 _chosenElementCnt;
-	mutable bool _dirtyFlag;
+	UInt32 _chosenElementCnt = 0;
+	mutable bool _dirtyFlag = true;
 };
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_ChoiceIterator_INCLUDED
