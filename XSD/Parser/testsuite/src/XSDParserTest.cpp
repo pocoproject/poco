@@ -327,7 +327,7 @@ void XSDParserTest::testComplexType()
 	poco_assert (pElem->getMinOccurs() == 1);
 	const Poco::XSD::Types::Type& aType = pElem->type();
 	poco_assert (aType.name() == "Person");
-	poco_assert (aType.getSchema() != 0);
+	poco_assert (aType.getSchema() != nullptr);
 }
 
 

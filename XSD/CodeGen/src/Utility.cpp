@@ -202,7 +202,7 @@ bool Utility::isReservedName(const std::string& name)
 		"while",
 		"xor",
 		"xor_eq",
-		0
+		nullptr
 	};
 
 	for (const char* const* p = &reserved[0]; *p; p++)

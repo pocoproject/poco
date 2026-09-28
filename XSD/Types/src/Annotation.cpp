@@ -34,6 +34,7 @@ Annotation::~Annotation()
 
 
 Annotation::Annotation(const Annotation& ann):
+	Visitable(),
 	_content(ann._content),
 	_id(ann._id)
 {

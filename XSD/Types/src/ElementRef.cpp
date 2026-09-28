@@ -25,7 +25,7 @@ namespace Types {
 
 ElementRef::ElementRef(const QName& ref):
 	_ref(ref),
-	_pElement(0)
+	_pElement(nullptr)
 {
 }
 
@@ -33,7 +33,7 @@ ElementRef::ElementRef(const QName& ref):
 ElementRef::ElementRef(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc, const QName& ref):
 	Element(id, minOcc, maxOcc),
 	_ref(ref),
-	_pElement(0)
+	_pElement(nullptr)
 {
 }
 
@@ -51,7 +51,7 @@ const std::string& ElementRef::nameSpace() const
 
 void ElementRef::fixup()
 {
-	if (_pElement == 0)
+	if (_pElement == nullptr)
 	{
 		// find the element, throw exception if not found
 		_pElement = TypesManager::instance().getElement(_ref);

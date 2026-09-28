@@ -30,6 +30,10 @@ RemotingNG/JSONRPC
 RemotingNG/REST
 RemotingNG/SOAP
 RemotingNG/RemoteGen
+XSD/Types
+XSD/Parser
+XSD/CodeGen
+XSD/Validator
 MongoDB
 Redis
 Prometheus

@@ -26,7 +26,7 @@ namespace Types {
 AttributeGroupRef::AttributeGroupRef(const std::string& id, const QName& ref):
 	AbstractAttributeGroup(id, ref.name()),
 	_ref(ref),
-	_pGroup(0)
+	_pGroup(nullptr)
 {
 }
 
@@ -65,7 +65,7 @@ void AttributeGroupRef::fixup()
 		if (!_pGroup)
 			throw InvalidTypeException("AttributeGroupRef references invalid attribute group:" + _ref.name());
 		// check for possible infinite ref loop
-		if (dynamic_cast<const AttributeGroupRef*>(_pGroup) != 0)
+		if (dynamic_cast<const AttributeGroupRef*>(_pGroup) != nullptr)
 			throw XSDException("AttributeGroupRef can't reference another AttributeGroupRef: possible infinite recursion");
 	}
 }

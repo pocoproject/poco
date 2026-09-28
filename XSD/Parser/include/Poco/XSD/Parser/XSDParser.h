@@ -42,7 +42,11 @@
 
 
 #if !defined(XSDParser_API)
-	#define XSDParser_API
+	#if !defined(POCO_NO_GCC_API_ATTRIBUTE) && defined (__GNUC__) && (__GNUC__ >= 4)
+		#define XSDParser_API __attribute__ ((visibility ("default")))
+	#else
+		#define XSDParser_API
+	#endif
 #endif
 
 
@@ -61,7 +65,7 @@ namespace XSD {
 namespace Parser {
 
 
-using CompactAttributes = std::map<std::string, const std::string>; // maps attrname to value
+using CompactAttributes = std::map<std::string, std::string>; // maps attrname to value
 
 
 } } } // namespace Poco::XSD::Parser

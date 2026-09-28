@@ -15,6 +15,10 @@ Figure 1 illustrates the code generation process from WSDL to C++ client code.
 
 [[image:images/XSDGen.png Figure 1: WSDL to C++ Code Generation]]
 
+Schema and WSDL documents, and the documents they reference by location, are opened with the
+privileges of the process through the registered URI schemes (file, http, ftp and, when built
+with NetSSL, https); run <*XSDGen*> only on documents from a trusted source.
+
 
 !!!Configuring XSDGen
 

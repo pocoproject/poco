@@ -81,7 +81,7 @@ poco: libexecs $(if $(TESTS),tests) $(if $(SAMPLES),samples)
 all: libexecs tests samples
 
 INSTALLDIR = $(DESTDIR)$(POCO_PREFIX)
-COMPONENTS = Foundation Encodings XML JSON Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL ActiveRecord ActiveRecord/Compiler Zip PageCompiler PageCompiler/File2Page JWT CppParser CodeGeneration RemotingNG RemotingNG/TCP RemotingNG/HTTP RemotingNG/JSONRPC RemotingNG/REST RemotingNG/SOAP RemotingNG/RemoteGen PDF MongoDB Redis Prometheus
+COMPONENTS = Foundation Encodings XML JSON Util Net Crypto NetSSL_OpenSSL Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL ActiveRecord ActiveRecord/Compiler Zip PageCompiler PageCompiler/File2Page JWT CppParser CodeGeneration RemotingNG RemotingNG/TCP RemotingNG/HTTP RemotingNG/JSONRPC RemotingNG/REST RemotingNG/SOAP RemotingNG/RemoteGen XSD/Types XSD/Parser XSD/CodeGen PDF MongoDB Redis Prometheus
 
 cppunit:
 	$(MAKE) -C $(POCO_BASE)/CppUnit
@@ -129,10 +129,10 @@ endif
 	find $(INSTALLDIR)/lib -name "libPoco*" -type f -exec rm -f  {} \;
 	find $(INSTALLDIR)/lib -name "libPoco*" -type l -exec rm -f {} \;
 
-libexecs =  Foundation-libexec Encodings-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec Data/PostgreSQL-libexec ActiveRecord-libexec ActiveRecord/Compiler-libexec Zip-libexec JWT-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec CodeGeneration-libexec RemotingNG-libexec RemotingNG/TCP-libexec RemotingNG/HTTP-libexec RemotingNG/JSONRPC-libexec RemotingNG/REST-libexec RemotingNG/SOAP-libexec RemotingNG/RemoteGen-libexec PDF-libexec MongoDB-libexec Redis-libexec Prometheus-libexec
-tests    =  Foundation-tests Encodings-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests Data/PostgreSQL-tests ActiveRecord-tests JWT-tests Zip-tests CppParser-tests CodeGeneration-tests RemotingNG-tests RemotingNG/TCP-tests RemotingNG/HTTP-tests RemotingNG/JSONRPC-tests RemotingNG/REST-tests RemotingNG/SOAP-tests PDF-tests MongoDB-tests Redis-tests Prometheus-tests
+libexecs =  Foundation-libexec Encodings-libexec XML-libexec JSON-libexec Util-libexec Net-libexec Crypto-libexec NetSSL_OpenSSL-libexec Data-libexec Data/SQLite-libexec Data/ODBC-libexec Data/MySQL-libexec Data/PostgreSQL-libexec ActiveRecord-libexec ActiveRecord/Compiler-libexec Zip-libexec JWT-libexec PageCompiler-libexec PageCompiler/File2Page-libexec CppParser-libexec CodeGeneration-libexec RemotingNG-libexec RemotingNG/TCP-libexec RemotingNG/HTTP-libexec RemotingNG/JSONRPC-libexec RemotingNG/REST-libexec RemotingNG/SOAP-libexec RemotingNG/RemoteGen-libexec XSD/Types-libexec XSD/Parser-libexec XSD/CodeGen-libexec PDF-libexec MongoDB-libexec Redis-libexec Prometheus-libexec
+tests    =  Foundation-tests Encodings-tests XML-tests JSON-tests Util-tests Net-tests Crypto-tests NetSSL_OpenSSL-tests Data-tests Data/SQLite-tests Data/ODBC-tests Data/MySQL-tests Data/PostgreSQL-tests ActiveRecord-tests JWT-tests Zip-tests CppParser-tests CodeGeneration-tests RemotingNG-tests RemotingNG/TCP-tests RemotingNG/HTTP-tests RemotingNG/JSONRPC-tests RemotingNG/REST-tests RemotingNG/SOAP-tests XSD/Types-tests XSD/Parser-tests PDF-tests MongoDB-tests Redis-tests Prometheus-tests
 samples  =  Foundation-samples Encodings-samples XML-samples JSON-samples Util-samples Net-samples Crypto-samples NetSSL_OpenSSL-samples Data-samples MongoDB-samples Prometheus-samples Zip-samples PageCompiler-samples RemotingNG-samples PDF-samples
-cleans   =  Foundation-clean Encodings-clean XML-clean JSON-clean Util-clean Net-clean Crypto-clean NetSSL_OpenSSL-clean Data-clean Data/SQLite-clean Data/ODBC-clean Data/MySQL-clean Data/PostgreSQL-clean ActiveRecord-clean ActiveRecord/Compiler-clean JWT-clean Zip-clean PageCompiler-clean PageCompiler/File2Page-clean CppParser-clean CodeGeneration-clean RemotingNG-clean RemotingNG/TCP-clean RemotingNG/HTTP-clean RemotingNG/JSONRPC-clean RemotingNG/REST-clean RemotingNG/SOAP-clean RemotingNG/RemoteGen-clean PDF-clean MongoDB-clean Redis-clean Prometheus-clean
+cleans   =  Foundation-clean Encodings-clean XML-clean JSON-clean Util-clean Net-clean Crypto-clean NetSSL_OpenSSL-clean Data-clean Data/SQLite-clean Data/ODBC-clean Data/MySQL-clean Data/PostgreSQL-clean ActiveRecord-clean ActiveRecord/Compiler-clean JWT-clean Zip-clean PageCompiler-clean PageCompiler/File2Page-clean CppParser-clean CodeGeneration-clean RemotingNG-clean RemotingNG/TCP-clean RemotingNG/HTTP-clean RemotingNG/JSONRPC-clean RemotingNG/REST-clean RemotingNG/SOAP-clean RemotingNG/RemoteGen-clean XSD/Types-clean XSD/Parser-clean XSD/CodeGen-clean PDF-clean MongoDB-clean Redis-clean Prometheus-clean
 
 .PHONY: $(libexecs)
 .PHONY: $(tests)
@@ -458,6 +458,36 @@ RemotingNG/RemoteGen-libexec: RemotingNG-libexec CodeGeneration-libexec CppParse
 
 RemotingNG/RemoteGen-clean:
 	$(MAKE) -C $(POCO_BASE)/RemotingNG/RemoteGen clean
+
+XSD/Types-libexec: Foundation-libexec XML-libexec
+	$(MAKE) -C $(POCO_BASE)/XSD/Types
+
+XSD/Types-tests: XSD/Types-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/XSD/Types/testsuite
+
+XSD/Types-clean:
+	$(MAKE) -C $(POCO_BASE)/XSD/Types clean
+	$(MAKE) -C $(POCO_BASE)/XSD/Types/testsuite clean
+
+XSD/Parser-libexec: Foundation-libexec XML-libexec XSD/Types-libexec
+	$(MAKE) -C $(POCO_BASE)/XSD/Parser
+
+XSD/Parser-tests: XSD/Parser-libexec cppunit
+	$(MAKE) -C $(POCO_BASE)/XSD/Parser/testsuite
+
+XSD/Parser-clean:
+	$(MAKE) -C $(POCO_BASE)/XSD/Parser clean
+	$(MAKE) -C $(POCO_BASE)/XSD/Parser/testsuite clean
+
+XSD/CodeGen-libexec: Foundation-libexec XML-libexec JSON-libexec Util-libexec Net-libexec XSD/Types-libexec XSD/Parser-libexec
+	$(MAKE) -C $(POCO_BASE)/XSD/CodeGen
+
+ifdef POCO_XSD_ENABLE_HTTPS
+XSD/CodeGen-libexec: Crypto-libexec NetSSL_OpenSSL-libexec
+endif
+
+XSD/CodeGen-clean:
+	$(MAKE) -C $(POCO_BASE)/XSD/CodeGen clean
 
 PDF-libexec: Util-libexec XML-libexec JSON-libexec Foundation-libexec
 	$(MAKE) -C $(POCO_BASE)/PDF

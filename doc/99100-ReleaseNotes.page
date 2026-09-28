@@ -17,6 +17,8 @@ Data/SQLite can now optionally bundle the sqlite-vec vector search extension
 RemotingNG (remote objects framework with TCP, HTTP, JSON-RPC, REST and SOAP transports and
 the RemoteGenNG code generator) and CodeGeneration, previously part of macchina.io, are now
 POCO components.
+XSD (XML Schema object model, XML Schema and WSDL parser, the XSDGen code generator and the
+libxml2-based Validator), previously part of macchina.io, is a group of POCO components.
 
 !!Features
 
@@ -32,6 +34,13 @@ POCO components.
     <*ENABLE_REMOTINGNG_JSONRPC*>, <*ENABLE_REMOTINGNG_REST*>, <*ENABLE_REMOTINGNG_SOAP*>,
     <*ENABLE_REMOTINGNG_REMOTEGEN*> and <*ENABLE_CODEGENERATION*> (all on by default; off with
     <*POCO_MINIMAL_BUILD*>).
+  - GH #5450 <*XSD*>: the XML Schema object model, the XML Schema and WSDL parser, the
+    <*XSDGen*> code generator and the libxml2-based <*Validator*> from macchina.io. Enable with
+    cmake <*ENABLE_XSD_TYPES*>, <*ENABLE_XSD_PARSER*>, <*ENABLE_XSD_CODEGEN*> (on by default;
+    off with <*POCO_MINIMAL_BUILD*>) and <*ENABLE_XSD_VALIDATOR*> (off by default, requires
+    libxml2); make components <*XSD/Types*>, <*XSD/Parser*>, <*XSD/CodeGen*>.
+    <*XSD/Validator*> is built with <*make -C XSD/Validator*> and its headers are not installed
+    by <*make install*>.
 
 !!Breaking Changes
 
@@ -56,6 +65,14 @@ POCO components.
     <*Poco/OrderedSet.h*>, <*Poco/OrderedMap.h*>, <*Poco/Net/SocketProactor.h*>,
     <*Poco/Data/Constants.h*>, <*Poco/Data/RecordSet.h*>, <*Poco/Data/RowIterator.h*>,
     <*Poco/MongoDB/ServerDescription.h*> and <*Poco/ActiveRecord/IDTraits.h*>. (PR #5453)
+
+!!Bug Fixes and Improvements
+
+  - GH #5450 <*Poco::XML::SAXParser*>, <*DOMParser*>: when a content handler throws, the events
+    Expat still delivers for the current token (the end tag of an empty element and its namespace
+    undeclarations) are no longer forwarded to the handlers. Since 1.15.4 the exception is stored
+    and the parse is stopped with <*XML_StopParser()*>, so handlers received these events after
+    their own exception.
 
 
 !!!Release 1.15.4

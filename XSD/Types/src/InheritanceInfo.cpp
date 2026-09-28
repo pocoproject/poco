@@ -57,7 +57,7 @@ const Type* InheritanceInfo::type() const
 {
 	if (!_parent.empty())
 		return _parent[0];
-	return 0;
+	return nullptr;
 }
 
 

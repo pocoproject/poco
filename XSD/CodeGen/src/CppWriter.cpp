@@ -613,7 +613,7 @@ void CppWriter::writeNamespaceEnd(std::ostream& out, const std::string& ns)
 		return;
 
 	Poco::StringTokenizer tok(ns, ":", Poco::StringTokenizer::TOK_IGNORE_EMPTY|Poco::StringTokenizer::TOK_TRIM);
-	for (int i = 0; i < tok.count(); ++i)
+	for (std::size_t i = 0; i < tok.count(); ++i)
 	{
 		out << "} ";
 	}

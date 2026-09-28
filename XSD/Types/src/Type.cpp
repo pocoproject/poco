@@ -27,7 +27,7 @@ const std::vector<const Type*> Type::NOPARENTS;
 
 Type::Type():
 	_name(),
-	_pSchema(0)
+	_pSchema(nullptr)
 {
 }
 
@@ -35,7 +35,7 @@ Type::Type():
 Type::Type(const std::string& id, const std::string& name):
 	AnnotatedObject(id),
 	_name(name),
-	_pSchema(0)
+	_pSchema(nullptr)
 {
 }
 

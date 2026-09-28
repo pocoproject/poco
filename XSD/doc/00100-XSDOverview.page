@@ -1,0 +1,154 @@
+XSD Overview
+XSD
+
+!!!Introduction
+
+XSD is a group of four parts under <[XSD/]> in the namespace <[Poco::XSD]>: an object model of
+XML Schema documents, a parser for XML Schema and WSDL documents, the <*XSDGen*> code generator
+and a validator that checks XML documents against an XML Schema at run time. <*XSDGen*>
+generates C++ classes from XML Schema and WSDL documents; it is the inverse of the XML Schema
+generator in <*RemoteGenNG*>, which generates XML Schema and WSDL documents from C++ classes.
+
+
+!!!Components
+
+!!Types
+
+The <*Types*> library (<*PocoXSDTypes*>, namespace <[Poco::XSD::Types]>) holds the object model
+of XML Schema documents: schemas, elements, types, attributes and groups. The class
+<[TypesManager]> keeps all loaded schemas. It is process-wide and not synchronised as a whole:
+load schemas, fix them up and generate code from one thread at a time.
+
+Dependencies: Foundation, XML.
+
+!!Parser
+
+The <*Parser*> library (<*PocoXSDParser*>, namespace <[Poco::XSD::Parser]>) parses XML Schema
+and WSDL documents into the object model of the <*Types*> library.
+Referenced schemas (<[schemaLocation]>) are opened through <[Poco::URIStreamOpener]>, so an
+application that loads schemas over HTTP or HTTPS registers
+<[Poco::Net::HTTPStreamFactory]> or <[Poco::Net::HTTPSStreamFactory]> itself.
+Locations named in <[schemaLocation]> and WSDL import attributes are opened with the
+privileges of the process through every registered URI scheme, so schemas and WSDL documents
+must come from a trusted source.
+
+Dependencies: Types, XML, Foundation.
+
+!!XSDGen
+
+<*XSDGen*> (built from <[XSD/CodeGen]>) generates C++ classes with Remoting attributes from
+XML Schema and WSDL documents. The generated classes are passed to <*RemoteGenNG*>, which
+generates the code for SOAP clients and servers. When built with NetSSL (compile definition
+<[POCO_XSD_ENABLE_HTTPS]>, set by CMake when a NetSSL library is part of the build),
+<*XSDGen*> also retrieves schemas over HTTPS.
+The [[00205-XSDGenUserGuide.html XSDGen User Guide]] describes its configuration and use.
+
+Dependencies: Types, Parser, XML, Util, Net, Foundation; NetSSL for HTTPS.
+
+!!Validator
+
+The <*Validator*> library (<*PocoXSDValidator*>, namespace <[Poco::XSD::Validator]>) validates
+an XML document against an XML Schema at run time. It is based on libxml2 and does not depend
+on the other three parts. <[Validator::validate(xml, xsd)]> throws
+<[Poco::DataFormatException]> when the schema does not parse, the document is not
+well-formed, or the document violates the schema.
+The document may come from an untrusted source; documents with a document type declaration
+are rejected. The schema must not: its entities are expanded (with libxml2 before 2.13 also
+external entities, which can read local files), and schemas that import or include other
+schemas by location are resolved through libxml2's default resource loader, which can read
+local files; with libxml2 before 2.13, diagnostics about such schemas may be written to
+standard error. <[Validator::validate()]> keeps no shared state and may be called
+concurrently.
+
+Dependencies: Foundation, libxml2.
+
+
+!!!Building XSD
+
+!!CMake
+
+The CMake options <*ENABLE_XSD_TYPES*>, <*ENABLE_XSD_PARSER*> and <*ENABLE_XSD_CODEGEN*> are
+on by default and off with <*POCO_MINIMAL_BUILD*>. <*ENABLE_XSD_VALIDATOR*> is off by default
+and is turned off automatically when libxml2 is not found.
+
+    cmake -B build -DENABLE_XSD_VALIDATOR=ON
+    cmake --build build
+
+libxml2 comes from the system: the package <[libxml2-dev]> on Debian and Ubuntu, the SDK on
+macOS, and the vcpkg port <[libxml2]> on Windows.
+
+!!GNU Make
+
+The components <[XSD/Types]>, <[XSD/Parser]> and <[XSD/CodeGen]> are part of the default
+build. The Validator and its test suite are built separately; <[make install]> does not copy
+the Validator headers.
+
+    make -C XSD/Validator
+    make -C XSD/Validator/testsuite
+
+With <[POCO_XSD_ENABLE_HTTPS=1]> in the environment, <*XSDGen*> is built with HTTPS support
+against NetSSL_OpenSSL.
+
+
+!!!Parsing a Schema
+
+The following program loads the schema at the URI given on the command line (for example
+<[file:///home/user/schema.xsd]> or an <[http]> URI), resolves its references and prints
+the names of its top-level elements. <[Schema::types()]> returns the named types in the same way.
+
+    #include "Poco/XSD/Parser/XSDContentHandler.h"
+    #include "Poco/XSD/Types/TypesManager.h"
+    #include "Poco/Net/HTTPStreamFactory.h"
+    #include "Poco/URI.h"
+    #include "Poco/Exception.h"
+    #include <iostream>
+
+    using Poco::XSD::Parser::XSDContentHandler;
+    using Poco::XSD::Types::TypesManager;
+
+    int main(int argc, char** argv)
+    {
+        if (argc != 2) return 1;
+        Poco::Net::HTTPStreamFactory::registerFactory();
+        try
+        {
+            XSDContentHandler::SchemaNSToLocationMap schemaMap;
+            auto pSchema = XSDContentHandler::loadXSD(Poco::URI(argv[1]), schemaMap);
+            TypesManager::instance().fixupSchemas();
+            for (const auto& [name, pElement]: pSchema->elements())
+                std::cout << name << std::endl;
+        }
+        catch (const Poco::Exception& exc)
+        {
+            std::cerr << exc.displayText() << std::endl;
+            return 1;
+        }
+        return 0;
+    }
+
+The program links with PocoXSDParser, PocoXSDTypes, PocoXML, PocoNet and PocoFoundation.
+
+
+!!!Validating a Document
+
+<[Validator::validate()]> takes the XML document and the XML Schema as strings. It returns
+when the document conforms to the schema and throws <[Poco::DataFormatException]> otherwise.
+
+    #include "Poco/XSD/Validator/Validator.h"
+    #include "Poco/Exception.h"
+    #include <iostream>
+    #include <string>
+
+    bool isValid(const std::string& xml, const std::string& xsd)
+    {
+        try
+        {
+            Poco::XSD::Validator::Validator::validate(xml, xsd);
+            return true;
+        }
+        catch (const Poco::DataFormatException& exc)
+        {
+            std::cerr << exc.displayText() << std::endl;
+            return false;
+        }
+    }

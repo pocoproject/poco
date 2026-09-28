@@ -26,7 +26,7 @@ namespace Types {
 AttributeRef::AttributeRef(const std::string& id, const QName& ref):
 	AbstractAttribute(id, ""),
 	_ref(ref),
-	_pAttr(0)
+	_pAttr(nullptr)
 {
 }
 
@@ -37,7 +37,7 @@ AttributeRef::AttributeRef(const std::string& id, const QName& ref, const Abstra
 	_pAttr(pAttr)
 {
 	poco_check_ptr (pAttr);
-	if (dynamic_cast<const AttributeRef*>(_pAttr) != 0)
+	if (dynamic_cast<const AttributeRef*>(_pAttr) != nullptr)
 			throw XSDException("AttributeRef can't reference another AttributeRef: possible infinite recursion");
 }
 
@@ -96,7 +96,7 @@ void AttributeRef::fixup()
 		if (!_pAttr)
 			throw InvalidTypeException("AttributeRef references invalid attribute:" + _ref.name());
 		// check for possible infinite ref loop
-		if (dynamic_cast<const AttributeRef*>(_pAttr) != 0)
+		if (dynamic_cast<const AttributeRef*>(_pAttr) != nullptr)
 			throw XSDException("AttributeRef can't reference another AttributeRef: possible infinite recursion");
 	}
 }

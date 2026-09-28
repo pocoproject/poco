@@ -19,7 +19,7 @@
 #include "Poco/Exception.h"
 #include "Poco/Net/HTTPStreamFactory.h"
 #include "Poco/Net/FTPStreamFactory.h"
-#if POCO_XSD_ENABLE_HTTPS
+#ifdef POCO_XSD_ENABLE_HTTPS
 #include "Poco/Net/HTTPSStreamFactory.h"
 #endif
 #include "Poco/XSD/Parser/XSDContentHandler.h"

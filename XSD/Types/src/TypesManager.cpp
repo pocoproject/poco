@@ -251,7 +251,7 @@ Definitions& TypesManager::getDefinitions(const std::string& ns)
 
 const Type* TypesManager::getType(const QName& ref) const
 {
-	const Type* pResult = 0;
+	const Type* pResult = nullptr;
 	Poco::Mutex::ScopedLock lock(_mutex);
 	Schemas::const_iterator it = _schemas.find(ref.getNamespace());
 	if (it != _schemas.end())
@@ -263,7 +263,7 @@ const Type* TypesManager::getType(const QName& ref) const
 
 const Element* TypesManager::getElement(const QName& ref) const
 {
-	const Element* pResult = 0;
+	const Element* pResult = nullptr;
 	Poco::Mutex::ScopedLock lock(_mutex);
 	Schemas::const_iterator it = _schemas.find(ref.getNamespace());
 	if (it != _schemas.end())
@@ -275,7 +275,7 @@ const Element* TypesManager::getElement(const QName& ref) const
 
 const AbstractAttribute* TypesManager::getAttribute(const QName& ref) const
 {
-	const AbstractAttribute* pResult = 0;
+	const AbstractAttribute* pResult = nullptr;
 	Poco::Mutex::ScopedLock lock(_mutex);
 	Schemas::const_iterator it = _schemas.find(ref.getNamespace());
 	if (it != _schemas.end())
@@ -287,7 +287,7 @@ const AbstractAttribute* TypesManager::getAttribute(const QName& ref) const
 
 const AbstractAttributeGroup* TypesManager::getAttributeGroup(const QName& ref) const
 {
-	const AbstractAttributeGroup* pResult = 0;
+	const AbstractAttributeGroup* pResult = nullptr;
 	Poco::Mutex::ScopedLock lock(_mutex);
 	Schemas::const_iterator it = _schemas.find(ref.getNamespace());
 	if (it != _schemas.end())
@@ -299,7 +299,7 @@ const AbstractAttributeGroup* TypesManager::getAttributeGroup(const QName& ref) 
 
 const Group* TypesManager::getGroup(const QName& ref) const
 {
-	const Group* pResult = 0;
+	const Group* pResult = nullptr;
 	Poco::Mutex::ScopedLock lock(_mutex);
 	Schemas::const_iterator it = _schemas.find(ref.getNamespace());
 	if (it != _schemas.end())

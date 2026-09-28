@@ -26,7 +26,7 @@ namespace Types {
 GroupRef::GroupRef(const std::string& id, const QName& ref, Poco::UInt32 minOcc, Poco::UInt32 maxOcc):
 	AbstractGroup(id, minOcc, maxOcc),
 	_ref(ref),
-	_pGroup(0)
+	_pGroup(nullptr)
 {
 }
 

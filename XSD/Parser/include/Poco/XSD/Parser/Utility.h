@@ -33,7 +33,7 @@ namespace XSD {
 namespace Parser {
 
 
-class Utility
+class XSDParser_API Utility
 	/// Utility class, used to extract attribute values.
 {
 public:
