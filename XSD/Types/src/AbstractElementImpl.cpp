@@ -15,9 +15,7 @@
 #include "Poco/XSD/Types/AbstractElementImpl.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 AbstractElementImpl::AbstractElementImpl():
@@ -73,9 +71,7 @@ AbstractElementImpl::AbstractElementImpl(
 }
 
 
-AbstractElementImpl::~AbstractElementImpl()
-{
-}
+AbstractElementImpl::~AbstractElementImpl() = default;
 
 
 const std::string& AbstractElementImpl::nameSpace() const
@@ -84,4 +80,4 @@ const std::string& AbstractElementImpl::nameSpace() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

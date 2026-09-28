@@ -708,9 +708,9 @@ void ParserEngine::resetContext()
 void ParserEngine::handleStartElement(void* userData, const XML_Char* name, const XML_Char** atts)
 {
 	ParserEngine* pThis = reinterpret_cast<ParserEngine*>(userData);
-	// After abortParse() Expat still delivers the remaining callbacks of the
-	// current token (the end tag of an empty element and its namespace
-	// undeclarations); they are dropped until the stored exception is rethrown.
+	// After abortParse(), Expat still delivers the rest of the current token
+	// (the end tag of an empty element and its namespace undeclarations);
+	// the handle*() callbacks ignore them.
 	if (pThis->_exception) return;
 
 	if (pThis->_pContentHandler)

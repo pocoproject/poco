@@ -23,9 +23,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API BindingProperties
@@ -46,14 +44,14 @@ public:
 	void set(const std::string& name, const std::string& value);
 		/// Sets a binding property.
 		
-	bool has(const std::string& name) const;
+	[[nodiscard]] bool has(const std::string& name) const;
 		/// Returns true if a property with the given name has been defined.
 		
-	const std::string& get(const std::string& name) const;
+	[[nodiscard]] const std::string& get(const std::string& name) const;
 		/// Returns the value of the property with the given name.
 		/// Throws a Poco::NotFoundException if the property has not been set.
 		
-	const std::string& get(const std::string& name, const std::string& deflt) const;
+	[[nodiscard]] const std::string& get(const std::string& name, const std::string& deflt) const;
 		/// Returns the valuie of the property with the given name, or
 		/// the given default value if the property has not been set.
 
@@ -79,8 +77,7 @@ inline bool BindingProperties::has(const std::string& name) const
 
 inline const std::string& BindingProperties::get(const std::string& name) const
 {
-	Map::const_iterator it = _map.find(name);
-	if (it != _map.end())
+	if (const auto it = _map.find(name); it != _map.end())
 		return it->second;
 	else
 		throw Poco::NotFoundException(name);
@@ -89,15 +86,14 @@ inline const std::string& BindingProperties::get(const std::string& name) const
 
 inline const std::string& BindingProperties::get(const std::string& name, const std::string& deflt) const
 {
-	Map::const_iterator it = _map.find(name);
-	if (it != _map.end())
+	if (const auto it = _map.find(name); it != _map.end())
 		return it->second;
 	else
 		return deflt;
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_BindingProperties_INCLUDED

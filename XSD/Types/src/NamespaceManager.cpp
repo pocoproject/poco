@@ -15,9 +15,7 @@
 #include "Poco/XSD/Types/NamespaceManager.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 NamespaceManager& NamespaceManager::instance()
@@ -31,28 +29,22 @@ NamespaceManager::NamespaceMap::const_iterator NamespaceManager::set(const std::
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
 
-	NamespaceMap::const_iterator cIt = _namespaceToId.find(ns);
-	if (cIt != _namespaceToId.end())
+	if (NamespaceMap::const_iterator cIt = _namespaceToId.find(ns); cIt != _namespaceToId.end())
 	{
 		return cIt;
 	}
 
 	int val = _maxId++;
 
-	_idToNamespace.insert(make_pair(val, ns));
-	cIt = _namespaceToId.insert(make_pair(ns, val)).first;
-	return cIt;
+	_idToNamespace.try_emplace(val, ns);
+	return _namespaceToId.try_emplace(ns, val).first;
 }
 
 
-NamespaceManager::NamespaceManager(): _maxId(0)
-{
-}
+NamespaceManager::NamespaceManager() = default;
 
 
-NamespaceManager::~NamespaceManager()
-{
-}
+NamespaceManager::~NamespaceManager() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

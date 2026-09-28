@@ -23,9 +23,7 @@
 #include "Poco/XSD/Types/QName.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API AttributeRef: public AbstractAttribute
@@ -37,19 +35,19 @@ public:
 	AttributeRef(const std::string& id, const QName& ref);
 		/// Creates the AttributeRef.
 
-	virtual ~AttributeRef();
+	~AttributeRef() override;
 		/// Destroys the AttributeRef.
 
 	// AbstractAttribute
-	const std::string& nameSpace() const;
-	const std::string& defaultValue() const;
-	const std::string& fixedValue() const;
-	bool qualifiedForm() const;
-	const SimpleType* type() const;
-	void fixup();
-	AbstractAttribute::Usage usage() const;
-	void accept(Visitor& v) const;
-	const std::string& name() const;
+	[[nodiscard]] const std::string& nameSpace() const override;
+	[[nodiscard]] const std::string& defaultValue() const override;
+	[[nodiscard]] const std::string& fixedValue() const override;
+	[[nodiscard]] bool qualifiedForm() const override;
+	[[nodiscard]] const SimpleType* type() const override;
+	void fixup() override;
+	[[nodiscard]] AbstractAttribute::Usage usage() const override;
+	void accept(Visitor& v) const override;
+	[[nodiscard]] const std::string& name() const override;
 
 private:
 	AttributeRef(const std::string& id, const QName& ref, const AbstractAttribute* pAttr);
@@ -62,7 +60,7 @@ private:
 };
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_AttributeRef_INCLUDED

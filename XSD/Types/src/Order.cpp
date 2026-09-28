@@ -15,9 +15,7 @@
 #include "Poco/XSD/Types/Order.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 Order::Order(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc):
@@ -26,9 +24,7 @@ Order::Order(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc):
 }
 
 
-Order::~Order()
-{
-}
+Order::~Order() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

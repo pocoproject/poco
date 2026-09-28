@@ -16,14 +16,10 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
-Binding::Binding()
-{
-}
+Binding::Binding() = default;
 
 
 Binding::Binding(const std::string& name):
@@ -32,9 +28,7 @@ Binding::Binding(const std::string& name):
 }
 
 
-Binding::~Binding()
-{
-}
+Binding::~Binding() = default;
 
 
 void Binding::accept(Visitor& v) const
@@ -43,4 +37,4 @@ void Binding::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

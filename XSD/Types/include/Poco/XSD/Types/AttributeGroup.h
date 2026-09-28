@@ -24,9 +24,7 @@
 #include "Poco/XSD/Types/AnyAttribute.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API AttributeGroup: public AbstractAttributeGroup
@@ -38,26 +36,26 @@ public:
 	AttributeGroup(const std::string& id, const std::string& name);
 		/// Creates the AttributeGroup.
 
-	virtual ~AttributeGroup();
+	~AttributeGroup() override;
 		/// Destroys the AttributeGroup.
 
-	void add(AttributeContent::Ptr ptr);
+	void add(AttributeContent::Ptr ptr) override;
 		/// Adds an attribute content child to the group.
 		///
 		/// Throws an exception if a child with that name already exists.
 
-	const AbstractAttributeGroup::Attributes& getAttributes() const;
+	[[nodiscard]] const AbstractAttributeGroup::Attributes& getAttributes() const override;
 		/// Returns all the children.
 
-	bool hasAnyAttribute() const;
+	[[nodiscard]] bool hasAnyAttribute() const override;
 		/// Returns true if the any attribute is set.
 
-	AnyAttribute::Ptr getAny() const;
+	[[nodiscard]] AnyAttribute::Ptr getAny() const override;
 		/// Returns the any attribute.
 
 	// AbstractAttributeGroup
-	void fixup();
-	void accept(Visitor& v) const;
+	void fixup() override;
+	void accept(Visitor& v) const override;
 
 private:
 	AbstractAttributeGroup::Attributes _children;
@@ -87,7 +85,7 @@ inline AnyAttribute::Ptr AttributeGroup::getAny() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_AttributeGroup_INCLUDED

@@ -17,14 +17,10 @@
 #include "Poco/StringTokenizer.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
-Operation::Operation()
-{
-}
+Operation::Operation() = default;
 
 
 Operation::Operation(const std::string& name):
@@ -33,9 +29,7 @@ Operation::Operation(const std::string& name):
 }
 
 
-Operation::~Operation()
-{
-}
+Operation::~Operation() = default;
 
 	
 void Operation::accept(Visitor& v) const
@@ -51,4 +45,4 @@ void Operation::setParameterOrder(const std::string& parameterOrder)
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

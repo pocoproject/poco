@@ -18,9 +18,7 @@
 #include "Poco/XSD/Types/XSDException.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 Union::Union(const std::string& id, const std::vector<QName>& memberTypes):
@@ -30,35 +28,29 @@ Union::Union(const std::string& id, const std::vector<QName>& memberTypes):
 }
 
 
-Union::~Union()
-{
-}
+Union::~Union() = default;
 
 
 void Union::fixup()
 {
 	_allTypes.clear();
-	std::vector<QName>::const_iterator itQN = _memberTypes.begin();
-	std::vector<QName>::const_iterator itQNEnd = _memberTypes.end();
 	TypesManager& tm = TypesManager::instance();
-	for (; itQN != itQNEnd; ++itQN)
+	for (const auto& memberType: _memberTypes)
 	{
-		const Type* pType = tm.getType(*itQN);
+		const Type* pType = tm.getType(memberType);
 		if (!pType)
-			throw InvalidTypeException("Union references invalid simple type:" + itQN->name());
+			throw InvalidTypeException("Union references invalid simple type:" + memberType.name());
 		_allTypes.push_back(pType);
 	}
 
-	std::vector<SimpleType::Ptr>::iterator it = _inlineTypes.begin();
-	std::vector<SimpleType::Ptr>::iterator itEnd = _inlineTypes.end();
-	for (; it != itEnd; ++it)
+	for (auto& pInlineType: _inlineTypes)
 	{
-		if (!(*it))
+		if (pInlineType == nullptr)
 		{
 			throw InvalidTypeException("Union uses null type");
 		}
-		(*it)->fixup();
-		_allTypes.push_back(*it);
+		pInlineType->fixup();
+		_allTypes.push_back(pInlineType);
 	}
 }
 
@@ -69,4 +61,4 @@ void Union::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

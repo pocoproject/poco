@@ -19,14 +19,11 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 ElementTypeRef::ElementTypeRef():
 	AbstractElementImpl(),
-	_pType(nullptr),
 	_typeRef()
 {
 }
@@ -66,15 +63,12 @@ ElementTypeRef::ElementTypeRef(
 		nameSpace,
 		nillable,
 		substitutionGroup),
-	_pType(nullptr),
 	_typeRef(typeRef)
 {
 }
 
 
-ElementTypeRef::~ElementTypeRef()
-{
-}
+ElementTypeRef::~ElementTypeRef() = default;
 
 
 void ElementTypeRef::fixup()
@@ -95,4 +89,4 @@ void ElementTypeRef::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

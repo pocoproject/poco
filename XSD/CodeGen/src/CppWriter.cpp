@@ -17,6 +17,7 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/NumberParser.h"
 #include <fstream>
+#include <iterator>
 
 
 const std::string CppWriter::EXT_H("h");
@@ -42,9 +43,7 @@ CppWriter::CppWriter(const SchemaInfo& si, int options, const std::string& amalg
 }
 
 
-CppWriter::~CppWriter()
-{
-}
+CppWriter::~CppWriter() = default;
 
 
 void CppWriter::updateIncludeDir(ClassInfo& cInfo) const
@@ -56,9 +55,8 @@ void CppWriter::updateIncludeDir(ClassInfo& cInfo) const
 
 void CppWriter::generate(const std::map<std::string, ClassInfo>& classes)
 {
-	std::map<std::string, ClassInfo>::const_iterator it = classes.begin();
-	for (; it != classes.end(); ++it)
-		generate(it->second);
+	for (const auto& [name, cinfo]: classes)
+		generate(cinfo);
 }
 
 
@@ -186,18 +184,17 @@ std::string CppWriter::generateHeaderFile(std::ostream& out, const ClassInfo& ci
 	bool visWritten = false;
 	Utility::Access lastAccess = Utility::AC_PRIVATE;
 	const std::vector<Constructor>& constr = cinfo.getConstructors();
-	std::vector<Constructor>::const_iterator itC = constr.begin();
-	for (; itC != constr.end(); ++itC)
+	for (const auto& constructor: constr)
 	{
 		if (!visWritten)
 		{
 			visWritten = true;
-			writeAccessibility(out, itC->getAccess());
-			lastAccess = itC->getAccess();
+			writeAccessibility(out, constructor.getAccess());
+			lastAccess = constructor.getAccess();
 		}
-		checkAccessibility(out, lastAccess, itC->getAccess());
-		writeConstructorHeader(out, *itC);
-		lastAccess = itC->getAccess();
+		checkAccessibility(out, lastAccess, constructor.getAccess());
+		writeConstructorHeader(out, constructor);
+		lastAccess = constructor.getAccess();
 	}
 
 	if (!visWritten)
@@ -212,7 +209,7 @@ std::string CppWriter::generateHeaderFile(std::ostream& out, const ClassInfo& ci
 	lastAccess = cinfo.getDestructor().getAccess();
 
 	const std::multimap<std::string, MethodInfo>& methods = cinfo.getMethods();
-	std::multimap<std::string, MethodInfo>::const_iterator itM = methods.begin();
+	auto itM = methods.begin();
 	for (; itM != methods.end(); ++itM)
 	{
 		if (!visWritten)
@@ -229,22 +226,21 @@ std::string CppWriter::generateHeaderFile(std::ostream& out, const ClassInfo& ci
 	}
 
 	const std::map<int, Variable>& vars = cinfo.getVariables();
-	std::map<int, Variable>::const_iterator itV = vars.begin();
-	for (; itV != vars.end(); ++itV)
+	for (const auto& [order, var]: vars)
 	{
 		if (!visWritten)
 		{
 			visWritten = true;
-			writeAccessibility(out, itV->second.getAccess());
-			lastAccess = itV->second.getAccess();
+			writeAccessibility(out, var.getAccess());
+			lastAccess = var.getAccess();
 		}
 
-		checkAccessibility(out, lastAccess, itV->second.getAccess());
-		writeRemotingAttributes(out, itV->second.getAll(), 1);
+		checkAccessibility(out, lastAccess, var.getAccess());
+		writeRemotingAttributes(out, var.getAll(), 1);
 		out << "\t";
-		writeVariable(out, itV->second);
+		writeVariable(out, var);
 		out << ";" << std::endl << std::endl;
-		lastAccess = itV->second.getAccess();
+		lastAccess = var.getAccess();
 	}
 
 	writeClassEnd(out, cinfo);
@@ -263,17 +259,16 @@ bool CppWriter::generateSourceFile(std::ostream& out, std::ostream& hStr, const 
 	writeNamespaceBegin(out, cinfo.getNameSpace());
 
 	const std::vector<Constructor>& constr = cinfo.getConstructors();
-	std::vector<Constructor>::const_iterator itC = constr.begin();
-	for (; itC != constr.end(); ++itC)
+	for (const auto& constructor: constr)
 	{
 		if (_options & OPT_INLINE_ALL)
 		{
-			writeConstructorSrc(hStr, *itC, cinfo, true);
+			writeConstructorSrc(hStr, constructor, cinfo, true);
 		}
 		else
 		{
 			hasContent = true;
-			writeConstructorSrc(out, *itC, cinfo, false);
+			writeConstructorSrc(out, constructor, cinfo, false);
 		}
 	}
 
@@ -288,17 +283,16 @@ bool CppWriter::generateSourceFile(std::ostream& out, std::ostream& hStr, const 
 	}
 
 	const std::multimap<std::string, MethodInfo>& methods = cinfo.getMethods();
-	std::multimap<std::string, MethodInfo>::const_iterator itM = methods.begin();
-	for (; itM != methods.end(); ++itM)
+	for (const auto& [name, method]: methods)
 	{
-		if (itM->second.getCode().size() < 2 || (_options & OPT_INLINE_ALL) != 0)
+		if (method.getCode().size() < 2 || (_options & OPT_INLINE_ALL) != 0)
 		{
-			writeMethodSrc(hStr, cinfo, itM->second, true);
+			writeMethodSrc(hStr, cinfo, method, true);
 		}
 		else
 		{
 			hasContent = true;
-			writeMethodSrc(out, cinfo, itM->second, false);
+			writeMethodSrc(out, cinfo, method, false);
 		}
 	}
 
@@ -316,10 +310,9 @@ void CppWriter::writeComment(std::ostream& out, const std::string& line, int ind
 
 void CppWriter::writeComment(std::ostream& out, const std::vector<std::string>& lines, int indent)
 {
-	std::vector<std::string>::const_iterator it = lines.begin();
-	for (; it != lines.end(); ++it)
+	for (const auto& line: lines)
 	{
-		writeComment(out, *it);
+		writeComment(out, line);
 	}
 }
 
@@ -348,10 +341,9 @@ void CppWriter::writeHeader(std::ostream& out, const std::string& fileName)
 
 void CppWriter::writeInclude(std::ostream& out, const std::set<std::string>& includes, bool systemInc)
 {
-	std::set<std::string>::const_iterator it = includes.begin();
-	for (; it != includes.end(); ++it)
+	for (const auto& include: includes)
 	{
-		writeInclude(out, *it, systemInc);
+		writeInclude(out, include, systemInc);
 	}
 }
 
@@ -378,13 +370,11 @@ void CppWriter::writeInclude(std::ostream& out, const std::string& include, bool
 
 void CppWriter::writeFwdDecls(std::ostream& out, const std::set<std::string>& fwds)
 {
-	std::set<std::string>::const_iterator it = fwds.begin();
 	std::string lastNS;
 	std::string closeNSLine;
 
-	for (; it != fwds.end(); ++it)
+	for (const auto& fwd: fwds)
 	{
-		const std::string& fwd = *it;
 		std::string::size_type pos = fwd.rfind("::");
 		std::string ns;
 		std::string name;
@@ -402,10 +392,9 @@ void CppWriter::writeFwdDecls(std::ostream& out, const std::set<std::string>& fw
 				out << closeNSLine << std::endl;
 			closeNSLine.clear();
 			Poco::StringTokenizer tok(ns, ":", Poco::StringTokenizer::TOK_TRIM | Poco::StringTokenizer::TOK_IGNORE_EMPTY);
-			Poco::StringTokenizer::Iterator it = tok.begin();
-			for (; it != tok.end(); ++it)
+			for (const auto& part: tok)
 			{
-				out << "namespace " << *it << " {" << std::endl;
+				out << "namespace " << part << " {" << std::endl;
 				closeNSLine += "} ";
 			}
 			lastNS = ns;
@@ -449,58 +438,53 @@ void CppWriter::allIncludeFiles(const ClassInfo& info, std::set<std::string>& in
 		}
 		else
 		{
-			Poco::StringTokenizer::Iterator itTok = tok.begin();
-			for (; itTok != tok.end(); ++itTok)
+			for (const auto& include: tok)
 			{
-				if (*itTok == "string")
-					sysIncludes.insert(*itTok);
+				if (include == "string")
+					sysIncludes.insert(include);
 				else
-					includes.insert(*itTok);
+					includes.insert(include);
 			}
 		}
 	}
 
 	const std::map<int, Variable>& vars = info.getVariables();
-	std::map<int, Variable>::const_iterator it = vars.begin();
-	for (; it != vars.end(); ++it)
+	for (const auto& [order, var]: vars)
 	{
 		// builtin types often don't need an include (like float)
-		if (!it->second.getType().getIncludeFile().empty())
+		if (!var.getType().getIncludeFile().empty())
 		{
-			if (canForwardDeclare(it->second))
+			if (canForwardDeclare(var))
 			{
-				fwdDecl.insert(it->second.getType().getFullName());
+				fwdDecl.insert(var.getType().getFullName());
 			}
 			else
 			{
-				Poco::StringTokenizer tok(it->second.getType().getIncludeFile(),",;", Poco::StringTokenizer::TOK_IGNORE_EMPTY| Poco::StringTokenizer::TOK_TRIM);
-				if (it->second.getType().isSystemInclude())
+				Poco::StringTokenizer tok(var.getType().getIncludeFile(),",;", Poco::StringTokenizer::TOK_IGNORE_EMPTY| Poco::StringTokenizer::TOK_TRIM);
+				if (var.getType().isSystemInclude())
 				{
 					poco_assert (tok.count() == 1);
-					sysIncludes.insert(it->second.getType().getIncludeFile());
+					sysIncludes.insert(var.getType().getIncludeFile());
 				}
 				else
 				{
-					Poco::StringTokenizer::Iterator itTok = tok.begin();
-					for (; itTok != tok.end(); ++itTok)
+					for (const auto& include: tok)
 					{
-						if (*itTok == "string")
-							sysIncludes.insert(*itTok);
+						if (include == "string")
+							sysIncludes.insert(include);
 						else
-							includes.insert(*itTok);
+							includes.insert(include);
 					}
 				}
 			}
 		}
-		if (it->second.isVector())
+		if (var.isVector())
 			sysIncludes.insert("vector");
 	}
 
 	const std::multimap<std::string, MethodInfo>& methods = info.getMethods();
-	std::multimap<std::string, MethodInfo>::const_iterator itM = methods.begin();
-	for (; itM != methods.end(); ++itM)
+	for (const auto& [name, mi]: methods)
 	{
-		const MethodInfo& mi = itM->second;
 		const std::map<int, Parameter>& params = mi.getParameters();
 		Poco::SharedPtr<Parameter> pRet = mi.getReturnParameter();
 		if (pRet)
@@ -521,13 +505,12 @@ void CppWriter::allIncludeFiles(const ClassInfo& info, std::set<std::string>& in
 					}
 					else
 					{
-						Poco::StringTokenizer::Iterator itTok = tok.begin();
-						for (; itTok != tok.end(); ++itTok)
+						for (const auto& include: tok)
 						{
-							if (*itTok == "string")
-								sysIncludes.insert(*itTok);
+							if (include == "string")
+								sysIncludes.insert(include);
 							else
-								includes.insert(*itTok);
+								includes.insert(include);
 						}
 					}
 				}
@@ -536,38 +519,36 @@ void CppWriter::allIncludeFiles(const ClassInfo& info, std::set<std::string>& in
 			if (pRet->isVector())
 				sysIncludes.insert("vector");
 		}
-		std::map<int, Parameter>::const_iterator itP = params.begin();
-		for (; itP != params.end(); ++itP)
+		for (const auto& [order, param]: params)
 		{
-			if (canForwardDeclare(itP->second))
-				fwdDecl.insert (itP->second.getType().getFullName());
+			if (canForwardDeclare(param))
+				fwdDecl.insert (param.getType().getFullName());
 			else
 			{
 				// builtin types often don't need an include (like float)
-				if (!itP->second.getType().getIncludeFile().empty())
+				if (!param.getType().getIncludeFile().empty())
 				{
 					//Problem are list types XSDVEctor<Poco::URI> -> need to include two files!
-					Poco::StringTokenizer tok(itP->second.getType().getIncludeFile(),",;", Poco::StringTokenizer::TOK_IGNORE_EMPTY| Poco::StringTokenizer::TOK_TRIM);
-					if (itP->second.getType().isSystemInclude())
+					Poco::StringTokenizer tok(param.getType().getIncludeFile(),",;", Poco::StringTokenizer::TOK_IGNORE_EMPTY| Poco::StringTokenizer::TOK_TRIM);
+					if (param.getType().isSystemInclude())
 					{
 						poco_assert (tok.count() == 1);
-						sysIncludes.insert(itP->second.getType().getIncludeFile());
+						sysIncludes.insert(param.getType().getIncludeFile());
 					}
 					else
 					{
-						Poco::StringTokenizer::Iterator itTok = tok.begin();
-						for (; itTok != tok.end(); ++itTok)
+						for (const auto& include: tok)
 						{
-							if (*itTok == "string")
-								sysIncludes.insert(*itTok);
+							if (include == "string")
+								sysIncludes.insert(include);
 							else
-								includes.insert(*itTok);
+								includes.insert(include);
 						}
 					}
 				}
 			}
 
-			if (itP->second.isVector())
+			if (param.isVector())
 				sysIncludes.insert("vector");
 		}
 	}
@@ -577,15 +558,14 @@ void CppWriter::allIncludeFiles(const ClassInfo& info, std::set<std::string>& in
 void CppWriter::allExtraIncludeFiles(const ClassInfo& info, std::set<std::string>& includes)
 {
 	const std::map<int, Variable>& vars = info.getVariables();
-	std::map<int, Variable>::const_iterator it = vars.begin();
-	for (; it != vars.end(); ++it)
+	for (const auto& [order, var]: vars)
 	{
 		// builtin types often don't need an include (like float)
-		if (!it->second.getType().getIncludeFile().empty())
+		if (!var.getType().getIncludeFile().empty())
 		{
-			if (canForwardDeclare(it->second))
+			if (canForwardDeclare(var))
 			{
-				includes.insert(it->second.getType().getIncludeFile());
+				includes.insert(var.getType().getIncludeFile());
 			}
 		}
 	}
@@ -598,10 +578,9 @@ void CppWriter::writeNamespaceBegin(std::ostream& out, const std::string& ns)
 		return;
 
 	Poco::StringTokenizer tok(ns, ":", Poco::StringTokenizer::TOK_IGNORE_EMPTY|Poco::StringTokenizer::TOK_TRIM);
-	Poco::StringTokenizer::Iterator it = tok.begin();
-	for (; it != tok.end(); ++it)
+	for (const auto& part: tok)
 	{
-		out << "namespace " << *it << " {" << std::endl;
+		out << "namespace " << part << " {" << std::endl;
 	}
 	out << std::endl << std::endl;
 }
@@ -701,14 +680,13 @@ void CppWriter::writeConstructorSrc(std::ostream& out, const Constructor& constr
 		{
 			out << ":" << std::endl;
 			bool writeColon = false;
-			std::map<int, Variable>::const_iterator it = vars.begin();
-			for (; it != vars.end(); ++it)
+			for (const auto& [order, var]: vars)
 			{
 				if (writeColon)
 				{
 					out << "," << std::endl;
 				}
-				out << "\t" << it->second.getName() + "()";
+				out << "\t" << var.getName() + "()";
 				writeColon = true;
 			}
 		}
@@ -732,15 +710,14 @@ void CppWriter::writeConstructorSrc(std::ostream& out, const Constructor& constr
 			}
 		}
 		const std::map<int, Variable>& vars = info.getVariables();
-		std::map<int, Variable>::const_iterator it = vars.begin();
-		for (; it != vars.end(); ++it)
+		for (const auto& [order, var]: vars)
 		{
 			if (writeColon)
 			{
 				out << "," << std::endl;
 			}
-			std::vector<std::string>::iterator itC = code.begin();
-			while(itC != code.end() && itC->find(it->second.getName()))
+			auto itC = code.begin();
+			while(itC != code.end() && itC->find(var.getName()))
 				++itC;
 			if (itC != code.end())
 			{
@@ -748,7 +725,7 @@ void CppWriter::writeConstructorSrc(std::ostream& out, const Constructor& constr
 				code.erase(itC);
 			}
 			else
-				out << "\t" << it->second.getName() + "()";
+				out << "\t" << var.getName() + "()";
 
 			writeColon = true;
 		}
@@ -763,7 +740,7 @@ void CppWriter::writeConstructorSrc(std::ostream& out, const Constructor& constr
 
 void CppWriter::writeParameterList(std::ostream& out, const std::map<int, Parameter>& params, bool singleLine)
 {
-	std::map<int, Parameter>::const_iterator it = params.begin();
+	auto it = params.begin();
 	for (; it != params.end(); ++it)
 	{
 		if (it != params.begin())
@@ -962,10 +939,9 @@ void CppWriter::writeMethodSrc(std::ostream& out, const ClassInfo& info, const M
 
 void CppWriter::writeCode(std::ostream& out, const std::vector<std::string>& code, int indent)
 {
-	std::vector<std::string>::const_iterator it = code.begin();
-	for (; it != code.end(); ++it)
+	for (const auto& line: code)
 	{
-		writeCode(out, *it, indent);
+		writeCode(out, line, indent);
 	}
 }
 
@@ -984,7 +960,7 @@ void CppWriter::writePrefixedLine(std::ostream& out, const std::string& prefix, 
 		"\t\t\t\t\t\t\t\t\t", "\t\t\t\t\t\t\t\t\t\t"};
 	if (ind >= 0)
 	{
-		out << indent[ind%11] << prefix;
+		out << indent[static_cast<std::size_t>(ind) % std::size(indent)] << prefix;
 	}
 	out << Poco::trim(line);
 	if (ind >= 0 && (line.empty() || line[line.size() - 1] != '{'))
@@ -1007,7 +983,7 @@ void CppWriter::writeRemotingAttributes(std::ostream& out, const std::map<std::s
 {
 	if (!_info.remotingAttributes())
 		return;
-	std::map<std::string, std::string>::const_iterator it = attrs.begin();
+	auto it = attrs.begin();
 	for (; it != attrs.end(); ++it)
 	{
 		std::string name = it->first;
@@ -1022,12 +998,12 @@ void CppWriter::writeRemotingAttributes(std::ostream& out, const std::map<std::s
 			bool mustQuote = false;
 			if (value != "\"\"")
 			{
-				for (std::string::const_iterator itv = value.begin(); itv != value.end(); ++itv)
+				for (const auto& ch: value)
 				{
-					bool isAlNum = (*itv >= '0' && *itv <= '9')
-						|| (*itv >= 'a' && *itv <= 'z')
-						|| (*itv >= 'A' && *itv <= 'Z')
-						|| (*itv == '_');
+					bool isAlNum = (ch >= '0' && ch <= '9')
+						|| (ch >= 'a' && ch <= 'z')
+						|| (ch >= 'A' && ch <= 'Z')
+						|| (ch == '_');
 					if (!isAlNum) mustQuote = true;
 				}
 			}
@@ -1057,16 +1033,15 @@ void CppWriter::writeMethodRemotingAttributes(std::ostream& out, const MethodInf
 		}
 	}
 	const std::map<int, Parameter>& params = mi.getParameters();
-	std::map<int, Parameter>::const_iterator it = params.begin();
-	for (; it != params.end(); ++it)
+	for (const auto& [order, param]: params)
 	{
-		if (!it->second.getAll().empty())
+		if (!param.getAll().empty())
 		{
 			std::string attr("$");
-			attr += it->second.getName();
+			attr += param.getName();
 			attr += "={";
 			writeRemotingAttribute(out, attr, indent);
-			writeRemotingAttributes(out, it->second.getAll(), -1);
+			writeRemotingAttributes(out, param.getAll(), -1);
 			out << "}" << std::endl;
 		}
 	}

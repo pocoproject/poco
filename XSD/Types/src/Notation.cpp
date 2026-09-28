@@ -16,9 +16,7 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 Notation::Notation(const std::string& id, const std::string& name, const std::string& pub, const std::string& system):
@@ -30,9 +28,7 @@ Notation::Notation(const std::string& id, const std::string& name, const std::st
 }
 
 
-Notation::~Notation()
-{
-}
+Notation::~Notation() = default;
 
 
 void Notation::accept(Visitor& v) const
@@ -41,4 +37,4 @@ void Notation::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

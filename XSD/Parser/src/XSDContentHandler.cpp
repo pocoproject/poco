@@ -14,7 +14,7 @@
 
 #include "Poco/XSD/Parser/XSDContentHandler.h"
 #include "Poco/XSD/Parser/Constants.h"
-#include "Poco/XSD/Parser/Utility.h"
+#include "Utility.h"
 #include "Poco/XSD/Types/XSDException.h"
 #include "Poco/XSD/Types/ElementImpl.h"
 #include "Poco/XSD/Types/ElementTypeRef.h"
@@ -58,23 +58,11 @@ using namespace Poco::XSD::Types;
 using namespace Poco::XML;
 
 
-namespace Poco {
-namespace XSD {
-namespace Parser {
+namespace Poco::XSD::Parser {
 
 
 XSDContentHandler::XSDContentHandler(const Poco::URI& schemaLocation, const SchemaNSToLocationMap& schemaMap):
 	_schemaLocation(schemaLocation),
-	_pLocator(nullptr),
-	_qualifiedAttributeForm(false),
-	_qualifiedElementForm(false),
-	_blockExtension(false),
-	_blockRestriction(false),
-	_blockSubstitution(false),
-	_finalExtension(false),
-	_finalRestriction(false),
-	_finalList(false),
-	_finalUnion(false),
 	_states(),
 	_schemaMap(schemaMap)
 {
@@ -108,8 +96,8 @@ void XSDContentHandler::endDocument()
 	_states.pop_back();
 	poco_assert_dbg (_states.back() == StateMachine::ST_INUNINITIALIZED);
 
-	// The SAX parser calls endDocument() only after the whole document parsed without error,
-	// so a document that fails, even after its last end tag, adds nothing to the registered schemas.
+	// endDocument() is called only for a document that parsed without error, so a document
+	// that fails, even after its last end tag, adds nothing to the registered schemas
 	TypesManager& tm = TypesManager::instance();
 	for (const auto& pSchema: _registeredSchemas)
 	{
@@ -168,13 +156,13 @@ void XSDContentHandler::endElement(const std::string& uri, const std::string& lo
 }
 
 
-void XSDContentHandler::characters(const XMLChar ch[], int start, int length)
+void XSDContentHandler::characters(const XMLChar* ch, int start, int length)
 {
 	_characters.append(ch+start, length);
 }
 
 
-void XSDContentHandler::ignorableWhitespace(const XMLChar ch[], int start, int length)
+void XSDContentHandler::ignorableWhitespace(const XMLChar* ch, int start, int length)
 {
 	_characters.append(ch+start, length);
 }
@@ -211,7 +199,7 @@ void XSDContentHandler::stateAllStart(const std::string& uri, const std::string&
 	//    {any attributes with non-schema namespace . . .}>
 	//    Content: (annotation?, element*)
 	//  </all>
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	Poco::UInt32 maxOccurs = Utility::getMaxOccurs(itEnd, attrList.find(Constants::XSD_MAXOCCURS));
 	poco_assert (maxOccurs == 1);
@@ -232,7 +220,7 @@ void XSDContentHandler::stateAnnotationStart(const std::string& uri, const std::
 	//  Content: (appinfo | documentation)*
 	//</annotation>
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	Annotation::Ptr pAnn = new Annotation(id);
 	_annot.push(pAnn);
@@ -250,7 +238,7 @@ void XSDContentHandler::stateAnyStart(const std::string& uri, const std::string&
 	//  {any attributes with non-schema namespace . . .}>
 	//  Content: (annotation?)
 	//</any>
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	Poco::UInt32 maxOccurs = Utility::getMaxOccurs(itEnd, attrList.find(Constants::XSD_MAXOCCURS));
 	Poco::UInt32 minOccurs = Utility::getMinOccurs(itEnd, attrList.find(Constants::XSD_MINOCCURS));
@@ -280,7 +268,7 @@ void XSDContentHandler::stateAnyAttributeStart(const std::string& uri, const std
 	//  {any attributes with non-schema namespace . . .}>
 	//  Content: (annotation?)
 	//</anyAttribute>
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	const std::string& ns = Utility::getString(itEnd, attrList.find(Constants::XSD_NAMESPACE), Constants::XSD_DOUBLEHASH_ANY);
 	AnyAttribute::ProcessStyle ps = Utility::getAnyAttrProcessStyle(itEnd, attrList.find(Constants::XSD_PROCESSCONTENTS));
@@ -298,7 +286,7 @@ void XSDContentHandler::stateAppInfoStart(const std::string& uri, const std::str
 	//  Content: ({any})*
 	//</appinfo>
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& src = Utility::getString(itEnd, attrList.find(Constants::XSD_SOURCE), Constants::XSD_EMPTY_STRING);
 	AnnotationContent::Ptr ptr = new AppInfo(src);
 	_annotContent.push(ptr);
@@ -319,12 +307,12 @@ void XSDContentHandler::stateAttributeStart(const std::string& uri, const std::s
 	//  {any attributes with non-schema namespace . . .}>
 	//  Content: (annotation?, simpleType?)
 	//</attribute>
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
 	// do we have a ref?
-	CompactAttributes::const_iterator itRef = attrList.find(Constants::XSD_REF);
-	CompactAttributes::const_iterator itTypeRef = attrList.find(Constants::XSD_TYPE);
+	auto itRef = attrList.find(Constants::XSD_REF);
+	auto itTypeRef = attrList.find(Constants::XSD_TYPE);
 	AttributeContent::Ptr pAttr;
 	bool inlineAttrWritten = false;
 	if (itRef != itEnd)
@@ -371,10 +359,10 @@ void XSDContentHandler::stateAttributeGroupStart(const std::string& uri, const s
 	//  Content: (annotation?, ((attribute | attributeGroup)*, anyAttribute?))
 	//</attributeGroup>
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	// do we have a ref?
-	CompactAttributes::const_iterator itRef = attrList.find(Constants::XSD_REF);
+	auto itRef = attrList.find(Constants::XSD_REF);
 	AbstractAttributeGroup::Ptr pGroup;
 	if (itRef != itEnd)
 	{
@@ -400,7 +388,7 @@ void XSDContentHandler::stateChoiceStart(const std::string& uri, const std::stri
 	//  {any attributes with non-schema namespace . . .}>
 	//  Content: (annotation?, (element | group | choice | sequence | any)*)
 	//</choice>
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	Poco::UInt32 maxOccurs = Utility::getMaxOccurs(itEnd, attrList.find(Constants::XSD_MAXOCCURS));
 	Poco::UInt32 minOccurs = Utility::getMinOccurs(itEnd, attrList.find(Constants::XSD_MINOCCURS));
@@ -442,7 +430,7 @@ void XSDContentHandler::stateComplexTypeStart(const std::string& uri, const std:
 	if (getParentState() == StateMachine::ST_INELEMENT && _elementsImpl.top() == nullptr)
 		throw Types::SchemaException("An element with a type or ref attribute must not declare an inline type");
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	bool mixed = Utility::getBool(itEnd, attrList.find(Constants::XSD_MIXED), false);
 	bool isAbstract = Utility::getBool(itEnd, attrList.find(Constants::XSD_ABSTRACT), false);
@@ -452,15 +440,11 @@ void XSDContentHandler::stateComplexTypeStart(const std::string& uri, const std:
 		if (!_elements.empty())
 		{
 			std::string topElemName = _elements.top()->name();
-			if (_generatedTypeNames.find(topElemName) == _generatedTypeNames.end())
-			{
-				_generatedTypeNames[topElemName] = 0;
+			const auto [itName, inserted] = _generatedTypeNames.try_emplace(topElemName, 0);
+			if (inserted)
 				name = "#" + topElemName;
-			}
 			else
-			{
-				name = "#" + topElemName + "_" + Poco::NumberFormatter::format(++_generatedTypeNames[topElemName]);
-			}
+				name = "#" + topElemName + "_" + Poco::NumberFormatter::format(++itName->second);
 		}
 	}
 	bool blockRestriction = _blockRestriction;
@@ -485,7 +469,7 @@ void XSDContentHandler::stateDocumentationStart(const std::string& uri, const st
 	//  Content: ({any})*
 	//</documentation>
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& src = Utility::getString(itEnd, attrList.find(Constants::XSD_SOURCE), Constants::XSD_EMPTY_STRING);
 	const std::string& lang = Utility::getString(itEnd, attrList.find(Constants::XSD_LANG), Constants::XSD_EMPTY_STRING);
 	AnnotationContent::Ptr ptr = new Documentation(src, lang);
@@ -513,8 +497,8 @@ void XSDContentHandler::stateElementStart(const std::string& uri, const std::str
 	//  {any attributes with non-schema namespace . . .}>
 	//  Content: (annotation?, ((simpleType | complexType)?, (unique | key | keyref)*))
 	//</element>
-	CompactAttributes::const_iterator it = attrList.find(Constants::XSD_REF);
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto it = attrList.find(Constants::XSD_REF);
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	Poco::UInt32 maxOccurs = Utility::getMaxOccurs(itEnd, attrList.find(Constants::XSD_MAXOCCURS));
 	Poco::UInt32 minOccurs = Utility::getMinOccurs(itEnd, attrList.find(Constants::XSD_MINOCCURS));
@@ -573,7 +557,7 @@ void XSDContentHandler::stateElementStart(const std::string& uri, const std::str
 		}
 		else
 		{
-			ElementImpl* pElemImpl =
+			auto* pElemImpl =
 				new ElementImpl(id,
 				minOccurs,
 				maxOccurs,
@@ -613,7 +597,7 @@ void XSDContentHandler::stateSimpleExtensionStart(const std::string& uri, const 
 	//  {any attributes with non-schema namespace . . .}>
 	//  Content: (annotation?, ((attribute | attributeGroup)*, anyAttribute?))
 	//</extension>
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& base = Utility::getString(itEnd, attrList.find(Constants::XSD_BASE));
 	poco_assert_dbg (_complexInheritance.top()->getSimpleContent());
 	_complexInheritance.top()->setRestriction(false);
@@ -631,7 +615,7 @@ void XSDContentHandler::stateComplexExtensionStart(const std::string& uri, const
 	//  Content: (annotation?, ((group | all | choice | sequence)?, ((attribute | attributeGroup)*, anyAttribute?)))
 	//</extension>
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& base = Utility::getString(itEnd, attrList.find(Constants::XSD_BASE));
 	poco_assert_dbg (_complexInheritance.top()->getSimpleContent() == false);
 	_complexInheritance.top()->setRestriction(false);
@@ -665,11 +649,11 @@ void XSDContentHandler::stateGroupStart(const std::string& uri, const std::strin
 	//  Content: (annotation?, (all | choice | sequence)?)
 	//</group>
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	Poco::UInt32 maxOccurs = Utility::getMaxOccurs(itEnd, attrList.find(Constants::XSD_MAXOCCURS));
 	Poco::UInt32 minOccurs = Utility::getMinOccurs(itEnd, attrList.find(Constants::XSD_MINOCCURS));
-	CompactAttributes::const_iterator itRef = attrList.find(Constants::XSD_REF);
+	auto itRef = attrList.find(Constants::XSD_REF);
 	OrderContent::Ptr ptr;
 	if (itRef != itEnd)
 	{
@@ -698,7 +682,7 @@ void XSDContentHandler::stateXSDImportStart(const std::string& uri, const std::s
 	//  Content: (annotation?)
 	//</import>
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& ns = Utility::getString(itEnd, attrList.find(Constants::XSD_NAMESPACE), Constants::XSD_EMPTY_STRING);
 	const std::string& loc = Utility::getString(itEnd, attrList.find(Constants::XSD_SCHEMALOCATION), Constants::XSD_EMPTY_STRING);
 	Poco::URI url;
@@ -732,8 +716,7 @@ void XSDContentHandler::stateXSDImportStart(const std::string& uri, const std::s
 		// no namespace and no schemaLocation is allowed!
 		if (!ns.empty())
 		{
-			SchemaNSToLocationMap::const_iterator it = _schemaMap.find(ns);
-			if (it != _schemaMap.end())
+			if (const auto it = _schemaMap.find(ns); it != _schemaMap.end())
 			{
 				url = it->second;
 				resolveSchemaLocation(url, Poco::URI(_schemaLocation));
@@ -756,7 +739,7 @@ void XSDContentHandler::stateIncludeStart(const std::string& uri, const std::str
 	//  Content: (annotation?)
 	//</include>
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& loc = Utility::getString(itEnd, attrList.find(Constants::XSD_SCHEMALOCATION));
 	// only one single xsd entry! no uri_location pair at includes!
 	Poco::URI url(loc);
@@ -806,9 +789,9 @@ void XSDContentHandler::stateListStart(const std::string& uri, const std::string
 	//  {any attributes with non-schema namespace . . .}>
 	//  Content: (annotation?, simpleType?)
 	//</list>
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
-	CompactAttributes::const_iterator it = attrList.find(Constants::XSD_ITEMTYPE);
+	auto it = attrList.find(Constants::XSD_ITEMTYPE);
 
 	SimpleTypeInheritance::Ptr ptr;
 	ListTypeRef::Ptr pRef;
@@ -843,7 +826,7 @@ void XSDContentHandler::stateNotationStart(const std::string& uri, const std::st
 	//  Content: (annotation?)
 	//</notation>
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME));
 	const std::string& pub = Utility::getString(itEnd, attrList.find(Constants::XSD_PUBLIC), Constants::XSD_EMPTY_STRING);
@@ -875,7 +858,7 @@ void XSDContentHandler::stateComplexRestrictionStart(const std::string& uri, con
 	//  {any attributes with non-schema namespace . . .}>
 	//  Content: (annotation?, ((group | all | choice | sequence)?, ((attribute | attributeGroup)*, anyAttribute?)))
 	//</restriction>
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& base = Utility::getString(itEnd, attrList.find(Constants::XSD_BASE));
 	poco_assert_dbg (_complexInheritance.top()->getSimpleContent() == false);
 	_complexInheritance.top()->setRestriction(true);
@@ -892,7 +875,7 @@ void XSDContentHandler::stateSimpleContentRestrictionStart(const std::string& ur
 	//  {any attributes with non-schema namespace . . .}>
 	//  Content: (annotation?, (simpleType?, (minExclusive | minInclusive | maxExclusive | maxInclusive | totalDigits | fractionDigits | length | minLength | maxLength | enumeration | whiteSpace | pattern)*)?, ((attribute | attributeGroup)*, anyAttribute?))
 	//</restriction>
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& base = Utility::getString(itEnd, attrList.find(Constants::XSD_BASE));
 	poco_assert_dbg (_complexInheritance.top()->getSimpleContent());
 	_complexInheritance.top()->setRestriction(true);
@@ -910,7 +893,7 @@ void XSDContentHandler::stateSimpleTypeRestrictionStart(const std::string& uri, 
 	//  {any attributes with non-schema namespace . . .}>
 	//  Content: (annotation?, (simpleType?, (minExclusive | minInclusive | maxExclusive | maxInclusive | totalDigits | fractionDigits | length | minLength | maxLength | enumeration | whiteSpace | pattern)*))
 	//</restriction>
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	const std::string& base = Utility::getString(itEnd, attrList.find(Constants::XSD_BASE), Constants::XSD_EMPTY_STRING);
 	if (base.empty())
@@ -943,13 +926,13 @@ void XSDContentHandler::stateSchemaStart(const std::string& uri, const std::stri
 	//  Content: ((include | import | redefine | annotation)*, (((simpleType | complexType | group | attributeGroup) | element | attribute | notation), annotation*)*)
 	//</schema>
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	_qualifiedAttributeForm = Utility::getQualified(itEnd, attrList.find(Constants::XSD_ATTRIBUTEFORMDEFAULT), false);
 	Utility::getBlock(itEnd, attrList.find(Constants::XSD_BLOCKDEFAULT), _blockRestriction, _blockExtension, _blockSubstitution);
 	_qualifiedElementForm = Utility::getQualified(itEnd, attrList.find(Constants::XSD_ELEMENTFORMDEFAULT), false);
 	Utility::getFinalDefault(itEnd, attrList.find(Constants::XSD_FINALDEFAULT), _finalRestriction, _finalExtension, _finalList, _finalUnion);
 
-	CompactAttributes::const_iterator it = attrList.find(Constants::XSD_TARGETNAMESPACE);
+	auto it = attrList.find(Constants::XSD_TARGETNAMESPACE);
 	std::string tns;
 	if (it != itEnd)
 	{
@@ -1000,7 +983,7 @@ void XSDContentHandler::stateSequenceStart(const std::string& uri, const std::st
 	//  {any attributes with non-schema namespace . . .}>
 	//  Content: (annotation?, (element | group | choice | sequence | any)*)
 	//</sequence>
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	Poco::UInt32 maxOccurs = Utility::getMaxOccurs(itEnd, attrList.find(Constants::XSD_MAXOCCURS));
 	Poco::UInt32 minOccurs = Utility::getMinOccurs(itEnd, attrList.find(Constants::XSD_MINOCCURS));
@@ -1019,8 +1002,6 @@ void XSDContentHandler::stateSimpleContentStart(const std::string& uri, const st
 	//  Content: (annotation?, (restriction | extension))
 	//</simpleContent>
 
-	//CompactAttributes::const_iterator itEnd = attrList.end();
-	//const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	InheritanceInfo::Ptr ptr = new InheritanceInfo();
 	ptr->setSimpleContent(true);
 	_complexInheritance.push(ptr);
@@ -1054,7 +1035,7 @@ void XSDContentHandler::stateSimpleTypeStart(const std::string& uri, const std::
 	bool finalRestriction = false;
 	bool finalList = false;
 	bool finalUnion = false;
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
 	SimpleType::Ptr ptr(new SimpleType(id, name, finalRestriction, finalList, finalUnion));
@@ -1071,16 +1052,14 @@ void XSDContentHandler::stateUnionStart(const std::string& uri, const std::strin
 	//  {any attributes with non-schema namespace . . .}>
 	//  Content: (annotation?, simpleType*)
 	//</union>
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& id = Utility::getString(itEnd, attrList.find(Constants::XSD_ID), Constants::XSD_EMPTY_STRING);
 	const std::string& memberTypes = Utility::getString(itEnd, attrList.find(Constants::XSD_MEMBERTYPES), Constants::XSD_EMPTY_STRING);
 	StringTokenizer tok(memberTypes, " ", StringTokenizer::TOK_IGNORE_EMPTY|StringTokenizer::TOK_TRIM);
-	StringTokenizer::Iterator itQ = tok.begin();
-	StringTokenizer::Iterator itQEnd = tok.end();
 	std::vector<QName> qn;
-	for (; itQ != itQEnd; ++itQ)
+	for (const auto& memberType: tok)
 	{
-		qn.push_back(createQName(*itQ));
+		qn.push_back(createQName(memberType));
 	}
 
 	Union::Ptr ptr(new Union(id, qn));
@@ -1538,16 +1517,6 @@ void XSDContentHandler::stateElementEnd(const std::string& uri, const std::strin
 
 	// pushed: _elementsImpl, _elements, _orderContents, _objects
 	poco_assert_dbg (!_elementsImpl.empty());
-	ElementImpl* pImpl = _elementsImpl.top();
-
-	if (pImpl)
-	{
-		// we had an implementation type
-		// call to make sure the type is set!
-		// (returns a const ref to the type dereferencing it)
-		//pImpl->getType();
-	}
-
 	poco_assert_dbg (!_elements.empty());
 	poco_assert_dbg (!_orderContents.empty());
 	Element* pElem = _elements.top();
@@ -2010,7 +1979,7 @@ void XSDContentHandler::stateMetaAnyEnd(const std::string& uri, const std::strin
 
 void XSDContentHandler::stateDefinitionsStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
 {
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& tns = Utility::getString(itEnd, attrList.find(Constants::XSD_TARGETNAMESPACE), Constants::XSD_EMPTY_STRING);
 	if (tns.empty()) throw Types::SchemaException("No targetNamespace attribute in definitions element");
 	_pDefinitions = new Types::Definitions(tns);
@@ -2035,7 +2004,7 @@ void XSDContentHandler::stateWSDLImportStart(const std::string& uri, const std::
 	//  Content: (annotation?)
 	//</import>
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& ns = Utility::getString(itEnd, attrList.find(Constants::WSDL_NAMESPACE), Constants::XSD_EMPTY_STRING);
 	const std::string& loc = Utility::getString(itEnd, attrList.find(Constants::WSDL_LOCATION), Constants::XSD_EMPTY_STRING);
 	Poco::URI url(loc);
@@ -2064,7 +2033,7 @@ void XSDContentHandler::stateTypesEnd(const std::string& uri, const std::string&
 
 void XSDContentHandler::stateMessageStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
 {
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
 	if (name.empty()) throw Types::SchemaException("No name attribute in message element");
 	_objects.push(new Types::Message(name));
@@ -2087,7 +2056,7 @@ void XSDContentHandler::statePartStart(const std::string& uri, const std::string
 	Types::Message::Ptr pMessage = _objects.top().cast<Types::Message>();
 	if (pMessage)
 	{
-		CompactAttributes::const_iterator itEnd = attrList.end();
+		auto itEnd = attrList.end();
 		const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
 		const std::string& elemq = Utility::getString(itEnd, attrList.find(Constants::XSD_ELEMENT), Constants::XSD_EMPTY_STRING);
 		const std::string& typeq = Utility::getString(itEnd, attrList.find(Constants::XSD_TYPE), Constants::XSD_EMPTY_STRING);
@@ -2113,7 +2082,7 @@ void XSDContentHandler::statePartEnd(const std::string& uri, const std::string& 
 
 void XSDContentHandler::statePortTypeStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
 {
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
 	if (name.empty()) throw Types::SchemaException("No name attribute in portType element");
 	_objects.push(new Types::PortType(name));
@@ -2132,7 +2101,7 @@ void XSDContentHandler::statePortTypeEnd(const std::string& uri, const std::stri
 
 void XSDContentHandler::stateOperationStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
 {
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
 	if (name.empty()) throw Types::SchemaException("No name attribute in operation element");
 
@@ -2190,7 +2159,7 @@ void XSDContentHandler::stateInputStart(const std::string& uri, const std::strin
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
 	poco_check_ptr(pOperation);
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
 	const std::string& message = Utility::getString(itEnd, attrList.find(Constants::WSDL_MESSAGE), Constants::XSD_EMPTY_STRING);
 	const std::string& wsaAction = Utility::getString(itEnd, attrList.find(Constants::WSA_ACTION), Constants::XSD_EMPTY_STRING);
@@ -2215,7 +2184,7 @@ void XSDContentHandler::stateOutputStart(const std::string& uri, const std::stri
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
 	poco_check_ptr(pOperation);
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
 	const std::string& message = Utility::getString(itEnd, attrList.find(Constants::WSDL_MESSAGE), Constants::XSD_EMPTY_STRING);
 	const std::string& wsaAction = Utility::getString(itEnd, attrList.find(Constants::WSA_ACTION), Constants::XSD_EMPTY_STRING);
@@ -2240,7 +2209,7 @@ void XSDContentHandler::stateFaultStart(const std::string& uri, const std::strin
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
 	poco_check_ptr(pOperation);
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
 	const std::string& message = Utility::getString(itEnd, attrList.find(Constants::WSDL_MESSAGE), Constants::XSD_EMPTY_STRING);
 	const std::string& wsaAction = Utility::getString(itEnd, attrList.find(Constants::WSA_ACTION), Constants::XSD_EMPTY_STRING);
@@ -2261,7 +2230,7 @@ void XSDContentHandler::stateFaultEnd(const std::string& uri, const std::string&
 
 void XSDContentHandler::stateBindingStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
 {
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
 	if (name.empty()) throw Types::SchemaException("No name attribute in binding element");
 	const std::string& type = Utility::getString(itEnd, attrList.find(Constants::XSD_TYPE), Constants::XSD_EMPTY_STRING);
@@ -2272,7 +2241,7 @@ void XSDContentHandler::stateBindingStart(const std::string& uri, const std::str
 
 	const Types::Definitions& defs = Types::TypesManager::instance().getDefinitions(portTypeName.namespaceURI());
 	const Types::Definitions::PortTypes& portTypes = defs.portTypes();
-	Types::Definitions::PortTypes::const_iterator it = portTypes.find(portTypeName.localName());
+	auto it = portTypes.find(portTypeName.localName());
 	if (it == portTypes.end()) throw Poco::NotFoundException("Port type: " + portTypeName.localName() + " in namespace: " + portTypeName.namespaceURI() + " referenced by binding", name);
 
 	pBinding->setPortType(it->second);
@@ -2297,7 +2266,7 @@ void XSDContentHandler::stateSoapBindingStart(const std::string& uri, const std:
 {
 	poco_check_ptr (_pBinding);
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	std::string style = Utility::getString(itEnd, attrList.find(Constants::SOAP_STYLE), "document");
 	std::string transport = Utility::getString(itEnd, attrList.find(Constants::SOAP_TRANSPORT), Constants::XSD_EMPTY_STRING);
 	if (transport.empty()) throw Types::SchemaException("No transport attribute in SOAP binding element");
@@ -2319,7 +2288,7 @@ void XSDContentHandler::stateSoapOperationStart(const std::string& uri, const st
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
 	poco_check_ptr(pOperation);
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& soapAction = Utility::getString(itEnd, attrList.find(Constants::SOAP_ACTION), Constants::XSD_EMPTY_STRING);
 	const std::string& style = Utility::getString(itEnd, attrList.find(Constants::SOAP_STYLE), Constants::XSD_EMPTY_STRING);
 	pOperation->bindingProperties().set("soap.soapAction", soapAction);
@@ -2338,7 +2307,7 @@ void XSDContentHandler::stateSoapHeaderStart(const std::string& uri, const std::
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
 	poco_check_ptr(pOperation);
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& message = Utility::getString(itEnd, attrList.find(Constants::SOAP_MESSAGE), Constants::XSD_EMPTY_STRING);
 	const XML::Name messageName = resolveName(message);
 	const std::string& part = Utility::getString(itEnd, attrList.find(Constants::SOAP_PART), Constants::XSD_EMPTY_STRING);
@@ -2373,7 +2342,7 @@ void XSDContentHandler::stateSoapHeaderFaultStart(const std::string& uri, const 
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
 	poco_check_ptr(pOperation);
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& message = Utility::getString(itEnd, attrList.find(Constants::SOAP_MESSAGE), Constants::XSD_EMPTY_STRING);
 	const XML::Name messageName = resolveName(message);
 	const std::string& part = Utility::getString(itEnd, attrList.find(Constants::SOAP_PART), Constants::XSD_EMPTY_STRING);
@@ -2410,7 +2379,7 @@ void XSDContentHandler::stateSoapBodyStart(const std::string& uri, const std::st
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
 	poco_check_ptr(pOperation);
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& parts = Utility::getString(itEnd, attrList.find(Constants::SOAP_PARTS), Constants::XSD_EMPTY_STRING);
 	const std::string& use = Utility::getString(itEnd, attrList.find(Constants::SOAP_USE), Constants::XSD_EMPTY_STRING);
 	const std::string& encodingStyle = Utility::getString(itEnd, attrList.find(Constants::SOAP_ENCODINGSTYLE), Constants::XSD_EMPTY_STRING);
@@ -2435,7 +2404,7 @@ void XSDContentHandler::stateSoapFaultStart(const std::string& uri, const std::s
 	Types::Operation::Ptr pOperation = _objects.top().cast<Types::Operation>();
 	poco_check_ptr(pOperation);
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& parts = Utility::getString(itEnd, attrList.find(Constants::SOAP_PARTS), Constants::XSD_EMPTY_STRING);
 	const std::string& use = Utility::getString(itEnd, attrList.find(Constants::SOAP_USE), Constants::XSD_EMPTY_STRING);
 	const std::string& encodingStyle = Utility::getString(itEnd, attrList.find(Constants::SOAP_ENCODINGSTYLE), Constants::XSD_EMPTY_STRING);
@@ -2456,7 +2425,7 @@ void XSDContentHandler::stateSoapFaultEnd(const std::string& uri, const std::str
 
 void XSDContentHandler::stateServiceStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
 {
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
 	if (name.empty()) throw Types::SchemaException("No name attribute in service element");
 	Types::Service::Ptr pService = new Types::Service(name);
@@ -2476,7 +2445,7 @@ void XSDContentHandler::stateServiceEnd(const std::string& uri, const std::strin
 
 void XSDContentHandler::statePortStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList)
 {
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& name = Utility::getString(itEnd, attrList.find(Constants::XSD_NAME), Constants::XSD_EMPTY_STRING);
 	if (name.empty()) throw Types::SchemaException("No name attribute in port element");
 	const std::string& bindingq = Utility::getString(itEnd, attrList.find(Constants::WSDL_BINDING), Constants::XSD_EMPTY_STRING);
@@ -2518,7 +2487,7 @@ void XSDContentHandler::stateWSDLDocumentationStart(const std::string& uri, cons
 	Annotation::Ptr pAnn = new Annotation("");
 	_annot.push(pAnn);
 
-	CompactAttributes::const_iterator itEnd = attrList.end();
+	auto itEnd = attrList.end();
 	const std::string& src = Utility::getString(itEnd, attrList.find(Constants::XSD_SOURCE), Constants::XSD_EMPTY_STRING);
 	const std::string& lang = Utility::getString(itEnd, attrList.find(Constants::XSD_LANG), Constants::XSD_EMPTY_STRING);
 	AnnotationContent::Ptr ptr = new Documentation(src, lang);
@@ -2567,7 +2536,7 @@ void XSDContentHandler::convertAttributes(const XML::Attributes& attr, CompactAt
 {
 	for (int i = 0; i < attr.getLength(); ++i)
 	{
-		attrList.insert(std::make_pair(attr.getLocalName(i), attr.getValue(i)));
+		attrList.try_emplace(attr.getLocalName(i), attr.getValue(i));
 	}
 }
 
@@ -2583,8 +2552,7 @@ XML::Name XSDContentHandler::resolveName(const std::string& qname) const
 {
 	std::string namespaceURI;
 	std::string localName;
-	// an undeclared prefix leaves namespaceURI empty; the schema model rejects
-	// such a name when it resolves the reference
+	// an undeclared prefix is not an error; it leaves the name without a namespace
 	static_cast<void>(_namespaces.processName(qname, namespaceURI, localName, false));
 	return XML::Name(qname, namespaceURI, localName);
 }
@@ -2592,7 +2560,7 @@ XML::Name XSDContentHandler::resolveName(const std::string& qname) const
 
 Types::BindingProperties& XSDContentHandler::operationBindingProperties(Types::Operation& operation) const
 {
-	for (StateList::const_reverse_iterator it = _states.rbegin(); it != _states.rend(); ++it)
+	for (auto it = _states.rbegin(); it != _states.rend(); ++it)
 	{
 		switch (*it)
 		{
@@ -2692,7 +2660,6 @@ void XSDContentHandler::resolveSchemaLocation(Poco::URI& schemaLocation, const P
 Poco::XSD::Types::Schema::Ptr XSDContentHandler::loadXSD(const Poco::URI& schemaLocation, const XSDContentHandler::SchemaNSToLocationMap& schemaMap)
 {
 	Poco::XSD::Types::Schema::Ptr pSchema = loadDocument(schemaLocation, schemaMap);
-	// endDocument() merged the document into the registered schema of its namespace;
 	// a document of the XML Schema namespace itself is not registered
 	Poco::XSD::Types::Schema::Ptr pRegistered = Types::TypesManager::instance().findSchema(schemaLocation);
 	return pRegistered != nullptr ? pRegistered : pSchema;
@@ -2731,4 +2698,4 @@ void XSDContentHandler::importWSDL(const std::string& targetNamespace, const Poc
 }
 
 
-} } } // namespace Poco::XSD::Parser
+} // namespace Poco::XSD::Parser

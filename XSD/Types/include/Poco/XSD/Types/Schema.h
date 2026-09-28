@@ -30,9 +30,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API Schema: public AnnotatedObject
@@ -63,10 +61,10 @@ public:
 		bool needsFixup = true);
 		/// Creates the Schema.
 
-	~Schema();
+	~Schema() override;
 		/// Destroys the Schema.
 
-	const std::string& targetNamespace() const;
+	[[nodiscard]] const std::string& targetNamespace() const;
 		/// The namespace of the Schema
 
 	void addType(TypePtr pType);
@@ -75,7 +73,7 @@ public:
 		/// Note that once a type was added to the Schema, it can not
 		/// be removed!
 
-	const Type* getType(const std::string& name) const;
+	[[nodiscard]] const Type* getType(const std::string& name) const;
 		/// Returns a type for the given name, returns a null pointer if not found
 
 	void addElement(ElementPtr pElem);
@@ -84,7 +82,7 @@ public:
 		/// Note that once an element was added to the Schema, it can not
 		/// be removed!
 
-	const Element* getElement(const std::string& name) const;
+	[[nodiscard]] const Element* getElement(const std::string& name) const;
 		/// Returns an element for the given name, returns a null pointer if not found
 
 	void addAttribute(AbstractAttribute::Ptr pAttr);
@@ -93,7 +91,7 @@ public:
 		/// Note that once an attribute was added to the Schema, it can not
 		/// be removed!
 
-	const AbstractAttribute* getAttribute(const std::string& name) const;
+	[[nodiscard]] const AbstractAttribute* getAttribute(const std::string& name) const;
 		/// Returns a attribute for the given name, returns a null pointer if not found
 
 	void addAttributeGroup(AbstractAttributeGroup::Ptr pAttr);
@@ -102,7 +100,7 @@ public:
 		/// Note that once an attributegroup was added to the Schema, it can not
 		/// be removed!
 
-	const AbstractAttributeGroup* getAttributeGroup(const std::string& name) const;
+	[[nodiscard]] const AbstractAttributeGroup* getAttributeGroup(const std::string& name) const;
 		/// Returns an attributegroup for the given name, returns a null pointer if not found
 
 	void addGroup(Group::Ptr pAttr);
@@ -111,7 +109,7 @@ public:
 		/// Note that once a group was added to the Schema, it can not
 		/// be removed!
 
-	const Group* getGroup(const std::string& name) const;
+	[[nodiscard]] const Group* getGroup(const std::string& name) const;
 		/// Returns a group for the given name, returns a null pointer if not found
 
 	void addNotation(Notation::Ptr ptr);
@@ -120,7 +118,7 @@ public:
 		/// Note that once an Notation was added to the Schema, it can not
 		/// be removed!
 
-	const Notation* getNotation(const std::string& name) const;
+	[[nodiscard]] const Notation* getNotation(const std::string& name) const;
 		/// Returns a Notation for the given name, returns a null pointer if not found
 
 	void addImportedSchema(Ptr pSchema);
@@ -129,56 +127,56 @@ public:
 	void includeSchema(Ptr pSchema);
 		/// Includes the given schema. Including the schema into itself does nothing.
 
-	const Schema::Types& types() const;
+	[[nodiscard]] const Schema::Types& types() const;
 		/// Returns all types of the schema
 
-	const Schema::Elements& elements() const;
+	[[nodiscard]] const Schema::Elements& elements() const;
 		/// Returns all elements exported by the schema
 
-	const Schema::Attributes& attributes() const;
+	[[nodiscard]] const Schema::Attributes& attributes() const;
 		/// Returns all attributes exported by the schema
 
-	const Schema::AttributeGroups& attributeGroups() const;
+	[[nodiscard]] const Schema::AttributeGroups& attributeGroups() const;
 		/// Returns all attribute groups exported by the schema
 
-	const Schema::Groups& groups() const;
+	[[nodiscard]] const Schema::Groups& groups() const;
 		/// Returns all groups exported by the schema
 
-	const Schema::Notations& notations() const;
+	[[nodiscard]] const Schema::Notations& notations() const;
 		/// Returns all notations of the schema
 
 	[[nodiscard]] const Schemas& importedSchemas() const;
 		/// Returns the schemas this schema imports, including the imports of the
 		/// documents of the same namespace that were merged into it.
 		
-	bool qualifiedAttributeForm() const;
+	[[nodiscard]] bool qualifiedAttributeForm() const;
 		/// Are attributes qualified?
 
-	bool qualifiedElementForm() const;
+	[[nodiscard]] bool qualifiedElementForm() const;
 		/// Are elements qualified?
 
-	bool blockExtension() const;
+	[[nodiscard]] bool blockExtension() const;
 		/// Are extensions forbidden?
 
-	bool blockRestriction() const;
+	[[nodiscard]] bool blockRestriction() const;
 		/// Are restrictions forbidden?
 
-	bool blockSubstitution() const;
+	[[nodiscard]] bool blockSubstitution() const;
 		/// Is substitution forbidden?
 
-	bool finalExtension() const;
+	[[nodiscard]] bool finalExtension() const;
 		/// Is the default for extension final?
 
-	bool finalRestriction() const;
+	[[nodiscard]] bool finalRestriction() const;
 		/// Is the default for restriction final?
 
-	bool finalList() const;
+	[[nodiscard]] bool finalList() const;
 		/// Is the default for list final?
 
-	bool finalUnion() const;
+	[[nodiscard]] bool finalUnion() const;
 		/// Is the default for union final?
 
-	void accept(Visitor& v) const;
+	void accept(Visitor& v) const override;
 
 	void fixup();
 
@@ -309,12 +307,12 @@ inline const Schema::Schemas& Schema::importedSchemas() const
 }
 
 
-bool XSDTypes_API conflicts(const Schema& s1, const Schema& s2);
+[[nodiscard]] bool XSDTypes_API conflicts(const Schema& s1, const Schema& s2);
 	/// Compares two schemas. A schema conflicts with one another
 	/// when they have the same namespace but different defaults
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_Schema_INCLUDED

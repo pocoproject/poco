@@ -38,8 +38,8 @@ namespace
 		/// The value check, C++ type and literal suffix of an XSD integer type.
 	{
 		IntegerValue (*format)(const std::string& value, std::string& literal);
-		const char* cppType;  // the C++ type as written in generated code
-		const char* suffix;   // the literal suffix
+		const char* cppType;
+		const char* suffix;
 	};
 
 
@@ -60,8 +60,7 @@ namespace
 		// NumberParser also accepts forms that are not XSD integers, such as "+-5"
 		if (!isIntegerLexical(value))
 			return IntegerValue::Invalid;
-		// the XSD integer types have no digit group separators, so none are accepted
-		const char noThousandSeparator = 0;
+		constexpr char noThousandSeparator = 0;
 		if constexpr (std::numeric_limits<T>::is_signed)
 		{
 			Poco::Int64 number = 0;
@@ -87,8 +86,6 @@ namespace
 
 
 	[[noreturn]] void throwInvalidValue(const std::string& xsdName, const std::string& value)
-		/// Throws the exception for a default or fixed value that is not valid for the type of
-		/// the schema declaration xsdName.
 	{
 		throw Poco::DataFormatException("invalid default or fixed value for " + xsdName, value);
 	}
@@ -150,9 +147,7 @@ BuiltinTypes::BuiltinTypes():
 }
 
 
-BuiltinTypes::~BuiltinTypes()
-{
-}
+BuiltinTypes::~BuiltinTypes() = default;
 
 
 BuiltinTypes& BuiltinTypes::instance()
@@ -164,7 +159,7 @@ BuiltinTypes& BuiltinTypes::instance()
 
 bool BuiltinTypes::tryGet(const std::string& xsdType, TypeInfo& result) const
 {
-	std::map<std::string, TypeInfo>::const_iterator it = _types.find(xsdType);
+	auto it = _types.find(xsdType);
 	bool found = (it != _types.end());
 	if (found)
 		result = it->second;
@@ -174,7 +169,7 @@ bool BuiltinTypes::tryGet(const std::string& xsdType, TypeInfo& result) const
 
 const TypeInfo& BuiltinTypes::get(const std::string& xsdType) const
 {
-	std::map<std::string, TypeInfo>::const_iterator it = _types.find(xsdType);
+	auto it = _types.find(xsdType);
 	if (it == _types.end())
 	{
 		throw Poco::NotFoundException(xsdType);
@@ -186,7 +181,7 @@ const TypeInfo& BuiltinTypes::get(const std::string& xsdType) const
 
 void BuiltinTypes::add(const std::string& key, const TypeInfo& val, bool isString)
 {
-	_types.insert(std::make_pair(key, val));
+	_types.try_emplace(key, val);
 	_typesCpp.insert(val);
 	if (isString)
 		_stringTypes.insert(val);
@@ -233,8 +228,7 @@ std::string BuiltinTypes::generateInitializeValue(ClassInfo& ci, Constructor& co
 
 	const TypeInfo& info = var.getType();
 	std::string value = Poco::trim(xsdString);
-	const auto itInteger = integerTypes.find(info.name());
-	if (itInteger != integerTypes.end())
+	if (const auto itInteger = integerTypes.find(info.name()); itInteger != integerTypes.end())
 	{
 		const IntegerType& type = itInteger->second;
 		std::string literal;

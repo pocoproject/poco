@@ -18,9 +18,7 @@
 #include <algorithm>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 Schema::Schema(const std::string& targetNS,
@@ -54,9 +52,7 @@ Schema::Schema(const std::string& targetNS,
 }
 
 
-Schema::~Schema()
-{
-}
+Schema::~Schema() = default;
 
 
 void Schema::addType(TypePtr pType)
@@ -69,15 +65,14 @@ void Schema::addType(TypePtr pType)
 	if (name.empty())
 		throw InvalidTypeException("Name is empty");
 	pType->setSchema(this);
-	std::pair<Types::iterator, bool> res = _declaredTypes.insert(std::make_pair(name, pType));
-	if (!res.second)
+	if (!_declaredTypes.try_emplace(name, pType).second)
 		throw TypeAlreadyDefinedException(name);
 }
 
 
 const Type* Schema::getType(const std::string& name) const
 {
-	Types::const_iterator it = _declaredTypes.find(name);
+	auto it = _declaredTypes.find(name);
 	if (it == _declaredTypes.end())
 		return nullptr;
 	return it->second.get();
@@ -94,15 +89,14 @@ void Schema::addElement(ElementPtr pElement)
 	if (name.empty())
 		throw InvalidElementException("Name is empty");
 
-	std::pair<Elements::iterator, bool> res = _exportedElements.insert(std::make_pair(name, pElement));
-	if (!res.second)
+	if (!_exportedElements.try_emplace(name, pElement).second)
 		throw ElementAlreadyDefinedException(name);
 }
 
 
 const Element* Schema::getElement(const std::string& name) const
 {
-	Elements::const_iterator it = _exportedElements.find(name);
+	auto it = _exportedElements.find(name);
 	if (it == _exportedElements.end())
 		return nullptr;
 	return it->second.get();
@@ -119,15 +113,14 @@ void Schema::addAttribute(AbstractAttribute::Ptr pAttr)
 	if (name.empty())
 		throw InvalidTypeException("Attribute Name is empty");
 
-	std::pair<Attributes::iterator, bool> res = _exportedAttributes.insert(std::make_pair(name, pAttr));
-	if (!res.second)
+	if (!_exportedAttributes.try_emplace(name, pAttr).second)
 		throw TypeAlreadyDefinedException(name);
 }
 
 
 const AbstractAttribute* Schema::getAttribute(const std::string& name) const
 {
-	Attributes::const_iterator it = _exportedAttributes.find(name);
+	auto it = _exportedAttributes.find(name);
 	if (it == _exportedAttributes.end())
 		return nullptr;
 	return it->second.get();
@@ -144,15 +137,14 @@ void Schema::addAttributeGroup(AbstractAttributeGroup::Ptr pAttr)
 	if (name.empty())
 		throw InvalidTypeException("Attribute Group Name is empty");
 
-	std::pair<AttributeGroups::iterator, bool> res = _exportedAttributeGroups.insert(std::make_pair(name, pAttr));
-	if (!res.second)
+	if (!_exportedAttributeGroups.try_emplace(name, pAttr).second)
 		throw TypeAlreadyDefinedException(name);
 }
 
 
 const AbstractAttributeGroup* Schema::getAttributeGroup(const std::string& name) const
 {
-	AttributeGroups::const_iterator it = _exportedAttributeGroups.find(name);
+	auto it = _exportedAttributeGroups.find(name);
 	if (it == _exportedAttributeGroups.end())
 		return nullptr;
 	return it->second.get();
@@ -169,15 +161,14 @@ void Schema::addGroup(Group::Ptr pAttr)
 	if (name.empty())
 		throw InvalidTypeException("Group Name is empty");
 
-	std::pair<Groups::iterator, bool> res = _exportedGroups.insert(std::make_pair(name, pAttr));
-	if (!res.second)
+	if (!_exportedGroups.try_emplace(name, pAttr).second)
 		throw TypeAlreadyDefinedException(name);
 }
 
 
 const Group* Schema::getGroup(const std::string& name) const
 {
-	Groups::const_iterator it = _exportedGroups.find(name);
+	auto it = _exportedGroups.find(name);
 	if (it == _exportedGroups.end())
 		return nullptr;
 	return it->second.get();
@@ -194,15 +185,14 @@ void Schema::addNotation(Notation::Ptr ptr)
 	if (name.empty())
 		throw InvalidTypeException("Notation Name is empty");
 
-	std::pair<Notations::iterator, bool> res = _notations.insert(std::make_pair(name, ptr));
-	if (!res.second)
+	if (!_notations.try_emplace(name, ptr).second)
 		throw TypeAlreadyDefinedException(name);
 }
 
 
 const Notation* Schema::getNotation(const std::string& name) const
 {
-	Notations::const_iterator it = _notations.find(name);
+	auto it = _notations.find(name);
 	if (it == _notations.end())
 		return nullptr;
 	return it->second.get();
@@ -217,8 +207,8 @@ void Schema::addImportedSchema(Ptr pSchema)
 
 void Schema::includeSchema(Ptr pSchema)
 {
-	// A document that includes the same schema document twice gets the registered schema, which may be
-	// this one, from the location cache; including a schema into itself adds nothing.
+	// A schema document included a second time comes from the location cache as the
+	// registered schema, which may be this one.
 	if (pSchema.get() == this)
 		return;
 
@@ -247,34 +237,34 @@ void Schema::fixup()
 	if (_fixedUp) return;
 	_fixedUp = true;
 	
-	for (Schemas::iterator it = _importedSchemas.begin(); it != _importedSchemas.end(); ++it)
+	for (auto& pImported: _importedSchemas)
 	{
-		if (!(*it)->_fixedUp) (*it)->fixup();
+		if (!pImported->_fixedUp) pImported->fixup();
 	}
 
-	for (Types::iterator it = _declaredTypes.begin(); it != _declaredTypes.end(); ++it)
+	for (auto& [name, pType]: _declaredTypes)
 	{
-		it->second->fixup();
+		pType->fixup();
 	}
 
-	for (Elements::iterator it = _exportedElements.begin(); it != _exportedElements.end(); ++it)
+	for (auto& [name, pElement]: _exportedElements)
 	{
-		it->second->fixup();
+		pElement->fixup();
 	}
 
-	for (Attributes::iterator it = _exportedAttributes.begin(); it != _exportedAttributes.end(); ++it)
+	for (auto& [name, pAttr]: _exportedAttributes)
 	{
-		it->second->fixup();
+		pAttr->fixup();
 	}
 
-	for (AttributeGroups::iterator it = _exportedAttributeGroups.begin(); it != _exportedAttributeGroups.end(); ++it)
+	for (auto& [name, pAttrGroup]: _exportedAttributeGroups)
 	{
-		it->second->fixup();
+		pAttrGroup->fixup();
 	}
 
-	for (Groups::iterator it = _exportedGroups.begin(); it != _exportedGroups.end(); ++it)
+	for (auto& [name, pGroup]: _exportedGroups)
 	{
-		it->second->fixup();
+		pGroup->fixup();
 	}
 }
 
@@ -295,4 +285,4 @@ bool conflicts(const Schema& s1, const Schema& s2)
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

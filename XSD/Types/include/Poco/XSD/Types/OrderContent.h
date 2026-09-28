@@ -22,9 +22,7 @@
 #include "Poco/XSD/Types/Content.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API OrderContent: public Content
@@ -39,28 +37,28 @@ public:
 	OrderContent(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc);
 		/// Creates the OrderContent.
 
-	virtual ~OrderContent();
+	~OrderContent() override;
 		/// Destroys the OrderContent.
 
-	const std::string& getId() const;
+	[[nodiscard]] const std::string& getId() const;
 		/// Returns the id.
 
 	void setId(const std::string& id);
 		/// Sets the id.
 
-	Poco::UInt32 getMinOccurs() const;
+	[[nodiscard]] Poco::UInt32 getMinOccurs() const;
 		/// Returns how often an object must occur at least in the XML instance.
 
 	void setMinOccurs(Poco::UInt32 minOcc);
 		/// Sets how often an object must occur at least in the XML instance.
 
-	Poco::UInt32 getMaxOccurs() const;
+	[[nodiscard]] Poco::UInt32 getMaxOccurs() const;
 		/// Returns how often an object can occur at most in the XML instance.
 
 	void setMaxOccurs(Poco::UInt32 maxOcc);
 		/// Sets how often an object can occur at most in the XML instance.
 
-	const std::vector<const Type*>& types() const;
+	[[nodiscard]] const std::vector<const Type*>& types() const override;
 		/// OrderContent never references existing content. Returns empty vector.
 
 private:
@@ -109,7 +107,7 @@ inline void OrderContent::setMaxOccurs(Poco::UInt32 maxOcc)
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_OrderContent_INCLUDED

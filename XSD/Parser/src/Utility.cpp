@@ -12,15 +12,13 @@
 //
 
 
-#include "Poco/XSD/Parser/Utility.h"
+#include "Utility.h"
 #include "Poco/XSD/Parser/XSDContentHandler.h"
 #include "Poco/XSD/Types/TypesManager.h"
 #include "Poco/NumberParser.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Parser {
+namespace Poco::XSD::Parser {
 
 
 void Utility::getBlock(const CompactAttributes::const_iterator& itEnd, const CompactAttributes::const_iterator& itAttr, bool& blockRestriction, bool& blockExtension, bool& blockSubstitution)
@@ -174,4 +172,4 @@ Poco::XSD::Types::AbstractAttribute::Usage Utility::getAttrUsage(const CompactAt
 }
 
 
-} } } // namespace Poco::XSD::Parser
+} // namespace Poco::XSD::Parser

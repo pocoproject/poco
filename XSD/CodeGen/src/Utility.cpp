@@ -118,7 +118,7 @@ std::string Utility::varNameToParamName(const std::string& varName)
 
 bool Utility::isReservedName(const std::string& name)
 {
-	static const char* reserved[] = {
+	static constexpr const char* reserved[] = {
 		"alignas",
 		"alignof",
 		"and",
@@ -245,7 +245,7 @@ std::string Utility::cppStringLiteral(const std::string& value)
 	std::string result("\"");
 	for (const char c: value)
 	{
-		const unsigned char byte = static_cast<unsigned char>(c);
+		const auto byte = static_cast<unsigned char>(c);
 		if (c == '\\' || c == '"' || c == '?')
 		{
 			result += '\\';

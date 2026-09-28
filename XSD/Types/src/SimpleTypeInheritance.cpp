@@ -16,14 +16,10 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
-SimpleTypeInheritance::SimpleTypeInheritance()
-{
-}
+SimpleTypeInheritance::SimpleTypeInheritance() = default;
 
 
 SimpleTypeInheritance::SimpleTypeInheritance(const std::string& id):
@@ -32,9 +28,7 @@ SimpleTypeInheritance::SimpleTypeInheritance(const std::string& id):
 }
 
 
-SimpleTypeInheritance::~SimpleTypeInheritance()
-{
-}
+SimpleTypeInheritance::~SimpleTypeInheritance() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

@@ -16,9 +16,7 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 AppInfo::AppInfo(const std::string& sourceUri):
@@ -27,9 +25,7 @@ AppInfo::AppInfo(const std::string& sourceUri):
 }
 
 
-AppInfo::~AppInfo()
-{
-}
+AppInfo::~AppInfo() = default;
 
 
 void AppInfo::accept(Visitor& v) const
@@ -38,4 +34,4 @@ void AppInfo::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

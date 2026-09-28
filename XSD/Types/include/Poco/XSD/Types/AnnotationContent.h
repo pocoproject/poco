@@ -23,9 +23,7 @@
 #include "Poco/AutoPtr.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API AnnotationContent: public Visitable
@@ -34,16 +32,16 @@ class XSDTypes_API AnnotationContent: public Visitable
 public:
 	using Ptr = Poco::AutoPtr<AnnotationContent>;
 
-	AnnotationContent(const std::string& sourceUri);
+	explicit AnnotationContent(const std::string& sourceUri);
 		/// Creates the AnnotationContent.
 
-	virtual ~AnnotationContent();
+	~AnnotationContent() override;
 		/// Destroys the AnnotationContent.
 
-	const std::string& source() const;
+	[[nodiscard]] const std::string& source() const;
 		/// Returns the source URL for the AnnotationContent
 
-	const std::string& getData() const;
+	[[nodiscard]] const std::string& getData() const;
 		/// Returns the content in string form
 
 	void setData(const std::string& data);
@@ -76,7 +74,7 @@ inline void AnnotationContent::setData(const std::string& data)
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_AnnotationContent_INCLUDED

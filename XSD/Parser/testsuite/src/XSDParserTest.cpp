@@ -51,7 +51,6 @@ namespace
 
 
 	Poco::URI writeSchemaFile(const Poco::TemporaryFile& file, const std::string& xml)
-		/// Writes xml to file and returns the location of file.
 	{
 		{
 			Poco::FileOutputStream out(file.path());
@@ -67,9 +66,7 @@ XSDParserTest::XSDParserTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-XSDParserTest::~XSDParserTest()
-{
-}
+XSDParserTest::~XSDParserTest() = default;
 
 
 void XSDParserTest::testAnnotation()
@@ -89,16 +86,7 @@ void XSDParserTest::testAnnotation()
 							"</xs:schema>");
 
 	TypesManager::instance().eraseSchema("http://www.appinf.com");
-	std::istringstream iss(xml);
-	Poco::XML::InputSource in(iss);
-	Poco::URI loc("mem://testAnnotation");
-	XSDContentHandler::SchemaNSToLocationMap schemaMap;
-	XSDContentHandler xsd(loc, schemaMap);
-	Poco::XML::SAXParser parser;
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, true);
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
-	parser.setContentHandler(&xsd);
-	parser.parse(&in);
+	parseDocument(xml, "mem://testAnnotation");
 	Schema& schema = TypesManager::instance().getSchema("http://www.appinf.com");
 	assert (schema.getAnnotations().size() == 1);
 	const Annotation& ann = schema.getAnnotations()[0];
@@ -124,16 +112,7 @@ void XSDParserTest::testAnnotation2()
 							"</xs:schema>");
 
 	TypesManager::instance().eraseSchema("http://www.appinf.com");
-	std::istringstream iss(xml);
-	Poco::XML::InputSource in(iss);
-	Poco::URI loc("mem://testAnnotation2");
-	XSDContentHandler::SchemaNSToLocationMap schemaMap;
-	XSDContentHandler xsd(loc, schemaMap);
-	Poco::XML::SAXParser parser;
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, true);
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
-	parser.setContentHandler(&xsd);
-	parser.parse(&in);
+	parseDocument(xml, "mem://testAnnotation2");
 	Schema& schema = TypesManager::instance().getSchema("http://www.appinf.com");
 	assert (schema.getAnnotations().size() == 1);
 	const Annotation& ann = schema.getAnnotations()[0];
@@ -153,16 +132,7 @@ void XSDParserTest::testAttribute()
 								"</xs:schema>");
 
 	TypesManager::instance().eraseSchema("http://www.appinf.com");
-	std::istringstream iss(xml);
-	Poco::XML::InputSource in(iss);
-	Poco::URI loc("mem://testAttribute");
-	XSDContentHandler::SchemaNSToLocationMap schemaMap;
-	XSDContentHandler xsd(loc, schemaMap);
-	Poco::XML::SAXParser parser;
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, true);
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
-	parser.setContentHandler(&xsd);
-	parser.parse(&in);
+	parseDocument(xml, "mem://testAttribute");
 	Schema& schema = TypesManager::instance().getSchema("http://www.appinf.com");
 	schema.fixup();
 	const AbstractAttribute* pAttr = schema.getAttribute("age");
@@ -189,16 +159,7 @@ void XSDParserTest::testAttribute2()
 								"</xs:schema>");
 
 	TypesManager::instance().eraseSchema("http://www.appinf.com");
-	std::istringstream iss(xml);
-	Poco::XML::InputSource in(iss);
-	Poco::URI loc("mem://testAttribute");
-	XSDContentHandler::SchemaNSToLocationMap schemaMap;
-	XSDContentHandler xsd(loc, schemaMap);
-	Poco::XML::SAXParser parser;
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, true);
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
-	parser.setContentHandler(&xsd);
-	parser.parse(&in);
+	parseDocument(xml, "mem://testAttribute");
 	Schema& schema = TypesManager::instance().getSchema("http://www.appinf.com");
 	schema.fixup();
 	const AbstractAttribute* pAttr = schema.getAttribute("age");
@@ -225,18 +186,9 @@ void XSDParserTest::testAttribute3()
 								"</xs:schema>");
 
 	TypesManager::instance().eraseSchema("http://www.appinf.com");
-	std::istringstream iss(xml);
-	Poco::XML::InputSource in(iss);
-	Poco::URI loc("mem://testAttribute");
-	XSDContentHandler::SchemaNSToLocationMap schemaMap;
-	XSDContentHandler xsd(loc, schemaMap);
-	Poco::XML::SAXParser parser;
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, true);
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
-	parser.setContentHandler(&xsd);
 	try
 	{
-		parser.parse(&in);
+		parseDocument(xml, "mem://testAttribute");
 		fail("illegal xsd");
 	}
 	catch (Poco::XSD::Types::XSDException&)
@@ -256,16 +208,7 @@ void XSDParserTest::testElement()
 								"</xs:schema>");
 
 	TypesManager::instance().eraseSchema("http://www.appinf.com");
-	std::istringstream iss(xml);
-	Poco::XML::InputSource in(iss);
-	Poco::URI loc("mem://testElement");
-	XSDContentHandler::SchemaNSToLocationMap schemaMap;
-	XSDContentHandler xsd(loc, schemaMap);
-	Poco::XML::SAXParser parser;
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, true);
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
-	parser.setContentHandler(&xsd);
-	parser.parse(&in);
+	parseDocument(xml, "mem://testElement");
 	Schema& schema = TypesManager::instance().getSchema("http://www.appinf.com");
 	schema.fixup();
 	const Element* pElem = schema.getElement("name");
@@ -295,16 +238,7 @@ void XSDParserTest::testElementInline()
 								"</xs:schema>");
 
 	TypesManager::instance().eraseSchema("http://www.appinf.com");
-	std::istringstream iss(xml);
-	Poco::XML::InputSource in(iss);
-	Poco::URI loc("mem://testElement");
-	XSDContentHandler::SchemaNSToLocationMap schemaMap;
-	XSDContentHandler xsd(loc, schemaMap);
-	Poco::XML::SAXParser parser;
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, true);
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
-	parser.setContentHandler(&xsd);
-	parser.parse(&in);
+	parseDocument(xml, "mem://testElement");
 	Schema& schema = TypesManager::instance().getSchema("http://www.appinf.com");
 	schema.fixup();
 	const Element* pElem = schema.getElement("name");
@@ -344,16 +278,7 @@ void XSDParserTest::testComplexType()
 								"</xs:schema>");
 
 	TypesManager::instance().eraseSchema("http://www.appinf.com");
-	std::istringstream iss(xml);
-	Poco::XML::InputSource in(iss);
-	Poco::URI loc("mem://testComplexType");
-	XSDContentHandler::SchemaNSToLocationMap schemaMap;
-	XSDContentHandler xsd(loc, schemaMap);
-	Poco::XML::SAXParser parser;
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACES, true);
-	parser.setFeature(Poco::XML::XMLReader::FEATURE_NAMESPACE_PREFIXES, true);
-	parser.setContentHandler(&xsd);
-	parser.parse(&in);
+	parseDocument(xml, "mem://testComplexType");
 	Schema& schema = TypesManager::instance().getSchema("http://www.appinf.com");
 	schema.fixup();
 	const Element* pElem = schema.getElement("person");
@@ -476,7 +401,7 @@ void XSDParserTest::testSoapHeaderFault()
 	parseDocument(xml, "mem://testSoapHeaderFault");
 	TypesManager& tm = TypesManager::instance();
 	const Definitions& defs = tm.getDefinitions(ns);
-	const Definitions::PortTypes::const_iterator it = defs.portTypes().find("PT");
+	const auto it = defs.portTypes().find("PT");
 	assertTrue (it != defs.portTypes().end());
 	const Operation::Ptr pOperation = it->second->findOperation("op");
 	assertTrue (!pOperation.isNull());
@@ -756,7 +681,7 @@ void XSDParserTest::testIncludeAfterImport()
 	const Element* pElem = tm.getElement(QName("ec", includedImportNs));
 	assertTrue (pElem != nullptr);
 	assertEqual ("TC", pElem->type().name());
-	// the fixup of all schemas, as XSDGen runs it, only after the checks above
+	// fixupSchemas(), as XSDGen calls it, also fixes up C, so it runs after the checks above
 	tm.fixupSchemas();
 	tm.eraseSchema(ns);
 	tm.eraseSchema(importedNs);

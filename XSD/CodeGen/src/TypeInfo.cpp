@@ -20,7 +20,6 @@ TypeInfo::TypeInfo():
 	_includeFile(),
 	_isSystemInclude(false),
 	_isVector(false),
-	_isNullable(false),
 	_isScalar(false)
 {
 }
@@ -35,12 +34,6 @@ TypeInfo::TypeInfo(const std::string& name, const std::string& nameSpace, const 
 	_includeFile(includeFile),
 	_isSystemInclude(isSystemInclude),
 	_isVector(isVector),
-	_isNullable(false),
 	_isScalar(isScalar)
-{
-}
-
-
-TypeInfo::~TypeInfo()
 {
 }

@@ -18,14 +18,11 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 ElementImpl::ElementImpl():
-	AbstractElementImpl(),
-	_pType(nullptr)
+	AbstractElementImpl()
 {
 }
 
@@ -63,8 +60,7 @@ ElementImpl::ElementImpl(
 		name,
 		nameSpace,
 		nillable,
-		substitutionGroup),
-	_pType(nullptr)
+		substitutionGroup)
 {
 }
 
@@ -105,4 +101,4 @@ void ElementImpl::fixup()
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

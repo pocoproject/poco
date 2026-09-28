@@ -57,9 +57,7 @@
 #endif
 
 
-namespace Poco {
-namespace XSD {
-namespace Validator {
+namespace Poco::XSD::Validator {
 
 
 class XSDValidator_API Validator
@@ -75,8 +73,7 @@ class XSDValidator_API Validator
 	/// validation paths should batch where possible or, in the future, use a
 	/// stateful overload that retains a compiled xmlSchemaPtr.
 	///
-	/// validate() may be called concurrently from several threads; every call
-	/// uses its own libxml2 contexts.
+	/// validate() may be called concurrently from several threads.
 	///
 	/// The document may come from an untrusted source; it is parsed without
 	/// network access, entity references are not expanded, and documents with
@@ -88,9 +85,17 @@ class XSDValidator_API Validator
 	/// 2.13, diagnostics about such included or imported schemas may be written
 	/// to standard error.
 	///
-	/// Error messages list at most the first ten errors. The document is parsed
-	/// into memory as a whole, so callers should limit the size of the documents
-	/// they validate.
+	/// The schema is parsed without network access and with its internal
+	/// entities expanded; a schema that names an external DTD or declares
+	/// external entities is rejected. Schemas referenced by xs:include,
+	/// xs:import and xs:redefine, directly or indirectly, must be local files,
+	/// not files on a network host, and must not name an external DTD or
+	/// declare external entities either. They are read with the privileges of
+	/// the process. With libxml2 before 2.13, diagnostics about them may be
+	/// written to standard error.
+	///
+	/// The document is parsed into memory as a whole, so callers should limit
+	/// the size of the documents they validate.
 {
 public:
 	Validator() = delete;
@@ -99,16 +104,22 @@ public:
 	static void validate(const std::string& xml, const std::string& xsdContent);
 		/// Validates the given XML string against the schema in xsdContent.
 		///
-		/// Throws Poco::DataFormatException with the underlying libxml2 error
-		/// messages, separated by "; ", if:
+		/// Throws Poco::DataFormatException if:
 		///   - xsdContent is not well-formed XML
 		///     ("XSD: malformed schema document: line N: ..."),
+		///   - xsdContent or a schema it references names an external DTD or
+		///     declares external entities
+		///     ("XSD: external DTDs and external entities are not supported ..."),
+		///   - a schema that xsdContent references is not a local file
+		///     ("XSD: referenced schemas must be local files: ..."),
 		///   - xsdContent is not a valid XML Schema ("XSD: invalid schema: ..."),
 		///   - xml is not well-formed XML ("XML: malformed document: line N: ..."),
 		///   - xml contains a document type declaration
 		///     ("XML: document type declarations are not supported"),
 		///   - xml does not conform to the schema
 		///     ("XML: schema validation failed: ...").
+		/// The exception message lists at most the first ten libxml2 errors,
+		/// separated by "; ".
 		///
 		/// Throws Poco::InvalidArgumentException if xml or xsdContent exceeds
 		/// the libxml2 size limit (INT_MAX bytes).
@@ -121,7 +132,7 @@ public:
 };
 
 
-} } } // namespace Poco::XSD::Validator
+} // namespace Poco::XSD::Validator
 
 
 #endif // Poco_XSD_Validator_Validator_INCLUDED

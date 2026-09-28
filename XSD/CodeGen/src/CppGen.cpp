@@ -54,16 +54,12 @@ CppGen::CppGen(const std::map<std::string, SchemaInfo>& config, const std::strin
 	_options(options),
 	_classes(),
 	_schemas(),
-	_pLastSchema(nullptr),
-	_logger(Poco::Logger::get("CppGen")),
-	_inChoice(false)
+	_logger(Poco::Logger::get("CppGen"))
 {
 }
 
 
-CppGen::~CppGen()
-{
-}
+CppGen::~CppGen() = default;
 
 
 void CppGen::visit(const Poco::XSD::Types::Annotation& ann)
@@ -155,24 +151,22 @@ void CppGen::visit(const Poco::XSD::Types::ElementTypeRef& val)
 
 void CppGen::prepare(const Poco::XSD::Types::Schema& s)
 {
-	if (_schemas.find(s.targetNamespace()) != _schemas.end())
+	if (!_schemas.try_emplace(s.targetNamespace()).second)
 		return;
 
 	_logger.debug("preparing schema " + s.targetNamespace());
 
-	_schemas.insert(std::make_pair(s.targetNamespace(), Classes()));
 	const Schema::Types& allTypes = s.types();
-	Schema::Types::const_iterator it = allTypes.begin();
-	for (; it != allTypes.end(); ++it)
+	for (const auto& [name, pDeclaredType]: allTypes)
 	{
-		const ComplexType* pType = dynamic_cast<const ComplexType*>(it->second.get());
+		const auto* pType = dynamic_cast<const ComplexType*>(pDeclaredType.get());
 		if (pType)
 		{
 			prepare(*pType);
 		}
 		else
 		{
-			const SimpleType* pSimple = dynamic_cast<const SimpleType*>(it->second.get());
+			const auto* pSimple = dynamic_cast<const SimpleType*>(pDeclaredType.get());
 			poco_check_ptr (pSimple);
 			prepare(*pSimple);
 		}
@@ -184,14 +178,13 @@ void CppGen::visit(const Poco::XSD::Types::Schema& s)
 {
 	_logger.debug("visiting schema " + s.targetNamespace());
 
-	_schemas.insert(std::make_pair(s.targetNamespace(), Classes()));
+	_schemas.try_emplace(s.targetNamespace());
 	_pLastSchema = &config(s.targetNamespace());
 	_lastSchemaNamespace = s.targetNamespace();
 	const Schema::Types& allTypes = s.types();
-	Schema::Types::const_iterator it = allTypes.begin();
-	for (; it != allTypes.end(); ++it)
+	for (const auto& [name, pDeclaredType]: allTypes)
 	{
-		it->second->accept(*this);
+		pDeclaredType->accept(*this);
 	}
 }
 
@@ -199,11 +192,10 @@ void CppGen::visit(const Poco::XSD::Types::Schema& s)
 void CppGen::visit(const Poco::XSD::Types::Sequence& val)
 {
 	const Sequence::Content& seq = val.getContent();
-	Sequence::Content::const_iterator it = seq.begin();
-	for (; it != seq.end(); ++it)
+	for (const auto& pContent: seq)
 	{
 		_inChoice = false;
-		(*it)->accept(*this);
+		pContent->accept(*this);
 	}
 }
 
@@ -249,7 +241,7 @@ void CppGen::visit(const Poco::XSD::Types::SimpleType& val)
 	}
 	TypeInfo ti = createTypeInfo(pParent);
 	ClassInfo ci(ti.name(), ti.getNameSpace(), ti.getSchemaNameSpace(), ti.getIncludeFile(), "");
-	schema(tns).insert(std::make_pair(className, ci));
+	schema(tns).try_emplace(className, ci);
 }
 
 
@@ -272,11 +264,11 @@ bool CppGen::extendsFromSimpleType(const Poco::XSD::Types::Type& val, bool& pare
 		return false;
 	}
 
-	const SimpleType* pSimple = dynamic_cast<const SimpleType*>(&val);
+	const auto* pSimple = dynamic_cast<const SimpleType*>(&val);
 
 	bool isList = false;
 	poco_assert_dbg (!val.parents().empty());
-	const SimpleType* pParent = dynamic_cast<const SimpleType*>(val.parents()[0]);
+	const auto* pParent = dynamic_cast<const SimpleType*>(val.parents()[0]);
 	if (!pParent)
 	{
 		assertClassInfoExists(static_cast<const ComplexType*>(val.parents()[0]));
@@ -321,12 +313,12 @@ bool CppGen::extendsFromSimpleType(const Poco::XSD::Types::Type& val, bool& pare
 		ClassInfo ci(name, "std", nameSpace, incFiles, "");
 		ci.insert("inline", "");
 		if (!val.parents()[0]->name().empty())
-			schema(nameSpace).insert(std::make_pair(Utility::xsdNameToClassName(val.parents()[0]->name()), ci));
+			schema(nameSpace).try_emplace(Utility::xsdNameToClassName(val.parents()[0]->name()), ci);
 		if (pSimple)
 		{
 			// a simple type parent
 			if (!Utility::isBuiltinNamespace(nameSpace))
-				schema(nameSpace).insert(std::make_pair(createClassName(val.name()), ClassInfo(name, pParentInfo->getNameSpace(), nameSpace, pParentInfo->getIncludeFile(), _dllExportMacro)));
+				schema(nameSpace).try_emplace(createClassName(val.name()), ClassInfo(name, pParentInfo->getNameSpace(), nameSpace, pParentInfo->getIncludeFile(), _dllExportMacro));
 		}
 	}
 	else
@@ -352,7 +344,7 @@ bool CppGen::extendsFromSimpleType(const Poco::XSD::Types::Type& val, bool& pare
 			{
 				ClassInfo ci(name, pParentInfo->getNameSpace(), nameSpace, pParentInfo->getIncludeFile(), "");
 				ci.insert("inline", "");
-				schema(nameSpace).insert(std::make_pair(createClassName(val.name()), ci));
+				schema(nameSpace).try_emplace(createClassName(val.name()), ci);
 			}
 		}
 		else
@@ -385,7 +377,7 @@ void CppGen::prepare(const Poco::XSD::Types::ComplexType& val)
 	if (!noParent && (parentIsListType || !isSimple))
 		ci.setParent(*pParent);
 
-	schema(val.getSchema()->targetNamespace()).insert(std::make_pair(className, ci));
+	schema(val.getSchema()->targetNamespace()).try_emplace(className, ci);
 }
 
 
@@ -437,10 +429,9 @@ void CppGen::visit(const Poco::XSD::Types::ComplexType& val)
 		{
 			// now visit content: elements+attributes etc
 			const std::vector<AttributeContent::Ptr>& attrs = val.attributeContent();
-			std::vector<AttributeContent::Ptr>::const_iterator it = attrs.begin();
-			for (; it != attrs.end(); ++it)
+			for (const auto& pAttribute: attrs)
 			{
-				(*it)->accept(*this);
+				pAttribute->accept(*this);
 			}
 
 			if (val.getContent())
@@ -452,7 +443,7 @@ void CppGen::visit(const Poco::XSD::Types::ComplexType& val)
 	if (val.getSchema())
 	{
 		Classes& theSchema = schema(val.getSchema()->targetNamespace());
-		Classes::iterator itClass = theSchema.find(className);
+		auto itClass = theSchema.find(className);
 		poco_assert_dbg (itClass != theSchema.end());
 		itClass->second = _classes.top();
 	}
@@ -460,9 +451,7 @@ void CppGen::visit(const Poco::XSD::Types::ComplexType& val)
 	{
 		//inner type
 		Classes& theSchema = schema(_lastSchemaNamespace);
-		std::pair<Classes::iterator, bool> aPair = theSchema.insert(std::make_pair(className, _classes.top()));
-		if (!aPair.second)
-			aPair.first->second = _classes.top();
+		theSchema.insert_or_assign(className, _classes.top());
 	}
 	_classes.pop();
 }
@@ -474,7 +463,6 @@ void CppGen::visit(const Poco::XSD::Types::Attribute& val)
 
 	// an attribute defines an inner simple type that extends from a primitive type
 	// simplified to always use the parent type
-	// FIXME: add a typedef?
 	poco_assert (!_classes.empty());
 	// an attribute is handled as a member var of the complexType
 	std::string cppVarName = Utility::xsdNameToVarName(val.name());
@@ -559,8 +547,7 @@ void CppGen::addVarToClass(ClassInfo& ci, const std::string& cppVarName, const s
 
 	MethodInfo miSet(Utility::setterMethodName(cppVarName), Utility::AC_PUBLIC, false, false, false, false);
 	miSet.addParameter(Parameter("val", var.getType(), 0, modMethod, var.isOptional(), false, var.isNillable()));
-	//FIXME: due to how remoting handles ser/deser, we have to provide a setter method
-	//even for a fixed value, simply ignore the value
+	// Remoting deserializes through the setter, so a fixed value gets one too; it ignores the value
 	if (!isFixedValue)
 		miSet.addCode(var.getName() + " = val;");
 
@@ -580,26 +567,25 @@ void CppGen::addVarToClass(ClassInfo& ci, const std::string& cppVarName, const s
 		modMethod = Variable::V_ISREFVECTOR;
 		if (recursiveDataStructure)
 			modMethod = (Variable::Modifiers)((int)modMethod | Variable::V_ISPOINTER);
-		MethodInfo miGet(Utility::getterMethodName(cppVarName), Utility::AC_PUBLIC, false, false, false, false);
-		miGet.setReturnParameter(new Parameter("", var.getType(), 0, modMethod, var.isOptional(), false, var.isNillable()));
-		miGet.addCode("return " + var.getName() + ";");
-		ci.addMethod(miGet);
+		MethodInfo miGetVector(Utility::getterMethodName(cppVarName), Utility::AC_PUBLIC, false, false, false, false);
+		miGetVector.setReturnParameter(new Parameter("", var.getType(), 0, modMethod, var.isOptional(), false, var.isNillable()));
+		miGetVector.addCode("return " + var.getName() + ";");
+		ci.addMethod(miGetVector);
 	}
 
 	if (hasDefault || isFixedValue)
 	{
 		// add initialization code to constructor
 		std::vector<Constructor>& constr = ci.getConstructors();
-		std::vector<Constructor>::iterator it = constr.begin();
-		for (; it != constr.end(); ++it)
+		for (auto& constructor: constr)
 		{
-			std::string val = BuiltinTypes::instance().generateInitializeValue(ci, *it, var, xsdName, defaultValue);
+			std::string val = BuiltinTypes::instance().generateInitializeValue(ci, constructor, var, xsdName, defaultValue);
 			if (recursiveDataStructure)
 			{
-				it->addInitializationCode(var.getName()+ "(new " + var.getType().getFullName() + "("+val+"))");
+				constructor.addInitializationCode(var.getName()+ "(new " + var.getType().getFullName() + "("+val+"))");
 			}
 			else
-				it->addInitializationCode(var.getName()+"("+val+")");
+				constructor.addInitializationCode(var.getName()+"("+val+")");
 		}
 	}
 }
@@ -624,10 +610,9 @@ void CppGen::visit(const Poco::XSD::Types::AttributeTypeRef& val)
 void CppGen::generateAttributeGroup(const Poco::XSD::Types::AbstractAttributeGroup& val)
 {
 	const AbstractAttributeGroup::Attributes& attrs =  val.getAttributes();
-	AbstractAttributeGroup::Attributes::const_iterator it = attrs.begin();
-	for (; it != attrs.end(); ++it)
+	for (const auto& [name, pAttribute]: attrs)
 	{
-		it->second->accept(*this);
+		pAttribute->accept(*this);
 	}
 }
 
@@ -665,51 +650,34 @@ void CppGen::visit(const Poco::XSD::Types::GroupRef& val)
 void CppGen::visit(const Poco::XSD::Types::All& val)
 {
 	const All::Content& seq = val.getContent();
-	All::Content::const_iterator it = seq.begin();
-	for (; it != seq.end(); ++it)
+	for (const auto& [name, pElement]: seq)
 	{
 		_inChoice = false;
-		it->second->accept(*this);
+		pElement->accept(*this);
 	}
 }
 
 
 void CppGen::visit(const Poco::XSD::Types::Any& val)
 {
-/**
-	// the any element, map to Poco::Any
-	poco_assert (!_classes.empty());
-	std::string cppVarName = "Any";
-	TypeInfo ti (cppVarName, "Poco", TypesManager::XSD_NAMESPACE, "Poco/Any.h", false, (val.getMaxOccurs() > 1));
-
-	addVarToClass(_classes.top(), "_any", "any", ti, (val.getMinOccurs() == 0), false, "elem", false, false, "");
-**/
+	// xs:any is not mapped to C++.
 }
 
 
 void CppGen::visit(const Poco::XSD::Types::AnyAttribute& val)
 {
-/**
-	// the any element, map to Poco::Any
-	poco_assert (!_classes.empty());
-	ClassInfo& theClass = _classes.top();
-	std::string cppVarName = "Any";
-	TypeInfo ti (cppVarName, "Poco", TypesManager::XSD_NAMESPACE, "Poco/Any.h", false, false);
-
-	addVarToClass(_classes.top(), "_anyAttr", "anyAttr", ti, true, false, "attr", false, false, "");
-**/
+	// xs:anyAttribute is not mapped to C++.
 }
 
 
 void CppGen::visit(const Poco::XSD::Types::Choice& val)
 {
-	//FIXME: we treat a choice as a sequence
+	// a choice is generated like a sequence: every alternative becomes a member
 	const Choice::Content& seq = val.getContent();
-	Choice::Content::const_iterator it = seq.begin();
-	for (; it != seq.end(); ++it)
+	for (const auto& pContent: seq)
 	{
 		_inChoice = true;
-		(*it)->accept(*this);
+		pContent->accept(*this);
 		_inChoice = false;
 	}
 }
@@ -761,26 +729,26 @@ void CppGen::visit(const Poco::XSD::Types::Definitions& val)
 {
 	_lastSchemaNamespace = val.targetNamespace();
 
-	_schemas.insert(std::make_pair(val.targetNamespace(), Classes()));
+	_schemas.try_emplace(val.targetNamespace());
 
-	for (Poco::XSD::Types::Definitions::Messages::const_iterator itM = val.messages().begin(); itM != val.messages().end(); ++itM)
+	for (const auto& [name, pMessage]: val.messages())
 	{
-		itM->second->accept(*this);
+		pMessage->accept(*this);
 	}
 
-	for (Poco::XSD::Types::Definitions::PortTypes::const_iterator itP = val.portTypes().begin(); itP != val.portTypes().end(); ++itP)
+	for (const auto& [name, pPortType]: val.portTypes())
 	{
-		itP->second->accept(*this);
+		pPortType->accept(*this);
 	}
 
-	for (Poco::XSD::Types::Definitions::Bindings::const_iterator itB = val.bindings().begin(); itB != val.bindings().end(); ++itB)
+	for (const auto& [name, pBinding]: val.bindings())
 	{
-		itB->second->accept(*this);
+		pBinding->accept(*this);
 	}
 
-	for (Poco::XSD::Types::Definitions::Services::const_iterator itS = val.services().begin(); itS != val.services().end(); ++itS)
+	for (const auto& [name, pService]: val.services())
 	{
-		itS->second->accept(*this);
+		pService->accept(*this);
 	}
 }
 
@@ -797,9 +765,9 @@ void CppGen::visit(const Poco::XSD::Types::Operation& val)
 
 void CppGen::visit(const Poco::XSD::Types::PortType& val)
 {
-	for (Poco::XSD::Types::PortType::Operations::const_iterator it = val.operations().begin(); it != val.operations().end(); ++it)
+	for (const auto& [name, pOperation]: val.operations())
 	{
-		it->second->accept(*this);
+		pOperation->accept(*this);
 	}
 }
 
@@ -841,9 +809,8 @@ void CppGen::generateDocumentBinding(const Poco::XSD::Types::Binding& binding, c
 	ci.insert("name", name);
 
 	Poco::XSD::Types::PortType::Ptr pPortType = binding.getPortType();
-	for (Poco::XSD::Types::PortType::Operations::const_iterator ito = pPortType->operations().begin(); ito != pPortType->operations().end(); ++ito)
+	for (const auto& [operationName, pOperation]: pPortType->operations())
 	{
-		Operation::Ptr pOperation = ito->second;
 		std::string methodName = Utility::xsdNameToMethodName(pOperation->name());
 		MethodInfo mi(methodName, Utility::AC_PUBLIC, false, false, true, true);
 
@@ -922,7 +889,7 @@ void CppGen::generateDocumentBinding(const Poco::XSD::Types::Binding& binding, c
 		ci.addMethod(mi);
 	}
 
-	schema(_lastSchemaNamespace).insert(std::make_pair(className, ci));
+	schema(_lastSchemaNamespace).try_emplace(className, ci);
 }
 
 
@@ -937,9 +904,8 @@ void CppGen::generateRpcBinding(const Poco::XSD::Types::Binding& binding, const 
 	ci.insert("name", name);
 
 	Poco::XSD::Types::PortType::Ptr pPortType = binding.getPortType();
-	for (Poco::XSD::Types::PortType::Operations::const_iterator ito = pPortType->operations().begin(); ito != pPortType->operations().end(); ++ito)
+	for (const auto& [operationName, pOperation]: pPortType->operations())
 	{
-		Operation::Ptr pOperation = ito->second;
 		std::string methodName = Utility::xsdNameToMethodName(pOperation->name());
 		MethodInfo mi(methodName, Utility::AC_PUBLIC, false, false, true, true);
 
@@ -999,7 +965,7 @@ void CppGen::generateRpcBinding(const Poco::XSD::Types::Binding& binding, const 
 		ci.addMethod(mi);
 	}
 
-	schema(_lastSchemaNamespace).insert(std::make_pair(className, ci));
+	schema(_lastSchemaNamespace).try_emplace(className, ci);
 }
 
 
@@ -1007,10 +973,9 @@ void CppGen::visit(const Poco::XSD::Types::Service& val)
 {
 	const Poco::XSD::Types::Definitions& defs = Poco::XSD::Types::TypesManager::instance().getDefinitions(_lastSchemaNamespace);
 	// find SOAP/HTTP port/binding
-	for (Poco::XSD::Types::Service::Ports::const_iterator it = val.ports().begin(); it != val.ports().end(); ++it)
+	for (const auto& port: val.ports())
 	{
-		Poco::XSD::Types::Definitions::Bindings::const_iterator itb = defs.bindings().find(it->binding.localName());
-		if (itb != defs.bindings().end())
+		if (const auto itb = defs.bindings().find(port.binding.localName()); itb != defs.bindings().end())
 		{
 			Poco::XSD::Types::Binding::Ptr pBinding = itb->second;
 			generateBinding(*pBinding, val.name());
@@ -1044,15 +1009,15 @@ void CppGen::createHeaderParameters(MethodInfo& mi, const Poco::XML::Name& messa
 {
 	const Poco::XSD::Types::Definitions& defs = Poco::XSD::Types::TypesManager::instance().getDefinitions(_lastSchemaNamespace);
 
-	Definitions::Messages::const_iterator itm = defs.messages().find(messageName.localName());
+	auto itm = defs.messages().find(messageName.localName());
 	if (itm == defs.messages().end()) throw Poco::NotFoundException("message", messageName.localName());
 	Poco::XSD::Types::Message::Ptr pMessage = itm->second;
-	for (Poco::XSD::Types::Message::Parts::const_iterator itp = pMessage->parts().begin(); itp != pMessage->parts().end(); itp++)
+	for (const auto& part: pMessage->parts())
 	{
-		if (itp->name == partName)
+		if (part.name == partName)
 		{
-			if (!itp->typeName.localName().empty()) throw Poco::NotImplementedException("SOAP header part with a type attribute", partName);
-			const Poco::XML::Name& elemName = itp->elementName;
+			if (!part.typeName.localName().empty()) throw Poco::NotImplementedException("SOAP header part with a type attribute", partName);
+			const Poco::XML::Name& elemName = part.elementName;
 
 			Poco::XSD::Types::TypesManager& tm = Poco::XSD::Types::TypesManager::instance();
 			Poco::XSD::Types::QName qname(elemName.localName(), elemName.namespaceURI());
@@ -1060,15 +1025,13 @@ void CppGen::createHeaderParameters(MethodInfo& mi, const Poco::XML::Name& messa
 			if (pElem == nullptr) throw Poco::NotFoundException("element", qname.name());
 			const Poco::XSD::Types::Type& type = pElem->type();
 
-			TypeNameMap::const_iterator ittm = _typeNameMap.find(&type);
-			if (ittm != _typeNameMap.end())
+			if (TypeNameMap::const_iterator ittm = _typeNameMap.find(&type); ittm != _typeNameMap.end())
 			{
 				std::string typeClassName = ittm->second;
 				std::string typeClassNamespace = _typeNamespaceMap[&type];
 
 				CppGen::Classes& classes = schema(typeClassNamespace);
-				Classes::const_iterator iti = classes.find(typeClassName);
-				if (iti != classes.end())
+				if (Classes::const_iterator iti = classes.find(typeClassName); iti != classes.end())
 				{
 					const ClassInfo& ci = iti->second;
 
@@ -1102,7 +1065,7 @@ bool CppGen::isWrapped(const std::string& operationName, const Poco::XML::Name& 
 	const Poco::XSD::Types::Definitions& defs = Poco::XSD::Types::TypesManager::instance().getDefinitions(_lastSchemaNamespace);
 
 	// TODO: check namespace
-	Definitions::Messages::const_iterator itm = defs.messages().find(messageName.localName());
+	auto itm = defs.messages().find(messageName.localName());
 	if (itm == defs.messages().end()) throw Poco::NotFoundException("message", messageName.localName());
 	Poco::XSD::Types::Message::Ptr pMessage = itm->second;
 
@@ -1122,7 +1085,7 @@ std::string CppGen::createWrappedParameters(MethodInfo& mi, const Poco::XML::Nam
 	const Poco::XSD::Types::Definitions& defs = Poco::XSD::Types::TypesManager::instance().getDefinitions(_lastSchemaNamespace);
 
 	// TODO: check namespace
-	Definitions::Messages::const_iterator itm = defs.messages().find(messageName.localName());
+	auto itm = defs.messages().find(messageName.localName());
 	if (itm == defs.messages().end()) throw Poco::NotFoundException("message", messageName.localName());
 	Poco::XSD::Types::Message::Ptr pMessage = itm->second;
 
@@ -1136,15 +1099,13 @@ std::string CppGen::createWrappedParameters(MethodInfo& mi, const Poco::XML::Nam
 		const Poco::XSD::Types::Type& type = pElem->type();
 		result = elemName.localName();
 
-		TypeNameMap::const_iterator ittm = _typeNameMap.find(&type);
-		if (ittm != _typeNameMap.end())
+		if (TypeNameMap::const_iterator ittm = _typeNameMap.find(&type); ittm != _typeNameMap.end())
 		{
 			std::string typeClassName = ittm->second;
 			std::string typeClassNamespace = _typeNamespaceMap[&type];
 
 			CppGen::Classes& classes = schema(typeClassNamespace);
-			Classes::const_iterator iti = classes.find(typeClassName);
-			if (iti != classes.end())
+			if (Classes::const_iterator iti = classes.find(typeClassName); iti != classes.end())
 			{
 				const ClassInfo& ci = iti->second;
 				if (ci.getSchemaNameSpace() != _lastSchemaNamespace)
@@ -1153,12 +1114,12 @@ std::string CppGen::createWrappedParameters(MethodInfo& mi, const Poco::XML::Nam
 				}
 				const std::map<int, Variable>& vars = ci.getVariables();
 				int orderOffset = static_cast<int>(mi.getParameters().size());
-				for (std::map<int, Variable>::const_iterator itv = vars.begin(); itv != vars.end(); ++itv)
+				for (const auto& [order, var]: vars)
 				{
-					std::string parName = Utility::varNameToParamName(itv->second.getName());
+					std::string parName = Utility::varNameToParamName(var.getName());
 					makeUniqueParameterName(mi, parName);
-					Parameter par(parName, itv->second.getType(), itv->first + orderOffset, itv->second.getModifiers(), itv->second.isOptional(), false, itv->second.isNillable());
-					if (!itv->second.getType().isScalar() || direction == Parameter::DIR_OUT)
+					Parameter par(parName, var.getType(), order + orderOffset, var.getModifiers(), var.isOptional(), false, var.isNillable());
+					if (!var.getType().isScalar() || direction == Parameter::DIR_OUT)
 					{
 						if (direction == Parameter::DIR_IN)
 						{
@@ -1171,7 +1132,7 @@ std::string CppGen::createWrappedParameters(MethodInfo& mi, const Poco::XML::Nam
 					}
 					par.setDirection(direction);
 					par.insert("direction", direction == Parameter::DIR_IN ? "in" : "out");
-					par.insert("name", itv->second.get("name"));
+					par.insert("name", var.get("name"));
 					mi.addParameter(par);
 				}
 			}
@@ -1190,27 +1151,27 @@ void CppGen::createParameters(MethodInfo& mi, const Poco::XML::Name& messageName
 	const Poco::XSD::Types::Definitions& defs = Poco::XSD::Types::TypesManager::instance().getDefinitions(_lastSchemaNamespace);
 
 	// TODO: check namespace
-	Definitions::Messages::const_iterator itm = defs.messages().find(messageName.localName());
+	auto itm = defs.messages().find(messageName.localName());
 	if (itm == defs.messages().end()) throw Poco::NotFoundException("message", messageName.localName());
 	Poco::XSD::Types::Message::Ptr pMessage = itm->second;
 
 	if (parameterOrder.empty())
 	{
-		for (std::size_t part = 0; part < pMessage->parts().size(); part++)
+		for (const auto& part: pMessage->parts())
 		{
-			parameterOrder.push_back(pMessage->parts()[part].name);
+			parameterOrder.push_back(part.name);
 		}
 	}
 
 	std::map<std::string, int> parameterOrderMap;
 	int parameterOffset = static_cast<int>(mi.getParameters().size());
-	for (std::vector<std::string>::const_iterator it = parameterOrder.begin(); it != parameterOrder.end(); ++it)
+	for (const auto& partName: parameterOrder)
 	{
 		int offset = parameterOffset++;
-		parameterOrderMap[*it] = offset;
+		parameterOrderMap[partName] = offset;
 	}
 
-	for (std::size_t part = 0; part < pMessage->parts().size(); part++)
+	for (const auto& part: pMessage->parts())
 	{
 		const Poco::XSD::Types::Type* pType = nullptr;
 		std::string paramName;
@@ -1218,9 +1179,9 @@ void CppGen::createParameters(MethodInfo& mi, const Poco::XML::Name& messageName
 		TypeInfo typeInfo;
 		bool optional = false;
 
-		const std::string& partName = pMessage->parts()[part].name;
-		const Poco::XML::Name& elemName = pMessage->parts()[part].elementName;
-		const Poco::XML::Name& typeName = pMessage->parts()[part].typeName;
+		const std::string& partName = part.name;
+		const Poco::XML::Name& elemName = part.elementName;
+		const Poco::XML::Name& typeName = part.typeName;
 		Poco::XSD::Types::TypesManager& tm = Poco::XSD::Types::TypesManager::instance();
 		if (!elemName.localName().empty())
 		{
@@ -1236,7 +1197,7 @@ void CppGen::createParameters(MethodInfo& mi, const Poco::XML::Name& messageName
 			_elements.pop();
 			typeInfo.setVector((pElem->getMaxOccurs() > 1));
 			typeInfo.setNullable(pElem->getMinOccurs() == 0 && pElem->getMaxOccurs() == 1);
-			// TODO: const std::string& defValue = (pElem->hasFixed() ? pElem->getFixed() : pElem->getDefault());
+			// TODO: the default or fixed value of the element is not applied to the parameter.
 			optional = pElem->getMinOccurs() == 0;
 		}
 		else if (!typeName.localName().empty())
@@ -1284,8 +1245,8 @@ void CppGen::makeUniqueParameterName(const MethodInfo& mi, std::string& name)
 {
 	std::string originalName(name);
 	int count = 2;
-	std::map<int, Parameter>::const_iterator it = mi.getParameters().begin();
-	std::map<int, Parameter>::const_iterator end = mi.getParameters().end();
+	auto it = mi.getParameters().begin();
+	auto end = mi.getParameters().end();
 	while (it != end)
 	{
 		if (it->second.getName() == name)
@@ -1301,7 +1262,7 @@ void CppGen::makeUniqueParameterName(const MethodInfo& mi, std::string& name)
 
 const SchemaInfo& CppGen::config(const std::string& ns) const
 {
-	std::map<std::string, SchemaInfo>::const_iterator it = _config.find(ns);
+	auto it = _config.find(ns);
 	if (it == _config.end())
 		throw Poco::NotFoundException(
 			"No C++ mapping for schema target namespace \"" + ns + "\" defined. "
@@ -1313,13 +1274,12 @@ const SchemaInfo& CppGen::config(const std::string& ns) const
 
 CppGen::Classes& CppGen::schema(const std::string& ns)
 {
-	Schemas::iterator it = _schemas.find(ns);
+	auto it = _schemas.find(ns);
 	if (it == _schemas.end())
 	{
 		TypesManager& tm = TypesManager::instance();
 		const TypesManager::Schemas& allSchemas = tm.getSchemas();
-		TypesManager::Schemas::const_iterator itS = allSchemas.find(ns);
-		if (itS != allSchemas.end())
+		if (const auto itS = allSchemas.find(ns); itS != allSchemas.end())
 		{
 			prepare(*itS->second);
 			it = _schemas.find(ns);
@@ -1334,7 +1294,7 @@ CppGen::Classes& CppGen::schema(const std::string& ns)
 
 const CppGen::Classes& CppGen::schema(const std::string& ns) const
 {
-	Schemas::const_iterator it = _schemas.find(ns);
+	auto it = _schemas.find(ns);
 	if (it == _schemas.end())
 		throw Poco::NotFoundException("Schema", ns);
 	return it->second;
@@ -1344,7 +1304,7 @@ const CppGen::Classes& CppGen::schema(const std::string& ns) const
 const ClassInfo& CppGen::classInfo(const std::string& ns, const std::string& name) const
 {
 	const CppGen::Classes& classes = schema(ns);
-	CppGen::Classes::const_iterator it = classes.find(name);
+	auto it = classes.find(name);
 	if (it == classes.end())
 		throw Poco::NotFoundException("Class", ns + "::" + name);
 	return it->second;
@@ -1358,8 +1318,7 @@ void CppGen::assertClassInfoExists(const Poco::XSD::Types::ComplexType* pVal)
 
 	poco_assert_dbg (pVal->getSchema());
 	const CppGen::Classes& classes = schema(pVal->getSchema()->targetNamespace());
-	CppGen::Classes::const_iterator it = classes.find(Utility::xsdNameToClassName(pVal->name()));
-	if (it == classes.end())
+	if (classes.find(Utility::xsdNameToClassName(pVal->name())) == classes.end())
 		prepare(*pVal);
 }
 
@@ -1374,8 +1333,7 @@ void CppGen::assertClassInfoExists(const Poco::XSD::Types::SimpleType* pVal)
 
 	poco_assert_dbg (pVal->getSchema());
 	const CppGen::Classes& classes = schema(pVal->getSchema()->targetNamespace());
-	CppGen::Classes::const_iterator it = classes.find(Utility::xsdNameToClassName(pVal->name()));
-	if (it == classes.end())
+	if (classes.find(Utility::xsdNameToClassName(pVal->name())) == classes.end())
 		prepare(*pVal);
 }
 
@@ -1431,10 +1389,10 @@ void CppGen::postProcess()
 {
 	// iterate over all schemas, addFullConstructor
 
-	Schemas::iterator it = _schemas.begin();
+	auto it = _schemas.begin();
 	for (; it != _schemas.end(); ++it)
 	{
-		Classes::iterator itC = it->second.begin();
+		auto itC = it->second.begin();
 		for (; itC != it->second.end(); ++itC)
 		{
 			addFullConstructor(itC->second);
@@ -1526,7 +1484,7 @@ void CppGen::buildHierarchy(std::vector<ClassInfo*>& hierarchy, ClassInfo& ci)
 ClassInfo& CppGen::classInfo(const std::string& ns, const std::string& name)
 {
 	CppGen::Classes& classes = schema(ns);
-	CppGen::Classes::iterator it = classes.find(name);
+	auto it = classes.find(name);
 	if (it == classes.end())
 		throw Poco::NotFoundException("Class", ns + "::" + name);
 	return it->second;
@@ -1535,14 +1493,12 @@ ClassInfo& CppGen::classInfo(const std::string& ns, const std::string& name)
 
 void CppGen::extractVariables(std::vector<const Variable*>& vars, const std::vector<ClassInfo*>& classes)
 {
-	std::vector<ClassInfo*>::const_iterator it = classes.begin();
-	for (; it != classes.end(); ++it)
+	for (const auto& pClass: classes)
 	{
-		const std::map<int, Variable>& tmp = (*it)->getVariables();
-		std::map<int, Variable>::const_iterator itV = tmp.begin();
-		for (; itV != tmp.end(); ++itV)
+		const std::map<int, Variable>& tmp = pClass->getVariables();
+		for (const auto& [order, var]: tmp)
 		{
-			vars.push_back(&(itV->second));
+			vars.push_back(&var);
 		}
 	}
 }

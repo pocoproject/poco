@@ -16,8 +16,3 @@ MethodInfo::MethodInfo(const std::string& name, Utility::Access acc, bool isCons
 	AbstractMethod(name, acc, isConst, isStatic, isVirtual, isAbstract)
 {
 }
-
-
-MethodInfo::~MethodInfo()
-{
-}

@@ -22,9 +22,7 @@
 #include "Poco/RefCountedObject.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class Visitor;
@@ -37,13 +35,13 @@ public:
 	Visitable();
 		/// Creates the Visitable.
 
-	Visitable(const std::string& id);
+	explicit Visitable(const std::string& id);
 		/// Creates the Visitable with the given ID.
 
-	virtual ~Visitable();
+	~Visitable() override;
 		/// Destroys the Visitable.
 
-	const std::string& id() const;
+	[[nodiscard]] const std::string& id() const;
 		/// Returns the id of the object
 
 	virtual void accept(Visitor& v) const = 0;
@@ -64,7 +62,7 @@ inline const std::string& Visitable::id() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_Visitable_INCLUDED

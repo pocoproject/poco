@@ -22,9 +22,7 @@
 #include "Poco/XSD/Types/OrderContent.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API CollectionContent: public OrderContent
@@ -39,7 +37,7 @@ public:
 	CollectionContent(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc);
 		/// Creates the CollectionContent.
 
-	virtual ~CollectionContent();
+	~CollectionContent() override;
 		/// Destroys the CollectionContent.
 
 protected:
@@ -48,7 +46,7 @@ private:
 };
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_CollectionContent_INCLUDED

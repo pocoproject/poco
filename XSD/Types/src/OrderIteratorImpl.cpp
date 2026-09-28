@@ -15,20 +15,13 @@
 #include "Poco/XSD/Types/OrderIteratorImpl.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
-OrderIteratorImpl::OrderIteratorImpl():
-	_closed(false)
-{
-}
+OrderIteratorImpl::OrderIteratorImpl() = default;
 
 
-OrderIteratorImpl::~OrderIteratorImpl()
-{
-}
+OrderIteratorImpl::~OrderIteratorImpl() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

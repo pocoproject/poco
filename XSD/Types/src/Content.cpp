@@ -15,14 +15,10 @@
 #include "Poco/XSD/Types/Content.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
-Content::Content()
-{
-}
+Content::Content() = default;
 
 
 Content::Content(const std::string& id):
@@ -31,9 +27,7 @@ Content::Content(const std::string& id):
 }
 
 
-Content::~Content()
-{
-}
+Content::~Content() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

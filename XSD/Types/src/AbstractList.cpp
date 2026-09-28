@@ -17,9 +17,7 @@
 #include "Poco/XSD/Types/XSDException.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 AbstractList::AbstractList(const std::string& id):
@@ -28,9 +26,7 @@ AbstractList::AbstractList(const std::string& id):
 }
 
 
-AbstractList::~AbstractList()
-{
-}
+AbstractList::~AbstractList() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

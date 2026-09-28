@@ -44,137 +44,137 @@ public:
 
 	CppGen(const std::map<std::string, SchemaInfo>& config, const std::string& dllExportMacro, int options = 0);
 
-	~CppGen();
+	~CppGen() override;
 
-	void visit(const Poco::XSD::Types::Annotation& ann);
+	void visit(const Poco::XSD::Types::Annotation& ann) override;
 		/// Visits an object of type Annotation
 
-	void visit(const Poco::XSD::Types::ElementImpl& ann);
+	void visit(const Poco::XSD::Types::ElementImpl& ann) override;
 		/// Visits an object of type ElementImpl
 
-	void visit(const Poco::XSD::Types::ElementRef& ann);
+	void visit(const Poco::XSD::Types::ElementRef& ann) override;
 		/// Visits an object of type ElementRef
 
-	void visit(const Poco::XSD::Types::ElementTypeRef& ann);
+	void visit(const Poco::XSD::Types::ElementTypeRef& ann) override;
 		/// Visits an object of type ElementTypeRef
 
 	void prepare(const Poco::XSD::Types::Schema& ann);
 		/// Prepares to visit an object of type Schema
 
-	void visit(const Poco::XSD::Types::Schema& ann);
+	void visit(const Poco::XSD::Types::Schema& ann) override;
 		/// Visits an object of type Schema
 
-	void visit(const Poco::XSD::Types::Sequence& ann);
+	void visit(const Poco::XSD::Types::Sequence& ann) override;
 		/// Visits an object of type Sequence
 
-	void visit(const Poco::XSD::Types::Documentation& doc);
+	void visit(const Poco::XSD::Types::Documentation& doc) override;
 		/// Visits an object of type Documentation
 
-	void visit(const Poco::XSD::Types::AppInfo& doc);
+	void visit(const Poco::XSD::Types::AppInfo& doc) override;
 		/// Visits an object of type AppInfo
 
-	void visit(const Poco::XSD::Types::SimpleType& val);
+	void visit(const Poco::XSD::Types::SimpleType& val) override;
 		/// Visits an object of type SimpleType
 
-	void visit(const Poco::XSD::Types::ComplexType& val);
+	void visit(const Poco::XSD::Types::ComplexType& val) override;
 		/// Visits an object of type ComplexType
 
-	void visit(const Poco::XSD::Types::Attribute& val);
+	void visit(const Poco::XSD::Types::Attribute& val) override;
 		/// Visits an object of type Attribute
 
-	void visit(const Poco::XSD::Types::AttributeRef& val);
+	void visit(const Poco::XSD::Types::AttributeRef& val) override;
 		/// Visits an object of type AttributeRef
 
-	void visit(const Poco::XSD::Types::AttributeTypeRef& val);
+	void visit(const Poco::XSD::Types::AttributeTypeRef& val) override;
 		/// Visits an object of type AttributeTypeRef
 
-	void visit(const Poco::XSD::Types::AttributeGroup& val);
+	void visit(const Poco::XSD::Types::AttributeGroup& val) override;
 		/// Visits an object of type AttributeGroup
 
-	void visit(const Poco::XSD::Types::AttributeGroupRef& val);
+	void visit(const Poco::XSD::Types::AttributeGroupRef& val) override;
 		/// Visits an object of type AttributeGroupRef
 
-	void visit(const Poco::XSD::Types::Group& val);
+	void visit(const Poco::XSD::Types::Group& val) override;
 		/// Visits an object of type Group
 
-	void visit(const Poco::XSD::Types::GroupRef& val);
+	void visit(const Poco::XSD::Types::GroupRef& val) override;
 		/// Visits an object of type GroupRef
 
-	void visit(const Poco::XSD::Types::All& val);
+	void visit(const Poco::XSD::Types::All& val) override;
 		/// Visits an object of type All
 
-	void visit(const Poco::XSD::Types::Any& val);
+	void visit(const Poco::XSD::Types::Any& val) override;
 		/// Visits an object of type Any
 
-	void visit(const Poco::XSD::Types::AnyAttribute& val);
+	void visit(const Poco::XSD::Types::AnyAttribute& val) override;
 		/// Visits an object of type AnyAttribute
 
-	void visit(const Poco::XSD::Types::Choice& val);
+	void visit(const Poco::XSD::Types::Choice& val) override;
 		/// Visits an object of type Choice
 
-	void visit(const Poco::XSD::Types::Notation& val);
+	void visit(const Poco::XSD::Types::Notation& val) override;
 		/// Visits an object of type Notation
 
-	void visit(const Poco::XSD::Types::Union& val);
+	[[noreturn]] void visit(const Poco::XSD::Types::Union& val) override;
 		/// Visits an object of type Union
 
-	void visit(const Poco::XSD::Types::InheritanceInfo& val);
+	void visit(const Poco::XSD::Types::InheritanceInfo& val) override;
 		/// Visits an object of type InheritanceInfo
 
-	void visit(const Poco::XSD::Types::List& val);
+	[[noreturn]] void visit(const Poco::XSD::Types::List& val) override;
 		/// Visits an object of type List
 
-	void visit(const Poco::XSD::Types::ListTypeRef& val);
+	[[noreturn]] void visit(const Poco::XSD::Types::ListTypeRef& val) override;
 		/// Visits an object of type ListTypeRef
 
-	void visit(const Poco::XSD::Types::SimpleRestriction& val);
+	[[noreturn]] void visit(const Poco::XSD::Types::SimpleRestriction& val) override;
 		/// Visits an object of type SimpleRestriction
 
-	void visit(const Poco::XSD::Types::SimpleRestrictionInlineType& val);
+	[[noreturn]] void visit(const Poco::XSD::Types::SimpleRestrictionInlineType& val) override;
 		/// Visits an object of type SimpleRestrictionInlineType
 
-	void visit(const Poco::XSD::Types::Definitions& val);
+	void visit(const Poco::XSD::Types::Definitions& val) override;
 		/// Visits an object of type Message.
 	
-	void visit(const Poco::XSD::Types::Message& val);
+	void visit(const Poco::XSD::Types::Message& val) override;
 		/// Visits an object of type Message.
 		
-	void visit(const Poco::XSD::Types::Operation& val);
+	void visit(const Poco::XSD::Types::Operation& val) override;
 		/// Visits an object of type Operation.
 		
-	void visit(const Poco::XSD::Types::PortType& val);
+	void visit(const Poco::XSD::Types::PortType& val) override;
 		/// Visits an object of type PortType.
 
-	void visit(const Poco::XSD::Types::Binding& val);
+	void visit(const Poco::XSD::Types::Binding& val) override;
 		/// Visits an object of type Binding.
 		
-	void visit(const Poco::XSD::Types::Service& val);
+	void visit(const Poco::XSD::Types::Service& val) override;
 		/// Visits an object of type Service.
 
-	const CppGen::Schemas& getSchemas() const;
+	[[nodiscard]] const CppGen::Schemas& getSchemas() const;
 
-	const SchemaInfo& config(const std::string& ns) const;
+	[[nodiscard]] const SchemaInfo& config(const std::string& ns) const;
 
-	const Classes& schema(const std::string& ns) const;
+	[[nodiscard]] const Classes& schema(const std::string& ns) const;
 
-	const ClassInfo& classInfo(const std::string& ns, const std::string& name) const;
+	[[nodiscard]] const ClassInfo& classInfo(const std::string& ns, const std::string& name) const;
 
-	TypeInfo createTypeInfo(const Poco::XSD::Types::Type* pType);
+	[[nodiscard]] TypeInfo createTypeInfo(const Poco::XSD::Types::Type* pType);
 
 	void postProcess();
 		/// Postprocesses all the internal classes
 
 private:
-	std::string createClassName(const std::string& xsdClassName);
+	[[nodiscard]] std::string createClassName(const std::string& xsdClassName);
 		/// Creates a class name. If xsdClassName is empty, an innerclassName
 		/// will be generated, set autoIncrement to false if you are not in visit(complexType)
 
-	std::string genInnerClassName();
+	[[nodiscard]] std::string genInnerClassName();
 		/// generates an inner class name for an otherwise unnamed inner type
 
-	Classes& schema(const std::string& ns);
+	[[nodiscard]] Classes& schema(const std::string& ns);
 
-	ClassInfo& classInfo(const std::string& ns, const std::string& name);
+	[[nodiscard]] ClassInfo& classInfo(const std::string& ns, const std::string& name);
 
 	void generateAbstractAttribute(const Poco::XSD::Types::AbstractAttribute& val);
 
@@ -193,7 +193,7 @@ private:
 
 	void assertClassInfoExists(const Poco::XSD::Types::SimpleType* val);
 
-	std::string mapCppToXSD(const std::string& cppNS) const;
+	[[nodiscard]] std::string mapCppToXSD(const std::string& cppNS) const;
 
 	void addVarToClass(ClassInfo& ci, 
 		const std::string& cppVarName, 
@@ -216,8 +216,8 @@ private:
 
 	void extractVariables(std::vector<const Variable*>& vars, const std::vector<ClassInfo*>& classes);
 
-	bool isWrapped(const std::string& operationName, const Poco::XML::Name& messageName);
-	std::string createWrappedParameters(MethodInfo& mi, const Poco::XML::Name& messageName, Parameter::Direction direction);
+	[[nodiscard]] bool isWrapped(const std::string& operationName, const Poco::XML::Name& messageName);
+	[[nodiscard]] std::string createWrappedParameters(MethodInfo& mi, const Poco::XML::Name& messageName, Parameter::Direction direction);
 	void createParameters(MethodInfo& mi, const Poco::XML::Name& messageName, Parameter::Direction direction, std::vector<std::string>& parameterOrder, bool detectReturn = false);
 	void createHeaderParameters(MethodInfo& mi, const Poco::XSD::Types::BindingProperties& bindingProps, const std::string& soapVersion, Parameter::Direction direction);
 	void createHeaderParameters(MethodInfo& mi, const Poco::XML::Name& messageName, const std::string& partName, Parameter::Direction direction);
@@ -240,13 +240,13 @@ private:
 	std::stack<ClassInfo> _classes;
 	std::stack<std::string> _elements;
 	Schemas _schemas;
-	const SchemaInfo* _pLastSchema;
+	const SchemaInfo* _pLastSchema = nullptr;
 	std::string _lastSchemaNamespace;
 	std::stack<COLLTYPE> _inCollection;
 	std::stack<std::string> _choiceName; /// Contains the name of the choice -> generate choicemembername from that
 	std::stack<int>   _choiceMaxOccurs;
 	Poco::Logger& _logger;
-	bool _inChoice;
+	bool _inChoice = false;
 	TypeNameMap _typeNameMap;
 	TypeNameMap _typeNamespaceMap;
 };

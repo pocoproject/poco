@@ -16,14 +16,10 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
-Service::Service()
-{
-}
+Service::Service() = default;
 
 
 Service::Service(const std::string& name):
@@ -32,9 +28,7 @@ Service::Service(const std::string& name):
 }
 
 
-Service::~Service()
-{
-}
+Service::~Service() = default;
 
 	
 void Service::addPort(const std::string& name, const Poco::XML::Name& binding)
@@ -52,4 +46,4 @@ void Service::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

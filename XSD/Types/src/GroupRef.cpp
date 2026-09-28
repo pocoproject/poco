@@ -18,22 +18,17 @@
 #include "Poco/XSD/Types/TypesManager.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 GroupRef::GroupRef(const std::string& id, const QName& ref, Poco::UInt32 minOcc, Poco::UInt32 maxOcc):
 	AbstractGroup(id, minOcc, maxOcc),
-	_ref(ref),
-	_pGroup(nullptr)
+	_ref(ref)
 {
 }
 
 
-GroupRef::~GroupRef()
-{
-}
+GroupRef::~GroupRef() = default;
 
 
 void GroupRef::fixup()
@@ -67,4 +62,4 @@ const std::string& GroupRef::name() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

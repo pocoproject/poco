@@ -17,23 +17,18 @@
 #include "Poco/XSD/Types/XSDException.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 ElementIterator::ElementIterator(Element& elem):
 	_pElem(&elem),
-	_cnt(0),
 	_next()
 {
 	_next.insert(elem.name());
 }
 
 
-ElementIterator::~ElementIterator()
-{
-}
+ElementIterator::~ElementIterator() = default;
 
 OrderContent::Ptr ElementIterator::next(const std::string& name)
 {
@@ -93,4 +88,4 @@ void ElementIterator::reset()
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

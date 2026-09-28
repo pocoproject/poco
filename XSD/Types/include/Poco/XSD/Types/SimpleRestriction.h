@@ -23,9 +23,7 @@
 #include "Poco/XSD/Types/QName.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API SimpleRestriction: public SimpleTypeInheritance
@@ -35,28 +33,28 @@ public:
 	SimpleRestriction(const std::string& id, const QName& baseClass);
 		/// Creates the SimpleRestriction.
 
-	virtual ~SimpleRestriction();
+	~SimpleRestriction() override;
 		/// Destroys the SimpleRestriction.
 
-	const QName& baseTypeRef() const;
+	[[nodiscard]] const QName& baseTypeRef() const;
 		/// Returns the type reference of the base class.
 
-	const std::vector<const Type*>& types() const;
+	[[nodiscard]] const std::vector<const Type*>& types() const override;
 		/// Returns the type that we inherit from.
 
-	void fixup();
+	void fixup() override;
 		/// Replaces type references with the referenced type object.
 
-	bool isRestriction() const;
+	[[nodiscard]] bool isRestriction() const override;
 		/// True if we inherit by restriction.
 
-	bool isList() const;
+	[[nodiscard]] bool isList() const override;
 		/// True if we inherit by list, thus returns false.
 
-	bool isUnion() const;
+	[[nodiscard]] bool isUnion() const override;
 		/// True if we inherit by Union, thus returns false.
 
-	void accept(Visitor& v) const;
+	void accept(Visitor& v) const override;
 
 private:
 	QName       _baseClass;
@@ -97,7 +95,7 @@ inline bool SimpleRestriction::isUnion() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_SimpleRestriction_INCLUDED

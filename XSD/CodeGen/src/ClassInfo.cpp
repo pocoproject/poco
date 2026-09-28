@@ -28,11 +28,6 @@ ClassInfo::ClassInfo(const std::string& name,
 }
 
 
-ClassInfo::~ClassInfo()
-{
-}
-
-
 void ClassInfo::addConstructor(const Constructor& constr)
 {
 	poco_assert (constr.name() == name());

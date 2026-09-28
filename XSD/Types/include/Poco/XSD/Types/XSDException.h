@@ -22,9 +22,7 @@
 #include "Poco/Exception.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 POCO_DECLARE_EXCEPTION(XSDTypes_API, XSDException, Exception)
@@ -40,7 +38,7 @@ POCO_DECLARE_EXCEPTION(XSDTypes_API, InvalidElementException, ElementException)
 POCO_DECLARE_EXCEPTION(XSDTypes_API, ElementAlreadyDefinedException, ElementException)
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_XSDException_INCLUDED

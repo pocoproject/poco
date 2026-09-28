@@ -19,27 +19,21 @@
 #include "Poco/XSD/Types/XSDException.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 AllIterator::AllIterator(const All& all):
 	_min(all.getMinOccurs()),
-	_cnt(0),
 	_mapIt(),
 	_itLastUsed(),
-	_nexts(),
-	_dirtyFlag(true)
+	_nexts()
 {
-	All::Content::const_iterator it = all.getContent().begin();
-	All::Content::const_iterator itEnd = all.getContent().end();
-	for (; it != itEnd; ++it)
+	for (const auto& [name, pElem]: all.getContent())
 	{
-		if (it->second->getMaxOccurs() > 0)
+		if (pElem->getMaxOccurs() > 0)
 		{
 			// insert can never fail: all.content is a map, ie. all keys are guaranteed to be unique
-			_mapIt.insert(std::make_pair(it->first, new ElementIterator(*const_cast<Element*>(it->second.get()))));
+			_mapIt.try_emplace(name, makeAuto<ElementIterator>(*const_cast<Element*>(pElem.get())));
 		}
 	}
 
@@ -47,15 +41,7 @@ AllIterator::AllIterator(const All& all):
 }
 
 
-AllIterator::~AllIterator()
-{
-	AllIterator::Content::iterator it = _mapIt.begin();
-	AllIterator::Content::iterator itEnd = _mapIt.end();
-	for (; it != itEnd; ++it)
-	{
-		delete it->second;
-	}
-}
+AllIterator::~AllIterator() = default;
 
 
 OrderContent::Ptr AllIterator::next(const std::string& name)
@@ -91,11 +77,9 @@ const std::set<std::string>& AllIterator::validNexts() const
 	_nexts.clear();
 	_dirtyFlag = false;
 
-	AllIterator::Content::const_iterator it = _mapIt.begin();
-	AllIterator::Content::const_iterator itEnd = _mapIt.end();
-	for (; it != itEnd; ++it)
+	for (const auto& [name, pElemIt]: _mapIt)
 	{
-		const std::set<std::string>& ins = it->second->validNexts();
+		const std::set<std::string>& ins = pElemIt->validNexts();
 		_nexts.insert(ins.begin(), ins.end());
 	}
 
@@ -118,11 +102,9 @@ bool AllIterator::validNext(const std::string& name) const
 void AllIterator::close()
 {
 	// we can close if we accessed all mandatory elements
-	AllIterator::Content::iterator it = _mapIt.begin();
-	AllIterator::Content::iterator itEnd = _mapIt.end();
-	for (; it != itEnd; ++it)
+	for (auto& [name, pElemIt]: _mapIt)
 	{
-		it->second->close();
+		pElemIt->close();
 	}
 	_dirtyFlag = true;
 }
@@ -131,13 +113,11 @@ void AllIterator::close()
 bool AllIterator::canClose() const
 {
 	// we can close if we accessed all mandatory elements
-	AllIterator::Content::const_iterator it = _mapIt.begin();
-	AllIterator::Content::const_iterator itEnd = _mapIt.end();
 	bool can = true;
-	for (; it != itEnd; ++it)
+	for (const auto& [name, pElemIt]: _mapIt)
 	{
-		if (!it->second->closed())
-			can &= it->second->canClose();
+		if (!pElemIt->closed())
+			can &= pElemIt->canClose();
 	}
 
 	return can;
@@ -146,16 +126,14 @@ bool AllIterator::canClose() const
 
 void AllIterator::reset()
 {
-	AllIterator::Content::iterator it = _mapIt.begin();
-	AllIterator::Content::iterator itEnd = _mapIt.end();
-	for (; it != itEnd; ++it)
+	for (auto& [name, pElemIt]: _mapIt)
 	{
-		it->second->reset();
+		pElemIt->reset();
 	}
 	_cnt = 0;
-	_itLastUsed = itEnd;
+	_itLastUsed = _mapIt.end();
 	_dirtyFlag = true;
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

@@ -23,9 +23,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class Type;
@@ -40,30 +38,30 @@ public:
 	SimpleTypeInheritance();
 		/// Creates the SimpleTypeInheritance.
 
-	SimpleTypeInheritance(const std::string& id);
+	explicit SimpleTypeInheritance(const std::string& id);
 		/// Creates the SimpleTypeInheritance.
 
-	virtual ~SimpleTypeInheritance();
+	~SimpleTypeInheritance() override;
 		/// Destroys the SimpleTypeInheritance.
 
-	virtual const std::vector<const Type*>& types() const = 0;
+	[[nodiscard]] virtual const std::vector<const Type*>& types() const = 0;
 		/// Returns the types that we inherit from. Will only contain more than one element for the union case.
 
 	virtual void fixup() = 0;
 		/// Replaces type references with the referenced type object.
 
-	virtual bool isRestriction() const = 0;
+	[[nodiscard]] virtual bool isRestriction() const = 0;
 		/// True if we inherit by restriction.
 
-	virtual bool isList() const = 0;
+	[[nodiscard]] virtual bool isList() const = 0;
 		/// Inherit by list.
 
-	virtual bool isUnion() const = 0;
+	[[nodiscard]] virtual bool isUnion() const = 0;
 		/// Inherit by union.
 };
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_SimpleTypeInheritance_INCLUDED

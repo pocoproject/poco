@@ -24,17 +24,25 @@ public:
 
 	PropertyHolder();
 
-	virtual ~PropertyHolder();
+	PropertyHolder(const PropertyHolder&) = default;
+
+	PropertyHolder(PropertyHolder&&) = default;
+
+	virtual ~PropertyHolder() = default;
+
+	PropertyHolder& operator = (const PropertyHolder&) = default;
+
+	PropertyHolder& operator = (PropertyHolder&&) = default;
 
 	void insert(const std::string& id, const std::string& val);
 
 	void update(const std::string& id, const std::string& val);
 
-	bool has(const std::string& id) const;
+	[[nodiscard]] bool has(const std::string& id) const;
 
-	const std::map<std::string, std::string>& getAll() const;
+	[[nodiscard]] const std::map<std::string, std::string>& getAll() const;
 
-	const std::string& get(const std::string& id) const;
+	[[nodiscard]] const std::string& get(const std::string& id) const;
 
 private:
 	std::map<std::string, std::string> _props;
@@ -46,15 +54,13 @@ private:
 //
 inline void PropertyHolder::insert(const std::string& id, const std::string& val)
 {
-	_props.insert(std::make_pair(id, val));
+	_props.try_emplace(id, val);
 }
 
 
 inline void PropertyHolder::update(const std::string& id, const std::string& val)
 {
-	std::pair<Properties::iterator, bool> aPair = _props.insert(std::make_pair(id, val));
-	if (!aPair.second)
-		aPair.first->second = val;
+	_props.insert_or_assign(id, val);
 }
 
 

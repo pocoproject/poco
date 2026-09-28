@@ -23,9 +23,7 @@
 #include "Poco/XSD/Types/QName.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API AbstractList: public SimpleTypeInheritance
@@ -33,17 +31,17 @@ class XSDTypes_API AbstractList: public SimpleTypeInheritance
 public:
 	using Ptr = AutoPtr<AbstractList>;
 
-	AbstractList(const std::string& id);
+	explicit AbstractList(const std::string& id);
 		/// Creates the AbstractList.
 
-	virtual ~AbstractList();
+	~AbstractList() override;
 		/// Destroys the AbstractList.
 
-	bool isRestriction() const;
+	[[nodiscard]] bool isRestriction() const override;
 
-	bool isList() const;
+	[[nodiscard]] bool isList() const override;
 
-	bool isUnion() const;
+	[[nodiscard]] bool isUnion() const override;
 };
 
 
@@ -68,7 +66,7 @@ inline bool AbstractList::isUnion() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_AbstractList_INCLUDED

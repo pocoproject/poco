@@ -25,9 +25,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API Binding: public AnnotatedObject
@@ -39,31 +37,31 @@ public:
 	Binding();
 		/// Creates the Binding.
 
-	Binding(const std::string& name);
+	explicit Binding(const std::string& name);
 		/// Creates the Binding.
 
-	~Binding();
+	~Binding() override;
 		/// Destroys the Binding.
 
 	void setName(const std::string& name);
 		/// Sets the name.
 
-	const std::string& name() const;
+	[[nodiscard]] const std::string& name() const;
 		/// Returns the name.
 	
 	void setPortType(PortType::Ptr pPortType);
 		/// Associates a PortType with the Binding.
 		
-	PortType::Ptr getPortType() const;
+	[[nodiscard]] PortType::Ptr getPortType() const;
 		/// Returns the associated PortType.
 
-	const BindingProperties& bindingProperties() const;
+	[[nodiscard]] const BindingProperties& bindingProperties() const;
 		/// Returns the binding properties for the entire binding (e.g., "soap.binding.stye", "soap.binding.transport").
 		
-	BindingProperties& bindingProperties();
+	[[nodiscard]] BindingProperties& bindingProperties();
 		/// Returns the binding properties for the entire binding (e.g., "soap.binding.stye", "soap.binding.transport").
 	
-	void accept(Visitor& v) const;
+	void accept(Visitor& v) const override;
 
 private:
 	std::string _name;
@@ -111,7 +109,7 @@ inline BindingProperties& Binding::bindingProperties()
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_Binding_INCLUDED

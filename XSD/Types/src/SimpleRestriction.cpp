@@ -18,9 +18,7 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 SimpleRestriction::SimpleRestriction(const std::string& id, const QName& baseClass):
@@ -31,9 +29,7 @@ SimpleRestriction::SimpleRestriction(const std::string& id, const QName& baseCla
 }
 
 
-SimpleRestriction::~SimpleRestriction()
-{
-}
+SimpleRestriction::~SimpleRestriction() = default;
 
 
 void SimpleRestriction::fixup()
@@ -55,4 +51,4 @@ void SimpleRestriction::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

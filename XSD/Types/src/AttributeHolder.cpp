@@ -15,19 +15,13 @@
 #include "Poco/XSD/Types/AttributeHolder.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
-AttributeHolder::AttributeHolder()
-{
-}
+AttributeHolder::AttributeHolder() = default;
 
 
-AttributeHolder::~AttributeHolder()
-{
-}
+AttributeHolder::~AttributeHolder() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

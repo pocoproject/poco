@@ -22,11 +22,13 @@
 #include "Poco/XSD/Types/OrderIteratorImpl.h"
 #include "Poco/XSD/Types/OrderIterator.h"
 #include <vector>
+#include <limits>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+POCO_CHECK_MINMAX_MACROS
+
+
+namespace Poco::XSD::Types {
 
 
 class Sequence;
@@ -36,38 +38,40 @@ class XSDTypes_API SequenceIterator: public OrderIteratorImpl
 	/// An iterator for iterating over Sequence content groups.
 {
 public:
-	SequenceIterator(const Sequence& data);
+	explicit SequenceIterator(const Sequence& data);
 		/// Creates the SequenceIterator.
 
 	SequenceIterator(const std::vector<OrderIterator>& its, UInt32 min);
 		/// Creates the SequenceIterator.
 
-	virtual ~SequenceIterator();
+	~SequenceIterator() override;
 		/// Destroys the SequenceIterator.
 
 	// OrderIteratorImpl
-	OrderContent::Ptr next(const std::string& name);
-	const std::set<std::string>& validNexts() const;
-	bool end() const;
-	bool validNext(const std::string& name) const;
-	void close();
-	bool canClose() const;
-	void reset();
+	OrderContent::Ptr next(const std::string& name) override;
+	[[nodiscard]] const std::set<std::string>& validNexts() const override;
+	[[nodiscard]] bool end() const override;
+	[[nodiscard]] bool validNext(const std::string& name) const override;
+	void close() override;
+	[[nodiscard]] bool canClose() const override;
+	void reset() override;
 
 private:
 	using Iterators = std::vector<OrderIterator>;
 
+	static constexpr Iterators::size_type NO_POS = std::numeric_limits<Iterators::size_type>::max();
+		/// Value of _curPos before an element has been chosen.
+
 	UInt32 _min;
 	UInt32 _max;
 	Iterators _vecIt;
-	Iterators::size_type _curPos;
+	Iterators::size_type _curPos = NO_POS;
 	mutable std::set<std::string> _next;
-	mutable bool _dirtyFlag;
-	static const Iterators::size_type NO_POS;
+	mutable bool _dirtyFlag = true;
 };
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_SequenceIterator_INCLUDED

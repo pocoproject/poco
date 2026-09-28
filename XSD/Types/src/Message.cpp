@@ -16,14 +16,10 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
-Message::Message()
-{
-}
+Message::Message() = default;
 
 
 Message::Message(const std::string& name):
@@ -32,9 +28,7 @@ Message::Message(const std::string& name):
 }
 
 
-Message::~Message()
-{
-}
+Message::~Message() = default;
 
 	
 void Message::addElementPart(const std::string& name, const Poco::XML::Name& elementName)
@@ -61,4 +55,4 @@ void Message::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

@@ -22,9 +22,7 @@
 #include "Poco/XSD/Types/OrderIteratorImpl.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class Element;
@@ -34,29 +32,29 @@ class XSDTypes_API ElementIterator: public OrderIteratorImpl
 	/// An iterator for iterating over an Element's content.
 {
 public:
-	ElementIterator(Element& elem);
+	explicit ElementIterator(Element& elem);
 		/// Creates the ElementIterator.
 
-	virtual ~ElementIterator();
+	~ElementIterator() override;
 		/// Destroys the ElementIterator.
 
 	// OrderIteratorImpl
-	OrderContent::Ptr next(const std::string& name);
-	const std::set<std::string>& validNexts() const;
-	bool validNext(const std::string& name) const;
-	bool end() const;
-	void close();
-	bool canClose() const;
-	void reset();
+	OrderContent::Ptr next(const std::string& name) override;
+	[[nodiscard]] const std::set<std::string>& validNexts() const override;
+	[[nodiscard]] bool validNext(const std::string& name) const override;
+	[[nodiscard]] bool end() const override;
+	void close() override;
+	[[nodiscard]] bool canClose() const override;
+	void reset() override;
 
 private:
 	Element* _pElem;
-	UInt32 _cnt;
+	UInt32 _cnt = 0;
 	mutable std::set<std::string> _next;
 };
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_ElementIterator_INCLUDED

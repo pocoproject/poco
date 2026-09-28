@@ -19,12 +19,6 @@ Parameter::Parameter(const std::string& name,
 		bool soapHeader, 
 		bool nillable):
 	Variable(name, type, Utility::AC_PUBLIC, order, t, optional, nillable),
-	_soapHeader(soapHeader),
-	_direction(DIR_IN)
-{
-}
-
-
-Parameter::~Parameter()
+	_soapHeader(soapHeader)
 {
 }

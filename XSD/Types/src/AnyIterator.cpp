@@ -17,15 +17,12 @@
 #include "Poco/XSD/Types/Any.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 AnyIterator::AnyIterator(Any& any):
 	_min(any.getMinOccurs()),
 	_max(any.getMaxOccurs()),
-	_cnt(0),
 	_pAny(&any),
 	_next()
 {
@@ -33,9 +30,7 @@ AnyIterator::AnyIterator(Any& any):
 }
 
 
-AnyIterator::~AnyIterator()
-{
-}
+AnyIterator::~AnyIterator() = default;
 
 
 OrderContent::Ptr AnyIterator::next(const std::string& name)
@@ -90,4 +85,4 @@ void AnyIterator::reset()
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

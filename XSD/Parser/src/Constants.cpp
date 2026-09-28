@@ -15,9 +15,7 @@
 #include "Poco/XSD/Parser/Constants.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Parser {
+namespace Poco::XSD::Parser {
 
 
 const std::string Constants::XSD_NAMESPACE_URI("http://www.w3.org/2001/XMLSchema");
@@ -116,7 +114,6 @@ const std::string Constants::XSD_PROHIBITED("prohibited");
 
 // Other
 const std::string Constants::XSD_COLON(":");
-const char Constants::XSD_COLONCHAR(':');
 const std::string Constants::XSD_EMPTY_STRING;
 const std::string Constants::XSD_DOUBLEHASH_ANY("##any");
 const std::string Constants::XSD_SIMPLEEXTENSION("sx");
@@ -170,4 +167,4 @@ const std::string Constants::WSA_NAMESPACE_URI("http://schemas.xmlsoap.org/ws/20
 const std::string Constants::WSA_ACTION("Action");
 
 
-} } } // namespace Poco::XSD::Parser
+} // namespace Poco::XSD::Parser

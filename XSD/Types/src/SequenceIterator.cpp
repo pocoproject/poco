@@ -17,12 +17,7 @@
 #include "Poco/XSD/Types/XSDException.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
-
-
-const SequenceIterator::Iterators::size_type SequenceIterator::NO_POS(-1);
+namespace Poco::XSD::Types {
 
 
 SequenceIterator::SequenceIterator(const Sequence& data):
@@ -30,14 +25,10 @@ SequenceIterator::SequenceIterator(const Sequence& data):
 	_min(data.getMinOccurs()),
 	_max(data.getMaxOccurs()),
 	_vecIt(),
-	_curPos(NO_POS),
-	_next(),
-	_dirtyFlag(true)
+	_next()
 {
-	Sequence::Content::const_iterator it = data.getContent().begin();
-	Sequence::Content::const_iterator itEnd = data.getContent().end();
-	for (; it != itEnd; ++it)
-		_vecIt.push_back((*it)->iterator());
+	for (const auto& pChild: data.getContent())
+		_vecIt.push_back(pChild->iterator());
 
 	poco_assert (_max <= 1); // > 1 not supported yet
 }
@@ -48,16 +39,12 @@ SequenceIterator::SequenceIterator(const std::vector<OrderIterator>& its, UInt32
 	_min(min),
 	_max(1),
 	_vecIt(),
-	_curPos(NO_POS),
-	_next(),
-	_dirtyFlag(true)
+	_next()
 {
 }
 
 
-SequenceIterator::~SequenceIterator()
-{
-}
+SequenceIterator::~SequenceIterator() = default;
 
 
 OrderContent::Ptr SequenceIterator::next(const std::string& name)
@@ -205,11 +192,9 @@ void SequenceIterator::reset()
 {
 	_curPos = NO_POS;
 	_dirtyFlag = true;
-	Iterators::iterator it = _vecIt.begin();
-	Iterators::iterator itEnd = _vecIt.end();
-	for (; it != itEnd; ++it)
-		it->reset();
+	for (auto& itOrd: _vecIt)
+		itOrd.reset();
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

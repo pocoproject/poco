@@ -28,9 +28,7 @@ XSDTypesTest::XSDTypesTest(const std::string& name): CppUnit::TestCase(name)
 }
 
 
-XSDTypesTest::~XSDTypesTest()
-{
-}
+XSDTypesTest::~XSDTypesTest() = default;
 
 
 void XSDTypesTest::testEmptySequence()

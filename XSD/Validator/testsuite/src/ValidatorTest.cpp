@@ -72,9 +72,7 @@ ValidatorTest::ValidatorTest(const std::string& name):
 }
 
 
-ValidatorTest::~ValidatorTest()
-{
-}
+ValidatorTest::~ValidatorTest() = default;
 
 
 void ValidatorTest::setUp()
@@ -213,7 +211,7 @@ void ValidatorTest::testValidatorCannotBeInstantiated()
 	// Compile-time check via std::is_default_constructible: the deleted
 	// default constructor on Validator makes the trait false. If someone
 	// accidentally removes `= delete`, this assertion catches it.
-	static_assert(!std::is_default_constructible<Validator>::value,
+	static_assert(!std::is_default_constructible_v<Validator>,
 		"Poco::XSD::Validator::Validator must remain static-only (= delete)");
 }
 
@@ -239,8 +237,7 @@ void ValidatorTest::testSchemaIncludeNamedSchemaXsd()
 
 void ValidatorTest::testSchemaInternalEntities()
 {
-	// libxml2 parses the entity text without the namespace declarations of the
-	// place where it is referenced, so the entity declares the prefix itself.
+	// The entity declares the xs prefix itself; see ELEMENT_B_DECLARATION.
 	const std::string schema = R"(<!DOCTYPE xs:schema [
   <!ENTITY b '<xs:element xmlns:xs="http://www.w3.org/2001/XMLSchema" name="b" type="xs:int"/>'>
 ]>
@@ -345,7 +342,7 @@ void ValidatorTest::testErrorMessageBounded()
 		assertTrue (message.size() < 4096);
 	}
 
-	// ten errors are listed, the eleventh is counted
+	// Ten errors are listed; the eleventh is counted.
 	xml = "<root>";
 	for (int i = 0; i < 11; ++i)
 		xml += "<item name=\"X\" direction=\"sideways\"/>";

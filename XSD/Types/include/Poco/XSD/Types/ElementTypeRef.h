@@ -22,9 +22,7 @@
 #include "Poco/XSD/Types/AbstractElementImpl.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API ElementTypeRef: public AbstractElementImpl
@@ -54,17 +52,17 @@ public:
 		const QName& typeRef);
 		/// Creates an initialized ElementTypeRef
 
-	virtual ~ElementTypeRef();
+	~ElementTypeRef() override;
 		/// Destroys the ElementTypeRef.
 
-	void fixup();
+	void fixup() override;
 
-	const Type& type() const;
+	[[nodiscard]] const Type& type() const override;
 
-	void accept(Visitor& v) const;
+	void accept(Visitor& v) const override;
 
 private:
-	const Type* _pType;
+	const Type* _pType = nullptr;
 	QName _typeRef;
 };
 
@@ -79,7 +77,7 @@ inline const Type& ElementTypeRef::type() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_ElementTypeRef_INCLUDED

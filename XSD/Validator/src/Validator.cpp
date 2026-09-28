@@ -28,9 +28,7 @@
 #include <vector>
 
 
-namespace Poco {
-namespace XSD {
-namespace Validator {
+namespace Poco::XSD::Validator {
 
 
 namespace {
@@ -67,7 +65,7 @@ using DocPtr = std::unique_ptr<xmlDoc, LibXmlDeleter<xmlFreeDoc>>;
 using SchemaValidCtxtPtr = std::unique_ptr<xmlSchemaValidCtxt, LibXmlDeleter<xmlSchemaFreeValidCtxt>>;
 
 
-// libxml2 2.12 changed the error argument of xmlStructuredErrorFunc to a pointer to const.
+// From libxml2 2.12, xmlStructuredErrorFunc takes the error as a pointer to const.
 #if LIBXML_VERSION >= 21200
 using ErrorPtr = const xmlError*;
 #else
@@ -128,13 +126,13 @@ public:
 		}
 	}
 
-	bool outOfMemory() const
+	[[nodiscard]] bool outOfMemory() const
 		/// Returns true if libxml2 or the collector ran out of memory.
 	{
 		return _outOfMemory;
 	}
 
-	std::string message() const
+	[[nodiscard]] std::string message() const
 		/// Returns the collected messages joined with "; ".
 	{
 		if (_messages.empty()) return "unknown error";
@@ -244,8 +242,6 @@ void Validator::validate(const std::string& xml, const std::string& xsdContent)
 		throw Poco::RuntimeException(OUT_OF_MEMORY_MESSAGE);
 	xmlSchemaSetValidStructuredErrors(pValidCtxt.get(), onError, &validationErrors);
 
-	// xmlSchemaValidateDoc returns 0 for a valid document, a positive
-	// value for a schema violation and a negative value for an internal error.
 	const int rc = xmlSchemaValidateDoc(pValidCtxt.get(), pDoc.get());
 	if (rc != 0 && validationErrors.outOfMemory())
 		throw Poco::RuntimeException(OUT_OF_MEMORY_MESSAGE);
@@ -256,4 +252,4 @@ void Validator::validate(const std::string& xml, const std::string& xsdContent)
 }
 
 
-} } } // namespace Poco::XSD::Validator
+} // namespace Poco::XSD::Validator

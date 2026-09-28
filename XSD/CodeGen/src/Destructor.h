@@ -23,8 +23,6 @@ class Destructor: public AbstractMethod
 public:
 	Destructor(const ClassInfo& owner, Utility::Access acc, bool isVirtual);
 
-	virtual ~Destructor();
-
 private:
 	Destructor();
 

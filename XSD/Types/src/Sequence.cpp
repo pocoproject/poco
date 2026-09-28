@@ -18,9 +18,7 @@
 #include "Poco/XSD/Types/XSDException.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 Sequence::Sequence(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc):
@@ -29,9 +27,7 @@ Sequence::Sequence(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxO
 }
 
 
-Sequence::~Sequence()
-{
-}
+Sequence::~Sequence() = default;
 
 
 void Sequence::accept(Visitor& v) const
@@ -50,10 +46,8 @@ void Sequence::add(OrderContent::Ptr pChild)
 
 void Sequence::fixup()
 {
-	std::vector<OrderContent::Ptr>::iterator it = _content.begin();
-	std::vector<OrderContent::Ptr>::iterator itEnd = _content.end();
-	for (; it != itEnd; ++it)
-		(*it)->fixup();
+	for (auto& pChild: _content)
+		pChild->fixup();
 }
 
 
@@ -63,4 +57,4 @@ OrderIterator Sequence::iterator() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

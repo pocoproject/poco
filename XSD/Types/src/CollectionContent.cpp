@@ -15,14 +15,10 @@
 #include "Poco/XSD/Types/CollectionContent.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
-CollectionContent::CollectionContent()
-{
-}
+CollectionContent::CollectionContent() = default;
 
 
 CollectionContent::CollectionContent(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc):
@@ -31,9 +27,7 @@ CollectionContent::CollectionContent(const std::string& id, Poco::UInt32 minOcc,
 }
 
 
-CollectionContent::~CollectionContent()
-{
-}
+CollectionContent::~CollectionContent() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

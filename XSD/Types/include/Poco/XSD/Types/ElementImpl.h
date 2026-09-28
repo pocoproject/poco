@@ -22,9 +22,7 @@
 #include "Poco/XSD/Types/AbstractElementImpl.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API ElementImpl: public AbstractElementImpl
@@ -53,21 +51,21 @@ public:
 		const QName& substitutionGroup = QName::INVALID);
 		/// Creates an initialized ElementImpl
 
-	~ElementImpl();
+	~ElementImpl() override;
 		/// Destroys the ElementImpl.
 
-	void fixup();
+	void fixup() override;
 		/// ElementImpl is fine, just fwd to the internal _pType.
 
-	const Type& type() const;
+	[[nodiscard]] const Type& type() const override;
 	
 	void setType(AutoPtr<Type> pType);
 		/// Sets the type internally
 
-	void accept(Visitor& v) const;
+	void accept(Visitor& v) const override;
 
 private:
-	const Type* _pType;
+	const Type* _pType = nullptr;
 };
 
 
@@ -81,7 +79,7 @@ inline const Type& ElementImpl::type() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_ElementImpl_INCLUDED

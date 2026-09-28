@@ -26,9 +26,7 @@
 #include "Poco/XSD/Types/InheritanceInfo.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API ComplexType: public Type
@@ -47,47 +45,47 @@ public:
 		bool mixed);
 		/// Creates the ComplexType.
 
-	virtual ~ComplexType();
+	~ComplexType() override;
 		/// Destroys the ComplexType.
 
 
-	bool isAbstract() const;
+	[[nodiscard]] bool isAbstract() const;
 
-	bool blockExtension() const;
+	[[nodiscard]] bool blockExtension() const;
 
-	bool blockRestriction() const;
+	[[nodiscard]] bool blockRestriction() const;
 
-	bool finalExtension() const;
+	[[nodiscard]] bool finalExtension() const;
 
-	bool finalRestriction() const;
+	[[nodiscard]] bool finalRestriction() const;
 
-	bool mixed() const;
+	[[nodiscard]] bool mixed() const;
 
 	void setParent(InheritanceInfo::Ptr pInh);
 
-	InheritanceInfo::Ptr getParent() const;
+	[[nodiscard]] InheritanceInfo::Ptr getParent() const;
 
 	void setContent(Content::Ptr ptr);
 
-	Content::Ptr getContent() const;
+	[[nodiscard]] Content::Ptr getContent() const;
 
-	void fixup();
+	void fixup() override;
 		/// Resolves type references to a parent class.
 
-	const std::vector<const Type*>& parents() const;
+	[[nodiscard]] const std::vector<const Type*>& parents() const override;
 
-	void accept(Visitor& v) const;
+	void accept(Visitor& v) const override;
 
 	void addAttribute(AttributeContent::Ptr pAttr);
 		/// Adds the attribute to the set.
 
-	const std::vector<AttributeContent::Ptr>& attributeContent() const;
+	[[nodiscard]] const std::vector<AttributeContent::Ptr>& attributeContent() const;
 		/// Returns the attributes defined for the complex type.
 
-	bool hasAnyAttribute() const;
+	[[nodiscard]] bool hasAnyAttribute() const;
 		/// Returns true if the any attribute is allowed.
 
-	void createIterator(std::vector<OrderIterator>& seq) const;
+	void createIterator(std::vector<OrderIterator>& seq) const override;
 
 private:
 	bool _abstract;
@@ -99,7 +97,7 @@ private:
 	InheritanceInfo::Ptr _pParent;
 	Content::Ptr _pContent;
 	std::vector<AttributeContent::Ptr> _attrContent;
-	bool _containsAny;
+	bool _containsAny = false;
 };
 
 
@@ -185,7 +183,7 @@ inline const std::vector<AttributeContent::Ptr>& ComplexType::attributeContent()
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_ComplexType_INCLUDED

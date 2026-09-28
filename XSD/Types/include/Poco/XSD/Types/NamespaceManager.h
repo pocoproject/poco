@@ -24,9 +24,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API NamespaceManager
@@ -38,33 +36,32 @@ public:
 	using IdMap = std::map<NamespaceId, std::string>;
 	using NamespaceMap = std::map<std::string, NamespaceId>;
 
-	static NamespaceManager& instance();
+	NamespaceManager(const NamespaceManager&) = delete;
+	NamespaceManager& operator=(const NamespaceManager&) = delete;
+
+	[[nodiscard]] static NamespaceManager& instance();
 		/// Returns the singleton.
 
-	bool hasNamespace(const std::string& ns) const;
+	[[nodiscard]] bool hasNamespace(const std::string& ns) const;
 
-	bool hasNamespace(NamespaceManager::NamespaceId id) const;
+	[[nodiscard]] bool hasNamespace(NamespaceManager::NamespaceId id) const;
 
-	NamespaceManager::NamespaceMap::const_iterator get(const std::string& ns) const;
+	[[nodiscard]] NamespaceManager::NamespaceMap::const_iterator get(const std::string& ns) const;
 
-	NamespaceManager::NamespaceId getId(const std::string& ns) const;
+	[[nodiscard]] NamespaceManager::NamespaceId getId(const std::string& ns) const;
 
-	const std::string& getNamespace(NamespaceManager::NamespaceId id) const;
+	[[nodiscard]] const std::string& getNamespace(NamespaceManager::NamespaceId id) const;
 
 	NamespaceManager::NamespaceMap::const_iterator set(const std::string& ns);
 		/// Inserts the namespace into the manager and returns the assigned id.
 		/// If the namespace already exists, the insert is ignored and the id is returned.
 
-	NamespaceManager::NamespaceMap::const_iterator end() const;
+	[[nodiscard]] NamespaceManager::NamespaceMap::const_iterator end() const;
 		/// Returns the end iterator.
 
 private:
 	NamespaceManager();
 		/// Creates the NamespaceManager.
-
-	NamespaceManager(const NamespaceManager&);
-
-	NamespaceManager& operator= (const NamespaceManager&);
 
 	~NamespaceManager();
 		/// Destroys the NamespaceManager.
@@ -72,7 +69,7 @@ private:
 private:
 	IdMap                 _idToNamespace;
 	NamespaceMap          _namespaceToId;
-	int                   _maxId;
+	int                   _maxId = 0;
 	Poco::FastMutex       _mutex;
 
 	friend class Poco::SingletonHolder<NamespaceManager>;
@@ -120,7 +117,7 @@ inline NamespaceManager::NamespaceMap::const_iterator NamespaceManager::end() co
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_NamespaceManager_INCLUDED

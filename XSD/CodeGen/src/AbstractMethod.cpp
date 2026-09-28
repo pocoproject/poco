@@ -24,11 +24,6 @@ AbstractMethod::AbstractMethod(const std::string& name, Utility::Access acc, boo
 }
 
 
-AbstractMethod::~AbstractMethod()
-{
-}
-
-
 void AbstractMethod::addCode(const std::string& line)
 {
 	_code.push_back(Poco::trim(line));
@@ -37,10 +32,9 @@ void AbstractMethod::addCode(const std::string& line)
 
 void AbstractMethod::addCode(const std::vector<std::string>& lines)
 {
-	std::vector<std::string>::const_iterator it = lines.begin();
-	for (; it != lines.end(); ++it)
+	for (const auto& line: lines)
 	{
-		addCode(*it);
+		addCode(line);
 	}
 }
 
@@ -53,9 +47,8 @@ void AbstractMethod::addDocu(const std::string& line)
 
 void AbstractMethod::addDocu(const std::vector<std::string>& lines)
 {
-	std::vector<std::string>::const_iterator it = lines.begin();
-	for (; it != lines.end(); ++it)
+	for (const auto& line: lines)
 	{
-		addDocu(*it);
+		addDocu(line);
 	}
 }

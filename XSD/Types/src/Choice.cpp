@@ -19,9 +19,7 @@
 #include "Poco/XSD/Types/OrderIterator.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 Choice::Choice(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc):
@@ -30,9 +28,7 @@ Choice::Choice(const std::string& id, Poco::UInt32 minOcc, Poco::UInt32 maxOcc):
 }
 
 
-Choice::~Choice()
-{
-}
+Choice::~Choice() = default;
 
 
 void Choice::add(OrderContent::Ptr pChild)
@@ -45,10 +41,8 @@ void Choice::add(OrderContent::Ptr pChild)
 
 void Choice::fixup()
 {
-	Choice::Content::iterator it = _content.begin();
-	Choice::Content::iterator itEnd = _content.end();
-	for (; it != itEnd; ++it)
-		(*it)->fixup();
+	for (auto& pChild: _content)
+		pChild->fixup();
 }
 
 
@@ -64,4 +58,4 @@ OrderIterator Choice::iterator() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

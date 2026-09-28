@@ -18,9 +18,7 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 ListTypeRef::ListTypeRef(const std::string& id, const QName& itemType):
@@ -31,9 +29,7 @@ ListTypeRef::ListTypeRef(const std::string& id, const QName& itemType):
 }
 
 
-ListTypeRef::~ListTypeRef()
-{
-}
+ListTypeRef::~ListTypeRef() = default;
 
 
 void ListTypeRef::fixup()
@@ -55,4 +51,4 @@ void ListTypeRef::accept(Visitor& v) const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

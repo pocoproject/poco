@@ -22,9 +22,7 @@
 #include "Poco/XSD/Types/AttributeContent.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API AnyAttribute: public AttributeContent
@@ -40,22 +38,22 @@ public:
 		PS_STRICT
 	};
 
-	AnyAttribute(const std::string& id, const std::string& nameSpace = "##any", ProcessStyle style = PS_STRICT);
+	explicit AnyAttribute(const std::string& id, const std::string& nameSpace = "##any", ProcessStyle style = PS_STRICT);
 		/// Creates the AnyAttribute.
 
-	virtual ~AnyAttribute();
+	~AnyAttribute() override;
 		/// Destroys the AnyAttribute.
 
-	const std::string& nameSpace() const;
+	[[nodiscard]] const std::string& nameSpace() const;
 		/// The namespace allowed for the any attribute.
 
-	ProcessStyle style() const;
+	[[nodiscard]] ProcessStyle style() const;
 		/// The processing for any attribute.
 
 	// AttributeContent
-	bool isAny() const;
-	void fixup();
-	void accept(Visitor& v) const;
+	[[nodiscard]] bool isAny() const override;
+	void fixup() override;
+	void accept(Visitor& v) const override;
 
 private:
 	std::string _nameSpace;
@@ -89,7 +87,7 @@ inline void AnyAttribute::fixup()
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_AnyAttribute_INCLUDED

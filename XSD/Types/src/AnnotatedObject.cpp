@@ -15,9 +15,7 @@
 #include "Poco/XSD/Types/AnnotatedObject.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 AnnotatedObject::AnnotatedObject():
@@ -41,9 +39,7 @@ AnnotatedObject::AnnotatedObject(const std::string& id, const Annotation& ann):
 }
 
 
-AnnotatedObject::~AnnotatedObject()
-{
-}
+AnnotatedObject::~AnnotatedObject() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

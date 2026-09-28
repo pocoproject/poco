@@ -15,19 +15,13 @@
 #include "Poco/XSD/Types/Visitor.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
-Visitor::Visitor()
-{
-}
+Visitor::Visitor() = default;
 
 
-Visitor::~Visitor()
-{
-}
+Visitor::~Visitor() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

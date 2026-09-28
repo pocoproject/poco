@@ -51,21 +51,17 @@
 #include <map>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 	class Element;
 	class ElementImpl;
 	class Any;
 	class Attribute;
 	class Operation;
 	class BindingProperties;
-} } } 
+} // namespace Poco::XSD::Types
 
 
-namespace Poco {
-namespace XSD {
-namespace Parser {
+namespace Poco::XSD::Parser {
 
 
 class XSDParser_API XSDContentHandler: public XML::ContentHandler
@@ -80,9 +76,11 @@ public:
 	using SchemaNSToLocationMap = std::map<std::string, std::string>;
 
 	XSDContentHandler(const Poco::URI& schemaLocation, const SchemaNSToLocationMap& schemaMap);
-		/// Creates the XSDContentHandler. set fixupSchema to false if you include another schema from within another one
+		/// Creates the XSDContentHandler for the schema document at schemaLocation. schemaMap gives the
+		/// schema location for an imported namespace whose import has no schemaLocation attribute;
+		/// the handler keeps a reference to it.
 
-	virtual ~XSDContentHandler();
+	~XSDContentHandler() override;
 		/// Destroys the XSDContentHandler.
 
 	static void resolveSchemaLocation(Poco::URI& schemaLocation, const Poco::URI& parentSchemaLocation);
@@ -93,17 +91,17 @@ public:
 		/// for its target namespace, into which the declarations of all loaded documents of that
 		/// namespace are merged. A document that was already loaded is not parsed again.
 
-	void setDocumentLocator(const XML::Locator* loc);
-	void startDocument();
-	void endDocument();
-	void startElement(const std::string& uri, const std::string& localName, const std::string& qname, const XML::Attributes& attrList);
-	void endElement(const std::string& uri, const std::string& localName, const std::string& qname);
-	void characters(const XML::XMLChar ch[], int start, int length);
-	void ignorableWhitespace(const XML::XMLChar ch[], int start, int length);
-	void processingInstruction(const std::string& target, const std::string& data);
-	void startPrefixMapping(const std::string& prefix, const std::string& uri);
-	void endPrefixMapping(const std::string& prefix);
-	void skippedEntity(const std::string& name);
+	void setDocumentLocator(const XML::Locator* loc) override;
+	void startDocument() override;
+	void endDocument() override;
+	void startElement(const std::string& uri, const std::string& localName, const std::string& qname, const XML::Attributes& attrList) override;
+	void endElement(const std::string& uri, const std::string& localName, const std::string& qname) override;
+	void characters(const XML::XMLChar* ch, int start, int length) override;
+	void ignorableWhitespace(const XML::XMLChar* ch, int start, int length) override;
+	void processingInstruction(const std::string& target, const std::string& data) override;
+	void startPrefixMapping(const std::string& prefix, const std::string& uri) override;
+	void endPrefixMapping(const std::string& prefix) override;
+	void skippedEntity(const std::string& name) override;
 
 private:
 	using StateList = std::vector<StateMachine::State>;
@@ -131,7 +129,7 @@ private:
 	void stateKeyrefStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
 	void stateListStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
 	void stateNotationStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
-	void stateRedefineStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
+	[[noreturn]] void stateRedefineStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
 	void stateSimpleTypeRestrictionStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
 	void stateComplexRestrictionStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
 	void stateSimpleContentRestrictionStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
@@ -153,7 +151,7 @@ private:
 	void stateMinLengthStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
 	void statePatternStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
 	void stateTotalDigitsStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
-	void stateUninitializedStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
+	[[noreturn]] void stateUninitializedStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
 	void stateWhiteSpaceStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
 	void stateMetaAnyStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
 	void stateAllEnd(const std::string& uri, const std::string& localName, const std::string& qname);
@@ -178,7 +176,7 @@ private:
 	void stateKeyrefEnd(const std::string& uri, const std::string& localName, const std::string& qname);
 	void stateListEnd(const std::string& uri, const std::string& localName, const std::string& qname);
 	void stateNotationEnd(const std::string& uri, const std::string& localName, const std::string& qname);
-	void stateRedefineEnd(const std::string& uri, const std::string& localName, const std::string& qname);
+	[[noreturn]] void stateRedefineEnd(const std::string& uri, const std::string& localName, const std::string& qname);
 	void stateSimpleTypeRestrictionEnd(const std::string& uri, const std::string& localName, const std::string& qname);
 	void stateSimpleContentRestrictionEnd(const std::string& uri, const std::string& localName, const std::string& qname);
 	void stateComplexRestrictionEnd(const std::string& uri, const std::string& localName, const std::string& qname);
@@ -200,7 +198,7 @@ private:
 	void stateMinLengthEnd(const std::string& uri, const std::string& localName, const std::string& qname);
 	void statePatternEnd(const std::string& uri, const std::string& localName, const std::string& qname);
 	void stateTotalDigitsEnd(const std::string& uri, const std::string& localName, const std::string& qname);
-	void stateUninitializedEnd(const std::string& uri, const std::string& localName, const std::string& qname);
+	[[noreturn]] void stateUninitializedEnd(const std::string& uri, const std::string& localName, const std::string& qname);
 	void stateWhiteSpaceEnd(const std::string& uri, const std::string& localName, const std::string& qname);
 	void stateMetaAnyEnd(const std::string& uri, const std::string& localName, const std::string& qname);
 
@@ -248,13 +246,13 @@ private:
 	void stateWSDLDocumentationStart(const std::string& uri, const std::string& localName, const std::string& qname, const CompactAttributes& attrList);
 	void stateWSDLDocumentationEnd(const std::string& uri, const std::string& localName, const std::string& qname);
 
-	std::string location() const;
+	[[nodiscard]] std::string location() const;
 		/// PrettyPrints the locator
 
 	void convertAttributes(const XML::Attributes& attr, CompactAttributes& attrList);
 		/// Adds the attributes from attr to attrList
 
-	Poco::XSD::Types::QName createQName(const std::string& str) const;
+	[[nodiscard]] Poco::XSD::Types::QName createQName(const std::string& str) const;
 		/// Creates a qualified name for a given string
 		
 	void importXSD(const Poco::URI& schemaLocation, const XSDContentHandler::SchemaNSToLocationMap& schemaMap);
@@ -264,52 +262,49 @@ private:
 	void clear();
 		/// Releases all objects created during parsing
 
-	static StateMachine& stateMachine();
+	[[nodiscard]] static StateMachine& stateMachine();
 		/// Returns the state machine definition. 
 
-	StateMachine::State getParentState() const;
+	[[nodiscard]] StateMachine::State getParentState() const;
 		/// Returns the state of the parent
 
-	XML::Name resolveName(const std::string& qname) const;
+	[[nodiscard]] XML::Name resolveName(const std::string& qname) const;
 		/// Returns the name for a qualified name from an attribute value, with its prefix
 		/// resolved to a namespace URI.
 
-	Types::BindingProperties& operationBindingProperties(Types::Operation& operation) const;
+	[[nodiscard]] Types::BindingProperties& operationBindingProperties(Types::Operation& operation) const;
 		/// Returns the binding properties of the wsdl:input, wsdl:output or wsdl:fault
-		/// element that encloses the current element.
+		/// element that encloses the current element. Throws a SchemaException if there is none.
 
 	void revokeRegistrations();
-		/// Removes the schemas and definitions that this handler registered from the
-		/// TypesManager. Called when the document fails to parse.
+		/// Removes the schemas and definitions that this handler registered from the TypesManager.
 
 	void parse();
-		/// Parses the document at the schema location given to the constructor with this handler.
-		/// If parsing fails, removes the registrations this handler made in the TypesManager
-		/// and rethrows the exception.
+		/// Parses the document at the schema location given to the constructor. If parsing fails,
+		/// removes the registrations of this handler from the TypesManager and rethrows the exception.
 
 	static Poco::XSD::Types::Schema::Ptr loadDocument(const Poco::URI& schemaLocation,
 		const SchemaNSToLocationMap& schemaMap);
-		/// Returns the schema of the document at schemaLocation. A document that is not loaded yet
-		/// is parsed, and its own schema is returned, because xs:include takes over the declarations
-		/// of that document only, not those of other documents merged into the same registered schema
-		/// (for example other documents without a target namespace); otherwise the schema the
-		/// TypesManager holds for schemaLocation is returned.
+		/// Returns the schema of the document at schemaLocation. A document not loaded yet is parsed
+		/// and its own schema is returned, because xs:include takes over the declarations of that
+		/// document only, not those of other documents of its namespace. Otherwise returns the schema
+		/// the TypesManager holds for schemaLocation.
 
 private:
 	Poco::URI _schemaLocation;
-	const XML::Locator*   _pLocator;
+	const XML::Locator*   _pLocator = nullptr;
 	XML::NamespaceSupport _namespaces;
 
 	// schema specific info
-	bool _qualifiedAttributeForm;
-	bool _qualifiedElementForm;
-	bool _blockExtension;
-	bool _blockRestriction;
-	bool _blockSubstitution;
-	bool _finalExtension;
-	bool _finalRestriction;
-	bool _finalList;
-	bool _finalUnion;
+	bool _qualifiedAttributeForm = false;
+	bool _qualifiedElementForm = false;
+	bool _blockExtension = false;
+	bool _blockRestriction = false;
+	bool _blockSubstitution = false;
+	bool _finalExtension = false;
+	bool _finalRestriction = false;
+	bool _finalList = false;
+	bool _finalUnion = false;
 	
 	StateList _states;
 		/// Contains all active states. Is not a stack because some childs need information about
@@ -360,7 +355,6 @@ private:
 
 	std::vector<Poco::XSD::Types::Schema::Ptr> _registeredSchemas;
 	std::vector<Poco::XSD::Types::Definitions::Ptr> _registeredDefinitions;
-		/// The schemas and definitions this handler registered with the TypesManager.
 
 	friend class StateMachine;
 	friend struct StateMachine::StateInfo;
@@ -378,7 +372,7 @@ inline StateMachine::State XSDContentHandler::getParentState() const
 }
 
 
-} } } // namespace Poco::XSD::Parser
+} // namespace Poco::XSD::Parser
 
 
 #endif // XSDParser_XSDContentHandler_INCLUDED

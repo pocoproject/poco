@@ -15,9 +15,7 @@
 #include "Poco/XSD/Types/AnnotationContent.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 AnnotationContent::AnnotationContent(const std::string& sourceUri):
@@ -27,9 +25,7 @@ AnnotationContent::AnnotationContent(const std::string& sourceUri):
 }
 
 
-AnnotationContent::~AnnotationContent()
-{
-}
+AnnotationContent::~AnnotationContent() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

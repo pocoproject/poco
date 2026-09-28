@@ -15,9 +15,7 @@
 #include "Poco/XSD/Types/AbstractAttribute.h"
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 AbstractAttribute::AbstractAttribute(const std::string& id, const std::string& name):
@@ -26,9 +24,7 @@ AbstractAttribute::AbstractAttribute(const std::string& id, const std::string& n
 }
 
 
-AbstractAttribute::~AbstractAttribute()
-{
-}
+AbstractAttribute::~AbstractAttribute() = default;
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types

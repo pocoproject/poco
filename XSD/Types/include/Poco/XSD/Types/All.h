@@ -24,9 +24,7 @@
 #include <map>
 
 
-namespace Poco {
-namespace XSD {
-namespace Types {
+namespace Poco::XSD::Types {
 
 
 class XSDTypes_API All: public Order
@@ -39,23 +37,23 @@ public:
 	All(const std::string& id, Poco::UInt32 minOcc);
 		/// Creates the All.
 
-	virtual ~All();
+	~All() override;
 		/// Destroys the All.
 
-	void add(OrderContent::Ptr pChild);
+	void add(OrderContent::Ptr pChild) override;
 		/// Note: All only accepts elements as children. If the order content cannot be cast to Element::Ptr it will throw an exception.
 
 	void add(Element::Ptr pChild);
 		/// Adds an element to the All collection
 
-	const All::Content& getContent() const;
+	[[nodiscard]] const All::Content& getContent() const;
 		/// Returns the children of the All collection
 
-	void fixup();
+	void fixup() override;
 
-	void accept(Visitor& v) const;
+	void accept(Visitor& v) const override;
 
-	OrderIterator iterator() const;
+	[[nodiscard]] OrderIterator iterator() const override;
 
 private:
 	All::Content _content;
@@ -71,7 +69,7 @@ inline const All::Content& All::getContent() const
 }
 
 
-} } } // namespace Poco::XSD::Types
+} // namespace Poco::XSD::Types
 
 
 #endif // XSDTypes_All_INCLUDED
