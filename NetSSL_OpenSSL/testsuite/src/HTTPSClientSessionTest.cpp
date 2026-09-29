@@ -34,6 +34,8 @@
 #include "Poco/DateTimeFormatter.h"
 #include "Poco/DateTimeFormat.h"
 #include "Poco/Thread.h"
+#include "Poco/Timestamp.h"
+#include "DialogServer.h"
 #include "HTTPSTestServer.h"
 #include <iostream>
 #include <sstream>
@@ -521,6 +523,35 @@ void HTTPSClientSessionTest::testProxySetters()
 }
 
 
+
+void HTTPSClientSessionTest::testStalledPeerTimeout()
+{
+	// DialogServer accepts the connection and, with no response queued, never writes a byte,
+	// so the TLS handshake never receives a ServerHello. connectSSL() runs that handshake with
+	// the socket timeout set to the connection timeout, so it has to fail there; leaving the
+	// session looking connected makes the first request pay a receive timeout on top of it.
+	DialogServer srv;
+	const Poco::Timespan connectTimeout(1, 0);
+	const Poco::Timespan requestTimeout(5, 0);
+
+	HTTPSClientSession s("127.0.0.1", srv.port());
+	s.setTimeout(connectTimeout, requestTimeout, requestTimeout);
+
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/");
+	Poco::Timestamp tsStart;
+	try
+	{
+		s.sendRequest(request);
+		HTTPResponse response;
+		s.receiveResponse(response);
+		fail("a peer that never answers must not produce a response");
+	}
+	catch (Poco::TimeoutException&)
+	{
+	}
+	assertTrue (tsStart.elapsed() < (connectTimeout + requestTimeout).totalMicroseconds());
+}
+
 void HTTPSClientSessionTest::setUp()
 {
 }
@@ -553,6 +584,7 @@ CppUnit::Test* HTTPSClientSessionTest::suite()
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testServerAbort);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxyConfig);
 	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testProxySetters);
+	CppUnit_addTest(pSuite, HTTPSClientSessionTest, testStalledPeerTimeout);
 
 	return pSuite;
 }
