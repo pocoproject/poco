@@ -162,6 +162,26 @@ int WebSocketImpl::receiveHeader(char mask[4], bool& useMask)
 		payloadLength = lengthByte;
 	}
 
+	if(!_mustMaskPayload && !useMask) throw WebSocketException("Recieved unmasked client frame", WebSocket::WS_PROTOCOL_ERROR);
+	if(_mustMaskPayload && useMask) throw WebSocketException("Recieved masked server frame", WebSocket::WS_PROTOCOL_ERROR);
+
+	int opcode = _frameFlags& 0x0F;
+
+	if((opcode>=3 && opcode<=7) || (opcode>=11 && opcode<=15)){
+		throw WebSocketException("Recieved reserved opcode", WebSocket::WS_PROTOCOL_ERROR);
+	}
+
+	if((_frameFlags & 0x70)!=0){
+		throw WebSocketException("Recieved frame with RSV bits set", WebSocket::WS_PROTOCOL_ERROR);
+	}
+
+	if(opcode>=8){
+		bool isFin = (_frameFlags & 0x80)!=0;
+
+		if(!isFin) throw WebSocketException("Fragmented control frame", WebSocket::WS_PROTOCOL_ERROR);
+		if(payloadLength>125) throw WebSocketException("Control frame payload exceeds 125 bytes", WebSocket::WS_PROTOCOL_ERROR);
+	}
+
 	if (useMask)
 	{
 		n = receiveNBytes(mask, 4);
