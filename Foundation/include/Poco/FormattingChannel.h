@@ -22,6 +22,7 @@
 #include "Poco/Channel.h"
 #include "Poco/Formatter.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/Mutex.h"
 
 
 namespace Poco {
@@ -89,8 +90,9 @@ protected:
 	~FormattingChannel() override;
 
 private:
-	Formatter::Ptr _pFormatter;
-	Channel::Ptr   _pChannel;
+	Formatter::Ptr    _pFormatter;
+	Channel::Ptr      _pChannel;
+	mutable FastMutex _mutex;
 };
 
 
