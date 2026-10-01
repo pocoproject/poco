@@ -41,12 +41,14 @@ Logger::~Logger()
 
 void Logger::setChannel(Channel::Ptr pChannel)
 {
+	FastMutex::ScopedLock lock(_channelMutex);
 	_pChannel = pChannel;
 }
 
 
 Channel::Ptr Logger::getChannel() const
 {
+	FastMutex::ScopedLock lock(_channelMutex);
 	return _pChannel;
 }
 
@@ -77,9 +79,13 @@ void Logger::setProperty(const std::string& name, const std::string& value)
 template <typename M>
 void Logger::logImpl(M&& msg)
 {
-	if (_level >= msg.getPriority() && _pChannel)
+	if (_level >= msg.getPriority())
 	{
-		_pChannel->log(std::forward<M>(msg));
+		Channel::Ptr pChannel = getChannel();
+		if (pChannel)
+		{
+			pChannel->log(std::forward<M>(msg));
+		}
 	}
 }
 
@@ -110,11 +116,15 @@ void Logger::log(const Exception& exc, const char* file, LineNumber line)
 
 void Logger::dump(const std::string& msg, const void* buffer, std::size_t length, Message::Priority prio)
 {
-	if (_level >= prio && _pChannel)
+	if (_level >= prio)
 	{
-		std::string text(msg);
-		formatDump(text, buffer, length);
-		_pChannel->log(Message(_name, text, prio));
+		Channel::Ptr pChannel = getChannel();
+		if (pChannel)
+		{
+			std::string text(msg);
+			formatDump(text, buffer, length);
+			pChannel->log(Message(_name, text, prio));
+		}
 	}
 }
 

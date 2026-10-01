@@ -31,6 +31,8 @@ public:
 	void testFormatThreadName();
 	void testFormatStdThreadName();
 	void testLoggerRefSurvivesShutdown();
+	void testConcurrentChannelReplacement();
+	void testConcurrentShutdown();
 
 	void setUp();
 	void tearDown();

@@ -261,6 +261,7 @@ private:
 
 	[[nodiscard]] RotateStrategy* createRotationStrategy(const std::string& rotation, const std::string& times) const;
 	[[nodiscard]] ArchiveStrategy* createArchiveStrategy(const std::string& archive, const std::string& times) const;
+	void unsafeOpen();
 
 	std::string      _path;
 	std::string      _times;

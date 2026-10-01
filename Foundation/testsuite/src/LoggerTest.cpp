@@ -18,6 +18,7 @@
 #include "Poco/Event.h"
 #include "Poco/PatternFormatter.h"
 #include "Poco/FormattingChannel.h"
+#include "Poco/NullChannel.h"
 #include <thread>
 #include <memory>
 #include <vector>
@@ -28,6 +29,7 @@ using Poco::Message;
 using Poco::AutoPtr;
 using Poco::PatternFormatter;
 using Poco::FormattingChannel;
+using Poco::NullChannel;
 using Poco::Event;
 using Poco::Thread;
 
@@ -411,6 +413,78 @@ void LoggerTest::testLoggerRefSurvivesShutdown()
 }
 
 
+void LoggerTest::testConcurrentChannelReplacement()
+{
+	Logger& logger = Logger::get("TestLogger.ConcurrentReplace");
+	logger.setLevel(Message::PRIO_INFORMATION);
+
+	std::atomic<bool> stop{false};
+	std::vector<std::thread> threads;
+
+	// Worker threads logging concurrently
+	for (int i = 0; i < 4; ++i)
+	{
+		threads.emplace_back([&logger, &stop, i]() {
+			while (!stop)
+			{
+				logger.information("concurrent message from thread " + std::to_string(i));
+			}
+		});
+	}
+
+	// Channel replacement thread
+	for (int i = 0; i < 200; ++i)
+	{
+		AutoPtr<NullChannel> pChan = new NullChannel;
+		logger.setChannel(pChan);
+		std::this_thread::yield();
+	}
+
+	stop = true;
+	for (auto& t : threads)
+	{
+		t.join();
+	}
+	logger.setChannel(nullptr);
+}
+
+
+void LoggerTest::testConcurrentShutdown()
+{
+	Logger& logger = Logger::get("TestLogger.ConcurrentShutdown");
+	AutoPtr<NullChannel> pChannel = new NullChannel;
+	logger.setChannel(pChannel);
+	logger.setLevel(Message::PRIO_INFORMATION);
+
+	std::atomic<bool> stop{false};
+	std::vector<std::thread> threads;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		threads.emplace_back([&logger, &stop]() {
+			while (!stop)
+			{
+				logger.information("message during shutdown");
+			}
+		});
+	}
+
+	for (int i = 0; i < 50; ++i)
+	{
+		Logger::shutdown();
+		logger.setChannel(new NullChannel);
+	}
+
+	stop = true;
+	for (auto& t : threads)
+	{
+		t.join();
+	}
+	Logger::shutdown();
+}
+
+
+
 void LoggerTest::setUp()
 {
 	Logger::shutdown();
@@ -433,6 +507,8 @@ CppUnit::Test* LoggerTest::suite()
 	CppUnit_addTest(pSuite, LoggerTest, testFormatThreadName);
 	CppUnit_addTest(pSuite, LoggerTest, testFormatStdThreadName);
 	CppUnit_addTest(pSuite, LoggerTest, testLoggerRefSurvivesShutdown);
+	CppUnit_addTest(pSuite, LoggerTest, testConcurrentChannelReplacement);
+	CppUnit_addTest(pSuite, LoggerTest, testConcurrentShutdown);
 
 	return pSuite;
 }

@@ -87,7 +87,12 @@ FileChannel::~FileChannel()
 void FileChannel::open()
 {
 	FastMutex::ScopedLock lock(_mutex);
+	unsafeOpen();
+}
 
+
+void FileChannel::unsafeOpen()
+{
 	if (!_pFile)
 	{
 		_pFile = new LogFile(_path);
@@ -122,9 +127,9 @@ void FileChannel::close()
 
 void FileChannel::log(const Message& msg)
 {
-	open();
-
 	FastMutex::ScopedLock lock(_mutex);
+
+	unsafeOpen();
 
 	if (_pRotateStrategy->mustRotate(_pFile))
 	{
