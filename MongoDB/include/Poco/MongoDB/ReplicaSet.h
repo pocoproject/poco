@@ -123,6 +123,8 @@ public:
 
 		Connection::SocketFactory* socketFactory{nullptr};
 			/// Optional socket factory for SSL/TLS connections.
+			/// Called with secure=true and the applicable connect timeout;
+			/// the default SocketFactory does not support secure sockets.
 			/// Can be set via config or later using setSocketFactory().
 			/// Custom factories can access timeout config via ReplicaSet::configuration().
 	};
@@ -233,7 +235,7 @@ public:
 		/// Stops the background monitoring thread.
 
 	void setSocketFactory(Connection::SocketFactory* factory);
-		/// Sets the socket factory for creating connections.
+		/// Sets the socket factory for creating SSL/TLS connections (secure=true).
 		/// The factory can access timeout configuration via configuration().connectTimeoutSeconds
 		/// and configuration().socketTimeoutSeconds.
 		///

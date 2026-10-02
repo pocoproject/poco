@@ -483,7 +483,8 @@ Connection::Ptr ReplicaSet::createConnection(const Net::SocketAddress& address)
 			// Custom factories can be set via Config or using setSocketFactory().
 			// They can access timeout values via configuration().connectTimeoutSeconds
 			// and configuration().socketTimeoutSeconds to properly configure sockets.
-			conn->connect(address.toString(), *factory);
+			conn->connect(factory->createSocket(address.host().toString(), address.port(),
+				Poco::Timespan(static_cast<long>(connectTimeoutSec), 0), true));
 		}
 		else
 		{
@@ -529,7 +530,8 @@ Connection::Ptr ReplicaSet::createConnection(const Net::SocketAddress& address,
 		{
 			// Use custom socket factory (e.g., for SSL/TLS)
 			// Custom factories are responsible for applying their own timeouts.
-			conn->connect(address.toString(), *factory);
+			conn->connect(factory->createSocket(address.host().toString(), address.port(),
+				connectTimeout, true));
 		}
 		else
 		{
@@ -576,7 +578,8 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address)
 		{
 			// Custom factories can be set via Config or using setSocketFactory().
 			// They can access timeout values via configuration() to configure sockets.
-			conn->connect(address.toString(), *factory);
+			conn->connect(factory->createSocket(address.host().toString(), address.port(),
+				Poco::Timespan(static_cast<long>(connectTimeoutSec), 0), true));
 		}
 		else
 		{
