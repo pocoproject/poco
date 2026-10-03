@@ -132,8 +132,10 @@ public:
 			/// The server rejected the username or password for authentication.
 		WS_ERR_PAYLOAD_TOO_BIG                = 10,
 			/// Payload too big for supplied buffer.
-		WS_ERR_INCOMPLETE_FRAME               = 11
+		WS_ERR_INCOMPLETE_FRAME               = 11,
 			/// Incomplete frame received.
+		WS_ERR_CORRUPT_FRAME                  = 12
+			/// Malformed or protocol-violating frame received.
 	};
 
 	WebSocket(HTTPServerRequest& request, HTTPServerResponse& response);
