@@ -30,6 +30,7 @@ public:
 	void testWebSocketNB();
 	void testPeerCloseAfterPartialHeader();
 	void testPeerCloseAfterPartialHeaderNB();
+	void testMalformedFrames();
 
 	void setUp();
 	void tearDown();

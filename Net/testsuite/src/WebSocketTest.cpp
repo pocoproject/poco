@@ -516,6 +516,181 @@ void WebSocketTest::testWebSocketNB()
 }
 
 
+void WebSocketTest::testMalformedFrames()
+{
+	// 1. Test server rejecting unmasked client frame
+	{
+		SingleFrameState::Ptr pState = new SingleFrameState;
+		Poco::Net::ServerSocket ss(0);
+		Poco::Net::HTTPServer server(new SingleFrameRequestHandlerFactory(pState), ss, new Poco::Net::HTTPServerParams);
+		server.start();
+
+		HTTPClientSession cs("127.0.0.1", ss.address().port());
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
+		request.set("Upgrade", "websocket");
+		request.set("Connection", "Upgrade");
+		request.set("Sec-WebSocket-Version", WebSocket::WEBSOCKET_VERSION);
+		request.set("Sec-WebSocket-Key", "dGhlIHNhbXBsZSBub25jZQ==");
+		cs.setKeepAlive(true);
+		cs.sendRequest(request);
+		HTTPResponse response;
+		cs.receiveResponse(response);
+		assertTrue (response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS);
+		Poco::Net::StreamSocket sock = cs.detachSocket();
+		assertTrue (pState->upgraded.tryWait(10000));
+
+		// Unmasked TEXT frame: 0x81, 0x01, 'A'
+		const char unmaskedFrame[] = {'\x81', '\x01', 'A'};
+		sock.sendBytes(unmaskedFrame, sizeof(unmaskedFrame));
+		sock.shutdownSend();
+
+		assertTrue (pState->done.tryWait(10000));
+		assertTrue (pState->received == -1); // Caught WebSocketException
+
+		sock.close();
+		server.stop();
+	}
+
+	// 2. Test server rejecting non-zero RSV bits
+	{
+		SingleFrameState::Ptr pState = new SingleFrameState;
+		Poco::Net::ServerSocket ss(0);
+		Poco::Net::HTTPServer server(new SingleFrameRequestHandlerFactory(pState), ss, new Poco::Net::HTTPServerParams);
+		server.start();
+
+		HTTPClientSession cs("127.0.0.1", ss.address().port());
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
+		request.set("Upgrade", "websocket");
+		request.set("Connection", "Upgrade");
+		request.set("Sec-WebSocket-Version", WebSocket::WEBSOCKET_VERSION);
+		request.set("Sec-WebSocket-Key", "dGhlIHNhbXBsZSBub25jZQ==");
+		cs.setKeepAlive(true);
+		cs.sendRequest(request);
+		HTTPResponse response;
+		cs.receiveResponse(response);
+		assertTrue (response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS);
+		Poco::Net::StreamSocket sock = cs.detachSocket();
+		assertTrue (pState->upgraded.tryWait(10000));
+
+		// RSV1 set (0xC1) with mask: 0xC1, 0x81, mask(4), 'A'
+		const char rsvFrame[] = {'\xC1', '\x81', '\x01', '\x02', '\x03', '\x04', '\x40'};
+		sock.sendBytes(rsvFrame, sizeof(rsvFrame));
+		sock.shutdownSend();
+
+		assertTrue (pState->done.tryWait(10000));
+		assertTrue (pState->received == -1);
+
+		sock.close();
+		server.stop();
+	}
+
+	// 3. Test server rejecting reserved opcode (0x03)
+	{
+		SingleFrameState::Ptr pState = new SingleFrameState;
+		Poco::Net::ServerSocket ss(0);
+		Poco::Net::HTTPServer server(new SingleFrameRequestHandlerFactory(pState), ss, new Poco::Net::HTTPServerParams);
+		server.start();
+
+		HTTPClientSession cs("127.0.0.1", ss.address().port());
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
+		request.set("Upgrade", "websocket");
+		request.set("Connection", "Upgrade");
+		request.set("Sec-WebSocket-Version", WebSocket::WEBSOCKET_VERSION);
+		request.set("Sec-WebSocket-Key", "dGhlIHNhbXBsZSBub25jZQ==");
+		cs.setKeepAlive(true);
+		cs.sendRequest(request);
+		HTTPResponse response;
+		cs.receiveResponse(response);
+		assertTrue (response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS);
+		Poco::Net::StreamSocket sock = cs.detachSocket();
+		assertTrue (pState->upgraded.tryWait(10000));
+
+		// Opcode 3: 0x83, 0x81, mask(4), payload
+		const char opcodeFrame[] = {'\x83', '\x81', '\x01', '\x02', '\x03', '\x04', '\x40'};
+		sock.sendBytes(opcodeFrame, sizeof(opcodeFrame));
+		sock.shutdownSend();
+
+		assertTrue (pState->done.tryWait(10000));
+		assertTrue (pState->received == -1);
+
+		sock.close();
+		server.stop();
+	}
+
+	// 4. Test server rejecting fragmented control frame (PING with FIN=0: 0x09)
+	{
+		SingleFrameState::Ptr pState = new SingleFrameState;
+		Poco::Net::ServerSocket ss(0);
+		Poco::Net::HTTPServer server(new SingleFrameRequestHandlerFactory(pState), ss, new Poco::Net::HTTPServerParams);
+		server.start();
+
+		HTTPClientSession cs("127.0.0.1", ss.address().port());
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
+		request.set("Upgrade", "websocket");
+		request.set("Connection", "Upgrade");
+		request.set("Sec-WebSocket-Version", WebSocket::WEBSOCKET_VERSION);
+		request.set("Sec-WebSocket-Key", "dGhlIHNhbXBsZSBub25jZQ==");
+		cs.setKeepAlive(true);
+		cs.sendRequest(request);
+		HTTPResponse response;
+		cs.receiveResponse(response);
+		assertTrue (response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS);
+		Poco::Net::StreamSocket sock = cs.detachSocket();
+		assertTrue (pState->upgraded.tryWait(10000));
+
+		// Fragmented PING: 0x09, 0x81, mask(4), payload
+		const char fragControlFrame[] = {'\x09', '\x81', '\x01', '\x02', '\x03', '\x04', '\x40'};
+		sock.sendBytes(fragControlFrame, sizeof(fragControlFrame));
+		sock.shutdownSend();
+
+		assertTrue (pState->done.tryWait(10000));
+		assertTrue (pState->received == -1);
+
+		sock.close();
+		server.stop();
+	}
+
+	// 5. Test server rejecting oversized control frame (>125 bytes)
+	{
+		SingleFrameState::Ptr pState = new SingleFrameState;
+		Poco::Net::ServerSocket ss(0);
+		Poco::Net::HTTPServer server(new SingleFrameRequestHandlerFactory(pState), ss, new Poco::Net::HTTPServerParams);
+		server.start();
+
+		HTTPClientSession cs("127.0.0.1", ss.address().port());
+		HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
+		request.set("Upgrade", "websocket");
+		request.set("Connection", "Upgrade");
+		request.set("Sec-WebSocket-Version", WebSocket::WEBSOCKET_VERSION);
+		request.set("Sec-WebSocket-Key", "dGhlIHNhbXBsZSBub25jZQ==");
+		cs.setKeepAlive(true);
+		cs.sendRequest(request);
+		HTTPResponse response;
+		cs.receiveResponse(response);
+		assertTrue (response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS);
+		Poco::Net::StreamSocket sock = cs.detachSocket();
+		assertTrue (pState->upgraded.tryWait(10000));
+
+		// PING with 126 bytes payload (lengthByte = 126 / 0xFE with mask bit): 0x89, 0xFE, 0x00, 0x7E, mask(4)...
+		std::string oversizedPing;
+		oversizedPing.push_back('\x89');
+		oversizedPing.push_back('\xFE');
+		oversizedPing.push_back('\x00');
+		oversizedPing.push_back('\x7E');
+		oversizedPing.append("\x01\x02\x03\x04", 4);
+		oversizedPing.append(126, 'A');
+		sock.sendBytes(oversizedPing.data(), (int) oversizedPing.size());
+		sock.shutdownSend();
+
+		assertTrue (pState->done.tryWait(10000));
+		assertTrue (pState->received == -1);
+
+		sock.close();
+		server.stop();
+	}
+}
+
+
 void WebSocketTest::setUp()
 {
 }
@@ -536,6 +711,8 @@ CppUnit::Test* WebSocketTest::suite()
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketNB);
 	CppUnit_addTest(pSuite, WebSocketTest, testPeerCloseAfterPartialHeader);
 	CppUnit_addTest(pSuite, WebSocketTest, testPeerCloseAfterPartialHeaderNB);
+	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrames);
 
 	return pSuite;
 }
+

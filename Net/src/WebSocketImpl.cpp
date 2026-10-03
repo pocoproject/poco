@@ -214,10 +214,42 @@ int WebSocketImpl::peekHeader(ReceiveState& receiveState)
 
 	Poco::UInt8 flags = static_cast<Poco::UInt8>(header[0]);
 	receiveState.frameFlags = flags;
+
+	if ((flags & (WebSocket::FRAME_FLAG_RSV1 | WebSocket::FRAME_FLAG_RSV2 | WebSocket::FRAME_FLAG_RSV3)) != 0)
+	{
+		throw WebSocketException("Reserved bits (RSV) must be zero", WebSocket::WS_ERR_CORRUPT_FRAME);
+	}
+
+	Poco::UInt8 opcode = (flags & WebSocket::FRAME_OP_BITMASK);
+	bool isControl = ((opcode & WebSocket::FRAME_OP_CLOSE) != 0);
+	if ((!isControl && opcode > WebSocket::FRAME_OP_BINARY) || (isControl && opcode > WebSocket::FRAME_OP_PONG))
+	{
+		throw WebSocketException("Reserved or unknown opcode", WebSocket::WS_ERR_CORRUPT_FRAME);
+	}
+
+	if (isControl && ((flags & WebSocket::FRAME_FLAG_FIN) == 0))
+	{
+		throw WebSocketException("Control frames must not be fragmented", WebSocket::WS_ERR_CORRUPT_FRAME);
+	}
+
 	Poco::UInt8 lengthByte = static_cast<Poco::UInt8>(header[1]);
 	receiveState.useMask = ((lengthByte & FRAME_FLAG_MASK) != 0);
+
+	if (_mustMaskPayload && receiveState.useMask)
+	{
+		throw WebSocketException("Client received masked frame from server", WebSocket::WS_ERR_CORRUPT_FRAME);
+	}
+	else if (!_mustMaskPayload && !receiveState.useMask)
+	{
+		throw WebSocketException("Server received unmasked frame from client", WebSocket::WS_ERR_CORRUPT_FRAME);
+	}
+
 	int maskOffset = 0;
 	lengthByte &= 0x7f;
+	if (isControl && lengthByte > 125)
+	{
+		throw WebSocketException("Control frame payload must not exceed 125 bytes", WebSocket::WS_ERR_CORRUPT_FRAME);
+	}
 	if (lengthByte == 127)
 	{
 		if (n < 10)
