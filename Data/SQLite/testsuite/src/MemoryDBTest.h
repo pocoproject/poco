@@ -37,6 +37,13 @@ public:
 	void testWithoutRowidRejectedViaSession();
 	void testCommentPrefixedWithoutRowidRejected();
 	void testLoadArchivedFalse();
+	void testInsertAfterReopenKeepsSealedRows();
+	void testInsertAfterReopenKeepsSealedRowsAutoincrement();
+	void testInsertAfterReopenKeepsSealedRowsImplicitRowid();
+	void testAutoincrementSequenceSurvivesReopen();
+	void testInsertIntoArchivedRangeRejected();
+	void testEmptiedArchiveRangeIsReused();
+	void testUpsertAfterReopenUpdatesNewestRow();
 	void testIdleFlush();
 	void testCustomShardNamer();
 	void testIndexPreservedAcrossReload();
@@ -73,6 +80,12 @@ public:
 	static CppUnit::Test* suite();
 
 private:
+	void insertAfterReopen(const std::string& columns);
+		/// Seals every row of a table created with the given columns,
+		/// reopens without loading sealed shards, inserts one more row,
+		/// and checks that the sealed rows are all still there and that
+		/// the new row is numbered above them.
+
 	std::string _dir;
 };
 

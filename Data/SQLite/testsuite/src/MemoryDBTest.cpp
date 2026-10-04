@@ -384,6 +384,209 @@ void MemoryDBTest::testLoadArchivedFalse()
 }
 
 
+void MemoryDBTest::insertAfterReopen(const std::string& columns)
+{
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+
+	{
+		MemoryDB db(_dir, off);
+		db << ("CREATE TABLE t(" + columns + ")"), now;
+		std::string v("sealed");
+		for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		db.sealActive();
+		db.flush();
+	} // closed with every row sealed: the active shard holds none of t
+
+	{
+		MemoryDB db(_dir, off);
+		std::string v("added");
+		db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		db.flush();
+
+		// history shows the three sealed rows and the added one, each once
+		db.attachAllArchived();
+		std::string view = db.historyView("t");
+		int total = 0;
+		int sealed = 0;
+		db << ("SELECT count(*) FROM " + view), into(total), now;
+		db << ("SELECT count(*) FROM " + view + " WHERE v = 'sealed'"), into(sealed), now;
+		db.detachAllArchived();
+		assertTrue (sealed == 3);
+		assertTrue (total == 4);
+	}
+
+	MemoryDB::Options on;
+	on.loadArchivedShards = true;
+	MemoryDB db(_dir, on);
+	int total = 0;
+	int distinct = 0;
+	int sealed = 0;
+	int added = 0;
+	Poco::Int64 addedRowid = 0;
+	db << "SELECT count(*), count(DISTINCT rowid) FROM t", into(total), into(distinct), now;
+	db << "SELECT count(*) FROM t WHERE v = 'sealed'", into(sealed), now;
+	db << "SELECT count(*) FROM t WHERE v = 'added'", into(added), now;
+	db << "SELECT rowid FROM t WHERE v = 'added'", into(addedRowid), now;
+	assertTrue (total == 4);
+	assertTrue (distinct == 4);
+	assertTrue (sealed == 3);
+	assertTrue (added == 1);
+	assertTrue (addedRowid == 4); // numbered above the archived rows
+}
+
+
+void MemoryDBTest::testInsertAfterReopenKeepsSealedRows()
+{
+	insertAfterReopen("id INTEGER PRIMARY KEY, v TEXT");
+}
+
+
+void MemoryDBTest::testInsertAfterReopenKeepsSealedRowsAutoincrement()
+{
+	insertAfterReopen("id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT");
+}
+
+
+void MemoryDBTest::testInsertAfterReopenKeepsSealedRowsImplicitRowid()
+{
+	insertAfterReopen("v TEXT");
+}
+
+
+void MemoryDBTest::testAutoincrementSequenceSurvivesReopen()
+{
+	{
+		MemoryDB db(_dir);
+		db << "CREATE TABLE t(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
+		std::string v("first");
+		for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		db << "DELETE FROM t WHERE id = 3", now;
+		db.flush();
+	}
+
+	MemoryDB db(_dir);
+	std::string v("next");
+	db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+	Poco::Int64 id = 0;
+	db << "SELECT id FROM t WHERE v = 'next'", into(id), now;
+	assertTrue (id == 4); // 3 was handed out before, although its row is gone
+}
+
+
+void MemoryDBTest::testInsertIntoArchivedRangeRejected()
+{
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+
+	{
+		MemoryDB db(_dir, off);
+		db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+		std::string v("sealed");
+		for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		db.sealActive();
+		db.flush();
+		std::string a("active");
+		db << "INSERT INTO t(v) VALUES(:v)", use(a), now;
+		db.flush();
+	}
+
+	{
+		MemoryDB db(_dir, off);
+		std::string v("intruder");
+		db << "INSERT INTO t(id, v) VALUES(2, :v)", use(v), now; // id 2 is archived and not in memory
+		try
+		{
+			db.flush();
+			failmsg("a row inserted into an archived range must poison the instance");
+		}
+		catch (Poco::NotImplementedException&)
+		{
+		}
+	}
+
+	MemoryDB::Options on;
+	on.loadArchivedShards = true;
+	MemoryDB db(_dir, on);
+	int total = 0;
+	std::string v;
+	db << "SELECT count(*) FROM t", into(total), now;
+	db << "SELECT v FROM t WHERE id = 2", into(v), now;
+	assertTrue (total == 4);
+	assertTrue (v == "sealed"); // the archived row is untouched
+}
+
+
+void MemoryDBTest::testEmptiedArchiveRangeIsReused()
+{
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+
+	{
+		MemoryDB db(_dir, off);
+		db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+		std::string v("gone");
+		for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		db.sealActive();
+		db.flush();
+		// the sealed rows are still in memory in this run, so they can be deleted
+		db << "DELETE FROM t WHERE id > 0", now;
+		db.flush();
+	}
+
+	{
+		MemoryDB db(_dir, off);
+		std::string v("fresh");
+		db << "INSERT INTO t(v) VALUES(:v)", use(v), now; // rowid 1 again: nothing archived holds it
+		db.flush();
+	}
+
+	MemoryDB::Options on;
+	on.loadArchivedShards = true;
+	MemoryDB db(_dir, on);
+	int total = 0;
+	std::string v;
+	db << "SELECT count(*) FROM t", into(total), now;
+	db << "SELECT v FROM t", into(v), now;
+	assertTrue (total == 1);
+	assertTrue (v == "fresh");
+}
+
+
+void MemoryDBTest::testUpsertAfterReopenUpdatesNewestRow()
+{
+	MemoryDB::Options off;
+	off.loadArchivedShards = false;
+
+	{
+		MemoryDB db(_dir, off);
+		db << "CREATE TABLE a(k TEXT PRIMARY KEY, n INTEGER)", now;
+		db << "INSERT INTO a(k, n) VALUES('x', 1)", now;
+		db << "INSERT INTO a(k, n) VALUES('y', 1)", now;
+		db.sealActive();
+		db.flush();
+	}
+
+	{
+		MemoryDB db(_dir, off);
+		// 'y' is the newest archived row; it is back in the active shard,
+		// so the upsert finds it and its change is saved
+		db << "INSERT INTO a(k, n) VALUES('y', 1) ON CONFLICT(k) DO UPDATE SET n = n + 1", now;
+		db.flush();
+	}
+
+	MemoryDB::Options on;
+	on.loadArchivedShards = true;
+	MemoryDB db(_dir, on);
+	int total = 0;
+	int n = 0;
+	db << "SELECT count(*) FROM a", into(total), now;
+	db << "SELECT n FROM a WHERE k = 'y'", into(n), now;
+	assertTrue (total == 2);
+	assertTrue (n == 2);
+}
+
+
 void MemoryDBTest::testIdleFlush()
 {
 	MemoryDB::Options o;
@@ -1762,6 +1965,13 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testWithoutRowidRejectedViaSession);
 	CppUnit_addTest(pSuite, MemoryDBTest, testCommentPrefixedWithoutRowidRejected);
 	CppUnit_addTest(pSuite, MemoryDBTest, testLoadArchivedFalse);
+	CppUnit_addTest(pSuite, MemoryDBTest, testInsertAfterReopenKeepsSealedRows);
+	CppUnit_addTest(pSuite, MemoryDBTest, testInsertAfterReopenKeepsSealedRowsAutoincrement);
+	CppUnit_addTest(pSuite, MemoryDBTest, testInsertAfterReopenKeepsSealedRowsImplicitRowid);
+	CppUnit_addTest(pSuite, MemoryDBTest, testAutoincrementSequenceSurvivesReopen);
+	CppUnit_addTest(pSuite, MemoryDBTest, testInsertIntoArchivedRangeRejected);
+	CppUnit_addTest(pSuite, MemoryDBTest, testEmptiedArchiveRangeIsReused);
+	CppUnit_addTest(pSuite, MemoryDBTest, testUpsertAfterReopenUpdatesNewestRow);
 	CppUnit_addTest(pSuite, MemoryDBTest, testIdleFlush);
 	CppUnit_addTest(pSuite, MemoryDBTest, testCustomShardNamer);
 	CppUnit_addTest(pSuite, MemoryDBTest, testIndexPreservedAcrossReload);
