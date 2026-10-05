@@ -31,6 +31,13 @@ public:
 		_recvMessageCallback = cb;
 	}
 
+	void setCloseCallback(const CloseCallback& cb)
+		/// Sets the callback that the connections accepted from now on
+		/// call when they close.
+	{
+		_closeCallback = cb;
+	}
+
 private:
 	TCPReactorServerConnection* createServiceHandler(Poco::Net::StreamSocket& socket) override;
 
@@ -42,6 +49,7 @@ private:
 	bool                                        _useSelfReactor;
 	std::shared_ptr<ThreadPool>                 _threadPool;
 	RecvMessageCallback                         _recvMessageCallback;
+	CloseCallback                               _closeCallback;
 	TCPServerParams::Ptr                        _pParams;
 	std::atomic<bool>                           _stopped{false};
 };

@@ -33,6 +33,14 @@ public:
 		/// specific interface — e.g. SocketAddress("127.0.0.1", 9800)
 		/// for a localhost-only service.
 
+	TCPReactorServer(const ServerSocket& socket, TCPServerParams::Ptr pParams);
+		/// Serves the given socket, which must be bound and listening,
+		/// with a single acceptor, whatever number of acceptors the
+		/// parameters name.
+		///
+		/// With a SecureServerSocket the server speaks TLS. Its connections
+		/// should then be non-blocking, see TCPServerParams::setNonBlocking().
+
 	~TCPReactorServer();
 
 	void start();
@@ -45,6 +53,12 @@ public:
 	int port() const { return _port; }
 
 	void setRecvMessageCallback(const RecvMessageCallback& cb);
+
+	void setCloseCallback(const CloseCallback& cb);
+		/// Sets the callback that every connection calls once when it
+		/// closes, on the thread of the reactor that serves it. The buffer
+		/// of the connection still holds what was received and not taken
+		/// out of it. Must be called before start().
 
 private:
 	ThreadPool                                       _threadPool;

@@ -104,8 +104,13 @@ TCPReactorServerConnection* TCPReactorAcceptor::createServiceHandler(Poco::Net::
 	{
 		socket.setSendTimeout(sendTimeout);
 	}
+	if (_pParams->getNonBlocking())
+	{
+		socket.setBlocking(false);
+	}
 	auto tmpConnPtr = std::make_shared<TCPReactorServerConnection>(socket, reactor());
 	tmpConnPtr->setRecvMessageCallback(_recvMessageCallback);
+	tmpConnPtr->setCloseCallback(_closeCallback);
 	tmpConnPtr->setMaxPendingRequestSize(_pParams->getMaxPendingRequestSize());
 	tmpConnPtr->initialize();
 	return tmpConnPtr.get();
