@@ -97,9 +97,18 @@ class SQLite_API MemoryDB
 	///     Utility::THREAD_MODE_MULTI connections have no mutex, so the statement-boundary
 	///     snapshots used by historyView() and virtual-table persistence could not be
 	///     guaranteed; the constructor throws Poco::NotImplementedException in that mode.
-	///   * The sharding scheme is most efficient when older data stops changing; correctness
-	///     is preserved if it does not, but modifying rows in many sealed shards causes those
-	///     shards to be rewritten.
+	///   * The sharding scheme is most efficient when older data stops changing. Rows of a
+	///     sealed shard can be changed while they are in memory (the shard was sealed in
+	///     this run, or loadArchivedShards is set); the shard is then rewritten. Rows of a
+	///     sealed shard that is not in memory are out of reach, and a row inserted into
+	///     the rowid range of such a shard cannot be saved: the insert poisons the
+	///     instance, as a WITHOUT ROWID table does.
+	///   * Rowids continue above the archived rows after a reopen. For an AUTOINCREMENT
+	///     table the sequence is stored with the catalog. For any other table that has
+	///     no row left in the active shard, the newest archived row is moved back into
+	///     the active shard at open, so that SQLite numbers the next row above it. A
+	///     table that is emptied and filled again reuses rowids; declare its key
+	///     AUTOINCREMENT if it is to be archived.
 	///   * Do not run the VACUUM command against the database (see PRAGMA notes in the docs);
 	///     it can renumber rowids and break shard ownership.
 	///   * Total shard count is capped at sqlite3_limit(SQLITE_LIMIT_ATTACHED) on the
@@ -404,7 +413,19 @@ private:
 		int             schemaVersion = 0;
 		Poco::UInt64    bytes = 0;    // size of the file as last written
 		bool            dirty = false;
+		bool            resident = true; // its rows are in the in-memory database
 		std::map<std::string, std::pair<Poco::Int64, Poco::Int64> > ranges; // table -> (lo, hi]
+	};
+
+	struct MovedRow
+	{
+		std::string  file;       // the sealed shard file the row was archived in
+		std::string  table;
+		Poco::Int64  rowid = 0;
+		Poco::Int64  hi = 0;     // the upper bound of that shard's range before the row left it
+		Poco::UInt32 shard = 0;  // the shard the row is in now
+		bool         saved = false; // that shard was written with the row, and the catalog
+		                            // that says so is being committed
 	};
 
 	// SQLite C callbacks (trampolines -> instance methods)
@@ -431,7 +452,23 @@ private:
 	void startFresh();
 	void registerHooks();
 	void doFlush(bool allowSeal = true);
-	void writeCatalog(int schemaVersion, const std::vector<std::string>& schemaLog);
+	void writeCatalog(int schemaVersion, const std::vector<std::string>& schemaLog,
+		const std::map<std::string, Poco::Int64>* pSequences = nullptr);
+		// pSequences: the AUTOINCREMENT sequences to store; null leaves the stored ones as they are.
+		// A sealed shard a row was moved out of is recorded with the range it had
+		// before, until the shard the row is in now has been written: the catalog
+		// never says that a row has left a shard before it is saved elsewhere.
+	void restoreSequences();
+		// load(): puts the AUTOINCREMENT sequences back, never below a rowid in use
+	void unsealNewestRows();
+		// load(): for a table without AUTOINCREMENT that has no row left in the
+		// active shard, moves its newest archived row back into the active shard
+	void purgeMovedRows(const std::vector<MovedRow>& rows);
+		// removes rows unsealNewestRows() moved, and a flush has saved, from their
+		// sealed shard files; caller holds _flushMutex
+	[[nodiscard]] bool sampleSequences(std::map<std::string, Poco::Int64>& sequences);
+		// false when no table is declared AUTOINCREMENT
+	[[nodiscard]] bool isAutoincrement(const std::string& table);
 	std::string buildHistoryView(const std::string& table, const std::vector<Poco::UInt32>& shardIds);
 	void maybeSeal(const std::vector<std::string>& tables,
 		const std::map<std::string, Poco::Int64>& maxRowids); // caller holds _stateMutex
@@ -487,6 +524,9 @@ private:
 	sqlite3*                   _memHandle = nullptr;
 
 	std::vector<ShardInfo>     _shards;
+	std::vector<MovedRow>      _movedRows;    // moved into the active shard at open and not saved
+	                                          // there yet; removed from their sealed files once a
+	                                          // flush has saved them
 	int                        _schemaVersion = 0;
 	std::vector<std::string>   _schemaLog;    // ddl statements, index == version-1
 	Poco::UInt32               _nextShardId = 1;
