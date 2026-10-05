@@ -30,6 +30,19 @@ public:
 	void testOldBSD();
 	void testStructuredData();
 	void testBSDWithoutTimestamp();
+	void testTCPOctetCounting();
+	void testTCPNewline();
+	void testTCPMixedFraming();
+	void testTCPSplitFrames();
+	void testTCPCoalescedFrames();
+	void testTCPOversize();
+	void testTCPGarbage();
+	void testTCPUnterminated();
+	void testTCPManyConnections();
+	void testTCPOpenTwice();
+	void testTCPTwoSockets();
+	void testTCPCloseWithClients();
+	void testTCPPort();
 
 	void setUp();
 	void tearDown();
