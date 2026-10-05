@@ -20,7 +20,8 @@ objects = AcceptCertificateHandler RejectCertificateHandler ConsoleCertificateHa
 	SecureSocketImpl SecureStreamSocket SecureStreamSocketImpl \
 	SSLException SSLManager Utility VerificationErrorArgs \
 	X509Certificate Session SecureSMTPClientSession \
-	FTPSClientSession FTPSStreamFactory
+	FTPSClientSession FTPSStreamFactory \
+	SecureRemoteSyslogChannel SecureRemoteSyslogListener
 
 target         = PocoNetSSL
 target_version = $(LIBVERSION)
