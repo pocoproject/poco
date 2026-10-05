@@ -80,7 +80,7 @@ public:
 		///       binding to the same port number.
 		///     * threads: The number of parser threads processing
 		///       received syslog messages. Defaults to 1. A maximum
-		///       of 16 threads is supported.
+		///       of 15 threads is supported.
 		///     * buffer: The UDP socket receive buffer size in bytes. If not
 		///       specified, the system default is used.
 
