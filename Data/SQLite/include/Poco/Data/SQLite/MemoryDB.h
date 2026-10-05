@@ -419,9 +419,13 @@ private:
 
 	struct MovedRow
 	{
-		std::string file;        // the sealed shard file the row was archived in
-		std::string table;
-		Poco::Int64 rowid = 0;
+		std::string  file;       // the sealed shard file the row was archived in
+		std::string  table;
+		Poco::Int64  rowid = 0;
+		Poco::Int64  hi = 0;     // the upper bound of that shard's range before the row left it
+		Poco::UInt32 shard = 0;  // the shard the row is in now
+		bool         saved = false; // that shard was written with the row, and the catalog
+		                            // that says so is being committed
 	};
 
 	// SQLite C callbacks (trampolines -> instance methods)
@@ -450,15 +454,18 @@ private:
 	void doFlush(bool allowSeal = true);
 	void writeCatalog(int schemaVersion, const std::vector<std::string>& schemaLog,
 		const std::map<std::string, Poco::Int64>* pSequences = nullptr);
-		// pSequences: the AUTOINCREMENT sequences to store; null leaves the stored ones as they are
+		// pSequences: the AUTOINCREMENT sequences to store; null leaves the stored ones as they are.
+		// A sealed shard a row was moved out of is recorded with the range it had
+		// before, until the shard the row is in now has been written: the catalog
+		// never says that a row has left a shard before it is saved elsewhere.
 	void restoreSequences();
 		// load(): puts the AUTOINCREMENT sequences back, never below a rowid in use
 	void unsealNewestRows();
 		// load(): for a table without AUTOINCREMENT that has no row left in the
 		// active shard, moves its newest archived row back into the active shard
-	void purgeMovedRows();
-		// removes the rows unsealNewestRows() moved from their sealed shard files;
-		// caller holds _flushMutex
+	void purgeMovedRows(const std::vector<MovedRow>& rows);
+		// removes rows unsealNewestRows() moved, and a flush has saved, from their
+		// sealed shard files; caller holds _flushMutex
 	[[nodiscard]] bool sampleSequences(std::map<std::string, Poco::Int64>& sequences);
 		// false when no table is declared AUTOINCREMENT
 	[[nodiscard]] bool isAutoincrement(const std::string& table);
@@ -517,8 +524,9 @@ private:
 	sqlite3*                   _memHandle = nullptr;
 
 	std::vector<ShardInfo>     _shards;
-	std::vector<MovedRow>      _movedRows;    // moved into the active shard at open; removed from
-	                                          // their sealed files once a flush has saved them
+	std::vector<MovedRow>      _movedRows;    // moved into the active shard at open and not saved
+	                                          // there yet; removed from their sealed files once a
+	                                          // flush has saved them
 	int                        _schemaVersion = 0;
 	std::vector<std::string>   _schemaLog;    // ddl statements, index == version-1
 	Poco::UInt32               _nextShardId = 1;

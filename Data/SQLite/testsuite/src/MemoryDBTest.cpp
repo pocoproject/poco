@@ -474,6 +474,91 @@ void MemoryDBTest::testAutoincrementSequenceSurvivesReopen()
 }
 
 
+void MemoryDBTest::testAutoincrementSequenceSavedWhileWriting()
+{
+	MemoryDB::Options options;
+	options.idleInterval = Timespan(3600, 0);    // no flush but those asked for here
+	options.maxFlushInterval = Timespan(0);
+	MemoryDB db(_dir, options);
+	db << "CREATE TABLE t(id INTEGER PRIMARY KEY AUTOINCREMENT, v TEXT)", now;
+	db.flush();
+
+	// One thread hands out a key and deletes its row again, while this one
+	// flushes. Whenever a flush leaves nothing to be saved, the catalog knows
+	// of every key handed out so far: were the program to end there, none of
+	// them would be handed out again.
+	std::atomic<Poco::Int64> issued(0);
+	std::atomic<int> asked(0);
+	std::atomic<int> answered(0);
+	std::atomic<bool> stop(false);
+	std::atomic<bool> failed(false);
+
+	struct Writer
+	{
+		~Writer()
+		{
+			stop = true;
+			if (thread.joinable()) thread.join();
+		}
+
+		std::atomic<bool>& stop;
+		std::thread thread;
+	} writer{stop, std::thread([&]
+	{
+		int seen = 0;
+		while (!stop)
+		{
+			const int wanted = asked.load();
+			if (wanted == seen)
+			{
+				std::this_thread::yield();
+				continue;
+			}
+			seen = wanted;
+			try
+			{
+				std::string v("gone at once");
+				db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+				Poco::Int64 id = 0;
+				db << "SELECT last_insert_rowid()", into(id), now;
+				db << "DELETE FROM t WHERE id = :id", use(id), now;
+				issued = id;
+			}
+			catch (...)
+			{
+				failed = true;
+			}
+			answered = seen;
+		}
+	})};
+
+	const std::string manifest = Poco::Path(_dir, "manifest.db").toString();
+	const int rounds = 200;
+	for (int round = 1; round <= rounds; ++round)
+	{
+		asked = round;
+		db.flush();
+
+		const Poco::Timestamp waiting;
+		while (answered.load() != round && waiting.elapsed() < 30*Timespan::SECONDS) std::this_thread::yield();
+		assertTrue (answered.load() == round);
+		assertTrue (!failed);
+
+		// what the flush that ran beside the writer did not save, the next one does
+		for (int i = 0; i < 10 && db.dirty(); ++i) db.flush();
+		assertTrue (!db.dirty());
+
+		Poco::Int64 stored = 0;
+		{
+			Poco::Data::Session catalog(Poco::Data::SQLite::Connector::KEY, manifest);
+			catalog << "SELECT IFNULL(MAX(seq), 0) FROM sequences WHERE tbl = 't'", into(stored), now;
+		}
+		assertTrue (stored >= issued.load());
+	}
+	assertTrue (issued.load() == rounds);
+}
+
+
 void MemoryDBTest::testInsertIntoArchivedRangeRejected()
 {
 	MemoryDB::Options off;
@@ -584,6 +669,179 @@ void MemoryDBTest::testUpsertAfterReopenUpdatesNewestRow()
 	db << "SELECT n FROM a WHERE k = 'y'", into(n), now;
 	assertTrue (total == 2);
 	assertTrue (n == 2);
+}
+
+
+namespace
+{
+	MemoryDB::Options activeOnly(const bool& blocked)
+		/// Options with which only the active shard is in memory, and with
+		/// which a shard that has no file yet cannot be written while
+		/// blocked is set: its file is named into a directory there is
+		/// none of. A shard that has its file keeps it and is written.
+	{
+		MemoryDB::Options options;
+		options.loadArchivedShards = false;
+		options.shardNamer = [&blocked](Poco::UInt32 id, const Poco::Timestamp&)
+		{
+			std::string name = "shard-" + Poco::NumberFormatter::format0(static_cast<unsigned>(id), 6) + ".db";
+			return blocked ? "no-such-directory/" + name : name;
+		};
+		return options;
+	}
+}
+
+
+void MemoryDBTest::testMovedRowSurvivesFailedFlush()
+{
+	bool blocked = false;
+	const MemoryDB::Options off = activeOnly(blocked);
+	MemoryDB::Options on;
+	on.loadArchivedShards = true;
+
+	{
+		MemoryDB db(_dir, off);
+		db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+		std::string v("sealed");
+		for (int i = 0; i < 3; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		db.flush();
+
+		// the shard is sealed and saved; the active one that follows it is not
+		blocked = true;
+		db.sealActive();
+		try
+		{
+			db.flush();
+			failmsg("the new active shard has nowhere to be written");
+		}
+		catch (Poco::IOException&)
+		{
+		}
+	}
+
+	{
+		// Row 3, the newest archived one, comes back into the active shard,
+		// which still cannot be written: the row is saved nowhere but in the
+		// sealed shard, while the catalog can be written all along.
+		MemoryDB db(_dir, off);
+		int inMemory = 0;
+		db << "SELECT count(*) FROM t", into(inMemory), now;
+		assertTrue (inMemory == 1);
+		assertTrue (db.dirty());
+		try
+		{
+			db.flush();
+			failmsg("the active shard has nowhere to be written");
+		}
+		catch (Poco::IOException&)
+		{
+		}
+	}
+
+	// the program ended there: no row is lost
+	{
+		MemoryDB db(_dir, on);
+		int total = 0;
+		db << "SELECT count(*) FROM t", into(total), now;
+		assertTrue (total == 3);
+	}
+
+	// and when the active shard can be written, the row is saved with it,
+	// once, and its rowid is not given out again
+	blocked = false;
+	{
+		MemoryDB db(_dir, off);
+		assertTrue (!db.dirty());
+		std::string v("next");
+		db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		Poco::Int64 id = 0;
+		db << "SELECT id FROM t WHERE v = 'next'", into(id), now;
+		assertTrue (id == 4);
+		db.flush();
+	}
+	MemoryDB db(_dir, on);
+	int total = 0;
+	int distinct = 0;
+	int sealed = 0;
+	db << "SELECT count(*) FROM t", into(total), now;
+	db << "SELECT count(DISTINCT id) FROM t", into(distinct), now;
+	db << "SELECT count(*) FROM t WHERE v = 'sealed'", into(sealed), now;
+	assertTrue (total == 4);
+	assertTrue (distinct == 4);
+	assertTrue (sealed == 3);
+}
+
+
+void MemoryDBTest::testMovedRowSurvivesCatalogWriteBeforeFlush()
+{
+	bool blocked = false;
+	const MemoryDB::Options off = activeOnly(blocked);
+	MemoryDB::Options on;
+	on.loadArchivedShards = true;
+
+	{
+		MemoryDB db(_dir, off);
+		db << "CREATE TABLE t(id INTEGER PRIMARY KEY, v TEXT)", now;
+		std::string v("older");
+		for (int i = 0; i < 2; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		db.sealActive();
+		db.flush();
+		v = "newer";
+		for (int i = 0; i < 2; ++i) db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		db.flush();
+
+		blocked = true;
+		db.sealActive();
+		try
+		{
+			db.flush();
+			failmsg("the new active shard has nowhere to be written");
+		}
+		catch (Poco::IOException&)
+		{
+		}
+	}
+
+	{
+		// row 4 is back in the active shard, which cannot be written
+		MemoryDB db(_dir, off);
+		std::vector<Poco::UInt32> ids = db.archivedShardIds();
+		assertTrue (ids.size() == 2);
+		assertTrue (db.dirty());
+
+		// deleting the older shard writes the catalog, with no flush
+		db.deleteShard(ids[0]);
+		assertTrue (db.archivedShardIds().size() == 1);
+	}
+
+	// the program ended there: row 4 is not lost with the catalog as it is now
+	{
+		MemoryDB db(_dir, on);
+		int total = 0;
+		int newer = 0;
+		db << "SELECT count(*) FROM t", into(total), now;
+		db << "SELECT count(*) FROM t WHERE v = 'newer'", into(newer), now;
+		assertTrue (total == 2);
+		assertTrue (newer == 2);
+	}
+
+	blocked = false;
+	{
+		MemoryDB db(_dir, off);
+		std::string v("next");
+		db << "INSERT INTO t(v) VALUES(:v)", use(v), now;
+		Poco::Int64 id = 0;
+		db << "SELECT id FROM t WHERE v = 'next'", into(id), now;
+		assertTrue (id == 5);
+		db.flush();
+	}
+	MemoryDB db(_dir, on);
+	int total = 0;
+	int distinct = 0;
+	db << "SELECT count(*) FROM t", into(total), now;
+	db << "SELECT count(DISTINCT id) FROM t", into(distinct), now;
+	assertTrue (total == 3);
+	assertTrue (distinct == 3);
 }
 
 
@@ -1969,9 +2227,12 @@ CppUnit::Test* MemoryDBTest::suite()
 	CppUnit_addTest(pSuite, MemoryDBTest, testInsertAfterReopenKeepsSealedRowsAutoincrement);
 	CppUnit_addTest(pSuite, MemoryDBTest, testInsertAfterReopenKeepsSealedRowsImplicitRowid);
 	CppUnit_addTest(pSuite, MemoryDBTest, testAutoincrementSequenceSurvivesReopen);
+	CppUnit_addTest(pSuite, MemoryDBTest, testAutoincrementSequenceSavedWhileWriting);
 	CppUnit_addTest(pSuite, MemoryDBTest, testInsertIntoArchivedRangeRejected);
 	CppUnit_addTest(pSuite, MemoryDBTest, testEmptiedArchiveRangeIsReused);
 	CppUnit_addTest(pSuite, MemoryDBTest, testUpsertAfterReopenUpdatesNewestRow);
+	CppUnit_addTest(pSuite, MemoryDBTest, testMovedRowSurvivesFailedFlush);
+	CppUnit_addTest(pSuite, MemoryDBTest, testMovedRowSurvivesCatalogWriteBeforeFlush);
 	CppUnit_addTest(pSuite, MemoryDBTest, testIdleFlush);
 	CppUnit_addTest(pSuite, MemoryDBTest, testCustomShardNamer);
 	CppUnit_addTest(pSuite, MemoryDBTest, testIndexPreservedAcrossReload);

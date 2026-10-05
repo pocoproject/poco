@@ -41,9 +41,12 @@ public:
 	void testInsertAfterReopenKeepsSealedRowsAutoincrement();
 	void testInsertAfterReopenKeepsSealedRowsImplicitRowid();
 	void testAutoincrementSequenceSurvivesReopen();
+	void testAutoincrementSequenceSavedWhileWriting();
 	void testInsertIntoArchivedRangeRejected();
 	void testEmptiedArchiveRangeIsReused();
 	void testUpsertAfterReopenUpdatesNewestRow();
+	void testMovedRowSurvivesFailedFlush();
+	void testMovedRowSurvivesCatalogWriteBeforeFlush();
 	void testIdleFlush();
 	void testCustomShardNamer();
 	void testIndexPreservedAcrossReload();

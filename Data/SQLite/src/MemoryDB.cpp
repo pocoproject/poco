@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cctype>
+#include <iterator>
 #include <set>
 
 // Table classification is built on PRAGMA table_list (SQLite 3.37),
@@ -920,12 +921,17 @@ void MemoryDB::unsealNewestRows()
 			}
 			ss << "DETACH DATABASE mem", now;
 
-			r->second.second = newest - 1;
+			// In memory the row is the active shard's from here on. On disk
+			// it is the sealed shard's until the active shard has been
+			// written with it: writeCatalog() goes by what is noted here.
 			MovedRow moved;
 			moved.file = s.file;
 			moved.table = t;
 			moved.rowid = newest;
+			moved.hi = r->second.second;
+			if (ShardInfo* a = activeShard()) moved.shard = a->id;
 			_movedRows.push_back(moved);
+			r->second.second = newest - 1;
 			changed = true;
 			break;
 		}
@@ -939,22 +945,18 @@ void MemoryDB::unsealNewestRows()
 }
 
 
-void MemoryDB::purgeMovedRows()
+void MemoryDB::purgeMovedRows(const std::vector<MovedRow>& rows)
 {
-	std::vector<MovedRow> rows;
-	{
-		Poco::FastMutex::ScopedLock l(_stateMutex);
-		rows.swap(_movedRows);
-	}
-
-	// The rows are saved in the active shard by now. What is left of them in the
-	// sealed files lies outside those shards' ranges and is read by nothing, so
-	// a failure here costs only the space.
+	// The rows are saved in the shard they are in now, and the catalog says so.
+	// What is left of them in the sealed files lies outside those shards' ranges
+	// and is read by nothing, so a failure here costs only the space.
 	for (const auto& r: rows)
 	{
 		try
 		{
-			Session ss(Connector::KEY, Poco::Path(_dir, r.file).toString());
+			std::string path = Poco::Path(_dir, r.file).toString();
+			if (!Poco::File(path).exists()) continue; // the shard was deleted since
+			Session ss(Connector::KEY, path);
 			Poco::Int64 rowid = r.rowid;
 			ss << ("DELETE FROM " + quoteIdent(r.table) + " WHERE rowid = ?"), use(rowid), now;
 		}
@@ -1392,6 +1394,21 @@ void MemoryDB::writeCatalog(int schemaVersion, const std::vector<std::string>& s
 		Poco::FastMutex::ScopedLock l(_stateMutex);
 		snapshot = _shards;
 		nextId = _nextShardId;
+
+		// A row that was moved out of a sealed shard is in memory only until
+		// the shard it is in now has been written. Until then the catalog
+		// keeps the range the sealed shard had: were the program to end, the
+		// row would be found where it still is.
+		for (const auto& m: _movedRows)
+		{
+			if (m.saved) continue;
+			for (auto& s: snapshot)
+			{
+				if (!s.sealed || s.file != m.file) continue;
+				auto r = s.ranges.find(m.table);
+				if (r != s.ranges.end() && r->second.second < m.hi) r->second.second = m.hi;
+			}
+		}
 	}
 
 	_catalog.begin();
@@ -2241,11 +2258,6 @@ void MemoryDB::doFlush(bool allowSeal)
 	std::vector<std::string> vtabs = virtualTables(_persist);
 	std::map<std::string, Poco::Int64> maxRowids;
 	for (const auto& t: tables) maxRowids[t] = maxRowid(t);
-	// sqlite_sequence is not a user table and is in no shard; the catalog keeps
-	// it, so that an AUTOINCREMENT key goes on above the archived rows after a
-	// reopen.
-	std::map<std::string, Poco::Int64> sequences;
-	(void) sampleSequences(sequences);
 
 	struct Slice { std::string table; Poco::Int64 lo; Poco::Int64 hi; bool open; };
 	struct Plan { std::size_t idx; std::string finalName; std::vector<Slice> slices; bool copyVtabs = false; };
@@ -2397,6 +2409,8 @@ void MemoryDB::doFlush(bool allowSeal)
 	}
 
 	// write the catalog (single transaction = the durable commit point)
+	std::vector<MovedRow> savedRows;
+	bool committed = false;
 	try
 	{
 		// fold IO results into shard state under the lock first, so the catalog reflects it
@@ -2410,13 +2424,52 @@ void MemoryDB::doFlush(bool allowSeal)
 			}
 			for (const auto& r: newRanges)
 				_shards[r.first].ranges = r.second;
+
+			// A row that was moved out of a sealed shard is saved once the
+			// shard it is in now was written; this catalog may then say that
+			// it has left the sealed one. Room for those rows is made here,
+			// so that nothing can fail once the catalog is committed.
+			savedRows.reserve(_movedRows.size());
+			for (auto& m: _movedRows)
+			{
+				for (const auto& w: written)
+					if (_shards[w.first].id == m.shard) { m.saved = true; break; }
+			}
 		}
+
+		// sqlite_sequence is not a user table and is in no shard; the catalog
+		// keeps it, so that an AUTOINCREMENT key goes on above the archived rows
+		// after a reopen. It is read here, after the plan above has taken the
+		// shards' dirty marks: a key that is handed out from now on marks its
+		// shard dirty again, and the flush that follows saves the sequence. Read
+		// before the plan, a key handed out and deleted again in between would
+		// leave nothing dirty and a catalog that does not know of it.
+		std::map<std::string, Poco::Int64> sequences;
+		(void) sampleSequences(sequences);
 		writeCatalog(schemaVersion, schemaLog, &sequences);
+		committed = true;
 	}
 	catch (...)
 	{
 		ok = false;
 	}
+	{
+		Poco::FastMutex::ScopedLock l(_stateMutex);
+		if (committed)
+		{
+			// what the catalog says is saved needs no more keeping track of
+			auto firstSaved = std::partition(_movedRows.begin(), _movedRows.end(),
+				[](const MovedRow& m) { return !m.saved; });
+			std::move(firstSaved, _movedRows.end(), std::back_inserter(savedRows));
+			_movedRows.erase(firstSaved, _movedRows.end());
+		}
+		else
+		{
+			// the catalog does not say that any of them is saved
+			for (auto& m: _movedRows) m.saved = false;
+		}
+	}
+	purgeMovedRows(savedRows);
 
 	// Detect tables that appeared between the initial userTables() sample
 	// (line above, outside _stateMutex - the trace-hook A/B inversion forces
@@ -2467,8 +2520,6 @@ void MemoryDB::doFlush(bool allowSeal)
 
 	if (!ok)
 		throw Poco::IOException("MemoryDB flush failed");
-
-	purgeMovedRows();
 
 	// Always run enforceRetention: the SQLITE_LIMIT_ATTACHED backstop on
 	// total shard count is unconditional, and age/bytes retention (if
