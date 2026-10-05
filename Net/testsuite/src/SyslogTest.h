@@ -43,6 +43,14 @@ public:
 	void testTCPTwoSockets();
 	void testTCPCloseWithClients();
 	void testTCPPort();
+	void testTCPChannel();
+	void testTCPChannelToListener();
+	void testTCPChannelReconnect();
+	void testTCPChannelServerClosed();
+	void testTCPChannelResend();
+	void testTCPChannelServerAway();
+	void testTCPChannelSwitchTransport();
+	void testTCPChannelProperties();
 
 	void setUp();
 	void tearDown();
