@@ -17,7 +17,11 @@
 #include "Poco/Thread.h"
 #include "Poco/Message.h"
 #include "Poco/AutoPtr.h"
+#include <chrono>
+#include <condition_variable>
 #include <list>
+#include <mutex>
+#include <vector>
 
 
 using namespace Poco::Net;
@@ -108,6 +112,44 @@ void CachingChannel::getMessages(std::vector<Poco::Message>& msg, int offset, in
 		msg.push_back(*it);
 		++it;
 	}
+}
+
+
+namespace
+{
+	class CollectingChannel: public Poco::Channel
+		/// Keeps the messages logged to it in the order of their arrival
+		/// and lets a test wait for them.
+	{
+	public:
+		void log(const Poco::Message& msg) override
+		{
+			{
+				std::lock_guard<std::mutex> lock(_mutex);
+				_messages.push_back(msg);
+			}
+			_arrived.notify_all();
+		}
+
+		bool waitFor(std::size_t count, int milliseconds = 10000)
+			/// Waits until count messages have arrived.
+			/// Returns false if they have not within the given time.
+		{
+			std::unique_lock<std::mutex> lock(_mutex);
+			return _arrived.wait_for(lock, std::chrono::milliseconds(milliseconds), [this, count] { return _messages.size() >= count; });
+		}
+
+		std::vector<Poco::Message> messages() const
+		{
+			std::lock_guard<std::mutex> lock(_mutex);
+			return _messages;
+		}
+
+	private:
+		std::vector<Poco::Message> _messages;
+		mutable std::mutex _mutex;
+		std::condition_variable _arrived;
+	};
 }
 
 
@@ -286,6 +328,27 @@ void SyslogTest::testStructuredData()
 }
 
 
+void SyslogTest::testBSDWithoutTimestamp()
+{
+	// A BSD message may come without a timestamp, the host name first.
+	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(0);
+	listener->open();
+	auto pCL = Poco::makeAuto<CollectingChannel>();
+	listener->addChannel(pCL);
+	listener->enqueueMessage("<34>myhost app: text", SocketAddress("127.0.0.1", 514));
+	bool arrived = pCL->waitFor(1);
+	listener->close();
+	assertTrue (arrived);
+	std::vector<Poco::Message> msgs = pCL->messages();
+	assertTrue (msgs.size() == 1);
+	assertTrue (msgs[0].getSource() == "myhost");
+	assertTrue (msgs[0].getText() == "app: text");
+	assertTrue (msgs[0].getPriority() == Poco::Message::PRIO_CRITICAL);
+	assertTrue (msgs[0].get("facility") == "AUTH");
+	assertTrue (msgs[0].get("addr") == "127.0.0.1");
+}
+
+
 void SyslogTest::setUp()
 {
 }
@@ -305,6 +368,7 @@ CppUnit::Test* SyslogTest::suite()
 	CppUnit_addTest(pSuite, SyslogTest, testChannelOpenClose);
 	CppUnit_addTest(pSuite, SyslogTest, testOldBSD);
 	CppUnit_addTest(pSuite, SyslogTest, testStructuredData);
+	CppUnit_addTest(pSuite, SyslogTest, testBSDWithoutTimestamp);
 
 	return pSuite;
 }

@@ -346,6 +346,8 @@ void SyslogParser::parseBSD(const std::string& line, RemoteSyslogChannel::Severi
 					// probably a shortened time value, or the hostname
 					// assume hostName
 					Poco::Message logEntry(line.substr(start, pos-start), line.substr(pos+1), prio);
+					logEntry[RemoteSyslogListener::LOG_PROP_FACILITY] = RemoteSyslogChannel::facilityToString(fac);
+					pos = line.size();
 					message.swap(logEntry);
 					return;
 				}
