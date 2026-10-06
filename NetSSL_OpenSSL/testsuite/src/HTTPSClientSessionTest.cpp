@@ -523,7 +523,6 @@ void HTTPSClientSessionTest::testProxySetters()
 }
 
 
-
 void HTTPSClientSessionTest::testStalledPeerTimeout()
 {
 	// DialogServer accepts the connection and, with no response queued, never writes a byte,
@@ -551,6 +550,7 @@ void HTTPSClientSessionTest::testStalledPeerTimeout()
 	}
 	assertTrue (tsStart.elapsed() < (connectTimeout + requestTimeout).totalMicroseconds());
 }
+
 
 void HTTPSClientSessionTest::setUp()
 {
