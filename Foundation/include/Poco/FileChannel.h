@@ -23,6 +23,8 @@
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
 #include "Poco/Mutex.h"
+#include <atomic>
+#include <memory>
 
 
 namespace Poco {
@@ -176,9 +178,13 @@ public:
 
 	void close() override;
 		/// Closes the FileChannel.
+		///
+		/// The channel can be closed and opened while other threads
+		/// log: a message that finds it closed opens it again.
 
 	void log(const Message& msg) override;
-		/// Logs the given message to the file.
+		/// Logs the given message to the file. A channel that is
+		/// not open is opened first, by a call to open().
 
 	void setProperty(const std::string& name, const std::string& value) override;
 		/// Sets the property with the given name.
@@ -261,6 +267,11 @@ private:
 
 	[[nodiscard]] RotateStrategy* createRotationStrategy(const std::string& rotation, const std::string& times) const;
 	[[nodiscard]] ArchiveStrategy* createArchiveStrategy(const std::string& archive, const std::string& times) const;
+	void unsafeOpen();
+		/// Opens the log file if it is not open. The caller holds the mutex.
+
+	void unsafeSetRotationStrategy(RotateStrategy* strategy);
+		/// Replaces the rotation strategy. The caller holds the mutex.
 
 	std::string      _path;
 	std::string      _times;
@@ -271,11 +282,15 @@ private:
 	std::string      _purgeCount;
 	bool             _flush;
 	bool             _rotateOnOpen;
-	LogFile*         _pFile;
+	std::atomic<LogFile*> _pFile;
 	RotateStrategy*  _pRotateStrategy;
 	ArchiveStrategy* _pArchiveStrategy;
-	PurgeStrategy*   _pPurgeStrategy;
-	FastMutex        _mutex;
+	std::shared_ptr<PurgeStrategy> _pPurgeStrategy;
+	mutable FastMutex _mutex;
+	mutable FastMutex _purgeMutex;
+		/// Guards the purge strategy and the path for purge(), which is
+		/// also called by the thread that compresses archived files.
+		/// It is the last mutex to be taken.
 };
 
 

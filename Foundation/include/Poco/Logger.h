@@ -23,6 +23,8 @@
 #include "Poco/Message.h"
 #include "Poco/Format.h"
 #include "Poco/AutoPtr.h"
+#include "Poco/Mutex.h"
+#include <atomic>
 #include <map>
 #include <vector>
 #include <cstddef>
@@ -88,6 +90,11 @@ public:
 
 	void setChannel(Channel::Ptr pChannel);
 		/// Attaches the given Channel to the Logger.
+		///
+		/// The channel can be replaced while other threads log. A
+		/// message that is on its way to the channel that is replaced
+		/// still gets there, and that channel is released when the
+		/// last such message is through.
 
 	[[nodiscard]] Channel::Ptr getChannel() const;
 		/// Returns the Channel attached to the logger.
@@ -498,9 +505,14 @@ private:
 	void logAlways(const std::string& text, Message::Priority prio);
 	void logAlways(std::string&& text, Message::Priority prio);
 
-	std::string _name;
-	Channel::Ptr _pChannel;
-	int         _level;
+	[[nodiscard]] Channel::Ptr exchangeChannel(Channel::Ptr pChannel);
+		/// Attaches the given Channel and returns the one that was
+		/// attached, for the caller to release where it holds no mutex.
+
+	std::string       _name;
+	Channel::Ptr      _pChannel;
+	std::atomic<int>  _level;
+	mutable FastMutex _channelMutex;
 
 	// definitions in Foundation.cpp
 	static LoggerMapPtr _pLoggerMap;
@@ -724,72 +736,92 @@ inline int Logger::getLevel() const
 
 inline void Logger::log(const std::string& text, Message::Priority prio)
 {
-	if (_level >= prio && _pChannel)
+	if (_level >= prio)
 	{
-		_pChannel->log(Message(_name, text, prio));
+		Channel::Ptr pChannel = getChannel();
+		if (pChannel)
+		{
+			pChannel->log(Message(_name, text, prio));
+		}
 	}
 }
 
 
 inline void Logger::log(std::string&& text, Message::Priority prio)
 {
-	if (_level >= prio && _pChannel)
+	if (_level >= prio)
 	{
-		_pChannel->log(Message(_name, std::move(text), prio));
+		Channel::Ptr pChannel = getChannel();
+		if (pChannel)
+		{
+			pChannel->log(Message(_name, std::move(text), prio));
+		}
 	}
 }
 
 
 inline void Logger::logNPC(const std::string& text, Message::Priority prio)
 {
-	if (_pChannel)
+	Channel::Ptr pChannel = getChannel();
+	if (pChannel)
 	{
-		_pChannel->log(Message(_name, text, prio));
+		pChannel->log(Message(_name, text, prio));
 	}
 }
 
 
 inline void Logger::logNPC(std::string&& text, Message::Priority prio)
 {
-	if (_pChannel)
+	Channel::Ptr pChannel = getChannel();
+	if (pChannel)
 	{
-		_pChannel->log(Message(_name, std::move(text), prio));
+		pChannel->log(Message(_name, std::move(text), prio));
 	}
 }
 
 
 inline void Logger::log(const std::string& text, Message::Priority prio, const char* file, LineNumber line)
 {
-	if (_level >= prio && _pChannel)
+	if (_level >= prio)
 	{
-		_pChannel->log(Message(_name, text, prio, file, line));
+		Channel::Ptr pChannel = getChannel();
+		if (pChannel)
+		{
+			pChannel->log(Message(_name, text, prio, file, line));
+		}
 	}
 }
 
 
 inline void Logger::log(std::string&& text, Message::Priority prio, const char* file, LineNumber line)
 {
-	if (_level >= prio && _pChannel)
+	if (_level >= prio)
 	{
-		_pChannel->log(Message(_name, std::move(text), prio, file, line));
+		Channel::Ptr pChannel = getChannel();
+		if (pChannel)
+		{
+			pChannel->log(Message(_name, std::move(text), prio, file, line));
+		}
 	}
 }
 
 
 inline void Logger::logAlways(const std::string& text, Message::Priority prio)
 {
-	if (_pChannel)
+	Channel::Ptr pChannel = getChannel();
+	if (pChannel)
 	{
-		_pChannel->log(Message(_name, text, prio));
+		pChannel->log(Message(_name, text, prio));
 	}
 }
 
 
 inline void Logger::logAlways(std::string&& text, Message::Priority prio)
 {
-	if (_pChannel)
+	Channel::Ptr pChannel = getChannel();
+	if (pChannel)
 	{
-		_pChannel->log(Message(_name, std::move(text), prio));
+		pChannel->log(Message(_name, std::move(text), prio));
 	}
 }
 

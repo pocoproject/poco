@@ -84,14 +84,18 @@ AsyncChannel::~AsyncChannel()
 
 void AsyncChannel::setChannel(Channel::Ptr pChannel)
 {
-	FastMutex::ScopedLock lock(_channelMutex);
-
-	_pChannel = pChannel;
+	// The channel that is replaced is released when the mutex is free
+	// again: its destructor may log.
+	{
+		FastMutex::ScopedLock lock(_channelMutex);
+		_pChannel.swap(pChannel);
+	}
 }
 
 
 Channel::Ptr AsyncChannel::getChannel() const
 {
+	FastMutex::ScopedLock lock(_channelMutex);
 	return _pChannel;
 }
 
@@ -213,10 +217,10 @@ void AsyncChannel::run()
 	while (nf)
 	{
 		MessageNotification* pNf = dynamic_cast<MessageNotification*>(nf.get());
+		if (pNf)
 		{
-			FastMutex::ScopedLock lock(_channelMutex);
-
-			if (pNf && _pChannel) _pChannel->log(pNf->message());
+			Channel::Ptr pChannel = getChannel();
+			if (pChannel) pChannel->log(pNf->message());
 		}
 		nf = _queue.waitDequeueNotification();
 	}

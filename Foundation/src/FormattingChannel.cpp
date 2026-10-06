@@ -48,41 +48,60 @@ FormattingChannel::~FormattingChannel()
 
 void FormattingChannel::setFormatter(Formatter::Ptr pFormatter)
 {
-	_pFormatter = pFormatter;
+	// The formatter that is replaced is released when the mutex is free
+	// again: its destructor may log.
+	{
+		FastMutex::ScopedLock lock(_mutex);
+		_pFormatter.swap(pFormatter);
+	}
 }
 
 
 Formatter::Ptr FormattingChannel::getFormatter() const
 {
+	FastMutex::ScopedLock lock(_mutex);
 	return _pFormatter;
 }
 
 
 void FormattingChannel::setChannel(Channel::Ptr pChannel)
 {
-	_pChannel = pChannel;
+	// The channel that is replaced is released when the mutex is free
+	// again: its destructor may log.
+	{
+		FastMutex::ScopedLock lock(_mutex);
+		_pChannel.swap(pChannel);
+	}
 }
 
 
 Channel::Ptr FormattingChannel::getChannel() const
 {
+	FastMutex::ScopedLock lock(_mutex);
 	return _pChannel;
 }
 
 
 void FormattingChannel::log(const Message& msg)
 {
-	if (_pChannel)
+	Formatter::Ptr pFormatter;
+	Channel::Ptr pChannel;
 	{
-		if (_pFormatter)
+		FastMutex::ScopedLock lock(_mutex);
+		pFormatter = _pFormatter;
+		pChannel = _pChannel;
+	}
+	if (pChannel)
+	{
+		if (pFormatter)
 		{
 			std::string text;
-			_pFormatter->format(msg, text);
-			_pChannel->log(Message(msg, text));
+			pFormatter->format(msg, text);
+			pChannel->log(Message(msg, text));
 		}
 		else
 		{
-			_pChannel->log(msg);
+			pChannel->log(msg);
 		}
 	}
 }
@@ -94,22 +113,28 @@ void FormattingChannel::setProperty(const std::string& name, const std::string& 
 		setChannel(LoggingRegistry::defaultRegistry().channelForName(value));
 	else if (name == "formatter")
 		setFormatter(LoggingRegistry::defaultRegistry().formatterForName(value));
-	else if (_pChannel)
-		_pChannel->setProperty(name, value);
+	else
+	{
+		Channel::Ptr pChannel = getChannel();
+		if (pChannel)
+			pChannel->setProperty(name, value);
+	}
 }
 
 
 void FormattingChannel::open()
 {
-	if (_pChannel)
-		_pChannel->open();
+	Channel::Ptr pChannel = getChannel();
+	if (pChannel)
+		pChannel->open();
 }
 
 
 void FormattingChannel::close()
 {
-	if (_pChannel)
-		_pChannel->close();
+	Channel::Ptr pChannel = getChannel();
+	if (pChannel)
+		pChannel->close();
 }
 
 
