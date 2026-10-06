@@ -716,6 +716,36 @@ void SyslogTest::testTCPOversize()
 }
 
 
+void SyslogTest::testTCPExactSize()
+{
+	const int maxSize = 256;
+	TCPListener listener(maxSize);
+	StreamSocket socket(listener.address());
+
+	// A message of just the largest size is whole, and is taken when its
+	// end has arrived: the carriage return is of the end, not of the
+	// message. The message before it tells when the listener has seen
+	// all that was sent so far.
+	const std::string text(maxSize - MESSAGE_HEADER.size() - 1, 'a');
+	send(socket, line("before") + message(text) + '\r');
+	assertTrue (listener.pChannel->waitFor(1));
+	send(socket, '\n' + line("after"));
+	assertTrue (listener.pChannel->waitFor(3));
+
+	const std::string whole(maxSize - MESSAGE_HEADER.size(), 'b');
+	send(socket, line(whole));
+	assertTrue (listener.pChannel->waitFor(4));
+	socket.close();
+
+	std::vector<std::string> texts = listener.pChannel->texts();
+	assertTrue (texts.size() == 4);
+	assertTrue (texts[0] == "before");
+	assertTrue (texts[1] == text);
+	assertTrue (texts[2] == "after");
+	assertTrue (texts[3] == whole);
+}
+
+
 void SyslogTest::testTCPGarbage()
 {
 	TCPListener listener;
@@ -1315,6 +1345,7 @@ CppUnit::Test* SyslogTest::suite()
 	CppUnit_addTest(pSuite, SyslogTest, testTCPSplitFrames);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPCoalescedFrames);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPOversize);
+	CppUnit_addTest(pSuite, SyslogTest, testTCPExactSize);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPGarbage);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPUnterminated);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPManyConnections);

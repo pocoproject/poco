@@ -36,6 +36,7 @@ public:
 	void testTCPSplitFrames();
 	void testTCPCoalescedFrames();
 	void testTCPOversize();
+	void testTCPExactSize();
 	void testTCPGarbage();
 	void testTCPUnterminated();
 	void testTCPManyConnections();

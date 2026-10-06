@@ -352,7 +352,8 @@ std::size_t RemoteTCPListener::takeMessages(Connection& connection, const std::s
 			const std::size_t lf = data.find('\n', pos);
 			if (lf == std::string::npos)
 			{
-				if (size - pos < _maxMessageSize) break;
+				// a message of just the largest size may still end with the next octet
+				if (size - pos <= _maxMessageSize) break;
 				enqueue(connection, data, pos, _maxMessageSize);
 				connection.skipLine = true;
 				pos += _maxMessageSize;
