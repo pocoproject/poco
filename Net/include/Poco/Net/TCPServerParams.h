@@ -145,6 +145,31 @@ public:
 		/// The same buffer holds the request body, so the limit must cover the
 		/// largest body the server is expected to accept.
 
+	[[nodiscard]] bool getNonBlocking() const;
+		/// Returns true if the sockets of accepted connections are made
+		/// non-blocking in reactor mode.
+
+	void setNonBlocking(bool nonBlocking);
+		/// Makes the sockets of accepted connections non-blocking (reactor
+		/// mode only).
+		///
+		/// A blocking connection is read once each time its socket becomes
+		/// readable, and again for what a secure socket has taken from the
+		/// network and not yet handed out, since that is not signalled as
+		/// readable again. A handshake or a record that has not arrived in
+		/// full makes a blocking read wait, with every other connection of
+		/// the reactor waiting behind it. A non-blocking connection is read
+		/// as long as there is something to read, up to 16 reads of 4 KB
+		/// for one event and whatever a secure socket holds, and a read
+		/// that cannot be completed returns to the reactor at once.
+		///
+		/// A read callback that writes to the connection must then be
+		/// prepared for sendBytes() to take less than it was given. The
+		/// request handlers of HTTPReactorServer are not, so this is not
+		/// for HTTPReactorServer.
+		///
+		/// Default false.
+
 protected:
 	virtual ~TCPServerParams();
 		/// Destroys the TCPServerParams.
@@ -160,6 +185,7 @@ private:
 	bool _useSelfReactor;
 	Poco::Timespan _sendTimeout;
 	std::size_t _maxPendingRequestSize;
+	bool _nonBlocking;
 };
 
 
@@ -211,6 +237,18 @@ inline std::size_t TCPServerParams::getMaxPendingRequestSize() const
 inline void TCPServerParams::setMaxPendingRequestSize(std::size_t size)
 {
 	_maxPendingRequestSize = size;
+}
+
+
+inline bool TCPServerParams::getNonBlocking() const
+{
+	return _nonBlocking;
+}
+
+
+inline void TCPServerParams::setNonBlocking(bool nonBlocking)
+{
+	_nonBlocking = nonBlocking;
 }
 
 

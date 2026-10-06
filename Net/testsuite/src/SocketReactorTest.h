@@ -41,6 +41,7 @@ public:
 	void testSocketConnectorDeadlock();
 	void testSocketReactorWakeup();
 	void testSocketReactorRemove();
+	void testSocketReactorClose();
 	void testConcurrentHandlerRemoval();
 
 	void setUp();

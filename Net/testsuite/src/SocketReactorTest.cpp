@@ -23,8 +23,10 @@
 #include "Poco/Stopwatch.h"
 #include "Poco/Exception.h"
 #include "Poco/Thread.h"
+#include "Poco/Timespan.h"
 #include <sstream>
 #include <chrono>
+#include <memory>
 
 
 using Poco::Net::SocketReactor;
@@ -460,6 +462,32 @@ namespace
 	};
 
 
+	class ClosingServiceHandler
+		/// Serves a connection until its first data has arrived and then
+		/// lets go of it: its handler is removed and its socket given up.
+	{
+	public:
+		ClosingServiceHandler(const StreamSocket& socket, SocketReactor& reactor):
+			_socket(socket),
+			_reactor(reactor)
+		{
+			_reactor.addEventHandler(_socket, NObserver<ClosingServiceHandler, ReadableNotification>(*this, &ClosingServiceHandler::onReadable));
+		}
+
+		void onReadable(const AutoPtr<ReadableNotification>& pNf)
+		{
+			char buffer[64];
+			(void) _socket.receiveBytes(buffer, sizeof(buffer));
+			_reactor.removeEventHandler(_socket, NObserver<ClosingServiceHandler, ReadableNotification>(*this, &ClosingServiceHandler::onReadable));
+			_socket = StreamSocket();
+		}
+
+	private:
+		StreamSocket   _socket;
+		SocketReactor& _reactor;
+	};
+
+
 	// Handler that aggressively queries and modifies reactor from within notifications
 	// Tests the NotificationCenter deadlock fix by calling removeEventHandler while
 	// holding Observer mutex, concurrent with other threads adding/removing handlers
@@ -807,6 +835,38 @@ void SocketReactorTest::testSocketReactorRemove()
 }
 
 
+void SocketReactorTest::testSocketReactorClose()
+{
+	// A reactor with a socket to watch and nothing to do: it polls again
+	// only after a long time.
+	SocketReactor reactor(Poco::Timespan(60, 0));
+	ServerSocket ss(SocketAddress("127.0.0.1", 0));
+	reactor.addEventHandler(ss, NObserver<SocketReactorTest, ReadableNotification>(*this, &SocketReactorTest::onReadable));
+
+	StreamSocket sock(ss.address());
+	std::unique_ptr<ClosingServiceHandler> pHandler;
+	{
+		StreamSocket accepted = ss.acceptConnection();
+		pHandler = std::make_unique<ClosingServiceHandler>(accepted, reactor);
+	}
+	Thread thread;
+	thread.start(reactor);
+
+	// The handler lets go of the connection with the first data. The other
+	// side sees the end of the connection when that is done, and does not
+	// have to wait for the reactor to poll again.
+	sock.sendBytes("x", 1);
+	bool ended = sock.poll(Poco::Timespan(10, 0), Poco::Net::Socket::SELECT_READ);
+	char buffer[8];
+	int n = ended ? sock.receiveBytes(buffer, sizeof(buffer)) : -1;
+
+	reactor.stop();
+	thread.join();
+	assertTrue (ended);
+	assertTrue (n == 0);
+}
+
+
 void SocketReactorTest::testConcurrentHandlerRemoval()
 {
 	// This test specifically exercises the NotificationCenter deadlock fix
@@ -943,6 +1003,7 @@ CppUnit::Test* SocketReactorTest::suite()
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketConnectorDeadlock);
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketReactorWakeup);
 	CppUnit_addTest(pSuite, SocketReactorTest, testSocketReactorRemove);
+	CppUnit_addTest(pSuite, SocketReactorTest, testSocketReactorClose);
 	CppUnit_addTest(pSuite, SocketReactorTest, testConcurrentHandlerRemoval);
 
 	return pSuite;

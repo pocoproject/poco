@@ -26,10 +26,35 @@ public:
 
 	void onAccept(const AutoPtr<ReadableNotification>& pNf) override;
 
+	void onTimeout(const AutoPtr<TimeoutNotification>& pNf);
+		/// Calls the timeout callback. The reactor dispatches the
+		/// TimeoutNotification when a poll has found nothing to do.
+
 	void setRecvMessageCallback(const RecvMessageCallback& cb)
 	{
 		_recvMessageCallback = cb;
 	}
+
+	void setCloseCallback(const CloseCallback& cb)
+		/// Sets the callback that the connections accepted from now on
+		/// call when they close.
+	{
+		_closeCallback = cb;
+	}
+
+	void setAcceptCallback(const AcceptCallback& cb)
+		/// Sets the callback that is asked whether a connection that has
+		/// just been accepted is taken. A connection that it declines is
+		/// closed at once and never served.
+	{
+		_acceptCallback = cb;
+	}
+
+	void setTimeoutCallback(const TimeoutCallback& cb);
+		/// Sets the callback that is called, on the thread of the reactor
+		/// of the server socket, whenever a poll of that reactor has found
+		/// nothing to do: every poll timeout while there is no traffic.
+		/// Must be called before the reactor runs.
 
 private:
 	TCPReactorServerConnection* createServiceHandler(Poco::Net::StreamSocket& socket) override;
@@ -42,7 +67,11 @@ private:
 	bool                                        _useSelfReactor;
 	std::shared_ptr<ThreadPool>                 _threadPool;
 	RecvMessageCallback                         _recvMessageCallback;
+	CloseCallback                               _closeCallback;
+	AcceptCallback                              _acceptCallback;
+	TimeoutCallback                             _timeoutCallback;
 	TCPServerParams::Ptr                        _pParams;
+	ServerSocket                                _serverSocket;
 	std::atomic<bool>                           _stopped{false};
 };
 

@@ -11,7 +11,8 @@ TCPReactorAcceptor::TCPReactorAcceptor(Poco::Net::ServerSocket& socket, Poco::Ne
 	: Poco::Net::SocketAcceptor<TCPReactorServerConnection>(socket, reactor),
 	  _selfReactor(reactor),
 	  _useSelfReactor(pParams->getUseSelfReactor()),
-	  _pParams(pParams)
+	  _pParams(pParams),
+	  _serverSocket(socket)
 {
 	int workerThreads = _useSelfReactor ? 0 : _pParams->getMaxThreads();
 	if (workerThreads > 0)
@@ -41,6 +42,11 @@ void TCPReactorAcceptor::stop()
 	{
 		return;
 	}
+	if (_timeoutCallback)
+	{
+		_selfReactor.removeEventHandler(_serverSocket,
+			NObserver<TCPReactorAcceptor, TimeoutNotification>(*this, &TCPReactorAcceptor::onTimeout));
+	}
 	for (auto& worker : _workerReactors)
 	{
 		worker->stop();
@@ -62,6 +68,36 @@ void TCPReactorAcceptor::onAccept(const AutoPtr<ReadableNotification>& pNf)
 	try
 	{
 		SocketAcceptor<TCPReactorServerConnection>::onAccept(pNf);
+	}
+	catch (Poco::Exception& exc)
+	{
+		ErrorHandler::handle(exc);
+	}
+	catch (std::exception& exc)
+	{
+		ErrorHandler::handle(exc);
+	}
+	catch (...)
+	{
+		ErrorHandler::handle();
+	}
+}
+
+void TCPReactorAcceptor::setTimeoutCallback(const TimeoutCallback& cb)
+{
+	_timeoutCallback = cb;
+	NObserver<TCPReactorAcceptor, TimeoutNotification> observer(*this, &TCPReactorAcceptor::onTimeout);
+	if (!_selfReactor.hasEventHandler(_serverSocket, observer))
+	{
+		_selfReactor.addEventHandler(_serverSocket, observer);
+	}
+}
+
+void TCPReactorAcceptor::onTimeout(const AutoPtr<TimeoutNotification>&)
+{
+	try
+	{
+		if (_timeoutCallback) _timeoutCallback();
 	}
 	catch (Poco::Exception& exc)
 	{
@@ -104,10 +140,27 @@ TCPReactorServerConnection* TCPReactorAcceptor::createServiceHandler(Poco::Net::
 	{
 		socket.setSendTimeout(sendTimeout);
 	}
+	if (_pParams->getNonBlocking())
+	{
+		socket.setBlocking(false);
+	}
 	auto tmpConnPtr = std::make_shared<TCPReactorServerConnection>(socket, reactor());
 	tmpConnPtr->setRecvMessageCallback(_recvMessageCallback);
+	tmpConnPtr->setCloseCallback(_closeCallback);
 	tmpConnPtr->setMaxPendingRequestSize(_pParams->getMaxPendingRequestSize());
-	tmpConnPtr->initialize();
+	// A connection that the accept callback declines dies here with its
+	// socket: it is never served.
+	if (_acceptCallback && !_acceptCallback(tmpConnPtr)) return nullptr;
+	try
+	{
+		tmpConnPtr->initialize();
+	}
+	catch (...)
+	{
+		// taken and never served: the close callback tells so
+		tmpConnPtr->handleClose();
+		throw;
+	}
 	return tmpConnPtr.get();
 }
 

@@ -33,6 +33,17 @@ TCPReactorServer::TCPReactorServer(const SocketAddress& address, TCPServerParams
 	}
 }
 
+TCPReactorServer::TCPReactorServer(const ServerSocket& socket, TCPServerParams::Ptr pParams)
+	: _threadPool("TCPRA", 1),
+	  _reactors(1),
+	  _pParams(pParams),
+	  _port(socket.address().port()),
+	  _stopped(false)
+{
+	_sockets.push_back(socket);
+	_acceptors.push_back(std::make_shared<TCPReactorAcceptor>(_sockets.back(), _reactors.front(), _pParams));
+}
+
 TCPReactorServer::~TCPReactorServer()
 {
 	stop();
@@ -51,6 +62,30 @@ void TCPReactorServer::setRecvMessageCallback(const RecvMessageCallback& cb)
 	for (auto& acceptor : _acceptors)
 	{
 		acceptor->setRecvMessageCallback(cb);
+	}
+}
+
+void TCPReactorServer::setCloseCallback(const CloseCallback& cb)
+{
+	for (auto& acceptor : _acceptors)
+	{
+		acceptor->setCloseCallback(cb);
+	}
+}
+
+void TCPReactorServer::setAcceptCallback(const AcceptCallback& cb)
+{
+	for (auto& acceptor : _acceptors)
+	{
+		acceptor->setAcceptCallback(cb);
+	}
+}
+
+void TCPReactorServer::setTimeoutCallback(const TimeoutCallback& cb)
+{
+	for (auto& acceptor : _acceptors)
+	{
+		acceptor->setTimeoutCallback(cb);
 	}
 }
 

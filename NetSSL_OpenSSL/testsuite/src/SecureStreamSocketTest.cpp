@@ -314,6 +314,28 @@ void SecureStreamSocketTest::testNB()
 }
 
 
+void SecureStreamSocketTest::testLazyHandshake()
+{
+	SecureServerSocket svs(0);
+	TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+	srv.start();
+
+	SecureStreamSocket ss;
+	ss.setLazyHandshake(true);
+	ss.connect(SocketAddress("127.0.0.1", svs.address().port()));
+
+	// the handshake is made with the first data
+	std::string data("hello, world");
+	ss.sendBytes(data.data(), static_cast<int>(data.size()));
+	char buffer[256];
+	int n = ss.receiveBytes(buffer, sizeof(buffer));
+	assertTrue (n > 0);
+	assertTrue (std::string(buffer, n) == data);
+
+	ss.close();
+}
+
+
 void SecureStreamSocketTest::testSendFile()
 {
 	SecureServerSocket svs(0);
@@ -616,6 +638,7 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendReceive);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testPeek);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testNB);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testLazyHandshake);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFile);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFileLarge);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testSendFileRange);

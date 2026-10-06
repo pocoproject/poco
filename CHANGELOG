@@ -35,6 +35,14 @@ Bundled Third-Party Library Upgrades:
 
 Features:
 
+- GH #5516 Poco::Net::RemoteSyslogChannel and RemoteSyslogListener speak syslog over TCP as well
+  (RFC 6587, in both framings), and Poco::Net::SecureRemoteSyslogChannel and
+  SecureRemoteSyslogListener (NetSSL_OpenSSL and NetSSL_Win) speak it over TLS (RFC 5425). The
+  listener can limit the number of connections, the time a connection may stay idle and the
+  number of messages waiting for its parser threads, and counts what the limits refuse, close and
+  drop. Poco::Net::TCPReactorServer takes a listening
+  socket that is given to it, serves non-blocking connections, asks before it takes a connection,
+  tells when a connection is closed and when it has nothing to do.
 - GH #5440 Data/SQLite: integrate the sqlite-vec vector search extension (PR #5459) -- vec0
   virtual tables, vec_distance_* functions and KNN MATCH ... ORDER BY distance queries in every
   SQLite session, including MemoryDB (virtual tables are persisted whole in the always-in-memory
@@ -58,6 +66,16 @@ New Components:
 
 Bug Fixes and Improvements:
 
+- GH #5516 Poco::Net::SocketReactor lets go of the sockets of a poll when their round is over, so
+  that a connection closed while it is served is closed at once and not when a later poll returns.
+- GH #5516 Poco::Net::SocketImpl: on macOS, setting an option on a socket that has been shut down
+  or reset by the peer no longer throws InvalidArgumentException; the option is ignored, as it is
+  on other systems.
+- GH #5518 NetSSL_Win: Poco::Net::SecureStreamSocket::connect() with a timeout fails when the
+  handshake does not complete in time, and a connection does not count as established before its
+  handshake is done.
+- GH #5519 Poco::Net::RemoteSyslogChannel does not wait for the name service without limit when it
+  is opened, and finds its server by name with every attempt to connect.
 - GH #5450 Poco::XML::SAXParser and DOMParser: when a content handler throws, the events Expat
   still delivers for the current token (the end tag of an empty element and its namespace
   undeclarations) are no longer forwarded to the handlers. Since 1.15.4 the exception is stored

@@ -186,8 +186,8 @@ void SecureSocketImpl::connect(const SocketAddress& address, bool performHandsha
 {
 	setState(ST_ERROR);
 	_pSocket->connect(address);
+	// the state is that of the handshake: done, or still to be made with the first data
 	connectSSL(performHandshake);
-	setState(ST_DONE);
 }
 
 
@@ -195,8 +195,30 @@ void SecureSocketImpl::connect(const SocketAddress& address, const Poco::Timespa
 {
 	setState(ST_ERROR);
 	_pSocket->connect(address, timeout);
-	connectSSL(performHandshake);
-	setState(ST_DONE);
+	// the handshake is allowed the time that the connection was
+	Poco::Timespan receiveTimeout = _pSocket->getReceiveTimeout();
+	Poco::Timespan sendTimeout = _pSocket->getSendTimeout();
+	_pSocket->setReceiveTimeout(timeout);
+	_pSocket->setSendTimeout(timeout);
+	try
+	{
+		connectSSL(performHandshake);
+	}
+	catch (...)
+	{
+		// the socket gets its own timeouts back also when there is no connection
+		try
+		{
+			_pSocket->setReceiveTimeout(receiveTimeout);
+			_pSocket->setSendTimeout(sendTimeout);
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		throw;
+	}
+	_pSocket->setReceiveTimeout(receiveTimeout);
+	_pSocket->setSendTimeout(sendTimeout);
 }
 
 
@@ -304,7 +326,23 @@ void SecureSocketImpl::abort()
 
 int SecureSocketImpl::available() const
 {
-	return static_cast<int>(_overflowBuffer.size() + _recvBufferOffset + _extraBufferOffset);
+	// What a read gets without the network: the data that is decrypted
+	// already, and the records that have arrived in full, which can be
+	// decrypted. A part of a record counts for nothing: the rest of it has
+	// to come from the network first.
+	int available = static_cast<int>(_overflowBuffer.size());
+	const int raw = static_cast<int>(_recvBufferOffset + _extraBufferOffset);
+	if (_recvBufferOffset > 0)
+	{
+		const int recLength = recordLength(_recvBuffer.begin(), static_cast<int>(_recvBufferOffset));
+		if (recLength > 0 && recLength <= raw) available += raw;
+	}
+	else if (_extraBufferOffset > 0)
+	{
+		const int recLength = recordLength(_extraBuffer.begin(), static_cast<int>(_extraBufferOffset));
+		if (recLength > 0 && recLength <= raw) available += raw;
+	}
+	return available;
 }
 
 
@@ -1184,6 +1222,11 @@ void SecureSocketImpl::stateServerHandshakeLoopInit()
 	else if (_securityStatus == SEC_E_OK)
 	{
 		setState(ST_SERVER_HSK_LOOP_DONE);
+	}
+	else
+	{
+		// no state follows from here: the handshake has to end, or it never would
+		throw SSLException("Handshake failure", Utility::formatError(_securityStatus));
 	}
 }
 

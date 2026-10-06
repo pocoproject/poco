@@ -517,6 +517,57 @@ void SocketTest::testOptions()
 }
 
 
+void SocketTest::testOptionsAfterShutdown()
+{
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+
+	// A connection that its peer has reset, and one that this side has
+	// shut down: an option set then is not a wrong option. A system may
+	// say that the connection is gone; none may blame the argument.
+	StreamSocket reset(server.address());
+	{
+		StreamSocket accepted = server.acceptConnection();
+		accepted.setLinger(true, 0);
+	}
+	assertTrue (reset.poll(Timespan(10, 0), Socket::SELECT_READ | Socket::SELECT_ERROR));
+
+	StreamSocket shutDown(server.address());
+	StreamSocket accepted = server.acceptConnection();
+	shutDown.shutdown();
+
+	auto setOptions = [this](StreamSocket& socket)
+	{
+		try
+		{
+			socket.setReceiveTimeout(Timespan(1, 0));
+			socket.setSendTimeout(Timespan(1, 0));
+			socket.setNoDelay(true);
+			socket.setKeepAlive(true);
+		}
+		catch (InvalidArgumentException&)
+		{
+			fail("the options are valid - must not throw InvalidArgumentException");
+		}
+		catch (Poco::IOException&)
+		{
+		}
+	};
+	setOptions(reset);
+	setOptions(shutDown);
+
+	// a wrong argument on a live socket is still reported
+	try
+	{
+		int value = 0;
+		accepted.impl()->setRawOption(SOL_SOCKET, SO_RCVBUF, &value, 1);
+		fail("an option value of the wrong length - must throw");
+	}
+	catch (Poco::Exception&)
+	{
+	}
+}
+
+
 void SocketTest::testKeepAliveParams()
 {
 	EchoServer echoServer;
@@ -964,6 +1015,7 @@ CppUnit::Test* SocketTest::suite()
 	CppUnit_addTest(pSuite, SocketTest, testTimeout);
 	CppUnit_addTest(pSuite, SocketTest, testBufferSize);
 	CppUnit_addTest(pSuite, SocketTest, testOptions);
+	CppUnit_addTest(pSuite, SocketTest, testOptionsAfterShutdown);
 	CppUnit_addTest(pSuite, SocketTest, testKeepAliveParams);
 
 #if defined(POCO_TEST_DEPRECATED)

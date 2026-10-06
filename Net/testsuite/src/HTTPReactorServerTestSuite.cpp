@@ -2,6 +2,7 @@
 #include "CppUnit/TestSuite.h"
 #include "HTTPReactorServerSessionTest.h"
 #include "HTTPReactorServerTest.h"
+#include "TCPReactorServerTest.h"
 
 
 CppUnit::Test* HTTPReactorServerTestSuite::suite()
@@ -10,6 +11,7 @@ CppUnit::Test* HTTPReactorServerTestSuite::suite()
 
 	pSuite->addTest(HTTPReactorServerSessionTest::suite());
 	pSuite->addTest(HTTPReactorServerTest::suite());
+	pSuite->addTest(TCPReactorServerTest::suite());
 
 	return pSuite;
 }

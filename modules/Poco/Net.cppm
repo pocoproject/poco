@@ -137,6 +137,8 @@ module;
 #include "Poco/Net/RemoteSyslogChannel.h"
 #include "Poco/Net/RemoteSyslogListener.h"
 #if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
+#include "Poco/Net/SecureRemoteSyslogChannel.h"
+#include "Poco/Net/SecureRemoteSyslogListener.h"
 #include "Poco/Net/SecureServerSocket.h"
 #include "Poco/Net/SecureServerSocketImpl.h"
 #include "Poco/Net/SecureSMTPClientSession.h"
@@ -392,6 +394,8 @@ export namespace Poco::Net {
 	#endif
 	using Poco::Net::SSPINTLMCredentials;
 	#if defined(ENABLE_NETSSL_OPENSSL) || defined(ENABLE_NETSSL_WIN)
+	using Poco::Net::SecureRemoteSyslogChannel;
+	using Poco::Net::SecureRemoteSyslogListener;
 	using Poco::Net::SecureSMTPClientSession;
 	using Poco::Net::SecureServerSocket;
 	using Poco::Net::SecureServerSocketImpl;
