@@ -721,15 +721,29 @@ void SyslogTest::testTCPOversize()
 	assertTrue (texts[4] == cut);
 	assertTrue (texts[5] == "after the long line");
 
+	// A counted message that is too long and arrives in pieces: the cut
+	// message is taken from the first piece, the rest is skipped as it
+	// comes, and the message after it is whole.
+	const std::string frame = counted(big);
+	const std::size_t piece = frame.find(' ') + 1 + maxMessageSize + 7;
+	send(client, frame.substr(0, piece));
+	assertTrue (listener.pChannel->waitFor(7));
+	send(client, frame.substr(piece) + counted("after the pieces"));
+	assertTrue (listener.pChannel->waitFor(8));
+	texts = listener.pChannel->texts();
+	assertTrue (texts.size() == 8);
+	assertTrue (texts[6] == cut);
+	assertTrue (texts[7] == "after the pieces");
+
 	// a message of exactly the size is whole
 	const std::string fits(maxMessageSize - MESSAGE_HEADER.size(), 'y');
 	send(client, counted(fits) + line(fits) + line("last"));
-	assertTrue (listener.pChannel->waitFor(9));
+	assertTrue (listener.pChannel->waitFor(11));
 	texts = listener.pChannel->texts();
-	assertTrue (texts.size() == 9);
-	assertTrue (texts[6] == fits);
-	assertTrue (texts[7] == fits);
-	assertTrue (texts[8] == "last");
+	assertTrue (texts.size() == 11);
+	assertTrue (texts[8] == fits);
+	assertTrue (texts[9] == fits);
+	assertTrue (texts[10] == "last");
 }
 
 
@@ -950,18 +964,31 @@ void SyslogTest::testTCPCloseWithClients()
 
 void SyslogTest::testTCPPort()
 {
-	Poco::UInt16 port = 0;
-	{
-		// a port that was free a moment ago
-		ServerSocket socket(SocketAddress("127.0.0.1", 0));
-		port = socket.address().port();
-	}
 	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(0);
 	assertTrue (listener->getProperty("tcpPort") == "0");
 	assertTrue (listener->getProperty("maxMessageSize") == "65536");
-	listener->setProperty("tcpPort", std::to_string(port));
-	assertTrue (listener->getProperty("tcpPort") == std::to_string(port));
-	listener->open();
+	// A port that was free a moment ago may have been taken in between:
+	// another is tried then.
+	Poco::UInt16 port = 0;
+	for (int i = 0; i < 100 && port == 0; ++i)
+	{
+		Poco::UInt16 candidate = 0;
+		{
+			ServerSocket socket(SocketAddress("127.0.0.1", 0));
+			candidate = socket.address().port();
+		}
+		listener->setProperty("tcpPort", std::to_string(candidate));
+		assertTrue (listener->getProperty("tcpPort") == std::to_string(candidate));
+		try
+		{
+			listener->open();
+			port = candidate;
+		}
+		catch (Poco::Net::NetException&)
+		{
+		}
+	}
+	assertTrue (port != 0);
 	auto pCL = Poco::makeAuto<CollectingChannel>();
 	listener->addChannel(pCL);
 
@@ -1196,12 +1223,10 @@ void SyslogTest::testTCPChannelResend()
 
 void SyslogTest::testTCPChannelServerAway()
 {
-	SocketAddress address;
-	{
-		// a port that nobody listens on
-		ServerSocket socket(SocketAddress("127.0.0.1", 0));
-		address = socket.address();
-	}
+	// a port that nobody listens on, and that nobody else can take meanwhile
+	ServerSocket server;
+	server.bind(SocketAddress("127.0.0.1", 0), true, false);
+	const SocketAddress address = server.address();
 	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
 	channel->setProperty("loghost", address.toString());
 	channel->setProperty("transport", "tcp");
@@ -1221,8 +1246,6 @@ void SyslogTest::testTCPChannelServerAway()
 
 	// The server is there now. No connection is tried before the retry
 	// interval is over, and the messages are dropped.
-	ServerSocket server;
-	server.bind(address, true, false);
 	server.listen();
 	sw.restart();
 	channel->log(msg);
@@ -1450,6 +1473,54 @@ void SyslogTest::testTCPChannelProperties()
 }
 
 
+void SyslogTest::testTCPOpenFailed()
+{
+	// An open() that fails because its TCP port is taken leaves nothing
+	// behind: the UDP port is free again, and a later open() succeeds.
+	// A port that was free a moment ago may have been taken by somebody
+	// else in between: the whole is tried again then.
+	bool done = false;
+	for (int i = 0; i < 100 && !done; ++i)
+	{
+		Poco::UInt16 udpPort = 0;
+		{
+			DatagramSocket probe(SocketAddress("127.0.0.1", 0), false);
+			udpPort = probe.address().port();
+		}
+		// Bound to every address and without SO_REUSEADDR, on which the
+		// listener binds its own socket: no system lets it have the port.
+		ServerSocket taken;
+		taken.bind(SocketAddress(IPAddress(), 0), false, false);
+		taken.listen();
+		Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(udpPort);
+		listener->setProperty("tcpPort", std::to_string(taken.address().port()));
+		try
+		{
+			listener->open();
+			fail("the TCP port is taken - open() must throw");
+		}
+		catch (Poco::Net::NetException&)
+		{
+		}
+		try
+		{
+			// nobody holds the UDP port: the socket of the failed open() is gone
+			DatagramSocket probe;
+			probe.bind(SocketAddress("127.0.0.1", udpPort), false);
+		}
+		catch (Poco::Net::NetException&)
+		{
+			continue;
+		}
+		taken.close();
+		listener->open();
+		listener->close();
+		done = true;
+	}
+	assertTrue (done);
+}
+
+
 void SyslogTest::testTCPChannelServerNotReading()
 {
 	// A server that takes the connection and does not read holds a message
@@ -1517,6 +1588,7 @@ CppUnit::Test* SyslogTest::suite()
 	CppUnit_addTest(pSuite, SyslogTest, testTCPTwoSockets);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPCloseWithClients);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPPort);
+	CppUnit_addTest(pSuite, SyslogTest, testTCPOpenFailed);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannel);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelToListener);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelReconnect);

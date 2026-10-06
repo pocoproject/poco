@@ -88,9 +88,8 @@ void SecureRemoteSyslogListener::createServerSockets(std::vector<ServerSocket>& 
 	if (_tlsPort > 0)
 	{
 		Context::Ptr pContext = _pContext ? _pContext : SSLManager::instance().defaultServerContext();
-		bool reusePort = Poco::NumberParser::parseBool(getProperty(PROP_REUSE_PORT));
 		SecureServerSocket socket(pContext);
-		socket.bind(SocketAddress(IPAddress(), _tlsPort), true, reusePort);
+		socket.bind(SocketAddress(IPAddress(), _tlsPort), true, reusePort());
 		socket.listen();
 		sockets.push_back(socket);
 	}

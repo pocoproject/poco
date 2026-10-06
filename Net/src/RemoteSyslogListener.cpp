@@ -184,6 +184,8 @@ private:
 			/// Octets still to be skipped of a message that was cut off.
 		bool          skipLine = false;
 			/// Skipping up to the next line feed.
+		std::size_t   scanned = 0;
+			/// Octets at the start of what is pending that hold no line feed.
 	};
 
 	struct Server
@@ -335,7 +337,8 @@ std::size_t RemoteTCPListener::takeMessages(Connection& connection, const std::s
 		}
 		else if (connection.skipLine)
 		{
-			const std::size_t lf = data.find('\n', pos);
+			const std::size_t lf = data.find('\n', pos + connection.scanned);
+			connection.scanned = 0;
 			if (lf == std::string::npos)
 			{
 				pos = size;
@@ -349,14 +352,22 @@ std::size_t RemoteTCPListener::takeMessages(Connection& connection, const std::s
 		else if (data[pos] == '<')
 		{
 			// non-transparent framing: SYSLOG-MSG LF
-			const std::size_t lf = data.find('\n', pos);
+			const std::size_t lf = data.find('\n', pos + connection.scanned);
+			connection.scanned = 0;
 			if (lf == std::string::npos)
 			{
-				// a message of just the largest size may still end with the next octet
-				if (size - pos <= _maxMessageSize) break;
+				// A message of just the largest size may still end with the
+				// next octet. What is pending holds no line feed: the next
+				// search begins after it.
+				if (size - pos <= _maxMessageSize)
+				{
+					connection.scanned = size - pos;
+					break;
+				}
 				enqueue(connection, data, pos, _maxMessageSize);
 				connection.skipLine = true;
 				pos += _maxMessageSize;
+				connection.scanned = size - pos;
 			}
 			else
 			{
@@ -405,7 +416,7 @@ std::size_t RemoteTCPListener::takeMessages(Connection& connection, const std::s
 
 void RemoteTCPListener::enqueue(const Connection& connection, const std::string& data, std::size_t pos, std::size_t length)
 {
-	_listener.enqueueMessage(data.substr(pos, length), connection.peerAddress);
+	_listener.enqueueMessage(data.data() + pos, length, connection.peerAddress);
 }
 
 
@@ -842,6 +853,18 @@ void RemoteSyslogListener::processMessage(const std::string& messageText)
 void RemoteSyslogListener::enqueueMessage(const std::string& messageText, const Poco::Net::SocketAddress& senderAddress)
 {
 	_queue.enqueueNotification(new MessageNotification(messageText, senderAddress));
+}
+
+
+void RemoteSyslogListener::enqueueMessage(const char* messageText, std::size_t length, const Poco::Net::SocketAddress& senderAddress)
+{
+	_queue.enqueueNotification(new MessageNotification(messageText, length, senderAddress));
+}
+
+
+bool RemoteSyslogListener::reusePort() const
+{
+	return _reusePort;
 }
 
 

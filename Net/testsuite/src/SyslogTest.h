@@ -44,6 +44,7 @@ public:
 	void testTCPTwoSockets();
 	void testTCPCloseWithClients();
 	void testTCPPort();
+	void testTCPOpenFailed();
 	void testTCPChannel();
 	void testTCPChannelToListener();
 	void testTCPChannelReconnect();

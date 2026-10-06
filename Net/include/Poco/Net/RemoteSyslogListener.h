@@ -61,6 +61,13 @@ class Net_API RemoteSyslogListener: public Poco::SplitterChannel
 	/// at that size and the rest of it is skipped. What is not a message
 	/// is skipped up to the next line feed. Neither closes the connection.
 	///
+	/// NOTE: There is no limit on the number of connections and no idle
+	/// timeout: a sender that sends part of a message and then nothing
+	/// keeps its connection and up to "maxMessageSize" plus one read of
+	/// memory. The queue to the parser threads is not bounded either, so
+	/// a sender is never slowed down. A TCP port that untrusted peers can
+	/// reach needs to be guarded by other means.
+	///
 	/// The RemoteSyslogListener is a subclass of Poco::SplitterChannel.
 	/// Every received log message is sent to the channels registered
 	/// with addChannel() or the "channel" property.
@@ -137,6 +144,7 @@ public:
 		/// and sends it down the filter chain.
 
 	void enqueueMessage(const std::string& messageText, const Poco::Net::SocketAddress& senderAddress);
+	void enqueueMessage(const char* messageText, std::size_t length, const Poco::Net::SocketAddress& senderAddress);
 		/// Enqueues a single line of text containing a syslog message
 		/// for asynchronous processing by a parser thread.
 
@@ -157,6 +165,9 @@ public:
 
 protected:
 	~RemoteSyslogListener();
+
+	[[nodiscard]] bool reusePort() const;
+		/// Returns true if the ports are bound with SO_REUSEPORT (the "reusePort" property).
 		/// Destroys the RemoteSyslogListener, after stopping it.
 
 	virtual void createServerSockets(std::vector<ServerSocket>& sockets);
