@@ -38,6 +38,7 @@ WebSocketImpl::WebSocketImpl(StreamSocketImpl* pStreamSocketImpl, HTTPSession& s
 	_buffer(0),
 	_bufferOffset(0),
 	_mustMaskPayload(mustMaskPayload),
+	_allowedRSV(0),
 	_peerClosed(false)
 {
 	poco_check_ptr(pStreamSocketImpl);
@@ -215,13 +216,13 @@ int WebSocketImpl::peekHeader(ReceiveState& receiveState)
 	Poco::UInt8 flags = static_cast<Poco::UInt8>(header[0]);
 	receiveState.frameFlags = flags;
 
-	if ((flags & (WebSocket::FRAME_FLAG_RSV1 | WebSocket::FRAME_FLAG_RSV2 | WebSocket::FRAME_FLAG_RSV3)) != 0)
+	if ((flags & ~(WebSocket::FRAME_FLAG_FIN | _allowedRSV)) & (WebSocket::FRAME_FLAG_RSV1 | WebSocket::FRAME_FLAG_RSV2 | WebSocket::FRAME_FLAG_RSV3))
 	{
 		throw WebSocketException("Reserved bits (RSV) must be zero", WebSocket::WS_ERR_CORRUPT_FRAME);
 	}
 
 	Poco::UInt8 opcode = (flags & WebSocket::FRAME_OP_BITMASK);
-	bool isControl = ((opcode & WebSocket::FRAME_OP_CLOSE) != 0);
+	bool isControl = (opcode >= WebSocket::FRAME_OP_CLOSE);
 	if ((!isControl && opcode > WebSocket::FRAME_OP_BINARY) || (isControl && opcode > WebSocket::FRAME_OP_PONG))
 	{
 		throw WebSocketException("Reserved or unknown opcode", WebSocket::WS_ERR_CORRUPT_FRAME);

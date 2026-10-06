@@ -103,6 +103,22 @@ public:
 		///
 		/// The default is std::numeric_limits<int>::max().
 
+	void setAllowedRSVBits(Poco::UInt8 rsvBits);
+		/// Sets the RSV bits (FRAME_FLAG_RSV1, FRAME_FLAG_RSV2,
+		/// FRAME_FLAG_RSV3) that receiveFrame() accepts on received
+		/// frames.
+		///
+		/// This is for applications that negotiate WebSocket extensions
+		/// themselves (for example permessage-deflate) and use the
+		/// corresponding RSV bits on both peers.
+		///
+		/// The default is 0: all RSV bits are rejected.
+
+	[[nodiscard]] Poco::UInt8 getAllowedRSVBits() const;
+		/// Returns the RSV bits that receiveFrame() accepts.
+		///
+		/// The default is 0: all RSV bits are rejected.
+
 protected:
 	enum
 	{
@@ -155,6 +171,7 @@ private:
 	Poco::Buffer<char> _buffer;
 	int _bufferOffset;
 	bool _mustMaskPayload;
+	Poco::UInt8 _allowedRSV;
 	bool _peerClosed;
 		/// Set once a receive on the underlying socket has reported the end
 		/// of the connection.
@@ -176,6 +193,16 @@ inline int WebSocketImpl::frameFlags() const
 inline bool WebSocketImpl::mustMaskPayload() const
 {
 	return _mustMaskPayload;
+}
+
+inline void WebSocketImpl::setAllowedRSVBits(Poco::UInt8 rsvBits)
+{
+	_allowedRSV = static_cast<Poco::UInt8>(rsvBits & (WebSocket::FRAME_FLAG_RSV1 | WebSocket::FRAME_FLAG_RSV2 | WebSocket::FRAME_FLAG_RSV3));
+}
+
+inline Poco::UInt8 WebSocketImpl::getAllowedRSVBits() const
+{
+	return _allowedRSV;
 }
 
 

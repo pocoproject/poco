@@ -40,6 +40,7 @@ public:
 private:
 	void testOneLargeFrame(int msgSize);
 	void peerCloseAfterPartialHeader(bool blocking);
+	int sendServerFrame(const std::string& frameBytes, Poco::UInt8 allowedRSV = 0, int bufferSize = 256, int* pFlags = nullptr);
 };
 
 
