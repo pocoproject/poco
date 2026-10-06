@@ -19,6 +19,7 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
+#include "Poco/Net/Context.h"
 #include "Poco/LoggingFactory.h"
 #include "Poco/Message.h"
 #include "Poco/AutoPtr.h"
@@ -188,11 +189,28 @@ namespace
 	}
 
 
-	Poco::UInt16 freePort()
-		/// Returns a port that was free a moment ago.
+	void openOnFreePort(SecureRemoteSyslogListener& listener)
+		/// Opens the listener on a port that was free a moment ago. Another
+		/// is tried if somebody else has taken it in between.
 	{
-		ServerSocket socket(SocketAddress("127.0.0.1", 0));
-		return socket.address().port();
+		for (int i = 0; i < 100; ++i)
+		{
+			Poco::UInt16 port = 0;
+			{
+				ServerSocket socket(SocketAddress("127.0.0.1", 0));
+				port = socket.address().port();
+			}
+			listener.setProperty("tlsPort", std::to_string(port));
+			try
+			{
+				listener.open();
+				return;
+			}
+			catch (Poco::Net::NetException&)
+			{
+			}
+		}
+		throw Poco::RuntimeException("no free port found");
 	}
 
 
@@ -227,15 +245,13 @@ SecureSyslogTest::~SecureSyslogTest()
 void SecureSyslogTest::testRoundTrip()
 {
 	// Both set up by their properties, with the default contexts.
-	const Poco::UInt16 port = freePort();
 	Poco::AutoPtr<SecureRemoteSyslogListener> listener = new SecureRemoteSyslogListener;
-	listener->setProperty("tlsPort", std::to_string(port));
-	listener->open();
+	openOnFreePort(*listener);
 	auto pCL = Poco::makeAuto<CollectingChannel>();
 	listener->addChannel(pCL);
 
 	Poco::AutoPtr<SecureRemoteSyslogChannel> channel = new SecureRemoteSyslogChannel;
-	channel->setProperty("loghost", "127.0.0.1:" + std::to_string(port));
+	channel->setProperty("loghost", "127.0.0.1:" + listener->getProperty("tlsPort"));
 	channel->setProperty("facility", "LOCAL3");
 	channel->setProperty("host", "ahost");
 	channel->setProperty("name", "anapp");
@@ -587,6 +603,45 @@ void SecureSyslogTest::testDefaultPort()
 }
 
 
+void SecureSyslogTest::testServerNotVerified()
+{
+	// A server whose certificate does not verify gets no message. The
+	// context of the channel is strict, and the certificate of the test
+	// server is not for the address the server is reached at. A message
+	// sent with a verifying context afterwards is the one that arrives,
+	// and it arrives alone: nothing was sent to the server before it.
+	Poco::AutoPtr<SecureRemoteSyslogListener> listener = new SecureRemoteSyslogListener;
+	openOnFreePort(*listener);
+	auto pCL = Poco::makeAuto<CollectingChannel>();
+	listener->addChannel(pCL);
+	const std::string logHost = "127.0.0.1:" + listener->getProperty("tlsPort");
+
+	Context::Ptr pContext = new Context(Context::TLS_CLIENT_USE, "", Context::VERIFY_STRICT);
+	Poco::AutoPtr<SecureRemoteSyslogChannel> strict = new SecureRemoteSyslogChannel(pContext);
+	strict->setProperty("loghost", logHost);
+	strict->setProperty("host", "ahost");
+	strict->setProperty("retryInterval", "0");
+	Poco::Message msg("asource", "for a server that does not verify", Poco::Message::PRIO_CRITICAL);
+	strict->log(msg);
+	strict->log(msg);
+	strict->close();
+
+	Poco::AutoPtr<SecureRemoteSyslogChannel> trusting = new SecureRemoteSyslogChannel;
+	trusting->setProperty("loghost", logHost);
+	trusting->setProperty("host", "ahost");
+	msg.setText("for a server that verifies");
+	trusting->log(msg);
+	bool arrived = pCL->waitFor(1);
+	trusting->close();
+	listener->close();
+	assertTrue (arrived);
+
+	std::vector<Poco::Message> msgs = pCL->messages();
+	assertTrue (msgs.size() == 1);
+	assertTrue (msgs[0].getText() == "for a server that verifies");
+}
+
+
 void SecureSyslogTest::testProperties()
 {
 	Poco::AutoPtr<SecureRemoteSyslogChannel> channel = new SecureRemoteSyslogChannel;
@@ -663,6 +718,7 @@ CppUnit::Test* SecureSyslogTest::suite()
 	CppUnit_addTest(pSuite, SecureSyslogTest, testChannelReconnect);
 	CppUnit_addTest(pSuite, SecureSyslogTest, testChannelHandshakeTimeout);
 	CppUnit_addTest(pSuite, SecureSyslogTest, testDefaultPort);
+	CppUnit_addTest(pSuite, SecureSyslogTest, testServerNotVerified);
 	CppUnit_addTest(pSuite, SecureSyslogTest, testProperties);
 
 	return pSuite;

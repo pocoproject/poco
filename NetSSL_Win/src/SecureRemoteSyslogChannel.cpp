@@ -93,8 +93,10 @@ StreamSocket SecureRemoteSyslogChannel::createSocket(const SocketAddress& addres
 	plainSocket.setSendTimeout(timeout);
 	SecureStreamSocket socket(SecureStreamSocket::attach(plainSocket, hostName, pContext));
 
-	// No message is handed to the connection before the handshake is
-	// complete and the certificate of the server is verified.
+	// The handshake is completed and the certificate of the server is
+	// verified here, before any message is handed to the connection: it
+	// is not left to the first send, whatever state attach() leaves the
+	// socket in.
 	socket.setBlocking(false);
 	const int rc = socket.completeHandshake();
 	socket.setBlocking(true);

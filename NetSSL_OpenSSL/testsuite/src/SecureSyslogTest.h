@@ -34,6 +34,7 @@ public:
 	void testChannelReconnect();
 	void testChannelHandshakeTimeout();
 	void testDefaultPort();
+	void testServerNotVerified();
 	void testProperties();
 
 	void setUp();
