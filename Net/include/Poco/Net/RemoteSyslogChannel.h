@@ -27,6 +27,7 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/Clock.h"
 #include "Poco/Timespan.h"
+#include <exception>
 #include <functional>
 #include <memory>
 
@@ -65,14 +66,23 @@ class Net_API RemoteSyslogChannel: public Poco::Channel
 	/// address of the server.
 	///
 	/// A connection that the server has closed is made anew with the next
-	/// message, and a message that could not be sent over a connection
-	/// is sent once more over a new one. Syslog has no acknowledgement:
-	/// what was handed to a connection that then broke may be lost.
+	/// message. A message of which nothing was sent over a connection
+	/// that then broke is sent once more over a new one; one of which a
+	/// part was sent is not, since the server may have taken the part
+	/// for a message. Syslog has no acknowledgement: what was handed to a
+	/// connection that then broke may be lost. A server that closes or
+	/// breaks two connections in a row within the time of the "timeout"
+	/// property after they were made counts as a server that is away.
+	/// The channel learns of a close with its next message only: a server
+	/// that closes every connection at once is recognised when messages
+	/// follow each other within that time, not when they are far apart.
 	///
-	/// An attempt to connect that fails is reported through
-	/// Poco::ErrorHandler, once, until a connection has been made again:
-	/// a server that cannot be reached, or whose certificate does not
-	/// verify, is not silent.
+	/// An attempt to connect that fails, and a server that closes the
+	/// connection at once, are reported through Poco::ErrorHandler, once,
+	/// until a connection has been made again: a server that cannot be
+	/// reached, or whose certificate does not verify, is not silent. The
+	/// report is made after log() has let go of its lock, so that the
+	/// handler of the application may log through this channel.
 {
 public:
 	using Ptr = Poco::AutoPtr<RemoteSyslogChannel>;
@@ -201,8 +211,8 @@ protected:
 		/// that the "loghost" property names, without a port.
 		///
 		/// A subclass can override this method to send over another kind
-		/// of stream socket. A Poco::Exception or a std::exception thrown
-		/// here counts as a server that is away.
+		/// of stream socket. Any exception thrown here counts as a server
+		/// that is away.
 
 	[[nodiscard]] virtual Poco::UInt16 defaultPort() const;
 		/// Returns the port that messages are sent to if the "loghost"
@@ -258,17 +268,32 @@ private:
 		/// Makes the connection, unless an attempt failed a short while
 		/// ago. Returns true if the connection is there.
 
-	void serverAway(const Poco::Exception& exc);
-	void serverAway(const std::exception& exc);
-		/// Notes that the server is away, which the exception says why.
-		/// It is reported through the ErrorHandler if the server was not
-		/// away before.
+	void sendMessage(const Message& msg);
+		/// Builds the syslog message and sends it. The caller holds the mutex.
+
+	void serverAway();
+		/// Notes that the server is away, which the exception being handled
+		/// says why. The caller is in a catch block and holds the mutex.
+
+	void serverAway(std::exception_ptr pException);
+		/// Notes that the server is away, which the exception says why. It
+		/// is kept for a report through the ErrorHandler after log() has let
+		/// go of the mutex, if the server was not away before.
+
+	static void report(std::exception_ptr pException);
+		/// Hands the exception to the ErrorHandler.
 
 	void disconnect();
 		/// Closes the connection without waiting for the server.
 
-	void sendFrame(const std::string& frame);
-		/// Sends all of the frame within the time allowed, or throws.
+	bool connectionLost();
+		/// Closes the connection that the server has closed or broken, and
+		/// returns true if the server counts as away for that: it closed
+		/// the second connection in a row as soon as it was made.
+
+	void sendFrame(const std::string& frame, std::size_t& sent);
+		/// Sends all of the frame within the time allowed, or throws. sent
+		/// tells how much of the frame went out, also when this throws.
 
 	[[nodiscard]] bool closedByServer();
 		/// Returns true if the server has closed or reset the connection.
@@ -299,8 +324,13 @@ private:
 	SocketAddress _socketAddress;
 	bool _open;
 	bool _connected;
+	Poco::Clock _connectedAt;
+	int _closedAtOnce;
+		/// Connections in a row that the server closed as soon as they were made.
 	bool _failed;
 	Poco::Clock _failedAt;
+	std::exception_ptr _pendingReport;
+		/// Why the server is away, until log() has reported it.
 	std::shared_ptr<HostNameLookup> _pHostNameLookup;
 		/// There for as long as the name of the local host is being asked for.
 	mutable Poco::FastMutex _mutex;

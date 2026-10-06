@@ -23,6 +23,7 @@
 #include "Poco/Message.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
+#include "Poco/ErrorHandler.h"
 #include "Poco/Event.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Timespan.h"
@@ -35,6 +36,7 @@
 #include <string>
 #include <utility>
 #include <initializer_list>
+#include <functional>
 #include <thread>
 #include <atomic>
 #include <vector>
@@ -416,6 +418,90 @@ namespace
 	private:
 		Poco::Event _entered;
 		Poco::Event _letGo{Poco::Event::EVENT_MANUALRESET};
+	};
+
+
+	class CountingErrorHandler: public Poco::ErrorHandler
+		/// Counts the exceptions reported to it, and logs through a channel
+		/// while it is at it, as the handler of an application may.
+	{
+	public:
+		explicit CountingErrorHandler(Poco::Channel::Ptr pChannel):
+			_pChannel(pChannel)
+		{
+		}
+
+		void exception(const Poco::Exception&) override
+		{
+			reported();
+		}
+
+		void exception(const std::exception&) override
+		{
+			reported();
+		}
+
+		void exception() override
+		{
+			reported();
+		}
+
+		int reports() const
+		{
+			return _reports;
+		}
+
+	private:
+		void reported()
+		{
+			++_reports;
+			_pChannel->log(Poco::Message("handler", "reported", Poco::Message::PRIO_ERROR));
+		}
+
+		Poco::Channel::Ptr _pChannel;
+		std::atomic<int>   _reports{0};
+	};
+
+
+	class ErrorHandlerGuard
+		/// Installs an ErrorHandler for the time of a test.
+	{
+	public:
+		explicit ErrorHandlerGuard(Poco::ErrorHandler& handler):
+			_pPrevious(Poco::ErrorHandler::set(&handler))
+		{
+		}
+
+		~ErrorHandlerGuard()
+		{
+			Poco::ErrorHandler::set(_pPrevious);
+		}
+
+	private:
+		Poco::ErrorHandler* _pPrevious;
+	};
+
+
+	class Joiner
+		/// Joins a thread of a test when the test is left, also by a
+		/// failed assertion, after it has made the thread stop.
+	{
+	public:
+		Joiner(std::thread& thread, std::function<void()> stop):
+			_thread(thread),
+			_stop(std::move(stop))
+		{
+		}
+
+		~Joiner()
+		{
+			_stop();
+			if (_thread.joinable()) _thread.join();
+		}
+
+	private:
+		std::thread& _thread;
+		std::function<void()> _stop;
 	};
 
 
@@ -1740,6 +1826,99 @@ void SyslogTest::testTCPChannelServerNotReading()
 }
 
 
+void SyslogTest::testTCPChannelServerAwayReported()
+{
+	// A server that is away is reported through the ErrorHandler once,
+	// until a connection has been made again, and after log() has let
+	// go of its lock: the handler logs through the channel while it is
+	// at it.
+	ServerSocket server;
+	server.bind(SocketAddress("127.0.0.1", 0), true, false);
+	Poco::AutoPtr<ObservedChannel> channel = new ObservedChannel;
+	channel->setProperty("loghost", server.address().toString());
+	channel->setProperty("transport", "tcp");
+	channel->setProperty("timeout", "500");
+	channel->setProperty("retryInterval", "0");
+	channel->setProperty("host", "ahost");
+	Poco::Message msg("asource", "sent", Poco::Message::PRIO_CRITICAL);
+
+	CountingErrorHandler handler(channel);
+	ErrorHandlerGuard guard(handler);
+	channel->log(msg);
+	channel->log(msg);
+	assertTrue (handler.reports() == 1);
+
+	// the server is there: the next message connects and is sent
+	server.listen();
+	channel->log(msg);
+	assertTrue (server.poll(Poco::Timespan(10, 0), Socket::SELECT_READ));
+	StreamSocket connection = server.acceptConnection();
+	assertTrue (endsWith(receiveUntil(connection, "sent\n"), " - sent\n"));
+
+	// gone again, which the channel sees with the next message once the
+	// close has arrived: reported once more, and once only
+	connection.close();
+	server.close();
+	assertTrue (channel->waitForServerClose());
+	channel->log(msg);
+	channel->log(msg);
+	assertTrue (handler.reports() == 2);
+	channel->close();
+}
+
+
+void SyslogTest::testTCPChannelServerCloses()
+{
+	// A server that takes every connection and closes it at once is away:
+	// the second connection in a row that the channel finds closed is
+	// reported, and no connection is made before the retry interval is
+	// over.
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
+	std::atomic<bool> stop(false);
+	std::thread closer([&]
+	{
+		while (!stop)
+		{
+			if (server.poll(Poco::Timespan(100000), Socket::SELECT_READ))
+			{
+				StreamSocket connection = server.acceptConnection();
+				connection.close();
+			}
+		}
+	});
+	Joiner joiner(closer, [&] { stop = true; });
+
+	Poco::AutoPtr<ObservedChannel> channel = new ObservedChannel;
+	channel->setProperty("loghost", server.address().toString());
+	channel->setProperty("transport", "tcp");
+	channel->setProperty("timeout", "5000");
+	channel->setProperty("retryInterval", "3600000");
+	channel->setProperty("host", "ahost");
+	Poco::Message msg("asource", "lost", Poco::Message::PRIO_CRITICAL);
+	CountingErrorHandler handler(channel);
+	ErrorHandlerGuard guard(handler);
+
+	// Every message finds the connection of the one before it closed, or
+	// cannot be sent over its own, which is up to the timing: after a few,
+	// the server is away. The close of a connection has arrived before the
+	// next message is logged.
+	for (int i = 0; i < 5 && handler.reports() == 0; ++i)
+	{
+		channel->log(msg);
+		if (handler.reports() == 0) assertTrue (channel->waitForServerClose());
+	}
+	assertTrue (handler.reports() == 1);
+
+	// within the retry interval, a message makes no connection
+	const int made = channel->connections();
+	channel->log(msg);
+	channel->log(msg);
+	assertTrue (channel->connections() == made);
+	assertTrue (handler.reports() == 1);
+	channel->close();
+}
+
+
 void SyslogTest::setUp()
 {
 }
@@ -1785,6 +1964,8 @@ CppUnit::Test* SyslogTest::suite()
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelResend);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelServerAway);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelServerNotReading);
+	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelServerAwayReported);
+	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelServerCloses);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelTarget);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelHostName);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelSwitchTransport);

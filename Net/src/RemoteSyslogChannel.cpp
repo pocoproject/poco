@@ -19,6 +19,7 @@
 #include "Poco/NumberParser.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/DNS.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/LoggingFactory.h"
 #include "Poco/Instantiator.h"
 #include "Poco/String.h"
@@ -83,6 +84,7 @@ RemoteSyslogChannel::RemoteSyslogChannel():
 	_retryInterval(DEFAULT_RETRY_INTERVAL),
 	_open(false),
 	_connected(false),
+	_closedAtOnce(0),
 	_failed(false)
 {
 }
@@ -100,6 +102,7 @@ RemoteSyslogChannel::RemoteSyslogChannel(const std::string& address, const std::
 	_retryInterval(DEFAULT_RETRY_INTERVAL),
 	_open(false),
 	_connected(false),
+	_closedAtOnce(0),
 	_failed(false)
 {
 	if (_name.empty()) _name = "-";
@@ -255,8 +258,20 @@ void RemoteSyslogChannel::closeSockets()
 
 void RemoteSyslogChannel::log(const Message& msg)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
+	// A server that is found to be away is reported once the mutex is free
+	// again: the handler of the application may log through this channel.
+	std::exception_ptr pReport;
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+		sendMessage(msg);
+		std::swap(pReport, _pendingReport);
+	}
+	if (pReport) report(pReport);
+}
 
+
+void RemoteSyslogChannel::sendMessage(const Message& msg)
+{
 	openChannel();
 	if (_pHostNameLookup) takeHostName();
 
@@ -319,33 +334,54 @@ void RemoteSyslogChannel::log(const Message& msg)
 
 void RemoteSyslogChannel::sendOverConnection(const std::string& frame)
 {
-	if (_connected && closedByServer()) disconnect();
+	if (_connected && closedByServer() && connectionLost())
+	{
+		serverAway(std::make_exception_ptr(ConnectionAbortedException("connections closed by the syslog server as soon as they were made")));
+		return;
+	}
 
 	for (int attempt = 0; attempt < 2; ++attempt)
 	{
 		const bool fresh = !_connected;
 		if (fresh && !connect()) return;
-		// a server that takes the connection and not the message is away as well
-		auto failed = [this, fresh](const auto& exc)
-		{
-			disconnect();
-			if (fresh) serverAway(exc);
-			return fresh;
-		};
+		std::size_t sent = 0;
 		try
 		{
-			sendFrame(frame);
+			sendFrame(frame, sent);
 			return;
 		}
-		catch (Poco::Exception& exc)
+		catch (...)
 		{
-			if (failed(exc)) return;
+			// a server that takes the connection and not the message is away as well
+			if (fresh)
+			{
+				disconnect();
+				serverAway();
+				return;
+			}
+			if (connectionLost())
+			{
+				serverAway();
+				return;
+			}
 		}
-		catch (std::exception& exc)
-		{
-			if (failed(exc)) return;
-		}
+		// A frame of which a part went out is not sent again: the server
+		// may have taken the part for a message.
+		if (sent > 0) return;
 	}
+}
+
+
+bool RemoteSyslogChannel::connectionLost()
+{
+	// A server that closes every connection as soon as it was made is away
+	// as well: the second connection in a row that it closed, or broke,
+	// within the time allowed for a message counts as a failed attempt. A
+	// server that closes a connection once, after a message, gets a new one.
+	const bool atOnce = !_connectedAt.isElapsed(_timeout.totalMicroseconds());
+	disconnect();
+	_closedAtOnce = atOnce ? _closedAtOnce + 1 : 0;
+	return _closedAtOnce >= 2;
 }
 
 
@@ -360,35 +396,50 @@ bool RemoteSyslogChannel::connect()
 		// what is sent from here on waits for its deadline, not for the socket
 		_streamSocket.setBlocking(false);
 		_connected = true;
+		_connectedAt.update();
 		_failed = false;
 	}
-	catch (Poco::Exception& exc)
+	catch (...)
 	{
 		_streamSocket = StreamSocket();
-		serverAway(exc);
-	}
-	catch (std::exception& exc)
-	{
-		_streamSocket = StreamSocket();
-		serverAway(exc);
+		serverAway();
 	}
 	return _connected;
 }
 
 
-void RemoteSyslogChannel::serverAway(const Poco::Exception& exc)
+void RemoteSyslogChannel::serverAway()
 {
-	if (!_failed) Poco::ErrorHandler::handle(exc);
+	serverAway(std::current_exception());
+}
+
+
+void RemoteSyslogChannel::serverAway(std::exception_ptr pException)
+{
+	if (!_failed) _pendingReport = pException;
 	_failed = true;
 	_failedAt.update();
 }
 
 
-void RemoteSyslogChannel::serverAway(const std::exception& exc)
+void RemoteSyslogChannel::report(std::exception_ptr pException)
 {
-	if (!_failed) Poco::ErrorHandler::handle(exc);
-	_failed = true;
-	_failedAt.update();
+	try
+	{
+		std::rethrow_exception(pException);
+	}
+	catch (Poco::Exception& exc)
+	{
+		Poco::ErrorHandler::handle(exc);
+	}
+	catch (std::exception& exc)
+	{
+		Poco::ErrorHandler::handle(exc);
+	}
+	catch (...)
+	{
+		Poco::ErrorHandler::handle();
+	}
 }
 
 
@@ -408,16 +459,18 @@ void RemoteSyslogChannel::disconnect()
 }
 
 
-void RemoteSyslogChannel::sendFrame(const std::string& frame)
+void RemoteSyslogChannel::sendFrame(const std::string& frame, std::size_t& sent)
 {
 	// The socket is non-blocking: the time allowed is for the whole frame,
 	// not for every stall of the server.
 	const Poco::Clock::ClockDiff timeout = _timeout.totalMicroseconds();
 	Poco::Clock start;
-	std::size_t sent = 0;
+	sent = 0;
 	while (sent < frame.size())
 	{
 		const int n = _streamSocket.sendBytes(frame.data() + sent, static_cast<int>(frame.size() - sent));
+		// nothing goes over a connection that is gone, which a secure socket says with 0
+		if (n == 0) throw ConnectionAbortedException("connection closed while a syslog message was sent");
 		if (n > 0) sent += static_cast<std::size_t>(n);
 		if (sent < frame.size())
 		{
