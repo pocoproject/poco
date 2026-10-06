@@ -554,6 +554,17 @@ void SocketTest::testOptionsAfterShutdown()
 	};
 	setOptions(reset);
 	setOptions(shutDown);
+
+	// a wrong argument on a live socket is still reported
+	try
+	{
+		int value = 0;
+		accepted.impl()->setRawOption(SOL_SOCKET, SO_RCVBUF, &value, 1);
+		fail("an option value of the wrong length - must throw");
+	}
+	catch (Poco::Exception&)
+	{
+	}
 }
 
 
