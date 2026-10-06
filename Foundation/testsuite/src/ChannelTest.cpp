@@ -19,8 +19,12 @@
 #include "Poco/FormattingChannel.h"
 #include "Poco/ConsoleChannel.h"
 #include "Poco/StreamChannel.h"
+#include "Poco/Event.h"
 #include "TestChannel.h"
+#include <atomic>
 #include <sstream>
+#include <thread>
+#include <vector>
 
 
 using Poco::SplitterChannel;
@@ -28,9 +32,11 @@ using Poco::AsyncChannel;
 using Poco::FormattingChannel;
 using Poco::ConsoleChannel;
 using Poco::StreamChannel;
+using Poco::Channel;
 using Poco::Formatter;
 using Poco::Message;
 using Poco::AutoPtr;
+using Poco::Event;
 using Poco::Thread;
 using Poco::Runnable;
 
@@ -71,6 +77,40 @@ private:
 	AutoPtr<AsyncChannel> _pAsync;
 	std::atomic<bool> _stop;
 };
+
+
+namespace
+{
+	struct Tally
+		/// The messages that all the channels of a test have got.
+	{
+		std::atomic<int> formatted{0};
+		std::atomic<int> plain{0};
+		std::atomic<int> other{0};
+	};
+
+
+	class TallyChannel : public Channel
+		/// Counts the messages it gets: those that a SimpleFormatter
+		/// has formatted, those that came unformatted, and the rest.
+	{
+	public:
+		explicit TallyChannel(Tally& tally) :
+			_tally(tally)
+		{
+		}
+
+		void log(const Message& msg) override
+		{
+			if (msg.getText() == "Source: Text") ++_tally.formatted;
+			else if (msg.getText() == "Text") ++_tally.plain;
+			else ++_tally.other;
+		}
+
+	private:
+		Tally& _tally;
+	};
+}
 
 
 ChannelTest::ChannelTest(const std::string& name) : CppUnit::TestCase(name)
@@ -143,6 +183,66 @@ void ChannelTest::testFormatting()
 }
 
 
+void ChannelTest::testFormattingConcurrentReplacement()
+{
+	// Messages are logged while another thread replaces the formatter and
+	// the destination: each one is formatted by a formatter or by none,
+	// and gets to a destination.
+	constexpr int THREADS = 4;
+	constexpr int ROUNDS = 1000;
+	constexpr long TIMEOUT = 10000;
+
+	Tally tally;
+	AutoPtr<FormattingChannel> pFormatterChannel = new FormattingChannel(new SimpleFormatter, new TallyChannel(tally));
+
+	std::atomic<bool> stop(false);
+	std::atomic<int> logged(0);
+	std::atomic<int> failed(0);
+	Event loggedOne;
+	std::vector<std::thread> threads;
+	for (int i = 0; i < THREADS; ++i)
+	{
+		threads.emplace_back([&]()
+		{
+			Message msg("Source", "Text", Message::PRIO_INFORMATION);
+			while (!stop)
+			{
+				try
+				{
+					pFormatterChannel->log(msg);
+					++logged;
+				}
+				catch (...)
+				{
+					++failed;
+				}
+				loggedOne.set();
+			}
+		});
+	}
+
+	// Replacing takes turns with logging, so that every round meets
+	// messages that are being logged.
+	int rounds = 0;
+	while (rounds < ROUNDS && loggedOne.tryWait(TIMEOUT))
+	{
+		pFormatterChannel->setFormatter(rounds % 2 == 0 ? new SimpleFormatter : nullptr);
+		pFormatterChannel->setChannel(new TallyChannel(tally));
+		++rounds;
+	}
+	stop = true;
+	for (auto& t : threads)
+	{
+		t.join();
+	}
+
+	assertEqual(ROUNDS, rounds);
+	assertEqual(0, failed.load());
+	assertEqual(0, tally.other.load());
+	assertEqual(logged.load(), tally.formatted + tally.plain);
+}
+
+
 void ChannelTest::testConsole()
 {
 	AutoPtr<ConsoleChannel> pChannel = new ConsoleChannel;
@@ -183,6 +283,7 @@ CppUnit::Test* ChannelTest::suite()
 	CppUnit_addTest(pSuite, ChannelTest, testSplitterAddSameChannelTwice);
 	CppUnit_addTest(pSuite, ChannelTest, testAsync);
 	CppUnit_addTest(pSuite, ChannelTest, testFormatting);
+	CppUnit_addTest(pSuite, ChannelTest, testFormattingConcurrentReplacement);
 	CppUnit_addTest(pSuite, ChannelTest, testConsole);
 	CppUnit_addTest(pSuite, ChannelTest, testStream);
 

@@ -33,6 +33,7 @@ public:
 
 	void testRotateNever();
 	void testFlushing();
+	void testConcurrentOpenClose();
 	void testRotateBySize();
 	void testRotateByAge();
 	void testRotateAtTimeDayUTC();

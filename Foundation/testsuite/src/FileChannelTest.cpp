@@ -29,13 +29,19 @@
 #include "Poco/RotateStrategy.h"
 #include "Poco/ArchiveStrategy.h"
 #include "Poco/PurgeStrategy.h"
+#include "Poco/Event.h"
+#include "Poco/FileStream.h"
+#include <atomic>
+#include <thread>
 #include <vector>
 #include <iostream>
 
 
 using Poco::FileChannel;
+using Poco::FileInputStream;
 using Poco::Message;
 using Poco::AutoPtr;
+using Poco::Event;
 using Poco::TemporaryFile;
 using Poco::Thread;
 using Poco::File;
@@ -130,6 +136,87 @@ void FileChannelTest::testFlushing()
 
 		// Writing to channel with flushing is expected to be slower.
 		assertTrue(flushTime > noFlushTime);
+	}
+	catch (...)
+	{
+		remove(name);
+		throw;
+	}
+	remove(name);
+}
+
+
+void FileChannelTest::testConcurrentOpenClose()
+{
+	// Messages are logged to a channel that another thread closes and
+	// opens again and again: a message opens the file if it has to, and
+	// none is lost.
+	constexpr int THREADS = 4;
+	constexpr int ROUNDS = 500;
+	constexpr long TIMEOUT = 10000;
+
+	std::string name = filename();
+	try
+	{
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
+
+		std::atomic<bool> stop(false);
+		std::atomic<int> logged(0);
+		std::atomic<int> failed(0);
+		Event loggedOne;
+		std::vector<std::thread> threads;
+		for (int i = 0; i < THREADS; ++i)
+		{
+			threads.emplace_back([&]()
+			{
+				Message msg("source", "This is a log file entry", Message::PRIO_INFORMATION);
+				while (!stop)
+				{
+					try
+					{
+						pChannel->log(msg);
+						++logged;
+					}
+					catch (...)
+					{
+						++failed;
+					}
+					loggedOne.set();
+				}
+			});
+		}
+
+		// Closing takes turns with logging, so that every round meets
+		// messages that are being logged.
+		int rounds = 0;
+		try
+		{
+			while (rounds < ROUNDS && loggedOne.tryWait(TIMEOUT))
+			{
+				pChannel->close();
+				pChannel->open();
+				++rounds;
+			}
+		}
+		catch (...)
+		{
+			++failed;
+		}
+		stop = true;
+		for (auto& t: threads)
+		{
+			t.join();
+		}
+		pChannel->close();
+
+		assertEqual (ROUNDS, rounds);
+		assertEqual (0, failed.load());
+
+		FileInputStream istr(name);
+		std::string line;
+		int lines = 0;
+		while (std::getline(istr, line)) ++lines;
+		assertEqual (logged.load(), lines);
 	}
 	catch (...)
 	{
@@ -947,6 +1034,7 @@ CppUnit::Test* FileChannelTest::suite()
 
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateNever);
 	CppUnit_addTest(pSuite, FileChannelTest, testFlushing);
+	CppUnit_addTest(pSuite, FileChannelTest, testConcurrentOpenClose);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateBySize);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateByAge);
 	CppUnit_addLongTest(pSuite, FileChannelTest, testRotateAtTimeDayUTC);
