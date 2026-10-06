@@ -23,6 +23,7 @@
 #include "Poco/Message.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
+#include "Poco/Event.h"
 #include "Poco/Stopwatch.h"
 #include "Poco/Timespan.h"
 #include <algorithm>
@@ -32,6 +33,10 @@
 #include <mutex>
 #include <set>
 #include <string>
+#include <utility>
+#include <initializer_list>
+#include <thread>
+#include <atomic>
 #include <vector>
 
 
@@ -105,6 +110,17 @@ namespace
 			pChannel(new CollectingChannel)
 		{
 			if (maxMessageSize > 0) pListener->setProperty("maxMessageSize", std::to_string(maxMessageSize));
+			pListener->addServerSocket(socket);
+			pListener->open();
+			pListener->addChannel(pChannel);
+		}
+
+		explicit TCPListener(std::initializer_list<std::pair<const char*, const char*>> properties):
+			socket(SocketAddress("127.0.0.1", 0)),
+			pListener(new RemoteSyslogListener(0)),
+			pChannel(new CollectingChannel)
+		{
+			for (const auto& property: properties) pListener->setProperty(property.first, property.second);
 			pListener->addServerSocket(socket);
 			pListener->open();
 			pListener->addChannel(pChannel);
@@ -376,6 +392,33 @@ namespace
 
 namespace
 {
+	class HoldingChannel: public Poco::Channel
+		/// A channel that holds the thread that logs to it until it is
+		/// let go, which holds a parser thread of a listener.
+	{
+	public:
+		void log(const Poco::Message&) override
+		{
+			_entered.set();
+			(void) _letGo.tryWait(10000);
+		}
+
+		bool waitUntilEntered(long milliseconds = 10000)
+		{
+			return _entered.tryWait(milliseconds);
+		}
+
+		void letGo()
+		{
+			_letGo.set();
+		}
+
+	private:
+		Poco::Event _entered;
+		Poco::Event _letGo{Poco::Event::EVENT_MANUALRESET};
+	};
+
+
 	class StallingSocketImpl: public StreamSocketImpl
 		/// A connected socket that takes nothing: what a server that never
 		/// reads leaves a sender with once the buffers are full, without
@@ -1551,6 +1594,122 @@ void SyslogTest::testTCPOpenFailed()
 }
 
 
+void SyslogTest::testTCPMaxConnections()
+{
+	Poco::AutoPtr<RemoteSyslogListener> defaults = new RemoteSyslogListener(0);
+	assertTrue (defaults->getProperty("maxConnections") == "0");
+	assertTrue (defaults->getProperty("idleTimeout") == "0");
+	assertTrue (defaults->getProperty("maxQueued") == "0");
+	for (const char* name: {"maxConnections", "idleTimeout", "maxQueued"})
+	{
+		try
+		{
+			defaults->setProperty(name, "-1");
+			fail("a negative limit - must throw");
+		}
+		catch (Poco::InvalidArgumentException&)
+		{
+		}
+	}
+
+	// With two connections allowed, a third is closed at once, and once
+	// one of the two is gone, a new one is taken.
+	TCPListener listener({{"maxConnections", "2"}});
+	StreamSocket first(listener.address());
+	StreamSocket second(listener.address());
+	send(first, line("first"));
+	send(second, line("second"));
+	assertTrue (listener.pChannel->waitFor(2));
+
+	StreamSocket third(listener.address());
+	assertTrue (closedByPeer(third));
+
+	first.close();
+	// The listener learns of the close on its own thread, so a new
+	// connection may still find two there: it is tried again then.
+	bool taken = false;
+	for (int i = 0; i < 100 && !taken; ++i)
+	{
+		try
+		{
+			StreamSocket fourth(listener.address());
+			send(fourth, line("fourth"));
+			taken = listener.pChannel->waitForText("fourth", 1, 200);
+		}
+		catch (Poco::Exception&)
+		{
+			// closed before the message was out
+		}
+	}
+	assertTrue (taken);
+}
+
+
+void SyslogTest::testTCPIdleTimeout()
+{
+	// A connection that has sent part of a message and then nothing is
+	// closed by the listener, and the part is dropped; one that sends
+	// afterwards is served.
+	TCPListener listener({{"idleTimeout", "200"}});
+	StreamSocket idle(listener.address());
+	send(idle, message("begun and never ended"));
+	assertTrue (closedByPeer(idle));
+
+	StreamSocket active(listener.address());
+	send(active, line("active"));
+	assertTrue (listener.pChannel->waitFor(1));
+	std::vector<std::string> texts = listener.pChannel->texts();
+	assertTrue (texts.size() == 1);
+	assertTrue (texts[0] == "active");
+}
+
+
+void SyslogTest::testTCPMaxQueued()
+{
+	// With one message allowed to wait, the one that is brought while
+	// one waits is held, with the thread that brings it, until the parser
+	// thread has taken the waiting one: that is how TCP slows a sender
+	// down. Nothing is dropped.
+	TCPListener listener({{"maxQueued", "1"}});
+	auto pHolding = Poco::makeAuto<HoldingChannel>();
+	listener.pListener->addChannel(pHolding);
+	const SocketAddress sender("127.0.0.1", 4321);
+
+	listener.pListener->enqueueMessage(message("held by the channel"), sender);
+	assertTrue (pHolding->waitUntilEntered());
+	// the parser thread is held with the first message; one may wait
+	listener.pListener->enqueueMessage(message("waiting in the queue"), sender);
+
+	std::atomic<bool> letGo(false);
+	std::atomic<bool> throughBeforeLetGo(false);
+	std::thread bringer([&]
+	{
+		listener.pListener->enqueueMessage(message("held at the door"), sender);
+		throughBeforeLetGo = !letGo;
+	});
+	letGo = true;
+	pHolding->letGo();
+	bringer.join();
+	assertTrue (!throughBeforeLetGo);
+	assertTrue (listener.pChannel->waitFor(3));
+	std::vector<std::string> texts = listener.pChannel->texts();
+	assertTrue (texts[0] == "held by the channel");
+	assertTrue (texts[1] == "waiting in the queue");
+	assertTrue (texts[2] == "held at the door");
+
+	// a burst over a connection arrives whole and in order
+	StreamSocket client(listener.address());
+	std::string burst;
+	for (int i = 0; i < 20; ++i) burst += line("burst " + std::to_string(i));
+	send(client, burst);
+	assertTrue (listener.pChannel->waitFor(23));
+	texts = listener.pChannel->texts();
+	assertTrue (texts.size() == 23);
+	assertTrue (texts[3] == "burst 0");
+	assertTrue (texts[22] == "burst 19");
+}
+
+
 void SyslogTest::testTCPChannelServerNotReading()
 {
 	// A server that takes the connection and does not read holds a message
@@ -1616,6 +1775,9 @@ CppUnit::Test* SyslogTest::suite()
 	CppUnit_addTest(pSuite, SyslogTest, testTCPCloseWithClients);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPPort);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPOpenFailed);
+	CppUnit_addTest(pSuite, SyslogTest, testTCPMaxConnections);
+	CppUnit_addTest(pSuite, SyslogTest, testTCPIdleTimeout);
+	CppUnit_addTest(pSuite, SyslogTest, testTCPMaxQueued);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannel);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelToListener);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelReconnect);

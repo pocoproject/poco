@@ -73,6 +73,22 @@ void TCPReactorServer::setCloseCallback(const CloseCallback& cb)
 	}
 }
 
+void TCPReactorServer::setAcceptCallback(const AcceptCallback& cb)
+{
+	for (auto& acceptor : _acceptors)
+	{
+		acceptor->setAcceptCallback(cb);
+	}
+}
+
+void TCPReactorServer::setTimeoutCallback(const TimeoutCallback& cb)
+{
+	for (auto& acceptor : _acceptors)
+	{
+		acceptor->setTimeoutCallback(cb);
+	}
+}
+
 void TCPReactorServer::stop()
 {
 	if (_stopped.exchange(true))

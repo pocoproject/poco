@@ -45,6 +45,9 @@ public:
 	void testTCPCloseWithClients();
 	void testTCPPort();
 	void testTCPOpenFailed();
+	void testTCPMaxConnections();
+	void testTCPIdleTimeout();
+	void testTCPMaxQueued();
 	void testTCPChannel();
 	void testTCPChannelToListener();
 	void testTCPChannelReconnect();

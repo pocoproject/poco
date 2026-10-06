@@ -24,6 +24,9 @@
 #include "Poco/ThreadPool.h"
 #include "Poco/SplitterChannel.h"
 #include "Poco/NotificationQueue.h"
+#include "Poco/Event.h"
+#include "Poco/Timespan.h"
+#include <atomic>
 #include <cstddef>
 #include <memory>
 #include <vector>
@@ -61,12 +64,13 @@ class Net_API RemoteSyslogListener: public Poco::SplitterChannel
 	/// at that size and the rest of it is skipped. What is not a message
 	/// is skipped up to the next line feed. Neither closes the connection.
 	///
-	/// NOTE: There is no limit on the number of connections and no idle
-	/// timeout: a sender that sends part of a message and then nothing
-	/// keeps its connection and up to "maxMessageSize" plus one read of
-	/// memory. The queue to the parser threads is not bounded either, so
-	/// a sender is never slowed down. A TCP port that untrusted peers can
-	/// reach needs to be guarded by other means.
+	/// NOTE: By default there is no limit on the number of connections,
+	/// no idle timeout and no bound on the queue to the parser threads:
+	/// a sender that sends part of a message and then nothing keeps its
+	/// connection and up to "maxMessageSize" plus one read of memory, and
+	/// a sender is never slowed down. The "maxConnections", "idleTimeout"
+	/// and "maxQueued" properties set such limits; a TCP port that
+	/// untrusted peers can reach should have them.
 	///
 	/// The RemoteSyslogListener is a subclass of Poco::SplitterChannel.
 	/// Every received log message is sent to the channels registered
@@ -117,6 +121,17 @@ public:
 		///     * maxMessageSize: The largest size, in octets, of a message
 		///       taken from a connection. Defaults to 65536, which is
 		///       also the most that is taken from a UDP packet.
+		///     * maxConnections: The number of TCP connections the listener
+		///       holds at once. A connection that arrives when that many
+		///       are there is closed at once. Defaults to 0: no limit.
+		///     * idleTimeout: The time in milliseconds after which a TCP
+		///       connection that has sent nothing is closed; a message
+		///       that it had begun is dropped. Defaults to 0: no limit.
+		///     * maxQueued: The number of messages that may wait for the
+		///       parser threads. When that many are waiting, a connection
+		///       is not read until a parser thread has taken a message, so
+		///       that TCP slows the sender down, and a UDP datagram is
+		///       dropped. Defaults to 0: no limit.
 		///
 		/// These properties are read by open(): a change takes effect
 		/// when the listener is opened the next time.
@@ -147,6 +162,10 @@ public:
 	void enqueueMessage(const char* messageText, std::size_t length, const Poco::Net::SocketAddress& senderAddress);
 		/// Enqueues a single line of text containing a syslog message
 		/// for asynchronous processing by a parser thread.
+		///
+		/// Waits while the queue holds as many messages as the
+		/// "maxQueued" property allows, until a parser thread has
+		/// taken one.
 
 	static void registerChannel();
 		/// Registers the channel with the global LoggingFactory.
@@ -157,6 +176,9 @@ public:
 	static const std::string PROP_THREADS;
 	static const std::string PROP_BUFFER;
 	static const std::string PROP_MAX_MESSAGE_SIZE;
+	static const std::string PROP_MAX_CONNECTIONS;
+	static const std::string PROP_IDLE_TIMEOUT;
+	static const std::string PROP_MAX_QUEUED;
 
 	static const std::string LOG_PROP_FACILITY;
 	static const std::string LOG_PROP_APP;
@@ -182,6 +204,11 @@ private:
 	void stop();
 		/// Stops and joins all threads.
 
+	void waitForQueueRoom();
+		/// Waits while the queue holds as many messages as the "maxQueued"
+		/// property allows, until a parser thread has taken one or the
+		/// listener closes.
+
 	std::unique_ptr<RemoteUDPListener> _pListener;
 	std::unique_ptr<RemoteTCPListener> _pTCPListener;
 	std::unique_ptr<SyslogParser>      _pParser;
@@ -194,6 +221,11 @@ private:
 	int                                _threads;
 	int                                _buffer;
 	std::size_t                        _maxMessageSize;
+	int                                _maxConnections = 0;
+	Poco::Timespan                     _idleTimeout;
+	int                                _maxQueued = 0;
+	Poco::Event                        _queueRoom;
+	std::atomic<bool>                  _closing{false};
 };
 
 

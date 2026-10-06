@@ -15,6 +15,8 @@ class TCPReactorServerConnection;
 using TcpReactorConnectionPtr = std::shared_ptr<TCPReactorServerConnection>;
 using RecvMessageCallback = std::function<void(const TcpReactorConnectionPtr&)>;
 using CloseCallback = std::function<void(const TcpReactorConnectionPtr&)>;
+using AcceptCallback = std::function<bool(const TcpReactorConnectionPtr&)>;
+using TimeoutCallback = std::function<void()>;
 
 class Net_API TCPReactorServerConnection : public std::enable_shared_from_this<TCPReactorServerConnection>
 {

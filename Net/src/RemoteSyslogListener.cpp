@@ -18,6 +18,7 @@
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/TCPReactorServer.h"
 #include "Poco/Net/TCPServerParams.h"
+#include "Poco/Clock.h"
 #include "Poco/Runnable.h"
 #include "Poco/Notification.h"
 #include "Poco/AutoPtr.h"
@@ -92,7 +93,7 @@ public:
 		BUFFER_SIZE = 65536
 	};
 
-	RemoteUDPListener(Poco::NotificationQueue& queue, Poco::UInt16 port, bool reusePort, int buffer);
+	RemoteUDPListener(Poco::NotificationQueue& queue, Poco::UInt16 port, bool reusePort, int buffer, int maxQueued);
 	~RemoteUDPListener();
 
 	void run();
@@ -101,13 +102,15 @@ public:
 private:
 	Poco::NotificationQueue& _queue;
 	DatagramSocket           _socket;
+	int                      _maxQueued;
 	std::atomic<bool>        _stopped;
 };
 
 
-RemoteUDPListener::RemoteUDPListener(Poco::NotificationQueue& queue, Poco::UInt16 port, bool reusePort, int buffer):
+RemoteUDPListener::RemoteUDPListener(Poco::NotificationQueue& queue, Poco::UInt16 port, bool reusePort, int buffer, int maxQueued):
 	_queue(queue),
 	_socket(Poco::Net::SocketAddress(Poco::Net::IPAddress(), port), false, reusePort),
+	_maxQueued(maxQueued),
 	_stopped(false)
 {
 	if (buffer > 0)
@@ -134,7 +137,9 @@ void RemoteUDPListener::run()
 			{
 				Poco::Net::SocketAddress sourceAddress;
 				int n = _socket.receiveFrom(buffer.begin(), BUFFER_SIZE, sourceAddress);
-				if (n > 0)
+				// a datagram that finds the queue full is dropped: a sender
+				// cannot be slowed down over UDP
+				if (n > 0 && (_maxQueued == 0 || _queue.size() < _maxQueued))
 				{
 					_queue.enqueueNotification(new MessageNotification(buffer.begin(), n, sourceAddress));
 				}
@@ -165,7 +170,7 @@ class RemoteTCPListener
 	/// accepts the connections of that socket and reads from them.
 {
 public:
-	RemoteTCPListener(RemoteSyslogListener& listener, std::size_t maxMessageSize);
+	RemoteTCPListener(RemoteSyslogListener& listener, std::size_t maxMessageSize, int maxConnections, const Poco::Timespan& idleTimeout);
 	~RemoteTCPListener();
 
 	void addServerSocket(const ServerSocket& socket);
@@ -180,6 +185,8 @@ private:
 		/// Where the framing of a connection stands.
 	{
 		SocketAddress peerAddress;
+		Poco::Clock   lastData;
+			/// When the connection was taken or last sent something.
 		Poco::UInt64  skip = 0;
 			/// Octets still to be skipped of a message that was cut off.
 		bool          skipLine = false;
@@ -193,10 +200,23 @@ private:
 		std::unique_ptr<TCPReactorServer> pServer;
 		std::map<std::weak_ptr<TCPReactorServerConnection>, Connection, std::owner_less<>> connections;
 			/// Used by the thread of the server only.
+		Poco::Clock lastSweep;
+			/// When the connections were last looked through for idle ones.
 	};
+
+	bool onAccept(Server& server, const TcpReactorConnectionPtr& pConnection);
+		/// Takes the connection, unless as many as allowed are there.
 
 	void onData(Server& server, const TcpReactorConnectionPtr& pConnection);
 	void onClose(Server& server, const TcpReactorConnectionPtr& pConnection);
+	void onTimeout(Server& server);
+
+	Connection& admit(Server& server, const TcpReactorConnectionPtr& pConnection);
+		/// Adds the connection to those of the server.
+
+	void sweep(Server& server);
+		/// Closes the connections that have sent nothing for the idle
+		/// timeout, at most every quarter of that time.
 
 	std::size_t takeMessages(Connection& connection, const std::string& data);
 		/// Enqueues the messages that data holds in full and returns
@@ -206,14 +226,20 @@ private:
 
 	RemoteSyslogListener&                _listener;
 	std::size_t                          _maxMessageSize;
+	int                                  _maxConnections;
+	Poco::Timespan                       _idleTimeout;
 	std::vector<std::unique_ptr<Server>> _servers;
+	std::atomic<int>                     _connections;
 	std::atomic<bool>                    _stopping;
 };
 
 
-RemoteTCPListener::RemoteTCPListener(RemoteSyslogListener& listener, std::size_t maxMessageSize):
+RemoteTCPListener::RemoteTCPListener(RemoteSyslogListener& listener, std::size_t maxMessageSize, int maxConnections, const Poco::Timespan& idleTimeout):
 	_listener(listener),
 	_maxMessageSize(maxMessageSize),
+	_maxConnections(maxConnections),
+	_idleTimeout(idleTimeout),
+	_connections(0),
 	_stopping(false)
 {
 }
@@ -255,6 +281,13 @@ void RemoteTCPListener::addServerSocket(const ServerSocket& socket)
 		{
 			onClose(server, pConnection);
 		});
+	pServer->pServer->setAcceptCallback(
+		[this, &server](const TcpReactorConnectionPtr& pConnection)
+		{
+			return onAccept(server, pConnection);
+		});
+	// idle connections are also looked for when there is no traffic
+	pServer->pServer->setTimeoutCallback([this, &server] { onTimeout(server); });
 	_servers.push_back(std::move(pServer));
 }
 
@@ -276,27 +309,77 @@ void RemoteTCPListener::stop()
 		pServer->pServer->stop();
 	}
 	_servers.clear();
+	_connections = 0;
+}
+
+
+bool RemoteTCPListener::onAccept(Server& server, const TcpReactorConnectionPtr& pConnection)
+{
+	sweep(server);
+	if (_maxConnections > 0 && _connections >= _maxConnections) return false;
+	admit(server, pConnection);
+	return true;
+}
+
+
+RemoteTCPListener::Connection& RemoteTCPListener::admit(Server& server, const TcpReactorConnectionPtr& pConnection)
+{
+	Connection connection;
+	try
+	{
+		connection.peerAddress = pConnection->socket().peerAddress();
+	}
+	catch (Poco::Exception&)
+	{
+		// gone already: what it sent is taken without its address
+	}
+	++_connections;
+	return server.connections.emplace(pConnection, connection).first->second;
+}
+
+
+void RemoteTCPListener::onTimeout(Server& server)
+{
+	sweep(server);
+}
+
+
+void RemoteTCPListener::sweep(Server& server)
+{
+	if (_idleTimeout == 0) return;
+	const Poco::Clock::ClockDiff timeout = _idleTimeout.totalMicroseconds();
+	if (!server.lastSweep.isElapsed(timeout/4)) return;
+	server.lastSweep.update();
+
+	// An idle connection is taken out of the map before it is closed:
+	// what it had begun is not a message, and onClose() does nothing for
+	// a connection it does not know.
+	std::vector<TcpReactorConnectionPtr> idle;
+	for (auto it = server.connections.begin(); it != server.connections.end();)
+	{
+		if (it->second.lastData.isElapsed(timeout))
+		{
+			if (TcpReactorConnectionPtr pConnection = it->first.lock()) idle.push_back(pConnection);
+			it = server.connections.erase(it);
+			--_connections;
+		}
+		else ++it;
+	}
+	for (auto& pConnection: idle)
+	{
+		pConnection->handleClose();
+	}
 }
 
 
 void RemoteTCPListener::onData(Server& server, const TcpReactorConnectionPtr& pConnection)
 {
 	auto it = server.connections.find(pConnection);
-	if (it == server.connections.end())
-	{
-		Connection connection;
-		try
-		{
-			connection.peerAddress = pConnection->socket().peerAddress();
-		}
-		catch (Poco::Exception&)
-		{
-			// gone already: what it sent is taken without its address
-		}
-		it = server.connections.emplace(pConnection, connection).first;
-	}
+	Connection& connection = it != server.connections.end() ? it->second : admit(server, pConnection);
+	connection.lastData.update();
 	std::string& data = pConnection->buffer();
-	data.erase(0, takeMessages(it->second, data));
+	data.erase(0, takeMessages(connection, data));
+	sweep(server);
 }
 
 
@@ -320,6 +403,7 @@ void RemoteTCPListener::onClose(Server& server, const TcpReactorConnectionPtr& p
 		}
 	}
 	server.connections.erase(it);
+	--_connections;
 }
 
 
@@ -435,7 +519,7 @@ public:
 		WAITTIME_MILLISEC = 1000
 	};
 
-	SyslogParser(Poco::NotificationQueue& queue, RemoteSyslogListener& listener);
+	SyslogParser(Poco::NotificationQueue& queue, RemoteSyslogListener& listener, Poco::Event& room);
 	~SyslogParser();
 
 	void parse(const std::string& line, Poco::Message& message);
@@ -463,16 +547,19 @@ private:
 	Poco::NotificationQueue& _queue;
 	std::atomic<bool>        _stopped;
 	RemoteSyslogListener&    _listener;
+	Poco::Event&             _room;
+		/// Set whenever a message has been taken from the queue.
 };
 
 
 const std::string SyslogParser::NILVALUE("-");
 
 
-SyslogParser::SyslogParser(Poco::NotificationQueue& queue, RemoteSyslogListener& listener):
+SyslogParser::SyslogParser(Poco::NotificationQueue& queue, RemoteSyslogListener& listener, Poco::Event& room):
 	_queue(queue),
 	_stopped(false),
-	_listener(listener)
+	_listener(listener),
+	_room(room)
 {
 }
 
@@ -491,6 +578,7 @@ void SyslogParser::run()
 			Poco::AutoPtr<Poco::Notification> pNf(_queue.waitDequeueNotification(WAITTIME_MILLISEC));
 			if (pNf)
 			{
+				_room.set();
 				Poco::AutoPtr<MessageNotification> pMsgNf = pNf.cast<MessageNotification>();
 				// anything else was enqueued to end the wait
 				if (!pMsgNf) continue;
@@ -778,6 +866,9 @@ const std::string RemoteSyslogListener::PROP_REUSE_PORT("reusePort");
 const std::string RemoteSyslogListener::PROP_THREADS("threads");
 const std::string RemoteSyslogListener::PROP_BUFFER("buffer");
 const std::string RemoteSyslogListener::PROP_MAX_MESSAGE_SIZE("maxMessageSize");
+const std::string RemoteSyslogListener::PROP_MAX_CONNECTIONS("maxConnections");
+const std::string RemoteSyslogListener::PROP_IDLE_TIMEOUT("idleTimeout");
+const std::string RemoteSyslogListener::PROP_MAX_QUEUED("maxQueued");
 
 const std::string RemoteSyslogListener::LOG_PROP_FACILITY("facility");
 const std::string RemoteSyslogListener::LOG_PROP_APP("app");
@@ -852,13 +943,26 @@ void RemoteSyslogListener::processMessage(const std::string& messageText)
 
 void RemoteSyslogListener::enqueueMessage(const std::string& messageText, const Poco::Net::SocketAddress& senderAddress)
 {
+	waitForQueueRoom();
 	_queue.enqueueNotification(new MessageNotification(messageText, senderAddress));
 }
 
 
 void RemoteSyslogListener::enqueueMessage(const char* messageText, std::size_t length, const Poco::Net::SocketAddress& senderAddress)
 {
+	waitForQueueRoom();
 	_queue.enqueueNotification(new MessageNotification(messageText, length, senderAddress));
+}
+
+
+void RemoteSyslogListener::waitForQueueRoom()
+{
+	// The thread that reads a connection waits here, so that TCP slows
+	// the sender down, until a parser thread has taken a message.
+	while (!_closing && _maxQueued > 0 && _queue.size() >= _maxQueued)
+	{
+		_queueRoom.tryWait(100);
+	}
 }
 
 
@@ -910,6 +1014,30 @@ void RemoteSyslogListener::setProperty(const std::string& name, const std::strin
 		else
 			throw Poco::InvalidArgumentException("Not a valid message size", value);
 	}
+	else if (name == PROP_MAX_CONNECTIONS)
+	{
+		int val = Poco::NumberParser::parse(value);
+		if (val >= 0)
+			_maxConnections = val;
+		else
+			throw Poco::InvalidArgumentException("Not a valid number of connections", value);
+	}
+	else if (name == PROP_IDLE_TIMEOUT)
+	{
+		int val = Poco::NumberParser::parse(value);
+		if (val >= 0)
+			_idleTimeout = Poco::Timespan(val*Poco::Timespan::MILLISECONDS);
+		else
+			throw Poco::InvalidArgumentException("Not a valid idle timeout", value);
+	}
+	else if (name == PROP_MAX_QUEUED)
+	{
+		int val = Poco::NumberParser::parse(value);
+		if (val >= 0)
+			_maxQueued = val;
+		else
+			throw Poco::InvalidArgumentException("Not a valid number of queued messages", value);
+	}
 	else
 	{
 		SplitterChannel::setProperty(name, value);
@@ -931,6 +1059,12 @@ std::string RemoteSyslogListener::getProperty(const std::string& name) const
 		return Poco::NumberFormatter::format(_buffer);
 	else if (name == PROP_MAX_MESSAGE_SIZE)
 		return Poco::NumberFormatter::format(_maxMessageSize);
+	else if (name == PROP_MAX_CONNECTIONS)
+		return Poco::NumberFormatter::format(_maxConnections);
+	else if (name == PROP_IDLE_TIMEOUT)
+		return Poco::NumberFormatter::format(_idleTimeout.totalMilliseconds());
+	else if (name == PROP_MAX_QUEUED)
+		return Poco::NumberFormatter::format(_maxQueued);
 	else
 		return SplitterChannel::getProperty(name);
 }
@@ -959,18 +1093,19 @@ void RemoteSyslogListener::open()
 	if (_pParser) return;
 
 	SplitterChannel::open();
+	_closing = false;
 	try
 	{
-		_pParser = std::make_unique<SyslogParser>(_queue, *this);
+		_pParser = std::make_unique<SyslogParser>(_queue, *this, _queueRoom);
 		if (_port > 0)
 		{
-			_pListener = std::make_unique<RemoteUDPListener>(_queue, _port, _reusePort, _buffer);
+			_pListener = std::make_unique<RemoteUDPListener>(_queue, _port, _reusePort, _buffer, _maxQueued);
 		}
 		std::vector<ServerSocket> sockets(_serverSockets);
 		createServerSockets(sockets);
 		if (!sockets.empty())
 		{
-			_pTCPListener = std::make_unique<RemoteTCPListener>(*this, _maxMessageSize);
+			_pTCPListener = std::make_unique<RemoteTCPListener>(*this, _maxMessageSize, _maxConnections, _idleTimeout);
 			for (const auto& socket: sockets)
 			{
 				_pTCPListener->addServerSocket(socket);
@@ -1008,6 +1143,9 @@ void RemoteSyslogListener::close()
 
 void RemoteSyslogListener::stop()
 {
+	// a thread that waits for room in the queue is let go first
+	_closing = true;
+	_queueRoom.set();
 	if (_pTCPListener)
 	{
 		_pTCPListener->stop();

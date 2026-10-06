@@ -60,6 +60,18 @@ public:
 		/// of the connection still holds what was received and not taken
 		/// out of it. Must be called before start().
 
+	void setAcceptCallback(const AcceptCallback& cb);
+		/// Sets the callback that is asked, on the thread of the reactor
+		/// that accepted it, whether a connection that has just been
+		/// accepted is taken. A connection that it declines is closed at
+		/// once and never served. Must be called before start().
+
+	void setTimeoutCallback(const TimeoutCallback& cb);
+		/// Sets the callback that is called, on the thread of the reactor
+		/// of a server socket, whenever a poll of that reactor has found
+		/// nothing to do: every poll timeout while there is no traffic on
+		/// the connections it serves. Must be called before start().
+
 private:
 	ThreadPool                                       _threadPool;
 	std::vector<SocketReactor>                       _reactors;
