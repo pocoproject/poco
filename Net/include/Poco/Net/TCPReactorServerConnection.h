@@ -29,8 +29,10 @@ public:
 		/// Reads from the socket and passes what was read to the receive
 		/// callback.
 		///
-		/// A blocking socket is read once. A non-blocking socket is read
-		/// until nothing is left to read at the moment.
+		/// A blocking socket is read once, and again for what a TLS socket
+		/// holds. A non-blocking socket is read as long as there is
+		/// something to read, up to 16 reads of 4 KB for one event; what a
+		/// TLS socket holds is read whatever the count.
 
 	void onError(const AutoPtr<ErrorNotification>& pNf);
 	void onShutdown(const AutoPtr<ShutdownNotification>& pNf);

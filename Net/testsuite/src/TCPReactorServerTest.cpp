@@ -319,6 +319,8 @@ void TCPReactorServerTest::testNonBlockingRead()
 	// hold: the reads that find nothing must leave the connection open.
 	const std::string data = pattern(1024*1024);
 	StreamSocket client(ss.address());
+	// a server that stopped reading would fail the test, not hold it up
+	client.setSendTimeout(Poco::Timespan(30, 0));
 	sendAll(client, data);
 	bool arrived = recorder.waitForData(data.size());
 	std::size_t closedBefore = recorder.closedConnections();

@@ -20,6 +20,51 @@ constexpr int MAX_READS_PER_EVENT = 16;
 constexpr int MAX_READS_ON_ERROR = 4096;
 
 
+namespace
+{
+	// Why a connection is closed is logged without touching the connection,
+	// which may be gone by then. A peer that resets or aborts, or a timeout
+	// from a stalled peer, is routine on a busy server and logged at debug;
+	// anything else stays at error, so that alerting can rely on it.
+	void logClosed(const Poco::Exception& exc)
+	{
+		try
+		{
+			Poco::Logger& log = Poco::Logger::get("Poco.Net.TCPReactorServer");
+			if (dynamic_cast<const Poco::Net::ConnectionResetException*>(&exc)
+				|| dynamic_cast<const Poco::Net::ConnectionAbortedException*>(&exc)
+				|| dynamic_cast<const Poco::TimeoutException*>(&exc))
+			{
+				if (log.debug()) log.debug("connection closed: %s", exc.displayText());
+			}
+			else
+				log.error("connection closed on error: %s", exc.displayText());
+		}
+		catch (...) {}
+	}
+
+	void logClosed(const std::exception& exc)
+	{
+		try
+		{
+			Poco::Logger::get("Poco.Net.TCPReactorServer").error(
+				"connection closed on error: %s", std::string(exc.what()));
+		}
+		catch (...) {}
+	}
+
+	void logClosedOnUnknownError()
+	{
+		try
+		{
+			Poco::Logger::get("Poco.Net.TCPReactorServer").error(
+				"connection closed on unknown error");
+		}
+		catch (...) {}
+	}
+}
+
+
 TCPReactorServerConnection::TCPReactorServerConnection(StreamSocket socket, SocketReactor& reactor)
 	: _reactor(reactor), _socket(socket)
 {
@@ -70,8 +115,12 @@ void TCPReactorServerConnection::onRead(const AutoPtr<ReadableNotification>& pNf
 		if (_socket.getBlocking())
 		{
 			// One read per event: a second one could wait for data that is
-			// not there, and the reactor with it.
-			(void) readSome();
+			// not there, and the reactor with it. What a TLS socket holds
+			// is not signalled again, so it is read now; that read does
+			// not wait.
+			while (readSome() == READ_DATA && socketHoldsData())
+			{
+			}
 		}
 		else
 		{
@@ -88,48 +137,20 @@ void TCPReactorServerConnection::onRead(const AutoPtr<ReadableNotification>& pNf
 	catch (const Poco::Exception& exc)
 	{
 		// Close FIRST: the leak/hot-spin fix must run even if logging throws.
-		// Then log best-effort, guarded so nothing escapes onRead. handleClose()
-		// may already have destroyed this, so the block below touches only the
-		// exception and free functions, never a member.
+		// handleClose() may already have destroyed this, so what follows
+		// touches only the exception, never a member.
 		handleClose();
-		try
-		{
-			// Expected client-disconnect exceptions - a peer reset/abort, or a
-			// timeout from a stalled peer (including the accepted-socket send
-			// timeout) - are routine on a busy server, so log them at debug.
-			// Genuinely unexpected failures stay at error so alerting can rely
-			// on it.
-			Poco::Logger& log = Poco::Logger::get("Poco.Net.TCPReactorServer");
-			if (dynamic_cast<const Poco::Net::ConnectionResetException*>(&exc)
-				|| dynamic_cast<const Poco::Net::ConnectionAbortedException*>(&exc)
-				|| dynamic_cast<const Poco::TimeoutException*>(&exc))
-			{
-				if (log.debug()) log.debug("connection closed: %s", exc.displayText());
-			}
-			else
-				log.error("connection closed on error: %s", exc.displayText());
-		}
-		catch (...) {}
+		logClosed(exc);
 	}
 	catch (const std::exception& exc)
 	{
 		handleClose();
-		try
-		{
-			Poco::Logger::get("Poco.Net.TCPReactorServer").error(
-				"connection closed on error: %s", std::string(exc.what()));
-		}
-		catch (...) {}
+		logClosed(exc);
 	}
 	catch (...)
 	{
 		handleClose();
-		try
-		{
-			Poco::Logger::get("Poco.Net.TCPReactorServer").error(
-				"connection closed on unknown error");
-		}
-		catch (...) {}
+		logClosedOnUnknownError();
 	}
 }
 
@@ -153,7 +174,18 @@ void TCPReactorServerConnection::onError(const AutoPtr<ErrorNotification>& pNf)
 			}
 		}
 	}
-	catch (...) {}
+	catch (const Poco::Exception& exc)
+	{
+		logClosed(exc);
+	}
+	catch (const std::exception& exc)
+	{
+		logClosed(exc);
+	}
+	catch (...)
+	{
+		logClosedOnUnknownError();
+	}
 	try
 	{
 		handleClose();
@@ -194,11 +226,10 @@ TCPReactorServerConnection::ReadResult TCPReactorServerConnection::readSome()
 	{
 		Poco::ErrorHandler::handle(MessageException(
 			Poco::format("incomplete request exceeds %z bytes", _maxPendingRequestSize)));
-		// Deregistering only removes the handlers; the reactor's most recent
-		// poll result still holds a copy of the socket, so the descriptor
-		// would stay open until that map is replaced. The local copy outlives
-		// handleClose(), which may destroy this, so nothing below touches a
-		// member.
+		// Deregistering only removes the handlers; the socket is closed here
+		// rather than left to the reactor, which holds a copy of it until
+		// its round is over. The local copy outlives handleClose(), which
+		// may destroy this, so nothing below touches a member.
 		StreamSocket socket = _socket;
 		handleClose();
 		socket.close();

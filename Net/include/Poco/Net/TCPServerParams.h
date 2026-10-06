@@ -154,13 +154,14 @@ public:
 		/// mode only).
 		///
 		/// A blocking connection is read once each time its socket becomes
-		/// readable. A TLS connection needs more than that: what a secure
-		/// socket has taken from the network and not yet handed out is not
-		/// signalled as readable again, and a handshake or a record that has
-		/// not arrived in full makes the read wait, with every other
-		/// connection of the reactor waiting behind it. A non-blocking
-		/// connection is read until nothing is left, and a read that cannot
-		/// be completed returns to the reactor at once.
+		/// readable, and again for what a secure socket has taken from the
+		/// network and not yet handed out, since that is not signalled as
+		/// readable again. A handshake or a record that has not arrived in
+		/// full makes a blocking read wait, with every other connection of
+		/// the reactor waiting behind it. A non-blocking connection is read
+		/// as long as there is something to read, up to 16 reads of 4 KB
+		/// for one event and whatever a secure socket holds, and a read
+		/// that cannot be completed returns to the reactor at once.
 		///
 		/// A read callback that writes to the connection must then be
 		/// prepared for sendBytes() to take less than it was given. The
