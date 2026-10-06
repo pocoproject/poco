@@ -13,6 +13,7 @@
 
 
 #include "Poco/Logger.h"
+#include "DeferredRelease.h"
 #include "Poco/Formatter.h"
 #include "Poco/LoggingRegistry.h"
 #include "Poco/Exception.h"
@@ -29,7 +30,7 @@ Mutex                Logger::_mapMtx;
 const std::string    Logger::ROOT;
 
 
-Logger::Logger(const std::string& name, Channel::Ptr pChannel, int level): _name(name), _pChannel(pChannel), _level(level)
+Logger::Logger(const std::string& name, Channel::Ptr pChannel, int level): _name(name), _pChannel(pChannel), _pCurrentChannel(_pChannel.get()), _level(level)
 {
 }
 
@@ -41,9 +42,10 @@ Logger::~Logger()
 
 void Logger::setChannel(Channel::Ptr pChannel)
 {
-	// The channel that is replaced is released when the mutex is free
-	// again: its destructor may log.
-	Channel::Ptr pReplaced = exchangeChannel(std::move(pChannel));
+	// The channel that is replaced is let go of when the mutex is free
+	// again, since its destructor may log, and not before the threads
+	// that log are done with it.
+	DeferredRelease::release(exchangeChannel(std::move(pChannel)));
 }
 
 
@@ -51,6 +53,7 @@ Channel::Ptr Logger::exchangeChannel(Channel::Ptr pChannel)
 {
 	FastMutex::ScopedLock lock(_channelMutex);
 	_pChannel.swap(pChannel);
+	_pCurrentChannel.store(_pChannel.get());
 	return pChannel;
 }
 
@@ -90,11 +93,25 @@ void Logger::logImpl(M&& msg)
 {
 	if (_level >= msg.getPriority())
 	{
-		Channel::Ptr pChannel = getChannel();
+		// The channel is kept for the time of the reader: a thread that
+		// logs takes no mutex and counts no reference.
+		DeferredRelease::Reader reader;
+		Channel* pChannel = _pCurrentChannel.load();
 		if (pChannel)
 		{
 			pChannel->log(std::forward<M>(msg));
 		}
+	}
+}
+
+
+void Logger::logToChannel(Message&& msg)
+{
+	DeferredRelease::Reader reader;
+	Channel* pChannel = _pCurrentChannel.load();
+	if (pChannel)
+	{
+		pChannel->log(std::move(msg));
 	}
 }
 
@@ -125,15 +142,11 @@ void Logger::log(const Exception& exc, const char* file, LineNumber line)
 
 void Logger::dump(const std::string& msg, const void* buffer, std::size_t length, Message::Priority prio)
 {
-	if (_level >= prio)
+	if (_level >= prio && hasChannel())
 	{
-		Channel::Ptr pChannel = getChannel();
-		if (pChannel)
-		{
-			std::string text(msg);
-			formatDump(text, buffer, length);
-			pChannel->log(Message(_name, text, prio));
-		}
+		std::string text(msg);
+		formatDump(text, buffer, length);
+		logToChannel(Message(_name, text, prio));
 	}
 }
 
@@ -158,14 +171,15 @@ void Logger::setLevel(const std::string& name, int level)
 
 void Logger::setChannel(const std::string& name, Channel::Ptr pChannel)
 {
-	// The channels that are replaced are released when the mutex is free
+	// The channels that are replaced are let go of when the mutex is free
 	// again: a destructor may wait for a thread that asks for a logger.
-	std::vector<Channel::Ptr> replaced;
+	std::vector<DeferredRelease::Ptr> replaced;
 	{
 		Mutex::ScopedLock lock(_mapMtx);
 
 		if (_pLoggerMap)
 		{
+			replaced.reserve(_pLoggerMap->size());
 			std::string::size_type len = name.length();
 			for (auto& p: *_pLoggerMap)
 			{
@@ -176,18 +190,20 @@ void Logger::setChannel(const std::string& name, Channel::Ptr pChannel)
 			}
 		}
 	}
+	DeferredRelease::release(replaced);
 }
 
 
 void Logger::setProperty(const std::string& loggerName, const std::string& propertyName, const std::string& value)
 {
-	// Channels that are replaced are released when the mutex is free again.
-	std::vector<Channel::Ptr> replaced;
+	// Channels that are replaced are let go of when the mutex is free again.
+	std::vector<DeferredRelease::Ptr> replaced;
 	{
 		Mutex::ScopedLock lock(_mapMtx);
 
 		if (_pLoggerMap)
 		{
+			replaced.reserve(_pLoggerMap->size());
 			std::string::size_type len = loggerName.length();
 			for (auto& p: *_pLoggerMap)
 			{
@@ -201,6 +217,7 @@ void Logger::setProperty(const std::string& loggerName, const std::string& prope
 			}
 		}
 	}
+	DeferredRelease::release(replaced);
 }
 
 
@@ -374,9 +391,9 @@ Logger::Ptr Logger::has(const std::string& name)
 
 void Logger::shutdown()
 {
-	// The channels are released when the mutex is free again: a
+	// The channels are let go of when the mutex is free again: a
 	// destructor may wait for a thread that asks for a logger.
-	std::vector<Channel::Ptr> detached;
+	std::vector<DeferredRelease::Ptr> detached;
 	{
 		Mutex::ScopedLock lock(_mapMtx);
 
@@ -387,12 +404,14 @@ void Logger::shutdown()
 		// causing use-after-free during static destruction.
 		if (_pLoggerMap)
 		{
+			detached.reserve(_pLoggerMap->size());
 			for (auto& [name, pLogger] : *_pLoggerMap)
 			{
 				if (pLogger) detached.push_back(pLogger->exchangeChannel(nullptr));
 			}
 		}
 	}
+	DeferredRelease::release(detached);
 }
 
 

@@ -93,8 +93,10 @@ public:
 		///
 		/// The channel can be replaced while other threads log. A
 		/// message that is on its way to the channel that is replaced
-		/// still gets there, and that channel is released when the
-		/// last such message is through.
+		/// still gets there. The Logger lets go of that channel at
+		/// once if no thread is logging, and otherwise as soon as
+		/// the messages that were on their way, through any Logger,
+		/// are through.
 
 	[[nodiscard]] Channel::Ptr getChannel() const;
 		/// Returns the Channel attached to the logger.
@@ -505,12 +507,25 @@ private:
 	void logAlways(const std::string& text, Message::Priority prio);
 	void logAlways(std::string&& text, Message::Priority prio);
 
+	[[nodiscard]] bool hasChannel() const;
+		/// Returns true if a Channel is attached. It may be replaced or
+		/// detached the next moment: this only saves the making of a
+		/// message that nobody would take.
+
+	void logToChannel(Message&& msg);
+		/// Passes the message to the attached Channel, if there is one.
+
 	[[nodiscard]] Channel::Ptr exchangeChannel(Channel::Ptr pChannel);
 		/// Attaches the given Channel and returns the one that was
-		/// attached, for the caller to release where it holds no mutex.
+		/// attached. A thread that logs may still use that one: the
+		/// caller lets go of it with DeferredRelease, where it holds
+		/// no mutex.
 
 	std::string       _name;
 	Channel::Ptr      _pChannel;
+	std::atomic<Channel*> _pCurrentChannel;
+		/// The attached Channel for the threads that log, which load it
+		/// without the mutex and without counting a reference.
 	std::atomic<int>  _level;
 	mutable FastMutex _channelMutex;
 
@@ -734,94 +749,80 @@ inline int Logger::getLevel() const
 }
 
 
+inline bool Logger::hasChannel() const
+{
+	return _pCurrentChannel.load(std::memory_order_relaxed) != nullptr;
+}
+
+
 inline void Logger::log(const std::string& text, Message::Priority prio)
 {
-	if (_level >= prio)
+	if (_level >= prio && hasChannel())
 	{
-		Channel::Ptr pChannel = getChannel();
-		if (pChannel)
-		{
-			pChannel->log(Message(_name, text, prio));
-		}
+		logToChannel(Message(_name, text, prio));
 	}
 }
 
 
 inline void Logger::log(std::string&& text, Message::Priority prio)
 {
-	if (_level >= prio)
+	if (_level >= prio && hasChannel())
 	{
-		Channel::Ptr pChannel = getChannel();
-		if (pChannel)
-		{
-			pChannel->log(Message(_name, std::move(text), prio));
-		}
+		logToChannel(Message(_name, std::move(text), prio));
 	}
 }
 
 
 inline void Logger::logNPC(const std::string& text, Message::Priority prio)
 {
-	Channel::Ptr pChannel = getChannel();
-	if (pChannel)
+	if (hasChannel())
 	{
-		pChannel->log(Message(_name, text, prio));
+		logToChannel(Message(_name, text, prio));
 	}
 }
 
 
 inline void Logger::logNPC(std::string&& text, Message::Priority prio)
 {
-	Channel::Ptr pChannel = getChannel();
-	if (pChannel)
+	if (hasChannel())
 	{
-		pChannel->log(Message(_name, std::move(text), prio));
+		logToChannel(Message(_name, std::move(text), prio));
 	}
 }
 
 
 inline void Logger::log(const std::string& text, Message::Priority prio, const char* file, LineNumber line)
 {
-	if (_level >= prio)
+	if (_level >= prio && hasChannel())
 	{
-		Channel::Ptr pChannel = getChannel();
-		if (pChannel)
-		{
-			pChannel->log(Message(_name, text, prio, file, line));
-		}
+		logToChannel(Message(_name, text, prio, file, line));
 	}
 }
 
 
 inline void Logger::log(std::string&& text, Message::Priority prio, const char* file, LineNumber line)
 {
-	if (_level >= prio)
+	if (_level >= prio && hasChannel())
 	{
-		Channel::Ptr pChannel = getChannel();
-		if (pChannel)
-		{
-			pChannel->log(Message(_name, std::move(text), prio, file, line));
-		}
+		logToChannel(Message(_name, std::move(text), prio, file, line));
 	}
 }
 
 
 inline void Logger::logAlways(const std::string& text, Message::Priority prio)
 {
-	Channel::Ptr pChannel = getChannel();
-	if (pChannel)
+	if (hasChannel())
 	{
-		pChannel->log(Message(_name, text, prio));
+		logToChannel(Message(_name, text, prio));
 	}
 }
 
 
 inline void Logger::logAlways(std::string&& text, Message::Priority prio)
 {
-	Channel::Ptr pChannel = getChannel();
-	if (pChannel)
+	if (hasChannel())
 	{
-		pChannel->log(Message(_name, std::move(text), prio));
+		logToChannel(Message(_name, std::move(text), prio));
 	}
 }
 

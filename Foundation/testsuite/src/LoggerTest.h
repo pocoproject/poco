@@ -36,6 +36,12 @@ public:
 	void testLogDuringDestructionOfReplaced();
 	void testGetDuringDestructionOfDetached();
 	void testConcurrentSetLevel();
+	void testReplacedChannelReleased();
+	void testReplaceChannelWithMessageOnItsWay();
+	void testReplaceFormatterWithMessageOnItsWay();
+	void testReplacedChannelNotKeptByLaterMessage();
+	void testChannelReplacesItself();
+	void testLogWhileThreadEnds();
 
 	void setUp();
 	void tearDown();

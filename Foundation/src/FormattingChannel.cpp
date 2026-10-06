@@ -13,6 +13,7 @@
 
 
 #include "Poco/FormattingChannel.h"
+#include "DeferredRelease.h"
 #include "Poco/Message.h"
 #include "Poco/LoggingRegistry.h"
 
@@ -22,21 +23,27 @@ namespace Poco {
 
 FormattingChannel::FormattingChannel():
 	_pFormatter(nullptr),
-	_pChannel(nullptr)
+	_pChannel(nullptr),
+	_pCurrentFormatter(nullptr),
+	_pCurrentChannel(nullptr)
 {
 }
 
 
 FormattingChannel::FormattingChannel(Formatter::Ptr pFormatter):
 	_pFormatter(pFormatter),
-	_pChannel(nullptr)
+	_pChannel(nullptr),
+	_pCurrentFormatter(_pFormatter.get()),
+	_pCurrentChannel(nullptr)
 {
 }
 
 
 FormattingChannel::FormattingChannel(Formatter::Ptr pFormatter, Channel::Ptr pChannel):
 	_pFormatter(pFormatter),
-	_pChannel(pChannel)
+	_pChannel(pChannel),
+	_pCurrentFormatter(_pFormatter.get()),
+	_pCurrentChannel(_pChannel.get())
 {
 }
 
@@ -48,12 +55,15 @@ FormattingChannel::~FormattingChannel()
 
 void FormattingChannel::setFormatter(Formatter::Ptr pFormatter)
 {
-	// The formatter that is replaced is released when the mutex is free
-	// again: its destructor may log.
+	// The formatter that is replaced is let go of when the mutex is free
+	// again, since its destructor may log, and not before the threads
+	// that log are done with it.
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		_pFormatter.swap(pFormatter);
+		_pCurrentFormatter.store(_pFormatter.get());
 	}
+	DeferredRelease::release(pFormatter);
 }
 
 
@@ -66,12 +76,15 @@ Formatter::Ptr FormattingChannel::getFormatter() const
 
 void FormattingChannel::setChannel(Channel::Ptr pChannel)
 {
-	// The channel that is replaced is released when the mutex is free
-	// again: its destructor may log.
+	// The channel that is replaced is let go of when the mutex is free
+	// again, since its destructor may log, and not before the threads
+	// that log are done with it.
 	{
 		FastMutex::ScopedLock lock(_mutex);
 		_pChannel.swap(pChannel);
+		_pCurrentChannel.store(_pChannel.get());
 	}
+	DeferredRelease::release(pChannel);
 }
 
 
@@ -84,13 +97,12 @@ Channel::Ptr FormattingChannel::getChannel() const
 
 void FormattingChannel::log(const Message& msg)
 {
-	Formatter::Ptr pFormatter;
-	Channel::Ptr pChannel;
-	{
-		FastMutex::ScopedLock lock(_mutex);
-		pFormatter = _pFormatter;
-		pChannel = _pChannel;
-	}
+	// The formatter and the channel are kept for the time of the reader:
+	// a thread that logs takes no mutex and counts no reference. Within
+	// the reader of a Logger, this one costs next to nothing.
+	DeferredRelease::Reader reader;
+	Formatter* pFormatter = _pCurrentFormatter.load();
+	Channel* pChannel = _pCurrentChannel.load();
 	if (pChannel)
 	{
 		if (pFormatter)

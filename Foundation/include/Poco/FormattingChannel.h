@@ -23,6 +23,7 @@
 #include "Poco/Formatter.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Mutex.h"
+#include <atomic>
 
 
 namespace Poco {
@@ -56,8 +57,10 @@ public:
 		///
 		/// The formatter and the destination channel can be
 		/// replaced while other threads log. A message that is
-		/// on its way keeps the ones it started with, and they
-		/// are released when the last such message is through.
+		/// on its way keeps the ones it started with. The channel
+		/// lets go of those at once if no thread is logging, and
+		/// otherwise as soon as the messages that were on their
+		/// way are through.
 
 	[[nodiscard]] Formatter::Ptr getFormatter() const;
 		/// Returns the Formatter used to format messages,
@@ -97,6 +100,10 @@ protected:
 private:
 	Formatter::Ptr    _pFormatter;
 	Channel::Ptr      _pChannel;
+	std::atomic<Formatter*> _pCurrentFormatter;
+	std::atomic<Channel*>   _pCurrentChannel;
+		/// The formatter and the channel for the threads that log, which
+		/// load them without the mutex and without counting a reference.
 	mutable FastMutex _mutex;
 };
 

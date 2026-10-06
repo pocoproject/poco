@@ -136,6 +136,166 @@ namespace
 	private:
 		Bystander::Ptr _pBystander;
 	};
+
+	struct Watch
+		/// What a test shares with a channel or a formatter that it watches.
+	{
+		using Ptr = std::shared_ptr<Watch>;
+
+		static constexpr long TIMEOUT = 10000;
+
+		void messageArrived()
+			/// Called by the watched object for every message. Holds the
+			/// message there until the test lets it go on, if the test
+			/// wants that.
+		{
+			++messages;
+			arrived.set();
+			if (holding) goOn.tryWait(TIMEOUT);
+			if (destroyed) destroyedInUse = true;
+		}
+
+		Event arrived;
+			/// A message has arrived in the watched object.
+
+		Event goOn;
+			/// Set by the test: the message that is held may go on.
+
+		std::atomic<bool> holding{false};
+			/// Messages are held in the watched object.
+
+		std::atomic<int> messages{0};
+			/// The messages that have arrived in the watched object.
+
+		std::atomic<bool> destroyed{false};
+			/// The watched object is destroyed.
+
+		std::atomic<bool> destroyedInUse{false};
+			/// The watched object was destroyed with a message in it.
+	};
+
+
+	class WatchedChannel: public Channel
+		/// A channel that tells a test of its messages and of its destruction.
+	{
+	public:
+		explicit WatchedChannel(Watch::Ptr pWatch):
+			_pWatch(std::move(pWatch))
+		{
+		}
+
+		void log(const Message&) override
+		{
+			// Kept apart from the channel, which the test expects to be
+			// there for as long as the message is in it.
+			Watch::Ptr pWatch = _pWatch;
+			pWatch->messageArrived();
+		}
+
+	protected:
+		~WatchedChannel() override
+		{
+			_pWatch->destroyed = true;
+		}
+
+	private:
+		Watch::Ptr _pWatch;
+	};
+
+
+	class WatchedFormatter: public Formatter
+		/// A formatter that tells a test of its messages and of its destruction.
+	{
+	public:
+		explicit WatchedFormatter(Watch::Ptr pWatch):
+			_pWatch(std::move(pWatch))
+		{
+		}
+
+		~WatchedFormatter() override
+		{
+			_pWatch->destroyed = true;
+		}
+
+		void format(const Message& msg, std::string& text) override
+		{
+			Watch::Ptr pWatch = _pWatch;
+			pWatch->messageArrived();
+			text = msg.getText();
+		}
+
+	private:
+		Watch::Ptr _pWatch;
+	};
+
+
+	class SelfReplacingChannel: public Channel
+		/// A channel that replaces itself in its logger while it logs.
+	{
+	public:
+		SelfReplacingChannel(Logger& logger, Watch::Ptr pWatch):
+			_logger(logger),
+			_pWatch(std::move(pWatch))
+		{
+		}
+
+		void log(const Message&) override
+		{
+			Watch::Ptr pWatch = _pWatch;
+			_logger.setChannel(new NullChannel);
+			pWatch->messageArrived();
+		}
+
+	protected:
+		~SelfReplacingChannel() override
+		{
+			_pWatch->destroyed = true;
+		}
+
+	private:
+		Logger& _logger;
+		Watch::Ptr _pWatch;
+	};
+
+
+	class Sender
+		/// A thread that logs. It is joined when the test leaves it
+		/// behind, which a failed assertion does as well.
+	{
+	public:
+		explicit Sender(std::function<void()> log):
+			_thread(std::move(log))
+		{
+		}
+
+		~Sender()
+		{
+			join();
+		}
+
+		void join()
+		{
+			if (_thread.joinable()) _thread.join();
+		}
+
+	private:
+		std::thread _thread;
+	};
+
+
+	struct LastWords
+		/// Logs when the thread that it belongs to ends.
+	{
+		~LastWords()
+		{
+			if (say) say();
+		}
+
+		std::function<void()> say;
+	};
+
+
+	thread_local LastWords lastWords;
 }
 
 
@@ -673,6 +833,205 @@ void LoggerTest::testConcurrentSetLevel()
 }
 
 
+void LoggerTest::testReplacedChannelReleased()
+{
+	// With no message on its way, a channel that is replaced or detached
+	// is released at once. A thread that has logged and ended does not
+	// hold it back.
+	Logger& logger = Logger::get("TestLogger.ReplacedReleased");
+	logger.setLevel(Message::PRIO_INFORMATION);
+
+	auto pReplaced = std::make_shared<Watch>();
+	logger.setChannel(new WatchedChannel(pReplaced));
+	logger.information("through before the channel is replaced");
+	Sender sender([&logger] { logger.information("through as well, from a thread that ends"); });
+	sender.join();
+	assertEqual (2, pReplaced->messages.load());
+	assertTrue (!pReplaced->destroyed);
+	logger.setChannel(new NullChannel);
+	assertTrue (pReplaced->destroyed);
+
+	auto pReplacedByName = std::make_shared<Watch>();
+	logger.setChannel(new WatchedChannel(pReplacedByName));
+	Logger::setChannel("TestLogger.ReplacedReleased", new NullChannel);
+	assertTrue (pReplacedByName->destroyed);
+
+	auto pDetached = std::make_shared<Watch>();
+	logger.setChannel(new WatchedChannel(pDetached));
+	Logger::shutdown();
+	assertTrue (pDetached->destroyed);
+
+	AutoPtr<FormattingChannel> pFormattingChannel = new FormattingChannel;
+	auto pFormatter = std::make_shared<Watch>();
+	pFormattingChannel->setFormatter(new WatchedFormatter(pFormatter));
+	pFormattingChannel->setFormatter(nullptr);
+	assertTrue (pFormatter->destroyed);
+
+	auto pDestination = std::make_shared<Watch>();
+	pFormattingChannel->setChannel(new WatchedChannel(pDestination));
+	pFormattingChannel->setChannel(nullptr);
+	assertTrue (pDestination->destroyed);
+}
+
+
+void LoggerTest::testReplaceChannelWithMessageOnItsWay()
+{
+	// A channel that is replaced while a message is on its way through
+	// it is kept until that message is through.
+	Logger& logger = Logger::get("TestLogger.MessageOnItsWay");
+	logger.setLevel(Message::PRIO_INFORMATION);
+
+	auto pReplaced = std::make_shared<Watch>();
+	pReplaced->holding = true;
+	logger.setChannel(new WatchedChannel(pReplaced));
+
+	Sender sender([&logger] { logger.information("on its way while the channel is replaced"); });
+	assertTrue (pReplaced->arrived.tryWait(Watch::TIMEOUT));
+	logger.setChannel(new NullChannel);
+	assertTrue (!pReplaced->destroyed);
+
+	pReplaced->goOn.set();
+	sender.join();
+	assertTrue (pReplaced->destroyed);
+	assertTrue (!pReplaced->destroyedInUse);
+
+	logger.setChannel(nullptr);
+}
+
+
+void LoggerTest::testReplaceFormatterWithMessageOnItsWay()
+{
+	// The same for the formatter and for the destination of a
+	// FormattingChannel that a logger passes its messages to.
+	AutoPtr<FormattingChannel> pFormattingChannel = new FormattingChannel;
+	Logger& logger = Logger::get("TestLogger.FormatterMessageOnItsWay");
+	logger.setLevel(Message::PRIO_INFORMATION);
+	logger.setChannel(pFormattingChannel);
+	auto logOne = [&logger] { logger.information("on its way while a part of the channel is replaced"); };
+
+	{
+		auto pFormatter = std::make_shared<Watch>();
+		pFormatter->holding = true;
+		pFormattingChannel->setFormatter(new WatchedFormatter(pFormatter));
+		pFormattingChannel->setChannel(new NullChannel);
+
+		Sender sender(logOne);
+		assertTrue (pFormatter->arrived.tryWait(Watch::TIMEOUT));
+		pFormattingChannel->setFormatter(nullptr);
+		assertTrue (!pFormatter->destroyed);
+
+		pFormatter->goOn.set();
+		sender.join();
+		assertTrue (pFormatter->destroyed);
+		assertTrue (!pFormatter->destroyedInUse);
+	}
+
+	{
+		auto pDestination = std::make_shared<Watch>();
+		pDestination->holding = true;
+		pFormattingChannel->setChannel(new WatchedChannel(pDestination));
+
+		Sender sender(logOne);
+		assertTrue (pDestination->arrived.tryWait(Watch::TIMEOUT));
+		pFormattingChannel->setChannel(new NullChannel);
+		assertTrue (!pDestination->destroyed);
+
+		pDestination->goOn.set();
+		sender.join();
+		assertTrue (pDestination->destroyed);
+		assertTrue (!pDestination->destroyedInUse);
+	}
+
+	logger.setChannel(nullptr);
+}
+
+
+void LoggerTest::testReplacedChannelNotKeptByLaterMessage()
+{
+	// A channel that was replaced is kept for the messages that were on
+	// their way at that moment, and not for one that set out later.
+	Logger& logger = Logger::get("TestLogger.LaterMessage");
+	logger.setLevel(Message::PRIO_INFORMATION);
+	auto logOne = [&logger] { logger.information("on its way"); };
+
+	auto pReplaced = std::make_shared<Watch>();
+	pReplaced->holding = true;
+	auto pCurrent = std::make_shared<Watch>();
+	pCurrent->holding = true;
+
+	logger.setChannel(new WatchedChannel(pReplaced));
+	Sender earlier(logOne);
+	assertTrue (pReplaced->arrived.tryWait(Watch::TIMEOUT));
+
+	logger.setChannel(new WatchedChannel(pCurrent));
+	Sender later(logOne);
+	assertTrue (pCurrent->arrived.tryWait(Watch::TIMEOUT));
+	assertTrue (!pReplaced->destroyed);
+
+	pReplaced->goOn.set();
+	earlier.join();
+	assertTrue (pReplaced->destroyed);
+	assertTrue (!pReplaced->destroyedInUse);
+	assertTrue (!pCurrent->destroyed);
+
+	pCurrent->goOn.set();
+	later.join();
+	logger.setChannel(nullptr);
+	assertTrue (pCurrent->destroyed);
+}
+
+
+void LoggerTest::testChannelReplacesItself()
+{
+	// A channel may replace itself in its logger while it logs: it is
+	// kept until its message is through.
+	Logger& logger = Logger::get("TestLogger.ReplacesItself");
+	logger.setLevel(Message::PRIO_INFORMATION);
+
+	auto pWatch = std::make_shared<Watch>();
+	logger.setChannel(new SelfReplacingChannel(logger, pWatch));
+	logger.information("makes the channel replace itself");
+	assertEqual (1, pWatch->messages.load());
+	assertTrue (pWatch->destroyed);
+	assertTrue (!pWatch->destroyedInUse);
+
+	logger.setChannel(nullptr);
+}
+
+
+void LoggerTest::testLogWhileThreadEnds()
+{
+	// A thread may log while it ends, from the destructor of an object
+	// of its own, whether that object was made before the thread logged
+	// for the first time or after.
+	Logger& logger = Logger::get("TestLogger.ThreadEnds");
+	logger.setLevel(Message::PRIO_INFORMATION);
+	auto pWatch = std::make_shared<Watch>();
+	logger.setChannel(new WatchedChannel(pWatch));
+	auto logLast = [&logger] { logger.information("logged while the thread ends"); };
+
+	Sender madeBefore([&logger, logLast]
+	{
+		lastWords.say = logLast;
+		logger.information("logged by the thread");
+	});
+	madeBefore.join();
+	assertEqual (2, pWatch->messages.load());
+
+	Sender madeAfter([&logger, logLast]
+	{
+		logger.information("logged by the thread");
+		lastWords.say = logLast;
+	});
+	madeAfter.join();
+	assertEqual (4, pWatch->messages.load());
+
+	// the threads that have ended hold nothing back
+	logger.setChannel(nullptr);
+	assertTrue (pWatch->destroyed);
+}
+
+
 void LoggerTest::setUp()
 {
 	Logger::shutdown();
@@ -700,6 +1059,12 @@ CppUnit::Test* LoggerTest::suite()
 	CppUnit_addTest(pSuite, LoggerTest, testLogDuringDestructionOfReplaced);
 	CppUnit_addTest(pSuite, LoggerTest, testGetDuringDestructionOfDetached);
 	CppUnit_addTest(pSuite, LoggerTest, testConcurrentSetLevel);
+	CppUnit_addTest(pSuite, LoggerTest, testReplacedChannelReleased);
+	CppUnit_addTest(pSuite, LoggerTest, testReplaceChannelWithMessageOnItsWay);
+	CppUnit_addTest(pSuite, LoggerTest, testReplaceFormatterWithMessageOnItsWay);
+	CppUnit_addTest(pSuite, LoggerTest, testReplacedChannelNotKeptByLaterMessage);
+	CppUnit_addTest(pSuite, LoggerTest, testChannelReplacesItself);
+	CppUnit_addTest(pSuite, LoggerTest, testLogWhileThreadEnds);
 
 	return pSuite;
 }
