@@ -217,7 +217,9 @@ public:
 		/// Returns the underlying socket descriptor.
 
 	[[nodiscard]] int available() const;
-		/// Returns the number of bytes available in the buffer.
+		/// Returns the number of bytes that a read gets without waiting
+		/// for the network: the decrypted data that is buffered, and the
+		/// records that have arrived in full.
 
 	[[nodiscard]] SocketImpl* socket();
 		/// Returns the underlying SocketImpl.

@@ -35,6 +35,7 @@ public:
 	void testChannelHandshakeTimeout();
 	void testDefaultPort();
 	void testServerNotVerified();
+	void testBlockingReactorConnection();
 	void testProperties();
 
 	void setUp();

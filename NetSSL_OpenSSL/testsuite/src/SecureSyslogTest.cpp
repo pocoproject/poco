@@ -17,6 +17,9 @@
 #include "Poco/Net/SecureStreamSocket.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/TCPReactorServer.h"
+#include "Poco/Net/TCPReactorServerConnection.h"
+#include "Poco/Net/TCPServerParams.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/Context.h"
@@ -651,6 +654,47 @@ void SecureSyslogTest::testServerNotVerified()
 }
 
 
+void SecureSyslogTest::testBlockingReactorConnection()
+{
+	// A TCPReactorServer with blocking connections on a SecureServerSocket:
+	// a record larger than one read arrives whole without the peer sending
+	// anything more, since what the secure socket holds is read as well.
+	SecureServerSocket socket(SocketAddress("127.0.0.1", 0));
+	TCPServerParams::Ptr pParams = new TCPServerParams;
+	pParams->setReactorMode(true);
+	pParams->setUseSelfReactor(true);
+	pParams->setNonBlocking(false);
+	pParams->setMaxPendingRequestSize(0);
+	TCPReactorServer server(socket, pParams);
+	std::mutex mutex;
+	std::condition_variable arrived;
+	std::string received;
+	server.setRecvMessageCallback([&](const TcpReactorConnectionPtr& pConnection)
+	{
+		{
+			std::lock_guard<std::mutex> lock(mutex);
+			received += pConnection->buffer();
+		}
+		pConnection->buffer().clear();
+		arrived.notify_all();
+	});
+	server.start();
+
+	SecureStreamSocket client = connectTLS(socket.address());
+	const std::string data(12000, 'x');
+	send(client, data);
+	bool whole = false;
+	{
+		std::unique_lock<std::mutex> lock(mutex);
+		whole = arrived.wait_for(lock, std::chrono::seconds(10), [&] { return received.size() >= data.size(); });
+	}
+	client.close();
+	server.stop();
+	assertTrue (whole);
+	assertTrue (received == data);
+}
+
+
 void SecureSyslogTest::testProperties()
 {
 	Poco::AutoPtr<SecureRemoteSyslogChannel> channel = new SecureRemoteSyslogChannel;
@@ -728,6 +772,7 @@ CppUnit::Test* SecureSyslogTest::suite()
 	CppUnit_addTest(pSuite, SecureSyslogTest, testChannelHandshakeTimeout);
 	CppUnit_addTest(pSuite, SecureSyslogTest, testDefaultPort);
 	CppUnit_addTest(pSuite, SecureSyslogTest, testServerNotVerified);
+	CppUnit_addTest(pSuite, SecureSyslogTest, testBlockingReactorConnection);
 	CppUnit_addTest(pSuite, SecureSyslogTest, testProperties);
 
 	return pSuite;

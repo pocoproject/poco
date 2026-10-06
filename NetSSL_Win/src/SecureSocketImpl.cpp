@@ -326,7 +326,23 @@ void SecureSocketImpl::abort()
 
 int SecureSocketImpl::available() const
 {
-	return static_cast<int>(_overflowBuffer.size() + _recvBufferOffset + _extraBufferOffset);
+	// What a read gets without the network: the data that is decrypted
+	// already, and the records that have arrived in full, which can be
+	// decrypted. A part of a record counts for nothing: the rest of it has
+	// to come from the network first.
+	int available = static_cast<int>(_overflowBuffer.size());
+	const int raw = static_cast<int>(_recvBufferOffset + _extraBufferOffset);
+	if (_recvBufferOffset > 0)
+	{
+		const int recLength = recordLength(_recvBuffer.begin(), static_cast<int>(_recvBufferOffset));
+		if (recLength > 0 && recLength <= raw) available += raw;
+	}
+	else if (_extraBufferOffset > 0)
+	{
+		const int recLength = recordLength(_extraBuffer.begin(), static_cast<int>(_extraBufferOffset));
+		if (recLength > 0 && recLength <= raw) available += raw;
+	}
+	return available;
 }
 
 
