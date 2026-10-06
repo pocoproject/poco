@@ -22,9 +22,7 @@
 #include "Poco/Net/SocketNotification.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Exception.h"
-#include "Poco/Thread.h"
 #include "Poco/Timespan.h"
-#include "Poco/Timestamp.h"
 #include <algorithm>
 #include <chrono>
 #include <condition_variable>
@@ -164,21 +162,37 @@ namespace
 
 
 	class HoldingSocketImpl: public Poco::Net::StreamSocketImpl
-		/// A non-blocking socket that hands out data it holds already,
-		/// as a TLS socket does with what it has decrypted. None of it is
-		/// on the network, so the socket does not become readable.
+		/// A socket that hands out data it holds already, so that a test
+		/// knows what every read finds without waiting for a network.
+		/// A TLS socket holds what it has decrypted in this way: none
+		/// of it is on the network, and the socket does not become
+		/// readable for it.
 	{
 	public:
-		HoldingSocketImpl(const std::string& data, bool secure):
+		enum End
+			/// What a read finds once the data is used up.
+		{
+			END_NOTHING, /// nothing for now
+			END_CLOSED,  /// the peer has closed the connection
+			END_RESET    /// the peer has reset the connection
+		};
+
+		HoldingSocketImpl(const std::string& data, bool blocking, bool secure = false, End end = END_NOTHING):
 			_data(data),
-			_secure(secure)
+			_blocking(blocking),
+			_secure(secure),
+			_end(end)
 		{
 			init(AF_INET);
 		}
 
 		int receiveBytes(void* buffer, int length, int flags = 0) override
 		{
-			if (_pos == _data.size()) return -1;
+			if (_pos == _data.size())
+			{
+				if (_end == END_RESET) throw Poco::Net::ConnectionResetException();
+				return _end == END_CLOSED ? 0 : -1;
+			}
 			const std::size_t n = std::min(static_cast<std::size_t>(length), _data.size() - _pos);
 			std::memcpy(buffer, _data.data() + _pos, n);
 			_pos += n;
@@ -197,13 +211,15 @@ namespace
 
 		bool getBlocking() const override
 		{
-			return false;
+			return _blocking;
 		}
 
 	private:
 		std::string _data;
 		std::size_t _pos = 0;
+		bool _blocking;
 		bool _secure;
+		End _end;
 	};
 
 
@@ -237,34 +253,23 @@ namespace
 	}
 
 
-	bool waitForAvailable(const StreamSocket& socket, std::size_t size, int milliseconds = 10000)
-		/// Waits until size bytes have arrived at the socket.
-	{
-		Poco::Timestamp start;
-		while (static_cast<std::size_t>(socket.available()) < size)
-		{
-			if (start.isElapsed(Poco::Timestamp::TimeDiff(milliseconds)*1000)) return false;
-			Poco::Thread::sleep(1);
-		}
-		return true;
-	}
-
-
 	bool closedByPeer(StreamSocket& socket, int milliseconds = 10000)
 		/// Returns true if the peer closes or resets the connection
 		/// within the given time.
 	{
-		socket.setReceiveTimeout(Poco::Timespan(Poco::Timespan::TimeDiff(milliseconds)*1000));
-		char buffer[256];
+		// No socket option is set for the waiting: a connection that
+		// was reset may not take one any more.
 		try
 		{
+			if (!socket.poll(Poco::Timespan(Poco::Timespan::TimeDiff(milliseconds)*1000), Poco::Net::Socket::SELECT_READ)) return false;
+			char buffer[256];
 			return socket.receiveBytes(buffer, sizeof(buffer)) == 0;
 		}
 		catch (const Poco::TimeoutException&)
 		{
 			return false;
 		}
-		catch (const Poco::Net::NetException&)
+		catch (const Poco::IOException&)
 		{
 			return true;
 		}
@@ -330,38 +335,42 @@ void TCPReactorServerTest::testNonBlockingRead()
 
 void TCPReactorServerTest::testReadsPerEvent()
 {
-	// What one event may read is seen with a reactor that delivers nothing
-	// by itself. The data is several times what one read takes.
+	// The reactor is not run and the socket holds its data: what a
+	// connection reads for one event is seen exactly. The data is several
+	// times what one read takes.
 	const std::string data = pattern(32*1024);
-	for (int nonBlocking = 0; nonBlocking < 2; ++nonBlocking)
+	for (int blocking = 0; blocking < 2; ++blocking)
 	{
 		Recorder recorder;
 		ManualReactor reactor;
-		ServerSocket ss(SocketAddress("127.0.0.1", 0));
-		StreamSocket client(ss.address());
-		StreamSocket accepted = ss.acceptConnection();
-		accepted.setBlocking(nonBlocking == 0);
-		auto pConnection = std::make_shared<TCPReactorServerConnection>(accepted, reactor);
+		StreamSocket socket(new HoldingSocketImpl(data, blocking != 0));
+		auto pConnection = std::make_shared<TCPReactorServerConnection>(socket, reactor);
 		pConnection->setRecvMessageCallback([&recorder](const TcpReactorConnectionPtr& pConn) { recorder.received(pConn); });
 		pConnection->setCloseCallback([&recorder](const TcpReactorConnectionPtr& pConn) { recorder.closed(pConn); });
 		pConnection->initialize();
 
-		sendAll(client, data);
-		assertTrue (waitForAvailable(accepted, data.size()));
-		reactor.readable(accepted);
-		if (nonBlocking)
+		reactor.readable(socket);
+		if (blocking)
 		{
-			// read until nothing was left, and still open
-			assertTrue (recorder.data() == data);
-			assertTrue (recorder.receives() > 1);
+			// one read, since a second one could wait
+			assertTrue (recorder.receives() == 1);
+			const std::string first = recorder.data();
+			assertTrue (!first.empty());
+			assertTrue (first.size() < data.size());
+			assertTrue (data.compare(0, first.size(), first) == 0);
+			reactor.readable(socket);
+			assertTrue (recorder.receives() == 2);
+			assertTrue (recorder.data().size() > first.size());
+			assertTrue (recorder.data().size() < data.size());
+			assertTrue (data.compare(0, recorder.data().size(), recorder.data()) == 0);
 		}
 		else
 		{
-			// read once
-			assertTrue (recorder.receives() == 1);
-			assertTrue (!recorder.data().empty());
-			assertTrue (recorder.data().size() < data.size());
-			assertTrue (data.compare(0, recorder.data().size(), recorder.data()) == 0);
+			// read until nothing was left, and still open
+			assertTrue (recorder.receives() > 1);
+			assertTrue (recorder.data() == data);
+			reactor.readable(socket);
+			assertTrue (recorder.data() == data);
 		}
 		assertTrue (recorder.closedConnections() == 0);
 
@@ -382,7 +391,7 @@ void TCPReactorServerTest::testReadsHeldData()
 	{
 		Recorder recorder;
 		ManualReactor reactor;
-		StreamSocket socket(new HoldingSocketImpl(data, secure != 0));
+		StreamSocket socket(new HoldingSocketImpl(data, false, secure != 0));
 		auto pConnection = std::make_shared<TCPReactorServerConnection>(socket, reactor);
 		pConnection->setRecvMessageCallback([&recorder](const TcpReactorConnectionPtr& pConn) { recorder.received(pConn); });
 		pConnection->setCloseCallback([&recorder](const TcpReactorConnectionPtr& pConn) { recorder.closed(pConn); });
@@ -416,34 +425,40 @@ void TCPReactorServerTest::testReadsHeldData()
 
 void TCPReactorServerTest::testDataBeforeErrorIsDelivered()
 {
-	// A hang-up may be reported as an error, together with the last data
-	// of the peer. That data must reach the receive callback before the
+	// A peer that closes or is lost may be reported as an error, together
+	// with its last data being readable. The data is more than is read for
+	// one event: the rest must reach the receive callback before the
 	// connection closes.
-	Recorder recorder;
-	ManualReactor reactor;
-	ServerSocket ss(SocketAddress("127.0.0.1", 0));
-	StreamSocket client(ss.address());
-	StreamSocket accepted = ss.acceptConnection();
-	accepted.setBlocking(false);
-	auto pConnection = std::make_shared<TCPReactorServerConnection>(accepted, reactor);
-	pConnection->setRecvMessageCallback([&recorder](const TcpReactorConnectionPtr& pConn) { recorder.received(pConn); });
-	pConnection->setCloseCallback([&recorder](const TcpReactorConnectionPtr& pConn) { recorder.closed(pConn); });
-	pConnection->initialize();
+	const std::string data = pattern(100*1024);
+	const HoldingSocketImpl::End ends[] = {HoldingSocketImpl::END_CLOSED, HoldingSocketImpl::END_RESET};
+	for (HoldingSocketImpl::End end: ends)
+	{
+		Recorder recorder;
+		ManualReactor reactor;
+		StreamSocket socket(new HoldingSocketImpl(data, false, false, end));
+		auto pConnection = std::make_shared<TCPReactorServerConnection>(socket, reactor);
+		pConnection->setRecvMessageCallback([&recorder](const TcpReactorConnectionPtr& pConn) { recorder.received(pConn); });
+		pConnection->setCloseCallback([&recorder](const TcpReactorConnectionPtr& pConn) { recorder.closed(pConn); });
+		pConnection->initialize();
 
-	const std::string data = pattern(24*1024);
-	sendAll(client, data);
-	client.close();
-	assertTrue (waitForAvailable(accepted, data.size()));
-	reactor.onError(0, "simulated error");
-	assertTrue (recorder.data() == data);
-	assertTrue (recorder.closedConnections() == 1);
-	assertTrue (recorder.everyCloseOnce());
+		reactor.readable(socket);
+		assertTrue (!recorder.data().empty());
+		assertTrue (recorder.data().size() < data.size());
+		assertTrue (recorder.closedConnections() == 0);
 
-	// closed: nothing more is delivered, and nothing is reported twice
-	reactor.onError(0, "simulated error");
-	pConnection->handleClose();
-	assertTrue (recorder.closedConnections() == 1);
-	assertTrue (recorder.everyCloseOnce());
+		reactor.onError(0, "simulated error");
+		assertTrue (recorder.data() == data);
+		assertTrue (recorder.closedConnections() == 1);
+		assertTrue (recorder.everyCloseOnce());
+
+		// closed: nothing more is delivered, and nothing is reported twice
+		reactor.onError(0, "simulated error");
+		reactor.readable(socket);
+		pConnection->handleClose();
+		assertTrue (recorder.data() == data);
+		assertTrue (recorder.closedConnections() == 1);
+		assertTrue (recorder.everyCloseOnce());
+	}
 }
 
 

@@ -141,7 +141,8 @@ public:
 		///     * loghost:   The target IP address or host name where log messages are sent. Optionally, a port number (separated
 		///                  by a colon) can also be specified.
 		///     * host:      (optional) Host name included in syslog messages. If not specified, the host's real domain name or
-		///                  IP address will be used.
+		///                  IP address will be used. It is looked up when the channel is opened, with the first message at
+		///                  the latest, and that takes as long as the name service takes.
 		///     * buffer:    UDP socket send buffer size in bytes. If not specified, the system default is used.
 		///     * transport: "udp" (default) or "tcp". A change closes the channel, and the next message opens it again.
 		///     * framing:   How messages are told apart on a TCP connection (RFC 6587): "newline" (default), with a line feed

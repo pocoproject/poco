@@ -18,7 +18,6 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
-#include "Poco/Net/NetException.h"
 #include "Poco/LoggingFactory.h"
 #include "Poco/Message.h"
 #include "Poco/AutoPtr.h"
@@ -169,17 +168,19 @@ namespace
 		/// Returns true if the peer closes or resets the connection
 		/// within the given time.
 	{
-		socket.setReceiveTimeout(Poco::Timespan(Poco::Timespan::TimeDiff(milliseconds)*1000));
-		char buffer[256];
+		// No socket option is set for the waiting: a connection that
+		// was reset may not take one any more.
 		try
 		{
+			if (!socket.poll(Poco::Timespan(Poco::Timespan::TimeDiff(milliseconds)*1000), Poco::Net::Socket::SELECT_READ)) return false;
+			char buffer[256];
 			return socket.receiveBytes(buffer, sizeof(buffer)) == 0;
 		}
 		catch (const Poco::TimeoutException&)
 		{
 			return false;
 		}
-		catch (const NetException&)
+		catch (const Poco::IOException&)
 		{
 			return true;
 		}
@@ -280,6 +281,7 @@ void SecureSyslogTest::testNewlineFraming()
 	Poco::AutoPtr<SecureRemoteSyslogChannel> channel = new SecureRemoteSyslogChannel;
 	channel->setProperty("loghost", listener.address().toString());
 	channel->setProperty("framing", "newline");
+	channel->setProperty("host", "ahost");
 	Poco::Message msg("asource", "five", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg);
 	bool arrivedFromChannel = listener.pChannel->waitFor(5);
@@ -374,6 +376,7 @@ void SecureSyslogTest::testStalledHandshake()
 	Poco::AutoPtr<SecureRemoteSyslogChannel> channel = new SecureRemoteSyslogChannel;
 	channel->setProperty("loghost", listener.address().toString());
 	channel->setProperty("timeout", "10000");
+	channel->setProperty("host", "ahost");
 	Poco::Message msg("asource", "not delayed", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg);
 	bool arrived = listener.pChannel->waitFor(1);
@@ -451,6 +454,7 @@ void SecureSyslogTest::testChannelReconnect()
 	Poco::AutoPtr<SecureRemoteSyslogChannel> channel = new SecureRemoteSyslogChannel;
 	channel->setProperty("loghost", address.toString());
 	channel->setProperty("retryInterval", "10");
+	channel->setProperty("host", "ahost");
 	Poco::Message before("asource", "before", Poco::Message::PRIO_CRITICAL);
 	channel->log(before);
 	assertTrue (pCL->waitFor(1));
@@ -490,6 +494,9 @@ void SecureSyslogTest::testChannelHandshakeTimeout()
 	channel->setProperty("loghost", server.address().toString());
 	channel->setProperty("timeout", "300");
 	channel->setProperty("retryInterval", "3600000");
+	// with its name given, the channel does not look up the local host
+	// when it is opened, which may take longer than any handshake
+	channel->setProperty("host", "ahost");
 	Poco::Message msg("asource", "dropped", Poco::Message::PRIO_CRITICAL);
 
 	// neither held up for long nor made to fail
@@ -510,17 +517,25 @@ void SecureSyslogTest::testChannelHandshakeTimeout()
 
 	// Nothing of a message was sent: what arrived is of the handshake,
 	// and the connection is closed.
-	connection.setReceiveTimeout(Poco::Timespan(10, 0));
 	std::string received;
+	bool closed = false;
 	char buffer[4096];
 	try
 	{
-		int n;
-		while ((n = connection.receiveBytes(buffer, sizeof(buffer))) > 0) received.append(buffer, n);
+		while (!closed && connection.poll(Poco::Timespan(10, 0), Socket::SELECT_READ))
+		{
+			int n = connection.receiveBytes(buffer, sizeof(buffer));
+			if (n > 0)
+				received.append(buffer, n);
+			else
+				closed = true;
+		}
 	}
-	catch (const NetException&)
+	catch (const Poco::IOException&)
 	{
+		closed = true;
 	}
+	assertTrue (closed);
 	assertTrue (received.find("dropped") == std::string::npos);
 	channel->close();
 }

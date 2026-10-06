@@ -17,7 +17,6 @@
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
-#include "Poco/Net/NetException.h"
 #include "Poco/Net/DNS.h"
 #include "Poco/Thread.h"
 #include "Poco/Message.h"
@@ -257,20 +256,28 @@ namespace
 		/// Returns true if the peer closes or resets the connection
 		/// within the given time.
 	{
-		socket.setReceiveTimeout(Poco::Timespan(Poco::Timespan::TimeDiff(milliseconds)*1000));
-		char buffer[256];
+		// No socket option is set for the waiting: a connection that
+		// was reset may not take one any more.
 		try
 		{
+			if (!socket.poll(Poco::Timespan(Poco::Timespan::TimeDiff(milliseconds)*1000), Poco::Net::Socket::SELECT_READ)) return false;
+			char buffer[256];
 			return socket.receiveBytes(buffer, sizeof(buffer)) == 0;
 		}
 		catch (const Poco::TimeoutException&)
 		{
 			return false;
 		}
-		catch (const NetException&)
+		catch (const Poco::IOException&)
 		{
 			return true;
 		}
+	}
+
+
+	bool endsWith(const std::string& data, const std::string& end)
+	{
+		return data.size() >= end.size() && data.compare(data.size() - end.size(), end.size(), end) == 0;
 	}
 
 
@@ -279,28 +286,16 @@ namespace
 		/// text. Gives up when the peer closes the connection or sends
 		/// nothing for the given time, and returns what was read.
 	{
-		socket.setReceiveTimeout(Poco::Timespan(Poco::Timespan::TimeDiff(milliseconds)*1000));
+		const Poco::Timespan timeout(Poco::Timespan::TimeDiff(milliseconds)*1000);
 		std::string data;
 		char buffer[1024];
-		try
+		while (!endsWith(data, end) && socket.poll(timeout, Socket::SELECT_READ))
 		{
-			while (data.size() < end.size() || data.compare(data.size() - end.size(), end.size(), end) != 0)
-			{
-				int n = socket.receiveBytes(buffer, sizeof(buffer));
-				if (n <= 0) break;
-				data.append(buffer, n);
-			}
-		}
-		catch (const Poco::TimeoutException&)
-		{
+			int n = socket.receiveBytes(buffer, sizeof(buffer));
+			if (n <= 0) break;
+			data.append(buffer, n);
 		}
 		return data;
-	}
-
-
-	bool endsWith(const std::string& data, const std::string& end)
-	{
-		return data.size() >= end.size() && data.compare(data.size() - end.size(), end.size(), end) == 0;
 	}
 
 
@@ -1060,6 +1055,7 @@ void SyslogTest::testTCPChannelReconnect()
 	channel->setProperty("loghost", address.toString());
 	channel->setProperty("transport", "tcp");
 	channel->setProperty("retryInterval", "10");
+	channel->setProperty("host", "ahost");
 	Poco::Message before("asource", "before", Poco::Message::PRIO_CRITICAL);
 	channel->log(before);
 	assertTrue (pCL->waitFor(1));
@@ -1097,6 +1093,7 @@ void SyslogTest::testTCPChannelServerClosed()
 	Poco::AutoPtr<ObservedChannel> channel = new ObservedChannel;
 	channel->setProperty("loghost", server.address().toString());
 	channel->setProperty("transport", "tcp");
+	channel->setProperty("host", "ahost");
 	Poco::Message msg("asource", "one", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg);
 	assertTrue (server.poll(Poco::Timespan(10, 0), Socket::SELECT_READ));
@@ -1123,6 +1120,7 @@ void SyslogTest::testTCPChannelResend()
 	Poco::AutoPtr<ObservedChannel> channel = new ObservedChannel;
 	channel->setProperty("loghost", server.address().toString());
 	channel->setProperty("transport", "tcp");
+	channel->setProperty("host", "ahost");
 	Poco::Message msg("asource", "one", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg);
 	assertTrue (server.poll(Poco::Timespan(10, 0), Socket::SELECT_READ));
@@ -1162,6 +1160,9 @@ void SyslogTest::testTCPChannelServerAway()
 	channel->setProperty("transport", "tcp");
 	channel->setProperty("timeout", "500");
 	channel->setProperty("retryInterval", "3600000");
+	// with its name given, the channel does not look up the local host
+	// when it is opened, which may take longer than any connecting
+	channel->setProperty("host", "ahost");
 	Poco::Message msg("asource", "dropped", Poco::Message::PRIO_CRITICAL);
 
 	// neither held up nor made to fail
@@ -1219,6 +1220,7 @@ void SyslogTest::testTCPChannelSwitchTransport()
 	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
 	channel->setProperty("loghost", server.address().toString());
 	channel->setProperty("transport", "tcp");
+	channel->setProperty("host", "ahost");
 	Poco::Message msg("asource", "one", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg);
 	assertTrue (server.poll(Poco::Timespan(10, 0), Socket::SELECT_READ));
