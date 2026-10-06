@@ -189,7 +189,7 @@ private:
 	struct Server
 	{
 		std::unique_ptr<TCPReactorServer> pServer;
-		std::map<const TCPReactorServerConnection*, Connection> connections;
+		std::map<std::weak_ptr<TCPReactorServerConnection>, Connection, std::owner_less<>> connections;
 			/// Used by the thread of the server only.
 	};
 
@@ -279,7 +279,7 @@ void RemoteTCPListener::stop()
 
 void RemoteTCPListener::onData(Server& server, const TcpReactorConnectionPtr& pConnection)
 {
-	auto it = server.connections.find(pConnection.get());
+	auto it = server.connections.find(pConnection);
 	if (it == server.connections.end())
 	{
 		Connection connection;
@@ -291,7 +291,7 @@ void RemoteTCPListener::onData(Server& server, const TcpReactorConnectionPtr& pC
 		{
 			// gone already: what it sent is taken without its address
 		}
-		it = server.connections.emplace(pConnection.get(), connection).first;
+		it = server.connections.emplace(pConnection, connection).first;
 	}
 	std::string& data = pConnection->buffer();
 	data.erase(0, takeMessages(it->second, data));
@@ -300,7 +300,7 @@ void RemoteTCPListener::onData(Server& server, const TcpReactorConnectionPtr& pC
 
 void RemoteTCPListener::onClose(Server& server, const TcpReactorConnectionPtr& pConnection)
 {
-	auto it = server.connections.find(pConnection.get());
+	auto it = server.connections.find(pConnection);
 	if (it == server.connections.end()) return;
 
 	// Only a sender that closes the connection ends its last message with
@@ -423,7 +423,7 @@ public:
 		WAITTIME_MILLISEC = 1000
 	};
 
-	SyslogParser(Poco::NotificationQueue& queue, RemoteSyslogListener* pListener);
+	SyslogParser(Poco::NotificationQueue& queue, RemoteSyslogListener& listener);
 	~SyslogParser();
 
 	void parse(const std::string& line, Poco::Message& message);
@@ -450,19 +450,18 @@ private:
 private:
 	Poco::NotificationQueue& _queue;
 	std::atomic<bool>        _stopped;
-	RemoteSyslogListener*    _pListener;
+	RemoteSyslogListener&    _listener;
 };
 
 
 const std::string SyslogParser::NILVALUE("-");
 
 
-SyslogParser::SyslogParser(Poco::NotificationQueue& queue, RemoteSyslogListener* pListener):
+SyslogParser::SyslogParser(Poco::NotificationQueue& queue, RemoteSyslogListener& listener):
 	_queue(queue),
 	_stopped(false),
-	_pListener(pListener)
+	_listener(listener)
 {
-	poco_check_ptr (_pListener);
 }
 
 
@@ -486,7 +485,7 @@ void SyslogParser::run()
 				Poco::Message message;
 				parse(pMsgNf->message(), message);
 				message["addr"] =pMsgNf->sourceAddress().host().toString();
-				_pListener->log(message);
+				_listener.log(message);
 			}
 		}
 		catch (Poco::Exception&)
@@ -775,9 +774,6 @@ const std::string RemoteSyslogListener::LOG_PROP_STRUCTURED_DATA("structured-dat
 
 
 RemoteSyslogListener::RemoteSyslogListener():
-	_pListener(nullptr),
-	_pTCPListener(nullptr),
-	_pParser(nullptr),
 	_port(RemoteSyslogChannel::SYSLOG_PORT),
 	_tcpPort(0),
 	_reusePort(false),
@@ -789,9 +785,6 @@ RemoteSyslogListener::RemoteSyslogListener():
 
 
 RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port):
-	_pListener(nullptr),
-	_pTCPListener(nullptr),
-	_pParser(nullptr),
 	_port(port),
 	_tcpPort(0),
 	_reusePort(false),
@@ -803,9 +796,6 @@ RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port):
 
 
 RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port, int threads):
-	_pListener(nullptr),
-	_pTCPListener(nullptr),
-	_pParser(nullptr),
 	_port(port),
 	_tcpPort(0),
 	_reusePort(false),
@@ -817,9 +807,6 @@ RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port, int threads):
 
 
 RemoteSyslogListener::RemoteSyslogListener(Poco::UInt16 port, bool reusePort, int threads):
-	_pListener(nullptr),
-	_pTCPListener(nullptr),
-	_pParser(nullptr),
 	_port(port),
 	_tcpPort(0),
 	_reusePort(reusePort),
@@ -950,16 +937,16 @@ void RemoteSyslogListener::open()
 	SplitterChannel::open();
 	try
 	{
-		_pParser = new SyslogParser(_queue, this);
+		_pParser = std::make_unique<SyslogParser>(_queue, *this);
 		if (_port > 0)
 		{
-			_pListener = new RemoteUDPListener(_queue, _port, _reusePort, _buffer);
+			_pListener = std::make_unique<RemoteUDPListener>(_queue, _port, _reusePort, _buffer);
 		}
 		std::vector<ServerSocket> sockets(_serverSockets);
 		createServerSockets(sockets);
 		if (!sockets.empty())
 		{
-			_pTCPListener = new RemoteTCPListener(*this, _maxMessageSize);
+			_pTCPListener = std::make_unique<RemoteTCPListener>(*this, _maxMessageSize);
 			for (const auto& socket: sockets)
 			{
 				_pTCPListener->addServerSocket(socket);
@@ -1017,12 +1004,9 @@ void RemoteSyslogListener::stop()
 	}
 	_threadPool.joinAll();
 	_queue.clear();
-	delete _pTCPListener;
-	delete _pListener;
-	delete _pParser;
-	_pTCPListener = nullptr;
-	_pListener = nullptr;
-	_pParser = nullptr;
+	_pTCPListener.reset();
+	_pListener.reset();
+	_pParser.reset();
 }
 
 

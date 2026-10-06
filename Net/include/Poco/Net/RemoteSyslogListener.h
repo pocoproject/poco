@@ -25,6 +25,7 @@
 #include "Poco/SplitterChannel.h"
 #include "Poco/NotificationQueue.h"
 #include <cstddef>
+#include <memory>
 #include <vector>
 
 
@@ -170,18 +171,18 @@ private:
 	void stop();
 		/// Stops and joins all threads.
 
-	RemoteUDPListener*        _pListener;
-	RemoteTCPListener*        _pTCPListener;
-	SyslogParser*             _pParser;
-	Poco::ThreadPool          _threadPool;
-	Poco::NotificationQueue   _queue;
-	std::vector<ServerSocket> _serverSockets;
-	Poco::UInt16              _port;
-	Poco::UInt16              _tcpPort;
-	bool                      _reusePort;
-	int                       _threads;
-	int                       _buffer;
-	std::size_t               _maxMessageSize;
+	std::unique_ptr<RemoteUDPListener> _pListener;
+	std::unique_ptr<RemoteTCPListener> _pTCPListener;
+	std::unique_ptr<SyslogParser>      _pParser;
+	Poco::ThreadPool                   _threadPool;
+	Poco::NotificationQueue            _queue;
+	std::vector<ServerSocket>          _serverSockets;
+	Poco::UInt16                       _port;
+	Poco::UInt16                       _tcpPort;
+	bool                               _reusePort;
+	int                                _threads;
+	int                                _buffer;
+	std::size_t                        _maxMessageSize;
 };
 
 
