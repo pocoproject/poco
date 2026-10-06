@@ -57,7 +57,7 @@ namespace
 			Task("TestTask"),
 			_fail(false),
 			_started(false),
-			_released(false)
+			_letGo(false)
 		{
 		}
 
@@ -85,10 +85,10 @@ namespace
 			_event.set();
 		}
 
-		void release()
+		void letGo()
 			/// Lets the task run to its end without waiting for the test again.
 		{
-			_released = true;
+			_letGo = true;
 			_event.set();
 		}
 
@@ -100,13 +100,13 @@ namespace
 	private:
 		void waitForTest()
 		{
-			if (!_released) _event.wait();
+			if (!_letGo) _event.wait();
 		}
 
 		Event _event;
 		std::atomic<bool> _fail;
 		std::atomic<bool> _started;
-		std::atomic<bool> _released;
+		std::atomic<bool> _letGo;
 	};
 
 	class TaskGuard
@@ -127,7 +127,7 @@ namespace
 		{
 			try
 			{
-				_task.release();
+				_task.letGo();
 				_tm.joinAll();
 			}
 			catch (...)
