@@ -56,22 +56,23 @@ namespace
 		TestTask():
 			Task("TestTask"),
 			_fail(false),
-			_started(false)
+			_started(false),
+			_released(false)
 		{
 		}
 
 		void runTask() override
 		{
 			_started = true;
-			_event.wait();
+			waitForTest();
 			setProgress(0.5);
-			_event.wait();
+			waitForTest();
 			if (isCancelled())
 				return;
 			if (_fail)
 				throw SystemException("warp core breach detected");
 			setProgress(1.0);
-			_event.wait();
+			waitForTest();
 		}
 
 		void fail()
@@ -84,15 +85,59 @@ namespace
 			_event.set();
 		}
 
+		void release()
+			/// Lets the task run to its end without waiting for the test again.
+		{
+			_released = true;
+			_event.set();
+		}
+
 		bool started() const
 		{
 			return _started;
 		}
 
 	private:
+		void waitForTest()
+		{
+			if (!_released) _event.wait();
+		}
+
 		Event _event;
 		std::atomic<bool> _fail;
 		std::atomic<bool> _started;
+		std::atomic<bool> _released;
+	};
+
+	class TaskGuard
+		/// Lets a TestTask go and waits for the tasks of its manager when a
+		/// test is left, also by a failed assertion. The thread of a task
+		/// that still waited would outlive the task, its manager and the
+		/// observer, and the test would never end: a task cannot be
+		/// destroyed while its thread waits in it.
+	{
+	public:
+		TaskGuard(TaskManager& tm, TestTask& task):
+			_tm(tm),
+			_task(task)
+		{
+		}
+
+		~TaskGuard()
+		{
+			try
+			{
+				_task.release();
+				_tm.joinAll();
+			}
+			catch (...)
+			{
+			}
+		}
+
+	private:
+		TaskManager& _tm;
+		TestTask& _task;
 	};
 
 	class SimpleTask: public Task
@@ -254,6 +299,7 @@ void TaskManagerTest::testFinish()
 	tm.addObserver(NObserver<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
 	tm.addObserver(NObserver<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
+	TaskGuard guard(tm, *pTT);
 	(void) tm.start(pTT.duplicate());
 	assertTrue (waitForCondition([&]{ return pTT->state() >= Task::TASK_RUNNING; }, 5000));
 	assertTrue (pTT->progress() == 0);
@@ -297,6 +343,7 @@ void TaskManagerTest::testCancel()
 	tm.addObserver(NObserver<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
 	tm.addObserver(NObserver<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
+	TaskGuard guard(tm, *pTT);
 	(void) tm.start(pTT.duplicate());
 	assertTrue (waitForCondition([&]{ return pTT->state() >= Task::TASK_RUNNING; }, 5000));
 	assertTrue (pTT->progress() == 0);
@@ -342,6 +389,7 @@ void TaskManagerTest::testError()
 	tm.addObserver(NObserver<TaskObserver, TaskFinishedNotification>(to, &TaskObserver::taskFinished));
 	tm.addObserver(NObserver<TaskObserver, TaskProgressNotification>(to, &TaskObserver::taskProgress));
 	AutoPtr<TestTask> pTT = new TestTask;
+	TaskGuard guard(tm, *pTT);
 	assertTrue (tm.start(pTT.duplicate()));
 	Stopwatch sw;
 	sw.start();
