@@ -835,6 +835,182 @@ BENCHMARK(Logger_ParseLevel);
 
 
 //
+// Several threads logging through one Logger - measures how the logging
+// path scales when the threads share a logger, its channel and its formatter.
+// Google Benchmark reports the time per message, and the messages per second,
+// of one thread: the throughput of all threads together is the thread count
+// times the latter, and the time stays the same as threads are added if the
+// path scales.
+//
+
+static void Logger_Threaded_Disabled(benchmark::State& state)
+{
+	Logger& logger = Logger::get("BenchLogger.Threaded.Disabled");
+	if (state.thread_index() == 0)
+	{
+		AutoPtr<NullChannel> pChannel(new NullChannel);
+		logger.setChannel(pChannel);
+		logger.setLevel(Message::PRIO_ERROR);  // Only ERROR and above
+	}
+
+	const std::string text = "This is a test log message";
+	for (auto _ : state)
+	{
+		logger.information(text);
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(Logger_Threaded_Disabled)->Threads(1)->Threads(2)->Threads(4)->Threads(8)->UseRealTime();
+
+
+static void Logger_Threaded_NullChannel(benchmark::State& state)
+{
+	Logger& logger = Logger::get("BenchLogger.Threaded.NullChannel");
+	if (state.thread_index() == 0)
+	{
+		AutoPtr<NullChannel> pChannel(new NullChannel);
+		logger.setChannel(pChannel);
+		logger.setLevel(Message::PRIO_TRACE);
+	}
+
+	const std::string text = "This is a test log message";
+	for (auto _ : state)
+	{
+		logger.information(text);
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(Logger_Threaded_NullChannel)->Threads(1)->Threads(2)->Threads(4)->Threads(8)->UseRealTime();
+
+
+static void Logger_Threaded_NullChannel_Message(benchmark::State& state)
+{
+	// The message is made once: what is measured is the way of a message
+	// through the logger alone.
+	Logger& logger = Logger::get("BenchLogger.Threaded.NullChannel.Message");
+	if (state.thread_index() == 0)
+	{
+		AutoPtr<NullChannel> pChannel(new NullChannel);
+		logger.setChannel(pChannel);
+		logger.setLevel(Message::PRIO_TRACE);
+	}
+
+	const Message msg("BenchLogger", "This is a test log message", Message::PRIO_INFORMATION);
+	for (auto _ : state)
+	{
+		logger.log(msg);
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(Logger_Threaded_NullChannel_Message)->Threads(1)->Threads(2)->Threads(4)->Threads(8)->UseRealTime();
+
+
+static void Logger_Threaded_NullChannel_Replacing(benchmark::State& state)
+{
+	// One of the threads also replaces the channel now and then.
+	Logger& logger = Logger::get("BenchLogger.Threaded.NullChannel.Replacing");
+	if (state.thread_index() == 0)
+	{
+		AutoPtr<NullChannel> pChannel(new NullChannel);
+		logger.setChannel(pChannel);
+		logger.setLevel(Message::PRIO_TRACE);
+	}
+
+	const Message msg("BenchLogger", "This is a test log message", Message::PRIO_INFORMATION);
+	const bool replaces = state.thread_index() == 0;
+	std::size_t count = 0;
+	for (auto _ : state)
+	{
+		logger.log(msg);
+		if (replaces && (++count & 0x3FF) == 0)
+		{
+			AutoPtr<NullChannel> pChannel(new NullChannel);
+			logger.setChannel(pChannel);
+		}
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(Logger_Threaded_NullChannel_Replacing)->Threads(1)->Threads(2)->Threads(4)->Threads(8)->UseRealTime();
+
+
+static void Logger_Threaded_FormattingChannel(benchmark::State& state)
+{
+	Logger& logger = Logger::get("BenchLogger.Threaded.Formatting");
+	if (state.thread_index() == 0)
+	{
+		AutoPtr<NullChannel> pNullChannel(new NullChannel);
+		AutoPtr<PatternFormatter> pFormatter(new PatternFormatter("%Y-%m-%d %H:%M:%S.%i [%p] %s: %t"));
+		AutoPtr<FormattingChannel> pChannel(new FormattingChannel(pFormatter, pNullChannel));
+		logger.setChannel(pChannel);
+		logger.setLevel(Message::PRIO_TRACE);
+	}
+
+	const std::string text = "This is a test log message";
+	for (auto _ : state)
+	{
+		logger.information(text);
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(Logger_Threaded_FormattingChannel)->Threads(1)->Threads(2)->Threads(4)->Threads(8)->UseRealTime();
+
+
+static void Logger_Threaded_FormattingChannel_Message(benchmark::State& state)
+{
+	// The message is made once and the formatter only copies its text:
+	// what is measured is the way of a message through the logger and the
+	// formatting channel alone.
+	Logger& logger = Logger::get("BenchLogger.Threaded.Formatting.Message");
+	if (state.thread_index() == 0)
+	{
+		AutoPtr<NullChannel> pNullChannel(new NullChannel);
+		AutoPtr<PatternFormatter> pFormatter(new PatternFormatter("%t"));
+		AutoPtr<FormattingChannel> pChannel(new FormattingChannel(pFormatter, pNullChannel));
+		logger.setChannel(pChannel);
+		logger.setLevel(Message::PRIO_TRACE);
+	}
+
+	const Message msg("BenchLogger", "This is a test log message", Message::PRIO_INFORMATION);
+	for (auto _ : state)
+	{
+		logger.log(msg);
+	}
+	state.SetItemsProcessed(state.iterations());
+}
+BENCHMARK(Logger_Threaded_FormattingChannel_Message)->Threads(1)->Threads(2)->Threads(4)->Threads(8)->UseRealTime();
+
+
+static void Logger_Threaded_FileChannel(benchmark::State& state)
+{
+	static std::string tempFile;
+	Logger& logger = Logger::get("BenchLogger.Threaded.File");
+	if (state.thread_index() == 0)
+	{
+		tempFile = TemporaryFile::tempName() + ".log";
+		AutoPtr<FileChannel> pFileChannel(new FileChannel(tempFile));
+		AutoPtr<PatternFormatter> pFormatter(new PatternFormatter("%Y-%m-%d %H:%M:%S.%i [%p] %s: %t"));
+		AutoPtr<FormattingChannel> pChannel(new FormattingChannel(pFormatter, pFileChannel));
+		logger.setChannel(pChannel);
+		logger.setLevel(Message::PRIO_TRACE);
+	}
+
+	const std::string text = "This is a test log message";
+	for (auto _ : state)
+	{
+		logger.information(text);
+	}
+	state.SetItemsProcessed(state.iterations());
+
+	if (state.thread_index() == 0)
+	{
+		logger.setChannel(nullptr);
+		try { File(tempFile).remove(); } catch (...) {}
+	}
+}
+BENCHMARK(Logger_Threaded_FileChannel)->Threads(1)->Threads(2)->Threads(4)->Threads(8)->UseRealTime();
+
+
+//
 // Complete pipeline comparison benchmarks
 //
 
