@@ -48,8 +48,12 @@ FormattingChannel::~FormattingChannel()
 
 void FormattingChannel::setFormatter(Formatter::Ptr pFormatter)
 {
-	FastMutex::ScopedLock lock(_mutex);
-	_pFormatter = pFormatter;
+	// The formatter that is replaced is released when the mutex is free
+	// again: its destructor may log.
+	{
+		FastMutex::ScopedLock lock(_mutex);
+		_pFormatter.swap(pFormatter);
+	}
 }
 
 
@@ -62,8 +66,12 @@ Formatter::Ptr FormattingChannel::getFormatter() const
 
 void FormattingChannel::setChannel(Channel::Ptr pChannel)
 {
-	FastMutex::ScopedLock lock(_mutex);
-	_pChannel = pChannel;
+	// The channel that is replaced is released when the mutex is free
+	// again: its destructor may log.
+	{
+		FastMutex::ScopedLock lock(_mutex);
+		_pChannel.swap(pChannel);
+	}
 }
 
 

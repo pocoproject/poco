@@ -19,12 +19,15 @@
 #include "Poco/PatternFormatter.h"
 #include "Poco/FormattingChannel.h"
 #include "Poco/NullChannel.h"
+#include <atomic>
+#include <functional>
 #include <thread>
 #include <memory>
 #include <vector>
 
 using Poco::Logger;
 using Poco::Channel;
+using Poco::Formatter;
 using Poco::Message;
 using Poco::AutoPtr;
 using Poco::PatternFormatter;
@@ -32,6 +35,109 @@ using Poco::FormattingChannel;
 using Poco::NullChannel;
 using Poco::Event;
 using Poco::Thread;
+
+
+namespace
+{
+	class Bystander
+		/// A thread that logs when it is asked to, which shows whether
+		/// logging is possible while the thread that asked is busy
+		/// with something else.
+	{
+	public:
+		using Ptr = std::shared_ptr<Bystander>;
+
+		explicit Bystander(std::function<void()> logOne):
+			_thread([this, logOne = std::move(logOne)]
+			{
+				if (_asked.tryWait(TIMEOUT))
+				{
+					logOne();
+					_logged.set();
+				}
+			})
+		{
+		}
+
+		~Bystander()
+		{
+			_asked.set();
+			_thread.join();
+		}
+
+		void ask()
+			/// Asks the thread to log and waits for that, but not
+			/// for long: logging is not possible if it takes longer.
+		{
+			_asked.set();
+			_couldLog = _logged.tryWait(TIMEOUT);
+		}
+
+		bool couldLog() const
+			/// Returns true if the thread has logged in time
+			/// when it was asked to.
+		{
+			return _couldLog;
+		}
+
+	private:
+		static constexpr long TIMEOUT = 10000;
+
+		Event _asked;
+		Event _logged;
+		std::atomic<bool> _couldLog{false};
+		std::thread _thread;
+	};
+
+
+	class LastWordsChannel: public Channel
+		/// A channel that asks a bystander to log while it is destroyed.
+	{
+	public:
+		explicit LastWordsChannel(Bystander::Ptr pBystander):
+			_pBystander(std::move(pBystander))
+		{
+		}
+
+		void log(const Message&) override
+		{
+		}
+
+	protected:
+		~LastWordsChannel() override
+		{
+			_pBystander->ask();
+		}
+
+	private:
+		Bystander::Ptr _pBystander;
+	};
+
+
+	class LastWordsFormatter: public Formatter
+		/// A formatter that asks a bystander to log while it is destroyed.
+	{
+	public:
+		explicit LastWordsFormatter(Bystander::Ptr pBystander):
+			_pBystander(std::move(pBystander))
+		{
+		}
+
+		~LastWordsFormatter() override
+		{
+			_pBystander->ask();
+		}
+
+		void format(const Message& msg, std::string& text) override
+		{
+			text = msg.getText();
+		}
+
+	private:
+		Bystander::Ptr _pBystander;
+	};
+}
+
 
 LoggerTest::LoggerTest(const std::string& name): CppUnit::TestCase(name)
 {
@@ -484,6 +590,36 @@ void LoggerTest::testConcurrentShutdown()
 }
 
 
+void LoggerTest::testLogDuringDestructionOfReplaced()
+{
+	// The destructor of a channel or of a formatter may log, and so may
+	// any other thread while that destructor runs.
+	AutoPtr<FormattingChannel> pFormattingChannel = new FormattingChannel;
+	pFormattingChannel->setChannel(new NullChannel);
+	Logger& logger = Logger::get("TestLogger.DestructionOfReplaced");
+	logger.setLevel(Message::PRIO_INFORMATION);
+	logger.setChannel(pFormattingChannel);
+
+	auto logOne = [&logger] { logger.information("logged while the one replaced is destroyed"); };
+
+	auto pFormatterBystander = std::make_shared<Bystander>(logOne);
+	pFormattingChannel->setFormatter(new LastWordsFormatter(pFormatterBystander));
+	pFormattingChannel->setFormatter(nullptr);
+	assertTrue (pFormatterBystander->couldLog());
+
+	auto pDestinationBystander = std::make_shared<Bystander>(logOne);
+	pFormattingChannel->setChannel(new LastWordsChannel(pDestinationBystander));
+	pFormattingChannel->setChannel(new NullChannel);
+	assertTrue (pDestinationBystander->couldLog());
+
+	auto pChannelBystander = std::make_shared<Bystander>(logOne);
+	logger.setChannel(new LastWordsChannel(pChannelBystander));
+	logger.setChannel(pFormattingChannel);
+	assertTrue (pChannelBystander->couldLog());
+
+	logger.setChannel(nullptr);
+}
+
 
 void LoggerTest::setUp()
 {
@@ -509,6 +645,7 @@ CppUnit::Test* LoggerTest::suite()
 	CppUnit_addTest(pSuite, LoggerTest, testLoggerRefSurvivesShutdown);
 	CppUnit_addTest(pSuite, LoggerTest, testConcurrentChannelReplacement);
 	CppUnit_addTest(pSuite, LoggerTest, testConcurrentShutdown);
+	CppUnit_addTest(pSuite, LoggerTest, testLogDuringDestructionOfReplaced);
 
 	return pSuite;
 }

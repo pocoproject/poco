@@ -33,6 +33,7 @@ public:
 	void testLoggerRefSurvivesShutdown();
 	void testConcurrentChannelReplacement();
 	void testConcurrentShutdown();
+	void testLogDuringDestructionOfReplaced();
 
 	void setUp();
 	void tearDown();

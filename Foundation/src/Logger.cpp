@@ -41,8 +41,12 @@ Logger::~Logger()
 
 void Logger::setChannel(Channel::Ptr pChannel)
 {
-	FastMutex::ScopedLock lock(_channelMutex);
-	_pChannel = pChannel;
+	// The channel that is replaced is released when the mutex is free
+	// again: its destructor may log.
+	{
+		FastMutex::ScopedLock lock(_channelMutex);
+		_pChannel.swap(pChannel);
+	}
 }
 
 
