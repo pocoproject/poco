@@ -27,6 +27,8 @@
 #include "Poco/AutoPtr.h"
 #include "Poco/Clock.h"
 #include "Poco/Timespan.h"
+#include <functional>
+#include <memory>
 
 
 namespace Poco::Net {
@@ -39,7 +41,7 @@ class Net_API RemoteSyslogChannel: public Poco::Channel
 	/// and over TCP according to RFC 6587 "Transmission of Syslog
 	/// Messages over TCP".
 	///
-	/// In addition, RemoteSyslogListener also supports the "old" BSD syslog
+	/// In addition, RemoteSyslogChannel also supports the "old" BSD syslog
 	/// protocol, as described in RFC 3164.
 	///
 	/// RFC 5424 structured data can be passed via the "structured-data"
@@ -56,7 +58,11 @@ class Net_API RemoteSyslogChannel: public Poco::Channel
 	/// property, and the message is dropped, as are the messages that
 	/// follow, until the time of the "retryInterval" property has passed
 	/// and the next message makes another attempt. log() does not throw
-	/// because of that.
+	/// because of that, nor because of a server whose address cannot be
+	/// found. A server that is given by name is looked up with every
+	/// attempt to connect, and what the name service takes for that is
+	/// not within the "timeout" property: where that matters, give the
+	/// address of the server.
 	///
 	/// A connection that the server has closed is made anew with the next
 	/// message, and a message that could not be sent over a connection
@@ -122,7 +128,8 @@ public:
 		/// If bsdFormat is true, messages are formatted according to RFC 3164.
 
 	void open();
-		/// Opens the RemoteSyslogChannel.
+		/// Opens the RemoteSyslogChannel. A channel that is not open is
+		/// opened by the first message.
 
 	void close();
 		/// Closes the RemoteSyslogChannel.
@@ -139,16 +146,19 @@ public:
 		///                  The LOG_ prefix can be omitted and values are case insensitive (e.g. a facility value "mail" is recognized as SYSLOG_MAIL)
 		///     * format:    "bsd"/"rfc3164" (RFC 3164 format) or "new"/"rfc5424" (default)
 		///     * loghost:   The target IP address or host name where log messages are sent. Optionally, a port number (separated
-		///                  by a colon) can also be specified.
+		///                  by a colon) can also be specified. An IPv6 address that a port number follows is put in
+		///                  square brackets.
 		///     * host:      (optional) Host name included in syslog messages. If not specified, the host's real domain name or
-		///                  IP address will be used. It is looked up when the channel is opened, with the first message at
-		///                  the latest, and that takes as long as the name service takes.
+		///                  IP address will be used. The name service is asked for it when the channel is opened, with the
+		///                  first message at the latest, and is waited for no longer than the time of the "timeout" property.
+		///                  Until its answer is there, messages carry the name that the system has for the host.
 		///     * buffer:    UDP socket send buffer size in bytes. If not specified, the system default is used.
 		///     * transport: "udp" (default) or "tcp". A change closes the channel, and the next message opens it again.
 		///     * framing:   How messages are told apart on a TCP connection (RFC 6587): "newline" (default), with a line feed
 		///                  after every message and the line feeds within a message replaced by spaces, or "octet-counting",
 		///                  with every message preceded by its length.
-		///     * timeout:   The time in milliseconds allowed for connecting to the server and for sending a message over TCP.
+		///     * timeout:   The time in milliseconds allowed for connecting to the server and for sending a message over TCP,
+		///                  and the longest that opening the channel waits for the name of the local host (see host).
 		///                  Defaults to 2000.
 		///     * retryInterval: The time in milliseconds after a failed attempt to connect during which no other is made
 		///                  and messages are dropped. Defaults to 5000.
@@ -190,6 +200,18 @@ protected:
 		/// Returns the port that messages are sent to if the "loghost"
 		/// property names none.
 
+	using HostNameSource = std::function<std::string()>;
+
+	[[nodiscard]] virtual HostNameSource hostNameSource() const;
+		/// Returns the function that tells the name of the local host for
+		/// the messages of a channel whose "host" property names none.
+		/// The default asks the name service (DNS::thisHost()).
+		///
+		/// The function is called on a thread of its own, since it takes
+		/// the time that the name service takes, and it may still run
+		/// when the channel is gone: it must not use the channel. An
+		/// exception or an empty name means that the name cannot be told.
+
 private:
 	enum Transport
 	{
@@ -202,6 +224,20 @@ private:
 		FRAMING_NEWLINE,
 		FRAMING_OCTET_COUNTING
 	};
+
+	struct HostNameLookup;
+
+	void openChannel();
+		/// Opens the channel if it is not open. The caller holds the mutex.
+
+	void lookUpHostName();
+		/// Has the name of the local host asked for and waits for it for
+		/// the time of the "timeout" property at the most. The caller
+		/// holds the mutex.
+
+	void takeHostName();
+		/// Takes the name of the local host if it has been told since.
+		/// The caller holds the mutex.
 
 	void closeSockets();
 		/// Closes the channel. The caller holds the mutex.
@@ -223,8 +259,16 @@ private:
 	[[nodiscard]] bool closedByServer();
 		/// Returns true if the server has closed or reset the connection.
 
+	void splitLogHost(std::string& host, std::string& port) const;
+		/// Gives the host that the "loghost" property names and the port, which
+		/// is empty if the property names none.
+
 	[[nodiscard]] std::string logHostName() const;
 		/// Returns the host that the "loghost" property names, without the port.
+
+	[[nodiscard]] SocketAddress logHostAddress() const;
+		/// Returns the address that messages are sent to. A host name is
+		/// resolved, which takes as long as the name service takes.
 
 	std::string _logHost;
 	std::string _name;
@@ -243,6 +287,8 @@ private:
 	bool _connected;
 	bool _failed;
 	Poco::Clock _failedAt;
+	std::shared_ptr<HostNameLookup> _pHostNameLookup;
+		/// There for as long as the name of the local host is being asked for.
 	mutable Poco::FastMutex _mutex;
 };
 

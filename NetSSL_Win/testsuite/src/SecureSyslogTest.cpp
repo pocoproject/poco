@@ -18,6 +18,7 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/LoggingFactory.h"
 #include "Poco/Message.h"
 #include "Poco/AutoPtr.h"
@@ -193,6 +194,23 @@ namespace
 		ServerSocket socket(SocketAddress("127.0.0.1", 0));
 		return socket.address().port();
 	}
+
+
+	class TargetChannel: public SecureRemoteSyslogChannel
+		/// A channel that connects to nothing and keeps where
+		/// it was asked to connect to.
+	{
+	public:
+		std::vector<std::string> targets;
+			/// The address and the host name of every attempt.
+
+	protected:
+		StreamSocket createSocket(const SocketAddress& address, const std::string& hostName, const Poco::Timespan& timeout) override
+		{
+			targets.push_back(address.toString() + " " + hostName);
+			throw Poco::Net::ConnectionRefusedException();
+		}
+	};
 }
 
 
@@ -541,6 +559,34 @@ void SecureSyslogTest::testChannelHandshakeTimeout()
 }
 
 
+void SecureSyslogTest::testDefaultPort()
+{
+	Poco::AutoPtr<TargetChannel> channel = new TargetChannel;
+	channel->setProperty("retryInterval", "0");
+	Poco::Message msg("asource", "amessage", Poco::Message::PRIO_CRITICAL);
+
+	// what the "loghost" property may say, and where that is
+	const char* targets[][2] =
+	{
+		{"127.0.0.1", "127.0.0.1:6514 127.0.0.1"},
+#if defined(POCO_HAVE_IPv6)
+		{"[::1]", "[::1]:6514 ::1"},
+		{"[::1]:1514", "[::1]:1514 ::1"},
+		{"::1", "[::1]:6514 ::1"},
+#endif
+		{"127.0.0.1:1514", "127.0.0.1:1514 127.0.0.1"}
+	};
+	for (const auto& target: targets)
+	{
+		channel->setProperty("loghost", target[0]);
+		channel->log(msg);
+		assertTrue (!channel->targets.empty());
+		assertEqual (std::string(target[1]), channel->targets.back());
+	}
+	channel->close();
+}
+
+
 void SecureSyslogTest::testProperties()
 {
 	Poco::AutoPtr<SecureRemoteSyslogChannel> channel = new SecureRemoteSyslogChannel;
@@ -616,6 +662,7 @@ CppUnit::Test* SecureSyslogTest::suite()
 	CppUnit_addTest(pSuite, SecureSyslogTest, testCloseWithClients);
 	CppUnit_addTest(pSuite, SecureSyslogTest, testChannelReconnect);
 	CppUnit_addTest(pSuite, SecureSyslogTest, testChannelHandshakeTimeout);
+	CppUnit_addTest(pSuite, SecureSyslogTest, testDefaultPort);
 	CppUnit_addTest(pSuite, SecureSyslogTest, testProperties);
 
 	return pSuite;

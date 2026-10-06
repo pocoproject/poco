@@ -17,6 +17,7 @@
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
+#include "Poco/Net/NetException.h"
 #include "Poco/Net/DNS.h"
 #include "Poco/Message.h"
 #include "Poco/AutoPtr.h"
@@ -26,6 +27,7 @@
 #include <algorithm>
 #include <chrono>
 #include <condition_variable>
+#include <memory>
 #include <mutex>
 #include <set>
 #include <string>
@@ -297,6 +299,76 @@ namespace
 		StreamSocket _last;
 		std::string _hostName;
 		int _connections = 0;
+	};
+
+
+	class NamedChannel: public RemoteSyslogChannel
+		/// A channel whose name service is the test: it tells the name
+		/// of the local host when the test lets it, or that there is none.
+	{
+	public:
+		NamedChannel(const std::string& name = "canonical.example"):
+			_pService(std::make_shared<Service>())
+		{
+			_pService->name = name;
+		}
+
+		void answer()
+			/// Lets the name service answer.
+		{
+			{
+				std::lock_guard<std::mutex> lock(_pService->mutex);
+				_pService->open = true;
+			}
+			_pService->opened.notify_all();
+		}
+
+	protected:
+		~NamedChannel()
+		{
+			// nothing is left waiting, whatever became of the test
+			answer();
+		}
+
+		HostNameSource hostNameSource() const override
+		{
+			std::shared_ptr<Service> pService = _pService;
+			return [pService]()
+			{
+				std::unique_lock<std::mutex> lock(pService->mutex);
+				pService->opened.wait(lock, [&pService] { return pService->open; });
+				if (pService->name.empty()) throw Poco::Net::HostNotFoundException();
+				return pService->name;
+			};
+		}
+
+	private:
+		struct Service
+		{
+			std::mutex mutex;
+			std::condition_variable opened;
+			bool open = false;
+			std::string name;
+		};
+
+		std::shared_ptr<Service> _pService;
+	};
+
+
+	class TargetChannel: public RemoteSyslogChannel
+		/// A channel that connects to nothing and keeps where
+		/// it was asked to connect to.
+	{
+	public:
+		std::vector<std::string> targets;
+			/// The address and the host name of every attempt.
+
+	protected:
+		StreamSocket createSocket(const SocketAddress& address, const std::string& hostName, const Poco::Timespan& timeout) override
+		{
+			targets.push_back(address.toString() + " " + hostName);
+			throw Poco::Net::ConnectionRefusedException();
+		}
 	};
 }
 
@@ -1155,6 +1227,112 @@ void SyslogTest::testTCPChannelServerAway()
 }
 
 
+void SyslogTest::testTCPChannelTarget()
+{
+	Poco::AutoPtr<TargetChannel> channel = new TargetChannel;
+	channel->setProperty("transport", "tcp");
+	channel->setProperty("retryInterval", "0");
+	Poco::Message msg("asource", "amessage", Poco::Message::PRIO_CRITICAL);
+
+	// what the "loghost" property may say, and where that is
+	const char* targets[][2] =
+	{
+		{"127.0.0.1", "127.0.0.1:514 127.0.0.1"},
+#if defined(POCO_HAVE_IPv6)
+		{"[::1]", "[::1]:514 ::1"},
+		{"[::1]:1514", "[::1]:1514 ::1"},
+		{"::1", "[::1]:514 ::1"},
+#endif
+		{"127.0.0.1:1514", "127.0.0.1:1514 127.0.0.1"}
+	};
+	for (const auto& target: targets)
+	{
+		channel->setProperty("loghost", target[0]);
+		channel->log(msg);
+		assertTrue (!channel->targets.empty());
+		assertEqual (std::string(target[1]), channel->targets.back());
+	}
+
+	// A server whose address cannot be found is a server that is away:
+	// the message is dropped, and log() does not throw.
+	const std::size_t attempts = channel->targets.size();
+	channel->setProperty("loghost", "127.0.0.1:nosuchservice");
+	channel->log(msg);
+	assertTrue (channel->targets.size() == attempts);
+	channel->close();
+}
+
+
+void SyslogTest::testTCPChannelHostName()
+{
+	TCPListener listener;
+	Poco::Message msg("asource", "amessage", Poco::Message::PRIO_CRITICAL);
+
+	// The name service has told the name by the time the first message goes.
+	{
+		Poco::AutoPtr<NamedChannel> channel = new NamedChannel;
+		channel->setProperty("loghost", listener.address().toString());
+		channel->setProperty("transport", "tcp");
+		channel->answer();
+		channel->log(msg);
+		assertTrue (listener.pChannel->waitFor(1));
+		assertTrue (listener.pChannel->messages().back().get("host") == "canonical.example");
+		channel->close();
+	}
+
+	// The name service does not answer. The first message is not held up
+	// for longer than the channel is told to wait, and says the name that
+	// the system has for the host. Once the answer is there, the messages
+	// say the name it told.
+	{
+		Poco::AutoPtr<NamedChannel> channel = new NamedChannel;
+		channel->setProperty("loghost", listener.address().toString());
+		channel->setProperty("transport", "tcp");
+		channel->setProperty("timeout", "100");
+		channel->log(msg);
+		assertTrue (listener.pChannel->waitFor(2));
+		assertTrue (listener.pChannel->messages().back().get("host") == DNS::hostName());
+
+		channel->answer();
+		bool told = false;
+		for (std::size_t i = 3; i < 100 && !told; ++i)
+		{
+			channel->log(msg);
+			assertTrue (listener.pChannel->waitFor(i));
+			told = listener.pChannel->messages().back().get("host") == "canonical.example";
+		}
+		assertTrue (told);
+		channel->close();
+	}
+
+	// The name service has no name to tell.
+	{
+		const std::size_t before = listener.pChannel->messages().size();
+		Poco::AutoPtr<NamedChannel> channel = new NamedChannel("");
+		channel->setProperty("loghost", listener.address().toString());
+		channel->setProperty("transport", "tcp");
+		channel->answer();
+		channel->log(msg);
+		assertTrue (listener.pChannel->waitFor(before + 1));
+		assertTrue (listener.pChannel->messages().back().get("host") == "-");
+		channel->close();
+	}
+
+	// A name that is given is taken, and nothing is asked.
+	{
+		const std::size_t before = listener.pChannel->messages().size();
+		Poco::AutoPtr<NamedChannel> channel = new NamedChannel;
+		channel->setProperty("loghost", listener.address().toString());
+		channel->setProperty("transport", "tcp");
+		channel->setProperty("host", "ahost");
+		channel->log(msg);
+		assertTrue (listener.pChannel->waitFor(before + 1));
+		assertTrue (listener.pChannel->messages().back().get("host") == "ahost");
+		channel->close();
+	}
+}
+
+
 void SyslogTest::testTCPChannelSwitchTransport()
 {
 	// a port that is free for TCP and for UDP
@@ -1287,6 +1465,8 @@ CppUnit::Test* SyslogTest::suite()
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelServerClosed);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelResend);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelServerAway);
+	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelTarget);
+	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelHostName);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelSwitchTransport);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelProperties);
 

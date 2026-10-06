@@ -33,6 +33,7 @@ public:
 	void testCloseWithClients();
 	void testChannelReconnect();
 	void testChannelHandshakeTimeout();
+	void testDefaultPort();
 	void testProperties();
 
 	void setUp();

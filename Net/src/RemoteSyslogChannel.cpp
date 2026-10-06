@@ -24,6 +24,10 @@
 #include "Poco/String.h"
 #include "Poco/Exception.h"
 #include <algorithm>
+#include <chrono>
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 
 
 namespace Poco::Net {
@@ -49,6 +53,21 @@ namespace
 	const Poco::Timespan DEFAULT_TIMEOUT(2, 0);
 	const Poco::Timespan DEFAULT_RETRY_INTERVAL(5, 0);
 }
+
+
+struct RemoteSyslogChannel::HostNameLookup
+	/// What was told about the name of the local host. The question is
+	/// asked on a thread of its own: it takes the time that the name
+	/// service takes, and it can neither be given a time nor be taken
+	/// back. So whoever waits for the answer says for how long, and the
+	/// thread, which keeps nothing but this, ends when the answer is there.
+{
+	std::mutex              mutex;
+	std::condition_variable answered;
+	bool                    done = false;
+	std::string             name;
+		/// Empty if the name could not be told.
+};
 
 
 RemoteSyslogChannel::RemoteSyslogChannel():
@@ -101,40 +120,106 @@ RemoteSyslogChannel::~RemoteSyslogChannel()
 
 void RemoteSyslogChannel::open()
 {
-	if (_open) return;
+	Poco::FastMutex::ScopedLock lock(_mutex);
 
-	if (_logHost.find(':') != std::string::npos)
-		_socketAddress = SocketAddress(_logHost);
-	else
-		_socketAddress = SocketAddress(_logHost, defaultPort());
+	openChannel();
+}
+
+
+void RemoteSyslogChannel::openChannel()
+{
+	if (_open) return;
 
 	if (_transport == TRANSPORT_UDP)
 	{
+		_socketAddress = logHostAddress();
 		// reset socket for the case that it has been previously closed
 		_socket = DatagramSocket(_socketAddress.family());
+		if (_buffer) _socket.setSendBufferSize(_buffer);
 	}
 
-	if (_host.empty())
+	if (_host.empty()) lookUpHostName();
+
+	_open = true;
+}
+
+
+void RemoteSyslogChannel::lookUpHostName()
+{
+	if (!_pHostNameLookup)
 	{
+		auto pLookup = std::make_shared<HostNameLookup>();
+		HostNameSource source = hostNameSource();
 		try
 		{
-			_host = DNS::thisHost().name();
+			std::thread([pLookup, source]()
+			{
+				std::string name;
+				try
+				{
+					name = source();
+				}
+				catch (...)
+				{
+				}
+				{
+					std::lock_guard<std::mutex> lock(pLookup->mutex);
+					pLookup->name = std::move(name);
+					pLookup->done = true;
+				}
+				pLookup->answered.notify_all();
+			}).detach();
+			_pHostNameLookup = pLookup;
+		}
+		catch (std::exception&)
+		{
+			// no thread to ask on
+		}
+	}
+
+	bool answered = false;
+	if (_pHostNameLookup)
+	{
+		std::unique_lock<std::mutex> lock(_pHostNameLookup->mutex);
+		const HostNameLookup& lookup = *_pHostNameLookup;
+		answered = _pHostNameLookup->answered.wait_for(lock, std::chrono::microseconds(_timeout.totalMicroseconds()), [&lookup] { return lookup.done; });
+		if (answered) _host = lookup.name;
+	}
+	if (answered)
+	{
+		_pHostNameLookup.reset();
+	}
+	else
+	{
+		// Until the answer is there, the name that the system has for the host.
+		try
+		{
+			_host = DNS::hostName();
 		}
 		catch (Poco::Exception&)
 		{
-			if (_transport == TRANSPORT_UDP)
-				_host = _socket.address().host().toString();
-			else
-				_host = "-"; // the NILVALUE of RFC 5424: not known
 		}
 	}
-
-	if (_buffer && _transport == TRANSPORT_UDP)
+	if (_host.empty())
 	{
-		_socket.setSendBufferSize(_buffer);
+		if (_transport == TRANSPORT_UDP)
+			_host = _socket.address().host().toString();
+		else
+			_host = "-"; // the NILVALUE of RFC 5424: not known
 	}
+}
 
-	_open = true;
+
+void RemoteSyslogChannel::takeHostName()
+{
+	std::string name;
+	{
+		std::lock_guard<std::mutex> lock(_pHostNameLookup->mutex);
+		if (!_pHostNameLookup->done) return;
+		name = _pHostNameLookup->name;
+	}
+	_pHostNameLookup.reset();
+	if (!name.empty()) _host = name;
 }
 
 
@@ -173,7 +258,8 @@ void RemoteSyslogChannel::log(const Message& msg)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
 
-	if (!_open) open();
+	openChannel();
+	if (_pHostNameLookup) takeHostName();
 
 	std::string m;
 	m.reserve(1024);
@@ -266,7 +352,8 @@ bool RemoteSyslogChannel::connect()
 
 	try
 	{
-		_streamSocket = createSocket(_socketAddress, logHostName(), _timeout);
+		// the address of the server is asked for with every connection: it may have changed
+		_streamSocket = createSocket(logHostAddress(), logHostName(), _timeout);
 		// the receive timeout bounds what a TLS socket reads while it sends
 		_streamSocket.setSendTimeout(_timeout);
 		_streamSocket.setReceiveTimeout(_timeout);
@@ -338,17 +425,50 @@ bool RemoteSyslogChannel::closedByServer()
 }
 
 
-std::string RemoteSyslogChannel::logHostName() const
+void RemoteSyslogChannel::splitLogHost(std::string& host, std::string& port) const
 {
+	host = _logHost;
+	port.clear();
 	if (!_logHost.empty() && _logHost[0] == '[')
 	{
 		const std::string::size_type end = _logHost.find(']');
-		if (end != std::string::npos) return _logHost.substr(1, end - 1);
+		if (end != std::string::npos)
+		{
+			host = _logHost.substr(1, end - 1);
+			if (end + 1 < _logHost.size() && _logHost[end + 1] == ':') port = _logHost.substr(end + 2);
+		}
 	}
-	const std::string::size_type colon = _logHost.find(':');
-	if (colon != std::string::npos && _logHost.find(':', colon + 1) == std::string::npos)
-		return _logHost.substr(0, colon);
-	return _logHost;
+	else
+	{
+		// an IPv6 address that is not in brackets has more than the one colon, and no port
+		const std::string::size_type colon = _logHost.find(':');
+		if (colon != std::string::npos && _logHost.find(':', colon + 1) == std::string::npos)
+		{
+			host = _logHost.substr(0, colon);
+			port = _logHost.substr(colon + 1);
+		}
+	}
+}
+
+
+std::string RemoteSyslogChannel::logHostName() const
+{
+	std::string host;
+	std::string port;
+	splitLogHost(host, port);
+	return host;
+}
+
+
+SocketAddress RemoteSyslogChannel::logHostAddress() const
+{
+	std::string host;
+	std::string port;
+	splitLogHost(host, port);
+	if (port.empty())
+		return SocketAddress(host, defaultPort());
+	else
+		return SocketAddress(host, port);
 }
 
 
@@ -363,6 +483,12 @@ StreamSocket RemoteSyslogChannel::createSocket(const SocketAddress& address, con
 Poco::UInt16 RemoteSyslogChannel::defaultPort() const
 {
 	return SYSLOG_PORT;
+}
+
+
+RemoteSyslogChannel::HostNameSource RemoteSyslogChannel::hostNameSource() const
+{
+	return []() { return DNS::thisHost().name(); };
 }
 
 
@@ -438,7 +564,10 @@ void RemoteSyslogChannel::setProperty(const std::string& name, const std::string
 	}
 	else if (name == PROP_HOST)
 	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
 		_host = value;
+		// a name that is given is not replaced by one that is told later
+		_pHostNameLookup.reset();
 	}
 	else if (name == PROP_FORMAT)
 	{
