@@ -27,6 +27,8 @@
 #include "Poco/Util/Application.h"
 #include "Poco/Util/AbstractConfiguration.h"
 #include "Poco/Thread.h"
+#include "Poco/Runnable.h"
+#include "Poco/Event.h"
 #include "Poco/Timestamp.h"
 #include "Poco/Timespan.h"
 #include "Poco/File.h"
@@ -130,6 +132,60 @@ namespace
 
 	Poco::FastMutex CopyToStringConnection::_mutex;
 	std::string CopyToStringConnection::_data;
+
+	class HeldBackServer: public Poco::Runnable
+		/// Takes one connection and answers the TLS handshake only when
+		/// it is told to. Keeps what the client then sends.
+	{
+	public:
+		HeldBackServer():
+			_socket(SocketAddress("127.0.0.1", 0))
+		{
+		}
+
+		Poco::UInt16 port() const
+		{
+			return _socket.address().port();
+		}
+
+		void proceed()
+		{
+			_proceed.set();
+		}
+
+		std::string received()
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+			return _received;
+		}
+
+		void run() override
+		{
+			try
+			{
+				// the handshake of an accepted socket is made with its first data
+				StreamSocket socket = _socket.acceptConnection();
+				_proceed.wait(30000);
+				socket.setReceiveTimeout(Poco::Timespan(10, 0));
+				char buffer[256];
+				int n = socket.receiveBytes(buffer, sizeof(buffer));
+				if (n > 0)
+				{
+					Poco::FastMutex::ScopedLock lock(_mutex);
+					_received.assign(buffer, n);
+				}
+			}
+			catch (Poco::Exception&)
+			{
+			}
+		}
+
+	private:
+		SecureServerSocket _socket;
+		Poco::Event _proceed;
+		Poco::FastMutex _mutex;
+		std::string _received;
+	};
 }
 
 
@@ -501,6 +557,70 @@ void SecureStreamSocketTest::testStaleErrorQueue()
 }
 
 
+void SecureStreamSocketTest::testHandshakeTimeout()
+{
+	// The certificate of the test servers is not one for this name, and no
+	// name service is needed to tell the name from the local host.
+	const std::string otherName("192.0.2.1");
+
+	{
+		SecureServerSocket svs(0);
+		TCPServer srv(new TCPServerConnectionFactoryImpl<EchoConnection>(), svs);
+		srv.start();
+
+		SecureStreamSocket ss;
+		ss.setPeerHostName(otherName);
+		try
+		{
+			ss.connect(SocketAddress("127.0.0.1", svs.address().port()));
+			fail("certificate for another host - must throw");
+		}
+		catch (Poco::Net::CertificateValidationException&)
+		{
+		}
+	}
+
+	// A server that does not answer the handshake within the time allowed
+	// for connecting: there is no connection then, whatever the server
+	// does afterwards.
+	HeldBackServer server;
+	Thread thread;
+	thread.start(server);
+
+	SecureStreamSocket ss;
+	ss.setPeerHostName(otherName);
+	std::string outcome("connected");
+	try
+	{
+		ss.connect(SocketAddress("127.0.0.1", server.port()), Poco::Timespan(0, 250000));
+	}
+	catch (Poco::TimeoutException&)
+	{
+		outcome = "timeout";
+	}
+	catch (Poco::Exception& exc)
+	{
+		outcome = exc.displayText();
+	}
+	// the time allowed for connecting does not stay on the socket
+	Poco::Timespan timeoutLeft(1, 0);
+	try
+	{
+		timeoutLeft = ss.getReceiveTimeout();
+	}
+	catch (Poco::Exception&)
+	{
+	}
+	// the server is let go before anything is asserted: its thread uses what is on this stack
+	server.proceed();
+	ss.close();
+	thread.join();
+	assertEqual (std::string("timeout"), outcome);
+	assertTrue (timeoutLeft == Poco::Timespan());
+	assertTrue (server.received().empty());
+}
+
+
 void SecureStreamSocketTest::setUp()
 {
 }
@@ -525,6 +645,7 @@ CppUnit::Test* SecureStreamSocketTest::suite()
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testShutdownBidirectional);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testPeerHostNameTooLong);
 	CppUnit_addTest(pSuite, SecureStreamSocketTest, testStaleErrorQueue);
+	CppUnit_addTest(pSuite, SecureStreamSocketTest, testHandshakeTimeout);
 
 	return pSuite;
 }
