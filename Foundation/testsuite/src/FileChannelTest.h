@@ -33,6 +33,8 @@ public:
 
 	void testRotateNever();
 	void testFlushing();
+	void testOpenCalledByLog();
+	void testPurgeStrategyReplacedDuringPurge();
 	void testConcurrentOpenClose();
 	void testRotateBySize();
 	void testRotateByAge();

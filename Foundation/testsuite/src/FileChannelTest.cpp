@@ -32,6 +32,7 @@
 #include "Poco/Event.h"
 #include "Poco/FileStream.h"
 #include <atomic>
+#include <memory>
 #include <thread>
 #include <vector>
 #include <iostream>
@@ -54,6 +55,64 @@ using Poco::DateTimeFormatter;
 using Poco::DateTimeFormat;
 using Poco::DirectoryIterator;
 using Poco::InvalidArgumentException;
+
+
+namespace
+{
+	class CountingFileChannel: public FileChannel
+		/// Counts the calls of open().
+	{
+	public:
+		using FileChannel::FileChannel;
+
+		void open() override
+		{
+			++opened;
+			FileChannel::open();
+		}
+
+		int opened = 0;
+	};
+
+
+	class HeldPurgeStrategy: public Poco::PurgeStrategy
+		/// A purge strategy that waits in a purge until the test has
+		/// replaced it, and tells whether it is still there then.
+	{
+	public:
+		struct State
+		{
+			Event purging;
+			Event replaced;
+			Event purged;
+			std::atomic<bool> destroyed{false};
+			std::atomic<bool> thereWhenReplaced{false};
+		};
+
+		explicit HeldPurgeStrategy(std::shared_ptr<State> pState):
+			_pState(std::move(pState))
+		{
+		}
+
+		~HeldPurgeStrategy() override
+		{
+			_pState->destroyed = true;
+		}
+
+		void purge(const std::string&) override
+		{
+			std::shared_ptr<State> pState = _pState;
+			pState->purging.set();
+			if (pState->replaced.tryWait(TIMEOUT)) pState->thereWhenReplaced = !pState->destroyed;
+			pState->purged.set();
+		}
+
+		static constexpr long TIMEOUT = 10000;
+
+	private:
+		std::shared_ptr<State> _pState;
+	};
+}
 
 
 FileChannelTest::FileChannelTest(const std::string& name): CppUnit::TestCase(name)
@@ -146,11 +205,79 @@ void FileChannelTest::testFlushing()
 }
 
 
+void FileChannelTest::testOpenCalledByLog()
+{
+	// A message that finds the channel closed opens it by a call to
+	// open(), which a subclass may have overridden.
+	std::string name = filename();
+	try
+	{
+		AutoPtr<CountingFileChannel> pChannel = new CountingFileChannel(name);
+		Message msg("source", "This is a log file entry", Message::PRIO_INFORMATION);
+		pChannel->log(msg);
+		assertEqual (1, pChannel->opened);
+		pChannel->log(msg);
+		assertEqual (1, pChannel->opened);
+		pChannel->close();
+		pChannel->log(msg);
+		assertEqual (2, pChannel->opened);
+	}
+	catch (...)
+	{
+		remove(name);
+		throw;
+	}
+	remove(name);
+}
+
+
+void FileChannelTest::testPurgeStrategyReplacedDuringPurge()
+{
+	// The thread that compresses an archived file purges when it is done.
+	// A purge strategy that is replaced meanwhile is there until that
+	// purge has returned.
+	std::string name = filename();
+	try
+	{
+		auto pState = std::make_shared<HeldPurgeStrategy::State>();
+		AutoPtr<FileChannel> pChannel = new FileChannel(name);
+		pChannel->setProperty(FileChannel::PROP_ROTATION, "1 K");
+		pChannel->setProperty(FileChannel::PROP_ARCHIVE, "number");
+		pChannel->setProperty(FileChannel::PROP_COMPRESS, "true");
+		pChannel->setPurgeStrategy(new HeldPurgeStrategy(pState));
+
+		// enough for the file to be rotated once, and not twice
+		Message msg("source", "This is a log file entry", Message::PRIO_INFORMATION);
+		for (int i = 0; i < 60; ++i)
+		{
+			pChannel->log(msg);
+		}
+
+		const bool purging = pState->purging.tryWait(HeldPurgeStrategy::TIMEOUT);
+		pChannel->setPurgeStrategy(new Poco::NullPurgeStrategy);
+		pState->replaced.set();
+		const bool purged = pState->purged.tryWait(HeldPurgeStrategy::TIMEOUT);
+		pChannel->close();
+
+		assertTrue (purging);
+		assertTrue (purged);
+		assertTrue (pState->thereWhenReplaced);
+	}
+	catch (...)
+	{
+		remove(name);
+		throw;
+	}
+	remove(name);
+}
+
+
 void FileChannelTest::testConcurrentOpenClose()
 {
 	// Messages are logged to a channel that another thread closes and
-	// opens again and again: a message opens the file if it has to, and
-	// none is lost.
+	// opens again and again, while a third asks it for its size and
+	// replaces its rotation strategy: a message opens the file if it
+	// has to, and none is lost.
 	constexpr int THREADS = 4;
 	constexpr int ROUNDS = 500;
 	constexpr long TIMEOUT = 10000;
@@ -185,6 +312,24 @@ void FileChannelTest::testConcurrentOpenClose()
 				}
 			});
 		}
+
+		threads.emplace_back([&]()
+		{
+			while (!stop)
+			{
+				try
+				{
+					(void) pChannel->size();
+					(void) pChannel->creationDate();
+					(void) pChannel->getProperty(FileChannel::PROP_PATH);
+					pChannel->setRotationStrategy(new Poco::NullRotateStrategy);
+				}
+				catch (...)
+				{
+					++failed;
+				}
+			}
+		});
 
 		// Closing takes turns with logging, so that every round meets
 		// messages that are being logged.
@@ -1034,6 +1179,8 @@ CppUnit::Test* FileChannelTest::suite()
 
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateNever);
 	CppUnit_addTest(pSuite, FileChannelTest, testFlushing);
+	CppUnit_addTest(pSuite, FileChannelTest, testOpenCalledByLog);
+	CppUnit_addTest(pSuite, FileChannelTest, testPurgeStrategyReplacedDuringPurge);
 	CppUnit_addTest(pSuite, FileChannelTest, testConcurrentOpenClose);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateBySize);
 	CppUnit_addTest(pSuite, FileChannelTest, testRotateByAge);
