@@ -69,9 +69,9 @@ public:
 		/// Frame header flags.
 	{
 		FRAME_FLAG_FIN  = 0x80, /// FIN bit: final fragment of a multi-fragment message.
-		FRAME_FLAG_RSV1 = 0x40, /// Reserved for future use. Must be zero.
-		FRAME_FLAG_RSV2 = 0x20, /// Reserved for future use. Must be zero.
-		FRAME_FLAG_RSV3 = 0x10  /// Reserved for future use. Must be zero.
+		FRAME_FLAG_RSV1 = 0x40, /// RSV1 bit: extension data (e.g. permessage-deflate) or reserved.
+		FRAME_FLAG_RSV2 = 0x20, /// RSV2 bit: extension data or reserved.
+		FRAME_FLAG_RSV3 = 0x10  /// RSV3 bit: extension data or reserved.
 	};
 
 	enum FrameOpcodes
@@ -285,13 +285,13 @@ public:
 		/// match the role (servers must receive masked frames, clients
 		/// unmasked ones). The offending frame is not consumed, so the
 		/// connection must be failed as required by RFC 6455 section
-		/// 7.1.7: recommend calling shutdown(WS_PROTOCOL_ERROR) before
-		/// closing. Calling receiveFrame() again without failing the
-		/// connection returns the same exception, or blocks in blocking
+		/// 7.1.7: call shutdown(WS_PROTOCOL_ERROR) before closing the socket.
+		/// Calling receiveFrame() again without failing the
+		/// connection throws the same exception, or blocks in blocking
 		/// mode, because the corrupted frame is still pending.
 		///
-		/// A WebSocketException will also be thrown if a malformed
-		/// or incomplete frame is received.
+		/// A WebSocketException will also be thrown if an incomplete frame
+		/// is received.
 		///
 		/// A connection closed in the middle of a frame header is reported
 		/// as a closed connection rather than as an incomplete frame: the
@@ -343,13 +343,13 @@ public:
 		/// match the role (servers must receive masked frames, clients
 		/// unmasked ones). The offending frame is not consumed, so the
 		/// connection must be failed as required by RFC 6455 section
-		/// 7.1.7: recommend calling shutdown(WS_PROTOCOL_ERROR) before
-		/// closing. Calling receiveFrame() again without failing the
-		/// connection returns the same exception, or blocks in blocking
+		/// 7.1.7: call shutdown(WS_PROTOCOL_ERROR) before closing the socket.
+		/// Calling receiveFrame() again without failing the
+		/// connection throws the same exception, or blocks in blocking
 		/// mode, because the corrupted frame is still pending.
 		///
-		/// A WebSocketException will also be thrown if a malformed
-		/// or incomplete frame is received.
+		/// A WebSocketException will also be thrown if an incomplete frame
+		/// is received.
 		///
 		/// If this method is used, a reasonable maximum payload size should
 		/// be set with setMaxPayloadSize() to prevent a potential
@@ -398,7 +398,7 @@ public:
 		///
 		/// The default is std::numeric_limits<int>::max().
 
-	void setAllowedRSVBits(Poco::UInt8 rsvBits);
+	void setAllowedRSVBits(int allowedRSV);
 		/// Sets the RSV bits (FRAME_FLAG_RSV1, FRAME_FLAG_RSV2,
 		/// FRAME_FLAG_RSV3) that receiveFrame() accepts on received
 		/// frames.
@@ -407,9 +407,15 @@ public:
 		/// themselves (for example permessage-deflate) and use the
 		/// corresponding RSV bits on both peers.
 		///
+		/// The library does not process extensions: frames with an allowed
+		/// RSV bit are passed to the application as received, including
+		/// control and continuation frames, so the application must verify
+		/// where its extension allows the bit (RFC 7692 forbids RSV1 on
+		/// control frames).
+		///
 		/// The default is 0: all RSV bits are rejected.
 
-	[[nodiscard]] Poco::UInt8 getAllowedRSVBits() const;
+	[[nodiscard]] int getAllowedRSVBits() const;
 		/// Returns the RSV bits that receiveFrame() accepts.
 		///
 		/// The default is 0: all RSV bits are rejected.

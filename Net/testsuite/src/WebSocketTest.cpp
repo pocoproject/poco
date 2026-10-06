@@ -20,6 +20,7 @@
 #include "Poco/Net/HTTPRequestHandlerFactory.h"
 #include "Poco/Net/HTTPServerRequest.h"
 #include "Poco/Net/HTTPServerResponse.h"
+#include "Poco/Net/HTTPServerRequestImpl.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/NetException.h"
@@ -39,6 +40,7 @@ using Poco::Net::HTTPRequest;
 using Poco::Net::HTTPResponse;
 using Poco::Net::HTTPServerRequest;
 using Poco::Net::HTTPServerResponse;
+using Poco::Net::HTTPServerRequestImpl;
 using Poco::Net::SocketStream;
 using Poco::Net::WebSocket;
 using Poco::Net::WebSocketException;
@@ -127,17 +129,16 @@ namespace
 		Poco::Event upgraded;
 		Poco::Event done;
 		std::atomic<int> received{-1};
-		std::atomic<int> flags{-1};
-		std::atomic<int> errorCode{-1};
+		std::atomic<int> flags{0};
+		std::atomic<int> errorCode{0};
 			/// The code of the WebSocketException caught by the reader,
-			/// or -1 if either no exception was thrown or a non-WebSocket
-			/// exception was.
+			/// or 0 if no exception was thrown.
 		bool blocking = true;
 			/// Whether the reader reads the frame in blocking mode. A
 			/// non-blocking reader retries until the frame is complete, the
 			/// connection is reported closed, or its own deadline passes.
-		Poco::UInt8 allowedRSV = 0;
-		int bufferSize = 64;
+		int allowedRSV = 0;
+		int bufferSize = 256;
 	};
 
 	class SingleFrameRequestHandler: public Poco::Net::HTTPRequestHandler
@@ -179,6 +180,7 @@ namespace
 				}
 				_pState->received = n;
 				_pState->flags = flags;
+				_pState->errorCode = 0;
 			}
 			catch (WebSocketException& exc)
 			{
@@ -188,6 +190,7 @@ namespace
 			catch (Poco::Exception&)
 			{
 				_pState->received = -1;
+				_pState->errorCode = -1;
 			}
 			_pState->done.set();
 		}
@@ -528,7 +531,7 @@ void WebSocketTest::testWebSocketNB()
 }
 
 
-int WebSocketTest::sendServerFrame(const std::string& frameBytes, Poco::UInt8 allowedRSV, int bufferSize, int* pFlags)
+int WebSocketTest::sendServerFrame(const std::string& frameBytes, int allowedRSV, int bufferSize, int* pFlags, int* pReceived)
 {
 	SingleFrameState::Ptr pState = new SingleFrameState;
 	pState->allowedRSV = allowedRSV;
@@ -555,14 +558,14 @@ int WebSocketTest::sendServerFrame(const std::string& frameBytes, Poco::UInt8 al
 	sock.shutdownSend();
 
 	assertTrue (pState->done.tryWait(10000));
-	int res = pState->received;
 	int err = pState->errorCode;
-	if (pFlags) *pFlags = pState->flags;
+	if (pFlags != nullptr) *pFlags = pState->flags;
+	if (pReceived != nullptr) *pReceived = pState->received;
 
 	sock.close();
 	server.stop();
 
-	return (res == -1) ? err : res;
+	return err;
 }
 
 
@@ -571,48 +574,54 @@ void WebSocketTest::testMalformedFrames()
 	// 1. Server rejects unmasked client frame
 	{
 		const std::string unmaskedFrame = "\x81\x01\x41";
-		assertEqual (WebSocket::WS_ERR_CORRUPT_FRAME, sendServerFrame(unmaskedFrame));
+		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(unmaskedFrame));
 	}
 
 	// 2. Server rejects non-zero RSV bits by default
 	{
 		// RSV1 (0xC1) with mask
 		const std::string rsv1Frame = "\xC1\x81\x01\x02\x03\x04\x40";
-		assertEqual (WebSocket::WS_ERR_CORRUPT_FRAME, sendServerFrame(rsv1Frame));
+		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(rsv1Frame));
 
 		// RSV2 (0xA1) with mask
 		const std::string rsv2Frame = "\xA1\x81\x01\x02\x03\x04\x40";
-		assertEqual (WebSocket::WS_ERR_CORRUPT_FRAME, sendServerFrame(rsv2Frame));
+		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(rsv2Frame));
 
 		// RSV3 (0x91) with mask
 		const std::string rsv3Frame = "\x91\x81\x01\x02\x03\x04\x40";
-		assertEqual (WebSocket::WS_ERR_CORRUPT_FRAME, sendServerFrame(rsv3Frame));
+		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(rsv3Frame));
 	}
 
 	// 3. Server accepts allowed RSV bits configured via setAllowedRSVBits
 	{
 		const std::string rsv1Frame = "\xC1\x81\x01\x02\x03\x04\x40";
 		int flags = 0;
-		int n = sendServerFrame(rsv1Frame, WebSocket::FRAME_FLAG_RSV1, 256, &flags);
-		assertEqual (1, n);
+		int received = 0;
+		int err = sendServerFrame(rsv1Frame, WebSocket::FRAME_FLAG_RSV1, 256, &flags, &received);
+		assertEqual (0, err);
+		assertEqual (1, received);
 		assertTrue ((flags & WebSocket::FRAME_FLAG_RSV1) != 0);
+
+		// Negative case: RSV1 allowed, but peer sends RSV2 frame -> corrupt frame error
+		const std::string rsv2Frame = "\xA1\x81\x01\x02\x03\x04\x40";
+		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(rsv2Frame, WebSocket::FRAME_FLAG_RSV1));
 	}
 
 	// 4. Server rejects reserved opcodes
 	{
 		// Reserved non-control opcode 0x03
 		const std::string opcode3 = "\x83\x81\x01\x02\x03\x04\x40";
-		assertEqual (WebSocket::WS_ERR_CORRUPT_FRAME, sendServerFrame(opcode3));
+		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(opcode3));
 
 		// Reserved control opcode 0x0B
 		const std::string opcodeB = "\x8B\x81\x01\x02\x03\x04\x40";
-		assertEqual (WebSocket::WS_ERR_CORRUPT_FRAME, sendServerFrame(opcodeB));
+		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(opcodeB));
 	}
 
 	// 5. Server rejects fragmented control frame (PING with FIN=0: 0x09)
 	{
 		const std::string fragPing = "\x09\x81\x01\x02\x03\x04\x40";
-		assertEqual (WebSocket::WS_ERR_CORRUPT_FRAME, sendServerFrame(fragPing));
+		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(fragPing));
 	}
 
 	// 6. Control frame boundary: 125-byte accepted, 126/127-byte rejected
@@ -623,7 +632,10 @@ void WebSocketTest::testMalformedFrames()
 		ping125.push_back('\xFD'); // 125 with mask bit
 		ping125.append("\x01\x02\x03\x04", 4);
 		ping125.append(125, '\x00');
-		assertEqual (125, sendServerFrame(ping125, 0, 256));
+		int received = 0;
+		int err = sendServerFrame(ping125, 0, 256, nullptr, &received);
+		assertEqual (0, err);
+		assertEqual (125, received);
 
 		// 126-byte PING with 16-bit length (rejected)
 		std::string ping126;
@@ -633,7 +645,7 @@ void WebSocketTest::testMalformedFrames()
 		ping126.push_back('\x7E'); // 126
 		ping126.append("\x01\x02\x03\x04", 4);
 		ping126.append(126, '\x00');
-		assertEqual (WebSocket::WS_ERR_CORRUPT_FRAME, sendServerFrame(ping126, 0, 256));
+		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(ping126, 0, 256));
 
 		// 64-bit length 127 encoding on control frame (rejected)
 		std::string ping127;
@@ -641,11 +653,17 @@ void WebSocketTest::testMalformedFrames()
 		ping127.push_back('\xFF'); // 127 with mask bit
 		ping127.append(8, '\x00');
 		ping127.append("\x01\x02\x03\x04", 4);
-		assertEqual (WebSocket::WS_ERR_CORRUPT_FRAME, sendServerFrame(ping127, 0, 256));
+		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(ping127, 0, 256));
 	}
 
 	// 7. Client rejects masked frame from server
 	{
+		class TestWebSocket: public WebSocket
+		{
+		public:
+			using WebSocket::computeAccept;
+		};
+
 		class MaskedFrameRequestHandler: public Poco::Net::HTTPRequestHandler
 		{
 		public:
@@ -653,12 +671,16 @@ void WebSocketTest::testMalformedFrames()
 			{
 				try
 				{
+					std::string key = request.get("Sec-WebSocket-Key", "");
 					response.setStatusAndReason(HTTPResponse::HTTP_SWITCHING_PROTOCOLS);
 					response.set("Upgrade", "websocket");
 					response.set("Connection", "Upgrade");
-					std::string key = request.get("Sec-WebSocket-Key", "");
-					response.set("Sec-WebSocket-Accept", WebSocket::computeAccept(key));
-					Poco::Net::StreamSocket sock = response.detachSocket();
+					response.set("Sec-WebSocket-Accept", TestWebSocket::computeAccept(key));
+					response.setContentLength(HTTPResponse::UNKNOWN_CONTENT_LENGTH);
+					response.send().flush();
+
+					HTTPServerRequestImpl& requestImpl = static_cast<HTTPServerRequestImpl&>(request);
+					Poco::Net::StreamSocket sock = requestImpl.detachSocket();
 
 					// Send masked frame to client (illegal per RFC 6455)
 					const char maskedFrame[] = {'\x81', '\x81', '\x01', '\x02', '\x03', '\x04', '\x40'};
@@ -698,7 +720,7 @@ void WebSocketTest::testMalformedFrames()
 		}
 		catch (WebSocketException& exc)
 		{
-			assertEqual (WebSocket::WS_ERR_CORRUPT_FRAME, exc.code());
+			assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), exc.code());
 		}
 
 		server.stop();

@@ -216,7 +216,7 @@ int WebSocketImpl::peekHeader(ReceiveState& receiveState)
 	Poco::UInt8 flags = static_cast<Poco::UInt8>(header[0]);
 	receiveState.frameFlags = flags;
 
-	if ((flags & ~(WebSocket::FRAME_FLAG_FIN | _allowedRSV)) & (WebSocket::FRAME_FLAG_RSV1 | WebSocket::FRAME_FLAG_RSV2 | WebSocket::FRAME_FLAG_RSV3))
+	if ((flags & (WebSocket::FRAME_FLAG_RSV1 | WebSocket::FRAME_FLAG_RSV2 | WebSocket::FRAME_FLAG_RSV3) & ~_allowedRSV) != 0)
 	{
 		throw WebSocketException("Reserved bits (RSV) must be zero", WebSocket::WS_ERR_CORRUPT_FRAME);
 	}
@@ -324,6 +324,12 @@ void WebSocketImpl::setMaxPayloadSize(int maxPayloadSize)
 	poco_assert (maxPayloadSize > 0);
 
 	_maxPayloadSize = maxPayloadSize;
+}
+
+
+void WebSocketImpl::setAllowedRSVBits(int allowedRSV)
+{
+	_allowedRSV = static_cast<int>(allowedRSV & (WebSocket::FRAME_FLAG_RSV1 | WebSocket::FRAME_FLAG_RSV2 | WebSocket::FRAME_FLAG_RSV3));
 }
 
 

@@ -192,13 +192,13 @@ int WebSocket::getMaxPayloadSize() const
 }
 
 
-void WebSocket::setAllowedRSVBits(Poco::UInt8 rsvBits)
+void WebSocket::setAllowedRSVBits(int allowedRSV)
 {
-	static_cast<WebSocketImpl*>(impl())->setAllowedRSVBits(rsvBits);
+	static_cast<WebSocketImpl*>(impl())->setAllowedRSVBits(allowedRSV);
 }
 
 
-Poco::UInt8 WebSocket::getAllowedRSVBits() const
+int WebSocket::getAllowedRSVBits() const
 {
 	return static_cast<WebSocketImpl*>(impl())->getAllowedRSVBits();
 }
