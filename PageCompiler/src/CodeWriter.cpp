@@ -35,6 +35,16 @@ void CodeWriter::writeHeader(std::ostream& ostr, const std::string& headerFileNa
 {
 	beginGuard(ostr, headerFileName);
 	writeHeaderIncludes(ostr);
+
+	if (_page.getBool("page.stringify", false))
+	{
+		ostr << "\n#include <iosfwd>\n";
+		if (_page.getBool("page.form", true))
+		{
+			ostr << "\nnamespace Poco::Net { class HTMLForm; }\n";
+		}
+	}
+
 	ostr << "\n\n";
 
 	std::string decls(_page.headerDecls().str());
@@ -165,7 +175,10 @@ void CodeWriter::handlerClass(std::ostream& ostr, const std::string& base, const
 	if (_page.getBool("page.stringify", false))
 	{
 		ostr << "\tvoid stringify(std::ostream& responseStream";
-		if (_page.getBool("page.form", true)) ostr << ", Poco::Net::HTMLForm& form";
+		if (_page.getBool("page.form", true))
+		{
+			 ostr << ", [[maybe_unused]] Poco::Net::HTMLForm& form";
+		}
 		ostr << ");\n";
 	}
 
@@ -203,14 +216,6 @@ void CodeWriter::factoryImpl(std::ostream& ostr, const std::string& arg)
 void CodeWriter::writeHeaderIncludes(std::ostream& ostr)
 {
 	ostr << "#include \"Poco/Net/HTTPRequestHandler.h\"\n";
-	if (_page.getBool("page.stringify", false))
-	{
-		ostr << "#include <iosfwd>\n";
-		if (_page.getBool("page.form", true))
-		{
-			ostr << "namespace Poco { namespace Net { class HTMLForm; } }\n";
-		}
-	}
 }
 
 
@@ -295,7 +300,10 @@ void CodeWriter::writeHandler(std::ostream& ostr)
 	if (_page.getBool("page.stringify", false))
 	{
 		ostr << "\nvoid " << _class << "::stringify(std::ostream& responseStream";
-		if (_page.getBool("page.form", true)) ostr << ", Poco::Net::HTMLForm& form";
+		if (_page.getBool("page.form", true))
+		{
+			ostr << ", [[maybe_unused]] Poco::Net::HTMLForm& form";
+		}
 		ostr << ")\n";
 		ostr << "{\n";
 		if (_page.getBool("page.escape", false))

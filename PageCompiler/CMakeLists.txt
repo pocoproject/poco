@@ -26,3 +26,23 @@ install(
 	BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR}
 	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
+
+
+if(ENABLE_TESTS)
+	add_test(
+		NAME PageCompiler-TestBase
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND PageCompiler -o "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/test/test.cpsp"
+	)
+	add_test(
+		NAME PageCompiler-Stringify
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND PageCompiler -o "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/test/test-stringify.cpsp"
+	)
+	add_test(
+		NAME PageCompiler-StringifyNoForm
+		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+		COMMAND PageCompiler -o "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/test/test-stringify-no-form.cpsp"
+	)
+endif()
+
