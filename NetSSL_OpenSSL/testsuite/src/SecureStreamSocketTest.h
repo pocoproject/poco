@@ -33,6 +33,7 @@ public:
 	void testShutdownBidirectional();
 	void testPeerHostNameTooLong();
 	void testStaleErrorQueue();
+	void testHandshakeTimeout();
 
 	void setUp();
 	void tearDown();

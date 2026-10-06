@@ -42,6 +42,7 @@ public:
 	void testServerAbort();
 	void testProxyConfig();
 	void testProxySetters();
+	void testStalledPeerTimeout();
 
 	void setUp();
 	void tearDown();
