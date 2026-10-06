@@ -28,6 +28,7 @@ public:
 	void testCustomSocketFactoryConnections();
 	void testCustomSocketFactoryFailure();
 	void testCustomSocketFactoryIPv6();
+	void testCustomSocketFactoryMonitoringTimeout();
 	void testServerHelloAndPing();
 	void testScriptedErrorReply();
 	void testNoReplyTimesOut();
