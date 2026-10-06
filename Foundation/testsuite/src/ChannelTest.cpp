@@ -23,6 +23,7 @@
 #include "TestChannel.h"
 #include <atomic>
 #include <sstream>
+#include <string>
 #include <thread>
 #include <vector>
 
@@ -109,6 +110,66 @@ namespace
 
 	private:
 		Tally& _tally;
+	};
+
+
+	class HoldingFormatter: public Formatter
+		/// A formatter that holds a message until the test lets it go on.
+	{
+	public:
+		static constexpr long TIMEOUT = 10000;
+
+		void format(const Message& msg, std::string& text) override
+		{
+			arrived.set();
+			(void) goOn.tryWait(TIMEOUT);
+			text = msg.getText();
+		}
+
+		Event arrived;
+		Event goOn;
+	};
+
+
+	class GenerationFormatter: public Formatter
+		/// Writes the generation of the configuration it belongs to.
+	{
+	public:
+		explicit GenerationFormatter(int generation):
+			_generation(generation)
+		{
+		}
+
+		void format(const Message&, std::string& text) override
+		{
+			text = std::to_string(_generation);
+		}
+
+	private:
+		int _generation;
+	};
+
+
+	class GenerationChannel: public Channel
+		/// Counts the messages that a formatter of an older generation
+		/// than its own formatted: pairs of a formatter and a channel
+		/// that never were.
+	{
+	public:
+		GenerationChannel(int generation, std::atomic<int>& torn):
+			_generation(generation),
+			_torn(torn)
+		{
+		}
+
+		void log(const Message& msg) override
+		{
+			if (std::stoi(msg.getText()) < _generation) ++_torn;
+		}
+
+	private:
+		int _generation;
+		std::atomic<int>& _torn;
 	};
 }
 
@@ -284,6 +345,78 @@ void ChannelTest::testFormattingConcurrentReplacement()
 }
 
 
+void ChannelTest::testFormattingMessageKeepsItsPair()
+{
+	// A message that is on its way keeps the formatter and the channel it
+	// started with, as one pair: the channel is replaced while the
+	// formatter holds a message, and the message still goes to the old one.
+	AutoPtr<HoldingFormatter> pFormatter = new HoldingFormatter;
+	AutoPtr<TestChannel> pOldChannel = new TestChannel;
+	AutoPtr<TestChannel> pNewChannel = new TestChannel;
+	AutoPtr<FormattingChannel> pFormatterChannel = new FormattingChannel(pFormatter, pOldChannel);
+
+	std::thread sender([&]()
+	{
+		pFormatterChannel->log(Message("Source", "Text", Message::PRIO_INFORMATION));
+	});
+	const bool arrived = pFormatter->arrived.tryWait(HoldingFormatter::TIMEOUT);
+	pFormatterChannel->setChannel(pNewChannel);
+	pFormatter->goOn.set();
+	sender.join();
+
+	assertTrue(arrived);
+	assertTrue(pOldChannel->list().size() == 1);
+	assertTrue(pNewChannel->list().empty());
+}
+
+
+void ChannelTest::testFormattingPairNeverTorn()
+{
+	// Messages are logged while another thread replaces first the formatter
+	// and then the channel, generation after generation. A message is
+	// formatted by the formatter and sent to the channel of one moment, so
+	// none that an older formatter formatted reaches a newer channel.
+	constexpr int THREADS = 4;
+	constexpr int ROUNDS = 1000;
+	constexpr long TIMEOUT = 10000;
+
+	std::atomic<int> torn(0);
+	AutoPtr<FormattingChannel> pFormatterChannel = new FormattingChannel(new GenerationFormatter(0), new GenerationChannel(0, torn));
+
+	std::atomic<bool> stop(false);
+	Event loggedOne;
+	std::vector<std::thread> threads;
+	for (int i = 0; i < THREADS; ++i)
+	{
+		threads.emplace_back([&]()
+		{
+			Message msg("Source", "Text", Message::PRIO_INFORMATION);
+			while (!stop)
+			{
+				pFormatterChannel->log(msg);
+				loggedOne.set();
+			}
+		});
+	}
+
+	int rounds = 0;
+	while (rounds < ROUNDS && loggedOne.tryWait(TIMEOUT))
+	{
+		++rounds;
+		pFormatterChannel->setFormatter(new GenerationFormatter(rounds));
+		pFormatterChannel->setChannel(new GenerationChannel(rounds, torn));
+	}
+	stop = true;
+	for (auto& t : threads)
+	{
+		t.join();
+	}
+
+	assertEqual(ROUNDS, rounds);
+	assertEqual(0, torn.load());
+}
+
+
 void ChannelTest::testConsole()
 {
 	AutoPtr<ConsoleChannel> pChannel = new ConsoleChannel;
@@ -326,6 +459,8 @@ CppUnit::Test* ChannelTest::suite()
 	CppUnit_addTest(pSuite, ChannelTest, testAsyncConcurrentReplacement);
 	CppUnit_addTest(pSuite, ChannelTest, testFormatting);
 	CppUnit_addTest(pSuite, ChannelTest, testFormattingConcurrentReplacement);
+	CppUnit_addTest(pSuite, ChannelTest, testFormattingMessageKeepsItsPair);
+	CppUnit_addTest(pSuite, ChannelTest, testFormattingPairNeverTorn);
 	CppUnit_addTest(pSuite, ChannelTest, testConsole);
 	CppUnit_addTest(pSuite, ChannelTest, testStream);
 

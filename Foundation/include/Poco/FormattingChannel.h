@@ -57,10 +57,10 @@ public:
 		///
 		/// The formatter and the destination channel can be
 		/// replaced while other threads log. A message that is
-		/// on its way keeps the ones it started with. The channel
-		/// lets go of those at once if no thread is logging, and
-		/// otherwise as soon as the messages that were on their
-		/// way are through.
+		/// on its way keeps the ones it started with, as one
+		/// pair. The channel lets go of those at once if no
+		/// thread is logging, and otherwise as soon as the
+		/// messages that were on their way are through.
 
 	[[nodiscard]] Formatter::Ptr getFormatter() const;
 		/// Returns the Formatter used to format messages,
@@ -98,12 +98,29 @@ protected:
 	~FormattingChannel() override;
 
 private:
-	Formatter::Ptr    _pFormatter;
-	Channel::Ptr      _pChannel;
-	std::atomic<Formatter*> _pCurrentFormatter;
-	std::atomic<Channel*>   _pCurrentChannel;
-		/// The formatter and the channel for the threads that log, which
-		/// load them without the mutex and without counting a reference.
+	struct Parts: public RefCountedObject
+		/// The formatter and the destination channel of one moment.
+		/// A thread that logs loads them as one, and a message that
+		/// is on its way keeps both.
+	{
+		Parts(Formatter::Ptr pFormatter, Channel::Ptr pChannel);
+
+		Formatter::Ptr pFormatter;
+		Channel::Ptr   pChannel;
+
+	protected:
+		~Parts() override = default;
+	};
+
+	using PartsPtr = AutoPtr<Parts>;
+
+	PartsPtr _pParts;
+		/// The current parts, for getFormatter() and getChannel().
+
+	std::atomic<Parts*> _pCurrentParts;
+		/// The current parts for the threads that log, which load them
+		/// without the mutex and without counting a reference.
+
 	mutable FastMutex _mutex;
 };
 

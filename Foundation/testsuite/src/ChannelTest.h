@@ -30,6 +30,8 @@ public:
 	void testAsyncConcurrentReplacement();
 	void testFormatting();
 	void testFormattingConcurrentReplacement();
+	void testFormattingMessageKeepsItsPair();
+	void testFormattingPairNeverTorn();
 	void testConsole();
 	void testStream();
 
