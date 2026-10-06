@@ -1050,7 +1050,24 @@ void SocketImpl::setRawOption(int level, int option, const void* value, poco_soc
 #else
 	int rc = ::setsockopt(_sockfd, level, option, reinterpret_cast<const char*>(value), length);
 #endif
-	if (rc == -1) error();
+	if (rc == -1)
+	{
+		int err = lastError();
+#if POCO_OS == POCO_OS_MAC_OS_X
+		// macOS takes no option for a socket that has been shut down, by a
+		// reset of the peer or in both directions, and answers EINVAL, as it
+		// then does to getpeername(). No option matters for such a socket
+		// any more, and other systems accept it: so it is not an error here.
+		if (err == POCO_EINVAL)
+		{
+			struct sockaddr_storage peer;
+			poco_socklen_t peerLength = sizeof(peer);
+			if (::getpeername(_sockfd, reinterpret_cast<struct sockaddr*>(&peer), &peerLength) == -1 && lastError() == POCO_EINVAL)
+				return;
+		}
+#endif
+		error(err);
+	}
 }
 
 
