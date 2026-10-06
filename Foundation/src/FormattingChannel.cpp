@@ -13,6 +13,7 @@
 
 
 #include "Poco/FormattingChannel.h"
+#include "DeferredRelease.h"
 #include "Poco/Message.h"
 #include "Poco/LoggingRegistry.h"
 
@@ -20,23 +21,30 @@
 namespace Poco {
 
 
+FormattingChannel::Parts::Parts(Formatter::Ptr pFormatter, Channel::Ptr pChannel):
+	pFormatter(std::move(pFormatter)),
+	pChannel(std::move(pChannel))
+{
+}
+
+
 FormattingChannel::FormattingChannel():
-	_pFormatter(nullptr),
-	_pChannel(nullptr)
+	_pParts(new Parts(nullptr, nullptr)),
+	_pCurrentParts(_pParts.get())
 {
 }
 
 
 FormattingChannel::FormattingChannel(Formatter::Ptr pFormatter):
-	_pFormatter(pFormatter),
-	_pChannel(nullptr)
+	_pParts(new Parts(std::move(pFormatter), nullptr)),
+	_pCurrentParts(_pParts.get())
 {
 }
 
 
 FormattingChannel::FormattingChannel(Formatter::Ptr pFormatter, Channel::Ptr pChannel):
-	_pFormatter(pFormatter),
-	_pChannel(pChannel)
+	_pParts(new Parts(std::move(pFormatter), std::move(pChannel))),
+	_pCurrentParts(_pParts.get())
 {
 }
 
@@ -48,60 +56,69 @@ FormattingChannel::~FormattingChannel()
 
 void FormattingChannel::setFormatter(Formatter::Ptr pFormatter)
 {
-	// The formatter that is replaced is released when the mutex is free
-	// again: its destructor may log.
+	// The new formatter and the current channel make a new pair. The pair
+	// that is replaced is let go of when the mutex is free again, since a
+	// destructor may log, and not before the threads that log are done
+	// with it.
+	PartsPtr pParts = new Parts(std::move(pFormatter), nullptr);
 	{
 		FastMutex::ScopedLock lock(_mutex);
-		_pFormatter.swap(pFormatter);
+		pParts->pChannel = _pParts->pChannel;
+		_pParts.swap(pParts);
+		_pCurrentParts.store(_pParts.get());
 	}
+	DeferredRelease::release(pParts);
 }
 
 
 Formatter::Ptr FormattingChannel::getFormatter() const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	return _pFormatter;
+	return _pParts->pFormatter;
 }
 
 
 void FormattingChannel::setChannel(Channel::Ptr pChannel)
 {
-	// The channel that is replaced is released when the mutex is free
-	// again: its destructor may log.
+	// The current formatter and the new channel make a new pair; the one
+	// replaced is let go of as in setFormatter().
+	PartsPtr pParts = new Parts(nullptr, std::move(pChannel));
 	{
 		FastMutex::ScopedLock lock(_mutex);
-		_pChannel.swap(pChannel);
+		pParts->pFormatter = _pParts->pFormatter;
+		_pParts.swap(pParts);
+		_pCurrentParts.store(_pParts.get());
 	}
+	DeferredRelease::release(pParts);
 }
 
 
 Channel::Ptr FormattingChannel::getChannel() const
 {
 	FastMutex::ScopedLock lock(_mutex);
-	return _pChannel;
+	return _pParts->pChannel;
 }
 
 
 void FormattingChannel::log(const Message& msg)
 {
-	Formatter::Ptr pFormatter;
-	Channel::Ptr pChannel;
+	// The formatter and the channel are loaded as one pair and kept for
+	// the time of the reader: a thread that logs takes no mutex and counts
+	// no reference. Within the reader of a Logger, this one costs next to
+	// nothing.
+	DeferredRelease::Reader reader;
+	Parts& parts = *_pCurrentParts.load();
+	if (parts.pChannel)
 	{
-		FastMutex::ScopedLock lock(_mutex);
-		pFormatter = _pFormatter;
-		pChannel = _pChannel;
-	}
-	if (pChannel)
-	{
-		if (pFormatter)
+		if (parts.pFormatter)
 		{
 			std::string text;
-			pFormatter->format(msg, text);
-			pChannel->log(Message(msg, text));
+			parts.pFormatter->format(msg, text);
+			parts.pChannel->log(Message(msg, text));
 		}
 		else
 		{
-			pChannel->log(msg);
+			parts.pChannel->log(msg);
 		}
 	}
 }
