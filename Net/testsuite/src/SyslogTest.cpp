@@ -1709,6 +1709,7 @@ void SyslogTest::testTCPMaxConnections()
 
 	StreamSocket third(listener.address());
 	assertTrue (closedByPeer(third));
+	assertTrue (listener.pListener->connectionsRefused() == 1);
 
 	first.close();
 	// The listener learns of the close on its own thread, so a new
@@ -1733,20 +1734,44 @@ void SyslogTest::testTCPMaxConnections()
 
 void SyslogTest::testTCPIdleTimeout()
 {
-	// A connection that has sent part of a message and then nothing is
-	// closed by the listener, and the part is dropped; one that sends
-	// afterwards is served.
-	TCPListener listener({{"idleTimeout", "200"}});
+	// Two connections allowed. One sends part of a message and then
+	// nothing, the other keeps sending. The first is closed by the
+	// listener once the timeout is over, and not before, and the part is
+	// dropped; the second stays, and its messages arrive. The slot of the
+	// closed one is free again.
+	TCPListener listener({{"idleTimeout", "500"}, {"maxConnections", "2"}});
 	StreamSocket idle(listener.address());
+	StreamSocket busy(listener.address());
+	Poco::Stopwatch sw;
+	sw.start();
 	send(idle, message("begun and never ended"));
+	int sentByBusy = 0;
+	// the busy one sends whenever the idle one has not been closed for another 50 ms
+	while (!idle.poll(Poco::Timespan(50000), Socket::SELECT_READ) && sw.elapsed() < 30*Poco::Stopwatch::resolution())
+	{
+		send(busy, line("busy " + std::to_string(sentByBusy++)));
+	}
+	sw.stop();
 	assertTrue (closedByPeer(idle));
+	assertTrue (sw.elapsed() >= Poco::Stopwatch::resolution()/2);
+	assertTrue (listener.pChannel->waitFor(sentByBusy));
+	send(busy, line("still busy"));
+	assertTrue (listener.pChannel->waitForText("still busy", 1));
+	StreamSocket next(listener.address());
+	send(next, line("next"));
+	assertTrue (listener.pChannel->waitForText("next", 1));
+	assertTrue (listener.pListener->connectionsClosedIdle() == 1);
+	for (const auto& text: listener.pChannel->texts())
+	{
+		assertTrue (text != "begun and never ended");
+	}
 
-	StreamSocket active(listener.address());
-	send(active, line("active"));
-	assertTrue (listener.pChannel->waitFor(1));
-	std::vector<std::string> texts = listener.pChannel->texts();
-	assertTrue (texts.size() == 1);
-	assertTrue (texts[0] == "active");
+	// With no traffic at all, a listener finds an idle connection as well.
+	TCPListener quiet({{"idleTimeout", "500"}});
+	StreamSocket lonely(quiet.address());
+	send(lonely, message("alone"));
+	assertTrue (closedByPeer(lonely));
+	assertTrue (quiet.pListener->connectionsClosedIdle() == 1);
 }
 
 
@@ -1766,17 +1791,17 @@ void SyslogTest::testTCPMaxQueued()
 	// the parser thread is held with the first message; one may wait
 	listener.pListener->enqueueMessage(message("waiting in the queue"), sender);
 
-	std::atomic<bool> letGo(false);
-	std::atomic<bool> throughBeforeLetGo(false);
+	Poco::Event through;
 	std::thread bringer([&]
 	{
 		listener.pListener->enqueueMessage(message("held at the door"), sender);
-		throughBeforeLetGo = !letGo;
+		through.set();
 	});
-	letGo = true;
+	Joiner joiner(bringer, [&] { pHolding->letGo(); });
+	// held: not through while the queue is full
+	assertTrue (!through.tryWait(100));
 	pHolding->letGo();
-	bringer.join();
-	assertTrue (!throughBeforeLetGo);
+	assertTrue (through.tryWait(10000));
 	assertTrue (listener.pChannel->waitFor(3));
 	std::vector<std::string> texts = listener.pChannel->texts();
 	assertTrue (texts[0] == "held by the channel");

@@ -151,7 +151,16 @@ TCPReactorServerConnection* TCPReactorAcceptor::createServiceHandler(Poco::Net::
 	// A connection that the accept callback declines dies here with its
 	// socket: it is never served.
 	if (_acceptCallback && !_acceptCallback(tmpConnPtr)) return nullptr;
-	tmpConnPtr->initialize();
+	try
+	{
+		tmpConnPtr->initialize();
+	}
+	catch (...)
+	{
+		// taken and never served: the close callback tells so
+		tmpConnPtr->handleClose();
+		throw;
+	}
 	return tmpConnPtr.get();
 }
 

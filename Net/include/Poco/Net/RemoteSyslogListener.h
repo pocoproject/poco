@@ -128,10 +128,13 @@ public:
 		///       connection that has sent nothing is closed; a message
 		///       that it had begun is dropped. Defaults to 0: no limit.
 		///     * maxQueued: The number of messages that may wait for the
-		///       parser threads. When that many are waiting, a connection
-		///       is not read until a parser thread has taken a message, so
-		///       that TCP slows the sender down, and a UDP datagram is
-		///       dropped. Defaults to 0: no limit.
+		///       parser threads. When that many are waiting, the listening
+		///       socket whose connection brings one more stands still until
+		///       a parser thread has taken a message: none of its
+		///       connections is read or accepted, and none is closed for
+		///       being idle. TCP thus slows the senders down. A UDP datagram
+		///       that finds the queue full is dropped. Defaults to 0: no
+		///       limit.
 		///
 		/// These properties are read by open(): a change takes effect
 		/// when the listener is opened the next time.
@@ -165,7 +168,22 @@ public:
 		///
 		/// Waits while the queue holds as many messages as the
 		/// "maxQueued" property allows, until a parser thread has
-		/// taken one.
+		/// taken one; a caller outside the listener waits as well.
+
+	[[nodiscard]] Poco::UInt64 connectionsRefused() const;
+		/// Returns the number of connections closed at once because as
+		/// many as the "maxConnections" property allows were there.
+
+	[[nodiscard]] Poco::UInt64 connectionsClosedIdle() const;
+		/// Returns the number of connections closed because they had sent
+		/// nothing for the time of the "idleTimeout" property.
+
+	[[nodiscard]] Poco::UInt64 messagesDropped() const;
+		/// Returns the number of UDP datagrams dropped because as many
+		/// messages as the "maxQueued" property allows were waiting.
+		///
+		/// The three counts run since the listener was created, so that a
+		/// limit at work can be seen.
 
 	static void registerChannel();
 		/// Registers the channel with the global LoggingFactory.
@@ -187,10 +205,10 @@ public:
 
 protected:
 	~RemoteSyslogListener();
+		/// Destroys the RemoteSyslogListener, after stopping it.
 
 	[[nodiscard]] bool reusePort() const;
 		/// Returns true if the ports are bound with SO_REUSEPORT (the "reusePort" property).
-		/// Destroys the RemoteSyslogListener, after stopping it.
 
 	virtual void createServerSockets(std::vector<ServerSocket>& sockets);
 		/// Called by open() to create the listening sockets that the
@@ -224,8 +242,13 @@ private:
 	int                                _maxConnections = 0;
 	Poco::Timespan                     _idleTimeout;
 	int                                _maxQueued = 0;
+	int                                _queueBound = 0;
+		/// The "maxQueued" property as it was when the listener was opened.
 	Poco::Event                        _queueRoom;
 	std::atomic<bool>                  _closing{false};
+	std::atomic<Poco::UInt64>          _connectionsRefused{0};
+	std::atomic<Poco::UInt64>          _connectionsClosedIdle{0};
+	std::atomic<Poco::UInt64>          _messagesDropped{0};
 };
 
 

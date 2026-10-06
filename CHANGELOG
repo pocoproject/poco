@@ -39,7 +39,8 @@ Features:
   (RFC 6587, in both framings), and Poco::Net::SecureRemoteSyslogChannel and
   SecureRemoteSyslogListener (NetSSL_OpenSSL and NetSSL_Win) speak it over TLS (RFC 5425). The
   listener can limit the number of connections, the time a connection may stay idle and the
-  number of messages waiting for its parser threads. Poco::Net::TCPReactorServer takes a listening
+  number of messages waiting for its parser threads, and counts what the limits refuse, close and
+  drop. Poco::Net::TCPReactorServer takes a listening
   socket that is given to it, serves non-blocking connections, asks before it takes a connection,
   tells when a connection is closed and when it has nothing to do.
 - GH #5440 Data/SQLite: integrate the sqlite-vec vector search extension (PR #5459) -- vec0
