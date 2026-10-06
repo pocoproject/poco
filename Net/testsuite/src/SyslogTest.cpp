@@ -16,6 +16,7 @@
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/Net/DatagramSocket.h"
 #include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/StreamSocketImpl.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/DNS.h"
@@ -375,15 +376,43 @@ namespace
 
 namespace
 {
-	class SmallBufferChannel: public RemoteSyslogChannel
-		/// A channel whose connections hold little, so that a server
-		/// that does not read stalls them soon.
+	class StallingSocketImpl: public StreamSocketImpl
+		/// A connected socket that takes nothing: what a server that never
+		/// reads leaves a sender with once the buffers are full, without
+		/// a dependence on how much a system buffers.
+	{
+	public:
+		int sendBytes(const void*, int, int) override
+		{
+			// nothing taken, as a non-blocking socket says
+			return -1;
+		}
+
+		bool poll(const Poco::Timespan& timeout, int) override
+		{
+			// nothing arrives on the connection either: the time runs out
+			return StreamSocketImpl::poll(timeout, SELECT_READ);
+		}
+	};
+
+
+	class StallingSocket: public StreamSocket
+	{
+	public:
+		StallingSocket(): StreamSocket(new StallingSocketImpl)
+		{
+		}
+	};
+
+
+	class StallingChannel: public RemoteSyslogChannel
+		/// A channel whose connections take nothing.
 	{
 	protected:
-		StreamSocket createSocket(const SocketAddress& address, const std::string& hostName, const Poco::Timespan& timeout) override
+		StreamSocket createSocket(const SocketAddress& address, const std::string&, const Poco::Timespan& timeout) override
 		{
-			StreamSocket socket = RemoteSyslogChannel::createSocket(address, hostName, timeout);
-			socket.setSendBufferSize(8192);
+			StallingSocket socket;
+			socket.connect(address, timeout);
 			return socket;
 		}
 	};
@@ -1499,8 +1528,9 @@ void SyslogTest::testTCPOpenFailed()
 			listener->open();
 			fail("the TCP port is taken - open() must throw");
 		}
-		catch (Poco::Net::NetException&)
+		catch (Poco::IOException&)
 		{
+			// the address is in use, or Windows denies it
 		}
 		try
 		{
@@ -1508,7 +1538,7 @@ void SyslogTest::testTCPOpenFailed()
 			DatagramSocket probe;
 			probe.bind(SocketAddress("127.0.0.1", udpPort), false);
 		}
-		catch (Poco::Net::NetException&)
+		catch (Poco::IOException&)
 		{
 			continue;
 		}
@@ -1526,17 +1556,14 @@ void SyslogTest::testTCPChannelServerNotReading()
 	// A server that takes the connection and does not read holds a message
 	// up for the time allowed, not for good: log() returns without the
 	// message having been sent, and the server counts as away.
-	ServerSocket server;
-	server.bind(SocketAddress("127.0.0.1", 0), true, false);
-	server.setReceiveBufferSize(8192);
-	server.listen();
+	ServerSocket server(SocketAddress("127.0.0.1", 0));
 
-	Poco::AutoPtr<SmallBufferChannel> channel = new SmallBufferChannel;
+	Poco::AutoPtr<StallingChannel> channel = new StallingChannel;
 	channel->setProperty("loghost", server.address().toString());
 	channel->setProperty("transport", "tcp");
 	channel->setProperty("timeout", "300");
 	channel->setProperty("host", "ahost");
-	Poco::Message msg("asource", std::string(4*1024*1024, 'x'), Poco::Message::PRIO_CRITICAL);
+	Poco::Message msg("asource", "never taken", Poco::Message::PRIO_CRITICAL);
 
 	Poco::Stopwatch sw;
 	sw.start();
