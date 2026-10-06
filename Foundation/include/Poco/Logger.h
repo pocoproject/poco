@@ -24,6 +24,7 @@
 #include "Poco/Format.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Mutex.h"
+#include <atomic>
 #include <map>
 #include <vector>
 #include <cstddef>
@@ -89,6 +90,11 @@ public:
 
 	void setChannel(Channel::Ptr pChannel);
 		/// Attaches the given Channel to the Logger.
+		///
+		/// The channel can be replaced while other threads log. A
+		/// message that is on its way to the channel that is replaced
+		/// still gets there, and that channel is released when the
+		/// last such message is through.
 
 	[[nodiscard]] Channel::Ptr getChannel() const;
 		/// Returns the Channel attached to the logger.
@@ -499,9 +505,13 @@ private:
 	void logAlways(const std::string& text, Message::Priority prio);
 	void logAlways(std::string&& text, Message::Priority prio);
 
+	[[nodiscard]] Channel::Ptr exchangeChannel(Channel::Ptr pChannel);
+		/// Attaches the given Channel and returns the one that was
+		/// attached, for the caller to release where it holds no mutex.
+
 	std::string       _name;
 	Channel::Ptr      _pChannel;
-	int               _level;
+	std::atomic<int>  _level;
 	mutable FastMutex _channelMutex;
 
 	// definitions in Foundation.cpp

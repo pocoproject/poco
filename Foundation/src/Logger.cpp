@@ -43,10 +43,15 @@ void Logger::setChannel(Channel::Ptr pChannel)
 {
 	// The channel that is replaced is released when the mutex is free
 	// again: its destructor may log.
-	{
-		FastMutex::ScopedLock lock(_channelMutex);
-		_pChannel.swap(pChannel);
-	}
+	Channel::Ptr pReplaced = exchangeChannel(std::move(pChannel));
+}
+
+
+Channel::Ptr Logger::exchangeChannel(Channel::Ptr pChannel)
+{
+	FastMutex::ScopedLock lock(_channelMutex);
+	_pChannel.swap(pChannel);
+	return pChannel;
 }
 
 
@@ -153,16 +158,21 @@ void Logger::setLevel(const std::string& name, int level)
 
 void Logger::setChannel(const std::string& name, Channel::Ptr pChannel)
 {
-	Mutex::ScopedLock lock(_mapMtx);
-
-	if (_pLoggerMap)
+	// The channels that are replaced are released when the mutex is free
+	// again: a destructor may wait for a thread that asks for a logger.
+	std::vector<Channel::Ptr> replaced;
 	{
-		std::string::size_type len = name.length();
-		for (auto& p: *_pLoggerMap)
+		Mutex::ScopedLock lock(_mapMtx);
+
+		if (_pLoggerMap)
 		{
-			if (len == 0 || (p.first.compare(0, len, name) == 0 && (p.first.length() == len || p.first[len] == '.')))
+			std::string::size_type len = name.length();
+			for (auto& p: *_pLoggerMap)
 			{
-				p.second->setChannel(pChannel);
+				if (len == 0 || (p.first.compare(0, len, name) == 0 && (p.first.length() == len || p.first[len] == '.')))
+				{
+					replaced.push_back(p.second->exchangeChannel(pChannel));
+				}
 			}
 		}
 	}
@@ -171,16 +181,23 @@ void Logger::setChannel(const std::string& name, Channel::Ptr pChannel)
 
 void Logger::setProperty(const std::string& loggerName, const std::string& propertyName, const std::string& value)
 {
-	Mutex::ScopedLock lock(_mapMtx);
-
-	if (_pLoggerMap)
+	// Channels that are replaced are released when the mutex is free again.
+	std::vector<Channel::Ptr> replaced;
 	{
-		std::string::size_type len = loggerName.length();
-		for (auto& p: *_pLoggerMap)
+		Mutex::ScopedLock lock(_mapMtx);
+
+		if (_pLoggerMap)
 		{
-			if (len == 0 || (p.first.compare(0, len, loggerName) == 0 && (p.first.length() == len || p.first[len] == '.')))
+			std::string::size_type len = loggerName.length();
+			for (auto& p: *_pLoggerMap)
 			{
-				p.second->setProperty(propertyName, value);
+				if (len == 0 || (p.first.compare(0, len, loggerName) == 0 && (p.first.length() == len || p.first[len] == '.')))
+				{
+					if (propertyName == "channel")
+						replaced.push_back(p.second->exchangeChannel(LoggingRegistry::defaultRegistry().channelForName(value)));
+					else
+						p.second->setProperty(propertyName, value);
+				}
 			}
 		}
 	}
@@ -357,18 +374,23 @@ Logger::Ptr Logger::has(const std::string& name)
 
 void Logger::shutdown()
 {
-	Mutex::ScopedLock lock(_mapMtx);
-
-	// Detach channels from all loggers instead of destroying the logger
-	// objects. Singletons and other components may still hold Logger
-	// references obtained via Logger::get() during their lifetime.
-	// Destroying the loggers would leave those references dangling,
-	// causing use-after-free during static destruction.
-	if (_pLoggerMap)
+	// The channels are released when the mutex is free again: a
+	// destructor may wait for a thread that asks for a logger.
+	std::vector<Channel::Ptr> detached;
 	{
-		for (auto& [name, pLogger] : *_pLoggerMap)
+		Mutex::ScopedLock lock(_mapMtx);
+
+		// Detach channels from all loggers instead of destroying the logger
+		// objects. Singletons and other components may still hold Logger
+		// references obtained via Logger::get() during their lifetime.
+		// Destroying the loggers would leave those references dangling,
+		// causing use-after-free during static destruction.
+		if (_pLoggerMap)
 		{
-			if (pLogger) pLogger->setChannel(nullptr);
+			for (auto& [name, pLogger] : *_pLoggerMap)
+			{
+				if (pLogger) detached.push_back(pLogger->exchangeChannel(nullptr));
+			}
 		}
 	}
 }

@@ -621,6 +621,58 @@ void LoggerTest::testLogDuringDestructionOfReplaced()
 }
 
 
+void LoggerTest::testGetDuringDestructionOfDetached()
+{
+	// While a channel that shutdown() or the static setChannel() has
+	// detached is destroyed, any thread may ask for a logger.
+	Logger& logger = Logger::get("TestLogger.DestructionOfDetached");
+	auto getOne = [] { Logger::get("TestLogger.AskedFor").information("asked for while a channel is destroyed"); };
+
+	auto pShutdownBystander = std::make_shared<Bystander>(getOne);
+	logger.setChannel(new LastWordsChannel(pShutdownBystander));
+	Logger::shutdown();
+	assertTrue (pShutdownBystander->couldLog());
+
+	auto pSetChannelBystander = std::make_shared<Bystander>(getOne);
+	logger.setChannel(new LastWordsChannel(pSetChannelBystander));
+	Logger::setChannel("TestLogger.DestructionOfDetached", nullptr);
+	assertTrue (pSetChannelBystander->couldLog());
+}
+
+
+void LoggerTest::testConcurrentSetLevel()
+{
+	Logger& logger = Logger::get("TestLogger.ConcurrentLevel");
+	logger.setChannel(new NullChannel);
+
+	std::atomic<bool> stop{false};
+	std::vector<std::thread> threads;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		threads.emplace_back([&logger, &stop]() {
+			while (!stop)
+			{
+				logger.information("message while the level changes");
+			}
+		});
+	}
+
+	for (int i = 0; i < 1000; ++i)
+	{
+		logger.setLevel(i % 2 == 0 ? Message::PRIO_ERROR : Message::PRIO_DEBUG);
+		std::this_thread::yield();
+	}
+
+	stop = true;
+	for (auto& t : threads)
+	{
+		t.join();
+	}
+	logger.setChannel(nullptr);
+}
+
+
 void LoggerTest::setUp()
 {
 	Logger::shutdown();
@@ -646,6 +698,8 @@ CppUnit::Test* LoggerTest::suite()
 	CppUnit_addTest(pSuite, LoggerTest, testConcurrentChannelReplacement);
 	CppUnit_addTest(pSuite, LoggerTest, testConcurrentShutdown);
 	CppUnit_addTest(pSuite, LoggerTest, testLogDuringDestructionOfReplaced);
+	CppUnit_addTest(pSuite, LoggerTest, testGetDuringDestructionOfDetached);
+	CppUnit_addTest(pSuite, LoggerTest, testConcurrentSetLevel);
 
 	return pSuite;
 }
