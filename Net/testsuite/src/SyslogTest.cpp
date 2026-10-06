@@ -1775,6 +1775,36 @@ void SyslogTest::testTCPIdleTimeout()
 }
 
 
+void SyslogTest::testTCPIdleTimeoutQueueFull()
+{
+	// While the listener waits for room in the queue, it reads no
+	// connection. A sender whose message waits in its socket meanwhile,
+	// for longer than the idle timeout, is not idle: it is not closed,
+	// and its message arrives.
+	TCPListener listener({{"maxQueued", "1"}, {"idleTimeout", "300"}});
+	auto pHolding = Poco::makeAuto<HoldingChannel>();
+	listener.pListener->addChannel(pHolding);
+
+	StreamSocket a(listener.address());
+	StreamSocket b(listener.address());
+	// the parser thread is held with the first message of b
+	send(b, line("b1"));
+	assertTrue (pHolding->waitUntilEntered());
+	// One message of a waits in the queue, and the next one holds the
+	// thread that reads the connections.
+	send(a, line("a1") + line("a2"));
+	assertTrue (!closedByPeer(a, 100));
+	// this one waits in the socket of b for longer than the idle timeout
+	send(b, line("b2"));
+	assertTrue (!closedByPeer(b, 600));
+	pHolding->letGo();
+	assertTrue (listener.pChannel->waitFor(4));
+	const std::vector<std::string> texts = listener.pChannel->texts();
+	assertTrue (std::find(texts.begin(), texts.end(), "b2") != texts.end());
+	assertTrue (listener.pListener->connectionsClosedIdle() == 0);
+}
+
+
 void SyslogTest::testTCPMaxQueued()
 {
 	// With one message allowed to wait, the one that is brought while
@@ -1981,6 +2011,7 @@ CppUnit::Test* SyslogTest::suite()
 	CppUnit_addTest(pSuite, SyslogTest, testTCPOpenFailed);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPMaxConnections);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPIdleTimeout);
+	CppUnit_addTest(pSuite, SyslogTest, testTCPIdleTimeoutQueueFull);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPMaxQueued);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannel);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelToListener);

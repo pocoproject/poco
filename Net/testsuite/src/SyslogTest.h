@@ -47,6 +47,7 @@ public:
 	void testTCPOpenFailed();
 	void testTCPMaxConnections();
 	void testTCPIdleTimeout();
+	void testTCPIdleTimeoutQueueFull();
 	void testTCPMaxQueued();
 	void testTCPChannel();
 	void testTCPChannelToListener();
