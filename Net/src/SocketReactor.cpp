@@ -82,14 +82,16 @@ void SocketReactor::run()
 	}
 	Poco::Stopwatch sw;
 	if (_params.throttle) sw.start();
-	PollSet::SocketModeMap sm;
 	while (!_stop)
 	{
 		try
 		{
 			if (hasSocketHandlers())
 			{
-				sm = _pollSet.poll(_params.pollTimeout);
+				// The sockets of a poll are held for its round only: one whose
+				// handlers are removed while it is served is closed when the
+				// round is over, not when a later poll returns.
+				PollSet::SocketModeMap sm = _pollSet.poll(_params.pollTimeout);
 				if (_stop) break;
 				for (const auto& s : sm)
 				{
