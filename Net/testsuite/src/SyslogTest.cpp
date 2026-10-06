@@ -373,6 +373,23 @@ namespace
 }
 
 
+namespace
+{
+	class SmallBufferChannel: public RemoteSyslogChannel
+		/// A channel whose connections hold little, so that a server
+		/// that does not read stalls them soon.
+	{
+	protected:
+		StreamSocket createSocket(const SocketAddress& address, const std::string& hostName, const Poco::Timespan& timeout) override
+		{
+			StreamSocket socket = RemoteSyslogChannel::createSocket(address, hostName, timeout);
+			socket.setSendBufferSize(8192);
+			return socket;
+		}
+	};
+}
+
+
 SyslogTest::SyslogTest(const std::string& name): CppUnit::TestCase(name)
 {
 }
@@ -1289,13 +1306,20 @@ void SyslogTest::testTCPChannelHostName()
 		channel->setProperty("loghost", listener.address().toString());
 		channel->setProperty("transport", "tcp");
 		channel->setProperty("timeout", "100");
+		// the first message waits for the answer no longer than the timeout
+		Poco::Stopwatch sw;
+		sw.start();
 		channel->log(msg);
+		sw.stop();
+		assertTrue (sw.elapsed() >= Poco::Stopwatch::resolution()/10);
+		assertTrue (sw.elapsed() < 5*Poco::Stopwatch::resolution());
 		assertTrue (listener.pChannel->waitFor(2));
 		assertTrue (listener.pChannel->messages().back().get("host") == DNS::hostName());
 
 		channel->answer();
 		bool told = false;
-		for (std::size_t i = 3; i < 100 && !told; ++i)
+		sw.restart();
+		for (std::size_t i = 3; !told && sw.elapsed() < 10*Poco::Stopwatch::resolution(); ++i)
 		{
 			channel->log(msg);
 			assertTrue (listener.pChannel->waitFor(i));
@@ -1305,7 +1329,8 @@ void SyslogTest::testTCPChannelHostName()
 		channel->close();
 	}
 
-	// The name service has no name to tell.
+	// The name service has no name to tell: the name that the system has
+	// for the host is sent.
 	{
 		const std::size_t before = listener.pChannel->messages().size();
 		Poco::AutoPtr<NamedChannel> channel = new NamedChannel("");
@@ -1314,7 +1339,7 @@ void SyslogTest::testTCPChannelHostName()
 		channel->answer();
 		channel->log(msg);
 		assertTrue (listener.pChannel->waitFor(before + 1));
-		assertTrue (listener.pChannel->messages().back().get("host") == "-");
+		assertTrue (listener.pChannel->messages().back().get("host") == DNS::hostName());
 		channel->close();
 	}
 
@@ -1425,6 +1450,39 @@ void SyslogTest::testTCPChannelProperties()
 }
 
 
+void SyslogTest::testTCPChannelServerNotReading()
+{
+	// A server that takes the connection and does not read holds a message
+	// up for the time allowed, not for good: log() returns without the
+	// message having been sent, and the server counts as away.
+	ServerSocket server;
+	server.bind(SocketAddress("127.0.0.1", 0), true, false);
+	server.setReceiveBufferSize(8192);
+	server.listen();
+
+	Poco::AutoPtr<SmallBufferChannel> channel = new SmallBufferChannel;
+	channel->setProperty("loghost", server.address().toString());
+	channel->setProperty("transport", "tcp");
+	channel->setProperty("timeout", "300");
+	channel->setProperty("host", "ahost");
+	Poco::Message msg("asource", std::string(4*1024*1024, 'x'), Poco::Message::PRIO_CRITICAL);
+
+	Poco::Stopwatch sw;
+	sw.start();
+	channel->log(msg);
+	sw.stop();
+	assertTrue (sw.elapsed() >= 3*Poco::Stopwatch::resolution()/10);
+	assertTrue (sw.elapsed() < 10*Poco::Stopwatch::resolution());
+
+	// the next message is dropped at once
+	sw.restart();
+	channel->log(msg);
+	sw.stop();
+	assertTrue (sw.elapsed() < 3*Poco::Stopwatch::resolution()/10);
+	channel->close();
+}
+
+
 void SyslogTest::setUp()
 {
 }
@@ -1465,6 +1523,7 @@ CppUnit::Test* SyslogTest::suite()
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelServerClosed);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelResend);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelServerAway);
+	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelServerNotReading);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelTarget);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelHostName);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPChannelSwitchTransport);

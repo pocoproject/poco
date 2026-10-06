@@ -23,6 +23,7 @@
 #include "Poco/Instantiator.h"
 #include "Poco/String.h"
 #include "Poco/Exception.h"
+#include "Poco/ErrorHandler.h"
 #include <algorithm>
 #include <chrono>
 #include <condition_variable>
@@ -185,13 +186,11 @@ void RemoteSyslogChannel::lookUpHostName()
 		answered = _pHostNameLookup->answered.wait_for(lock, std::chrono::microseconds(_timeout.totalMicroseconds()), [&lookup] { return lookup.done; });
 		if (answered) _host = lookup.name;
 	}
-	if (answered)
+	if (answered) _pHostNameLookup.reset();
+	if (_host.empty())
 	{
-		_pHostNameLookup.reset();
-	}
-	else
-	{
-		// Until the answer is there, the name that the system has for the host.
+		// The name that the system has for the host: until the answer is
+		// there, and when the name service has none to tell.
 		try
 		{
 			_host = DNS::hostName();
@@ -326,21 +325,25 @@ void RemoteSyslogChannel::sendOverConnection(const std::string& frame)
 	{
 		const bool fresh = !_connected;
 		if (fresh && !connect()) return;
+		// a server that takes the connection and not the message is away as well
+		auto failed = [this, fresh](const auto& exc)
+		{
+			disconnect();
+			if (fresh) serverAway(exc);
+			return fresh;
+		};
 		try
 		{
 			sendFrame(frame);
 			return;
 		}
-		catch (Poco::Exception&)
+		catch (Poco::Exception& exc)
 		{
-			disconnect();
-			if (fresh)
-			{
-				// a server that takes the connection and not the message is away as well
-				_failed = true;
-				_failedAt.update();
-				return;
-			}
+			if (failed(exc)) return;
+		}
+		catch (std::exception& exc)
+		{
+			if (failed(exc)) return;
 		}
 	}
 }
@@ -354,19 +357,38 @@ bool RemoteSyslogChannel::connect()
 	{
 		// the address of the server is asked for with every connection: it may have changed
 		_streamSocket = createSocket(logHostAddress(), logHostName(), _timeout);
-		// the receive timeout bounds what a TLS socket reads while it sends
-		_streamSocket.setSendTimeout(_timeout);
-		_streamSocket.setReceiveTimeout(_timeout);
+		// what is sent from here on waits for its deadline, not for the socket
+		_streamSocket.setBlocking(false);
 		_connected = true;
 		_failed = false;
 	}
-	catch (Poco::Exception&)
+	catch (Poco::Exception& exc)
 	{
 		_streamSocket = StreamSocket();
-		_failed = true;
-		_failedAt.update();
+		serverAway(exc);
+	}
+	catch (std::exception& exc)
+	{
+		_streamSocket = StreamSocket();
+		serverAway(exc);
 	}
 	return _connected;
+}
+
+
+void RemoteSyslogChannel::serverAway(const Poco::Exception& exc)
+{
+	if (!_failed) Poco::ErrorHandler::handle(exc);
+	_failed = true;
+	_failedAt.update();
+}
+
+
+void RemoteSyslogChannel::serverAway(const std::exception& exc)
+{
+	if (!_failed) Poco::ErrorHandler::handle(exc);
+	_failed = true;
+	_failedAt.update();
 }
 
 
@@ -388,6 +410,8 @@ void RemoteSyslogChannel::disconnect()
 
 void RemoteSyslogChannel::sendFrame(const std::string& frame)
 {
+	// The socket is non-blocking: the time allowed is for the whole frame,
+	// not for every stall of the server.
 	const Poco::Clock::ClockDiff timeout = _timeout.totalMicroseconds();
 	Poco::Clock start;
 	std::size_t sent = 0;
@@ -399,7 +423,10 @@ void RemoteSyslogChannel::sendFrame(const std::string& frame)
 		{
 			const Poco::Clock::ClockDiff elapsed = start.elapsed();
 			if (elapsed >= timeout) throw Poco::TimeoutException("syslog message not sent in time");
-			if (n <= 0) (void) _streamSocket.poll(Poco::Timespan(timeout - elapsed), Socket::SELECT_WRITE);
+			// A secure socket may have to read before it can write: it says
+			// so with -2 (SecureStreamSocket::ERR_SSL_WANT_READ).
+			const int mode = n == -2 ? Socket::SELECT_READ : Socket::SELECT_WRITE;
+			(void) _streamSocket.poll(Poco::Timespan(timeout - elapsed), mode);
 		}
 	}
 }
@@ -413,10 +440,7 @@ bool RemoteSyslogChannel::closedByServer()
 	{
 		if (!_streamSocket.poll(Poco::Timespan(), Socket::SELECT_READ)) return false;
 		char buffer[256];
-		_streamSocket.setBlocking(false);
-		const int n = _streamSocket.receiveBytes(buffer, sizeof(buffer));
-		_streamSocket.setBlocking(true);
-		return n == 0;
+		return _streamSocket.receiveBytes(buffer, sizeof(buffer)) == 0;
 	}
 	catch (Poco::Exception&)
 	{
@@ -494,6 +518,8 @@ RemoteSyslogChannel::HostNameSource RemoteSyslogChannel::hostNameSource() const
 
 void RemoteSyslogChannel::setProperty(const std::string& name, const std::string& value)
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
 	if (name == PROP_NAME)
 	{
 		_name = value;
@@ -564,7 +590,6 @@ void RemoteSyslogChannel::setProperty(const std::string& name, const std::string
 	}
 	else if (name == PROP_HOST)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
 		_host = value;
 		// a name that is given is not replaced by one that is told later
 		_pHostNameLookup.reset();
@@ -587,7 +612,6 @@ void RemoteSyslogChannel::setProperty(const std::string& name, const std::string
 		else
 			throw Poco::InvalidArgumentException("Not a valid transport", value);
 
-		Poco::FastMutex::ScopedLock lock(_mutex);
 		if (transport != _transport)
 		{
 			// the sockets are those of the transport: the next message opens the channel again
@@ -605,7 +629,6 @@ void RemoteSyslogChannel::setProperty(const std::string& name, const std::string
 		else
 			throw Poco::InvalidArgumentException("Not a valid framing", value);
 
-		Poco::FastMutex::ScopedLock lock(_mutex);
 		_framing = framing;
 	}
 	else if (name == PROP_TIMEOUT)
@@ -613,7 +636,6 @@ void RemoteSyslogChannel::setProperty(const std::string& name, const std::string
 		int val = Poco::NumberParser::parse(value);
 		if (val <= 0) throw Poco::InvalidArgumentException("Not a valid timeout", value);
 
-		Poco::FastMutex::ScopedLock lock(_mutex);
 		_timeout = Poco::Timespan(val*Poco::Timespan::MILLISECONDS);
 	}
 	else if (name == PROP_RETRY_INTERVAL)
@@ -621,7 +643,6 @@ void RemoteSyslogChannel::setProperty(const std::string& name, const std::string
 		int val = Poco::NumberParser::parse(value);
 		if (val < 0) throw Poco::InvalidArgumentException("Not a valid retry interval", value);
 
-		Poco::FastMutex::ScopedLock lock(_mutex);
 		_retryInterval = Poco::Timespan(val*Poco::Timespan::MILLISECONDS);
 	}
 	else
@@ -633,6 +654,8 @@ void RemoteSyslogChannel::setProperty(const std::string& name, const std::string
 
 std::string RemoteSyslogChannel::getProperty(const std::string& name) const
 {
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
 	if (name == PROP_NAME)
 	{
 		if (_name != "-")
@@ -711,22 +734,18 @@ std::string RemoteSyslogChannel::getProperty(const std::string& name) const
 	}
 	else if (name == PROP_TRANSPORT)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
 		return _transport == TRANSPORT_UDP ? "udp" : "tcp";
 	}
 	else if (name == PROP_FRAMING)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
 		return _framing == FRAMING_NEWLINE ? "newline" : "octet-counting";
 	}
 	else if (name == PROP_TIMEOUT)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
 		return Poco::NumberFormatter::format(_timeout.totalMilliseconds());
 	}
 	else if (name == PROP_RETRY_INTERVAL)
 	{
-		Poco::FastMutex::ScopedLock lock(_mutex);
 		return Poco::NumberFormatter::format(_retryInterval.totalMilliseconds());
 	}
 	else

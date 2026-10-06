@@ -50,6 +50,7 @@ public:
 	void testTCPChannelServerClosed();
 	void testTCPChannelResend();
 	void testTCPChannelServerAway();
+	void testTCPChannelServerNotReading();
 	void testTCPChannelTarget();
 	void testTCPChannelHostName();
 	void testTCPChannelSwitchTransport();

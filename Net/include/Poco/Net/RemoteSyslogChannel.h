@@ -68,6 +68,11 @@ class Net_API RemoteSyslogChannel: public Poco::Channel
 	/// message, and a message that could not be sent over a connection
 	/// is sent once more over a new one. Syslog has no acknowledgement:
 	/// what was handed to a connection that then broke may be lost.
+	///
+	/// An attempt to connect that fails is reported through
+	/// Poco::ErrorHandler, once, until a connection has been made again:
+	/// a server that cannot be reached, or whose certificate does not
+	/// verify, is not silent.
 {
 public:
 	using Ptr = Poco::AutoPtr<RemoteSyslogChannel>;
@@ -151,7 +156,9 @@ public:
 		///     * host:      (optional) Host name included in syslog messages. If not specified, the host's real domain name or
 		///                  IP address will be used. The name service is asked for it when the channel is opened, with the
 		///                  first message at the latest, and is waited for no longer than the time of the "timeout" property.
-		///                  Until its answer is there, messages carry the name that the system has for the host.
+		///                  Until its answer is there, and when it has no name to tell, messages carry the name that the
+		///                  system has for the host: the messages of one connection may thus name the host differently
+		///                  before and after the answer.
 		///     * buffer:    UDP socket send buffer size in bytes. If not specified, the system default is used.
 		///     * transport: "udp" (default) or "tcp". A change closes the channel, and the next message opens it again.
 		///     * framing:   How messages are told apart on a TCP connection (RFC 6587): "newline" (default), with a line feed
@@ -194,7 +201,8 @@ protected:
 		/// that the "loghost" property names, without a port.
 		///
 		/// A subclass can override this method to send over another kind
-		/// of stream socket. Any exception counts as a server that is away.
+		/// of stream socket. A Poco::Exception or a std::exception thrown
+		/// here counts as a server that is away.
 
 	[[nodiscard]] virtual Poco::UInt16 defaultPort() const;
 		/// Returns the port that messages are sent to if the "loghost"
@@ -249,6 +257,12 @@ private:
 	bool connect();
 		/// Makes the connection, unless an attempt failed a short while
 		/// ago. Returns true if the connection is there.
+
+	void serverAway(const Poco::Exception& exc);
+	void serverAway(const std::exception& exc);
+		/// Notes that the server is away, which the exception says why.
+		/// It is reported through the ErrorHandler if the server was not
+		/// away before.
 
 	void disconnect();
 		/// Closes the connection without waiting for the server.
