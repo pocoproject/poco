@@ -27,6 +27,7 @@ public:
 	void testSendReceive();
 	void testPeek();
 	void testNB();
+	void testLazyHandshake();
 	void testSendFile();
 	void testSendFileLarge();
 	void testSendFileRange();

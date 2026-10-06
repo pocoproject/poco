@@ -186,8 +186,8 @@ void SecureSocketImpl::connect(const SocketAddress& address, bool performHandsha
 {
 	setState(ST_ERROR);
 	_pSocket->connect(address);
+	// the state is that of the handshake: done, or still to be made with the first data
 	connectSSL(performHandshake);
-	setState(ST_DONE);
 }
 
 
@@ -195,8 +195,30 @@ void SecureSocketImpl::connect(const SocketAddress& address, const Poco::Timespa
 {
 	setState(ST_ERROR);
 	_pSocket->connect(address, timeout);
-	connectSSL(performHandshake);
-	setState(ST_DONE);
+	// the handshake is allowed the time that the connection was
+	Poco::Timespan receiveTimeout = _pSocket->getReceiveTimeout();
+	Poco::Timespan sendTimeout = _pSocket->getSendTimeout();
+	_pSocket->setReceiveTimeout(timeout);
+	_pSocket->setSendTimeout(timeout);
+	try
+	{
+		connectSSL(performHandshake);
+	}
+	catch (...)
+	{
+		// the socket gets its own timeouts back also when there is no connection
+		try
+		{
+			_pSocket->setReceiveTimeout(receiveTimeout);
+			_pSocket->setSendTimeout(sendTimeout);
+		}
+		catch (Poco::Exception&)
+		{
+		}
+		throw;
+	}
+	_pSocket->setReceiveTimeout(receiveTimeout);
+	_pSocket->setSendTimeout(sendTimeout);
 }
 
 
@@ -1184,6 +1206,11 @@ void SecureSocketImpl::stateServerHandshakeLoopInit()
 	else if (_securityStatus == SEC_E_OK)
 	{
 		setState(ST_SERVER_HSK_LOOP_DONE);
+	}
+	else
+	{
+		// no state follows from here: the handshake has to end, or it never would
+		throw SSLException("Handshake failure", Utility::formatError(_securityStatus));
 	}
 }
 

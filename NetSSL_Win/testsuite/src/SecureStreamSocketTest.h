@@ -27,6 +27,8 @@ public:
 	void testSendReceive();
 	void testPeek();
 	void testNB();
+	void testHandshakeTimeout();
+	void testLazyHandshake();
 
 	void setUp();
 	void tearDown();
