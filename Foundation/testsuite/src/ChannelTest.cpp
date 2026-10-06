@@ -171,6 +171,47 @@ void ChannelTest::testAsync()
 }
 
 
+void ChannelTest::testAsyncConcurrentReplacement()
+{
+	// Messages are logged while another thread replaces the target
+	// channel and a third asks for it: each one gets to a target.
+	constexpr int MESSAGES = 5000;
+
+	Tally tally;
+	AutoPtr<AsyncChannel> pAsync = new AsyncChannel(new TallyChannel(tally));
+
+	std::atomic<bool> stop(false);
+	std::atomic<int> logged(0);
+	std::thread logging([&]()
+	{
+		Message msg("Source", "Text", Message::PRIO_INFORMATION);
+		for (int i = 0; i < MESSAGES; ++i)
+		{
+			pAsync->log(msg);
+			++logged;
+		}
+	});
+	std::thread asking([&]()
+	{
+		while (!stop)
+		{
+			Channel::Ptr pChannel = pAsync->getChannel();
+		}
+	});
+
+	while (logged < MESSAGES)
+	{
+		pAsync->setChannel(new TallyChannel(tally));
+	}
+	logging.join();
+	stop = true;
+	asking.join();
+	pAsync->close();
+
+	assertEqual(MESSAGES, tally.plain.load());
+}
+
+
 void ChannelTest::testFormatting()
 {
 	AutoPtr<TestChannel> pChannel = new TestChannel;
@@ -282,6 +323,7 @@ CppUnit::Test* ChannelTest::suite()
 	CppUnit_addTest(pSuite, ChannelTest, testSplitter);
 	CppUnit_addTest(pSuite, ChannelTest, testSplitterAddSameChannelTwice);
 	CppUnit_addTest(pSuite, ChannelTest, testAsync);
+	CppUnit_addTest(pSuite, ChannelTest, testAsyncConcurrentReplacement);
 	CppUnit_addTest(pSuite, ChannelTest, testFormatting);
 	CppUnit_addTest(pSuite, ChannelTest, testFormattingConcurrentReplacement);
 	CppUnit_addTest(pSuite, ChannelTest, testConsole);

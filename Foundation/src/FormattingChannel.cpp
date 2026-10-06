@@ -84,10 +84,15 @@ Channel::Ptr FormattingChannel::getChannel() const
 
 void FormattingChannel::log(const Message& msg)
 {
-	Channel::Ptr pChannel = getChannel();
+	Formatter::Ptr pFormatter;
+	Channel::Ptr pChannel;
+	{
+		FastMutex::ScopedLock lock(_mutex);
+		pFormatter = _pFormatter;
+		pChannel = _pChannel;
+	}
 	if (pChannel)
 	{
-		Formatter::Ptr pFormatter = getFormatter();
 		if (pFormatter)
 		{
 			std::string text;

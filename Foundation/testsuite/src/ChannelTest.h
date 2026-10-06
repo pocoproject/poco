@@ -27,6 +27,7 @@ public:
 	void testSplitter();
 	void testSplitterAddSameChannelTwice();
 	void testAsync();
+	void testAsyncConcurrentReplacement();
 	void testFormatting();
 	void testFormattingConcurrentReplacement();
 	void testConsole();

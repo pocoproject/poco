@@ -51,6 +51,10 @@ public:
 	void setChannel(Channel::Ptr pChannel);
 		/// Connects the AsyncChannel to the given target channel.
 		/// All messages will be forwarded to this channel.
+		///
+		/// The target channel can be replaced while messages are
+		/// logged. A message that is on its way to the channel
+		/// that is replaced still gets there.
 
 	[[nodiscard]] Channel::Ptr getChannel() const;
 		/// Returns the target channel.
@@ -122,7 +126,7 @@ private:
 	Channel::Ptr _pChannel;
 	Thread    _thread;
 	FastMutex _threadMutex;
-	FastMutex _channelMutex;
+	mutable FastMutex _channelMutex;
 	NotificationQueue _queue;
 	std::size_t _queueSize = 0;
 	std::size_t _dropCount = 0;

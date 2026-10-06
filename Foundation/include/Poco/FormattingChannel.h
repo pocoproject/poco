@@ -53,6 +53,11 @@ public:
 		/// Sets the Formatter used to format the messages
 		/// before they are passed on. If null, the message
 		/// is passed on unmodified.
+		///
+		/// The formatter and the destination channel can be
+		/// replaced while other threads log. A message that is
+		/// on its way keeps the ones it started with, and they
+		/// are released when the last such message is through.
 
 	[[nodiscard]] Formatter::Ptr getFormatter() const;
 		/// Returns the Formatter used to format messages,
