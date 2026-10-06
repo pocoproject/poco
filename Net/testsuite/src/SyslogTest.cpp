@@ -18,7 +18,6 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
 #include "Poco/Net/DNS.h"
-#include "Poco/Thread.h"
 #include "Poco/Message.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
@@ -27,7 +26,6 @@
 #include <algorithm>
 #include <chrono>
 #include <condition_variable>
-#include <list>
 #include <mutex>
 #include <set>
 #include <string>
@@ -35,94 +33,6 @@
 
 
 using namespace Poco::Net;
-
-
-class CachingChannel: public Poco::Channel
-	/// Caches the last n Messages in memory
-{
-public:
-	typedef std::list<Poco::Message> Messages;
-
-	CachingChannel(std::size_t n = 100);
-		/// Creates the CachingChannel. Caches n messages in memory
-
-	~CachingChannel();
-		/// Destroys the CachingChannel.
-
-	void log(const Poco::Message& msg);
-		/// Writes the log message to the cache
-
-	void getMessages(std::vector<Poco::Message>& msg, int offset, int numEntries) const;
-		/// Retrieves numEntries Messages starting with position offset. Most recent messages are first.
-
-	std::size_t getMaxSize() const;
-
-	std::size_t getCurrentSize() const;
-
-private:
-	CachingChannel(const CachingChannel&);
-
-	Messages   _cache;
-	std::size_t _size;
-	std::size_t _maxSize;
-	mutable Poco::FastMutex _mutex;
-};
-
-
-std::size_t CachingChannel::getMaxSize() const
-{
-	return _maxSize;
-}
-
-
-std::size_t CachingChannel::getCurrentSize() const
-{
-	Poco::FastMutex::ScopedLock lock(_mutex);
-	return _size;
-}
-
-
-CachingChannel::CachingChannel(std::size_t n):
-	_cache(),
-	_size(0),
-	_maxSize(n),
-	_mutex()
-{
-}
-
-
-CachingChannel::~CachingChannel()
-{
-}
-
-
-void CachingChannel::log(const Poco::Message& msg)
-{
-	Poco::FastMutex::ScopedLock lock(_mutex);
-	_cache.push_front(msg);
-	if (_size == _maxSize)
-	{
-		_cache.pop_back();
-	}
-	else
-		++_size;
-}
-
-
-void CachingChannel::getMessages(std::vector<Poco::Message>& msg, int offset, int numEntries) const
-{
-	msg.clear();
-	Messages::const_iterator it = _cache.begin();
-
-	while (offset > 0 && it != _cache.end())
-		++it;
-
-	while (numEntries > 0 && it != _cache.end())
-	{
-		msg.push_back(*it);
-		++it;
-	}
-}
 
 
 namespace
@@ -208,6 +118,53 @@ namespace
 		}
 
 		ServerSocket socket;
+		Poco::AutoPtr<RemoteSyslogListener> pListener;
+		Poco::AutoPtr<CollectingChannel> pChannel;
+	};
+
+
+	struct UDPListener
+		/// A listener that takes messages from datagrams sent to a port
+		/// that was free when the listener was opened.
+	{
+		UDPListener():
+			port(0),
+			pChannel(new CollectingChannel)
+		{
+			// The listener binds its port itself and cannot be asked which
+			// one it has. So a free port is looked for and then tried:
+			// somebody else may have taken it in between.
+			for (int i = 0; i < 100 && !pListener; ++i)
+			{
+				{
+					DatagramSocket probe(SocketAddress("127.0.0.1", 0), false);
+					port = probe.address().port();
+				}
+				Poco::AutoPtr<RemoteSyslogListener> pCandidate = new RemoteSyslogListener(port);
+				try
+				{
+					pCandidate->open();
+					pListener = pCandidate;
+				}
+				catch (Poco::Exception&)
+				{
+				}
+			}
+			if (!pListener) throw Poco::IOException("no UDP port to listen on");
+			pListener->addChannel(pChannel);
+		}
+
+		~UDPListener()
+		{
+			pListener->close();
+		}
+
+		std::string address() const
+		{
+			return "127.0.0.1:" + std::to_string(port);
+		}
+
+		Poco::UInt16 port;
 		Poco::AutoPtr<RemoteSyslogListener> pListener;
 		Poco::AutoPtr<CollectingChannel> pChannel;
 	};
@@ -356,128 +313,105 @@ SyslogTest::~SyslogTest()
 
 void SyslogTest::testListener()
 {
+	UDPListener listener;
 	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
-	channel->setProperty("loghost", "127.0.0.1:51400");
+	channel->setProperty("loghost", listener.address());
+	channel->setProperty("host", "ahost");
 	channel->open();
-	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
-	listener->open();
-	auto pCL = Poco::makeAuto<CachingChannel>();
-	listener->addChannel(pCL);
-	assertTrue (pCL->getCurrentSize() == 0);
 	Poco::Message msg("asource", "amessage", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg);
-	Poco::Thread::sleep(1000);
-	listener->close();
+	assertTrue (listener.pChannel->waitFor(1));
 	channel->close();
-	assertTrue (pCL->getCurrentSize() == 1);
-	std::vector<Poco::Message> msgs;
-	pCL->getMessages(msgs, 0, 10);
+	std::vector<Poco::Message> msgs = listener.pChannel->messages();
 	assertTrue (msgs.size() == 1);
 	assertTrue (msgs[0].getSource() == "asource");
 	assertTrue (msgs[0].getText() == "amessage");
 	assertTrue (msgs[0].getPriority() == Poco::Message::PRIO_CRITICAL);
 }
 
+
 void SyslogTest::testChannelFacility()
 {
+	UDPListener listener;
 	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
-	channel->setProperty("loghost", "127.0.0.1:51400");
+	channel->setProperty("loghost", listener.address());
+	channel->setProperty("host", "ahost");
 	channel->setProperty("facility", "KERN");
 	channel->open();
-	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
-	listener->open();
-	auto pCL = Poco::makeAuto<CachingChannel>();
-	listener->addChannel(pCL);
-	assertTrue (pCL->getCurrentSize() == 0);
 	Poco::Message msg("asource", "amessage", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg);
 	channel->setProperty("facility", "USER");
 	msg.setText("asecondmessage");
 	channel->log(msg);
 	assertFalse (msg.has("facility"));
-	Poco::Thread::sleep(1000);
-	listener->close();
+	assertTrue (listener.pChannel->waitFor(2));
 	channel->close();
-	assertTrue (pCL->getCurrentSize() == 2);
-	std::vector<Poco::Message> msgs;
-	pCL->getMessages(msgs, 0, 10);
-
+	std::vector<Poco::Message> msgs = listener.pChannel->messages();
 	assertTrue (msgs.size() == 2);
 
-	assertTrue (msgs[1].getSource() == "asource");
-	assertTrue (msgs[1].getText() == "amessage");
-	assertTrue (msgs[1].getPriority() == Poco::Message::PRIO_CRITICAL);
-	assertTrue (msgs[1].has("facility"));
-	assertTrue (msgs[1].get("facility") == "KERN");
-
 	assertTrue (msgs[0].getSource() == "asource");
-	assertTrue (msgs[0].getText() == "asecondmessage");
+	assertTrue (msgs[0].getText() == "amessage");
 	assertTrue (msgs[0].getPriority() == Poco::Message::PRIO_CRITICAL);
 	assertTrue (msgs[0].has("facility"));
-	assertTrue (msgs[0].get("facility") == "USER");
+	assertTrue (msgs[0].get("facility") == "KERN");
+
+	assertTrue (msgs[1].getSource() == "asource");
+	assertTrue (msgs[1].getText() == "asecondmessage");
+	assertTrue (msgs[1].getPriority() == Poco::Message::PRIO_CRITICAL);
+	assertTrue (msgs[1].has("facility"));
+	assertTrue (msgs[1].get("facility") == "USER");
 }
+
 
 void SyslogTest::testChannelOpenClose()
 {
+	UDPListener listener;
 	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
-	channel->setProperty("loghost", "127.0.0.1:51400");
+	channel->setProperty("loghost", listener.address());
+	channel->setProperty("host", "ahost");
 	channel->open();
-	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
-	listener->open();
-	auto pCL = Poco::makeAuto<CachingChannel>();
-	listener->addChannel(pCL);
 
-	assertTrue (pCL->getCurrentSize() == 0);
 	Poco::Message msg1("source1", "message1", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg1);
-	Poco::Thread::sleep(1000);
-	assertTrue (pCL->getCurrentSize() == 1);
+	assertTrue (listener.pChannel->waitFor(1));
 
 	channel->close(); // close and re-open channel
 	channel->open();
 
 	Poco::Message msg2("source2", "message2", Poco::Message::PRIO_ERROR);
 	channel->log(msg2);
-	Poco::Thread::sleep(1000);
-	assertTrue (pCL->getCurrentSize() == 2);
+	assertTrue (listener.pChannel->waitFor(2));
+	channel->close();
 
-	listener->close();
-	std::vector<Poco::Message> msgs;
-	pCL->getMessages(msgs, 0, 10);
+	std::vector<Poco::Message> msgs = listener.pChannel->messages();
 	assertTrue (msgs.size() == 2);
 
-	assertTrue (msgs[1].getSource() == "source1");
-	assertTrue (msgs[1].getText() == "message1");
-	assertTrue (msgs[1].getPriority() == Poco::Message::PRIO_CRITICAL);
+	assertTrue (msgs[0].getSource() == "source1");
+	assertTrue (msgs[0].getText() == "message1");
+	assertTrue (msgs[0].getPriority() == Poco::Message::PRIO_CRITICAL);
 
-	assertTrue (msgs[0].getSource() == "source2");
-	assertTrue (msgs[0].getText() == "message2");
-	assertTrue (msgs[0].getPriority() == Poco::Message::PRIO_ERROR);
+	assertTrue (msgs[1].getSource() == "source2");
+	assertTrue (msgs[1].getText() == "message2");
+	assertTrue (msgs[1].getPriority() == Poco::Message::PRIO_ERROR);
 }
 
 
 void SyslogTest::testOldBSD()
 {
+	UDPListener listener;
 	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
-	channel->setProperty("loghost", "127.0.0.1:51400");
+	channel->setProperty("loghost", listener.address());
+	channel->setProperty("host", "ahost");
 	channel->setProperty("format", "bsd");
 	channel->open();
-	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
-	listener->open();
-	auto pCL = Poco::makeAuto<CachingChannel>();
-	listener->addChannel(pCL);
-	assertTrue (pCL->getCurrentSize() == 0);
 	Poco::Message msg("asource", "amessage", Poco::Message::PRIO_CRITICAL);
 	channel->log(msg);
-	Poco::Thread::sleep(1000);
-	listener->close();
+	assertTrue (listener.pChannel->waitFor(1));
 	channel->close();
-	assertTrue (pCL->getCurrentSize() == 1);
-	std::vector<Poco::Message> msgs;
-	pCL->getMessages(msgs, 0, 10);
+	std::vector<Poco::Message> msgs = listener.pChannel->messages();
 	assertTrue (msgs.size() == 1);
 	// the source is lost with old BSD messages: we only send the local host name!
-	assertTrue (msgs[0].getSource() == Poco::Net::DNS::thisHost().name());
+	assertTrue (msgs[0].getSource() == "ahost");
 	assertTrue (msgs[0].getText() == "amessage");
 	assertTrue (msgs[0].getPriority() == Poco::Message::PRIO_CRITICAL);
 }
@@ -485,37 +419,31 @@ void SyslogTest::testOldBSD()
 
 void SyslogTest::testStructuredData()
 {
+	UDPListener listener;
 	Poco::AutoPtr<RemoteSyslogChannel> channel = new RemoteSyslogChannel();
-	channel->setProperty("loghost", "127.0.0.1:51400");
+	channel->setProperty("loghost", listener.address());
+	channel->setProperty("host", "ahost");
 	channel->open();
-	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(51400);
-	listener->open();
-	auto pCL = Poco::makeAuto<CachingChannel>();
-	listener->addChannel(pCL);
-	assertTrue (pCL->getCurrentSize() == 0);
 	Poco::Message msg1("asource", "amessage", Poco::Message::PRIO_CRITICAL);
 	msg1.set("structured-data", "[exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"]");
 	channel->log(msg1);
 	Poco::Message msg2("asource", "amessage", Poco::Message::PRIO_CRITICAL);
 	msg2.set("structured-data", "[exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"][examplePriority@32473 class=\"high\"]");
 	channel->log(msg2);
-	Poco::Thread::sleep(1000);
-	listener->close();
+	assertTrue (listener.pChannel->waitFor(2));
 	channel->close();
-	assertTrue (pCL->getCurrentSize() == 2);
-	std::vector<Poco::Message> msgs;
-	pCL->getMessages(msgs, 0, 10);
+	std::vector<Poco::Message> msgs = listener.pChannel->messages();
 	assertTrue (msgs.size() == 2);
 
 	assertTrue (msgs[0].getSource() == "asource");
 	assertTrue (msgs[0].getText() == "amessage");
 	assertTrue (msgs[0].getPriority() == Poco::Message::PRIO_CRITICAL);
-	assertTrue (msgs[0].get("structured-data") == "[exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"][examplePriority@32473 class=\"high\"]");
+	assertTrue (msgs[0].get("structured-data") == "[exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"]");
 
 	assertTrue (msgs[1].getSource() == "asource");
 	assertTrue (msgs[1].getText() == "amessage");
 	assertTrue (msgs[1].getPriority() == Poco::Message::PRIO_CRITICAL);
-	assertTrue (msgs[1].get("structured-data") == "[exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"]");
+	assertTrue (msgs[1].get("structured-data") == "[exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"][examplePriority@32473 class=\"high\"]");
 }
 
 
