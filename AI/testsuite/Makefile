@@ -13,6 +13,7 @@ objects = \
 	AgentLoopTest \
 	AnthropicProviderTest \
 	OpenAIProviderTest \
+	ToolDispatchProviderTest \
 	MCPHostTest
 
 target         = testrunner

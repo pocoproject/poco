@@ -35,10 +35,14 @@ class AI_API ToolDispatchProvider: public LLMProvider
 	/// cannot call tools themselves. Keyword rules match the user's message
 	/// to tools; a matched tool is reported as a tool call, the AgentLoop
 	/// executes it, and the results are given to the wrapped provider as
-	/// context for the answer.
+	/// context for the answer. Only the tool results of the current turn,
+	/// those after the last user message, count: results of earlier turns
+	/// in the history neither stop the rules from matching nor reach the
+	/// answer.
 	///
-	/// When no rule matches, the request falls through to the wrapped
-	/// provider's native tool calling, if it has any, so rules handle the
+	/// When no rule matches, or when there are no tools at all, the request
+	/// goes to the wrapped provider with the conversation as it is, and
+	/// with its native tool calling if it has any, so rules handle the
 	/// well-known questions and the model handles the rest.
 	///
 	/// The rules come from the application through addRule(); the provider
@@ -95,6 +99,7 @@ public:
 
 private:
 	std::vector<ContentEvent> matchTools(const std::string& userMessage);
+	unsigned int currentTurn(const Poco::JSON::Array& messages) const;
 	bool hasToolResults(const Poco::JSON::Array& messages) const;
 	std::string extractToolResults(const Poco::JSON::Array& messages) const;
 	std::string extractLastUserMessage(const Poco::JSON::Array& messages) const;

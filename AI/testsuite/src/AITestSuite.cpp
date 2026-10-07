@@ -13,6 +13,7 @@
 #include "AgentLoopTest.h"
 #include "AnthropicProviderTest.h"
 #include "OpenAIProviderTest.h"
+#include "ToolDispatchProviderTest.h"
 #include "MCPHostTest.h"
 
 
@@ -24,6 +25,7 @@ CppUnit::Test* AITestSuite::suite()
 	pSuite->addTest(AgentLoopTest::suite());
 	pSuite->addTest(AnthropicProviderTest::suite());
 	pSuite->addTest(OpenAIProviderTest::suite());
+	pSuite->addTest(ToolDispatchProviderTest::suite());
 	pSuite->addTest(MCPHostTest::suite());
 
 	return pSuite;

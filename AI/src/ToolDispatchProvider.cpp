@@ -49,9 +49,9 @@ void ToolDispatchProvider::chat(
 	const Poco::JSON::Array& tools,
 	ContentEventCallback onEvent)
 {
-	// If tools are empty (final summary round from AgentLoop) or
-	// tool results are already present, generate the response.
-	if (tools.size() == 0 || hasToolResults(messages))
+	// The tools of this turn have run: the wrapped provider answers from
+	// their results.
+	if (hasToolResults(messages))
 	{
 		std::string userMsg = extractLastUserMessage(messages);
 		std::string toolSummary = extractToolResults(messages);
@@ -61,24 +61,25 @@ void ToolDispatchProvider::chat(
 		return;
 	}
 
-	// First round: match keywords to tools
-	std::string userMsg = extractLastUserMessage(messages);
-	auto matches = matchTools(userMsg);
-
-	if (matches.empty())
+	// First round of a turn: match keywords to tools
+	if (tools.size() > 0)
 	{
-		// No keyword match: fall through to the chat provider's native
-		// tool calling (if supported). Providers that don't support tools
-		// ignore the tools array.
-		_pChatProvider->chat(messages, systemPrompt, tools, onEvent);
-		return;
+		auto matches = matchTools(extractLastUserMessage(messages));
+		if (!matches.empty())
+		{
+			// Emit tool calls for AgentLoop to execute
+			for (auto& tc : matches)
+			{
+				onEvent(tc);
+			}
+			return;
+		}
 	}
 
-	// Emit tool calls for AgentLoop to execute
-	for (auto& tc : matches)
-	{
-		onEvent(tc);
-	}
+	// No keyword match, or no tools to match: the wrapped provider gets the
+	// conversation as it is, with its native tool calling if it has any.
+	// Providers that don't support tools ignore the tools array.
+	_pChatProvider->chat(messages, systemPrompt, tools, onEvent);
 }
 
 
@@ -198,9 +199,22 @@ std::vector<ContentEvent> ToolDispatchProvider::matchTools(const std::string& us
 }
 
 
+unsigned int ToolDispatchProvider::currentTurn(const Poco::JSON::Array& messages) const
+{
+	// The current turn starts after the last user message.
+	for (unsigned int i = static_cast<unsigned int>(messages.size()); i > 0; --i)
+	{
+		auto pMsg = messages.getObject(i - 1);
+		if (pMsg && pMsg->optValue<std::string>("role", "") == "user")
+			return i;
+	}
+	return 0;
+}
+
+
 bool ToolDispatchProvider::hasToolResults(const Poco::JSON::Array& messages) const
 {
-	for (unsigned int i = 0; i < messages.size(); ++i)
+	for (unsigned int i = currentTurn(messages); i < messages.size(); ++i)
 	{
 		auto pMsg = messages.getObject(i);
 		if (pMsg && pMsg->optValue<std::string>("role", "") == "tool")
@@ -215,7 +229,7 @@ std::string ToolDispatchProvider::extractToolResults(const Poco::JSON::Array& me
 	std::string summary;
 	const std::size_t maxChars = static_cast<std::size_t>(_contextBudget) * 4;
 
-	for (unsigned int i = 0; i < messages.size(); ++i)
+	for (unsigned int i = currentTurn(messages); i < messages.size(); ++i)
 	{
 		auto pMsg = messages.getObject(i);
 		if (!pMsg || pMsg->optValue<std::string>("role", "") != "tool")
