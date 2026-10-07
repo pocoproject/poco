@@ -1,18 +1,18 @@
 # Sources
 file(GLOB SRCS_G "src/*.cpp")
-POCO_SOURCES_AUTO(SRCS ${SRCS_G})
+POCO_SOURCES_AUTO(MCP_SRCS ${SRCS_G})
 
 # Headers
 file(GLOB_RECURSE HDRS_G "include/*.h")
-POCO_HEADERS_AUTO(SRCS ${HDRS_G})
+POCO_HEADERS_AUTO(MCP_SRCS ${HDRS_G})
 
 # Version Resource
 if(MSVC AND BUILD_SHARED_LIBS)
 	source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
-	list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
+	list(APPEND MCP_SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 endif()
 
-add_library(AIMCP ${SRCS})
+add_library(AIMCP ${MCP_SRCS})
 add_library(Poco::AIMCP ALIAS AIMCP)
 set_target_properties(AIMCP
 	PROPERTIES

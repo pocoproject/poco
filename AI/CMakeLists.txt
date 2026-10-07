@@ -1,6 +1,8 @@
 # The AI library family: the Model Context Protocol core (MCP), its HTTP
 # client transport (MCP/HTTP) and the AI library itself, which depends on
-# both and is therefore configured after them.
+# both and is therefore configured after them. A nested directory inherits
+# the variables of its parent, so each library collects its sources in a
+# variable of its own.
 if(ENABLE_AI_MCP)
 	add_subdirectory(MCP)
 endif()
@@ -8,19 +10,19 @@ endif()
 if(ENABLE_AI)
 	# Sources
 	file(GLOB SRCS_G "src/*.cpp")
-	POCO_SOURCES_AUTO(SRCS ${SRCS_G})
+	POCO_SOURCES_AUTO(AI_SRCS ${SRCS_G})
 
 	# Headers
 	file(GLOB_RECURSE HDRS_G "include/*.h")
-	POCO_HEADERS_AUTO(SRCS ${HDRS_G})
+	POCO_HEADERS_AUTO(AI_SRCS ${HDRS_G})
 
 	# Version Resource
 	if(MSVC AND BUILD_SHARED_LIBS)
 		source_group("Resources" FILES ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
-		list(APPEND SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
+		list(APPEND AI_SRCS ${PROJECT_SOURCE_DIR}/DLLVersion.rc)
 	endif()
 
-	add_library(AI ${SRCS})
+	add_library(AI ${AI_SRCS})
 	add_library(Poco::AI ALIAS AI)
 	set_target_properties(AI
 		PROPERTIES
