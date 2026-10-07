@@ -231,6 +231,15 @@ void Connection::popFrameHandler(Poco::AutoPtr<FrameHandler> pHandler)
 }
 
 
+void Connection::start(Poco::ThreadPool& threadPool)
+{
+	threadPool.start(*this);
+	// From here on the thread has its reference to the connection, and
+	// the caller is free to give up its own.
+	_started.wait();
+}
+
+
 bool Connection::waitReady(Poco::Timespan timeout)
 {
 	return _ready.tryWait(static_cast<long>(timeout.totalMilliseconds())) && !handshakeError();
@@ -259,9 +268,11 @@ void Connection::handshakeFailed(const Poco::Exception& exc)
 
 void Connection::run()
 {
-	// Once a failed handshake is known to whoever waits for the connection,
-	// this may be the only reference left to it.
+	// The thread's own reference to the connection. Once a failed handshake
+	// is known to whoever waits for the connection, it may be the only one
+	// left.
 	Connection::Ptr pThis(this, true);
+	_started.set();
 
 	try
 	{

@@ -33,6 +33,7 @@
 #include "Poco/Logger.h"
 #include "Poco/AtomicCounter.h"
 #include "Poco/Exception.h"
+#include "Poco/ThreadPool.h"
 #include <atomic>
 #include <memory>
 #include <vector>
@@ -197,6 +198,18 @@ public:
 	void popFrameHandler(Poco::AutoPtr<FrameHandler> pHandler);
 		/// Removes the FrameHandler from the internal stack.
 
+	void start(Poco::ThreadPool& threadPool);
+		/// Runs the connection on a thread obtained from the given
+		/// thread pool.
+		///
+		/// Returns as soon as that thread holds a reference to the
+		/// connection of its own, which it keeps until it ends. The
+		/// caller, who must hold one during the call, may give up
+		/// its reference at any time afterwards.
+		///
+		/// Throws a Poco::NoThreadAvailableException if the thread
+		/// pool has no thread for the connection.
+
 	[[nodiscard]] bool waitReady(Poco::Timespan timeout = 2*TIMEOUT_HELO);
 		/// Waits until the connection is established, until the
 		/// handshake has failed, or until the given timeout expires.
@@ -283,6 +296,7 @@ private:
 	Poco::UInt32 _nextChannel;
 	Poco::Clock _lastFrame;
 	Poco::Event _ready;
+	Poco::Event _started;
 	std::unique_ptr<Poco::Exception> _pHandshakeError;
 	Poco::Logger& _logger;
 	mutable Poco::FastMutex _mutex;

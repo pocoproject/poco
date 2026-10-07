@@ -88,7 +88,8 @@ Bug Fixes and Improvements:
 - GH #5526 Poco::RemotingNG::TCP::ConnectionManager: a connection whose handshake fails is reported
   to the caller at once, with the exception that made it fail, and no longer as a TimeoutException
   16 seconds later; the time a handshake is waited for follows setHandshakeTimeout(). New:
-  Connection::handshakeError().
+  Connection::handshakeError(), and Connection::start(), which runs a connection on a thread pool
+  and returns when the thread holds its own reference to the connection.
 - GH #5526 Poco::RemotingNG::TCP::Listener runs the connections it accepts on the thread pool of
   its ConnectionManager, as it does requests and events, and no longer on the default thread pool
   whichever ConnectionManager it was given.

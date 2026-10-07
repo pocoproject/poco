@@ -77,6 +77,11 @@ namespace
 			_thread.join();
 		}
 
+		SocketAddress address() const
+		{
+			return _socket.address();
+		}
+
 		Poco::URI uri() const
 		{
 			return Poco::URI(Poco::format("remoting.tcp://127.0.0.1:%hu", _socket.address().port()));
@@ -86,6 +91,26 @@ namespace
 		ServerSocket _socket;
 		std::atomic<bool> _stopped{false};
 		std::thread _thread;
+	};
+
+
+	class WatchedConnection: public Connection
+		/// A client connection that tells when it has been destroyed.
+	{
+	public:
+		WatchedConnection(const StreamSocket& socket, std::atomic<bool>& destroyed):
+			Connection(socket, Connection::MODE_CLIENT),
+			_destroyed(destroyed)
+		{
+		}
+
+		~WatchedConnection()
+		{
+			_destroyed = true;
+		}
+
+	private:
+		std::atomic<bool>& _destroyed;
 	};
 
 
@@ -230,6 +255,73 @@ void ConnectionTest::testHandshakeTimeout()
 }
 
 
+void ConnectionTest::testHandshakeTimeoutZero()
+{
+	// No time at all for the handshake: the caller has given the connection
+	// up before the connection's thread is through with it, and the
+	// connection is there for its thread all the same.
+	Poco::Event done;
+	Peer peer([&done](StreamSocket&)
+	{
+		done.tryWait(60000);
+	});
+	Client client;
+	client.manager().setHandshakeTimeout(Timespan(0));
+
+	try
+	{
+		Connection::Ptr pConnection = client.manager().getConnection(peer.uri());
+		done.set();
+		fail("a connection without a handshake must not be handed out");
+	}
+	catch (Poco::TimeoutException&)
+	{
+		done.set();
+	}
+	catch (...)
+	{
+		done.set();
+		throw;
+	}
+}
+
+
+void ConnectionTest::testStart()
+{
+	// A connection that has been started is its thread's as well: given up
+	// by whoever started it, it is there until that thread has ended.
+	Poco::Event proceed;
+	Peer peer([&proceed](StreamSocket&)
+	{
+		proceed.tryWait(60000);
+	});
+	std::atomic<bool> destroyed{false};
+	Poco::ThreadPool pool("connection", 1, 2);
+
+	bool kept = false;
+	try
+	{
+		{
+			Connection::Ptr pConnection = new WatchedConnection(StreamSocket(peer.address()), destroyed);
+			pConnection->setHandshakeTimeout(Timespan(600, 0));
+			pConnection->start(pool);
+		}
+		// The thread waits for the peer, and the peer for the word to go on.
+		kept = !destroyed;
+		proceed.set();
+		pool.joinAll();
+	}
+	catch (...)
+	{
+		proceed.set();
+		pool.joinAll();
+		throw;
+	}
+	assertTrue (kept);
+	assertTrue (destroyed);
+}
+
+
 void ConnectionTest::testListenerThreadPool()
 {
 	// The connections a Listener accepts run on the thread pool of the
@@ -260,6 +352,8 @@ CppUnit::Test* ConnectionTest::suite()
 
 	CppUnit_addTest(pSuite, ConnectionTest, testHandshakeFailure);
 	CppUnit_addTest(pSuite, ConnectionTest, testHandshakeTimeout);
+	CppUnit_addTest(pSuite, ConnectionTest, testHandshakeTimeoutZero);
+	CppUnit_addTest(pSuite, ConnectionTest, testStart);
 	CppUnit_addTest(pSuite, ConnectionTest, testListenerThreadPool);
 
 	return pSuite;

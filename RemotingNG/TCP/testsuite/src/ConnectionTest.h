@@ -26,6 +26,8 @@ public:
 
 	void testHandshakeFailure();
 	void testHandshakeTimeout();
+	void testHandshakeTimeoutZero();
+	void testStart();
 	void testListenerThreadPool();
 
 	void setUp();
