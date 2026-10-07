@@ -81,6 +81,9 @@ New Components:
 
 Bug Fixes and Improvements:
 
+- PR #5535 build/config/Linux-clang passed -arch, a macOS driver option that clang on Linux rejects, so
+  the make build could not compile anything with this config; the flag is gone and ARCHFLAGS stays
+  overridable.
 - GH #5516 Poco::Net::SocketReactor lets go of the sockets of a poll when their round is over, so
   that a connection closed while it is served is closed at once and not when a later poll returns.
 - GH #5516 Poco::Net::SocketImpl: on macOS, setting an option on a socket that has been shut down
