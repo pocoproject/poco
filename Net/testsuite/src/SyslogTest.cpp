@@ -21,6 +21,8 @@
 #include "Poco/Net/NetException.h"
 #include "Poco/Net/DNS.h"
 #include "Poco/Message.h"
+#include "Poco/DateTimeFormatter.h"
+#include "Poco/Timestamp.h"
 #include "Poco/AutoPtr.h"
 #include "Poco/Exception.h"
 #include "Poco/ErrorHandler.h"
@@ -712,6 +714,97 @@ void SyslogTest::testBSDWithoutTimestamp()
 	assertTrue (msgs[0].getPriority() == Poco::Message::PRIO_CRITICAL);
 	assertTrue (msgs[0].get("facility") == "AUTH");
 	assertTrue (msgs[0].get("addr") == "127.0.0.1");
+}
+
+
+void SyslogTest::testTimestamp()
+{
+	// The TIMESTAMP of a RFC 5424 message: the fraction of a second is
+	// optional and has one to six digits, and the time is that of the time
+	// zone whose offset follows it. What is not such a timestamp leaves the
+	// message the time of its arrival.
+	struct Sample
+	{
+		const char* timestamp;
+		const char* utc; // null: not a timestamp
+	};
+	const Sample samples[] =
+	{
+		// the examples of RFC 5424, 6.2.3.1
+		{"1985-04-12T23:20:50.52Z", "1985-04-12T23:20:50.520000"},
+		{"1985-04-12T19:20:50.52-04:00", "1985-04-12T23:20:50.520000"},
+		{"2003-10-11T22:14:15.003Z", "2003-10-11T22:14:15.003000"},
+		{"2003-08-24T05:14:15.000003-07:00", "2003-08-24T12:14:15.000003"},
+		{"2003-08-24T05:14:15.000000003-07:00", nullptr},
+
+		{"2003-10-11T22:14:15Z", "2003-10-11T22:14:15.000000"},
+		{"2003-10-11T22:14:15+02:00", "2003-10-11T20:14:15.000000"},
+		{"2003-10-11T22:14:15.5Z", "2003-10-11T22:14:15.500000"},
+		{"2003-10-11T22:14:15.123456Z", "2003-10-11T22:14:15.123456"},
+		{"2003-10-11T22:14:15.003+02:00", "2003-10-11T20:14:15.003000"},
+		{"2003-12-31T23:30:00.25-05:30", "2004-01-01T05:00:00.250000"},
+		{"2004-03-01T00:15:00+01:00", "2004-02-29T23:15:00.000000"},
+		{"2003-10-11T22:14:15+00:00", "2003-10-11T22:14:15.000000"},
+
+		{"-", nullptr},
+		{"2003-10-11T22:14:15", nullptr},
+		{"2003-10-11T22:14:15.Z", nullptr},
+		{"2003-10-11T22:14:15.1234567Z", nullptr},
+		{"2003-10-11T22:14:15+0200", nullptr},
+		{"2003-10-11T22:14:15+02", nullptr},
+		{"2003-10-11T22:14:15+24:00", nullptr},
+		{"2003-10-11T22:14:15+02:60", nullptr},
+		{"2003-10-11T22:14:15z", nullptr},
+		{"2003-10-11t22:14:15Z", nullptr},
+		{"2003-10-11T22:14:15ZZ", nullptr},
+		{"2003-10-11T22:14Z", nullptr},
+		{"2003-10-11", nullptr},
+		{"20031011T221415Z", nullptr},
+		{"2003-02-29T22:14:15Z", nullptr},
+		{"2003-13-11T22:14:15Z", nullptr},
+		{"2003-10-11T24:00:00Z", nullptr},
+		{"2003-10-11T22:60:15Z", nullptr},
+		{"2003-10-11T23:59:60Z", nullptr}
+	};
+
+	Poco::AutoPtr<RemoteSyslogListener> listener = new RemoteSyslogListener(0);
+	listener->open();
+	auto pCL = Poco::makeAuto<CollectingChannel>();
+	listener->addChannel(pCL);
+
+	// One message at a time, so that each is known by its place and the
+	// time of its arrival lies between two readings of the clock.
+	std::vector<std::pair<Poco::Timestamp, Poco::Timestamp>> arrivals;
+	bool arrived = true;
+	std::size_t count = 0;
+	for (const Sample& sample: samples)
+	{
+		const Poco::Timestamp before;
+		listener->enqueueMessage(std::string("<34>1 ") + sample.timestamp + " ahost anapp 77 asource - text", SocketAddress("127.0.0.1", 514));
+		arrived = pCL->waitFor(++count);
+		if (!arrived) break;
+		arrivals.emplace_back(before, Poco::Timestamp());
+	}
+	listener->close();
+	assertTrue (arrived);
+
+	std::vector<Poco::Message> msgs = pCL->messages();
+	assertEqual (sizeof(samples)/sizeof(samples[0]), msgs.size());
+	for (std::size_t i = 0; i < msgs.size(); ++i)
+	{
+		const Poco::Timestamp time = msgs[i].getTime();
+		if (samples[i].utc)
+		{
+			assertEqual (std::string(samples[i].utc), Poco::DateTimeFormatter::format(time, "%Y-%m-%dT%H:%M:%S.%F"));
+		}
+		else if (time < arrivals[i].first || time > arrivals[i].second)
+		{
+			failmsg(std::string("not the time of arrival: ") + samples[i].timestamp);
+		}
+		// The rest of the message is read whatever its timestamp.
+		assertEqual (std::string("text"), msgs[i].getText());
+		assertEqual (std::string("asource"), msgs[i].getSource());
+	}
 }
 
 
@@ -1994,6 +2087,7 @@ CppUnit::Test* SyslogTest::suite()
 	CppUnit_addTest(pSuite, SyslogTest, testOldBSD);
 	CppUnit_addTest(pSuite, SyslogTest, testStructuredData);
 	CppUnit_addTest(pSuite, SyslogTest, testBSDWithoutTimestamp);
+	CppUnit_addTest(pSuite, SyslogTest, testTimestamp);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPOctetCounting);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPNewline);
 	CppUnit_addTest(pSuite, SyslogTest, testTCPMixedFraming);
