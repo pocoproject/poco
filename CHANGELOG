@@ -70,6 +70,14 @@ New Components:
   Net only; HTTPS comes from the instantiator the application registers). CMake options
   ENABLE_AI_MCP and ENABLE_AI_MCP_HTTP (off by default); make components AI/MCP and
   AI/MCP/HTTP.
+- GH #5533 AI: a client library for large language model APIs and a minimal agent runtime:
+  providers for the Anthropic Messages API and the OpenAI Chat Completions format (streaming,
+  tool calls, model listing and embeddings on the OpenAI-compatible side), a thread-safe tool
+  registry, the agent loop (call the model, execute the tools it requests, feed the results
+  back, repeat), keyword-rule dispatch for models without native tool calling, and MCPHost,
+  which mirrors the tools of MCP servers into the registry. HTTPS through
+  Poco::Net::HTTPSessionFactory, so no NetSSL link. CMake option ENABLE_AI (off by default);
+  make component AI.
 
 Bug Fixes and Improvements:
 

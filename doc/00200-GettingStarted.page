@@ -352,6 +352,7 @@ Here is an overview of POCO build options:
     * ENABLE_PROMETHEUS                Set to OFF|ON (default is ON) to build Prometheus library
     * ENABLE_AI_MCP                    Set to OFF|ON (default is OFF) to build AI MCP (Model Context Protocol) library
     * ENABLE_AI_MCP_HTTP               Set to OFF|ON (default is OFF) to build AI MCP HTTP client transport library
+    * ENABLE_AI                        Set to OFF|ON (default is OFF) to build AI library (LLM providers and agent runtime)
     * ENABLE_MODULES                   Set to OFF|ON (default is OFF) to build C++ modules (requires C++20 and CMake 3.28+)
     * ENABLE_COMPILER_WARNINGS         Set to OFF|ON (default is OFF) to enable compiler warnings
     * POCO_UNBUNDLED                   Set to OFF|ON (default is OFF) to control linking dependencies as external
