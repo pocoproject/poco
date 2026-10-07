@@ -26,6 +26,7 @@ public:
 	void testPingBeforeInitialize();
 	void testToolsRequireInitialize();
 	void testUnknownMethod();
+	void testMethodMustBeString();
 
 	void setUp();
 	void tearDown();

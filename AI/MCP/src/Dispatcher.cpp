@@ -109,8 +109,11 @@ Poco::JSON::Object::Ptr Dispatcher::handle(const Poco::JSON::Object::Ptr& messag
 	const bool hasId = message->has("id");
 	const Id id = hasId ? message->get("id") : Id();
 	const std::string version = message->optValue<std::string>("jsonrpc", "");
+	const Poco::Dynamic::Var methodValue = message->get("method");
 
-	if (version != JSONRPC_VERSION || !message->has("method"))
+	// JSON-RPC wants the method to be a string; anything else, a missing
+	// method included, is not a request.
+	if (version != JSONRPC_VERSION || !methodValue.isString())
 	{
 		// A malformed notification gets no reply; a malformed request gets an error.
 		if (!hasId)
@@ -120,7 +123,7 @@ Poco::JSON::Object::Ptr Dispatcher::handle(const Poco::JSON::Object::Ptr& messag
 		return Response::error(id, ErrorCode::InvalidRequest, "Invalid Request");
 	}
 
-	const std::string method = message->getValue<std::string>("method");
+	const std::string method = methodValue.extract<std::string>();
 	Poco::JSON::Object::Ptr params = message->isObject("params") ? message->getObject("params") : Poco::JSON::Object::Ptr();
 
 	if (!hasId)
@@ -186,6 +189,10 @@ Poco::JSON::Object::Ptr Dispatcher::onInitialize(const Id& id, const Poco::JSON:
 	bool hasResources, hasPrompts;
 	{
 		Poco::FastMutex::ScopedLock lock(_mutex);
+		// Requests are served from here on. The specification holds the client
+		// back only until the server has responded to initialize; the
+		// initialized notification is what the server waits for before it
+		// sends requests of its own, and this one sends none.
 		_initialized = true;
 		name = _serverName;
 		serverVersion = _serverVersion;

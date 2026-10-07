@@ -14,6 +14,11 @@
 #include "Poco/AI/MCP/Server.h"
 #include "Poco/AI/MCP/Message.h"
 #include "Poco/JSON/Object.h"
+#include "Poco/JSON/Array.h"
+#include "Poco/JSON/Parser.h"
+#include "Poco/Dynamic/Var.h"
+#include <sstream>
+#include <vector>
 
 
 using Poco::AI::MCP::Server;
@@ -114,6 +119,55 @@ void HandshakeTest::testUnknownMethod()
 }
 
 
+void HandshakeTest::testMethodMustBeString()
+{
+	Server server;
+
+	// A request whose method is not a string is an invalid request, whatever
+	// stands in its place, and none of them may throw.
+	const std::vector<Poco::Dynamic::Var> methods{
+		Poco::Dynamic::Var(),
+		Poco::Dynamic::Var(5),
+		Poco::Dynamic::Var(true),
+		Poco::Dynamic::Var(Object::Ptr(new Object)),
+		Poco::Dynamic::Var(Poco::JSON::Array::Ptr(new Poco::JSON::Array))};
+	for (const auto& method: methods)
+	{
+		Object::Ptr request = new Object;
+		request->set("jsonrpc", "2.0");
+		request->set("id", 7);
+		request->set("method", method);
+		Object::Ptr resp = server.handleMessage(request);
+		assertTrue(!resp.isNull());
+		assertTrue(resp->isObject("error"));
+		assertEqual(-32600, resp->getObject("error")->getValue<int>("code"));
+
+		// The same without an id is a malformed notification: no reply.
+		Object::Ptr notification = new Object;
+		notification->set("jsonrpc", "2.0");
+		notification->set("method", method);
+		assertTrue(server.handleMessage(notification).isNull());
+	}
+
+	// No method at all.
+	Object::Ptr request = new Object;
+	request->set("jsonrpc", "2.0");
+	request->set("id", 8);
+	Object::Ptr resp = server.handleMessage(request);
+	assertTrue(resp->isObject("error"));
+	assertEqual(-32600, resp->getObject("error")->getValue<int>("code"));
+
+	// Over the stream ingress it is an invalid request as well, not a parse error.
+	std::istringstream in("{\"jsonrpc\":\"2.0\",\"id\":9,\"method\":null}\n");
+	std::ostringstream out;
+	server.serve(in, out);
+	Poco::JSON::Parser parser;
+	Object::Ptr reply = parser.parse(out.str()).extract<Object::Ptr>();
+	assertTrue(reply->isObject("error"));
+	assertEqual(-32600, reply->getObject("error")->getValue<int>("code"));
+}
+
+
 void HandshakeTest::setUp()
 {
 }
@@ -133,6 +187,7 @@ CppUnit::Test* HandshakeTest::suite()
 	CppUnit_addTest(pSuite, HandshakeTest, testPingBeforeInitialize);
 	CppUnit_addTest(pSuite, HandshakeTest, testToolsRequireInitialize);
 	CppUnit_addTest(pSuite, HandshakeTest, testUnknownMethod);
+	CppUnit_addTest(pSuite, HandshakeTest, testMethodMustBeString);
 
 	return pSuite;
 }
