@@ -18,6 +18,7 @@
 #include "Poco/NumberFormatter.h"
 #include "Poco/Pipe.h"
 #include <errno.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -145,6 +146,34 @@ bool ProcessHandleImpl::isRunning() const
 }
 
 
+#if !defined(POCO_NO_FORK_EXEC)
+namespace
+{
+	void closeStandardStream(int fd)
+		/// Cuts a standard stream of the process off without leaving its
+		/// descriptor free: the descriptor is attached to the null device,
+		/// so that the next file or socket the process opens does not take
+		/// the place of its standard input, output or error. If the null
+		/// device cannot be opened, the descriptor is closed.
+		///
+		/// For a child between fork() and exec(): uses only what is safe
+		/// to call there.
+	{
+		int null = ::open("/dev/null", fd == STDIN_FILENO ? O_RDONLY : O_WRONLY);
+		if (null < 0)
+		{
+			::close(fd);
+		}
+		else if (null != fd)
+		{
+			::dup2(null, fd);
+			::close(null);
+		}
+	}
+}
+#endif
+
+
 //
 // ProcessImpl
 //
@@ -192,10 +221,18 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 			inherit.flags |= SPAWN_SETGROUP;
 			inherit.pgroup = SPAWN_NEWPGROUP;
 		}
+		// A stream that is closed for the child is attached to the null
+		// device, as launchByForkExecImpl() does it. The descriptors of
+		// this process stay as they are.
+		int nullIn = (options & PROCESS_CLOSE_STDIN) ? ::open("/dev/null", O_RDONLY) : -1;
+		int nullOut = (options & (PROCESS_CLOSE_STDOUT | PROCESS_CLOSE_STDERR)) ? ::open("/dev/null", O_WRONLY) : -1;
 		int fdmap[3];
 		fdmap[0] = inPipe  ? inPipe->readHandle()   : 0;
 		fdmap[1] = outPipe ? outPipe->writeHandle() : 1;
 		fdmap[2] = errPipe ? errPipe->writeHandle() : 2;
+		if (nullIn >= 0) fdmap[0] = nullIn;
+		if (nullOut >= 0 && (options & PROCESS_CLOSE_STDOUT)) fdmap[1] = nullOut;
+		if (nullOut >= 0 && (options & PROCESS_CLOSE_STDERR)) fdmap[2] = nullOut;
 
 		char** envPtr = 0;
 		std::vector<char> envChars;
@@ -217,15 +254,14 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 
 		int pid = ::spawn(command.c_str(), 3, fdmap, &inherit, argv, envPtr);
 		delete [] argv;
+		if (nullIn >= 0) ::close(nullIn);
+		if (nullOut >= 0) ::close(nullOut);
 		if (pid == -1)
 			throw SystemException("cannot spawn", command);
 
 		if (inPipe)  inPipe->close(Pipe::CLOSE_READ);
-		if (options & PROCESS_CLOSE_STDIN) ::close(STDIN_FILENO);
 		if (outPipe) outPipe->close(Pipe::CLOSE_WRITE);
-		if (options & PROCESS_CLOSE_STDOUT) ::close(STDOUT_FILENO);
 		if (errPipe) errPipe->close(Pipe::CLOSE_WRITE);
-		if (options & PROCESS_CLOSE_STDERR) ::close(STDERR_FILENO);
 		return new ProcessHandleImpl(pid);
 	}
 	else
@@ -293,15 +329,15 @@ ProcessHandleImpl* ProcessImpl::launchByForkExecImpl(const std::string& command,
 				::dup2(inPipe->readHandle(), STDIN_FILENO);
 				inPipe->close(Pipe::CLOSE_BOTH);
 			}
-			if (options & PROCESS_CLOSE_STDIN) ::close(STDIN_FILENO);
+			if (options & PROCESS_CLOSE_STDIN) closeStandardStream(STDIN_FILENO);
 
 			// outPipe and errPipe may be the same, so we dup first and close later
 			if (outPipe) ::dup2(outPipe->writeHandle(), STDOUT_FILENO);
 			if (errPipe) ::dup2(errPipe->writeHandle(), STDERR_FILENO);
 			if (outPipe) outPipe->close(Pipe::CLOSE_BOTH);
-			if (options & PROCESS_CLOSE_STDOUT) ::close(STDOUT_FILENO);
+			if (options & PROCESS_CLOSE_STDOUT) closeStandardStream(STDOUT_FILENO);
 			if (errPipe) errPipe->close(Pipe::CLOSE_BOTH);
-			if (options & PROCESS_CLOSE_STDERR) ::close(STDERR_FILENO);
+			if (options & PROCESS_CLOSE_STDERR) closeStandardStream(STDERR_FILENO);
 			// close all open file descriptors other than stdin, stdout, stderr
 			long fdMax = ::sysconf(_SC_OPEN_MAX);
 			// on some systems, sysconf(_SC_OPEN_MAX) returns a ridiculously high number

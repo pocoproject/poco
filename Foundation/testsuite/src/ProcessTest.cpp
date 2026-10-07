@@ -356,6 +356,48 @@ void ProcessTest::testLaunchCloseHandles()
 }
 
 
+void ProcessTest::testLaunchClosedHandlesStayTaken()
+{
+#if defined(POCO_OS_FAMILY_UNIX)
+	// A standard stream that is closed for the child keeps its descriptor
+	// taken: the first thing the child opens gets descriptor 3 and does not
+	// become its standard input, output or error. The streams that are not
+	// closed are given pipes here, so that the outcome does not depend on
+	// what this process has for its own.
+	std::string cmd("TestApp");
+#if defined(_DEBUG) && (POCO_OS != POCO_OS_ANDROID)
+	cmd += "d";
+#endif
+	std::vector<std::string> args;
+	args.push_back("-first-fd");
+
+	{
+		Pipe outPipe;
+		Pipe errPipe;
+		ProcessHandle ph = Process::launch(cmd, args, nullptr, &outPipe, &errPipe, Poco::PROCESS_CLOSE_STDIN);
+		assertEqual (3, ph.wait());
+	}
+	{
+		Pipe inPipe;
+		Pipe errPipe;
+		ProcessHandle ph = Process::launch(cmd, args, &inPipe, nullptr, &errPipe, Poco::PROCESS_CLOSE_STDOUT);
+		assertEqual (3, ph.wait());
+	}
+	{
+		Pipe inPipe;
+		Pipe outPipe;
+		ProcessHandle ph = Process::launch(cmd, args, &inPipe, &outPipe, nullptr, Poco::PROCESS_CLOSE_STDERR);
+		assertEqual (3, ph.wait());
+	}
+	{
+		ProcessHandle ph = Process::launch(cmd, args,
+			Poco::PROCESS_CLOSE_STDIN | Poco::PROCESS_CLOSE_STDOUT | Poco::PROCESS_CLOSE_STDERR);
+		assertEqual (3, ph.wait());
+	}
+#endif
+}
+
+
 void ProcessTest::testIsRunningAllowsForTermination()
 {
 #if !defined(_WIN32_WCE)
@@ -611,6 +653,7 @@ CppUnit::Test* ProcessTest::suite()
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchInvalidCommand);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunning);
 	CppUnit_addTest(pSuite, ProcessTest, testLaunchCloseHandles);
+	CppUnit_addTest(pSuite, ProcessTest, testLaunchClosedHandlesStayTaken);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunningAllowsForTermination);
 	CppUnit_addTest(pSuite, ProcessTest, testIsRunningByPidAllowsForTermination);
 	CppUnit_addTest(pSuite, ProcessTest, testWaitAfterIsRunning);

@@ -26,6 +26,13 @@ namespace Poco {
 
 enum ProcessOptions
 	/// Options to configure child process behavior.
+	///
+	/// A standard stream that is closed for the child process is cut off
+	/// from that of the parent process. On POSIX platforms its descriptor
+	/// does not stay free: it is attached to the null device, so that the
+	/// first file or socket the child process opens does not become its
+	/// standard input, output or error. Reading from a closed STDIN gives
+	/// end of file, what is written to a closed STDOUT or STDERR is discarded.
 {
 	PROCESS_CLOSE_STDIN = 1,
 		/// Causes the child process STDIN to be closed.
