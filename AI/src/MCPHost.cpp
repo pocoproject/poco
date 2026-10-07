@@ -59,7 +59,7 @@ namespace
 		bool allText = true;
 		if (pContent)
 		{
-			for (std::size_t i = 0; i < pContent->size(); ++i)
+			for (unsigned int i = 0; i < pContent->size(); ++i)
 			{
 				Poco::JSON::Object::Ptr pBlock = pContent->getObject(i);
 				if (pBlock && pBlock->optValue<std::string>("type", "") == "text" && pBlock->has("text"))
@@ -124,7 +124,7 @@ std::size_t MCPHost::registerInto(ToolRegistry& registry, std::vector<std::strin
 		{
 			continue;
 		}
-		for (std::size_t i = 0; i < pConnection->pTools->size(); ++i)
+		for (unsigned int i = 0; i < pConnection->pTools->size(); ++i)
 		{
 			Poco::JSON::Object::Ptr pTool = pConnection->pTools->getObject(i);
 			if (!pTool || !pTool->has("name"))

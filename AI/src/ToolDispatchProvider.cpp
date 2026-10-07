@@ -200,7 +200,7 @@ std::vector<ContentEvent> ToolDispatchProvider::matchTools(const std::string& us
 
 bool ToolDispatchProvider::hasToolResults(const Poco::JSON::Array& messages) const
 {
-	for (std::size_t i = 0; i < messages.size(); ++i)
+	for (unsigned int i = 0; i < messages.size(); ++i)
 	{
 		auto pMsg = messages.getObject(i);
 		if (pMsg && pMsg->optValue<std::string>("role", "") == "tool")
@@ -215,7 +215,7 @@ std::string ToolDispatchProvider::extractToolResults(const Poco::JSON::Array& me
 	std::string summary;
 	const std::size_t maxChars = static_cast<std::size_t>(_contextBudget) * 4;
 
-	for (std::size_t i = 0; i < messages.size(); ++i)
+	for (unsigned int i = 0; i < messages.size(); ++i)
 	{
 		auto pMsg = messages.getObject(i);
 		if (!pMsg || pMsg->optValue<std::string>("role", "") != "tool")

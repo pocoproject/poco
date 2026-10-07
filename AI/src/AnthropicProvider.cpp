@@ -344,7 +344,7 @@ void AnthropicProvider::appendToolResult(
 	// Check if last message is already a user message with tool_results.
 	if (messages.size() > 0)
 	{
-		auto pLast = messages.getObject(messages.size() - 1);
+		auto pLast = messages.getObject(static_cast<unsigned int>(messages.size() - 1));
 		if (pLast && pLast->getValue<std::string>("role") == "user")
 		{
 			auto pContent = pLast->getArray("content");
@@ -381,7 +381,7 @@ void AnthropicProvider::appendToolResult(
 Poco::JSON::Array AnthropicProvider::toAnthropicTools(const Poco::JSON::Array& tools)
 {
 	Array result;
-	for (std::size_t i = 0; i < tools.size(); ++i)
+	for (unsigned int i = 0; i < tools.size(); ++i)
 	{
 		auto pTool = tools.getObject(i);
 		Object::Ptr pAnthropicTool = new Object;

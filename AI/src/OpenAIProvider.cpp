@@ -84,7 +84,7 @@ void OpenAIProvider::chat(
 		pSystemMsg->set("content", systemPrompt);
 		apiMessages.add(pSystemMsg);
 	}
-	for (std::size_t i = 0; i < messages.size(); ++i)
+	for (unsigned int i = 0; i < messages.size(); ++i)
 	{
 		apiMessages.add(messages.get(i));
 	}
@@ -228,7 +228,7 @@ void OpenAIProvider::chat(
 				Array::Ptr pTcs = pDelta->getArray("tool_calls");
 				if (pTcs)
 				{
-					for (std::size_t i = 0; i < pTcs->size(); ++i)
+					for (unsigned int i = 0; i < pTcs->size(); ++i)
 					{
 						Object::Ptr pTc = pTcs->getObject(i);
 						if (!pTc) continue;
@@ -492,7 +492,7 @@ void OpenAIProvider::appendToolResult(
 Poco::JSON::Array OpenAIProvider::toOpenAITools(const Poco::JSON::Array& tools)
 {
 	Array result;
-	for (std::size_t i = 0; i < tools.size(); ++i)
+	for (unsigned int i = 0; i < tools.size(); ++i)
 	{
 		auto pTool = tools.getObject(i);
 
