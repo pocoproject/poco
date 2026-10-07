@@ -89,7 +89,7 @@ void ToolsTest::testToolsList()
 	assertEqual(2, static_cast<int>(tools->size()));
 
 	bool foundEcho = false;
-	for (std::size_t i = 0; i < tools->size(); ++i)
+	for (unsigned int i = 0; i < tools->size(); ++i)
 	{
 		Object::Ptr tool = tools->getObject(i);
 		assertTrue(tool->has("inputSchema"));

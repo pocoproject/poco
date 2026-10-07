@@ -103,7 +103,7 @@ void MCPHostTest::testRegisterAndCall()
 	// The MCP inputSchema becomes the registry "parameters" JSON Schema.
 	Array defs = registry.getToolDefinitions();
 	bool foundEcho = false;
-	for (std::size_t i = 0; i < defs.size(); ++i)
+	for (unsigned int i = 0; i < defs.size(); ++i)
 	{
 		Object::Ptr def = defs.getObject(i);
 		if (def->getValue<std::string>("name") == "echo")
