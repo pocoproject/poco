@@ -43,6 +43,11 @@ class AIMCPHTTP_API HTTPClient
 	/// Poco::Net::HTTPSSessionInstantiator (see createClientSession()), and
 	/// a caller-supplied factory can carry its own TLS context or proxy.
 	///
+	/// The server may answer a request with a single JSON object or with an
+	/// event stream; the client reads either. From an event stream it takes
+	/// the response to its request and passes over the notifications and
+	/// requests the server sends ahead of it.
+	///
 	/// Not safe for concurrent use: one call at a time per client.
 {
 public:
@@ -54,8 +59,10 @@ public:
 		/// Destroys the client.
 
 	Poco::JSON::Object::Ptr initialize(const std::string& clientName, const std::string& clientVersion);
-		/// Performs the MCP handshake (initialize + notifications/initialized) and
-		/// captures the Mcp-Session-Id. Returns the initialize result.
+		/// Performs the MCP handshake (initialize + notifications/initialized),
+		/// captures the Mcp-Session-Id and the protocol version the server
+		/// answers with, and sends both with every later request. Returns
+		/// the initialize result.
 
 	void ping();
 		/// Sends a ping and waits for the reply.
@@ -69,6 +76,10 @@ public:
 	const std::string& sessionId() const;
 		/// Returns the current Mcp-Session-Id (empty before initialize).
 
+	const std::string& protocolVersion() const;
+		/// Returns the protocol version negotiated by initialize() (empty
+		/// before it).
+
 private:
 	Poco::JSON::Object::Ptr call(const std::string& method, Poco::JSON::Object::Ptr params);
 	void notify(const std::string& method, Poco::JSON::Object::Ptr params);
@@ -80,6 +91,7 @@ private:
 	Poco::URI _uri;
 	SessionFactory _sessionFactory;
 	std::string _sessionId;
+	std::string _protocolVersion;
 	Poco::Int64 _nextId;
 };
 
@@ -90,6 +102,12 @@ private:
 inline const std::string& HTTPClient::sessionId() const
 {
 	return _sessionId;
+}
+
+
+inline const std::string& HTTPClient::protocolVersion() const
+{
+	return _protocolVersion;
 }
 
 

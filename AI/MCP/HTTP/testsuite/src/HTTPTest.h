@@ -25,6 +25,8 @@ public:
 
 	void testRoundTrip();
 	void testSessionRequired();
+	void testProtocolVersion();
+	void testEventStream();
 	void testSessionFactory();
 	void testHttpsNeedsInstantiator();
 

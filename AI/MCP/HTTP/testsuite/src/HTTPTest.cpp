@@ -12,6 +12,7 @@
 #include "TestHTTPHost.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
+#include "Poco/AI/MCP/MCP.h"
 #include "Poco/AI/MCP/Server.h"
 #include "Poco/AI/MCP/Content.h"
 #include "Poco/AI/MCP/HTTP/HTTPClient.h"
@@ -129,6 +130,59 @@ void HTTPTest::testSessionRequired()
 }
 
 
+void HTTPTest::testProtocolVersion()
+{
+	Server server;
+	server.setServerInfo("http-server", "1.0.0");
+	registerEcho(server);
+
+	TestHTTPHost http(server);
+	http.start();
+
+	// The host refuses a request after initialize that does not name the
+	// negotiated protocol version, so the calls below prove the header.
+	HTTPClient client(endpoint(http.port()));
+	assertTrue(client.protocolVersion().empty());
+	client.initialize("test-client", "1.0.0");
+	assertEqual(std::string(Poco::AI::MCP::PROTOCOL_VERSION), client.protocolVersion());
+	client.ping();
+	assertEqual(1, static_cast<int>(client.listTools()->size()));
+
+	http.stop();
+}
+
+
+void HTTPTest::testEventStream()
+{
+	Server server;
+	server.setServerInfo("http-server", "1.0.0");
+	registerEcho(server);
+
+	// The host answers every request with an event stream that carries a
+	// comment, a notification and a response to another request ahead of
+	// the response to this one.
+	TestHTTPHost http(server, TestHTTPHost::REPLY_EVENT_STREAM);
+	http.start();
+
+	HTTPClient client(endpoint(http.port()));
+	Object::Ptr result = client.initialize("test-client", "1.0.0");
+	assertTrue(!result.isNull());
+	assertEqual(std::string("http-server"), result->getObject("serverInfo")->getValue<std::string>("name"));
+	assertTrue(!client.sessionId().empty());
+
+	Array::Ptr tools = client.listTools();
+	assertEqual(1, static_cast<int>(tools->size()));
+
+	Object::Ptr args = new Object;
+	args->set("message", "streamed");
+	assertEqual(std::string("streamed"), firstText(client.callTool("echo", args)));
+
+	client.ping();
+
+	http.stop();
+}
+
+
 void HTTPTest::testSessionFactory()
 {
 	Server server;
@@ -194,6 +248,8 @@ CppUnit::Test* HTTPTest::suite()
 
 	CppUnit_addTest(pSuite, HTTPTest, testRoundTrip);
 	CppUnit_addTest(pSuite, HTTPTest, testSessionRequired);
+	CppUnit_addTest(pSuite, HTTPTest, testProtocolVersion);
+	CppUnit_addTest(pSuite, HTTPTest, testEventStream);
 	CppUnit_addTest(pSuite, HTTPTest, testSessionFactory);
 	CppUnit_addTest(pSuite, HTTPTest, testHttpsNeedsInstantiator);
 
