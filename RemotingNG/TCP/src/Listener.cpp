@@ -94,7 +94,7 @@ Listener::Listener(const std::string& endPoint, ConnectionManager& connectionMan
 {
 	Poco::Net::SocketAddress addr(endPoint);
 	Poco::Net::ServerSocket socket(addr);
-	_pTCPServer = new Poco::Net::TCPServer(new ServerConnectionFactory(Ptr(this, true)), socket);
+	_pTCPServer = new Poco::Net::TCPServer(new ServerConnectionFactory(Ptr(this, true)), _connectionManager.threadPool(), socket);
 }
 
 
@@ -108,7 +108,7 @@ Listener::Listener(const std::string& endPoint, Poco::Net::TCPServerParams::Ptr 
 {
 	Poco::Net::SocketAddress addr(endPoint);
 	Poco::Net::ServerSocket socket(addr);
-	_pTCPServer = new Poco::Net::TCPServer(new ServerConnectionFactory(Ptr(this, true)), socket, pParams);
+	_pTCPServer = new Poco::Net::TCPServer(new ServerConnectionFactory(Ptr(this, true)), _connectionManager.threadPool(), socket, pParams);
 }
 
 
@@ -120,7 +120,7 @@ Listener::Listener(const std::string& endPoint, const Poco::Net::ServerSocket& s
 	_eventSubscriptionTimeout(DEFAULT_EVENT_SUBSCR_TIMEOUT, 0),
 	_secure(socket.secure())
 {
-	_pTCPServer = new Poco::Net::TCPServer(new ServerConnectionFactory(Ptr(this, true)), socket, pParams);
+	_pTCPServer = new Poco::Net::TCPServer(new ServerConnectionFactory(Ptr(this, true)), _connectionManager.threadPool(), socket, pParams);
 }
 
 

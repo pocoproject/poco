@@ -9,6 +9,7 @@ include $(POCO_BASE)/build/rules/global
 objects = \
 	Driver \
 	RemotingTest \
+	ConnectionTest \
 	TCPTestSuite \
 	Tester \
 	ITester \

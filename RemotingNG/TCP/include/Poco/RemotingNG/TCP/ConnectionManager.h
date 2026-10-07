@@ -42,9 +42,10 @@ class RemotingNGTCP_API ConnectionManager
 	/// For creation of Connection objects the ConnectionManager uses
 	/// a SocketFactory.
 	///
-	/// A Poco::ThreadPool is used to obtain threads for driving the protocol
-	/// on the client side, as well as for scheduling requests on the server
-	/// and events on the client.
+	/// A Poco::ThreadPool is used to obtain threads for driving the protocol,
+	/// on the client side and, for the connections accepted by a Listener
+	/// using the ConnectionManager, on the server side, as well as for
+	/// scheduling requests on the server and events on the client.
 {
 public:
 	ConnectionManager(Poco::ThreadPool& threadPool = Poco::ThreadPool::defaultPool());
@@ -94,6 +95,11 @@ public:
 		/// If a connection exists, and the connection is in established state,
 		/// it is returned. Otherwise, a new connection to that endpoint
 		/// is created.
+		///
+		/// If the handshake of a new connection fails, the exception that
+		/// made it fail is thrown, as soon as it has failed. If the peer
+		/// does not answer within the handshake timeout, a
+		/// Poco::TimeoutException is thrown.
 
 	void shutdown();
 		/// Closes all connections.

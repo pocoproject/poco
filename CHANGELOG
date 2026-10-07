@@ -85,6 +85,13 @@ Bug Fixes and Improvements:
   and counts no reference for every message; a channel or formatter that is replaced is released
   when no message can still be on its way to it. Logging through a shared Logger scales with the
   number of threads again.
+- GH #5526 Poco::RemotingNG::TCP::ConnectionManager: a connection whose handshake fails is reported
+  to the caller at once, with the exception that made it fail, and no longer as a TimeoutException
+  16 seconds later; the time a handshake is waited for follows setHandshakeTimeout(). New:
+  Connection::handshakeError().
+- GH #5526 Poco::RemotingNG::TCP::Listener runs the connections it accepts on the thread pool of
+  its ConnectionManager, as it does requests and events, and no longer on the default thread pool
+  whichever ConnectionManager it was given.
 
 
 Release 1.15.4 (2026-09-22)

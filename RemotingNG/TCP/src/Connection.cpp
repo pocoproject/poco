@@ -233,24 +233,52 @@ void Connection::popFrameHandler(Poco::AutoPtr<FrameHandler> pHandler)
 
 bool Connection::waitReady(Poco::Timespan timeout)
 {
-	return _ready.tryWait(static_cast<long>(timeout.totalMilliseconds()));
+	return _ready.tryWait(static_cast<long>(timeout.totalMilliseconds())) && !handshakeError();
+}
+
+
+const Poco::Exception* Connection::handshakeError() const
+{
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
+	return _pHandshakeError.get();
+}
+
+
+void Connection::handshakeFailed(const Poco::Exception& exc)
+{
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+		if (_pHandshakeError || (_state != STATE_PRE_HANDSHAKE && _state != STATE_HANDSHAKE)) return;
+		_pHandshakeError.reset(exc.clone());
+	}
+	_ready.set();
 }
 
 
 void Connection::run()
 {
+	// Once a failed handshake is known to whoever waits for the connection,
+	// this may be the only reference left to it.
+	Connection::Ptr pThis(this, true);
+
 	try
 	{
 		runImpl();
 	}
 	catch (Poco::Exception& exc)
 	{
+		handshakeFailed(exc);
 		_logger.log(exc);
 	}
 	catch (...)
 	{
+		handshakeFailed(Poco::UnhandledException("Unknown exception while handling connection"));
 		_logger.fatal("Unknown exception while handling connection.");
 	}
+	// Whoever still waits for the connection has nothing left to wait for.
+	_ready.set();
 }
 
 
