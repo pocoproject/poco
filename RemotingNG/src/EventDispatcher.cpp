@@ -17,6 +17,31 @@
 #include "Poco/Exception.h"
 
 
+namespace
+{
+	class Unlocker
+		/// Unlocks a mutex that tryLock() has locked.
+	{
+	public:
+		explicit Unlocker(Poco::FastMutex& mutex):
+			_mutex(mutex)
+		{
+		}
+
+		~Unlocker()
+		{
+			_mutex.unlock();
+		}
+
+		Unlocker(const Unlocker&) = delete;
+		Unlocker& operator = (const Unlocker&) = delete;
+
+	private:
+		Poco::FastMutex& _mutex;
+	};
+}
+
+
 namespace Poco {
 namespace RemotingNG {
 
@@ -41,7 +66,41 @@ void EventDispatcher::setOwner(const Poco::AutoPtr<Poco::RefCountedObject>& pOwn
 void EventDispatcher::subscribe(const std::string& subscriberURI, const std::string& endpointURI, Poco::Clock expireTime)
 {
 	Poco::FastMutex::ScopedLock lock(_mutex);
-	
+
+	addSubscriber(subscriberURI, endpointURI, expireTime);
+}
+
+
+void EventDispatcher::unsubscribe(const std::string& subscriberURI)
+{
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
+	removeSubscriber(subscriberURI);
+}
+
+
+bool EventDispatcher::trySubscribe(const std::string& subscriberURI, const std::string& endpointURI, Poco::Clock expireTime)
+{
+	if (!_mutex.tryLock()) return false;
+	Unlocker unlocker(_mutex);
+
+	addSubscriber(subscriberURI, endpointURI, expireTime);
+	return true;
+}
+
+
+bool EventDispatcher::tryUnsubscribe(const std::string& subscriberURI)
+{
+	if (!_mutex.tryLock()) return false;
+	Unlocker unlocker(_mutex);
+
+	removeSubscriber(subscriberURI);
+	return true;
+}
+
+
+void EventDispatcher::addSubscriber(const std::string& subscriberURI, const std::string& endpointURI, Poco::Clock expireTime)
+{
 	SubscriberMap::iterator it = _subscribers.find(subscriberURI);
 	if (it == _subscribers.end())
 	{
@@ -57,10 +116,8 @@ void EventDispatcher::subscribe(const std::string& subscriberURI, const std::str
 }
 
 
-void EventDispatcher::unsubscribe(const std::string& subscriberURI)
+void EventDispatcher::removeSubscriber(const std::string& subscriberURI)
 {
-	Poco::FastMutex::ScopedLock lock(_mutex);
-	
 	SubscriberMap::iterator it = _subscribers.find(subscriberURI);
 	if (it != _subscribers.end())
 	{

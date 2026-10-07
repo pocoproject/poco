@@ -37,12 +37,16 @@
 #include "Poco/NullStream.h"
 #include "Poco/StreamCopier.h"
 #include "Poco/Delegate.h"
+#include "Poco/Stopwatch.h"
+#include "Poco/Event.h"
 #include "Tester.h"
 #include "TesterServerHelper.h"
 #include "TesterClientHelper.h"
 #include "TesterRemoteObject.h"
 #include "TesterProxy.h"
+#include <atomic>
 #include <sstream>
+#include <thread>
 
 
 class MockAuthenticator: public Poco::RemotingNG::Authenticator
@@ -786,6 +790,109 @@ void RemotingTest::onEvent(const void* pSender, std::string& arg)
 }
 
 
+void RemotingTest::onEventHeld(const void* pSender, std::string& arg)
+{
+	_eventArg = arg;
+	_eventReceived.set();
+	(void) _proceed.tryWait(20000);
+}
+
+
+void RemotingTest::testEventUnsubscribeBeforeReply()
+{
+	// The unsubscribe of a subscriber reaches the server before its reply
+	// to a two-way event. The server takes both and goes on serving the
+	// connection: the reply is not kept waiting behind the unsubscribe
+	// until the event times out.
+	Poco::RemotingNG::TCP::Listener::Ptr pEventListener = new Poco::RemotingNG::TCP::Listener;
+	TesterServerHelper::enableEvents(_objectURI, "tcp");
+
+	ITester::Ptr pTester = createProxy(_objectURI);
+
+	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
+	pProxy->remoting__enableEvents(pEventListener);
+
+	pTester->testEvent += Poco::delegate(this, &RemotingTest::onEventHeld);
+	_eventArg.clear();
+	pTester->fireTestEvent("s3cr3t");
+	const bool received = _eventReceived.tryWait(10000);
+	pProxy->remoting__enableEvents(pEventListener, false);
+	_proceed.set();
+
+	Poco::Stopwatch stopwatch;
+	stopwatch.start();
+	int i = 0;
+	try
+	{
+		i = pTester->testInt1(42);
+	}
+	catch (Poco::Exception&)
+	{
+	}
+	const int seconds = static_cast<int>(stopwatch.elapsedSeconds());
+
+	pTester->testEvent -= Poco::delegate(this, &RemotingTest::onEventHeld);
+	pTester = nullptr;
+	pProxy = nullptr;
+
+	assert (received);
+	assert (_eventArg == "s3cr3t");
+	assert (i == 42);
+	assert (seconds < 10);
+}
+
+
+void RemotingTest::testEventUnsubscribeOrder()
+{
+	// A request that follows an unsubscribe on the same connection is served
+	// after it, also when the unsubscribe has to wait for a two-way event
+	// to be answered.
+	Poco::RemotingNG::TCP::Listener::Ptr pEventListener = new Poco::RemotingNG::TCP::Listener;
+	TesterServerHelper::enableEvents(_objectURI, "tcp");
+
+	ITester::Ptr pTester = createProxy(_objectURI);
+
+	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
+	pProxy->remoting__enableEvents(pEventListener);
+
+	pTester->testEvent += Poco::delegate(this, &RemotingTest::onEventHeld);
+	_eventArg.clear();
+	pTester->fireTestEvent("s3cr3t");
+	const bool received = _eventReceived.tryWait(10000);
+	pProxy->remoting__enableEvents(pEventListener, false);
+
+	// The event is not answered yet, so the unsubscribe is not made yet,
+	// and neither is the request served.
+	std::atomic<int> answer(0);
+	Poco::Event answered;
+	std::thread caller([&pTester, &answer, &answered]()
+	{
+		try
+		{
+			answer = pTester->testInt1(42);
+		}
+		catch (...)
+		{
+			answer = -1;
+		}
+		answered.set();
+	});
+	const bool overtook = answered.tryWait(500);
+	_proceed.set();
+	const bool served = overtook || answered.tryWait(20000);
+	caller.join();
+
+	pTester->testEvent -= Poco::delegate(this, &RemotingTest::onEventHeld);
+	pTester = nullptr;
+	pProxy = nullptr;
+
+	assert (received);
+	assert (!overtook);
+	assert (served);
+	assert (answer == 42);
+}
+
+
 void RemotingTest::onVoidEvent(const void* pSender)
 {
 	_eventArg = "FIRED";
@@ -1134,6 +1241,8 @@ CppUnit::Test* RemotingTest::suite()
 	CppUnit_addTest(pSuite, RemotingTest, testTimeout);
 	CppUnit_addTest(pSuite, RemotingTest, testEvent);
 	CppUnit_addTest(pSuite, RemotingTest, testOneWayEvent);
+	CppUnit_addTest(pSuite, RemotingTest, testEventUnsubscribeBeforeReply);
+	CppUnit_addTest(pSuite, RemotingTest, testEventUnsubscribeOrder);
 
 	return pSuite;
 }

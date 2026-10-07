@@ -59,6 +59,8 @@ public:
 	void testEvent();
 	void testOneWayEvent();
 	void testVoidEvent();
+	void testEventUnsubscribeBeforeReply();
+	void testEventUnsubscribeOrder();
 
 	void setUp();
 	void tearDown();
@@ -82,7 +84,10 @@ protected:
 	virtual ITester::Ptr createProxy(const std::string& uri);
 
 	void onEvent(const void* pSender, std::string& arg);
-	
+
+	void onEventHeld(const void* pSender, std::string& arg);
+		/// Takes the event and keeps its reply back until _proceed is set.
+
 	void onVoidEvent(const void* pSender);
 
 protected:
@@ -91,6 +96,7 @@ protected:
 	Poco::RemotingNG::TCP::Listener::Ptr _pListener;
 	std::string _eventArg;
 	Poco::Event _eventReceived;
+	Poco::Event _proceed;
 };
 
 
