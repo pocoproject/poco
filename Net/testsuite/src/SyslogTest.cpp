@@ -719,7 +719,7 @@ void SyslogTest::testBSDWithoutTimestamp()
 
 void SyslogTest::testTimestamp()
 {
-	// The TIMESTAMP of a RFC 5424 message: the fraction of a second is
+	// The TIMESTAMP of an RFC 5424 message: the fraction of a second is
 	// optional and has one to six digits, and the time is that of the time
 	// zone whose offset follows it. What is not such a timestamp leaves the
 	// message the time of its arrival.
@@ -740,6 +740,10 @@ void SyslogTest::testTimestamp()
 		{"2003-10-11T22:14:15Z", "2003-10-11T22:14:15.000000"},
 		{"2003-10-11T22:14:15+02:00", "2003-10-11T20:14:15.000000"},
 		{"2003-10-11T22:14:15.5Z", "2003-10-11T22:14:15.500000"},
+		{"2003-10-11T22:14:15.52Z", "2003-10-11T22:14:15.520000"},
+		{"2003-10-11T22:14:15.123Z", "2003-10-11T22:14:15.123000"},
+		{"2003-10-11T22:14:15.1234Z", "2003-10-11T22:14:15.123400"},
+		{"2003-10-11T22:14:15.12345Z", "2003-10-11T22:14:15.123450"},
 		{"2003-10-11T22:14:15.123456Z", "2003-10-11T22:14:15.123456"},
 		{"2003-10-11T22:14:15.003+02:00", "2003-10-11T20:14:15.003000"},
 		{"2003-12-31T23:30:00.25-05:30", "2004-01-01T05:00:00.250000"},

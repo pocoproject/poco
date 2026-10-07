@@ -574,9 +574,9 @@ private:
 	void parseBSD(const std::string& line, RemoteSyslogChannel::Severity severity, RemoteSyslogChannel::Facility fac, std::size_t& pos, Poco::Message& message);
 
 	static bool parseTimestamp(const std::string& timestamp, Poco::Timestamp& time);
-		/// Parses the TIMESTAMP of a RFC 5424 message: a date and a time with
-		/// an optional fraction of a second of one to six digits, followed by
-		/// Z or by the offset of the time zone the time is given in.
+		/// Parses the TIMESTAMP of an RFC 5424 message: a date and a time
+		/// with an optional fraction of a second of one to six digits, followed
+		/// by Z or by the offset of the time zone the time is given in.
 		///
 		/// Returns true and the instant the timestamp stands for, or false,
 		/// leaving time as it is, if timestamp is not one. The NILVALUE is
