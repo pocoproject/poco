@@ -15,3 +15,5 @@ Redis
 ActiveRecord
 ActiveRecord/Compiler
 Prometheus
+AI/MCP
+AI/MCP/HTTP

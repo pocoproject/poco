@@ -37,6 +37,8 @@ XSD/Validator
 MongoDB
 Redis
 Prometheus
+AI/MCP
+AI/MCP/HTTP
 ActiveRecord
 ActiveRecord/Compiler
 DNSSD

@@ -63,6 +63,13 @@ New Components:
   ENABLE_XSD_VALIDATOR (off by default, requires libxml2); make components XSD/Types,
   XSD/Parser, XSD/CodeGen; XSD/Validator is built with make -C XSD/Validator and its headers
   are not installed by make install.
+- GH #5532 AI/MCP (Model Context Protocol, specification revision 2025-06-18: JSON-RPC 2.0
+  envelope, dispatcher with tools, resources and prompts, server with stream and message
+  ingress, stream client, stdio transport) and AI/MCP/HTTP (the Streamable HTTP client
+  transport, which takes its sessions from Poco::Net::HTTPSessionFactory and therefore links
+  Net only; HTTPS comes from the instantiator the application registers). CMake options
+  ENABLE_AI_MCP and ENABLE_AI_MCP_HTTP (off by default); make components AI/MCP and
+  AI/MCP/HTTP.
 
 Bug Fixes and Improvements:
 

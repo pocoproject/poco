@@ -1,0 +1,6 @@
+include(CMakeFindDependencyMacro)
+find_dependency(PocoFoundation)
+find_dependency(PocoJSON)
+find_dependency(PocoNet)
+find_dependency(PocoAIMCP)
+include("${CMAKE_CURRENT_LIST_DIR}/PocoAIMCPHTTPTargets.cmake")
