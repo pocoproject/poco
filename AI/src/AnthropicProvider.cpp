@@ -13,6 +13,7 @@
 
 
 #include "Poco/AI/AnthropicProvider.h"
+#include "ToolInput.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/JSON/Parser.h"
@@ -28,7 +29,6 @@
 
 using namespace Poco::Net;
 using namespace Poco::JSON;
-using Poco::Dynamic::Var;
 
 
 namespace Poco {
@@ -244,19 +244,18 @@ void AnthropicProvider::chat(
 				{
 					const ToolAccum& acc = it->second;
 					ContentEvent evt;
-					evt.type = ContentEvent::TYPE_TOOL_USE;
-					evt.id = acc.id;
-					evt.name = acc.name;
-					if (!acc.args.empty())
+					if (parseToolInput(acc.args, evt.input))
 					{
-						try
-						{
-							Parser argParser;
-							Var argResult = argParser.parse(acc.args);
-							auto pArgs = argResult.extract<Object::Ptr>();
-							if (pArgs) evt.input = *pArgs;
-						}
-						catch (...) { /* invalid JSON - pass empty input */ }
+						evt.type = ContentEvent::TYPE_TOOL_USE;
+						evt.id = acc.id;
+						evt.name = acc.name;
+					}
+					else
+					{
+						// The tool is not called on input the model did not give.
+						evt.type = ContentEvent::TYPE_ERROR;
+						evt.text = "Anthropic tool call '" + acc.name + "' has malformed input";
+						evt.code = "malformed_tool_input";
 					}
 					onEvent(evt);
 					toolCalls.erase(it);

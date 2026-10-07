@@ -13,6 +13,7 @@
 
 
 #include "Poco/AI/OpenAIProvider.h"
+#include "ToolInput.h"
 #include "Poco/Net/HTTPRequest.h"
 #include "Poco/Net/HTTPResponse.h"
 #include "Poco/JSON/Parser.h"
@@ -263,19 +264,18 @@ void OpenAIProvider::chat(
 	{
 		const ToolAccum& acc = kv.second;
 		ContentEvent evt;
-		evt.type = ContentEvent::TYPE_TOOL_USE;
-		evt.id = acc.id;
-		evt.name = acc.name;
-		if (!acc.args.empty())
+		if (parseToolInput(acc.args, evt.input))
 		{
-			try
-			{
-				Parser argParser;
-				Var argResult = argParser.parse(acc.args);
-				auto pArgs = argResult.extract<Object::Ptr>();
-				if (pArgs) evt.input = *pArgs;
-			}
-			catch (...) { /* invalid JSON - pass empty input */ }
+			evt.type = ContentEvent::TYPE_TOOL_USE;
+			evt.id = acc.id;
+			evt.name = acc.name;
+		}
+		else
+		{
+			// The tool is not called on arguments the model did not give.
+			evt.type = ContentEvent::TYPE_ERROR;
+			evt.text = "OpenAI tool call '" + acc.name + "' has malformed arguments";
+			evt.code = "malformed_tool_input";
 		}
 		onEvent(evt);
 	}
@@ -402,6 +402,8 @@ std::vector<std::vector<float>> OpenAIProvider::embed(
 			if (!pVec || pVec->size() == 0)
 				throw Poco::DataFormatException("embeddings response entry has no embedding");
 			std::vector<float>& out = result[idx];
+			if (!out.empty())
+				throw Poco::DataFormatException(Poco::format("embeddings response repeats index %z", idx));
 			out.reserve(pVec->size());
 			for (std::size_t j = 0; j < pVec->size(); ++j)
 				out.push_back(static_cast<float>(pVec->getElement<double>(static_cast<unsigned>(j))));

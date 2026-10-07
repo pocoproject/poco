@@ -28,6 +28,10 @@ public:
 	void testToOpenAITools();
 	void testEmbed();
 	void testEmbedError();
+	void testEmbedRepeatedIndex();
+	void testChatToolCall();
+	void testChatMalformedToolArguments();
+	void testChatToolCallWithoutArguments();
 	void testListModels();
 	void testListModelsError();
 	void testListModelsMalformed();

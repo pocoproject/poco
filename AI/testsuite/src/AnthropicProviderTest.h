@@ -26,6 +26,9 @@ public:
 	void testAppendToolResult();
 	void testAppendToolResultMerge();
 	void testToAnthropicTools();
+	void testChatToolUse();
+	void testChatMalformedToolInput();
+	void testChatToolUseWithoutInput();
 
 	void setUp();
 	void tearDown();

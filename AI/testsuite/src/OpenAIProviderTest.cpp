@@ -12,6 +12,7 @@
 
 
 #include "OpenAIProviderTest.h"
+#include "CannedServer.h"
 #include "CppUnit/TestCaller.h"
 #include "CppUnit/TestSuite.h"
 #include "Poco/AI/OpenAIProvider.h"
@@ -23,7 +24,10 @@
 #include "Poco/Net/HTTPServerResponse.h"
 #include "Poco/Net/ServerSocket.h"
 #include "Poco/StreamCopier.h"
+#include "Poco/Exception.h"
 #include <sstream>
+#include <string>
+#include <vector>
 
 
 using Poco::AI::OpenAIProvider;
@@ -147,6 +151,76 @@ public:
 private:
 	ModelsMock& _state;
 };
+
+
+// One user message and one tool, for the chat tests.
+Array userMessage()
+{
+	Object::Ptr pMessage = new Object;
+	pMessage->set("role", "user");
+	pMessage->set("content", "What is the weather in Paris?");
+	Array messages;
+	messages.add(pMessage);
+	return messages;
+}
+
+
+Array lookupTool()
+{
+	Object::Ptr pTool = new Object;
+	pTool->set("name", "lookup");
+	pTool->set("description", "Looks up the weather of a city.");
+	Object::Ptr pParameters = new Object;
+	pParameters->set("type", "object");
+	pTool->set("parameters", pParameters);
+	Array tools;
+	tools.add(pTool);
+	return tools;
+}
+
+
+// The stream of a Chat Completions response that calls the lookup tool with
+// the given arguments, sent in the given fragments.
+std::string toolCallStream(const std::vector<std::string>& argumentFragments)
+{
+	std::string stream = R"(data: {"choices":[{"delta":{"content":"Let me check."}}]})" "\n\n";
+	bool first = true;
+	for (const auto& fragment: argumentFragments)
+	{
+		Object::Ptr pFunction = new Object;
+		if (first) pFunction->set("name", "lookup");
+		pFunction->set("arguments", fragment);
+		Object::Ptr pToolCall = new Object;
+		pToolCall->set("index", 0);
+		if (first) pToolCall->set("id", "call_1");
+		pToolCall->set("function", pFunction);
+		Array::Ptr pToolCalls = new Array;
+		pToolCalls->add(pToolCall);
+		Object::Ptr pDelta = new Object;
+		pDelta->set("tool_calls", pToolCalls);
+		Object::Ptr pChoice = new Object;
+		pChoice->set("delta", pDelta);
+		Array::Ptr pChoices = new Array;
+		pChoices->add(pChoice);
+		Object chunk;
+		chunk.set("choices", pChoices);
+		std::ostringstream text;
+		chunk.stringify(text);
+		stream += "data: " + text.str() + "\n\n";
+		first = false;
+	}
+	stream += "data: [DONE]\n\n";
+	return stream;
+}
+
+
+std::vector<ContentEvent> chat(OpenAIProvider& provider)
+{
+	std::vector<ContentEvent> events;
+	provider.chat(userMessage(), "You are a test.", lookupTool(),
+		[&events](const ContentEvent& event) { events.push_back(event); });
+	return events;
+}
 
 
 } // namespace
@@ -333,6 +407,97 @@ void OpenAIProviderTest::testEmbed()
 }
 
 
+void OpenAIProviderTest::testEmbedRepeatedIndex()
+{
+	// Two entries for two inputs, but both claim index 0: the response does
+	// not hold one vector per input, whatever its length says.
+	CannedServer server("application/json",
+		R"({"object":"list","data":[)"
+		R"({"object":"embedding","index":0,"embedding":[0.1,0.2]},)"
+		R"({"object":"embedding","index":0,"embedding":[0.3,0.4]})"
+		R"(]})");
+	OpenAIProvider provider(server.baseUrl(), "", "chat-model", 1024, 30);
+
+	try
+	{
+		provider.embed({"first text", "second text"}, "embed-model");
+		fail("a repeated index must throw");
+	}
+	catch (Poco::DataFormatException&)
+	{
+	}
+}
+
+
+void OpenAIProviderTest::testChatToolCall()
+{
+	// The arguments arrive in two fragments and are parsed when the stream ends.
+	CannedServer server("text/event-stream", toolCallStream({R"({"city":)", R"("Paris"})"}));
+	OpenAIProvider provider(server.baseUrl(), "secret", "chat-model", 1024, 30);
+
+	const std::vector<ContentEvent> events = chat(provider);
+
+	assertEqual(std::string("/v1/chat/completions"), server.path());
+	assertEqual(std::string("Bearer secret"), server.header("Authorization"));
+	assertTrue(server.request().find("\"stream\":true") != std::string::npos);
+	assertTrue(server.request().find("\"lookup\"") != std::string::npos);
+
+	assertEqual(2, static_cast<int>(events.size()));
+	assertTrue(events[0].type == ContentEvent::TYPE_TEXT);
+	assertEqual(std::string("Let me check."), events[0].text);
+	assertTrue(events[1].type == ContentEvent::TYPE_TOOL_USE);
+	assertEqual(std::string("call_1"), events[1].id);
+	assertEqual(std::string("lookup"), events[1].name);
+	assertEqual(std::string("Paris"), events[1].input.getValue<std::string>("city"));
+}
+
+
+void OpenAIProviderTest::testChatMalformedToolArguments()
+{
+	// Arguments that are cut short, or are not an object, are an error: the
+	// tool call is not delivered, so the tool cannot run without them.
+	const std::vector<std::vector<std::string>> malformed{
+		{R"({"city":)"},
+		{R"({"city":"Par)"},
+		{R"(["Paris"])"},
+		{R"("Paris")"},
+		{"not json"}};
+	for (const auto& fragments: malformed)
+	{
+		CannedServer server("text/event-stream", toolCallStream(fragments));
+		OpenAIProvider provider(server.baseUrl(), "", "chat-model", 1024, 30);
+
+		const std::vector<ContentEvent> events = chat(provider);
+
+		assertEqual(2, static_cast<int>(events.size()));
+		assertTrue(events[0].type == ContentEvent::TYPE_TEXT);
+		assertTrue(events[1].type == ContentEvent::TYPE_ERROR);
+		assertEqual(std::string("malformed_tool_input"), events[1].code);
+		assertTrue(events[1].text.find("lookup") != std::string::npos);
+	}
+}
+
+
+void OpenAIProviderTest::testChatToolCallWithoutArguments()
+{
+	// No arguments, an empty object and null all stand for a call without
+	// arguments.
+	const std::vector<std::vector<std::string>> none{{""}, {"{}"}, {"null"}, {"  "}};
+	for (const auto& fragments: none)
+	{
+		CannedServer server("text/event-stream", toolCallStream(fragments));
+		OpenAIProvider provider(server.baseUrl(), "", "chat-model", 1024, 30);
+
+		const std::vector<ContentEvent> events = chat(provider);
+
+		assertEqual(2, static_cast<int>(events.size()));
+		assertTrue(events[1].type == ContentEvent::TYPE_TOOL_USE);
+		assertEqual(std::string("lookup"), events[1].name);
+		assertEqual(0, static_cast<int>(events[1].input.size()));
+	}
+}
+
+
 void OpenAIProviderTest::testListModels()
 {
 	ModelsMock state;
@@ -434,6 +599,10 @@ CppUnit::Test* OpenAIProviderTest::suite()
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testToOpenAITools);
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testEmbed);
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testEmbedError);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testEmbedRepeatedIndex);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testChatToolCall);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testChatMalformedToolArguments);
+	CppUnit_addTest(pSuite, OpenAIProviderTest, testChatToolCallWithoutArguments);
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testListModels);
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testListModelsError);
 	CppUnit_addTest(pSuite, OpenAIProviderTest, testListModelsMalformed);

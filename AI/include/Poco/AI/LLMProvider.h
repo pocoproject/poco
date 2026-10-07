@@ -48,7 +48,7 @@ struct AI_API ContentEvent
 	std::string id;           /// The tool call id (TYPE_TOOL_USE)
 	std::string name;         /// The tool name (TYPE_TOOL_USE)
 	Poco::JSON::Object input; /// The tool input (TYPE_TOOL_USE)
-	std::string code;         /// A machine-readable error code (TYPE_ERROR), e.g. "unauthenticated"
+	std::string code;         /// A machine-readable error code (TYPE_ERROR): "unauthenticated", "malformed_tool_input", or empty
 };
 
 
@@ -87,7 +87,9 @@ public:
 		ContentEventCallback onEvent) = 0;
 		/// Makes a single API call and delivers the content events through
 		/// onEvent. Transport failures propagate as exceptions; errors the
-		/// API reports arrive as a TYPE_ERROR event.
+		/// API reports arrive as a TYPE_ERROR event, and so does a tool call
+		/// whose input is not a JSON object (code "malformed_tool_input"),
+		/// which is not delivered as a tool call.
 
 	virtual void appendAssistantMessage(
 		Poco::JSON::Array& messages,
