@@ -38,6 +38,9 @@
 #include "Poco/StreamCopier.h"
 #include "Poco/Delegate.h"
 #include "Poco/Stopwatch.h"
+#include "Poco/Exception.h"
+#include "Poco/Runnable.h"
+#include "Poco/ThreadPool.h"
 #include "Poco/Event.h"
 #include "Tester.h"
 #include "TesterServerHelper.h"
@@ -47,6 +50,58 @@
 #include <atomic>
 #include <sstream>
 #include <thread>
+
+
+namespace
+{
+	class ThreadKeeper: public Poco::Runnable
+		/// Keeps threads of a thread pool busy until it is told to let
+		/// them go.
+	{
+	public:
+		ThreadKeeper():
+			_letGo(Poco::Event::EVENT_MANUALRESET)
+		{
+		}
+
+		void run()
+		{
+			_letGo.wait();
+		}
+
+		int takeAll(Poco::ThreadPool& pool)
+			/// Takes every thread the pool still has to give.
+			/// Returns their number.
+		{
+			_letGo.reset();
+			int taken = 0;
+			try
+			{
+				for (;;)
+				{
+					pool.start(*this);
+					++taken;
+				}
+			}
+			catch (Poco::NoThreadAvailableException&)
+			{
+			}
+			return taken;
+		}
+
+		void letGo()
+		{
+			_letGo.set();
+		}
+
+	private:
+		Poco::Event _letGo;
+	};
+
+	// Of static storage duration: a thread may still be on its way out of
+	// run() when the test that let it go is over.
+	ThreadKeeper threadKeeper;
+}
 
 
 class MockAuthenticator: public Poco::RemotingNG::Authenticator
@@ -893,6 +948,59 @@ void RemotingTest::testEventUnsubscribeOrder()
 }
 
 
+void RemotingTest::testEventUnsubscribeNoThread()
+{
+	// As testEventUnsubscribeOrder(), with a thread pool that has no thread
+	// left when the unsubscribe arrives. The thread of the connection does
+	// not wait for the event in the place of the thread it did not get:
+	// the unsubscribe is made when there is a thread again.
+	Poco::RemotingNG::TCP::Listener::Ptr pEventListener = new Poco::RemotingNG::TCP::Listener;
+	TesterServerHelper::enableEvents(_objectURI, "tcp");
+
+	ITester::Ptr pTester = createProxy(_objectURI);
+
+	Poco::AutoPtr<TesterProxy> pProxy = pTester.cast<TesterProxy>();
+	pProxy->remoting__enableEvents(pEventListener);
+
+	pTester->testEvent += Poco::delegate(this, &RemotingTest::onEventHeld);
+	_eventArg.clear();
+	pTester->fireTestEvent("s3cr3t");
+	const bool received = _eventReceived.tryWait(10000);
+	const int taken = threadKeeper.takeAll(Poco::ThreadPool::defaultPool());
+	pProxy->remoting__enableEvents(pEventListener, false);
+
+	std::atomic<int> answer(0);
+	Poco::Event answered;
+	std::thread caller([&pTester, &answer, &answered]()
+	{
+		try
+		{
+			answer = pTester->testInt1(42);
+		}
+		catch (...)
+		{
+			answer = -1;
+		}
+		answered.set();
+	});
+	const bool overtook = answered.tryWait(500);
+	_proceed.set();
+	const bool served = overtook || answered.tryWait(20000);
+	threadKeeper.letGo();
+	caller.join();
+
+	pTester->testEvent -= Poco::delegate(this, &RemotingTest::onEventHeld);
+	pTester = nullptr;
+	pProxy = nullptr;
+
+	assert (received);
+	assert (taken > 0);
+	assert (!overtook);
+	assert (served);
+	assert (answer == 42);
+}
+
+
 void RemotingTest::onVoidEvent(const void* pSender)
 {
 	_eventArg = "FIRED";
@@ -1243,6 +1351,7 @@ CppUnit::Test* RemotingTest::suite()
 	CppUnit_addTest(pSuite, RemotingTest, testOneWayEvent);
 	CppUnit_addTest(pSuite, RemotingTest, testEventUnsubscribeBeforeReply);
 	CppUnit_addTest(pSuite, RemotingTest, testEventUnsubscribeOrder);
+	CppUnit_addTest(pSuite, RemotingTest, testEventUnsubscribeNoThread);
 
 	return pSuite;
 }

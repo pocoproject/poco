@@ -61,6 +61,7 @@ public:
 	void testVoidEvent();
 	void testEventUnsubscribeBeforeReply();
 	void testEventUnsubscribeOrder();
+	void testEventUnsubscribeNoThread();
 
 	void setUp();
 	void tearDown();

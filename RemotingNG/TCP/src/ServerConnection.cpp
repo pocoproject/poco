@@ -19,6 +19,7 @@
 #include "Poco/RemotingNG/TCP/ServerTransport.h"
 #include "Poco/RemotingNG/TCP/Transport.h"
 #include "Poco/RemotingNG/TCP/ChannelStream.h"
+#include "Poco/RemotingNG/TCP/Timer.h"
 #include "Poco/RemotingNG/EventDispatcher.h"
 #include "Poco/RemotingNG/Context.h"
 #include "Poco/RemotingNG/ORB.h"
@@ -163,7 +164,7 @@ class SubscriptionChanges: public Poco::Runnable, public Poco::RefCountedObject
 	/// The changes to event subscriptions that a connection asks for.
 	///
 	/// A change is made by the thread of the connection, at once, if the
-	/// EventDispatcher is free. That thread does not wait for an
+	/// EventDispatcher is free. That thread never waits for an
 	/// EventDispatcher that is busy: it is busy while it delivers an
 	/// event, and if that event goes to this connection and wants a
 	/// reply, the reply has to pass the very thread that would be waiting.
@@ -172,12 +173,22 @@ class SubscriptionChanges: public Poco::Runnable, public Poco::RefCountedObject
 	/// changes and the requests that arrive on the connection are kept
 	/// and taken up in the order of their arrival, so that none of them
 	/// overtakes a change that was asked for before it.
+	///
+	/// If the thread pool has no thread, what is pending stays pending,
+	/// and the timer of the listener asks for a thread again until there
+	/// is one or the connection is gone.
 {
 public:
 	using Ptr = Poco::AutoPtr<SubscriptionChanges>;
 
-	SubscriptionChanges(Listener::Ptr pListener, Poco::Logger& logger):
+	enum
+	{
+		RETRY_INTERVAL = 50 // milliseconds
+	};
+
+	SubscriptionChanges(Listener::Ptr pListener, Timer& timer, Poco::Logger& logger):
 		_pListener(pListener),
+		_timer(timer),
 		_logger(logger)
 	{
 	}
@@ -203,14 +214,9 @@ public:
 			// and with it everyone else who holds this object.
 			_pSelf.assign(this, true);
 		}
-		try
+		if (!start())
 		{
-			_pListener->connectionManager().threadPool().start(*this);
-		}
-		catch (Poco::Exception&)
-		{
-			// There is no thread to be had: what is pending is done here.
-			run();
+			_timer.scheduleAtFixedRate(new Retry(Ptr(this, true)), RETRY_INTERVAL, RETRY_INTERVAL);
 		}
 	}
 
@@ -229,13 +235,23 @@ public:
 		return true;
 	}
 
+	void closed()
+		/// The connection is gone.
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+		_closed = true;
+	}
+
 	void run()
 	{
 		Ptr pSelf;
 		{
 			Poco::FastMutex::ScopedLock lock(_mutex);
+
 			pSelf.swap(_pSelf);
 		}
+		ServerTransport::Ptr pLastRequest;
 		for (;;)
 		{
 			Item item;
@@ -249,6 +265,14 @@ public:
 				}
 				item = _pending.front();
 				_pending.pop_front();
+				if (item.type == Item::REQUEST && _pending.empty())
+				{
+					// Nothing waits behind this request: this thread serves
+					// it and needs no other one from the thread pool.
+					_working = false;
+					pLastRequest = item.pServerTransport;
+					break;
+				}
 			}
 			const std::string what(item.type == Item::REQUEST ? "begin a request that waited for an event subscription change"s : "change an event subscription"s);
 			try
@@ -267,6 +291,8 @@ public:
 				_logger.warning("Failed to %s."s, what);
 			}
 		}
+		pSelf.reset();
+		if (pLastRequest) pLastRequest->run();
 	}
 
 	static void begin(Listener& listener, ServerTransport::Ptr pServerTransport)
@@ -293,6 +319,63 @@ private:
 		ServerTransport::Ptr pServerTransport;
 	};
 
+	class Retry: public TimerTask
+		/// Asks for a thread again, for as long as it takes.
+	{
+	public:
+		explicit Retry(SubscriptionChanges::Ptr pSubscriptionChanges):
+			_pSubscriptionChanges(pSubscriptionChanges)
+		{
+		}
+
+		void run()
+		{
+			if (_pSubscriptionChanges->retry()) cancel();
+		}
+
+	private:
+		SubscriptionChanges::Ptr _pSubscriptionChanges;
+	};
+
+	bool start()
+		/// Asks the thread pool of the listener for a thread that takes
+		/// up what is pending. Returns false if it has none.
+		///
+		/// The thread of the connection does not do that work in its
+		/// place: it would have to wait for the EventDispatcher.
+	{
+		try
+		{
+			_pListener->connectionManager().threadPool().start(*this);
+			return true;
+		}
+		catch (Poco::Exception&)
+		{
+			return false;
+		}
+	}
+
+	bool retry()
+		/// Asks for a thread again. Returns true if there is nothing
+		/// left to ask for.
+	{
+		Ptr pSelf;
+		{
+			Poco::FastMutex::ScopedLock lock(_mutex);
+
+			if (_closed)
+			{
+				// With the connection gone nobody waits for what is pending,
+				// and a subscription that is neither renewed nor ended expires.
+				pSelf.swap(_pSelf);
+				_pending.clear();
+				_working = false;
+				return true;
+			}
+		}
+		return start();
+	}
+
 	bool make(const Item& item, bool wait)
 		/// Makes the change. If the EventDispatcher is busy, waits for
 		/// it, or returns false with nothing changed.
@@ -315,9 +398,11 @@ private:
 	}
 
 	Listener::Ptr _pListener;
+	Timer& _timer;
 	Poco::Logger& _logger;
 	std::deque<Item> _pending;
 	bool _working = false;
+	bool _closed = false;
 	Ptr _pSelf;
 	Poco::FastMutex _mutex;
 };
@@ -418,7 +503,7 @@ void ServerConnection::run()
 	if (_logger.debug()) _logger.debug("ServerConnection started."s);
 	Connection::Ptr pConnection = new Connection(socket(), Connection::MODE_SERVER);
 	AuthFrameHandler::Ptr pAuthFrameHandler = new AuthFrameHandler(_pListener, _pCredentialsStore, _logger);
-	SubscriptionChanges::Ptr pSubscriptionChanges = new SubscriptionChanges(_pListener, _logger);
+	SubscriptionChanges::Ptr pSubscriptionChanges = new SubscriptionChanges(_pListener, _pListener->_timer, _logger);
 	EventSubscriptionFrameHandler::Ptr pEventSubFrameHandler = new EventSubscriptionFrameHandler(pSubscriptionChanges);
 	RequestFrameHandler::Ptr pRequestFrameHandler = new RequestFrameHandler(_pListener, _pCredentialsStore, pSubscriptionChanges);
 	pConnection->setHandshakeTimeout(_pListener->getHandshakeTimeout());
@@ -448,6 +533,7 @@ void ServerConnection::run()
 		_logger.log(exc);
 	}
 	_pListener->connectionManager().unregisterConnection(pConnection);
+	pSubscriptionChanges->closed();
 	pConnection->popFrameHandler(pRequestFrameHandler);
 	pConnection->popFrameHandler(pEventSubFrameHandler);
 	pConnection->popFrameHandler(pAuthFrameHandler);
