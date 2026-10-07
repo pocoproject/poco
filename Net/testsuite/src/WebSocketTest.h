@@ -30,7 +30,19 @@ public:
 	void testWebSocketNB();
 	void testPeerCloseAfterPartialHeader();
 	void testPeerCloseAfterPartialHeaderNB();
-	void testMalformedFrames();
+	void testMalformedFrameUnmaskedClient();
+	void testMalformedFrameRSV1Default();
+	void testMalformedFrameRSV2Default();
+	void testMalformedFrameRSV3Default();
+	void testMalformedFrameAllowedRSV1();
+	void testMalformedFrameAllowedRSV1RejectRSV2();
+	void testMalformedFrameReservedOpcode03();
+	void testMalformedFrameReservedControlOpcode0B();
+	void testMalformedFrameFragmentedControlPing();
+	void testMalformedFrameControlPing125Accepted();
+	void testMalformedFrameControlPing126Rejected();
+	void testMalformedFrameControlPing127Rejected();
+	void testMalformedFrameClientRejectsMaskedServerFrame();
 
 	void setUp();
 	void tearDown();

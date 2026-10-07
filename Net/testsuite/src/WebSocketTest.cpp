@@ -569,162 +569,179 @@ int WebSocketTest::sendServerFrame(const std::string& frameBytes, int allowedRSV
 }
 
 
-void WebSocketTest::testMalformedFrames()
+void WebSocketTest::testMalformedFrameUnmaskedClient()
 {
-	// 1. Server rejects unmasked client frame
+	const std::string unmaskedFrame = "\x81\x01\x41";
+	assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(unmaskedFrame));
+}
+
+
+void WebSocketTest::testMalformedFrameRSV1Default()
+{
+	const std::string rsv1Frame = "\xC1\x81\x01\x02\x03\x04\x40";
+	assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(rsv1Frame));
+}
+
+
+void WebSocketTest::testMalformedFrameRSV2Default()
+{
+	const std::string rsv2Frame = "\xA1\x81\x01\x02\x03\x04\x40";
+	assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(rsv2Frame));
+}
+
+
+void WebSocketTest::testMalformedFrameRSV3Default()
+{
+	const std::string rsv3Frame = "\x91\x81\x01\x02\x03\x04\x40";
+	assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(rsv3Frame));
+}
+
+
+void WebSocketTest::testMalformedFrameAllowedRSV1()
+{
+	const std::string rsv1Frame = "\xC1\x81\x01\x02\x03\x04\x40";
+	int flags = 0;
+	int received = 0;
+	int err = sendServerFrame(rsv1Frame, WebSocket::FRAME_FLAG_RSV1, 256, &flags, &received);
+	assertEqual (0, err);
+	assertEqual (1, received);
+	assertTrue ((flags & WebSocket::FRAME_FLAG_RSV1) != 0);
+}
+
+
+void WebSocketTest::testMalformedFrameAllowedRSV1RejectRSV2()
+{
+	const std::string rsv2Frame = "\xA1\x81\x01\x02\x03\x04\x40";
+	assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(rsv2Frame, WebSocket::FRAME_FLAG_RSV1));
+}
+
+
+void WebSocketTest::testMalformedFrameReservedOpcode03()
+{
+	const std::string opcode3 = "\x83\x81\x01\x02\x03\x04\x40";
+	assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(opcode3));
+}
+
+
+void WebSocketTest::testMalformedFrameReservedControlOpcode0B()
+{
+	const std::string opcodeB = "\x8B\x81\x01\x02\x03\x04\x40";
+	assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(opcodeB));
+}
+
+
+void WebSocketTest::testMalformedFrameFragmentedControlPing()
+{
+	const std::string fragPing = "\x09\x81\x01\x02\x03\x04\x40";
+	assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(fragPing));
+}
+
+
+void WebSocketTest::testMalformedFrameControlPing125Accepted()
+{
+	std::string ping125;
+	ping125.push_back('\x89');
+	ping125.push_back('\xFD');
+	ping125.append("\x01\x02\x03\x04", 4);
+	ping125.append(125, '\x00');
+	int received = 0;
+	int err = sendServerFrame(ping125, 0, 256, nullptr, &received);
+	assertEqual (0, err);
+	assertEqual (125, received);
+}
+
+
+void WebSocketTest::testMalformedFrameControlPing126Rejected()
+{
+	std::string ping126;
+	ping126.push_back('\x89');
+	ping126.push_back('\xFE');
+	ping126.push_back('\x00');
+	ping126.push_back('\x7E');
+	ping126.append("\x01\x02\x03\x04", 4);
+	ping126.append(126, '\x00');
+	assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(ping126, 0, 256));
+}
+
+
+void WebSocketTest::testMalformedFrameControlPing127Rejected()
+{
+	std::string ping127;
+	ping127.push_back('\x89');
+	ping127.push_back('\xFF');
+	ping127.append(8, '\x00');
+	ping127.append("\x01\x02\x03\x04", 4);
+	assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(ping127, 0, 256));
+}
+
+
+void WebSocketTest::testMalformedFrameClientRejectsMaskedServerFrame()
+{
+	class TestWebSocket: public WebSocket
 	{
-		const std::string unmaskedFrame = "\x81\x01\x41";
-		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(unmaskedFrame));
-	}
+	public:
+		using WebSocket::computeAccept;
+	};
 
-	// 2. Server rejects non-zero RSV bits by default
+	class MaskedFrameRequestHandler: public Poco::Net::HTTPRequestHandler
 	{
-		// RSV1 (0xC1) with mask
-		const std::string rsv1Frame = "\xC1\x81\x01\x02\x03\x04\x40";
-		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(rsv1Frame));
+	public:
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		{
+			try
+			{
+				std::string key = request.get("Sec-WebSocket-Key", "");
+				response.setStatusAndReason(HTTPResponse::HTTP_SWITCHING_PROTOCOLS);
+				response.set("Upgrade", "websocket");
+				response.set("Connection", "Upgrade");
+				response.set("Sec-WebSocket-Accept", TestWebSocket::computeAccept(key));
+				response.setContentLength(HTTPResponse::UNKNOWN_CONTENT_LENGTH);
+				response.send().flush();
 
-		// RSV2 (0xA1) with mask
-		const std::string rsv2Frame = "\xA1\x81\x01\x02\x03\x04\x40";
-		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(rsv2Frame));
+				HTTPServerRequestImpl& requestImpl = static_cast<HTTPServerRequestImpl&>(request);
+				Poco::Net::StreamSocket sock = requestImpl.detachSocket();
 
-		// RSV3 (0x91) with mask
-		const std::string rsv3Frame = "\x91\x81\x01\x02\x03\x04\x40";
-		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(rsv3Frame));
-	}
+				const char maskedFrame[] = {'\x81', '\x81', '\x01', '\x02', '\x03', '\x04', '\x40'};
+				sock.sendBytes(maskedFrame, sizeof(maskedFrame));
+				sock.shutdownSend();
+				sock.close();
+			}
+			catch (Poco::Exception&)
+			{
+			}
+		}
+	};
 
-	// 3. Server accepts allowed RSV bits configured via setAllowedRSVBits
+	class MaskedFrameRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFactory
 	{
-		const std::string rsv1Frame = "\xC1\x81\x01\x02\x03\x04\x40";
+	public:
+		Poco::Net::HTTPRequestHandler* createRequestHandler(const HTTPServerRequest&)
+		{
+			return new MaskedFrameRequestHandler;
+		}
+	};
+
+	Poco::Net::ServerSocket ss(0);
+	Poco::Net::HTTPServer server(new MaskedFrameRequestHandlerFactory, ss, new Poco::Net::HTTPServerParams);
+	server.start();
+
+	HTTPClientSession cs("127.0.0.1", ss.address().port());
+	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
+	HTTPResponse response;
+	try
+	{
+		WebSocket ws(cs, request, response);
+		char buffer[64];
 		int flags = 0;
-		int received = 0;
-		int err = sendServerFrame(rsv1Frame, WebSocket::FRAME_FLAG_RSV1, 256, &flags, &received);
-		assertEqual (0, err);
-		assertEqual (1, received);
-		assertTrue ((flags & WebSocket::FRAME_FLAG_RSV1) != 0);
-
-		// Negative case: RSV1 allowed, but peer sends RSV2 frame -> corrupt frame error
-		const std::string rsv2Frame = "\xA1\x81\x01\x02\x03\x04\x40";
-		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(rsv2Frame, WebSocket::FRAME_FLAG_RSV1));
+		ws.receiveFrame(buffer, sizeof(buffer), flags);
+		fail("expected WebSocketException for masked frame on client");
 	}
-
-	// 4. Server rejects reserved opcodes
+	catch (WebSocketException& exc)
 	{
-		// Reserved non-control opcode 0x03
-		const std::string opcode3 = "\x83\x81\x01\x02\x03\x04\x40";
-		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(opcode3));
-
-		// Reserved control opcode 0x0B
-		const std::string opcodeB = "\x8B\x81\x01\x02\x03\x04\x40";
-		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(opcodeB));
+		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), exc.code());
 	}
 
-	// 5. Server rejects fragmented control frame (PING with FIN=0: 0x09)
-	{
-		const std::string fragPing = "\x09\x81\x01\x02\x03\x04\x40";
-		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(fragPing));
-	}
-
-	// 6. Control frame boundary: 125-byte accepted, 126/127-byte rejected
-	{
-		// 125-byte PING (accepted)
-		std::string ping125;
-		ping125.push_back('\x89');
-		ping125.push_back('\xFD'); // 125 with mask bit
-		ping125.append("\x01\x02\x03\x04", 4);
-		ping125.append(125, '\x00');
-		int received = 0;
-		int err = sendServerFrame(ping125, 0, 256, nullptr, &received);
-		assertEqual (0, err);
-		assertEqual (125, received);
-
-		// 126-byte PING with 16-bit length (rejected)
-		std::string ping126;
-		ping126.push_back('\x89');
-		ping126.push_back('\xFE'); // 126 with mask bit
-		ping126.push_back('\x00');
-		ping126.push_back('\x7E'); // 126
-		ping126.append("\x01\x02\x03\x04", 4);
-		ping126.append(126, '\x00');
-		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(ping126, 0, 256));
-
-		// 64-bit length 127 encoding on control frame (rejected)
-		std::string ping127;
-		ping127.push_back('\x89');
-		ping127.push_back('\xFF'); // 127 with mask bit
-		ping127.append(8, '\x00');
-		ping127.append("\x01\x02\x03\x04", 4);
-		assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), sendServerFrame(ping127, 0, 256));
-	}
-
-	// 7. Client rejects masked frame from server
-	{
-		class TestWebSocket: public WebSocket
-		{
-		public:
-			using WebSocket::computeAccept;
-		};
-
-		class MaskedFrameRequestHandler: public Poco::Net::HTTPRequestHandler
-		{
-		public:
-			void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
-			{
-				try
-				{
-					std::string key = request.get("Sec-WebSocket-Key", "");
-					response.setStatusAndReason(HTTPResponse::HTTP_SWITCHING_PROTOCOLS);
-					response.set("Upgrade", "websocket");
-					response.set("Connection", "Upgrade");
-					response.set("Sec-WebSocket-Accept", TestWebSocket::computeAccept(key));
-					response.setContentLength(HTTPResponse::UNKNOWN_CONTENT_LENGTH);
-					response.send().flush();
-
-					HTTPServerRequestImpl& requestImpl = static_cast<HTTPServerRequestImpl&>(request);
-					Poco::Net::StreamSocket sock = requestImpl.detachSocket();
-
-					// Send masked frame to client (illegal per RFC 6455)
-					const char maskedFrame[] = {'\x81', '\x81', '\x01', '\x02', '\x03', '\x04', '\x40'};
-					sock.sendBytes(maskedFrame, sizeof(maskedFrame));
-					sock.shutdownSend();
-					sock.close();
-				}
-				catch (Poco::Exception&)
-				{
-				}
-			}
-		};
-
-		class MaskedFrameRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFactory
-		{
-		public:
-			Poco::Net::HTTPRequestHandler* createRequestHandler(const HTTPServerRequest&)
-			{
-				return new MaskedFrameRequestHandler;
-			}
-		};
-
-		Poco::Net::ServerSocket ss(0);
-		Poco::Net::HTTPServer server(new MaskedFrameRequestHandlerFactory, ss, new Poco::Net::HTTPServerParams);
-		server.start();
-
-		HTTPClientSession cs("127.0.0.1", ss.address().port());
-		HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
-		HTTPResponse response;
-		try
-		{
-			WebSocket ws(cs, request, response);
-			char buffer[64];
-			int flags = 0;
-			ws.receiveFrame(buffer, sizeof(buffer), flags);
-			fail("expected WebSocketException for masked frame on client");
-		}
-		catch (WebSocketException& exc)
-		{
-			assertEqual (static_cast<int>(WebSocket::WS_ERR_CORRUPT_FRAME), exc.code());
-		}
-
-		server.stop();
-	}
+	server.stop();
 }
 
 
@@ -748,7 +765,19 @@ CppUnit::Test* WebSocketTest::suite()
 	CppUnit_addTest(pSuite, WebSocketTest, testWebSocketNB);
 	CppUnit_addTest(pSuite, WebSocketTest, testPeerCloseAfterPartialHeader);
 	CppUnit_addTest(pSuite, WebSocketTest, testPeerCloseAfterPartialHeaderNB);
-	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrames);
+	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameUnmaskedClient);
+	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameRSV1Default);
+	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameRSV2Default);
+	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameRSV3Default);
+	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameAllowedRSV1);
+	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameAllowedRSV1RejectRSV2);
+	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameReservedOpcode03);
+	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameReservedControlOpcode0B);
+	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameFragmentedControlPing);
+	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameControlPing125Accepted);
+	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameControlPing126Rejected);
+	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameControlPing127Rejected);
+	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameClientRejectsMaskedServerFrame);
 
 	return pSuite;
 }
