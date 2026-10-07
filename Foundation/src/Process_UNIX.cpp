@@ -154,21 +154,31 @@ namespace
 		/// descriptor free: the descriptor is attached to the null device,
 		/// so that the next file or socket the process opens does not take
 		/// the place of its standard input, output or error. If the null
-		/// device cannot be opened, the descriptor is closed.
+		/// device cannot be opened, or the descriptor cannot be attached
+		/// to it, the descriptor is closed.
 		///
 		/// For a child between fork() and exec(): uses only what is safe
 		/// to call there.
 	{
-		int null = ::open("/dev/null", fd == STDIN_FILENO ? O_RDONLY : O_WRONLY);
-		if (null < 0)
+		int null = -1;
+		do
 		{
-			::close(fd);
+			null = ::open("/dev/null", fd == STDIN_FILENO ? O_RDONLY : O_WRONLY);
 		}
-		else if (null != fd)
+		while (null < 0 && errno == EINTR);
+		if (null == fd) return;
+
+		int rc = -1;
+		if (null >= 0)
 		{
-			::dup2(null, fd);
+			do
+			{
+				rc = ::dup2(null, fd);
+			}
+			while (rc < 0 && errno == EINTR);
 			::close(null);
 		}
+		if (rc < 0) ::close(fd);
 	}
 }
 #endif
@@ -222,7 +232,8 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 			inherit.pgroup = SPAWN_NEWPGROUP;
 		}
 		// A stream that is closed for the child is attached to the null
-		// device, as launchByForkExecImpl() does it. The descriptors of
+		// device, as launchByForkExecImpl() does it, and closed in the
+		// child if the null device cannot be opened. The descriptors of
 		// this process stay as they are.
 		int nullIn = (options & PROCESS_CLOSE_STDIN) ? ::open("/dev/null", O_RDONLY) : -1;
 		int nullOut = (options & (PROCESS_CLOSE_STDOUT | PROCESS_CLOSE_STDERR)) ? ::open("/dev/null", O_WRONLY) : -1;
@@ -230,9 +241,9 @@ ProcessHandleImpl* ProcessImpl::launchImpl(const std::string& command, const Arg
 		fdmap[0] = inPipe  ? inPipe->readHandle()   : 0;
 		fdmap[1] = outPipe ? outPipe->writeHandle() : 1;
 		fdmap[2] = errPipe ? errPipe->writeHandle() : 2;
-		if (nullIn >= 0) fdmap[0] = nullIn;
-		if (nullOut >= 0 && (options & PROCESS_CLOSE_STDOUT)) fdmap[1] = nullOut;
-		if (nullOut >= 0 && (options & PROCESS_CLOSE_STDERR)) fdmap[2] = nullOut;
+		if (options & PROCESS_CLOSE_STDIN) fdmap[0] = nullIn >= 0 ? nullIn : SPAWN_FDCLOSED;
+		if (options & PROCESS_CLOSE_STDOUT) fdmap[1] = nullOut >= 0 ? nullOut : SPAWN_FDCLOSED;
+		if (options & PROCESS_CLOSE_STDERR) fdmap[2] = nullOut >= 0 ? nullOut : SPAWN_FDCLOSED;
 
 		char** envPtr = 0;
 		std::vector<char> envChars;
