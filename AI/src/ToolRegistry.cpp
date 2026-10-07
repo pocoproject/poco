@@ -13,12 +13,25 @@
 
 
 #include "Poco/AI/ToolRegistry.h"
-#include "Poco/JSON/Parser.h"
 #include <sstream>
 
 
 namespace Poco {
 namespace AI {
+
+
+namespace
+{
+	std::string errorResult(const std::string& message)
+		/// Returns the JSON text of a tool result that reports an error.
+	{
+		Poco::JSON::Object error;
+		error.set("error", message);
+		std::ostringstream stream;
+		error.stringify(stream);
+		return stream.str();
+	}
+}
 
 
 void ToolRegistry::registerTool(const Poco::JSON::Object& definition, ToolExecutor executor)
@@ -56,7 +69,7 @@ std::string ToolRegistry::executeTool(const std::string& name, const Poco::JSON:
 		auto it = _tools.find(name);
 		if (it == _tools.end())
 		{
-			return R"({"error":"Unknown tool: )" + name + R"("})";
+			return errorResult("Unknown tool: " + name);
 		}
 		executor = it->second.executor;
 	}
@@ -66,11 +79,11 @@ std::string ToolRegistry::executeTool(const std::string& name, const Poco::JSON:
 	}
 	catch (const Poco::Exception& e)
 	{
-		return R"({"error":"Tool execution failed: )" + e.displayText() + R"("})";
+		return errorResult("Tool execution failed: " + e.displayText());
 	}
 	catch (const std::exception& e)
 	{
-		return std::string(R"({"error":"Tool execution failed: )") + e.what() + R"("})";
+		return errorResult(std::string("Tool execution failed: ") + e.what());
 	}
 }
 

@@ -26,6 +26,7 @@ public:
 	void testUnregister();
 	void testUnknownTool();
 	void testExecutorException();
+	void testErrorsAreJSON();
 
 	void setUp();
 	void tearDown();

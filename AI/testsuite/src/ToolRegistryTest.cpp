@@ -13,6 +13,8 @@
 #include "CppUnit/TestSuite.h"
 #include "Poco/AI/ToolRegistry.h"
 #include "Poco/JSON/Parser.h"
+#include <stdexcept>
+#include <string>
 
 
 using Poco::AI::ToolRegistry;
@@ -23,6 +25,33 @@ using Poco::JSON::Array;
 ToolRegistryTest::ToolRegistryTest(const std::string& name):
 	CppUnit::TestCase(name)
 {
+}
+
+
+void ToolRegistryTest::testErrorsAreJSON()
+{
+	ToolRegistry registry;
+
+	// The name of a tool comes from the model and the text of an exception
+	// from anywhere: quotes, backslashes and line breaks in either must
+	// still leave the error a JSON object.
+	const std::string name = "no \"such\" \\ tool";
+	Poco::JSON::Parser parser;
+	Object::Ptr pUnknown = parser.parse(registry.executeTool(name, Object())).extract<Object::Ptr>();
+	assertEqual("Unknown tool: " + name, pUnknown->getValue<std::string>("error"));
+
+	Object definition;
+	definition.set("name", "failing");
+	definition.set("description", "always fails");
+	definition.set("parameters", Object::Ptr(new Object));
+	const std::string reason = "line one\nsaid \"no\" at C:\\temp";
+	registry.registerTool(definition, [reason](const Object&) -> std::string
+	{
+		throw std::runtime_error(reason);
+	});
+	parser.reset();
+	Object::Ptr pFailed = parser.parse(registry.executeTool("failing", Object())).extract<Object::Ptr>();
+	assertEqual("Tool execution failed: " + reason, pFailed->getValue<std::string>("error"));
 }
 
 
@@ -149,6 +178,7 @@ CppUnit::Test* ToolRegistryTest::suite()
 	CppUnit_addTest(pSuite, ToolRegistryTest, testUnregister);
 	CppUnit_addTest(pSuite, ToolRegistryTest, testUnknownTool);
 	CppUnit_addTest(pSuite, ToolRegistryTest, testExecutorException);
+	CppUnit_addTest(pSuite, ToolRegistryTest, testErrorsAreJSON);
 
 	return pSuite;
 }
