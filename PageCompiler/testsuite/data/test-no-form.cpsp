@@ -1,4 +1,4 @@
-<%@ page class="StringifyHandler" namespace="AI::Test" session="test" stringify="true" %>
+<%@ page class="TestHandlerNoForm" namespace="AI::Test" session="test" form="false" %>
 <%!
 #include "Poco/DateTime.h"
 #include "Poco/DateTimeFormatter.h"
@@ -8,6 +8,10 @@
 using Poco::DateTime;
 using Poco::DateTimeFormatter;
 using Poco::DateTimeFormat;
+%>
+
+<%%
+	(void)request;
 %>
 
 <%
