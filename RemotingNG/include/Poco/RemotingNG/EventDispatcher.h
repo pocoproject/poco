@@ -85,7 +85,24 @@ public:
 		/// by the given URI.
 		///
 		/// Throws a Poco::NotFoundException if no subscription exists.
-		
+
+	[[nodiscard]] bool trySubscribe(const std::string& subscriberURI, const std::string& endpointURI, Poco::Clock expireTime = 0);
+		/// Does what subscribe() does, but does not wait if the
+		/// EventDispatcher is busy, which it is for as long as it
+		/// delivers an event: then nothing is changed, and false
+		/// is returned.
+		///
+		/// For a caller that must not wait for the delivery of an
+		/// event to end, such as a thread which the reply to that
+		/// event has to pass.
+
+	[[nodiscard]] bool tryUnsubscribe(const std::string& subscriberURI);
+		/// Does what unsubscribe() does, but does not wait if the
+		/// EventDispatcher is busy: then nothing is changed, and
+		/// false is returned.
+		///
+		/// Throws a Poco::NotFoundException if no subscription exists.
+
 	template <typename T>
 	void setEventFilter(const std::string& subscriberURI, const std::string& event, typename EventFilter<T>::Ptr pFilter)
 		/// Sets an event filter for the given subscriber and event.
@@ -154,6 +171,15 @@ protected:
 private:
 	EventDispatcher(const EventDispatcher&);
 	EventDispatcher& operator = (const EventDispatcher&);
+
+	void addSubscriber(const std::string& subscriberURI, const std::string& endpointURI, Poco::Clock expireTime);
+		/// Registers the subscriber, or gives its subscription the new
+		/// expireTime. The mutex is locked by the caller.
+
+	void removeSubscriber(const std::string& subscriberURI);
+		/// Unregisters the subscriber. The mutex is locked by the caller.
+		///
+		/// Throws a Poco::NotFoundException if no subscription exists.
 
 	void setOwner(const Poco::AutoPtr<Poco::RefCountedObject>& pOwner);
 		/// Keeps the object whose events this dispatcher forwards alive for the

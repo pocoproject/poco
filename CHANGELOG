@@ -66,6 +66,11 @@ New Components:
 
 Bug Fixes and Improvements:
 
+- GH #5538 Poco::RemotingNG::TCP::Listener: a subscription to events, its renewal or an unsubscribe
+  that arrives while a two-way event awaits its reply on the same connection no longer stops the
+  connection, the event and every other event of the object until the request times out. The thread
+  of the connection does not wait for the EventDispatcher; a request that follows the change on the
+  connection is still served after it. New: EventDispatcher::trySubscribe() and tryUnsubscribe().
 - GH #5516 Poco::Net::SocketReactor lets go of the sockets of a poll when their round is over, so
   that a connection closed while it is served is closed at once and not when a later poll returns.
 - GH #5516 Poco::Net::SocketImpl: on macOS, setting an option on a socket that has been shut down
