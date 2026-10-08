@@ -11,6 +11,7 @@
 #include "RemotingTestSuite.h"
 #include "RemotingTest.h"
 #include "EventFilterTest.h"
+#include "EventDispatcherTest.h"
 #include "URIUtilityTest.h"
 
 
@@ -20,6 +21,7 @@ CppUnit::Test* RemotingTestSuite::suite()
 
 	pSuite->addTest(RemotingTest::suite());
 	pSuite->addTest(EventFilterTest::suite());
+	pSuite->addTest(EventDispatcherTest::suite());
 	pSuite->addTest(URIUtilityTest::suite());
 
 	return pSuite;

@@ -24,6 +24,7 @@
 #if defined(POCO_OS_FAMILY_UNIX)
 #include "Poco/Thread.h"
 #include "Poco/Runnable.h"
+#include <fcntl.h>
 #include <unistd.h>
 #include <sys/wait.h>
 #elif defined(POCO_OS_FAMILY_WINDOWS)
@@ -276,6 +277,18 @@ int main(int argc, char** argv)
 			}
 		}
 #if defined(POCO_OS_FAMILY_UNIX)
+		else if (arg == "-std-fds")
+		{
+			// Which of the standard descriptors this process has: 1 for
+			// standard input, 2 for standard output and 4 for standard
+			// error, added up.
+			int taken = 0;
+			for (int fd = 0; fd < 3; ++fd)
+			{
+				if (::fcntl(fd, F_GETFD) != -1) taken |= 1 << fd;
+			}
+			return taken;
+		}
 		else if (argc > 2 && arg.find("--pidfile") != std::string::npos && std::string(argv[2]) == "--launch-thread")
 		{
 			size_t equals_pos = arg.find('=');

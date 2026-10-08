@@ -32,7 +32,10 @@
 #include "Poco/Mutex.h"
 #include "Poco/Logger.h"
 #include "Poco/AtomicCounter.h"
+#include "Poco/Exception.h"
+#include "Poco/ThreadPool.h"
 #include <atomic>
+#include <memory>
 #include <vector>
 #include <set>
 
@@ -195,9 +198,32 @@ public:
 	void popFrameHandler(Poco::AutoPtr<FrameHandler> pHandler);
 		/// Removes the FrameHandler from the internal stack.
 
+	void start(Poco::ThreadPool& threadPool);
+		/// Runs the connection on a thread obtained from the given
+		/// thread pool.
+		///
+		/// Returns as soon as that thread holds a reference to the
+		/// connection of its own, which it keeps until it ends. The
+		/// caller, who must hold one during the call, may give up
+		/// its reference at any time afterwards.
+		///
+		/// Throws a Poco::NoThreadAvailableException if the thread
+		/// pool has no thread for the connection.
+
 	[[nodiscard]] bool waitReady(Poco::Timespan timeout = 2*TIMEOUT_HELO);
-		/// Waits until the connection is established, or the
-		/// given timeout expires.
+		/// Waits until the connection is established, until the
+		/// handshake has failed, or until the given timeout expires.
+		///
+		/// Returns true if the connection has been established.
+		/// If the handshake has failed, handshakeError() returns
+		/// the exception that made it fail.
+
+	[[nodiscard]] const Poco::Exception* handshakeError() const;
+		/// Returns the exception that ended the connection's thread
+		/// before the connection was established, or a null pointer
+		/// if there is none.
+		///
+		/// The exception is owned by the connection.
 
 	void returnFrame(Frame::Ptr pFrame);
 		/// Returns the frame to the pool.
@@ -235,6 +261,10 @@ protected:
 	int receiveNBytes(char* buffer, int bytes);
 		/// Receive exactly the given number of bytes.
 
+	void handshakeFailed(const Poco::Exception& exc);
+		/// Keeps the exception and ends waitReady(), if the
+		/// connection has not been established.
+
 private:
 	Connection();
 	Connection(const Connection&);
@@ -266,8 +296,10 @@ private:
 	Poco::UInt32 _nextChannel;
 	Poco::Clock _lastFrame;
 	Poco::Event _ready;
+	Poco::Event _started;
+	std::unique_ptr<Poco::Exception> _pHandshakeError;
 	Poco::Logger& _logger;
-	Poco::FastMutex _mutex;
+	mutable Poco::FastMutex _mutex;
 
 	static Poco::AtomicCounter _idCounter;
 

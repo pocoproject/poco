@@ -10,6 +10,7 @@ objects = \
 	Driver \
 	RemotingTest \
 	EventFilterTest \
+	EventDispatcherTest \
 	URIUtilityTest \
 	RemotingTestSuite \
 	Tester \
