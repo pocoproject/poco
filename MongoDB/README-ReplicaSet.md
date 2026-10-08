@@ -608,8 +608,8 @@ config.setName = "rs0";
 // Optional: Default read preference
 config.readPreference = ReadPreference(ReadPreference::PrimaryPreferred);
 
-// Connect and socket timeouts in seconds; 0 means no timeout.
-// A custom SocketFactory applies its own instead (see "Timeouts").
+// Connect and socket timeouts in seconds (see "Timeouts" for zero values).
+// These also apply when using a custom SocketFactory.
 config.connectTimeoutSeconds = 10;
 config.socketTimeoutSeconds = 30;
 
@@ -631,7 +631,7 @@ config.socketFactory = &myCustomSocketFactory;
 
 **Timeouts**
 
-`Config::connectTimeoutSeconds` and `Config::socketTimeoutSeconds` apply to every connection the ReplicaSet creates, including the ones used for `hello` topology refreshes, and 0 means no timeout. Explicit timeouts passed to `ReplicaSetConnection` or `ReplicaSetPoolableConnectionFactory` replace them for that instance's own connections, except that a socket timeout of 0 there means the configured one. A custom `SocketFactory` applies its own instead.
+`Config::connectTimeoutSeconds` and `Config::socketTimeoutSeconds` apply to every connection the ReplicaSet creates, including the ones used for `hello` topology refreshes. A connect timeout of 0 means no timeout. Positive socket timeouts are applied as both the send and receive timeout after connection; 0 leaves the socket's timeouts unchanged (no timeout on a new default socket). Explicit timeouts passed to `ReplicaSetConnection` or `ReplicaSetPoolableConnectionFactory` replace them for that instance's own connections, except that a socket timeout of 0 there means the configured one. A custom `SocketFactory` receives the applicable connect timeout as an argument and must honor it; ReplicaSet applies positive socket timeouts to the socket returned by the factory.
 
 ### ReplicaSetURI - URI Parsing and Generation
 
@@ -732,7 +732,7 @@ ReplicaSet rs(uri.toString());
 
 ### Using Custom SocketFactory with Timeout Configuration
 
-Custom SocketFactory implementations can access timeout configuration from the ReplicaSet config:
+A custom SocketFactory must honor its `connectTimeout` argument, including 0 for no timeout. ReplicaSet applies the positive send/receive timeout to the returned socket; the factory does not need to read `configuration()`:
 
 ```cpp
 #include "Poco/MongoDB/ReplicaSet.h"
@@ -746,54 +746,45 @@ using namespace Poco::Net;
 class MySSLSocketFactory : public Connection::SocketFactory
 {
 public:
-    MySSLSocketFactory(ReplicaSet& rs) : _replicaSet(rs) {}
-
     StreamSocket createSocket(const std::string& host, int port,
                              Poco::Timespan connectTimeout, bool secure) override
     {
-        // Access timeout configuration from ReplicaSet config
-        auto config = _replicaSet.configuration();
-        Poco::Timespan connTimeout(config.connectTimeoutSeconds, 0);
-        Poco::Timespan sockTimeout(config.socketTimeoutSeconds, 0);
-
         if (secure)
         {
-            // Create SSL/TLS socket with configured timeouts
+            // Create SSL/TLS socket using the supplied connect timeout
             Context::Ptr context = new Context(Context::CLIENT_USE, "", "", "",
                                               Context::VERIFY_RELAXED);
             SecureStreamSocket socket(context);
-            socket.connect(SocketAddress(host, port), connTimeout);
-            socket.setReceiveTimeout(sockTimeout);
-            socket.setSendTimeout(sockTimeout);
+            if (connectTimeout > 0)
+                socket.connect(SocketAddress(host, port), connectTimeout);
+            else
+                socket.connect(SocketAddress(host, port));
             return socket;
         }
         else
         {
-            // Create regular socket with configured timeouts
+            // Create regular socket using the supplied connect timeout
             StreamSocket socket;
-            socket.connect(SocketAddress(host, port), connTimeout);
-            socket.setReceiveTimeout(sockTimeout);
-            socket.setSendTimeout(sockTimeout);
+            if (connectTimeout > 0)
+                socket.connect(SocketAddress(host, port), connectTimeout);
+            else
+                socket.connect(SocketAddress(host, port));
             return socket;
         }
     }
-
-private:
-    ReplicaSet& _replicaSet;
 };
 
 // Usage
+MySSLSocketFactory factory;
 ReplicaSet::Config config;
-config.seeds = {Net::SocketAddress("mongo1:27017"),
-                Net::SocketAddress("mongo2:27017")};
+config.seeds = {SocketAddress("mongo1:27017"),
+                SocketAddress("mongo2:27017")};
 config.connectTimeoutSeconds = 5;   // 5 second connect timeout
 config.socketTimeoutSeconds = 30;   // 30 second socket timeout
 
+// Use the factory for initial discovery as well as subsequent connections.
+config.socketFactory = &factory;
 ReplicaSet rs(config);
-
-// Set custom socket factory that uses the config
-MySSLSocketFactory factory(rs);
-rs.setSocketFactory(&factory);
 
 // Now connections will use the socket factory with configured timeouts
 Connection::Ptr conn = rs.getPrimaryConnection();
