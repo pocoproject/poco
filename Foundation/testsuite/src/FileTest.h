@@ -43,6 +43,7 @@ public:
 	void testRenameFailIfExists();
 	void testRootDir();
 	void testLongPath();
+	void testLongPathUNC();
 	void testUnixFileExtension();
 	void testTemporaryFile();
 	void testGetExecutablePathNonExistent();
