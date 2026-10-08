@@ -82,6 +82,13 @@ class Net_API RemoteSyslogListener: public Poco::SplitterChannel
 	///   - host: host name; only for "new" syslog messages.
 	///   - app:  application name; only for "new" syslog messages.
 	///   - structured-data: RFC 5424 structured data, or empty if not present.
+	///
+	/// The time of the Poco::Message created for a "new" syslog message
+	/// is the instant its TIMESTAMP stands for, in all the forms RFC 5424
+	/// allows: with or without a fraction of a second of up to six digits,
+	/// in UTC or in a time zone given with its offset. A message with the
+	/// NILVALUE for a timestamp, or with one that is not valid, has the
+	/// time at which it arrived.
 {
 public:
 	RemoteSyslogListener();

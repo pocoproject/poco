@@ -573,6 +573,15 @@ private:
 	void parseNew(const std::string& line, RemoteSyslogChannel::Severity severity, RemoteSyslogChannel::Facility fac, std::size_t& pos, Poco::Message& message);
 	void parseBSD(const std::string& line, RemoteSyslogChannel::Severity severity, RemoteSyslogChannel::Facility fac, std::size_t& pos, Poco::Message& message);
 
+	static bool parseTimestamp(const std::string& timestamp, Poco::Timestamp& time);
+		/// Parses the TIMESTAMP of an RFC 5424 message: a date and a time
+		/// with an optional fraction of a second of one to six digits, followed
+		/// by Z or by the offset of the time zone the time is given in.
+		///
+		/// Returns true and the instant the timestamp stands for, or false,
+		/// leaving time as it is, if timestamp is not one. The NILVALUE is
+		/// not one.
+
 	static std::string parseUntilSpace(const std::string& line, std::size_t& pos);
 		/// Parses until it encounters the next space char, returns the string from pos, excluding space
 		/// pos will point past the space char
@@ -708,17 +717,16 @@ void SyslogParser::parseNew(const std::string& line, RemoteSyslogChannel::Severi
 	std::string sd(parseStructuredData(line, pos));
 	std::string messageText(line.substr(pos));
 	pos = line.size();
-	Poco::DateTime date;
-	int tzd = 0;
-	bool hasDate = Poco::DateTimeParser::tryParse(RemoteSyslogChannel::SYSLOG_TIMEFORMAT, timeStr, date, tzd);
 	Poco::Message logEntry(msgId, messageText, prio);
 	logEntry[RemoteSyslogListener::LOG_PROP_FACILITY] = RemoteSyslogChannel::facilityToString(fac);
 	logEntry[RemoteSyslogListener::LOG_PROP_HOST] = hostName;
 	logEntry[RemoteSyslogListener::LOG_PROP_APP] = appName;
 	logEntry[RemoteSyslogListener::LOG_PROP_STRUCTURED_DATA] = sd;
 
-	if (hasDate)
-		logEntry.setTime(date.timestamp());
+	// Without a timestamp the message keeps the time of its arrival.
+	Poco::Timestamp time;
+	if (parseTimestamp(timeStr, time))
+		logEntry.setTime(time);
 	int lval(0);
 	(void) Poco::NumberParser::tryParse(procId, lval);
 	logEntry.setPid(lval);
@@ -795,6 +803,87 @@ void SyslogParser::parseBSD(const std::string& line, RemoteSyslogChannel::Severi
 	logEntry.setTime(date.timestamp());
 	logEntry[RemoteSyslogListener::LOG_PROP_FACILITY] = RemoteSyslogChannel::facilityToString(fac);
 	message.swap(logEntry);
+}
+
+
+bool SyslogParser::parseTimestamp(const std::string& timestamp, Poco::Timestamp& time)
+{
+	// TIMESTAMP   = NILVALUE / FULL-DATE "T" FULL-TIME
+	// FULL-DATE   = 4DIGIT "-" 2DIGIT "-" 2DIGIT
+	// FULL-TIME   = 2DIGIT ":" 2DIGIT ":" 2DIGIT ["." 1*6DIGIT] TIME-OFFSET
+	// TIME-OFFSET = "Z" / ("+" / "-") 2DIGIT ":" 2DIGIT
+	const std::size_t size = timestamp.size();
+
+	const auto number = [&timestamp, size](std::size_t pos, std::size_t digits, int& value)
+	{
+		if (pos + digits > size) return false;
+		value = 0;
+		for (std::size_t i = pos; i < pos + digits; ++i)
+		{
+			if (!Poco::Ascii::isDigit(timestamp[i])) return false;
+			value = value*10 + (timestamp[i] - '0');
+		}
+		return true;
+	};
+	const auto is = [&timestamp, size](std::size_t pos, char c)
+	{
+		return pos < size && timestamp[pos] == c;
+	};
+
+	int year = 0;
+	int month = 0;
+	int day = 0;
+	int hour = 0;
+	int minute = 0;
+	int second = 0;
+	if (!(number(0, 4, year) && is(4, '-') && number(5, 2, month) && is(7, '-') && number(8, 2, day) && is(10, 'T')
+		&& number(11, 2, hour) && is(13, ':') && number(14, 2, minute) && is(16, ':') && number(17, 2, second)))
+	{
+		return false;
+	}
+
+	std::size_t pos = 19;
+	int microseconds = 0;
+	if (is(pos, '.'))
+	{
+		++pos;
+		int digits = 0;
+		for (; pos < size && Poco::Ascii::isDigit(timestamp[pos]); ++pos, ++digits)
+		{
+			if (digits == 6) return false;
+			microseconds = microseconds*10 + (timestamp[pos] - '0');
+		}
+		if (digits == 0) return false;
+		for (; digits < 6; ++digits) microseconds *= 10;
+	}
+
+	int offset = 0; // seconds east of UTC
+	if (is(pos, 'Z'))
+	{
+		++pos;
+	}
+	else if (is(pos, '+') || is(pos, '-'))
+	{
+		int hours = 0;
+		int minutes = 0;
+		if (!(number(pos + 1, 2, hours) && is(pos + 3, ':') && number(pos + 4, 2, minutes)) || hours > 23 || minutes > 59)
+		{
+			return false;
+		}
+		offset = (timestamp[pos] == '+' ? 1 : -1)*(hours*3600 + minutes*60);
+		pos += 6;
+	}
+	else return false;
+
+	// A leap second is valid for a DateTime; RFC 5424 does not allow one.
+	if (pos != size || second > 59 || !Poco::DateTime::isValid(year, month, day, hour, minute, second, microseconds/1000, microseconds%1000))
+	{
+		return false;
+	}
+
+	time = Poco::DateTime(year, month, day, hour, minute, second, microseconds/1000, microseconds%1000).timestamp();
+	time -= Poco::Timespan(offset, 0);
+	return true;
 }
 
 

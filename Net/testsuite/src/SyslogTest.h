@@ -30,6 +30,7 @@ public:
 	void testOldBSD();
 	void testStructuredData();
 	void testBSDWithoutTimestamp();
+	void testTimestamp();
 	void testTCPOctetCounting();
 	void testTCPNewline();
 	void testTCPMixedFraming();

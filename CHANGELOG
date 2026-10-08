@@ -81,6 +81,10 @@ Bug Fixes and Improvements:
   handshake is done.
 - GH #5519 Poco::Net::RemoteSyslogChannel does not wait for the name service without limit when it
   is opened, and finds its server by name with every attempt to connect.
+- GH #5530 Poco::Net::RemoteSyslogListener reads the TIMESTAMP of an RFC 5424 message in every
+  form the RFC allows: with or without a fraction of a second of one to six digits, and with the
+  offset of its time zone applied. Before, a fraction of other than three digits was misread or
+  left the message the time of its arrival, and the offset was ignored.
 - GH #5450 Poco::XML::SAXParser and DOMParser: when a content handler throws, the events Expat
   still delivers for the current token (the end tag of an empty element and its namespace
   undeclarations) are no longer forwarded to the handlers. Since 1.15.4 the exception is stored
