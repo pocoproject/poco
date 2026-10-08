@@ -231,26 +231,65 @@ void Connection::popFrameHandler(Poco::AutoPtr<FrameHandler> pHandler)
 }
 
 
+void Connection::start(Poco::ThreadPool& threadPool)
+{
+	threadPool.start(*this);
+	// From here on the thread has its reference to the connection, and
+	// the caller is free to give up its own.
+	_started.wait();
+}
+
+
 bool Connection::waitReady(Poco::Timespan timeout)
 {
-	return _ready.tryWait(static_cast<long>(timeout.totalMilliseconds()));
+	return _ready.tryWait(static_cast<long>(timeout.totalMilliseconds())) && !handshakeError();
+}
+
+
+const Poco::Exception* Connection::handshakeError() const
+{
+	Poco::FastMutex::ScopedLock lock(_mutex);
+
+	return _pHandshakeError.get();
+}
+
+
+void Connection::handshakeFailed(const Poco::Exception& exc)
+{
+	{
+		Poco::FastMutex::ScopedLock lock(_mutex);
+
+		if (_pHandshakeError || (_state != STATE_PRE_HANDSHAKE && _state != STATE_HANDSHAKE)) return;
+		_pHandshakeError.reset(exc.clone());
+	}
+	_ready.set();
 }
 
 
 void Connection::run()
 {
+	// The thread's own reference to the connection. Once a failed handshake
+	// is known to whoever waits for the connection, it may be the only one
+	// left.
+	Connection::Ptr pThis(this, true);
+	_started.set();
+
 	try
 	{
 		runImpl();
 	}
 	catch (Poco::Exception& exc)
 	{
+		handshakeFailed(exc);
 		_logger.log(exc);
 	}
 	catch (...)
 	{
+		handshakeFailed(Poco::UnhandledException("Unknown exception while handling connection"));
 		_logger.fatal("Unknown exception while handling connection.");
 	}
+	// Whoever still waits for the connection has nothing left to wait for.
+	_ready.set();
 }
 
 

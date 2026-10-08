@@ -39,6 +39,10 @@ namespace TCP {
 
 class RemotingNGTCP_API Listener: public Poco::RemotingNG::EventListener
 	/// The RemotingNG Listener implementation for the TCP transport.
+	///
+	/// The threads of a Listener are all obtained from the thread pool
+	/// of its ConnectionManager: those driving the connections it accepts,
+	/// as well as those serving requests and delivering events.
 {
 public:
 	using Ptr = Poco::AutoPtr<Listener>;

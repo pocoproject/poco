@@ -196,14 +196,19 @@ Connection::Ptr ConnectionManager::createConnection(const Poco::URI& endpointURI
 	pConnection->setHandshakeTimeout(_handshakeTimeout);
 	pConnection->addCapability(Frame::CAPA_REMOTING_PROTOCOL_1_0);
 	pConnection->addCapability(Frame::CAPA_REMOTING_PROTOCOL_1_1);
-	_threadPool.start(*pConnection);
-	if (pConnection->waitReady())
+	pConnection->start(_threadPool);
+	// The connection gives up on the handshake by itself, when the handshake
+	// timeout is over. Twice that is how long a connection is waited for
+	// that neither gets established nor reports why not.
+	if (pConnection->waitReady(Poco::Timespan(2*_handshakeTimeout.totalMicroseconds())))
 	{
 		return pConnection;
 	}
 	else
 	{
 		pConnection->close();
+		const Poco::Exception* pError = pConnection->handshakeError();
+		if (pError && !dynamic_cast<const Poco::TimeoutException*>(pError)) pError->rethrow();
 		throw Poco::TimeoutException("Timeout while waiting for handshake completion with endpoint", endpointURI.toString());
 	}
 }

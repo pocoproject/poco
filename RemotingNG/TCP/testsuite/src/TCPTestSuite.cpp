@@ -10,6 +10,7 @@
 
 #include "TCPTestSuite.h"
 #include "RemotingTest.h"
+#include "ConnectionTest.h"
 
 
 CppUnit::Test* TCPTestSuite::suite()
@@ -18,6 +19,7 @@ CppUnit::Test* TCPTestSuite::suite()
 
 	pSuite->addTest(RemotingTest::suite());
 	pSuite->addTest(RemotingTestCompressed::suite());
+	pSuite->addTest(ConnectionTest::suite());
 
 	return pSuite;
 }
