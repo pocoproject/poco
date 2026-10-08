@@ -200,8 +200,8 @@ static=""
 shared=""
 nosqlparser=
 mssqlbigstring=
-omitMinimal="Crypto NetSSL_OpenSSL Zip Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF DNSSD DNSSD/Avahi DNSSD/Bonjour CppParser PageCompiler"
-omitTypical="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF DNSSD DNSSD/Avahi DNSSD/Bonjour CppParser"
+omitMinimal="Crypto NetSSL_OpenSSL Zip Data Data/SQLite Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF DNSSD DNSSD/Avahi DNSSD/Bonjour CppParser PageCompiler AI"
+omitTypical="Data/ODBC Data/MySQL Data/PostgreSQL MongoDB Redis PDF DNSSD DNSSD/Avahi DNSSD/Bonjour CppParser AI"
 omit=$omitTypical
 # parse arguments
 while [ $# -ge 1 ]; do
