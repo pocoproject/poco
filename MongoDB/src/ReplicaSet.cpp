@@ -29,6 +29,25 @@ using namespace std::string_literals;
 namespace Poco::MongoDB {
 
 
+namespace
+{
+	[[nodiscard]] Net::StreamSocket createFactorySocket(Connection::SocketFactory& factory,
+		const Net::SocketAddress& address, const Poco::Timespan& connectTimeout,
+		const Poco::Timespan& socketTimeout)
+		/// Socket timeouts keep an unresponsive member from blocking the
+		/// monitoring thread and ~ReplicaSet(), as in Connection::connect(uri, factory).
+	{
+		Net::StreamSocket socket = factory.createSocket(address.host().toString(), address.port(), connectTimeout, true);
+		if (socketTimeout > 0)
+		{
+			socket.setSendTimeout(socketTimeout);
+			socket.setReceiveTimeout(socketTimeout);
+		}
+		return socket;
+	}
+}
+
+
 //
 // ReplicaSet
 //
@@ -479,16 +498,9 @@ Connection::Ptr ReplicaSet::createConnection(const Net::SocketAddress& address)
 	{
 		if (factory != nullptr)
 		{
-			// 2026-10-07: Pass the connect timeout to the factory and apply socket timeouts here.
-			Net::StreamSocket socket = factory->createSocket(address.host().toString(), address.port(),
-				Poco::Timespan(static_cast<long>(connectTimeoutSec), 0), true);
-			if (socketTimeoutSec > 0)
-			{
-				Poco::Timespan socketTimeout(static_cast<long>(socketTimeoutSec), 0);
-				socket.setSendTimeout(socketTimeout);
-				socket.setReceiveTimeout(socketTimeout);
-			}
-			conn->connect(socket);
+			conn->connect(createFactorySocket(*factory, address,
+				Poco::Timespan(static_cast<long>(connectTimeoutSec), 0),
+				Poco::Timespan(static_cast<long>(socketTimeoutSec), 0)));
 		}
 		else
 		{
@@ -532,15 +544,7 @@ Connection::Ptr ReplicaSet::createConnection(const Net::SocketAddress& address,
 	{
 		if (factory != nullptr)
 		{
-			// 2026-10-07: Pass the connect timeout to the factory and apply socket timeouts here.
-			Net::StreamSocket socket = factory->createSocket(address.host().toString(), address.port(),
-				connectTimeout, true);
-			if (socketTimeout > 0)
-			{
-				socket.setSendTimeout(socketTimeout);
-				socket.setReceiveTimeout(socketTimeout);
-			}
-			conn->connect(socket);
+			conn->connect(createFactorySocket(*factory, address, connectTimeout, socketTimeout));
 		}
 		else
 		{
@@ -585,16 +589,9 @@ void ReplicaSet::updateTopologyFromHello(const Net::SocketAddress& address)
 
 		if (factory != nullptr)
 		{
-			// 2026-10-07: Pass the connect timeout to the factory and apply socket timeouts here.
-			Net::StreamSocket socket = factory->createSocket(address.host().toString(), address.port(),
-				Poco::Timespan(static_cast<long>(connectTimeoutSec), 0), true);
-			if (socketTimeoutSec > 0)
-			{
-				Poco::Timespan socketTimeout(static_cast<long>(socketTimeoutSec), 0);
-				socket.setSendTimeout(socketTimeout);
-				socket.setReceiveTimeout(socketTimeout);
-			}
-			conn->connect(socket);
+			conn->connect(createFactorySocket(*factory, address,
+				Poco::Timespan(static_cast<long>(connectTimeoutSec), 0),
+				Poco::Timespan(static_cast<long>(socketTimeoutSec), 0)));
 		}
 		else
 		{

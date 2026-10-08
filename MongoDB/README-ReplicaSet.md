@@ -732,7 +732,7 @@ ReplicaSet rs(uri.toString());
 
 ### Using Custom SocketFactory with Timeout Configuration
 
-A custom SocketFactory must honor its `connectTimeout` argument, including 0 for no timeout. ReplicaSet applies the applicable positive send/receive timeout to the returned socket; the factory does not need to read `configuration()`:
+A custom SocketFactory must honor its `connectTimeout` argument, including 0 for no timeout. ReplicaSet applies the positive send/receive timeout to the returned socket; the factory does not need to read `configuration()`:
 
 ```cpp
 #include "Poco/MongoDB/ReplicaSet.h"

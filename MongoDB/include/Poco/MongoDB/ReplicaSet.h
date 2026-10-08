@@ -128,6 +128,7 @@ public:
 			/// the default SocketFactory does not support secure sockets.
 			/// Can be set via config or later using setSocketFactory().
 			/// ReplicaSet applies positive socket timeouts to the returned socket.
+			/// The factory must be thread-safe and must outlive the ReplicaSet.
 	};
 
 	explicit ReplicaSet(const Config& config);
@@ -237,8 +238,8 @@ public:
 
 	void setSocketFactory(Connection::SocketFactory* factory);
 		/// Sets the socket factory for creating SSL/TLS connections (secure=true).
-		/// The factory can access timeout configuration via configuration().connectTimeoutSeconds
-		/// and configuration().socketTimeoutSeconds.
+		/// The factory receives the connect timeout as an argument, and
+		/// ReplicaSet applies positive socket timeouts to the returned socket.
 		///
 		/// Example:
 		///   rs.setSocketFactory(&myCustomFactory);

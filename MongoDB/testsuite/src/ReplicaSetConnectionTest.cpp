@@ -1423,10 +1423,11 @@ void ReplicaSetConnectionTest::testCustomSocketFactoryFailure()
 
 void ReplicaSetConnectionTest::testCustomSocketFactoryIPv6()
 {
+#ifdef POCO_HAVE_IPv6
 	RecordingSocketFactory factory;
 	factory.fail = true;
 	ReplicaSet::Config config;
-	config.seeds.emplace_back("::1", 0);
+	config.seeds.emplace_back("::1", 27017);
 	config.enableMonitoring = false;
 	config.socketFactory = &factory;
 	config.connectTimeoutSeconds = 0;
@@ -1436,16 +1437,16 @@ void ReplicaSetConnectionTest::testCustomSocketFactoryIPv6()
 	assertEqual(1, factory.calls);
 	assertTrue(factory.secureRequested);
 	assertEqual("::1"s, factory.lastHost);
-	assertEqual(0, factory.lastPort);
+	assertEqual(27017, factory.lastPort);
 	assertEqual(Poco::Timespan().totalMicroseconds(), factory.lastConnectTimeout.totalMicroseconds());
 	assertFalse(replicaSet.hasPrimary());
 	assertTrue(replicaSet.topology().servers().front().error().find(Poco::IOException().what()) != std::string::npos);
+#endif
 }
 
 
 void ReplicaSetConnectionTest::testCustomSocketFactoryMonitoringTimeout()
 {
-	// 2026-10-07: Bound destruction while a factory socket waits for hello.
 	MongoDBTestServer server;
 	RecordingSocketFactory factory;
 	auto config = makeConfig({&server});
