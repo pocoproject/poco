@@ -177,7 +177,7 @@ void CodeWriter::handlerClass(std::ostream& ostr, const std::string& base, const
 		ostr << "\tvoid stringify(std::ostream& responseStream";
 		if (_page.getBool("page.form", true))
 		{
-			 ostr << ", [[maybe_unused]] Poco::Net::HTMLForm& form";
+			ostr << ", [[maybe_unused]] Poco::Net::HTMLForm& form";
 		}
 		ostr << ");\n";
 	}
