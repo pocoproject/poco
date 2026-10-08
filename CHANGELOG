@@ -90,6 +90,11 @@ Bug Fixes and Improvements:
   undeclarations) are no longer forwarded to the handlers. Since 1.15.4 the exception is stored
   and the parse is stopped with XML_StopParser(), so handlers received these events after their
   own exception.
+- GH #5527 Poco::Process::launch(): on POSIX platforms a standard stream closed for the child
+  (PROCESS_CLOSE_STDIN, PROCESS_CLOSE_STDOUT, PROCESS_CLOSE_STDERR, the default of ProcessRunner)
+  is attached to the null device and its descriptor no longer left free, so that the first file
+  or socket the child opens does not become its standard input, output or error. In the QNX
+  spawn() path the options no longer close the descriptors of the calling process.
 - GH #5521 Poco::Logger and Poco::FormattingChannel: a thread that logs no longer takes a mutex
   and counts no reference for every message; a channel or formatter that is replaced is released
   when no message can still be on its way to it. Logging through a shared Logger scales with the
