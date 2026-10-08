@@ -361,6 +361,13 @@ Example:
     <%@ page path="/index.html" %>
 ----
 
+!stringify
+
+If set to <[true]>, generates a public <[stringify()]> member function
+that renders the page content to an output stream.
+Defaults to <[false]>.
+See section Rendering to a Stream for details and examples.
+
 
 !!Implicit Objects
 
