@@ -1,6 +1,11 @@
 //
 // PageCompilerTest.h
 //
+// Definition of the PageCompilerTest class.
+//
+// Copyright (c) 2026, Applied Informatics Software Engineering GmbH.
+// and Contributors.
+//
 // SPDX-License-Identifier:	BSL-1.0
 //
 
@@ -23,6 +28,11 @@ public:
 	void testStringify();
 	void testStringifyNoForm();
 	void testStringifyEscape();
+	void testHandleRequest();
+	void testHandleRequestNoForm();
+	void testHandleRequestEscape();
+	void testHandleRequestBuffered();
+	void testHandleRequestCompressed();
 
 	void setUp();
 	void tearDown();

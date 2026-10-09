@@ -299,7 +299,7 @@ void CodeWriter::writeHandler(std::ostream& ostr)
 
 	if (_page.getBool("page.stringify", false))
 	{
-		ostr << "\nvoid " << _class << "::stringify(std::ostream& responseStream";
+		ostr << "\n\nvoid " << _class << "::stringify(std::ostream& responseStream";
 		if (_page.getBool("page.form", true))
 		{
 			ostr << ", [[maybe_unused]] Poco::Net::HTMLForm& form";

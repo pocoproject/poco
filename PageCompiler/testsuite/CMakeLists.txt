@@ -38,17 +38,12 @@ pagecompiler_test_page(data/test-no-form.cpsp TestHandlerNoForm)
 pagecompiler_test_page(data/test-stringify.cpsp StringifyHandler)
 pagecompiler_test_page(data/test-stringify-no-form.cpsp StringifyHandlerNoForm)
 pagecompiler_test_page(data/test-stringify-escape.cpsp StringifyEscapeHandler)
+pagecompiler_test_page(data/test-stringify-buffered.cpsp StringifyBufferedHandler)
+pagecompiler_test_page(data/test-stringify-compressed.cpsp StringifyCompressedHandler)
 
 poco_add_executable(PageCompiler-testrunner ${TEST_SRCS})
 target_include_directories(PageCompiler-testrunner PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(PageCompiler-testrunner PUBLIC Poco::Net CppUnit)
-
-# Why: exercise the PageCompiler functionality through the test runner, like [[maybe_unused]] in C++ code.
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-	target_compile_options(PageCompiler-testrunner PRIVATE
-		$<$<COMPILE_LANGUAGE:CXX>:-Wunused-parameter>
-	)
-endif()
 
 add_test(
 	NAME PageCompiler
