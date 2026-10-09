@@ -26,3 +26,8 @@ install(
 	BUNDLE DESTINATION ${CMAKE_INSTALL_BINDIR}
 	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
+
+
+if(ENABLE_TESTS)
+	add_subdirectory(testsuite)
+endif()
