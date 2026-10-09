@@ -329,7 +329,7 @@ void WebSocketImpl::setMaxPayloadSize(int maxPayloadSize)
 
 void WebSocketImpl::setAllowedRSVBits(int allowedRSV)
 {
-	_allowedRSV = static_cast<int>(allowedRSV & (WebSocket::FRAME_FLAG_RSV1 | WebSocket::FRAME_FLAG_RSV2 | WebSocket::FRAME_FLAG_RSV3));
+	_allowedRSV = allowedRSV & (WebSocket::FRAME_FLAG_RSV1 | WebSocket::FRAME_FLAG_RSV2 | WebSocket::FRAME_FLAG_RSV3);
 }
 
 

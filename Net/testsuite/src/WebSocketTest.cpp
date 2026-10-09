@@ -129,7 +129,7 @@ namespace
 		Poco::Event upgraded;
 		Poco::Event done;
 		std::atomic<int> received{-1};
-		std::atomic<int> flags{0};
+		std::atomic<int> flags{-1};
 		std::atomic<int> errorCode{0};
 			/// The code of the WebSocketException caught by the reader,
 			/// or 0 if no exception was thrown.
@@ -408,17 +408,9 @@ void WebSocketTest::testPeerCloseAfterPartialHeaderNB()
 }
 
 
-void WebSocketTest::peerCloseAfterPartialHeader(bool blocking)
+Poco::Net::StreamSocket WebSocketTest::connectWebSocket(const Poco::Net::SocketAddress& addr)
 {
-	SingleFrameState::Ptr pState = new SingleFrameState;
-	pState->blocking = blocking;
-	Poco::Net::ServerSocket ss(0);
-	Poco::Net::HTTPServer server(new SingleFrameRequestHandlerFactory(pState), ss, new Poco::Net::HTTPServerParams);
-	server.start();
-
-	// The handshake is done by hand so that the frame following it can be
-	// sent in pieces.
-	HTTPClientSession cs("127.0.0.1", ss.address().port());
+	HTTPClientSession cs(addr.host().toString(), addr.port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
 	request.set("Connection", "Upgrade");
 	request.set("Upgrade", "websocket");
@@ -429,7 +421,21 @@ void WebSocketTest::peerCloseAfterPartialHeader(bool blocking)
 	HTTPResponse response;
 	cs.receiveResponse(response);
 	assertTrue (response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS);
-	Poco::Net::StreamSocket ws = cs.detachSocket();
+	return cs.detachSocket();
+}
+
+
+void WebSocketTest::peerCloseAfterPartialHeader(bool blocking)
+{
+	SingleFrameState::Ptr pState = new SingleFrameState;
+	pState->blocking = blocking;
+	Poco::Net::ServerSocket ss(0);
+	Poco::Net::HTTPServer server(new SingleFrameRequestHandlerFactory(pState), ss, new Poco::Net::HTTPServerParams);
+	server.start();
+
+	// The handshake is done by hand so that the frame following it can be
+	// sent in pieces.
+	Poco::Net::StreamSocket ws = connectWebSocket(ss.address());
 	assertTrue (pState->upgraded.tryWait(10000));
 
 	// The first two bytes of a masked text frame carrying four bytes of
@@ -540,18 +546,7 @@ int WebSocketTest::sendServerFrame(const std::string& frameBytes, int allowedRSV
 	Poco::Net::HTTPServer server(new SingleFrameRequestHandlerFactory(pState), ss, new Poco::Net::HTTPServerParams);
 	server.start();
 
-	HTTPClientSession cs("127.0.0.1", ss.address().port());
-	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
-	request.set("Upgrade", "websocket");
-	request.set("Connection", "Upgrade");
-	request.set("Sec-WebSocket-Version", WebSocket::WEBSOCKET_VERSION);
-	request.set("Sec-WebSocket-Key", "dGhlIHNhbXBsZSBub25jZQ==");
-	cs.setKeepAlive(true);
-	cs.sendRequest(request);
-	HTTPResponse response;
-	cs.receiveResponse(response);
-	assertTrue (response.getStatus() == HTTPResponse::HTTP_SWITCHING_PROTOCOLS);
-	Poco::Net::StreamSocket sock = cs.detachSocket();
+	Poco::Net::StreamSocket sock = connectWebSocket(ss.address());
 	assertTrue (pState->upgraded.tryWait(10000));
 
 	sock.sendBytes(frameBytes.data(), static_cast<int>(frameBytes.size()));
@@ -597,7 +592,7 @@ void WebSocketTest::testMalformedFrameRSV3Default()
 }
 
 
-void WebSocketTest::testMalformedFrameAllowedRSV1()
+void WebSocketTest::testAllowedRSV1Accepted()
 {
 	const std::string rsv1Frame = "\xC1\x81\x01\x02\x03\x04\x40";
 	int flags = 0;
@@ -637,7 +632,7 @@ void WebSocketTest::testMalformedFrameFragmentedControlPing()
 }
 
 
-void WebSocketTest::testMalformedFrameControlPing125Accepted()
+void WebSocketTest::testControlPing125Accepted()
 {
 	std::string ping125;
 	ping125.push_back('\x89');
@@ -648,6 +643,42 @@ void WebSocketTest::testMalformedFrameControlPing125Accepted()
 	int err = sendServerFrame(ping125, 0, 256, nullptr, &received);
 	assertEqual (0, err);
 	assertEqual (125, received);
+}
+
+
+void WebSocketTest::testControlPongEmptyAccepted()
+{
+	const std::string pongEmpty = "\x8A\x80\x01\x02\x03\x04";
+	int flags = 0;
+	int received = -1;
+	int err = sendServerFrame(pongEmpty, 0, 256, &flags, &received);
+	assertEqual (0, err);
+	assertEqual (0, received);
+	assertEqual (static_cast<int>(WebSocket::FRAME_FLAG_FIN) | static_cast<int>(WebSocket::FRAME_OP_PONG), flags);
+}
+
+
+void WebSocketTest::testTextWithoutFINAccepted()
+{
+	const std::string textNoFin = "\x01\x81\x01\x02\x03\x04\x40";
+	int flags = 0;
+	int received = -1;
+	int err = sendServerFrame(textNoFin, 0, 256, &flags, &received);
+	assertEqual (0, err);
+	assertEqual (1, received);
+	assertEqual (static_cast<int>(WebSocket::FRAME_OP_TEXT), flags);
+}
+
+
+void WebSocketTest::testContinuationFrameAccepted()
+{
+	const std::string contFrame = "\x80\x81\x01\x02\x03\x04\x40";
+	int flags = 0;
+	int received = -1;
+	int err = sendServerFrame(contFrame, 0, 256, &flags, &received);
+	assertEqual (0, err);
+	assertEqual (1, received);
+	assertEqual (static_cast<int>(WebSocket::FRAME_FLAG_FIN) | static_cast<int>(WebSocket::FRAME_OP_CONT), flags);
 }
 
 
@@ -686,7 +717,7 @@ void WebSocketTest::testMalformedFrameClientRejectsMaskedServerFrame()
 	class MaskedFrameRequestHandler: public Poco::Net::HTTPRequestHandler
 	{
 	public:
-		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response)
+		void handleRequest(HTTPServerRequest& request, HTTPServerResponse& response) override
 		{
 			try
 			{
@@ -715,7 +746,7 @@ void WebSocketTest::testMalformedFrameClientRejectsMaskedServerFrame()
 	class MaskedFrameRequestHandlerFactory: public Poco::Net::HTTPRequestHandlerFactory
 	{
 	public:
-		Poco::Net::HTTPRequestHandler* createRequestHandler(const HTTPServerRequest&)
+		Poco::Net::HTTPRequestHandler* createRequestHandler(const HTTPServerRequest&) override
 		{
 			return new MaskedFrameRequestHandler;
 		}
@@ -769,12 +800,15 @@ CppUnit::Test* WebSocketTest::suite()
 	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameRSV1Default);
 	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameRSV2Default);
 	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameRSV3Default);
-	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameAllowedRSV1);
+	CppUnit_addTest(pSuite, WebSocketTest, testAllowedRSV1Accepted);
 	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameAllowedRSV1RejectRSV2);
 	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameReservedOpcode03);
 	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameReservedControlOpcode0B);
 	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameFragmentedControlPing);
-	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameControlPing125Accepted);
+	CppUnit_addTest(pSuite, WebSocketTest, testControlPing125Accepted);
+	CppUnit_addTest(pSuite, WebSocketTest, testControlPongEmptyAccepted);
+	CppUnit_addTest(pSuite, WebSocketTest, testTextWithoutFINAccepted);
+	CppUnit_addTest(pSuite, WebSocketTest, testContinuationFrameAccepted);
 	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameControlPing126Rejected);
 	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameControlPing127Rejected);
 	CppUnit_addTest(pSuite, WebSocketTest, testMalformedFrameClientRejectsMaskedServerFrame);

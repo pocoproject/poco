@@ -401,7 +401,8 @@ public:
 	void setAllowedRSVBits(int allowedRSV);
 		/// Sets the RSV bits (FRAME_FLAG_RSV1, FRAME_FLAG_RSV2,
 		/// FRAME_FLAG_RSV3) that receiveFrame() accepts on received
-		/// frames.
+		/// frames. Bits other than FRAME_FLAG_RSV1 to FRAME_FLAG_RSV3
+		/// are ignored.
 		///
 		/// This is for applications that negotiate WebSocket extensions
 		/// themselves (for example permessage-deflate) and use the
