@@ -399,6 +399,7 @@ Only available with the POCO Open Service Platform, and if the
 <[session]> page attribute has been specified. May be null if
 the <[createSession]> attribute is false and no session exists.
 
+
 !!!Rendering to a Stream
 
 Set <[stringify]> to <[true]> to generate a public <[stringify()]> member
