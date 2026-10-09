@@ -43,7 +43,7 @@ poco_add_executable(PageCompiler-testrunner ${TEST_SRCS})
 target_include_directories(PageCompiler-testrunner PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(PageCompiler-testrunner PUBLIC Poco::Net CppUnit)
 
-# Why: exercite the PageCompiler functionality through the test runner, like [[maybe_unused]] in C++ code.
+# Why: exercise the PageCompiler functionality through the test runner, like [[maybe_unused]] in C++ code.
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 	target_compile_options(PageCompiler-testrunner PRIVATE
 		$<$<COMPILE_LANGUAGE:CXX>:-Wunused-parameter>

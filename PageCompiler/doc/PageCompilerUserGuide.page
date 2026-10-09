@@ -435,7 +435,6 @@ remain in <[handleRequest()]> and are not executed by <[stringify()]>.
 The <[escape]> option applies to stream rendering as usual.
 
 
-
 !!!Invoking the Page Compiler
 
 The Page Compiler is invoked from the command line. The file names of the
