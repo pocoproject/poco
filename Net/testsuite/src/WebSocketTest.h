@@ -15,6 +15,8 @@
 
 
 #include "Poco/Net/Net.h"
+#include "Poco/Net/StreamSocket.h"
+#include "Poco/Net/SocketAddress.h"
 #include "CppUnit/TestCase.h"
 
 
@@ -30,6 +32,22 @@ public:
 	void testWebSocketNB();
 	void testPeerCloseAfterPartialHeader();
 	void testPeerCloseAfterPartialHeaderNB();
+	void testMalformedFrameUnmaskedClient();
+	void testMalformedFrameRSV1Default();
+	void testMalformedFrameRSV2Default();
+	void testMalformedFrameRSV3Default();
+	void testAllowedRSV1Accepted();
+	void testMalformedFrameAllowedRSV1RejectRSV2();
+	void testMalformedFrameReservedOpcode03();
+	void testMalformedFrameReservedControlOpcode0B();
+	void testMalformedFrameFragmentedControlPing();
+	void testControlPing125Accepted();
+	void testControlPongEmptyAccepted();
+	void testTextWithoutFINAccepted();
+	void testContinuationFrameAccepted();
+	void testMalformedFrameControlPing126Rejected();
+	void testMalformedFrameControlPing127Rejected();
+	void testMalformedFrameClientRejectsMaskedServerFrame();
 
 	void setUp();
 	void tearDown();
@@ -39,6 +57,8 @@ public:
 private:
 	void testOneLargeFrame(int msgSize);
 	void peerCloseAfterPartialHeader(bool blocking);
+	Poco::Net::StreamSocket connectWebSocket(const Poco::Net::SocketAddress& addr);
+	int sendServerFrame(const std::string& frameBytes, int allowedRSV = 0, int bufferSize = 256, int* pFlags = nullptr, int* pReceived = nullptr);
 };
 
 

@@ -103,6 +103,22 @@ public:
 		///
 		/// The default is std::numeric_limits<int>::max().
 
+	void setAllowedRSVBits(int allowedRSV);
+		/// Sets the RSV bits (FRAME_FLAG_RSV1, FRAME_FLAG_RSV2,
+		/// FRAME_FLAG_RSV3) that receiveFrame() accepts on received
+		/// frames.
+		///
+		/// This is for applications that negotiate WebSocket extensions
+		/// themselves (for example permessage-deflate) and use the
+		/// corresponding RSV bits on both peers.
+		///
+		/// The default is 0: all RSV bits are rejected.
+
+	[[nodiscard]] int getAllowedRSVBits() const;
+		/// Returns the RSV bits that receiveFrame() accepts.
+		///
+		/// The default is 0: all RSV bits are rejected.
+
 protected:
 	enum
 	{
@@ -155,6 +171,7 @@ private:
 	Poco::Buffer<char> _buffer;
 	int _bufferOffset;
 	bool _mustMaskPayload;
+	int _allowedRSV;
 	bool _peerClosed;
 		/// Set once a receive on the underlying socket has reported the end
 		/// of the connection.
@@ -176,6 +193,12 @@ inline int WebSocketImpl::frameFlags() const
 inline bool WebSocketImpl::mustMaskPayload() const
 {
 	return _mustMaskPayload;
+}
+
+
+inline int WebSocketImpl::getAllowedRSVBits() const
+{
+	return _allowedRSV;
 }
 
 
