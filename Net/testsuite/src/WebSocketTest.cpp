@@ -410,7 +410,7 @@ void WebSocketTest::testPeerCloseAfterPartialHeaderNB()
 
 Poco::Net::StreamSocket WebSocketTest::connectWebSocket(const Poco::Net::SocketAddress& addr)
 {
-	HTTPClientSession cs(addr.host().toString(), addr.port());
+	HTTPClientSession cs("127.0.0.1", addr.port());
 	HTTPRequest request(HTTPRequest::HTTP_GET, "/ws", HTTPRequest::HTTP_1_1);
 	request.set("Connection", "Upgrade");
 	request.set("Upgrade", "websocket");
