@@ -48,6 +48,9 @@ Context::Params::Params(KeyDHGroup dhBits):
 	cipherList("ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"),
 	dhGroup(dhBits),
 	securityLevel(SECURITY_LEVEL_NONE)
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	,libctx(0)
+#endif
 {
 }
 
@@ -113,6 +116,36 @@ Context::Context(
 }
 
 
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+
+Context::Context(
+	Usage usage,
+	OSSL_LIB_CTX *libctx,
+	const std::string &provider,
+	VerificationMode verificationMode,
+	int verificationDepth,
+	bool loadDefaultCAs,
+	const std::string &cipherList ) :
+	_usage( usage ),
+	_mode( verificationMode ),
+	_pSSLContext( 0 ),
+	_extendedCertificateVerification( true ),
+	_ocspStaplingResponseVerification( false )
+{
+	Params params;
+	params.providerName = provider;
+	params.libctx = libctx;
+	params.verificationMode = verificationMode;
+	params.verificationDepth = verificationDepth;
+	params.loadDefaultCAs = loadDefaultCAs;
+	params.cipherList = cipherList;
+
+	init( params );
+}
+
+#endif
+
+
 Context::~Context()
 {
 	try
@@ -131,7 +164,7 @@ void Context::init(const Params& params)
 {
 	Poco::Crypto::OpenSSLInitializer::initialize();
 
-	createSSLContext();
+	createSSLContext( params );
 
 	try
 	{
@@ -562,8 +595,20 @@ void Context::setInvalidCertificateHandler(InvalidCertificateHandlerPtr pInvalid
 	_pInvalidCertificateHandler = pInvalidCertificateHandler;
 }
 
+void Context::initContext(const Params& params, const SSL_METHOD *method) {
+#if POCO_OPENSSL_VERSION_PREREQ(3, 0, 0)
+	if ( nullptr != params.libctx ) {
+		_pSSLContext = SSL_CTX_new_ex( params.libctx, params.providerName.empty() ? nullptr : params.providerName.c_str(), method );
+	}
+	else {
+		_pSSLContext = SSL_CTX_new( method );
+	}
+#else
+	_pSSLContext = SSL_CTX_new( method );
+#endif
+}
 
-void Context::createSSLContext()
+void Context::createSSLContext( const Params &params )
 {
 	int minTLSVersion = 0;
 
@@ -571,54 +616,54 @@ void Context::createSSLContext()
 	{
 	case CLIENT_USE:
 	case TLS_CLIENT_USE:
-		_pSSLContext = SSL_CTX_new(TLS_client_method());
+		initContext(params, TLS_client_method());
 		minTLSVersion = TLS1_VERSION;
 		break;
 
 	case SERVER_USE:
 	case TLS_SERVER_USE:
-		_pSSLContext = SSL_CTX_new(TLS_server_method());
+		initContext(params, TLS_server_method());
 		minTLSVersion = TLS1_VERSION;
 		break;
 
 	case TLSV1_CLIENT_USE:
-		_pSSLContext = SSL_CTX_new(TLS_client_method());
+		initContext(params, TLS_client_method());
 		minTLSVersion = TLS1_VERSION;
 		break;
 
 	case TLSV1_SERVER_USE:
-		_pSSLContext = SSL_CTX_new(TLS_server_method());
+		initContext(params, TLS_server_method());
 		minTLSVersion = TLS1_VERSION;
 		break;
 
 #if !defined(OPENSSL_NO_TLS1)
 	case TLSV1_1_CLIENT_USE:
-		_pSSLContext = SSL_CTX_new(TLS_client_method());
+		initContext(params, TLS_client_method());
 		minTLSVersion = TLS1_1_VERSION;
 		break;
 
 	case TLSV1_1_SERVER_USE:
-		_pSSLContext = SSL_CTX_new(TLS_server_method());
+		initContext(params, TLS_server_method());
 		minTLSVersion = TLS1_1_VERSION;
 		break;
 
 	case TLSV1_2_CLIENT_USE:
-		_pSSLContext = SSL_CTX_new(TLS_client_method());
+		initContext(params, TLS_client_method());
 		minTLSVersion = TLS1_2_VERSION;
 		break;
 
 	case TLSV1_2_SERVER_USE:
-		_pSSLContext = SSL_CTX_new(TLS_server_method());
+		initContext(params, TLS_server_method());
 		minTLSVersion = TLS1_2_VERSION;
 		break;
 
 	case TLSV1_3_CLIENT_USE:
-		_pSSLContext = SSL_CTX_new(TLS_client_method());
+		initContext(params, TLS_client_method());
 		minTLSVersion = TLS1_3_VERSION;
 		break;
 
 	case TLSV1_3_SERVER_USE:
-		_pSSLContext = SSL_CTX_new(TLS_server_method());
+		initContext(params, TLS_server_method());
 		minTLSVersion = TLS1_3_VERSION;
 		break;
 #endif
